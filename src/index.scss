@@ -1,0 +1,42 @@
+@import url(stories/stories.scss);
+
+$fontFamily: Helvetica;
+$primaryDarkColor: #1F3625;
+$primaryLightColor: #9AA59D;
+$secondaryDarkColor: #9BC53D;
+$secondaryLightColor: #CDE29E;
+$tertiaryDarkColor: #573D1C;
+$tertiaryLightColor: #AB9E8D;
+$appBackground: #f5f5fa;
+
+@media (max-width: 1000px) {
+  .container {
+    width: 1000px !important;
+  }
+}
+
+@media (max-width: 1375px) {
+  .minWidthDiv {
+    min-width: 45px
+  }
+}
+
+@media (min-width: 1376px) {
+  .minWidthDiv {
+    min-width: 70px
+  }
+}
+
+body {
+  font-family: $fontFamily !important;
+  font-weight: 700;
+  font-style: normal;
+  font-stretch: normal;
+  -webkit-font-smoothing: antialiased;
+  min-height: 100%;
+  min-width: 1024px;
+  background: $appBackground !important;
+  height: 100%;
+  font-size: 12px;
+  overflow-x: hidden;
+}
