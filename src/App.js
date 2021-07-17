@@ -1,6 +1,7 @@
 // import logo from "./logo.svg";
 import "./App.css";
 import Button from "./stories/buttons/Button";
+import Paginate from "./stories/Chips/Paginate";
 
 function hello() {
   alert("clicked");
