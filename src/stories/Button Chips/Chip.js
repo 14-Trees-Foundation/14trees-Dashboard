@@ -2,9 +2,6 @@ import React from "react";
 import PropTypes from "prop-types";
 import "./Chip.scss";
 
-/**
- * Primary UI component for user interaction
- */
 export const Chip = ({ mode, backgroundColor, label, ...props }) => {
   return (
     <button
