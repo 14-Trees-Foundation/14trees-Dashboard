@@ -1,0 +1,48 @@
+.nav {
+  position: absolute;
+  left: 0%;
+  right: 0%;
+  top: 0%;
+  bottom: 0%;
+
+  background: #1f3625;
+}
+ul {
+  margin: 0;
+  padding: 0;
+  list-style-type: none;
+  position: absolute;
+  left: 40%;
+  // right: 36.56%;
+  // top: 40.83%;
+  // bottom: 40.83%;
+
+  /* Heading 7 */
+
+  font-family: Helvetica Now Display;
+  font-style: normal;
+  font-weight: 500;
+  font-size: 20px;
+  line-height: 130%;
+  /* or 26px */
+
+  display: flex;
+  align-items: center;
+  text-align: center;
+
+  float: left;
+}
+li {
+  float: right;
+}
+a {
+  display: block;
+  padding: 49px 50px;
+  color: #fff;
+  text-decoration: none;
+}
+
+#btn {
+  color: #fff;
+  border-radius: 10px;
+}
