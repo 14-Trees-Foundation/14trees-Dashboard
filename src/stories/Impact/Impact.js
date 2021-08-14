@@ -3,29 +3,31 @@ import PropTypes from "prop-types";
 import { Card } from "primereact/card";
 import "./Impact.scss";
 
-const header = <h1 className="headerTxt">190</h1>;
+const header = (text) => (
+  <h1 className="header-text">
+    {text}
+  </h1>
+);
 
-const footer = (
-  <p className="footertxt">
-    Ponds created systematically to increase the water table
+const footer = (text) => (
+  <p className="footer-text">
+    {text}
   </p>
 );
 
-export const Impact = ({ mode, ...props }) => {
+export const Impact = ({ mainText, footText, ...props }) => {
   return (
     <Card
-      className={[`box--${mode}`]}
-      header={header}
-      footer={footer}
+      className={[`box`]}
+      header={header(`${mainText}`)}
+      footer={footer(`${footText}`)}
       {...props}
     ></Card>
   );
 };
 
-Impact.propTypes = {
-  mode: PropTypes.oneOf(["active", "normal"]),
-};
 Impact.defaultProps = {
-  mode: "normal",
+  mainText: "190",
+  footText: "Some text to be shown as footer"
 };
 export default Impact;

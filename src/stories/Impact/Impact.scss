@@ -1,63 +1,33 @@
-.box--active {
-  position: absolute;
-  width: 214px;
-  height: 185px;
-  //   left: 980px;
-  //   top: 220px;
-
+.box {
+  display: inline-block;
+  min-width: 214px;
+  min-height: 185px;
   background: #ffffff;
   border-radius: 16px;
 }
-.box--active:hover {
+.box:hover {
   box-shadow: 7px 7px 7px 7px #ecebeb;
 }
 
-.box--normal {
-  position: absolute;
-  width: 214px;
-  height: 185px;
-  //   left: 980px;
-  //   top: 220px;
-
-  background: #ffffff;
-  border-radius: 16px;
-}
-.box--normal:hover {
-  box-shadow: 7px 7px 7px 7px #ecebeb;
-}
-.headerTxt {
-  position: absolute;
-  width: 100px;
-  height: 88px;
-  //   left: 1037px;
-  //   top: 243px;
-
-  font-family: Helvetica Now Display;
+.header-text {
+  font-family: Helvetica, Arial, sans-serif;
   font-style: normal;
-  font-weight: bold;
+  font-weight: 600;
   font-size: 60px;
-  line-height: 88px;
-  text-align: center;
   color: #9bc53d;
-  margin: 23px 57px 74px 57px;
+  margin-left: 25%;
+  margin-bottom: -5%;
 }
-.footertxt {
-  position: absolute;
-  width: 149px;
-  height: 54px;
-  //left: 1012px;
-  //   top: 327px;
-  // left: 27px;
-  // top: 100px;
-  font-family: Lato;
+.footer-text {
+  word-wrap: break-word;
+  font-family: Helvetica, Arial, sans-serif;
+  text-align: center;
   font-style: normal;
   font-weight: normal;
   font-size: 14px;
-  line-height: 129%;
-  /* or 18px */
-
   text-align: center;
-
   color: #1f3625;
-  margin: 107px 33px 24px 32px;
+  margin-bottom: 25%;
+  margin-left: 5%;
+  margin-right: 5%;
 }
