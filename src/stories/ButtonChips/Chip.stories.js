@@ -14,5 +14,5 @@ const Template = (args) => <Chip {...args} />;
 
 export const Primary = Template.bind({});
 Primary.args = {
-  label: "Button",
+  label: "Organization (20)",
 };

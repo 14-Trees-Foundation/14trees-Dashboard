@@ -6,7 +6,7 @@ export const Chip = ({ mode, backgroundColor, label, ...props }) => {
   return (
     <button
       type="button"
-      className={["button-chip", `button-chip--${mode}`].join(" ")}
+      className={["button-chip", `button-chip-${mode}`].join(" ")}
       style={backgroundColor && { backgroundColor }}
       {...props}
     >
