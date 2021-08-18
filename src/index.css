@@ -1,23 +1,13 @@
-@media (max-width: 1000px) {
-  .container {
-    width: 1000px !important; } }
-@media (max-width: 1375px) {
-  .minWidthDiv {
-    min-width: 45px; } }
-@media (min-width: 1376px) {
-  .minWidthDiv {
-    min-width: 70px; } }
 body {
-  font-family: Helvetica !important;
+  font-family: Helvetica;
   font-weight: 700;
   font-style: normal;
   font-stretch: normal;
   -webkit-font-smoothing: antialiased;
   min-height: 100%;
-  min-width: 1024px;
-  background: #f5f5fa !important;
   height: 100%;
   font-size: 12px;
-  overflow-x: hidden; }
+  margin: auto;
+}
 
 /*# sourceMappingURL=index.css.map */
