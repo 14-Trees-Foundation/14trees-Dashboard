@@ -1,16 +1,15 @@
 import "./App.css";
-import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
-import { Navbar } from "./stories/Navbar/Navbar";
+import { Switch, Route } from "react-router-dom";
+import { Profile } from "./pages/profile/Profile"
+import { Layout } from "./stories/Layout/Layout";
 
 function App() {
   return (
-      <Router>
-        <Navbar />
-        {/* <Switch> */}
-          {/* <Route path="/" exact component={} />
-          <Route path="/about" component={} /> */}
-        {/* </Switch> */}
-      </Router>
+      <Layout>
+        <Switch>
+          <Route path="/profile/:saplingId" component={Profile} exact></Route>
+        </Switch>
+      </Layout>
   );
 }
 
