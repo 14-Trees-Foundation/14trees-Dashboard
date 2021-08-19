@@ -1,6 +1,6 @@
 import { useParams } from "react-router";
 import { Impact } from "../../../stories/Impact/Impact";
-import { Bar } from "../../../stories/Progress Bar/Bar";
+import { Bar } from "../../../stories/ProgressBar/Bar";
 import './overall.scss';
 import 'primeflex/primeflex.css';
 
