@@ -1,4 +1,4 @@
-import "./App.css";
+import "./App.scss";
 import { Switch, Route } from "react-router-dom";
 import { Profile } from "./pages/profile/Profile"
 import { Layout } from "./stories/Layout/Layout";

@@ -1,0 +1,45 @@
+.bar{
+  &:hover .count{
+    font-size: 42px;
+  }
+  .count {
+    position: absolute;
+    font-family: Helvetica, Arial, sans-serif;
+    font-style: normal;
+    font-weight: bold;
+    font-size: 40px;
+    line-height: 59px;
+    color: #9bc53d;
+  }
+}
+
+.progress {
+  margin-top: 100px;
+}
+
+progress[value] {
+  width: 100%;
+  -webkit-appearance: none;
+  appearance: none;
+}
+progress[value]::-webkit-progress-bar {
+  height: 10px;
+  background-color: #e0e3d7;
+  border-radius: 10px;
+}
+
+progress[value]::-webkit-progress-value {
+  height: 10px;
+  background-color: #9bc53d;
+  border-radius: 10px;
+}
+
+.heading {
+  position: absolute;
+  font-family: Helvetica, Arial, sans-serif;
+  font-style: normal;
+  font-weight: normal;
+  font-size: 13px;
+  color: #1f3625;
+  margin-top: 2rem;
+}

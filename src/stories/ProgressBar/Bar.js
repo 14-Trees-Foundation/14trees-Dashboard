@@ -6,10 +6,10 @@ const Setvalue = (20560 / 100000) * 100;
 
 export const Bar = ({ value, max, ...props }) => {
   return (
-    <div>
+    <div className="bar">
       <h1 className="heading">Trees planted till date,</h1>
       <p className="count">20,560/100,000</p>
-      <progress value={Setvalue} max={max} className="bar" {...props} />
+      <progress value={Setvalue} max={max} className="progress" {...props} />
     </div>
   );
 };

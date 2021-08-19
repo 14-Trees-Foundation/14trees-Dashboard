@@ -35,6 +35,14 @@
   padding-top: 15px;
   background-color: var(--surface-a);
   border: 1px solid var(--surface-d);
+  @media (max-width: 540px) {
+    margin-left: 10px;
+    margin-top: 50px
+  }
+  @media (max-width: 760px) {
+    margin-left: 20px;
+    margin-top: 50px
+  }
 }
 
 @keyframes App-logo-spin {
