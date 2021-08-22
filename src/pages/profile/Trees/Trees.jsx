@@ -4,6 +4,7 @@ import './trees.scss'
 import 'primeflex/primeflex.css';
 
 export const Trees = (props) => {
+    let numTrees = props.trees.length
     return (
         <div className="trees">
             {/* <h2>Trees Planted</h2> */}
@@ -14,10 +15,30 @@ export const Trees = (props) => {
                             <h2 style={{"margin":"0 0 5px 0"}}>Trees Planted</h2>
                         </div>
                         <div className="p-col-6 p-lg-6 p-md-6" style={{"padding":0}}>
-                            <TreesPlanted />
+                            {
+                                numTrees > 0
+                                ?
+                                    <TreesPlanted
+                                        id={props.trees[0].sapling_id}
+                                        name={props.trees[0].name}
+                                        img={props.trees[0].image}
+                                        date={props.trees[0].date_added}/>
+                                :
+                                    <TreesPlanted/>
+                            }
                         </div>
                         <div className="p-col-6 p-lg-6 p-md-6" style={{"padding":0}}>
-                            <TreesPlanted/>
+                            {
+                                numTrees > 1
+                                ?
+                                    <TreesPlanted
+                                        id={props.trees[1].sapling_id}
+                                        name={props.trees[1].name}
+                                        img={props.trees[1].image}
+                                        date={props.trees[1].date_added}/>
+                                :
+                                    <TreesPlanted/>
+                            }
                         </div>
                     </div>
                 </div>

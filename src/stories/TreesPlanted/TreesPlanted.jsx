@@ -1,42 +1,57 @@
 import React from "react";
 import PropTypes from "prop-types";
 import { Card } from "primereact/card";
+import tree from '../../assets/sample.png';
 import "./treesplanted.scss";
 
-const header = (
-  <img alt="Card" src="https://picsum.photos/536/354" className="img"/>
-);
+const header = (img) => {
+  if(img === "") {
+     return <img alt="Card" src={tree} className="img"/>
+  } else {
+    return <img alt="Card" src={img} className="img"/>
+  }
+};
 
-const footer = (
-  <div>
-    <p className="title">Tree Name</p>
-    <p className="info">
-      Sapling ID : #12890100
-      <br />
-      Date : 29/04/2021
-      <br />
-      Event : Independant Visit
-    </p>
-  </div>
-);
-export const TreesPlanted = ({ mode, ...props }) => {
+const footer = (id, name, date) => {
+  date = date !== undefined ? date.slice(0,10) : "";
+  name = name !== undefined ? name : "Tree Name";
+    return (
+      <div>
+        <p className="title">{name}</p>
+        <p className="info">
+          Sapling ID : {id}
+          <br />
+          Date : {date}
+          <br />
+          Event : Independant Visit
+        </p>
+      </div>
+  )
+};
+export const TreesPlanted = ({ mode, id, name, img, date, ...props }) => {
+
   return (
     <Card
       className={[`box-${mode}`]}
-      header={header}
+      header={header(img)}
       {...props}
     >
-      {footer}
+      {footer(id, name, date)}
     </Card>
   );
 };
 
 TreesPlanted.propTypes = {
   mode: PropTypes.oneOf(["primary", "secondary"]),
+  id: PropTypes.string,
+  name: PropTypes.string,
+  img: PropTypes.string,
+  date: PropTypes.string
 };
 
 TreesPlanted.defaultProps = {
   mode: "secondary",
+  img: ""
 };
 
 export default TreesPlanted;

@@ -1,6 +1,5 @@
 import React from 'react'
 import 'primeflex/primeflex.css';
-import tree from "../../assets/14trees.jpeg";
 import notfound from "../../assets/user.png";
 import "./notfound.scss"
 

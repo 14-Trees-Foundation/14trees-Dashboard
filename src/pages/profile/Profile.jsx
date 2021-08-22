@@ -38,9 +38,10 @@ export const Profile = () => {
     return (
         <div className="main-content">
             {
-                Object.keys(saplingData).length === 0 ?
+                Object.keys(saplingData).length === 0
+                ?
                     <NotFound/>
-                    :
+                :
                     <div className="p-grid" style={{"marginTop":"15px"}}>
                         <div className="p-col-12 p-md-6 p-sm-12">
                             <UserInfo saplingData={saplingData}/>
