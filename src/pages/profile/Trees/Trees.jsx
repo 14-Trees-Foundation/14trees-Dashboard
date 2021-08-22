@@ -1,11 +1,9 @@
-import { useParams } from "react-router";
 import { Memories } from "./Memories/Memories";
 import { TreesPlanted } from '../../../stories/TreesPlanted/TreesPlanted';
 import './trees.scss'
 import 'primeflex/primeflex.css';
 
-export const Trees = () => {
-    const { saplingId } = useParams();
+export const Trees = (props) => {
     return (
         <div className="trees">
             {/* <h2>Trees Planted</h2> */}
@@ -16,7 +14,7 @@ export const Trees = () => {
                             <h2 style={{"margin":"0 0 5px 0"}}>Trees Planted</h2>
                         </div>
                         <div className="p-col-6 p-lg-6 p-md-6" style={{"padding":0}}>
-                            <TreesPlanted/>
+                            <TreesPlanted />
                         </div>
                         <div className="p-col-6 p-lg-6 p-md-6" style={{"padding":0}}>
                             <TreesPlanted/>

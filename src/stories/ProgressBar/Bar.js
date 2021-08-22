@@ -20,8 +20,8 @@ Bar.propTypes = {
 };
 
 Bar.defaultProps = {
-  max: "100",
-  value: "80"
+  max: 100,
+  value: 80
 };
 
 export default Bar;

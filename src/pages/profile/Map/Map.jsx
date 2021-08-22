@@ -69,9 +69,7 @@ export const Map = () => {
         setMap(null)
       }, []);
 
-      const polyLoad = polygon => {
-        console.log("polygon: ", polygon);
-      }
+      const polyLoad = polygon => {};
 
       return isLoaded ? (
           <div className="map">

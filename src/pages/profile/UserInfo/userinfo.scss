@@ -1,3 +1,61 @@
 .user{
-    min-height: 40vh;
+    min-height: 44vh;
+    height: 300px;
+    margin-top: 5%;
+    .img{
+        height: 300px;
+        width: 240px;
+        margin: 10px 0 0 10px;
+    }
+    .desc{
+        margin-top: 5%;
+        height: 300px;
+        .overall{
+            display: flex;
+            background-color: #1F3625;
+            margin-top: 2%;
+            color: #ffffff;
+            font-weight: 400;
+            height: 18%;
+            border-radius: 10px;
+            .done{
+                font-weight: 550;
+                font-size: 25px;
+                background-color: #9BC53D;
+                border-radius: 10px;
+                align-items: center;
+            }
+            .count{
+                font-weight: 500;
+                position: absolute;
+                margin-left: 1em;
+                margin-top: 0.25em;
+                font-size: 30px;
+            }
+            .label{
+                margin-top: 0.4em;
+                font-size: 11px;
+                text-align: center;
+                padding-top: 8px;
+            }
+        }
+    }
+}
+
+@media (max-width: 560px) {
+    .user{
+        .desc{
+            margin-top: 2%;
+        }
+    }
+}
+
+.label{
+    font-weight: 300;
+    font-size: 16px;
+}
+.data{
+    font-weight: 500;
+    font-size: 24px;
+    margin-bottom: 3%;
 }

@@ -1,3 +1,15 @@
 .overall{
     width: 90%;
 }
+
+@media (min-width: 880px) {
+    .overall{
+        margin-top: 5%;
+    }
+}
+
+@media (max-width: 540px) {
+    .overall{
+        margin-top: 5px;;
+    }
+}
