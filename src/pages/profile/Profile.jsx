@@ -4,6 +4,7 @@ import * as Axios from "../../api/local";
 import './profile.scss'
 
 import { useEffect, useState } from "react";
+import { NotFound } from '../notfound/NotFound';
 import { useParams } from "react-router";
 import { UserInfo } from "./UserInfo/UserInfo";
 import { Overall } from "./Overall/Overall";
@@ -38,7 +39,7 @@ export const Profile = () => {
         <div className="main-content">
             {
                 Object.keys(saplingData).length === 0 ?
-                    <div>Not found</div>
+                    <NotFound/>
                     :
                     <div className="p-grid" style={{"marginTop":"15px"}}>
                         <div className="p-col-12 p-md-6 p-sm-12">
