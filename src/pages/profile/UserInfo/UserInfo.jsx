@@ -16,13 +16,13 @@ export const UserInfo = (props) => {
                         <div className="data">{props.saplingData.name}</div>
                         <div className="label">Organization</div>
                         <div className="data">{props.saplingData.organisation}</div>
-                        <InfoChip/>
-                        <InfoChip/>
+                        <InfoChip count={props.saplingData.treesPlanted.length} label="Trees Planted"/>
+                        <InfoChip count={props.saplingData.treesPlanted.length} label="Visits till date"/>
                         <div className="overall">
                             <div className="done" style={{"width":'25%'}}>
                             </div>
                             <div className="count">
-                                12
+                                {14 - props.saplingData.treesPlanted.length}
                             </div>
                             <div className="label">
                                 Trees away from neutralising your carbon footprint
