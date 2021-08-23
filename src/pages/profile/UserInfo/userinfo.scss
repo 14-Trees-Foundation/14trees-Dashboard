@@ -13,11 +13,12 @@
         .overall{
             display: flex;
             background-color: #1F3625;
-            margin-top: 2%;
+            margin-top: 4%;
             color: #ffffff;
             font-weight: 400;
-            height: 18%;
+            min-height: 18%;
             border-radius: 10px;
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);;
             .done{
                 font-weight: 550;
                 font-size: 25px;
@@ -34,9 +35,9 @@
             }
             .label{
                 margin-top: 0.4em;
-                font-size: 11px;
+                font-size: 13px;
                 text-align: center;
-                padding-top: 10px;
+                padding-top: 7px;
             }
         }
     }
@@ -47,13 +48,18 @@
         height: 300px;
         .desc{
             margin-top: 20px;
-            .overall .count{
-                margin-left: 0.5rem;
-            }
-            .overall .label{
-                margin-top: 0.1em;
-                // font-size: 10px;
-                // margin-left: 0.25em
+            .overall{
+                min-height: 40px;
+                .count{
+                    margin-left: 0.5rem;
+                    font-size: 25px;
+                    margin-left: 0.1em;
+                }
+                .label{
+                    margin-top: 0.1em;
+                    font-size: 10px;
+                    margin-left: 0.3em
+                }
             }
         }
         .img{
@@ -71,6 +77,9 @@
             .overall .count{
                 margin-left: 1.1rem
             }
+            .overall .lable{
+                font-size: 14px;
+            }
         }
     }
 }
@@ -86,6 +95,9 @@
         .desc{
             margin-top: 7%;
             margin-left: -5%;
+            .overall .lable{
+                font-size: 14px;
+            }
         }
     }
 }

@@ -1,12 +1,13 @@
 .infochip{
   min-width: 25%;
-  min-height: 15%;
+  min-height: 18%;
   border-radius: 10px;
   font-weight: 300;
   border: 0;
   color: #ffffff;
   background-color: #1F3625;
   margin-right: 2%;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
   .info{
     display: flex;
     .count{
@@ -22,8 +23,9 @@
   }
 }
 
-@media (min-width: 560px) {
+@media (max-width: 560px) {
   .infochip{
     margin-top: 2%;
+    min-height: 40px;
   }
 }

@@ -46,3 +46,11 @@
     border-radius: 10px;
   }
 }
+
+@media (min-width: 1024px) {
+  .bar{
+    .heading{
+      margin-top: 2.2rem;
+    }
+  }
+}

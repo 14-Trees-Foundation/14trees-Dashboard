@@ -6,9 +6,7 @@
   border-radius: 14px;
   margin-right: 5px;
   border: 1px solid #ecebeb;
-  &:hover {
-    box-shadow: 3px 3px 3px 3px #ecebeb;
-  }
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
   &:hover .header-text{
     font-weight: 600;
     font-size: 42px;

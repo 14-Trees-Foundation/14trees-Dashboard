@@ -14,19 +14,19 @@ const footer = (text) => (
   </p>
 );
 
-export const Impact = ({ mainText, footText, ...props }) => {
+export const Impact = ({ count, text, ...props }) => {
   return (
     <Card
       className={[`box`]}
-      header={header(`${mainText}`)}
-      footer={footer(`${footText}`)}
+      header={header(`${count}`)}
+      footer={footer(`${text}`)}
       {...props}
     ></Card>
   );
 };
 
 Impact.defaultProps = {
-  mainText: "190",
-  footText: "Some text to be shown as footer"
+  count: "190",
+  text: "14 Trees"
 };
 export default Impact;
