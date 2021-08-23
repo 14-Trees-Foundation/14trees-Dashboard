@@ -9,7 +9,10 @@ export const UserInfo = (props) => {
                 <div className="p-col-12 p-md-10 p-lg-10" style={{"padding":'0'}}>
                     <div className="p-grid" style={{"padding":0}}>
                         <div className="p-col-6 p-md-6 p-sm-6" style={{"padding":0}}>
-                            <img alt="Card" src="https://picsum.photos/523/354" className="img"/>
+                            <img
+                                alt="Card"
+                                src={props.saplingData.profile_image === "" ? "https://picsum.photos/523/354" : props.saplingData.profile_image}
+                                className="img"/>
                         </div>
                         <div className="p-col-6 p-md-6 p-sm-6 desc">
                             <div className="label">Name</div>

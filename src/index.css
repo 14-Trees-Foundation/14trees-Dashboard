@@ -7,7 +7,12 @@ body {
   min-height: 100%;
   font-size: 12px;
   margin:auto;
-  overflow: hidden;
+}
+
+@media (min-width: 1024px){
+  body{
+    overflow: hidden;
+  }
 }
 
 /*# sourceMappingURL=index.css.map */

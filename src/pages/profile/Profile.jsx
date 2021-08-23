@@ -29,6 +29,9 @@ export const Profile = () => {
         async function fetchTreeOverall() {
             const overallResponse = await Axios.default.get(`/api/v1/analytics/totaltree`);
             console.log("overall response...", overallResponse);
+            if(overallResponse.status === 200) {
+                setOverallData(overallResponse.data);
+              }
         }
         fetchTreeOverall();
         
@@ -48,7 +51,7 @@ export const Profile = () => {
                             <Trees trees={saplingData.treesPlanted}/>
                         </div>
                         <div className="p-col-12 p-md-6 p-sm-12">
-                            <Overall/>
+                            <Overall />
                             <Map/>
                         </div>
                     </div>

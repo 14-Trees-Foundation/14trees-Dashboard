@@ -14,7 +14,8 @@ const header = (img) => {
 
 const footer = (id, name, date) => {
   date = date !== undefined ? date.slice(0,10) : "";
-  name = name !== undefined ? name : "Tree Name";
+  name = name !== undefined ? name : "Yet to Plant";
+  if (name !== "Yet to Plant"){
     return (
       <div>
         <p className="title">{name}</p>
@@ -26,7 +27,14 @@ const footer = (id, name, date) => {
           Event : Independant Visit
         </p>
       </div>
-  )
+    )
+  } else {
+    return (
+      <div>
+        <p className="emptytitle">{name}</p>
+      </div>
+    )
+  }
 };
 export const TreesPlanted = ({ mode, id, name, img, date, ...props }) => {
 

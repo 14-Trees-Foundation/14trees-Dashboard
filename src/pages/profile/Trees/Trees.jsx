@@ -5,6 +5,10 @@ import 'primeflex/primeflex.css';
 
 export const Trees = (props) => {
     let numTrees = props.trees.length
+    let images = [];
+    for (const tree of props.trees){
+        images.push.apply(images,tree['memories']);
+    }
     return (
         <div className="trees">
             {/* <h2>Trees Planted</h2> */}
@@ -47,17 +51,25 @@ export const Trees = (props) => {
                         <div className="p-col-12" style={{"padding":0}}>
                             <h2 style={{"margin":"0 0 5px 0"}}>Memories</h2>
                         </div>
-                            <div className="p-col-7 p-lg-7 p-md-7" style={{"padding":"0 0.3rem 0 0"}}>
-                                <Memories overlay="false"/>
+                            <div className="p-col-7 p-lg-7 p-md-7" style={{"padding":"0 0.3rem 0.2rem 0"}}>
+                                <Memories
+                                    img={images[0]}
+                                    overlay="false"/>
                             </div>
-                            <div className="p-col-5 p-lg-5 p-md-5" style={{"padding":"0 0.3rem 0 0"}}>
-                                <Memories overlay="false"/>
+                            <div className="p-col-5 p-lg-5 p-md-5" style={{"padding":"0 0.3rem 0.2rem 0"}}>
+                                <Memories 
+                                    img={images[1]}
+                                    overlay="false"/>
                             </div>
-                            <div className="p-col-7 p-lg-7 p-md-7" style={{"padding":"0 0.3rem 0 0"}}>
-                                <Memories overlay="false"/>
+                            <div className="p-col-7 p-lg-7 p-md-7" style={{"padding":"0 0.3rem 0.2rem 0"}}>
+                                <Memories
+                                    img={images[2]}
+                                    overlay="false"/>
                             </div>
-                            <div className="p-col-5 p-lg-5 p-md-5" style={{"padding":"0 0.3rem 0 0"}}>
-                                <Memories overlay="true"/>
+                            <div className="p-col-5 p-lg-5 p-md-5" style={{"padding":"0 0.3rem 0.2rem 0"}}>
+                                <Memories 
+                                img={""}
+                                overlay="true"/>
                             </div>
                     </div>
                 </div>
