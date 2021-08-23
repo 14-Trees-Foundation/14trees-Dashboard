@@ -51,46 +51,43 @@ const mapOptions = {
     keyboardShortcuts: false,
 }
 
-export const Map = () => {
+export const Map = ({location}) => {
+    let loc = [];
+    for (const l of location){
+        loc.push(l.location);
+    }
     const { isLoaded } = useJsApiLoader({
         id: 'google-map-script',
         googleMapsApiKey: process.env.REACT_APP_API_MAP_KEY
     })
 
     const [map, setMap] = useState(null);
+    const onUnmount = useCallback(function callback(map) {
+    setMap(null)
+    }, []);
 
-    // const onLoad = useCallback(function callback(map) {
-    //     const bounds = new window.google.maps.LatLngBounds();
-    //     map.fitBounds(bounds);
-    //     setMap(map)
-    //   }, [])
-    
-      const onUnmount = useCallback(function callback(map) {
-        setMap(null)
-      }, []);
+    const polyLoad = polygon => {};
 
-      const polyLoad = polygon => {};
-
-      return isLoaded ? (
-          <div className="map">
-              <h2>Site Map</h2>
-              <GoogleMap
-                mapContainerStyle={containerStyle}
-                mapTypeId={'satellite'}
-                center={{
-                    lat: 18.9270007032460,
-                    lng: 73.7733311321322
-                }}
-                zoom={16}
-                onUnmount={onUnmount}
-                options={mapOptions}
-                >
-                    <Polygon
-                        onLoad={polyLoad}
-                        paths={paths}
-                        options={options}
-                        />
-                </GoogleMap>
-          </div>
-    ) : <></>
+    return isLoaded ? (
+        <div className="map">
+            <h2>Site Map</h2>
+            <GoogleMap
+            mapContainerStyle={containerStyle}
+            mapTypeId={'satellite'}
+            center={{
+                lat: 18.9270007032460,
+                lng: 73.7733311321322
+            }}
+            zoom={16}
+            onUnmount={onUnmount}
+            options={mapOptions}
+            >
+                <Polygon
+                    onLoad={polyLoad}
+                    paths={paths}
+                    options={options}
+                />
+            </GoogleMap>
+        </div>
+) : <></>
 }

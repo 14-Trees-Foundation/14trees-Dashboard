@@ -41,11 +41,20 @@
   }
 }
 
+@media (min-width: 1024px) {
+  .footer-text{
+    font-size: 14px;
+  }
+}
+
 @media (min-width: 1475px){
   .box{
     height: 12rem;
   }
   .header-text{
     margin-top: 25%;
+  }
+  .footer-text{
+    font-size: 15px;
   }
 }
