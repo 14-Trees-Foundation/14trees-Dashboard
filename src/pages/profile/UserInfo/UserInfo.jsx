@@ -8,10 +8,10 @@ export const UserInfo = (props) => {
             <div className="p-grid nested-grid" style={{"padding":'20'}}>
                 <div className="p-col-12 p-md-10 p-lg-10" style={{"padding":'0'}}>
                     <div className="p-grid" style={{"padding":0}}>
-                        <div className="p-col-12 p-md-5 p-lg-5" style={{"padding":0}}>
+                        <div className="p-col-6 p-md-6 p-sm-6" style={{"padding":0}}>
                             <img alt="Card" src="https://picsum.photos/523/354" className="img"/>
                         </div>
-                        <div className="p-col-12 p-md-7 p-lg-7 desc">
+                        <div className="p-col-6 p-md-6 p-sm-6 desc">
                             <div className="label">Name</div>
                             <div className="data">{props.saplingData.name}</div>
                             <div className="label">Organization</div>

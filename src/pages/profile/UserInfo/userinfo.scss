@@ -36,7 +36,7 @@
                 margin-top: 0.4em;
                 font-size: 11px;
                 text-align: center;
-                padding-top: 8px;
+                padding-top: 10px;
             }
         }
     }
@@ -44,8 +44,33 @@
 
 @media (max-width: 560px) {
     .user{
+        height: 300px;
         .desc{
-            margin-top: 2%;
+            margin-top: 20px;
+            .overall .count{
+                margin-left: 0.5rem;
+            }
+            .overall .label{
+                margin-top: 0.1em;
+                // font-size: 10px;
+                // margin-left: 0.25em
+            }
+        }
+        .img{
+            width: 50vw;
+            height: 70vw;
+            margin: 20px 0 0 0;
+        }
+    }
+}
+
+@media (min-width: 1275px){
+    .user{
+        .desc{
+            margin-left: -3%;
+            .overall .count{
+                margin-left: 1.1rem
+            }
         }
     }
 }
@@ -60,6 +85,7 @@
         }
         .desc{
             margin-top: 7%;
+            margin-left: -5%;
         }
     }
 }

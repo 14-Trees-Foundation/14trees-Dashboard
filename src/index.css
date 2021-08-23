@@ -7,6 +7,7 @@ body {
   min-height: 100%;
   font-size: 12px;
   margin:auto;
+  overflow: hidden;
 }
 
 /*# sourceMappingURL=index.css.map */
