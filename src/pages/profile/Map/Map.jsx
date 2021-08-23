@@ -6,7 +6,7 @@ require('dotenv').config();
 
 const containerStyle = {
     width: '100%',
-    height: '55%',
+    height: '100%',
     borderRadius: '6px'
 };
 

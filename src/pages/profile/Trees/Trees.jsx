@@ -9,7 +9,7 @@ export const Trees = (props) => {
         <div className="trees">
             {/* <h2>Trees Planted</h2> */}
             <div className="p-grid nested-grid">
-                <div className="p-col-12 p-lg-6 p-md-6" style={{"padding":0}}>
+                <div className="p-col-12 p-lg-6 p-md-6 treesplanted">
                     <div className="p-grid" style={{"margin":0}}>
                         <div className="p-col-12" style={{"padding":0}}>
                             <h2 style={{"margin":"0 0 5px 0"}}>Trees Planted</h2>
@@ -42,7 +42,7 @@ export const Trees = (props) => {
                         </div>
                     </div>
                 </div>
-                <div className="p-col-12 p-lg-6 p-md-6" style={{"padding":0}}>
+                <div className="p-col-12 p-lg-6 p-md-6 memories">
                     <div className="p-grid" style={{"margin":0}}>
                         <div className="p-col-12" style={{"padding":0}}>
                             <h2 style={{"margin":"0 0 5px 0"}}>Memories</h2>

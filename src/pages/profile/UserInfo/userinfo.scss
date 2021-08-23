@@ -1,6 +1,6 @@
 .user{
-    min-height: 44vh;
-    height: 300px;
+    // min-height: 44vh;
+    height: 350px;
     margin-top: 5%;
     .img{
         height: 300px;
@@ -46,6 +46,20 @@
     .user{
         .desc{
             margin-top: 2%;
+        }
+    }
+}
+
+@media (min-width: 1475px){
+    .user{
+        margin-top: 10%;
+        .img{
+            height: 360px;
+            width: 320px;
+            margin: 10px 0 0 10px;
+        }
+        .desc{
+            margin-top: 7%;
         }
     }
 }

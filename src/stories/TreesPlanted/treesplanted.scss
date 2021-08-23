@@ -34,11 +34,12 @@
   margin: 5%;
 }
 
-.header{
-  width: 95%;
-  height: 50%;
-  background: #1f3625;
-  border-radius: 10px;
+
+.info {
+  font-size: 12px;
+  text-align: center;
+  font-weight: 350;
+  color: #ffffff;
 }
 
 .title {
@@ -48,9 +49,27 @@
   color: #ffffff;
 }
 
-.info {
-  font-size: 12px;
-  text-align: center;
-  font-weight: 350;
-  color: #ffffff;
+@media (min-width: 1475px){
+  .box-secondary{
+    height: 400px;
+  }
+
+  .img{
+    height: 230px;
+  }
+
+  .info{
+    font-size: 14px;
+  }
+
+  .title{
+    font-size: 16px;
+  }
+}
+
+.header{
+  width: 95%;
+  height: 50%;
+  background: #1f3625;
+  border-radius: 10px;
 }

@@ -1,7 +1,7 @@
 .box {
   display: inline-block;
   min-width: 85%;
-  min-height: 9rem;
+  height: 9rem;
   background: #ffffff;
   border-radius: 14px;
   margin-right: 5px;
@@ -38,5 +38,14 @@
     margin-top: 10%;
     margin-left: 5%;
     margin-right: 5%;
+  }
+}
+
+@media (min-width: 1475px){
+  .box{
+    height: 12rem;
+  }
+  .header-text{
+    margin-top: 25%;
   }
 }

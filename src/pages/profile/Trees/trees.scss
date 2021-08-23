@@ -1,3 +1,23 @@
 .trees{
-    min-height: 50vh;
+    min-height: 350px;
+}
+
+.treesplanted{
+    padding: 0;
+}
+
+.memories{
+    padding:0;
+}
+
+@media (min-width: 1475px) {
+    .trees{
+        min-height: 400px;
+    }
+    .treesplanted{
+        padding-top: 5%;
+    }
+    .memories{
+        padding-top: 5%;
+    }
 }
