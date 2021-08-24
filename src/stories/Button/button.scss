@@ -38,3 +38,9 @@
     font-size: 22px;
   }
 }
+
+@media (max-width: 560px) {
+  .storybook-button-large{
+    font-size: 14px;
+  }
+}

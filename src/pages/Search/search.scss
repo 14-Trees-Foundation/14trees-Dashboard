@@ -62,3 +62,14 @@
         padding-top: 5%;
     }
 }
+
+@media (max-width: 560px) {
+    .s-bg{
+        width: 100vw;
+    }
+    .s-input{
+        width: 90vw;
+        padding-top: 15%;
+        padding-left: 5%;
+    }
+}
