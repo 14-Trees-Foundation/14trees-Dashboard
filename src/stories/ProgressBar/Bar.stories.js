@@ -3,7 +3,7 @@ import React from "react";
 import { Bar } from "./Bar";
 
 export default {
-  title: "Example/Progress Bar",
+  title: "Progress Bar",
   component: Bar,
 };
 const Template = (args) => <Bar {...args} />;

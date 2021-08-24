@@ -4,7 +4,7 @@ import ReactPaginate from "react-paginate";
 import Paginate from "./Paginate";
 
 export default {
-  title: "Example/Paginate",
+  title: "Paginate",
   component: Paginate,
 };
 

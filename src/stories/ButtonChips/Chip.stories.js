@@ -3,7 +3,7 @@ import React from "react";
 import { Chip } from "./Chip";
 
 export default {
-  title: "Example/Button Chips",
+  title: "Button Chips",
   component: Chip,
   argTypes: {
     backgroundColor: { control: "color" },

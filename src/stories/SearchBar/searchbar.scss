@@ -1,0 +1,40 @@
+.sb-box{
+    // margin-top: 200px;
+}
+
+.input{
+    width: 95%;
+    height: 50px;
+    padding-left:20px;
+    border: 0;
+    background-color: #DCDCDC;
+    border-radius: 5px;
+}
+
+.sb-button{
+    min-width: 100px;
+    height: 50px;
+    background-color: #9bc53d;
+    border: 0;
+    color: #ffffff;
+    font-weight: 500;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 450;
+    margin-left: -120px;
+    justify-content: center;
+}
+
+.sb-button:hover{
+    background-color: #1F3625;
+}
+
+@media (max-width: 540px) {
+    .input{
+        height: 40px;
+    }
+    .sb-button{
+        height: 40px;
+    }
+}

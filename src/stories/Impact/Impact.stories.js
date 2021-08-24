@@ -3,7 +3,7 @@ import React from "react";
 import { Impact } from "./Impact";
 
 export default {
-  title: "Example/Impact",
+  title: "Impact",
   component: Impact,
 };
 
