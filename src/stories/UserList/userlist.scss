@@ -5,28 +5,30 @@
     font-size: 15px;
     font-weight: 400;
     color: #000000;
-    justify-content: space-between;
     font-family: Helvetica, Arial, sans-serif;
     margin: 2px;
 }
 
 .ul-box{
-    padding-top: 7px;
+    padding-top: 8px;
     margin-bottom: 7px;
     width: 100%;
     min-height: 30px;
     border-radius: 5px;
     background-color: #ffffff;
-    font-size: 18px;
-    font-weight: 400;
+    font-size: 16px;
+    font-weight: 450;
     display: flex;
-    justify-content: space-between;
     font-family: Helvetica, Arial, sans-serif;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.16), 0 1px 2px rgba(0, 0, 0, 0.23);;
 }
 
-.ul-space{
-    width: 20%;
+.ul-item-long{
+    width: 23%;
+    text-align: center;
+}
+
+.ul-item-short{
+    width: 17%;
     text-align: center;
 }
 

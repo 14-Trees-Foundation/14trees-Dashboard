@@ -7,20 +7,20 @@ export const UserList = ({ data, ...props }) => {
     return (
         <div>
             <div className="ul-header">
-                <div className="ul-space">Name</div>
-                <div className="ul-space">Organization</div>
-                <div className="ul-space">No. Of Plants</div>
-                <div className="ul-space">No. of Visits</div>
-                <div className="ul-space">Last Vsit</div>
+                <div className="ul-item-long">Name</div>
+                <div className="ul-item-long">Organization</div>
+                <div className="ul-item-short">No. Of Plants</div>
+                <div className="ul-item-short">No. of Visits</div>
+                <div className="ul-item-short">Last Vsit</div>
             </div>
             {data.map((i) => {
                 return (
                     <div className="ul-box" key={i.id}>
-                        <div className="ul-space">{i.name}</div>
-                        <div className="ul-space">{i.org}</div>
-                        <div className="ul-space">{i.num_plants}</div>
-                        <div className="ul-space">{i.num_visits}</div>
-                        <div className="ul-space">{i.last_visit}</div>
+                        <div className="ul-item-long">{i.name}</div>
+                        <div className="ul-item-long">{i.org}</div>
+                        <div className="ul-item-short">{i.num_plants}</div>
+                        <div className="ul-item-short">{i.num_visits}</div>
+                        <div className="ul-item-short">{i.last_visit}</div>
                     </div>
                 )
             })}
