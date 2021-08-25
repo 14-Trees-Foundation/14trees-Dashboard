@@ -3,7 +3,8 @@ import { useState } from "react"
 import { InputBar } from "./InputBar/InputBar";
 import { Button } from "../../stories/Button/Button";
 import { Chip } from "../../stories/ButtonChips/Chip";
-import {UserList} from "../../stories/UserList/UserList";
+import { UserList } from "../../stories/UserList/UserList";
+import { OrgList } from "../../stories/OrgList/OrgList";
 import bg from "../../assets/bg.png"
 import './search.scss'
 
@@ -66,10 +67,14 @@ export const Search = () => {
                             <div className="s-results-for">
                                 Search Results for: 
                             </div>
-                            <UserList />
-                            <div className="s-page">
-                                hello
+                            <div className="s-results-ind">
+                                Individual Found
                             </div>
+                            <UserList />
+                            <div className="s-results-ind">
+                                Organisation Found
+                            </div>
+                            <OrgList/>
                         </div>
                     </div>
                 </div>
