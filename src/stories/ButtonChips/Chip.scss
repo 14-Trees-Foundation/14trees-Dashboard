@@ -1,17 +1,14 @@
 .button-chip {
   font-family: Helvetica, Arial, sans-serif;
-  font-size: 90%;
+  font-size: 12px;
   min-height: 40px;
   border-radius: 40px;
-  font-style: normal;
-  font-weight: 400;
-  letter-spacing: 0em;
+  font-weight: 500;
   text-align: center;
-  position: absolute;
   cursor: pointer;
-  display: inline-block;
   padding-left: 2em;
   padding-right: 2em;
+  margin-right: 5px;
 }
 
 .button-chip-primary {
@@ -23,4 +20,10 @@
   border: 1px solid rgba(31, 54, 37, 0.5);
   box-sizing: border-box;
   color: #a5afa8;
+}
+
+@media (max-width: 540px) {
+  .button-chip{
+    margin-bottom: 5px;
+  }
 }

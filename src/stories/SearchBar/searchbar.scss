@@ -1,5 +1,5 @@
 .sb-box{
-    // margin-top: 200px;
+    margin-left: 2.5%
 }
 
 .input{
@@ -12,7 +12,7 @@
 }
 
 .sb-button{
-    min-width: 100px;
+    width: 100px;
     height: 50px;
     background-color: #9bc53d;
     border: 0;
@@ -31,11 +31,17 @@
 }
 
 @media (max-width: 540px) {
+    .sb-box {
+        margin-left: 1%;
+        width: 96%;
+    }
     .input{
         height: 40px;
+        // padding: 10px;
     }
     .sb-button{
-        height: 40px;
-        margin-left: -110px;
+        width: 70px;
+        height: 35px;
+        margin-left: -25%;
     }
 }
