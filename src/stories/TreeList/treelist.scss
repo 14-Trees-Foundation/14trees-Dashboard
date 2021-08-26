@@ -1,15 +1,15 @@
-.ul-header{
+.tl-header{
     display: flex;
     width: 100%;
     height: 25px;
     font-size: 15px;
     font-weight: 400;
     color: #000000;
-    font-family: Helvetica, Arial, sans-serif;
+    font-family: Htlvetica, Arial, sans-serif;
     margin: 2px;
 }
 
-.ul-box{
+.tl-box{
     padding-top: 8px;
     margin-bottom: 7px;
     width: 100%;
@@ -26,22 +26,32 @@
     }
 }
 
-.ul-item-long{
+.tl-item-long{
     width: 23%;
     text-align: center;
 }
 
-.ul-item-short{
+.tl-item-short{
     width: 17%;
     text-align: center;
 }
 
+.tl-image{
+    padding-left: 10px;
+    min-width: 180px;
+    width: 25%;
+    height: 140px;
+    object-fit: cover;
+    border-radius: 6px;
+    padding-bottom: 8px;
+}
+
 @media (max-width: 735px) {
-    .ul-header{
+    .tl-header{
         font-size: 11px;
     }
 
-    .ul-box{
+    .tl-box{
         font-size: 11px;
         padding-bottom: 5px;
         padding-top: 5px;

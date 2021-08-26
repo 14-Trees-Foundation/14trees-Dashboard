@@ -20,6 +20,10 @@
     font-weight: 450;
     display: flex;
     font-family: Helvetica, Arial, sans-serif;
+    cursor: pointer;
+    &:hover{
+        transform: scale(1.01);
+    }
 }
 
 .ol-name {

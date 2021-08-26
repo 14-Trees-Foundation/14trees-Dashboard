@@ -5,11 +5,18 @@ import { Button } from "../../stories/Button/Button";
 import { Chip } from "../../stories/ButtonChips/Chip";
 import { UserList } from "../../stories/UserList/UserList";
 import { OrgList } from "../../stories/OrgList/OrgList";
+import { EventList } from "../../stories/EventList/EventList";
+import { TreeList } from "../../stories/TreeList/TreeList";
 import bg from "../../assets/bg.png"
 import './search.scss'
 
 export const Search = () => {
     let [results, setResults] = useState(true);
+    let [key, setKey] = useState("All");
+
+    const onUserClick = (value) => {
+        console.log(value);
+    }
     
     if (!results){
         return(
@@ -70,11 +77,19 @@ export const Search = () => {
                             <div className="s-results-ind">
                                 Individual Found
                             </div>
-                            <UserList />
+                            <UserList handleClick={onUserClick}/>
                             <div className="s-results-ind">
                                 Organisation Found
                             </div>
                             <OrgList/>
+                            <div className="s-results-ind">
+                                Events Found
+                            </div>
+                            <EventList/>
+                            <div className="s-results-ind">
+                                Trees Found
+                            </div>
+                            <TreeList/>
                         </div>
                     </div>
                 </div>
