@@ -8,13 +8,17 @@ import 'primeflex/primeflex.css';
 
 export const Overall = ({trees}) => {
 
-    const [popup, setPopup] = useState(true);
+    const [popup, setPopup] = useState(false);
 
     const togglePopup = () => {
         setPopup(!popup);
     }
 
     const getPonds = () => {
+        setPopup(!popup)
+    }
+
+    const getTrees = () => {
         setPopup(!popup)
     }
 
@@ -31,7 +35,10 @@ export const Overall = ({trees}) => {
                     onClick={() => getPonds()}>
                     <Impact count={trees.count} text={"Trees Planted by visitors till date"}/>
                 </div>
-                <div className="p-col-12 p-md-3 p-sm-6">
+                <div
+                    className="p-col-12 p-md-3 p-sm-6"
+                    style={{"cursor":"pointer"}}
+                    onClick={() => getTrees()}>
                     <Impact count={"100+"} text={"People employed from local community."}/>
                 </div>
                 <div className="p-col-12 p-md-6 p-sm-12">
