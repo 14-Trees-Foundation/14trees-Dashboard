@@ -1,0 +1,101 @@
+.modal-window{
+    .p-item{
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 80%;
+        height: 80%;
+        transform: translate(-50%, -40%);
+        font-family: Helvetica, sans-serif, Arial;
+        .p-modal-img{
+            width: 90%;
+            height: 90%;
+            border-radius: 6px;
+        }
+        .p-modal-desc{
+            width: 40%;
+            padding-left: 10px;
+            padding-top: 8%;
+            .p-header{
+                font-size: 24px;
+                font-weight: 550;
+                padding-bottom: 10px;
+                color: #ffffff;
+            }
+            .p-desc{
+                font-size: 13px;
+                font-weight: 450;
+                color: #ffffff;
+            }
+            .p-box{
+                margin-top: 10%;
+                min-height: 80px;
+                background-color: #9BC53D;
+                border-radius: 7px;
+                color: #ffffff;
+                display: flex;
+                padding-top: 20px;
+                .p-box-count{
+                    font-size: 21px;
+                    padding-left: 7%;
+                }
+                .p-box-desc{
+                    font-size: 13px;
+                    padding-left: 7%;
+                    font-weight: 450;
+                }
+            }
+        }
+    }
+}
+
+@media (max-width: 540px) {
+    .modal-window{
+        .p-item{
+            position: absolute;
+            top: 40%;
+            left: 50%;
+            width: 90%;
+            height: 80%;
+            font-family: Helvetica, sans-serif, Arial;
+            padding-left: 8%;
+            .p-modal-desc{
+                width: 100%;
+                padding-left: 1px;
+                padding-top: 3%;
+                .p-header{
+                    font-size: 20px;
+                    font-weight: 550;
+                    padding-bottom: 10px;
+                    color: #ffffff;
+                }
+                .p-desc{
+                    font-size: 12px;
+                    font-weight: 450;
+                    color: #ffffff;
+                }
+                .p-box{
+                    min-height: 80px;
+                    width: 100%;
+                    background-color: #9BC53D;
+                    border-radius: 7px;
+                    color: #ffffff;
+                    display: flex;
+                    padding-top: 5px;
+                    .p-box-left{
+                        height: 80px;
+                        align-items: center;
+                        justify-content: center;
+                    }
+                    .p-box-count{
+                        font-size: 20px;
+                    }
+                    .p-box-desc{
+                        padding-top:1%;
+                        font-weight: 400;
+                    }
+                }
+            }
+        }
+    }
+}

@@ -11,6 +11,7 @@ import { Overall } from "./Overall/Overall";
 import { Trees } from "./Trees/Trees";
 import { Map } from "./Map/Map";
 
+
 export const Profile = () => {
     const { saplingId } = useParams();
     const [saplingData, setSaplingData] = useState({});
