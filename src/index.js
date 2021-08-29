@@ -4,6 +4,13 @@ import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 import { BrowserRouter } from "react-router-dom";
+import { makeServer } from './mockServer/server';
+
+if (process.env.NODE_ENV === 'development') {
+  makeServer({
+    environment: 'developement'
+  });
+}
 
 ReactDOM.render(
   <React.StrictMode>
