@@ -5,10 +5,11 @@ import App from './App';
 import reportWebVitals from './reportWebVitals';
 import { BrowserRouter } from "react-router-dom";
 import { makeServer } from './mockServer/server';
+require('dotenv').config()
 
 if (process.env.NODE_ENV === 'development') {
   makeServer({
-    environment: 'developement'
+    environment: 'development'
   });
 }
 
