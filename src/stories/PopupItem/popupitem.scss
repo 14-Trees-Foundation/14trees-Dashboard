@@ -29,7 +29,7 @@
             }
             .p-box{
                 margin-top: 10%;
-                min-height: 80px;
+                max-height: 30%;
                 background-color: #9BC53D;
                 border-radius: 7px;
                 color: #ffffff;
@@ -49,7 +49,7 @@
     }
 }
 
-@media (max-width: 540px) {
+@media (min-width: 340px) and (max-width: 768px) {
     .modal-window{
         .p-item{
             position: absolute;

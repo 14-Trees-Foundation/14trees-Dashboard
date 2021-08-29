@@ -7,12 +7,11 @@
     left:0;
     position: fixed;
     z-index: 1;
-    padding-left: 5px;
     .modal-window{
         width: 70vw;
         height: 70vh;
-        margin-left: 13vw;
-        margin-top: 10vh;
+        margin-left: 15vw;
+        margin-top: 15vh;
         background-color: #1F3625;
         border-radius: 5px;
         position: absolute;
@@ -25,12 +24,13 @@
     }
 }
 
-@media (min-width: 340px) {
+@media (min-width: 340px) and (max-width: 768px){
     .modal-bg{
         .modal-window{
             width: 80vw;
             height: 80vh;
-            margin-left: 8vw;
+            margin-left: 10vw;
+            margin-top: 10vh;
         }
     }
 }
