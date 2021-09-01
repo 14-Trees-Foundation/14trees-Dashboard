@@ -12,10 +12,31 @@ import './search.scss'
 
 export const Search = () => {
     let [results, setResults] = useState(true);
-    let [key, setKey] = useState("All");
+    let [type, setType] = useState("All");
+
+    let intialChipState = {
+        "All": "secondary",
+        "Individual": "secondary",
+        "Tree": "secondary",
+        "Event": "secondary",
+        "Organization": "secondary"
+    }
+    let [searchChips, setSearchChips] = useState(intialChipState);
+
+    const onChipSelect = (value) => {
+        setSearchChips(prevState => ({
+            ...intialChipState,
+            [value]: "primary"
+        }))
+    }
 
     const onUserClick = (value) => {
         console.log(value);
+    }
+
+    const handleData = (data) => {
+        setResults(data);
+        console.log(results);
     }
     
     if (!results){
@@ -30,7 +51,7 @@ export const Search = () => {
                         </div>
                         <div>
                             <div className="s-input-box">
-                                <InputBar/>
+                                <InputBar type={type} setData={handleData}/>
                             </div>
                             <p className="s-sep">OR</p>
                             <div className="s-s-btn">
@@ -56,17 +77,17 @@ export const Search = () => {
                             <p className="s-desc">People employed from local community</p>
                         </div>
                         <div className="s-input-box">
-                            <InputBar/>
+                            <InputBar type={type} setData={handleData}/>
                             <div className="s-search-info">
                                 <div className="s-searchby">
                                     Search by:
                                 </div>
-                                <div className="s-search-filter"> 
-                                    <Chip label={"All"} mode={"secondary"}/>
-                                    <Chip label={"Individual"} mode={"secondary"}/>
-                                    <Chip label={"Event"} mode={"secondary"}/>
-                                    <Chip label={"Organization"} mode={"secondary"}/>
-                                    <Chip label={"Tree"} mode={"secondary"}/>
+                                <div className="s-search-filter">
+                                    {
+                                        Object.keys(searchChips).map(key => 
+                                            <Chip label={key} mode={searchChips[key]} handleClick={onChipSelect}/>
+                                        )
+                                    }
                                 </div>
                             </div>
                         </div>

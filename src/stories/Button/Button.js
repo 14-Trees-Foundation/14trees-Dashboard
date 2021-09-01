@@ -6,7 +6,6 @@ import "./button.scss";
  * Primary UI component for user interaction
  */
 export const Button = ({ primary, size, label, ...props }) => {
-  console.log(label)
   const mode = primary
     ? "storybook-button-primary"
     : "storybook-button-secondary";

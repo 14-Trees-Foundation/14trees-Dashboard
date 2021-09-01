@@ -7,7 +7,7 @@ import { BrowserRouter } from "react-router-dom";
 import { makeServer } from './mockServer/server';
 require('dotenv').config()
 
-if (process.env.NODE_ENV === 'development') {
+if (process.env.REACT_APP_ENV === 'development') {
   makeServer({
     environment: 'development'
   });
