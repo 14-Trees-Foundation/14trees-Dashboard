@@ -23,7 +23,7 @@ export const InputBar = ({ type, setData }) => {
         });
 
         if(res.status === 200) {
-            setData(res);
+            setData(res, key);
         } else {
             console.log("Fetch error")
         }

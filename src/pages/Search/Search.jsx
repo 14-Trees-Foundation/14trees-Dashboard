@@ -11,6 +11,7 @@ import bg from "../../assets/bg.png"
 import './search.scss'
 
 export const Search = () => {
+    let [key, setKey] = useState("");
     let [results, setResults] = useState(true);
     let [type, setType] = useState("All");
 
@@ -22,19 +23,23 @@ export const Search = () => {
         "Organization": "secondary"
     }
     let [searchChips, setSearchChips] = useState(intialChipState);
+    let [selectedChips, setSelectedChips] = useState("")
 
     const onChipSelect = (value) => {
         setSearchChips(prevState => ({
             ...intialChipState,
             [value]: "primary"
-        }))
+        }));
+
+        setSelectedChips(value);
     }
 
     const onUserClick = (value) => {
         console.log(value);
     }
 
-    const handleData = (data) => {
+    const handleData = (data, key) => {
+        setKey(key);
         setResults(data);
         console.log(results);
     }
@@ -93,24 +98,44 @@ export const Search = () => {
                         </div>
                         <div className="s-results">
                             <div className="s-results-for">
-                                Search Results for: 
+                                Search Results for: {key}
                             </div>
-                            <div className="s-results-ind">
-                                Individual Found
-                            </div>
-                            <UserList handleClick={onUserClick}/>
-                            <div className="s-results-ind">
-                                Organisation Found
-                            </div>
-                            <OrgList/>
-                            <div className="s-results-ind">
-                                Events Found
-                            </div>
-                            <EventList/>
-                            <div className="s-results-ind">
-                                Trees Found
-                            </div>
-                            <TreeList/>
+                            {
+                                (selectedChips==="Individual" || selectedChips==="All") && 
+                                <div>
+                                    <div className="s-results-ind">
+                                        Individual Found
+                                    </div>
+                                    <UserList handleClick={onUserClick}/>
+                                </div>
+                            }
+                            {
+                                (selectedChips==="Organization" || selectedChips==="All") && 
+                                <div>
+                                    <div className="s-results-ind">
+                                        Organization Found
+                                    </div>
+                                    <OrgList/>
+                                </div>
+                            }
+                            {
+                                (selectedChips==="Event" || selectedChips==="All") && 
+                                <div>
+                                    <div className="s-results-ind">
+                                        Events Found
+                                    </div>
+                                    <EventList/>
+                                </div>
+                            }
+                            {
+                                (selectedChips==="Tree" || selectedChips==="All") && 
+                                <div>
+                                    <div className="s-results-ind">
+                                        Trees Found
+                                    </div>
+                                    <TreeList/>
+                                </div>
+                            }
                         </div>
                     </div>
                 </div>
