@@ -3,6 +3,7 @@ export function makeServer({ environment = 'development' }) {
     let server = createServer({
         environment,
         routes() {
+            this.timing = 5000;
             this.urlPrefix = 'http://localhost:7000';
             this.get('/api/v1/profile', () => {
                 return {

@@ -23,7 +23,7 @@ export const Search = () => {
         "Organization": "secondary"
     }
     let [searchChips, setSearchChips] = useState(intialChipState);
-    let [selectedChips, setSelectedChips] = useState("")
+    let [selectedChips, setSelectedChips] = useState("All")
 
     const onChipSelect = (value) => {
         setSearchChips(prevState => ({
@@ -41,7 +41,6 @@ export const Search = () => {
     const handleData = (data, key) => {
         setKey(key);
         setResults(data);
-        console.log(results);
     }
     
     if (!results){
