@@ -17,6 +17,7 @@ export const Profile = () => {
     const { saplingId } = useParams();
     const [saplingData, setSaplingData] = useState({});
     const [overallData, setOverallData] = useState({});
+    const [pondsImages, setPondsImages] = useState({});
     const delay = ms => new Promise(res => setTimeout(res, ms));
 
     let [loading, setLoading] = useState(true);
@@ -30,10 +31,15 @@ export const Profile = () => {
         }
     
         const overallResponse = await Axios.default.get(`/api/v1/analytics/totaltree`);
-        console.log("overall response...", overallResponse);
         if(overallResponse.status === 200) {
             setOverallData(overallResponse.data[0]);                
         }
+
+        const pondImagesRes = await Axios.default.get(`/api/v1/analytics/ponds`);
+        if(pondImagesRes.status === 200) {
+            setPondsImages(pondImagesRes.data);                
+        }
+
         await delay(1500);
         setLoading(false);
     }, [saplingId]);
@@ -58,7 +64,7 @@ export const Profile = () => {
                                 <Trees trees={saplingData.treesPlanted}/>
                             </div>
                             <div className="p-col-12 p-md-6 p-sm-12">
-                                <Overall trees={overallData}/>
+                                <Overall trees={overallData} ponds={pondsImages}/>
                                 <Map location={saplingData.treesPlanted}/>
                             </div>
                         </div>

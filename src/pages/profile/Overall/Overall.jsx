@@ -6,8 +6,9 @@ import { PopupItem } from "../../../stories/PopupItem/PopupItem";
 import './overall.scss';
 import 'primeflex/primeflex.css';
 
-export const Overall = ({trees}) => {
+export const Overall = ({trees, ponds}) => {
 
+    console.log(ponds)
     const [popup, setPopup] = useState(false);
 
     const togglePopup = () => {

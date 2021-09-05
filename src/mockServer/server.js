@@ -34,6 +34,38 @@ export function makeServer({ environment = 'development' }) {
                     {"count":"436"}
                 ];
             });
+            this.get('/api/v1/analytics/ponds', () => {
+                return {
+                    "status":"success",
+                    "count":"8",
+                    "images":[
+                        {
+                            "original":"https://14treesplants.s3.ap-south-1.amazonaws.com/ponds/1.jpg",
+                        },
+                        {
+                            "original":"https://14treesplants.s3.ap-south-1.amazonaws.com/ponds/2.jpg",
+                        },
+                        {
+                            "original":"https://14treesplants.s3.ap-south-1.amazonaws.com/ponds/3.jpg",
+                        },
+                        {
+                            "original":"https://14treesplants.s3.ap-south-1.amazonaws.com/ponds/4.jpg",
+                        },
+                        {
+                            "original":"https://14treesplants.s3.ap-south-1.amazonaws.com/ponds/5.jpg",
+                        },
+                        {
+                            "original":"https://14treesplants.s3.ap-south-1.amazonaws.com/ponds/6.jpg",
+                        },
+                        {
+                            "original":"https://14treesplants.s3.ap-south-1.amazonaws.com/ponds/7.jpg",
+                        },
+                        {
+                            "original":"https://14treesplants.s3.ap-south-1.amazonaws.com/ponds/8.jpg",
+                        },
+                    ]
+                }
+            });
         },
       });
   return server;
