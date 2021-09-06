@@ -16,6 +16,8 @@ import { makeStyles } from '@material-ui/core/styles';
 import bg from "../../assets/bg.png";
 import { Spinner } from "../../stories/Spinner/Spinner";
 
+import Axios from "../../api/local";
+
 const intitialFValues = {
     sapling: '',
     name: '',
@@ -168,36 +170,28 @@ export const Visitor = () => {
             
             formData.append('userImages', userImages);
             formData.append('extraImages', extraImages);
-            console.log(values)
-            // api.post('/api/v1/visitor/form', formData, {
-            //     headers: {
-            //         'Content-type': 'multipart/form-data'
-            //     },
-            // }).then(data => {
-            //     setValues({
-            //         ...values,
-            //         loading:false
-            //     })
-            //     console.log(data.status === 204)
-            //     if (data.status !== 200) {
-            //         toast.error(data.statusText)
-            //     } else {
-            //         setValues({
-            //             ...values,
-            //             uploaded:true
-            //         })
-            //     }
-            // }).catch(err => {
-            //     setValues({
-            //         ...values,
-            //         loading:false
-            //     })
-            //     if (err.response.status === 409) {
-            //         toast.error(err.response.statusText)
-            //     } else {
-            //         toast.error("Something went wrong!")
-            //     }
-            // })
+            let res = await Axios.post('/api/v1/visitor/form', formData, {
+                headers: {
+                    'Content-type': 'multipart/form-data'
+                },
+            })
+            
+            if(res.status === 200) {
+                setValues({
+                    ...values,
+                    loading:false
+                })
+                toast.success("Data uploaded successfully!")
+            } else if(res.status === 204) {
+                toast.error(res.statusText)
+            } else if(res.status === 409){
+                toast.error(res.response.statusText)
+            } else {
+                setValues({
+                    ...values,
+                    uploaded:true
+                })
+            }
         }
         // await delay(2000);
         setValues({
