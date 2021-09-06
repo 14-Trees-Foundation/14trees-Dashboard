@@ -7,7 +7,7 @@ import { UserList } from "../../stories/UserList/UserList";
 import { OrgList } from "../../stories/OrgList/OrgList";
 import { EventList } from "../../stories/EventList/EventList";
 import { TreeList } from "../../stories/TreeList/TreeList";
-import bg from "../../assets/bg.png"
+import bg from "../../assets/bg.png";
 import './search.scss'
 
 export const Search = () => {

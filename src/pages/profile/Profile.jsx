@@ -3,7 +3,7 @@ import 'primeflex/primeflex.css';
 import * as Axios from "../../api/local";
 import './profile.scss'
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { NotFound } from '../notfound/NotFound';
 import { useParams } from "react-router";
 import { UserInfo } from "./UserInfo/UserInfo";
@@ -11,7 +11,6 @@ import { Overall } from "./Overall/Overall";
 import { Trees } from "./Trees/Trees";
 import { Map } from "./Map/Map";
 import { Spinner } from "../../stories/Spinner/Spinner";
-import { useCallback } from 'react';
 
 export const Profile = () => {
     const { saplingId } = useParams();

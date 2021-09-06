@@ -1,0 +1,39 @@
+@import "../Search/search.scss";
+
+.s-input{
+    width: 75vw;
+    padding-left: 13%;
+    .s-info{
+        margin-top: 6%;
+        .s-header{
+            font-size: 60px;
+            width: 30%;
+            color: #9BC53D;
+            font-weight: 550;
+        }
+        .s-desc{
+            word-wrap: inherit;
+            font-weight: 500;
+            font-size: 22px;
+            color: #ffffff;
+        }
+    }
+    .s-sep{
+        color: #ffffff;
+        justify-content: center;
+        display: flex;
+        padding-top: 3%;
+        padding-bottom: 3%;
+    }
+    .s-s-btn{
+        display: flex;
+        justify-content: space-between;
+    }
+    .s-input-box{
+        width: 55vw;
+    }
+}
+
+.paper {
+    margin-top: 20%;
+}

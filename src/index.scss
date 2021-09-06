@@ -29,14 +29,13 @@ $appBackground: #f5f5fa;
 
 body {
   font-family: $fontFamily !important;
-  font-weight: 700;
+  font-weight: 500;
   font-style: normal;
   font-stretch: normal;
   -webkit-font-smoothing: antialiased;
-  min-height: 100%;
   min-width: 1024px;
   background: $appBackground !important;
   height: 100%;
-  font-size: 12px;
+  font-size: 14px;
   overflow-x: hidden;
 }
