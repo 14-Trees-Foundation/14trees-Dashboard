@@ -1,5 +1,14 @@
 import {useState, useCallback} from 'react';
-import { GoogleMap, useJsApiLoader, Polygon } from '@react-google-maps/api';
+import { 
+    GoogleMap,
+    useJsApiLoader,
+    Polygon,
+    Marker,
+    InfoBox
+    } from '@react-google-maps/api';
+
+import marker from "../../../assets/marker.png";
+import tree from "../../../assets/neem.png";
 import './maps.scss';
 
 require('dotenv').config();
@@ -20,6 +29,8 @@ const paths = [
     {lat: 18.92438629234444, lng: 73.77423369992533},
     {lat: 18.92570084213888, lng: 73.77352011507531},
     {lat: 18.92600029548707, lng: 73.77345136906712},
+    {lat: 18.92642050830927, lng: 73.77176739452904},
+    {lat: 18.92600029548707, lng: 73.77345136906712},
     {lat: 18.92609001880532, lng: 73.77465867426133},
     {lat: 18.92921738105332, lng: 73.77494262525147},
     {lat: 18.92983007114656, lng: 73.77419310992801},
@@ -29,12 +40,14 @@ const paths = [
     {lat: 18.92388548178382, lng: 73.77198156977873}
 ];
 
+const markers = [{lat: 18.92701129548707, lng: 73.77245238906712},]
+
 const options = {
     fillColor: "lightblue",
-    fillOpacity: 0.1,
+    fillOpacity: 0.2,
     strokeColor: "lightgreen",
     strokeOpacity: 1,
-    strokeWeight: 1,
+    strokeWeight: 2,
     clickable: false,
     draggable: false,
     editable: false,
@@ -51,6 +64,8 @@ const mapOptions = {
     rotateControl: true,
     keyboardShortcuts: false,
 }
+
+const boxOptions = { closeBoxURL: '', enableEventPropagation: true };
 
 export const Map = ({location}) => {
     let loc = [];
@@ -79,7 +94,7 @@ export const Map = ({location}) => {
                 lat: 18.9270007032460,
                 lng: 73.7733311321322
             }}
-            zoom={16}
+            zoom={17}
             onUnmount={onUnmount}
             options={mapOptions}
             >
@@ -88,6 +103,32 @@ export const Map = ({location}) => {
                     paths={paths}
                     options={options}
                 />
+                <Marker
+                    icon={marker}
+                    position={markers[0]}
+                    animation={1}>
+                </Marker>
+                <InfoBox
+                    options={boxOptions}
+                    position={markers[0]}
+                >
+                    <div style={{
+                        backgroundColor: '#ffffff',
+                        width: '150px',
+                        height: '100px',
+                        borderRadius: '20px',
+                        display: "flex"}}>
+                        <img alt="tree" src={tree} style={{
+                            width:"80px",
+                            height:"80px",
+                            padding:"10px",
+                            borderRadius:"25%"}}/>
+                        <div style={{color: "e9e9e9", paddingTop: "20px", textAlign:"center"}}>
+                            <h5>Neem</h5>
+                            <h5>Sapling</h5>
+                        </div>
+                    </div>
+                    </InfoBox>
             </GoogleMap>
         </div>
 ) : <></>
