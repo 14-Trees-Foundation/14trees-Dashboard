@@ -40,7 +40,7 @@ const intitialFValues = {
     addImage2src:null,
     addImage3src:null,
     addimageerror:null,
-    uploaded:true,
+    uploaded:false,
     loading:false,
     backdropOpen:false,
 }
