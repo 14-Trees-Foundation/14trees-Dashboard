@@ -1,18 +1,19 @@
 import { useState } from "react"
 
 import { InputBar } from "./InputBar/InputBar";
-import { Button } from "../../stories/Button/Button";
 import { Chip } from "../../stories/ButtonChips/Chip";
 import { UserList } from "../../stories/UserList/UserList";
 import { OrgList } from "../../stories/OrgList/OrgList";
 import { EventList } from "../../stories/EventList/EventList";
 import { TreeList } from "../../stories/TreeList/TreeList";
 import bg from "../../assets/bg.png";
-import './search.scss'
+import './search.scss';
+
+import Button from '@mui/material/Button';
 
 export const Search = () => {
     let [key, setKey] = useState("");
-    let [results, setResults] = useState(true);
+    let [results, setResults] = useState(false);
     let [type, setType] = useState("All");
 
     let intialChipState = {
@@ -59,9 +60,10 @@ export const Search = () => {
                             </div>
                             <p className="s-sep">OR</p>
                             <div className="s-s-btn">
-                                <Button size={"large"} label={"See all the people"}/>
-                                <Button size={"large"} label={"See all the events"}/>
-                                <Button size={"large"} label={"See all the organization"}/>
+
+                                <Button variant="contained" color="secondary" size="large" onClick={() => onUserClick()}>See all the people</Button>
+                                <Button variant="contained" color="secondary" size="large">See all the events</Button>
+                                <Button variant="contained" color="secondary" size="large">See all the organization</Button>
                             </div>
                         </div>
                     </div>
