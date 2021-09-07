@@ -5,7 +5,7 @@ import "primeflex/primeflex.css";
 import { Divider } from "primereact/divider";
 import ponds from "../../../src/assets/ponds.png";
 
-export const PopupItem = ({ img, title, header, ...props }) => {
+export const PopupItem = ({ header,desc,title,titleDesc, about, ...props }) => {
   return (
     <div className="p-item">
       <div className="p-grid nested-grid">
@@ -13,16 +13,15 @@ export const PopupItem = ({ img, title, header, ...props }) => {
           <img src={ponds} alt="ponds" className="p-modal-img" />
         </div>
         <div className="p-col-12 p-md-5 p-lg-5 p-modal-desc">
-          <div className="p-header">Restoring the Water Table</div>
+          <div className="p-header">{header}</div>
           <div className="p-desc">
-            Some description of the pond. Some description of the pond. Some
-            description of the pond.
+           {desc}
           </div>
           <div className="p-box p-grid">
             <div className="p-col-6 p-box-left">
-              <div className="p-box-count">190 Ponds</div>
+              <div className="p-box-count">{title}</div>
               <div className="p-box-desc">
-                Some description Some Description
+                {titleDesc}
               </div>
             </div>
 
@@ -30,7 +29,7 @@ export const PopupItem = ({ img, title, header, ...props }) => {
               //   style={{ fontSize: "15px", marginTop: "2%" }}
               className="p-col-6 p-box--desc"
             >
-              That is enough to water 15 farm lands
+              {about}
             </div>
           </div>
         </div>
@@ -38,5 +37,12 @@ export const PopupItem = ({ img, title, header, ...props }) => {
     </div>
   );
 };
+PopupItem.defaultProps={
+  header:"Restoring the water table",
+  desc:" Some description of the pond. Some description of the pond. Somedescription of the pond.",
+  title:"190 Ponds",
+  titleDesc:"Some description",
+  about:"That is enough to water 15 farm lands"
+}
 
 export default PopupItem;
