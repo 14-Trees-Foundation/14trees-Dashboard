@@ -1,5 +1,6 @@
 .sb-box{
-    margin-left: 2.5%
+    margin-left: 2.5%;
+    display: flex;
 }
 
 .input{
@@ -11,23 +12,12 @@
     border-radius: 5px;
 }
 
-.sb-button{
-    width: 100px;
-    height: 50px;
-    background-color: #9bc53d;
-    border: 0;
-    color: #ffffff;
-    font-weight: 500;
-    border-radius: 8px;
-    cursor: pointer;
-    font-size: 16px;
-    font-weight: 450;
-    margin-left: -120px;
-    justify-content: center;
-}
-
-.sb-button:hover{
-    background-color: #1F3625;
+.sb-button-div{
+    margin-left : -180px;
+    display: flex;
+    .sb-button {
+        width: 180px;
+    }
 }
 
 @media (max-width: 540px) {
@@ -39,9 +29,10 @@
         height: 40px;
         // padding: 10px;
     }
-    .sb-button{
-        width: 70px;
-        height: 35px;
-        margin-left: -25%;
+    .sb-button-div {
+        margin-left: -100px;
+        .sb-button {
+            width: 100px;
+        }
     }
 }

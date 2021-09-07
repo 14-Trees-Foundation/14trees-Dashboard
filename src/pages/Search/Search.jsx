@@ -59,11 +59,10 @@ export const Search = () => {
                                 <InputBar type={type} setData={handleData}/>
                             </div>
                             <p className="s-sep">OR</p>
-                            <div className="s-s-btn">
-
-                                <Button variant="contained" color="secondary" size="large" onClick={() => onUserClick()}>See all the people</Button>
-                                <Button variant="contained" color="secondary" size="large">See all the events</Button>
-                                <Button variant="contained" color="secondary" size="large">See all the organization</Button>
+                            <div className="s-btn">
+                                <Button variant="contained" color="secondary" size="large" className="s-s-btn" onClick={() => onUserClick()}>See all the people</Button>
+                                <Button variant="contained" color="secondary" size="large" className="s-s-btn">See all the events</Button>
+                                <Button variant="contained" color="secondary" size="large" className="s-s-btn">See all the organization</Button>
                             </div>
                         </div>
                     </div>

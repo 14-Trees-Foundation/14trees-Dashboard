@@ -28,7 +28,7 @@ const theme = createTheme({
                     backgroundColor: '#9BC53D',
                     fontcolor: '#ffffff',
                     fontSize: 18,
-                    minWidth: "200px",
+                    minWidth: "100px",
                     textTransform: 'none',
                     borderRadius: "7px",
                     '&:hover':{

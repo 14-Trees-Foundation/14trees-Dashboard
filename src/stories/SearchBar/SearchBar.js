@@ -1,7 +1,9 @@
 import React from "react";
 import PropTypes from "prop-types";
 import { InputText } from 'primereact/inputtext';
-import { Button } from "../Button/Button";
+
+import Button from '@mui/material/Button';
+
 import "./searchbar.scss";
 
 /**
@@ -15,12 +17,11 @@ export const SearchBar = ({ value, onClick, onSubmit, ...props }) => {
             value={value}
             onChange={(e)=>onClick(e.target.value)}
             className="input"/>
-        <Button
-            primary={true}
-            size={'large'}
-            className="sb-button"
-            label={"Submit"}
-            onClick={onSubmit}/>
+            <div className="sb-button-div">
+                <Button variant="contained" color="primary" className="sb-button" onClick={onSubmit}>
+                    Submit
+                </Button>
+            </div>
       </div>
   )
 };
