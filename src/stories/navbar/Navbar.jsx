@@ -18,7 +18,6 @@ export const Navbar = (props) => {
                     <MenuButton label="About"/>
                     <Button
                         className="navbar-button"
-                        icon="pi pi-wallet"
                         iconPos="right"
                         label="Connect"
                         // onClick={onClickHandler}

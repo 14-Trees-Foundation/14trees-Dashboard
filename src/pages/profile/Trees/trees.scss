@@ -21,3 +21,9 @@
         padding-top: 5%;
     }
 }
+
+@media (max-width: 540px){
+    .trees {
+        min-height: 300px;
+    }
+}
