@@ -9,6 +9,7 @@ export const Trees = (props) => {
     for (const tree of props.trees){
         images.push.apply(images,tree['memories']);
     }
+    images = images.sort((a, b) => 0.5 - Math.random());
     return (
         <div className="trees">
             {/* <h2>Trees Planted</h2> */}
@@ -68,7 +69,7 @@ export const Trees = (props) => {
                             </div>
                             <div className="p-col-5 p-lg-5 p-md-5" style={{"padding":"0 0.3rem 0.2rem 0"}}>
                                 <Memories 
-                                img={""}
+                                img={images[3]}
                                 overlay="true"/>
                             </div>
                     </div>

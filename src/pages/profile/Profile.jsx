@@ -24,7 +24,6 @@ export const Profile = () => {
     const fetchData = useCallback(async () => {
         
         const response = await Axios.default.get(`/api/v1/profile?id=${saplingId}`);
-        console.log(response);
         if(response.status === 200) {
             setSaplingData(response.data);
         }

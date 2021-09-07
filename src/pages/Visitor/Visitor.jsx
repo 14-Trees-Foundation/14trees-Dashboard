@@ -194,11 +194,11 @@ export const Visitor = () => {
             }
         }
         // await delay(2000);
-        setValues({
-            ...values,
-            loading:false,
-            backdropOpen:false
-        })
+        // setValues({
+        //     ...values,
+        //     loading:false,
+        //     backdropOpen:false
+        // })
     }
     if(values.uploaded){
         return(
