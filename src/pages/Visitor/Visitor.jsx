@@ -50,14 +50,8 @@ export const Visitor = () => {
     const [errors, setErrors] = useState({});
     const PROFILE_IMG_MAX=2;
     const ADDITIONAL_IMG_MAX=10;
-    const delay = ms => new Promise(res => setTimeout(res, ms));
 
     const classes = UseStyle();
-
-    const reset = () => {
-        setValues(intitialFValues)
-        setErrors({}) 
-    }
 
     const validate = () => {
         let temp = {};
@@ -84,15 +78,6 @@ export const Visitor = () => {
             date:value
         });
       };
-    
-    const handleClose = () => {
-        if (!values.loading) {
-            setValues({
-                ...values,
-                backdropOpen:false,
-            })
-        };
-        }
     
     const handleAdditionalPicUpload = (e) => {
         if (Array.from(e.target.files).length > ADDITIONAL_IMG_MAX) {
@@ -193,12 +178,6 @@ export const Visitor = () => {
                 toast.error(res.response.statusText)
             }
         }
-        // await delay(2000);
-        // setValues({
-        //     ...values,
-        //     loading:false,
-        //     backdropOpen:false
-        // })
     }
     if(values.uploaded){
         return(
@@ -240,7 +219,7 @@ export const Visitor = () => {
                     </div>
                     <div className={classes.inputbox}>
                         <Paper className={classes.paper}>
-                            <Backdrop className={classes.backdrop} open={values.backdropOpen} onClick={handleClose}>  
+                            <Backdrop className={classes.backdrop} open={values.backdropOpen}>  
                                 <Spinner text={"Sending your data..."}/>
                             </Backdrop>
                             <ToastContainer />
