@@ -26,6 +26,9 @@ export const Profile = () => {
         const response = await Axios.default.get(`/api/v1/profile?id=${saplingId}`);
         if(response.status === 200) {
             setSaplingData(response.data);
+        } else if (response.status === 204) {
+            setLoading(false);
+            setSaplingData(response.data);
         }
     
         const overallResponse = await Axios.default.get(`/api/v1/analytics/totaltree`);

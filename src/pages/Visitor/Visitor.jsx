@@ -173,8 +173,18 @@ export const Visitor = () => {
                 })
                 toast.success("Data uploaded successfully!")
             } else if(res.status === 204) {
+                setValues({
+                    ...values,
+                    loading:false,
+                    backdropOpen:false
+                })
                 toast.error(res.statusText)
             } else if(res.status === 409){
+                setValues({
+                    ...values,
+                    loading:false,
+                    backdropOpen:false
+                })
                 toast.error(res.response.statusText)
             }
         }

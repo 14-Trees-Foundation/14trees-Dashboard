@@ -8,7 +8,6 @@ import 'primeflex/primeflex.css';
 
 export const Overall = ({trees, ponds}) => {
 
-    console.log(ponds)
     const [popup, setPopup] = useState(false);
 
     const togglePopup = () => {
