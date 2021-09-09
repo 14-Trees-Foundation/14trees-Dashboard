@@ -272,7 +272,7 @@ export const Visitor = () => {
                                                 margin="normal"
                                                 id="date-picker-dialog"
                                                 label="Date of birth"
-                                                format="MM/dd/yyyy"
+                                                format="dd/MM/yyyy"
                                                 value={values.date}
                                                 onChange={handleDateChange}
                                                 KeyboardButtonProps={{
