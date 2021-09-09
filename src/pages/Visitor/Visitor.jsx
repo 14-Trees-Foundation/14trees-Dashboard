@@ -299,8 +299,7 @@ export const Visitor = () => {
                                             <Avatar alt="U" src={values.userImage2src? values.userImage2src : null} />
                                             <span className={classes.span}></span>
                                             <label htmlFor="contained-button-file" style={{'display':'block', 'marginTop':'5px'}}>
-                                                
-                                                <Button variant="contained" color='secondary' size='small'>
+                                                <Button variant="contained" color='secondary' size='small' style={{minWidth:"170px"}}>
                                                 Upload your pic
                                                 </Button>
                                             </label>
@@ -349,7 +348,7 @@ export const Visitor = () => {
                                             <Avatar alt="U" src={values.addImage3src? values.addImage3src : null}/>
                                             <span className={classes.span}></span>
                                             <label htmlFor="additional-image-file" style={{'display':'block', 'marginTop':'5px'}}>
-                                                <Button variant="contained" color='secondary' size='small'>
+                                                <Button variant="contained" color='secondary' size='small' style={{minWidth:"170px"}}>
                                                 Add more pics
                                                 </Button>
                                             </label>
@@ -531,6 +530,7 @@ const UseStyle = makeStyles((theme) => ({
         marginTop: '20px',
         marginLeft: "auto",
         marginRight: "auto",
+        marginBottom: '10px',
         display: "block"
     }
 }));
