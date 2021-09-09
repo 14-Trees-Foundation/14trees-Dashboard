@@ -4,7 +4,7 @@ import { makeStyles } from '@material-ui/core/styles';
 import Backdrop from '@mui/material/Backdrop';
 import Grid from '@material-ui/core/Grid';
 import TextField from '@material-ui/core/TextField';
-import { Button, Paper, Typography, Avatar } from '@material-ui/core';
+import { Paper, Typography, Avatar } from '@material-ui/core';
 import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
 import CardMedia from '@material-ui/core/CardMedia';
@@ -18,6 +18,8 @@ import tree from "../../../assets/dark_logo.png";
 import { Spinner } from "../../../stories/Spinner/Spinner";
 
 import Axios from "../../../api/local";
+
+import Button from '@mui/material/Button';
 
 const intitialFValues = {
     treename: '',
@@ -204,8 +206,8 @@ export const AddTree = () => {
                                         <div className={classes.submitDiv}>
                                                 <Avatar alt="U" src={values.imagesrc? values.imagesrc : null}/>
                                                 <span className={classes.span}></span>
-                                                <label htmlFor="contained-button-file" style={{'display':'block', 'marginTop':'5px'}}>
-                                                    <Button variant="contained" component="span" color='primary' size='small' className={classes.imgbtn}>
+                                                <label htmlFor="contained-button-file" style={{'display':'block'}}>
+                                                    <Button variant="contained" color='secondary' size='small'>
                                                     Upload
                                                     </Button>
                                                 </label>
@@ -213,7 +215,9 @@ export const AddTree = () => {
                                     </Grid>
                                         {
                                             !values.uimageerror && !values.addimageerror &&
-                                            <Button size='large' className={classes.submitbtn} variant="contained" component="span" color='secondary' onClick={onSubmit}>Submit</Button>
+                                            <div className={classes.submitbtn}>
+                                                <Button size='large' variant="contained" color='primary' onClick={onSubmit}>Submit</Button>
+                                            </div>
                                         }
                                 </Grid>
                             </form>
@@ -355,7 +359,7 @@ const UseStyle = makeStyles((theme) => ({
         }
     },
     submitbtn: {
-        marginTop: '20px',
+        paddingTop: '20px',
         marginLeft: "auto",
         marginRight: "auto",
         marginBottom: '10px',

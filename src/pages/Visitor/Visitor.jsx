@@ -7,7 +7,7 @@ import { Alert, AlertTitle } from '@material-ui/lab';
 import Backdrop from '@material-ui/core/Backdrop';
 import Grid from '@material-ui/core/Grid';
 import TextField from '@material-ui/core/TextField';
-import { Button, Paper, Typography, Avatar } from '@material-ui/core';
+import { Paper, Typography, Avatar } from '@material-ui/core';
 import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
 import CardMedia from '@material-ui/core/CardMedia';
@@ -21,6 +21,8 @@ import tree from "../../assets/dark_logo.png";
 import { Spinner } from "../../stories/Spinner/Spinner";
 
 import Axios from "../../api/local";
+
+import Button from '@mui/material/Button';
 
 const intitialFValues = {
     sapling: '',
@@ -298,7 +300,7 @@ export const Visitor = () => {
                                             <span className={classes.span}></span>
                                             <label htmlFor="contained-button-file" style={{'display':'block', 'marginTop':'5px'}}>
                                                 
-                                                <Button variant="contained" component="span" color='primary' size='small' className={classes.imgbtn}>
+                                                <Button variant="contained" color='secondary' size='small'>
                                                 Upload your pic
                                                 </Button>
                                             </label>
@@ -347,7 +349,7 @@ export const Visitor = () => {
                                             <Avatar alt="U" src={values.addImage3src? values.addImage3src : null}/>
                                             <span className={classes.span}></span>
                                             <label htmlFor="additional-image-file" style={{'display':'block', 'marginTop':'5px'}}>
-                                                <Button variant="contained" component="span" color='primary' size='small' className={classes.imgbtn}>
+                                                <Button variant="contained" color='secondary' size='small'>
                                                 Add more pics
                                                 </Button>
                                             </label>
@@ -355,7 +357,9 @@ export const Visitor = () => {
                                     </Grid>
                                         {
                                             !values.uimageerror && !values.addimageerror &&
-                                            <Button size='large' className={classes.submitbtn} variant="contained" component="span" color='secondary' onClick={onSubmit}>Submit</Button>
+                                            <div className={classes.submitbtn}>
+                                                <Button size='large' variant="contained" color='primary' onClick={onSubmit}>Submit</Button>
+                                            </div>
                                         }
                                 </Grid>
                             </form>
