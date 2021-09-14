@@ -1,11 +1,11 @@
 import React from "react";
-import { Navbar } from "../Navbar/Navbar";
+import { AppBar } from "../AppBar/AppBar";
 import "./layout.scss";
 
 export const Layout = (props) => {
   return (
     <div className="layout-container">
-      <Navbar/>
+      <AppBar/>
       <div className="layout-content">
         {props.children}
       </div>

@@ -77,7 +77,7 @@ export const Visitor = () => {
     const handleDateChange = (value) => {
         setValues({
             ...values,
-            date:value
+            dob:value
         });
       };
     
@@ -154,13 +154,13 @@ export const Visitor = () => {
             
             if (values.additionalImages) {
                 for (const key of Object.keys(values.additionalImages)) {
-                    formData.append('userImages', values.additionalImages[key])
+                    formData.append('userimages', values.additionalImages[key])
                     extraImages.push(values.additionalImages[key].name)
                 }
             }
             
-            formData.append('userImages', userImages);
-            formData.append('extraImages', extraImages);
+            formData.append('uimagefilename', userImages);
+            formData.append('eimagfilename', extraImages);
             let res = await Axios.post('/api/v1/visitor/form', formData, {
                 headers: {
                     'Content-type': 'multipart/form-data'
@@ -273,7 +273,7 @@ export const Visitor = () => {
                                                 id="date-picker-dialog"
                                                 label="Date of birth"
                                                 format="dd/MM/yyyy"
-                                                value={values.date}
+                                                value={values.dob}
                                                 onChange={handleDateChange}
                                                 KeyboardButtonProps={{
                                                     'aria-label': 'change date',
@@ -299,7 +299,7 @@ export const Visitor = () => {
                                             <Avatar alt="U" src={values.userImage2src? values.userImage2src : null} />
                                             <span className={classes.span}></span>
                                             <label htmlFor="contained-button-file" style={{'display':'block', 'marginTop':'5px'}}>
-                                                <Button variant="contained" color='secondary' size='small' style={{minWidth:"170px"}}>
+                                                <Button component="span" variant="contained" color='secondary' size='small' style={{minWidth:"170px"}}>
                                                 Upload your pic
                                                 </Button>
                                             </label>
@@ -348,7 +348,7 @@ export const Visitor = () => {
                                             <Avatar alt="U" src={values.addImage3src? values.addImage3src : null}/>
                                             <span className={classes.span}></span>
                                             <label htmlFor="additional-image-file" style={{'display':'block', 'marginTop':'5px'}}>
-                                                <Button variant="contained" color='secondary' size='small' style={{minWidth:"170px"}}>
+                                                <Button component="span" variant="contained" color='secondary' size='small' style={{minWidth:"170px"}}>
                                                 Add more pics
                                                 </Button>
                                             </label>

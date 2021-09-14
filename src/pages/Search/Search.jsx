@@ -1,7 +1,7 @@
 import { useState } from "react"
 
 import { InputBar } from "./InputBar/InputBar";
-import { Chip } from "../../stories/ButtonChips/Chip";
+import { Chip } from "../../stories/Chip/Chip";
 import { UserList } from "../../stories/UserList/UserList";
 import { OrgList } from "../../stories/OrgList/OrgList";
 import { EventList } from "../../stories/EventList/EventList";

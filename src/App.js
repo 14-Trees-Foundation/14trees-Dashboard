@@ -1,6 +1,6 @@
 import "./App.scss";
 import { Switch, Route } from "react-router-dom";
-import { Profile } from "./pages/profile/Profile"
+import { Profile } from "./pages/UserProfile/Profile"
 import { Layout } from "./stories/Layout/Layout";
 import { Search } from "./pages/Search/Search";
 import { Visitor } from "./pages/Visitor/Visitor";

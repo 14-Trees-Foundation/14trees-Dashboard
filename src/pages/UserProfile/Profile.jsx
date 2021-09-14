@@ -66,7 +66,10 @@ export const Profile = () => {
                             </div>
                             <div className="p-col-12 p-md-6 p-sm-12">
                                 <Overall trees={overallData} ponds={pondsImages}/>
-                                <Map location={saplingData.treesPlanted}/>
+                                <div style={{height: '54vh'}}>
+                                    <h2 style={{marginTop:'18px'}}>Site Map</h2>
+                                    <Map location={saplingData.treesPlanted}/>
+                                </div>
                             </div>
                         </div>
                 }

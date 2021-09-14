@@ -207,7 +207,7 @@ export const AddTree = () => {
                                                 <Avatar alt="U" src={values.imagesrc? values.imagesrc : null}/>
                                                 <span className={classes.span}></span>
                                                 <label htmlFor="contained-button-file" style={{'display':'block'}}>
-                                                    <Button variant="contained" color='secondary' size='small'>
+                                                    <Button component="span" variant="contained" color='secondary' size='small'>
                                                     Upload
                                                     </Button>
                                                 </label>

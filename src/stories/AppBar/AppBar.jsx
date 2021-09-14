@@ -2,9 +2,9 @@ import React, { Fragment } from "react";
 import { Button } from "primereact/button";
 import { MenuButton } from "./MenuButton/menubutton";
 import logo from '../../assets/logo_light.png';
-import './navbar.scss'
+import './appbar.scss'
 
-export const Navbar = (props) => {
+export const AppBar = (props) => {
     return (
         <Fragment>
             <nav className="navbar">

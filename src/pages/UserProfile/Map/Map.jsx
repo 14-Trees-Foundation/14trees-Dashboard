@@ -15,7 +15,7 @@ require('dotenv').config();
 
 const containerStyle = {
     width: '100%',
-    height: '101%',
+    height: '100%',
     borderRadius: '6px',
     // boxShadow: '0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23)'
 };
@@ -86,7 +86,6 @@ export const Map = ({location}) => {
 
     return isLoaded ? (
         <div className="map">
-            <h2>Site Map</h2>
             <GoogleMap
             mapContainerStyle={containerStyle}
             mapTypeId={'satellite'}
