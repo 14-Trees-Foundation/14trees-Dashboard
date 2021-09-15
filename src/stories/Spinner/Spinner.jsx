@@ -13,7 +13,7 @@ export const Spinner = ({text}) => {
 };
 
 Spinner.defaultProps = {
-  text: 'This forest is dense, taking some time to reach your Tree!'
+  text: 'This forest is dense, taking some time to reach your destination!'
 };
 
 export default Spinner;

@@ -1,10 +1,11 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 import { makeStyles } from '@material-ui/core/styles';
 import Backdrop from '@mui/material/Backdrop';
 import Grid from '@material-ui/core/Grid';
 import TextField from '@material-ui/core/TextField';
-import { Paper, Typography, Avatar } from '@material-ui/core';
+import Autocomplete from '@material-ui/lab/Autocomplete';
+import { Paper } from '@material-ui/core';
 import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
 import CardMedia from '@material-ui/core/CardMedia';
@@ -22,56 +23,60 @@ import Axios from "../../../api/local";
 import Button from '@mui/material/Button';
 
 const intitialFValues = {
-    treename: '',
-    sapling: '',
-    images: null,
-    image: null,
-    imagesrc: null,
-    uimageerror: null,
+    selectedTreetype: '',
+    saplingId: '',
     uploaded: false,
+    backdropOpen: false
 }
 
 export const AddTree = () => {
 
     const [values, setValues] = useState(intitialFValues);
     const [errors, setErrors] = useState({});
+    const [treetype, setTreeType] = useState({});
     const classes = UseStyle();
+
+    let [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+
+        (async() => {
+            let response = await Axios.get(`/api/trees/treetypes`);
+            if(response.status === 200) {
+                setTreeType(response.data);
+            }
+            setLoading(false);
+        })();
+    }, []);
 
     const validate = () => {
         let temp = {};
-        temp.treename = values.treename ? "" : "Required Field"
-        temp.sapling = values.sapling ? "" : "Required Field"
+        temp.treeTypeId = values.selectedTreetype ? "" : "Required Field"
+        temp.saplingId = values.saplingId ? "" : "Required Field"
         setErrors({
             ...temp
         })
         return Object.values(temp).every(x => x === "")
     }
 
-    const handleInputchange = (e) => {
-        const { name, value } = e.target
+    const handleSaplingIdChange = (e) => {
         validate();
         setValues({
             ...values,
-            [name]:value
+            saplingId:e.target.value
         })
     }
 
-    const handlePicUpload = (e) => {
-        if (Array.from(e.target.files).length > 1) {
-            setValues({
-                ...values,
-                uimageerror:true
-            })
-            return
-        }
+    const handleTreeTypeChange = (value) => {
         setValues({
             ...values,
-            images: e.target.files,
-            image: e.target.files[0] ? e.target.files[0] : null,
-            imagesrc: e.target.files[0] ? URL.createObjectURL(e.target.files[0]) : null,
-            uimageerror: null
+            selectedTreetype:value
         })
     }
+
+    useEffect(() => {
+        validate();
+     }, [values]);
 
     const onSubmit = async (e) => {
         if(!validate()){
@@ -90,142 +95,118 @@ export const AddTree = () => {
                 loading:true,
                 backdropOpen:true
             })
-            const formData = new FormData();
-            formData.append('name', values.treename)
-            formData.append('sapling', values.sapling);
-
-            if (values.image) {
-                formData.append('image', values.image)
-                formData.append('imagename', values.image.name)
-            }
-            let res = await Axios.post('/api/v1/upload/tree', formData, {
-                headers: {
-                    'Content-type': 'multipart/form-data'
-                },
-            })
+            const params = JSON.stringify({
+                "sapling_id": values.saplingId,
+                "tree_id": values.selectedTreetype.tree_id,
+                });
             
-            if(res.status === 200) {
-                setValues({
-                    ...values,
-                    loading: false,
-                    uploaded: true,
+            try {
+                let res = await Axios.post('/api/trees/addtree', params, {
+                    headers: {
+                        'Content-type': 'application/json'
+                    },
                 })
-                toast.success("Data uploaded successfully!")
-            } else if(res.status === 204) {
-                setValues({
-                    ...values,
-                    loading: false,
-                    uploaded: false,
-                })
-                toast.error(res.statusText)
-            } else if(res.status === 409){
-                setValues({
-                    ...values,
-                    loading: false,
-                    uploaded: false,
-                })
-                toast.error(res.response.statusText)
+                if(res.status === 201) {
+                    setValues({
+                        ...values,
+                        loading: false,
+                        uploaded: true,
+                    })
+                    toast.success("Data uploaded successfully!")
+                }
+            } catch (error) {
+                if(error.response.status === 500) {
+                    setValues({
+                        ...values,
+                        loading: false,
+                        uploaded: false,
+                    })
+                    toast.error(error.response.data.error)
+                }
             }
         }
     }
 
-    if(values.uploaded){
-        return(
-            <div className={classes.box}>
-                <img alt="bg" src={bg} className={classes.bgimg}/>
-                <div className={classes.bg}>
-                    <div className={classes.infobox}>
-                        <p className={classes.infodesc}>Tree Data Saved</p>
-                    </div>
-                    <div className={classes.sucessbox}>
-                        <Card className={classes.maincard}>
-                            <CardContent style={{'marginTop':'1%'}}>
-                                <Alert severity="success">
-                                    Your data has been uploaded successfuly!
-                                </Alert>
-                                <CardMedia
-                                    className={classes.media}
-                                    image= {tree}
-                                    title="tree"
-                                />
-                            </CardContent>
-                        </Card>
-                    </div>
-                </div>
-            </div>
-        )
+    if (loading) {
+        return <Spinner />
     } else {
-        return (
-            <div className={classes.box}>
-                <img alt="bg" src={bg} className={classes.bgimg}/>
-                <div className={classes.bg}>
-                    <div className={classes.infobox}>
-                        <p className={classes.infodesc}>Fill tree information</p>
-                    </div>
-                    <div className={classes.inputbox}>
-                        <Paper className={classes.paper}>
-                            <Backdrop className={classes.backdrop} open={values.backdropOpen}>  
-                                <Spinner text={"Sending your data..."}/>
-                            </Backdrop>
-                            <ToastContainer />
-                            <h1 className={classes.formheader}>Tree information</h1>
-                            <form className={classes.root} autoComplete='off'>
-                                <Grid container>
-                                    <Grid item xs={12} sm={12} md={12}>
-                                        <TextField
-                                            error={errors.treename!==""?true:false}
-                                            variant='outlined'
-                                            label='Tree Name *'
-                                            name='treename'
-                                            value={values.treename}
-                                            helperText="Tree Name"
-                                            onChange = {handleInputchange}
-                                        />
-                                        <TextField
-                                            error={errors.sapling!==""?true:false}
-                                            variant='outlined'
-                                            label='Sapling ID *'
-                                            name='sapling'
-                                            value={values.sapling}
-                                            helperText="Spaling ID"
-                                            onChange = {handleInputchange}
-                                        />
-                                        <div style={{'marginTop':'20px'}}>
-                                            <Typography variant="subtitle2" gutterBottom className={classes.helper}>
-                                                Upload the sapling image.
-                                            </Typography>
-                                            <input
-                                                accept="image/*"
-                                                className={classes.input}
-                                                id="contained-button-file"
-                                                multiple
-                                                type="file"
-                                                onChange={handlePicUpload}
-                                            />
-                                        </div>
-                                        <div className={classes.submitDiv}>
-                                                <Avatar alt="U" src={values.imagesrc? values.imagesrc : null}/>
-                                                <span className={classes.span}></span>
-                                                <label htmlFor="contained-button-file" style={{'display':'block'}}>
-                                                    <Button component="span" variant="contained" color='secondary' size='small'>
-                                                    Upload
-                                                    </Button>
-                                                </label>
-                                            </div>
-                                    </Grid>
-                                        {
-                                            !values.uimageerror && !values.addimageerror &&
-                                            <div className={classes.submitbtn}>
-                                                <Button size='large' variant="contained" color='primary' onClick={onSubmit}>Submit</Button>
-                                            </div>
-                                        }
-                                </Grid>
-                            </form>
-                        </Paper>
+        if(values.uploaded){
+            return(
+                <div className={classes.box}>
+                    <img alt="bg" src={bg} className={classes.bgimg}/>
+                    <div className={classes.bg}>
+                        <div className={classes.infobox}>
+                            <p className={classes.infodesc}>Tree Data Saved</p>
+                        </div>
+                        <div className={classes.sucessbox}>
+                            <Card className={classes.maincard}>
+                                <CardContent style={{'marginTop':'1%'}}>
+                                    <Alert severity="success">
+                                        Your data has been uploaded successfuly!
+                                    </Alert>
+                                    <CardMedia
+                                        className={classes.media}
+                                        image= {tree}
+                                        title="tree"
+                                    />
+                                </CardContent>
+                            </Card>
+                        </div>
                     </div>
                 </div>
-            </div>
-        )
+            )
+        } else {
+            return (
+                <div className={classes.box}>
+                    <img alt="bg" src={bg} className={classes.bgimg}/>
+                    <div className={classes.bg}>
+                        <div className={classes.infobox}>
+                            <p className={classes.infodesc}>Fill tree information</p>
+                        </div>
+                        <div className={classes.inputbox}>
+                            <Paper className={classes.paper}>
+                                <Backdrop className={classes.backdrop} open={values.backdropOpen}>  
+                                    <Spinner text={"Sending your data..."}/>
+                                </Backdrop>
+                                <ToastContainer />
+                                <h1 className={classes.formheader}>Tree information</h1>
+                                <form className={classes.root} autoComplete='off'>
+                                    <Grid container>
+                                        <Grid item xs={12} sm={12} md={12}>
+                                            <Autocomplete
+                                                id="treetype"
+                                                options={treetype}
+                                                autoHighlight
+                                                getOptionLabel={(option) => option.name}
+                                                onChange={(event, newValue) => {
+                                                    handleTreeTypeChange(newValue);
+                                                }}
+                                                renderInput={(params) => <TextField {...params} label="Select Tree Type" variant="outlined" />}
+                                                />
+                                            <TextField
+                                                error={errors.saplingId!==""?true:false}
+                                                variant='outlined'
+                                                label='Sapling ID *'
+                                                name='sapling'
+                                                value={values.sapling}
+                                                helperText="Sapling ID"
+                                                onChange = {handleSaplingIdChange}
+                                            />
+                                        </Grid>
+                                            {
+                                                !values.uimageerror && !values.addimageerror &&
+                                                <div className={classes.submitbtn}>
+                                                    <Button size='large' variant="contained" color='primary' onClick={onSubmit}>Submit</Button>
+                                                </div>
+                                            }
+                                    </Grid>
+                                </form>
+                            </Paper>
+                        </div>
+                    </div>
+                </div>
+            )
+        }
     }
 }
 
@@ -272,10 +253,10 @@ const UseStyle = makeStyles((theme) => ({
         objectFit: 'cover',
     },
     bg: {
-        overflow: "auto",
-        "&::-webkit-scrollbar" : {
-            display: "none",
-        },
+        // overflow: "auto",
+        // "&::-webkit-scrollbar" : {
+        //     display: "none",
+        // },
         width: '100vw',
         height: '100vh',
         position: 'absolute',
