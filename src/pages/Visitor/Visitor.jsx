@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 import DateFnsUtils from '@date-io/date-fns';
 import moment from 'moment';
@@ -118,6 +118,10 @@ export const Visitor = () => {
         })
     }
 
+    useEffect(() => {
+        validate();
+     }, [values]);
+
     const onSubmit = async (e) => {
         if(!validate()){
             toast.error('Please fill mandatory fields', {
@@ -142,52 +146,54 @@ export const Visitor = () => {
             formData.append('org', values.org);
             formData.append('dob', date);
             formData.append('contact', values.contact);
-            formData.append('sapling', values.sapling);
+            formData.append('sapling_id', values.sapling);
             const userImages = [];
             const extraImages = [];
             if (values.userImages) {
                 for (const key of Object.keys(values.userImages)) {
-                    formData.append('userImages', values.userImages[key])
+                    formData.append('files', values.userImages[key])
                     userImages.push(values.userImages[key].name)
                 }
             }
             
             if (values.additionalImages) {
                 for (const key of Object.keys(values.additionalImages)) {
-                    formData.append('userimages', values.additionalImages[key])
+                    formData.append('files', values.additionalImages[key])
                     extraImages.push(values.additionalImages[key].name)
                 }
             }
             
-            formData.append('uimagefilename', userImages);
-            formData.append('eimagfilename', extraImages);
-            let res = await Axios.post('/api/v1/visitor/form', formData, {
-                headers: {
-                    'Content-type': 'multipart/form-data'
-                },
-            })
-            
-            if(res.status === 200) {
-                setValues({
-                    ...values,
-                    loading: false,
-                    uploaded: true,
+            formData.append('userimages', userImages);
+            formData.append('memoryimages', extraImages);
+            try {
+                let res = await Axios.post('/api/profile/usertreereg', formData, {
+                    headers: {
+                        'Content-type': 'multipart/form-data'
+                    },
                 })
-                toast.success("Data uploaded successfully!")
-            } else if(res.status === 204) {
+                
+                if(res.status === 201) {
+                    setValues({
+                        ...values,
+                        loading: false,
+                        uploaded: true,
+                    })
+                    toast.success("Data uploaded successfully!")
+                } else if(res.status === 204 || res.status === 400) {
+                    setValues({
+                        ...values,
+                        loading:false,
+                        backdropOpen:false
+                    })
+                    toast.error(res.statusText)
+                }
+            } catch (error) {
                 setValues({
                     ...values,
                     loading:false,
                     backdropOpen:false
                 })
-                toast.error(res.statusText)
-            } else if(res.status === 409){
-                setValues({
-                    ...values,
-                    loading:false,
-                    backdropOpen:false
-                })
-                toast.error(res.response.statusText)
+                toast.error(error.response.statusText)
             }
         }
     }

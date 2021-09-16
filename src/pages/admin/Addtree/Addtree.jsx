@@ -98,7 +98,7 @@ export const AddTree = () => {
             const params = JSON.stringify({
                 "sapling_id": values.saplingId,
                 "tree_id": values.selectedTreetype.tree_id,
-                });
+            });
             
             try {
                 let res = await Axios.post('/api/trees/addtree', params, {
