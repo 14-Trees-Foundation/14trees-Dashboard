@@ -38,6 +38,7 @@ const footer = (id, name, date) => {
 };
 export const TreesPlanted = ({ mode, id, name, img, date, ...props }) => {
 
+  console.log(img)
   return (
     <Card
       className={[`box-${mode}`]}

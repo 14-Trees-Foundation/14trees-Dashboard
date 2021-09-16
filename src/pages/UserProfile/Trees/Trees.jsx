@@ -7,6 +7,7 @@ import './trees.scss'
 import 'primeflex/primeflex.css';
 
 export const Trees = (props) => {
+    console.log(props)
 
     const history = useHistory();
 
@@ -30,10 +31,10 @@ export const Trees = (props) => {
                 <div className="p-col-12 p-lg-6 p-md-6 treesplanted">
                     <div className="p-grid" style={{"margin":0}}>
                         <div className="p-col-12" style={{"padding":0, "display":"flex"}}>
-                            <h2 style={{"margin":"0 0 5px 0", paddingTop:'5px'}}>Trees Planted</h2>
+                            <h2 style={{"margin":"0 0px 5px 0", paddingTop:'5px'}}>Trees Planted</h2>
                             {
                                 numTrees > 2 &&
-                                <Chip label={"See All >"} mode={'primary'} size={'small'} handleClick={onAllTreeSelect}/>
+                                <Chip label={"See All >"} mode={'secondary'} size={'small'} handleClick={onAllTreeSelect}/>
                             }
                         </div>
                         <div className="p-col-6 p-lg-6 p-md-6" style={{"padding":0}}>
@@ -41,10 +42,10 @@ export const Trees = (props) => {
                                 numTrees > 0
                                 ?
                                     <TreesPlanted
-                                        id={props.trees[0].sapling_id}
-                                        name={props.trees[0].name}
-                                        img={props.trees[0].image}
-                                        date={props.trees[0].date_added}/>
+                                        id={props.trees[0].tree.sapling_id}
+                                        name={props.trees[0].tree.tree_id.name}
+                                        img={props.trees[0].tree.tree_id.image[0]}
+                                        date={props.trees[0].tree.date_added}/>
                                 :
                                     <TreesPlanted/>
                             }
@@ -54,10 +55,10 @@ export const Trees = (props) => {
                                 numTrees > 1
                                 ?
                                     <TreesPlanted
-                                        id={props.trees[1].sapling_id}
-                                        name={props.trees[1].name}
-                                        img={props.trees[1].image}
-                                        date={props.trees[1].date_added}/>
+                                    id={props.trees[1].tree.sapling_id}
+                                    name={props.trees[1].tree.tree_id.name}
+                                    img={props.trees[1].tree.tree_id.image[0]}
+                                    date={props.trees[1].tree.date_added}/>
                                 :
                                     <TreesPlanted/>
                             }

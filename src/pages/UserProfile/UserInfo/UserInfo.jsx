@@ -11,21 +11,21 @@ export const UserInfo = (props) => {
                         <div className="p-col-6 p-md-6 p-sm-6" style={{"padding":0}}>
                             <img
                                 alt="Card"
-                                src={props.saplingData.profile_image === "" ? "https://picsum.photos/523/354" : props.saplingData.profile_image}
+                                src={props.saplingData.user.profile_image === "" ? "https://picsum.photos/523/354" : props.saplingData.user.profile_image[0]}
                                 className="img"/>
                         </div>
                         <div className="p-col-6 p-md-6 p-sm-6 desc">
                             <div className="label">Name</div>
-                            <div className="data">{props.saplingData.name}</div>
+                            <div className="data">{props.saplingData.user.user.name}</div>
                             <div className="label">Organization</div>
-                            <div className="data">{props.saplingData.organisation}</div>
-                            <InfoChip count={props.saplingData.treesPlanted.length} label="Trees Planted"/>
-                            <InfoChip count={props.saplingData.treesPlanted.length} label="Visits till date"/>
+                            <div className="data">{props.saplingData.user.user.org}</div>
+                            <InfoChip count={props.saplingData.trees.length} label="Trees Planted"/>
+                            <InfoChip count={props.saplingData.trees.length} label="Visits till date"/>
                             <div className="overall">
                                 <div className="done" style={{"width":'25%'}}>
                                 </div>
                                 <div className="count">
-                                    {14 - props.saplingData.treesPlanted.length}
+                                    {14 - props.saplingData.trees.length}
                                 </div>
                                 <div className="label">
                                     Trees away from neutralising your carbon footprint

@@ -24,6 +24,7 @@ export const Profile = () => {
     const fetchData = useCallback(async () => {
         
         const response = await Axios.default.get(`/profile?id=${saplingId}`);
+        console.log(response)
         if(response.status === 200) {
             setSaplingData(response.data);
         } else if (response.status === 204) {
@@ -31,12 +32,12 @@ export const Profile = () => {
             setSaplingData(response.data);
         }
     
-        const overallResponse = await Axios.default.get(`/analytics/totaltree`);
+        const overallResponse = await Axios.default.get(`/analytics/totaltrees`);
         if(overallResponse.status === 200) {
-            setOverallData(overallResponse.data[0]);                
+            setOverallData(overallResponse.data);                
         }
 
-        const pondImagesRes = await Axios.default.get(`/analytics/ponds`);
+        const pondImagesRes = await Axios.default.get(`/analytics/totalponds`);
         if(pondImagesRes.status === 200) {
             setPondsImages(pondImagesRes.data);                
         }
@@ -62,13 +63,13 @@ export const Profile = () => {
                         <div className="p-grid" style={{"marginTop":"15px"}}>
                             <div className="p-col-12 p-md-6 p-sm-12">
                                 <UserInfo saplingData={saplingData}/>
-                                <Trees trees={saplingData.treesPlanted}/>
+                                <Trees trees={saplingData.trees}/>
                             </div>
                             <div className="p-col-12 p-md-6 p-sm-12">
                                 <Overall trees={overallData} ponds={pondsImages}/>
                                 <div style={{height: '54vh'}}>
                                     <h2 style={{marginTop:'18px'}}>Site Map</h2>
-                                    <Map location={saplingData.treesPlanted}/>
+                                    <Map location={saplingData.trees}/>
                                 </div>
                             </div>
                         </div>
