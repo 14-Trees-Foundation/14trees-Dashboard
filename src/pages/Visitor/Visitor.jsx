@@ -166,7 +166,7 @@ export const Visitor = () => {
             formData.append('userimages', userImages);
             formData.append('memoryimages', extraImages);
             try {
-                let res = await Axios.post('/api/profile/usertreereg', formData, {
+                let res = await Axios.post('/profile/usertreereg', formData, {
                     headers: {
                         'Content-type': 'multipart/form-data'
                     },

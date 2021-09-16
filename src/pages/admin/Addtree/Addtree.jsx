@@ -41,7 +41,7 @@ export const AddTree = () => {
     useEffect(() => {
 
         (async() => {
-            let response = await Axios.get(`/api/trees/treetypes`);
+            let response = await Axios.get(`/trees/treetypes`);
             if(response.status === 200) {
                 setTreeType(response.data);
             }
@@ -101,7 +101,7 @@ export const AddTree = () => {
             });
             
             try {
-                let res = await Axios.post('/api/trees/addtree', params, {
+                let res = await Axios.post('/trees/addtree', params, {
                     headers: {
                         'Content-type': 'application/json'
                     },

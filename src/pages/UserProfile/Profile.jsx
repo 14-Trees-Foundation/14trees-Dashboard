@@ -23,7 +23,7 @@ export const Profile = () => {
 
     const fetchData = useCallback(async () => {
         
-        const response = await Axios.default.get(`/api/v1/profile?id=${saplingId}`);
+        const response = await Axios.default.get(`/profile?id=${saplingId}`);
         if(response.status === 200) {
             setSaplingData(response.data);
         } else if (response.status === 204) {
@@ -31,12 +31,12 @@ export const Profile = () => {
             setSaplingData(response.data);
         }
     
-        const overallResponse = await Axios.default.get(`/api/v1/analytics/totaltree`);
+        const overallResponse = await Axios.default.get(`/analytics/totaltree`);
         if(overallResponse.status === 200) {
             setOverallData(overallResponse.data[0]);                
         }
 
-        const pondImagesRes = await Axios.default.get(`/api/v1/analytics/ponds`);
+        const pondImagesRes = await Axios.default.get(`/analytics/ponds`);
         if(pondImagesRes.status === 200) {
             setPondsImages(pondImagesRes.data);                
         }
