@@ -24,6 +24,7 @@ import Button from '@mui/material/Button';
 
 const intitialFValues = {
     selectedTreetype: '',
+    selectedPlot: '',
     saplingId: '',
     uploaded: false,
     backdropOpen: false
@@ -34,6 +35,7 @@ export const AddTree = () => {
     const [values, setValues] = useState(intitialFValues);
     const [errors, setErrors] = useState({});
     const [treetype, setTreeType] = useState({});
+    const [plots, setPlots] = useState({});
     const classes = UseStyle();
 
     let [loading, setLoading] = useState(true);
@@ -41,9 +43,16 @@ export const AddTree = () => {
     useEffect(() => {
 
         (async() => {
-            let response = await Axios.get(`/trees/treetypes`);
-            if(response.status === 200) {
-                setTreeType(response.data);
+            // Get Tree types
+            let TreeRes = await Axios.get(`/trees/treetypes`);
+            if(TreeRes.status === 200) {
+                setTreeType(TreeRes.data);
+            }
+
+            // Get Plots
+            let plotRes = await Axios.get(`/plots`);
+            if(plotRes.status === 200) {
+                setPlots(plotRes.data);
             }
             setLoading(false);
         })();
@@ -52,6 +61,7 @@ export const AddTree = () => {
     const validate = () => {
         let temp = {};
         temp.treeTypeId = values.selectedTreetype ? "" : "Required Field"
+        temp.plotId = values.selectedPlot ? "" : "Required Field"
         temp.saplingId = values.saplingId ? "" : "Required Field"
         setErrors({
             ...temp
@@ -71,6 +81,13 @@ export const AddTree = () => {
         setValues({
             ...values,
             selectedTreetype:value
+        })
+    }
+
+    const handlePlotTypeChange = (value) => {
+        setValues({
+            ...values,
+            selectedPlot:value
         })
     }
 
@@ -98,6 +115,7 @@ export const AddTree = () => {
             const params = JSON.stringify({
                 "sapling_id": values.saplingId,
                 "tree_id": values.selectedTreetype.tree_id,
+                "plot_id": values.selectedPlot.plot_id
             });
             
             try {
@@ -182,6 +200,16 @@ export const AddTree = () => {
                                                     handleTreeTypeChange(newValue);
                                                 }}
                                                 renderInput={(params) => <TextField {...params} label="Select Tree Type" variant="outlined" />}
+                                                />
+                                            <Autocomplete
+                                                id="plots"
+                                                options={plots}
+                                                autoHighlight
+                                                getOptionLabel={(option) => option.name}
+                                                onChange={(event, newValue) => {
+                                                    handlePlotTypeChange(newValue);
+                                                }}
+                                                renderInput={(params) => <TextField {...params} label="Select Plot" variant="outlined" />}
                                                 />
                                             <TextField
                                                 error={errors.saplingId!==""?true:false}
