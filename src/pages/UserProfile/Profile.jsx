@@ -69,7 +69,7 @@ export const Profile = () => {
                                 <Overall trees={overallData} ponds={pondsImages}/>
                                 <div style={{height: '54vh'}}>
                                     <h2 style={{marginTop:'18px'}}>Site Map</h2>
-                                    <Map location={saplingData.trees}/>
+                                    <Map trees={saplingData.trees}/>
                                 </div>
                             </div>
                         </div>

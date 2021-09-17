@@ -6,14 +6,14 @@ import { TreesPlanted } from '../../../stories/TreesPlanted/TreesPlanted';
 import './trees.scss'
 import 'primeflex/primeflex.css';
 
-export const Trees = (props) => {
-    console.log(props)
+export const Trees = ({trees}) => {
+    console.log(trees)
 
     const history = useHistory();
 
-    let numTrees = props.trees.length
+    let numTrees = trees.length
     let images = [];
-    for (const tree of props.trees){
+    for (const tree of trees){
         images.push.apply(images,tree['memories']);
     }
     images = images.sort((a, b) => 0.5 - Math.random());
@@ -21,7 +21,7 @@ export const Trees = (props) => {
     const onAllTreeSelect = () => {
         history.push({
                 pathname: '/trees',
-                state: { trees: props.trees }
+                state: { trees: trees }
             });
     }
     return (
@@ -42,10 +42,10 @@ export const Trees = (props) => {
                                 numTrees > 0
                                 ?
                                     <TreesPlanted
-                                        id={props.trees[0].tree.sapling_id}
-                                        name={props.trees[0].tree.tree_id.name}
-                                        img={props.trees[0].tree.tree_id.image[0]}
-                                        date={props.trees[0].tree.date_added}/>
+                                        id={trees[0].tree.sapling_id}
+                                        name={trees[0].tree.tree_id.name}
+                                        img={trees[0].tree.tree_id.image[0]}
+                                        date={trees[0].tree.date_added}/>
                                 :
                                     <TreesPlanted/>
                             }
@@ -55,10 +55,10 @@ export const Trees = (props) => {
                                 numTrees > 1
                                 ?
                                     <TreesPlanted
-                                    id={props.trees[1].tree.sapling_id}
-                                    name={props.trees[1].tree.tree_id.name}
-                                    img={props.trees[1].tree.tree_id.image[0]}
-                                    date={props.trees[1].tree.date_added}/>
+                                    id={trees[1].tree.sapling_id}
+                                    name={trees[1].tree.tree_id.name}
+                                    img={trees[1].tree.tree_id.image[0]}
+                                    date={trees[1].tree.date_added}/>
                                 :
                                     <TreesPlanted/>
                             }
