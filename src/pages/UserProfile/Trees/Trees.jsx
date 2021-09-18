@@ -7,7 +7,6 @@ import './trees.scss'
 import 'primeflex/primeflex.css';
 
 export const Trees = ({trees}) => {
-    console.log(trees)
 
     const history = useHistory();
 
@@ -37,7 +36,7 @@ export const Trees = ({trees}) => {
                                 <Chip label={"See All >"} mode={'secondary'} size={'small'} handleClick={onAllTreeSelect}/>
                             }
                         </div>
-                        <div className="p-col-6 p-lg-6 p-md-6" style={{"padding":0}}>
+                        <div className="p-col-6 p-lg-6 p-md-6" style={{"padding":0, "cursor":"pointer"}} onClick={onAllTreeSelect}>
                             {
                                 numTrees > 0
                                 ?
@@ -50,7 +49,7 @@ export const Trees = ({trees}) => {
                                     <TreesPlanted/>
                             }
                         </div>
-                        <div className="p-col-6 p-lg-6 p-md-6" style={{"padding":0}}>
+                        <div className="p-col-6 p-lg-6 p-md-6" style={{"padding":0, "cursor":"pointer"}} onClick={onAllTreeSelect}>
                             {
                                 numTrees > 1
                                 ?
