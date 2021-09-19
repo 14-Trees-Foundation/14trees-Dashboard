@@ -20,6 +20,11 @@ export const Profile = () => {
     const delay = ms => new Promise(res => setTimeout(res, ms));
 
     let [loading, setLoading] = useState(true);
+    const [activeStep, setActiveStep] = useState(0);
+
+    const handleInfoChange = (i) => {
+        setActiveStep(i)
+    }
 
     const fetchData = useCallback(async () => {
         
@@ -69,7 +74,11 @@ export const Profile = () => {
                                 <Overall trees={overallData} ponds={pondsImages}/>
                                 <div style={{height: '54vh'}}>
                                     <h2 style={{marginTop:'18px'}}>Site Map</h2>
-                                    <Map trees={saplingData.trees}/>
+                                    <Map
+                                        trees={saplingData.trees}
+                                        currentInfo={activeStep}
+                                        handleInfoChange={handleInfoChange}
+                                    />
                                 </div>
                             </div>
                         </div>

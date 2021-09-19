@@ -23,7 +23,7 @@ const containerStyle = {
 const markers = [{lat: 18.92701129548707, lng: 73.77245238906712},]
 
 const options = {
-    fillColor: "lightblue",
+    fillColor: "green",
     fillOpacity: 0.2,
     strokeColor: "lightgreen",
     strokeOpacity: 1,
@@ -32,6 +32,11 @@ const options = {
     draggable: false,
     editable: false,
     geodesic: false,
+}
+
+const selectedOption = {
+    ...options,
+    fillOpacity: 0.5,
 }
 
 const mapOptions = {
@@ -47,10 +52,10 @@ const mapOptions = {
 
 const boxOptions = { closeBoxURL: '', enableEventPropagation: true };
 
-export const Map = ({ trees }) => {
+export const Map = ({ trees, currentInfo, handleInfoChange }) => {
 
     const [map, setMap] = useState(null);
-    const [info, setInfo] = useState(0);
+
     const onUnmount = useCallback(function callback(map) {
         setMap(null)
     }, []);
@@ -69,7 +74,7 @@ export const Map = ({ trees }) => {
     const polyLoad = polygon => {};
 
     const onMarkerClick = (i) => {
-        setInfo(i)
+        handleInfoChange(i)
     }
     return isLoaded ? (
         <div className="map">
@@ -83,11 +88,20 @@ export const Map = ({ trees }) => {
             >
                 {boundaries.map((marker, i) => (
                     <Fragment key={i}>
-                        <Polygon
-                            onLoad={polyLoad}
-                            paths={marker}
-                            options={options}
-                        />
+                        {
+                            currentInfo === i ?
+                            <Polygon
+                                onLoad={polyLoad}
+                                paths={marker}
+                                options={selectedOption}
+                            />
+                            :
+                            <Polygon
+                                onLoad={polyLoad}
+                                paths={marker}
+                                options={options}
+                            />
+                        }
                         <Marker
                             icon={icon}
                             position={marker[0]}
@@ -95,7 +109,7 @@ export const Map = ({ trees }) => {
                             onClick={() => onMarkerClick(i)}>
                         </Marker>
                         {
-                            info === i &&
+                            currentInfo === i &&
                             <InfoBox
                                 options={boxOptions}
                                 position={marker[0]}
