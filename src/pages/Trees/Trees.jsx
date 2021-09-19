@@ -1,11 +1,24 @@
 import { Map } from "../UserProfile/Map/Map";
+import { Navigator } from "./Navigator";
 import TreeInfoCard from "../../stories/TreeInfoCard/TreeInfoCard"
 
 import { useLocation } from "react-router-dom";
 
+import { useState } from 'react';
+
 export const Trees = () => {
 
     const location = useLocation();
+
+    const [activeStep, setActiveStep] = useState(0);
+
+    const handleNext = () => {
+        setActiveStep((prevActiveStep) => prevActiveStep + 1);
+    };
+
+    const handleBack = () => {
+        setActiveStep((prevActiveStep) => prevActiveStep - 1);
+    };
 
     return (
         <div style={{'display':'flex'}}>
@@ -13,7 +26,16 @@ export const Trees = () => {
                 <Map trees={location.state.trees}/>
             </div>
             <div style={{width:'35vw', marginTop: '67px', marginLeft:'-10px', zIndex:'1'}}>
-                <TreeInfoCard/>
+                <TreeInfoCard
+                    activeStep={activeStep}
+                >
+                    <Navigator
+                        activeStep={activeStep}
+                        maxSteps={4}
+                        handleBack={handleBack}
+                        handleNext={handleNext}
+                    />
+                </TreeInfoCard>
             </div>
         </div>
     )

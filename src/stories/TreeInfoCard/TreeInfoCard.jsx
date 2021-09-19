@@ -1,8 +1,7 @@
-import React, { useState } from "react";
+import React from "react";
 import PropTypes from "prop-types";
 import { makeStyles } from '@material-ui/core/styles';
 
-import tree from '../../assets/sample.png';
 import icon from '../assets/markericon.png';
 
 import { useTheme } from '@mui/material/styles';
@@ -10,9 +9,6 @@ import Button from '@mui/material/Button';
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
 import SwipeableViews from 'react-swipeable-views';
-
-import KeyboardArrowLeftIcon from '@mui/icons-material/KeyboardArrowLeft';
-import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
 
 const UseStyle = makeStyles((theme) => ({
     main: {
@@ -104,23 +100,9 @@ const images = [
   },
 ];
 
-export const TreeInfoCard = () => {
+export const TreeInfoCard = ({activeStep, ...props}) => {
     const classes = UseStyle();
     const theme = useTheme();
-    const [activeStep, setActiveStep] = React.useState(0);
-    const maxSteps = images.length;
-
-    const handleNext = () => {
-        setActiveStep((prevActiveStep) => prevActiveStep + 1);
-    };
-
-    const handleBack = () => {
-        setActiveStep((prevActiveStep) => prevActiveStep - 1);
-    };
-
-    const handleStepChange = (step) => {
-        setActiveStep(step);
-    };
 
     return (
         <div className={classes.main}>
@@ -128,7 +110,6 @@ export const TreeInfoCard = () => {
                 <SwipeableViews
                     axis={theme.direction === 'rtl' ? 'x-reverse' : 'x'}
                     index={activeStep}
-                    onChangeIndex={handleStepChange}
                     enableMouseEvents
                 >
                     {images.map((step, index) => (
@@ -195,17 +176,7 @@ export const TreeInfoCard = () => {
                 </SwipeableViews>
             </div>
             <div className={classes.navbtn}>
-                {
-                    activeStep > 0 &&
-                    <div className={classes.keybtn}>
-                        <KeyboardArrowLeftIcon fontSize={"large"} label="Prev Tree"/>
-                    <span>Prev Tree</span>
-                </div>
-                }
-                <div className={classes.keybtn}>
-                    <span>Next Tree</span>
-                    <KeyboardArrowRightIcon fontSize={"large"}/>
-                </div>
+                {props.children}
             </div>
         </div>
     );
