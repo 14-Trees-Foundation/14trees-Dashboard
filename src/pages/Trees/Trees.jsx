@@ -26,14 +26,14 @@ export const Trees = () => {
 
     return (
         <div style={{'display':'flex'}}>
-            <div style={{height: 'calc(100vh - 67px)', width:'67vw', marginTop: '67px'}}>
+            <div style={{height: 'calc(100vh - 67px)', width:'100%', marginTop: '67px'}}>
                 <Map
                     trees={location.state.trees}
                     currentInfo={activeStep}
                     handleInfoChange={handleInfoChange}
                 />
             </div>
-            <div style={{width:'35vw', marginTop: '67px', marginLeft:'-10px', zIndex:'1'}}>
+            <div style={{width:'35vw', marginTop: '67px', marginLeft:'-9px', zIndex:'1'}}>
                 <TreeInfoCard
                     trees={location.state.trees}
                     activeStep={activeStep}
