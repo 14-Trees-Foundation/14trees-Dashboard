@@ -1,14 +1,10 @@
-import { useHistory } from "react-router-dom";
-
 import { Memories } from "./Memories/Memories";
 import { Chip } from "../../../stories/Chip/Chip";
 import { TreesPlanted } from '../../../stories/TreesPlanted/TreesPlanted';
 import './trees.scss'
 import 'primeflex/primeflex.css';
 
-export const Trees = ({trees}) => {
-
-    const history = useHistory();
+export const Trees = ({trees, handleTreeClick}) => {
 
     let numTrees = trees.length
     let images = [];
@@ -18,10 +14,7 @@ export const Trees = ({trees}) => {
     images = images.sort((a, b) => 0.5 - Math.random());
 
     const onAllTreeSelect = () => {
-        history.push({
-                pathname: '/trees',
-                state: { trees: trees }
-            });
+        handleTreeClick();
     }
     return (
         <div className="trees">

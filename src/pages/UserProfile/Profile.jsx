@@ -3,6 +3,7 @@ import 'primeflex/primeflex.css';
 import * as Axios from "../../api/local";
 import './profile.scss'
 
+import { useHistory } from "react-router-dom";
 import { useEffect, useState, useCallback } from "react";
 import { NotFound } from '../notfound/NotFound';
 import { useParams } from "react-router";
@@ -13,6 +14,9 @@ import { Map } from "./Map/Map";
 import { Spinner } from "../../stories/Spinner/Spinner";
 
 export const Profile = () => {
+
+    const history = useHistory();
+
     const { saplingId } = useParams();
     const [saplingData, setSaplingData] = useState({});
     const [overallData, setOverallData] = useState({});
@@ -24,6 +28,13 @@ export const Profile = () => {
 
     const handleInfoChange = (i) => {
         setActiveStep(i)
+    }
+
+    const handleTreeClick = () => {
+        history.push({
+            pathname: '/trees',
+            state: { trees: saplingData.trees }
+        });
     }
 
     const fetchData = useCallback(async () => {
@@ -67,8 +78,8 @@ export const Profile = () => {
                     :
                         <div className="p-grid" style={{"marginTop":"15px"}}>
                             <div className="p-col-12 p-md-6 p-sm-12">
-                                <UserInfo saplingData={saplingData}/>
-                                <Trees trees={saplingData.trees}/>
+                                <UserInfo saplingData={saplingData} handleTreeClick={handleTreeClick}/>
+                                <Trees trees={saplingData.trees} handleTreeClick={handleTreeClick}/>
                             </div>
                             <div className="p-col-12 p-md-6 p-sm-12">
                                 <Overall trees={overallData} ponds={pondsImages}/>

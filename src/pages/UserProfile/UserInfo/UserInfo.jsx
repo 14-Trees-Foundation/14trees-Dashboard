@@ -3,6 +3,10 @@ import './userinfo.scss';
 import { InfoChip } from "../../../stories/InfoChip/InfoChip";
 
 export const UserInfo = (props) => {
+
+    const handleTreeClick = () => {
+        props.handleTreeClick();
+    }
     return (
         <div className="user">
             <div className="p-grid nested-grid" style={{"padding":'20'}}>
@@ -19,7 +23,7 @@ export const UserInfo = (props) => {
                             <div className="data">{props.saplingData.user.user.name}</div>
                             <div className="label">Organization</div>
                             <div className="data">{props.saplingData.user.user.org}</div>
-                            <InfoChip count={props.saplingData.trees.length} label="Trees Planted"/>
+                            <InfoChip count={props.saplingData.trees.length} label="Trees Planted" onClick={handleTreeClick}/>
                             <InfoChip count={props.saplingData.trees.length} label="Visits till date"/>
                             <div className="overall">
                                 <div className="done" style={{"width":'25%'}}>
