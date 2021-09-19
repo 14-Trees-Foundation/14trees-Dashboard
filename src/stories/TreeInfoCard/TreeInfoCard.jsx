@@ -57,6 +57,7 @@ const UseStyle = makeStyles((theme) => ({
         height: '200px',
         maxWidth: '330px',
         marginRight: '15px',
+        objectFit: 'cover',
     },
     navbtn: {
         display: 'flex',
@@ -101,17 +102,20 @@ const images = [
   },
 ];
 
-export const TreeInfoCard = ({trees, activeStep, ...props}) => {
+export const TreeInfoCard = ({trees, activeStep, setIndex, ...props}) => {
     const classes = UseStyle();
     const theme = useTheme();
 
-    console.log(trees)
+    const handleStepChange = (i) => {
+        setIndex(i)
+    }
     return (
         <div className={classes.main}>
             <div className={classes.info}>
                 <SwipeableViews
                     axis={theme.direction === 'rtl' ? 'x-reverse' : 'x'}
                     index={activeStep}
+                    onChangeIndex={handleStepChange}
                     enableMouseEvents
                 >
                     {trees.map((step, index) => (
@@ -119,7 +123,7 @@ export const TreeInfoCard = ({trees, activeStep, ...props}) => {
                         {Math.abs(activeStep - index) <= 2 ? (
                         <Grid container spacing={2}>
                             <Grid item xs={6}>
-                                <Box
+                                {/* <Box
                                     borderRadius={'7%'}
                                     component="img"
                                     sx={{
@@ -130,6 +134,9 @@ export const TreeInfoCard = ({trees, activeStep, ...props}) => {
                                         width: '100%',
                                         padding: '10px',
                                     }}
+                                */}
+                                <img
+                                    style={{borderRadius:'6%', objectFit: 'cover', height:'300px', width:'100%', padding:'10px'}}
                                     src={step.profile_image[0]}
                                     alt={step.user}
                                 />
@@ -138,8 +145,8 @@ export const TreeInfoCard = ({trees, activeStep, ...props}) => {
                                 <div className={classes.treeinfo}>
                                     <div style={{fontSize:'30px',fontWeight: 'bold'}}>{step.tree.tree_id.name}</div>
                                     <div style={{fontSize:'25px',fontWeight: '400'}}>{step.tree.tree_id.scientific_name}</div>
-                                    <div style={{color:'#9BC53D', fontSize:'12px'}}>Sapling ID: {step.tree.sapling_id}</div>
-                                    <div style={{color:'#9BC53D', fontSize:'12px'}}>Planted On: {step.tree.date_added.slice(0,10)}</div>
+                                    <div style={{ fontWeight: '300', fontSize:'12px', marginTop:'10px'}}>Sapling ID: {step.tree.sapling_id}</div>
+                                    <div style={{ fontWeight: '300', fontSize:'12px'}}>Planted On: {step.tree.date_added.slice(0,10)}</div>
                                     <Button style={{marginTop:'10px'}} size='large' variant="contained" color='primary'>190 Plants</Button>
                                 </div>
                             </Grid>

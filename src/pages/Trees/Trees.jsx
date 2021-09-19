@@ -37,6 +37,7 @@ export const Trees = () => {
                 <TreeInfoCard
                     trees={location.state.trees}
                     activeStep={activeStep}
+                    setIndex={setActiveStep}
                 >
                     <Navigator
                         activeStep={activeStep}
