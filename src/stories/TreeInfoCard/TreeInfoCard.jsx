@@ -9,6 +9,7 @@ import Button from '@mui/material/Button';
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
 import SwipeableViews from 'react-swipeable-views';
+import { stepperClasses } from "@mui/material";
 
 const UseStyle = makeStyles((theme) => ({
     main: {
@@ -40,7 +41,7 @@ const UseStyle = makeStyles((theme) => ({
         }
     },
     treeinfo: {
-        paddingTop: '45px',
+        paddingTop: '40%',
         paddingLeft: '7px'
     },
     memories: {
@@ -100,10 +101,11 @@ const images = [
   },
 ];
 
-export const TreeInfoCard = ({activeStep, ...props}) => {
+export const TreeInfoCard = ({trees, activeStep, ...props}) => {
     const classes = UseStyle();
     const theme = useTheme();
 
+    console.log(trees)
     return (
         <div className={classes.main}>
             <div className={classes.info}>
@@ -112,7 +114,7 @@ export const TreeInfoCard = ({activeStep, ...props}) => {
                     index={activeStep}
                     enableMouseEvents
                 >
-                    {images.map((step, index) => (
+                    {trees.map((step, index) => (
                     <div key={step.label}>
                         {Math.abs(activeStep - index) <= 2 ? (
                         <Grid container spacing={2}>
@@ -128,29 +130,39 @@ export const TreeInfoCard = ({activeStep, ...props}) => {
                                         width: '100%',
                                         padding: '10px',
                                     }}
-                                    src={step.imgPath}
-                                    alt={step.label}
+                                    src={step.profile_image[0]}
+                                    alt={step.user}
                                 />
                             </Grid>
                             <Grid item xs={6}>
                                 <div className={classes.treeinfo}>
-                                    <div style={{fontSize:'20px',fontWeight: 'bold'}}>{step.label}</div>
-                                    <div>{step.sci_name}</div>
-                                    <div style={{color:'#9BC53D', fontSize:'12px'}}>{step.sci_name}</div>
-                                    <div style={{color:'#9BC53D', fontSize:'12px'}}>{step.sci_name}</div>
-                                    <Button style={{marginTop:'10px'}} size='large' variant="contained" color='primary'>Submit</Button>
+                                    <div style={{fontSize:'30px',fontWeight: 'bold'}}>{step.tree.tree_id.name}</div>
+                                    <div style={{fontSize:'25px',fontWeight: '400'}}>{step.tree.tree_id.scientific_name}</div>
+                                    <div style={{color:'#9BC53D', fontSize:'12px'}}>Sapling ID: {step.tree.sapling_id}</div>
+                                    <div style={{color:'#9BC53D', fontSize:'12px'}}>Planted On: {step.tree.date_added.slice(0,10)}</div>
+                                    <Button style={{marginTop:'10px'}} size='large' variant="contained" color='primary'>190 Plants</Button>
+                                </div>
+                            </Grid>
+                            <Grid item xs={12}>
+                                <div style={{display: 'inline-flex', marginLeft: '10px'}}>
+                                    <img src={icon} alt={'icon'} style={{width:'30px', height:'30px'}}/>
+                                    <p style={{textAlign:'center', lineHeight:'30px',margin:'0 0 0 5px'}}>Characteristics</p>
+                                </div>
+                                <div style={{lineHeight: '15px', margin:'10px 0 0 15px'}}>
+                                    <div style={{fontSize:'14px', fontWeight:'350', marginBottom:'5px'}}>Family: {step.tree.tree_id.family}</div>
+                                    <div style={{fontSize:'14px', fontWeight:'350', marginBottom:'5px'}}>Habit: {step.tree.tree_id.habit}</div>
+                                    <div style={{fontSize:'14px', fontWeight:'350', marginBottom:'5px'}}>Remarkable Character: {step.tree.tree_id.remarkable_char}</div>
                                 </div>
                             </Grid>
                             <Grid item xs={12}>
                                 <div style={{display: 'flex', marginLeft: '10px'}}>
                                     <img src={icon} alt={'icon'} style={{width:'30px', height:'30px'}}/>
-                                    <p style={{textAlign:'center', lineHeight:'30px',margin:'0 0 0 5px'}}>Characteristics</p>
-                                </div>
-                            </Grid>
-                            <Grid item xs={12}>
-                            <div style={{display: 'flex', marginLeft: '10px'}}>
-                                    <img src={icon} alt={'icon'} style={{width:'30px', height:'30px'}}/>
                                     <p style={{textAlign:'center', lineHeight:'30px',margin:'0 0 0 5px'}}>Benefits</p>
+                                </div>
+                                <div style={{lineHeight: '15px', margin:'10px 0 0 15px'}}>
+                                    <div style={{fontSize:'14px', fontWeight:'350', marginBottom:'5px'}}>- {step.tree.tree_id.med_use}</div>
+                                    <div style={{fontSize:'14px', fontWeight:'350', marginBottom:'5px'}}>- {step.tree.tree_id.other_use}</div>
+                                    <div style={{fontSize:'14px', fontWeight:'350', marginBottom:'5px'}}>- {step.tree.tree_id.food}</div>
                                 </div>
                             </Grid>
                             <Grid item xs={11}>
@@ -164,9 +176,11 @@ export const TreeInfoCard = ({activeStep, ...props}) => {
                             </Grid>
                             <Grid item xs={12}>
                                 <div className={classes.memories}>
-                                    <img className={classes.memimg} src={step.imgPath} alt={step.label}/>
-                                    <img className={classes.memimg} src={step.imgPath} alt={step.label}/>
-                                    <img className={classes.memimg} src={step.imgPath} alt={step.label}/>
+                                    {
+                                        step.memories.map((img) => (
+                                            <img className={classes.memimg} src={img} alt={img}/>
+                                        ))
+                                    }
                                 </div>
                             </Grid>
                         </Grid>

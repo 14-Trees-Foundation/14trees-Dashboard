@@ -27,11 +27,12 @@ export const Trees = () => {
             </div>
             <div style={{width:'35vw', marginTop: '67px', marginLeft:'-10px', zIndex:'1'}}>
                 <TreeInfoCard
+                    trees={location.state.trees}
                     activeStep={activeStep}
                 >
                     <Navigator
                         activeStep={activeStep}
-                        maxSteps={4}
+                        maxSteps={location.state.trees.length}
                         handleBack={handleBack}
                         handleNext={handleNext}
                     />

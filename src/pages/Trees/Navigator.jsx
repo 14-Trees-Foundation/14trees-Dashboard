@@ -25,6 +25,7 @@ export const Navigator = ({activeStep, maxSteps, handleBack, handleNext}) => {
     const onClickNext = () => {
         handleNext();
     }
+    
     return (
         <Fragment>
             {
