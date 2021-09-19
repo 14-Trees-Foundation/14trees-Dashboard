@@ -75,33 +75,6 @@ const UseStyle = makeStyles((theme) => ({
     }
 }));
 
-const images = [
-  {
-    label: 'San Francisco',
-    sci_name: 'Some sci name',
-    imgPath:
-      'https://images.unsplash.com/photo-1537944434965-cf4679d1a598?auto=format&fit=crop&w=400&h=250&q=60',
-  },
-  {
-    label: 'Bird',
-    sci_name: 'Some sci name',
-    imgPath:
-      'https://images.unsplash.com/photo-1538032746644-0212e812a9e7?auto=format&fit=crop&w=400&h=250&q=60',
-  },
-  {
-    label: 'Bali, Indonesia',
-    sci_name: 'Some sci name',
-    imgPath:
-      'https://images.unsplash.com/photo-1537996194471-e657df975ab4?auto=format&fit=crop&w=400&h=250&q=80',
-  },
-  {
-    label: 'Goč, Serbia',
-    sci_name: 'Some sci name',
-    imgPath:
-      'https://images.unsplash.com/photo-1512341689857-198e7e2f3ca8?auto=format&fit=crop&w=400&h=250&q=60',
-  },
-];
-
 export const TreeInfoCard = ({trees, activeStep, setIndex, ...props}) => {
     const classes = UseStyle();
     const theme = useTheme();
@@ -137,7 +110,7 @@ export const TreeInfoCard = ({trees, activeStep, setIndex, ...props}) => {
                                 */}
                                 <img
                                     style={{borderRadius:'6%', objectFit: 'cover', height:'300px', width:'100%', padding:'10px'}}
-                                    src={step.profile_image[0]}
+                                    src={step.tree.tree_id.image[0]}
                                     alt={step.user}
                                 />
                             </Grid>
