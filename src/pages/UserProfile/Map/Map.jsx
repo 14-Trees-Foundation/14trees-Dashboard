@@ -1,11 +1,11 @@
-import {useState, useCallback, Fragment} from 'react';
-import { 
+import { useState, useCallback, Fragment } from 'react';
+import {
     GoogleMap,
     useJsApiLoader,
     Polygon,
     Marker,
     InfoBox
-    } from '@react-google-maps/api';
+} from '@react-google-maps/api';
 
 import icon from "../../../assets/marker.png";
 import tree from "../../../assets/neem.png";
@@ -20,7 +20,7 @@ const containerStyle = {
     // boxShadow: '0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23)'
 };
 
-const markers = [{lat: 18.92701129548707, lng: 73.77245238906712},]
+const markers = [{ lat: 18.92701129548707, lng: 73.77245238906712 },]
 
 const options = {
     fillColor: "green",
@@ -43,7 +43,7 @@ const mapOptions = {
     disableDefaultUI: true,
     mapTypeId: 'satellite',
     zoom: 16,
-    minZoom:10,
+    minZoom: 10,
     maxZoom: 18,
     panControl: true,
     rotateControl: true,
@@ -62,7 +62,7 @@ export const Map = ({ trees, currentInfo, handleInfoChange }) => {
 
     let boundaries = [];
     for (const tree of trees) {
-        let pathObj = tree.tree.plot_id.boundaries.coordinates[0].map(([lat, lng]) => ({ lat, lng}));
+        let pathObj = tree.tree.plot_id.boundaries.coordinates[0].map(([lat, lng]) => ({ lat, lng }));
         boundaries.push(pathObj)
     }
 
@@ -71,7 +71,7 @@ export const Map = ({ trees, currentInfo, handleInfoChange }) => {
         googleMapsApiKey: process.env.REACT_APP_API_MAP_KEY
     })
 
-    const polyLoad = polygon => {};
+    const polyLoad = polygon => { };
 
     const onMarkerClick = (i) => {
         handleInfoChange(i)
@@ -79,28 +79,28 @@ export const Map = ({ trees, currentInfo, handleInfoChange }) => {
     return isLoaded ? (
         <div className="map">
             <GoogleMap
-            mapContainerStyle={containerStyle}
-            mapTypeId={'satellite'}
-            center={boundaries[0][0]}
-            zoom={18}
-            onUnmount={onUnmount}
-            options={mapOptions}
+                mapContainerStyle={containerStyle}
+                mapTypeId={'satellite'}
+                center={boundaries[0][0]}
+                zoom={18}
+                onUnmount={onUnmount}
+                options={mapOptions}
             >
                 {boundaries.map((marker, i) => (
                     <Fragment key={i}>
                         {
                             currentInfo === i ?
-                            <Polygon
-                                onLoad={polyLoad}
-                                paths={marker}
-                                options={selectedOption}
-                            />
-                            :
-                            <Polygon
-                                onLoad={polyLoad}
-                                paths={marker}
-                                options={options}
-                            />
+                                <Polygon
+                                    onLoad={polyLoad}
+                                    paths={marker}
+                                    options={selectedOption}
+                                />
+                                :
+                                <Polygon
+                                    onLoad={polyLoad}
+                                    paths={marker}
+                                    options={options}
+                                />
                         }
                         <Marker
                             icon={icon}
@@ -119,23 +119,25 @@ export const Map = ({ trees, currentInfo, handleInfoChange }) => {
                                     width: '150px',
                                     height: '100px',
                                     borderRadius: '20px',
-                                    display: "flex"}}>
+                                    display: "flex"
+                                }}>
                                     <img alt="tree" src={tree} style={{
-                                        width:"80px",
-                                        height:"80px",
-                                        padding:"10px",
+                                        width: "80px",
+                                        height: "80px",
+                                        padding: "10px",
                                         paddingRight: "0px",
-                                        borderRadius:"25%"}}/>
-                                    <div style={{color: "e9e9e9", paddingTop: "5px", textAlign:"center"}}>
-                                        <h6>Name: {trees[i].tree.tree_id.name}</h6>
-                                        <h6>Sapling ID: {trees[i].tree.sapling_id}</h6>
+                                        borderRadius: "25%"
+                                    }} />
+                                    <div style={{ color: "e9e9e9", paddingTop: "5px", textAlign: "center" }}>
+                                        <h3>{trees[i].tree.tree_id.name}</h3>
+                                        <h5>Sapling ID: {trees[i].tree.sapling_id}</h5>
                                     </div>
                                 </div>
-                                </InfoBox>
+                            </InfoBox>
                         }
-                        </Fragment>
+                    </Fragment>
                 ))}
             </GoogleMap>
         </div>
-) : <></>
+    ) : <></>
 }
