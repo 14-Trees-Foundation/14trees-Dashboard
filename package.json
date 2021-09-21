@@ -34,6 +34,7 @@
     "react-swipeable-views": "^0.14.0",
     "react-toastify": "^8.0.2",
     "react-transition-group": "^4.4.2",
+    "recoil": "^0.4.1",
     "sass": "^1.35.1",
     "web-vitals": "^1.0.1"
   },

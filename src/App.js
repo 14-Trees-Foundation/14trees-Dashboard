@@ -14,10 +14,11 @@ function App() {
         <Switch>
           <Route path="/profile/:saplingId" component={Profile} exact></Route>
           <Route path="/search" component={Search} exact></Route>
+          <Route path="/" component={Search} exact></Route>
           <Route path="/visitor" component={Visitor} exact></Route>
           <Route path="/addtree" component={AddTree} exact></Route>
           <Route path="/trees" component={Trees} exact></Route>
-          <Route component={NotFound} />
+          {/* <Route component={NotFound} /> */}
         </Switch>
       </Layout>
   );
