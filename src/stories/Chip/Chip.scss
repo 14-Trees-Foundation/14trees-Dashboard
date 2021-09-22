@@ -1,6 +1,6 @@
 .button-chip-large {
   font-family: Helvetica, Arial, sans-serif;
-  font-size: 12px;
+  font-size: 15px;
   min-height: 40px;
   border-radius: 40px;
   font-weight: 500;
@@ -21,7 +21,7 @@
   cursor: pointer;
   padding-left: 2em;
   padding-right: 2em;
-  margin:0 0.5em 0.5em 0.8em;
+  margin: 0 0.5em 0.5em 0.8em;
 }
 
 .button-chip-secondary {
@@ -37,7 +37,7 @@
 }
 
 @media (max-width: 540px) {
-  .button-chip{
+  .button-chip {
     margin-bottom: 5px;
   }
 }

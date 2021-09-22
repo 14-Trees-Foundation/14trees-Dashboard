@@ -1,63 +1,71 @@
-.s-box{
-    margin-top: 65px;
+.s-box {
+    // margin-top: 65px;
     width: 100%;
     height: 100%;
     position: relative;
-    .s-img{
+
+    .s-img {
         // object-fit: cover;
         width: 100vw;
         height: 100vh;
         object-fit: cover;
     }
-} 
-.s-bg{
+}
+
+.s-bg {
     // width: 70vw;
-    width: 100vw;
-    height: 100vh;
     position: absolute;
-    top: 0;
+    top: 67px;
     bottom: 0;
     left: 0;
     right: 0;
+    width: 100vw;
+    height: calc(100vh - 67px);
     background: linear-gradient(358.58deg, #1F3625 37.04%, rgba(31, 54, 37, 0.636721) 104.2%, rgba(31, 54, 37, 0) 140.95%);
 }
 
-.s-input{
+.s-input {
     width: 65vw;
     padding-left: 18%;
     height: 90vh;
     position: relative;
-    .s-info{
+
+    .s-info {
         margin-top: 9%;
         display: flex;
         align-items: center;
         justify-content: center;
-        .s-header{
+
+        .s-header {
             font-size: 70px;
             padding-inline-end: 20px;
             color: #9BC53D;
             font-weight: 550;
         }
-        .s-desc{
+
+        .s-desc {
             word-wrap: inherit;
             font-weight: 500;
             font-size: 25px;
             color: #ffffff;
         }
     }
-    .s-sep{
+
+    .s-sep {
         color: #ffffff;
         justify-content: center;
         display: flex;
         padding-top: 3%;
         padding-bottom: 3%;
     }
-    .s-btn{
+
+    .s-btn {
         display: flex;
         justify-content: space-around;
         flex-wrap: wrap;
     }
-    .s-input-box{
+
+    .s-input-box {
         width: 65vw;
         background-color: #ffffff;
         border-radius: 7px;
@@ -65,23 +73,27 @@
         padding-top: 2%;
         padding-bottom: 2%;
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.16), 0 4px 8px rgba(0, 0, 0, 0.23);
-        .s-search-info{
-            .s-searchby{
+
+        .s-search-info {
+            .s-searchby {
                 font-weight: 250;
                 margin-top: 10px;
                 margin-left: 2.5%;
                 font-size: 14px;
             }
-            .s-search-filter{
+
+            .s-search-filter {
                 display: flex;
                 margin-left: 2.5%;
                 margin-top: 10px;
             }
         }
     }
-    .s-results{
+
+    .s-results {
         margin-top: 2%;
-        .s-results-for{
+
+        .s-results-for {
             font-size: 16px;
             font-weight: 400;
             height: 36px;
@@ -90,7 +102,8 @@
             border-radius: 5px;
             background-color: #e5e5e5;
         }
-        .s-results-ind{
+
+        .s-results-ind {
             margin-top: 2%;
             font-size: 16px;
             font-weight: 600;
@@ -101,62 +114,73 @@
             background-color: #e5e5e5;
         }
     }
-    .s-page{
+
+    .s-page {
         font: 40px;
     }
 }
 
-.s-scroll{
+.s-scroll {
     overflow-y: scroll;
     overflow-x: hidden;
-    &::-webkit-scrollbar{
+
+    &::-webkit-scrollbar {
         display: none;
     }
 }
 
 @media (min-width: 1075px) {
-    .s-input{
+    .s-input {
         width: 55vw;
         padding-left: 22%;
+
         // padding-top: 2%;
-        .s-input-box{
+        .s-input-box {
             width: 55vw;
         }
     }
 }
 
 @media (max-width: 735px) {
-    .s-bg{
+    .s-bg {
         width: 100vw;
-        .s-info{
+
+        .s-info {
             flex-wrap: wrap;
-            .s-header{
+
+            .s-header {
                 font-size: 50px;
                 padding-inline-end: 1px;
-                margin:0;
+                margin: 0;
             }
+
             .s-desc {
                 font-size: 15px;
             }
         }
     }
-    .s-input{
+
+    .s-input {
         width: 95vw;
         padding-top: 8%;
         padding-left: 2%;
-        .s-input-box{
+
+        .s-input-box {
             width: 90vw;
             margin-left: 2%;
-            .s-search-filter{
+
+            .s-search-filter {
                 justify-content: center;
                 flex-wrap: wrap;
             }
         }
+
         .s-s-btn {
             margin-top: 10px;
         }
-        .s-results{
-            .s-results-for{
+
+        .s-results {
+            .s-results-for {
                 padding-top: 20px;
                 padding-left: 5px;
                 padding-bottom: 20px;
