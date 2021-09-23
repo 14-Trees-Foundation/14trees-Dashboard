@@ -1,4 +1,4 @@
-import { useState, Fragment } from "react"
+import { useState } from "react"
 
 import { AppBar } from "../../stories/AppBar/AppBar";
 import { InputBar } from "./InputBar/InputBar";
@@ -54,10 +54,10 @@ export const Search = () => {
                     <AppBar />
                     <div className={classes.main}>
                         <div className={classes.header}>
-                            <h1 style={{ fontSize: '70px', paddingInlineEnd: '20px', color: '#9BC53D', fontWeight: '550' }}>
+                            <h1 className={classes.infoheader}>
                                 100+
                             </h1>
-                            <p style={{ wordWrap: 'inherit', fontWeight: '500', fontSize: '25px', color: '#ffffff' }}>
+                            <p className={classes.infodesc}>
                                 People employed from local community
                             </p>
                         </div>
@@ -81,71 +81,68 @@ export const Search = () => {
             <div className="s-box">
                 <img alt="bg" src={bg} className="s-img" style={{ "height": "40vh" }} />
                 <AppBar>
-                    <div className="s-bg s-scroll"
-                        style={{
-                            "background": "linear-gradient(rgba(31, 54, 37, 0) 5%,rgba(31, 54, 37, 0.636721) 15%, #1F3625 40%, #e5e5e5 40%)"
-                        }}>
-                        <div className="s-input s-scroll">
-                            <div className="s-info">
-                                <h1 className="s-header">100+</h1>
-                                <p className="s-desc">People employed from local community</p>
-                            </div>
-                            <div className="s-input-box">
-                                <InputBar type={type} setData={handleData} />
-                                <div className="s-search-info">
-                                    <div className="s-searchby">
-                                        Search by:
-                                    </div>
-                                    <div className="s-search-filter">
-                                        {
-                                            Object.keys(searchChips).map(key =>
-                                                <Chip label={key} mode={searchChips[key]} handleClick={onChipSelect} />
-                                            )
-                                        }
-                                    </div>
+                    <div style={{
+                        "background": "linear-gradient(rgba(31, 54, 37, 0) 5%,rgba(31, 54, 37, 0.636721) 15%, #1F3625 40%, #e5e5e5 40%)"
+                    }}>
+                        <div className={classes.infobox}>
+                            <h1 className={classes.infoheader}>100+</h1>
+                            <p className={classes.infodesc}>People employed from local community</p>
+                        </div>
+                        <div className="s-input-box">
+                            <InputBar type={type} setData={handleData} />
+                            <div className="s-search-info">
+                                <div className="s-searchby">
+                                    Search by:
+                                </div>
+                                <div className="s-search-filter">
+                                    {
+                                        Object.keys(searchChips).map(key =>
+                                            <Chip label={key} mode={searchChips[key]} handleClick={onChipSelect} />
+                                        )
+                                    }
                                 </div>
                             </div>
-                            <div className="s-results">
-                                <div className="s-results-for">
-                                    Search Results for: {key}
-                                </div>
-                                {
-                                    (selectedChips === "Individual" || selectedChips === "All") &&
-                                    <div>
-                                        <div className="s-results-ind">
-                                            Individual Found
-                                        </div>
-                                        <UserList handleClick={onUserClick} />
-                                    </div>
-                                }
-                                {
-                                    (selectedChips === "Organization" || selectedChips === "All") &&
-                                    <div>
-                                        <div className="s-results-ind">
-                                            Organization Found
-                                        </div>
-                                        <OrgList />
-                                    </div>
-                                }
-                                {
-                                    (selectedChips === "Event" || selectedChips === "All") &&
-                                    <div>
-                                        <div className="s-results-ind">
-                                            Events Found
-                                        </div>
-                                        <EventList />
-                                    </div>
-                                }
-                                {
-                                    (selectedChips === "Tree" || selectedChips === "All") &&
-                                    <div>
-                                        <div className="s-results-ind">
-                                            Trees Found
-                                        </div>
-                                        <TreeList />
-                                    </div>
-                                }
+                        </div>
+                        <div className="s-results">
+                            <div className="s-results-for">
+                                Search Results for: {key}
                             </div>
+                            {
+                                (selectedChips === "Individual" || selectedChips === "All") &&
+                                <div>
+                                    <div className="s-results-ind">
+                                        Individual Found
+                                    </div>
+                                    <UserList handleClick={onUserClick} />
+                                </div>
+                            }
+                            {
+                                (selectedChips === "Organization" || selectedChips === "All") &&
+                                <div>
+                                    <div className="s-results-ind">
+                                        Organization Found
+                                    </div>
+                                    <OrgList />
+                                </div>
+                            }
+                            {
+                                (selectedChips === "Event" || selectedChips === "All") &&
+                                <div>
+                                    <div className="s-results-ind">
+                                        Events Found
+                                    </div>
+                                    <EventList />
+                                </div>
+                            }
+                            {
+                                (selectedChips === "Tree" || selectedChips === "All") &&
+                                <div>
+                                    <div className="s-results-ind">
+                                        Trees Found
+                                    </div>
+                                    <TreeList />
+                                </div>
+                            }
                         </div>
                     </div>
                 </AppBar>
@@ -189,6 +186,34 @@ const UseStyle = makeStyles((theme) => ({
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
+    },
+    infobox: {
+        marginTop: '5%',
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        [theme.breakpoints.down('md')]: {
+            flexWrap: 'wrap',
+        }
+    },
+    infoheader: {
+        fontSize: '55px',
+        color: '#9BC53D',
+        fontWeight: '550',
+        [theme.breakpoints.down('md')]: {
+            fontSize: '50px',
+        }
+    },
+    infodesc: {
+        fontSize: '22px',
+        paddingLeft: '1%',
+        color: '#ffffff',
+        fontWeight: '500',
+        alignItems: 'center',
+        textAlign: 'center',
+        [theme.breakpoints.down('md')]: {
+            fontSize: '15px',
+        }
     },
     inputBox: {
         width: '65vw',

@@ -22,6 +22,7 @@ import { Spinner } from "../../stories/Spinner/Spinner";
 
 import Axios from "../../api/local";
 
+import { AppBar } from "../../stories/AppBar/AppBar";
 import Button from '@mui/material/Button';
 
 const intitialFValues = {
@@ -34,24 +35,24 @@ const intitialFValues = {
     userImages: [],
     userImage1: null,
     userImage2: null,
-    uimageerror:null,
+    uimageerror: null,
     additionalImages: [],
-    userImage1src:null,
-    userImage2src:null,
-    addImage1src:null,
-    addImage2src:null,
-    addImage3src:null,
-    addimageerror:null,
-    uploaded:false,
-    loading:false,
-    backdropOpen:false,
+    userImage1src: null,
+    userImage2src: null,
+    addImage1src: null,
+    addImage2src: null,
+    addImage3src: null,
+    addimageerror: null,
+    uploaded: false,
+    loading: false,
+    backdropOpen: false,
 }
 
 export const Visitor = () => {
     const [values, setValues] = useState(intitialFValues);
     const [errors, setErrors] = useState({});
-    const PROFILE_IMG_MAX=2;
-    const ADDITIONAL_IMG_MAX=10;
+    const PROFILE_IMG_MAX = 2;
+    const ADDITIONAL_IMG_MAX = 10;
 
     const classes = UseStyle();
 
@@ -70,32 +71,32 @@ export const Visitor = () => {
         validate();
         setValues({
             ...values,
-            [name]:value
+            [name]: value
         })
     }
 
     const handleDateChange = (value) => {
         setValues({
             ...values,
-            dob:value
+            dob: value
         });
-      };
-    
+    };
+
     const handleAdditionalPicUpload = (e) => {
         if (Array.from(e.target.files).length > ADDITIONAL_IMG_MAX) {
             setValues({
                 ...values,
-                addimageerror:true
+                addimageerror: true
             })
             return
-          }
+        }
         setValues({
             ...values,
-            additionalImages:e.target.files,
-            addImage1src:URL.createObjectURL(e.target.files[0]),
-            addImage2src:e.target.files[1] ? URL.createObjectURL(e.target.files[1]) : null,
-            addImage3src:e.target.files[2] ? URL.createObjectURL(e.target.files[2]) : null,
-            addimageerror:null
+            additionalImages: e.target.files,
+            addImage1src: URL.createObjectURL(e.target.files[0]),
+            addImage2src: e.target.files[1] ? URL.createObjectURL(e.target.files[1]) : null,
+            addImage3src: e.target.files[2] ? URL.createObjectURL(e.target.files[2]) : null,
+            addimageerror: null
         })
     }
 
@@ -103,27 +104,27 @@ export const Visitor = () => {
         if (Array.from(e.target.files).length > PROFILE_IMG_MAX) {
             setValues({
                 ...values,
-                uimageerror:true
+                uimageerror: true
             })
             return
-          }
+        }
         setValues({
             ...values,
-            userImages:e.target.files,
-            userImage1:e.target.files[0] ? e.target.files[0] : null,
-            userImage2:e.target.files[1] ? e.target.files[1] : null,
-            userImage1src:e.target.files[0] ? URL.createObjectURL(e.target.files[0]) : null,
-            userImage2src:e.target.files[1] ? URL.createObjectURL(e.target.files[1]) : null,
-            uimageerror:null
+            userImages: e.target.files,
+            userImage1: e.target.files[0] ? e.target.files[0] : null,
+            userImage2: e.target.files[1] ? e.target.files[1] : null,
+            userImage1src: e.target.files[0] ? URL.createObjectURL(e.target.files[0]) : null,
+            userImage2src: e.target.files[1] ? URL.createObjectURL(e.target.files[1]) : null,
+            uimageerror: null
         })
     }
 
     useEffect(() => {
         validate();
-     }, [values]);
+    }, [values]);
 
     const onSubmit = async (e) => {
-        if(!validate()){
+        if (!validate()) {
             toast.error('Please fill mandatory fields', {
                 position: "top-right",
                 autoClose: 5000,
@@ -136,8 +137,8 @@ export const Visitor = () => {
         } else {
             setValues({
                 ...values,
-                loading:true,
-                backdropOpen:true
+                loading: true,
+                backdropOpen: true
             })
             const formData = new FormData()
             const date = moment(values.dob).format('YYYY-MM-DD')
@@ -155,14 +156,14 @@ export const Visitor = () => {
                     userImages.push(values.userImages[key].name)
                 }
             }
-            
+
             if (values.additionalImages) {
                 for (const key of Object.keys(values.additionalImages)) {
                     formData.append('files', values.additionalImages[key])
                     extraImages.push(values.additionalImages[key].name)
                 }
             }
-            
+
             formData.append('userimages', userImages);
             formData.append('memoryimages', extraImages);
             try {
@@ -171,36 +172,36 @@ export const Visitor = () => {
                         'Content-type': 'multipart/form-data'
                     },
                 })
-                
-                if(res.status === 201) {
+
+                if (res.status === 201) {
                     setValues({
                         ...values,
                         loading: false,
                         uploaded: true,
                     })
                     toast.success("Data uploaded successfully!")
-                } else if(res.status === 204 || res.status === 400) {
+                } else if (res.status === 204 || res.status === 400) {
                     setValues({
                         ...values,
-                        loading:false,
-                        backdropOpen:false
+                        loading: false,
+                        backdropOpen: false
                     })
                     toast.error(res.statusText)
                 }
             } catch (error) {
                 setValues({
                     ...values,
-                    loading:false,
-                    backdropOpen:false
+                    loading: false,
+                    backdropOpen: false
                 })
                 toast.error(error.response.statusText)
             }
         }
     }
-    if(values.uploaded){
-        return(
+    if (values.uploaded) {
+        return (
             <div className={classes.box}>
-                <img alt="bg" src={bg} className={classes.bgimg}/>
+                <img alt="bg" src={bg} className={classes.bgimg} />
                 <div className={classes.bg}>
                     <div className={classes.infobox}>
                         <h1 className={classes.infoheader}>Thank You!</h1>
@@ -208,7 +209,7 @@ export const Visitor = () => {
                     </div>
                     <div className={classes.sucessbox}>
                         <Card className={classes.maincard}>
-                            <CardContent style={{'marginTop':'1%'}}>
+                            <CardContent style={{ 'marginTop': '1%' }}>
                                 <Alert severity="success">
                                     Your data has been uploaded successfuly!
                                 </Alert>
@@ -217,7 +218,7 @@ export const Visitor = () => {
                                 </Typography> */}
                                 <CardMedia
                                     className={classes.media}
-                                    image= {tree}
+                                    image={tree}
                                     title="tree"
                                 />
                             </CardContent>
@@ -229,146 +230,149 @@ export const Visitor = () => {
     } else {
         return (
             <div className={classes.box}>
-                <img alt="bg" src={bg} className={classes.bgimg}/>
-                <div className={classes.bg}>
-                    <div className={classes.infobox}>
-                        <h1 className={classes.infoheader}>Thank You!</h1>
-                        <p className={classes.infodesc}>We need some details to get you on-boarded for this journey!</p>
-                    </div>
-                    <div className={classes.inputbox}>
-                        <Paper className={classes.paper}>
-                            <Backdrop className={classes.backdrop} open={values.backdropOpen}>  
-                                <Spinner text={"Sending your data..."}/>
-                            </Backdrop>
-                            <ToastContainer />
-                            {values.uimageerror &&  
-                                <Alert severity="error">
-                                    <AlertTitle>Error</AlertTitle>
-                                    Please select at max two profile images only
-                                </Alert>
-                            }
-                            {values.addimageerror &&  
-                                <Alert severity="error">
-                                    <AlertTitle>Error</AlertTitle>
-                                    Please select at max 10 additional images only
-                                </Alert>
-                            }
-                            <h1 className={classes.formheader}>Visitor Form</h1>
-                            <form className={classes.root} autoComplete='off'>
-                                <Grid container>
-                                    <Grid item xs={12} sm={6} md={6}>
-                                        <TextField
-                                            error={errors.name!==""?true:false}
-                                            variant='outlined'
-                                            label='Full Name *'
-                                            name='name'
-                                            value={values.name}
-                                            helperText="The name you want to be displayed on the physical name plate."
-                                            onChange = {handleInputchange}
-                                        />
-                                        <TextField
-                                            variant='outlined'
-                                            label='Email'
-                                            name='email'
-                                            value={values.email}
-                                            onChange = {handleInputchange}
-                                        />
-                                        <MuiPickersUtilsProvider utils={DateFnsUtils}>
-                                            <KeyboardDatePicker
-                                                margin="normal"
-                                                id="date-picker-dialog"
-                                                label="Date of birth"
-                                                format="dd/MM/yyyy"
-                                                value={values.dob}
-                                                onChange={handleDateChange}
-                                                KeyboardButtonProps={{
-                                                    'aria-label': 'change date',
-                                                }}
-                                                style={{'marginTop':'15px'}}
+                <img alt="bg" src={bg} className={classes.bgimg} />
+                <div className={classes.overlay}>
+                    <AppBar />
+                    <div className={classes.main}>
+                        <div className={classes.infobox}>
+                            <h1 className={classes.infoheader}>Thank You!</h1>
+                            <p className={classes.infodesc}>We need some details to get you on-boarded for this journey!</p>
+                        </div>
+                        <div className={classes.inputbox}>
+                            <Paper className={classes.paper}>
+                                <Backdrop className={classes.backdrop} open={values.backdropOpen}>
+                                    <Spinner text={"Sending your data..."} />
+                                </Backdrop>
+                                <ToastContainer />
+                                {values.uimageerror &&
+                                    <Alert severity="error">
+                                        <AlertTitle>Error</AlertTitle>
+                                        Please select at max two profile images only
+                                    </Alert>
+                                }
+                                {values.addimageerror &&
+                                    <Alert severity="error">
+                                        <AlertTitle>Error</AlertTitle>
+                                        Please select at max 10 additional images only
+                                    </Alert>
+                                }
+                                <h1 className={classes.formheader}>Visitor Form</h1>
+                                <form className={classes.root} autoComplete='off'>
+                                    <Grid container>
+                                        <Grid item xs={12} sm={6} md={6}>
+                                            <TextField
+                                                error={errors.name !== "" ? true : false}
+                                                variant='outlined'
+                                                label='Full Name *'
+                                                name='name'
+                                                value={values.name}
+                                                helperText="The name you want to be displayed on the physical name plate."
+                                                onChange={handleInputchange}
                                             />
-                                        </MuiPickersUtilsProvider>
-                                        <div style={{'marginTop':'20px'}}>
-                                            <Typography variant="subtitle2" gutterBottom className={classes.helper}>
-                                                Upload two photographs of yours with sapling.
-                                            </Typography>
-                                            <input
-                                                accept="image/*"
-                                                className={classes.input}
-                                                id="contained-button-file"
-                                                multiple
-                                                type="file"
-                                                onChange={handleProfilePicUpload}
+                                            <TextField
+                                                variant='outlined'
+                                                label='Email'
+                                                name='email'
+                                                value={values.email}
+                                                onChange={handleInputchange}
                                             />
-                                        </div>
-                                        <div className={classes.submitDiv}>
-                                            <Avatar alt="U" src={values.userImage1src? values.userImage1src : null}/>
-                                            <Avatar alt="U" src={values.userImage2src? values.userImage2src : null} />
-                                            <span className={classes.span}></span>
-                                            <label htmlFor="contained-button-file" style={{'display':'block', 'marginTop':'5px'}}>
-                                                <Button component="span" variant="contained" color='secondary' size='small' style={{minWidth:"170px"}}>
-                                                Upload your pic
-                                                </Button>
-                                            </label>
-                                        </div>
-                                    </Grid>
-                                    <Grid item xs={12} sm={6} md={6}>
-                                        <TextField
-                                            error={errors.sapling!==""?true:false}
-                                            variant='outlined'
-                                            label='Sapling ID *'
-                                            name='sapling'
-                                            value={values.sapling}
-                                            helperText="The unique number you received from 14Trees staff."
-                                            onChange = {handleInputchange}
-                                        />
-                                        <TextField
-                                            variant='outlined'
-                                            label='Organization'
-                                            name='org'
-                                            value={values.org}
-                                            onChange = {handleInputchange}
-                                        />
-                                        <TextField
-                                            variant='outlined'
-                                            label='Contact'
-                                            name='contact'
-                                            value={values.contact}
-                                            onChange = {handleInputchange}
-                                        />
-                                        <div style={{'marginTop':'15px'}}>
-                                            <Typography variant="subtitle2" gutterBottom className={classes.helper}>
-                                                Feel free to share the photographs from your visit (max: 10)
-                                            </Typography>
-                                            <input
-                                                accept="image/*"
-                                                className={classes.input}
-                                                id="additional-image-file"
-                                                multiple
-                                                type="file"
-                                                onChange={handleAdditionalPicUpload}
+                                            <MuiPickersUtilsProvider utils={DateFnsUtils}>
+                                                <KeyboardDatePicker
+                                                    margin="normal"
+                                                    id="date-picker-dialog"
+                                                    label="Date of birth"
+                                                    format="dd/MM/yyyy"
+                                                    value={values.dob}
+                                                    onChange={handleDateChange}
+                                                    KeyboardButtonProps={{
+                                                        'aria-label': 'change date',
+                                                    }}
+                                                    style={{ 'marginTop': '15px' }}
+                                                />
+                                            </MuiPickersUtilsProvider>
+                                            <div style={{ 'marginTop': '20px' }}>
+                                                <Typography variant="subtitle2" gutterBottom className={classes.helper}>
+                                                    Upload two photographs of yours with sapling.
+                                                </Typography>
+                                                <input
+                                                    accept="image/*"
+                                                    className={classes.input}
+                                                    id="contained-button-file"
+                                                    multiple
+                                                    type="file"
+                                                    onChange={handleProfilePicUpload}
+                                                />
+                                            </div>
+                                            <div className={classes.submitDiv}>
+                                                <Avatar alt="U" src={values.userImage1src ? values.userImage1src : null} />
+                                                <Avatar alt="U" src={values.userImage2src ? values.userImage2src : null} />
+                                                <span className={classes.span}></span>
+                                                <label htmlFor="contained-button-file" style={{ 'display': 'block', 'marginTop': '5px' }}>
+                                                    <Button component="span" variant="contained" color='secondary' size='small' style={{ minWidth: "170px" }}>
+                                                        Upload your pic
+                                                    </Button>
+                                                </label>
+                                            </div>
+                                        </Grid>
+                                        <Grid item xs={12} sm={6} md={6}>
+                                            <TextField
+                                                error={errors.sapling !== "" ? true : false}
+                                                variant='outlined'
+                                                label='Sapling ID *'
+                                                name='sapling'
+                                                value={values.sapling}
+                                                helperText="The unique number you received from 14Trees staff."
+                                                onChange={handleInputchange}
                                             />
-                                        </div>
-                                        <div className={classes.submitDiv}>
-                                            <Avatar alt="U" src={values.addImage1src? values.addImage1src : null}/>
-                                            <Avatar alt="U" src={values.addImage2src? values.addImage2src : null}/>
-                                            <Avatar alt="U" src={values.addImage3src? values.addImage3src : null}/>
-                                            <span className={classes.span}></span>
-                                            <label htmlFor="additional-image-file" style={{'display':'block', 'marginTop':'5px'}}>
-                                                <Button component="span" variant="contained" color='secondary' size='small' style={{minWidth:"170px"}}>
-                                                Add more pics
-                                                </Button>
-                                            </label>
-                                        </div>
-                                    </Grid>
+                                            <TextField
+                                                variant='outlined'
+                                                label='Organization'
+                                                name='org'
+                                                value={values.org}
+                                                onChange={handleInputchange}
+                                            />
+                                            <TextField
+                                                variant='outlined'
+                                                label='Contact'
+                                                name='contact'
+                                                value={values.contact}
+                                                onChange={handleInputchange}
+                                            />
+                                            <div style={{ 'marginTop': '15px' }}>
+                                                <Typography variant="subtitle2" gutterBottom className={classes.helper}>
+                                                    Feel free to share the photographs from your visit (max: 10)
+                                                </Typography>
+                                                <input
+                                                    accept="image/*"
+                                                    className={classes.input}
+                                                    id="additional-image-file"
+                                                    multiple
+                                                    type="file"
+                                                    onChange={handleAdditionalPicUpload}
+                                                />
+                                            </div>
+                                            <div className={classes.submitDiv}>
+                                                <Avatar alt="U" src={values.addImage1src ? values.addImage1src : null} />
+                                                <Avatar alt="U" src={values.addImage2src ? values.addImage2src : null} />
+                                                <Avatar alt="U" src={values.addImage3src ? values.addImage3src : null} />
+                                                <span className={classes.span}></span>
+                                                <label htmlFor="additional-image-file" style={{ 'display': 'block', 'marginTop': '5px' }}>
+                                                    <Button component="span" variant="contained" color='secondary' size='small' style={{ minWidth: "170px" }}>
+                                                        Add more pics
+                                                    </Button>
+                                                </label>
+                                            </div>
+                                        </Grid>
                                         {
                                             !values.uimageerror && !values.addimageerror &&
                                             <div className={classes.submitbtn}>
                                                 <Button size='large' variant="contained" color='primary' onClick={onSubmit}>Submit</Button>
                                             </div>
                                         }
-                                </Grid>
-                            </form>
-                        </Paper>
+                                    </Grid>
+                                </form>
+                            </Paper>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -377,16 +381,84 @@ export const Visitor = () => {
 }
 
 const UseStyle = makeStyles((theme) => ({
+    box: {
+        width: '100%',
+        height: '100vh',
+        position: 'relative'
+    },
     root: {
-        '& .MuiFormControl-root':{
-            width: '90%',
-            margin: theme.spacing(1),
-        },
-        [theme.breakpoints.down('md')]:{
-            '& .MuiFormControl-root':{
-                width: '93%',
-                margin: '12px',
-            },
+        '& .MuiFormControl-root': {
+            width: '93%',
+            margin: '12px'
+        }
+    },
+    bgimg: {
+        width: '100%',
+        height: '100vh',
+        objectFit: 'cover',
+    },
+    overlay: {
+        position: 'absolute',
+        top: '0',
+        left: '0',
+        width: '100%',
+        height: '100%',
+        background: 'linear-gradient(358.58deg, #1F3625 37.04%, rgba(31, 54, 37, 0.636721) 104.2%, rgba(31, 54, 37, 0) 140.95%)',
+    },
+    main: {
+        width: '75vw',
+        paddingLeft: '12.5vw',
+        paddingTop: '5vh',
+        height: '90vh',
+        position: 'relative',
+        [theme.breakpoints.down('748')]: {
+            width: '80vw',
+            paddingLeft: '9vw'
+        }
+    },
+    infobox: {
+        marginTop: '5%',
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        [theme.breakpoints.down('md')]: {
+            flexWrap: 'wrap',
+        }
+    },
+    infoheader: {
+        fontSize: '55px',
+        color: '#9BC53D',
+        fontWeight: '550',
+        [theme.breakpoints.down('md')]: {
+            fontSize: '50px',
+        }
+    },
+    infodesc: {
+        fontSize: '22px',
+        paddingLeft: '1%',
+        color: '#ffffff',
+        fontWeight: '500',
+        alignItems: 'center',
+        textAlign: 'center',
+        [theme.breakpoints.down('md')]: {
+            fontSize: '15px',
+        }
+    },
+    inputbox: {
+        width: '75vw',
+        height: '90vh',
+        position: 'relative',
+        [theme.breakpoints.down('md')]: {
+            width: '90vw',
+            paddingLeft: '4vw',
+        }
+    },
+    paper: {
+        margin: theme.spacing(5),
+        padding: theme.spacing(3),
+        [theme.breakpoints.down('md')]: {
+            margin: theme.spacing(0),
+            padding: '0px',
         }
     },
     successbox: {
@@ -394,7 +466,7 @@ const UseStyle = makeStyles((theme) => ({
         paddingLeft: '12.5%',
         height: '90vh',
         position: 'relative',
-        [theme.breakpoints.down('md')]:{
+        [theme.breakpoints.down('md')]: {
             width: '90vw',
             paddingLeft: '0',
         }
@@ -403,7 +475,7 @@ const UseStyle = makeStyles((theme) => ({
         width: "50%",
         marginLeft: "auto",
         marginRight: "auto",
-        [theme.breakpoints.down('md')]:{
+        [theme.breakpoints.down('md')]: {
             width: "90%",
             padding: '0px',
         }
@@ -411,26 +483,15 @@ const UseStyle = makeStyles((theme) => ({
     media: {
         width: '30%',
         height: '350px',
-        marginLeft:"auto",
-        marginRight:"auto",
-        [theme.breakpoints.down('md')]:{
+        marginLeft: "auto",
+        marginRight: "auto",
+        [theme.breakpoints.down('md')]: {
             width: '90%',
         }
     },
-    box: {
-        marginTop: '65px',
-        width: '100%',
-        height: '100%',
-        position: 'relative',
-    },
-    bgimg: {
-        width: '100vw',
-        height: '40vh',
-        objectFit: 'cover',
-    },
     bg: {
         overflow: "auto",
-        "&::-webkit-scrollbar" : {
+        "&::-webkit-scrollbar": {
             display: "none",
         },
         width: '100vw',
@@ -442,73 +503,22 @@ const UseStyle = makeStyles((theme) => ({
         right: '0',
         "background": "linear-gradient(rgba(31, 54, 37, 0) 5%,rgba(31, 54, 37, 0.636721) 15%, #1F3625 40%, #e5e5e5 40%)",
     },
-    infobox: {
-        marginTop: '5%',
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        [theme.breakpoints.down('md')]:{
-            flexWrap: 'wrap',
-        }
-    },
-    infoheader: {
-        fontSize: '55px',
-        color: '#9BC53D',
-        fontWeight: '550',
-        [theme.breakpoints.down('md')]:{
-            fontSize: '50px',
-        }
-    },
-    infodesc: {
-        fontSize: '22px',
-        paddingLeft: '1%',
-        color: '#ffffff',
-        fontWeight: '500',
-        alignItems: 'center',
-        textAlign: 'center',
-        [theme.breakpoints.down('md')]:{
-            fontSize: '15px',
-        }
-    },
     formheader: {
         paddingLeft: '1%',
-        [theme.breakpoints.down('md')]:{
+        [theme.breakpoints.down('md')]: {
             paddingLeft: "5%",
             paddingTop: '5%',
-        }
-    },
-    inputbox:{
-        width: '75vw',
-        paddingLeft: '12.5%',
-        height: '90vh',
-        position: 'relative',
-        // overflowY: "scroll",
-        // overflowX: "hidden",
-        // "&::-webkit-scrollbar" : {
-        //     display: "none",
-        // },
-        [theme.breakpoints.down('md')]:{
-            width: '90vw',
-            paddingLeft: '4vw',
-        }
-    },
-    paper: {
-        margin: theme.spacing(5),
-        padding: theme.spacing(3),
-        [theme.breakpoints.down('md')]:{
-            margin: theme.spacing(0),
-            padding: '0px',
         }
     },
     backdrop: {
         zIndex: theme.zIndex.drawer + 1,
     },
-    submitDiv:{
-        display:'flex',
+    submitDiv: {
+        display: 'flex',
         // marginLeft:'30px',
         flexDirection: 'row',
-        marginTop:'10px',
-        [theme.breakpoints.down('md')]:{
+        marginTop: '10px',
+        [theme.breakpoints.down('md')]: {
             marginLeft: '6%',
             marginBottom: '10px',
         }
@@ -520,17 +530,17 @@ const UseStyle = makeStyles((theme) => ({
         display: 'none',
     },
     helper: {
-        width:'90%',
+        width: '90%',
         paddingLeft: '1%',
         textAlign: "left",
-        [theme.breakpoints.down('md')]:{
+        [theme.breakpoints.down('md')]: {
             paddingLeft: '5%',
             textAlign: "center",
         }
     },
-    images:{
-        display:'flex',
-        justifyContent:'center'
+    images: {
+        display: 'flex',
+        justifyContent: 'center'
     },
     submitbtn: {
         marginTop: '20px',
