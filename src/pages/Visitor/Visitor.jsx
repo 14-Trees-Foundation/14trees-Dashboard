@@ -56,7 +56,7 @@ export const Visitor = () => {
 
     const classes = UseStyle();
 
-    const validate = () => {
+    const validate = (values) => {
         let temp = {};
         temp.name = values.name ? "" : "Required Field"
         temp.sapling = values.sapling ? "" : "Required Field"
@@ -120,7 +120,7 @@ export const Visitor = () => {
     }
 
     useEffect(() => {
-        validate();
+        validate(values);
     }, [values]);
 
     const onSubmit = async (e) => {
@@ -202,27 +202,27 @@ export const Visitor = () => {
         return (
             <div className={classes.box}>
                 <img alt="bg" src={bg} className={classes.bgimg} />
-                <div className={classes.bg}>
-                    <div className={classes.infobox}>
-                        <h1 className={classes.infoheader}>Thank You!</h1>
-                        <p className={classes.infodesc}>We have saved your data!</p>
-                    </div>
-                    <div className={classes.sucessbox}>
-                        <Card className={classes.maincard}>
-                            <CardContent style={{ 'marginTop': '1%' }}>
-                                <Alert severity="success">
-                                    Your data has been uploaded successfuly!
-                                </Alert>
-                                {/* <Typography variant="h5" component="h2" style={{'marginBottom':'10px'}}>
-                                    Form Submitted
-                                </Typography> */}
-                                <CardMedia
-                                    className={classes.media}
-                                    image={tree}
-                                    title="tree"
-                                />
-                            </CardContent>
-                        </Card>
+                <div className={classes.overlay}>
+                    <AppBar />
+                    <div className={classes.main}>
+                        <div className={classes.infobox}>
+                            <h1 className={classes.infoheader}>Thank You!</h1>
+                            <p className={classes.infodesc}>We have saved your data!</p>
+                        </div>
+                        <div className={classes.sucessbox}>
+                            <Card className={classes.maincard}>
+                                <CardContent style={{ 'marginTop': '1%' }}>
+                                    <Alert severity="success">
+                                        Your data has been uploaded successfuly!
+                                    </Alert>
+                                    <CardMedia
+                                        className={classes.media}
+                                        image={tree}
+                                        title="tree"
+                                    />
+                                </CardContent>
+                            </Card>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -384,7 +384,8 @@ const UseStyle = makeStyles((theme) => ({
     box: {
         width: '100%',
         height: '100vh',
-        position: 'relative'
+        position: 'relative',
+        backgroundColor: '#e5e5e5'
     },
     root: {
         '& .MuiFormControl-root': {
@@ -394,7 +395,7 @@ const UseStyle = makeStyles((theme) => ({
     },
     bgimg: {
         width: '100%',
-        height: '100vh',
+        height: '45vh',
         objectFit: 'cover',
     },
     overlay: {
@@ -402,7 +403,7 @@ const UseStyle = makeStyles((theme) => ({
         top: '0',
         left: '0',
         width: '100%',
-        height: '100%',
+        height: '45vh',
         background: 'linear-gradient(358.58deg, #1F3625 37.04%, rgba(31, 54, 37, 0.636721) 104.2%, rgba(31, 54, 37, 0) 140.95%)',
     },
     main: {
@@ -454,7 +455,6 @@ const UseStyle = makeStyles((theme) => ({
         }
     },
     paper: {
-        margin: theme.spacing(5),
         padding: theme.spacing(3),
         [theme.breakpoints.down('md')]: {
             margin: theme.spacing(0),
@@ -481,7 +481,7 @@ const UseStyle = makeStyles((theme) => ({
         }
     },
     media: {
-        width: '30%',
+        width: '60%',
         height: '350px',
         marginLeft: "auto",
         marginRight: "auto",
