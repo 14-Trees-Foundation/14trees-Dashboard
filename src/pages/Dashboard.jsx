@@ -129,12 +129,12 @@ export const Dashboard = () => {
     }
 }
 
-const useStyles = makeStyles(() =>
+const useStyles = makeStyles((theme) =>
     createStyles({
         drawer: {
-            width: '17%',
+            width: '13%',
             '& .MuiPaper-root': {
-                width: '17%',
+                width: '13%',
                 backgroundColor: '#3F5344',
                 borderTopRightRadius: '10px'
             }
@@ -146,7 +146,7 @@ const useStyles = makeStyles(() =>
         item: {
             cursor: 'pointer',
             color: '#ffffff',
-            width: '160px',
+            width: '80%',
             margin: '0 auto 20px auto',
         },
         itembtn: {
@@ -172,7 +172,15 @@ const useStyles = makeStyles(() =>
             width: '80px',
             height: '100px',
             margin: '25px auto 30px auto',
-            paddingTop: '25px'
+            paddingTop: '25px',
+            [theme.breakpoints.down('md')]: {
+                width: '60px',
+                height: '80px',
+            },
+            [theme.breakpoints.down('sm')]: {
+                width: '40px',
+                height: '55px',
+            }
         },
         itemlogo: {
             width: '18px',
@@ -182,6 +190,9 @@ const useStyles = makeStyles(() =>
             margin: '5px',
             fontWeight: 450,
             fontSize: 16,
+            [theme.breakpoints.down('md')]: {
+                display: 'none'
+            }
         }
     }),
 );
