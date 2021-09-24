@@ -9,6 +9,7 @@ import App from './App';
 import reportWebVitals from './reportWebVitals';
 import { BrowserRouter } from "react-router-dom";
 import { makeServer } from './mockServer/server';
+import { RecoilRoot } from "recoil";
 require('dotenv').config()
 
 if (process.env.REACT_APP_ENV === 'development') {
@@ -21,7 +22,9 @@ ReactDOM.render(
   <React.StrictMode>
     <BrowserRouter>
       <ThemeProvider theme={theme}>
-        <App />
+        <RecoilRoot>
+          <App />
+        </RecoilRoot>
       </ThemeProvider>
     </BrowserRouter>
   </React.StrictMode>,
