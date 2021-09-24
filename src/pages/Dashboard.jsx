@@ -3,7 +3,6 @@ import Divider from '@mui/material/Divider';
 
 import Drawer from '@mui/material/Drawer';
 import { createStyles, makeStyles } from '@mui/styles';
-import useMediaQuery from '@mui/material/useMediaQuery';
 
 import { useParams } from "react-router";
 import { useEffect, useState, useCallback } from "react";
@@ -14,6 +13,7 @@ import { usersData, overallData, pondsImages, navIndex } from '../store/atoms'
 
 import { Profile } from './UserProfile/Profile';
 import { Maps } from "./Maps/Maps";
+import { RightDrawer } from '../components/RightDrawer';
 import { Spinner } from "../stories/Spinner/Spinner";
 import logo from "../assets/logo_white_small.png"
 
@@ -88,7 +88,10 @@ export const Dashboard = () => {
         console.log(index)
         const Page = pages[index].page
         return (
-            <Page />
+            // <Page />
+            <div style={{ fontSize: '40px', textAlign: 'center' }}>
+                Under development
+            </div>
         )
     }
 
@@ -119,11 +122,18 @@ export const Dashboard = () => {
                         }
                     </div>
                 </Drawer>
-                <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
+                <Box component="main" sx={{ flexGrow: 1, p: 2 }}>
                     {
                         mainBox()
                     }
                 </Box>
+                <Drawer
+                    className={classes.rdrawer}
+                    variant="permanent"
+                    anchor="right"
+                >
+                    <RightDrawer />
+                </Drawer>
             </Box >
         );
     }
@@ -132,9 +142,9 @@ export const Dashboard = () => {
 const useStyles = makeStyles((theme) =>
     createStyles({
         drawer: {
-            width: '13%',
+            width: '14%',
             '& .MuiPaper-root': {
-                width: '13%',
+                width: '14%',
                 backgroundColor: '#3F5344',
                 borderTopRightRadius: '10px'
             }
@@ -193,6 +203,14 @@ const useStyles = makeStyles((theme) =>
             [theme.breakpoints.down('md')]: {
                 display: 'none'
             }
-        }
-    }),
+        },
+        rdrawer: {
+            width: '21%',
+            '& .MuiPaper-root': {
+                width: '21%',
+                backgroundColor: '#B1BFB5',
+                paddingTop: '20px'
+            }
+        },
+    })
 );

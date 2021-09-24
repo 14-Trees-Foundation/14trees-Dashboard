@@ -36,9 +36,9 @@ export const Profile = () => {
                             <Trees />
                         </div>
                         <div className="p-col-12 p-md-6 p-sm-12">
-                            <Overall trees={overallinfo} ponds={pondsimages} />
                             <div style={{ height: '54vh' }}>
                                 <h2 style={{ marginTop: '18px' }}>Site Map</h2>
+                                <Trees />
                                 <Map
                                     trees={userinfo.trees}
                                     currentInfo={activeStep}
