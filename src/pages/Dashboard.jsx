@@ -9,7 +9,13 @@ import { useEffect, useState, useCallback } from "react";
 
 import * as Axios from "../api/local";
 import { useRecoilState, useSetRecoilState } from 'recoil';
-import { usersData, overallData, pondsImages, navIndex } from '../store/atoms'
+import {
+    usersData,
+    overallData,
+    pondsImages,
+    navIndex,
+    activitiesData
+} from '../store/atoms'
 
 import { Profile } from './UserProfile/Profile';
 import { Maps } from "./Maps/Maps";
@@ -26,6 +32,7 @@ export const Dashboard = () => {
     const setUserinfo = useSetRecoilState(usersData);
     const setOverallInfo = useSetRecoilState(overallData);
     const setPondsImages = useSetRecoilState(pondsImages);
+    const setActivities = useSetRecoilState(activitiesData);
     const [index, setIndex] = useRecoilState(navIndex);
 
     const [loading, setLoading] = useState(true);
@@ -53,6 +60,11 @@ export const Dashboard = () => {
         const pondImagesRes = await Axios.default.get(`/analytics/totalponds`);
         if (pondImagesRes.status === 200) {
             setPondsImages(pondImagesRes.data);
+        }
+
+        const actRes = await Axios.default.get(`/activity/`);
+        if (pondImagesRes.status === 200) {
+            setActivities(actRes.data);
         }
 
         // const totEmpRes = await Axios.default.get(`/analytics/totalemployees`);
@@ -209,7 +221,11 @@ const useStyles = makeStyles((theme) =>
             '& .MuiPaper-root': {
                 width: '21%',
                 backgroundColor: '#B1BFB5',
-                paddingTop: '20px'
+                paddingTop: '20px',
+                overflowY: 'hidden'
+            },
+            [theme.breakpoints.down('md')]: {
+                display: 'none'
             }
         },
     })

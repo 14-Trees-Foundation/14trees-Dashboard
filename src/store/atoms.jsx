@@ -20,4 +20,15 @@ const pondsImages = atom({
     default: {},
 });
 
-export { usersData, overallData, pondsImages, navIndex };
+const activitiesData = atom({
+    key: 'activities',
+    default: {}
+})
+
+export {
+    usersData,
+    overallData,
+    pondsImages,
+    navIndex,
+    activitiesData
+};

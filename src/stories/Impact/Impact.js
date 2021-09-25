@@ -26,19 +26,23 @@ const useStyles = makeStyles((theme) =>
     createStyles({
         cardsmall: {
           margin:'7px 7px 7px 0',
-            minWidth: '100px',
-            maxWidth: '400px',
+            minWidth: '70px',
+            maxWidth: '190px',
+            minHeight: '15%',
             backgroundColor: '#ffffff',
             borderRadius: '18px',
-            padding: '10px'
+            padding: '20px'
         },
         cardlarge: {
             margin:'7px 7px 7px 0',
-            minWidth: '90%',
+            minWidth: '82%',
             maxWidth: '400px',
             backgroundColor: '#ffffff',
             borderRadius: '18px',
-            padding: '10px'
+            padding: '20px',
+            [theme.breakpoints.down('lg')]: {
+              minWidth: '78%',
+          }
         },
         header: {
           fontSize: '30px',
@@ -52,5 +56,5 @@ const useStyles = makeStyles((theme) =>
           fontWeight: '500',
           textAlign:'center'
         }
-    }))
-export default Impact;
+    })
+)
