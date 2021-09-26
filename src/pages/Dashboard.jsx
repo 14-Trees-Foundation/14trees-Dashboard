@@ -100,10 +100,10 @@ export const Dashboard = () => {
         console.log(index)
         const Page = pages[index].page
         return (
-            // <Page />
-            <div style={{ fontSize: '40px', textAlign: 'center' }}>
-                Under development
-            </div>
+            <Page />
+            // <div style={{ fontSize: '40px', textAlign: 'center' }}>
+            //     Under development
+            // </div>
         )
     }
 
@@ -134,7 +134,7 @@ export const Dashboard = () => {
                         }
                     </div>
                 </Drawer>
-                <Box component="main" sx={{ flexGrow: 1, p: 2 }}>
+                <Box component="main" sx={{ flexGrow: 1, p: 2, backgroundColor: '#e5e5e5' }}>
                     {
                         mainBox()
                     }
@@ -193,7 +193,7 @@ const useStyles = makeStyles((theme) =>
         logo: {
             width: '80px',
             height: '100px',
-            margin: '25px auto 30px auto',
+            margin: '12px auto 30px auto',
             paddingTop: '25px',
             [theme.breakpoints.down('md')]: {
                 width: '60px',

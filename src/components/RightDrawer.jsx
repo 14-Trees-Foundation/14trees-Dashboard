@@ -8,7 +8,7 @@ export const RightDrawer = () => {
     const classes = useStyles();
     return (
         <div>
-            <div style={{ height: '45vh' }}>
+            <div className={classes.main}>
                 <h3 style={{ marginLeft: '9%' }}>Overall Impact</h3>
                 <Divider style={{ margin: '0 9% 2% 9%' }} />
                 <div className={classes.infobox}>
@@ -31,6 +31,12 @@ export const RightDrawer = () => {
 
 const useStyles = makeStyles((theme) =>
     createStyles({
+        main: {
+            maxHeight: '45vh',
+            [theme.breakpoints.down('lg')]: {
+                maxHeight: '55vh',
+            }
+        },
         infobox: {
             marginLeft: '9%',
             marginRight: '20px',
@@ -56,6 +62,9 @@ const useStyles = makeStyles((theme) =>
                 backgroundColor: '#1F3625',
                 borderRadius: '0.3em',
                 height: '10px'
+            },
+            [theme.breakpoints.down('lg')]: {
+                maxHeight: '35vh',
             }
         }
     }))
