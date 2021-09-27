@@ -134,7 +134,7 @@ export const Dashboard = () => {
                         }
                     </div>
                 </Drawer>
-                <Box component="main" sx={{ flexGrow: 1, p: 2, backgroundColor: '#e5e5e5' }}>
+                <Box component="main" sx={{ backgroundColor: '#e5e5e5', width: '65%' }}>
                     {
                         mainBox()
                     }

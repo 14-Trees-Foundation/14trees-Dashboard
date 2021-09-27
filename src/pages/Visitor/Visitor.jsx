@@ -56,7 +56,7 @@ export const Visitor = () => {
 
     const classes = UseStyle();
 
-    const validate = (values) => {
+    const validate = () => {
         let temp = {};
         temp.name = values.name ? "" : "Required Field"
         temp.sapling = values.sapling ? "" : "Required Field"

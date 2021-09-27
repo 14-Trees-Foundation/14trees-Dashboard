@@ -59,6 +59,9 @@ const useStyles = makeStyles((theme) =>
         label: {
             fontSize: '12px',
             textAlign: 'center',
+            [theme.breakpoints.up('xl')]: {
+                fontSize: '15px',
+            }
         },
     })
 )

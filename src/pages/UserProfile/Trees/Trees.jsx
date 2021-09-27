@@ -1,4 +1,3 @@
-import { Memories } from "./Memories/Memories";
 import { Chip } from "../../../stories/Chip/Chip";
 import { TreesPlanted } from '../../../stories/TreesPlanted/TreesPlanted';
 import './trees.scss'
@@ -55,33 +54,6 @@ export const Trees = () => {
                                     :
                                     <TreesPlanted />
                             }
-                        </div>
-                    </div>
-                </div>
-                <div className="p-col-12 p-lg-6 p-md-6 memories">
-                    <div className="p-grid" style={{ "margin": 0 }}>
-                        <div className="p-col-12" style={{ "padding": 0 }}>
-                            <h2 style={{ "margin": "0 0 15px 0" }}>Memories</h2>
-                        </div>
-                        <div className="p-col-7 p-lg-7 p-md-7" style={{ "padding": "0 0.3rem 0.2rem 0" }}>
-                            <Memories
-                                img={images[0]}
-                                overlay="false" />
-                        </div>
-                        <div className="p-col-5 p-lg-5 p-md-5" style={{ "padding": "0 0.3rem 0.2rem 0" }}>
-                            <Memories
-                                img={images[1]}
-                                overlay="false" />
-                        </div>
-                        <div className="p-col-7 p-lg-7 p-md-7" style={{ "padding": "0 0.3rem 0.2rem 0" }}>
-                            <Memories
-                                img={images[2]}
-                                overlay="false" />
-                        </div>
-                        <div className="p-col-5 p-lg-5 p-md-5" style={{ "padding": "0 0.3rem 0.2rem 0" }}>
-                            <Memories
-                                img={images[3]}
-                                overlay="true" />
                         </div>
                     </div>
                 </div>

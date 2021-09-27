@@ -69,6 +69,7 @@ const useStyles = makeStyles((theme) =>
             width: '45%',
             height: '70px',
             borderRadius: '10px',
-            marginRight: '5%'
+            marginRight: '5%',
+            objectFit: 'cover'
         }
     }))

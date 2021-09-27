@@ -36,7 +36,9 @@ export const Profile = () => {
             <Divider />
             <div style={{ display: 'flex', marginBottom: '20px' }}>
                 <UserInfo />
-                {/* <Trees /> */}
+            </div>
+            <div style={{ fontSize: '30px', margin: '40px' }}>
+                Map in development
             </div>
             {/* <div className="p-grid" style={{ "marginTop": "15px" }}>
                 <div className="p-col-12 p-md-6 p-sm-12">
