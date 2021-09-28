@@ -1,15 +1,15 @@
 import { useState, useEffect } from 'react';
 
-import { makeStyles } from '@material-ui/core/styles';
+import { createStyles, makeStyles } from '@mui/styles';
 import Backdrop from '@mui/material/Backdrop';
-import Grid from '@material-ui/core/Grid';
-import TextField from '@material-ui/core/TextField';
-import Autocomplete from '@material-ui/lab/Autocomplete';
-import { Paper } from '@material-ui/core';
-import Card from '@material-ui/core/Card';
-import CardContent from '@material-ui/core/CardContent';
-import CardMedia from '@material-ui/core/CardMedia';
-import { Alert } from '@material-ui/lab';
+import Grid from '@mui/material/Grid';
+import TextField from '@mui/material/TextField';
+import Autocomplete from '@mui/material/Autocomplete';
+import { Paper } from '@mui/material';
+import Card from '@mui/material/Card';
+import CardContent from '@mui/material/CardContent';
+import CardMedia from '@mui/material/CardMedia';
+import Alert from '@mui/material/Alert';
 
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -42,16 +42,16 @@ export const AddTree = () => {
 
     useEffect(() => {
 
-        (async() => {
+        (async () => {
             // Get Tree types
             let TreeRes = await Axios.get(`/trees/treetypes`);
-            if(TreeRes.status === 200) {
+            if (TreeRes.status === 200) {
                 setTreeType(TreeRes.data);
             }
 
             // Get Plots
             let plotRes = await Axios.get(`/plots`);
-            if(plotRes.status === 200) {
+            if (plotRes.status === 200) {
                 setPlots(plotRes.data);
             }
             setLoading(false);
@@ -73,30 +73,30 @@ export const AddTree = () => {
         validate();
         setValues({
             ...values,
-            saplingId:e.target.value
+            saplingId: e.target.value
         })
     }
 
     const handleTreeTypeChange = (value) => {
         setValues({
             ...values,
-            selectedTreetype:value
+            selectedTreetype: value
         })
     }
 
     const handlePlotTypeChange = (value) => {
         setValues({
             ...values,
-            selectedPlot:value
+            selectedPlot: value
         })
     }
 
     useEffect(() => {
         validate();
-     }, [values]);
+    }, [values]);
 
     const onSubmit = async (e) => {
-        if(!validate()){
+        if (!validate()) {
             toast.error('Please fill mandatory fields', {
                 position: "top-right",
                 autoClose: 5000,
@@ -109,22 +109,22 @@ export const AddTree = () => {
         } else {
             setValues({
                 ...values,
-                loading:true,
-                backdropOpen:true
+                loading: true,
+                backdropOpen: true
             })
             const params = JSON.stringify({
                 "sapling_id": values.saplingId,
                 "tree_id": values.selectedTreetype.tree_id,
                 "plot_id": values.selectedPlot.plot_id
             });
-            
+
             try {
                 let res = await Axios.post('/trees/addtree', params, {
                     headers: {
                         'Content-type': 'application/json'
                     },
                 })
-                if(res.status === 201) {
+                if (res.status === 201) {
                     setValues({
                         ...values,
                         loading: false,
@@ -133,7 +133,7 @@ export const AddTree = () => {
                     toast.success("Data uploaded successfully!")
                 }
             } catch (error) {
-                if(error.response.status === 500) {
+                if (error.response.status === 500) {
                     setValues({
                         ...values,
                         loading: false,
@@ -148,23 +148,23 @@ export const AddTree = () => {
     if (loading) {
         return <Spinner />
     } else {
-        if(values.uploaded){
-            return(
+        if (values.uploaded) {
+            return (
                 <div className={classes.box}>
-                    <img alt="bg" src={bg} className={classes.bgimg}/>
+                    <img alt="bg" src={bg} className={classes.bgimg} />
                     <div className={classes.bg}>
                         <div className={classes.infobox}>
                             <p className={classes.infodesc}>Tree Data Saved</p>
                         </div>
                         <div className={classes.sucessbox}>
                             <Card className={classes.maincard}>
-                                <CardContent style={{'marginTop':'1%'}}>
+                                <CardContent style={{ 'marginTop': '1%' }}>
                                     <Alert severity="success">
                                         Your data has been uploaded successfuly!
                                     </Alert>
                                     <CardMedia
                                         className={classes.media}
-                                        image= {tree}
+                                        image={tree}
                                         title="tree"
                                     />
                                 </CardContent>
@@ -176,15 +176,15 @@ export const AddTree = () => {
         } else {
             return (
                 <div className={classes.box}>
-                    <img alt="bg" src={bg} className={classes.bgimg}/>
+                    <img alt="bg" src={bg} className={classes.bgimg} />
                     <div className={classes.bg}>
                         <div className={classes.infobox}>
                             <p className={classes.infodesc}>Fill tree information</p>
                         </div>
                         <div className={classes.inputbox}>
                             <Paper className={classes.paper}>
-                                <Backdrop className={classes.backdrop} open={values.backdropOpen}>  
-                                    <Spinner text={"Sending your data..."}/>
+                                <Backdrop className={classes.backdrop} open={values.backdropOpen}>
+                                    <Spinner text={"Sending your data..."} />
                                 </Backdrop>
                                 <ToastContainer />
                                 <h1 className={classes.formheader}>Tree information</h1>
@@ -200,7 +200,7 @@ export const AddTree = () => {
                                                     handleTreeTypeChange(newValue);
                                                 }}
                                                 renderInput={(params) => <TextField {...params} label="Select Tree Type" variant="outlined" />}
-                                                />
+                                            />
                                             <Autocomplete
                                                 id="plots"
                                                 options={plots}
@@ -210,23 +210,23 @@ export const AddTree = () => {
                                                     handlePlotTypeChange(newValue);
                                                 }}
                                                 renderInput={(params) => <TextField {...params} label="Select Plot" variant="outlined" />}
-                                                />
+                                            />
                                             <TextField
-                                                error={errors.saplingId!==""?true:false}
+                                                error={errors.saplingId !== "" ? true : false}
                                                 variant='outlined'
                                                 label='Sapling ID *'
                                                 name='sapling'
                                                 value={values.sapling}
                                                 helperText="Sapling ID"
-                                                onChange = {handleSaplingIdChange}
+                                                onChange={handleSaplingIdChange}
                                             />
                                         </Grid>
-                                            {
-                                                !values.uimageerror && !values.addimageerror &&
-                                                <div className={classes.submitbtn}>
-                                                    <Button size='large' variant="contained" color='primary' onClick={onSubmit}>Submit</Button>
-                                                </div>
-                                            }
+                                        {
+                                            !values.uimageerror && !values.addimageerror &&
+                                            <div className={classes.submitbtn}>
+                                                <Button size='large' variant="contained" color='primary' onClick={onSubmit}>Submit</Button>
+                                            </div>
+                                        }
                                     </Grid>
                                 </form>
                             </Paper>
@@ -238,140 +238,141 @@ export const AddTree = () => {
     }
 }
 
-const UseStyle = makeStyles((theme) => ({
-    root: {
-        '& .MuiFormControl-root':{
-            width: '90%',
-            margin: theme.spacing(1),
-        },
-        [theme.breakpoints.down('md')]:{
-            '& .MuiFormControl-root':{
-                width: '93%',
-                margin: '12px',
+const UseStyle = makeStyles((theme) =>
+    createStyles({
+        root: {
+            '& .MuiFormControl-root': {
+                width: '90%',
+                margin: theme.spacing(1),
             },
-        }
-    },
-    maincard: {
-        width: "50%",
-        marginLeft: "auto",
-        marginRight: "auto",
-        [theme.breakpoints.down('md')]:{
-            width: "90%",
-            padding: '0px',
-        }
-    },
-    media: {
-        width: '30%',
-        height: '330px',
-        marginLeft:"auto",
-        marginRight:"auto",
-        [theme.breakpoints.down('md')]:{
+            [theme.breakpoints.down('md')]: {
+                '& .MuiFormControl-root': {
+                    width: '93%',
+                    margin: '12px',
+                },
+            }
+        },
+        maincard: {
+            width: "50%",
+            marginLeft: "auto",
+            marginRight: "auto",
+            [theme.breakpoints.down('md')]: {
+                width: "90%",
+                padding: '0px',
+            }
+        },
+        media: {
+            width: '30%',
+            height: '330px',
+            marginLeft: "auto",
+            marginRight: "auto",
+            [theme.breakpoints.down('md')]: {
+                width: '90%',
+            }
+        },
+        box: {
+            marginTop: '65px',
+            width: '100%',
+            height: '100%',
+            position: 'relative',
+        },
+        bgimg: {
+            width: '100vw',
+            height: '40vh',
+            objectFit: 'cover',
+        },
+        bg: {
+            // overflow: "auto",
+            // "&::-webkit-scrollbar" : {
+            //     display: "none",
+            // },
+            width: '100vw',
+            height: '100vh',
+            position: 'absolute',
+            top: '0',
+            bottom: '0',
+            left: '0',
+            right: '0',
+            "background": "linear-gradient(rgba(31, 54, 37, 0) 5%,rgba(31, 54, 37, 0.636721) 15%, #1F3625 40%, #e5e5e5 40%)",
+        },
+        infobox: {
+            marginTop: '5%',
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            [theme.breakpoints.down('md')]: {
+                flexWrap: 'wrap',
+            }
+        },
+        infodesc: {
+            fontSize: '30px',
+            paddingLeft: '1%',
+            color: '#ffffff',
+            fontWeight: '600',
+            alignItems: 'center',
+            textAlign: 'center',
+            [theme.breakpoints.down('md')]: {
+                fontSize: '20px',
+            }
+        },
+        formheader: {
+            paddingLeft: '1%',
+            [theme.breakpoints.down('md')]: {
+                paddingLeft: "5%",
+                paddingTop: '5%',
+            }
+        },
+        inputbox: {
+            width: '55vw',
+            paddingLeft: '22.5%',
+            height: '90vh',
+            position: 'relative',
+            [theme.breakpoints.down('md')]: {
+                width: '90vw',
+                paddingLeft: '4vw',
+            }
+        },
+        paper: {
+            margin: theme.spacing(5),
+            padding: theme.spacing(3),
+            [theme.breakpoints.down('md')]: {
+                margin: theme.spacing(0),
+                padding: '0px',
+            }
+        },
+        backdrop: {
+            zIndex: theme.zIndex.drawer + 1,
+        },
+        submitDiv: {
+            display: 'flex',
+            // marginLeft:'30px',
+            flexDirection: 'row',
+            marginTop: '10px',
+            marginLeft: '10px',
+            [theme.breakpoints.down('md')]: {
+                marginLeft: '6%',
+                marginBottom: '10px',
+            }
+        },
+        span: {
+            flexGrow: "0.89",
+        },
+        input: {
+            display: 'none',
+        },
+        helper: {
             width: '90%',
-        }
-    },
-    box: {
-        marginTop: '65px',
-        width: '100%',
-        height: '100%',
-        position: 'relative',
-    },
-    bgimg: {
-        width: '100vw',
-        height: '40vh',
-        objectFit: 'cover',
-    },
-    bg: {
-        // overflow: "auto",
-        // "&::-webkit-scrollbar" : {
-        //     display: "none",
-        // },
-        width: '100vw',
-        height: '100vh',
-        position: 'absolute',
-        top: '0',
-        bottom: '0',
-        left: '0',
-        right: '0',
-        "background": "linear-gradient(rgba(31, 54, 37, 0) 5%,rgba(31, 54, 37, 0.636721) 15%, #1F3625 40%, #e5e5e5 40%)",
-    },
-    infobox: {
-        marginTop: '5%',
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        [theme.breakpoints.down('md')]:{
-            flexWrap: 'wrap',
-        }
-    },
-    infodesc: {
-        fontSize: '30px',
-        paddingLeft: '1%',
-        color: '#ffffff',
-        fontWeight: '600',
-        alignItems: 'center',
-        textAlign: 'center',
-        [theme.breakpoints.down('md')]:{
-            fontSize: '20px',
-        }
-    },
-    formheader: {
-        paddingLeft: '1%',
-        [theme.breakpoints.down('md')]:{
-            paddingLeft: "5%",
-            paddingTop: '5%',
-        }
-    },
-    inputbox:{
-        width: '55vw',
-        paddingLeft: '22.5%',
-        height: '90vh',
-        position: 'relative',
-        [theme.breakpoints.down('md')]:{
-            width: '90vw',
-            paddingLeft: '4vw',
-        }
-    },
-    paper: {
-        margin: theme.spacing(5),
-        padding: theme.spacing(3),
-        [theme.breakpoints.down('md')]:{
-            margin: theme.spacing(0),
-            padding: '0px',
-        }
-    },
-    backdrop: {
-        zIndex: theme.zIndex.drawer + 1,
-    },
-    submitDiv:{
-        display:'flex',
-        // marginLeft:'30px',
-        flexDirection: 'row',
-        marginTop:'10px',
-        marginLeft: '10px',
-        [theme.breakpoints.down('md')]:{
-            marginLeft: '6%',
+            paddingLeft: '1%',
+            textAlign: "left",
+            [theme.breakpoints.down('md')]: {
+                paddingLeft: '5%',
+            }
+        },
+        submitbtn: {
+            paddingTop: '20px',
+            marginLeft: "auto",
+            marginRight: "auto",
             marginBottom: '10px',
+            display: "block"
         }
-    },
-    span: {
-        flexGrow: "0.89",
-    },
-    input: {
-        display: 'none',
-    },
-    helper: {
-        width:'90%',
-        paddingLeft: '1%',
-        textAlign: "left",
-        [theme.breakpoints.down('md')]:{
-            paddingLeft: '5%',
-        }
-    },
-    submitbtn: {
-        paddingTop: '20px',
-        marginLeft: "auto",
-        marginRight: "auto",
-        marginBottom: '10px',
-        display: "block"
-    }
-}));
+    }));

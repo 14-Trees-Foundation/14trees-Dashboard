@@ -9,7 +9,7 @@ import { EventList } from "../../stories/EventList/EventList";
 import { TreeList } from "../../stories/TreeList/TreeList";
 import bg from "../../assets/bg.png";
 
-import { makeStyles } from '@material-ui/core/styles';
+import { createStyles, makeStyles } from '@mui/styles';
 import Button from '@mui/material/Button';
 
 export const Search = () => {
@@ -78,8 +78,8 @@ export const Search = () => {
         )
     } else {
         return (
-            <div className="s-box">
-                <img alt="bg" src={bg} className="s-img" style={{ "height": "40vh" }} />
+            <div className={classes.box}>
+                <img alt="bg" src={bg} className={classes.bg} />
                 <AppBar>
                     <div style={{
                         "background": "linear-gradient(rgba(31, 54, 37, 0) 5%,rgba(31, 54, 37, 0.636721) 15%, #1F3625 40%, #e5e5e5 40%)"
@@ -151,92 +151,93 @@ export const Search = () => {
     }
 }
 
-const UseStyle = makeStyles((theme) => ({
-    box: {
-        width: '100%',
-        height: '100vh',
-        position: 'relative'
-    },
-    bg: {
-        width: '100%',
-        height: '100vh',
-        objectFit: 'cover',
-    },
-    overlay: {
-        position: 'absolute',
-        top: '0',
-        left: '0',
-        width: '100%',
-        height: '100%',
-        background: 'linear-gradient(358.58deg, #1F3625 37.04%, rgba(31, 54, 37, 0.636721) 104.2%, rgba(31, 54, 37, 0) 140.95%)',
-    },
-    main: {
-        width: '65vw',
-        paddingLeft: '18vw',
-        paddingTop: '10vh',
-        height: '90vh',
-        position: 'relative',
-        [theme.breakpoints.down('748')]: {
-            width: '80vw',
-            paddingLeft: '9vw'
-        }
-    },
-    header: {
-        marginTop: '9%',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-    },
-    infobox: {
-        marginTop: '5%',
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        [theme.breakpoints.down('md')]: {
+const UseStyle = makeStyles((theme) =>
+    createStyles({
+        box: {
+            width: '100%',
+            height: '100vh',
+            position: 'relative'
+        },
+        bg: {
+            width: '100%',
+            height: '100vh',
+            objectFit: 'cover',
+        },
+        overlay: {
+            position: 'absolute',
+            top: '0',
+            left: '0',
+            width: '100%',
+            height: '100%',
+            background: 'linear-gradient(358.58deg, #1F3625 37.04%, rgba(31, 54, 37, 0.636721) 104.2%, rgba(31, 54, 37, 0) 140.95%)',
+        },
+        main: {
+            width: '65vw',
+            paddingLeft: '18vw',
+            paddingTop: '10vh',
+            height: '90vh',
+            position: 'relative',
+            [theme.breakpoints.down('748')]: {
+                width: '80vw',
+                paddingLeft: '9vw'
+            }
+        },
+        header: {
+            marginTop: '9%',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+        },
+        infobox: {
+            marginTop: '5%',
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            [theme.breakpoints.down('md')]: {
+                flexWrap: 'wrap',
+            }
+        },
+        infoheader: {
+            fontSize: '55px',
+            color: '#9BC53D',
+            fontWeight: '550',
+            [theme.breakpoints.down('md')]: {
+                fontSize: '50px',
+            }
+        },
+        infodesc: {
+            fontSize: '22px',
+            paddingLeft: '1%',
+            color: '#ffffff',
+            fontWeight: '500',
+            alignItems: 'center',
+            textAlign: 'center',
+            [theme.breakpoints.down('md')]: {
+                fontSize: '15px',
+            }
+        },
+        inputBox: {
+            width: '65vw',
+            backgroundColor: '#ffffff',
+            borderRadius: '7px',
+            alignItems: 'center',
+            paddingTop: '2%',
+            paddingBottom: '2%',
+            boxShadow: '0 4px 8px rgba(0, 0, 0, 0.16), 0 4px 8px rgba(0, 0, 0, 0.23)',
+            [theme.breakpoints.down('748')]: {
+                width: '80vw',
+            }
+        },
+        sep: {
+            color: '#ffffff',
+            justifyContent: 'center',
+            display: 'flex',
+            paddingTop: '3%',
+            paddingBottom: '3%',
+        },
+        btnGrp: {
+            display: 'flex',
+            justifyContent: 'space-around',
             flexWrap: 'wrap',
         }
-    },
-    infoheader: {
-        fontSize: '55px',
-        color: '#9BC53D',
-        fontWeight: '550',
-        [theme.breakpoints.down('md')]: {
-            fontSize: '50px',
-        }
-    },
-    infodesc: {
-        fontSize: '22px',
-        paddingLeft: '1%',
-        color: '#ffffff',
-        fontWeight: '500',
-        alignItems: 'center',
-        textAlign: 'center',
-        [theme.breakpoints.down('md')]: {
-            fontSize: '15px',
-        }
-    },
-    inputBox: {
-        width: '65vw',
-        backgroundColor: '#ffffff',
-        borderRadius: '7px',
-        alignItems: 'center',
-        paddingTop: '2%',
-        paddingBottom: '2%',
-        boxShadow: '0 4px 8px rgba(0, 0, 0, 0.16), 0 4px 8px rgba(0, 0, 0, 0.23)',
-        [theme.breakpoints.down('748')]: {
-            width: '80vw',
-        }
-    },
-    sep: {
-        color: '#ffffff',
-        justifyContent: 'center',
-        display: 'flex',
-        paddingTop: '3%',
-        paddingBottom: '3%',
-    },
-    btnGrp: {
-        display: 'flex',
-        justifyContent: 'space-around',
-        flexWrap: 'wrap',
-    }
-}))
+    }))

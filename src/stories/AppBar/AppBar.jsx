@@ -1,8 +1,7 @@
 import React, { Fragment } from "react";
 import logo from '../../assets/logo_white_small.png';
 import { Chip } from "../../stories/Chip/Chip";
-
-import { makeStyles } from '@material-ui/core/styles';
+import { createStyles, makeStyles } from '@mui/styles';
 
 export const AppBar = () => {
 
@@ -32,41 +31,42 @@ export const AppBar = () => {
     )
 }
 
-const UseStyle = makeStyles((theme) => ({
-    appbar: {
-        width: '100vw',
-        position: 'absolute',
-        top: '0',
-        left: '0',
-    },
-    content: {
-        height: '67px',
-        display: 'flex',
-        width: '100 %',
-        flexDirection: 'row',
-        alignItems: 'center',
-        marginTop: '5px'
-    },
-    logo: {
-        height: '60px',
-        width: '60px',
-        alignItems: 'center',
-        marginLeft: '1rem'
-    },
-    right: {
-        width: '100%',
-        display: 'flex',
-        flexDirection: 'row',
-        justifyContent: 'flex-end'
-    },
-    links: {
-        fontWeight: '350',
-        color: '#ffffff',
-        marginLeft: '2%',
-        marginRight: '2%',
-        cursor: 'pointer',
-        [theme.breakpoints.down('md')]: {
-            display: 'none'
+const UseStyle = makeStyles((theme) =>
+    createStyles({
+        appbar: {
+            width: '100vw',
+            position: 'absolute',
+            top: '0',
+            left: '0',
+        },
+        content: {
+            height: '67px',
+            display: 'flex',
+            width: '100 %',
+            flexDirection: 'row',
+            alignItems: 'center',
+            marginTop: '5px'
+        },
+        logo: {
+            height: '60px',
+            width: '60px',
+            alignItems: 'center',
+            marginLeft: '1rem'
+        },
+        right: {
+            width: '100%',
+            display: 'flex',
+            flexDirection: 'row',
+            justifyContent: 'flex-end'
+        },
+        links: {
+            fontWeight: '350',
+            color: '#ffffff',
+            marginLeft: '2%',
+            marginRight: '2%',
+            cursor: 'pointer',
+            [theme.breakpoints.down('md')]: {
+                display: 'none'
+            }
         }
-    }
-}))
+    }))

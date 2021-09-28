@@ -5,7 +5,7 @@ export function makeServer({ environment = 'development' }) {
         routes() {
             this.timing = 5000;
             this.urlPrefix = 'http://localhost:7000';
-            this.get('/api/v1/profile', () => {
+            this.get('/api/profile', () => {
                 return {
                     "status":"success",
                     "name":"Geeta Nair",
@@ -29,12 +29,12 @@ export function makeServer({ environment = 'development' }) {
                         ]
                     }
             });
-            this.get('/api/v1/analytics/totaltree', () => {
+            this.get('/api/analytics/totaltree', () => {
                 return [
                     {"count":"436"}
                 ];
             });
-            this.get('/api/v1/analytics/ponds', () => {
+            this.get('/api/analytics/ponds', () => {
                 return {
                     "status":"success",
                     "count":"8",
