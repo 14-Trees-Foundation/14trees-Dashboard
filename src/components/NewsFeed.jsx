@@ -6,7 +6,6 @@ import Divider from '@mui/material/Divider';
 export const NewsFeed = () => {
     const classes = useStyles();
     const activities = useRecoilValue(sortedActivites);
-    console.log(activities)
 
     const element = (value) => {
 

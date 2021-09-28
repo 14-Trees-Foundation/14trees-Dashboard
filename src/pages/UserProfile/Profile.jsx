@@ -37,7 +37,7 @@ export const Profile = () => {
             <div className={classes.user}>
                 <UserInfo />
             </div>
-            <div style={{ fontSize: '30px', marginTop: '5vh', height: '55vh' }}>
+            <div className={classes.treemap}>
                 <div style={{ display: 'flex' }}>
                     <div style={{ width: '40%', height: '45vh', margin: '20px', marginRight: '-20px', zIndex: '1' }}><Trees /></div>
                     <div style={{ width: '60%', height: '45vh', margin: '20px', marginLeft: '-10px' }}><Map /></div>
@@ -80,6 +80,14 @@ const useStyles = makeStyles((theme) =>
         user: {
             display: 'flex',
             maxHeight: '35vh',
+        },
+        treemap: {
+            fontSize: '30px',
+            marginTop: '3vh',
+            height: '55vh',
+            [theme.breakpoints.up('1500')]: {
+                marginTop: '5vh',
+            }
         }
     })
 );
