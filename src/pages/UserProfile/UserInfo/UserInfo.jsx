@@ -19,7 +19,7 @@ export const UserInfo = () => {
     const treeDoneWidth = (userinfo.trees.length / 14) * 100;
     // const numEvent = userinfo.user
     return (
-        <div style={{ width: '100%' }}>
+        <div style={{ width: '100%', marginLeft: '15px' }}>
             <Grid container spacing={1}>
                 <Grid item xs={3}>
                     <img

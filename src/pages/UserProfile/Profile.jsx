@@ -28,17 +28,20 @@ export const Profile = () => {
     return (
         <div className={classes.main}>
             <div style={{ display: 'flex', marginBottom: '20px' }}>
-                <img src={logo} alt={logo} style={{ width: '50px', height: '50px' }} />
+                <img src={logo} alt={logo} style={{ width: '50px', height: '50px', marginTop: '20px' }} />
                 <div className={classes.username}>
                     {username}'s Dashboard
                 </div>
             </div>
             <Divider />
-            <div style={{ display: 'flex', marginBottom: '20px' }}>
+            <div className={classes.user}>
                 <UserInfo />
             </div>
-            <div style={{ fontSize: '30px', margin: '40px' }}>
-                Map in development
+            <div style={{ fontSize: '30px', marginTop: '5vh', height: '55vh' }}>
+                <div style={{ display: 'flex' }}>
+                    <div style={{ width: '40%', height: '45vh', margin: '20px', marginRight: '-20px', zIndex: '1' }}><Trees /></div>
+                    <div style={{ width: '60%', height: '45vh', margin: '20px', marginLeft: '-10px' }}><Map /></div>
+                </div>
             </div>
             {/* <div className="p-grid" style={{ "marginTop": "15px" }}>
                 <div className="p-col-12 p-md-6 p-sm-12">
@@ -71,7 +74,12 @@ const useStyles = makeStyles((theme) =>
             fontSize: '28px',
             color: '#1F3625',
             paddingLeft: '20px',
-            fontWeight: '500'
+            fontWeight: '500',
+            marginTop: '20px'
+        },
+        user: {
+            display: 'flex',
+            maxHeight: '35vh',
         }
     })
 );

@@ -25,10 +25,16 @@ const activitiesData = atom({
     default: {}
 })
 
+const currSelTree = atom({
+    key: 'currTree',
+    default: 0
+})
+
 export {
     usersData,
     overallData,
     pondsImages,
     navIndex,
-    activitiesData
+    activitiesData,
+    currSelTree
 };

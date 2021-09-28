@@ -1,4 +1,5 @@
 import { useState, useCallback, Fragment } from 'react';
+import { createStyles, makeStyles } from '@mui/styles';
 import {
     GoogleMap,
     useJsApiLoader,
@@ -9,7 +10,9 @@ import {
 
 import icon from "../../../assets/marker.png";
 import tree from "../../../assets/neem.png";
-import './maps.scss';
+
+import { useRecoilValue, useRecoilState } from 'recoil';
+import { usersData, currSelTree } from '../../../store/atoms';
 
 require('dotenv').config();
 
@@ -44,7 +47,7 @@ const mapOptions = {
     mapTypeId: 'satellite',
     zoom: 16,
     minZoom: 10,
-    maxZoom: 18,
+    maxZoom: 22,
     panControl: true,
     rotateControl: true,
     keyboardShortcuts: false,
@@ -52,8 +55,13 @@ const mapOptions = {
 
 const boxOptions = { closeBoxURL: '', enableEventPropagation: true };
 
-export const Map = ({ trees, currentInfo, handleInfoChange }) => {
+export const Map = () => {
 
+    const classes = useStyles();
+    const userinfo = useRecoilValue(usersData);
+    const [currTree, setCurrTree] = useRecoilState(currSelTree);
+    const trees = userinfo.trees
+    console.log(trees)
     const [map, setMap] = useState(null);
 
     const onUnmount = useCallback(function callback(map) {
@@ -71,13 +79,11 @@ export const Map = ({ trees, currentInfo, handleInfoChange }) => {
         googleMapsApiKey: process.env.REACT_APP_API_MAP_KEY
     })
 
-    const polyLoad = polygon => { };
-
     const onMarkerClick = (i) => {
-        handleInfoChange(i)
+        setCurrTree(i)
     }
     return isLoaded ? (
-        <div className="map">
+        <div className={classes.map}>
             <GoogleMap
                 mapContainerStyle={containerStyle}
                 mapTypeId={'satellite'}
@@ -89,15 +95,13 @@ export const Map = ({ trees, currentInfo, handleInfoChange }) => {
                 {boundaries.map((marker, i) => (
                     <Fragment key={i}>
                         {
-                            currentInfo === i ?
+                            currTree === i ?
                                 <Polygon
-                                    onLoad={polyLoad}
                                     paths={marker}
                                     options={selectedOption}
                                 />
                                 :
                                 <Polygon
-                                    onLoad={polyLoad}
                                     paths={marker}
                                     options={options}
                                 />
@@ -109,28 +113,21 @@ export const Map = ({ trees, currentInfo, handleInfoChange }) => {
                             onClick={() => onMarkerClick(i)}>
                         </Marker>
                         {
-                            currentInfo === i &&
+                            currTree === i &&
                             <InfoBox
                                 options={boxOptions}
                                 position={marker[0]}
                             >
                                 <div style={{
                                     backgroundColor: '#ffffff',
-                                    width: '150px',
-                                    height: '100px',
+                                    width: '140px',
+                                    height: '70px',
                                     borderRadius: '20px',
                                     display: "flex"
                                 }}>
-                                    <img alt="tree" src={tree} style={{
-                                        width: "80px",
-                                        height: "80px",
-                                        padding: "10px",
-                                        paddingRight: "0px",
-                                        borderRadius: "25%"
-                                    }} />
-                                    <div style={{ color: "e9e9e9", paddingTop: "5px", textAlign: "center" }}>
+                                    <img alt="tree" src={trees[i].tree.tree_id.image[0]} className={classes.treeimg} />
+                                    <div style={{ color: "e9e9e9", textAlign: "center", margin: 'auto 0', marginLeft: '10px' }}>
                                         <h3>{trees[i].tree.tree_id.name}</h3>
-                                        <h5>Sapling ID: {trees[i].tree.sapling_id}</h5>
                                     </div>
                                 </div>
                             </InfoBox>
@@ -141,3 +138,21 @@ export const Map = ({ trees, currentInfo, handleInfoChange }) => {
         </div>
     ) : <></>
 }
+
+const useStyles = makeStyles((theme) =>
+    createStyles({
+        map: {
+            width: '100%',
+            height: '100%',
+            marginRight: '20px'
+        },
+        treeimg: {
+            width: "50px",
+            height: "50px",
+            padding: "10px",
+            paddingRight: "0px",
+            borderRadius: "25%",
+            objectFit: 'cover'
+        }
+    })
+);
