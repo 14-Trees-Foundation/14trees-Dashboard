@@ -48,6 +48,17 @@ const useStyles = makeStyles((theme) =>
       paddingRight: '2em',
       margin: '0 0.5em 0 0.8em'
     },
+    chiplarge: {
+      fontSize: '15px',
+      minHeight: '35px',
+      borderRadius: '40px',
+      fontWeight: '500',
+      textAlign: 'center',
+      cursor: 'pointer',
+      paddingLeft: '2em',
+      paddingRight: '2em',
+      margin: '0 0.5em 0 0.8em'
+    },
     chipprimary: {
       border: '1px solid #9bc53d',
       backgroundColor: '#ffffff',
