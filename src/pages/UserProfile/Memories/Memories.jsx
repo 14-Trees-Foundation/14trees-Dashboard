@@ -60,11 +60,14 @@ const useStyles = makeStyles((theme) =>
     createStyles({
         main: {
             width: '100%',
-            // height: '100%',
+            height: '98%',
             borderRadius: '15px',
             backgroundColor: '#ffffff',
             marginLeft: '25px',
             boxShadow: '0px 0px 20px rgba(0, 0, 0, 0.15)',
+            [theme.breakpoints.down('1500')]: {
+                height: '280px',
+            }
         },
         header: {
             display: 'flex',
@@ -90,7 +93,10 @@ const useStyles = makeStyles((theme) =>
             borderRadius: '15px',
             objectFit: 'cover',
             padding: '2%',
-            paddingTop: '12px'
+            paddingTop: '4px',
+            [theme.breakpoints.down('1500')]: {
+                height: '210px',
+            }
         },
     })
 );
