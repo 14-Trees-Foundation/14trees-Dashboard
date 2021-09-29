@@ -65,9 +65,6 @@ const useStyles = makeStyles((theme) =>
             backgroundColor: '#ffffff',
             marginLeft: '25px',
             boxShadow: '0px 0px 20px rgba(0, 0, 0, 0.15)',
-            [theme.breakpoints.down('1500')]: {
-                width: '88%',
-            }
         },
         header: {
             display: 'flex',

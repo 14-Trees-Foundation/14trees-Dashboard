@@ -27,7 +27,7 @@ export const UserInfo = () => {
                         alt="Card"
                         src={userinfo.user.profile_image[0] === "" ? "https://picsum.photos/523/354" : userinfo.user.profile_image[0]} />
                 </Grid>
-                <Grid item xs={3} style={{ height: '315px', position: 'relative', marginLeft: '-10px' }}>
+                <Grid item xs={3} style={{ height: '310px', position: 'relative', marginLeft: '-10px' }}>
                     <div className={classes.info}>
                         <div className={classes.label}>Name</div>
                         <div className={classes.data}>{userinfo.user.user.name}</div>
@@ -40,7 +40,7 @@ export const UserInfo = () => {
                                 ""
                         }
                     </div>
-                    <div style={{ paddingLeft: '20px', maxHeight: '50%', paddingTop: '50%' }}>
+                    <div style={{ paddingLeft: '20px' }}>
                         <div style={{ position: 'absolute', bottom: '0' }}>
                             <div style={{ display: 'flex' }}>
                                 <InfoChip count={userinfo.trees.length} label="Trees Planted" onClick={handleTreeClick} />
@@ -77,7 +77,7 @@ const useStyles = makeStyles((theme) =>
         },
         userimg: {
             width: '100%',
-            height: '315px',
+            height: '312px',
             borderRadius: '15px',
             objectFit: 'cover',
             maxWidth: '270px'
