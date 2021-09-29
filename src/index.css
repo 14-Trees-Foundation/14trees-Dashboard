@@ -6,12 +6,12 @@ body {
   -webkit-font-smoothing: antialiased;
   min-height: 100%;
   font-size: 12px;
-  margin:auto;
+  margin: auto;
 }
 
-@media (min-width: 1024px){
-  body{
-    overflow: hidden;
+@media (min-width: 1024px) {
+  body {
+    overflow-x: hidden;
   }
 }
 

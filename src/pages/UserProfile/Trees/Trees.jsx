@@ -83,7 +83,7 @@ const useStyles = makeStyles((theme) =>
             height: '40vh',
         },
         scroll: {
-            maxHeight: '38vh',
+            maxHeight: '80%',
             overflowX: 'hidden',
             overflowY: 'auto',
             '&::-webkit-scrollbar': {
@@ -95,9 +95,6 @@ const useStyles = makeStyles((theme) =>
                 borderRadius: '0.3em',
                 height: '10px'
             },
-            [theme.breakpoints.down('1500')]: {
-                maxHeight: '35vh',
-            }
         }
     })
 )

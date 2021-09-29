@@ -64,7 +64,7 @@ TreesPlanted.defaultProps = {
 const useStyles = makeStyles({
   main: {
     width: '91%',
-    maxHeight: '140px',
+    maxHeight: '130px',
     padding: '15px',
     margin: '0 0px 10px 4px',
     borderRadius: '12px',
@@ -79,7 +79,7 @@ const useStyles = makeStyles({
   },
   img: {
     width: '160px',
-    height: '130px',
+    height: '120px',
     objectFit: 'cover',
     borderRadius: '12px'
   }

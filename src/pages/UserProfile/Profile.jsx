@@ -40,27 +40,11 @@ export const Profile = () => {
                 </div>
                 <div className={classes.treemap}>
                     <div style={{ display: 'flex' }}>
-                        <div style={{ width: '40%', height: '45vh', margin: '20px', marginRight: '-20px', zIndex: '1' }}><Trees /></div>
-                        <div style={{ width: '60%', height: '45vh', margin: '20px', marginLeft: '-10px' }}><Map /></div>
+                        <div className={classes.tree}><Trees /></div>
+                        <div className={classes.map}><Map /></div>
                     </div>
                 </div>
             </div>
-            {/* <div className="p-grid" style={{ "marginTop": "15px" }}>
-                <div className="p-col-12 p-md-6 p-sm-12">
-
-                </div>
-                <div className="p-col-12 p-md-6 p-sm-12">
-                    <div style={{ height: '54vh' }}>
-                        <h2 style={{ marginTop: '18px' }}>Site Map</h2>
-                        <Trees />
-                        <Map
-                            trees={userinfo.trees}
-                            currentInfo={activeStep}
-                            handleInfoChange={handleInfoChange}
-                        />
-                    </div>
-                </div>
-            </div> */}
         </div>
     )
 }
@@ -68,13 +52,13 @@ export const Profile = () => {
 const useStyles = makeStyles((theme) =>
     createStyles({
         main: {
-            height: '100%'
+            height: '100%',
         },
         username: {
             lineHeight: '50px',
             fontSize: '34px',
             color: '#1F3625',
-            fontWeight: '550',
+            fontWeight: '500',
             marginLeft: '20px'
         },
         user: {
@@ -83,11 +67,19 @@ const useStyles = makeStyles((theme) =>
         },
         treemap: {
             fontSize: '30px',
-            marginTop: '3vh',
-            height: '43%',
-            [theme.breakpoints.up('1500')]: {
-                marginTop: '5vh',
-            }
+            height: '42vh',
+            marginTop: '3%'
+        },
+        tree: {
+            width: '40%',
+            height: '42vh',
+            marginRight: '-20px',
+            zIndex: '1'
+        },
+        map: {
+            width: '70%',
+            height: '42vh',
+            marginLeft: '-10px'
         }
     })
 );
