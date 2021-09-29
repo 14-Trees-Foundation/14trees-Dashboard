@@ -32,9 +32,9 @@ export const RightDrawer = () => {
 const useStyles = makeStyles((theme) =>
     createStyles({
         main: {
-            maxHeight: '45vh',
-            [theme.breakpoints.down('lg')]: {
-                maxHeight: '55vh',
+            maxHeight: '55vh',
+            [theme.breakpoints.up('lg')]: {
+                maxHeight: '45vh',
             }
         },
         infobox: {
@@ -48,7 +48,7 @@ const useStyles = makeStyles((theme) =>
         feed: {
             marginLeft: '9%',
             marginRight: '20px',
-            maxHeight: '45vh',
+            maxHeight: '48vh',
             overflowX: 'hidden',
             overflowY: 'auto',
             backgroundColor: '#ffffff',
@@ -63,8 +63,8 @@ const useStyles = makeStyles((theme) =>
                 borderRadius: '0.3em',
                 height: '10px'
             },
-            [theme.breakpoints.down('lg')]: {
-                maxHeight: '35vh',
+            [theme.breakpoints.up('1500')]: {
+                maxHeight: '57vh',
             }
         }
     }))
