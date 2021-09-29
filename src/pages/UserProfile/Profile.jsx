@@ -27,20 +27,22 @@ export const Profile = () => {
 
     return (
         <div className={classes.main}>
-            <div style={{ display: 'flex', marginBottom: '20px' }}>
-                <img src={logo} alt={logo} style={{ width: '50px', height: '50px', marginTop: '20px' }} />
+            <div style={{ display: 'flex', height: '5%', padding: '3.5%' }}>
+                <img src={logo} alt={logo} style={{ width: '50px', height: '50px' }} />
                 <div className={classes.username}>
                     {username}'s Dashboard
                 </div>
             </div>
-            <Divider />
-            <div className={classes.user}>
-                <UserInfo />
-            </div>
-            <div className={classes.treemap}>
-                <div style={{ display: 'flex' }}>
-                    <div style={{ width: '40%', height: '45vh', margin: '20px', marginRight: '-20px', zIndex: '1' }}><Trees /></div>
-                    <div style={{ width: '60%', height: '45vh', margin: '20px', marginLeft: '-10px' }}><Map /></div>
+            <Divider style={{ marginLeft: '4%', marginRight: '4%' }} />
+            <div style={{ padding: '4%' }}>
+                <div className={classes.user}>
+                    <UserInfo />
+                </div>
+                <div className={classes.treemap}>
+                    <div style={{ display: 'flex' }}>
+                        <div style={{ width: '40%', height: '45vh', margin: '20px', marginRight: '-20px', zIndex: '1' }}><Trees /></div>
+                        <div style={{ width: '60%', height: '45vh', margin: '20px', marginLeft: '-10px' }}><Map /></div>
+                    </div>
                 </div>
             </div>
             {/* <div className="p-grid" style={{ "marginTop": "15px" }}>
@@ -66,25 +68,23 @@ export const Profile = () => {
 const useStyles = makeStyles((theme) =>
     createStyles({
         main: {
-            marginTop: '1%',
-            marginLeft: '20px',
+            height: '100%'
         },
         username: {
             lineHeight: '50px',
-            fontSize: '28px',
+            fontSize: '34px',
             color: '#1F3625',
-            paddingLeft: '20px',
-            fontWeight: '500',
-            marginTop: '20px'
+            fontWeight: '550',
+            marginLeft: '20px'
         },
         user: {
             display: 'flex',
-            maxHeight: '35vh',
+            maxHeight: '29%',
         },
         treemap: {
             fontSize: '30px',
             marginTop: '3vh',
-            height: '55vh',
+            height: '43%',
             [theme.breakpoints.up('1500')]: {
                 marginTop: '5vh',
             }

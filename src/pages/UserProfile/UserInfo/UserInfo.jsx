@@ -19,15 +19,15 @@ export const UserInfo = () => {
     const treeDoneWidth = (userinfo.trees.length / 14) * 100;
     // const numEvent = userinfo.user
     return (
-        <div style={{ width: '100%', marginLeft: '15px' }}>
-            <Grid container spacing={1}>
+        <div style={{ width: '100%', height: '100%' }}>
+            <Grid container>
                 <Grid item xs={3}>
                     <img
                         className={classes.userimg}
                         alt="Card"
                         src={userinfo.user.profile_image[0] === "" ? "https://picsum.photos/523/354" : userinfo.user.profile_image[0]} />
                 </Grid>
-                <Grid item xs={3} style={{ height: '35vh', position: 'relative' }}>
+                <Grid item xs={3} style={{ height: '315px', position: 'relative', marginLeft: '-10px' }}>
                     <div className={classes.info}>
                         <div className={classes.label}>Name</div>
                         <div className={classes.data}>{userinfo.user.user.name}</div>
@@ -40,7 +40,7 @@ export const UserInfo = () => {
                                 ""
                         }
                     </div>
-                    <div style={{ paddingLeft: '20px', height: '20vh', position: 'relative', marginTop: '25px' }}>
+                    <div style={{ paddingLeft: '20px', maxHeight: '50%', paddingTop: '50%' }}>
                         <div style={{ position: 'absolute', bottom: '0' }}>
                             <div style={{ display: 'flex' }}>
                                 <InfoChip count={userinfo.trees.length} label="Trees Planted" onClick={handleTreeClick} />
@@ -60,7 +60,7 @@ export const UserInfo = () => {
                         </div>
                     </div>
                 </Grid>
-                <Grid item xs={6}>
+                <Grid item xs={6} style={{ maxWidth: '48%' }}>
                     <Memories />
                 </Grid>
             </Grid>
@@ -77,15 +77,15 @@ const useStyles = makeStyles((theme) =>
         },
         userimg: {
             width: '100%',
-            height: '35vh',
-            borderRadius: '12px',
-            marginTop: '25px',
+            height: '315px',
+            borderRadius: '15px',
             objectFit: 'cover',
+            maxWidth: '270px'
         },
         info: {
-            paddingTop: '7vh',
+            paddingTop: '10%',
             paddingLeft: '20px',
-            height: '8vh'
+            maxHeight: '20%'
         },
         username: {
             lineHeight: '50px',

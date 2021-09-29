@@ -74,6 +74,8 @@ export const Map = () => {
         boundaries.push(pathObj)
     }
 
+    const uniqBoundaries = [...new Set(boundaries)];
+
     const { isLoaded } = useJsApiLoader({
         id: 'google-map-script',
         googleMapsApiKey: process.env.REACT_APP_API_MAP_KEY
@@ -92,7 +94,7 @@ export const Map = () => {
                 onUnmount={onUnmount}
                 options={mapOptions}
             >
-                {boundaries.map((marker, i) => (
+                {uniqBoundaries.map((marker, i) => (
                     <Fragment key={i}>
                         {
                             currTree === i ?

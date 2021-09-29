@@ -59,10 +59,9 @@ export const Memories = () => {
 const useStyles = makeStyles((theme) =>
     createStyles({
         main: {
-            width: '90%',
-            height: '35vh',
-            borderRadius: '12px',
-            marginTop: '25px',
+            width: '100%',
+            // height: '100%',
+            borderRadius: '15px',
             backgroundColor: '#ffffff',
             marginLeft: '25px',
             boxShadow: '0px 0px 20px rgba(0, 0, 0, 0.15)',
@@ -89,10 +88,12 @@ const useStyles = makeStyles((theme) =>
         },
         memimage: {
             width: '230px',
-            height: '26vh',
-            borderRadius: '13px',
+            height: '233px',
+            maxHeight: '80%',
+            borderRadius: '15px',
             objectFit: 'cover',
             padding: '2%',
+            paddingTop: '12px'
         },
     })
 );

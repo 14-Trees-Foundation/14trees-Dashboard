@@ -3,6 +3,8 @@ import Divider from '@mui/material/Divider';
 
 import Drawer from '@mui/material/Drawer';
 import { createStyles, makeStyles } from '@mui/styles';
+import useMediaQuery from '@mui/material/useMediaQuery';
+
 
 import { useParams } from "react-router";
 import { useEffect, useState, useCallback } from "react";
@@ -26,7 +28,7 @@ import logo from "../assets/logo_white_small.png"
 export const Dashboard = () => {
 
     const { saplingId } = useParams();
-    // const greaterThan375 = useMediaQuery("(min-width:375px)");
+    const matches = useMediaQuery((theme) => theme.breakpoints.up('sm'));
     const classes = useStyles();
 
     const setUserinfo = useSetRecoilState(usersData);
