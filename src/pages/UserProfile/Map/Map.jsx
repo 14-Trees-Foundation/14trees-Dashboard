@@ -9,7 +9,6 @@ import {
 } from '@react-google-maps/api';
 
 import icon from "../../../assets/marker.png";
-import tree from "../../../assets/neem.png";
 
 import { useRecoilValue, useRecoilState } from 'recoil';
 import { usersData, currSelTree } from '../../../store/atoms';
@@ -23,11 +22,9 @@ const containerStyle = {
     // boxShadow: '0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23)'
 };
 
-const markers = [{ lat: 18.92701129548707, lng: 73.77245238906712 },]
-
 const options = {
     fillColor: "green",
-    fillOpacity: 0.2,
+    fillOpacity: 0.1,
     strokeColor: "lightgreen",
     strokeOpacity: 1,
     strokeWeight: 2,
@@ -39,14 +36,14 @@ const options = {
 
 const selectedOption = {
     ...options,
-    fillOpacity: 0.5,
+    fillOpacity: 0.35,
 }
 
 const mapOptions = {
     disableDefaultUI: true,
     mapTypeId: 'satellite',
     zoom: 16,
-    minZoom: 10,
+    minZoom: 13,
     maxZoom: 22,
     panControl: true,
     rotateControl: true,
@@ -55,13 +52,24 @@ const mapOptions = {
 
 const boxOptions = { closeBoxURL: '', enableEventPropagation: true };
 
+const removeDupBoundaries = (boundaries) => {
+    const flag = {};
+    const unique = [];
+    boundaries.forEach(boundary => {
+        if(!flag[boundary[0].lat]) {
+            flag[boundary[0].lat] = true
+            unique.push(boundary)
+        }
+    });
+    return unique
+}
+
 export const Map = () => {
 
     const classes = useStyles();
     const userinfo = useRecoilValue(usersData);
     const [currTree, setCurrTree] = useRecoilState(currSelTree);
     const trees = userinfo.trees
-    console.log(trees)
     const [map, setMap] = useState(null);
 
     const onUnmount = useCallback(function callback(map) {
@@ -74,7 +82,7 @@ export const Map = () => {
         boundaries.push(pathObj)
     }
 
-    const uniqBoundaries = [...new Set(boundaries)];
+    const uniqBoundaries = removeDupBoundaries(boundaries)
 
     const { isLoaded } = useJsApiLoader({
         id: 'google-map-script',
@@ -94,18 +102,13 @@ export const Map = () => {
                 onUnmount={onUnmount}
                 options={mapOptions}
             >
-                {uniqBoundaries.map((marker, i) => (
+                {boundaries.map((marker, i) => (
                     <Fragment key={i}>
                         {
-                            currTree === i ?
+                            currTree === i &&
                                 <Polygon
                                     paths={marker}
                                     options={selectedOption}
-                                />
-                                :
-                                <Polygon
-                                    paths={marker}
-                                    options={options}
                                 />
                         }
                         <Marker
@@ -136,6 +139,12 @@ export const Map = () => {
                         }
                     </Fragment>
                 ))}
+                {uniqBoundaries.map((marker, i) => {
+                        return(<Polygon
+                            paths={marker}
+                            options={options}
+                        />)
+                    })}
             </GoogleMap>
         </div>
     ) : <></>
