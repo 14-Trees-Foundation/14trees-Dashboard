@@ -67,6 +67,7 @@ const useStyles = makeStyles((theme) =>
             boxShadow: '0px 0px 20px rgba(0, 0, 0, 0.15)',
             [theme.breakpoints.down('1500')]: {
                 height: '280px',
+                width: '98%'
             }
         },
         header: {
