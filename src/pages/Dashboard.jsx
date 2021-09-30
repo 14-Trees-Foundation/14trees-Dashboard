@@ -10,19 +10,24 @@ import { useParams } from "react-router";
 import { useEffect, useState, useCallback } from "react";
 
 import * as Axios from "../api/local";
-import { useRecoilState, useSetRecoilState } from 'recoil';
+import { useRecoilState, useSetRecoilState, useRecoilValue } from 'recoil';
 import {
     usersData,
     overallData,
     pondsImages,
     navIndex,
-    activitiesData
+    activitiesData,
+    openVideo,
+    videoUrl
 } from '../store/atoms'
+
+import ReactPlayer from 'react-player/youtube'
 
 import { Profile } from './UserProfile/Profile';
 import { Maps } from "./Maps/Maps";
 import { RightDrawer } from '../components/RightDrawer';
 import { Spinner } from "../stories/Spinner/Spinner";
+import { Popup } from "../stories/Popup/Popup";
 import logo from "../assets/logo_white_small.png"
 
 export const Dashboard = () => {
@@ -36,12 +41,18 @@ export const Dashboard = () => {
     const setPondsImages = useSetRecoilState(pondsImages);
     const setActivities = useSetRecoilState(activitiesData);
     const [index, setIndex] = useRecoilState(navIndex);
+    const [open, setOpen] = useRecoilState(openVideo);
+    const url = useRecoilValue(videoUrl);
 
     const [loading, setLoading] = useState(true);
 
 
     const onClickNav = (value) => {
         setIndex(value);
+    }
+
+    const onToggleVideo = () => {
+        setOpen(false);
     }
 
     const fetchData = useCallback(async () => {
@@ -99,18 +110,27 @@ export const Dashboard = () => {
         },
     ]
     const mainBox = () => {
-        console.log(index)
         const Page = pages[index].page
         return (
             <Page />
-            // <div style={{ fontSize: '40px', textAlign: 'center' }}>
-            //     Under development
-            // </div>
         )
     }
 
     if (loading) {
         return <Spinner />
+    } else if(open) {
+        return (
+            <div style={{width: '100%', height: '100%'}}>
+                <Popup toggle={onToggleVideo}>
+                    <ReactPlayer
+                        url={url}
+                        width='100%'
+                        height='90%'
+                        controls={true}
+                    />
+                </Popup>
+            </div>
+        )
     } else {
         return (
             <Box sx={{ display: 'flex' }}>

@@ -21,8 +21,6 @@ export const Profile = () => {
         setActiveStep(i)
     }
 
-    console.log(userinfo)
-
     const username = userinfo.user.user.name.split(" ")[0]
 
     return (

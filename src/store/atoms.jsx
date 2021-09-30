@@ -30,11 +30,23 @@ const currSelTree = atom({
     default: 0
 })
 
+const openVideo = atom({
+    key: 'openVideo',
+    default: false
+})
+
+const videoUrl = atom({
+    key: 'videoUrl',
+    default: ''
+})
+
 export {
     usersData,
     overallData,
     pondsImages,
     navIndex,
     activitiesData,
-    currSelTree
+    currSelTree,
+    openVideo,
+    videoUrl
 };

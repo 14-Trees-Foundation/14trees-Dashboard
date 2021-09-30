@@ -1,20 +1,32 @@
+import {Fragment, useState} from 'react';
+
 import { createStyles, makeStyles } from '@mui/styles';
-import { useRecoilValue } from 'recoil';
+import { useRecoilValue, useSetRecoilState } from 'recoil';
 import { sortedActivites } from '../store/selectors';
+import { openVideo, videoUrl } from '../store/atoms';
 import Divider from '@mui/material/Divider';
+import set from 'date-fns/esm/set';
+
 
 export const NewsFeed = () => {
     const classes = useStyles();
     const activities = useRecoilValue(sortedActivites);
+    const setOpen = useSetRecoilState(openVideo);
+    const setVideoUrl = useSetRecoilState(videoUrl);
+
+    const playVideo = (url) => {
+        setOpen(true)
+    }
 
     const element = (value) => {
 
         if (value.type === '2') {
-            const videolink = 'https://img.youtube.com/vi/' + value.video.split('?v=').pop() + '/mqdefault.jpg';
+            setVideoUrl(value.video)
+            const vimagelink = 'https://img.youtube.com/vi/' + value.video.split('?v=').pop() + '/mqdefault.jpg';
             const date = value.date.slice(0, 10);
             return (
-                <div>
-                    <img className={classes.videoimg} src={videolink} alt={'video'} />
+                <div onClick={() => playVideo(value.video)} style={{cursor: 'pointer'}}>
+                    <img className={classes.videoimg} src={vimagelink} alt={'video'} />
                     <div style={{ marginTop: '5px', fontWeight: '500', fontSize: '13px' }}>
                         {value.title}
                     </div>
