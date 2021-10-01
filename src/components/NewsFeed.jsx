@@ -1,11 +1,8 @@
-import {Fragment, useState} from 'react';
-
 import { createStyles, makeStyles } from '@mui/styles';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
 import { sortedActivites } from '../store/selectors';
 import { openVideo, videoUrl } from '../store/atoms';
 import Divider from '@mui/material/Divider';
-import set from 'date-fns/esm/set';
 
 
 export const NewsFeed = () => {

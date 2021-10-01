@@ -1,6 +1,4 @@
 import React from "react";
-import PropTypes from "prop-types";
-import { Card } from "primereact/card";
 import "./treelist.scss";
 
 export const TreeList = ({ data, ...props }) => {

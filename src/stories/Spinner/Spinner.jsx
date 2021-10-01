@@ -1,5 +1,4 @@
 import React from "react";
-import PropTypes from "prop-types";
 import gif from '../../assets/loader_light.gif';
 import "./spinner.scss";
 

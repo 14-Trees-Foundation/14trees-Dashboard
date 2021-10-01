@@ -2,32 +2,6 @@ import React from "react";
 import PropTypes from "prop-types";
 import { createStyles, makeStyles } from '@mui/styles';
 
-import tree from '../../assets/sample.png';
-
-const footer = (id, name, date) => {
-  date = date !== undefined ? date.slice(0, 10) : "";
-  name = name !== undefined ? name : "Yet to Plant";
-  if (name !== "Yet to Plant") {
-    return (
-      <div>
-        <p className="title">{name}</p>
-        <p className="info">
-          Sapling ID : {id}
-          <br />
-          Date : {date}
-          <br />
-          Event : Independant Visit
-        </p>
-      </div>
-    )
-  } else {
-    return (
-      <div>
-        <p className="emptytitle">{name}</p>
-      </div>
-    )
-  }
-};
 export const TreesPlanted = (props) => {
 
   const classes = useStyles(props);
