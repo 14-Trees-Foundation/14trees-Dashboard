@@ -385,7 +385,10 @@ const UseStyle = makeStyles((theme) =>
             width: '100%',
             height: '100vh',
             position: 'relative',
-            backgroundColor: '#e5e5e5'
+            backgroundColor: '#e5e5e5',
+            [theme.breakpoints.down('540')]: {
+                height: '100%',
+            }
         },
         root: {
             '& .MuiFormControl-root': {
@@ -415,6 +418,10 @@ const UseStyle = makeStyles((theme) =>
             [theme.breakpoints.down('748')]: {
                 width: '80vw',
                 paddingLeft: '9vw'
+            },
+            [theme.breakpoints.down('540')]: {
+                width: '90vw',
+                paddingLeft: '1.5vw'
             }
         },
         infobox: {
