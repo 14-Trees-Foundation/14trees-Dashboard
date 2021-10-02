@@ -27,6 +27,7 @@ import { Spinner } from "../../stories/Spinner/Spinner";
 import Axios from "../../api/local";
 
 import { AppBar } from "../../stories/AppBar/AppBar";
+import imageCompression from 'browser-image-compression';
 
 const intitialFValues = {
     sapling: '',
@@ -85,7 +86,26 @@ export const Visitor = () => {
         });
     };
 
-    const handleAdditionalPicUpload = (e) => {
+    const compressImageList = async (file) => {
+
+        const options = {
+          maxSizeMB: 0.5,
+          maxWidthOrHeight: 1080,
+          useWebWorker: true
+        }
+
+        let compressedFile
+
+        try {
+            compressedFile = await imageCompression(file, options);
+        } catch (error) {
+          console.log(error);
+        }
+      
+        return new File([compressedFile], file.name);
+      }
+
+    const handleAdditionalPicUpload = async (e) => {
         if (Array.from(e.target.files).length > ADDITIONAL_IMG_MAX) {
             setValues({
                 ...values,
@@ -155,14 +175,16 @@ export const Visitor = () => {
             const extraImages = [];
             if (values.userImages) {
                 for (const key of Object.keys(values.userImages)) {
-                    formData.append('files', values.userImages[key])
+                    let image = await compressImageList(values.userImages[key]);
+                    formData.append('files', image)
                     userImages.push(values.userImages[key].name)
                 }
             }
 
             if (values.additionalImages) {
                 for (const key of Object.keys(values.additionalImages)) {
-                    formData.append('files', values.additionalImages[key])
+                    let image = await compressImageList(values.additionalImages[key]);
+                    formData.append('files', image)
                     extraImages.push(values.additionalImages[key].name)
                 }
             }
