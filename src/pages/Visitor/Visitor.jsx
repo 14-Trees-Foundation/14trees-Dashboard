@@ -205,21 +205,24 @@ export const Visitor = () => {
                         uploaded: true,
                     })
                     toast.success("Data uploaded successfully!")
-                } else if (res.status === 204 || res.status === 400) {
+                } else if (res.status === 204 || res.status === 400 || res.status === 409 || res.status === 404) {
                     setValues({
                         ...values,
                         loading: false,
                         backdropOpen: false
                     })
-                    toast.error(res.statusText)
+                    toast.error(res.status.error)
                 }
             } catch (error) {
+                console.log(error.response)
                 setValues({
                     ...values,
                     loading: false,
                     backdropOpen: false
                 })
-                toast.error(error.response.statusText)
+                if (error.response.status === 409 || error.response.status === 404) {
+                    toast.error(error.response.data.error)
+                }
             }
         }
     }
