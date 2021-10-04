@@ -1,5 +1,6 @@
 import { createStyles, makeStyles } from '@mui/styles';
 import Divider from '@mui/material/Divider';
+import Drawer from '@mui/material/Drawer';
 
 import { NewsFeed } from './NewsFeed'
 import { Impact } from "../stories/Impact/Impact";
@@ -7,30 +8,48 @@ import { Impact } from "../stories/Impact/Impact";
 export const RightDrawer = () => {
     const classes = useStyles();
     return (
-        <div>
-            <div className={classes.main}>
-                <h3 style={{ marginLeft: '9%' }}>Overall Impact</h3>
-                <Divider style={{ margin: '0 9% 2% 9%' }} />
-                <div className={classes.infobox}>
-                    <Impact count={'150+'} text={"People employed from local community"} />
-                    <Impact count={'190+'} text={"Ponds created to increase water label"} />
+        <Drawer
+                    className={classes.rdrawer}
+                    variant="permanent"
+                    anchor="right"
+                >
+            <div>
+                <div className={classes.main}>
+                    <h3 style={{ marginLeft: '9%' }}>Overall Impact</h3>
+                    <Divider style={{ margin: '0 9% 2% 9%' }} />
+                    <div className={classes.infobox}>
+                        <Impact count={'150+'} text={"People employed from local community"} />
+                        <Impact count={'190+'} text={"Ponds created to increase water label"} />
+                    </div>
+                    <div className={classes.infobox}>
+                        <Impact size={'large'} count={'28000+'} text={"Trees planted till date"} />
+                    </div>
+                    <h3 style={{ marginLeft: '9%' }}>What's New</h3>
+                    <Divider style={{ margin: '0 9% 2% 9%' }} />
                 </div>
-                <div className={classes.infobox}>
-                    <Impact size={'large'} count={'28000+'} text={"Trees planted till date"} />
+                <div className={classes.feed}>
+                    <NewsFeed />
                 </div>
-                <h3 style={{ marginLeft: '9%' }}>What's New</h3>
-                <Divider style={{ margin: '0 9% 2% 9%' }} />
             </div>
-            <div className={classes.feed}>
-                <NewsFeed />
-            </div>
-        </div>
+        </Drawer>
     )
 }
 
 
 const useStyles = makeStyles((theme) =>
     createStyles({
+        rdrawer: {
+            width: '21%',
+            '& .MuiPaper-root': {
+                width: '21%',
+                backgroundColor: '#B1BFB5',
+                paddingTop: '20px',
+                overflowY: 'hidden'
+            },
+            [theme.breakpoints.down('md')]: {
+                display: 'none'
+            }
+        },
         main: {
             maxHeight: '55vh',
             [theme.breakpoints.up('lg')]: {
