@@ -87,6 +87,25 @@ export const LeftDrawer = () => {
         // },
     ]
 
+    const menuitem = () => {
+        return (
+            <div className={classes.itemlist}>
+                {
+                    pages.map((item, i) => {
+                        return (
+                            <div className={classes.item} onClick={() => onClickNav(i)} key={i}>
+                                <div className={index === i ? classes.selected : classes.itembtn}>
+                                    <img className={classes.itemlogo} alt={"items"} src={item.logo} />
+                                    <div className={classes.itemtext}>{item.displayName}</div>
+                                </div>
+                            </div>
+                        )
+                    })
+                }
+            </div>
+        )
+    }
+
     if (matches) {
         return (
             <Box>
@@ -122,20 +141,9 @@ export const LeftDrawer = () => {
                     </DrawerHeader>
                     <Divider />
                     <img className={classes.logo} alt={'logo'} src={logo} />
-                    <div className={classes.itemlist}>
-                        {
-                            pages.map((item, i) => {
-                                return (
-                                    <div className={classes.item} onClick={() => onClickNav(i)} key={i}>
-                                        <div className={index === i ? classes.selected : classes.itembtn}>
-                                            <img className={classes.itemlogo} alt={"items"} src={item.logo} />
-                                            <div className={classes.itemtext}>{item.displayName}</div>
-                                        </div>
-                                    </div>
-                                )
-                            })
-                        }
-                    </div>
+                    {
+                        menuitem()
+                    }
                 </Drawer>
             </Box>
         )
@@ -148,20 +156,9 @@ export const LeftDrawer = () => {
         >
             <Divider />
             <img className={classes.logo} alt={'logo'} src={logo} />
-            <div className={classes.itemlist}>
-                {
-                    pages.map((item, i) => {
-                        return (
-                            <div className={classes.item} onClick={() => onClickNav(i)} key={i}>
-                                <div className={index === i ? classes.selected : classes.itembtn}>
-                                    <img className={classes.itemlogo} alt={"items"} src={item.logo} />
-                                    <div className={classes.itemtext}>{item.displayName}</div>
-                                </div>
-                            </div>
-                        )
-                    })
-                }
-            </div>
+            {
+                menuitem()
+            }
         </Drawer>
         )
     }
