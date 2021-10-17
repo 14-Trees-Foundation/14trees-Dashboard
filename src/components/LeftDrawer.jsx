@@ -7,7 +7,6 @@ import { Maps } from "../pages/Maps/Maps";
 
 import { useRecoilState } from 'recoil';
 import { navIndex } from '../store/atoms'
-
 import logo from "../assets/logo_white_small.png"
 
 export const LeftDrawer = () => {

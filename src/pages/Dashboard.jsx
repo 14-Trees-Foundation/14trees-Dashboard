@@ -24,6 +24,7 @@ import { RightDrawer } from '../components/RightDrawer';
 import { LeftDrawer } from '../components/LeftDrawer';
 import { Spinner } from "../stories/Spinner/Spinner";
 import { Popup } from "../stories/Popup/Popup";
+import { NotFound } from './notfound/NotFound'
 import logo from "../assets/logo_white_small.png"
 
 export const Dashboard = () => {
@@ -40,6 +41,7 @@ export const Dashboard = () => {
     const url = useRecoilValue(videoUrl);
 
     const [loading, setLoading] = useState(true);
+    const [found, setFound] = useState(true);
 
     const onToggleVideo = () => {
         setOpen(false);
@@ -47,13 +49,19 @@ export const Dashboard = () => {
 
     const fetchData = useCallback(async () => {
 
-        const response = await Axios.default.get(`/profile?id=${saplingId}`);
-        if (response.status === 200) {
-            setUserinfo(response.data);
-        } else if (response.status === 204) {
-            setLoading(false);
-            setUserinfo(response.data);
+
+        try {
+            const response = await Axios.default.get(`/profile?id=${saplingId}`);
+            if (response.status === 200) {
+                setUserinfo(response.data);
+            } else if (response.status === 204) {
+                setLoading(false);
+                setUserinfo(response.data);
+            }
+        } catch (error) {
+            setFound(false);
         }
+        
 
         const overallResponse = await Axios.default.get(`/analytics/totaltrees`);
         if (overallResponse.status === 200) {
@@ -103,7 +111,9 @@ export const Dashboard = () => {
 
     if (loading) {
         return <Spinner />
-    } else if(open) {
+    } else if (!found) {
+        return <NotFound/>
+    }else if(open) {
         return (
             <div style={{width: '100%', height: '100%'}}>
                 <Popup toggle={onToggleVideo}>
