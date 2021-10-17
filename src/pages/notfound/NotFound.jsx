@@ -18,7 +18,7 @@ export const NotFound = () => {
                 Please check if you are on right Trail!
             </Grid>
             <Grid xs={12} className={classes.btn}>
-                <Button variant="contained" color="secondary" size="large" component={Link} to="/search">Home</Button>
+                <Button variant="contained" color="secondary" size="large" component={Link} to="/home">14Trees Home</Button>
             </Grid>
         </Grid>
     );

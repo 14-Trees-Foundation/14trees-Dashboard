@@ -130,7 +130,7 @@ export const Dashboard = () => {
         return (
             <Box sx={{ display: 'flex' }}>
                 <LeftDrawer />
-                <Box component="main" sx={{ backgroundColor: '#e5e5e5', width: matches ? '86%' : '65%' }}>
+                <Box component="main" sx={{ backgroundColor: '#e5e5e5', width: matches ? '100%' : '65%' }}>
                     {
                         mainBox()
                     }
