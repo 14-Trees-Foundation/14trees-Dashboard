@@ -25,8 +25,24 @@ export const Profile = () => {
 
     const username = userinfo.user.user.name.split(" ")[0]
 
+    const header = () => {
+        if(!matches) {
+            return(
+                <div className={classes.header}>
+                    <img src={logo} alt={logo} className={classes.img} />
+                    <div className={classes.username}>
+                        {username}'s Dashboard
+                    </div>
+                </div>
+            )
+        }
+    }
+
     return (
         <div className={matches?classes.mbmain :classes.main}>
+            {
+               header()
+            }
             <Divider style={{ marginLeft: '4%', marginRight: '4%' }} />
             <div style={{ padding: '4%' }}>
                 <div className={classes.user}>
