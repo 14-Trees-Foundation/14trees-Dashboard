@@ -46,6 +46,10 @@ const useStyles = makeStyles((theme) =>
             marginRight: '2%',
             // boxShadow: '0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23)',
             cursor: 'pointer',
+            [theme.breakpoints.down('lg')]: {
+                minHeight: '30px',
+                borderRadius: '8px',
+            }
         },
         info: {
             display: 'flex',
@@ -55,9 +59,12 @@ const useStyles = makeStyles((theme) =>
             fontSize: '25px',
             marginLeft: '5px',
             marginRight: '3px',
+            [theme.breakpoints.down('lg')]: {
+                fontSize: '22px',
+            }
         },
         label: {
-            fontSize: '12px',
+            fontSize: '11px',
             textAlign: 'center',
             [theme.breakpoints.up('xl')]: {
                 fontSize: '15px',

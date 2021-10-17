@@ -60,7 +60,7 @@ export const UserInfo = () => {
                         </div>
                     </div>
                 </Grid>
-                <Grid item xs={6} style={{ maxWidth: '48%' }}>
+                <Grid item xs={6} className={classes.memory}>
                     <Memories />
                 </Grid>
             </Grid>
@@ -77,26 +77,28 @@ const useStyles = makeStyles((theme) =>
         },
         userimg: {
             width: '100%',
-            height: '312px',
+            height: '100%',
+            maxHeight: '260px',
             borderRadius: '15px',
             objectFit: 'cover',
-            maxWidth: '270px',
+            maxWidth: '250px',
             [theme.breakpoints.down('1500')]: {
-                height: '280px',
+                maxHeight: '220px',
+                maxWidth: '210px',
+            }
+        },
+        infobox: {
+            height: '260px',
+            position: 'relative',
+            // marginLeft: '-30px',
+            [theme.breakpoints.down('1500')]: {
+                height: '220px',
             }
         },
         info: {
             paddingTop: '10%',
             paddingLeft: '20px',
-            maxHeight: '20%',
-        },
-        infobox: {
-            height: '310px',
-            position: 'relative',
-            marginLeft: '-10px',
-            [theme.breakpoints.down('1500')]: {
-                height: '280px',
-            }
+            maxHeight: '30%',
         },
         username: {
             lineHeight: '50px',
@@ -123,6 +125,9 @@ const useStyles = makeStyles((theme) =>
             fontWeight: '400',
             minHeight: '50px',
             borderRadius: '10px',
+            [theme.breakpoints.down('1500')]: {
+                minHeight: '40px',
+            }
         },
         done: {
             backgroundColor: '#9BC53D',
@@ -144,6 +149,12 @@ const useStyles = makeStyles((theme) =>
             fontSize: '11px',
             textAlign: 'center',
             // paddingTop: '7px'
+        },
+        memory:{
+            maxWidth: '48%',
+            [theme.breakpoints.down('1500')]: {
+                maxWidth: '47%',
+            }
         }
     })
 );

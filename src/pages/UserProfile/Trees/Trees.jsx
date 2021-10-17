@@ -77,7 +77,7 @@ const useStyles = makeStyles((theme) =>
         card: {
             backgroundColor: '#ffffff',
             borderRadius: '12px',
-            maxHeight: '100%',
+            height: '100%',
             boxShadow: '0px 0px 20px rgba(0, 0, 0, 0.15)',
         },
         trees: {
@@ -85,10 +85,10 @@ const useStyles = makeStyles((theme) =>
             marginLeft: '15px',
             paddingTop: '5px',
             margin: '10px',
-            height: '40vh',
+            height: '90%',
         },
         scroll: {
-            maxHeight: '80%',
+            maxHeight: 'calc(100% - 50px)',
             overflowX: 'hidden',
             overflowY: 'auto',
             '&::-webkit-scrollbar': {

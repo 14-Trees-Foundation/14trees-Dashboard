@@ -25,7 +25,7 @@ export const Profile = () => {
 
     return (
         <div className={classes.main}>
-            <div style={{ display: 'flex', height: '5%', padding: '3.5%' }}>
+            <div className={classes.header}>
                 <img src={logo} alt={logo} style={{ width: '50px', height: '50px' }} />
                 <div className={classes.username}>
                     {username}'s Dashboard
@@ -52,32 +52,58 @@ const useStyles = makeStyles((theme) =>
         main: {
             height: '100%',
         },
+        header:{
+            display: 'flex',
+            height: '5vh',
+            padding: '3.5vh',
+            [theme.breakpoints.down('1500')]: {
+                height: '4vh',
+                padding: '3vh',
+            }
+        },
         username: {
             lineHeight: '50px',
             fontSize: '34px',
             color: '#1F3625',
             fontWeight: '500',
-            marginLeft: '20px'
+            marginLeft: '20px',
+            [theme.breakpoints.down('1500')]: {
+                lineHeight: '40px',
+                fontSize: '28px',
+            }
         },
         user: {
             display: 'flex',
-            maxHeight: '29%',
+            maxHeight: '22vh',
+            [theme.breakpoints.down('1500')]: {
+                maxHeight: '25vh',
+            }
         },
         treemap: {
             fontSize: '30px',
-            height: '42vh',
-            marginTop: '3%'
+            height: '50vh',
+            marginTop: '7%',
+            [theme.breakpoints.down('1500')]: {
+                height: '52vh',
+                marginTop: '5%',
+            }
         },
         tree: {
             width: '40%',
-            height: '42vh',
+            height: '50vh',
             marginRight: '-20px',
-            zIndex: '1'
+            zIndex: '1',
+            [theme.breakpoints.down('1500')]: {
+                height: '52vh',
+            }
         },
         map: {
             width: '70%',
-            height: '42vh',
-            marginLeft: '-10px'
+            height: '50vh',
+            marginLeft: '-10px',
+            [theme.breakpoints.down('1500')]: {
+                height: '52vh',
+            }
         }
     })
 );

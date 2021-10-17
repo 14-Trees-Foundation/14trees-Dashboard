@@ -60,15 +60,15 @@ const useStyles = makeStyles((theme) =>
     createStyles({
         main: {
             width: '100%',
-            height: '98%',
+            maxHeight: '260px',
             borderRadius: '15px',
             backgroundColor: '#ffffff',
             marginLeft: '25px',
             boxShadow: '0px 0px 20px rgba(0, 0, 0, 0.15)',
             [theme.breakpoints.down('1500')]: {
-                height: '280px',
-                width: '98%'
-            }
+                width: '98%',
+                maxHeight: '100%',
+            },
         },
         header: {
             display: 'flex',
@@ -88,15 +88,15 @@ const useStyles = makeStyles((theme) =>
             margin: '5px'
         },
         memimage: {
-            width: '230px',
-            height: '233px',
-            maxHeight: '80%',
+            width: '210px',
+            height: '190px',
             borderRadius: '15px',
             objectFit: 'cover',
             padding: '2%',
             paddingTop: '4px',
             [theme.breakpoints.down('1500')]: {
-                height: '210px',
+                width: '170px',
+                height: '160px'
             }
         },
     })

@@ -46,7 +46,10 @@ const useStyles = makeStyles((theme) =>
       display: 'flex',
       backgroundColor: props => props.selected ? '#1f3625' : '#ffffff',
       color: props => props.selected ? '#ffffff' : '#000000',
-      boxShadow: '0px 0px 4px rgba(0, 0, 0, 0.15)'
+      boxShadow: '0px 0px 4px rgba(0, 0, 0, 0.15)',
+      [theme.breakpoints.down('1500')]: {
+        width: '85%',
+      }
     },
     selected: {
       color: '#ffffff',
