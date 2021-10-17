@@ -49,6 +49,9 @@ const useStyles = makeStyles((theme) =>
             [theme.breakpoints.down('lg')]: {
                 minHeight: '30px',
                 borderRadius: '8px',
+            },
+            [theme.breakpoints.down('1025')]: {
+                minWidth: '70px',
             }
         },
         info: {
@@ -68,6 +71,9 @@ const useStyles = makeStyles((theme) =>
             textAlign: 'center',
             [theme.breakpoints.up('xl')]: {
                 fontSize: '15px',
+            },
+            [theme.breakpoints.down('1025')]: {
+                fontSize: '10px',
             }
         },
     })

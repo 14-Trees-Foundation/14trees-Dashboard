@@ -84,6 +84,10 @@ const useStyles = makeStyles((theme) =>
             },
             [theme.breakpoints.up('1500')]: {
                 maxHeight: '55vh',
+            },
+            [theme.breakpoints.down('1025')]: {
+                marginTop: '5px',
+                maxHeight: '35vh',
             }
         }
     }))

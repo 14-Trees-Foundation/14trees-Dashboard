@@ -60,14 +60,13 @@ const useStyles = makeStyles((theme) =>
     createStyles({
         main: {
             width: '100%',
-            maxHeight: '260px',
+            maxHeight: '100%',
             borderRadius: '15px',
             backgroundColor: '#ffffff',
             marginLeft: '25px',
             boxShadow: '0px 0px 20px rgba(0, 0, 0, 0.15)',
             [theme.breakpoints.down('1500')]: {
                 width: '98%',
-                maxHeight: '100%',
             },
         },
         header: {

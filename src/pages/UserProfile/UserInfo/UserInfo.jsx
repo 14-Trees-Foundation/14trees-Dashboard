@@ -110,12 +110,18 @@ const useStyles = makeStyles((theme) =>
         label: {
             fontSize: '13px',
             fontWeight: '350',
-            marginBottom: '5px'
+            marginBottom: '5px',
+            [theme.breakpoints.down('1025')]: {
+                fontSize: '10px',
+            }
         },
         data: {
             fontSize: '20px',
             fontWeight: '450',
-            marginBottom: '8px'
+            marginBottom: '8px',
+            [theme.breakpoints.down('1025')]: {
+                fontSize: '16px',
+            }
         },
         overall: {
             display: 'flex',
@@ -145,10 +151,11 @@ const useStyles = makeStyles((theme) =>
             display: 'flex'
         },
         countdesc: {
-            // marginTop: '0.4em',
             fontSize: '11px',
             textAlign: 'center',
-            // paddingTop: '7px'
+            [theme.breakpoints.down('1025')]: {
+                fontSize: '9px',
+            }
         },
         memory:{
             maxWidth: '48%',

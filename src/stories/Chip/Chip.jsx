@@ -46,7 +46,11 @@ const useStyles = makeStyles((theme) =>
       cursor: 'pointer',
       paddingLeft: '2em',
       paddingRight: '2em',
-      margin: '0 0.5em 0 0.8em'
+      margin: '0 0.5em 0 0.8em',
+      [theme.breakpoints.down('1025')]: {
+        minHeight: '26px',
+        fontSize: '11px',
+    }
     },
     chiplarge: {
       fontSize: '15px',
