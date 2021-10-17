@@ -21,13 +21,13 @@ export const UserInfo = () => {
     return (
         <div style={{ width: '100%', height: '100%' }}>
             <Grid container>
-                <Grid item xs={3}>
+                <Grid item xs={6} md={3}>
                     <img
                         className={classes.userimg}
                         alt="Card"
                         src={userinfo.user.profile_image[0] === "" ? "https://picsum.photos/523/354" : userinfo.user.profile_image[0]} />
                 </Grid>
-                <Grid item xs={3} className={classes.infobox}>
+                <Grid item xs={6} md={3} className={classes.infobox}>
                     <div className={classes.info}>
                         <div className={classes.label}>Name</div>
                         <div className={classes.data}>{userinfo.user.user.name}</div>
@@ -40,7 +40,7 @@ export const UserInfo = () => {
                                 ""
                         }
                     </div>
-                    <div style={{ paddingLeft: '20px' }}>
+                    <div className={classes.growth}>
                         <div style={{ position: 'absolute', bottom: '0' }}>
                             <div style={{ display: 'flex' }}>
                                 <InfoChip count={userinfo.trees.length} label="Trees Planted" onClick={handleTreeClick} />
@@ -60,7 +60,7 @@ export const UserInfo = () => {
                         </div>
                     </div>
                 </Grid>
-                <Grid item xs={6} className={classes.memory}>
+                <Grid item xs={12} md={6}>
                     <Memories />
                 </Grid>
             </Grid>
@@ -99,6 +99,9 @@ const useStyles = makeStyles((theme) =>
             paddingTop: '10%',
             paddingLeft: '20px',
             maxHeight: '30%',
+            [theme.breakpoints.down('480')]: {
+                paddingLeft: '10px',
+            }
         },
         username: {
             lineHeight: '50px',
@@ -123,6 +126,12 @@ const useStyles = makeStyles((theme) =>
                 fontSize: '16px',
             }
         },
+        growth:{
+            paddingLeft: '20px',
+            [theme.breakpoints.down('480')]: {
+                paddingLeft: '10px',
+            }
+        },
         overall: {
             display: 'flex',
             backgroundColor: '#1F3625',
@@ -133,7 +142,7 @@ const useStyles = makeStyles((theme) =>
             borderRadius: '10px',
             [theme.breakpoints.down('1500')]: {
                 minHeight: '40px',
-            }
+            },
         },
         done: {
             backgroundColor: '#9BC53D',
@@ -157,11 +166,5 @@ const useStyles = makeStyles((theme) =>
                 fontSize: '9px',
             }
         },
-        memory:{
-            maxWidth: '48%',
-            [theme.breakpoints.down('1500')]: {
-                maxWidth: '47%',
-            }
-        }
     })
 );

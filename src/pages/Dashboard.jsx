@@ -1,4 +1,5 @@
 import Box from '@mui/material/Box';
+import useMediaQuery from '@mui/material/useMediaQuery';
 
 import { useParams } from "react-router";
 import { useEffect, useState, useCallback } from "react";
@@ -27,6 +28,7 @@ import logo from "../assets/logo_white_small.png"
 
 export const Dashboard = () => {
 
+    const matches = useMediaQuery('(max-width:481px)');
     const { saplingId } = useParams();
 
     const setUserinfo = useSetRecoilState(usersData);
@@ -118,7 +120,7 @@ export const Dashboard = () => {
         return (
             <Box sx={{ display: 'flex' }}>
                 <LeftDrawer />
-                <Box component="main" sx={{ backgroundColor: '#e5e5e5', width: '65%' }}>
+                <Box component="main" sx={{ backgroundColor: '#e5e5e5', width: matches ? '86%' : '65%' }}>
                     {
                         mainBox()
                     }

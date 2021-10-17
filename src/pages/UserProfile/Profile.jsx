@@ -1,5 +1,6 @@
 import { createStyles, makeStyles } from '@mui/styles';
 import Divider from '@mui/material/Divider';
+import useMediaQuery from '@mui/material/useMediaQuery';
 
 import { useState } from "react";
 import { UserInfo } from "./UserInfo/UserInfo";
@@ -12,6 +13,7 @@ import { usersData } from '../../store/atoms';
 import logo from "../../assets/icon_round.png"
 
 export const Profile = () => {
+    const matches = useMediaQuery('(max-width:481px)');
     const classes = useStyles();
 
     const userinfo = useRecoilValue(usersData);
@@ -26,7 +28,7 @@ export const Profile = () => {
     return (
         <div className={classes.main}>
             <div className={classes.header}>
-                <img src={logo} alt={logo} style={{ width: '50px', height: '50px' }} />
+                <img src={logo} alt={logo} className={classes.img} />
                 <div className={classes.username}>
                     {username}'s Dashboard
                 </div>
@@ -37,7 +39,7 @@ export const Profile = () => {
                     <UserInfo />
                 </div>
                 <div className={classes.treemap}>
-                    <div style={{ display: 'flex' }}>
+                    <div style={{ display: matches ? 'block' : 'flex' }}>
                         <div className={classes.tree}><Trees /></div>
                         <div className={classes.map}><Map /></div>
                     </div>
@@ -52,12 +54,24 @@ const useStyles = makeStyles((theme) =>
         main: {
             height: '100%',
         },
+        img:{
+            width: '50px',
+            height: '50px',
+            [theme.breakpoints.down('480')]: {
+                width: '35px',
+                height: '35px',
+            }
+        },
         header:{
             display: 'flex',
             height: '5vh',
             padding: '3.5vh',
             [theme.breakpoints.down('1500')]: {
                 height: '4vh',
+                padding: '3vh',
+            },
+            [theme.breakpoints.down('480')]: {
+                height: '3vh',
                 padding: '3vh',
             }
         },
@@ -70,6 +84,10 @@ const useStyles = makeStyles((theme) =>
             [theme.breakpoints.down('1500')]: {
                 lineHeight: '40px',
                 fontSize: '28px',
+            },
+            [theme.breakpoints.down('480')]: {
+                lineHeight: '40px',
+                fontSize: '20px',
             }
         },
         user: {
@@ -77,7 +95,10 @@ const useStyles = makeStyles((theme) =>
             maxHeight: '22vh',
             [theme.breakpoints.down('1500')]: {
                 maxHeight: '32vh',
-            }
+            },
+            [theme.breakpoints.down('481')]: {
+                maxHeight: '100%',
+            },
         },
         treemap: {
             fontSize: '30px',
@@ -99,6 +120,14 @@ const useStyles = makeStyles((theme) =>
             [theme.breakpoints.down('1025')]: {
                 width: '50%',
             },
+            [theme.breakpoints.down('480')]: {
+                width: '100%',
+                height: '60%',
+                marginRight: '0',
+                marginTop: '10px',
+                marginBottom: '-30px',
+                position: 'relative'
+            },
         },
         map: {
             width: '70%',
@@ -109,6 +138,13 @@ const useStyles = makeStyles((theme) =>
             },
             [theme.breakpoints.down('1025')]: {
                 width: '60%',
+            },
+            [theme.breakpoints.down('480')]: {
+                width: '100%',
+                height: '60vh',
+                marginRight: '0px',
+                marginLeft: '0px',
+                paddingBottom: '20px',
             },
         }
     })

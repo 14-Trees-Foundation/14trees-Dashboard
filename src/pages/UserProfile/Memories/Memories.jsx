@@ -63,10 +63,15 @@ const useStyles = makeStyles((theme) =>
             maxHeight: '100%',
             borderRadius: '15px',
             backgroundColor: '#ffffff',
-            marginLeft: '25px',
+            marginLeft: '20px',
             boxShadow: '0px 0px 20px rgba(0, 0, 0, 0.15)',
             [theme.breakpoints.down('1500')]: {
                 width: '98%',
+            },
+            [theme.breakpoints.down('480')]: {
+                marginLeft: '1px',
+                marginTop: '15px',
+                width: '100%',
             },
         },
         header: {
