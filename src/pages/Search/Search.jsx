@@ -160,7 +160,7 @@ const UseStyle = makeStyles((theme) =>
         },
         bg: {
             width: '100%',
-            height: '100vh',
+            height: '100%',
             objectFit: 'cover',
         },
         overlay: {
@@ -174,8 +174,7 @@ const UseStyle = makeStyles((theme) =>
         main: {
             width: '65vw',
             paddingLeft: '18vw',
-            paddingTop: '10vh',
-            height: '90vh',
+            paddingTop: '5%',
             position: 'relative',
             [theme.breakpoints.down('748')]: {
                 width: '80vw',
@@ -183,22 +182,13 @@ const UseStyle = makeStyles((theme) =>
             }
         },
         header: {
-            marginTop: '9%',
+            marginTop: '20px',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
         },
-        infobox: {
-            marginTop: '5%',
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            [theme.breakpoints.down('md')]: {
-                flexWrap: 'wrap',
-            }
-        },
         infoheader: {
-            fontSize: '55px',
+            fontSize: '80px',
             color: '#9BC53D',
             fontWeight: '550',
             [theme.breakpoints.down('md')]: {
@@ -206,14 +196,24 @@ const UseStyle = makeStyles((theme) =>
             }
         },
         infodesc: {
-            fontSize: '22px',
-            paddingLeft: '1%',
+            fontSize: '24px',
+            paddingLeft: '2%',
             color: '#ffffff',
             fontWeight: '500',
             alignItems: 'center',
             textAlign: 'center',
+            lineHeight: '80px',
             [theme.breakpoints.down('md')]: {
                 fontSize: '15px',
+            }
+        },
+        infobox: {
+            marginTop: '50px',
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            [theme.breakpoints.down('md')]: {
+                flexWrap: 'wrap',
             }
         },
         inputBox: {

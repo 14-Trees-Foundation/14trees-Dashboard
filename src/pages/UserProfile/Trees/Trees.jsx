@@ -29,7 +29,7 @@ export const Trees = () => {
                 <div style={{ display: 'flex', lineHeight: '30px', padding: '10px 0 0 10px' }}>
                     <div style={{ padding: "1%", fontSize: '14px' }}>Trees Planted ({numTrees})</div>
                     {
-                        // numTrees > 2 &&
+                        numTrees > 2 &&
                         <div style={{ marginLeft: 'auto', marginRight: '5%' }}>
                             <Chip label={"See All >"} mode={'primary'} size={'small'} handleClick={handleSeeAllClick}/>
                         </div>

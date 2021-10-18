@@ -7,6 +7,10 @@ export const AppBar = () => {
 
     const classes = UseStyle();
 
+    const onChipSelect = () => {
+        console.log("Coming soon")
+    }
+
     return (
         <Fragment>
             <div className={classes.appbar}>
@@ -14,7 +18,7 @@ export const AppBar = () => {
                     <div className={classes.logo}>
                         <img style={{ width: '40px', marginLeft: '5px' }} src={logo} alt="logo banner" />
                     </div>
-                    <div className={classes.right}>
+                    {/* <div className={classes.right}>
                         <h2 className={classes.links}>Home</h2>
                         <h2 className={classes.links}>Events</h2>
                         <h2 className={classes.links}>Search</h2>
@@ -22,9 +26,9 @@ export const AppBar = () => {
                         <Chip
                             label={'Admin Login'}
                             mode={'primary'}
-                        // handleClick={onChipSelect}
+                            handleClick={onChipSelect}
                         />
-                    </div>
+                    </div> */}
                 </nav>
             </div>
         </Fragment>
