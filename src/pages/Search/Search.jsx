@@ -11,11 +11,12 @@ import bg from "../../assets/bg.png";
 
 import { createStyles, makeStyles } from '@mui/styles';
 import Button from '@mui/material/Button';
+import { useRecoilState, useRecoilValue } from "recoil";
+import { searchResults, searchKey } from "../../store/atoms";
 
 export const Search = () => {
     const classes = UseStyle();
-    let [key, setKey] = useState("");
-    let [results, setResults] = useState(false);
+    let results = useRecoilValue(searchResults);
     let [type, setType] = useState("All");
 
     let intialChipState = {
@@ -26,6 +27,7 @@ export const Search = () => {
         "Organization": "secondary"
     }
     let [searchChips, setSearchChips] = useState(intialChipState);
+    let key = useRecoilValue(searchKey);
     let [selectedChips, setSelectedChips] = useState("All")
 
     const onChipSelect = (value) => {
@@ -41,12 +43,7 @@ export const Search = () => {
         console.log(value);
     }
 
-    const handleData = (data, key) => {
-        setKey(key);
-        setResults(data);
-    }
-
-    if (!results) {
+    if (Object.keys(results.users).length === 0) {
         return (
             <div className={classes.box}>
                 <img alt="bg" src={bg} className={classes.bg} />
@@ -63,7 +60,7 @@ export const Search = () => {
                         </div>
                         <div>
                             <div className={classes.inputBox}>
-                                <InputBar type={type} setData={handleData} />
+                                <InputBar type={type}/>
                             </div>
                             <p className={classes.sep}>OR</p>
                             <div className={classes.btnGrp}>
@@ -80,15 +77,35 @@ export const Search = () => {
         return (
             <div className={classes.box}>
                 <img alt="bg" src={bg} className={classes.bg} />
-                <AppBar>
-                    <div style={{
-                        "background": "linear-gradient(rgba(31, 54, 37, 0) 5%,rgba(31, 54, 37, 0.636721) 15%, #1F3625 40%, #e5e5e5 40%)"
-                    }}>
-                        <div className={classes.infobox}>
-                            <h1 className={classes.infoheader}>100+</h1>
-                            <p className={classes.infodesc}>People employed from local community</p>
-                        </div>
-                        <div className="s-input-box">
+                <div className={classes.overlay}>
+                <AppBar />
+                <div className={classes.main} style={{paddingTop: '4%'}}>
+                    <div className={classes.header} style={{marginTop: '0'}}>
+                        <h1 className={classes.infoheader}>
+                            100+
+                        </h1>
+                        <p className={classes.infodesc}>
+                            People employed from local community
+                        </p>
+                    </div>
+                    <div>
+                    <div className={classes.inputBox}>
+                        <InputBar type={type}/>
+                    </div>
+                </div>
+                </div>
+                <div style={{marginTop: '2%', width: '65vw',marginLeft: '18vw', backgroundColor: '#e5e5e5'}}>
+                    <div className={classes.resultsH}>
+                        Search Results for: {key}
+                    </div>
+                        {
+                            (selectedChips === "Individual" || selectedChips === "All") &&
+                            <div>
+                                <UserList handleClick={onUserClick} />
+                            </div>
+                        }
+                </div>
+                        {/* <div className="s-input-box">
                             <InputBar type={type} setData={handleData} />
                             <div className="s-search-info">
                                 <div className="s-searchby">
@@ -107,15 +124,6 @@ export const Search = () => {
                             <div className="s-results-for">
                                 Search Results for: {key}
                             </div>
-                            {
-                                (selectedChips === "Individual" || selectedChips === "All") &&
-                                <div>
-                                    <div className="s-results-ind">
-                                        Individual Found
-                                    </div>
-                                    <UserList handleClick={onUserClick} />
-                                </div>
-                            }
                             {
                                 (selectedChips === "Organization" || selectedChips === "All") &&
                                 <div>
@@ -143,9 +151,8 @@ export const Search = () => {
                                     <TreeList />
                                 </div>
                             }
-                        </div>
+                        </div> */}
                     </div>
-                </AppBar>
             </div>
         )
     }
@@ -156,11 +163,12 @@ const UseStyle = makeStyles((theme) =>
         box: {
             width: '100%',
             height: '100vh',
-            position: 'relative'
+            position: 'relative',
+            backgroundColor: '#e5e5e5'
         },
         bg: {
             width: '100%',
-            height: '100%',
+            height: '40vh',
             objectFit: 'cover',
         },
         overlay: {
@@ -168,7 +176,7 @@ const UseStyle = makeStyles((theme) =>
             top: '0',
             left: '0',
             width: '100%',
-            height: '100%',
+            height: '40vh',
             background: 'linear-gradient(358.58deg, #1F3625 37.04%, rgba(31, 54, 37, 0.636721) 104.2%, rgba(31, 54, 37, 0) 140.95%)',
         },
         main: {
@@ -239,5 +247,16 @@ const UseStyle = makeStyles((theme) =>
             display: 'flex',
             justifyContent: 'space-around',
             flexWrap: 'wrap',
+        },
+        individual: {
+            marginTop: '10px',
+        },
+        resultsH: {
+            fontSize: '16px',
+            fontWeight: '400',
+            height: '36px',
+            paddingTop: '8px',
+            paddingLeft: '5px',
+            borderRadius: '5px',
         }
     }))

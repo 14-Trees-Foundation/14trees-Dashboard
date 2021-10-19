@@ -14,7 +14,7 @@ import {
     activitiesData,
     openVideo,
     videoUrl
-} from '../store/atoms'
+} from '../store/atoms';
 
 import ReactPlayer from 'react-player/youtube'
 

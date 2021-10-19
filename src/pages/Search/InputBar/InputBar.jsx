@@ -1,12 +1,15 @@
-import { useState } from "react"
+import { useState } from "react";
 import api from "../../../api/local";
-import { SearchBar } from "../../../stories/SearchBar/SearchBar"
+import { SearchBar } from "../../../stories/SearchBar/SearchBar";
+import { useSetRecoilState, useRecoilState } from 'recoil';
+import { searchResults, searchKey } from '../../../store/atoms';
 
-export const InputBar = ({ type, setData }) => {
+export const InputBar = ({ type }) => {
 
-    let [key, setKey] = useState("");
+    let [key, setKey] = useRecoilState(searchKey);
     let [searchSize, setSearchSize] = useState(10);
     let [currPage, setCurrPage] = useState(1);
+    const setSearchResult = useSetRecoilState(searchResults);
 
     const setValue = (value) => {
         setKey(value);
@@ -14,16 +17,16 @@ export const InputBar = ({ type, setData }) => {
 
     const fetchData = async () => {
         let params = {
-            term : key,
+            key : key,
             size: searchSize,
             index: currPage
         }
-        const res = await api.get('/api/v1/search/searchall', {
+        const res = await api.get('/search/', {
             params : params
         });
 
         if(res.status === 200) {
-            setData(res, key);
+            setSearchResult(res.data);
         } else {
             console.log("Fetch error")
         }

@@ -77,9 +77,12 @@ export const Map = () => {
     }, []);
 
     let boundaries = [];
+    let treeCenters = [];
     for (const tree of trees) {
         let pathObj = tree.tree.plot_id.boundaries.coordinates[0].map(([lat, lng]) => ({ lat, lng }));
-        boundaries.push(pathObj)
+        boundaries.push(pathObj);
+        let [lat, lng] = tree.tree.location.coordinates;
+        treeCenters.push({lat, lng});
     }
 
     const uniqBoundaries = removeDupBoundaries(boundaries)
@@ -102,18 +105,19 @@ export const Map = () => {
                 onUnmount={onUnmount}
                 options={mapOptions}
             >
-                {boundaries.map((marker, i) => (
+                {treeCenters.map((marker, i) => (
                     <Fragment key={i}>
                         {
                             currTree === i &&
                                 <Polygon
-                                    paths={marker}
+                                    paths={boundaries[i]}
                                     options={selectedOption}
                                 />
                         }
                         <Marker
                             icon={icon}
-                            position={marker[0]}
+                            // TODO: change this to tree location
+                            position={boundaries[i][0]}
                             animation={1}
                             onClick={() => onMarkerClick(i)}>
                         </Marker>
@@ -121,7 +125,8 @@ export const Map = () => {
                             currTree === i &&
                             <InfoBox
                                 options={boxOptions}
-                                position={marker[0]}
+                                // TODO: change this to tree location
+                                position={boundaries[i][0]}
                             >
                                 <div style={{
                                     backgroundColor: '#ffffff',

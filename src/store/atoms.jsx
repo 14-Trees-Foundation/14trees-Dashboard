@@ -40,6 +40,18 @@ const videoUrl = atom({
     default: ''
 })
 
+const searchResults = atom({
+    key: 'searchResults',
+    default: {
+        users: {},
+    },
+})
+
+const searchKey = atom({
+    key: 'searchKey',
+    default: "",
+})
+
 export {
     usersData,
     overallData,
@@ -48,5 +60,7 @@ export {
     activitiesData,
     currSelTree,
     openVideo,
-    videoUrl
+    videoUrl,
+    searchResults,
+    searchKey
 };

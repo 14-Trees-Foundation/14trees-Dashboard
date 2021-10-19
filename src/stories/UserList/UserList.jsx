@@ -1,114 +1,76 @@
 import React from "react";
-import "./userlist.scss";
+import { createStyles, makeStyles } from '@mui/styles';
+import { useRecoilValue } from 'recoil';
+import { searchResults } from '../../store/atoms';
 
-export const UserList = ({ data, handleClick, ...props }) => {
-    return (
-        <div>
-            <div className="ul-header">
-                <div className="ul-item-long">Name</div>
-                <div className="ul-item-long">Organization</div>
-                <div className="ul-item-short">No. Of Plants</div>
-                <div className="ul-item-short">No. of Visits</div>
-                <div className="ul-item-short">Last Vsit</div>
+export const UserList = ({ handleClick }) => {
+    const searchResult = useRecoilValue(searchResults);
+    const classes = UseStyle();
+    if(Object.keys(searchResult.users).length !== 0) {
+        return (
+            <div>
+                <div className={classes.header}>
+                    <div className={classes.itemlong}>Name</div>
+                    <div className={classes.itemlong}>Organization</div>
+                    <div className={classes.itemshort}>No. Of Plants</div>
+                    <div className={classes.itemshort}>Number of Vsit</div>
+                    <div className={classes.itemshort}>Last Vsit</div>
+                </div>
+                {searchResult.users.map((i) => {
+                    return (
+                        <div className={classes.box} key={i.id} onClick={() => {handleClick(i.id)}}>
+                            <div className={classes.itemlong}>{i.name}</div>
+                            <div className={classes.itemlong}>{i.org}</div>
+                            <div className={classes.itemshort}>{i.num_plants}</div>
+                            <div className={classes.itemshort}>{i.num_visit}</div>
+                            <div className={classes.itemshort}>{i.last_visit}</div>
+                        </div>
+                    )
+                })}
             </div>
-            {data.map((i) => {
-                return (
-                    <div className="ul-box" key={i.id} onClick={() => {handleClick(i.id)}}>
-                        <div className="ul-item-long">{i.name}</div>
-                        <div className="ul-item-long">{i.org}</div>
-                        <div className="ul-item-short">{i.num_plants}</div>
-                        <div className="ul-item-short">{i.num_visits}</div>
-                        <div className="ul-item-short">{i.last_visit}</div>
-                    </div>
-                )
-            })}
-        </div>
-    )
+        )
+    } else {
+        return <div></div>
+    }
 };
 
-UserList.defaultProps = {
-    data: [
-        {
-            id: 1,
-            name: 'Ajay Singh',
-            org: 'TCS Tata consultancy services',
-            num_plants: 5,
-            num_visits: 3,
-            last_visit: '2021-08-21'
+const UseStyle = makeStyles((theme) =>
+    createStyles({
+        header: {
+            display: 'flex',
+            width: '100%',
+            height: '15px',
+            fontSize: '12px',
+            fontWeight: '400',
+            color: '#000000',
+            margin: '2px',
         },
-        {
-            id: 2,
-            name: 'Ajay Madan',
-            org: 'VmWare',
-            num_plants: 2,
-            num_visits: 3,
-            last_visit: '2021-08-23'
+        itemlong: {
+            width: '23%',
+            textAlign: 'center',
+            alignSelf: 'center',
         },
-        {
-            id: 3,
-            name: 'Ajay Nagar',
-            org: 'IIT Kapur',
-            num_plants: 6,
-            num_visits: 4,
-            last_visit: '2021-07-21'
+        itemshort: {
+            width: '17%',
+            textAlign: 'center',
+            alignSelf: 'center',
         },
-        {
-            id: 4,
-            name: 'Ajay Singh',
-            org: 'TCS Tata consultancy services',
-            num_plants: 5,
-            num_visits: 3,
-            last_visit: '2021-08-21'
+        box: {
+            marginBottom: '10px',
+            width: '100%',
+            minHeight: '60px',
+            borderRadius: '5px',
+            backgroundColor: '#ffffff',
+            fontSize: '16px',
+            fontWeight: '450',
+            display: 'flex',
+            cursor: 'pointer',
+            justifyContent: 'center',
+            '&:hover': {
+                transform: 'scale(1.01)'
+            }
         },
-        {
-            id: 5,
-            name: 'Ajay Madan',
-            org: 'VmWare',
-            num_plants: 2,
-            num_visits: 3,
-            last_visit: '2021-08-23'
-        },
-        {
-            id: 6,
-            name: 'Ajay Nagar',
-            org: 'IIT Kapur',
-            num_plants: 6,
-            num_visits: 4,
-            last_visit: '2021-07-21'
-        },
-        {
-            id: 7,
-            name: 'Ajay Singh',
-            org: 'TCS Tata consultancy services',
-            num_plants: 5,
-            num_visits: 3,
-            last_visit: '2021-08-21'
-        },
-        {
-            id: 8,
-            name: 'Ajay Madan',
-            org: 'VmWare',
-            num_plants: 2,
-            num_visits: 3,
-            last_visit: '2021-08-23'
-        },
-        {
-            id: 9,
-            name: 'Ajay Nagar',
-            org: 'IIT Kapur',
-            num_plants: 6,
-            num_visits: 4,
-            last_visit: '2021-07-21'
-        },
-        {
-            id: 10,
-            name: 'Ajay Singh',
-            org: 'TCS Tata consultancy services',
-            num_plants: 5,
-            num_visits: 3,
-            last_visit: '2021-08-21'
-        }
-    ]
-};
+    }),
+);
 
 export default UserList;
