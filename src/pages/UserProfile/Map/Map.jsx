@@ -42,8 +42,8 @@ const selectedOption = {
 const mapOptions = {
     disableDefaultUI: true,
     mapTypeId: 'satellite',
-    zoom: 16,
-    minZoom: 13,
+    zoom: 15,
+    minZoom: 11,
     maxZoom: 22,
     panControl: true,
     rotateControl: true,
@@ -101,7 +101,7 @@ export const Map = () => {
                 mapContainerStyle={containerStyle}
                 mapTypeId={'satellite'}
                 center={boundaries[0][0]}
-                zoom={18}
+                zoom={17}
                 onUnmount={onUnmount}
                 options={mapOptions}
             >
