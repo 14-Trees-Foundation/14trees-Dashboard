@@ -1,5 +1,6 @@
 import React from "react";
 import { createStyles, makeStyles } from '@mui/styles';
+import Avatar from '@mui/material/Avatar';
 import { useRecoilValue } from 'recoil';
 import { searchResults } from '../../store/atoms';
 
@@ -13,16 +14,15 @@ export const UserList = ({ handleClick }) => {
                     <div className={classes.itemlong}>Name</div>
                     <div className={classes.itemlong}>Organization</div>
                     <div className={classes.itemshort}>No. Of Plants</div>
-                    <div className={classes.itemshort}>Number of Vsit</div>
                     <div className={classes.itemshort}>Last Vsit</div>
                 </div>
                 {searchResult.users.map((i) => {
                     return (
-                        <div className={classes.box} key={i.id} onClick={() => {handleClick(i.id)}}>
+                        <div className={classes.box} key={i.id} onClick={() => {handleClick(i.user_trees[0])}}>
+                            <Avatar className={classes.profile} alt="Profile" src={i.user_trees[0].profile_image[0]} sx={{ width: 40, height: 40 }}/>
                             <div className={classes.itemlong}>{i.name}</div>
                             <div className={classes.itemlong}>{i.org}</div>
-                            <div className={classes.itemshort}>{i.num_plants}</div>
-                            <div className={classes.itemshort}>{i.num_visit}</div>
+                            <div className={classes.itemshort}>{i.user_trees.length}</div>
                             <div className={classes.itemshort}>{i.last_visit}</div>
                         </div>
                     )
@@ -44,21 +44,31 @@ const UseStyle = makeStyles((theme) =>
             fontWeight: '400',
             color: '#000000',
             margin: '2px',
+            marginLeft: '4%',
+            marginBottom: '3%',
         },
         itemlong: {
+            width: '23%',
+            // textAlign: 'center',
+            alignSelf: 'center',
+            marginLeft: '2%'
+        },
+        itemshort: {
             width: '23%',
             textAlign: 'center',
             alignSelf: 'center',
         },
-        itemshort: {
-            width: '17%',
-            textAlign: 'center',
-            alignSelf: 'center',
+        profile:{
+            position: 'absolute',
+            top: '0',
+            bottom: '0',
+            margin: 'auto',
+            marginLeft: '4%'
         },
         box: {
             marginBottom: '10px',
             width: '100%',
-            minHeight: '60px',
+            minHeight: '80px',
             borderRadius: '5px',
             backgroundColor: '#ffffff',
             fontSize: '16px',
@@ -68,6 +78,10 @@ const UseStyle = makeStyles((theme) =>
             justifyContent: 'center',
             '&:hover': {
                 transform: 'scale(1.01)'
+            },
+            [theme.breakpoints.down('480')]: {
+                fontSize: '14px',
+                minHeight: '70px',
             }
         },
     }),

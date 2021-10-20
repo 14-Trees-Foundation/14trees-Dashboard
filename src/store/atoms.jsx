@@ -52,6 +52,11 @@ const searchKey = atom({
     default: "",
 })
 
+const searchError = atom({
+    key: 'searchError',
+    default: false,
+})
+
 export {
     usersData,
     overallData,
@@ -62,5 +67,6 @@ export {
     openVideo,
     videoUrl,
     searchResults,
-    searchKey
+    searchKey,
+    searchError
 };

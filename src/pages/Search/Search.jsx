@@ -2,22 +2,22 @@ import { useState } from "react"
 
 import { AppBar } from "../../stories/AppBar/AppBar";
 import { InputBar } from "./InputBar/InputBar";
-import { Chip } from "../../stories/Chip/Chip";
 import { UserList } from "../../stories/UserList/UserList";
-import { OrgList } from "../../stories/OrgList/OrgList";
-import { EventList } from "../../stories/EventList/EventList";
-import { TreeList } from "../../stories/TreeList/TreeList";
+import { useHistory } from "react-router-dom";
 import bg from "../../assets/bg.png";
 
 import { createStyles, makeStyles } from '@mui/styles';
 import Button from '@mui/material/Button';
-import { useRecoilState, useRecoilValue } from "recoil";
+import { useRecoilValue } from "recoil";
 import { searchResults, searchKey } from "../../store/atoms";
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 export const Search = () => {
     const classes = UseStyle();
     let results = useRecoilValue(searchResults);
     let [type, setType] = useState("All");
+    const history = useHistory();
 
     let intialChipState = {
         "All": "secondary",
@@ -43,11 +43,11 @@ export const Search = () => {
         console.log(value);
     }
 
-    if (Object.keys(results.users).length === 0) {
+    if (Object.keys(results.users).length === 0 && key === "") {
         return (
             <div className={classes.box}>
-                <img alt="bg" src={bg} className={classes.bg} />
-                <div className={classes.overlay}>
+                <img alt="bg" src={bg} className={classes.bg} style={{height: '100vh',}}/>
+                <div className={classes.overlay} style={{height: '100vh',}}>
                     <AppBar />
                     <div className={classes.main}>
                         <div className={classes.header}>
@@ -76,8 +76,12 @@ export const Search = () => {
     } else {
         return (
             <div className={classes.box}>
-                <img alt="bg" src={bg} className={classes.bg} />
-                <div className={classes.overlay}>
+                <ToastContainer />
+                {/* {searchError &&
+                    toast.warn("No results found!")
+                } */}
+                <img alt="bg" src={bg} className={classes.bg} style={{height: '40vh'}}/>
+                <div className={classes.overlay} style={{height: '40vh'}}>
                 <AppBar />
                 <div className={classes.main} style={{paddingTop: '4%'}}>
                     <div className={classes.header} style={{marginTop: '0'}}>
@@ -94,10 +98,14 @@ export const Search = () => {
                     </div>
                 </div>
                 </div>
-                <div style={{marginTop: '2%', width: '65vw',marginLeft: '18vw', backgroundColor: '#e5e5e5'}}>
-                    <div className={classes.resultsH}>
-                        Search Results for: {key}
-                    </div>
+                <div className={classes.result}>
+                        {results.total_results === 0 ?
+                            <div className={classes.resultsH}>0 Results Found for : {key}</div>
+                            :
+                            <div className={classes.resultsH}>
+                                Search Results for: {key}
+                            </div>
+                        }
                         {
                             (selectedChips === "Individual" || selectedChips === "All") &&
                             <div>
@@ -162,13 +170,13 @@ const UseStyle = makeStyles((theme) =>
     createStyles({
         box: {
             width: '100%',
-            height: '100vh',
             position: 'relative',
-            backgroundColor: '#e5e5e5'
+            backgroundColor: '#e5e5e5',
+            overflow: 'auto',
+            minHeight: '100vh',
         },
         bg: {
             width: '100%',
-            height: '40vh',
             objectFit: 'cover',
         },
         overlay: {
@@ -176,7 +184,6 @@ const UseStyle = makeStyles((theme) =>
             top: '0',
             left: '0',
             width: '100%',
-            height: '40vh',
             background: 'linear-gradient(358.58deg, #1F3625 37.04%, rgba(31, 54, 37, 0.636721) 104.2%, rgba(31, 54, 37, 0) 140.95%)',
         },
         main: {
@@ -210,7 +217,7 @@ const UseStyle = makeStyles((theme) =>
             fontWeight: '500',
             alignItems: 'center',
             textAlign: 'center',
-            lineHeight: '80px',
+            // lineHeight: '80px',
             [theme.breakpoints.down('md')]: {
                 fontSize: '15px',
             }
@@ -257,6 +264,20 @@ const UseStyle = makeStyles((theme) =>
             height: '36px',
             paddingTop: '8px',
             paddingLeft: '5px',
-            borderRadius: '5px',
+            [theme.breakpoints.down('480')]: {
+                paddingTop: '4%',
+                paddingLeft: '4%',
+            }
+        },
+        result: {
+            marginTop: '2%',
+            width: '65vw',
+            marginLeft: '18vw',
+            backgroundColor: '#e5e5e5',
+            borderRadius: '10px',
+            [theme.breakpoints.down('480')]: {
+                width: '90vw',
+                marginLeft: '5vw',
+            }
         }
     }))

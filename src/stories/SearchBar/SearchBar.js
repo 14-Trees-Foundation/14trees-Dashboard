@@ -10,20 +10,20 @@ import "./searchbar.scss";
  * Primary UI component for user interaction
  */
 export const SearchBar = ({ value, onClick, onSubmit, ...props }) => {
-  return(
-      <div className="sb-box">
-        <InputText
-            placeholder="Search by Name/Event/Organization"
-            value={value}
-            onChange={(e)=>onClick(e.target.value)}
-            className="input"/>
+    return (
+        <div className="sb-box">
+            <InputText
+                placeholder="Search by Name/Event/Organization"
+                value={value}
+                onChange={(e) => onClick(e.target.value)}
+                className="input" />
             <div className="sb-button-div">
                 <Button variant="contained" color="primary" className="sb-button" onClick={onSubmit}>
                     Submit
                 </Button>
             </div>
-      </div>
-  )
+        </div>
+    )
 };
 
 SearchBar.propTypes = {

@@ -37,7 +37,7 @@ export const Memories = () => {
                 <div style={{ fontSize: '16px', fontWeight: '700', padding: '5px' }}>
                     Memories
                 </div>
-                <Chip label={"See All"} mode={'primary'} size={'small'} />
+                {/* <Chip label={"See All"} mode={'primary'} size={'small'} /> */}
                 <div style={{ marginLeft: 'auto', marginRight: '20px', paddingTop: '5px' }}>
                     <ArrowBackIosIcon fontSize="small" style={{ color: 'green', cursor: 'pointer' }} onClick={() => prev()} />
                     <ArrowForwardIosIcon fontSize="small" style={{ color: 'green', cursor: 'pointer' }} onClick={() => next()} />
