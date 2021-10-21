@@ -35,6 +35,11 @@ const openVideo = atom({
     default: false
 })
 
+const openPopup = atom({
+    key: 'openPopup',
+    default: false
+})
+
 const videoUrl = atom({
     key: 'videoUrl',
     default: ''
@@ -68,5 +73,6 @@ export {
     videoUrl,
     searchResults,
     searchKey,
-    searchError
+    searchError,
+    openPopup
 };
