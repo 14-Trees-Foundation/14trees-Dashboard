@@ -42,8 +42,8 @@ const selectedOption = {
 const mapOptions = {
     disableDefaultUI: true,
     mapTypeId: 'satellite',
-    zoom: 15,
-    minZoom: 11,
+    zoom: 12,
+    minZoom: 6,
     maxZoom: 22,
     panControl: true,
     rotateControl: true,

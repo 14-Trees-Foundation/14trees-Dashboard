@@ -50,9 +50,14 @@ const useStyles = makeStyles((theme) =>
     },
     close: {
         float: 'right',
-        paddingTop: '5px',
-        paddingRight: '5px',
-        cursor: 'pointer'
+        paddingTop: '10px',
+        paddingRight: '10px',
+        cursor: 'pointer',
+        color: '#ffffff',
+        [theme.breakpoints.down('480')]: {
+          paddingTop: '5px',
+          paddingRight: '5px',
+        }
     },
   })
 )

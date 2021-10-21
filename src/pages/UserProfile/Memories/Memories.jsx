@@ -100,13 +100,19 @@ const useStyles = makeStyles((theme) =>
             marginLeft: '20px',
             boxShadow: '0px 0px 20px rgba(0, 0, 0, 0.15)',
             [theme.breakpoints.down('1500')]: {
-                width: '98%',
+                width: 'calc(100% - 20px)',
             },
             [theme.breakpoints.down('480')]: {
                 marginLeft: '1px',
                 marginTop: '15px',
                 width: '100%',
             },
+            [theme.breakpoints.between('481','900')]: {
+                marginLeft: '0px',
+                width: '100%',
+                marginTop: '15px',
+                marginBottom: '15px',
+            }
         },
         header: {
             display: 'flex',

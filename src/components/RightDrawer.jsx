@@ -51,9 +51,9 @@ const useStyles = makeStyles((theme) =>
             }
         },
         main: {
-            maxHeight: '55vh',
+            minHeight: '55vh',
             [theme.breakpoints.up('lg')]: {
-                maxHeight: '45vh',
+                minHeight: '45vh',
             }
         },
         infobox: {

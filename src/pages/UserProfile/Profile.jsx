@@ -106,12 +106,12 @@ const useStyles = makeStyles((theme) =>
         },
         user: {
             display: 'flex',
-            maxHeight: '22vh',
+            minHeight: '22vh',
             [theme.breakpoints.down('1500')]: {
-                maxHeight: '32vh',
+                minHeight: '32vh',
             },
             [theme.breakpoints.down('481')]: {
-                maxHeight: '100%',
+                minHeight: '100%',
             },
         },
         treemap: {
@@ -120,13 +120,12 @@ const useStyles = makeStyles((theme) =>
             marginTop: '7%',
             [theme.breakpoints.down('1500')]: {
                 height: '52vh',
-                marginTop: '1.5%',
+                marginTop: '1px',
             },
         },
         tree: {
             width: '40%',
             height: '50vh',
-            marginRight: '-20px',
             zIndex: '1',
             [theme.breakpoints.down('1500')]: {
                 height: '52vh',
@@ -144,14 +143,13 @@ const useStyles = makeStyles((theme) =>
             },
         },
         map: {
-            width: '70%',
+            width: '60%',
             height: '50vh',
-            marginLeft: '-10px',
             [theme.breakpoints.down('1500')]: {
                 height: '52vh',
             },
             [theme.breakpoints.down('1025')]: {
-                width: '60%',
+                width: '55%',
             },
             [theme.breakpoints.down('480')]: {
                 width: '100%',

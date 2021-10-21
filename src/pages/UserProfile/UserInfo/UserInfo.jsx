@@ -41,11 +41,11 @@ export const UserInfo = () => {
                         }
                     </div>
                     <div className={classes.growth}>
-                        <div style={{ position: 'absolute', bottom: '0' }}>
+                        <div style={{ marginTop: '20px' }}>
                             <div style={{ display: 'flex' }}>
                                 <InfoChip count={userinfo.trees.length} label="Trees Planted" onClick={handleTreeClick} />
                                 {/* TODO: Events attended configuration on backend */}
-                                <InfoChip count={userinfo.trees.length} label="Events attended" />
+                                {/* <InfoChip count={userinfo.trees.length} label="Events attended" /> */}
                             </div>
                             <div className={classes.overall}>
                                 <div className={classes.done} style={{ "width": `${treeDoneWidth}%` }}>
@@ -96,11 +96,14 @@ const useStyles = makeStyles((theme) =>
             }
         },
         info: {
-            paddingTop: '10%',
             paddingLeft: '20px',
-            maxHeight: '30%',
+            minHeight: '30%',
             [theme.breakpoints.down('480')]: {
                 paddingLeft: '10px',
+            },
+            [theme.breakpoints.between('481','900')]: {
+                paddingLeft: '0px',
+                marginLeft: '-10px'
             }
         },
         username: {
@@ -130,6 +133,10 @@ const useStyles = makeStyles((theme) =>
             paddingLeft: '20px',
             [theme.breakpoints.down('480')]: {
                 paddingLeft: '10px',
+            },
+            [theme.breakpoints.between('481','900')]: {
+                paddingLeft: '0px',
+                marginLeft: '-10px'
             }
         },
         overall: {
@@ -140,6 +147,7 @@ const useStyles = makeStyles((theme) =>
             fontWeight: '400',
             minHeight: '50px',
             borderRadius: '10px',
+            maxWidth: '180px',
             [theme.breakpoints.down('1500')]: {
                 minHeight: '40px',
             },
@@ -162,6 +170,7 @@ const useStyles = makeStyles((theme) =>
         countdesc: {
             fontSize: '11px',
             textAlign: 'center',
+            maxWidth: '150px',
             [theme.breakpoints.down('1025')]: {
                 fontSize: '9px',
             }
