@@ -117,10 +117,10 @@ const useStyles = makeStyles((theme) =>
         treemap: {
             fontSize: '30px',
             height: '50vh',
-            marginTop: '7%',
+            marginTop: '20px',
             [theme.breakpoints.down('1500')]: {
                 height: '52vh',
-                marginTop: '1px',
+                marginTop: '5px',
             },
         },
         tree: {

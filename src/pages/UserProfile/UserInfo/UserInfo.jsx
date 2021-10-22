@@ -138,7 +138,7 @@ const useStyles = makeStyles((theme) =>
         },
         label: {
             fontSize: '13px',
-            fontWeight: '350',
+            fontWeight: '300',
             marginBottom: '5px',
             [theme.breakpoints.down('1025')]: {
                 fontSize: '10px',
@@ -146,7 +146,7 @@ const useStyles = makeStyles((theme) =>
         },
         data: {
             fontSize: '17px',
-            fontWeight: '450',
+            fontWeight: '350',
             marginBottom: '8px',
             [theme.breakpoints.down('1025')]: {
                 fontSize: '16px',
@@ -167,7 +167,7 @@ const useStyles = makeStyles((theme) =>
             backgroundColor: '#1F3625',
             marginTop: '7%',
             color: '#ffffff',
-            fontWeight: '400',
+            fontWeight: '350',
             minHeight: '50px',
             borderRadius: '10px',
             maxWidth: '180px',
@@ -179,11 +179,11 @@ const useStyles = makeStyles((theme) =>
             backgroundColor: '#9BC53D',
             borderRadius: '10px',
             alignItems: 'center',
-            fontWeight: '550',
+            fontWeight: '400',
             fontSize: '25px',
         },
         count: {
-            fontWeight: '500',
+            fontWeight: '450',
             position: 'absolute',
             marginLeft: '0.25em',
             marginTop: '0.25em',
