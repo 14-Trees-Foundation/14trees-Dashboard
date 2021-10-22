@@ -1,71 +1,93 @@
 import { Fragment } from 'react';
 import { Grid } from '@mui/material';
 import { createStyles, makeStyles } from '@mui/styles';
-import { useSetRecoilState, useRecoilValue } from 'recoil';
+import { useSetRecoilState, useRecoilValue, useRecoilState } from 'recoil';
 
 import { Memories } from "../Memories/Memories";
 import { InfoChip } from "../../../stories/InfoChip/InfoChip";
-import { usersData, navIndex } from '../../../store/atoms';
+import { usersData, navIndex, openProfilePopup } from '../../../store/atoms';
+import { Popup } from "../../../stories/Popup/Popup";
 
 export const UserInfo = () => {
     const classes = useStyles();
 
     const userinfo = useRecoilValue(usersData);
     const setIndex = useSetRecoilState(navIndex);
+    const [open, setOpenPopup] = useRecoilState(openProfilePopup);
     const handleTreeClick = () => {
         setIndex(2);
     }
 
+    const onTogglePop = () => {
+        setOpenPopup(!open)
+    }
+
+    const handleOpenPopup = () => {
+        setOpenPopup(true)
+    }
+
     const treeDoneWidth = (userinfo.trees.length / 14) * 100;
     // const numEvent = userinfo.user
-    return (
-        <div style={{ width: '100%', height: '100%' }}>
-            <Grid container>
-                <Grid item xs={6} md={3}>
-                    <img
-                        className={classes.userimg}
-                        alt="Card"
-                        src={userinfo.user.profile_image[0] === "" ? "https://picsum.photos/523/354" : userinfo.user.profile_image[0]} />
-                </Grid>
-                <Grid item xs={6} md={3} className={classes.infobox}>
-                    <div className={classes.info}>
-                        <div className={classes.label}>Name</div>
-                        <div className={classes.data}>{userinfo.user.user.name}</div>
-                        {
-                            (userinfo.user.user.org) ?
-                                <Fragment>
-                                    <div className={classes.label}>Organization</div>
-                                    <div className={classes.data}>{userinfo.user.orgid.name}</div>
-                                </Fragment> :
-                                ""
-                        }
-                    </div>
-                    <div className={classes.growth}>
-                        <div style={{ marginTop: '20px' }}>
-                            <div style={{ display: 'flex' }}>
-                                <InfoChip count={userinfo.trees.length} label="Trees Planted" onClick={handleTreeClick} />
-                                {/* TODO: Events attended configuration on backend */}
-                                {/* <InfoChip count={userinfo.trees.length} label="Events attended" /> */}
-                            </div>
-                            <div className={classes.overall}>
-                                <div className={classes.done} style={{ "width": `${treeDoneWidth}%` }}>
+
+    if(open) {
+        return (
+            <div>
+                <Popup toggle={onTogglePop}>
+                    <img className={classes.imageWindow} src={userinfo.user.profile_image[0]} alt={"A"}/>
+                </Popup>
+            </div>
+        )
+    } else {
+        return (
+            <div style={{ width: '100%', height: '100%' }}>
+                <Grid container>
+                    <Grid item xs={6} md={3}>
+                        <img
+                            onClick={() => handleOpenPopup()}
+                            className={classes.userimg}
+                            alt="Card"
+                            src={userinfo.user.profile_image[0] === "" ? "https://picsum.photos/523/354" : userinfo.user.profile_image[0]} />
+                    </Grid>
+                    <Grid item xs={6} md={3} className={classes.infobox}>
+                        <div className={classes.info}>
+                            <div className={classes.label}>Name</div>
+                            <div className={classes.data}>{userinfo.user.user.name}</div>
+                            {
+                                (userinfo.user.user.org) ?
+                                    <Fragment>
+                                        <div className={classes.label}>Organization</div>
+                                        <div className={classes.data}>{userinfo.user.orgid.name}</div>
+                                    </Fragment> :
+                                    ""
+                            }
+                        </div>
+                        <div className={classes.growth}>
+                            <div style={{ marginTop: '20px' }}>
+                                <div style={{ display: 'flex' }}>
+                                    <InfoChip count={userinfo.trees.length} label="Trees Planted" onClick={handleTreeClick} />
+                                    {/* TODO: Events attended configuration on backend */}
+                                    {/* <InfoChip count={userinfo.trees.length} label="Events attended" /> */}
                                 </div>
-                                <div className={classes.count}>
-                                    {14 - userinfo.trees.length}
-                                    <div className={classes.countdesc}>
-                                        Trees away from neutralising your carbon footprint
+                                <div className={classes.overall}>
+                                    <div className={classes.done} style={{ "width": `${treeDoneWidth}%` }}>
+                                    </div>
+                                    <div className={classes.count}>
+                                        {14 - userinfo.trees.length}
+                                        <div className={classes.countdesc}>
+                                            Trees away from neutralising your carbon footprint
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    </Grid>
+                    <Grid item xs={12} md={6}>
+                        <Memories />
+                    </Grid>
                 </Grid>
-                <Grid item xs={12} md={6}>
-                    <Memories />
-                </Grid>
-            </Grid>
-        </div>
-    )
+            </div>
+        )
+    }
 }
 
 const useStyles = makeStyles((theme) =>
@@ -82,6 +104,7 @@ const useStyles = makeStyles((theme) =>
             borderRadius: '15px',
             objectFit: 'cover',
             maxWidth: '250px',
+            cursor: 'pointer',
             [theme.breakpoints.down('1500')]: {
                 maxHeight: '220px',
                 maxWidth: '210px',
@@ -175,5 +198,24 @@ const useStyles = makeStyles((theme) =>
                 fontSize: '9px',
             }
         },
+        imageWindow: {
+            height: '90%',
+            borderRadius: '20px',
+            objectFit: 'cover',
+            padding: '2%',
+            width: '40%',
+            marginLeft: '28%',
+            [theme.breakpoints.between('481', '1024')]: {
+                width: '60%',
+                marginTop: '2%',
+                marginLeft: '15%'
+            },
+            [theme.breakpoints.down('480')]: {
+                width: '300px',
+                height: '320px',
+                marginTop: '2%',
+                marginLeft: '10px'
+            }
+        }
     })
 );

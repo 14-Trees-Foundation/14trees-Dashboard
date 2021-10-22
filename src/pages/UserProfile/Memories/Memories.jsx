@@ -7,7 +7,7 @@ import { Chip } from "../../../stories/Chip/Chip";
 import { Popup } from "../../../stories/Popup/Popup";
 
 import { useRecoilValue, useRecoilState } from 'recoil';
-import { usersData, openPopup } from '../../../store/atoms';
+import { usersData, openMemoryPopup } from '../../../store/atoms';
 import { useState } from 'react';
 
 export const Memories = () => {
@@ -15,7 +15,7 @@ export const Memories = () => {
     const matches = useMediaQuery('(max-width:481px)');
 
     const userinfo = useRecoilValue(usersData);
-    const [open, setOpenPopup] = useRecoilState(openPopup);
+    const [open, setOpenPopup] = useRecoilState(openMemoryPopup);
     const [index, setIndex] = useState(0);
 
     let images = [];

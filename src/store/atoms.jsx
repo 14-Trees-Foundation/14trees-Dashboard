@@ -35,8 +35,13 @@ const openVideo = atom({
     default: false
 })
 
-const openPopup = atom({
-    key: 'openPopup',
+const openMemoryPopup = atom({
+    key: 'openMemoryPopup',
+    default: false
+})
+
+const openProfilePopup = atom({
+    key: 'openProfilePopup',
     default: false
 })
 
@@ -74,5 +79,6 @@ export {
     searchResults,
     searchKey,
     searchError,
-    openPopup
+    openMemoryPopup,
+    openProfilePopup,
 };
