@@ -60,7 +60,7 @@ export const Visitor = () => {
     useEffect(() => {
         (async () => {
             // Get Org types
-            let orgRes = await Axios.get(`/organization`);
+            let orgRes = await Axios.get(`/organizations`);
             if (orgRes.status === 200) {
                 setOrg(orgRes.data);
             }

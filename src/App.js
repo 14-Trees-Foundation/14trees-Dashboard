@@ -2,6 +2,7 @@ import { Switch, Route } from "react-router-dom"
 import { Search } from "./pages/Search/Search";
 import { Visitor } from "./pages/Visitor/Visitor";
 import { AddTree } from "./pages/admin/Addtree/Addtree";
+import { AddOrg } from "./pages/admin/Addorg/Addorg";
 import { Dashboard } from './pages/Dashboard';
 
 function App() {
@@ -12,6 +13,7 @@ function App() {
       <Route path="/search" component={Search} exact></Route>
       <Route path="/visitor" component={Visitor} exact></Route>
       <Route path="/addtree" component={AddTree} exact></Route>
+      <Route path="/addorg" component={AddOrg} exact></Route>
       <Route path="/profile/:saplingId" component={Dashboard} exact></Route>
       <Route path='/home' component={() => {
         window.location.href = 'https://14trees.org/';
