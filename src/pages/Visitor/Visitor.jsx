@@ -1,7 +1,9 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 
 import { createStyles, makeStyles } from '@mui/styles';
+import { Field, Form } from "react-final-form";
 import Button from '@mui/material/Button';
+import Autocomplete from '@mui/material/Autocomplete';
 import Alert from '@mui/material/Alert';
 import AlertTitle from '@mui/material/AlertTitle';
 import Backdrop from '@mui/material/Backdrop';
@@ -30,12 +32,6 @@ import { AppBar } from "../../stories/AppBar/AppBar";
 import imageCompression from 'browser-image-compression';
 
 const intitialFValues = {
-    sapling: '',
-    name: '',
-    org: '',
-    dob: new Date(),
-    email: '',
-    contact: '',
     userImages: [],
     userImage1: null,
     userImage2: null,
@@ -47,44 +43,33 @@ const intitialFValues = {
     addImage2src: null,
     addImage3src: null,
     addimageerror: null,
+    orgid: '',
     uploaded: false,
-    loading: false,
+    loading: true,
     backdropOpen: false,
 }
 
 export const Visitor = () => {
     const [values, setValues] = useState(intitialFValues);
-    const [errors, setErrors] = useState({});
+    const [org, setOrg] = useState({});
     const PROFILE_IMG_MAX = 2;
     const ADDITIONAL_IMG_MAX = 10;
 
     const classes = UseStyle();
 
-    const validate = () => {
-        let temp = {};
-        temp.name = values.name ? "" : "Required Field"
-        temp.sapling = values.sapling ? "" : "Required Field"
-        setErrors({
-            ...temp
-        })
-        return Object.values(temp).every(x => x === "")
-    }
-
-    const handleInputchange = (e) => {
-        const { name, value } = e.target
-        validate();
-        setValues({
-            ...values,
-            [name]: value
-        })
-    }
-
-    const handleDateChange = (value) => {
-        setValues({
-            ...values,
-            dob: value
-        });
-    };
+    useEffect(() => {
+        (async () => {
+            // Get Org types
+            let orgRes = await Axios.get(`/organization`);
+            if (orgRes.status === 200) {
+                setOrg(orgRes.data);
+            }
+            setValues({
+                ...values,
+                loading: false
+            });
+        })();
+    }, []);
 
     const compressImageList = async (file) => {
 
@@ -94,7 +79,7 @@ export const Visitor = () => {
           useWebWorker: true
         }
 
-        let compressedFile
+        let compressedFile;
 
         try {
             compressedFile = await imageCompression(file, options);
@@ -142,90 +127,82 @@ export const Visitor = () => {
         })
     }
 
-    useEffect(() => {
-        validate(values);
-    }, [values]);
+    const handleOrgChange = (orgid) => {
+        setValues({
+            ...values,
+            orgid: orgid._id
+        })
+    }
 
-    const onSubmit = async (e) => {
-        if (!validate()) {
-            toast.error('Please fill mandatory fields', {
-                position: "top-right",
-                autoClose: 5000,
-                hideProgressBar: false,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-            });
-        } else {
-            setValues({
-                ...values,
-                loading: true,
-                backdropOpen: true
+    const formSubmit = async (formValues) => {
+        const formData = new FormData()
+        const date = moment(formValues.dob).format('YYYY-MM-DD')
+        formData.append('name', formValues.name)
+        formData.append('email', formValues.email);
+        formData.append('org', values.orgid);
+        formData.append('dob', date);
+        formData.append('contact', formValues.phone);
+        formData.append('sapling_id', formValues.saplingid);
+        const userImages = [];
+        const extraImages = [];
+        if (values.userImages) {
+            for (const key of Object.keys(values.userImages)) {
+                let image = await compressImageList(values.userImages[key]);
+                formData.append('files', image)
+                userImages.push(values.userImages[key].name)
+            }
+        }
+
+        if (values.additionalImages) {
+            for (const key of Object.keys(values.additionalImages)) {
+                let image = await compressImageList(values.additionalImages[key]);
+                formData.append('files', image)
+                extraImages.push(values.additionalImages[key].name)
+            }
+        }
+
+        formData.append('userimages', userImages);
+        formData.append('memoryimages', extraImages);
+        setValues({
+            ...values,
+            loading: true,
+            backdropOpen: true
+        })
+        try {
+            let res = await Axios.post('/profile/usertreereg', formData, {
+                headers: {
+                    'Content-type': 'multipart/form-data'
+                },
             })
-            const formData = new FormData()
-            const date = moment(values.dob).format('YYYY-MM-DD')
-            formData.append('name', values.name)
-            formData.append('email', values.email);
-            formData.append('org', values.org);
-            formData.append('dob', date);
-            formData.append('contact', values.contact);
-            formData.append('sapling_id', values.sapling);
-            const userImages = [];
-            const extraImages = [];
-            if (values.userImages) {
-                for (const key of Object.keys(values.userImages)) {
-                    let image = await compressImageList(values.userImages[key]);
-                    formData.append('files', image)
-                    userImages.push(values.userImages[key].name)
-                }
-            }
 
-            if (values.additionalImages) {
-                for (const key of Object.keys(values.additionalImages)) {
-                    let image = await compressImageList(values.additionalImages[key]);
-                    formData.append('files', image)
-                    extraImages.push(values.additionalImages[key].name)
-                }
-            }
-
-            formData.append('userimages', userImages);
-            formData.append('memoryimages', extraImages);
-            try {
-                let res = await Axios.post('/profile/usertreereg', formData, {
-                    headers: {
-                        'Content-type': 'multipart/form-data'
-                    },
+            if (res.status === 201) {
+                setValues({
+                    ...values,
+                    loading: false,
+                    uploaded: true,
                 })
-
-                if (res.status === 201) {
-                    setValues({
-                        ...values,
-                        loading: false,
-                        uploaded: true,
-                    })
-                    toast.success("Data uploaded successfully!")
-                } else if (res.status === 204 || res.status === 400 || res.status === 409 || res.status === 404) {
-                    setValues({
-                        ...values,
-                        loading: false,
-                        backdropOpen: false
-                    })
-                    toast.error(res.status.error)
-                }
-            } catch (error) {
-                console.log(error.response)
+                toast.success("Data uploaded successfully!")
+            } else if (res.status === 204 || res.status === 400 || res.status === 409 || res.status === 404) {
                 setValues({
                     ...values,
                     loading: false,
                     backdropOpen: false
                 })
-                if (error.response.status === 409 || error.response.status === 404) {
-                    toast.error(error.response.data.error)
-                }
+                toast.error(res.status.error)
+            }
+        } catch (error) {
+            console.log(error.response)
+            setValues({
+                ...values,
+                loading: false,
+                backdropOpen: false
+            })
+            if (error.response.status === 409 || error.response.status === 404) {
+                toast.error(error.response.data.error)
             }
         }
     }
+
     if (values.uploaded) {
         return (
             <div className={classes.box}>
@@ -285,116 +262,175 @@ export const Visitor = () => {
                                     </Alert>
                                 }
                                 <h1 className={classes.formheader}>Visitor Form</h1>
-                                <form className={classes.root} autoComplete='off'>
-                                    <Grid container>
-                                        <Grid item xs={12} sm={6} md={6}>
-                                            <TextField
-                                                error={errors.name !== "" ? true : false}
-                                                variant='outlined'
-                                                label='Full Name *'
-                                                name='name'
-                                                value={values.name}
-                                                helperText="The name you want to be displayed on the physical name plate."
-                                                onChange={handleInputchange}
-                                            />
-                                            <TextField
-                                                variant='outlined'
-                                                label='Email'
-                                                name='email'
-                                                value={values.email}
-                                                onChange={handleInputchange}
-                                            />
-                                            <LocalizationProvider dateAdapter={AdapterDateFns}>
-                                                <DesktopDatePicker
-                                                    label="Date of Birth"
-                                                    inputFormat="dd/MM/yyyy"
-                                                    value={values.dob}
-                                                    onChange={handleDateChange}
-                                                    renderInput={(params) => <TextField {...params} />}
-                                                    style={{ 'marginTop': '15px' }}
-                                                />
-                                            </LocalizationProvider>
-                                            <div style={{ 'marginTop': '20px' }}>
-                                                <Typography variant="subtitle2" gutterBottom className={classes.helper}>
-                                                    Upload two photographs of yours with sapling.
-                                                </Typography>
-                                                <input
-                                                    accept="image/*"
-                                                    className={classes.input}
-                                                    id="contained-button-file"
-                                                    multiple
-                                                    type="file"
-                                                    onChange={handleProfilePicUpload}
-                                                />
-                                            </div>
-                                            <div className={classes.submitDiv}>
-                                                <Avatar alt="U" src={values.userImage1src ? values.userImage1src : null} />
-                                                <Avatar alt="U" src={values.userImage2src ? values.userImage2src : null} />
-                                                <span className={classes.span}></span>
-                                                <label htmlFor="contained-button-file" style={{ 'display': 'block', 'marginTop': '5px' }}>
-                                                    <Button component="span" variant="contained" color='secondary' size='small' style={{ minWidth: "170px" }}>
-                                                        Upload your pic
-                                                    </Button>
-                                                </label>
-                                            </div>
-                                        </Grid>
-                                        <Grid item xs={12} sm={6} md={6}>
-                                            <TextField
-                                                error={errors.sapling !== "" ? true : false}
-                                                variant='outlined'
-                                                label='Sapling ID *'
-                                                name='sapling'
-                                                value={values.sapling}
-                                                helperText="The unique number you received from 14Trees staff."
-                                                onChange={handleInputchange}
-                                            />
-                                            <TextField
-                                                variant='outlined'
-                                                label='Organization'
-                                                name='org'
-                                                value={values.org}
-                                                onChange={handleInputchange}
-                                            />
-                                            <TextField
-                                                variant='outlined'
-                                                label='Contact'
-                                                name='contact'
-                                                value={values.contact}
-                                                onChange={handleInputchange}
-                                            />
-                                            <div style={{ 'marginTop': '15px' }}>
-                                                <Typography variant="subtitle2" gutterBottom className={classes.helper}>
-                                                    Feel free to share the photographs from your visit (max: 10)
-                                                </Typography>
-                                                <input
-                                                    accept="image/*"
-                                                    className={classes.input}
-                                                    id="additional-image-file"
-                                                    multiple
-                                                    type="file"
-                                                    onChange={handleAdditionalPicUpload}
-                                                />
-                                            </div>
-                                            <div className={classes.submitDiv}>
-                                                <Avatar alt="U" src={values.addImage1src ? values.addImage1src : null} />
-                                                <Avatar alt="U" src={values.addImage2src ? values.addImage2src : null} />
-                                                <Avatar alt="U" src={values.addImage3src ? values.addImage3src : null} />
-                                                <span className={classes.span}></span>
-                                                <label htmlFor="additional-image-file" style={{ 'display': 'block', 'marginTop': '5px' }}>
-                                                    <Button component="span" variant="contained" color='secondary' size='small' style={{ minWidth: "170px" }}>
-                                                        Add more pics
-                                                    </Button>
-                                                </label>
-                                            </div>
-                                        </Grid>
-                                        {
-                                            !values.uimageerror && !values.addimageerror &&
-                                            <div className={classes.submitbtn}>
-                                                <Button size='large' variant="contained" color='primary' onClick={onSubmit}>Submit</Button>
-                                            </div>
-                                        }
-                                    </Grid>
-                                </form>
+                                <Form
+                                    onSubmit = {formSubmit}
+                                    validate = {(values) => {
+                                    const errors = {};
+                                    if(!values.name){
+                                        errors.name = "The name you want to be displayed on the physical name plate.";
+                                    }
+                                    if(!values.email){
+                                        errors.email = "Email required.";
+                                    }
+                                    if(!values.dob){
+                                        errors.dob = "Total Supply is a required field.";
+                                    }
+                                    if(!values.saplingid){
+                                        errors.saplingid = "The unique number you received from 14Trees staff.";
+                                    }
+                                    return errors;
+                                    }}
+                                    render={({ handleSubmit, form, submitting, pristine }) => (
+                                        <form onSubmit={handleSubmit} className={classes.root} autoComplete='off'>
+                                            <Grid container>
+                                                <Grid item xs={12} sm={6} md={6}>
+                                                <Field name="name">
+                                                {({ input, meta }) => (
+                                                    <TextField
+                                                        error={meta.error && meta.touched ? true : false}
+                                                        {...input}
+                                                        variant='outlined'
+                                                        label='Full Name *'
+                                                        name='name'
+                                                        helperText={meta.error && meta.touched ? meta.error : ""}
+                                                    />
+                                                    )}
+                                                </Field>
+                                                <Field name="email">
+                                                {({ input, meta }) => (
+                                                    <TextField
+                                                        variant='outlined'
+                                                        label='Email *'
+                                                        name='email'
+                                                        error={meta.error && meta.touched ? true : false}
+                                                        {...input}
+                                                        helperText={meta.error && meta.touched ? meta.error : ""}
+                                                    />
+                                                    )}
+                                                </Field>
+                                                <Field name="dob">
+                                                {({ input, meta }) => (
+                                                    <LocalizationProvider dateAdapter={AdapterDateFns}>
+                                                        <DesktopDatePicker
+                                                            label="Date of Birth"
+                                                            inputFormat="dd/MM/yyyy"
+                                                            error={meta.error && meta.touched ? true : false}
+                                                            {...input}
+                                                            renderInput={(params) => <TextField {...params} />}
+                                                            style={{ 'marginTop': '15px' }}
+                                                        />
+                                                    </LocalizationProvider>
+                                                    )}
+                                                </Field>
+                                                    <div style={{ 'marginTop': '20px' }}>
+                                                        <Typography variant="subtitle2" gutterBottom className={classes.helper}>
+                                                            Upload two photographs of yours with sapling.
+                                                        </Typography>
+                                                        <input
+                                                            accept="image/*"
+                                                            className={classes.input}
+                                                            id="contained-button-file"
+                                                            multiple
+                                                            type="file"
+                                                            onChange={handleProfilePicUpload}
+                                                        />
+                                                    </div>
+                                                    <div className={classes.submitDiv}>
+                                                        <Avatar alt="U" src={values.userImage1src ? values.userImage1src : null} />
+                                                        <Avatar alt="U" src={values.userImage2src ? values.userImage2src : null} />
+                                                        <span className={classes.span}></span>
+                                                        <label htmlFor="contained-button-file" style={{ 'display': 'block', 'marginTop': '5px' }}>
+                                                            <Button component="span" variant="contained" color='secondary' size='small' style={{ minWidth: "170px" }}>
+                                                                Upload your pic
+                                                            </Button>
+                                                        </label>
+                                                    </div>
+                                                </Grid>
+                                                <Grid item xs={12} sm={6} md={6}>
+                                                    <Field name="saplingid">
+                                                        {({ input, meta }) => (
+                                                            <TextField
+                                                                variant='outlined'
+                                                                label='Tree ID *'
+                                                                name='saplingid'
+                                                                error={meta.error && meta.touched ? true : false}
+                                                                {...input}
+                                                                helperText={meta.error && meta.touched ? meta.error : ""}
+                                                            />
+                                                            )}
+                                                    </Field>
+                                                    {/* <Field name="org">
+                                                        {({ input, meta }) => (
+                                                            <TextField
+                                                                variant='outlined'
+                                                                label='Organization'
+                                                                name='org'
+                                                                {...input}
+                                                            />
+                                                            )}
+                                                    </Field> */}
+                                                    <Autocomplete
+                                                        id="treetype"
+                                                        options={org}
+                                                        autoHighlight
+                                                        getOptionLabel={(option) => option.name}
+                                                        onChange={(event, newValue) => {
+                                                            handleOrgChange(newValue);
+                                                        }}
+                                                        renderInput={(params) => <TextField {...params} label="Organization" variant="outlined" />}
+                                                    />
+                                                    <Field name="phone">
+                                                        {({ input, meta }) => (
+                                                            <TextField
+                                                                variant='outlined'
+                                                                label='Contact *'
+                                                                name='phone'
+                                                                {...input}
+                                                            />
+                                                            )}
+                                                    </Field>
+                                                    <div style={{ 'marginTop': '15px' }}>
+                                                        <Typography variant="subtitle2" gutterBottom className={classes.helper}>
+                                                            Feel free to share the photographs from your visit (max: 10)
+                                                        </Typography>
+                                                        <input
+                                                            accept="image/*"
+                                                            className={classes.input}
+                                                            id="additional-image-file"
+                                                            multiple
+                                                            type="file"
+                                                            onChange={handleAdditionalPicUpload}
+                                                        />
+                                                    </div>
+                                                    <div className={classes.submitDiv}>
+                                                        <Avatar alt="U" src={values.addImage1src ? values.addImage1src : null} />
+                                                        <Avatar alt="U" src={values.addImage2src ? values.addImage2src : null} />
+                                                        <Avatar alt="U" src={values.addImage3src ? values.addImage3src : null} />
+                                                        <span className={classes.span}></span>
+                                                        <label htmlFor="additional-image-file" style={{ 'display': 'block', 'marginTop': '5px' }}>
+                                                            <Button component="span" variant="contained" color='secondary' size='small' style={{ minWidth: "170px" }}>
+                                                                Add more pics
+                                                            </Button>
+                                                        </label>
+                                                    </div>
+                                                </Grid>
+                                                {
+                                                    !values.uimageerror && !values.addimageerror &&
+                                                    <div className={classes.submitbtn}>
+                                                        <Button
+                                                            size='large'
+                                                            variant="contained"
+                                                            color='primary'
+                                                            disabled={submitting || pristine}
+                                                            type="submit">
+                                                                Submit
+                                                        </Button>
+                                                    </div>
+                                                }
+                                            </Grid>
+                                        </form>
+                                    )}
+                                />
                             </Paper>
                         </div>
                     </div>

@@ -1,13 +1,13 @@
 import React, { Fragment } from "react";
 import logo from '../../assets/logo_white_small.png';
-import { Chip } from "../../stories/Chip/Chip";
+import Button from '@mui/material/Button';
 import { createStyles, makeStyles } from '@mui/styles';
 
 export const AppBar = () => {
 
     const classes = UseStyle();
 
-    const onChipSelect = () => {
+    const handleClick = () => {
         console.log("Coming soon")
     }
 
@@ -18,17 +18,21 @@ export const AppBar = () => {
                     <div className={classes.logo}>
                         <img style={{ width: '40px', marginLeft: '5px' }} src={logo} alt="logo banner" />
                     </div>
-                    {/* <div className={classes.right}>
-                        <h2 className={classes.links}>Home</h2>
+                    <div className={classes.right}>
+                        {/* <h2 className={classes.links}>Home</h2>
                         <h2 className={classes.links}>Events</h2>
                         <h2 className={classes.links}>Search</h2>
-                        <h2 className={classes.links}>About</h2>
-                        <Chip
-                            label={'Admin Login'}
-                            mode={'primary'}
-                            handleClick={onChipSelect}
-                        />
-                    </div> */}
+                        <h2 className={classes.links}>About</h2> */}
+                        <Button
+                            variant="contained"
+                            color="primary"
+                            size="large"
+                            style={{marginRight: '2%'}}
+                            onClick={() => handleClick()}
+                        >
+                            Admin
+                        </Button>
+                    </div>
                 </nav>
             </div>
         </Fragment>

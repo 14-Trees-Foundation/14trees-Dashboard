@@ -3,21 +3,19 @@ import { useState } from "react"
 import { AppBar } from "../../stories/AppBar/AppBar";
 import { InputBar } from "./InputBar/InputBar";
 import { UserList } from "../../stories/UserList/UserList";
-import { useHistory } from "react-router-dom";
 import bg from "../../assets/bg.png";
 
 import { createStyles, makeStyles } from '@mui/styles';
 import Button from '@mui/material/Button';
 import { useRecoilValue } from "recoil";
 import { searchResults, searchKey } from "../../store/atoms";
-import { ToastContainer, toast } from 'react-toastify';
+import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 export const Search = () => {
     const classes = UseStyle();
     let results = useRecoilValue(searchResults);
     let [type, setType] = useState("All");
-    const history = useHistory();
 
     let intialChipState = {
         "All": "secondary",
@@ -39,13 +37,16 @@ export const Search = () => {
         setSelectedChips(value);
     }
 
+    // const fetchAndRedirect = ()
+
     const onUserClick = (value) => {
-        console.log(value);
+        console.log(value.tree);
     }
 
     if (Object.keys(results.users).length === 0 && key === "") {
         return (
             <div className={classes.box}>
+                <AppBar />
                 <img alt="bg" src={bg} className={classes.bg} style={{height: '100vh',}}/>
                 <div className={classes.overlay} style={{height: '100vh',}}>
                     <AppBar />
@@ -76,13 +77,13 @@ export const Search = () => {
     } else {
         return (
             <div className={classes.box}>
+                <AppBar />
                 <ToastContainer />
                 {/* {searchError &&
                     toast.warn("No results found!")
                 } */}
                 <img alt="bg" src={bg} className={classes.bg} style={{height: '40vh'}}/>
                 <div className={classes.overlay} style={{height: '40vh'}}>
-                <AppBar />
                 <div className={classes.main} style={{paddingTop: '4%'}}>
                     <div className={classes.header} style={{marginTop: '0'}}>
                         <h1 className={classes.infoheader}>

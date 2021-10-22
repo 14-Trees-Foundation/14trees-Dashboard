@@ -35,7 +35,7 @@ export const UserInfo = () => {
                             (userinfo.user.user.org) ?
                                 <Fragment>
                                     <div className={classes.label}>Organization</div>
-                                    <div className={classes.data}>{userinfo.user.user.org}</div>
+                                    <div className={classes.data}>{userinfo.user.orgid.name}</div>
                                 </Fragment> :
                                 ""
                         }
@@ -122,7 +122,7 @@ const useStyles = makeStyles((theme) =>
             }
         },
         data: {
-            fontSize: '20px',
+            fontSize: '17px',
             fontWeight: '450',
             marginBottom: '8px',
             [theme.breakpoints.down('1025')]: {

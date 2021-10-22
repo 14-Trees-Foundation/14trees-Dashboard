@@ -41,7 +41,6 @@ export const AddTree = () => {
     let [loading, setLoading] = useState(true);
 
     useEffect(() => {
-
         (async () => {
             // Get Tree types
             let TreeRes = await Axios.get(`/trees/treetypes`);

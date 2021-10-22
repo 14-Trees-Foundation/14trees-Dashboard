@@ -49,7 +49,6 @@ export const Dashboard = () => {
 
     const fetchData = useCallback(async () => {
 
-
         try {
             const response = await Axios.default.get(`/profile?id=${saplingId}`);
             if (response.status === 200) {
