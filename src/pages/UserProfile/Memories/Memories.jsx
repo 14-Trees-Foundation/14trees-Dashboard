@@ -159,7 +159,7 @@ const useStyles = makeStyles((theme) =>
             padding: '2%',
             [theme.breakpoints.down('480')]: {
                 width: '300px',
-                height: '260px'
+                height: '300px'
             }
         }
     })

@@ -211,10 +211,9 @@ const useStyles = makeStyles((theme) =>
                 marginLeft: '15%'
             },
             [theme.breakpoints.down('480')]: {
-                width: '300px',
-                height: '320px',
-                marginTop: '2%',
-                marginLeft: '10px'
+                width: '90%',
+                height: '85%',
+                marginLeft: '3%'
             }
         }
     })
