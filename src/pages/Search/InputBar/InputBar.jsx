@@ -35,6 +35,7 @@ export const InputBar = ({ type }) => {
         console.log(res.data)
 
         if(res.status === 200) {
+            console.log(res.data)
             setSearchResult(res.data);
         } else {
             console.log("Fetch error")

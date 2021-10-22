@@ -105,11 +105,8 @@ export const AddOrg = () => {
             return (
                 <div className={classes.box}>
                     <img alt="bg" src={bg} className={classes.bgimg} />
-                    <AppBar />
                     <div className={classes.bg}>
-                        <div className={classes.infobox}>
-                            <p className={classes.infodesc}>Fill Organization information</p>
-                        </div>
+                        <AppBar />
                         <div className={classes.inputbox}>
                             <Paper className={classes.paper}>
                                 <Backdrop className={classes.backdrop} open={values.backdropOpen}>
@@ -233,13 +230,12 @@ const UseStyle = makeStyles((theme) =>
         },
         box: {
             width: '100%',
+            height: '100%',
             position: 'relative',
-            backgroundColor: '#e5e5e5',
-            overflow: 'auto',
-            minHeight: '100vh',
         },
         bgimg: {
-            width: '100%',
+            width: '100vw',
+            height: '100vh',
             objectFit: 'cover',
         },
         bg: {
@@ -250,7 +246,7 @@ const UseStyle = makeStyles((theme) =>
             bottom: '0',
             left: '0',
             right: '0',
-            "background": "linear-gradient(rgba(31, 54, 37, 0) 5%,rgba(31, 54, 37, 0.636721) 15%, #1F3625 40%, #e5e5e5 40%)",
+            background: 'linear-gradient(358.58deg, #1F3625 25.04%, rgba(31, 54, 37, 0.636721) 80.2%, rgba(31, 54, 37, 0) 140.95%)',
         },
         infobox: {
             marginTop: '5%',
@@ -265,7 +261,7 @@ const UseStyle = makeStyles((theme) =>
             fontSize: '30px',
             paddingLeft: '1%',
             color: '#ffffff',
-            fontWeight: '600',
+            fontWeight: '500',
             alignItems: 'center',
             textAlign: 'center',
             [theme.breakpoints.down('md')]: {
@@ -274,6 +270,7 @@ const UseStyle = makeStyles((theme) =>
         },
         formheader: {
             paddingLeft: '1%',
+            fontWeight: '500',
             [theme.breakpoints.down('md')]: {
                 paddingLeft: "5%",
                 paddingTop: '5%',
@@ -284,9 +281,14 @@ const UseStyle = makeStyles((theme) =>
             paddingLeft: '22.5%',
             height: '90vh',
             position: 'relative',
+            paddingTop: '10%',
             [theme.breakpoints.down('md')]: {
                 width: '90vw',
                 paddingLeft: '4vw',
+                paddingTop: '15%'
+            },
+            [theme.breakpoints.down('481')]: {
+                paddingTop: '30%'
             }
         },
         paper: {
