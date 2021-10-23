@@ -54,7 +54,7 @@ export const UserInfo = () => {
                             <div className={classes.label}>Name</div>
                             <div className={classes.data}>{userinfo.user.user.name}</div>
                             {
-                                (userinfo.user.user.org) ?
+                                (userinfo.user.orgid) ?
                                     <Fragment>
                                         <div className={classes.label}>Organization</div>
                                         <div className={classes.data}>{userinfo.user.orgid.name}</div>
