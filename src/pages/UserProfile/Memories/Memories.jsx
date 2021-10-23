@@ -159,13 +159,13 @@ const useStyles = makeStyles((theme) =>
             }
         },
         memimageWindow: {
-            width: '720px',
+            width: 'auuto',
             height: '480px',
             borderRadius: '20px',
             objectFit: 'cover',
             padding: '2%',
             [theme.breakpoints.down('480')]: {
-                width: '300px',
+                width: 'auto',
                 height: '300px'
             }
         }

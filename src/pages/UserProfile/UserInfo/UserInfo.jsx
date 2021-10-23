@@ -200,21 +200,21 @@ const useStyles = makeStyles((theme) =>
             }
         },
         imageWindow: {
-            height: '90%',
+            height: '80%',
             borderRadius: '20px',
             objectFit: 'cover',
             padding: '2%',
-            width: '40%',
+            width: 'auto',
+            marginTop: '6%',
             marginLeft: '28%',
             [theme.breakpoints.between('481', '1024')]: {
-                width: '60%',
+                width: 'auto',
                 marginTop: '2%',
                 marginLeft: '15%'
             },
             [theme.breakpoints.down('480')]: {
-                width: '90%',
-                height: '85%',
-                marginLeft: '3%'
+                width: 'auto',
+                marginLeft: '5%'
             }
         }
     })
