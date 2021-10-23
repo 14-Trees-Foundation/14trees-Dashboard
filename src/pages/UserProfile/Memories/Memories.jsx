@@ -23,6 +23,13 @@ export const Memories = () => {
         images.push.apply(images, tree['memories']);
     }
 
+    if(images.length === 1 && images[0]===''){
+        images = [];
+        images.push("https://14treesplants.s3.ap-south-1.amazonaws.com/memories/IMG_20211003_151713.jpg")
+        images.push("https://14treesplants.s3.ap-south-1.amazonaws.com/memories/IMG_20211003_130043.jpg")
+        images.push("https://14treesplants.s3.ap-south-1.amazonaws.com/memories/IMG_20211003_121832.jpg")
+    }
+
     const next = () => {
         if (index < images.length - 1) {
             setIndex(index + 1)
