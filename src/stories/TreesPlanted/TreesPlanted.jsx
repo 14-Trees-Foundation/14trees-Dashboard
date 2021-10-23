@@ -13,7 +13,7 @@ export const TreesPlanted = (props) => {
         <div style={{ fontSize: '18px', fontWeight: '700' }}>{props.name}</div>
         <div className={classes.data}>Sapling ID : {props.id}</div>
         <div className={classes.data}>Date : {props.date}</div>
-        <div className={classes.data}>Event : {props.event}</div>
+        {/* <div className={classes.data}>Event : {props.event}</div> */}
       </div>
     </div>
   );
