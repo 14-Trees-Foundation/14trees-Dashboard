@@ -29,6 +29,7 @@ export const UserInfo = () => {
 
     const treeDoneWidth = (userinfo.trees.length / 14) * 100;
     // const numEvent = userinfo.user
+    console.log(userinfo)
 
     if(open) {
         return (
@@ -47,7 +48,7 @@ export const UserInfo = () => {
                             onClick={() => handleOpenPopup()}
                             className={classes.userimg}
                             alt="Card"
-                            src={userinfo.user.profile_image[0] === "" ? "https://picsum.photos/523/354" : userinfo.user.profile_image[0]} />
+                            src={userinfo.user.profile_image[0] === "" ? userinfo.trees[0].tree.image[0] : userinfo.user.profile_image[0]} />
                     </Grid>
                     <Grid item xs={6} md={3} className={classes.infobox}>
                         <div className={classes.info}>
