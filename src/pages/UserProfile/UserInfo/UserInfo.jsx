@@ -28,8 +28,6 @@ export const UserInfo = () => {
     }
 
     const treeDoneWidth = (userinfo.trees.length / 14) * 100;
-    // const numEvent = userinfo.user
-    console.log(userinfo)
 
     if(open) {
         return (
