@@ -1,5 +1,3 @@
-import { useState } from "react"
-
 import { AppBar } from "../../stories/AppBar/AppBar";
 import { InputBar } from "./InputBar/InputBar";
 import { UserList } from "../../stories/UserList/UserList";
@@ -15,27 +13,27 @@ import 'react-toastify/dist/ReactToastify.css';
 export const Search = () => {
     const classes = UseStyle();
     let results = useRecoilValue(searchResults);
-    let [type, setType] = useState("All");
+    let type = "All";
 
-    let intialChipState = {
-        "All": "secondary",
-        "Individual": "secondary",
-        "Tree": "secondary",
-        "Event": "secondary",
-        "Organization": "secondary"
-    }
-    let [searchChips, setSearchChips] = useState(intialChipState);
+    // let intialChipState = {
+    //     "All": "secondary",
+    //     "Individual": "secondary",
+    //     "Tree": "secondary",
+    //     "Event": "secondary",
+    //     "Organization": "secondary"
+    // }
+    // let [searchChips, setSearchChips] = useState(intialChipState);
     let key = useRecoilValue(searchKey);
-    let [selectedChips, setSelectedChips] = useState("All")
+    let selectedChips = "All";
 
-    const onChipSelect = (value) => {
-        setSearchChips(prevState => ({
-            ...intialChipState,
-            [value]: "primary"
-        }));
+    // const onChipSelect = (value) => {
+    //     setSearchChips(prevState => ({
+    //         ...intialChipState,
+    //         [value]: "primary"
+    //     }));
 
-        setSelectedChips(value);
-    }
+    //     setSelectedChips(value);
+    // }
 
     // const fetchAndRedirect = ()
 

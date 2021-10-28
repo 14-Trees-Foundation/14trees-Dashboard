@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 
 import { createStyles, makeStyles } from '@mui/styles';
 import { Field, Form } from "react-final-form";
@@ -13,6 +13,7 @@ import { Paper, Typography, Avatar } from '@mui/material';
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import CardMedia from '@mui/material/CardMedia';
+import CardActions from '@mui/material/CardActions';
 import DesktopDatePicker from '@mui/lab/DesktopDatePicker';
 import AdapterDateFns from '@mui/lab/AdapterDateFns';
 import LocalizationProvider from '@mui/lab/LocalizationProvider';
@@ -135,6 +136,11 @@ export const Visitor = () => {
     }
 
     const formSubmit = async (formValues) => {
+        setValues({
+            ...values,
+            loading: true,
+            backdropOpen: true
+        })
         const formData = new FormData()
         const date = moment(formValues.dob).format('YYYY-MM-DD')
         formData.append('name', formValues.name)
@@ -163,11 +169,6 @@ export const Visitor = () => {
 
         formData.append('userimages', userImages);
         formData.append('memoryimages', extraImages);
-        setValues({
-            ...values,
-            loading: true,
-            backdropOpen: true
-        })
         try {
             let res = await Axios.post('/profile/usertreereg', formData, {
                 headers: {
@@ -225,6 +226,16 @@ export const Visitor = () => {
                                         image={tree}
                                         title="tree"
                                     />
+                                    <CardActions>
+                                        <Button
+                                            style={{marginLeft : 'auto', marginRight: 'auto'}}
+                                            size='large'
+                                            variant="contained"
+                                            color='secondary'
+                                            onClick={() => {setValues(intitialFValues)}}>
+                                            Add more Visitor
+                                        </Button>
+                                    </CardActions>
                                 </CardContent>
                             </Card>
                         </div>
@@ -359,16 +370,6 @@ export const Visitor = () => {
                                                             />
                                                             )}
                                                     </Field>
-                                                    {/* <Field name="org">
-                                                        {({ input, meta }) => (
-                                                            <TextField
-                                                                variant='outlined'
-                                                                label='Organization'
-                                                                name='org'
-                                                                {...input}
-                                                            />
-                                                            )}
-                                                    </Field> */}
                                                     <Autocomplete
                                                         id="treetype"
                                                         options={org}

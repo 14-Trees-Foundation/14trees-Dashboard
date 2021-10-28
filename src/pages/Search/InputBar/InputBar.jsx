@@ -1,16 +1,13 @@
-import { useState } from "react";
 import api from "../../../api/local";
 import { SearchBar } from "../../../stories/SearchBar/SearchBar";
 import { useSetRecoilState, useRecoilState } from 'recoil';
 import { searchResults, searchKey, searchError } from '../../../store/atoms';
-import local from "../../../api/local";
 
 export const InputBar = ({ type }) => {
 
     let [key, setKey] = useRecoilState(searchKey);
-    let [localkey, setLocalKey] = useState("");
-    let [searchSize, setSearchSize] = useState(10);
-    let [currPage, setCurrPage] = useState(1);
+    let searchSize = 10;
+    let currPage = 1;
     const setSearchResult = useSetRecoilState(searchResults);
     const setSearchError = useSetRecoilState(searchError);
 

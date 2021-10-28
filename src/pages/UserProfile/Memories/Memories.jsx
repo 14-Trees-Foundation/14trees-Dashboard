@@ -3,7 +3,6 @@ import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
 import useMediaQuery from '@mui/material/useMediaQuery';
 
-import { Chip } from "../../../stories/Chip/Chip";
 import { Popup } from "../../../stories/Popup/Popup";
 
 import { useRecoilValue, useRecoilState } from 'recoil';
