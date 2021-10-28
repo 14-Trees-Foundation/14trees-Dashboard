@@ -140,6 +140,13 @@ export const AddTree = () => {
                         uploaded: false,
                     })
                     toast.error(error.response.data.error)
+                } else if (error.response.status === 409) {
+                    setValues({
+                        ...values,
+                        loading: false,
+                        uploaded: false,
+                    })
+                    toast.error(error.response.data.error)
                 }
             }
         }
