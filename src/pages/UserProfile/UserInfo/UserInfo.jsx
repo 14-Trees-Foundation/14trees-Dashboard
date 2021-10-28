@@ -204,8 +204,8 @@ const useStyles = makeStyles((theme) =>
             objectFit: 'cover',
             padding: '2%',
             width: 'auto',
-            marginTop: '6%',
-            marginLeft: '28%',
+            marginTop: theme.spacing(3),
+            marginLeft: theme.spacing(3),
             [theme.breakpoints.between('481', '1024')]: {
                 width: 'auto',
                 marginTop: '2%',
