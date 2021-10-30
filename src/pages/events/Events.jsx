@@ -1,4 +1,4 @@
-import React, { Fragment } from 'react';
+import React, { Fragment, useState } from 'react';
 
 import { createStyles, makeStyles } from '@mui/styles';
 import Grid from '@mui/material/Grid';
@@ -11,17 +11,57 @@ import logos from '../../assets/logos.png';
 import item1 from '../../assets/item1.png';
 import item2 from '../../assets/item2.png';
 import vector1 from '../../assets/vector1.png';
+import vector2 from '../../assets/treevector.png';
 import gatimg from '../../assets/gaticon.png';
+import treeicon from '../../assets/treeicon.png';
+import footicon from "../../assets/footicon.png";
+import footericon from "../../assets/footericon.png";
 import 'react-gallery-carousel/dist/index.css';
 
 import { Divider } from '@mui/material';
+import { Chip } from '../../stories/Chip/Chip'
 
 const images = [1,2,3,4,5,6,7,8,9].map((number) => ({
     src: `https://14treesplants.s3.ap-south-1.amazonaws.com/memories/kpit${number}.jpeg`
 }));
 
+const treeimages = [
+    "https://14treesplants.s3.ap-south-1.amazonaws.com/trees/rn_image_picker_lib_temp_07d6effc-6d4a-4480-9d75-e1d29780e894.jpg",
+    "https://14treesplants.s3.ap-south-1.amazonaws.com/trees/rn_image_picker_lib_temp_efb3533f-92b6-4219-a7f4-463e49fd2db7.jpg",
+    "https://14treesplants.s3.ap-south-1.amazonaws.com/trees/rn_image_picker_lib_temp_fec3b15a-62ab-49ef-8e86-cef80cef02c2.jpg",
+    "https://14treesplants.s3.ap-south-1.amazonaws.com/trees/rn_image_picker_lib_temp_ee6f6b8a-126a-4e82-bc8e-906e4aefc3a4.jpg",
+    "https://14treesplants.s3.ap-south-1.amazonaws.com/trees/rn_image_picker_lib_temp_712bbd26-de42-4d4d-b580-70f438aa13db.jpg",
+    "https://14treesplants.s3.ap-south-1.amazonaws.com/trees/rn_image_picker_lib_temp_d8f1b606-ae21-4de8-8adf-55cd3d23534e.jpg",
+    "https://14treesplants.s3.ap-south-1.amazonaws.com/trees/rn_image_picker_lib_temp_0bf4687d-b54b-4c06-9dbb-6c244a85e27b.jpg",
+    "https://14treesplants.s3.ap-south-1.amazonaws.com/trees/rn_image_picker_lib_temp_b730a046-a838-4243-a4c5-7ffb4590d165.jpg",
+    "https://14treesplants.s3.ap-south-1.amazonaws.com/trees/rn_image_picker_lib_temp_dde63c15-dc36-471f-bda9-a1300189c2c5.jpg",
+    "https://14treesplants.s3.ap-south-1.amazonaws.com/trees/rn_image_picker_lib_temp_245135e1-971e-4551-8b84-ffa30d6a038c.jpg",
+    "https://14treesplants.s3.ap-south-1.amazonaws.com/trees/rn_image_picker_lib_temp_157c6708-6ba4-4a97-bc70-5f60a88891f5.jpg",
+    "https://14treesplants.s3.ap-south-1.amazonaws.com/trees/rn_image_picker_lib_temp_78e638ae-aeda-4380-b14e-a5d0da4e9af5.jpg",
+    "https://14treesplants.s3.ap-south-1.amazonaws.com/trees/rn_image_picker_lib_temp_7f433a08-d260-432c-bf60-9cd12db33f18.jpg",
+    "https://14treesplants.s3.ap-south-1.amazonaws.com/trees/rn_image_picker_lib_temp_1622ed99-9eb8-48fc-b22a-68bad2470810.jpg",
+    "https://14treesplants.s3.ap-south-1.amazonaws.com/trees/rn_image_picker_lib_temp_dfa2714c-45a1-4741-b3cb-9c956ef8c14e.jpg",
+    "https://14treesplants.s3.ap-south-1.amazonaws.com/trees/rn_image_picker_lib_temp_0406cd0e-95d6-4edb-a997-13de3e980f36.jpg",
+    "https://14treesplants.s3.ap-south-1.amazonaws.com/trees/rn_image_picker_lib_temp_ed35e6b1-c129-43ac-af3b-9ed1f936a3de.jpg",
+    "https://14treesplants.s3.ap-south-1.amazonaws.com/trees/rn_image_picker_lib_temp_f9278d0f-af15-454e-b7c4-f9375e6cb826.jpg",
+    "https://14treesplants.s3.ap-south-1.amazonaws.com/trees/rn_image_picker_lib_temp_1c9d4a0d-f267-4452-b1da-b49e33c78036.jpg",
+    "https://14treesplants.s3.ap-south-1.amazonaws.com/trees/rn_image_picker_lib_temp_24fa5f0a-4aec-4114-acbf-6bde2547368b.jpg",
+
+]
+
 export const Events = () => {
-    console.log(images)
+    const [showMore, setShowMore] = useState(true);
+    const [treeList,setTreeList] = useState(treeimages.slice(0, 8));
+    const [index,setIndex] = useState(8);
+
+    const loadMore = () =>{
+        const newIndex = index + 8;
+        const newShowMore = newIndex < 19;
+        const newList = treeimages.slice(0, newIndex);
+        setIndex(newIndex);
+        setTreeList(newList);
+        setShowMore(newShowMore);
+    }
 
     const classes = useStyles();
     return (
@@ -101,10 +141,52 @@ export const Events = () => {
                         style={{position: 'relative', top: '-100px' ,height: '400px', background: 'linear-gradient(360deg, rgba(233, 234, 231, 0) 0%, #E5E5E7 58.96%)', zIndex:"-1"}}
                     ></div>
                     <img src="https://14treesplants.s3.ap-south-1.amazonaws.com/gat/gat_703.jpg"
-                        style={{top: '-500px', zIndex: '-2', width: '100%', position: 'relative', height: '100%'}} alt=""/>
+                        style={{top: '-500px', zIndex: '-2', width: '100%', position: 'relative', height: '100%', objectFit: 'cover'}} alt=""/>
                     <div
                         style={{top: '-900px' ,position: 'relative',height: '400px',transform: 'rotate(180deg)', background: 'linear-gradient(360deg, rgba(150, 120, 95, 0) 0%, #1F3625 85.27%)', zIndex: '4', marginBottom: '-550px'}}
                     >
+                    </div>
+                </div>
+                <div className={classes.trees}>
+                    <div style={{width: '130px', marginLeft: 'auto', marginRight: 'auto'}}>
+                        <img src={treeicon} alt="tree" className={classes.treeicon}/>
+                    </div>
+                    <div className={classes.treedesc}>
+                        The Trees Planted
+                    </div>
+                    <div style={{width: '80%', marginLeft: 'auto', marginRight: 'auto'}}>
+                        <Grid container spacing={3}>
+                            {
+                                treeList.map((image, idx) => {
+                                    return (
+                                        <Grid item xs={6} md={3}>
+                                            <img src={image} alt="" className={classes.treeimg}/>
+                                        </Grid>
+                                    )
+                                })
+                            }
+                        </Grid>
+                        {
+                            showMore && 
+                            (
+                                <div style={{padding: '24px', textAlign: 'center'}}>
+                                    <Chip label={"See More"} mode={'primary'} size={'large'} handleClick={()=>loadMore()}/>
+                                </div>
+                            )
+                        }
+                    </div>
+                </div>
+                <img src={vector2} alt="" style={{height: '100px',width: '100%'}}/>
+                <div className={classes.footer}>
+                    <div style={{width: '150px', marginLeft: 'auto', marginRight: 'auto'}}>
+                        <img src={footicon} alt="" style={{height: '120px'}}/>
+                    </div>
+                    <div className={classes.footthanks}>
+                        We thank you for your contribution!
+                    </div>
+                    <div style={{display: 'flex'}}>
+                        <img src={footericon} alt="" style={{height: '180px', width: '50%'}}/>
+                        <img src={footericon} alt="" style={{height: '180px', width: '50%'}}/>
                     </div>
                 </div>
             </div>
@@ -230,6 +312,48 @@ const useStyles = makeStyles((theme) =>
             marginLeft: 'auto',
             marginRight: 'auto',
             marginTop: '20px'
+        },
+        trees:{
+            backgroundColor: '#1F3625',
+            width: '100%',
+            marginTop: '-100px'
+        },
+        treeicon: {
+            height: '120px',
+            width: '120px',
+            marginTop: '10px'
+        },
+        treedesc: {
+            fontSize: '40px',
+            fontWeight: '500',
+            textAlign: 'center',
+            color: '#ffffff',
+            width: '50%',
+            marginLeft: 'auto',
+            marginRight: 'auto',
+            marginTop: '20px',
+            paddingBottom: '50px'
+        },
+        treeimg: {
+            width: '100%',
+            maxHeight: '300px',
+            objectFit: 'cover',
+            borderRadius: '12px'
+        },
+        footer: {
+            backgroundColor: '#e5e5e5',
+            marginTop: '-80px',
+            paddingTop: '80px'
+        },
+        footthanks: {
+            width: '80%',
+            color: '#1F3625',
+            fontSize: '24px',
+            fontWeight: '24px',
+            marginLeft: 'auto',
+            marginRight: 'auto',
+            textAlign: 'center',
+            padding: '24px'
         }
     })
 )
