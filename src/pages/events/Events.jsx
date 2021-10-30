@@ -26,26 +26,26 @@ const images = [1,2,3,4,5,6,7,8,9].map((number) => ({
 }));
 
 const treeimages = [
-    "https://14treesplants.s3.ap-south-1.amazonaws.com/trees/rn_image_picker_lib_temp_07d6effc-6d4a-4480-9d75-e1d29780e894.jpg",
-    "https://14treesplants.s3.ap-south-1.amazonaws.com/trees/rn_image_picker_lib_temp_efb3533f-92b6-4219-a7f4-463e49fd2db7.jpg",
-    "https://14treesplants.s3.ap-south-1.amazonaws.com/trees/rn_image_picker_lib_temp_fec3b15a-62ab-49ef-8e86-cef80cef02c2.jpg",
-    "https://14treesplants.s3.ap-south-1.amazonaws.com/trees/rn_image_picker_lib_temp_ee6f6b8a-126a-4e82-bc8e-906e4aefc3a4.jpg",
-    "https://14treesplants.s3.ap-south-1.amazonaws.com/trees/rn_image_picker_lib_temp_712bbd26-de42-4d4d-b580-70f438aa13db.jpg",
-    "https://14treesplants.s3.ap-south-1.amazonaws.com/trees/rn_image_picker_lib_temp_d8f1b606-ae21-4de8-8adf-55cd3d23534e.jpg",
-    "https://14treesplants.s3.ap-south-1.amazonaws.com/trees/rn_image_picker_lib_temp_0bf4687d-b54b-4c06-9dbb-6c244a85e27b.jpg",
-    "https://14treesplants.s3.ap-south-1.amazonaws.com/trees/rn_image_picker_lib_temp_b730a046-a838-4243-a4c5-7ffb4590d165.jpg",
-    "https://14treesplants.s3.ap-south-1.amazonaws.com/trees/rn_image_picker_lib_temp_dde63c15-dc36-471f-bda9-a1300189c2c5.jpg",
-    "https://14treesplants.s3.ap-south-1.amazonaws.com/trees/rn_image_picker_lib_temp_245135e1-971e-4551-8b84-ffa30d6a038c.jpg",
-    "https://14treesplants.s3.ap-south-1.amazonaws.com/trees/rn_image_picker_lib_temp_157c6708-6ba4-4a97-bc70-5f60a88891f5.jpg",
-    "https://14treesplants.s3.ap-south-1.amazonaws.com/trees/rn_image_picker_lib_temp_78e638ae-aeda-4380-b14e-a5d0da4e9af5.jpg",
-    "https://14treesplants.s3.ap-south-1.amazonaws.com/trees/rn_image_picker_lib_temp_7f433a08-d260-432c-bf60-9cd12db33f18.jpg",
-    "https://14treesplants.s3.ap-south-1.amazonaws.com/trees/rn_image_picker_lib_temp_1622ed99-9eb8-48fc-b22a-68bad2470810.jpg",
-    "https://14treesplants.s3.ap-south-1.amazonaws.com/trees/rn_image_picker_lib_temp_dfa2714c-45a1-4741-b3cb-9c956ef8c14e.jpg",
-    "https://14treesplants.s3.ap-south-1.amazonaws.com/trees/rn_image_picker_lib_temp_0406cd0e-95d6-4edb-a997-13de3e980f36.jpg",
-    "https://14treesplants.s3.ap-south-1.amazonaws.com/trees/rn_image_picker_lib_temp_ed35e6b1-c129-43ac-af3b-9ed1f936a3de.jpg",
-    "https://14treesplants.s3.ap-south-1.amazonaws.com/trees/rn_image_picker_lib_temp_f9278d0f-af15-454e-b7c4-f9375e6cb826.jpg",
-    "https://14treesplants.s3.ap-south-1.amazonaws.com/trees/rn_image_picker_lib_temp_1c9d4a0d-f267-4452-b1da-b49e33c78036.jpg",
-    "https://14treesplants.s3.ap-south-1.amazonaws.com/trees/rn_image_picker_lib_temp_24fa5f0a-4aec-4114-acbf-6bde2547368b.jpg",
+    {img:"https://14treesplants.s3.ap-south-1.amazonaws.com/trees/rn_image_picker_lib_temp_07d6effc-6d4a-4480-9d75-e1d29780e894.jpg",name:'Bahava', id: "34048"},
+    {img:"https://14treesplants.s3.ap-south-1.amazonaws.com/trees/rn_image_picker_lib_temp_efb3533f-92b6-4219-a7f4-463e49fd2db7.jpg",name:'Bahava', id: "34050"},
+    {img:"https://14treesplants.s3.ap-south-1.amazonaws.com/trees/rn_image_picker_lib_temp_fec3b15a-62ab-49ef-8e86-cef80cef02c2.jpg",name:'Bahava', id: "34051"},
+    {img:"https://14treesplants.s3.ap-south-1.amazonaws.com/trees/rn_image_picker_lib_temp_ee6f6b8a-126a-4e82-bc8e-906e4aefc3a4.jpg",name:'Bahava', id: "34053"},
+    {img:"https://14treesplants.s3.ap-south-1.amazonaws.com/trees/rn_image_picker_lib_temp_712bbd26-de42-4d4d-b580-70f438aa13db.jpg",name:'Bahava', id: "34052"},
+    {img:"https://14treesplants.s3.ap-south-1.amazonaws.com/trees/rn_image_picker_lib_temp_d8f1b606-ae21-4de8-8adf-55cd3d23534e.jpg",name:'Bahava', id: "34049"},
+    {img:"https://14treesplants.s3.ap-south-1.amazonaws.com/trees/rn_image_picker_lib_temp_0bf4687d-b54b-4c06-9dbb-6c244a85e27b.jpg",name:'Bahava', id: "34055"},
+    {img:"https://14treesplants.s3.ap-south-1.amazonaws.com/trees/rn_image_picker_lib_temp_b730a046-a838-4243-a4c5-7ffb4590d165.jpg",name:'Bahava', id: "34056"},
+    {img:"https://14treesplants.s3.ap-south-1.amazonaws.com/trees/rn_image_picker_lib_temp_dde63c15-dc36-471f-bda9-a1300189c2c5.jpg",name:'Bahava', id: "34057"},
+    {img:"https://14treesplants.s3.ap-south-1.amazonaws.com/trees/rn_image_picker_lib_temp_245135e1-971e-4551-8b84-ffa30d6a038c.jpg",name:'Bahava', id: "34058"},
+    {img:"https://14treesplants.s3.ap-south-1.amazonaws.com/trees/rn_image_picker_lib_temp_157c6708-6ba4-4a97-bc70-5f60a88891f5.jpg",name:'Bahava', id: "34054"},
+    {img:"https://14treesplants.s3.ap-south-1.amazonaws.com/trees/rn_image_picker_lib_temp_78e638ae-aeda-4380-b14e-a5d0da4e9af5.jpg",name:'Bahava', id: "34063"},
+    {img:"https://14treesplants.s3.ap-south-1.amazonaws.com/trees/rn_image_picker_lib_temp_7f433a08-d260-432c-bf60-9cd12db33f18.jpg",name:'Bahava', id: "34065"},
+    {img:"https://14treesplants.s3.ap-south-1.amazonaws.com/trees/rn_image_picker_lib_temp_1622ed99-9eb8-48fc-b22a-68bad2470810.jpg",name:'Bahava', id: "34066"},
+    {img:"https://14treesplants.s3.ap-south-1.amazonaws.com/trees/rn_image_picker_lib_temp_dfa2714c-45a1-4741-b3cb-9c956ef8c14e.jpg",name:'Bahava', id: "34064"},
+    {img:"https://14treesplants.s3.ap-south-1.amazonaws.com/trees/rn_image_picker_lib_temp_0406cd0e-95d6-4edb-a997-13de3e980f36.jpg",name:'Bahava', id: "34059"},
+    {img:"https://14treesplants.s3.ap-south-1.amazonaws.com/trees/rn_image_picker_lib_temp_ed35e6b1-c129-43ac-af3b-9ed1f936a3de.jpg",name:'Bahava', id: "34061"},
+    {img:"https://14treesplants.s3.ap-south-1.amazonaws.com/trees/rn_image_picker_lib_temp_f9278d0f-af15-454e-b7c4-f9375e6cb826.jpg",name:'Bahava', id: "34060"},
+    {img:"https://14treesplants.s3.ap-south-1.amazonaws.com/trees/rn_image_picker_lib_temp_1c9d4a0d-f267-4452-b1da-b49e33c78036.jpg",name:'Bahava', id: "34062"},
+    {img:"https://14treesplants.s3.ap-south-1.amazonaws.com/trees/rn_image_picker_lib_temp_24fa5f0a-4aec-4114-acbf-6bde2547368b.jpg",name:'Bahava', id: "34067"},
 
 ]
 
@@ -63,6 +63,12 @@ export const Events = () => {
         setShowMore(newShowMore);
     }
 
+    const collapse = () => {
+        setIndex(8);
+        setTreeList(treeimages.slice(0, 8));
+        setShowMore(true);
+    }
+
     const classes = useStyles();
     return (
         <Fragment>
@@ -78,7 +84,7 @@ export const Events = () => {
                                 <p className={classes.maintxt}>
                                     Celebrating 20 years of reimagining mobility together
                                 </p>
-                                <Divider style={{background: '#ffffff'}}/>
+                                <Divider style={{background: '#ffffff', width: '85%'}}/>
                                 <div className={classes.detail}>
                                     <div style={{marginBottom: '5px'}}>Event name: <b>KPIT-DENSO</b></div>
                                     <div style={{marginBottom: '20px'}}>Organized On: <b>28th of oct, 2021</b></div>
@@ -125,7 +131,7 @@ export const Events = () => {
                     -14 Trees Foundation.
                     </div>
                     <div className={classes.gatinfo}>
-                        <div style={{width: '90px', marginLeft: 'auto', marginRight: 'auto'}}>
+                        <div style={{width: '130px', marginLeft: 'auto', marginRight: 'auto'}}>
                             <img src={gatimg} alt="gat" className={classes.gatimg}/>
                         </div>
                         <div className={classes.gatheader}>
@@ -157,10 +163,12 @@ export const Events = () => {
                     <div style={{width: '80%', marginLeft: 'auto', marginRight: 'auto'}}>
                         <Grid container spacing={3}>
                             {
-                                treeList.map((image, idx) => {
+                                treeList.map((tree, idx) => {
                                     return (
                                         <Grid item xs={6} md={3}>
-                                            <img src={image} alt="" className={classes.treeimg}/>
+                                            <img src={tree.img} alt="" className={classes.treeimg}/>
+                                            <div style={{padding: '5px', fontWeight:'400', fontSize: '13px', color:'#ffffff'}}>Tree Name: {tree.name}</div>
+                                            <div style={{padding: '5px', fontWeight:'400', fontSize: '13px', color:'#ffffff'}}>Tree ID: {tree.id}</div>
                                         </Grid>
                                     )
                                 })
@@ -174,6 +182,12 @@ export const Events = () => {
                                 </div>
                             )
                         }
+                        {
+                            !showMore &&
+                            <div style={{padding: '24px', textAlign: 'center'}}>
+                                <Chip label={"Collapse"} mode={'primary'} size={'large'} handleClick={()=>collapse()}/>
+                            </div>
+                        }
                     </div>
                 </div>
                 <img src={vector2} alt="" style={{height: '100px',width: '100%'}}/>
@@ -185,8 +199,7 @@ export const Events = () => {
                         We thank you for your contribution!
                     </div>
                     <div style={{display: 'flex'}}>
-                        <img src={footericon} alt="" style={{height: '180px', width: '50%'}}/>
-                        <img src={footericon} alt="" style={{height: '180px', width: '50%'}}/>
+                        <img src={footericon} alt="" style={{height: '400px', width: '100%', objectFit:'cover'}}/>
                     </div>
                 </div>
             </div>
@@ -204,7 +217,7 @@ const useStyles = makeStyles((theme) =>
             padding: theme.spacing(15),
             backgroundColor: '#846C5B',
             paddingTop: theme.spacing(4),
-            minHeight: '100%',
+            height: 'calc(100vh - 200px)',
             maxWidth: '100vw',
             marginLeft: "auto",
             marginRight: 'auto',
@@ -276,8 +289,10 @@ const useStyles = makeStyles((theme) =>
             color: '#846C5B',
             fontSize: '45px',
             lineHeight: '60px',
-            fontWeight: 'bold',
+            fontWeight: '500',
             width: '50%',
+            marginLeft: 'auto', marginRight: 'auto',
+            textAlign: 'center'
         },
         imageC:{
             marginTop: '40px', height: '75vh', width: '80%', marginLeft: 'auto', marginRight: 'auto'
@@ -296,8 +311,8 @@ const useStyles = makeStyles((theme) =>
             zIndex: '4',
         },
         gatimg: {
-            height: '100px',
-            width: '100px'
+            height: '120px',
+            width: '120px',
         },
         gatheader: {
             marginTop: '20px', width: '80%', marginLeft: 'auto', marginRight: 'auto',
@@ -338,7 +353,7 @@ const useStyles = makeStyles((theme) =>
             width: '100%',
             maxHeight: '300px',
             objectFit: 'cover',
-            borderRadius: '12px'
+            borderRadius: '5px'
         },
         footer: {
             backgroundColor: '#e5e5e5',
