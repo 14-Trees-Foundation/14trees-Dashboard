@@ -115,7 +115,7 @@ export const Events = () => {
                         </Grid>
                     </Box>
                 </div>
-                <img style={{width: '100%', height: '50px'}} src={vector1} alt="vector1"/>
+                <img className={classes.topvector} src={vector1} alt="vector1"/>
                 <div className={classes.general}>
                     <div className={classes.msgTitle}>
                         Some message about the event from 14trees
@@ -147,7 +147,7 @@ export const Events = () => {
                         style={{position: 'relative', top: '-100px' ,height: '400px', background: 'linear-gradient(360deg, rgba(233, 234, 231, 0) 0%, #E5E5E7 58.96%)', zIndex:"-1"}}
                     ></div>
                     <img src="https://14treesplants.s3.ap-south-1.amazonaws.com/gat/gat_703.jpg"
-                        style={{top: '-500px', zIndex: '-2', width: '100%', position: 'relative', height: '100%', objectFit: 'cover'}} alt=""/>
+                        className={classes.plotimg} alt=""/>
                     <div
                         style={{top: '-900px' ,position: 'relative',height: '400px',transform: 'rotate(180deg)', background: 'linear-gradient(360deg, rgba(150, 120, 95, 0) 0%, #1F3625 85.27%)', zIndex: '4', marginBottom: '-550px'}}
                     >
@@ -160,7 +160,7 @@ export const Events = () => {
                     <div className={classes.treedesc}>
                         The Trees Planted
                     </div>
-                    <div style={{width: '80%', marginLeft: 'auto', marginRight: 'auto'}}>
+                    <div className={classes.treeimgcontainer}>
                         <Grid container spacing={3}>
                             {
                                 treeList.map((tree, idx) => {
@@ -190,7 +190,7 @@ export const Events = () => {
                         }
                     </div>
                 </div>
-                <img src={vector2} alt="" style={{height: '100px',width: '100%'}}/>
+                <img src={vector2} alt="" className={classes.treefootvector}/>
                 <div className={classes.footer}>
                     <div style={{width: '150px', marginLeft: 'auto', marginRight: 'auto'}}>
                         <img src={footicon} alt="" style={{height: '120px'}}/>
@@ -198,9 +198,7 @@ export const Events = () => {
                     <div className={classes.footthanks}>
                         We thank you for your contribution!
                     </div>
-                    <div style={{display: 'flex'}}>
-                        <img src={footericon} alt="" style={{height: '400px', width: '100%', objectFit:'cover'}}/>
-                    </div>
+                    <img src={footericon} alt="" className={classes.footericon}/>
                 </div>
             </div>
         </Fragment>
@@ -223,6 +221,7 @@ const useStyles = makeStyles((theme) =>
             marginRight: 'auto',
             [theme.breakpoints.down('480')]: {
                 padding: theme.spacing(3),
+                height: 'calc(100vh * 1.3)',
             },
         },
         item2: {
@@ -230,7 +229,12 @@ const useStyles = makeStyles((theme) =>
             zIndex: '1',
             width: '130px',
             height: '80px',
-            left: '-40px'
+            left: '-40px',
+            [theme.breakpoints.down('480')]: {
+                width: '100px',
+                height: '80px',
+                left: '-20px',
+            },
         },
         item1: {
             position: 'absolute',
@@ -238,7 +242,11 @@ const useStyles = makeStyles((theme) =>
             width: '80px',
             height: '80px',
             left:'90%',
-            top: '58vh'
+            top: '58vh',
+            [theme.breakpoints.down('480')]: {
+                left:'80%',
+                top: '35vh'
+            },
         },
         headerimg:{
             position: 'absolute',
@@ -263,6 +271,10 @@ const useStyles = makeStyles((theme) =>
             lineHeight: '60px',
             color: '#ffffff',
             fontWeight: 'bold',
+            [theme.breakpoints.down('480')]: {
+                fontSize: '35px',
+                lineHeight: '50px',
+            },
         },
         detail: {
             color: '#ffffff',
@@ -277,12 +289,19 @@ const useStyles = makeStyles((theme) =>
         numDetail: {
             fontSize: '13px', width: '60px', color: '#ffffff', fontWeight: '400', padding: theme.spacing(1)
         },
+        topvector: {
+            width: '100%', height: '50px',
+            [theme.breakpoints.down('480')]: {
+                height: '15px',
+            },
+        },
         general: {
             backgroundColor: '#e5e5e5',
             marginTop: '-30px',
             padding: theme.spacing(15),
             [theme.breakpoints.down('480')]: {
-                padding: theme.spacing(3),
+                padding: theme.spacing(1),
+                marginTop: '-10px',
             },
         },
         msgTitle: {
@@ -292,10 +311,20 @@ const useStyles = makeStyles((theme) =>
             fontWeight: '500',
             width: '50%',
             marginLeft: 'auto', marginRight: 'auto',
-            textAlign: 'center'
+            textAlign: 'center',
+            [theme.breakpoints.down('480')]: {
+                width: '85%',
+                fontSize: '35px',
+                lineHeight: '45px',
+                marginTop: '20px'
+            },
         },
         imageC:{
-            marginTop: '40px', height: '75vh', width: '80%', marginLeft: 'auto', marginRight: 'auto'
+            marginTop: '40px', height: '75vh', width: '80%', marginLeft: 'auto', marginRight: 'auto',
+            [theme.breakpoints.down('480')]: {
+                width: '100%',
+                height: '45vh',
+            },
         },
         msg: {
             fontSize: '16px',
@@ -309,6 +338,15 @@ const useStyles = makeStyles((theme) =>
             marginTop: '80px',
             width: '100%',
             zIndex: '4',
+            [theme.breakpoints.down('480')]: {
+                marginTop: '40px',
+            },
+        },
+        plotimg: {
+            top: '-500px', zIndex: '-2', width: '100%', position: 'relative', height: '100%', objectFit: 'cover',
+            [theme.breakpoints.down('480')]: {
+                height: '80%',
+            },
         },
         gatimg: {
             height: '120px',
@@ -316,7 +354,12 @@ const useStyles = makeStyles((theme) =>
         },
         gatheader: {
             marginTop: '20px', width: '80%', marginLeft: 'auto', marginRight: 'auto',
-            fontSize: '40px', textAlign: 'center', color:'#846C5B', fontWeight: '550'
+            fontSize: '40px', textAlign: 'center', color:'#846C5B', fontWeight: '550',
+            [theme.breakpoints.down('480')]: {
+                fontSize: '25px',
+                width: '100%',
+                marginTop: '5px'
+            },
         },
         gatdesc: {
             fontSize: '16px',
@@ -326,17 +369,28 @@ const useStyles = makeStyles((theme) =>
             width: '50%',
             marginLeft: 'auto',
             marginRight: 'auto',
-            marginTop: '20px'
+            marginTop: '20px',
+            [theme.breakpoints.down('480')]: {
+                width: '100%',
+            },
         },
         trees:{
             backgroundColor: '#1F3625',
             width: '100%',
-            marginTop: '-100px'
+            marginTop: '-100px',
+            [theme.breakpoints.down('480')]: {
+                marginTop: '-280px',
+            },
         },
         treeicon: {
             height: '120px',
             width: '120px',
-            marginTop: '10px'
+            marginTop: '10px',
+            [theme.breakpoints.down('480')]: {
+                height: '85px',
+                width: '85px',
+                marginLeft: '20px'
+            },
         },
         treedesc: {
             fontSize: '40px',
@@ -347,18 +401,40 @@ const useStyles = makeStyles((theme) =>
             marginLeft: 'auto',
             marginRight: 'auto',
             marginTop: '20px',
-            paddingBottom: '50px'
+            paddingBottom: '50px',
+            [theme.breakpoints.down('480')]: {
+                fontSize: '25px',
+                width: '80%',
+            },
+        },
+        treeimgcontainer: {
+            width: '80%', marginLeft: 'auto', marginRight: 'auto',
+            [theme.breakpoints.down('480')]: {
+                width: '90%',
+            },
         },
         treeimg: {
             width: '100%',
             maxHeight: '300px',
             objectFit: 'cover',
-            borderRadius: '5px'
+            borderRadius: '5px',
+            [theme.breakpoints.down('480')]: {
+                maxHeight: '180px',
+            },
+        },
+        treefootvector: {
+            height: '100px',width: '100%',
+            [theme.breakpoints.down('480')]: {
+                height: '50px'
+            },
         },
         footer: {
             backgroundColor: '#e5e5e5',
             marginTop: '-80px',
-            paddingTop: '80px'
+            paddingTop: '80px',
+            [theme.breakpoints.down('480')]: {
+                marginTop: '-50px',
+            },
         },
         footthanks: {
             width: '80%',
@@ -369,6 +445,12 @@ const useStyles = makeStyles((theme) =>
             marginRight: 'auto',
             textAlign: 'center',
             padding: '24px'
-        }
+        },
+        footericon: {
+            height: '400px', width: '100%', objectFit:'cover',
+            [theme.breakpoints.down('480')]: {
+                height: 'auto',
+            },
+        },
     })
 )
