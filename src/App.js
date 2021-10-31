@@ -17,7 +17,7 @@ function App() {
       <Route path="/addtree" component={AddTree} exact></Route>
       <Route path="/addorg" component={AddOrg} exact></Route>
       <Route path="/profile/:saplingId" component={Dashboard} exact></Route>
-      <Route path="/org/kpit-denso" component={Events} exact></Route>
+      <Route path="/events/kpit-denso" component={Events} exact></Route>
       <Route path='/home' component={() => {
         window.location.href = 'https://14trees.org/';
         return null;

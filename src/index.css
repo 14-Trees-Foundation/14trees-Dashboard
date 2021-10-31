@@ -1,9 +1,15 @@
+@font-face {
+  font-family: 'HelveticaNowDisplay';
+  src: local('HelveticaNowDisplay'), url(./fonts/HelveticaNowDisplay-Regular.ttf) format('truetype');
+}
+
 body {
-  font-family: Helvetica, Arial, sans-serif;
+  font-family: HelveticaNowDisplay;
   font-weight: 700;
   font-style: normal;
   font-stretch: normal;
   -webkit-font-smoothing: antialiased;
+  letter-spacing: 0.5px;
   min-height: 100%;
   font-size: 12px;
   margin: auto;

@@ -6,7 +6,6 @@ import Box from '@mui/material/Box';
 import Carousel from 'react-gallery-carousel';
 
 import { Appbar } from './Appbar';
-import headerimg from '../../assets/header.png';
 import logos from '../../assets/logos.png';
 import item1 from '../../assets/item1.png';
 import item2 from '../../assets/item2.png';
@@ -108,7 +107,7 @@ export const Events = () => {
                             <Grid item xs={12} md={7}>
                                 <div style={{position: 'relative'}}>
                                     <img className={classes.item2} src={item2} alt="item1" />
-                                    <img className={classes.headerimg} src={headerimg} alt="header logo"/>
+                                    <img className={classes.headerimg} src="https://14treesplants.s3.ap-south-1.amazonaws.com/events/denso_header-min.png" alt="header logo"/>
                                     <img className={classes.item1} src={item1} alt="item2" />
                                 </div>
                             </Grid>
@@ -124,8 +123,10 @@ export const Events = () => {
                         <Carousel hasMediaButton={false} hasIndexBoard={false} images={images}/>
                     </div>
                     <div className={classes.msg}>
-                    We are honoured to plant trees in memory of her. Here the letter will come. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque placerat risus neque, non lobortis felis gravida vel. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Quisque vitae bibendum metus. Integer rutrum sed tellus et luctus. Suspendisse vel lobortis augue. Ut sed dolor a ipsum mollis dictum. Nullam vestibulum dolor sed ultrices auctor. Nullam at tempor enim. Praesent ornare vel nulla eu bibendum. Cras ante ex, dignissim eu laoreet rutrum, imperdiet quis urna.
-                    Vivamus sed semper ex, id sodales velit. Suspendisse libero augue, cursus in sodales vitae, porta id tellus. Vestibulum porta fermentum sem, eget fringilla nisl pharetra nec. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque placerat risus neque, non lobortis felis gravida vel. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus.
+                    KPIT and DENSO are celebrating 20 years of their partnership on 9th November. KPIT with it's commitment to environment causes through it's CSR initiatives decided partner with 14 trees NGO to plant 20 trees at the 14 Trees site near Pune. 20 trees were planted one each dedicated to 1 year of DENSO-KPIT partnership. Mr Sanjivkumar Bajikar DENSO KPIT delivery manager and Mr. Tushar Juvekar head of CSR KPIT visited the 14 Trees site to plant the trees.14 Trees is committed to building sustainable, carbon-footprint-neutral eco-systems through re-forestation and has created lush forests from barren lands in over 100 acres in the village Vetale near Pune. 
+                    <br />
+                    <br />
+                    Apart from reforestation on acquired barren land 14 Trees also partners with local village governments, forest department, farmers, schools etc to plant trees on their land increasing awareness to combat the effects of environmental degradation and climate change as well as support projects on habitat restoration, ground water recharging, biodiversity experiments and also provide livelihood for local tribal villagers.
                     </div>
                     <div style={{fontSize: '15px', fontWeight: 'bold', marginTop: '16px', marginLeft: 'auto', marginRight: 'auto', width: '80%'}}>
                     -14 Trees Foundation.
@@ -185,7 +186,7 @@ export const Events = () => {
                         {
                             !showMore &&
                             <div style={{padding: '24px', textAlign: 'center'}}>
-                                <Chip label={"Collapse"} mode={'primary'} size={'large'} handleClick={()=>collapse()}/>
+                                <Chip label={"See less"} mode={'primary'} size={'large'} handleClick={()=>collapse()}/>
                             </div>
                         }
                     </div>

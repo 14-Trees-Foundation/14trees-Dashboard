@@ -65,8 +65,8 @@ const useStyles = makeStyles((theme) =>
     },
     chipprimary: {
       border: '1px solid #9bc53d',
-      backgroundColor: '#ffffff',
-      color: '#9bc53d',
+      backgroundColor: '#9bc53d',
+      color: '#ffffff',
     },
     chipsecondary: {
       border: '1px solid rgba(31, 54, 37, 0.1)',
