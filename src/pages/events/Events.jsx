@@ -139,8 +139,7 @@ export const Events = () => {
                             Site of Plantation : Gat 703
                         </div>
                         <div className={classes.gatdesc}>
-                        At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis praesentium voluptatum deleniti atque corrupti quos dolores et quas molestias excepturi sint occaecati cupiditate non provident, similique sunt in culpa qui officia deserunt mollitia animi, id est laborum et dolorum fuga. 
-                        </div>
+                        Gat 703 is a portion of a very large tract of completely barren land on a hilltop in village Vetale near Pune. We are attempting to reforest the land and restore damaged ecology. Slowly and steadily, we are .                        </div>
                     </div>
                 </div>
                 <div style={{height: '900px'}}>
