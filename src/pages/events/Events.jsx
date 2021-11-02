@@ -20,7 +20,7 @@ import 'react-gallery-carousel/dist/index.css';
 import { Divider } from '@mui/material';
 import { Chip } from '../../stories/Chip/Chip'
 
-const images = [1,2,3,4,5,6,7,8,9].map((number) => ({
+const images = [5,4,6,7,8,9,10,1,11,12].map((number) => ({
     src: `https://14treesplants.s3.ap-south-1.amazonaws.com/memories/kpit${number}.jpeg`
 }));
 
@@ -74,7 +74,7 @@ export const Events = () => {
             <div className={classes.main}>
                 <Appbar />
                 <div className={classes.header}>
-                    <Box sx={{ flexGrow: 1 }}>
+                    <Box >
                         <Grid container spacing={4}>
                             <Grid item xs={12} md={5}>
                                 <div className={classes.logos}>
@@ -123,11 +123,10 @@ export const Events = () => {
                         <Carousel hasMediaButton={false} hasIndexBoard={false} images={images}/>
                     </div>
                     <div className={classes.msg}>
-                    KPIT and DENSO are celebrating 20 years of their partnership on 9th November. KPIT with it's commitment to environment causes through it's CSR initiatives decided partner with 14 trees NGO to plant 20 trees at the 14 Trees site near Pune. 20 trees were planted one each dedicated to 1 year of DENSO-KPIT partnership. Mr Sanjivkumar Bajikar DENSO KPIT delivery manager and Mr. Tushar Juvekar head of CSR KPIT visited the 14 Trees site to plant the trees.14 Trees is committed to building sustainable, carbon-footprint-neutral eco-systems through re-forestation and has created lush forests from barren lands in over 100 acres in the village Vetale near Pune. 
+                    KPIT and DENSO are celebrating 20 years of their partnership on 9th November 2021. KPIT Corporate Social Responsibility (CSR) initiative's one of the thematic area is commitment to environment causes. On this partnership occasion KPIT decided to partner with 14 trees NGO to plant 20 trees at their site at Vetale Village near Pune. 20 trees were planted dedicated to each year of DENSO-KPIT partnership. Mr Sanjivkumar Bajikar ( AVP, DENSO KPIT delivery) and Mr. Tushar Juvekar (head of CSR KPIT) visited the 14 Trees site to plant the trees.14 Trees is committed to building sustainable, carbon-footprint-neutral eco-systems through re-forestation and has created lush forests from barren lands in over 100 acres in the village Vetale near Pune.
                     <br />
                     <br />
-                    Apart from reforestation on acquired barren land 14 Trees also partners with local village governments, forest department, farmers, schools etc to plant trees on their land increasing awareness to combat the effects of environmental degradation and climate change as well as support projects on habitat restoration, ground water recharging, biodiversity experiments and also provide livelihood for local tribal villagers.
-                    </div>
+                    Apart from reforestation on acquired barren land 14 Trees also partners with local village governments, forest department, farmers, schools etc. to plant trees on their land increasing awareness to combat the effects of environmental degradation and climate change as well as support projects on habitat restoration, ground water recharging, biodiversity experiments and also provide livelihood for local tribal villagers.                    </div>
                     <div style={{fontSize: '15px', fontWeight: 'bold', marginTop: '16px', marginLeft: 'auto', marginRight: 'auto', width: '80%'}}>
                     -14 Trees Foundation.
                     </div>
@@ -260,6 +259,9 @@ const useStyles = makeStyles((theme) =>
         },
         logos: {
             display: 'flex',
+            [theme.breakpoints.up('1480')]: {
+                marginTop: '10%'
+            },
         },
         logo: {
             maxWidth: '320px',
@@ -308,7 +310,7 @@ const useStyles = makeStyles((theme) =>
             color: '#846C5B',
             fontSize: '45px',
             lineHeight: '60px',
-            fontWeight: '500',
+            fontWeight: '600',
             width: '50%',
             marginLeft: 'auto', marginRight: 'auto',
             textAlign: 'center',
@@ -327,7 +329,7 @@ const useStyles = makeStyles((theme) =>
             },
         },
         msg: {
-            fontSize: '16px',
+            fontSize: '17px',
             lineHeight: '24px',
             paddingTop: '40px',
             color: '#54503C',
@@ -354,7 +356,7 @@ const useStyles = makeStyles((theme) =>
         },
         gatheader: {
             marginTop: '20px', width: '80%', marginLeft: 'auto', marginRight: 'auto',
-            fontSize: '40px', textAlign: 'center', color:'#846C5B', fontWeight: '550',
+            fontSize: '40px', textAlign: 'center', color:'#846C5B', fontWeight: '600',
             [theme.breakpoints.down('480')]: {
                 fontSize: '25px',
                 width: '100%',
@@ -362,7 +364,7 @@ const useStyles = makeStyles((theme) =>
             },
         },
         gatdesc: {
-            fontSize: '16px',
+            fontSize: '17px',
             fontWeight: '300',
             textAlign: 'center',
             color: '#54503C',
