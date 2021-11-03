@@ -1,6 +1,6 @@
 import React from 'react';
 import { Grid } from '@mui/material';
-import { Link } from 'react-router-dom'
+import { Link } from 'react-router-dom';
 import Button from '@mui/material/Button';
 import { createStyles, makeStyles } from '@mui/styles';
 import notfound from "../../assets/user.png";

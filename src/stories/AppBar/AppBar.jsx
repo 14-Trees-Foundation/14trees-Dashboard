@@ -1,15 +1,12 @@
 import React, { Fragment } from "react";
 import logo from '../../assets/logo_white_small.png';
 import Button from '@mui/material/Button';
+import { Link } from 'react-router-dom';
 import { createStyles, makeStyles } from '@mui/styles';
 
 export const AppBar = () => {
 
     const classes = UseStyle();
-
-    const handleClick = () => {
-        console.log("Coming soon")
-    }
 
     return (
         <Fragment>
@@ -28,7 +25,7 @@ export const AppBar = () => {
                             color="primary"
                             size="large"
                             style={{marginRight: '2%'}}
-                            onClick={() => handleClick()}
+                            component={Link} to="/login"
                         >
                             Admin
                         </Button>
