@@ -86,11 +86,11 @@ export const Events = () => {
                                 <Divider style={{background: '#ffffff', width: '85%'}}/>
                                 <div className={classes.detail}>
                                     <div style={{marginBottom: '5px'}}>Event name: <b>KPIT-DENSO</b></div>
-                                    <div style={{marginBottom: '20px'}}>Organized On: <b>28th of oct, 2021</b></div>
+                                    <div style={{marginBottom: '20px'}}>Organized On: <b>28 October, 2021</b></div>
                                 </div>
                                 <div style={{display: 'flex', alignItems: 'center'}}>
                                     <div className={classes.num}>
-                                        12
+                                        02
                                     </div>
                                     <div className={classes.numDetail}>
                                         People Attended
@@ -117,16 +117,23 @@ export const Events = () => {
                 <img className={classes.topvector} src={vector1} alt="vector1"/>
                 <div className={classes.general}>
                     <div className={classes.msgTitle}>
-                        Some message about the event from 14trees
+                        KPIT's commitment to Ecology Restoration by planting trees and supporting environment causes
                     </div>
                     <div className={classes.imageC}>
                         <Carousel hasMediaButton={false} hasIndexBoard={false} images={images}/>
                     </div>
                     <div className={classes.msg}>
-                    KPIT and DENSO are celebrating 20 years of their partnership on 9th November 2021. KPIT Corporate Social Responsibility (CSR) initiative's one of the thematic area is commitment to environment causes. On this partnership occasion KPIT decided to partner with 14 trees NGO to plant 20 trees at their site at Vetale Village near Pune. 20 trees were planted dedicated to each year of DENSO-KPIT partnership. Mr Sanjivkumar Bajikar ( AVP, DENSO KPIT delivery) and Mr. Tushar Juvekar (head of CSR KPIT) visited the 14 Trees site to plant the trees.14 Trees is committed to building sustainable, carbon-footprint-neutral eco-systems through re-forestation and has created lush forests from barren lands in over 100 acres in the village Vetale near Pune.
+                    KPIT and DENSO are celebrating 20 years of their partnership on 9th November. KPIT, with its commitment to supporting environmental causes, is partnering with a nature conservation NGO named ‘14 Trees’ to celebrate this important milestone in a unique way.
                     <br />
                     <br />
-                    Apart from reforestation on acquired barren land 14 Trees also partners with local village governments, forest department, farmers, schools etc. to plant trees on their land increasing awareness to combat the effects of environmental degradation and climate change as well as support projects on habitat restoration, ground water recharging, biodiversity experiments and also provide livelihood for local tribal villagers.                    </div>
+                    Mr. Sanjivkumar Bajikar DENSO KPIT delivery manager and Mr. Tushar Juvekar head of CSR KPIT planted 20 flowering bahava trees -- one for each year of DENSO-KPIT partnership -- on a barren, ecologically devastated land near village Vetale, near Pune, India.
+                    <br/>
+                    <br/>
+                    The trees planted on KPIT grove will support a larger effort by 14 Trees Foundation to transform barren, ecologically devastated hills of Sahyadri mountain range into thriving biodiverse forests full of native flora and fauna, while creating local livelihoods.
+                    <br/>
+                    <br/>
+                    DENSO-KPIT celebration trees are an example of how urban citizens, village communities, tribal workers and corporates can join hands in taking concrete action towards undoing environmental damage, in creating employment and entrepreneurship and in building a sustainable future for the next generation.
+                    </div>
                     <div style={{fontSize: '15px', fontWeight: 'bold', marginTop: '16px', marginLeft: 'auto', marginRight: 'auto', width: '80%'}}>
                     -14 Trees Foundation.
                     </div>
@@ -135,10 +142,11 @@ export const Events = () => {
                             <img src={gatimg} alt="gat" className={classes.gatimg}/>
                         </div>
                         <div className={classes.gatheader}>
-                            Site of Plantation : Gat 703
+                        Site of Plantation: Near Gat 703, Village - Vetale
                         </div>
                         <div className={classes.gatdesc}>
-                        Gat 703 is a portion of a very large tract of completely barren land on a hilltop in village Vetale near Pune. We are attempting to reforest the land and restore damaged ecology. Slowly and steadily, we are .                        </div>
+                        KPIT grove is a portion of a very large tract of completely barren land on a hilltop in village Vetale near Pune. Slowly and steadily, a team of 100+ tribal workers is restoring green cover, repairing damaged ecology, creating rainwater storage ponds, digging pits and planting trees.
+                        </div>
                     </div>
                 </div>
                 <div style={{height: '900px'}}>
@@ -265,8 +273,7 @@ const useStyles = makeStyles((theme) =>
         },
         logo: {
             maxWidth: '320px',
-            height: '70px',
-            padding: theme.spacing(1),
+            height: '60px',
         },
         maintxt: {
             fontSize: '40px',
@@ -311,13 +318,13 @@ const useStyles = makeStyles((theme) =>
             fontSize: '45px',
             lineHeight: '60px',
             fontWeight: '600',
-            width: '50%',
+            width: '70%',
             marginLeft: 'auto', marginRight: 'auto',
             textAlign: 'center',
             [theme.breakpoints.down('480')]: {
                 width: '85%',
-                fontSize: '35px',
-                lineHeight: '45px',
+                fontSize: '30px',
+                lineHeight: '40px',
                 marginTop: '20px'
             },
         },
