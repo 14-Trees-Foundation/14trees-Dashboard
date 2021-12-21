@@ -20,7 +20,6 @@ import Backdrop from '@mui/material/Backdrop';
 import { Spinner } from "../../stories/Spinner/Spinner";
 
 export const Login = ({token}) => {
-    console.log(token)
     const classes = UseStyle();
     const paperStyle={padding :20,minHeight:'300px',width:280, margin:"20px auto"}
     const avatarStyle={backgroundColor:'#1bbd7e'}
@@ -32,13 +31,13 @@ export const Login = ({token}) => {
     const [openBackdrop, setBackdropOpen] = useState(false);
     const [isLoggedIn, setLoggedIn] = useState(false);
     const { setAuthTokens } = useAuth();
-    
+
     const verifyToken = async () => {
         setBackdropOpen(true);
         try {
             let res = await api.post('/login/verifytoken', {}, {
                 headers: {
-                    'x-access-token': token 
+                    'x-access-token': token
                   }
             });
             if (res.status===200){
@@ -52,7 +51,9 @@ export const Login = ({token}) => {
     }
 
     useEffect(() => {
-        if (token !== null || token !== undefined) {
+        if (token === null) {
+            setLoggedIn(false);
+        } else if(token !== null || token !== undefined) {
             verifyToken();
         }
     });
@@ -61,7 +62,7 @@ export const Login = ({token}) => {
         setBackdropOpen(true);
         try {
             const res = await api.post('/login/user', {
-                params: { 
+                params: {
                     username : username,
                     password: password
                 }
@@ -84,12 +85,12 @@ export const Login = ({token}) => {
           username,
           password
         );
-      }
-    
+    }
+
     if (isLoggedIn) {
         return <Redirect to={"/admin"} />;
     }
-    
+
     return(
         <div className={classes.box}>
             <img alt="bg" src={bg} className={classes.bg} style={{height: '100vh'}}/>
