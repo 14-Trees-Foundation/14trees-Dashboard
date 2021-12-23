@@ -12,17 +12,6 @@ export const ApplicationBar = () => {
   }
 
   return (
-    <Navbar
-      collapseOnSelect
-      expand="lg"
-      bg="light"
-      variant="light"
-    >
-      <Container fluid>
-        <Navbar.Brand href="#home">
-          <img className="logo-img" src={logo} alt="logo" />
-        </Navbar.Brand>
-      </Container>
-    </Navbar>
+    <></>
   );
 };
