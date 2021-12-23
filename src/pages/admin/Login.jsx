@@ -12,7 +12,7 @@ import bg from "../../assets/bg.png";
 
 import api from '../../api/local';
 import { useAuth } from "./context/auth";
-import { Redirect } from "react-router-dom";
+import { useNavigate } from 'react-router-dom';
 import { createStyles, makeStyles } from '@mui/styles';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -25,6 +25,7 @@ export const Login = ({token}) => {
     const avatarStyle={backgroundColor:'#1bbd7e'}
     const textStyle={margin:'8px auto'}
     const btnstyle={margin:'8px 0'}
+    const navigate = useNavigate();
 
     const [username, setUserName] = useState();
     const [password, setPassword] = useState();
@@ -88,7 +89,7 @@ export const Login = ({token}) => {
     }
 
     if (isLoggedIn) {
-        return <Redirect to={"/admin"} />;
+        navigate('/admin');
     }
 
     return(

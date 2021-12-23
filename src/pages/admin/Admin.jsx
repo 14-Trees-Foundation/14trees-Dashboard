@@ -1,7 +1,11 @@
+import {
+    Outlet
+} from "react-router-dom";
+
 export const Admin = () => {
     return (
         <div>
-            Admin Page
+            <Outlet />
         </div>
     )
 }
