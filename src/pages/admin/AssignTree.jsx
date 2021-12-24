@@ -13,6 +13,7 @@ import tree from "../../assets/dark_logo.png";
 const intitialFValues = {
     name: '',
     email: '',
+    contact: '',
     saplingid: '',
     uploaded: false,
     loading: false,
@@ -32,6 +33,7 @@ export const AssignTree = () => {
         const params = JSON.stringify({
             "name": formValues.name,
             "email": formValues.email,
+            "contact": formValues.contact,
             "sapling_id": formValues.saplingid
         });
 
@@ -102,7 +104,7 @@ export const AssignTree = () => {
                         <Paper sx={{
                             m:2,
                             p:2,
-                            minWidth: '350px',
+                            minWidth: '300px',
                         }}
                         variant="elevation"
                         elevation={2}>
@@ -119,6 +121,9 @@ export const AssignTree = () => {
                                 }
                                 if(!values.email){
                                     errors.email = "Email required.";
+                                }
+                                if(!values.contact){
+                                    errors.email = "Contact required.";
                                 }
                                 if(!values.saplingid){
                                     errors.saplingid = "Sapling ID is a required field.";
@@ -151,6 +156,21 @@ export const AssignTree = () => {
                                                             variant='outlined'
                                                             label='Email *'
                                                             name='email'
+                                                            error={meta.error && meta.touched ? true : false}
+                                                            {...input}
+                                                            helperText={meta.error && meta.touched ? meta.error : ""}
+                                                        />
+                                                        )}
+                                                </Field>
+                                            </Grid>
+                                            <Grid item sx={{m:2}} xs={12}>
+                                                <Field name="contact">
+                                                    {({ input, meta }) => (
+                                                        <TextField
+                                                            fullWidth
+                                                            variant='outlined'
+                                                            label='Contact *'
+                                                            name='contact'
                                                             error={meta.error && meta.touched ? true : false}
                                                             {...input}
                                                             helperText={meta.error && meta.touched ? meta.error : ""}
