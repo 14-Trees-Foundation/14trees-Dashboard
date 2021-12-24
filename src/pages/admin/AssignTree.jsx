@@ -58,14 +58,13 @@ export const AssignTree = () => {
                 toast.error(res.status.error)
             }
         } catch (error) {
-            console.log(error.response.data)
             if (error.response.status === 409 || error.response.status === 404 || error.response.status === 400 || error.response.status === 500) {
                 setValues({
                     ...values,
                     loading: false,
                     backdropOpen: false
                 })
-                toast.error("hey")
+                toast.error(error.response.data.error)
             }
         }
     }
