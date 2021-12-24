@@ -61,7 +61,6 @@ export const AddOrg = () => {
                 toast.success("Data uploaded successfully!")
             }
         } catch (error) {
-            console.log(error)
             if (error.response.status === 500) {
                 setValues({
                     ...values,
