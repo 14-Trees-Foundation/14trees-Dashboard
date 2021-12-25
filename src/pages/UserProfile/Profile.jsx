@@ -1,5 +1,4 @@
 import { createStyles, makeStyles } from '@mui/styles';
-import { useNavigate, Link } from 'react-router-dom';
 import Divider from '@mui/material/Divider';
 import useMediaQuery from '@mui/material/useMediaQuery';
 
@@ -17,7 +16,6 @@ import { Button } from '@mui/material';
 export const Profile = () => {
     const matches = useMediaQuery('(max-width:481px)');
     const classes = useStyles();
-    const navigate = useNavigate();
 
     const userinfo = useRecoilValue(usersData);
     // const [activeStep, setActiveStep] = useState(0);

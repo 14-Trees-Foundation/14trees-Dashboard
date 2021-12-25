@@ -111,7 +111,11 @@ export const GiftTrees = () => {
             }
         }
     }
-    console.log(values.user)
+    const handleSaplingClick = (row) => {
+        if (row.assigned) {
+            window.open("http://dashboard.14trees.org/profile/" + row.tree_id.sapling_id)
+        }
+    }
 
     const assignTree = async (formValues, img) => {
         setValues({
@@ -267,7 +271,7 @@ export const GiftTrees = () => {
                                                     <TableCell component="th" scope="row">
                                                         {row.tree_id.tree_id.name}
                                                     </TableCell>
-                                                    <TableCell align="right">{row.tree_id.sapling_id}</TableCell>
+                                                    <TableCell align="right" style={{cursor: 'pointer'}} onClick={() => handleSaplingClick(row)}>{row.tree_id.sapling_id}</TableCell>
                                                     <TableCell align="right">{row.tree_id.plot_id.name}</TableCell>
                                                     <TableCell align="center">
                                                         {
