@@ -1,22 +1,26 @@
 import { useEffect, useState } from 'react';
-import { Col } from "react-bootstrap";
 import { createStyles, makeStyles } from '@mui/styles';
 import {
-    Paper,
     Typography,
     Button,
     Table, TableBody, TableCell,
     TableContainer, TableHead, TableRow,
+    Box
 } from "@mui/material";
 import { ToastContainer, toast } from 'react-toastify';
 import moment from 'moment';
+import { useParams } from 'react-router-dom';
 import 'react-toastify/dist/ReactToastify.css';
 
 import { Spinner } from "../../stories/Spinner/Spinner";
-import Axios from "../../api/local";
-import tree from "../../assets/dark_logo.png";
-import { useParams } from 'react-router-dom';
 import { GiftDialog } from './GiftDialog';
+import Axios from "../../api/local";
+
+import logo from '../../assets/gift/logogift.png';
+import tree from "../../assets/dark_logo.png";
+import bg from "../../assets/gift/bg.png";
+import bgfooter from "../../assets/gift/bgfooter.png";
+import footer from "../../assets/gift/footer.png";
 
 const intitialFValues = {
     name: '',
@@ -103,8 +107,9 @@ export const GiftTrees = () => {
         formData.append('dob', date);
         formData.append('contact', formValues.contact);
         formData.append('sapling_id', values.selectedSaplingId);
+        let res;
         try {
-            let res = await Axios.post('/profile/usertreereg', formData, {
+            res = await Axios.post('/profile/usertreereg', formData, {
                 headers: {
                     'Content-type': 'multipart/form-data'
                 },
@@ -112,13 +117,15 @@ export const GiftTrees = () => {
 
             if (res.status === 201) {
                 const params = JSON.stringify({
-                    "sapling_id": values.selectedSaplingId
+                    "sapling_id": values.selectedSaplingId,
+                    "user_id": res.data.usertreereg.user
                 })
                 await Axios.post('/mytrees/update', params, {
                     headers: {
                         'Content-type': 'application/json'
                     },
                 })
+
                 await fetchTrees();
                 setValues({
                     ...values,
@@ -149,97 +156,169 @@ export const GiftTrees = () => {
             }
         }
     }
+    console.log(values.trees.length)
 
     if (values.loading) {
         return <Spinner />
     } else {
-        return (
-            <>
-                <Col className={classes.left} lg={2} md={2} sm={12}></Col>
-                <Col className={classes.center} lg={8} md={8} sm={12}>
-                    <GiftDialog
-                        open={values.dlgOpen}
-                        onClose={handleClose}
-                        formData={handleFormData}/>
-                    <Paper sx={{
-                        m:2,
-                        p:4,
-                        minWidth: '400px',
-                    }}
-                    variant="elevation"
-                    elevation={2}>
-                        {
-                            values.user === undefined ?
-                            (
-                                <Typography variant="h5" align="left" sx={{pl:4,pt:2,pb:2}}>
-                                    No user found!
+        if (Object.keys(values.user).length === 0) {
+            return (
+                <Typography variant='h2' align='center' sx={{p:8, fontWeight: 'bold'}}>
+                    User ID not found!
+                </Typography>
+            )
+        } else {
+            return (
+                <>
+                    <div className={classes.bg}>
+                        <Box sx={{
+                            textAlign: 'center',p:8,
+                            '@media screen and (max-width: 640px)': {
+                                p:2,
+                            },
+                        }}>
+                            <img src={logo} className={classes.logo} alt="logoo"/>
+                            <div className={classes.headerbox}>
+                                <Typography variant='h4' align='center' sx={{color:'#1f3625',fontWeight:'550'}}>
+                                    <span>Thank You {values.user.name} for your contribution!</span>
+                                    <p style={{margin:'0px'}}>We couldn't have done this without you.</p>
                                 </Typography>
-                            ) :
-                            (
-                                <>
-                                    <Typography variant="h5" align="left" sx={{pl:4,pt:2,pb:2}}>
-                                        Welcome {values.user.name}
+                                <Typography variant='subtitle1' sx={{lineHeight: '25px', fontSize:'20px', fontWeight:'400', color:'#1f3625', pt:4, pb:3}}>
+                                    Thank you so much for the immeasurably and valuable contribution towards 14 Trees! We have not thanked you enough, and want to let you know that your dedication, efforts, support is essential to the work that we do and creating hugh impact not only on enviroment but on many lives.
+                                </Typography>
+                                <div style={{width:'80%', marginLeft:'auto', marginRight:'auto'}}>
+                                    <Typography sx={{lineHeight: '25px', fontSize:'20px', fontWeight:'600', color:'#1f3625', pb:3}}>
+                                        To acknolwdge and appreciate your contribution towards 14 Trees we would like to gift you 14 Trees which you can further gift to your freinds/family members on the occassaion of new year.
                                     </Typography>
-                                    <ToastContainer/>
-                                    {
-                                        tree.length === 0 && (
-                                            <Typography variant="h5" align="left" sx={{pl:4,pt:2,pb:2}}>
-                                                No Trees in your account
-                                            </Typography>
-                                        )
-                                    }
-                                    <TableContainer component={Paper}>
-                                        <Table sx={{ minWidth: 650 }} aria-label="simple table">
-                                            <TableHead>
-                                            <TableRow>
-                                                <TableCell>Tree Name</TableCell>
-                                                <TableCell align="right">Sapling ID</TableCell>
-                                                <TableCell align="right">Plot</TableCell>
-                                                <TableCell align="right">Assigned</TableCell>
-                                                <TableCell align="right"></TableCell>
-                                            </TableRow>
-                                            </TableHead>
-                                            <TableBody>
-                                                {
-                                                    values.trees.map((row) => (
-                                                        <TableRow
-                                                            key={row._id}
-                                                            sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
-                                                        >
-                                                            <TableCell component="th" scope="row">
-                                                                {row.tree_id.tree_id.name}
-                                                            </TableCell>
-                                                            <TableCell align="right">{row.tree_id.sapling_id}</TableCell>
-                                                            <TableCell align="right">{row.tree_id.plot_id.name}</TableCell>
-                                                            <TableCell align="right">{row.assigned ? "Yes" : "No"}</TableCell>
-                                                            <TableCell align="right">
-                                                                <Button
-                                                                    variant="contained"
-                                                                    color='primary'
-                                                                    disabled={row.assigned}
-                                                                    onClick={() => handleClickOpen(row.tree_id.sapling_id)}
-                                                                >
-                                                                    Assign
-                                                                </Button>
-                                                            </TableCell>
-                                                        </TableRow>
-                                                ))}
-                                            </TableBody>
-                                        </Table>
-                                    </TableContainer>
-                                </>
-                            )
-                        }
-                    </Paper>
-                </Col>
-                <Col className={classes.right} lg={2} md={2} sm={12}></Col>
-            </>
-        )
+                                </div>
+                            </div>
+                        </Box>
+                        <div style={{position: 'relative'}}>
+                            <img src={bg} className={classes.landingimg} alt="bg"/>
+                            <div style={{background: 'linear-gradient(360deg, #3F5344 17.02%, rgba(63, 83, 68, 0) 100%)', height: '230px', position: 'relative', zIndex: '999',marginTop: '-200px'}}></div>
+                            <img src={bgfooter} className={classes.bgfooter} alt="bgfooter"/>
+                        </div>
+                        <GiftDialog
+                            open={values.dlgOpen}
+                            onClose={handleClose}
+                            formData={handleFormData}/>
+                        <div className={classes.tbl}>
+                            <Typography variant="h4" align="left" sx={{pl:1, pt:4,pb:4, fontWeight: '600', color: '#1f3625'}}>
+                                Tree Holdings ( {values.trees.length} )
+                            </Typography>
+                            <ToastContainer/>
+                            {
+                                tree.length === 0 && (
+                                    <Typography variant="h5" align="left" sx={{pl:4,pt:2,pb:2}}>
+                                        No Trees in your account
+                                    </Typography>
+                                )
+                            }
+                            <TableContainer>
+                                <Table sx={{ minWidth: 400 }} aria-label="simple table">
+                                    <TableHead>
+                                        <TableRow sx={{fontSize: '16px'}}>
+                                            <TableCell>Tree Name</TableCell>
+                                            <TableCell align="right">Sapling ID</TableCell>
+                                            <TableCell align="right">Plot</TableCell>
+                                            <TableCell align="right"></TableCell>
+                                        </TableRow>
+                                    </TableHead>
+                                    <TableBody className={classes.tblrow}>
+                                        {
+                                            values.trees.map((row) => (
+                                                <TableRow
+                                                    key={row._id}
+                                                    sx={{
+                                                        m:2
+                                                    }}
+                                                >
+                                                    <TableCell component="th" scope="row">
+                                                        {row.tree_id.tree_id.name}
+                                                    </TableCell>
+                                                    <TableCell align="right">{row.tree_id.sapling_id}</TableCell>
+                                                    <TableCell align="right">{row.tree_id.plot_id.name}</TableCell>
+                                                    <TableCell align="center">
+                                                        {
+                                                            row.assigned ?
+                                                            (
+                                                                <>
+                                                                    <Typography variant='subtitle2' align='center' sx={{p:1, pb:0, fontSize:'12px'}}>
+                                                                        Assigned To
+                                                                    </Typography>
+                                                                    <Typography variant='subtitle1' align='center' sx={{fontWeight:'bold',color:'#1F3625'}}>
+                                                                        {row.assigned_to.name}
+                                                                    </Typography>
+                                                                </>
+                                                            ) :
+                                                            <Button
+                                                                sx={{ml:'auto', mr:'auto'}}
+                                                                variant="contained"
+                                                                color='primary'
+                                                                disabled={row.assigned}
+                                                                onClick={() => handleClickOpen(row.tree_id.sapling_id)}
+                                                            >
+                                                                Assign
+                                                            </Button>
+                                                        }
+                                                    </TableCell>
+                                                </TableRow>
+                                        ))}
+                                    </TableBody>
+                                </Table>
+                            </TableContainer>
+                        </div>
+                        <div className={classes.footer}>
+                        </div>
+                    </div>
+                </>
+            )
+        }
     }
 }
 
 const useStyles = makeStyles((theme) =>
     createStyles({
+        bg: {
+            backgroundColor: '#E9EAE7',
+            width: '100%',
+        },
+        logo: {
+            width: '90px',
+            height: '110px',
+            padding: theme.spacing(2)
+        },
+        headerbox: {
+            width: '70%', maxWidth:'820px', marginLeft:'auto', marginRight:'auto',
+            [theme.breakpoints.down('md')]: {
+                width: '100%'
+            }
+        },
+        landingimg: {
+            width: '100%', height: 'auto', marginTop: '-250px',
+            [theme.breakpoints.down('1200')]: {
+                marginTop: '-80px',
+                minHeight: '350px',
+            }
+        },
+        bgfooter: {
+            width: '100%',
+            height:'90px',
+            marginTop: '-5px',
+            [theme.breakpoints.down('1200')]: {
+                height: '50px'
+            }
+        },
+        tbl:{
+            maxWidth: '1300px',
+            marginLeft: 'auto',
+            marginRight: 'auto',
+            paddingBottom: theme.spacing(6),
+            paddingTop: theme.spacing(3),
+            [theme.breakpoints.down('1200')]: {
+                padding: '24px 16px 48px 16px'
+            }
+        },
         left: {
             width: '100%',
             marginRight: '10px',
@@ -278,4 +357,20 @@ const useStyles = makeStyles((theme) =>
         backdrop: {
             zIndex: theme.zIndex.drawer + 1,
         },
+        tblrow:{
+            '& .MuiTableCell-root': {
+                padding: '16px',
+            },
+            '& .MuiTableRow-root' : {
+                fontSize: '20px',
+                backgroundColor: '#ffffff',
+                borderRadius: '10px'
+            }
+        },
+        footer: {
+            marginTop: '48px',
+            backgroundImage: `url(${footer})`,
+            height: '245px',
+            width: 'auto',
+        }
     }))

@@ -123,7 +123,7 @@ export const AssignTree = () => {
                                     errors.email = "Email required.";
                                 }
                                 if(!values.contact){
-                                    errors.email = "Contact required.";
+                                    errors.contact = "Contact required.";
                                 }
                                 if(!values.saplingid){
                                     errors.saplingid = "Sapling ID is a required field.";
