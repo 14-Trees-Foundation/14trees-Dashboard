@@ -162,7 +162,7 @@ export const GiftTrees = () => {
     if (values.loading) {
         return <Spinner />
     } else {
-        if (Object.keys(values.user).length === 0) {
+        if (Object.keys(values.user).length === 0 && !values.loading) {
             return (
                 <Typography variant='h2' align='center' sx={{p:8, fontWeight: 'bold'}}>
                     User ID not found!
