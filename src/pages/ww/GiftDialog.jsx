@@ -12,6 +12,8 @@ import LocalizationProvider from '@mui/lab/LocalizationProvider';
 import DesktopDatePicker from '@mui/lab/DesktopDatePicker';
 import AdapterDateFns from '@mui/lab/AdapterDateFns';
 import { makeStyles } from '@mui/styles';
+import Dropzone from 'react-dropzone';
+import { useState } from 'react';
 
 const Transition = React.forwardRef(function Transition(props, ref) {
     return <Slide direction="up" ref={ref} {...props} />;
@@ -20,6 +22,8 @@ const Transition = React.forwardRef(function Transition(props, ref) {
 export const GiftDialog = (props) => {
     const classes = useStyles();
     const { onClose, open, formData } = props;
+    const [img, setImg] = useState(null);
+    const [imgsrc, setImgsrc] = useState(null);
 
     const handleClose = () => {
         onClose();
@@ -27,9 +31,13 @@ export const GiftDialog = (props) => {
 
     const formSubmit = (formValues) => {
         onClose();
-        formData(formValues);
+        formData(formValues, img);
     }
 
+    const handleProfilePic = (image) => {
+        setImg(image ? image[0] : null);
+        setImgsrc(image ? URL.createObjectURL(image[0]) : null);
+    }
     return (
         <Dialog
             onClose={handleClose}
@@ -119,6 +127,29 @@ export const GiftDialog = (props) => {
                                 </LocalizationProvider>
                             )}
                         </Field>
+                        <Field name="profile">
+                            {({ input, meta }) => (
+                                <div className={classes.imgdiv}>
+                                    <Dropzone onDrop={acceptedFiles => handleProfilePic(acceptedFiles)}>
+                                        {({getRootProps, getInputProps}) => (
+                                        <section>
+                                            <div {...getRootProps()}>
+                                            <input {...getInputProps()} />
+                                                <p style={{cursor: 'pointer'}}>Upload profile pic. Click or Drag!</p>
+                                            </div>
+                                        </section>
+                                        )}
+                                    </Dropzone>
+                                </div>
+                            )}
+                        </Field>
+                        {
+                            imgsrc !== null && (
+                                <div style={{width:'100%', textAlign:'center'}}>
+                                    <img src={imgsrc} className={classes.img} alt="profile"/>
+                                </div>
+                            )
+                        }
                         <div className={classes.actions}>
                             <Button
                                 variant="contained"
@@ -167,5 +198,17 @@ const useStyles = makeStyles((theme) => ({
             maxWidth: '100%',
             minHeight: '6vh'
         }
+    },
+    imgdiv: {
+        padding: '8px',
+        marginTop: '8px',
+        marginBottom: '8px',
+        border: '1px #1f3625 dashed',
+        textAlign: 'center'
+    },
+    img: {
+        width: '100px',
+        height: '100px',
+        borderRadius: '50px'
     }
 }))

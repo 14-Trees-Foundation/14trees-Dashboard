@@ -11,6 +11,7 @@ import { ToastContainer, toast } from 'react-toastify';
 import moment from 'moment';
 import { useParams } from 'react-router-dom';
 import 'react-toastify/dist/ReactToastify.css';
+import imageCompression from 'browser-image-compression';
 
 import { Spinner } from "../../stories/Spinner/Spinner";
 import { GiftDialog } from './GiftDialog';
@@ -42,6 +43,24 @@ export const GiftTrees = () => {
     const classes = useStyles();
     const [values, setValues] = useState(intitialFValues);
 
+    const compressImageList = async (file) => {
+
+        const options = {
+          maxSizeMB: 0.5,
+          maxWidthOrHeight: 1080,
+          useWebWorker: true
+        }
+
+        let compressedFile;
+
+        try {
+            compressedFile = await imageCompression(file, options);
+        } catch (error) {
+          console.log(error);
+        }
+
+        return new File([compressedFile], file.name);
+    }
     const handleClickOpen = (sapling_id) => {
         // setSelectedTree(sapling_id);
         setValues({
@@ -58,8 +77,8 @@ export const GiftTrees = () => {
         })
     };
 
-    const handleFormData = async (formData) => {
-        await assignTree(formData);
+    const handleFormData = async (formData, img) => {
+        await assignTree(formData, img);
     }
 
     useEffect(() => {
@@ -93,7 +112,7 @@ export const GiftTrees = () => {
         }
     }
 
-    const assignTree = async (formValues) => {
+    const assignTree = async (formValues, img) => {
         setValues({
             ...values,
             loading: true,
@@ -106,6 +125,13 @@ export const GiftTrees = () => {
         formData.append('dob', date);
         formData.append('contact', formValues.contact);
         formData.append('sapling_id', values.selectedSaplingId);
+
+        let userImages = [];
+        let image = await compressImageList(img);
+        formData.append('files', image)
+        userImages.push(img.name)
+        formData.append('userimages', userImages);
+
         let res;
         try {
             res = await Axios.post('/profile/usertreereg', formData, {
