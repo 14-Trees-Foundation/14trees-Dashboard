@@ -28,7 +28,7 @@ const intitialFValues = {
     contact: '',
     saplingid: '',
     uploaded: false,
-    loading: false,
+    loading: true,
     backdropOpen: false,
     dlgOpen: false,
     selectedSaplingId: 0,
