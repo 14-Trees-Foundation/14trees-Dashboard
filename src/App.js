@@ -13,6 +13,7 @@ import { Admin } from './pages/admin/Admin';
 import { AuthContext } from "./pages/admin/context/auth";
 import { Layout } from './components/Layout';
 import { GiftTrees } from './pages/ww/GiftTrees';
+import { WW } from './pages/ww/WW';
 // import PrivateRoute from './PrivateRoute';
 // import api from '../src/api/local';
 
@@ -56,7 +57,9 @@ function App() {
           <Route path="/admin" element={<Admin />}>
             <Route path="assigntrees" element={<AssignTree />}></Route>
           </Route>
-          <Route path="/ww/:email" element={<GiftTrees />}></Route>
+          <Route path="/ww" element={<WW />}>
+            <Route path=":email" element={<GiftTrees />}></Route>
+          </Route>
           <Route component={NotFound} />
         </Routes>
       </Layout>

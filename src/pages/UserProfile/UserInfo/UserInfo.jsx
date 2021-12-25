@@ -14,6 +14,9 @@ export const UserInfo = () => {
     const classes = useStyles();
 
     const userinfo = useRecoilValue(usersData);
+    console.log(userinfo)
+    console.log(userinfo.user.profile_image[0])
+    console.log(userinfo.trees[0].tree.image[0])
     // const setIndex = useSetRecoilState(navIndex);
     const [open, setOpenPopup] = useRecoilState(openProfilePopup);
     const handleTreeClick = () => {
@@ -48,7 +51,7 @@ export const UserInfo = () => {
                             onClick={() => handleOpenPopup()}
                             className={classes.userimg}
                             alt="Card"
-                            src={userinfo.user.profile_image[0] === "" ? userinfo.trees[0].tree.image[0] : userinfo.user.profile_image[0]} />
+                            src={userinfo.user.profile_image[0] === "" ? userinfo.trees[0].tree.tree_id.image[0] : userinfo.user.profile_image[0]} />
                     </Grid>
                     <Grid item xs={6} md={3} className={classes.infobox}>
                         <div className={classes.info}>
