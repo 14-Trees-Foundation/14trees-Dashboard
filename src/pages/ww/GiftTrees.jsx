@@ -37,7 +37,6 @@ const intitialFValues = {
 }
 
 export const GiftTrees = () => {
-    console.log("rendered")
     let {email} = useParams();
 
     const classes = useStyles();
@@ -126,13 +125,17 @@ export const GiftTrees = () => {
                     },
                 })
 
-                await fetchTrees();
-                setValues({
-                    ...values,
-                    loading: false,
-                    dlgOpen:false,
-                    uploaded: true,
-                })
+                let profileTrees = await Axios.get(`/mytrees/${email}`);
+                if (profileTrees.status === 200) {
+                    setValues({
+                        ...values,
+                        loading: false,
+                        user: profileTrees.data.user[0],
+                        trees: profileTrees.data.trees,
+                        dlgOpen:false,
+                        uploaded: true,
+                    })
+                }
                 toast.success("Data uploaded successfully!")
             } else if (res.status === 204 || res.status === 400 || res.status === 409 || res.status === 404) {
                 setValues({
@@ -144,7 +147,6 @@ export const GiftTrees = () => {
                 toast.error(res.status.error)
             }
         } catch (error) {
-            console.log(error.response)
             setValues({
                 ...values,
                 loading: false,
@@ -156,7 +158,6 @@ export const GiftTrees = () => {
             }
         }
     }
-    console.log(values.trees.length)
 
     if (values.loading) {
         return <Spinner />
@@ -310,13 +311,13 @@ const useStyles = makeStyles((theme) =>
             }
         },
         tbl:{
-            maxWidth: '1300px',
+            maxWidth: '1080px',
             marginLeft: 'auto',
             marginRight: 'auto',
-            paddingBottom: theme.spacing(6),
-            paddingTop: theme.spacing(3),
+            paddingBottom: theme.spacing(16),
+            paddingTop: theme.spacing(12),
             [theme.breakpoints.down('1200')]: {
-                padding: '24px 16px 48px 16px'
+                padding: '32px 16px 48px 32px'
             }
         },
         left: {
