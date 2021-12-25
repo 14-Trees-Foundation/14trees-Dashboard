@@ -4,10 +4,10 @@ import { createStyles, makeStyles } from '@mui/styles';
 import Grid from '@mui/material/Grid';
 import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
-import CardActions from '@mui/material/CardActions';
-import CardContent from '@mui/material/CardContent';
-import CardMedia from '@mui/material/CardMedia';
-import Typography from '@mui/material/Typography';
+// import CardActions from '@mui/material/CardActions';
+// import CardContent from '@mui/material/CardContent';
+// import CardMedia from '@mui/material/CardMedia';
+// import Typography from '@mui/material/Typography';
 import Carousel from 'react-gallery-carousel';
 
 import bdayItem1 from '../../assets/bdayItem1.png';
@@ -84,11 +84,11 @@ export const Birthday = () => {
                                     <img className={classes.logo} src={logo_white_small} alt="logo" />
                                 </div>
                                 <p className={classes.maintxt}>
-                                A thicket of 10 trees has been planted in the name of <br></br>Mr Sanjeev Rathava on the occassion of his birthday.
+                                A thicket of 10 trees has been <br /> planted in the name of <br /> Mr Sanjeev Rathava on the <br /> occassion of his birthday.
                                 </p>
                                 <div className={classes.detail}>
-                                    <div style={{marginBottom: '5px'}}>Donated by: <b>Mr Biswarup Dutta</b></div>
-                                    <div style={{marginBottom: '20px'}}>Date: <b>21st August 2021</b></div>
+                                    <div style={{marginBottom: '5px', marginLeft:'-30px'}}>Donated by: Mr Biswarup Dutta</div>
+                                    <div style={{marginBottom: '20px', marginLeft:'-30px'}}>Date: 21st August 2021</div>
                                 </div> 
                                 
                             </Grid>
@@ -104,7 +104,7 @@ export const Birthday = () => {
                 <Card className={classes.card}>
                 <div className={classes.general}>
                     <div className={classes.msgTitle}>
-                        Wishing you a very Happy Birthday!
+                        Wishing you a very <br />Happy Birthday!
                     </div>
                     <div className={classes.imageC}>
                         <Carousel hasMediaButton={false} hasIndexBoard={false} images={images}/>
@@ -206,7 +206,7 @@ const useStyles = makeStyles((theme) =>
             padding: theme.spacing(15),
             backgroundColor: '#664E2D',
             paddingTop: theme.spacing(0),
-            height: 'calc(100vh - 100px)',
+            height: 'calc(100vh - 45px)',
             maxWidth: '100vw',
             marginLeft: "auto",
             marginRight: 'auto',
@@ -217,42 +217,43 @@ const useStyles = makeStyles((theme) =>
         },
         item1: {
             position: 'absolute',
-            zIndex: '1',
+            zIndex: '0',
             width: '120%',
-            height: '100vh',
-            left:'1px',
-            top: '40vh',
+            height: '150vh',
+            left:'1%',
+            top: '28vh',
             [theme.breakpoints.down('480')]: {
                 width: '100%',
                 height: '200px',
-                left: '22px',
-                top: '15.5vh'
+                left: '24px',
+                top: '17vh'
             },
         },
         item2: {
             position: 'absolute',
             zIndex: '1',
-            width: '120%',
-            height: '60vh',
-            left: '8px',
+            width: '150%',
+            height: '65vh',
+            left: '-30%',
             top:'0vh',
             [theme.breakpoints.down('480')]: {
                 width: '100%',
                 height: '200px',
-                left: '25px',
+                left: '24px',
             },
         },
         item3: {
             position: 'absolute',
-            zIndex: '0',
-            width: '20%',
-            height: '80vh',
+            zIndex: '-1',
+            width: '40%',
+            height: '120vh',
             left: '1px',
-            top:'-30vh',
+            top:'-50vh',
             [theme.breakpoints.down('480')]: {
-                width: '100%',
+                width: '45%',
                 height: '200px',
                 left: '25px',
+                top:'-10vh',
             },
         },
         logos: {  
@@ -262,30 +263,41 @@ const useStyles = makeStyles((theme) =>
             },
         },
         logo: {
-            marginTop:'50px',
+            marginTop:'63px',
             maxWidth: '320px',
-            height: '60px',
+            height: '80px',
+            marginLeft:'-30px',
+            [theme.breakpoints.down('480')]: {
+                marginLeft:'-20px',
+                marginTop:'10px'
+            },
+            
         },
         maintxt: {
-            fontSize: '30px',
+            fontSize: '35px',
             fontFamily:'Noto Serif JP',
-            lineHeight: '50px',
+            lineHeight: '40px',
             color: '#ffffff',
             fontWeight: 'normal',
+            marginTop:'100px',
+            marginLeft:'-30px',
             [theme.breakpoints.down('480')]: {
-                fontSize: '35px',
-                lineHeight: '50px',
+                fontSize: '25px',
+                lineHeight: '40px',
+                marginTop:'50px',
+                marginLeft:'-20px',
             },
         },
         card:{
             position:'relative',
-            zIndex:'1',
-            marginTop:'100px',
-            marginLeft:'auto',
-            marginRight:'auto',
-            width:'60%',
-            borderRadius:'5px',
-            boxShadow:'0px 0px 30px rgba(0, 0, 0, 0.14)',
+            marginTop:'120px',
+            marginLeft:'130px',
+            width:'80%',
+            [theme.breakpoints.down('480')]: {
+                marginTop:'120px',
+                marginLeft:'35px',
+                width:'80%',
+            },
             
         },
         detail: {
@@ -293,7 +305,10 @@ const useStyles = makeStyles((theme) =>
             fontSize: '18px',
             fontWeight: '350',
             marginTop: theme.spacing(6),
-            display: 'block'
+            display: 'block',
+            [theme.breakpoints.down('480')]: {
+                marginLeft:'10px',
+            },
         },
         num:{
             fontSize: '45px',color: '#EDD9A3', fontWeight: '500'
@@ -321,13 +336,13 @@ const useStyles = makeStyles((theme) =>
             fontFamily:'Noto Serif JP',
             fontSize: '40px',
             lineHeight: '50px',
-            fontWeight: 'bold',
+            fontWeight: '500',
             width: '70%',
             marginLeft: 'auto', marginRight: 'auto',
             textAlign: 'center',
             [theme.breakpoints.down('480')]: {
                 width: '85%',
-                fontSize: '30px',
+                fontSize: '25px',
                 lineHeight: '40px',
                 marginTop: '20px'
             },
@@ -340,7 +355,7 @@ const useStyles = makeStyles((theme) =>
             },
         },
         msg: {
-            fontSize: '17px',
+            fontSize: '15px',
             lineHeight: '24px',
             paddingTop: '40px',
             color: '#54503C',
