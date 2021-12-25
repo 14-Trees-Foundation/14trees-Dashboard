@@ -1,4 +1,5 @@
 import { createStyles, makeStyles } from '@mui/styles';
+import { useNavigate, Link } from 'react-router-dom';
 import Divider from '@mui/material/Divider';
 import useMediaQuery from '@mui/material/useMediaQuery';
 
@@ -11,10 +12,12 @@ import { useRecoilValue } from 'recoil';
 import { usersData } from '../../store/atoms';
 
 import logo from "../../assets/icon_round.png"
+import { Button } from '@mui/material';
 
 export const Profile = () => {
     const matches = useMediaQuery('(max-width:481px)');
     const classes = useStyles();
+    const navigate = useNavigate();
 
     const userinfo = useRecoilValue(usersData);
     // const [activeStep, setActiveStep] = useState(0);
@@ -32,6 +35,11 @@ export const Profile = () => {
                     <img src={logo} alt={logo} className={classes.img} />
                     <div className={classes.username}>
                         {username}'s Dashboard
+                    </div>
+                    <div style={{justifyContent:'flex-end'}}>
+                        <Button color='primary' variant='contained' onClick={() => {window.open("https://www.14trees.org")}}>
+                            Donate
+                        </Button>
                     </div>
                 </div>
             )
@@ -71,6 +79,7 @@ const useStyles = makeStyles((theme) =>
         img:{
             width: '50px',
             height: '50px',
+            marginLeft:'0',
             [theme.breakpoints.down('480')]: {
                 width: '35px',
                 height: '35px',
@@ -78,6 +87,7 @@ const useStyles = makeStyles((theme) =>
         },
         header:{
             display: 'flex',
+            justifyContent: 'flex-end',
             height: '5vh',
             padding: '3.5vh',
             [theme.breakpoints.down('1500')]: {
@@ -95,6 +105,7 @@ const useStyles = makeStyles((theme) =>
             color: '#1F3625',
             fontWeight: '500',
             marginLeft: '20px',
+            marginRight: 'auto',
             [theme.breakpoints.down('1500')]: {
                 lineHeight: '40px',
                 fontSize: '28px',

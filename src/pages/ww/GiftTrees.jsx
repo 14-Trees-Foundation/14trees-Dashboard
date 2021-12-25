@@ -111,6 +111,7 @@ export const GiftTrees = () => {
             }
         }
     }
+    console.log(values.user)
 
     const assignTree = async (formValues, img) => {
         setValues({
@@ -125,6 +126,7 @@ export const GiftTrees = () => {
         formData.append('dob', date);
         formData.append('contact', formValues.contact);
         formData.append('sapling_id', values.selectedSaplingId);
+        formData.append('donor', values.user._id);
 
         if (img !== null) {
             let userImages = [];

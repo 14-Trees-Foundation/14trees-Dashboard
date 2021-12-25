@@ -14,9 +14,6 @@ export const UserInfo = () => {
     const classes = useStyles();
 
     const userinfo = useRecoilValue(usersData);
-    console.log(userinfo)
-    console.log(userinfo.user.profile_image[0])
-    console.log(userinfo.trees[0].tree.image[0])
     // const setIndex = useSetRecoilState(navIndex);
     const [open, setOpenPopup] = useRecoilState(openProfilePopup);
     const handleTreeClick = () => {
@@ -58,12 +55,19 @@ export const UserInfo = () => {
                             <div className={classes.label}>Name</div>
                             <div className={classes.data}>{userinfo.user.user.name}</div>
                             {
-                                (userinfo.user.orgid) ?
+                                (userinfo.user.donated_by !== undefined)
+                                ?
+                                (
+                                    <>
+                                        <div className={classes.label}>Donated By</div>
+                                        <div className={classes.data}>{userinfo.user.donated_by.name}</div>
+                                    </>
+                                )
+                                :
                                     <Fragment>
                                         <div className={classes.label}>Organization</div>
                                         <div className={classes.data}>{userinfo.user.orgid.name}</div>
-                                    </Fragment> :
-                                    ""
+                                    </Fragment>
                             }
                         </div>
                         <div className={classes.growth}>
