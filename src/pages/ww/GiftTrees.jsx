@@ -126,11 +126,13 @@ export const GiftTrees = () => {
         formData.append('contact', formValues.contact);
         formData.append('sapling_id', values.selectedSaplingId);
 
-        let userImages = [];
-        let image = await compressImageList(img);
-        formData.append('files', image)
-        userImages.push(img.name)
-        formData.append('userimages', userImages);
+        if (img !== null) {
+            let userImages = [];
+            let image = await compressImageList(img);
+            formData.append('files', image)
+            userImages.push(img.name)
+            formData.append('userimages', userImages);
+        }
 
         let res;
         try {
