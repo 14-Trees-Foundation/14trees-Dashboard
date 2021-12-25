@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Route, Routes } from "react-router-dom";
 import { Search } from "./pages/Search/Search";
 import { Visitor } from "./pages/Visitor/Visitor";
@@ -7,31 +7,32 @@ import { AddOrg } from "./pages/admin/Addorg/Addorg";
 import { Dashboard } from './pages/Dashboard';
 import { Events } from './pages/events/Events';
 import { NotFound } from './pages/notfound/NotFound';
-import { Login } from './pages/admin/Login';
+// import { Login } from './pages/admin/Login';
 import { AssignTree } from './pages/admin/AssignTree';
 import { Admin } from './pages/admin/Admin';
 import { AuthContext } from "./pages/admin/context/auth";
 import { Layout } from './components/Layout';
-import PrivateRoute from './PrivateRoute';
-import api from '../src/api/local';
+import { GiftTrees } from './pages/ww/GiftTrees';
+// import PrivateRoute from './PrivateRoute';
+// import api from '../src/api/local';
 
 function App() {
 
   const existingTokens = localStorage.getItem("token");
   const [authTokens, setAuthTokens] = useState(existingTokens);
-  let [isLoggedIn, setIsLoggedIn] = useState(false);
+  // let [isLoggedIn, setIsLoggedIn] = useState(false);
 
   const setTokens = (data) => {
     localStorage.setItem("token", data);
     setAuthTokens(data);
-    setIsLoggedIn(true);
+    // setIsLoggedIn(true);
   }
 
-  const removeTokens = () => {
-    localStorage.removeItem("token")
-    setAuthTokens();
-    setIsLoggedIn(false);
-  }
+  // const removeTokens = () => {
+  //   localStorage.removeItem("token")
+  //   setAuthTokens();
+  //   setIsLoggedIn(false);
+  // }
 
   return (
     <AuthContext.Provider value={{ authTokens, setAuthTokens: setTokens }}>
@@ -55,6 +56,7 @@ function App() {
           <Route path="/admin" element={<Admin />}>
             <Route path="assigntrees" element={<AssignTree />}></Route>
           </Route>
+          <Route path="/ww/:email" element={<GiftTrees />}></Route>
           <Route component={NotFound} />
         </Routes>
       </Layout>

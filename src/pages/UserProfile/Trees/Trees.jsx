@@ -1,10 +1,8 @@
 import { createStyles, makeStyles } from '@mui/styles';
+import { useRecoilValue, useRecoilState } from 'recoil';
 
-import { Chip } from "../../../stories/Chip/Chip";
 import { TreesPlanted } from '../../../stories/TreesPlanted/TreesPlanted';
-
-import { useRecoilValue, useRecoilState, useSetRecoilState} from 'recoil';
-import { usersData, currSelTree, navIndex, } from '../../../store/atoms';
+import { usersData, currSelTree } from '../../../store/atoms';
 
 export const Trees = () => {
 
@@ -12,15 +10,11 @@ export const Trees = () => {
 
     const userinfo = useRecoilValue(usersData);
     const [currTree, setCurrTree] = useRecoilState(currSelTree);
-    const setIndex = useSetRecoilState(navIndex);
+    // const setIndex = useSetRecoilState(navIndex);
     let numTrees = userinfo.trees.length
     let images = [];
     for (const tree of userinfo.trees) {
         images.push.apply(images, tree['memories']);
-    }
-
-    const handleSeeAllClick = () => {
-        setIndex(1)
     }
 
     return (

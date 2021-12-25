@@ -91,10 +91,6 @@ export const AddTree = () => {
         })
     }
 
-    useEffect(() => {
-        validate();
-    }, [values]);
-
     const onSubmit = async (e) => {
         if (!validate()) {
             toast.error('Please fill mandatory fields', {

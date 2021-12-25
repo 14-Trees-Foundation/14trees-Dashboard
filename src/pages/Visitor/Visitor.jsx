@@ -70,7 +70,8 @@ export const Visitor = () => {
                 loading: false
             });
         })();
-    }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    },[]);
 
     const compressImageList = async (file) => {
 
@@ -87,7 +88,7 @@ export const Visitor = () => {
         } catch (error) {
           console.log(error);
         }
-      
+
         return new File([compressedFile], file.name);
       }
 

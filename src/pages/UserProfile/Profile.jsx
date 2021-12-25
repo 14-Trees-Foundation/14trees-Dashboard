@@ -2,7 +2,7 @@ import { createStyles, makeStyles } from '@mui/styles';
 import Divider from '@mui/material/Divider';
 import useMediaQuery from '@mui/material/useMediaQuery';
 
-import { useState } from "react";
+// import { useState } from "react";
 import { UserInfo } from "./UserInfo/UserInfo";
 import { Trees } from "./Trees/Trees";
 import { Map } from "./Map/Map";
@@ -17,11 +17,11 @@ export const Profile = () => {
     const classes = useStyles();
 
     const userinfo = useRecoilValue(usersData);
-    const [activeStep, setActiveStep] = useState(0);
+    // const [activeStep, setActiveStep] = useState(0);
 
-    const handleInfoChange = (i) => {
-        setActiveStep(i)
-    }
+    // const handleInfoChange = (i) => {
+    //     setActiveStep(i)
+    // }
 
     const username = userinfo.user.user.name.split(" ")[0]
 

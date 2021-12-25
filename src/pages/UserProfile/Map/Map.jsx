@@ -1,4 +1,4 @@
-import { useState, useCallback, Fragment } from 'react';
+import { Fragment } from 'react';
 import { createStyles, makeStyles } from '@mui/styles';
 import {
     GoogleMap,
@@ -70,11 +70,6 @@ export const Map = () => {
     const userinfo = useRecoilValue(usersData);
     const [currTree, setCurrTree] = useRecoilState(currSelTree);
     const trees = userinfo.trees
-    const [map, setMap] = useState(null);
-
-    const onUnmount = useCallback(function callback(map) {
-        setMap(null)
-    }, []);
 
     let boundaries = [];
     let treeCenters = [];
@@ -102,7 +97,6 @@ export const Map = () => {
                 mapTypeId={'satellite'}
                 center={boundaries[0][0]}
                 zoom={17}
-                onUnmount={onUnmount}
                 options={mapOptions}
             >
                 {treeCenters.map((marker, i) => (

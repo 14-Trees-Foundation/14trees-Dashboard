@@ -1,18 +1,20 @@
 import { Fragment } from 'react';
 import { Grid } from '@mui/material';
 import { createStyles, makeStyles } from '@mui/styles';
-import { useSetRecoilState, useRecoilValue, useRecoilState } from 'recoil';
+import { useRecoilValue, useRecoilState } from 'recoil';
+// import { useSetRecoilState } from 'recoil';
 
 import { Memories } from "../Memories/Memories";
 import { InfoChip } from "../../../stories/InfoChip/InfoChip";
-import { usersData, navIndex, openProfilePopup } from '../../../store/atoms';
+import { usersData, openProfilePopup } from '../../../store/atoms';
+// import { navIndex } from '../../../store/atoms';
 import { Popup } from "../../../stories/Popup/Popup";
 
 export const UserInfo = () => {
     const classes = useStyles();
 
     const userinfo = useRecoilValue(usersData);
-    const setIndex = useSetRecoilState(navIndex);
+    // const setIndex = useSetRecoilState(navIndex);
     const [open, setOpenPopup] = useRecoilState(openProfilePopup);
     const handleTreeClick = () => {
         console.log("Tree clicked")
