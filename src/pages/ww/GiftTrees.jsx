@@ -254,8 +254,8 @@ export const GiftTrees = () => {
                                     <TableHead>
                                         <TableRow sx={{fontSize: '16px'}}>
                                             <TableCell>Tree Name</TableCell>
-                                            <TableCell align="right">Sapling ID</TableCell>
-                                            <TableCell align="right">Plot</TableCell>
+                                            <TableCell align="center">Sapling ID</TableCell>
+                                            <TableCell align="center">Plot</TableCell>
                                             <TableCell align="right"></TableCell>
                                         </TableRow>
                                     </TableHead>
@@ -271,8 +271,8 @@ export const GiftTrees = () => {
                                                     <TableCell component="th" scope="row">
                                                         {row.tree_id.tree_id.name}
                                                     </TableCell>
-                                                    <TableCell align="right" style={{cursor: 'pointer'}} onClick={() => handleSaplingClick(row)}>{row.tree_id.sapling_id}</TableCell>
-                                                    <TableCell align="right">{row.tree_id.plot_id.name}</TableCell>
+                                                    <TableCell align="center" style={{cursor: 'pointer'}} onClick={() => handleSaplingClick(row)}>{row.tree_id.sapling_id}</TableCell>
+                                                    <TableCell align="center">{row.tree_id.plot_id.name}</TableCell>
                                                     <TableCell align="center">
                                                         {
                                                             row.assigned ?
@@ -351,7 +351,7 @@ const useStyles = makeStyles((theme) =>
             paddingBottom: theme.spacing(16),
             paddingTop: theme.spacing(12),
             [theme.breakpoints.down('1200')]: {
-                padding: '32px 16px 48px 32px'
+                padding: '32px 8px 48px 8px'
             }
         },
         left: {
