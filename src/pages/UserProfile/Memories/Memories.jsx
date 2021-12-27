@@ -8,6 +8,7 @@ import { Popup } from "../../../stories/Popup/Popup";
 import { useRecoilValue, useRecoilState } from 'recoil';
 import { usersData, openMemoryPopup } from '../../../store/atoms';
 import { useState } from 'react';
+import Chip from '../../../stories/Chip/Chip';
 
 export const Memories = () => {
     const classes = useStyles();
@@ -27,6 +28,10 @@ export const Memories = () => {
         images.push("https://14treesplants.s3.ap-south-1.amazonaws.com/memories/IMG_20211003_151713.jpg")
         images.push("https://14treesplants.s3.ap-south-1.amazonaws.com/memories/IMG_20211003_130043.jpg")
         images.push("https://14treesplants.s3.ap-south-1.amazonaws.com/memories/IMG_20211003_121832.jpg")
+        images.push("https://14treesplants.s3.ap-south-1.amazonaws.com/memories/kpit1.jpeg")
+        images.push("https://14treesplants.s3.ap-south-1.amazonaws.com/memories/kpit2.jpeg")
+        images.push("https://14treesplants.s3.ap-south-1.amazonaws.com/memories/kpit3.jpeg")
+        images.push("https://14treesplants.s3.ap-south-1.amazonaws.com/memories/kpit4.jpeg")
     }
 
     const next = () => {
@@ -76,7 +81,7 @@ export const Memories = () => {
                     <div style={{ fontSize: '16px', fontWeight: '700', padding: '5px' }}>
                         Memories
                     </div>
-                    {/* <Chip label={"See All"} mode={'primary'} size={'small'} /> */}
+                    {/* <Chip label={"See All"} mode={'primary'} size={'small'} onClick={() => console.log("cliicked")}/> */}
                     <div style={{ marginLeft: 'auto', marginRight: '20px', paddingTop: '5px' }}>
                         <ArrowBackIosIcon fontSize="small" style={{ color: 'green', cursor: 'pointer' }} onClick={() => prev()} />
                         <ArrowForwardIosIcon fontSize="small" style={{ color: 'green', cursor: 'pointer' }} onClick={() => next()} />

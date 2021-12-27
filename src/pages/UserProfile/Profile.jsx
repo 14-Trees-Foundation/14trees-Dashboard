@@ -36,7 +36,7 @@ export const Profile = () => {
                     </div>
                     <div style={{justifyContent:'flex-end'}}>
                         <Button color='primary' variant='contained' onClick={() => {window.open("https://www.14trees.org")}}>
-                            Donate
+                            Gift a Tree
                         </Button>
                     </div>
                 </div>

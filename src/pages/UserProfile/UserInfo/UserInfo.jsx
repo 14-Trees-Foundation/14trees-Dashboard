@@ -59,7 +59,7 @@ export const UserInfo = () => {
                                 ?
                                 (
                                     <>
-                                        <div className={classes.label}>Donated By</div>
+                                        <div className={classes.label}>Gifted By</div>
                                         <div className={classes.data}>{userinfo.user.donated_by.name}</div>
                                     </>
                                 )
@@ -155,7 +155,7 @@ const useStyles = makeStyles((theme) =>
         },
         data: {
             fontSize: '17px',
-            fontWeight: '350',
+            fontWeight: '600',
             marginBottom: '8px',
             [theme.breakpoints.down('1025')]: {
                 fontSize: '16px',

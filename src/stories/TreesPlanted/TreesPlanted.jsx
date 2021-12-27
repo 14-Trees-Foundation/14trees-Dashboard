@@ -11,7 +11,7 @@ export const TreesPlanted = (props) => {
       <img src={props.img} alt={"Tree"} className={classes.img} />
       <div style={{ marginLeft: '15px', marginTop: '10px' }}>
         <div style={{ fontSize: '18px', fontWeight: '700' }}>{props.name}</div>
-        <div className={classes.data}>Sapling ID : {props.id}</div>
+        <div className={classes.data}>Tree ID : {props.id}</div>
         <div className={classes.data}>Date : {props.date}</div>
         {/* <div className={classes.data}>Event : {props.event}</div> */}
       </div>
@@ -64,7 +64,7 @@ const useStyles = makeStyles((theme) =>
     data: {
       fontSize: '15px',
       fontWeight: '500',
-      marginTop: '7px',
+      marginTop: '3px',
       [theme.breakpoints.down('1500')]: {
         fontSize: '13px',
         marginTop: '5px',
