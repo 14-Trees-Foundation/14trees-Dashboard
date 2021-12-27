@@ -97,12 +97,12 @@ export const Search = () => {
                                 <SearchBar
                                     searchSubmit={handleSearch}/>
                             </div>
-                            <p className={classes.sep}>OR</p>
+                            {/* <p className={classes.sep}>OR</p>
                             <div className={classes.btnGrp}>
                                 <Button variant="contained" color="secondary" size="large" className="s-s-btn" onClick={() => onUserClick()}>See all the people</Button>
                                 <Button variant="contained" color="secondary" size="large" className="s-s-btn">See all the events</Button>
                                 <Button variant="contained" color="secondary" size="large" className="s-s-btn">See all the organization</Button>
-                            </div>
+                            </div> */}
                         </div>
                     </div>
                 </div>
