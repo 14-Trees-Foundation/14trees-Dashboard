@@ -6,24 +6,24 @@ import { searchResults } from '../../store/atoms';
 
 export const UserList = ({ handleClick }) => {
     const searchResult = useRecoilValue(searchResults);
+
     const classes = UseStyle();
     if(Object.keys(searchResult.users).length !== 0) {
         return (
             <div>
                 <div className={classes.header}>
+                    <div className={classes.itemlong}></div>
                     <div className={classes.itemlong}>Name</div>
-                    <div className={classes.itemlong}>Organization</div>
                     <div className={classes.itemshort}>No. Of Plants</div>
                     <div className={classes.itemshort}>Last Vsit</div>
                 </div>
                 {searchResult.users.map((i) => {
                     return (
-                        <div className={classes.box} key={i.id} onClick={() => {handleClick(i.user_trees[0])}}>
+                        <div className={classes.box} key={i._id} onClick={() => {handleClick(i.user_trees[0])}}>
                             <Avatar className={classes.profile} alt="Profile" src={i.user_trees[0].profile_image[0]} sx={{ width: 40, height: 40 }}/>
                             <div className={classes.itemlong}>{i.name}</div>
-                            <div className={classes.itemlong}>{i.org}</div>
                             <div className={classes.itemshort}>{i.user_trees.length}</div>
-                            <div className={classes.itemshort}>{i.last_visit}</div>
+                            <div className={classes.itemshort}>{i.user_trees[0].date_added ? i.user_trees[0].date_added.slice(0,10): ""}</div>
                         </div>
                     )
                 })}

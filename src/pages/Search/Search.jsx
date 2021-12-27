@@ -1,46 +1,81 @@
-import { AppBar } from "../../stories/AppBar/AppBar";
-import { InputBar } from "./InputBar/InputBar";
-import { UserList } from "../../stories/UserList/UserList";
-import bg from "../../assets/bg.png";
-
+import * as React from 'react';
 import { createStyles, makeStyles } from '@mui/styles';
 import Button from '@mui/material/Button';
 import { useRecoilValue } from "recoil";
-import { searchResults, searchKey } from "../../store/atoms";
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import {useNavigate} from 'react-router-dom';
+
+import { AppBar } from "../../stories/AppBar/AppBar";
+import { Spinner } from "../../stories/Spinner/Spinner";
+import { UserList } from "../../stories/UserList/UserList";
+import bg from "../../assets/bg.png";
+import { searchResults, searchKey, searchError } from "../../store/atoms";
+import { SearchBar } from '../../components/Searchbar';
+import { useSetRecoilState, useRecoilState } from 'recoil';
+import api from "../../api/local";
 
 export const Search = () => {
     const classes = UseStyle();
+    const navigate = useNavigate();
     let results = useRecoilValue(searchResults);
-    let type = "All";
+    const [key, setKey] = useRecoilState(searchKey);
+    const setSearchResult = useSetRecoilState(searchResults);
+    const setSearchError = useSetRecoilState(searchError);
+    const [loading, setLoading] = React.useState(false);
+    let searchSize = 10;
+    let currPage = 1;
 
-    // let intialChipState = {
-    //     "All": "secondary",
-    //     "Individual": "secondary",
-    //     "Tree": "secondary",
-    //     "Event": "secondary",
-    //     "Organization": "secondary"
-    // }
-    // let [searchChips, setSearchChips] = useState(intialChipState);
-    let key = useRecoilValue(searchKey);
+    const handleSearch = (value) => {
+        setKey(value);
+        fetchData(value);
+    }
     let selectedChips = "All";
 
-    // const onChipSelect = (value) => {
-    //     setSearchChips(prevState => ({
-    //         ...intialChipState,
-    //         [value]: "primary"
-    //     }));
+    const fetchData = async (searchKey) => {
+        let params = {
+            key : searchKey,
+            size: searchSize,
+            index: currPage
+        }
+        setLoading(true);
+        const res = await api.get('/search/', {
+            params : params
+        });
 
-    //     setSelectedChips(value);
-    // }
+        if(res.data.total_results === 0){
+            setSearchError(true)
+        }
 
-    // const fetchAndRedirect = ()
-
-    const onUserClick = (value) => {
-        console.log(value.tree);
+        if(res.status === 200) {
+            for (let i=0; i< res.data.users.length; i++){
+                if(res.data.users[i].user_trees.length < 1){
+                    delete res.data.users[i]
+                }
+            }
+            setSearchResult(res.data);
+        } else {
+            console.log("Fetch error")
+        }
+        setLoading(false);
     }
 
+    const onUserClick = async (value) => {
+        setLoading(true);
+        let params = {
+            id : value.tree,
+        }
+        const res = await api.get('/trees/getsaplingid', {
+            params : params
+        });
+        setLoading(false);
+
+        navigate('/profile/'+res.data.sapling_id)
+    }
+
+    if (loading) {
+        return <Spinner />
+    } else {
     if (Object.keys(results.users).length === 0 && key === "") {
         return (
             <div className={classes.box}>
@@ -59,7 +94,8 @@ export const Search = () => {
                         </div>
                         <div>
                             <div className={classes.inputBox}>
-                                <InputBar type={type}/>
+                                <SearchBar
+                                    searchSubmit={handleSearch}/>
                             </div>
                             <p className={classes.sep}>OR</p>
                             <div className={classes.btnGrp}>
@@ -93,7 +129,8 @@ export const Search = () => {
                     </div>
                     <div>
                     <div className={classes.inputBox}>
-                        <InputBar type={type}/>
+                        <SearchBar
+                            searchSubmit={handleSearch}/>
                     </div>
                 </div>
                 </div>
@@ -163,6 +200,7 @@ export const Search = () => {
             </div>
         )
     }
+}
 }
 
 const UseStyle = makeStyles((theme) =>
