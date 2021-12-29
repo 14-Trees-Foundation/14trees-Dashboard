@@ -35,7 +35,7 @@ export const Profile = () => {
                         {username}'s Dashboard
                     </div>
                     <div style={{justifyContent:'flex-end'}}>
-                        <Button color='primary' variant='contained' onClick={() => {window.open("https://www.14trees.org")}}>
+                        <Button color='primary' variant='contained' onClick={() => {window.open("https://14trees.org/projects/reforestation-vetale/")}}>
                             Gift a Tree
                         </Button>
                     </div>
