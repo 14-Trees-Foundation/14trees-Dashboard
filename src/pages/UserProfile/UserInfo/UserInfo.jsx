@@ -21,6 +21,7 @@ export const UserInfo = () => {
         // setIndex(2);
     }
 
+    console.log(userinfo.user.donated_by === null)
     const onTogglePop = () => {
         setOpenPopup(!open)
     }
@@ -55,19 +56,19 @@ export const UserInfo = () => {
                             <div className={classes.label}>Name</div>
                             <div className={classes.data}>{userinfo.user.user.name}</div>
                             {
-                                (userinfo.user.donated_by !== undefined)
+                                (userinfo.user.donated_by === undefined || userinfo.user.donated_by === null )
                                 ?
                                 (
-                                    <>
-                                        <div className={classes.label}>Gifted By</div>
-                                        <div className={classes.data}>{userinfo.user.donated_by.name}</div>
-                                    </>
-                                )
-                                :
                                     <Fragment>
                                         <div className={classes.label}>Organization</div>
                                         <div className={classes.data}>{userinfo.user.orgid.name}</div>
                                     </Fragment>
+                                )
+                                :
+                                <>
+                                    <div className={classes.label}>Gifted By</div>
+                                    <div className={classes.data}>{userinfo.user.donated_by.name}</div>
+                                </>
                             }
                         </div>
                         <div className={classes.growth}>
