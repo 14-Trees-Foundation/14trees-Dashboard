@@ -14,6 +14,9 @@ import AdapterDateFns from '@mui/lab/AdapterDateFns';
 import { makeStyles } from '@mui/styles';
 import Dropzone from 'react-dropzone';
 import { useState } from 'react';
+import 'react-image-crop/dist/ReactCrop.css';
+import ReactCrop from 'react-image-crop';
+
 
 const Transition = React.forwardRef(function Transition(props, ref) {
     return <Slide direction="up" ref={ref} {...props} />;
@@ -23,7 +26,71 @@ export const GiftDialog = (props) => {
     const classes = useStyles();
     const { onClose, open, formData } = props;
     const [img, setImg] = useState(null);
+    const [croppedImg, setCroppedImg] = useState(null);
     const [imgsrc, setImgsrc] = useState(null);
+    const [cropImgsrc, setCropImgsrc] = useState(null);
+    const [imageRef, setImageRef] = useState();
+    const [crop, setCrop] = useState(
+        // default crop config
+        {
+            unit: '%',
+            width: 30,
+            aspect: 9 / 11,
+        }
+    );
+    async function cropImage(crop) {
+
+        let random = Math.random().toString(36).substr(2, 5);
+        if (imageRef && crop.width && crop.height) {
+            const croppedImage = await getCroppedImg(
+                imageRef,
+                crop,
+                'croppedImage' + random + '.jpeg' // destination filename
+            );
+
+            // calling the props function to expose
+            setCroppedImg(croppedImage);
+            setCropImgsrc(croppedImage ? URL.createObjectURL(croppedImage) : null);
+        }
+    }
+
+    const getCroppedImg = (imageFile, pixelCrop, fileName) => {
+        const canvas = document.createElement('canvas');
+
+        const scaleX = imageFile.naturalWidth / imageFile.width;
+        const scaleY = imageFile.naturalHeight / imageFile.height;
+        canvas.width = pixelCrop.width;
+        canvas.height = pixelCrop.height;
+        const ctx = canvas.getContext('2d');
+
+        ctx.drawImage(
+            imageFile,
+            pixelCrop.x * scaleX,
+            pixelCrop.y * scaleY,
+            pixelCrop.width * scaleX,
+            pixelCrop.height * scaleY,
+            0,
+            0,
+            pixelCrop.width,
+            pixelCrop.height
+        );
+
+        return new Promise((resolve, reject) => {
+            canvas.toBlob(
+                (blob) => {
+                    // returning an error
+                    if (!blob) {
+                        reject(new Error('Canvas is empty'));
+                        return;
+                    }
+
+                    blob.name = fileName;
+
+                    resolve(blob);
+                }, 'image/jpeg'
+            );
+        });
+      }
 
     const handleClose = () => {
         onClose();
@@ -31,7 +98,7 @@ export const GiftDialog = (props) => {
 
     const formSubmit = (formValues) => {
         onClose();
-        formData(formValues, img);
+        formData(formValues, croppedImg);
     }
 
     const handleProfilePic = (image) => {
@@ -145,9 +212,18 @@ export const GiftDialog = (props) => {
                         </Field>
                         {
                             imgsrc !== null && (
-                                <div style={{width:'100%', textAlign:'center'}}>
-                                    <img src={imgsrc} className={classes.img} alt="profile"/>
-                                </div>
+                                <>
+                                    <ReactCrop
+                                        src={imgsrc}
+                                        crop={crop}
+                                        onImageLoaded={(imageRef) => setImageRef(imageRef)}
+                                        onComplete={(cropConfig) => cropImage(cropConfig)}
+                                        onChange={(c) => setCrop(c)}
+                                    />
+                                     <div style={{width:'100%', textAlign:'center'}}>
+                                        <img src={cropImgsrc} className={classes.img2} alt="profile"/>
+                                    </div>
+                                </>
                             )
                         }
                         <div className={classes.actions}>
@@ -206,9 +282,9 @@ const useStyles = makeStyles((theme) => ({
         border: '1px #1f3625 dashed',
         textAlign: 'center'
     },
-    img: {
-        width: '100px',
-        height: '100px',
-        borderRadius: '50px'
+    img2: {
+        width: '200px',
+        height: '200px',
+        ObjectFit: 'cover'
     }
 }))
