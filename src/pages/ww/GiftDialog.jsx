@@ -87,7 +87,7 @@ export const GiftDialog = (props) => {
                     blob.name = fileName;
 
                     resolve(blob);
-                }, 'image/jpeg'
+                }, 'image/jpeg', 1
             );
         });
       }
