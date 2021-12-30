@@ -23,15 +23,11 @@ export const Memories = () => {
         images.push.apply(images, tree['memories']);
     }
 
-    if(images.length === 1 && images[0]===''){
-        images = [];
-        images.push("https://14treesplants.s3.ap-south-1.amazonaws.com/memories/IMG_20211003_151713.jpg")
-        images.push("https://14treesplants.s3.ap-south-1.amazonaws.com/memories/IMG_20211003_130043.jpg")
-        images.push("https://14treesplants.s3.ap-south-1.amazonaws.com/memories/IMG_20211003_121832.jpg")
-        images.push("https://14treesplants.s3.ap-south-1.amazonaws.com/memories/kpit1.jpeg")
-        images.push("https://14treesplants.s3.ap-south-1.amazonaws.com/memories/kpit2.jpeg")
-        images.push("https://14treesplants.s3.ap-south-1.amazonaws.com/memories/kpit3.jpeg")
-        images.push("https://14treesplants.s3.ap-south-1.amazonaws.com/memories/kpit4.jpeg")
+    if(images.length >= 1 && images[0]===''){
+        images = [7,6,1,3,5,4,8,9,1,11,12,13,14,15,23,16,17,18,19,20,21,22].map((number) => {
+            return `https://14treesplants.s3.ap-south-1.amazonaws.com/memories/memory${number}.jpg`
+        });
+
     }
 
     const next = () => {
