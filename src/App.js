@@ -6,6 +6,7 @@ import { AddTree } from "./pages/admin/Addtree/Addtree";
 import { AddOrg } from "./pages/admin/Addorg/Addorg";
 import { Dashboard } from './pages/Dashboard';
 import { Events } from './pages/events/Events';
+import { Birthday } from './pages/events/Birthday';
 import { NotFound } from './pages/notfound/NotFound';
 // import { Login } from './pages/admin/Login';
 import { AssignTree } from './pages/admin/AssignTree';
@@ -51,6 +52,7 @@ function App() {
           <Route path="/addorg" element={<AddOrg />}></Route>
           <Route path="/profile/:saplingId" element={<Dashboard />}></Route>
           <Route path="/events/kpit-denso" element={<Events />}></Route>
+          <Route path="/events/birthday" element={<Birthday />}></Route>
           {/* <Route exact path="/login" render={
           (props) => <Login {...props} token={authTokens} />
         } /> */}
