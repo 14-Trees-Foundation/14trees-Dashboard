@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { createStyles, makeStyles } from '@mui/styles';
 import {
     Typography,
@@ -15,6 +15,7 @@ import imageCompression from 'browser-image-compression';
 
 import { Spinner } from "../../stories/Spinner/Spinner";
 import { GiftDialog } from './GiftDialog';
+import { PwdDialog } from './PwdDialog';
 import Axios from "../../api/local";
 
 import logo from '../../assets/gift/logogift.png';
@@ -35,6 +36,7 @@ const intitialFValues = {
     selectedSaplingId: 0,
     user: {},
     trees: [],
+    pwdDlgOpen: true,
 }
 
 export const GiftTrees = () => {
@@ -70,6 +72,13 @@ export const GiftTrees = () => {
         })
     };
 
+    const handlePwdDlgClose = () => {
+        setValues({
+            ...values,
+            pwdDlgOpen: false
+        })
+    }
+
     const handleClose = () => {
         setValues({
             ...values,
@@ -81,14 +90,7 @@ export const GiftTrees = () => {
         await assignTree(formData, img);
     }
 
-    useEffect(() => {
-        (async () => {
-            // Get Profile
-            await fetchTrees();
-        })();
-    }, []);
-
-    const fetchTrees = async () => {
+    const fetchTrees = useCallback(async () => {
         try {
             let profileTrees = await Axios.get(`/mytrees/${email}`);
             if (profileTrees.status === 200) {
@@ -110,7 +112,15 @@ export const GiftTrees = () => {
                 toast.error(error.response.data.error)
             }
         }
-    }
+    }, [email])
+
+    useEffect(() => {
+        (async () => {
+            // Get Profile
+            await fetchTrees();
+        })();
+    }, [fetchTrees]);
+
     const handleSaplingClick = (row) => {
         if (row.assigned) {
             window.open("http://dashboard.14trees.org/profile/" + row.tree_id.sapling_id)
@@ -205,6 +215,9 @@ export const GiftTrees = () => {
         } else {
             return (
                 <>
+                    <PwdDialog
+                        open={values.pwdDlgOpen}
+                        onClose={handlePwdDlgClose}/>
                     <div className={classes.bg}>
                         <Box sx={{
                             textAlign: 'center',p:8,
