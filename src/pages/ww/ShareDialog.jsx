@@ -49,7 +49,7 @@ export const ShareDialog = (props) => {
             >
             <DialogTitle>
                 <div className={classes.title}>
-                    Select the template
+                    Select the Card
                 </div>
             </DialogTitle>
             <DialogContent>

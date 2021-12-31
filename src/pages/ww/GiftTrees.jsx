@@ -383,7 +383,7 @@ export const GiftTrees = () => {
                                                                 disabled={row.assigned}
                                                                 onClick={() => handleClickOpen(row.tree_id.sapling_id)}
                                                             >
-                                                                Assign
+                                                                Gift
                                                             </Button>
                                                         }
                                                     </TableCell>
