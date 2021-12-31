@@ -16,6 +16,7 @@ import imageCompression from 'browser-image-compression';
 import { Spinner } from "../../stories/Spinner/Spinner";
 import { GiftDialog } from './GiftDialog';
 import { PwdDialog } from './PwdDialog';
+import { ShareDialog } from './ShareDialog';
 import Axios from "../../api/local";
 
 import logo from '../../assets/gift/logogift.png';
@@ -37,6 +38,10 @@ const intitialFValues = {
     user: {},
     trees: [],
     pwdDlgOpen: true,
+    shareDlgOpen: false,
+    shareName: '',
+    shareTree: '',
+    shareTreeId: ''
 }
 
 export const GiftTrees = () => {
@@ -79,6 +84,13 @@ export const GiftTrees = () => {
         })
     }
 
+    const handleShareDlgClose = () => {
+        setValues({
+            ...values,
+            shareDlgOpen: false
+        })
+    }
+
     const handleClose = () => {
         setValues({
             ...values,
@@ -88,6 +100,16 @@ export const GiftTrees = () => {
 
     const handleFormData = async (formData, img) => {
         await assignTree(formData, img);
+    }
+
+    const handleShare = (sapling_id, tree_name, name) => {
+        setValues({
+            ...values,
+            shareName: name,
+            shareTree: tree_name,
+            shareTreeId: sapling_id,
+            shareDlgOpen: true
+        })
     }
 
     const fetchTrees = useCallback(async () => {
@@ -124,6 +146,56 @@ export const GiftTrees = () => {
     const handleSaplingClick = (row) => {
         if (row.assigned) {
             window.open("http://dashboard.14trees.org/profile/" + row.tree_id.sapling_id)
+        }
+    }
+
+    const download = (type) => {
+        console.log(type)
+        setValues({
+            ...values,
+            loading: true
+        })
+        const params = JSON.stringify({
+            "sapling_id": values.shareTreeId,
+            "tree_name": values.shareTree,
+            "name": values.shareName,
+            "type": type === '1' ? 'bd' : 'hny'
+        });
+        try {
+            Axios.post('/templates/', params, {
+                    responseType: 'arraybuffer',
+                    headers: {
+                        'Content-type': 'application/json'
+                    },
+                })
+                .then((img) => {
+                    console.log(img)
+                    const file = new Blob([img.data], {type:'image/png'})
+                    console.log(file.size) // !!! this line
+                    return file
+                })
+                .then((blob) => {
+                    let url = window.URL.createObjectURL(blob);
+                    let link = document.createElement('a');
+                    link.href = url;
+                    link.download = values.shareName;
+                    link.click();
+                })
+                setValues({
+                    ...values,
+                    loading: false
+                })
+                toast.success("Image downloded successfully!")
+        } catch (error) {
+            setValues({
+                ...values,
+                loading: false
+            })
+            if (error.response.status === 500) {
+                toast.error(error.response.data.error)
+            } else if (error.response.status === 409) {
+                toast.error(error.response.data.error)
+            }
         }
     }
 
@@ -218,6 +290,11 @@ export const GiftTrees = () => {
                     <PwdDialog
                         open={values.pwdDlgOpen}
                         onClose={handlePwdDlgClose}/>
+                    <ShareDialog
+                        open={values.shareDlgOpen}
+                        onClose={handleShareDlgClose}
+                        submit={download}
+                        />
                     <div className={classes.bg}>
                         <Box sx={{
                             textAlign: 'center',p:8,
@@ -263,7 +340,7 @@ export const GiftTrees = () => {
                                 )
                             }
                             <TableContainer>
-                                <Table sx={{ minWidth: 400 }} aria-label="simple table">
+                                <Table sx={{ minWidth: 360 }} aria-label="simple table">
                                     <TableHead>
                                         <TableRow sx={{fontSize: '16px'}}>
                                             <TableCell>Tree Name</TableCell>
@@ -309,6 +386,18 @@ export const GiftTrees = () => {
                                                                 Assign
                                                             </Button>
                                                         }
+                                                    </TableCell>
+                                                    <TableCell align="center">
+                                                        <Button
+                                                            sx={{ml:'auto', mr:'auto'}}
+                                                            variant="contained"
+                                                            color='primary'
+                                                            disabled={!row.assigned}
+                                                            onClick={() =>
+                                                                handleShare(row.tree_id.sapling_id, row.tree_id.tree_id.name, row.assigned_to.name)}
+                                                        >
+                                                            Share
+                                                        </Button>
                                                     </TableCell>
                                                 </TableRow>
                                         ))}

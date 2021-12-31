@@ -29,7 +29,6 @@ export const PwdDialog = (props) => {
         }
     }
     const handlePwd = (event) => {
-        console.log(pwd);
         setPwd(event.target.value)
     };
     return (
