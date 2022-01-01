@@ -6,6 +6,7 @@ import {
     Table, TableBody, TableCell,
     TableContainer, TableHead, TableRow,
     TablePagination,
+    FormControl, RadioGroup, Radio, FormControlLabel,
     Box
 } from "@mui/material";
 
@@ -39,6 +40,7 @@ const intitialFValues = {
     selectedSaplingId: 0,
     user: {},
     trees: [],
+    filteredTrees: [],
     pwdDlgOpen: true,
     shareDlgOpen: false,
     shareName: '',
@@ -53,6 +55,33 @@ export const GiftTrees = () => {
     const [page, setPage] = useState(0);
     const [values, setValues] = useState(intitialFValues);
     const [rowsPerPage, setRowsPerPage] = useState(10);
+    const [filter, setFilter] = useState('all');
+
+    const handleFilterChange = (event) => {
+        setFilter(event.target.value);
+        if(event.target.value === 'all') {
+            setValues({
+                ...values,
+                filteredTrees: values.trees
+            })
+        } else if(event.target.value === 'assigned') {
+            let temp = values.trees.filter((item) => {
+                return item.assigned
+            })
+            setValues({
+                ...values,
+                filteredTrees: temp
+            })
+        }else if(event.target.value === 'unassigned') {
+            let temp = values.trees.filter((item) => {
+                return !item.assigned
+            })
+            setValues({
+                ...values,
+                filteredTrees: temp
+            })
+        }
+    };
 
     const handleChangePage = (event, newPage) => {
         setPage(newPage);
@@ -133,7 +162,8 @@ export const GiftTrees = () => {
                     ...values,
                     loading: false,
                     user: profileTrees.data.user[0],
-                    trees: profileTrees.data.trees
+                    trees: profileTrees.data.trees,
+                    filteredTrees: profileTrees.data.trees,
                 })
             }
 
@@ -348,11 +378,18 @@ export const GiftTrees = () => {
                             onClose={handleClose}
                             formData={handleFormData}/>
                         <div className={classes.tbl}>
-                            <div >
+                            <Box>
                                 <Typography variant="h4" align="left" sx={{pl:1, pt:4,pb:4, fontWeight: '600', color: '#1f3625'}}>
                                     Tree Holdings ( {values.trees.length} )
                                 </Typography>
-                            </div>
+                                <FormControl component="fieldset" sx={{alignSelf:'center', pl:2}}>
+                                    <RadioGroup row aria-label="assigned" onChange={handleFilterChange} value={filter}>
+                                        <FormControlLabel value="all" control={<Radio />} label="All" />
+                                        <FormControlLabel value="assigned" control={<Radio />} label="Assigned" />
+                                        <FormControlLabel value="unassigned" control={<Radio />} label="Un-Assigned" />
+                                    </RadioGroup>
+                                </FormControl>
+                            </Box>
                             <ToastContainer/>
                             {
                                 tree.length === 0 && (
@@ -373,7 +410,7 @@ export const GiftTrees = () => {
                                     </TableHead>
                                     <TableBody className={classes.tblrow}>
                                         {
-                                            values.trees
+                                            values.filteredTrees
                                             .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                                             .map((row) => (
                                                 <TableRow
@@ -431,7 +468,7 @@ export const GiftTrees = () => {
                             <TablePagination
                                 rowsPerPageOptions={[10, 25, 100]}
                                 component="div"
-                                count={values.trees.length}
+                                count={values.filteredTrees.length}
                                 rowsPerPage={rowsPerPage}
                                 page={page}
                                 onPageChange={handleChangePage}
