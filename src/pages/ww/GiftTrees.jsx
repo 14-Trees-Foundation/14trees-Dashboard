@@ -297,7 +297,7 @@ export const GiftTrees = () => {
                         />
                     <div className={classes.bg}>
                         <Box sx={{
-                            textAlign: 'center',p:8,
+                            textAlign: 'center',p:6,
                             '@media screen and (max-width: 640px)': {
                                 p:2,
                             },
@@ -305,15 +305,31 @@ export const GiftTrees = () => {
                             <img src={logo} className={classes.logo} alt="logoo"/>
                             <div className={classes.headerbox}>
                                 <Typography variant='h4' align='center' sx={{color:'#1f3625',fontWeight:'550'}}>
-                                    <span>Thank You {values.user.name} for your contribution!</span>
-                                    <p style={{margin:'0px'}}>We couldn't have done this without you.</p>
+                                    <span>Thank You {values.user.name} for spending your valuable time volunteering at 14 Trees Foundation!</span>
                                 </Typography>
                                 <Typography variant='subtitle1' sx={{lineHeight: '25px', fontSize:'20px', fontWeight:'400', color:'#1f3625', pt:4, pb:3}}>
-                                    Thank you so much for the immeasurably and valuable contribution towards 14 Trees! We have not thanked you enough, and want to let you know that your dedication, efforts, support is essential to the work that we do and creating hugh impact not only on enviroment but on many lives.
+                                    <p style={{margin:'0px'}}>We are immensely grateful to have you with us. </p>
+                                    As a direct result of your help, we are able to expand our activities to cover more ground, trees,  ponds and beneficiaries.
                                 </Typography>
-                                <div style={{width:'80%', marginLeft:'auto', marginRight:'auto'}}>
-                                    <Typography sx={{lineHeight: '25px', fontSize:'20px', fontWeight:'600', color:'#1f3625', pb:3}}>
-                                        To acknolwdge and appreciate your contribution towards 14 Trees we would like to gift you 14 Trees which you can further gift to your freinds/family members on the occassaion of new year.
+                                <div style={{ marginLeft:'auto', marginRight:'auto'}}>
+                                    <Typography sx={{lineHeight: '25px', fontSize:'20px', fontWeight:'500', color:'#1f3625', pb:3}}>
+                                    Please accept a small token of appreciation in the form of trees. You are welcome to gift these to your friends and family on special occasions- birthdays, anniversaries, the new year, marriage, or festival celebrations.
+                                    </Typography>
+                                </div>
+                                <div style={{ marginLeft:'auto', marginRight:'auto'}}>
+                                    <Typography sx={{lineHeight: '25px', fontSize:'20px', fontWeight:'500', color:'#1f3625', pb:3}}>
+                                    Every tree that you gift - for its entire life - will stay standing to memorialise the special occasion. At the same time it will offset the devastating effects of carbon emissions and climate change.
+                                    </Typography>
+                                </div>
+                                <div style={{ marginLeft:'auto', marginRight:'auto'}}>
+                                    <Typography sx={{lineHeight: '25px', fontSize:'20px', fontWeight:'500', color:'#1f3625', pb:3}}>
+                                    May the seeds of your gift spread organically through your social network.
+                                    </Typography>
+                                </div>
+                                <div style={{ marginLeft:'auto', marginRight:'auto'}}>
+                                    <Typography sx={{lineHeight: '25px', fontSize:'20px', fontWeight:'500', color:'#1f3625', pb:3}}>
+                                    Thank You,
+                                    <p style={{margin:'0px', fontWeight: 'bold'}}>Team, 14Trees Foundation</p>
                                     </Typography>
                                 </div>
                             </div>
@@ -426,7 +442,7 @@ const useStyles = makeStyles((theme) =>
             padding: theme.spacing(2)
         },
         headerbox: {
-            width: '70%', maxWidth:'820px', marginLeft:'auto', marginRight:'auto',
+            width: '80%', maxWidth:'920px', marginLeft:'auto', marginRight:'auto',
             [theme.breakpoints.down('md')]: {
                 width: '100%'
             }
