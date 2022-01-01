@@ -5,8 +5,10 @@ import {
     Button,
     Table, TableBody, TableCell,
     TableContainer, TableHead, TableRow,
+    TablePagination,
     Box
 } from "@mui/material";
+
 import { ToastContainer, toast } from 'react-toastify';
 import moment from 'moment';
 import { useParams } from 'react-router-dom';
@@ -48,7 +50,18 @@ export const GiftTrees = () => {
     let {email} = useParams();
 
     const classes = useStyles();
+    const [page, setPage] = useState(0);
     const [values, setValues] = useState(intitialFValues);
+    const [rowsPerPage, setRowsPerPage] = useState(10);
+
+    const handleChangePage = (event, newPage) => {
+        setPage(newPage);
+    };
+
+    const handleChangeRowsPerPage = (event) => {
+        setRowsPerPage(+event.target.value);
+        setPage(0);
+    };
 
     const compressImageList = async (file) => {
 
@@ -150,7 +163,6 @@ export const GiftTrees = () => {
     }
 
     const download = (type) => {
-        console.log(type)
         setValues({
             ...values,
             loading: true
@@ -336,9 +348,11 @@ export const GiftTrees = () => {
                             onClose={handleClose}
                             formData={handleFormData}/>
                         <div className={classes.tbl}>
-                            <Typography variant="h4" align="left" sx={{pl:1, pt:4,pb:4, fontWeight: '600', color: '#1f3625'}}>
-                                Tree Holdings ( {values.trees.length} )
-                            </Typography>
+                            <div >
+                                <Typography variant="h4" align="left" sx={{pl:1, pt:4,pb:4, fontWeight: '600', color: '#1f3625'}}>
+                                    Tree Holdings ( {values.trees.length} )
+                                </Typography>
+                            </div>
                             <ToastContainer/>
                             {
                                 tree.length === 0 && (
@@ -359,7 +373,9 @@ export const GiftTrees = () => {
                                     </TableHead>
                                     <TableBody className={classes.tblrow}>
                                         {
-                                            values.trees.map((row) => (
+                                            values.trees
+                                            .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                                            .map((row) => (
                                                 <TableRow
                                                     key={row._id}
                                                     sx={{
@@ -412,6 +428,15 @@ export const GiftTrees = () => {
                                     </TableBody>
                                 </Table>
                             </TableContainer>
+                            <TablePagination
+                                rowsPerPageOptions={[10, 25, 100]}
+                                component="div"
+                                count={values.trees.length}
+                                rowsPerPage={rowsPerPage}
+                                page={page}
+                                onPageChange={handleChangePage}
+                                onRowsPerPageChange={handleChangeRowsPerPage}
+                            />
                         </div>
                         <div className={classes.footer}>
                         </div>
