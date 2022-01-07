@@ -29,7 +29,7 @@ import { Spinner } from "../../stories/Spinner/Spinner";
 
 import Axios from "../../api/local";
 
-import { AppBar } from "../../stories/AppBar/AppBar";
+import { AppBar } from "../../components/Appbar";
 import imageCompression from 'browser-image-compression';
 
 const intitialFValues = {

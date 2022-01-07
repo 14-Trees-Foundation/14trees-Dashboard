@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 
 import { createStyles, makeStyles } from '@mui/styles';
-import { AppBar } from "../../../stories/AppBar/AppBar";
 import Backdrop from '@mui/material/Backdrop';
 import Grid from '@mui/material/Grid';
 import TextField from '@mui/material/TextField';
@@ -18,6 +17,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import bg from "../../../assets/bg.png";
 import tree from "../../../assets/dark_logo.png";
 import { Spinner } from "../../../stories/Spinner/Spinner";
+import { AppBar } from "../../../components/Appbar"
 
 import Axios from "../../../api/local";
 

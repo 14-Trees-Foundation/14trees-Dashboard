@@ -5,7 +5,7 @@ import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import {useNavigate} from 'react-router-dom';
 
-import { AppBar } from "../../stories/AppBar/AppBar";
+import { AppBar } from "../../components/Appbar";
 import { Spinner } from "../../stories/Spinner/Spinner";
 import { UserList } from "../../stories/UserList/UserList";
 import bg from "../../assets/bg.png";
