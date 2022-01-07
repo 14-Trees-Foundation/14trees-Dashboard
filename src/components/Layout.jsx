@@ -1,12 +1,11 @@
 import React from 'react'
-import { ApplicationBar } from './appbar';
+import { AppBar } from './AppBar';
 
 export const Layout = (props) => {
-    const {children}  =props;
     return (
-        <div className="base-layout">
-            <ApplicationBar />
-            {children}
+        <div>
+            <AppBar />
+            {props.children}
         </div>
     );
 }

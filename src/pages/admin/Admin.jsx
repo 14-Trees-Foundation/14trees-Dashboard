@@ -10,7 +10,7 @@ export const Admin = () => {
     return (
         <div className={classes.box}>
             <img alt="bg" src={bg} className={classes.bg} style={{height: '100vh'}}/>
-            <div className={classes.overlay} style={{height: '100vh', paddingTop: '120px'}}>
+            <div className={classes.overlay} style={{height: '100vh'}}>
                 <Outlet />
             </div>
         </div>

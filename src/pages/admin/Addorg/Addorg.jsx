@@ -105,7 +105,6 @@ export const AddOrg = () => {
                 <div className={classes.box}>
                     <img alt="bg" src={bg} className={classes.bgimg} />
                     <div className={classes.bg}>
-                        <AppBar />
                         <div className={classes.inputbox}>
                             <Paper className={classes.paper}>
                                 <Backdrop className={classes.backdrop} open={values.backdropOpen}>
