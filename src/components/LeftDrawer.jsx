@@ -108,16 +108,7 @@ export const LeftDrawer = () => {
         return (
             <Box>
                 <AppBar position="fixed" open={open} className={classes.appbar}>
-                    <Toolbar>
-                        {/* <IconButton
-                            color="inherit"
-                            aria-label="open drawer"
-                            onClick={handleDrawerOpen}
-                            edge="start"
-                            sx={{ mr: 2, ...(open && { display: 'none' }) }}
-                        >
-                            <MenuIcon />
-                        </IconButton> */}
+                    <Toolbar style={{backgroundColor: '#e5e5e5'}}>
                         <div className={classes.header}>
                             <img src={icon} alt={logo} className={classes.img} onClick={handleDrawerOpen}/>
                             <div className={classes.username}>
@@ -148,16 +139,16 @@ export const LeftDrawer = () => {
     } else {
         return (
             <Drawer
-            className={classes.drawer}
-            variant="permanent"
-            anchor="left"
-        >
-            <Divider />
-            <img className={classes.logo} alt={'logo'} src={logo} />
-            {
-                menuitem()
-            }
-        </Drawer>
+                className={classes.drawer}
+                variant="permanent"
+                anchor="left"
+            >
+                <Divider />
+                <img className={classes.logo} alt={'logo'} src={logo} />
+                {
+                    menuitem()
+                }
+            </Drawer>
         )
     }
 }

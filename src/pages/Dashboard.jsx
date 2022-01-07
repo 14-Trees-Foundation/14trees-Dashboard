@@ -29,7 +29,7 @@ import logo from "../assets/logo_white_small.png";
 
 export const Dashboard = () => {
 
-    const matches = useMediaQuery('(max-width:481px)');
+    const matches = useMediaQuery('(max-width:601px)');
     const { saplingId } = useParams();
 
     const setUserinfo = useSetRecoilState(usersData);
