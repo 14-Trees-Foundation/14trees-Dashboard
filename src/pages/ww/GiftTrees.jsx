@@ -16,7 +16,7 @@ import { useParams } from 'react-router-dom';
 import 'react-toastify/dist/ReactToastify.css';
 import imageCompression from 'browser-image-compression';
 
-import { Spinner } from "../../stories/Spinner/Spinner";
+import { Spinner } from '../../components/Spinner';
 import { GiftDialog } from './GiftDialog';
 import { PwdDialog } from './PwdDialog';
 import { ShareDialog } from './ShareDialog';

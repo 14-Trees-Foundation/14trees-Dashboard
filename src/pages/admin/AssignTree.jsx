@@ -6,7 +6,7 @@ import { Field, Form } from "react-final-form";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
-import { Spinner } from "../../stories/Spinner/Spinner";
+import { Spinner } from '../../components/Spinner';
 import Axios from "../../api/local";
 import tree from "../../assets/dark_logo.png";
 

@@ -22,10 +22,10 @@ import { Profile } from './UserProfile/Profile';
 import { Maps } from "./Maps/Maps";
 import { RightDrawer } from '../components/RightDrawer';
 import { LeftDrawer } from '../components/LeftDrawer';
-import { Spinner } from "../stories/Spinner/Spinner";
 import { Popup } from "../stories/Popup/Popup";
-import { NotFound } from './notfound/NotFound'
-import logo from "../assets/logo_white_small.png"
+import { NotFound } from './notfound/NotFound';
+import { Spinner } from '../components/Spinner';
+import logo from "../assets/logo_white_small.png";
 
 export const Dashboard = () => {
 
@@ -60,7 +60,7 @@ export const Dashboard = () => {
         } catch (error) {
             setFound(false);
         }
-        
+
 
         const overallResponse = await Axios.default.get(`/analytics/totaltrees`);
         if (overallResponse.status === 200) {

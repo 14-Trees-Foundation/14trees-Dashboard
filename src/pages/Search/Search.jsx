@@ -6,7 +6,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import {useNavigate} from 'react-router-dom';
 
 import { AppBar } from "../../components/Appbar";
-import { Spinner } from "../../stories/Spinner/Spinner";
+import { Spinner } from '../../components/Spinner';
 import { UserList } from "../../stories/UserList/UserList";
 import bg from "../../assets/bg.png";
 import { searchResults, searchKey, searchError } from "../../store/atoms";
@@ -174,15 +174,6 @@ export const Search = () => {
                                         Organization Found
                                     </div>
                                     <OrgList />
-                                </div>
-                            }
-                            {
-                                (selectedChips === "Event" || selectedChips === "All") &&
-                                <div>
-                                    <div className="s-results-ind">
-                                        Events Found
-                                    </div>
-                                    <EventList />
                                 </div>
                             }
                             {

@@ -16,7 +16,7 @@ import 'react-toastify/dist/ReactToastify.css';
 
 import bg from "../../../assets/bg.png";
 import tree from "../../../assets/dark_logo.png";
-import { Spinner } from "../../../stories/Spinner/Spinner";
+import { Spinner } from '../../../components/Spinner';
 import { AppBar } from "../../../components/Appbar"
 
 import Axios from "../../../api/local";

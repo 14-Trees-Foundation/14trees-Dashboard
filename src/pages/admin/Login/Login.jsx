@@ -18,12 +18,11 @@ import 'react-toastify/dist/ReactToastify.css';
 import { useAuth } from "../auth/auth";
 import Axios from "../../../api/local";
 import bg from "../../../assets/bg.png";
-import { Spinner } from "../../../stories/Spinner/Spinner";
+import { Spinner } from '../../../components/Spinner';
 
 export const Login = () => {
     let navigate = useNavigate();
     let location = useLocation();
-    const [errors, setErrors] = React.useState({});
     const [openBackdrop, setBackdropOpen] = React.useState(false);
     const [username, setUserName] = React.useState("");
     const [email, setEmail] = React.useState(null);
