@@ -158,21 +158,25 @@ export const GiftTrees = () => {
         try {
             let profileTrees = await Axios.get(`/mytrees/${email}`);
             if (profileTrees.status === 200) {
-                setValues({
-                    ...values,
-                    loading: false,
-                    user: profileTrees.data.user[0],
-                    trees: profileTrees.data.trees,
-                    filteredTrees: profileTrees.data.trees,
+                setValues((values) => {
+                    return {
+                        ...values,
+                        loading: false,
+                        user: profileTrees.data.user[0],
+                        trees: profileTrees.data.trees,
+                        filteredTrees: profileTrees.data.trees,
+                    }
                 })
             }
 
         } catch (error) {
             if (error.response.status === 404) {
-                setValues({
-                    ...values,
-                    loading: false,
-                    backdropOpen: false
+                setValues((values) => {
+                    return {
+                        ...values,
+                        loading: false,
+                        backdropOpen: false
+                    }
                 })
                 toast.error(error.response.data.error)
             }

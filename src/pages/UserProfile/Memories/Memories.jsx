@@ -8,7 +8,6 @@ import { Popup } from "../../../stories/Popup/Popup";
 import { useRecoilValue, useRecoilState } from 'recoil';
 import { usersData, openMemoryPopup } from '../../../store/atoms';
 import { useState } from 'react';
-import Chip from '../../../stories/Chip/Chip';
 
 export const Memories = () => {
     const classes = useStyles();

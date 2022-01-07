@@ -25,7 +25,6 @@ const Transition = React.forwardRef(function Transition(props, ref) {
 export const GiftDialog = (props) => {
     const classes = useStyles();
     const { onClose, open, formData } = props;
-    const [img, setImg] = useState(null);
     const [croppedImg, setCroppedImg] = useState(null);
     const [imgsrc, setImgsrc] = useState(null);
     const [cropImgsrc, setCropImgsrc] = useState(null);
@@ -102,7 +101,6 @@ export const GiftDialog = (props) => {
     }
 
     const handleProfilePic = (image) => {
-        setImg(image ? image[0] : null);
         setImgsrc(image ? URL.createObjectURL(image[0]) : null);
     }
     return (
