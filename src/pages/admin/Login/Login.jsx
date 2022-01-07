@@ -48,14 +48,17 @@ export const Login = () => {
                     'Content-Type': "application/json"
                   }
             });
-            if(res.status === 201) {
+            if(res.status === 201 && res.data.user.role) {
                 localStorage.setItem('loginInfo', JSON.stringify(response));
                 auth.signin(res.data.name, response.tokenId, () => {
                     navigate(from, { replace: true });
                 })
             }
+            toast.error("User not authorized! Contact Admin")
         } catch (error) {
-            console.log(error)
+            if(error.response.status === 404 ) {
+                toast.error("User not Found! Contact Admin")
+            }
         }
     }
 
@@ -114,15 +117,6 @@ export const Login = () => {
                     }
                 }
             }
-            // auth.signin(username, () => {
-            // Send them back to the page they tried to visit when they were
-            // redirected to the login page. Use { replace: true } so we don't create
-            // another entry in the history stack for the login page.  This means that
-            // when they get to the protected page and click the back button, they
-            // won't end up back on the login page, which is also really nice for the
-            // user experience.
-                // navigate(from, { replace: true });
-            // });
         } catch(error) {
             toast.error(error.response.data.error)
         }
