@@ -18,7 +18,7 @@ export const RightDrawer = () => {
                 <h3 style={{ marginLeft: '9%' }}>Overall Impact</h3>
                 <Divider style={{ margin: '0 9% 2% 9%' }} />
                 <div className={classes.infobox}>
-                    <Impact count={'100+'} text={"People employed from local community"} />
+                    <Impact count={'120+'} text={"People employed from local community"} />
                     <Impact count={'70+'} text={"Ponds created to increase water label"} />
                 </div>
                 <div className={classes.infobox}>

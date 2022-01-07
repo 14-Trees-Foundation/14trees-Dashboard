@@ -220,7 +220,8 @@ const UseStyle = makeStyles((theme) =>
             position: 'relative',
             [theme.breakpoints.down('748')]: {
                 width: '80vw',
-                paddingLeft: '9vw'
+                paddingLeft: '9vw',
+                paddingTop: '15%',
             }
         },
         header: {

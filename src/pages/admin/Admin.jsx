@@ -1,20 +1,66 @@
+import { useEffect, useCallback, useState } from "react";
 import {
     Outlet
 } from "react-router-dom";
+import { useSetRecoilState } from 'recoil';
 import { createStyles, makeStyles } from '@mui/styles';
 
+import * as Axios from "../../api/local";
 import bg from "../../assets/bg.png";
+import { AdminLeftDrawer } from "./LeftDrawer";
+import { Spinner } from "../../components/Spinner";
+import { Box } from "@mui/material";
+import {
+    totalTrees,
+    totalTreeTypes
+} from '../../store/adminAtoms';
 
 export const Admin = () => {
     const classes = useStyles();
-    return (
-        <div className={classes.box}>
-            <img alt="bg" src={bg} className={classes.bg} style={{height: '100vh'}}/>
-            <div className={classes.overlay} style={{height: '100vh'}}>
-                <Outlet />
+    const [loading, setLoading] = useState(true);
+    const setTotalTrees = useSetRecoilState(totalTrees);
+    const setTotalTreeTypes = useSetRecoilState(totalTreeTypes);
+
+    const fetchData = useCallback(async () => {
+        setLoading(true)
+        try {
+            let response = await Axios.default.get(`/analytics/totaltrees`);
+            if (response.status === 200) {
+                setTotalTrees(response.data);
+            }
+
+            response = await Axios.default.get(`/analytics/totaltreetypes`);
+            if (response.status === 200) {
+                setTotalTreeTypes(response.data);
+            }
+        } catch (error) {
+            console.log(error)
+        }
+
+        setLoading(false);
+    }, [setTotalTrees, setTotalTreeTypes]);
+
+    useEffect(() => {
+        fetchData()
+    }, [fetchData]);
+
+    if (loading) {
+        return <Spinner />
+    } else {
+        return (
+            <div className={classes.box}>
+                <img alt="bg" src={bg} className={classes.bg} style={{height: '100vh'}}/>
+                <div className={classes.overlay} style={{height: '100vh'}}>
+                <Box sx={{ display: 'flex' }}>
+                    <AdminLeftDrawer />
+                    <Box component="main" sx={{ width: '100%', marginTop: '50px' }}>
+                        <Outlet />
+                    </Box>
+                </Box >
+                </div>
             </div>
-        </div>
-    )
+        )
+    }
 }
 
 const useStyles = makeStyles((theme) =>
