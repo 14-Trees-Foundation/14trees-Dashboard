@@ -12,7 +12,9 @@ import { Spinner } from "../../components/Spinner";
 import { Box } from "@mui/material";
 import {
     totalTrees,
-    totalTreeTypes
+    totalTreeTypes,
+    uniqueUsers,
+    totalPlots,
 } from '../../store/adminAtoms';
 
 export const Admin = () => {
@@ -20,6 +22,8 @@ export const Admin = () => {
     const [loading, setLoading] = useState(true);
     const setTotalTrees = useSetRecoilState(totalTrees);
     const setTotalTreeTypes = useSetRecoilState(totalTreeTypes);
+    const setUniqueUsers = useSetRecoilState(uniqueUsers);
+    const setTotalPlots = useSetRecoilState(totalPlots);
 
     const fetchData = useCallback(async () => {
         setLoading(true)
@@ -33,12 +37,22 @@ export const Admin = () => {
             if (response.status === 200) {
                 setTotalTreeTypes(response.data);
             }
+
+            response = await Axios.default.get(`/analytics/totalUsers`);
+            if (response.status === 200) {
+                setUniqueUsers(response.data);
+            }
+
+            response = await Axios.default.get(`/analytics/totalPlots`);
+            if (response.status === 200) {
+                setTotalPlots(response.data);
+            }
         } catch (error) {
             console.log(error)
         }
 
         setLoading(false);
-    }, [setTotalTrees, setTotalTreeTypes]);
+    }, [setTotalTrees, setTotalTreeTypes, setUniqueUsers, setTotalPlots]);
 
     useEffect(() => {
         fetchData()
@@ -53,7 +67,7 @@ export const Admin = () => {
                 <div className={classes.overlay} style={{height: '100vh'}}>
                 <Box sx={{ display: 'flex' }}>
                     <AdminLeftDrawer />
-                    <Box component="main" sx={{ width: '100%', marginTop: '50px' }}>
+                    <Box component="main" sx={{ width: '100%', marginTop: '100px' }}>
                         <Outlet />
                     </Box>
                 </Box >

@@ -15,8 +15,20 @@ const totalTreeTypes = atom({
     default: {},
 });
 
+const uniqueUsers = atom({
+    key: 'uniqueusers',
+    default: {},
+});
+
+const totalPlots = atom({
+    key: 'totalplots',
+    default: {},
+});
+
 export {
     navIndex,
     totalTrees,
-    totalTreeTypes
+    totalTreeTypes,
+    uniqueUsers,
+    totalPlots
 }
