@@ -1,7 +1,6 @@
 import * as React from 'react';
 import {
     Dialog,
-    DialogTitle,
     DialogContent,
     Slide,
     Button,
@@ -27,7 +26,7 @@ export const ShareDialog = (props) => {
     const canRef = useRef(null);
     const img1Ref = useRef(null);
     const img2Ref = useRef(null);
-    const { onClose, open, submit } = props;
+    const { onClose, open, submit, handleClick } = props;
     const [value, setValue] = React.useState('1');
 
     const handleChange = (event) => {
@@ -47,13 +46,17 @@ export const ShareDialog = (props) => {
                 fullWidth
                 maxWidth="md"
             >
-            <DialogTitle>
-                <div className={classes.title}>
-                    Select the Card
-                </div>
-            </DialogTitle>
             <DialogContent>
                 <div style={{marginLeft: 'auto', marginRight: 'auto', maxWidth: '720px'}}>
+                    <div className={classes.actions} style={{paddingBottom:'32px'}}>
+                        <Button
+                            variant="contained"
+                            color="secondary"
+                            onClick={handleClick}
+                        >
+                            Go to Dashboard
+                        </Button>
+                    </div>
                     <RadioGroup
                         aria-label="gender"
                         name="controlled-radio-buttons-group"
@@ -86,7 +89,7 @@ export const ShareDialog = (props) => {
                             color="secondary"
                             onClick={handleDownload}
                         >
-                            Download
+                            Download Card
                         </Button>
                     </div>
                 </div>
@@ -100,8 +103,12 @@ const useStyles = makeStyles((theme) => ({
         fontSize: '23px',
         fontWeight: '400',
         color: '#312F30',
-        textAlign: 'center',
-        margin: theme.spacing(4)
+        padding: theme.spacing(3),
+        '& .MuiButton-root': {
+            minWidth: '100%',
+            maxWidth: '100%',
+            minHeight: '6vh'
+        }
     },
     actions:{
         '& .MuiDialogActions-root': {

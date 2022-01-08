@@ -190,10 +190,8 @@ export const GiftTrees = () => {
         })();
     }, [fetchTrees]);
 
-    const handleSaplingClick = (row) => {
-        if (row.assigned) {
-            window.open("http://dashboard.14trees.org/profile/" + row.tree_id.sapling_id)
-        }
+    const handleSaplingClick = () => {
+        window.open("http://dashboard.14trees.org/profile/" + values.shareTreeId);
     }
 
     const download = (type) => {
@@ -336,11 +334,6 @@ export const GiftTrees = () => {
                     <PwdDialog
                         open={values.pwdDlgOpen}
                         onClose={handlePwdDlgClose}/>
-                    <ShareDialog
-                        open={values.shareDlgOpen}
-                        onClose={handleShareDlgClose}
-                        submit={download}
-                        />
                     <div className={classes.bg}>
                         <Box sx={{
                             textAlign: 'center',p:6,
@@ -426,7 +419,7 @@ export const GiftTrees = () => {
                                                     <TableCell component="th" scope="row">
                                                         {row.tree_id.tree_id.name}
                                                     </TableCell>
-                                                    <TableCell align="center" style={{cursor: 'pointer'}} onClick={() => handleSaplingClick(row)}>{row.tree_id.sapling_id}</TableCell>
+                                                    <TableCell align="center" style={{cursor: 'pointer'}}>{row.tree_id.sapling_id}</TableCell>
                                                     <TableCell align="center">{row.tree_id.plot_id.name}</TableCell>
                                                     <TableCell align="center">
                                                         {
@@ -464,6 +457,12 @@ export const GiftTrees = () => {
                                                             Share
                                                         </Button>
                                                     </TableCell>
+                                                    <ShareDialog
+                                                        open={values.shareDlgOpen}
+                                                        onClose={handleShareDlgClose}
+                                                        submit={download}
+                                                        handleClick={() => handleSaplingClick(row)}
+                                                    />
                                                 </TableRow>
                                         ))}
                                     </TableBody>
