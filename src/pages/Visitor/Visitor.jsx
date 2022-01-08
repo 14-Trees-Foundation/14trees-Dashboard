@@ -143,11 +143,9 @@ export const Visitor = () => {
             backdropOpen: true
         })
         const formData = new FormData()
-        const date = moment(formValues.dob).format('YYYY-MM-DD')
         formData.append('name', formValues.name)
         formData.append('email', formValues.email);
         formData.append('org', values.orgid);
-        formData.append('dob', date);
         formData.append('contact', formValues.phone);
         formData.append('sapling_id', formValues.saplingid);
         const userImages = [];
@@ -284,9 +282,6 @@ export const Visitor = () => {
                                     if(!values.email){
                                         errors.email = "Email required.";
                                     }
-                                    if(!values.dob){
-                                        errors.dob = "Total Supply is a required field.";
-                                    }
                                     if(!values.saplingid){
                                         errors.saplingid = "The unique number you received from 14Trees staff.";
                                     }
@@ -324,6 +319,7 @@ export const Visitor = () => {
                                                 {({ input, meta }) => (
                                                     <LocalizationProvider dateAdapter={AdapterDateFns}>
                                                         <DesktopDatePicker
+                                                            disabled
                                                             label="Date of Birth"
                                                             inputFormat="dd/MM/yyyy"
                                                             error={meta.error && meta.touched ? true : false}
