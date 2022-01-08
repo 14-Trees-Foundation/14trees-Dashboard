@@ -17,7 +17,8 @@ import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import logo from "../../assets/logo_white_small.png";
 import { useRecoilState } from 'recoil';
 import { navIndex } from '../../store/adminAtoms';
-import { AdminHome } from './AdminHome';
+import { AdminHome } from './home/AdminHome';
+import { Tree } from './tree/Tree';
 
 export const AdminLeftDrawer = () => {
     const theme = useTheme();
@@ -36,6 +37,11 @@ export const AdminLeftDrawer = () => {
             displayName: 'Home',
             logo: logo
         },
+        {
+            page: Tree,
+            displayName: 'Tree',
+            logo: logo
+        }
     ]
     const menuitem = () => {
         return (

@@ -15,7 +15,6 @@ import { WW } from './pages/ww/WW';
 import { RequireAuth } from "./pages/admin/auth/RequireAuth";
 import { AuthProvider } from "./pages/admin/auth/auth";
 import { Login } from "./pages/admin/Login/Login";
-import { AdminHome } from "./pages/admin/AdminHome";
 
 function App() {
 
@@ -39,7 +38,6 @@ function App() {
             <RequireAuth>
               <Admin />
             </RequireAuth>}>
-            <Route path="home" element={<AdminHome />}></Route>
             <Route path="assigntrees" element={<AssignTree />}></Route>
             <Route path="addorg" element={<AddOrg />}></Route>
           </Route>

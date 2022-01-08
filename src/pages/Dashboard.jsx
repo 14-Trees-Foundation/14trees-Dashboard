@@ -3,9 +3,10 @@ import useMediaQuery from '@mui/material/useMediaQuery';
 
 import { useParams } from "react-router";
 import { useEffect, useState, useCallback } from "react";
+import ReactPlayer from 'react-player/youtube';
+import { useRecoilState, useSetRecoilState, useRecoilValue } from 'recoil';
 
 import * as Axios from "../api/local";
-import { useRecoilState, useSetRecoilState, useRecoilValue } from 'recoil';
 import {
     usersData,
     overallData,
@@ -15,9 +16,6 @@ import {
     openVideo,
     videoUrl
 } from '../store/atoms';
-
-import ReactPlayer from 'react-player/youtube'
-
 import { Profile } from './UserProfile/Profile';
 import { Maps } from "./Maps/Maps";
 import { RightDrawer } from '../components/RightDrawer';

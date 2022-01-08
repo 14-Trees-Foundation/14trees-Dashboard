@@ -1,12 +1,8 @@
 import { useEffect, useCallback, useState } from "react";
-import {
-    Outlet
-} from "react-router-dom";
-import { useSetRecoilState } from 'recoil';
+import { useSetRecoilState, useRecoilValue } from 'recoil';
 import { createStyles, makeStyles } from '@mui/styles';
 
 import * as Axios from "../../api/local";
-import bg from "../../assets/bg.png";
 import { AdminLeftDrawer } from "./LeftDrawer";
 import { Spinner } from "../../components/Spinner";
 import { Box } from "@mui/material";
@@ -15,7 +11,12 @@ import {
     totalTreeTypes,
     uniqueUsers,
     totalPlots,
+    treeByPlots,
+    navIndex
 } from '../../store/adminAtoms';
+import { AdminHome } from "./home/AdminHome";
+import logo from "../../assets/logo_white_small.png";
+import { Tree } from "./tree/Tree";
 
 export const Admin = () => {
     const classes = useStyles();
@@ -24,6 +25,8 @@ export const Admin = () => {
     const setTotalTreeTypes = useSetRecoilState(totalTreeTypes);
     const setUniqueUsers = useSetRecoilState(uniqueUsers);
     const setTotalPlots = useSetRecoilState(totalPlots);
+    const setTreeByPlots = useSetRecoilState(treeByPlots);
+    const index = useRecoilValue(navIndex);
 
     const fetchData = useCallback(async () => {
         setLoading(true)
@@ -47,28 +50,54 @@ export const Admin = () => {
             if (response.status === 200) {
                 setTotalPlots(response.data);
             }
+
+            response = await Axios.default.get(`/trees/groupbyplots`);
+            if (response.status === 200) {
+                setTreeByPlots(response.data);
+            }
         } catch (error) {
             console.log(error)
         }
 
         setLoading(false);
-    }, [setTotalTrees, setTotalTreeTypes, setUniqueUsers, setTotalPlots]);
+    }, [setTotalTrees, setTotalTreeTypes, setUniqueUsers, setTotalPlots, setTreeByPlots]);
 
     useEffect(() => {
         fetchData()
     }, [fetchData]);
+
+    const pages = [
+        {
+            page: AdminHome,
+            displayName: 'Home',
+            logo: logo
+        },
+        {
+            page: Tree,
+            displayName: 'Tree',
+            logo: logo
+        },
+    ]
+    const mainBox = () => {
+        const Page = pages[index].page
+        return (
+            <Page />
+        )
+    }
 
     if (loading) {
         return <Spinner />
     } else {
         return (
             <div className={classes.box}>
-                <img alt="bg" src={bg} className={classes.bg} style={{height: '100vh'}}/>
+                {/* <img alt="bg" src={bg} className={classes.bg} style={{height: '100vh'}}/> */}
                 <div className={classes.overlay} style={{height: '100vh'}}>
-                <Box sx={{ display: 'flex' }}>
+                <Box sx={{ display: 'flex', color: '#ffffff', padding: '16px' }}>
                     <AdminLeftDrawer />
-                    <Box component="main" sx={{ width: '100%', marginTop: '100px' }}>
-                        <Outlet />
+                    <Box component="main" sx={{ width: '100%' }}>
+                    {
+                        mainBox()
+                    }
                     </Box>
                 </Box >
                 </div>
@@ -95,7 +124,7 @@ const useStyles = makeStyles((theme) =>
             top: '0',
             left: '0',
             width: '100%',
-            background: 'linear-gradient(358.58deg, #1F3625 17.04%, rgba(31, 54, 37, 0.636721) 104.2%, rgba(31, 54, 37, 0) 140.95%)',
+            background: 'linear-gradient(358.58deg, #1F3625 10.04%, rgba(31, 54, 37, 0.636721) 84.2%, rgba(31, 54, 37, 0) 120.95%)',
         },
     })
 )

@@ -25,10 +25,16 @@ const totalPlots = atom({
     default: {},
 });
 
+const treeByPlots = atom({
+    key: 'treebyplots',
+    default: {}
+})
+
 export {
     navIndex,
     totalTrees,
     totalTreeTypes,
     uniqueUsers,
-    totalPlots
+    totalPlots,
+    treeByPlots
 }

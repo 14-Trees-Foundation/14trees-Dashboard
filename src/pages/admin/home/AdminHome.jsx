@@ -8,7 +8,7 @@ import {
     totalTreeTypes,
     uniqueUsers,
     totalPlots
- } from '../../store/adminAtoms';
+ } from '../../../store/adminAtoms';
 
 export const AdminHome = () => {
     const navigate = useNavigate();
