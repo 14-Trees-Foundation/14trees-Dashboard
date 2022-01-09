@@ -12,13 +12,13 @@ export const NewsFeed = () => {
     const setVideoUrl = useSetRecoilState(videoUrl);
 
     const playVideo = (url) => {
+        setVideoUrl(url)
         setOpen(true)
     }
 
     const element = (value) => {
 
         if (value.type === '2') {
-            setVideoUrl(value.video)
             const vimagelink = 'https://img.youtube.com/vi/' + value.video.split('?v=').pop() + '/mqdefault.jpg';
             const date = value.date.slice(0, 10);
             return (
