@@ -1,7 +1,7 @@
 import { atom } from 'recoil';
 
-const navIndex = atom({
-    key: 'navindex',
+const adminNavIndex = atom({
+    key: 'adminnavindex',
     default: 0
 })
 
@@ -30,11 +30,17 @@ const treeByPlots = atom({
     default: {}
 })
 
+const treeLoggedByDate = atom({
+    key: 'treebydate',
+    default: {}
+})
+
 export {
-    navIndex,
+    adminNavIndex,
     totalTrees,
     totalTreeTypes,
     uniqueUsers,
     totalPlots,
-    treeByPlots
+    treeByPlots,
+    treeLoggedByDate
 }

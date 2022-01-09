@@ -11,8 +11,7 @@ import {
     totalTreeTypes,
     uniqueUsers,
     totalPlots,
-    treeByPlots,
-    navIndex
+    adminNavIndex
 } from '../../store/adminAtoms';
 import { AdminHome } from "./home/AdminHome";
 import logo from "../../assets/logo_white_small.png";
@@ -25,8 +24,7 @@ export const Admin = () => {
     const setTotalTreeTypes = useSetRecoilState(totalTreeTypes);
     const setUniqueUsers = useSetRecoilState(uniqueUsers);
     const setTotalPlots = useSetRecoilState(totalPlots);
-    const setTreeByPlots = useSetRecoilState(treeByPlots);
-    const index = useRecoilValue(navIndex);
+    const index = useRecoilValue(adminNavIndex);
 
     const fetchData = useCallback(async () => {
         setLoading(true)
@@ -50,17 +48,12 @@ export const Admin = () => {
             if (response.status === 200) {
                 setTotalPlots(response.data);
             }
-
-            response = await Axios.default.get(`/trees/groupbyplots`);
-            if (response.status === 200) {
-                setTreeByPlots(response.data);
-            }
         } catch (error) {
             console.log(error)
         }
 
         setLoading(false);
-    }, [setTotalTrees, setTotalTreeTypes, setUniqueUsers, setTotalPlots, setTreeByPlots]);
+    }, [setTotalTrees, setTotalTreeTypes, setUniqueUsers, setTotalPlots]);
 
     useEffect(() => {
         fetchData()
@@ -91,16 +84,14 @@ export const Admin = () => {
         return (
             <div className={classes.box}>
                 {/* <img alt="bg" src={bg} className={classes.bg} style={{height: '100vh'}}/> */}
-                <div className={classes.overlay} style={{height: '100vh'}}>
-                <Box sx={{ display: 'flex', color: '#ffffff', padding: '16px' }}>
+                <Box sx={{ display: 'flex', mt:{xs:7, md: 3} }}>
                     <AdminLeftDrawer />
-                    <Box component="main" sx={{ width: '100%' }}>
+                    <Box component="main" sx={{ minWidth: '900px', p:2,width: '100%' }}>
                     {
                         mainBox()
                     }
                     </Box>
                 </Box >
-                </div>
             </div>
         )
     }
@@ -109,22 +100,16 @@ export const Admin = () => {
 const useStyles = makeStyles((theme) =>
     createStyles({
         box: {
+            overflow: 'auto',
             width: '100%',
             position: 'relative',
             backgroundColor: '#e5e5e5',
-            overflow: 'auto',
             minHeight: '100vh',
+            heigth: '100%'
         },
         bg: {
             width: '100%',
             objectFit: 'cover',
-        },
-        overlay: {
-            position: 'absolute',
-            top: '0',
-            left: '0',
-            width: '100%',
-            background: 'linear-gradient(358.58deg, #1F3625 10.04%, rgba(31, 54, 37, 0.636721) 84.2%, rgba(31, 54, 37, 0) 120.95%)',
         },
     })
 )

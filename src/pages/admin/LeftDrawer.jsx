@@ -16,7 +16,7 @@ import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 
 import logo from "../../assets/logo_white_small.png";
 import { useRecoilState } from 'recoil';
-import { navIndex } from '../../store/adminAtoms';
+import { adminNavIndex } from '../../store/adminAtoms';
 import { AdminHome } from './home/AdminHome';
 import { Tree } from './tree/Tree';
 
@@ -25,7 +25,7 @@ export const AdminLeftDrawer = () => {
     const matches = useMediaQuery('(max-width:481px)');
     const [open, setOpen] = useState(false);
     const classes = useStyles();
-    const [index, setIndex] = useRecoilState(navIndex);
+    const [index, setIndex] = useRecoilState(adminNavIndex);
 
     const onClickNav = (value) => {
         setIndex(value);
@@ -144,7 +144,7 @@ const useStyles = makeStyles((theme) =>
             justifyContent: 'center',
             backgroundColor: '#3F5344',
             '&:hover': {
-                backgroundColor: '#9BC53D',
+                backgroundColor: '#383838',
             },
         },
         selected: {
