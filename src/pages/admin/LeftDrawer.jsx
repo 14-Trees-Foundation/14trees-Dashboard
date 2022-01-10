@@ -19,6 +19,7 @@ import { useRecoilState } from 'recoil';
 import { adminNavIndex } from '../../store/adminAtoms';
 import { AdminHome } from './home/AdminHome';
 import { Tree } from './tree/Tree';
+import { Forms } from './Forms';
 
 export const AdminLeftDrawer = () => {
     const theme = useTheme();
@@ -40,6 +41,11 @@ export const AdminLeftDrawer = () => {
         {
             page: Tree,
             displayName: 'Tree',
+            logo: logo
+        },
+        {
+            page: Forms,
+            displayName: 'Forms',
             logo: logo
         }
     ]

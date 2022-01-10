@@ -10,18 +10,14 @@ import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import CardMedia from '@mui/material/CardMedia';
 import Alert from '@mui/material/Alert';
+import Button from '@mui/material/Button';
 
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
-import bg from "../../../assets/bg.png";
 import tree from "../../../assets/dark_logo.png";
 import { Spinner } from '../../../components/Spinner';
-import { AppBar } from "../../../components/Appbar"
-
 import Axios from "../../../api/local";
-
-import Button from '@mui/material/Button';
 
 const intitialFValues = {
     selectedTreetype: '',
@@ -153,87 +149,77 @@ export const AddTree = () => {
     } else {
         if (values.uploaded) {
             return (
-                <div className={classes.box}>
-                    <img alt="bg" src={bg} className={classes.bgimg} />
-                    <div className={classes.bg}>
-                    <AppBar />
-                        <div className={classes.infobox}>
-                            <p className={classes.infodesc}>Tree Data Saved</p>
-                        </div>
-                        <div className={classes.sucessbox}>
-                            <Card className={classes.maincard}>
-                                <CardContent style={{ 'marginTop': '1%' }}>
-                                    <Alert severity="success">
-                                        Your data has been uploaded successfuly!
-                                    </Alert>
-                                    <CardMedia
-                                        className={classes.media}
-                                        image={tree}
-                                        title="tree"
-                                    />
-                                </CardContent>
-                            </Card>
-                        </div>
+                <>
+                    <div className={classes.infobox}>
+                        <p className={classes.infodesc}>Tree Data Saved</p>
                     </div>
-                </div>
+                    <div className={classes.sucessbox}>
+                        <Card className={classes.maincard}>
+                            <CardContent style={{ 'marginTop': '1%' }}>
+                                <Alert severity="success">
+                                    Your data has been uploaded successfuly!
+                                </Alert>
+                                <CardMedia
+                                    className={classes.media}
+                                    image={tree}
+                                    title="tree"
+                                />
+                            </CardContent>
+                        </Card>
+                    </div>
+                </>
             )
         } else {
             return (
-                <div className={classes.box}>
-                    <img alt="bg" src={bg} className={classes.bgimg} />
-                    <div className={classes.bg}>
-                        <AppBar />
-                        <div className={classes.inputbox}>
-                            <Paper className={classes.paper}>
-                                <Backdrop className={classes.backdrop} open={values.backdropOpen}>
-                                    <Spinner text={"Sending your data..."} />
-                                </Backdrop>
-                                <ToastContainer />
-                                <h1 className={classes.formheader}>Add Tree</h1>
-                                <form className={classes.root} autoComplete='off'>
-                                    <Grid container>
-                                        <Grid item xs={12} sm={12} md={12}>
-                                            <Autocomplete
-                                                id="treetype"
-                                                options={treetype}
-                                                autoHighlight
-                                                getOptionLabel={(option) => option.name}
-                                                onChange={(event, newValue) => {
-                                                    handleTreeTypeChange(newValue);
-                                                }}
-                                                renderInput={(params) => <TextField {...params} label="Select Tree Type" variant="outlined" />}
-                                            />
-                                            <Autocomplete
-                                                id="plots"
-                                                options={plots}
-                                                autoHighlight
-                                                getOptionLabel={(option) => option.name}
-                                                onChange={(event, newValue) => {
-                                                    handlePlotTypeChange(newValue);
-                                                }}
-                                                renderInput={(params) => <TextField {...params} label="Select Plot" variant="outlined" />}
-                                            />
-                                            <TextField
-                                                error={errors.saplingId !== "" ? true : false}
-                                                variant='outlined'
-                                                label='Sapling ID *'
-                                                name='sapling'
-                                                value={values.sapling}
-                                                helperText="Sapling ID"
-                                                onChange={handleSaplingIdChange}
-                                            />
-                                        </Grid>
-                                        {
-                                            !values.uimageerror && !values.addimageerror &&
-                                            <div className={classes.submitbtn}>
-                                                <Button size='large' variant="contained" color='primary' onClick={onSubmit}>Submit</Button>
-                                            </div>
-                                        }
-                                    </Grid>
-                                </form>
-                            </Paper>
-                        </div>
-                    </div>
+                <div className={classes.inputbox}>
+                    <Paper className={classes.paper}>
+                        <Backdrop className={classes.backdrop} open={values.backdropOpen}>
+                            <Spinner text={"Sending your data..."} />
+                        </Backdrop>
+                        <ToastContainer />
+                        <h1 className={classes.formheader}>Add Tree</h1>
+                        <form className={classes.root} autoComplete='off'>
+                            <Grid container>
+                                <Grid item xs={12} sm={12} md={12}>
+                                    <Autocomplete
+                                        id="treetype"
+                                        options={treetype}
+                                        autoHighlight
+                                        getOptionLabel={(option) => option.name}
+                                        onChange={(event, newValue) => {
+                                            handleTreeTypeChange(newValue);
+                                        }}
+                                        renderInput={(params) => <TextField {...params} label="Select Tree Type" variant="outlined" />}
+                                    />
+                                    <Autocomplete
+                                        id="plots"
+                                        options={plots}
+                                        autoHighlight
+                                        getOptionLabel={(option) => option.name}
+                                        onChange={(event, newValue) => {
+                                            handlePlotTypeChange(newValue);
+                                        }}
+                                        renderInput={(params) => <TextField {...params} label="Select Plot" variant="outlined" />}
+                                    />
+                                    <TextField
+                                        error={errors.saplingId !== "" ? true : false}
+                                        variant='outlined'
+                                        label='Sapling ID *'
+                                        name='sapling'
+                                        value={values.sapling}
+                                        helperText="Sapling ID"
+                                        onChange={handleSaplingIdChange}
+                                    />
+                                </Grid>
+                                {
+                                    !values.uimageerror && !values.addimageerror &&
+                                    <div className={classes.submitbtn}>
+                                        <Button size='large' variant="contained" color='primary' onClick={onSubmit}>Submit</Button>
+                                    </div>
+                                }
+                            </Grid>
+                        </form>
+                    </Paper>
                 </div>
             )
         }
@@ -258,21 +244,6 @@ const UseStyle = makeStyles((theme) =>
             width: '100%',
             height: '100%',
             position: 'relative',
-        },
-        bgimg: {
-            width: '100vw',
-            height: '100vh',
-            objectFit: 'cover',
-        },
-        bg: {
-            width: '100vw',
-            height: '100vh',
-            position: 'absolute',
-            top: '0',
-            bottom: '0',
-            left: '0',
-            right: '0',
-            background: 'linear-gradient(358.58deg, #1F3625 25.04%, rgba(31, 54, 37, 0.636721) 80.2%, rgba(31, 54, 37, 0) 140.95%)',
         },
         maincard: {
             width: "50%",
@@ -321,19 +292,9 @@ const UseStyle = makeStyles((theme) =>
             }
         },
         inputbox: {
-            width: '55vw',
-            paddingLeft: '22.5%',
-            height: '90vh',
-            position: 'relative',
-            paddingTop: '10%',
-            [theme.breakpoints.down('md')]: {
-                width: '90vw',
-                paddingLeft: '4vw',
-                paddingTop: '15%'
-            },
-            [theme.breakpoints.down('481')]: {
-                paddingTop: '30%'
-            }
+            maxWidth:'720px',
+            marginLeft:'auto',
+            marginRight:'auto',
         },
         paper: {
             margin: theme.spacing(5),

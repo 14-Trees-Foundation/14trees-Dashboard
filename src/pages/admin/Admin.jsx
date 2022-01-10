@@ -16,6 +16,7 @@ import {
 import { AdminHome } from "./home/AdminHome";
 import logo from "../../assets/logo_white_small.png";
 import { Tree } from "./tree/Tree";
+import { Forms } from "./Forms";
 
 export const Admin = () => {
     const classes = useStyles();
@@ -68,6 +69,11 @@ export const Admin = () => {
         {
             page: Tree,
             displayName: 'Tree',
+            logo: logo
+        },
+        {
+            page: Forms,
+            displayName: 'Forms',
             logo: logo
         },
     ]

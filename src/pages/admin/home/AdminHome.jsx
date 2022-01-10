@@ -1,6 +1,5 @@
 import { createStyles, makeStyles } from '@mui/styles';
-import { Button, Typography, Box, Grid } from "@mui/material";
-import { useNavigate } from "react-router-dom";
+import { Typography, Box, Grid } from "@mui/material";
 import { useRecoilValue } from 'recoil';
 
 import {
@@ -11,7 +10,6 @@ import {
  } from '../../../store/adminAtoms';
 
 export const AdminHome = () => {
-    const navigate = useNavigate();
     const totalTree = useRecoilValue(totalTrees);
     const totalTreeType = useRecoilValue(totalTreeTypes);
     const uniqueUser = useRecoilValue(uniqueUsers);
@@ -53,24 +51,6 @@ export const AdminHome = () => {
                     </div>
                 </Grid>
             </Grid>
-            <div style={{display: 'flex', justifyContent:'center', maxWidth: '480px'}}>
-                <Button
-                    sx={{m:2}}
-                    size='large'
-                    variant="contained"
-                    color='primary'
-                    onClick={() => navigate('/admin/assigntrees')}>
-                        AssignTrees
-                </Button>
-                <Button
-                    sx={{m:2}}
-                    size='large'
-                    variant="contained"
-                    color='primary'
-                    onClick={() => navigate('/admin/addorg')}>
-                        Add Org
-                </Button>
-            </div>
         </div>
     )
 }

@@ -15,6 +15,7 @@ import { WW } from './pages/ww/WW';
 import { RequireAuth } from "./pages/admin/auth/RequireAuth";
 import { AuthProvider } from "./pages/admin/auth/auth";
 import { Login } from "./pages/admin/Login/Login";
+import { Forms } from "./pages/admin/Forms";
 
 function App() {
 
@@ -38,8 +39,10 @@ function App() {
             <RequireAuth>
               <Admin />
             </RequireAuth>}>
-            <Route path="assigntrees" element={<AssignTree />}></Route>
-            <Route path="addorg" element={<AddOrg />}></Route>
+            <Route path="forms" element={<Forms />}>
+              <Route path="assigntrees" element={<AssignTree />}></Route>
+              <Route path="addorg" element={<AddOrg />}></Route>
+            </Route>
           </Route>
           <Route path="/ww" element={<WW />}>
             <Route path=":email" element={<GiftTrees />}></Route>
