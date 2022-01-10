@@ -20,8 +20,6 @@ export const UserInfo = () => {
         console.log("Tree clicked")
         // setIndex(2);
     }
-
-    console.log(userinfo.user.donated_by === null)
     const onTogglePop = () => {
         setOpenPopup(!open)
     }

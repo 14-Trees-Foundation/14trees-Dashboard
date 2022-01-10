@@ -37,7 +37,6 @@ export const Login = () => {
     let from = location.state?.from?.pathname || "/";
 
     const responseGoogle = async (response) => {
-        console.log("Response Gooogle : ", response)
         try {
             let res = await Axios.post('/auth/google', JSON.stringify({
                 "token": response.tokenId

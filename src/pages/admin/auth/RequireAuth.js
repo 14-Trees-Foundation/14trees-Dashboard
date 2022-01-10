@@ -16,7 +16,6 @@ export const RequireAuth = ({ children }) => {
         auth.token = user.tokenObj
     }
     let location = useLocation();
-    console.log("Login Status in RequireAuth : ", auth.signedin);
 
     if (!auth.signedin) {
         // Redirect them to the /login page, but save the current location they were

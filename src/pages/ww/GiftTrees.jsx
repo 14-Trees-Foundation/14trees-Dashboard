@@ -213,9 +213,7 @@ export const GiftTrees = () => {
                     },
                 })
                 .then((img) => {
-                    console.log(img)
                     const file = new Blob([img.data], {type:'image/png'})
-                    console.log(file.size) // !!! this line
                     return file
                 })
                 .then((blob) => {
