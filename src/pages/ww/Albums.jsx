@@ -1,4 +1,4 @@
-import { Button, FormControl, FormControlLabel, Radio, RadioGroup, Typography } from "@mui/material"
+import { Button, FormControl, FormControlLabel, Grid, Radio, RadioGroup, Typography } from "@mui/material"
 import { createStyles, makeStyles } from "@mui/styles";
 import { useRecoilValue } from "recoil";
 import Carousel from 'react-gallery-carousel';
@@ -67,26 +67,32 @@ export const Albums = ({handleCreateAlbum}) => {
             <CreateAlbumDialog open={createAlbmDlgOpen} onClose={handleDlgClose} formData={handleSubmit}/>
             {
                 albumsData.length > 0 && (
-                    <div className={classes.albumbox} style={{display:'flex'}}>
-                        <div className={classes.checkbox}>
-                            <Typography variant='h5'>
-                                Your Albums
-                            </Typography>
-                            <FormControl component="fieldset" sx={{alignSelf:'center', pl:2}}>
-                                <RadioGroup onChange={handleSelect} value={values.selectedAName}>
-                                {
-                                    albumsData.map((albumData) => {
-                                        return (
-                                            <FormControlLabel value={albumData.album_name} control={<Radio />} label={albumData.album_name} />
-                                        )
-                                    })
-                                }
-                                </RadioGroup>
-                            </FormControl>
-                        </div>
-                        <div className={classes.images}>
-                            <Carousel hasMediaButton={false} hasIndexBoard={false} images={values.images}/>
-                        </div>
+                    <div className={classes.albumbox}>
+                        <Grid container spacing={2}>
+                            <Grid item xs={12} md={4}>
+                                <div className={classes.checkbox}>
+                                    <Typography variant='h5'>
+                                        Your Albums
+                                    </Typography>
+                                    <FormControl component="fieldset" sx={{alignSelf:'center', pl:2}}>
+                                        <RadioGroup onChange={handleSelect} value={values.selectedAName}>
+                                        {
+                                            albumsData.map((albumData) => {
+                                                return (
+                                                    <FormControlLabel value={albumData.album_name} control={<Radio />} label={albumData.album_name} />
+                                                )
+                                            })
+                                        }
+                                        </RadioGroup>
+                                    </FormControl>
+                                </div>
+                            </Grid>
+                            <Grid item xs={12} md={8}>
+                                <div className={classes.images}>
+                                    <Carousel hasMediaButton={false} hasIndexBoard={false} images={values.images}/>
+                                </div>
+                            </Grid>
+                        </Grid>
                     </div>
                 )
             }
@@ -97,17 +103,16 @@ export const Albums = ({handleCreateAlbum}) => {
 const useStyles = makeStyles((theme) =>
     createStyles({
         images:{
-            marginTop: '40px', height: '50vh', width: '60%',marginRight:'auto',
+            marginTop: '40px', height: '50vh', width: '80%',marginRight:'auto',
             [theme.breakpoints.down('480')]: {
                 width: '100%',
                 height: '45vh',
             },
         },
         checkbox:{
-            marginTop: '60px', height: '50vh', width: '20%',marginLeft: 'auto',
+            marginTop: '60px', height: 'auto', width: '20%',marginLeft: 'auto',marginRight:'auto',textAlign:'center',
             [theme.breakpoints.down('480')]: {
                 width: '100%',
-                height: '45vh',
             },
         },
         albumbox:{
