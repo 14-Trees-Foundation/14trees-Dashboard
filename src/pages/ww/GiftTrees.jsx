@@ -9,7 +9,7 @@ import {
     FormControl, RadioGroup, Radio, FormControlLabel,
     Box
 } from "@mui/material";
-
+import { useRecoilState } from 'recoil';
 import { ToastContainer, toast } from 'react-toastify';
 import moment from 'moment';
 import { useParams } from 'react-router-dom';
@@ -21,12 +21,13 @@ import { GiftDialog } from './GiftDialog';
 import { PwdDialog } from './PwdDialog';
 import { ShareDialog } from './ShareDialog';
 import Axios from "../../api/local";
-
 import logo from '../../assets/gift/logogift.png';
 import tree from "../../assets/dark_logo.png";
 import bg from "../../assets/gift/bg.png";
 import bgfooter from "../../assets/gift/bgfooter.png";
 import footer from "../../assets/gift/footer.png";
+import { albums } from '../../store/adminAtoms';
+import { Albums } from './Albums';
 
 const intitialFValues = {
     name: '',
@@ -45,7 +46,7 @@ const intitialFValues = {
     shareDlgOpen: false,
     shareName: '',
     shareTree: '',
-    shareTreeId: ''
+    shareTreeId: '',
 }
 
 export const GiftTrees = () => {
@@ -56,6 +57,7 @@ export const GiftTrees = () => {
     const [values, setValues] = useState(intitialFValues);
     const [rowsPerPage, setRowsPerPage] = useState(10);
     const [filter, setFilter] = useState('all');
+    const [al,setAlbums] = useRecoilState(albums);
 
     const handleFilterChange = (event) => {
         setFilter(event.target.value);
@@ -140,8 +142,12 @@ export const GiftTrees = () => {
         })
     };
 
-    const handleFormData = async (formData, img) => {
-        await assignTree(formData, img);
+    const handleFormData = async (formData, img, albumName) => {
+        let images = [];
+        if (albumName !== "none"){
+            images = al.filter(album => {return album.album_name === albumName})[0].images
+        }
+        await assignTree(formData, img, images);
     }
 
     const handleShare = (sapling_id, tree_name, name) => {
@@ -161,7 +167,6 @@ export const GiftTrees = () => {
                 setValues((values) => {
                     return {
                         ...values,
-                        loading: false,
                         user: profileTrees.data.user[0],
                         trees: profileTrees.data.trees,
                         filteredTrees: profileTrees.data.trees,
@@ -169,7 +174,20 @@ export const GiftTrees = () => {
                 })
             }
 
+            let albums = await Axios.get(`/mytrees/albums/${email}`);
+            if (albums.status === 200) {
+                setAlbums(albums.data.albums)
+            }
+
+            setValues((values) => {
+                return {
+                    ...values,
+                    loading: false
+                }
+            })
+
         } catch (error) {
+            console.log(error)
             if (error.response.status === 404) {
                 setValues((values) => {
                     return {
@@ -185,7 +203,6 @@ export const GiftTrees = () => {
 
     useEffect(() => {
         (async () => {
-            // Get Profile
             await fetchTrees();
         })();
     }, [fetchTrees]);
@@ -241,7 +258,7 @@ export const GiftTrees = () => {
         }
     }
 
-    const assignTree = async (formValues, img) => {
+    const assignTree = async (formValues, img, images) => {
         setValues({
             ...values,
             loading: true,
@@ -262,6 +279,10 @@ export const GiftTrees = () => {
             formData.append('files', image)
             userImages.push(img.name)
             formData.append('userimages', userImages);
+        }
+
+        if (images.length > 0) {
+            formData.append('albumimages', images);
         }
 
         let res;
@@ -309,6 +330,63 @@ export const GiftTrees = () => {
                 ...values,
                 loading: false,
                 dlgOpen:false,
+                backdropOpen: false
+            })
+            if (error.response.status === 409 || error.response.status === 404) {
+                toast.error(error.response.data.error)
+            }
+        }
+    }
+
+    const handleCreateAlbum = async (album_name, files) => {
+        setValues({
+            ...values,
+            loading: true,
+            backdropOpen: true
+        })
+        const formData = new FormData()
+        formData.append('album_name', album_name)
+        formData.append('name', values.user.name);
+        const albumimages = [];
+        if (files) {
+            for (const key of Object.keys(files)) {
+                let image = await compressImageList(files[key]);
+                formData.append('images', image)
+                albumimages.push(files[key].name)
+            }
+        }
+        formData.append('files', albumimages);
+        try {
+            let res = await Axios.post(`/mytrees/albums/${email}`, formData, {
+                headers: {
+                    'Content-type': 'multipart/form-data'
+                },
+            })
+
+            if (res.status === 201) {
+                let albums = await Axios.get(`/mytrees/albums/${email}`);
+                if (albums.status === 200) {
+                    setAlbums(albums.data.albums)
+                }
+                setValues({
+                    ...values,
+                    loading: false,
+                    uploaded: true,
+                })
+                toast.success("Data uploaded successfully!")
+            } else if (res.status === 204 || res.status === 400 || res.status === 409 || res.status === 404) {
+                setValues({
+                    ...values,
+                    loading: false,
+                    backdropOpen: false
+                })
+                toast.error(res.status.error)
+            }
+        } catch (error) {
+            console.log(error.response)
+            setValues({
+                ...values,
+                loading: false,
                 backdropOpen: false
             })
             if (error.response.status === 409 || error.response.status === 404) {
@@ -372,7 +450,11 @@ export const GiftTrees = () => {
                             open={values.dlgOpen}
                             onClose={handleClose}
                             formData={handleFormData}/>
-                        <div className={classes.tbl}>
+                        <div className={classes.itembox}>
+                            <Albums
+                                handleCreateAlbum={handleCreateAlbum}/>
+                        </div>
+                        <div className={classes.itembox} style={{paddingTop:'32px'}}>
                             <Box>
                                 <Typography variant="h4" align="left" sx={{pl:1, pt:4,pb:4, fontWeight: '600', color: '#1f3625'}}>
                                     Tree Holdings ( {values.trees.length} )
@@ -517,11 +599,11 @@ const useStyles = makeStyles((theme) =>
                 height: '50px'
             }
         },
-        tbl:{
+        itembox:{
             maxWidth: '1080px',
             marginLeft: 'auto',
             marginRight: 'auto',
-            paddingBottom: theme.spacing(16),
+            paddingBottom: theme.spacing(10),
             paddingTop: theme.spacing(12),
             [theme.breakpoints.down('1200')]: {
                 padding: '32px 8px 48px 8px'

@@ -5,7 +5,9 @@ import {
     DialogContent,
     Slide,
     Button,
-    TextField
+    TextField,
+    MenuItem,
+    Select
 } from '@mui/material';
 import { Field, Form } from "react-final-form";
 import LocalizationProvider from '@mui/lab/LocalizationProvider';
@@ -16,6 +18,9 @@ import Dropzone from 'react-dropzone';
 import { useState } from 'react';
 import 'react-image-crop/dist/ReactCrop.css';
 import ReactCrop from 'react-image-crop';
+import { useRecoilValue } from "recoil";
+
+import { albums } from "../../store/adminAtoms";
 
 
 const Transition = React.forwardRef(function Transition(props, ref) {
@@ -29,6 +34,8 @@ export const GiftDialog = (props) => {
     const [imgsrc, setImgsrc] = useState(null);
     const [cropImgsrc, setCropImgsrc] = useState(null);
     const [imageRef, setImageRef] = useState();
+    const albumsData = useRecoilValue(albums);
+    const [selAlbum, setSelAlbumName] = useState("none");
     const [crop, setCrop] = useState(
         // default crop config
         {
@@ -97,7 +104,11 @@ export const GiftDialog = (props) => {
 
     const formSubmit = (formValues) => {
         onClose();
-        formData(formValues, croppedImg);
+        formData(formValues, croppedImg, selAlbum);
+    }
+
+    const handleAlbumChange = (e) => {
+        setSelAlbumName(e.target.value)
     }
 
     const handleProfilePic = (image) => {
@@ -192,6 +203,21 @@ export const GiftDialog = (props) => {
                                 </LocalizationProvider>
                             )}
                         </Field>
+                        <Select
+                            sx={{mt:1}}
+                            fullWidth
+                            onChange={handleAlbumChange}
+                            defaultValue="none"
+                            >
+                            <MenuItem disabled value="none" >Select Album.</MenuItem>
+                            {albumsData?.map(option => {
+                                return (
+                                    <MenuItem key={option.album_name} value={option.album_name}>
+                                    {option.album_name}
+                                    </MenuItem>
+                                );
+                            })}
+                        </Select>
                         <Field name="profile">
                             {({ input, meta }) => (
                                 <div className={classes.imgdiv}>

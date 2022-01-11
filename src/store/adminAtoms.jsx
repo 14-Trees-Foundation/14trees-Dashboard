@@ -1,5 +1,10 @@
 import { atom } from 'recoil';
 
+const albums = atom({
+    key: 'albums',
+    default: []
+})
+
 const adminNavIndex = atom({
     key: 'adminnavindex',
     default: 0
@@ -42,5 +47,6 @@ export {
     uniqueUsers,
     totalPlots,
     treeByPlots,
-    treeLoggedByDate
+    treeLoggedByDate,
+    albums
 }

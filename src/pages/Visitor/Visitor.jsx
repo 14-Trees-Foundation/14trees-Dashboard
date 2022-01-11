@@ -72,7 +72,6 @@ export const Visitor = () => {
     },[]);
 
     const compressImageList = async (file) => {
-
         const options = {
           maxSizeMB: 0.5,
           maxWidthOrHeight: 1080,
@@ -86,9 +85,8 @@ export const Visitor = () => {
         } catch (error) {
           console.log(error);
         }
-
         return new File([compressedFile], file.name);
-      }
+    }
 
     const handleAdditionalPicUpload = async (e) => {
         if (Array.from(e.target.files).length > ADDITIONAL_IMG_MAX) {
