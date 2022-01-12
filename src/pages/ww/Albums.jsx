@@ -1,29 +1,20 @@
-import { Button, FormControl, FormControlLabel, Grid, Radio, RadioGroup, Typography } from "@mui/material"
+import { Button, Box, Grid, Typography } from "@mui/material"
 import { createStyles, makeStyles } from "@mui/styles";
-import { useRecoilValue } from "recoil";
-import Carousel from 'react-gallery-carousel';
-import 'react-gallery-carousel/dist/index.css';
+import { useRecoilValue, useSetRecoilState } from "recoil";
 import 'react-toastify/dist/ReactToastify.css';
 
-import { albums } from "../../store/adminAtoms";
-import { selectedAlbum, selectedAlbumName, selectedImages } from '../../store/selectors';
+import { albums, wwSelectedAlbumImage } from "../../store/adminAtoms";
 import { useState } from "react";
 import { CreateAlbumDialog } from "./CreateAlbumDialog";
+import { ShowImagesDlg } from "./ShowImagesDlg";
 
 export const Albums = ({handleCreateAlbum}) => {
     const albumsData = useRecoilValue(albums);
-    const sAlbum = useRecoilValue(selectedAlbum);
-    const sAName = useRecoilValue(selectedAlbumName);
-    const sImages = useRecoilValue(selectedImages);
+    const setImages = useSetRecoilState(wwSelectedAlbumImage);
     const [createAlbmDlgOpen, setAlbnDlgOpen] = useState(false);
+    const [showAlbmDlgOpen, setShowAlbmDlgOpen] = useState(false);
     const classes = useStyles();
-    const [values, setValues] = useState({
-        selectedAlbum: sAlbum,
-        selectedAName: sAName,
-        images: sImages,
-        loading: false,
-        backdropOpen: false
-    });
+    console.log(albumsData);
 
     const handleClickDlgOpen = () => {
         setAlbnDlgOpen(true)
@@ -33,15 +24,9 @@ export const Albums = ({handleCreateAlbum}) => {
         setAlbnDlgOpen(false)
     }
 
-    const handleSelect = (event) => {
-        setValues({
-            ...values,
-            selectedAlbum: albumsData.find(obj => {return obj.album_name === event.target.value}),
-            selectedAName: event.target.value,
-            images: albumsData.find(obj => {return obj.album_name === event.target.value}).images.map((image) => ({
-                src: image
-            }))
-        })
+    const handleAlbumClick = (images) => {
+        setImages(images);
+        setShowAlbmDlgOpen(true);
     }
 
     const handleSubmit = (name, files) => {
@@ -62,36 +47,56 @@ export const Albums = ({handleCreateAlbum}) => {
                 </Button>
             </div>
             <Typography variant='subtitle1' align="left" sx={{pl:1}}>
-                    These albums can be used to add memory images while gifting.
-                </Typography>
+                These albums can be used to add memory images while gifting.
+            </Typography>
+            <ShowImagesDlg open={showAlbmDlgOpen} onClose={() => setShowAlbmDlgOpen(false)}/>
             <CreateAlbumDialog open={createAlbmDlgOpen} onClose={handleDlgClose} formData={handleSubmit}/>
             {
                 albumsData.length > 0 && (
                     <div className={classes.albumbox}>
-                        <Grid container spacing={2}>
-                            <Grid item xs={12} md={4}>
-                                <div className={classes.checkbox}>
-                                    <Typography variant='h5'>
-                                        Your Albums
-                                    </Typography>
-                                    <FormControl component="fieldset" sx={{alignSelf:'center', pl:2}}>
-                                        <RadioGroup onChange={handleSelect} value={values.selectedAName}>
-                                        {
-                                            albumsData.map((albumData) => {
-                                                return (
-                                                    <FormControlLabel value={albumData.album_name} control={<Radio />} label={albumData.album_name} />
-                                                )
-                                            })
-                                        }
-                                        </RadioGroup>
-                                    </FormControl>
-                                </div>
-                            </Grid>
-                            <Grid item xs={12} md={8}>
-                                <div className={classes.images}>
-                                    <Carousel hasMediaButton={false} hasIndexBoard={false} images={values.images}/>
-                                </div>
-                            </Grid>
+                        <Grid container spacing={5}>
+                            {
+                                albumsData.map((albumData) => {
+                                    return (
+                                        <Grid item xs={12} md={6} lg={4}>
+                                            <Box sx={{
+                                                minWidth: '100%',
+                                                maxWidth: '320px',
+                                                minHeight: '320px',
+                                                borderRadius: '15px',
+                                                boxShadow: '0px 0px 20px rgba(0, 0, 0, 0.15)',
+                                                position: 'relative',
+                                                cursor: 'pointer',
+                                            }}
+                                            >
+                                                <div style={{
+                                                    backgroundImage: `url(${albumData.images[0]})`,
+                                                    width:'100%',
+                                                    height: '320px',
+                                                    borderRadius: '15px',
+                                                }}
+                                                onClick={() => handleAlbumClick(albumData.images)}
+                                                >
+                                                    <div style={{
+                                                        width: '100%',
+                                                        height: '60px',
+                                                        backgroundColor:'rgb(0, 0, 0)',
+                                                        background: 'rgba(0, 0, 0, 0.5)',
+                                                        color: '#ffffff',
+                                                        fontSize: '32px',
+                                                        textAlign: 'center',
+                                                        borderBottomLeftRadius: '15px',
+                                                        borderBottomRightRadius: '15px',
+                                                        position:'absolute',
+                                                        bottom: 0}}>
+                                                        {albumData.album_name}
+                                                    </div>
+                                                </div>
+                                            </Box>
+                                        </Grid>
+                                    )
+                                })
+                            }
                         </Grid>
                     </div>
                 )
@@ -117,10 +122,9 @@ const useStyles = makeStyles((theme) =>
         },
         albumbox:{
             margin: '32px',
-            paddingTop: '16px',
-            paddingBottom: '32px',
+            padding: theme.spacing(5),
             borderRadius: '15px',
             backgroundColor: '#ffffff'
-        }
+        },
     })
 )
