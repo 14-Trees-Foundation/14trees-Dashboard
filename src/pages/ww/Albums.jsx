@@ -83,13 +83,13 @@ export const Albums = ({handleCreateAlbum}) => {
                                                         backgroundColor:'rgb(0, 0, 0)',
                                                         background: 'rgba(0, 0, 0, 0.5)',
                                                         color: '#ffffff',
-                                                        fontSize: '32px',
+                                                        fontSize: '24px',
                                                         textAlign: 'center',
                                                         borderBottomLeftRadius: '15px',
                                                         borderBottomRightRadius: '15px',
                                                         position:'absolute',
                                                         bottom: 0}}>
-                                                        {albumData.album_name}
+                                                        {albumData.album_name.split("/")[2]}
                                                     </div>
                                                 </div>
                                             </Box>
