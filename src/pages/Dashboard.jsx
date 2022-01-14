@@ -54,6 +54,8 @@ export const Dashboard = () => {
             } else if (response.status === 204) {
                 setLoading(false);
                 setUserinfo(response.data);
+            } else {
+                setFound(false);
             }
         } catch (error) {
             setFound(false);
@@ -76,7 +78,7 @@ export const Dashboard = () => {
         }
 
         setLoading(false);
-    }, [saplingId, setUserinfo, setOverallInfo, setPondsImages, setActivities ]);
+    }, [saplingId, setUserinfo, setOverallInfo, setPondsImages, setActivities]);
 
     useEffect(() => {
         fetchData()
@@ -109,10 +111,10 @@ export const Dashboard = () => {
     if (loading) {
         return <Spinner />
     } else if (!found) {
-        return <NotFound/>
-    }else if(open) {
+        return <NotFound />
+    } else if (open) {
         return (
-            <div style={{width: '100%', height: '100%'}}>
+            <div style={{ width: '100%', height: '100%' }}>
                 <Popup toggle={onToggleVideo}>
                     <ReactPlayer
                         url={url}

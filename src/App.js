@@ -4,6 +4,7 @@ import { Visitor } from "./pages/Visitor/Visitor";
 import { AddTree } from "./pages/admin/Addtree/Addtree";
 import { AddOrg } from "./pages/admin/Addorg/Addorg";
 import { Dashboard } from './pages/Dashboard';
+import { Corporate } from './pages/events/Corporate';
 import { Events } from './pages/events/Events';
 import { NotFound } from './pages/notfound/NotFound';
 import { AssignTree } from './pages/admin/AssignTree';
@@ -16,6 +17,7 @@ import { RequireAuth } from "./pages/admin/auth/RequireAuth";
 import { AuthProvider } from "./pages/admin/auth/auth";
 import { Login } from "./pages/admin/Login/Login";
 import { Forms } from "./pages/admin/Forms";
+import { Birthday } from "./pages/events/Birthday";
 
 function App() {
 
@@ -31,9 +33,8 @@ function App() {
           <Route path="/search" element={<Search />}></Route>
           <Route path="/visitor" element={<Visitor />}></Route>
           <Route path="/addtree" element={<AddTree />}></Route>
-          {/* <Route path="/addorg" element={<AddOrg />}></Route> */}
           <Route path="/profile/:saplingId" element={<Dashboard />}></Route>
-          <Route path="/events/kpit-denso" element={<Events />}></Route>
+          <Route path="/events/kpit-denso" element={<Corporate />}></Route>
           <Route path="/login" element={<Login />} />
           <Route path="/admin" element={
             <RequireAuth>
@@ -47,7 +48,10 @@ function App() {
           <Route path="/ww" element={<WW />}>
             <Route path=":email" element={<GiftTrees />}></Route>
           </Route>
-          <Route component={NotFound} />
+          <Route path="/events" element={<Events />}>
+            <Route path="birthday/:id" element={<Birthday />}></Route>
+          </Route>
+          <Route path="/notfound" element={<NotFound />} />
         </Routes>
       </Layout>
     </AuthProvider>

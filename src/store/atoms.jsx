@@ -67,6 +67,11 @@ const searchError = atom({
     default: false,
 })
 
+const birthdayData = atom({
+    key: 'birthday',
+    default: {}
+})
+
 export {
     usersData,
     overallData,
@@ -81,4 +86,5 @@ export {
     searchError,
     openMemoryPopup,
     openProfilePopup,
+    birthdayData
 };

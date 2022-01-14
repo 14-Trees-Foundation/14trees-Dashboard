@@ -50,23 +50,23 @@ const intitialFValues = {
 }
 
 export const GiftTrees = () => {
-    let {email} = useParams();
+    let { email } = useParams();
 
     const classes = useStyles();
     const [page, setPage] = useState(0);
     const [values, setValues] = useState(intitialFValues);
     const [rowsPerPage, setRowsPerPage] = useState(10);
     const [filter, setFilter] = useState('all');
-    const [al,setAlbums] = useRecoilState(albums);
+    const [al, setAlbums] = useRecoilState(albums);
 
     const handleFilterChange = (event) => {
         setFilter(event.target.value);
-        if(event.target.value === 'all') {
+        if (event.target.value === 'all') {
             setValues({
                 ...values,
                 filteredTrees: values.trees
             })
-        } else if(event.target.value === 'assigned') {
+        } else if (event.target.value === 'assigned') {
             let temp = values.trees.filter((item) => {
                 return item.assigned
             })
@@ -74,7 +74,7 @@ export const GiftTrees = () => {
                 ...values,
                 filteredTrees: temp
             })
-        }else if(event.target.value === 'unassigned') {
+        } else if (event.target.value === 'unassigned') {
             let temp = values.trees.filter((item) => {
                 return !item.assigned
             })
@@ -97,9 +97,9 @@ export const GiftTrees = () => {
     const compressImageList = async (file) => {
 
         const options = {
-          maxSizeMB: 0.5,
-          maxWidthOrHeight: 1080,
-          useWebWorker: true
+            maxSizeMB: 2,
+            maxWidthOrHeight: 1080,
+            useWebWorker: true
         }
 
         let compressedFile;
@@ -107,7 +107,7 @@ export const GiftTrees = () => {
         try {
             compressedFile = await imageCompression(file, options);
         } catch (error) {
-          console.log(error);
+            console.log(error);
         }
 
         return new File([compressedFile], file.name);
@@ -144,8 +144,8 @@ export const GiftTrees = () => {
 
     const handleFormData = async (formData, img, albumName) => {
         let images = [];
-        if (albumName !== "none"){
-            images = al.filter(album => {return album.album_name === albumName})[0].images
+        if (albumName !== "none") {
+            images = al.filter(album => { return album.album_name === albumName })[0].images
         }
         await assignTree(formData, img, images);
     }
@@ -224,13 +224,13 @@ export const GiftTrees = () => {
         });
         try {
             Axios.post('/templates/', params, {
-                    responseType: 'arraybuffer',
-                    headers: {
-                        'Content-type': 'application/json'
-                    },
-                })
+                responseType: 'arraybuffer',
+                headers: {
+                    'Content-type': 'application/json'
+                },
+            })
                 .then((img) => {
-                    const file = new Blob([img.data], {type:'image/png'})
+                    const file = new Blob([img.data], { type: 'image/png' })
                     return file
                 })
                 .then((blob) => {
@@ -240,11 +240,11 @@ export const GiftTrees = () => {
                     link.download = values.shareName;
                     link.click();
                 })
-                setValues({
-                    ...values,
-                    loading: false
-                })
-                toast.success("Image downloded successfully!")
+            setValues({
+                ...values,
+                loading: false
+            })
+            toast.success("Image downloded successfully!")
         } catch (error) {
             setValues({
                 ...values,
@@ -311,7 +311,7 @@ export const GiftTrees = () => {
                         loading: false,
                         user: profileTrees.data.user[0],
                         trees: profileTrees.data.trees,
-                        dlgOpen:false,
+                        dlgOpen: false,
                         uploaded: true,
                     })
                 }
@@ -320,7 +320,7 @@ export const GiftTrees = () => {
                 setValues({
                     ...values,
                     loading: false,
-                    dlgOpen:false,
+                    dlgOpen: false,
                     backdropOpen: false
                 })
                 toast.error(res.status.error)
@@ -329,7 +329,7 @@ export const GiftTrees = () => {
             setValues({
                 ...values,
                 loading: false,
-                dlgOpen:false,
+                dlgOpen: false,
                 backdropOpen: false
             })
             if (error.response.status === 409 || error.response.status === 404) {
@@ -400,7 +400,7 @@ export const GiftTrees = () => {
     } else {
         if (Object.keys(values.user).length === 0 && !values.loading) {
             return (
-                <Typography variant='h2' align='center' sx={{p:8, fontWeight: 'bold'}}>
+                <Typography variant='h2' align='center' sx={{ p: 8, fontWeight: 'bold' }}>
                     User ID not found!
                 </Typography>
             )
@@ -409,57 +409,57 @@ export const GiftTrees = () => {
                 <>
                     <PwdDialog
                         open={values.pwdDlgOpen}
-                        onClose={handlePwdDlgClose}/>
+                        onClose={handlePwdDlgClose} />
                     <div className={classes.bg}>
                         <Box sx={{
-                            textAlign: 'center',p:6,
+                            textAlign: 'center', p: 6,
                             '@media screen and (max-width: 640px)': {
-                                p:2,
+                                p: 2,
                             },
                         }}>
-                            <img src={logo} className={classes.logo} alt="logoo"/>
+                            <img src={logo} className={classes.logo} alt="logoo" />
                             <div className={classes.headerbox}>
-                                <Typography variant='h4' align='center' sx={{color:'#1f3625',fontWeight:'550'}}>
+                                <Typography variant='h4' align='center' sx={{ color: '#1f3625', fontWeight: '550' }}>
                                     <span>Thank You {values.user.name} for spending your valuable time volunteering at 14 Trees Foundation!</span>
                                 </Typography>
-                                <Typography variant='subtitle1' align='left' sx={{lineHeight: '25px', fontSize:'20px', color:'#1f3625', pt:6, pb:3}}>
-                                    <p style={{margin:'0px'}}>We are immensely grateful to have you with us. </p>
+                                <Typography variant='subtitle1' align='left' sx={{ lineHeight: '25px', fontSize: '20px', color: '#1f3625', pt: 6, pb: 3 }}>
+                                    <p style={{ margin: '0px' }}>We are immensely grateful to have you with us. </p>
                                     As a direct result of your help, we are able to expand our activities to cover more ground, trees,  ponds and beneficiaries.
                                 </Typography>
-                                <Typography align='left' sx={{lineHeight: '25px', fontSize:'20px', color:'#1f3625', pb:3}}>
+                                <Typography align='left' sx={{ lineHeight: '25px', fontSize: '20px', color: '#1f3625', pb: 3 }}>
                                     Please accept a small token of appreciation in the form of trees. You are welcome to gift these to your friends and family on special occasions- birthdays, anniversaries, the new year, marriage, or festival celebrations.
                                 </Typography>
-                                <Typography align='left' sx={{lineHeight: '25px', fontSize:'20px', color:'#1f3625', pb:3}}>
+                                <Typography align='left' sx={{ lineHeight: '25px', fontSize: '20px', color: '#1f3625', pb: 3 }}>
                                     Every tree that you gift - for its entire life - will stay standing to memorialise the special occasion. At the same time it will offset the devastating effects of carbon emissions and climate change.
                                 </Typography>
-                                <Typography align='left' sx={{lineHeight: '25px', fontSize:'20px', color:'#1f3625', pb:3}}>
+                                <Typography align='left' sx={{ lineHeight: '25px', fontSize: '20px', color: '#1f3625', pb: 3 }}>
                                     May the seeds of your gift spread organically through your social network.
                                 </Typography>
-                                <Typography align='left' sx={{lineHeight: '25px', fontSize:'20px', fontWeight:'500', color:'#1f3625', pb:3}}>
+                                <Typography align='left' sx={{ lineHeight: '25px', fontSize: '20px', fontWeight: '500', color: '#1f3625', pb: 3 }}>
                                     Thank You,
-                                    <p style={{margin:'0px', fontWeight: 'bold'}}>Team, 14Trees Foundation</p>
+                                    <p style={{ margin: '0px', fontWeight: 'bold' }}>Team, 14Trees Foundation</p>
                                 </Typography>
                             </div>
                         </Box>
-                        <div style={{position: 'relative'}}>
-                            <img src={bg} className={classes.landingimg} alt="bg"/>
-                            <div style={{background: 'linear-gradient(360deg, #3F5344 17.02%, rgba(63, 83, 68, 0) 100%)', height: '230px', position: 'relative', zIndex: '999',marginTop: '-200px'}}></div>
-                            <img src={bgfooter} className={classes.bgfooter} alt="bgfooter"/>
+                        <div style={{ position: 'relative' }}>
+                            <img src={bg} className={classes.landingimg} alt="bg" />
+                            <div style={{ background: 'linear-gradient(360deg, #3F5344 17.02%, rgba(63, 83, 68, 0) 100%)', height: '230px', position: 'relative', zIndex: '999', marginTop: '-200px' }}></div>
+                            <img src={bgfooter} className={classes.bgfooter} alt="bgfooter" />
                         </div>
                         <GiftDialog
                             open={values.dlgOpen}
                             onClose={handleClose}
-                            formData={handleFormData}/>
+                            formData={handleFormData} />
                         <div className={classes.itembox}>
                             <Albums
-                                handleCreateAlbum={handleCreateAlbum}/>
+                                handleCreateAlbum={handleCreateAlbum} />
                         </div>
-                        <div className={classes.itembox} style={{paddingTop:'32px'}}>
+                        <div className={classes.itembox} style={{ paddingTop: '32px' }}>
                             <Box>
-                                <Typography variant="h4" align="left" sx={{pl:1, pt:4,pb:4, fontWeight: '600', color: '#1f3625'}}>
+                                <Typography variant="h4" align="left" sx={{ pl: 1, pt: 4, pb: 4, fontWeight: '600', color: '#1f3625' }}>
                                     Tree Holdings ( {values.trees.length} )
                                 </Typography>
-                                <FormControl component="fieldset" sx={{alignSelf:'center', pl:2}}>
+                                <FormControl component="fieldset" sx={{ alignSelf: 'center', pl: 2 }}>
                                     <RadioGroup row aria-label="assigned" onChange={handleFilterChange} value={filter}>
                                         <FormControlLabel value="all" control={<Radio />} label="All" />
                                         <FormControlLabel value="assigned" control={<Radio />} label="Assigned" />
@@ -467,10 +467,10 @@ export const GiftTrees = () => {
                                     </RadioGroup>
                                 </FormControl>
                             </Box>
-                            <ToastContainer/>
+                            <ToastContainer />
                             {
                                 tree.length === 0 && (
-                                    <Typography variant="h5" align="left" sx={{pl:4,pt:2,pb:2}}>
+                                    <Typography variant="h5" align="left" sx={{ pl: 4, pt: 2, pb: 2 }}>
                                         No Trees in your account
                                     </Typography>
                                 )
@@ -478,7 +478,7 @@ export const GiftTrees = () => {
                             <TableContainer>
                                 <Table sx={{ minWidth: 360 }} aria-label="simple table">
                                     <TableHead>
-                                        <TableRow sx={{fontSize: '16px'}}>
+                                        <TableRow sx={{ fontSize: '16px' }}>
                                             <TableCell>Tree Name</TableCell>
                                             <TableCell align="center">Sapling ID</TableCell>
                                             <TableCell align="center">Plot</TableCell>
@@ -488,63 +488,63 @@ export const GiftTrees = () => {
                                     <TableBody className={classes.tblrow}>
                                         {
                                             values.filteredTrees
-                                            .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                                            .map((row) => (
-                                                <TableRow
-                                                    key={row._id}
-                                                    sx={{
-                                                        m:2
-                                                    }}
-                                                >
-                                                    <TableCell component="th" scope="row">
-                                                        {row.tree_id.tree_id.name}
-                                                    </TableCell>
-                                                    <TableCell align="center" style={{cursor: 'pointer'}}>{row.tree_id.sapling_id}</TableCell>
-                                                    <TableCell align="center">{row.tree_id.plot_id.name}</TableCell>
-                                                    <TableCell align="center">
-                                                        {
-                                                            row.assigned ?
-                                                            (
-                                                                <>
-                                                                    <Typography variant='subtitle2' align='center' sx={{p:1, pb:0, fontSize:'12px'}}>
-                                                                        Assigned To
-                                                                    </Typography>
-                                                                    <Typography variant='subtitle1' align='center' sx={{fontWeight:'bold',color:'#1F3625'}}>
-                                                                        {row.assigned_to.name}
-                                                                    </Typography>
-                                                                </>
-                                                            ) :
+                                                .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                                                .map((row) => (
+                                                    <TableRow
+                                                        key={row._id}
+                                                        sx={{
+                                                            m: 2
+                                                        }}
+                                                    >
+                                                        <TableCell component="th" scope="row">
+                                                            {row.tree_id.tree_id.name}
+                                                        </TableCell>
+                                                        <TableCell align="center" style={{ cursor: 'pointer' }}>{row.tree_id.sapling_id}</TableCell>
+                                                        <TableCell align="center">{row.tree_id.plot_id.name}</TableCell>
+                                                        <TableCell align="center">
+                                                            {
+                                                                row.assigned ?
+                                                                    (
+                                                                        <>
+                                                                            <Typography variant='subtitle2' align='center' sx={{ p: 1, pb: 0, fontSize: '12px' }}>
+                                                                                Assigned To
+                                                                            </Typography>
+                                                                            <Typography variant='subtitle1' align='center' sx={{ fontWeight: 'bold', color: '#1F3625' }}>
+                                                                                {row.assigned_to.name}
+                                                                            </Typography>
+                                                                        </>
+                                                                    ) :
+                                                                    <Button
+                                                                        sx={{ ml: 'auto', mr: 'auto' }}
+                                                                        variant="contained"
+                                                                        color='primary'
+                                                                        disabled={row.assigned}
+                                                                        onClick={() => handleClickOpen(row.tree_id.sapling_id)}
+                                                                    >
+                                                                        Gift
+                                                                    </Button>
+                                                            }
+                                                        </TableCell>
+                                                        <TableCell align="center">
                                                             <Button
-                                                                sx={{ml:'auto', mr:'auto'}}
+                                                                sx={{ ml: 'auto', mr: 'auto' }}
                                                                 variant="contained"
                                                                 color='primary'
-                                                                disabled={row.assigned}
-                                                                onClick={() => handleClickOpen(row.tree_id.sapling_id)}
+                                                                disabled={!row.assigned}
+                                                                onClick={() =>
+                                                                    handleShare(row.tree_id.sapling_id, row.tree_id.tree_id.name, row.assigned_to.name)}
                                                             >
-                                                                Gift
+                                                                Share
                                                             </Button>
-                                                        }
-                                                    </TableCell>
-                                                    <TableCell align="center">
-                                                        <Button
-                                                            sx={{ml:'auto', mr:'auto'}}
-                                                            variant="contained"
-                                                            color='primary'
-                                                            disabled={!row.assigned}
-                                                            onClick={() =>
-                                                                handleShare(row.tree_id.sapling_id, row.tree_id.tree_id.name, row.assigned_to.name)}
-                                                        >
-                                                            Share
-                                                        </Button>
-                                                    </TableCell>
-                                                    <ShareDialog
-                                                        open={values.shareDlgOpen}
-                                                        onClose={handleShareDlgClose}
-                                                        submit={download}
-                                                        handleClick={() => handleSaplingClick(row)}
-                                                    />
-                                                </TableRow>
-                                        ))}
+                                                        </TableCell>
+                                                        <ShareDialog
+                                                            open={values.shareDlgOpen}
+                                                            onClose={handleShareDlgClose}
+                                                            submit={download}
+                                                            handleClick={() => handleSaplingClick(row)}
+                                                        />
+                                                    </TableRow>
+                                                ))}
                                     </TableBody>
                                 </Table>
                             </TableContainer>
@@ -579,7 +579,7 @@ const useStyles = makeStyles((theme) =>
             padding: theme.spacing(2)
         },
         headerbox: {
-            width: '80%', maxWidth:'920px', marginLeft:'auto', marginRight:'auto',
+            width: '80%', maxWidth: '920px', marginLeft: 'auto', marginRight: 'auto',
             [theme.breakpoints.down('md')]: {
                 width: '100%'
             }
@@ -593,13 +593,13 @@ const useStyles = makeStyles((theme) =>
         },
         bgfooter: {
             width: '100%',
-            height:'90px',
+            height: '90px',
             marginTop: '-5px',
             [theme.breakpoints.down('1200')]: {
                 height: '50px'
             }
         },
-        itembox:{
+        itembox: {
             maxWidth: '1080px',
             marginLeft: 'auto',
             marginRight: 'auto',
@@ -647,11 +647,11 @@ const useStyles = makeStyles((theme) =>
         backdrop: {
             zIndex: theme.zIndex.drawer + 1,
         },
-        tblrow:{
+        tblrow: {
             '& .MuiTableCell-root': {
                 padding: '16px',
             },
-            '& .MuiTableRow-root' : {
+            '& .MuiTableRow-root': {
                 fontSize: '20px',
                 backgroundColor: '#ffffff',
                 borderRadius: '10px'

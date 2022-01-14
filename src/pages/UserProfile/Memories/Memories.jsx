@@ -22,12 +22,14 @@ export const Memories = () => {
         images.push.apply(images, tree['memories']);
     }
 
-    if(images.length >= 1 && images[0]===''){
-        images = [7,6,1,3,5,4,8,9,1,11,12,13,14,15,23,16,17,18,19,20,21,22].map((number) => {
+    if (images.length === 1 && images[0] === '') {
+        images = [7, 6, 1, 3, 5, 4, 8, 9, 1, 11, 12, 13, 14, 15, 23, 16, 17, 18, 19, 20, 21, 22].map((number) => {
             return `https://14treesplants.s3.ap-south-1.amazonaws.com/memories/memory${number}.jpg`
         });
 
     }
+    images = [...new Set(images)]
+    images = images.filter(function (e) { return e });
 
     const next = () => {
         if (index < images.length - 1) {
@@ -49,20 +51,20 @@ export const Memories = () => {
         setOpenPopup(true)
     }
 
-    if(open) {
+    if (open) {
         return (
-            <div style={{width: '100%', height: '100%'}}>
+            <div style={{ width: '100%', height: '100%' }}>
                 <Popup toggle={onTogglePop}>
                     <div className={classes.slideshowWindow}>
-                        <div className={classes.slider} style={{ transform: matches ? `translate3d(${-index * 310}px, 0, 0)` : `translate3d(${-index * 700}px, 0, 0)`}}>
+                        <div className={classes.slider} style={{ transform: matches ? `translate3d(${-index * 310}px, 0, 0)` : `translate3d(${-index * 700}px, 0, 0)` }}>
                             {images.map((image, index) => (
                                 <div className={classes.slide} key={index}>
-                                    <img className={classes.memimageWindow} src={image} alt={"A"}/>
+                                    <img className={classes.memimageWindow} src={image} alt={"A"} />
                                 </div>
                             ))}
                         </div>
                     </div>
-                    <div style={{ marginLeft: matches? '65%':'85%', marginRight: 'auto', width: '100%', paddingTop: '5px' }}>
+                    <div style={{ marginLeft: matches ? '65%' : '85%', marginRight: 'auto', width: '100%', paddingTop: '5px' }}>
                         <ArrowBackIosIcon fontSize="large" style={{ color: 'white', cursor: 'pointer' }} onClick={() => prev()} />
                         <ArrowForwardIosIcon fontSize="large" style={{ color: 'white', cursor: 'pointer', marginLeft: '30px' }} onClick={() => next()} />
                     </div>
@@ -86,7 +88,7 @@ export const Memories = () => {
                     <div className={classes.slider} style={{ transform: `translate3d(${-index * 240}px, 0, 0)` }}>
                         {images.map((image, index) => (
                             <div className={classes.slide} key={index}>
-                                <img className={classes.memimage} src={image} alt={"A"} onClick={() => handleOpenPopup()}/>
+                                <img className={classes.memimage} src={image} alt={"A"} onClick={() => handleOpenPopup()} />
                             </div>
                         ))}
                     </div>
@@ -113,7 +115,7 @@ const useStyles = makeStyles((theme) =>
                 marginTop: '15px',
                 width: '100%',
             },
-            [theme.breakpoints.between('481','900')]: {
+            [theme.breakpoints.between('481', '900')]: {
                 marginLeft: '0px',
                 width: '100%',
                 marginTop: '15px',
