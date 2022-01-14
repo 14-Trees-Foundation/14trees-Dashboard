@@ -45,6 +45,11 @@ const wwSelectedAlbumImage = atom({
     default: {},
 })
 
+const searchTreeData = atom({
+    key: 'tree',
+    default: {},
+})
+
 export {
     adminNavIndex,
     totalTrees,
@@ -54,5 +59,6 @@ export {
     treeByPlots,
     treeLoggedByDate,
     albums,
-    wwSelectedAlbumImage
+    wwSelectedAlbumImage,
+    searchTreeData
 }
