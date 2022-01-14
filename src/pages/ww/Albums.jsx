@@ -8,13 +8,12 @@ import { useState } from "react";
 import { CreateAlbumDialog } from "./CreateAlbumDialog";
 import { ShowImagesDlg } from "./ShowImagesDlg";
 
-export const Albums = ({handleCreateAlbum}) => {
+export const Albums = ({ handleCreateAlbum }) => {
     const albumsData = useRecoilValue(albums);
     const setImages = useSetRecoilState(wwSelectedAlbumImage);
     const [createAlbmDlgOpen, setAlbnDlgOpen] = useState(false);
     const [showAlbmDlgOpen, setShowAlbmDlgOpen] = useState(false);
     const classes = useStyles();
-    console.log(albumsData);
 
     const handleClickDlgOpen = () => {
         setAlbnDlgOpen(true)
@@ -34,8 +33,8 @@ export const Albums = ({handleCreateAlbum}) => {
     }
     return (
         <>
-            <div style={{display:'flex', justifyContent:'space-between'}}>
-                <Typography variant="h4" align="left" sx={{pl:1,fontWeight: '600', color: '#1f3625'}}>
+            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                <Typography variant="h4" align="left" sx={{ pl: 1, fontWeight: '600', color: '#1f3625' }}>
                     Albums ({albumsData.length})
                 </Typography>
                 <Button
@@ -46,11 +45,11 @@ export const Albums = ({handleCreateAlbum}) => {
                     Create Album
                 </Button>
             </div>
-            <Typography variant='subtitle1' align="left" sx={{pl:1}}>
+            <Typography variant='subtitle1' align="left" sx={{ pl: 1 }}>
                 These albums can be used to add memory images while gifting.
             </Typography>
-            <ShowImagesDlg open={showAlbmDlgOpen} onClose={() => setShowAlbmDlgOpen(false)}/>
-            <CreateAlbumDialog open={createAlbmDlgOpen} onClose={handleDlgClose} formData={handleSubmit}/>
+            <ShowImagesDlg open={showAlbmDlgOpen} onClose={() => setShowAlbmDlgOpen(false)} />
+            <CreateAlbumDialog open={createAlbmDlgOpen} onClose={handleDlgClose} formData={handleSubmit} />
             {
                 albumsData.length > 0 && (
                     <div className={classes.albumbox}>
@@ -71,24 +70,25 @@ export const Albums = ({handleCreateAlbum}) => {
                                             >
                                                 <div style={{
                                                     backgroundImage: `url(${albumData.images[0]})`,
-                                                    width:'100%',
+                                                    width: '100%',
                                                     height: '320px',
                                                     borderRadius: '15px',
                                                 }}
-                                                onClick={() => handleAlbumClick(albumData.images)}
+                                                    onClick={() => handleAlbumClick(albumData.images)}
                                                 >
                                                     <div style={{
                                                         width: '100%',
                                                         height: '60px',
-                                                        backgroundColor:'rgb(0, 0, 0)',
+                                                        backgroundColor: 'rgb(0, 0, 0)',
                                                         background: 'rgba(0, 0, 0, 0.5)',
                                                         color: '#ffffff',
                                                         fontSize: '24px',
                                                         textAlign: 'center',
                                                         borderBottomLeftRadius: '15px',
                                                         borderBottomRightRadius: '15px',
-                                                        position:'absolute',
-                                                        bottom: 0}}>
+                                                        position: 'absolute',
+                                                        bottom: 0
+                                                    }}>
                                                         {albumData.album_name.split("/")[2]}
                                                     </div>
                                                 </div>
@@ -107,20 +107,20 @@ export const Albums = ({handleCreateAlbum}) => {
 
 const useStyles = makeStyles((theme) =>
     createStyles({
-        images:{
-            marginTop: '40px', height: '50vh', width: '80%',marginRight:'auto',
+        images: {
+            marginTop: '40px', height: '50vh', width: '80%', marginRight: 'auto',
             [theme.breakpoints.down('480')]: {
                 width: '100%',
                 height: '45vh',
             },
         },
-        checkbox:{
-            marginTop: '60px', height: 'auto', width: '20%',marginLeft: 'auto',marginRight:'auto',textAlign:'center',
+        checkbox: {
+            marginTop: '60px', height: 'auto', width: '20%', marginLeft: 'auto', marginRight: 'auto', textAlign: 'center',
             [theme.breakpoints.down('480')]: {
                 width: '100%',
             },
         },
-        albumbox:{
+        albumbox: {
             margin: '32px',
             padding: theme.spacing(5),
             borderRadius: '15px',

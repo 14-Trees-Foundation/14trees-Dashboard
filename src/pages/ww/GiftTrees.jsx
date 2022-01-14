@@ -39,6 +39,7 @@ const intitialFValues = {
     backdropOpen: false,
     dlgOpen: false,
     selectedSaplingId: 0,
+    selectedPlotId: '',
     user: {},
     trees: [],
     filteredTrees: [],
@@ -112,11 +113,12 @@ export const GiftTrees = () => {
 
         return new File([compressedFile], file.name);
     }
-    const handleClickOpen = (sapling_id) => {
+    const handleClickOpen = (sapling_id, plot_id) => {
         // setSelectedTree(sapling_id);
         setValues({
             ...values,
             dlgOpen: true,
+            selectedPlotId: plot_id,
             selectedSaplingId: sapling_id
         })
     };
@@ -160,6 +162,11 @@ export const GiftTrees = () => {
         })
     }
 
+    const handleTemplateShare = (type, link) => {
+        if (type === "1") {
+            window.open(`http://dashboard.14trees.org/events/birthday/${link}`, '_blank')
+        }
+    }
     const fetchTrees = useCallback(async () => {
         try {
             let profileTrees = await Axios.get(`/mytrees/${email}`);
@@ -187,7 +194,6 @@ export const GiftTrees = () => {
             })
 
         } catch (error) {
-            console.log(error)
             if (error.response.status === 404) {
                 setValues((values) => {
                     return {
@@ -281,59 +287,118 @@ export const GiftTrees = () => {
             formData.append('userimages', userImages);
         }
 
+        if (formValues.type !== "") {
+            formData.append('type', formValues.type)
+            formData.append('plot_id', values.selectedPlotId)
+        }
+
         if (images.length > 0) {
             formData.append('albumimages', images);
         }
 
         let res;
-        try {
-            res = await Axios.post('/profile/usertreereg', formData, {
-                headers: {
-                    'Content-type': 'multipart/form-data'
-                },
-            })
-
-            if (res.status === 201) {
-                const params = JSON.stringify({
-                    "sapling_id": values.selectedSaplingId,
-                    "user_id": res.data.usertreereg.user
-                })
-                await Axios.post('/mytrees/update', params, {
+        if (formValues.type === "1") {
+            try {
+                res = await Axios.post('/events/addevents/', formData, {
                     headers: {
-                        'Content-type': 'application/json'
+                        'Content-type': 'multipart/form-data'
                     },
                 })
 
-                let profileTrees = await Axios.get(`/mytrees/${email}`);
-                if (profileTrees.status === 200) {
+                if (res.status === 201) {
+                    const params = JSON.stringify({
+                        "sapling_id": values.selectedSaplingId,
+                        "user_id": res.data.result.assigned_to[0],
+                        "link": res.data.result.link
+                    })
+                    await Axios.post('/mytrees/update', params, {
+                        headers: {
+                            'Content-type': 'application/json'
+                        },
+                    })
+
+                    let profileTrees = await Axios.get(`/mytrees/${email}`);
+                    if (profileTrees.status === 200) {
+                        setValues({
+                            ...values,
+                            loading: false,
+                            user: profileTrees.data.user[0],
+                            trees: profileTrees.data.trees,
+                            dlgOpen: false,
+                            uploaded: true,
+                        })
+                    }
+                    toast.success("Data uploaded successfully!")
+                } else if (res.status === 204 || res.status === 400 || res.status === 409 || res.status === 404) {
                     setValues({
                         ...values,
                         loading: false,
-                        user: profileTrees.data.user[0],
-                        trees: profileTrees.data.trees,
                         dlgOpen: false,
-                        uploaded: true,
+                        backdropOpen: false
                     })
+                    toast.error(res.status.error)
                 }
-                toast.success("Data uploaded successfully!")
-            } else if (res.status === 204 || res.status === 400 || res.status === 409 || res.status === 404) {
+            } catch (error) {
                 setValues({
                     ...values,
                     loading: false,
                     dlgOpen: false,
                     backdropOpen: false
                 })
-                toast.error(res.status.error)
+                if (error.response.status === 409 || error.response.status === 404) {
+                    toast.error(error.response.data.error)
+                }
             }
-        } catch (error) {
-            setValues({
-                ...values,
-                loading: false,
-                dlgOpen: false,
-                backdropOpen: false
-            })
-            if (error.response.status === 409 || error.response.status === 404) {
-                toast.error(error.response.data.error)
+        } else {
+            try {
+                res = await Axios.post('/profile/usertreereg', formData, {
+                    headers: {
+                        'Content-type': 'multipart/form-data'
+                    },
+                })
+
+                if (res.status === 201) {
+                    const params = JSON.stringify({
+                        "sapling_id": values.selectedSaplingId,
+                        "user_id": res.data.usertreereg.user
+                    })
+                    await Axios.post('/mytrees/update', params, {
+                        headers: {
+                            'Content-type': 'application/json'
+                        },
+                    })
+
+                    let profileTrees = await Axios.get(`/mytrees/${email}`);
+                    if (profileTrees.status === 200) {
+                        setValues({
+                            ...values,
+                            loading: false,
+                            user: profileTrees.data.user[0],
+                            trees: profileTrees.data.trees,
+                            dlgOpen: false,
+                            uploaded: true,
+                        })
+                    }
+                    toast.success("Data uploaded successfully!")
+                } else if (res.status === 204 || res.status === 400 || res.status === 409 || res.status === 404) {
+                    setValues({
+                        ...values,
+                        loading: false,
+                        dlgOpen: false,
+                        backdropOpen: false
+                    })
+                    toast.error(res.status.error)
+                }
+            } catch (error) {
+                setValues({
+                    ...values,
+                    loading: false,
+                    dlgOpen: false,
+                    backdropOpen: false
+                })
+                if (error.response.status === 409 || error.response.status === 404) {
+                    toast.error(error.response.data.error)
+                }
             }
         }
     }
@@ -383,7 +448,6 @@ export const GiftTrees = () => {
                 toast.error(res.status.error)
             }
         } catch (error) {
-            console.log(error.response)
             setValues({
                 ...values,
                 loading: false,
@@ -483,6 +547,7 @@ export const GiftTrees = () => {
                                             <TableCell align="center">Sapling ID</TableCell>
                                             <TableCell align="center">Plot</TableCell>
                                             <TableCell align="right"></TableCell>
+                                            <TableCell align="right"></TableCell>
                                         </TableRow>
                                     </TableHead>
                                     <TableBody className={classes.tblrow}>
@@ -519,7 +584,7 @@ export const GiftTrees = () => {
                                                                         variant="contained"
                                                                         color='primary'
                                                                         disabled={row.assigned}
-                                                                        onClick={() => handleClickOpen(row.tree_id.sapling_id)}
+                                                                        onClick={() => handleClickOpen(row.tree_id.sapling_id, row.tree_id.plot_id._id)}
                                                                     >
                                                                         Gift
                                                                     </Button>
@@ -536,6 +601,21 @@ export const GiftTrees = () => {
                                                             >
                                                                 Share
                                                             </Button>
+                                                        </TableCell>
+                                                        <TableCell align="center">
+                                                            {
+                                                                (row.type !== undefined && row.type !== "") && (
+                                                                    <Button
+                                                                        sx={{ ml: 'auto', mr: 'auto' }}
+                                                                        variant="contained"
+                                                                        color='primary'
+                                                                        disabled={!row.assigned && row.type !== null}
+                                                                        onClick={() => handleTemplateShare(row.type, row.link)}
+                                                                    >
+                                                                        Customized Page
+                                                                    </Button>
+                                                                )
+                                                            }
                                                         </TableCell>
                                                         <ShareDialog
                                                             open={values.shareDlgOpen}

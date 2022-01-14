@@ -44,15 +44,19 @@ export const Birthday = () => {
         memories.push.apply(memories, tree['memories']);
     }
 
+    memories = [...new Set(memories)]
+    memories = memories.filter(function (e) { return e });
+
     if (memories.length === 1 && memories[0] === '') {
         memories = [7, 6, 1, 3, 5, 4, 8, 9, 11, 12, 13, 14, 15, 23, 16, 17, 18, 19, 20, 21, 22].map((number) => ({
             src: `https://14treesplants.s3.ap-south-1.amazonaws.com/memories/memory${number}.jpg`
         }));
+    } else {
+        memories = memories.map(image => ({
+            src: image
+        }))
     }
-
-    memories = [...new Set(memories)]
-    memories = memories.filter(function (e) { return e });
-
+    console.log(memories)
     return (
         <>
             <div>

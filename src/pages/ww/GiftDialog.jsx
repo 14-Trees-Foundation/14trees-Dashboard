@@ -36,6 +36,11 @@ export const GiftDialog = (props) => {
     const [imageRef, setImageRef] = useState();
     const albumsData = useRecoilValue(albums);
     const [selAlbum, setSelAlbumName] = useState("none");
+    const [template, setTemplate] = useState("");
+    const templates = [{
+        name: "Birthday",
+        value: "1"
+    }]
     const [crop, setCrop] = useState(
         // default crop config
         {
@@ -96,7 +101,7 @@ export const GiftDialog = (props) => {
                 }, 'image/jpeg', 1
             );
         });
-      }
+    }
 
     const handleClose = () => {
         onClose();
@@ -104,11 +109,16 @@ export const GiftDialog = (props) => {
 
     const formSubmit = (formValues) => {
         onClose();
+        formValues['type'] = template;
         formData(formValues, croppedImg, selAlbum);
     }
 
     const handleAlbumChange = (e) => {
         setSelAlbumName(e.target.value)
+    }
+
+    const handleTemplateChange = (e) => {
+        setTemplate(e.target.value);
     }
 
     const handleProfilePic = (image) => {
@@ -123,148 +133,163 @@ export const GiftDialog = (props) => {
             fullWidth
             maxWidth="sm"
         >
-        <DialogTitle>
-            <div className={classes.title}>
-                Gift this tree to your loved ones
-            </div>
-        </DialogTitle>
-        <DialogContent>
-            <Form
-                onSubmit = {formSubmit}
-                validate = {(values) => {
-                    const errors = {};
-                    if(!values.name){
-                        errors.name = "Name is required.";
-                    }
-                    if(!values.email){
-                        errors.email = "Email required.";
-                    }
-                    if(!values.contact){
-                    }
-                    if(!values.dob){
-                    }
-                    return errors;
-                }}
-                render={({ handleSubmit, form, submitting, pristine }) => (
-                    <form onSubmit={handleSubmit} className={classes.root} autoComplete='off'>
-                        <Field name="name">
-                            {({ input, meta }) => (
-                                <TextField
-                                    error={meta.error && meta.touched ? true : false}
-                                    {...input}
-                                    variant='outlined'
-                                    label='Full Name *'
-                                    name='name'
-                                    fullWidth
-                                    sx={{mb: 2, mt:1}}
-                                    helperText={meta.error && meta.touched ? meta.error : ""}
-                                />
-                            )}
-                        </Field>
-                        <Field name="email">
-                            {({ input, meta }) => (
-                                <TextField
-                                    variant='outlined'
-                                    label='Email *'
-                                    name='email'
-                                    fullWidth
-                                    error={meta.error && meta.touched ? true : false}
-                                    {...input}
-                                    sx={{mb: 2}}
-                                    helperText={meta.error && meta.touched ? meta.error : ""}
-                                />
-                            )}
-                        </Field>
-                        <Field name="contact">
-                            {({ input, meta }) => (
-                                <TextField
-                                    variant='outlined'
-                                    label='Contact'
-                                    name='contact'
-                                    fullWidth
-                                    error={meta.error && meta.touched ? true : false}
-                                    {...input}
-                                    sx={{mb: 2}}
-                                    helperText={meta.error && meta.touched ? meta.error : ""}
-                                />
-                            )}
-                        </Field>
-                        <Field name="dob">
-                            {({ input, meta }) => (
-                                <LocalizationProvider dateAdapter={AdapterDateFns}>
-                                    <DesktopDatePicker
-                                        label="Date of Birth"
-                                        inputFormat="dd/MM/yyyy"
-                                        {...input}
-                                        error={meta.error && meta.touched ? true : false}
-                                        renderInput={(params) => <TextField {...params} fullWidth/>}
-                                        style={{ 'marginTop': '15px' }}
-                                    />
-                                </LocalizationProvider>
-                            )}
-                        </Field>
-                        <Select
-                            sx={{mt:1}}
-                            fullWidth
-                            onChange={handleAlbumChange}
-                            defaultValue="none"
-                            >
-                            <MenuItem disabled value="none" >Select Album.</MenuItem>
-                            {albumsData?.map(option => {
-                                return (
-                                    <MenuItem key={option.album_name} value={option.album_name}>
-                                    {option.album_name}
-                                    </MenuItem>
-                                );
-                            })}
-                        </Select>
-                        <Field name="profile">
-                            {({ input, meta }) => (
-                                <div className={classes.imgdiv}>
-                                    <Dropzone onDrop={acceptedFiles => handleProfilePic(acceptedFiles)}>
-                                        {({getRootProps, getInputProps}) => (
-                                        <section>
-                                            <div {...getRootProps()}>
-                                            <input {...getInputProps()} />
-                                                <p style={{cursor: 'pointer'}}>Upload profile pic. Click or Drag!</p>
-                                            </div>
-                                        </section>
-                                        )}
-                                    </Dropzone>
-                                </div>
-                            )}
-                        </Field>
-                        {
-                            imgsrc !== null && (
-                                <>
-                                    <ReactCrop
-                                        src={imgsrc}
-                                        crop={crop}
-                                        onImageLoaded={(imageRef) => setImageRef(imageRef)}
-                                        onComplete={(cropConfig) => cropImage(cropConfig)}
-                                        onChange={(c) => setCrop(c)}
-                                    />
-                                     <div style={{width:'100%', textAlign:'center'}}>
-                                        <img src={cropImgsrc} className={classes.img2} alt="profile"/>
-                                    </div>
-                                </>
-                            )
+            <DialogTitle>
+                <div className={classes.title}>
+                    Gift this tree to your loved ones
+                </div>
+            </DialogTitle>
+            <DialogContent>
+                <Form
+                    onSubmit={formSubmit}
+                    validate={(values) => {
+                        const errors = {};
+                        if (!values.name) {
+                            errors.name = "Name is required.";
                         }
-                        <div className={classes.actions}>
-                            <Button
-                                variant="contained"
-                                color="primary"
-                                disabled={submitting || pristine}
-                                type="submit"
+                        if (!values.email) {
+                            errors.email = "Email required.";
+                        }
+                        if (!values.contact) {
+                        }
+                        if (!values.dob) {
+                        }
+                        return errors;
+                    }}
+                    render={({ handleSubmit, form, submitting, pristine }) => (
+                        <form onSubmit={handleSubmit} className={classes.root} autoComplete='off'>
+                            <Field name="name">
+                                {({ input, meta }) => (
+                                    <TextField
+                                        error={meta.error && meta.touched ? true : false}
+                                        {...input}
+                                        variant='outlined'
+                                        label='Full Name *'
+                                        name='name'
+                                        fullWidth
+                                        sx={{ mb: 2, mt: 1 }}
+                                        helperText={meta.error && meta.touched ? meta.error : ""}
+                                    />
+                                )}
+                            </Field>
+                            <Field name="email">
+                                {({ input, meta }) => (
+                                    <TextField
+                                        variant='outlined'
+                                        label='Email *'
+                                        name='email'
+                                        fullWidth
+                                        error={meta.error && meta.touched ? true : false}
+                                        {...input}
+                                        sx={{ mb: 2 }}
+                                        helperText={meta.error && meta.touched ? meta.error : ""}
+                                    />
+                                )}
+                            </Field>
+                            <Field name="contact">
+                                {({ input, meta }) => (
+                                    <TextField
+                                        variant='outlined'
+                                        label='Contact'
+                                        name='contact'
+                                        fullWidth
+                                        error={meta.error && meta.touched ? true : false}
+                                        {...input}
+                                        sx={{ mb: 2 }}
+                                        helperText={meta.error && meta.touched ? meta.error : ""}
+                                    />
+                                )}
+                            </Field>
+                            <Field name="dob">
+                                {({ input, meta }) => (
+                                    <LocalizationProvider dateAdapter={AdapterDateFns}>
+                                        <DesktopDatePicker
+                                            label="Date of Birth"
+                                            inputFormat="dd/MM/yyyy"
+                                            {...input}
+                                            error={meta.error && meta.touched ? true : false}
+                                            renderInput={(params) => <TextField {...params} fullWidth />}
+                                            style={{ 'marginTop': '15px' }}
+                                        />
+                                    </LocalizationProvider>
+                                )}
+                            </Field>
+                            <Select
+                                sx={{ mt: 1 }}
+                                fullWidth
+                                onChange={handleAlbumChange}
+                                defaultValue="none"
                             >
-                                Gift
-                            </Button>
-                        </div>
-                    </form>
-                )}
-            />
-        </DialogContent>
-    </Dialog>
+                                <MenuItem disabled value="none" >Select Album</MenuItem>
+                                {albumsData?.map(option => {
+                                    return (
+                                        <MenuItem key={option.album_name} value={option.album_name}>
+                                            {option.album_name}
+                                        </MenuItem>
+                                    );
+                                })}
+                            </Select>
+                            <Select
+                                sx={{ mt: 1 }}
+                                fullWidth
+                                onChange={handleTemplateChange}
+                                defaultValue="none"
+                            >
+                                <MenuItem disabled value="none" >Select Template</MenuItem>
+                                {templates?.map(option => {
+                                    return (
+                                        <MenuItem key={option.value} value={option.value}>
+                                            {option.name}
+                                        </MenuItem>
+                                    );
+                                })}
+                            </Select>
+                            <Field name="profile">
+                                {({ input, meta }) => (
+                                    <div className={classes.imgdiv}>
+                                        <Dropzone onDrop={acceptedFiles => handleProfilePic(acceptedFiles)}>
+                                            {({ getRootProps, getInputProps }) => (
+                                                <section>
+                                                    <div {...getRootProps()}>
+                                                        <input {...getInputProps()} />
+                                                        <p style={{ cursor: 'pointer' }}>Upload profile pic. Click or Drag!</p>
+                                                    </div>
+                                                </section>
+                                            )}
+                                        </Dropzone>
+                                    </div>
+                                )}
+                            </Field>
+                            {
+                                imgsrc !== null && (
+                                    <>
+                                        <ReactCrop
+                                            src={imgsrc}
+                                            crop={crop}
+                                            onImageLoaded={(imageRef) => setImageRef(imageRef)}
+                                            onComplete={(cropConfig) => cropImage(cropConfig)}
+                                            onChange={(c) => setCrop(c)}
+                                        />
+                                        <div style={{ width: '100%', textAlign: 'center' }}>
+                                            <img src={cropImgsrc} className={classes.img2} alt="profile" />
+                                        </div>
+                                    </>
+                                )
+                            }
+                            <div className={classes.actions}>
+                                <Button
+                                    variant="contained"
+                                    color="primary"
+                                    disabled={submitting || pristine}
+                                    type="submit"
+                                >
+                                    Gift
+                                </Button>
+                            </div>
+                        </form>
+                    )}
+                />
+            </DialogContent>
+        </Dialog>
     )
 }
 
@@ -284,7 +309,7 @@ const useStyles = makeStyles((theme) => ({
         paddingBottom: theme.spacing(1),
         paddingTop: theme.spacing(1)
     },
-    actions:{
+    actions: {
         '& .MuiDialogActions-root': {
             display: 'block',
             paddingBottom: theme.spacing(3)
