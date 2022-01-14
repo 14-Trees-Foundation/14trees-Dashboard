@@ -309,7 +309,8 @@ export const GiftTrees = () => {
                     const params = JSON.stringify({
                         "sapling_id": values.selectedSaplingId,
                         "user_id": res.data.result.assigned_to[0],
-                        "link": res.data.result.link
+                        "link": res.data.result.link,
+                        "type": res.data.result.type,
                     })
                     await Axios.post('/mytrees/update', params, {
                         headers: {
