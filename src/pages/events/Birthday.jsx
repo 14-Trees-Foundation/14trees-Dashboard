@@ -106,7 +106,7 @@ export const Birthday = () => {
                             Site of Plantation: {data.plot_id.name}
                         </p>
                         <div style={{ position: 'absolute', width: '100%', top: '60%', opacity: '1', color: '#ffffff', fontFamily: 'Open Sans', fontSize: '22px' }}>
-                            <p className={classes.gatdesc}>Gat 703 is a portion of a very large tract of completely barren land on a hilltop in village Vetale near Pune. We are attempting to reforest the land and restore damaged ecology. Slowly and steadily, we are .</p>
+                            <p className={classes.gatdesc}>This land is a portion of a very large tract of completely barren land on a hilltop in village Vetale near Pune. We are attempting to reforest the land and restore damaged ecology. Slowly and steadily, we are .</p>
                         </div>
                         <img src={asset4} alt="" className={classes.asset4} />
                     </div>
@@ -150,11 +150,11 @@ export const Birthday = () => {
                     </div>
                 </div>
                 <div style={{ paddingTop: '10vh', width: '100%' }}>
-                    <img src={bottomborder} style={{ width: '100%', height: '130px' }} alt="" />
+                    <img src={bottomborder} style={{ width: '100%', height: 'auto' }} alt="" />
                 </div>
                 <div className={classes.footer}>
-                    <div style={{ width: '100%', marginLeft: 'auto', textAlign: 'center', marginTop: '-5px' }}>
-                        <img src={footerlogo} alt="" style={{ height: '120px', width: '136px', paddingTop: '16px', }} />
+                    <div style={{ width: '100%', marginLeft: 'auto', textAlign: 'center' }}>
+                        <img src={footerlogo} alt="" style={{ height: 'auto', width: '136px', paddingTop: '16px', }} />
                     </div>
                     <p className={classes.companydesc}>14 Trees Foundation</p>
                     <p style={{ marginTop: '0px', width: '100%', textAlign: 'center', fontSize: '18px', color: '#ffffff' }}>(A section 8 company)</p>
@@ -330,6 +330,7 @@ const useStyles = makeStyles((theme) =>
         },
         footer: {
             backgroundColor: '#664E2D',
+            marginTop: '-5px'
         },
         footthanks: {
             width: '80%',
