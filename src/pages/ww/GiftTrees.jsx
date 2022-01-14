@@ -98,8 +98,8 @@ export const GiftTrees = () => {
     const compressImageList = async (file) => {
 
         const options = {
-            maxSizeMB: 2,
-            maxWidthOrHeight: 1080,
+            maxSizeMB: 2.5,
+            maxWidthOrHeight: 1920,
             useWebWorker: true
         }
 
