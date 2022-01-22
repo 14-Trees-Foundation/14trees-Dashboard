@@ -1,5 +1,5 @@
 import { activitiesData } from './atoms';
-import { albums } from './adminAtoms';
+import { albums, treeLogByPlotDate, selectedPlot } from './adminAtoms';
 import { selector } from 'recoil';
 
 const sortedActivites = selector({
@@ -52,9 +52,22 @@ const selectedImages = selector({
     }
 })
 
+const filteredTreeLogByPlotDate = selector({
+    key: 'treeLogByPlotDate',
+    get: ({ get }) => {
+        const a = get(treeLogByPlotDate);
+        const selPlot = get(selectedPlot);
+        let res = a.filter((data) => {
+            return data.plot.name === selPlot
+        });
+        return res;
+    }
+})
+
 export {
     sortedActivites,
     selectedAlbum,
     selectedAlbumName,
-    selectedImages
+    selectedImages,
+    filteredTreeLogByPlotDate
 };

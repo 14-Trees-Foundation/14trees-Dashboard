@@ -40,6 +40,16 @@ const treeLoggedByDate = atom({
     default: {}
 })
 
+const treeLogByPlotDate = atom({
+    key: 'treelogbyplotdate',
+    default: {}
+})
+
+const selectedPlot = atom({
+    key: 'selectedplot',
+    default: ''
+})
+
 const wwSelectedAlbumImage = atom({
     key: 'selectedalbum',
     default: {},
@@ -60,5 +70,7 @@ export {
     treeLoggedByDate,
     albums,
     wwSelectedAlbumImage,
-    searchTreeData
+    searchTreeData,
+    treeLogByPlotDate,
+    selectedPlot
 }

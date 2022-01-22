@@ -2,20 +2,28 @@ import { useEffect, useCallback, useState } from 'react';
 import { Divider, Typography, Box, Grid } from "@mui/material";
 
 import * as Axios from "../../../api/local";
-import { treeByPlots, treeLoggedByDate } from '../../../store/adminAtoms';
+import {
+    searchTreeData,
+    treeByPlots,
+    treeLoggedByDate,
+    treeLogByPlotDate,
+    selectedPlot
+} from '../../../store/adminAtoms';
 import { TreeSummaryByPlot } from "./components/TreeSummaryByPlot";
 import { useRecoilValue, useSetRecoilState } from 'recoil';
 import { Spinner } from '../../../components/Spinner';
 import { TreeLoggedByDate } from './components/TreeLoggedByDate';
 import { SearchBox } from './components/SearchBox';
 import { SearchResult } from './components/SearchResult';
-import { searchTreeData } from '../../../store/adminAtoms';
+import { TreeLogByPlotDate } from './components/TreeLogByPlotDate';
 
 export const Tree = () => {
     const [loading, setLoading] = useState(true);
     const searchTree = useRecoilValue(searchTreeData)
     const setTreeByPlots = useSetRecoilState(treeByPlots);
     const setTreeLoggedByDate = useSetRecoilState(treeLoggedByDate);
+    const setTreeLogByPlot = useSetRecoilState(treeLogByPlotDate);
+    const setSelectedPlot = useSetRecoilState(selectedPlot);
 
     const fetchData = useCallback(async () => {
         setLoading(true)
@@ -31,6 +39,15 @@ export const Tree = () => {
                     element['_id'] = element['_id'].substring(0, 10)
                 });
                 setTreeLoggedByDate(response.data);
+            }
+
+            response = await Axios.default.get(`/trees/treelogbyplot`);
+            if (response.status === 200) {
+                response.data.forEach((element, index) => {
+                    element['_id']['date'] = element['_id']['date'].substring(0, 10)
+                });
+                setTreeLogByPlot(response.data);
+                setSelectedPlot(response.data[0].plot.name)
             }
         } catch (error) {
             console.log(error)
@@ -69,6 +86,11 @@ export const Tree = () => {
                         <Grid item xs={12} lg={6}>
                             <Box sx={{ backgroundColor: '#ffffff', p: 2, borderRadius: 3 }}>
                                 <TreeSummaryByPlot />
+                            </Box>
+                        </Grid>
+                        <Grid item xs={12} lg={6}>
+                            <Box sx={{ backgroundColor: '#ffffff', p: 2, borderRadius: 3 }}>
+                                <TreeLogByPlotDate />
                             </Box>
                         </Grid>
                         <Grid item xs={12} lg={6}>

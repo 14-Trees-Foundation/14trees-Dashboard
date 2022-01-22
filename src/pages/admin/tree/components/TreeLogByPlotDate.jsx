@@ -1,30 +1,34 @@
 import { Typography } from '@mui/material';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
-import { useRecoilValue, useSetRecoilState } from 'recoil';
+import { useRecoilValue } from 'recoil';
 
 import {
-    treeByPlots,
-    selectedPlot
-} from '../../../../store/adminAtoms';
+    filteredTreeLogByPlotDate
+} from '../../../../store/selectors';
+import { selectedPlot } from '../../../../store/adminAtoms';
 
-export const TreeSummaryByPlot = () => {
-    let treeByPlot = useRecoilValue(treeByPlots);
-    const setSelectedPlot = useSetRecoilState(selectedPlot);
+export const TreeLogByPlotDate = () => {
+    let treeByPlotDate = useRecoilValue(filteredTreeLogByPlotDate);
+    let selPlot = useRecoilValue(selectedPlot);
     return (
         <div>
-            <Typography variant='h6' gutterBottom>
-                Total tree count by plot name
-            </Typography>
+            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                <Typography variant='h6' gutterBottom>
+                    Tree logged in plot by date
+                </Typography>
+                <Typography variant='body1' gutterBottom>
+                    {selPlot}
+                </Typography>
+            </div>
             <ResponsiveContainer width="100%" height={400}>
                 <BarChart
-                    data={treeByPlot}
+                    data={treeByPlotDate}
                     stroke='#1f3625'
-                    onClick={(e) => setSelectedPlot(e.activeLabel)}
                 >
                     <CartesianGrid strokeDasharray="2 2" />
                     <XAxis
-                        dataKey="plot_name.name"
+                        dataKey="_id.date"
                         stroke='#1f3625'
                         fill='#1f3625'
                     />
