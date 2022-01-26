@@ -1,6 +1,6 @@
 import { Typography } from '@mui/material';
 // import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-import React, { PureComponent, useState } from 'react';
+import React, { useState } from 'react';
 import { PieChart, Pie, Sector, ResponsiveContainer } from 'recharts';
 
 import { useRecoilValue } from 'recoil';
@@ -46,7 +46,7 @@ const renderActiveShape = (props) => {
                 fill={'#1f3625'}
             />
             <path d={`M${sx},${sy}L${mx},${my}L${ex},${ey}`} stroke={'#1f3625'} fill="none" />
-            <circle cx={ex} cy={ey} r={2} fill={'#1f3625'} stroke="none" />
+            <circle cx={ex} cy={ey} r={2} fill={fill} stroke="none" />
             <text x={ex + (cos >= 0 ? 1 : -1) * 12} y={ey} textAnchor={textAnchor} fill="#1f3625">{`Tree Count ${value}`}</text>
             <text x={ex + (cos >= 0 ? 1 : -1) * 12} y={ey} dy={18} textAnchor={textAnchor} fill="#1f3625">
                 {`(Percent ${(percent * 100).toFixed(2)}%)`}
