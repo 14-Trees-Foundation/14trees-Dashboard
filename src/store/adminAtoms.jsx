@@ -35,6 +35,11 @@ const selectedPlot = atom({
     default: ''
 })
 
+const treeTypeCount = atom({
+    key: 'treetypecount',
+    default: {}
+})
+
 const wwSelectedAlbumImage = atom({
     key: 'selectedalbum',
     default: {},
@@ -54,5 +59,6 @@ export {
     wwSelectedAlbumImage,
     searchTreeData,
     treeLogByPlotDate,
-    selectedPlot
+    selectedPlot,
+    treeTypeCount
 }

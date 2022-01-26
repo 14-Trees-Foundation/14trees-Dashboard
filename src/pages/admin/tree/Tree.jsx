@@ -7,6 +7,7 @@ import {
     treeByPlots,
     treeLoggedByDate,
     treeLogByPlotDate,
+    treeTypeCount,
     selectedPlot
 } from '../../../store/adminAtoms';
 import { TreeSummaryByPlot } from "./components/TreeSummaryByPlot";
@@ -16,6 +17,7 @@ import { TreeLoggedByDate } from './components/TreeLoggedByDate';
 import { SearchBox } from './components/SearchBox';
 import { SearchResult } from './components/SearchResult';
 import { TreeLogByPlotDate } from './components/TreeLogByPlotDate';
+import { TreeCountByType } from './components/TreeCountByType';
 
 export const Tree = () => {
     const [loading, setLoading] = useState(true);
@@ -24,6 +26,7 @@ export const Tree = () => {
     const setTreeLoggedByDate = useSetRecoilState(treeLoggedByDate);
     const setTreeLogByPlot = useSetRecoilState(treeLogByPlotDate);
     const setSelectedPlot = useSetRecoilState(selectedPlot);
+    const setTreeCountByType = useSetRecoilState(treeTypeCount);
 
     const fetchData = useCallback(async () => {
         setLoading(true)
@@ -49,12 +52,16 @@ export const Tree = () => {
                 setTreeLogByPlot(response.data);
                 setSelectedPlot(response.data[0].plot.name)
             }
+            response = await Axios.default.get(`/trees/treebytypecount`);
+            if (response.status === 200) {
+                setTreeCountByType(response.data);
+            }
         } catch (error) {
             console.log(error)
         }
 
         setLoading(false);
-    }, [setTreeByPlots, setTreeLoggedByDate]);
+    }, [setTreeByPlots, setTreeLoggedByDate, setTreeCountByType, setSelectedPlot, setTreeLogByPlot]);
 
     useEffect(() => {
         fetchData()
@@ -96,6 +103,11 @@ export const Tree = () => {
                         <Grid item xs={12} lg={6}>
                             <Box sx={{ backgroundColor: '#ffffff', p: 2, borderRadius: 3 }}>
                                 <TreeLoggedByDate />
+                            </Box>
+                        </Grid>
+                        <Grid item xs={12} lg={6}>
+                            <Box sx={{ backgroundColor: '#ffffff', p: 2, borderRadius: 3 }}>
+                                <TreeCountByType />
                             </Box>
                         </Grid>
                     </Grid>
