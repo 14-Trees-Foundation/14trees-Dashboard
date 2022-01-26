@@ -7,10 +7,7 @@ import { AdminLeftDrawer } from "./LeftDrawer";
 import { Spinner } from "../../components/Spinner";
 import { Box } from "@mui/material";
 import {
-    totalTrees,
-    totalTreeTypes,
-    uniqueUsers,
-    totalPlots,
+    summary,
     adminNavIndex
 } from '../../store/adminAtoms';
 import { AdminHome } from "./home/AdminHome";
@@ -21,40 +18,22 @@ import { Forms } from "./Forms";
 export const Admin = () => {
     const classes = useStyles();
     const [loading, setLoading] = useState(true);
-    const setTotalTrees = useSetRecoilState(totalTrees);
-    const setTotalTreeTypes = useSetRecoilState(totalTreeTypes);
-    const setUniqueUsers = useSetRecoilState(uniqueUsers);
-    const setTotalPlots = useSetRecoilState(totalPlots);
+    const setSummary = useSetRecoilState(summary);
     const index = useRecoilValue(adminNavIndex);
 
     const fetchData = useCallback(async () => {
         setLoading(true)
         try {
-            let response = await Axios.default.get(`/analytics/totaltrees`);
+            let response = await Axios.default.get(`/analytics/summary`);
             if (response.status === 200) {
-                setTotalTrees(response.data);
-            }
-
-            response = await Axios.default.get(`/analytics/totaltreetypes`);
-            if (response.status === 200) {
-                setTotalTreeTypes(response.data);
-            }
-
-            response = await Axios.default.get(`/analytics/totalUsers`);
-            if (response.status === 200) {
-                setUniqueUsers(response.data);
-            }
-
-            response = await Axios.default.get(`/analytics/totalPlots`);
-            if (response.status === 200) {
-                setTotalPlots(response.data);
+                setSummary(response.data);
             }
         } catch (error) {
             console.log(error)
         }
 
         setLoading(false);
-    }, [setTotalTrees, setTotalTreeTypes, setUniqueUsers, setTotalPlots]);
+    }, [setSummary]);
 
     useEffect(() => {
         fetchData()
@@ -90,12 +69,12 @@ export const Admin = () => {
         return (
             <div className={classes.box}>
                 {/* <img alt="bg" src={bg} className={classes.bg} style={{height: '100vh'}}/> */}
-                <Box sx={{ display: 'flex', mt:{xs:7, md: 3} }}>
+                <Box sx={{ display: 'flex', mt: { xs: 7, md: 3 } }}>
                     <AdminLeftDrawer />
-                    <Box component="main" sx={{ minWidth: '900px', p:2,width: '100%' }}>
-                    {
-                        mainBox()
-                    }
+                    <Box component="main" sx={{ minWidth: '900px', p: 2, width: '100%' }}>
+                        {
+                            mainBox()
+                        }
                     </Box>
                 </Box >
             </div>
@@ -109,7 +88,7 @@ const useStyles = makeStyles((theme) =>
             overflow: 'auto',
             width: '100%',
             position: 'relative',
-            backgroundColor: '#e5e5e5',
+            backgroundColor: '#B1BFB5',
             minHeight: '100vh',
             heigth: '100%'
         },

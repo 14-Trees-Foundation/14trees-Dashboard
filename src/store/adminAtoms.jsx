@@ -10,23 +10,8 @@ const adminNavIndex = atom({
     default: 0
 })
 
-const totalTrees = atom({
-    key: 'totaltree',
-    default: {},
-});
-
-const totalTreeTypes = atom({
-    key: 'totaltreetypes',
-    default: {},
-});
-
-const uniqueUsers = atom({
-    key: 'uniqueusers',
-    default: {},
-});
-
-const totalPlots = atom({
-    key: 'totalplots',
+const summary = atom({
+    key: 'summary',
     default: {},
 });
 
@@ -62,10 +47,7 @@ const searchTreeData = atom({
 
 export {
     adminNavIndex,
-    totalTrees,
-    totalTreeTypes,
-    uniqueUsers,
-    totalPlots,
+    summary,
     treeByPlots,
     treeLoggedByDate,
     albums,
