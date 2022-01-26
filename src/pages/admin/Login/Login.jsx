@@ -29,10 +29,10 @@ export const Login = () => {
     const [phone, setPhone] = React.useState(null);
     let auth = useAuth();
     const classes = UseStyle();
-    const paperStyle={padding :20,minHeight:'300px',width:380, margin:"20px auto"}
-    const avatarStyle={backgroundColor:'#1bbd7e'}
-    const textStyle={margin:'8px auto'}
-    const btnstyle={margin:'8px 0'}
+    const paperStyle = { padding: 20, minHeight: '300px', width: 380, margin: "20px auto" }
+    const avatarStyle = { backgroundColor: '#1bbd7e' }
+    const textStyle = { margin: '8px auto' }
+    const btnstyle = { margin: '8px 0' }
 
     let from = location.state?.from?.pathname || "/";
 
@@ -41,12 +41,12 @@ export const Login = () => {
             let res = await Axios.post('/auth/google', JSON.stringify({
                 "token": response.tokenId
             }),
-            {
-                headers: {
-                    'Content-Type': "application/json"
-                  }
-            });
-            if(res.status === 201 && res.data.user.role) {
+                {
+                    headers: {
+                        'Content-Type': "application/json"
+                    }
+                });
+            if (res.status === 201 && res.data.user.role) {
                 localStorage.setItem('loginInfo', JSON.stringify(response));
                 auth.signin(res.data.name, response.tokenId, () => {
                     navigate(from, { replace: true });
@@ -54,7 +54,7 @@ export const Login = () => {
             }
             toast.error("User not authorized! Contact Admin")
         } catch (error) {
-            if(error.response.status === 404 ) {
+            if (error.response.status === 404) {
                 toast.error("User not Found! Contact Admin")
             }
         }
@@ -112,26 +112,29 @@ export const Login = () => {
                     if (error.response.status === 500 || error.response.status === 409) {
                         setBackdropOpen(false);
                         toast.error(error.response.data.error)
+                    } else if (error.response.status === 400) {
+                        setBackdropOpen(false);
+                        toast.error("User already Registered!")
                     }
                 }
             }
-        } catch(error) {
+        } catch (error) {
             toast.error(error.response.data.error)
         }
     }
 
     return (
         <div className={classes.box}>
-            <img alt="bg" src={bg} className={classes.bg} style={{height: '100vh'}}/>
-            <div className={classes.overlay} style={{height: '100vh',}}>
+            <img alt="bg" src={bg} className={classes.bg} style={{ height: '100vh' }} />
+            <div className={classes.overlay} style={{ height: '100vh', }}>
                 <Backdrop className={classes.backdrop} open={openBackdrop}>
                     <Spinner text={"Logging you in..."} />
                 </Backdrop>
                 <ToastContainer />
-                <Grid style={{'marginTop':'10%'}}>
+                <Grid style={{ 'marginTop': '10%' }}>
                     <Paper elevation={10} style={paperStyle}>
                         <Grid align='center'>
-                            <Avatar style={avatarStyle}><LockOutlinedIcon/></Avatar>
+                            <Avatar style={avatarStyle}><LockOutlinedIcon /></Avatar>
                             <h2>Sign Up</h2>
                         </Grid>
                         <TextField
@@ -142,7 +145,7 @@ export const Login = () => {
                             required
                             onChange={e => handleValueChange(e.target.value, "name")}
                         />
-                         <TextField
+                        <TextField
                             style={textStyle}
                             label='Email ID'
                             placeholder='Enter email ID'
@@ -150,7 +153,7 @@ export const Login = () => {
                             required
                             onChange={e => handleValueChange(e.target.value, "email")}
                         />
-                         <TextField
+                        <TextField
                             style={textStyle}
                             label='Contact'
                             placeholder='Enter Phone'
@@ -168,7 +171,7 @@ export const Login = () => {
                         >
                             Sign Up
                         </Button>
-                        <div style={{width: '100%', textAlign:'center', paddingTop: '24px'}}>
+                        <div style={{ width: '100%', textAlign: 'center', paddingTop: '24px' }}>
                             <GoogleLogin
                                 clientId={process.env.REACT_APP_CLIENT_ID}
                                 buttonText="Log in with Google"
@@ -187,7 +190,7 @@ export const Login = () => {
                     </Paper>
                 </Grid>
             </div>
-    </div>
+        </div>
     );
 }
 
