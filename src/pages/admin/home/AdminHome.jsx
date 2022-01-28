@@ -22,7 +22,7 @@ export const AdminHome = () => {
                         Summary
                     </Typography>
                 </Grid>
-                <Grid item xs={4} md={2}>
+                <Grid item xs={4} md={3} xl={2}>
                     <div className={classes.card}>
                         <Box sx={{ paddingTop: '10px' }}>
                             <ParkTwoToneIcon fontSize='large' />
@@ -31,7 +31,7 @@ export const AdminHome = () => {
                         </Box>
                     </div>
                 </Grid>
-                <Grid item xs={4} md={2}>
+                <Grid item xs={4} md={3} xl={2}>
                     <div className={classes.card}>
                         <Box sx={{ paddingTop: '10px' }}>
                             <GrassTwoToneIcon fontSize='large' />
@@ -40,7 +40,7 @@ export const AdminHome = () => {
                         </Box>
                     </div>
                 </Grid>
-                <Grid item xs={4} md={2}>
+                <Grid item xs={4} md={3} xl={2}>
                     <div className={classes.card}>
                         <Box sx={{ paddingTop: '10px' }}>
                             <AssignmentIndTwoToneIcon fontSize='large' />
@@ -49,7 +49,7 @@ export const AdminHome = () => {
                         </Box>
                     </div>
                 </Grid>
-                <Grid item xs={4} md={2}>
+                <Grid item xs={4} md={3} xl={2}>
                     <div className={classes.card}>
                         <Box sx={{ paddingTop: '10px' }}>
                             <PermIdentityTwoToneIcon fontSize='large' />
@@ -58,7 +58,7 @@ export const AdminHome = () => {
                         </Box>
                     </div>
                 </Grid>
-                <Grid item xs={4} md={2}>
+                <Grid item xs={4} md={3} xl={2}>
                     <div className={classes.card}>
                         <Box sx={{ paddingTop: '10px' }}>
                             <TerrainTwoToneIcon fontSize='large' />
@@ -85,7 +85,7 @@ const useStyles = makeStyles((theme) =>
             textAlign: 'center',
             padding: '16px',
             margin: '16px',
-            boxShadow: '0px 0px 20px rgba(0, 0, 0, 0.15)'
+            boxShadow: '0px 0px 20px rgba(0, 0, 0, 0.15)',
         },
     })
 )

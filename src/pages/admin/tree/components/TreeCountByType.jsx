@@ -16,9 +16,9 @@ const renderActiveShape = (props) => {
     const cos = Math.cos(-RADIAN * midAngle);
     const sx = cx + (outerRadius + 10) * cos;
     const sy = cy + (outerRadius + 10) * sin;
-    const mx = cx + (outerRadius + 30) * cos;
-    const my = cy + (outerRadius + 50) * sin;
-    const ex = mx + (cos >= 0 ? 1 : -1) * 50;
+    const mx = cx + (outerRadius + 20) * cos;
+    const my = cy + (outerRadius + 40) * sin;
+    const ex = mx + (cos >= 0 ? 1 : -1) * 30;
     const ey = my;
     const textAnchor = cos >= 0 ? 'start' : 'end';
 
@@ -103,8 +103,8 @@ export const TreeCountByType = () => {
                         data={fiilteredCount}
                         cx="50%"
                         cy="50%"
-                        innerRadius={90}
-                        outerRadius={120}
+                        innerRadius={70}
+                        outerRadius={100}
                         fill="#9BC53D"
                         dataKey="value"
                         onMouseEnter={onPieEnter}
