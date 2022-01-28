@@ -1,4 +1,6 @@
 import { Typography } from '@mui/material';
+import DownloadForOfflineIcon from '@mui/icons-material/DownloadForOffline';
+import { CSVLink } from "react-csv";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
 import { useRecoilValue, useSetRecoilState } from 'recoil';
@@ -11,11 +13,31 @@ import {
 export const TreeSummaryByPlot = () => {
     let treeByPlot = useRecoilValue(treeByPlots);
     const setSelectedPlot = useSetRecoilState(selectedPlot);
+
+    let headers = [
+        { label: "Tree Coount", key: "count" },
+        { label: "Plot Name", key: "plot_name" },
+    ]
+    let data = treeByPlot.map(item => {
+        return {
+            count: item.count,
+            plot_name: item.plot_name.name
+        }
+    })
+
+    let date = new Date().toISOString().slice(0, 10);
+    let file_name = 'tree_count_by_plot' + date + '.csv';
+
     return (
         <div>
-            <Typography variant='h6' gutterBottom>
-                Total tree count by plot name
-            </Typography>
+            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                <Typography variant='h6' gutterBottom>
+                    Total tree count by plot name
+                </Typography>
+                <CSVLink data={data} filename={file_name} headers={headers}>
+                    <DownloadForOfflineIcon fontSize='large' style={{ cursor: 'pointer', color: '#1f3625' }} />
+                </CSVLink>
+            </div>
             <ResponsiveContainer width="100%" height={400}>
                 <BarChart
                     data={treeByPlot}
