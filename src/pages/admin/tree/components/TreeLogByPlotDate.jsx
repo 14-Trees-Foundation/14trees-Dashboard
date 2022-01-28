@@ -1,6 +1,5 @@
 import { Typography } from '@mui/material';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-
 import { useRecoilValue } from 'recoil';
 
 import {
@@ -15,10 +14,7 @@ export const TreeLogByPlotDate = () => {
         <div>
             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                 <Typography variant='h6' gutterBottom>
-                    Tree logged in plot by date
-                </Typography>
-                <Typography variant='body1' gutterBottom>
-                    {selPlot}
+                    Tree/date in <em>{selPlot}</em>
                 </Typography>
             </div>
             <ResponsiveContainer width="100%" height={400}>

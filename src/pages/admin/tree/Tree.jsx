@@ -8,16 +8,18 @@ import {
     treeLoggedByDate,
     treeLogByPlotDate,
     treeTypeCount,
+    treeTypeCountByPlot,
     selectedPlot
 } from '../../../store/adminAtoms';
 import { TreeSummaryByPlot } from "./components/TreeSummaryByPlot";
-import { useRecoilValue, useSetRecoilState } from 'recoil';
+import { useRecoilValue, useSetRecoilState, useRecoilState } from 'recoil';
 import { Spinner } from '../../../components/Spinner';
 import { TreeLoggedByDate } from './components/TreeLoggedByDate';
 import { SearchBox } from './components/SearchBox';
 import { SearchResult } from './components/SearchResult';
 import { TreeLogByPlotDate } from './components/TreeLogByPlotDate';
 import { TreeCountByType } from './components/TreeCountByType';
+import { TreeTypeCountByPlot } from './components/TreeTypeCountByPlot';
 
 export const Tree = () => {
     const [loading, setLoading] = useState(true);
@@ -25,7 +27,8 @@ export const Tree = () => {
     const setTreeByPlots = useSetRecoilState(treeByPlots);
     const setTreeLoggedByDate = useSetRecoilState(treeLoggedByDate);
     const setTreeLogByPlot = useSetRecoilState(treeLogByPlotDate);
-    const setSelectedPlot = useSetRecoilState(selectedPlot);
+    const setTreeTypeCountByPlot = useSetRecoilState(treeTypeCountByPlot);
+    const [selectedPlotName, setSelectedPlot] = useRecoilState(selectedPlot);
     const setTreeCountByType = useSetRecoilState(treeTypeCount);
 
     const fetchData = useCallback(async () => {
@@ -52,16 +55,20 @@ export const Tree = () => {
                 setTreeLogByPlot(response.data);
                 setSelectedPlot(response.data[0].plot.name)
             }
-            response = await Axios.default.get(`/trees/treebytypecount`);
+            response = await Axios.default.get(`/trees/treetypecount`);
             if (response.status === 200) {
                 setTreeCountByType(response.data);
+            }
+            response = await Axios.default.get(`/trees/treetypecount/plots`);
+            if (response.status === 200) {
+                console.log(response.data)
+                setTreeTypeCountByPlot(response.data);
             }
         } catch (error) {
             console.log(error)
         }
-
         setLoading(false);
-    }, [setTreeByPlots, setTreeLoggedByDate, setTreeCountByType, setSelectedPlot, setTreeLogByPlot]);
+    }, [setTreeByPlots, setTreeLoggedByDate, setTreeCountByType, setSelectedPlot, setTreeLogByPlot, setTreeTypeCountByPlot]);
 
     useEffect(() => {
         fetchData()
@@ -90,10 +97,15 @@ export const Tree = () => {
                                 </Grid>
                             )
                         }
-                        <Grid item xs={12} lg={6}>
+                        <Grid item xs={12}>
                             <Box sx={{ backgroundColor: '#ffffff', p: 2, borderRadius: 3 }}>
                                 <TreeSummaryByPlot />
                             </Box>
+                        </Grid>
+                        <Grid item xs={12}>
+                            <Typography>
+                                {selectedPlotName}
+                            </Typography>
                         </Grid>
                         <Grid item xs={12} lg={6}>
                             <Box sx={{ backgroundColor: '#ffffff', p: 2, borderRadius: 3 }}>
@@ -101,6 +113,16 @@ export const Tree = () => {
                             </Box>
                         </Grid>
                         <Grid item xs={12} lg={6}>
+                            <Box sx={{ backgroundColor: '#ffffff', p: 2, borderRadius: 3 }}>
+                                <TreeTypeCountByPlot />
+                            </Box>
+                        </Grid>
+                        <Grid item xs={12}>
+                            <Typography variant='h6' gutterBottom>
+                                Tree count by date (All Plots/All Users)
+                            </Typography>
+                        </Grid>
+                        <Grid item xs={12}>
                             <Box sx={{ backgroundColor: '#ffffff', p: 2, borderRadius: 3 }}>
                                 <TreeLoggedByDate />
                             </Box>

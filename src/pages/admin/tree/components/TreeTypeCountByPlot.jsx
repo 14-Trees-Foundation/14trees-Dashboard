@@ -1,13 +1,15 @@
 import { Typography } from '@mui/material';
-// import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import React, { useState } from 'react';
 import { PieChart, Pie, Sector, ResponsiveContainer } from 'recharts';
+import { CSVLink } from "react-csv";
+import DownloadForOfflineIcon from '@mui/icons-material/DownloadForOffline';
 
 import { useRecoilValue } from 'recoil';
 
 import {
-    treeTypeCount
-} from '../../../../store/adminAtoms';
+    filteredTreeTypeCountByPlot
+} from '../../../../store/selectors';
+import { selectedPlot } from '../../../../store/adminAtoms';
 
 const renderActiveShape = (props) => {
     const RADIAN = Math.PI / 180;
@@ -55,17 +57,16 @@ const renderActiveShape = (props) => {
     );
 };
 
-export const TreeCountByType = () => {
-    let treeCountByType = useRecoilValue(treeTypeCount);
+export const TreeTypeCountByPlot = () => {
+    let treeTypeCount = useRecoilValue(filteredTreeTypeCountByPlot);
+    let selPlot = useRecoilValue(selectedPlot);
 
-    let fiilteredCount = treeCountByType.map(item => {
+    let filteredCount = treeTypeCount.map(item => {
         return ({
-            name: item.tree_type[0].name,
+            name: item.tree_type.name,
             value: item.count
         })
     })
-
-    // fiilteredCount = fiilteredCount.slice(0, 50);
 
     const [state, setState] = useState(0);
 
@@ -73,34 +74,30 @@ export const TreeCountByType = () => {
         setState(index);
     };
 
+    let headers = [
+        { label: "Tree Count", key: "value" },
+        { label: "Tree Type", key: "name" },
+    ]
+
+    let date = new Date().toISOString().slice(0, 10);
+    let file_name = 'tree_type_count_by_plot' + date + '.csv';
+
     return (
         <div>
-            <Typography variant='h6' gutterBottom>
-                Total tree by tree-type
-            </Typography>
-            {/* <ResponsiveContainer width="100%" height={400}>
-                <BarChart
-                    data={treeByPlot}
-                    stroke='#1f3625'
-                    onClick={(e) => setSelectedPlot(e.activeLabel)}
-                >
-                    <CartesianGrid strokeDasharray="2 2" />
-                    <XAxis
-                        dataKey="plot_name.name"
-                        stroke='#1f3625'
-                        fill='#1f3625'
-                    />
-                    <YAxis stroke='#1f3625' />
-                    <Tooltip contentStyle={{ color: '#1f3625' }} />
-                    <Bar dataKey="count" fill="#1f3625" />
-                </BarChart>
-            </ResponsiveContainer> */}
+            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                <Typography variant='subtitle1' gutterBottom>
+                    Tree types in <em>{selPlot}</em>
+                </Typography>
+                <CSVLink data={filteredCount} filename={file_name} headers={headers}>
+                    <DownloadForOfflineIcon fontSize='large' style={{ cursor: 'pointer', color: '#1f3625' }} />
+                </CSVLink>
+            </div>
             <ResponsiveContainer width={'100%'} height={400}>
                 <PieChart width={'100%'} height={350}>
                     <Pie
                         activeIndex={state}
                         activeShape={renderActiveShape}
-                        data={fiilteredCount}
+                        data={filteredCount}
                         cx="50%"
                         cy="50%"
                         innerRadius={70}

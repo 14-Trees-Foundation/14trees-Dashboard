@@ -32,7 +32,7 @@ export const TreeSummaryByPlot = () => {
         <div>
             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                 <Typography variant='h6' gutterBottom>
-                    Total tree count by plot name
+                    Tree count by plot
                 </Typography>
                 <CSVLink data={data} filename={file_name} headers={headers}>
                     <DownloadForOfflineIcon fontSize='large' style={{ cursor: 'pointer', color: '#1f3625' }} />

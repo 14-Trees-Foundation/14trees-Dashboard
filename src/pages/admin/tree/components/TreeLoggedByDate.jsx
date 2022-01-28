@@ -10,7 +10,7 @@ import {
 
 export const TreeLoggedByDate = () => {
     let treeByDate = useRecoilValue(treeLoggedByDate);
-    const [days, setDays] = useState(10);
+    const [days, setDays] = useState(20);
     const [open, setOpen] = useState(false);
 
     let treeByDateShow = treeByDate.slice(0, days)
@@ -30,9 +30,7 @@ export const TreeLoggedByDate = () => {
     return (
         <div style={{ '& .MuiSelect-select': { paddingTop: '5px' } }}>
             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                <Typography variant='h6' gutterBottom>
-                    Count of trees logged by date
-                </Typography>
+                <Typography></Typography>
                 <FormControl size='small'>
                     <Select
                         open={open}
@@ -42,8 +40,8 @@ export const TreeLoggedByDate = () => {
                         label="Age"
                         onChange={handleChange}
                     >
-                        <MenuItem value={10}>10</MenuItem>
                         <MenuItem value={20}>20</MenuItem>
+                        <MenuItem value={30}>30</MenuItem>
                         <MenuItem value={100}>All</MenuItem>
                     </Select>
                 </FormControl>
