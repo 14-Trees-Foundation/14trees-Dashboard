@@ -1,8 +1,10 @@
 import { Typography } from '@mui/material';
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { PieChart, Pie, Sector, ResponsiveContainer } from 'recharts';
 import { CSVLink } from "react-csv";
 import DownloadForOfflineIcon from '@mui/icons-material/DownloadForOffline';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 import { useRecoilValue } from 'recoil';
 
@@ -10,6 +12,7 @@ import {
     filteredTreeTypeCountByPlot
 } from '../../../../store/selectors';
 import { selectedPlot } from '../../../../store/adminAtoms';
+import * as Axios from "../../../../api/local";
 
 const renderActiveShape = (props) => {
     const RADIAN = Math.PI / 180;
@@ -58,6 +61,9 @@ const renderActiveShape = (props) => {
 };
 
 export const TreeTypeCountByPlot = () => {
+    const [treeTypesCount, setTreeTypesCount] = useState([]);
+    const csvLink = useRef();
+    const [state, setState] = useState(0);
     let treeTypeCount = useRecoilValue(filteredTreeTypeCountByPlot);
     let selPlot = useRecoilValue(selectedPlot);
 
@@ -68,28 +74,46 @@ export const TreeTypeCountByPlot = () => {
         })
     })
 
-    const [state, setState] = useState(0);
+    let headers = [
+        { label: "Sapling ID", key: "sapling_id" },
+        { label: "Tree Name", key: "name" },
+        { label: "Date Added", key: "date" },
+    ]
+
+    const getTreeTypeCountByPlotName = async () => {
+        try {
+            let response = await Axios.default.get(`/trees/treetypecount/plot?plot_name=${selPlot}`);
+            if (response.status === 200) {
+                let data = response.data.map(item => {
+                    return {
+                        sapling_id: item.sapling_id,
+                        name: item.tree_name.name,
+                        date: item.date_added.slice(0, 10),
+                    }
+                })
+                setTreeTypesCount(data);
+            }
+        } catch (error) {
+            toast.error(error);
+        }
+    }
 
     const onPieEnter = (_, index) => {
         setState(index);
     };
 
-    let headers = [
-        { label: "Tree Count", key: "value" },
-        { label: "Tree Type", key: "name" },
-    ]
-
     let date = new Date().toISOString().slice(0, 10);
-    let file_name = 'tree_type_count_by_plot' + date + '.csv';
+    let file_name = 'tree_type_count_' + selPlot + '_' + date + '.csv';
 
     return (
         <div>
+            <ToastContainer />
             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                 <Typography variant='subtitle1' gutterBottom>
                     Tree types in <em>{selPlot}</em>
                 </Typography>
-                <CSVLink data={filteredCount} filename={file_name} headers={headers}>
-                    <DownloadForOfflineIcon fontSize='large' style={{ cursor: 'pointer', color: '#1f3625' }} />
+                <CSVLink style={{ textDecoration: 'none' }} data={treeTypesCount} headers={headers} filename={file_name} ref={csvLink} target='_blank'>
+                    <DownloadForOfflineIcon fontSize='large' style={{ cursor: 'pointer', color: '#1f3625' }} onClick={getTreeTypeCountByPlotName} />
                 </CSVLink>
             </div>
             <ResponsiveContainer width={'100%'} height={400}>
