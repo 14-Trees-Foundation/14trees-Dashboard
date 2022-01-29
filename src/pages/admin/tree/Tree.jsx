@@ -1,5 +1,5 @@
 import { useEffect, useCallback, useState } from 'react';
-import { Divider, Typography, Box, Grid } from "@mui/material";
+import { Divider, Typography, Box, Grid, Select, MenuItem } from "@mui/material";
 
 import * as Axios from "../../../api/local";
 import {
@@ -24,7 +24,7 @@ import { TreeTypeCountByPlot } from './components/TreeTypeCountByPlot';
 export const Tree = () => {
     const [loading, setLoading] = useState(true);
     const searchTree = useRecoilValue(searchTreeData)
-    const setTreeByPlots = useSetRecoilState(treeByPlots);
+    const [treeByPlotsData, setTreeByPlots] = useRecoilState(treeByPlots);
     const setTreeLoggedByDate = useSetRecoilState(treeLoggedByDate);
     const setTreeLogByPlot = useSetRecoilState(treeLogByPlotDate);
     const setTreeTypeCountByPlot = useSetRecoilState(treeTypeCountByPlot);
@@ -79,9 +79,23 @@ export const Tree = () => {
     } else {
         return (
             <>
-                <div style={{ display: 'flex', justifyContent: 'space-between', padding: '32px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', padding: '24px' }}>
                     <Typography variant="h3">Trees</Typography>
-                    <div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                        <Select sx={{ mt: 1, width: '22ch' }}
+                            fullWidth
+                            onChange={(e) => setSelectedPlot(e.target.value)}
+                            defaultValue="none"
+                        >
+                            <MenuItem disabled value="none" >Select Plot</MenuItem>
+                            {treeByPlotsData?.map(plot => {
+                                return (
+                                    <MenuItem key={plot.plot_name.name} value={plot.plot_name.name}>
+                                        {plot.plot_name.name}
+                                    </MenuItem>
+                                );
+                            })}
+                        </Select>
                         <SearchBox setLoading={setLoading} />
                     </div>
                 </div>
