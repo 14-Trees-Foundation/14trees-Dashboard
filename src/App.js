@@ -7,7 +7,7 @@ import { Dashboard } from './pages/Dashboard';
 import { Corporate } from './pages/events/Corporate';
 import { Events } from './pages/events/Events';
 import { NotFound } from './pages/notfound/NotFound';
-import { AssignTree } from './pages/admin/AssignTree';
+import { AssignTree } from './pages/admin/Forms/AssignTree';
 import { Admin } from './pages/admin/Admin';
 import { Layout } from './components/Layout';
 import { GiftTrees } from './pages/ww/GiftTrees';

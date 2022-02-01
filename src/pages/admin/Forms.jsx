@@ -5,7 +5,7 @@ import TabsListUnstyled from '@mui/base/TabsListUnstyled';
 import TabPanelUnstyled from '@mui/base/TabPanelUnstyled';
 import { buttonUnstyledClasses } from '@mui/base/ButtonUnstyled';
 import TabUnstyled, { tabUnstyledClasses } from '@mui/base/TabUnstyled';
-import { AssignTree } from './AssignTree';
+import { AssignTree } from './Forms/AssignTree';
 import { AddOrg } from './Forms/Addorg';
 import { AddTree } from './Forms/Addtree';
 

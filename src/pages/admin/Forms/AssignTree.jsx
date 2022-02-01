@@ -6,9 +6,9 @@ import { Field, Form } from "react-final-form";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
-import { Spinner } from '../../components/Spinner';
-import Axios from "../../api/local";
-import tree from "../../assets/dark_logo.png";
+import { Spinner } from '../../../components/Spinner';
+import Axios from "../../../api/local";
+import tree from "../../../assets/dark_logo.png";
 
 const intitialFValues = {
     name: '',
@@ -76,7 +76,7 @@ export const AssignTree = () => {
     } else {
         if (values.uploaded) {
             return (
-                <div style={{maxWidth: '400px', marginLeft: 'auto', marginRight: 'auto'}}>
+                <div style={{ maxWidth: '400px', marginLeft: 'auto', marginRight: 'auto' }}>
                     <div className={classes.infobox}>
                         <p className={classes.infodesc}>Trees are assigned!</p>
                     </div>
@@ -102,53 +102,53 @@ export const AssignTree = () => {
                     <Col className={classes.left} lg={3} md={2} sm={12}></Col>
                     <Col className={classes.center} lg={6} md={8} sm={12}>
                         <Paper sx={{
-                            m:2,
-                            p:2,
+                            m: 2,
+                            p: 2,
                             minWidth: '300px',
                         }}
-                        variant="elevation"
-                        elevation={2}>
+                            variant="elevation"
+                            elevation={2}>
                             <Typography variant="h5" align="center">
                                 Assign trees for donation
                             </Typography>
-                            <ToastContainer/>
+                            <ToastContainer />
                             <Form
-                                onSubmit = {formSubmit}
-                                validate = {(values) => {
-                                const errors = {};
-                                if(!values.name){
-                                    errors.name = "Name required.";
-                                }
-                                if(!values.email){
-                                    errors.email = "Email required.";
-                                }
-                                if(!values.contact){
-                                    errors.contact = "Contact required.";
-                                }
-                                if(!values.saplingid){
-                                    errors.saplingid = "Sapling ID is a required field.";
-                                }
-                                return errors;
+                                onSubmit={formSubmit}
+                                validate={(values) => {
+                                    const errors = {};
+                                    if (!values.name) {
+                                        errors.name = "Name required.";
+                                    }
+                                    if (!values.email) {
+                                        errors.email = "Email required.";
+                                    }
+                                    if (!values.contact) {
+                                        errors.contact = "Contact required.";
+                                    }
+                                    if (!values.saplingid) {
+                                        errors.saplingid = "Sapling ID is a required field.";
+                                    }
+                                    return errors;
                                 }}
                                 render={({ handleSubmit, form, submitting, pristine }) => (
                                     <form onSubmit={handleSubmit} className={classes.root} autoComplete='off'>
-                                        <Grid container sx={{p:2}}>
-                                            <Grid sx={{m:2}} item xs={12}>
+                                        <Grid container sx={{ p: 2 }}>
+                                            <Grid sx={{ m: 2 }} item xs={12}>
                                                 <Field name="name">
-                                                {({ input, meta }) => (
-                                                    <TextField
-                                                        fullWidth
-                                                        error={meta.error && meta.touched ? true : false}
-                                                        {...input}
-                                                        variant='outlined'
-                                                        label='Full Name *'
-                                                        name='name'
-                                                        helperText={meta.error && meta.touched ? meta.error : ""}
-                                                    />
+                                                    {({ input, meta }) => (
+                                                        <TextField
+                                                            fullWidth
+                                                            error={meta.error && meta.touched ? true : false}
+                                                            {...input}
+                                                            variant='outlined'
+                                                            label='Full Name *'
+                                                            name='name'
+                                                            helperText={meta.error && meta.touched ? meta.error : ""}
+                                                        />
                                                     )}
                                                 </Field>
                                             </Grid>
-                                            <Grid item sx={{m:2}} xs={12}>
+                                            <Grid item sx={{ m: 2 }} xs={12}>
                                                 <Field name="email">
                                                     {({ input, meta }) => (
                                                         <TextField
@@ -160,10 +160,10 @@ export const AssignTree = () => {
                                                             {...input}
                                                             helperText={meta.error && meta.touched ? meta.error : ""}
                                                         />
-                                                        )}
+                                                    )}
                                                 </Field>
                                             </Grid>
-                                            <Grid item sx={{m:2}} xs={12}>
+                                            <Grid item sx={{ m: 2 }} xs={12}>
                                                 <Field name="contact">
                                                     {({ input, meta }) => (
                                                         <TextField
@@ -175,10 +175,10 @@ export const AssignTree = () => {
                                                             {...input}
                                                             helperText={meta.error && meta.touched ? meta.error : ""}
                                                         />
-                                                        )}
+                                                    )}
                                                 </Field>
                                             </Grid>
-                                            <Grid item sx={{m:2}} xs={12}>
+                                            <Grid item sx={{ m: 2 }} xs={12}>
                                                 <Field name="saplingid">
                                                     {({ input, meta }) => (
                                                         <TextField
@@ -190,18 +190,18 @@ export const AssignTree = () => {
                                                             {...input}
                                                             helperText={meta.error && meta.touched ? meta.error : ""}
                                                         />
-                                                        )}
+                                                    )}
                                                 </Field>
                                             </Grid>
                                             {
                                                 <Button
-                                                    sx={{m:2}}
+                                                    sx={{ m: 2 }}
                                                     size='large'
                                                     variant="contained"
                                                     color='primary'
                                                     disabled={submitting || pristine}
                                                     type="submit">
-                                                        Submit
+                                                    Submit
                                                 </Button>
                                             }
                                         </Grid>
