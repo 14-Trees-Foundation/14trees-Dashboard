@@ -6,8 +6,8 @@ import TabPanelUnstyled from '@mui/base/TabPanelUnstyled';
 import { buttonUnstyledClasses } from '@mui/base/ButtonUnstyled';
 import TabUnstyled, { tabUnstyledClasses } from '@mui/base/TabUnstyled';
 import { AssignTree } from './AssignTree';
-import { AddOrg } from './Addorg/Addorg';
-import { AddTree } from './Addtree/Addtree';
+import { AddOrg } from './Forms/Addorg';
+import { AddTree } from './Forms/Addtree';
 
 const Tab = styled(TabUnstyled)`
   color: #1f3625;
@@ -70,13 +70,13 @@ export const Forms = () => {
         <Tab>Add Tree</Tab>
       </TabsList>
       <TabPanel value={0}>
-          <AssignTree />
+        <AssignTree />
       </TabPanel>
       <TabPanel value={1}>
-          <AddOrg />
+        <AddOrg />
       </TabPanel>
       <TabPanel value={2}>
-          <AddTree/>
+        <AddTree />
       </TabPanel>
     </TabsUnstyled>
   );

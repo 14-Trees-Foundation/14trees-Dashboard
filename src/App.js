@@ -1,8 +1,8 @@
 import { Route, Routes } from "react-router-dom";
 import { Search } from "./pages/Search/Search";
 import { Visitor } from "./pages/Visitor/Visitor";
-import { AddTree } from "./pages/admin/Addtree/Addtree";
-import { AddOrg } from "./pages/admin/Addorg/Addorg";
+import { AddTree } from "./pages/admin/Forms/Addtree";
+import { AddOrg } from "./pages/admin/Forms/Addorg";
 import { Dashboard } from './pages/Dashboard';
 import { Corporate } from './pages/events/Corporate';
 import { Events } from './pages/events/Events';
