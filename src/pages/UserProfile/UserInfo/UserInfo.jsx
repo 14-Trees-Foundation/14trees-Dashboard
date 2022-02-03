@@ -30,11 +30,11 @@ export const UserInfo = () => {
 
     const treeDoneWidth = (userinfo.trees.length / 14) * 100;
 
-    if(open) {
+    if (open) {
         return (
             <div>
                 <Popup toggle={onTogglePop}>
-                    <img className={classes.imageWindow} src={userinfo.user.profile_image[0]} alt={"A"}/>
+                    <img className={classes.imageWindow} src={userinfo.user.profile_image[0]} alt={"A"} />
                 </Popup>
             </div>
         )
@@ -54,39 +54,39 @@ export const UserInfo = () => {
                             <div className={classes.label}>Name</div>
                             <div className={classes.data}>{userinfo.user.user.name}</div>
                             {
-                                (userinfo.user.donated_by === undefined || userinfo.user.donated_by === null )
-                                ?
-                                (
-                                    <Fragment>
-                                        <div className={classes.label}>Organization</div>
-                                        <div className={classes.data}>{userinfo.user.orgid.name}</div>
-                                    </Fragment>
-                                )
-                                :
-                                <>
-                                    <div className={classes.label}>Gifted By</div>
-                                    <div className={classes.data}>{userinfo.user.donated_by.name}</div>
-                                </>
+                                (userinfo.user.donated_by === undefined || userinfo.user.donated_by === null)
+                                    ?
+                                    (
+                                        <Fragment>
+                                            <div className={classes.label}>Organization</div>
+                                            <div className={classes.data}>{userinfo.user.orgid.name}</div>
+                                            <div className={classes.growth}>
+                                                <div style={{ marginTop: '20px' }}>
+                                                    <div style={{ display: 'flex' }}>
+                                                        <InfoChip count={userinfo.trees.length} label="Trees Planted" onClick={handleTreeClick} />
+                                                        {/* TODO: Events attended configuration on backend */}
+                                                        {/* <InfoChip count={userinfo.trees.length} label="Events attended" /> */}
+                                                    </div>
+                                                    <div className={classes.overall}>
+                                                        <div className={classes.done} style={{ "width": `${treeDoneWidth}%` }}>
+                                                        </div>
+                                                        <div className={classes.count}>
+                                                            {14 - userinfo.trees.length}
+                                                            <div className={classes.countdesc}>
+                                                                Trees away from neutralising your carbon footprint
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </Fragment>
+                                    )
+                                    :
+                                    <>
+                                        <div className={classes.label}>Gifted By</div>
+                                        <div className={classes.data}>{userinfo.user.donated_by.name}</div>
+                                    </>
                             }
-                        </div>
-                        <div className={classes.growth}>
-                            <div style={{ marginTop: '20px' }}>
-                                <div style={{ display: 'flex' }}>
-                                    <InfoChip count={userinfo.trees.length} label="Trees Planted" onClick={handleTreeClick} />
-                                    {/* TODO: Events attended configuration on backend */}
-                                    {/* <InfoChip count={userinfo.trees.length} label="Events attended" /> */}
-                                </div>
-                                <div className={classes.overall}>
-                                    <div className={classes.done} style={{ "width": `${treeDoneWidth}%` }}>
-                                    </div>
-                                    <div className={classes.count}>
-                                        {14 - userinfo.trees.length}
-                                        <div className={classes.countdesc}>
-                                            Trees away from neutralising your carbon footprint
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
                         </div>
                     </Grid>
                     <Grid item xs={12} md={6}>
@@ -132,7 +132,7 @@ const useStyles = makeStyles((theme) =>
             [theme.breakpoints.down('480')]: {
                 paddingLeft: '10px',
             },
-            [theme.breakpoints.between('481','900')]: {
+            [theme.breakpoints.between('481', '900')]: {
                 paddingLeft: '0px',
                 marginLeft: '-10px'
             }
@@ -160,12 +160,11 @@ const useStyles = makeStyles((theme) =>
                 fontSize: '16px',
             }
         },
-        growth:{
-            paddingLeft: '20px',
+        growth: {
             [theme.breakpoints.down('480')]: {
                 paddingLeft: '10px',
             },
-            [theme.breakpoints.between('481','900')]: {
+            [theme.breakpoints.between('481', '900')]: {
                 paddingLeft: '0px',
                 marginLeft: '-10px'
             }
