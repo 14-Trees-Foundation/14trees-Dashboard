@@ -85,6 +85,10 @@ export const UserInfo = () => {
                                     <>
                                         <div className={classes.label}>Gifted By</div>
                                         <div className={classes.data}>{userinfo.user.donated_by.name}</div>
+                                        <div className={classes.label}>Tree Name</div>
+                                        <div className={classes.data}>{userinfo.trees[0].tree.tree_id.name}</div>
+                                        <div className={classes.label}>Location</div>
+                                        <div className={classes.data}>{userinfo.trees[0].tree.plot_id.name}</div>
                                     </>
                             }
                         </div>
@@ -147,7 +151,7 @@ const useStyles = makeStyles((theme) =>
         label: {
             fontSize: '13px',
             fontWeight: '300',
-            marginBottom: '5px',
+            marginBottom: '3px',
             [theme.breakpoints.down('1025')]: {
                 fontSize: '10px',
             }
