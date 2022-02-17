@@ -14,6 +14,7 @@ export const Albums = ({ handleCreateAlbum }) => {
     const [createAlbmDlgOpen, setAlbnDlgOpen] = useState(false);
     const [showAlbmDlgOpen, setShowAlbmDlgOpen] = useState(false);
     const classes = useStyles();
+    console.log(albumsData)
 
     const handleClickDlgOpen = () => {
         setAlbnDlgOpen(true)
@@ -69,7 +70,10 @@ export const Albums = ({ handleCreateAlbum }) => {
                                             }}
                                             >
                                                 <div style={{
-                                                    backgroundImage: `url(${albumData.images[0]})`,
+                                                    backgroundImage: `url("${albumData.images[0]}")`,
+                                                    backgroundSize: 'cover',
+                                                    backgroundRepeat: 'no-repeat',
+                                                    backgroundPosition: 'center center',
                                                     width: '100%',
                                                     height: '320px',
                                                     borderRadius: '15px',
@@ -77,12 +81,15 @@ export const Albums = ({ handleCreateAlbum }) => {
                                                     onClick={() => handleAlbumClick(albumData.images)}
                                                 >
                                                     <div style={{
-                                                        width: '100%',
+                                                        width: 'calc(100% - 10px)',
                                                         height: '60px',
                                                         backgroundColor: 'rgb(0, 0, 0)',
-                                                        background: 'rgba(0, 0, 0, 0.5)',
+                                                        background: 'rgba(0, 0, 0, 0.8)',
                                                         color: '#ffffff',
-                                                        fontSize: '24px',
+                                                        fontSize: '18px',
+                                                        fontWeight: '600',
+                                                        paddingLeft: '5px',
+                                                        paddingRight: '5px',
                                                         textAlign: 'center',
                                                         borderBottomLeftRadius: '15px',
                                                         borderBottomRightRadius: '15px',
