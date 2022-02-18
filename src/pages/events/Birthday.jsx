@@ -46,7 +46,6 @@ export const Birthday = () => {
 
     memories = [...new Set(memories)]
     memories = memories.filter(function (e) { return e });
-    console.log(memories)
 
     if ((memories.length === 1 && memories[0] === '') || memories.length === 0) {
         memories = [7, 6, 1, 3, 5, 4, 8, 9, 11, 12, 13, 14, 15, 23, 16, 17, 18, 19, 20, 21, 22].map((number) => ({
@@ -57,7 +56,6 @@ export const Birthday = () => {
             src: image
         }))
     }
-    console.log(memories)
     return (
         <>
             <div>
@@ -88,9 +86,13 @@ export const Birthday = () => {
                         <p style={{ marginBottom: '8px', color: '#483924' }}>Wishing you a very</p>
                         <p style={{ marginTop: '8px', color: '#D2B68D' }}>Happy Birthday!</p>
                     </div>
-                    <div style={{ width: '100%', textAlign: 'center' }}>
-                        <img src={data.user_trees[0].profile_image[0]} alt="profile" className={classes.profile} />
-                    </div>
+                    {
+                        data.user_trees[0].profile_image[0] !== "" && (
+                            <div style={{ width: '100%', textAlign: 'center' }}>
+                                <img src={data.user_trees[0].profile_image[0]} alt="profile" className={classes.profile} />
+                            </div>
+                        )
+                    }
                     <div className={classes.activity}>
                         <p style={{ marginBottom: '8px', color: '#483924' }}>Some activites and memories from 14Trees</p>
                         <div className={classes.imageC}>
@@ -108,7 +110,7 @@ export const Birthday = () => {
                         </div>
                         <img src={gat} alt="gat" className={classes.gatLogo} />
                         <p className={classes.gatheader}>
-                            Site of Plantation: {data.plot_id.name}
+                            Site of Plantation: {data.user_trees[0].tree.plot_id.name}
                         </p>
                         <div style={{ position: 'absolute', width: '100%', top: '60%', opacity: '1', color: '#ffffff', fontFamily: 'Open Sans', fontSize: '22px' }}>
                             <p className={classes.gatdesc}>This land is a portion of a very large tract of completely barren land on a hilltop in village Vetale near Pune. We are attempting to reforest the land and restore damaged ecology. Slowly and steadily, we are .</p>
@@ -130,7 +132,13 @@ export const Birthday = () => {
                                 treeList.map((tree, idx) => {
                                     return (
                                         <Grid item xs={6} md={4}>
-                                            <img src={tree.tree.image[0]} alt="" className={classes.treeimg} onClick={() => navigate(`/profile/${tree.tree.sapling_id}`)} />
+                                            {
+                                                tree.tree.image[0] === "" ? (
+                                                    <img src={tree.tree.tree_id.image[0]} alt="" className={classes.treeimg} onClick={() => navigate(`/profile/${tree.tree.sapling_id}`)} />
+                                                ) : (
+                                                    <img src={tree.tree.image[0]} alt="" className={classes.treeimg} onClick={() => navigate(`/profile/${tree.tree.sapling_id}`)} />
+                                                )
+                                            }
                                             <div style={{ padding: '5px', fontWeight: '400', fontSize: '18px' }}>Tree Name: {tree.tree.tree_id.name}</div>
                                             <div style={{ padding: '5px', fontWeight: '400', fontSize: '18px' }}>#{tree.tree.sapling_id}</div>
                                         </Grid>

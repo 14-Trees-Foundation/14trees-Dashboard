@@ -1,3 +1,4 @@
+/* eslint-disable array-callback-return */
 import { useEffect, useState, useCallback } from 'react';
 import { createStyles, makeStyles } from '@mui/styles';
 import {
@@ -7,7 +8,7 @@ import {
     TableContainer, TableHead, TableRow,
     TablePagination,
     FormControl, RadioGroup, Radio, FormControlLabel,
-    Box
+    Box, Checkbox
 } from "@mui/material";
 import { useRecoilState } from 'recoil';
 import { ToastContainer, toast } from 'react-toastify';
@@ -43,6 +44,7 @@ const intitialFValues = {
     user: {},
     trees: [],
     filteredTrees: [],
+    selectedTreeSum: 0,
     pwdDlgOpen: true,
     shareDlgOpen: false,
     shareName: '',
@@ -113,13 +115,10 @@ export const GiftTrees = () => {
 
         return new File([compressedFile], file.name);
     }
-    const handleClickOpen = (sapling_id, plot_id) => {
-        // setSelectedTree(sapling_id);
+    const handleClickOpen = () => {
         setValues({
             ...values,
             dlgOpen: true,
-            selectedPlotId: plot_id,
-            selectedSaplingId: sapling_id
         })
     };
 
@@ -171,12 +170,14 @@ export const GiftTrees = () => {
         try {
             let profileTrees = await Axios.get(`/mytrees/${email}`);
             if (profileTrees.status === 200) {
+                let data = profileTrees.data.trees
+                data = data.map(tree => ({ ...tree, selected: false }))
                 setValues((values) => {
                     return {
                         ...values,
                         user: profileTrees.data.user[0],
-                        trees: profileTrees.data.trees,
-                        filteredTrees: profileTrees.data.trees,
+                        trees: data,
+                        filteredTrees: data,
                     }
                 })
             }
@@ -205,7 +206,7 @@ export const GiftTrees = () => {
                 toast.error(error.response.data.error)
             }
         }
-    }, [email])
+    }, [email, setAlbums])
 
     useEffect(() => {
         (async () => {
@@ -271,12 +272,13 @@ export const GiftTrees = () => {
             backdropOpen: true
         })
         const formData = new FormData()
+        let sapling_ids = values.filteredTrees.filter(t => t.selected === true).map(a => a.tree_id.sapling_id);
         const date = moment(formValues.dob).format('YYYY-MM-DD')
         formData.append('name', formValues.name)
         formData.append('email', formValues.email);
         formData.append('dob', date);
         formData.append('contact', formValues.contact);
-        formData.append('sapling_id', values.selectedSaplingId);
+        formData.append('sapling_id', sapling_ids);
         formData.append('donor', values.user._id);
 
         if (img !== null) {
@@ -289,7 +291,6 @@ export const GiftTrees = () => {
 
         if (formValues.type !== "") {
             formData.append('type', formValues.type)
-            formData.append('plot_id', values.selectedPlotId)
         }
 
         if (images.length > 0) {
@@ -307,7 +308,7 @@ export const GiftTrees = () => {
 
                 if (res.status === 201) {
                     const params = JSON.stringify({
-                        "sapling_id": values.selectedSaplingId,
+                        "sapling_ids": sapling_ids,
                         "user_id": res.data.result.assigned_to[0],
                         "link": res.data.result.link,
                         "type": res.data.result.type,
@@ -352,7 +353,7 @@ export const GiftTrees = () => {
             }
         } else {
             try {
-                res = await Axios.post('/profile/usertreereg', formData, {
+                res = await Axios.post('/profile/usertreereg/multi', formData, {
                     headers: {
                         'Content-type': 'multipart/form-data'
                     },
@@ -360,7 +361,7 @@ export const GiftTrees = () => {
 
                 if (res.status === 201) {
                     const params = JSON.stringify({
-                        "sapling_id": values.selectedSaplingId,
+                        "sapling_ids": sapling_ids,
                         "user_id": res.data.usertreereg.user
                     })
                     await Axios.post('/mytrees/update', params, {
@@ -460,6 +461,43 @@ export const GiftTrees = () => {
         }
     }
 
+    const handleSelectTrees = (event, value) => {
+
+        values.filteredTrees.forEach((item, index) => {
+            if (item.tree_id.sapling_id === value.tree_id.sapling_id && !item.assigned) {
+                item.selected = !value.selected;
+            }
+        });
+        const sum = values.filteredTrees
+            .map(item => item.selected)
+            .reduce((prev, curr) => prev + curr, 0);
+
+        setValues({
+            ...values,
+            selectedTreeSum: sum,
+        })
+    };
+
+    // const handleSelectAlltree = (event) => {
+    //     let selTrees = values.filteredTrees.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+    //     if (event.target.checked) {
+    //         // selTrees = selTrees.filter(tree => { return tree.assigned === false })
+    //         values.filteredTrees.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map(tree => (tree.assigned === false ? { ...tree, selected: true } : { ...tree }));
+    //     } else {
+    //         values.filteredTrees.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map(tree => ({ ...tree, selected: false }))
+    //     }
+    //     const sum = selTrees
+    //         .map(item => item.selected)
+    //         .reduce((prev, curr) => prev + curr, 0);
+
+    //     setValues({
+    //         ...values,
+    //         selectedTreeSum: sum,
+    //         // filteredTrees: selTrees
+    //     })
+    // }
+    // console.log(selectedTrees);
+
     if (values.loading) {
         return <Spinner />
     } else {
@@ -544,11 +582,24 @@ export const GiftTrees = () => {
                                 <Table sx={{ minWidth: 360 }} aria-label="simple table">
                                     <TableHead>
                                         <TableRow sx={{ fontSize: '16px' }}>
+                                            <TableCell align="right"></TableCell>
+                                            {/* <TableCell align="left"><Checkbox onClick={(e) => handleSelectAlltree(e)} /></TableCell> */}
                                             <TableCell>Tree Name</TableCell>
                                             <TableCell align="center">Sapling ID</TableCell>
                                             <TableCell align="center">Plot</TableCell>
                                             <TableCell align="right"></TableCell>
                                             <TableCell align="right"></TableCell>
+                                            <TableCell>
+                                                <Button
+                                                    sx={{ ml: 'auto', mr: 'auto' }}
+                                                    variant="contained"
+                                                    color='primary'
+                                                    disabled={values.selectedTreeSum <= 0}
+                                                    onClick={handleClickOpen}
+                                                >
+                                                    Assign
+                                                </Button>
+                                            </TableCell>
                                         </TableRow>
                                     </TableHead>
                                     <TableBody className={classes.tblrow}>
@@ -562,6 +613,12 @@ export const GiftTrees = () => {
                                                             m: 2
                                                         }}
                                                     >
+                                                        <TableCell onClick={(event) => handleSelectTrees(event, row)} align="center">
+                                                            <Checkbox
+                                                                disabled={row.assigned && row.type !== null}
+                                                                checked={row.selected}
+                                                            />
+                                                        </TableCell>
                                                         <TableCell component="th" scope="row">
                                                             {row.tree_id.tree_id.name}
                                                         </TableCell>
@@ -580,15 +637,7 @@ export const GiftTrees = () => {
                                                                             </Typography>
                                                                         </>
                                                                     ) :
-                                                                    <Button
-                                                                        sx={{ ml: 'auto', mr: 'auto' }}
-                                                                        variant="contained"
-                                                                        color='primary'
-                                                                        disabled={row.assigned}
-                                                                        onClick={() => handleClickOpen(row.tree_id.sapling_id, row.tree_id.plot_id._id)}
-                                                                    >
-                                                                        Gift
-                                                                    </Button>
+                                                                    <></>
                                                             }
                                                         </TableCell>
                                                         <TableCell align="center">
@@ -600,7 +649,7 @@ export const GiftTrees = () => {
                                                                 onClick={() =>
                                                                     handleShare(row.tree_id.sapling_id, row.tree_id.tree_id.name, row.assigned_to.name)}
                                                             >
-                                                                Share
+                                                                Card
                                                             </Button>
                                                         </TableCell>
                                                         <TableCell align="center">
@@ -613,7 +662,7 @@ export const GiftTrees = () => {
                                                                         disabled={!row.assigned && row.type !== null}
                                                                         onClick={() => handleTemplateShare(row.type, row.link)}
                                                                     >
-                                                                        Customized Page
+                                                                        Share
                                                                     </Button>
                                                                 )
                                                             }
