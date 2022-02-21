@@ -3,7 +3,7 @@ import { createStyles, makeStyles } from '@mui/styles';
 import { useRecoilValue } from "recoil";
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import {useNavigate} from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 import { AppBar } from "../../components/Appbar";
 import { Spinner } from '../../components/Spinner';
@@ -33,22 +33,22 @@ export const Search = () => {
 
     const fetchData = async (searchKey) => {
         let params = {
-            key : searchKey,
+            key: searchKey,
             size: searchSize,
             index: currPage
         }
         setLoading(true);
         const res = await api.get('/search/', {
-            params : params
+            params: params
         });
 
-        if(res.data.total_results === 0){
+        if (res.data.total_results === 0) {
             setSearchError(true)
         }
 
-        if(res.status === 200) {
-            for (let i=0; i< res.data.users.length; i++){
-                if(res.data.users[i].user_trees.length < 1){
+        if (res.status === 200) {
+            for (let i = 0; i < res.data.users.length; i++) {
+                if (res.data.users[i].user_trees.length < 1) {
                     delete res.data.users[i]
                 }
             }
@@ -62,92 +62,91 @@ export const Search = () => {
     const onUserClick = async (value) => {
         setLoading(true);
         let params = {
-            id : value.tree,
+            id: value.tree,
         }
         const res = await api.get('/trees/getsaplingid', {
-            params : params
+            params: params
         });
         setLoading(false);
 
-        navigate('/profile/'+res.data.sapling_id)
+        navigate('/profile/' + res.data.sapling_id)
     }
 
     if (loading) {
         return <Spinner />
     } else {
-    if (Object.keys(results.users).length === 0 && key === "") {
-        return (
-            <div className={classes.box}>
-                <AppBar />
-                <img alt="bg" src={bg} className={classes.bg} style={{height: '100vh',}}/>
-                <div className={classes.overlay} style={{height: '100vh',}}>
-                    <AppBar />
-                    <div className={classes.main}>
-                        <div className={classes.header}>
-                            <h1 className={classes.infoheader}>
-                                100+
-                            </h1>
-                            <p className={classes.infodesc}>
-                                People employed from local community
-                            </p>
-                        </div>
-                        <div>
-                            <div className={classes.inputBox}>
-                                <SearchBar
-                                    searchSubmit={handleSearch}/>
+        if (Object.keys(results.users).length === 0 && key === "") {
+            return (
+                <div className={classes.box}>
+                    <img alt="bg" src={bg} className={classes.bg} style={{ height: '100vh', }} />
+                    <div className={classes.overlay} style={{ height: '100vh', }}>
+                        <AppBar />
+                        <div className={classes.main}>
+                            <div className={classes.header}>
+                                <h1 className={classes.infoheader}>
+                                    100+
+                                </h1>
+                                <p className={classes.infodesc}>
+                                    People employed from local community
+                                </p>
                             </div>
-                            {/* <p className={classes.sep}>OR</p>
+                            <div>
+                                <div className={classes.inputBox}>
+                                    <SearchBar
+                                        searchSubmit={handleSearch} />
+                                </div>
+                                {/* <p className={classes.sep}>OR</p>
                             <div className={classes.btnGrp}>
                                 <Button variant="contained" color="secondary" size="large" className="s-s-btn" onClick={() => onUserClick()}>See all the people</Button>
                                 <Button variant="contained" color="secondary" size="large" className="s-s-btn">See all the events</Button>
                                 <Button variant="contained" color="secondary" size="large" className="s-s-btn">See all the organization</Button>
                             </div> */}
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
-        )
-    } else {
-        return (
-            <div className={classes.box}>
-                <AppBar />
-                <ToastContainer />
-                {/* {searchError &&
+            )
+        } else {
+            return (
+                <div className={classes.box}>
+                    <AppBar />
+                    <ToastContainer />
+                    {/* {searchError &&
                     toast.warn("No results found!")
                 } */}
-                <img alt="bg" src={bg} className={classes.bg} style={{height: '40vh'}}/>
-                <div className={classes.overlay} style={{height: '40vh'}}>
-                <div className={classes.main} style={{paddingTop: '4%'}}>
-                    <div className={classes.header} style={{marginTop: '0'}}>
-                        <h1 className={classes.infoheader}>
-                            100+
-                        </h1>
-                        <p className={classes.infodesc}>
-                            People employed from local community
-                        </p>
-                    </div>
-                    <div>
-                    <div className={classes.inputBox}>
-                        <SearchBar
-                            searchSubmit={handleSearch}/>
-                    </div>
-                </div>
-                </div>
-                <div className={classes.result}>
-                        {results.total_results === 0 ?
-                            <div className={classes.resultsH}>0 Results Found for : {key}</div>
-                            :
-                            <div className={classes.resultsH}>
-                                Search Results for: {key}
+                    <img alt="bg" src={bg} className={classes.bg} style={{ height: '40vh' }} />
+                    <div className={classes.overlay} style={{ height: '40vh' }}>
+                        <div className={classes.main} style={{ paddingTop: '4%' }}>
+                            <div className={classes.header} style={{ marginTop: '0' }}>
+                                <h1 className={classes.infoheader}>
+                                    100+
+                                </h1>
+                                <p className={classes.infodesc}>
+                                    People employed from local community
+                                </p>
                             </div>
-                        }
-                        {
-                            (selectedChips === "Individual" || selectedChips === "All") &&
                             <div>
-                                <UserList handleClick={onUserClick} />
+                                <div className={classes.inputBox}>
+                                    <SearchBar
+                                        searchSubmit={handleSearch} />
+                                </div>
                             </div>
-                        }
-                </div>
+                        </div>
+                        <div className={classes.result}>
+                            {results.total_results === 0 ?
+                                <div className={classes.resultsH}>0 Results Found for : {key}</div>
+                                :
+                                <div className={classes.resultsH}>
+                                    Search Results for: {key}
+                                </div>
+                            }
+                            {
+                                (selectedChips === "Individual" || selectedChips === "All") &&
+                                <div>
+                                    <UserList handleClick={onUserClick} />
+                                </div>
+                            }
+                        </div>
                         {/* <div className="s-input-box">
                             <InputBar type={type} setData={handleData} />
                             <div className="s-search-info">
@@ -187,10 +186,10 @@ export const Search = () => {
                             }
                         </div> */}
                     </div>
-            </div>
-        )
+                </div>
+            )
+        }
     }
-}
 }
 
 const UseStyle = makeStyles((theme) =>
@@ -216,12 +215,12 @@ const UseStyle = makeStyles((theme) =>
         main: {
             width: '65vw',
             paddingLeft: '18vw',
-            paddingTop: '5%',
+            marginTop: '5%',
             position: 'relative',
             [theme.breakpoints.down('748')]: {
                 width: '80vw',
                 paddingLeft: '9vw',
-                paddingTop: '15%',
+                marginTop: '20%',
             }
         },
         header: {

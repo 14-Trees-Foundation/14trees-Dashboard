@@ -1,11 +1,12 @@
 import React, { Fragment } from "react";
 import logo from '../assets/logo_white_small.png';
 import Button from '@mui/material/Button';
-import { Link } from 'react-router-dom';
 import { createStyles, makeStyles } from '@mui/styles';
+import { useNavigate } from 'react-router-dom';
 
 export const AppBar = () => {
 
+    const navigate = useNavigate();
     const classes = UseStyle();
 
     return (
@@ -24,8 +25,8 @@ export const AppBar = () => {
                             variant="contained"
                             color="primary"
                             size="large"
-                            style={{marginRight: '2%'}}
-                            component={Link} to="/admin"
+                            style={{ marginRight: '2%' }}
+                            onClick={() => navigate('/admin')}
                         >
                             Admin
                         </Button>
