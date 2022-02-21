@@ -13,7 +13,7 @@ import {
 import { AdminHome } from "./home/AdminHome";
 import logo from "../../assets/logo_white_small.png";
 import { Tree } from "./tree/Tree";
-import { Forms } from "./Forms";
+import { Forms } from "./Forms/Forms";
 
 export const Admin = () => {
     const classes = useStyles();

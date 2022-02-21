@@ -6,9 +6,9 @@ import { Field, Form } from "react-final-form";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
-import { Spinner } from '../../../components/Spinner';
-import Axios from "../../../api/local";
-import tree from "../../../assets/dark_logo.png";
+import { Spinner } from '../../../../components/Spinner';
+import Axios from "../../../../api/local";
+import tree from "../../../../assets/dark_logo.png";
 
 const intitialFValues = {
     name: '',
@@ -108,8 +108,11 @@ export const AssignTree = () => {
                         }}
                             variant="elevation"
                             elevation={2}>
-                            <Typography variant="h5" align="center">
-                                Assign trees for donation
+                            <Typography variant="h5" align="center" style={{ color: '#cc1111' }}>
+                                Step - 2
+                            </Typography>
+                            <Typography variant="h6" align="center" style={{}}>
+                                Assign trees to buyers/volunteers
                             </Typography>
                             <ToastContainer />
                             <Form

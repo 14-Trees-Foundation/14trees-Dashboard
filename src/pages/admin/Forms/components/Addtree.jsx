@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 
 import { createStyles, makeStyles } from '@mui/styles';
 import Backdrop from '@mui/material/Backdrop';
@@ -11,48 +11,36 @@ import CardContent from '@mui/material/CardContent';
 import CardMedia from '@mui/material/CardMedia';
 import Alert from '@mui/material/Alert';
 import Button from '@mui/material/Button';
+import { useRecoilValue } from 'recoil';
 
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
-import tree from "../../../assets/dark_logo.png";
-import { Spinner } from '../../../components/Spinner';
-import Axios from "../../../api/local";
+import {
+    plotsList,
+    treeTypesList
+} from '../../../../store/adminAtoms';
+import tree from "../../../../assets/dark_logo.png";
+import { Spinner } from '../../../../components/Spinner';
+import Axios from "../../../../api/local";
 
 const intitialFValues = {
     selectedTreetype: '',
     selectedPlot: '',
     saplingId: '',
+    loading: false,
     uploaded: false,
     backdropOpen: false
 }
 
 export const AddTree = () => {
 
+    const classes = UseStyle();
     const [values, setValues] = useState(intitialFValues);
     const [errors, setErrors] = useState({});
-    const [treetype, setTreeType] = useState({});
-    const [plots, setPlots] = useState({});
-    const classes = UseStyle();
 
-    let [loading, setLoading] = useState(true);
-
-    useEffect(() => {
-        (async () => {
-            // Get Tree types
-            let TreeRes = await Axios.get(`/trees/treetypes`);
-            if (TreeRes.status === 200) {
-                setTreeType(TreeRes.data);
-            }
-
-            // Get Plots
-            let plotRes = await Axios.get(`/plots`);
-            if (plotRes.status === 200) {
-                setPlots(plotRes.data);
-            }
-            setLoading(false);
-        })();
-    }, []);
+    const treetype = useRecoilValue(treeTypesList);
+    const plots = useRecoilValue(plotsList);
 
     const validate = () => {
         let temp = {};
@@ -144,7 +132,7 @@ export const AddTree = () => {
         }
     }
 
-    if (loading) {
+    if (values.loading) {
         return <Spinner />
     } else {
         if (values.uploaded) {
@@ -285,16 +273,16 @@ const UseStyle = makeStyles((theme) =>
         },
         formheader: {
             paddingLeft: '1%',
-            fontWeight:"500",
+            fontWeight: "500",
             [theme.breakpoints.down('md')]: {
                 paddingLeft: "5%",
                 paddingTop: '5%',
             }
         },
         inputbox: {
-            maxWidth:'720px',
-            marginLeft:'auto',
-            marginRight:'auto',
+            maxWidth: '720px',
+            marginLeft: 'auto',
+            marginRight: 'auto',
         },
         paper: {
             margin: theme.spacing(5),

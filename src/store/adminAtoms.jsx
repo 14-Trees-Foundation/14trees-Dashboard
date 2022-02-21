@@ -1,5 +1,15 @@
 import { atom } from 'recoil';
 
+const treeTypesList = atom({
+    key: 'treetypes',
+    default: []
+})
+
+const plotsList = atom({
+    key: 'plots',
+    default: []
+})
+
 const albums = atom({
     key: 'albums',
     default: []
@@ -56,6 +66,8 @@ const searchTreeData = atom({
 })
 
 export {
+    treeTypesList,
+    plotsList,
     adminNavIndex,
     summary,
     treeByPlots,

@@ -1,13 +1,13 @@
 import { Route, Routes } from "react-router-dom";
 import { Search } from "./pages/Search/Search";
 import { Visitor } from "./pages/Visitor/Visitor";
-import { AddTree } from "./pages/admin/Forms/Addtree";
-import { AddOrg } from "./pages/admin/Forms/Addorg";
+import { AddTree } from "./pages/admin/Forms/components/Addtree";
+import { AddOrg } from "./pages/admin/Forms/components/Addorg";
 import { Dashboard } from './pages/Dashboard';
 import { Corporate } from './pages/events/Corporate';
 import { Events } from './pages/events/Events';
 import { NotFound } from './pages/notfound/NotFound';
-import { AssignTree } from './pages/admin/Forms/AssignTree';
+import { AssignTree } from './pages/admin/Forms/components/AssignTree';
 import { Admin } from './pages/admin/Admin';
 import { Layout } from './components/Layout';
 import { GiftTrees } from './pages/ww/GiftTrees';
@@ -16,7 +16,7 @@ import { WW } from './pages/ww/WW';
 import { RequireAuth } from "./pages/admin/auth/RequireAuth";
 import { AuthProvider } from "./pages/admin/auth/auth";
 import { Login } from "./pages/admin/Login/Login";
-import { Forms } from "./pages/admin/Forms";
+import { Forms } from "./pages/admin/Forms/Forms";
 import { Birthday } from "./pages/events/Birthday";
 
 function App() {

@@ -13,9 +13,9 @@ import Alert from '@mui/material/Alert';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
-import tree from "../../../assets/dark_logo.png";
-import { Spinner } from '../../../components/Spinner';
-import Axios from "../../../api/local";
+import tree from "../../../../assets/dark_logo.png";
+import { Spinner } from '../../../../components/Spinner';
+import Axios from "../../../../api/local";
 
 const intitialFValues = {
     loading: false,
@@ -97,74 +97,74 @@ export const AddOrg = () => {
                             <ToastContainer />
                             <h1 className={classes.formheader}>Organization information</h1>
                             <Form
-                                onSubmit = {formSubmit}
-                                validate = {(values) => {
-                                const errors = {};
-                                if(!values.name){
-                                    errors.name = "Name of the oorganzation";
-                                }
-                                if(!values.type){
-                                    errors.type = "Type of organization.";
-                                }
-                                if(!values.desc){
-                                    errors.desc = "A small description";
-                                }
-                                return errors;
+                                onSubmit={formSubmit}
+                                validate={(values) => {
+                                    const errors = {};
+                                    if (!values.name) {
+                                        errors.name = "Name of the oorganzation";
+                                    }
+                                    if (!values.type) {
+                                        errors.type = "Type of organization.";
+                                    }
+                                    if (!values.desc) {
+                                        errors.desc = "A small description";
+                                    }
+                                    return errors;
                                 }}
                                 render={({ handleSubmit, form, submitting, pristine }) => (
                                     <form onSubmit={handleSubmit} className={classes.root} autoComplete='off'>
                                         <Grid container>
                                             <Grid item xs={12} sm={12} md={12}>
-                                            <Field name="name">
-                                            {({ input, meta }) => (
-                                                <TextField
-                                                    error={meta.error && meta.touched ? true : false}
-                                                    {...input}
-                                                    variant='outlined'
-                                                    label='Organization Name *'
-                                                    name='name'
-                                                    helperText={meta.error && meta.touched ? meta.error : ""}
-                                                />
-                                                )}
-                                            </Field>
-                                            <Field name="type">
-                                            {({ input, meta }) => (
-                                                <TextField
-                                                    variant='outlined'
-                                                    label='Type *'
-                                                    name='email'
-                                                    error={meta.error && meta.touched ? true : false}
-                                                    {...input}
-                                                    helperText={meta.error && meta.touched ? meta.error : ""}
-                                                />
-                                                )}
-                                            </Field>
-                                            <Field name="desc">
-                                            {({ input, meta }) => (
-                                                <TextField
-                                                    variant='outlined'
-                                                    label='Description *'
-                                                    name='desc'
-                                                    error={meta.error && meta.touched ? true : false}
-                                                    {...input}
-                                                    helperText={meta.error && meta.touched ? meta.error : ""}
-                                                />
-                                                )}
-                                            </Field>
-                                            {
-                                                !values.uimageerror && !values.addimageerror &&
-                                                <div className={classes.submitbtn}>
-                                                    <Button
-                                                        size='large'
-                                                        variant="contained"
-                                                        color='primary'
-                                                        disabled={submitting || pristine}
-                                                        type="submit">
+                                                <Field name="name">
+                                                    {({ input, meta }) => (
+                                                        <TextField
+                                                            error={meta.error && meta.touched ? true : false}
+                                                            {...input}
+                                                            variant='outlined'
+                                                            label='Organization Name *'
+                                                            name='name'
+                                                            helperText={meta.error && meta.touched ? meta.error : ""}
+                                                        />
+                                                    )}
+                                                </Field>
+                                                <Field name="type">
+                                                    {({ input, meta }) => (
+                                                        <TextField
+                                                            variant='outlined'
+                                                            label='Type *'
+                                                            name='email'
+                                                            error={meta.error && meta.touched ? true : false}
+                                                            {...input}
+                                                            helperText={meta.error && meta.touched ? meta.error : ""}
+                                                        />
+                                                    )}
+                                                </Field>
+                                                <Field name="desc">
+                                                    {({ input, meta }) => (
+                                                        <TextField
+                                                            variant='outlined'
+                                                            label='Description *'
+                                                            name='desc'
+                                                            error={meta.error && meta.touched ? true : false}
+                                                            {...input}
+                                                            helperText={meta.error && meta.touched ? meta.error : ""}
+                                                        />
+                                                    )}
+                                                </Field>
+                                                {
+                                                    !values.uimageerror && !values.addimageerror &&
+                                                    <div className={classes.submitbtn}>
+                                                        <Button
+                                                            size='large'
+                                                            variant="contained"
+                                                            color='primary'
+                                                            disabled={submitting || pristine}
+                                                            type="submit">
                                                             Submit
-                                                    </Button>
-                                                </div>
-                                            }
-                                        </Grid>
+                                                        </Button>
+                                                    </div>
+                                                }
+                                            </Grid>
                                         </Grid>
                                     </form>
                                 )}
@@ -220,8 +220,8 @@ const UseStyle = makeStyles((theme) =>
         inputbox: {
             maxWidth: '720px',
             paddingTop: '32px',
-            marginLeft:'auto',
-            marginRight:'auto'
+            marginLeft: 'auto',
+            marginRight: 'auto'
         },
         paper: {
             padding: theme.spacing(3),
