@@ -32,12 +32,14 @@ const usestyle = makeStyles((theme) => ({
         marginRight: 'auto',
         width: '200px',
         height: '200px',
-        marginBottom: '2%'
+        marginBottom: '2%',
+        zIndex: '1000'
     },
     text: {
         fontSize: '30px',
         color: '#ffffff',
         fontWeight: '500',
-        textAlign: 'center'
+        textAlign: 'center',
+        zIndex: '1000'
     }
 }))

@@ -1,5 +1,5 @@
 import { Typography } from '@mui/material';
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { PieChart, Pie, Sector, ResponsiveContainer } from 'recharts';
 import { CSVLink } from "react-csv";
 import DownloadForOfflineIcon from '@mui/icons-material/DownloadForOffline';
@@ -13,6 +13,7 @@ import {
 } from '../../../../store/selectors';
 import { selectedPlot } from '../../../../store/adminAtoms';
 import * as Axios from "../../../../api/local";
+import { Spinner } from '../../../../components/Spinner';
 
 const renderActiveShape = (props) => {
     const RADIAN = Math.PI / 180;
@@ -61,6 +62,7 @@ const renderActiveShape = (props) => {
 };
 
 export const TreeTypeCountByPlot = () => {
+    const [loading, setLoading] = useState(false);
     const [treeTypesCount, setTreeTypesCount] = useState([]);
     const csvLink = useRef();
     const [state, setState] = useState(0);
@@ -80,7 +82,15 @@ export const TreeTypeCountByPlot = () => {
         { label: "Date Added", key: "date" },
     ]
 
+    useEffect(() => {
+        console.log("called")
+        if (treeTypesCount.length > 0) {
+            csvLink.current.link.click();
+        }
+    }, [treeTypesCount])
+
     const getTreeTypeCountByPlotName = async () => {
+        setLoading(true)
         try {
             let response = await Axios.default.get(`/trees/treetypecount/plot?plot_name=${selPlot}`);
             if (response.status === 200) {
@@ -91,7 +101,9 @@ export const TreeTypeCountByPlot = () => {
                         date: item.date_added.slice(0, 10),
                     }
                 })
+                setLoading(false);
                 setTreeTypesCount(data);
+                toast.success("Downloading file!")
             }
         } catch (error) {
             toast.error(error);
@@ -105,33 +117,37 @@ export const TreeTypeCountByPlot = () => {
     let date = new Date().toISOString().slice(0, 10);
     let file_name = 'tree_type_count_' + selPlot + '_' + date + '.csv';
 
-    return (
-        <div>
-            <ToastContainer />
-            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                <Typography variant='subtitle1' gutterBottom>
-                    Tree types in <em>{selPlot}</em>
-                </Typography>
+    if (loading) {
+        return <Spinner text={"Dowloading your tree data!"} />
+    } else {
+        return (
+            <div>
+                <ToastContainer />
                 <CSVLink style={{ textDecoration: 'none' }} data={treeTypesCount} headers={headers} filename={file_name} ref={csvLink} target='_blank'>
-                    <DownloadForOfflineIcon fontSize='large' style={{ cursor: 'pointer', color: '#1f3625' }} onClick={getTreeTypeCountByPlotName} />
                 </CSVLink>
+                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                    <Typography variant='subtitle1' gutterBottom>
+                        Tree types in <em>{selPlot}</em>
+                    </Typography>
+                    <DownloadForOfflineIcon fontSize='large' style={{ cursor: 'pointer', color: '#1f3625' }} onClick={getTreeTypeCountByPlotName} />
+                </div>
+                <ResponsiveContainer width={'100%'} height={400}>
+                    <PieChart width={'100%'} height={350}>
+                        <Pie
+                            activeIndex={state}
+                            activeShape={renderActiveShape}
+                            data={filteredCount}
+                            cx="50%"
+                            cy="50%"
+                            innerRadius={70}
+                            outerRadius={100}
+                            fill="#9BC53D"
+                            dataKey="value"
+                            onMouseEnter={onPieEnter}
+                        />
+                    </PieChart>
+                </ResponsiveContainer>
             </div>
-            <ResponsiveContainer width={'100%'} height={400}>
-                <PieChart width={'100%'} height={350}>
-                    <Pie
-                        activeIndex={state}
-                        activeShape={renderActiveShape}
-                        data={filteredCount}
-                        cx="50%"
-                        cy="50%"
-                        innerRadius={70}
-                        outerRadius={100}
-                        fill="#9BC53D"
-                        dataKey="value"
-                        onMouseEnter={onPieEnter}
-                    />
-                </PieChart>
-            </ResponsiveContainer>
-        </div>
-    )
+        )
+    }
 }
