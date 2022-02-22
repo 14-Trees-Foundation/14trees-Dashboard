@@ -61,7 +61,6 @@ export const Tree = () => {
             }
             response = await Axios.default.get(`/trees/treetypecount/plotwise`);
             if (response.status === 200) {
-                console.log(response.data)
                 setTreeTypeCountByPlot(response.data);
             }
         } catch (error) {

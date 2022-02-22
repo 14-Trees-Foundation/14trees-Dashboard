@@ -105,10 +105,11 @@ export const AssignTree = () => {
                             m: 2,
                             p: 2,
                             minWidth: '300px',
+                            height: '600px',
                         }}
                             variant="elevation"
                             elevation={2}>
-                            <Typography variant="h5" align="center" style={{ color: '#cc1111' }}>
+                            <Typography variant="h5" align="center" style={{ color: '#9BC53D' }}>
                                 Step - 2
                             </Typography>
                             <Typography variant="h6" align="center" style={{}}>
