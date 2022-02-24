@@ -7,15 +7,15 @@ import { Spinner } from "../../components/Spinner";
 import { birthdayData } from "../../store/atoms";
 
 export const Events = () => {
-    const event_id = useParams();
+    const { id } = useParams();
     const navigate = useNavigate();
     const [loading, setLoading] = useState(true);
-    console.log(event_id.id);
+
     const setBirthdayData = useSetRecoilState(birthdayData);
 
     const fetchData = useCallback(async () => {
         try {
-            let response = await Axios.get(`/events/birthday/?id=${event_id.id}`);
+            let response = await Axios.get(`/events/birthday/?id=${id}`);
             console.log(response)
             if (response.status === 200) {
                 setBirthdayData(response.data.data)
@@ -26,7 +26,7 @@ export const Events = () => {
             navigate('/notfound');
         }
         setLoading(false)
-    }, [])
+    }, [setBirthdayData, navigate, id])
 
     useEffect(() => {
         fetchData()

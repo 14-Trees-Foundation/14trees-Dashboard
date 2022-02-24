@@ -1,5 +1,5 @@
 import { Fragment } from 'react';
-import { Grid } from '@mui/material';
+import { Dialog, Grid } from '@mui/material';
 import { createStyles, makeStyles } from '@mui/styles';
 import { useRecoilValue, useRecoilState } from 'recoil';
 // import { useSetRecoilState } from 'recoil';
@@ -8,7 +8,6 @@ import { Memories } from "../Memories/Memories";
 import { InfoChip } from "../../../stories/InfoChip/InfoChip";
 import { usersData, openProfilePopup } from '../../../store/atoms';
 // import { navIndex } from '../../../store/atoms';
-import { Popup } from "../../../stories/Popup/Popup";
 
 export const UserInfo = () => {
     const classes = useStyles();
@@ -33,9 +32,9 @@ export const UserInfo = () => {
     if (open) {
         return (
             <div>
-                <Popup toggle={onTogglePop}>
+                <Dialog onClose={onTogglePop} open={open}>
                     <img className={classes.imageWindow} src={userinfo.user.profile_image[0]} alt={"A"} />
-                </Popup>
+                </Dialog>
             </div>
         )
     } else {
@@ -210,22 +209,12 @@ const useStyles = makeStyles((theme) =>
             }
         },
         imageWindow: {
-            height: '80%',
+            height: 'auto',
             borderRadius: '20px',
             objectFit: 'cover',
             padding: '2%',
             width: 'auto',
-            marginTop: theme.spacing(3),
-            marginLeft: theme.spacing(3),
-            [theme.breakpoints.between('481', '1024')]: {
-                width: 'auto',
-                marginTop: '2%',
-                marginLeft: '15%'
-            },
-            [theme.breakpoints.down('480')]: {
-                width: 'auto',
-                marginLeft: '5%'
-            }
+            maxWidth: '540px',
         }
     })
 );
