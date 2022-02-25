@@ -30,7 +30,7 @@ export const TreeList = () => {
         setSelectedPlot(value.name)
         setLoading(true);
         try {
-            let response = await Axios.get(`/trees/countbyplot?id=${value._id}`);
+            let response = await Axios.get(`/trees/plot/count?id=${value._id}`);
             if (response.status === 200) {
                 let difference = response.data.alltrees.filter(x => !response.data.assignedtreee.includes(x));
                 setAssigned(response.data.assignedtreee)

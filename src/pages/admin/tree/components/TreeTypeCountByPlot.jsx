@@ -1,9 +1,6 @@
 import { Typography } from '@mui/material';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useState } from 'react';
 import { PieChart, Pie, Sector, ResponsiveContainer } from 'recharts';
-import { CSVLink } from "react-csv";
-import DownloadForOfflineIcon from '@mui/icons-material/DownloadForOffline';
-import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 import { useRecoilValue } from 'recoil';
@@ -12,8 +9,6 @@ import {
     filteredTreeTypeCountByPlot
 } from '../../../../store/selectors';
 import { selectedPlot } from '../../../../store/adminAtoms';
-import * as Axios from "../../../../api/local";
-import { Spinner } from '../../../../components/Spinner';
 
 const renderActiveShape = (props) => {
     const RADIAN = Math.PI / 180;
@@ -62,9 +57,6 @@ const renderActiveShape = (props) => {
 };
 
 export const TreeTypeCountByPlot = () => {
-    const [loading, setLoading] = useState(false);
-    const [treeTypesCount, setTreeTypesCount] = useState([]);
-    const csvLink = useRef();
     const [state, setState] = useState(0);
     let treeTypeCount = useRecoilValue(filteredTreeTypeCountByPlot);
     let selPlot = useRecoilValue(selectedPlot);
@@ -76,78 +68,33 @@ export const TreeTypeCountByPlot = () => {
         })
     })
 
-    let headers = [
-        { label: "Sapling ID", key: "sapling_id" },
-        { label: "Tree Name", key: "name" },
-        { label: "Date Added", key: "date" },
-    ]
-
-    useEffect(() => {
-        console.log("called")
-        if (treeTypesCount.length > 0) {
-            csvLink.current.link.click();
-        }
-    }, [treeTypesCount])
-
-    const getTreeTypeCountByPlotName = async () => {
-        setLoading(true)
-        try {
-            let response = await Axios.default.get(`/trees/treetypecount/plot?plot_name=${selPlot}`);
-            if (response.status === 200) {
-                let data = response.data.map(item => {
-                    return {
-                        sapling_id: item.sapling_id,
-                        name: item.tree_name.name,
-                        date: item.date_added.slice(0, 10),
-                    }
-                })
-                setLoading(false);
-                setTreeTypesCount(data);
-                toast.success("Downloading file!")
-            }
-        } catch (error) {
-            toast.error(error);
-        }
-    }
-
     const onPieEnter = (_, index) => {
         setState(index);
     };
 
-    let date = new Date().toISOString().slice(0, 10);
-    let file_name = 'tree_type_count_' + selPlot + '_' + date + '.csv';
-
-    if (loading) {
-        return <Spinner text={"Dowloading your tree data!"} />
-    } else {
-        return (
-            <div>
-                <ToastContainer />
-                <CSVLink style={{ textDecoration: 'none' }} data={treeTypesCount} headers={headers} filename={file_name} ref={csvLink} target='_blank'>
-                </CSVLink>
-                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                    <Typography variant='subtitle1' gutterBottom>
-                        Tree types in <em>{selPlot}</em>
-                    </Typography>
-                    <DownloadForOfflineIcon fontSize='large' style={{ cursor: 'pointer', color: '#1f3625' }} onClick={getTreeTypeCountByPlotName} />
-                </div>
-                <ResponsiveContainer width={'100%'} height={400}>
-                    <PieChart width={'100%'} height={350}>
-                        <Pie
-                            activeIndex={state}
-                            activeShape={renderActiveShape}
-                            data={filteredCount}
-                            cx="50%"
-                            cy="50%"
-                            innerRadius={70}
-                            outerRadius={100}
-                            fill="#9BC53D"
-                            dataKey="value"
-                            onMouseEnter={onPieEnter}
-                        />
-                    </PieChart>
-                </ResponsiveContainer>
+    return (
+        <div>
+            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                <Typography variant='subtitle1' gutterBottom>
+                    Tree types in <em>{selPlot}</em>
+                </Typography>
             </div>
-        )
-    }
+            <ResponsiveContainer width={'100%'} height={400}>
+                <PieChart width={'100%'} height={350}>
+                    <Pie
+                        activeIndex={state}
+                        activeShape={renderActiveShape}
+                        data={filteredCount}
+                        cx="50%"
+                        cy="50%"
+                        innerRadius={70}
+                        outerRadius={100}
+                        fill="#9BC53D"
+                        dataKey="value"
+                        onMouseEnter={onPieEnter}
+                    />
+                </PieChart>
+            </ResponsiveContainer>
+        </div>
+    )
 }
