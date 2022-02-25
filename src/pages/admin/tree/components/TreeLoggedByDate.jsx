@@ -30,7 +30,9 @@ export const TreeLoggedByDate = () => {
     return (
         <div style={{ '& .MuiSelect-select': { paddingTop: '5px' } }}>
             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                <Typography></Typography>
+                <Typography variant='subtitle1' gutterBottom>
+                    Tree count by date (All Plots/All Users)
+                </Typography>
                 <FormControl size='small'>
                     <Select
                         open={open}

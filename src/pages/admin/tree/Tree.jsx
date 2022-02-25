@@ -1,6 +1,8 @@
 import { useEffect, useCallback, useState } from 'react';
 import { Divider, Typography, Box, Grid, Select, MenuItem } from "@mui/material";
+import TabsUnstyled from '@mui/base/TabsUnstyled';
 
+import { Tab, TabsList, TabPanel } from '../../../components/CustomTabs';
 import * as Axios from "../../../api/local";
 import {
     searchTreeData,
@@ -11,15 +13,12 @@ import {
     treeTypeCountByPlot,
     selectedPlot
 } from '../../../store/adminAtoms';
-import { TreeSummaryByPlot } from "./components/TreeSummaryByPlot";
 import { useRecoilValue, useSetRecoilState, useRecoilState } from 'recoil';
 import { Spinner } from '../../../components/Spinner';
-import { TreeLoggedByDate } from './components/TreeLoggedByDate';
 import { SearchBox } from './components/SearchBox';
 import { SearchResult } from './components/SearchResult';
-import { TreeLogByPlotDate } from './components/TreeLogByPlotDate';
-import { TreeCountByType } from './components/TreeCountByType';
-import { TreeTypeCountByPlot } from './components/TreeTypeCountByPlot';
+import { Overall } from './overall/Overall';
+import { Plotwise } from './plotwise/Plotwise';
 
 export const Tree = () => {
     const [loading, setLoading] = useState(true);
@@ -78,7 +77,7 @@ export const Tree = () => {
     } else {
         return (
             <>
-                <div style={{ display: 'flex', justifyContent: 'space-between', padding: '24px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 24px' }}>
                     <Typography variant="h3">Trees</Typography>
                     <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                         <Select sx={{ mt: 1, width: '22ch' }}
@@ -100,6 +99,22 @@ export const Tree = () => {
                 </div>
                 <Divider sx={{ backgroundColor: '#ffffff' }} />
                 <Box sx={{ p: 3 }}>
+                    <TabsUnstyled defaultValue={0}>
+                        <TabsList>
+                            <Tab>Overall Summary</Tab>
+                            <Tab>{selectedPlotName}</Tab>
+                            {/* <Tab>Add Tree</Tab> */}
+                        </TabsList>
+                        <TabPanel value={0}>
+                            <Overall />
+                        </TabPanel>
+                        <TabPanel value={1}>
+                            <Plotwise />
+                        </TabPanel>
+                        {/* <TabPanel value={2}>
+
+                        </TabPanel> */}
+                    </TabsUnstyled>
                     <Grid container spacing={3}>
                         {
                             Object.keys(searchTree).length > 0 && (
@@ -110,41 +125,6 @@ export const Tree = () => {
                                 </Grid>
                             )
                         }
-                        <Grid item xs={12}>
-                            <Box sx={{ backgroundColor: '#ffffff', p: 2, borderRadius: 3 }}>
-                                <TreeSummaryByPlot />
-                            </Box>
-                        </Grid>
-                        <Grid item xs={12}>
-                            <Typography>
-                                {selectedPlotName}
-                            </Typography>
-                        </Grid>
-                        <Grid item xs={12} lg={6}>
-                            <Box sx={{ backgroundColor: '#ffffff', p: 2, borderRadius: 3 }}>
-                                <TreeLogByPlotDate />
-                            </Box>
-                        </Grid>
-                        <Grid item xs={12} lg={6}>
-                            <Box sx={{ backgroundColor: '#ffffff', p: 2, borderRadius: 3 }}>
-                                <TreeTypeCountByPlot />
-                            </Box>
-                        </Grid>
-                        <Grid item xs={12}>
-                            <Typography variant='h6' gutterBottom>
-                                Tree count by date (All Plots/All Users)
-                            </Typography>
-                        </Grid>
-                        <Grid item xs={12}>
-                            <Box sx={{ backgroundColor: '#ffffff', p: 2, borderRadius: 3 }}>
-                                <TreeLoggedByDate />
-                            </Box>
-                        </Grid>
-                        <Grid item xs={12} lg={6}>
-                            <Box sx={{ backgroundColor: '#ffffff', p: 2, borderRadius: 3 }}>
-                                <TreeCountByType />
-                            </Box>
-                        </Grid>
                     </Grid>
                 </Box>
             </>
