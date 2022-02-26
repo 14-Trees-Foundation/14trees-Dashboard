@@ -12,26 +12,48 @@ import { TreeTypeCountByPlot } from "../components/TreeTypeCountByPlot";
 import { Spinner } from "../../../../components/Spinner";
 
 const columns = [
-    { field: 'sapling_id', headerName: 'Sapling ID', width: 150 },
+    {
+        field: 'sapling_id',
+        headerName: 'Sapling ID',
+        width: 150
+    },
     {
         field: 'tree_name',
         headerName: 'Tree name',
-        width: 200,
-        editable: false,
-    },
-    {
-        field: 'added_by',
-        headerName: 'Added By',
-        width: 200,
+        width: 180,
         editable: false,
     },
     {
         field: 'date_added',
         headerName: 'Date added',
-        width: 200,
+        width: 180,
         editable: false,
-    }
+        valueFormatter: (params) => {
+            const valueFormatted = params.value.slice(0, 10);
+            return `${valueFormatted}`;
+        }
+    },
+    {
+        field: 'assigned_to',
+        headerName: 'Assigned To',
+        width: 180,
+        editable: false,
+    },
+    {
+        field: 'donated_by',
+        headerName: 'Donated By',
+        width: 180,
+        editable: false,
+    },
+    {
+        field: 'added_by',
+        headerName: 'Added By',
+        width: 180,
+        editable: false,
+        align: 'center'
+    },
 ];
+
 export const Plotwise = () => {
     const [loading, setLoading] = useState(true);
     const [treeList, setTreeList] = useState({})
