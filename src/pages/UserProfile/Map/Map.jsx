@@ -41,7 +41,7 @@ const selectedOption = {
 
 const mapOptions = {
     disableDefaultUI: true,
-    mapTypeId: 'satellite',
+    mapTypeId: 'hybrid',
     zoom: 12,
     minZoom: 6,
     maxZoom: 22,
@@ -56,7 +56,7 @@ const removeDupBoundaries = (boundaries) => {
     const flag = {};
     const unique = [];
     boundaries.forEach(boundary => {
-        if(!flag[boundary[0].lat]) {
+        if (!flag[boundary[0].lat]) {
             flag[boundary[0].lat] = true
             unique.push(boundary)
         }
@@ -77,7 +77,7 @@ export const Map = () => {
         let pathObj = tree.tree.plot_id.boundaries.coordinates[0].map(([lat, lng]) => ({ lat, lng }));
         boundaries.push(pathObj);
         let [lat, lng] = tree.tree.location.coordinates;
-        treeCenters.push({lat, lng});
+        treeCenters.push({ lat, lng });
     }
 
     const uniqBoundaries = removeDupBoundaries(boundaries)
@@ -94,19 +94,18 @@ export const Map = () => {
         <div className={classes.map}>
             <GoogleMap
                 mapContainerStyle={containerStyle}
-                mapTypeId={'satellite'}
                 center={boundaries[0][0]}
-                zoom={17}
+                zoom={16}
                 options={mapOptions}
             >
                 {treeCenters.map((marker, i) => (
                     <Fragment key={i}>
                         {
                             currTree === i &&
-                                <Polygon
-                                    paths={boundaries[i]}
-                                    options={selectedOption}
-                                />
+                            <Polygon
+                                paths={boundaries[i]}
+                                options={selectedOption}
+                            />
                         }
                         <Marker
                             icon={icon}
@@ -139,11 +138,11 @@ export const Map = () => {
                     </Fragment>
                 ))}
                 {uniqBoundaries.map((marker, i) => {
-                        return(<Polygon
-                            paths={marker}
-                            options={options}
-                        />)
-                    })}
+                    return (<Polygon
+                        paths={marker}
+                        options={options}
+                    />)
+                })}
             </GoogleMap>
         </div>
     ) : <></>
