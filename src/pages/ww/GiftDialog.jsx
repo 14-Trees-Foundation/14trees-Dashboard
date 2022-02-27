@@ -10,9 +10,6 @@ import {
     Select
 } from '@mui/material';
 import { Field, Form } from "react-final-form";
-import LocalizationProvider from '@mui/lab/LocalizationProvider';
-import DesktopDatePicker from '@mui/lab/DesktopDatePicker';
-import AdapterDateFns from '@mui/lab/AdapterDateFns';
 import { makeStyles } from '@mui/styles';
 import Dropzone from 'react-dropzone';
 import { useState } from 'react';
@@ -199,22 +196,7 @@ export const GiftDialog = (props) => {
                                     />
                                 )}
                             </Field>
-                            <Field name="dob">
-                                {({ input, meta }) => (
-                                    <LocalizationProvider dateAdapter={AdapterDateFns}>
-                                        <DesktopDatePicker
-                                            label="Date of Birth"
-                                            inputFormat="dd/MM/yyyy"
-                                            {...input}
-                                            error={meta.error && meta.touched ? true : false}
-                                            renderInput={(params) => <TextField {...params} fullWidth />}
-                                            style={{ 'marginTop': '15px' }}
-                                        />
-                                    </LocalizationProvider>
-                                )}
-                            </Field>
                             <Select
-                                sx={{ mt: 1 }}
                                 fullWidth
                                 onChange={handleAlbumChange}
                                 defaultValue="none"
@@ -233,6 +215,7 @@ export const GiftDialog = (props) => {
                                 fullWidth
                                 onChange={handleTemplateChange}
                                 defaultValue="none"
+                                disabled
                             >
                                 <MenuItem disabled value="none" >Select Template</MenuItem>
                                 {templates?.map(option => {

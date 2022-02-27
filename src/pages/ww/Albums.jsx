@@ -14,7 +14,6 @@ export const Albums = ({ handleCreateAlbum }) => {
     const [createAlbmDlgOpen, setAlbnDlgOpen] = useState(false);
     const [showAlbmDlgOpen, setShowAlbmDlgOpen] = useState(false);
     const classes = useStyles();
-    console.log(albumsData)
 
     const handleClickDlgOpen = () => {
         setAlbnDlgOpen(true)

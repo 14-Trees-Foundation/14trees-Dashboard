@@ -4,7 +4,6 @@ import { searchTreeData } from "../../../../store/adminAtoms";
 
 export const SearchResult = () => {
     const treeData = useRecoilValue(searchTreeData);
-    console.log("Tree : ", treeData)
     if (Object.keys(treeData).length > 0) {
         return (
             <div style={{ display: 'flex' }}>

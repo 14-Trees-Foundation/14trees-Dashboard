@@ -522,21 +522,17 @@ export const GiftTrees = () => {
                         }}>
                             <img src={logo} className={classes.logo} alt="logoo" />
                             <div className={classes.headerbox}>
-                                <Typography variant='h4' align='center' sx={{ color: '#1f3625', fontWeight: '550' }}>
-                                    <span>Thank You {values.user.name} for spending your valuable time volunteering at 14 Trees Foundation!</span>
+                                <Typography variant='h5' align='center' sx={{ color: '#1f3625', fontWeight: '550' }}>
+                                    <span>Thank You {values.user.name} for your generous donation to the 14 Trees Foundation and for supporting the efforts in building sustainable, carbon-footprint-neutral eco-systems through re-forestation.</span>
                                 </Typography>
                                 <Typography variant='subtitle1' align='left' sx={{ lineHeight: '25px', fontSize: '20px', color: '#1f3625', pt: 6, pb: 3 }}>
-                                    <p style={{ margin: '0px' }}>We are immensely grateful to have you with us. </p>
-                                    As a direct result of your help, we are able to expand our activities to cover more ground, trees,  ponds and beneficiaries.
+                                    Your generous support is helping us will plant more trees to combat the effects of environmental degradation and climate change as well as support projects on habitat restoration, groundwater recharging, biodiversity experiments, and also provide a livelihood for local tribal villagers.
                                 </Typography>
                                 <Typography align='left' sx={{ lineHeight: '25px', fontSize: '20px', color: '#1f3625', pb: 3 }}>
-                                    Please accept a small token of appreciation in the form of trees. You are welcome to gift these to your friends and family on special occasions- birthdays, anniversaries, the new year, marriage, or festival celebrations.
+                                    The following trees have been planted as a result of your support which you can assign to your family members, friends, and loved ones by following the steps mentioned here.
                                 </Typography>
                                 <Typography align='left' sx={{ lineHeight: '25px', fontSize: '20px', color: '#1f3625', pb: 3 }}>
-                                    Every tree that you gift - for its entire life - will stay standing to memorialise the special occasion. At the same time it will offset the devastating effects of carbon emissions and climate change.
-                                </Typography>
-                                <Typography align='left' sx={{ lineHeight: '25px', fontSize: '20px', color: '#1f3625', pb: 3 }}>
-                                    May the seeds of your gift spread organically through your social network.
+                                    Once again, thank you for your support.
                                 </Typography>
                                 <Typography align='left' sx={{ lineHeight: '25px', fontSize: '20px', fontWeight: '500', color: '#1f3625', pb: 3 }}>
                                     Thank You,

@@ -16,7 +16,6 @@ export const UserInfo = () => {
     // const setIndex = useSetRecoilState(navIndex);
     const [open, setOpenPopup] = useRecoilState(openProfilePopup);
     const handleTreeClick = () => {
-        console.log("Tree clicked")
         // setIndex(2);
     }
     const onTogglePop = () => {

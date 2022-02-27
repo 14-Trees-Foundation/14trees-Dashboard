@@ -26,7 +26,6 @@ export const TreeList = () => {
     const [unassigned, setUnassigned] = useState([]);
 
     const fetchAndShowTreeList = async (value) => {
-        console.log(value)
         setSelectedPlot(value.name)
         setLoading(true);
         try {

@@ -63,7 +63,6 @@ export const Plotwise = () => {
         setLoading(true);
         try {
             let response = await Axios.default.get(`/trees/plot/list?plot_name=${selPlot}`);
-            console.log(response.data)
             if (response.status === 200) {
                 setTreeList(response.data);
             }

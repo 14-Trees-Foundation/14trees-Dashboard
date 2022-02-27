@@ -16,7 +16,6 @@ export const Events = () => {
     const fetchData = useCallback(async () => {
         try {
             let response = await Axios.get(`/events/birthday/?id=${id}`);
-            console.log(response)
             if (response.status === 200) {
                 setBirthdayData(response.data.data)
             } else {
