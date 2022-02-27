@@ -73,7 +73,7 @@ export const Birthday = () => {
                         <img src={asset2} alt="asset2" className={classes.asset2} />
                         <div className={classes.hdrTxt}>
                             A thicket of <span style={{ color: '#D2B68D', fontWeight: 'bold' }}>{data.user_trees.length} tree</span> has
-                            been planted in the name of <span style={{ color: '#D2B68D', fontWeight: 'bold' }}>{data.assigned_to[0].name}</span> on the occassion of his birthday
+                            been planted in the name of <span style={{ color: '#D2B68D', fontWeight: 'bold' }}>{data.assigned_to[0].name}</span> on the occassion of their birthday
                         </div>
                         <div className={classes.donatedby}>
                             <span>Donated by: {data.assigned_by.name}</span>
@@ -217,7 +217,7 @@ const useStyles = makeStyles((theme) =>
         },
         donatedby: {
             fontFamily: 'Open Sans', fontSize: '30px', color: '#ffffff', lineHeight: '42px', position: 'absolute',
-            left: '7%', top: '70%', zIndex: '20',
+            left: '7%', top: '70%', zIndex: '20', paddingTop: '8px',
             [theme.breakpoints.down('1200')]: {
                 maxWidth: '70%',
             },
