@@ -17,6 +17,7 @@ export const Trees = () => {
         images.push.apply(images, tree['memories']);
     }
 
+    console.log(userinfo)
     return (
         <div className={classes.main}>
             <div className={classes.card}>
@@ -41,7 +42,7 @@ export const Trees = () => {
                                                 <TreesPlanted
                                                     id={tree.tree.sapling_id}
                                                     name={tree.tree.tree_id.name}
-                                                    img={tree.tree.tree_id.image[0]}
+                                                    img={tree.tree.image[0] !== undefined ? tree.tree.image[0] : tree.tree.tree_id.image[0]}
                                                     date={date}
                                                     selected={true} />
                                                 :
