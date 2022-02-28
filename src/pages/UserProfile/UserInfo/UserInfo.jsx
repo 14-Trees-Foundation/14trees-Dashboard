@@ -81,7 +81,7 @@ export const UserInfo = () => {
                                     )
                                     :
                                     <>
-                                        <div className={classes.label}>Gifted By</div>
+                                        <div className={classes.label}>Planted By</div>
                                         <div className={classes.data}>{userinfo.user.donated_by.name}</div>
                                         <div className={classes.label}>Tree Name</div>
                                         <div className={classes.data}>{userinfo.trees[0].tree.tree_id.name}</div>
