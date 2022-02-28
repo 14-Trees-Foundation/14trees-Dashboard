@@ -2,6 +2,7 @@ import { useEffect, useCallback, useState } from "react";
 import { Box, Grid } from "@mui/material";
 import { DataGrid, GridToolbar } from '@mui/x-data-grid';
 import { useRecoilValue } from 'recoil';
+import { useTheme } from '@mui/material/styles';
 
 import {
     selectedPlot
@@ -10,6 +11,7 @@ import * as Axios from "../../../../api/local";
 import { TreeLogByPlotDate } from "../components/TreeLogByPlotDate";
 import { TreeTypeCountByPlot } from "../components/TreeTypeCountByPlot";
 import { Spinner } from "../../../../components/Spinner";
+import Chip from "../../../../stories/Chip/Chip";
 
 const columns = [
     {
@@ -38,6 +40,7 @@ const columns = [
         headerName: 'Assigned To',
         width: 180,
         editable: false,
+        // cellClassName: (params) => `tree-assigned--${params.row.assigned_to !== undefined}`,
     },
     {
         field: 'donated_by',
@@ -55,6 +58,7 @@ const columns = [
 ];
 
 export const Plotwise = () => {
+    const theme = useTheme();
     const [loading, setLoading] = useState(true);
     const [treeList, setTreeList] = useState({})
     let selPlot = useRecoilValue(selectedPlot);
@@ -105,8 +109,19 @@ export const Plotwise = () => {
                             },
                             '& .MuiDataGrid-toolbarContainer': {
                                 p: 2
-                            }
+                            },
+                            '& .tree-assigned--true': {
+                                bgcolor: theme.custom.color.primary.green,
+                                color: '#fff',
+                                '&:hover': {
+                                    bgcolor: theme.custom.color.primary.brown,
+                                },
+                            },
                         }}>
+                            <div style={{ display: 'flex', padding: '16px 0' }}>
+                                <Chip label={`Total - ${treeList.length}`} size={"large"} mode={"secondary"} backgroundColor={theme.custom.color.secondary.red} />
+                                <Chip label={`Assigned - ${treeList.filter(val => { return val.assigned_to }).length}`} size={"large"} mode={"secondary"} />
+                            </div>
                             <DataGrid
                                 components={{ Toolbar: GridToolbar }}
                                 getRowId={(row) => row.sapling_id}
@@ -115,6 +130,7 @@ export const Plotwise = () => {
                                 pageSize={50}
                                 rowsPerPageOptions={[50]}
                                 disableSelectionOnClick
+                                getRowClassName={(params) => `tree-assigned--${params.row.assigned_to !== undefined}`}
                             />
                         </Box>
                     </Grid>

@@ -31,7 +31,9 @@ export const TreeList = () => {
         try {
             let response = await Axios.get(`/trees/plot/count?id=${value._id}`);
             if (response.status === 200) {
-                let difference = response.data.alltrees.filter(x => !response.data.assignedtreee.includes(x));
+                let difference = response.data.alltrees
+                    .filter(x => !response.data.assignedtreee.includes(x))
+                    .sort(function (a, b) { return a - b; });
                 setAssigned(response.data.assignedtreee)
                 setUnassigned(difference)
                 toast.success("Tree list fetched!")
