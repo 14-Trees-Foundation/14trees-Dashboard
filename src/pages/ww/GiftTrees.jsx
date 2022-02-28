@@ -321,14 +321,15 @@ export const GiftTrees = () => {
 
                     let profileTrees = await Axios.get(`/mytrees/${email}`);
                     if (profileTrees.status === 200) {
-                        setValues({
+                        setValues(values => ({
                             ...values,
                             loading: false,
                             user: profileTrees.data.user[0],
                             trees: profileTrees.data.trees,
+                            filteredTrees: profileTrees.data.trees,
                             dlgOpen: false,
                             uploaded: true,
-                        })
+                        }))
                     }
                     toast.success("Data uploaded successfully!")
                 } else if (res.status === 204 || res.status === 400 || res.status === 409 || res.status === 404) {

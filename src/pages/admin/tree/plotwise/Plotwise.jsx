@@ -114,7 +114,7 @@ export const Plotwise = () => {
                                 bgcolor: theme.custom.color.primary.green,
                                 color: '#fff',
                                 '&:hover': {
-                                    bgcolor: theme.custom.color.primary.brown,
+                                    bgcolor: theme.custom.color.primary.green,
                                 },
                             },
                         }}>
