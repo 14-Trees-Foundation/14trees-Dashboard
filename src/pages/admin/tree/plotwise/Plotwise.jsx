@@ -111,10 +111,11 @@ export const Plotwise = () => {
                                 p: 2
                             },
                             '& .tree-assigned--true': {
-                                bgcolor: theme.custom.color.primary.green,
+                                backgroundColor: theme.custom.color.primary.green,
                                 color: '#fff',
                                 '&:hover': {
-                                    bgcolor: theme.custom.color.primary.green,
+                                    backgroundColor: theme.custom.color.primary.brown,
+                                    color: '#fff'
                                 },
                             },
                         }}>
