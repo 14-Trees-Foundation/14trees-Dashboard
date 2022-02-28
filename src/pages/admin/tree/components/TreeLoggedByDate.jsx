@@ -1,5 +1,6 @@
 import { FormControl, MenuItem, Select, Typography } from '@mui/material';
 import { useState } from 'react';
+import { useTheme } from '@mui/material/styles';
 import { Area, AreaChart, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
 import { useRecoilValue } from 'recoil';
@@ -9,6 +10,7 @@ import {
 } from '../../../../store/adminAtoms';
 
 export const TreeLoggedByDate = () => {
+    const theme = useTheme();
     let treeByDate = useRecoilValue(treeLoggedByDate);
     const [days, setDays] = useState(20);
     const [open, setOpen] = useState(false);
@@ -28,7 +30,7 @@ export const TreeLoggedByDate = () => {
     };
 
     return (
-        <div style={{ '& .MuiSelect-select': { paddingTop: '5px' } }}>
+        <div style={{ '& .MuiSelectSselect': { paddingTop: '5px' } }}>
             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                 <Typography variant='subtitle1' gutterBottom>
                     Tree count by date (All Plots/All Users)
@@ -58,7 +60,7 @@ export const TreeLoggedByDate = () => {
                     <XAxis dataKey="_id" />
                     <YAxis stroke='#1f3625' />
                     <Tooltip contentStyle={{ color: '#1f3625' }} />
-                    <Area type="monotone" dataKey="count" stroke="#000000" fill="#1f3625" />
+                    <Area type="monotone" dataKey="count" stroke="#000000" fill={theme.custom.color.primary.brown} />
                 </AreaChart>
             </ResponsiveContainer>
         </div>

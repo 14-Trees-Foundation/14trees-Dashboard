@@ -1,7 +1,8 @@
 import { Typography } from '@mui/material';
 import DownloadForOfflineIcon from '@mui/icons-material/DownloadForOffline';
 import { CSVLink } from "react-csv";
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { useTheme } from '@mui/material/styles';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 
 import { useRecoilValue, useSetRecoilState } from 'recoil';
 
@@ -9,8 +10,12 @@ import {
     treeByPlots,
     selectedPlot
 } from '../../../../store/adminAtoms';
+import { useState } from 'react';
 
 export const TreeSummaryByPlot = () => {
+    const theme = useTheme();
+    const [focusBar, setFocusBar] = useState(null);
+
     let treeByPlot = useRecoilValue(treeByPlots);
     const setSelectedPlot = useSetRecoilState(selectedPlot);
 
@@ -42,6 +47,13 @@ export const TreeSummaryByPlot = () => {
                 <BarChart
                     data={treeByPlot}
                     stroke='#1f3625'
+                    onMouseMove={state => {
+                        if (state.isTooltipActive) {
+                            setFocusBar(state.activeTooltipIndex);
+                        } else {
+                            setFocusBar(null);
+                        }
+                    }}
                     onClick={(e) => setSelectedPlot(e.activeLabel)}
                 >
                     <CartesianGrid strokeDasharray="2 2" />
@@ -52,7 +64,11 @@ export const TreeSummaryByPlot = () => {
                     />
                     <YAxis stroke='#1f3625' />
                     <Tooltip contentStyle={{ color: '#1f3625' }} />
-                    <Bar dataKey="count" fill="#1f3625" />
+                    <Bar dataKey="count">
+                        {data.map((entry, index) => (
+                            <Cell key={`cell-${index}`} fill={focusBar === index ? theme.custom.color.primary.lightgreen : theme.custom.color.primary.green} />
+                        ))}
+                    </Bar>
                 </BarChart>
             </ResponsiveContainer>
         </div>

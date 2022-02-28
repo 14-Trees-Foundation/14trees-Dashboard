@@ -1,19 +1,28 @@
 import { createTheme } from '@mui/material/styles';
 
 const theme = createTheme({
+  custom: {
+    color: {
+      secondary: {
+        purple: '#6166B8',
+        red: '#C72542',
+        orange: '#F94F25',
+        pink: '#FEC8FE'
+      },
+      primary: {
+        lightgreen: '#9BC53D',
+        brown: '#573D1C',
+        green: '#1F3625',
+        blue: '#3C79BC'
+      }
+    }
+  },
   palette: {
     primary: {
       light: '#9BC53D',
       main: '#3f50b5',
       dark: '#1F3625',
       contrastText: '#fff',
-      grey: "#d9d9d9",
-    },
-    secondary: {
-      light: '#ff7961',
-      main: '#f44336',
-      dark: '#ba000d',
-      contrastText: '#000',
     },
   },
   typography: {
