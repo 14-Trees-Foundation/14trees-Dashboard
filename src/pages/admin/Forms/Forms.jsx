@@ -14,6 +14,7 @@ import {
   plotsList,
   treeTypesList
 } from '../../../store/adminAtoms';
+import { AddPlot } from './components/AddPlot';
 
 export const Forms = () => {
   const [loading, setLoading] = React.useState(true);
@@ -50,6 +51,7 @@ export const Forms = () => {
         <TabsList>
           <Tab>Assign Trees</Tab>
           <Tab>Add Org</Tab>
+          <Tab>Add Plot</Tab>
           <Tab>Add Tree</Tab>
         </TabsList>
         <TabPanel value={0}>
@@ -66,6 +68,9 @@ export const Forms = () => {
           <AddOrg />
         </TabPanel>
         <TabPanel value={2}>
+          <AddPlot />
+        </TabPanel>
+        <TabPanel value={3}>
           <AddTree />
         </TabPanel>
       </TabsUnstyled>

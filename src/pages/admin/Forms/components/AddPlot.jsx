@@ -9,10 +9,23 @@ import Axios from "../../../../api/local";
 
 const intitialFValues = {
     plotname: '',
-    shortname: '',
+    plotcode: '',
     loading: false,
     uploaded: false,
-    backdropOpen: false
+    backdropOpen: false,
+    boundaries: {
+        type: 'Polygon',
+        coordinates: [
+            [
+                [18.92883906964203, 73.7769217462353],
+                [18.92705962338517, 73.77601906599243],
+                [18.92691470408016, 73.77663242954684],
+                [18.92764441915284, 73.77778245391168],
+                [18.92883906964203, 73.7769217462353]
+            ]
+        ],
+    },
+    center: { type: 'Point', coordinates: [18.92883906964203, 73.7769217462353] }
 }
 
 export const AddPlot = () => {
@@ -23,7 +36,7 @@ export const AddPlot = () => {
     const validate = () => {
         let temp = {};
         temp.plotname = values.plotname ? "" : "Required Field"
-        temp.shortname = values.shortname ? "" : "Required Field"
+        temp.plotcode = values.plotcode ? "" : "Required Field"
         setErrors({
             ...temp
         })
@@ -35,6 +48,13 @@ export const AddPlot = () => {
         setValues({
             ...values,
             plotname: e.target.value
+        })
+    }
+    const handlePlotcodeChange = (e) => {
+        validate();
+        setValues({
+            ...values,
+            plotcode: e.target.value
         })
     }
 
@@ -56,13 +76,14 @@ export const AddPlot = () => {
                 backdropOpen: true
             })
             const params = JSON.stringify({
-                "sapling_id": values.saplingId,
-                "tree_id": values.selectedTreetype.tree_id,
-                "plot_id": values.selectedPlot.plot_id
+                "plot_name": values.plotname,
+                "plot_code": values.plotcode,
+                "boundaries": values.boundaries,
+                "center": values.center
             });
 
             try {
-                let res = await Axios.post('/trees/addtree', params, {
+                let res = await Axios.post('/plots/add', params, {
                     headers: {
                         'Content-type': 'application/json'
                     },
@@ -101,20 +122,20 @@ export const AddPlot = () => {
         if (values.uploaded) {
             return (
                 <>
-                    <div className={classes.infobox}>
-                        <p className={classes.infodesc}>Plot Data Saved</p>
-                    </div>
                     <div className={classes.sucessbox}>
                         <Card className={classes.maincard}>
                             <CardContent style={{ 'marginTop': '1%' }}>
                                 <Alert severity="success">
-                                    Your data has been uploaded successfuly!
+                                    Plot data has been uploaded successfuly!
                                 </Alert>
                                 <CardMedia
                                     className={classes.media}
                                     image={tree}
                                     title="tree"
                                 />
+                                <div className={classes.submitbtn} style={{ textAlign: 'center' }}>
+                                    <Button size='large' variant="contained" color='primary' onClick={() => setValues(intitialFValues)}>Add more</Button>
+                                </div>
                             </CardContent>
                         </Card>
                     </div>
@@ -140,6 +161,15 @@ export const AddPlot = () => {
                                         value={values.plotname}
                                         helperText="Plot Name"
                                         onChange={handlePlotnameChange}
+                                    />
+                                    <TextField
+                                        error={errors.plotname !== "" ? true : false}
+                                        variant='outlined'
+                                        label='Plot Code *'
+                                        name='plotcode'
+                                        value={values.plotcode}
+                                        helperText="Plot Code"
+                                        onChange={handlePlotcodeChange}
                                     />
                                 </Grid>
                                 {
