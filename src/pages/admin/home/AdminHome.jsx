@@ -45,7 +45,7 @@ export const AdminHome = () => {
                         <Box sx={{ paddingTop: '10px' }}>
                             <AssignmentIndTwoToneIcon fontSize='large' />
                             <Typography variant="h3" color="#9BC53D" sx={{ pt: 1, pb: 1 }}>{adminSummary.assignedTreeCount}</Typography>
-                            <Typography variant="subtitle2" color="#1f3625">Adopted Trees</Typography>
+                            <Typography variant="subtitle2" color="#1f3625">Assigned Trees</Typography>
                         </Box>
                     </div>
                 </Grid>
