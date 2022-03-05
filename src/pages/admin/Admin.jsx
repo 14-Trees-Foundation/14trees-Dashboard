@@ -59,7 +59,9 @@ export const Admin = () => {
     const mainBox = () => {
         const Page = pages[index].page
         return (
-            <Page />
+            <div className={classes.outlet}>
+                <Page />
+            </div>
         )
     }
 
@@ -96,5 +98,10 @@ const useStyles = makeStyles((theme) =>
             width: '100%',
             objectFit: 'cover',
         },
+        outlet: {
+            [theme.breakpoints.down('768')]: {
+                marginTop: '48px'
+            },
+        }
     })
 )
