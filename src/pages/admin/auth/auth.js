@@ -5,10 +5,12 @@ const AuthContext = React.createContext();
 export const AuthProvider = ({ children }) => {
     let [user, setUser] = React.useState(null);
     let [token, setToken] = React.useState(null);
+    let [permissions, setPermissions] = React.useState([]);
     let [signedin, setSignedin] = React.useState(false);
 
-    let signin = (name, token, callback) => {
+    let signin = (name, perm, token, callback) => {
         setUser(name);
+        setPermissions(perm);
         setToken(token);
         setSignedin(true);
         return callback();
@@ -20,7 +22,7 @@ export const AuthProvider = ({ children }) => {
         return callback();
     };
 
-    let value = { user, signedin, token, signin, signout };
+    let value = { user, signedin, token, permissions, signin, signout };
 
     return (
         <AuthContext.Provider value={value}>

@@ -11,15 +11,19 @@ import {
     adminNavIndex
 } from '../../store/adminAtoms';
 import { AdminHome } from "./home/AdminHome";
-import logo from "../../assets/logo_white_small.png";
 import { Tree } from "./tree/Tree";
 import { Forms } from "./Forms/Forms";
+import { Users } from "./users/Users";
+import logo from "../../assets/logo_white_small.png";
+import { useAuth } from "./auth/auth";
 
 export const Admin = () => {
     const classes = useStyles();
     const [loading, setLoading] = useState(true);
     const setSummary = useSetRecoilState(summary);
     const index = useRecoilValue(adminNavIndex);
+    let auth = useAuth();
+    console.log(auth.permissions)
 
     const fetchData = useCallback(async () => {
         setLoading(true)
@@ -55,6 +59,11 @@ export const Admin = () => {
             displayName: 'Forms',
             logo: logo
         },
+        {
+            page: Users,
+            displayName: 'Users',
+            logo: logo
+        }
     ]
     const mainBox = () => {
         const Page = pages[index].page

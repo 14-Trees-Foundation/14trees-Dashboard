@@ -28,6 +28,7 @@ export const Login = () => {
     const [email, setEmail] = React.useState(null);
     const [phone, setPhone] = React.useState(null);
     let auth = useAuth();
+
     const classes = UseStyle();
     const paperStyle = { padding: 20, minHeight: '300px', width: 380, margin: "20px auto" }
     const avatarStyle = { backgroundColor: '#1bbd7e' }
@@ -48,7 +49,8 @@ export const Login = () => {
                 });
             if (res.status === 201 && res.data.user.role) {
                 localStorage.setItem('loginInfo', JSON.stringify(response));
-                auth.signin(res.data.name, response.tokenId, () => {
+                localStorage.setItem('permissions', JSON.stringify(res.data.user.permissions));
+                auth.signin(res.data.user.name, res.data.user.permissions, response.tokenId, () => {
                     navigate(from, { replace: true });
                 })
             }

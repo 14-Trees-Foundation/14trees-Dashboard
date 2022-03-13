@@ -7,13 +7,15 @@ import { useAuth } from "./auth";
 
 export const RequireAuth = ({ children }) => {
     const user = JSON.parse(localStorage.getItem('loginInfo'));
+    const permissions = JSON.parse(localStorage.getItem('permissions'));
     let auth = useAuth();
     const now = Date.now(); // Unix timestamp in milliseconds
 
     if (user !== null && now < user.tokenObj.expires_at) {
         auth.signedin = true;
-        auth.user = user.profileObj.name
-        auth.token = user.tokenObj
+        auth.user = user.profileObj.name;
+        auth.token = user.tokenObj;
+        auth.permissions = permissions;
     }
     let location = useLocation();
 

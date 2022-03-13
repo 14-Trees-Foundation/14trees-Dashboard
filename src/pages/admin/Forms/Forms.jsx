@@ -1,20 +1,17 @@
-import * as React from 'react';
-import TabsUnstyled from '@mui/base/TabsUnstyled';
-import { useSetRecoilState } from 'recoil';
+import * as React from "react";
+import TabsUnstyled from "@mui/base/TabsUnstyled";
+import { useSetRecoilState } from "recoil";
 
-import { Tab, TabsList, TabPanel } from '../../../components/CustomTabs';
-import { Spinner } from '../../../components/Spinner';
+import { Tab, TabsList, TabPanel } from "../../../components/CustomTabs";
+import { Spinner } from "../../../components/Spinner";
 import Axios from "../../../api/local";
-import { AssignTree } from './components/AssignTree';
-import { AddOrg } from './components/Addorg';
-import { AddTree } from './components/Addtree';
-import { Grid } from '@mui/material';
-import { TreeList } from './components/TreeList';
-import {
-  plotsList,
-  treeTypesList
-} from '../../../store/adminAtoms';
-import { AddPlot } from './components/AddPlot';
+import { AssignTree } from "./components/AssignTree";
+import { AddOrg } from "./components/Addorg";
+import { AddTree } from "./components/Addtree";
+import { Grid } from "@mui/material";
+import { TreeList } from "./components/TreeList";
+import { plotsList, treeTypesList } from "../../../store/adminAtoms";
+import { AddPlot } from "./components/AddPlot";
 
 export const Forms = () => {
   const [loading, setLoading] = React.useState(true);
@@ -22,7 +19,7 @@ export const Forms = () => {
   const setPlotsList = useSetRecoilState(plotsList);
 
   const fetchData = React.useCallback(async () => {
-    setLoading(true)
+    setLoading(true);
     try {
       let TreeRes = await Axios.get(`/trees/treetypes`);
       if (TreeRes.status === 200) {
@@ -34,26 +31,28 @@ export const Forms = () => {
         setPlotsList(plotRes.data);
       }
     } catch (error) {
-      console.log(error)
+      console.log(error);
     }
     setLoading(false);
   }, [setPlotsList, setTreeTypeslist]);
 
   React.useEffect(() => {
-    fetchData()
+    fetchData();
   }, [fetchData]);
 
   if (loading) {
-    return <Spinner text={"Fetching Tree Data!"} />
+    return <Spinner text={"Fetching Tree Data!"} />;
   } else {
     return (
       <TabsUnstyled defaultValue={0}>
-        <TabsList>
-          <Tab>Assign Trees</Tab>
-          <Tab>Add Org</Tab>
-          <Tab>Add Plot</Tab>
-          <Tab>Add Tree</Tab>
-        </TabsList>
+        <div style={{ margin: "16px" }}>
+          <TabsList>
+            <Tab>Assign Trees</Tab>
+            <Tab>Add Org</Tab>
+            <Tab>Add Plot</Tab>
+            <Tab>Add Tree</Tab>
+          </TabsList>
+        </div>
         <TabPanel value={0}>
           <Grid container spacing={1}>
             <Grid item xs={6}>
@@ -76,4 +75,4 @@ export const Forms = () => {
       </TabsUnstyled>
     );
   }
-}
+};
