@@ -215,7 +215,7 @@ export const GiftDialog = (props) => {
                                 fullWidth
                                 onChange={handleTemplateChange}
                                 defaultValue="none"
-                            // disabled
+                                disabled
                             >
                                 <MenuItem disabled value="none" >Select Template</MenuItem>
                                 {templates?.map(option => {
