@@ -123,13 +123,13 @@ const useStyles = makeStyles((theme) =>
         infobox: {
             height: '260px',
             position: 'relative',
-            // marginLeft: '-30px',
             [theme.breakpoints.down('1500')]: {
                 height: '220px',
             }
         },
         info: {
             paddingLeft: '20px',
+            paddingTop: '10px',
             minHeight: '30%',
             [theme.breakpoints.down('480')]: {
                 paddingLeft: '10px',
@@ -163,9 +163,6 @@ const useStyles = makeStyles((theme) =>
             }
         },
         growth: {
-            [theme.breakpoints.down('480')]: {
-                paddingLeft: '10px',
-            },
             [theme.breakpoints.between('481', '900')]: {
                 paddingLeft: '0px',
                 marginLeft: '-10px'
