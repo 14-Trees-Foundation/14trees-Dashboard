@@ -110,8 +110,11 @@ const useStyles = makeStyles((theme) =>
       width: "14%",
       "& .MuiPaper-root": {
         width: "14%",
+        maxWidth: "200px",
         backgroundColor: "#3F5344",
+        opacity: '80%',
         borderTopRightRadius: "10px",
+        borderRight: '0px',
       },
     },
     mdrawer: {
@@ -129,27 +132,33 @@ const useStyles = makeStyles((theme) =>
     item: {
       cursor: "pointer",
       color: "#ffffff",
-      width: "80%",
-      margin: "0 auto 20px auto",
+      width: "calc(100% - 20px)",
+      margin: "0 0 20px 20px",
     },
     itembtn: {
+      padding: "0 16px",
       borderRadius: "20px",
+      borderTopRightRadius: '0px',
+      borderBottomRightRadius: '0px',
       height: "40px",
       display: "flex",
       alignItems: "center",
-      justifyContent: "center",
+      justifyContent: "space-evenly",
       backgroundColor: "#3F5344",
       "&:hover": {
         backgroundColor: "#383838",
       },
     },
     selected: {
-      borderRadius: "20px",
+      padding: "0 16px",
+      borderTopLeftRadius: "20px",
+      borderBottomLeftRadius: '20px',
       height: "40px",
       display: "flex",
       alignItems: "center",
-      justifyContent: "center",
-      backgroundColor: "#9BC53D",
+      justifyContent: "space-evenly",
+      boxShadow: 'rgba(149, 157, 165, 0.5) 0px 0px 10px',
+      background: 'linear-gradient(90deg, rgba(2,0,36,1) 0%, rgba(155,197,61,1) 0%, rgba(177,191,181,1) 100%)'
     },
     logo: {
       width: "80px",
