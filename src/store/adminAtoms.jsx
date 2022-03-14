@@ -65,6 +65,11 @@ const searchTreeData = atom({
     default: {},
 })
 
+const allUserProfile = atom({
+    key: 'userprofile',
+    default: {}
+})
+
 export {
     treeTypesList,
     plotsList,
@@ -78,5 +83,6 @@ export {
     treeLogByPlotDate,
     selectedPlot,
     treeTypeCount,
-    treeTypeCountByPlot
+    treeTypeCountByPlot,
+    allUserProfile
 }

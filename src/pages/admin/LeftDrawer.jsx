@@ -15,6 +15,7 @@ import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import logo from "../../assets/logo_white_small.png";
 import { useRecoilState } from "recoil";
 import { adminNavIndex } from "../../store/adminAtoms";
+import { useAuth } from "./auth/auth";
 
 export const AdminLeftDrawer = () => {
   const theme = useTheme();
@@ -22,6 +23,7 @@ export const AdminLeftDrawer = () => {
   const [open, setOpen] = useState(false);
   const classes = useStyles();
   const [index, setIndex] = useRecoilState(adminNavIndex);
+  let auth = useAuth();
 
   const onClickNav = (value) => {
     setIndex(value);
@@ -31,32 +33,40 @@ export const AdminLeftDrawer = () => {
     {
       displayName: "Home",
       logo: LeaderBoardOutlined,
+      display: true,
     },
     {
       displayName: "Tree",
       logo: ForestOutlined,
+      display: true,
     },
     {
       displayName: "Forms",
       logo: AssignmentOutlined,
+      display: true,
     },
     {
       displayName: "Users",
       logo: AccountCircleOutlined,
+      display: auth.permissions.includes('all')
     },
   ];
   const menuitem = () => {
     return (
       <div className={classes.itemlist}>
         {pages.map((item, i) => {
-          return (
-            <div className={classes.item} onClick={() => onClickNav(i)} key={i}>
-              <div className={index === i ? classes.selected : classes.itembtn}>
-                <item.logo />
-                <div className={classes.itemtext}>{item.displayName}</div>
+          if(item.display) {
+            return (
+              <div className={classes.item} onClick={() => onClickNav(i)} key={i}>
+                <div className={index === i ? classes.selected : classes.itembtn}>
+                  <item.logo />
+                  <div className={classes.itemtext}>{item.displayName}</div>
+                </div>
               </div>
-            </div>
-          );
+            );
+          } else {
+            return <></>
+          }
         })}
       </div>
     );
@@ -108,6 +118,7 @@ const useStyles = makeStyles((theme) =>
     },
     drawer: {
       width: "14%",
+      maxWidth: "200px",
       "& .MuiPaper-root": {
         width: "14%",
         maxWidth: "200px",

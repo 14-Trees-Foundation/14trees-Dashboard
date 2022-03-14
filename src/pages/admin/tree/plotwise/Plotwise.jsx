@@ -110,13 +110,16 @@ export const Plotwise = () => {
                             '& .MuiDataGrid-toolbarContainer': {
                                 p: 2
                             },
+                            '& .MuiDataGrid-root': {
+                                height: '94%',
+                            },
                             '& .tree-assigned--true': {
                                 backgroundColor: theme.custom.color.primary.green,
                                 color: '#fff',
                                 '&:hover': {
-                                    backgroundColor: theme.custom.color.primary.brown,
-                                    color: '#fff'
-                                },
+                                    backgroundColor: '#ffff00',
+                                    color: '#000',
+                                }
                             },
                         }}>
                             <div style={{ display: 'flex', padding: '16px 0' }}>
