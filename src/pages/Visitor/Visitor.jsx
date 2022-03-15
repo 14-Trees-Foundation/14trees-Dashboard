@@ -9,7 +9,7 @@ import AlertTitle from '@mui/material/AlertTitle';
 import Backdrop from '@mui/material/Backdrop';
 import Grid from '@mui/material/Grid';
 import TextField from '@mui/material/TextField';
-import { Paper, Typography, Avatar } from '@mui/material';
+import { Paper, Typography, Avatar, Dialog, DialogActions } from '@mui/material';
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import CardMedia from '@mui/material/CardMedia';
@@ -17,6 +17,8 @@ import CardActions from '@mui/material/CardActions';
 import DesktopDatePicker from '@mui/lab/DesktopDatePicker';
 import AdapterDateFns from '@mui/lab/AdapterDateFns';
 import LocalizationProvider from '@mui/lab/LocalizationProvider';
+import 'react-image-crop/dist/ReactCrop.css';
+import ReactCrop from 'react-image-crop';
 
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -29,15 +31,14 @@ import Axios from "../../api/local";
 
 import { AppBar } from "../../components/Appbar";
 import imageCompression from 'browser-image-compression';
+import { GetCroppedImg } from '../../helpers/imageCrop';
 
 const intitialFValues = {
     userImages: [],
     userImage1: null,
-    userImage2: null,
     uimageerror: null,
     additionalImages: [],
     userImage1src: null,
-    userImage2src: null,
     addImage1src: null,
     addImage2src: null,
     addImage3src: null,
@@ -46,14 +47,26 @@ const intitialFValues = {
     uploaded: false,
     loading: true,
     backdropOpen: false,
+    dlgOpen: false
 }
 
 export const Visitor = () => {
     const [values, setValues] = useState(intitialFValues);
     const [org, setOrg] = useState({});
-    const PROFILE_IMG_MAX = 2;
+    const PROFILE_IMG_MAX = 1;
     const ADDITIONAL_IMG_MAX = 10;
+    const [croppedImg, setCroppedImg] = useState(null);
+    const [cropImgsrc, setCropImgsrc] = useState(null);
+    const [imageRef, setImageRef] = useState();
 
+    const [crop, setCrop] = useState(
+        // default crop config
+        {
+            unit: '%',
+            width: 40,
+            aspect: 9 / 11,
+        }
+    );
     const classes = UseStyle();
 
     useEffect(() => {
@@ -73,7 +86,7 @@ export const Visitor = () => {
 
     const compressImageList = async (file) => {
         const options = {
-          maxSizeMB: 0.5,
+          maxSizeMB: 0.8,
           maxWidthOrHeight: 1080,
           useWebWorker: true
         }
@@ -118,12 +131,27 @@ export const Visitor = () => {
             ...values,
             userImages: e.target.files,
             userImage1: e.target.files[0] ? e.target.files[0] : null,
-            userImage2: e.target.files[1] ? e.target.files[1] : null,
             userImage1src: e.target.files[0] ? URL.createObjectURL(e.target.files[0]) : null,
-            userImage2src: e.target.files[1] ? URL.createObjectURL(e.target.files[1]) : null,
-            uimageerror: null
+            uimageerror: null,
+            dlgOpen: true,
         })
     }
+
+    async function cropImage(crop) {
+        let random = Math.random().toString(36).substr(2, 5);
+        if (imageRef && crop.width && crop.height) {
+            const croppedImage = await GetCroppedImg(
+                imageRef,
+                crop,
+                'croppedImage' + random + '.jpeg' // destination filename
+            );
+    
+            // calling the props function to expose
+            setCroppedImg(croppedImage);
+            setCropImgsrc(croppedImage ? URL.createObjectURL(croppedImage) : null);
+        }
+    }
+
 
     const handleOrgChange = (orgid) => {
         setValues({
@@ -144,14 +172,13 @@ export const Visitor = () => {
         formData.append('org', values.orgid);
         formData.append('contact', formValues.phone);
         formData.append('sapling_id', formValues.saplingid);
-        const userImages = [];
         const extraImages = [];
-        if (values.userImages) {
-            for (const key of Object.keys(values.userImages)) {
-                let image = await compressImageList(values.userImages[key]);
-                formData.append('files', image)
-                userImages.push(values.userImages[key].name)
-            }
+        if (croppedImg) {
+            let userImages = [];
+            let image = await compressImageList(croppedImg);
+            formData.append('files', image)
+            userImages.push(croppedImg.name)
+            formData.append('userimages', userImages);
         }
 
         if (values.additionalImages) {
@@ -162,7 +189,6 @@ export const Visitor = () => {
             }
         }
 
-        formData.append('userimages', userImages);
         formData.append('memoryimages', extraImages);
         try {
             let res = await Axios.post('/profile/usertreereg', formData, {
@@ -187,7 +213,6 @@ export const Visitor = () => {
                 toast.error(res.status.error)
             }
         } catch (error) {
-            console.log(error.response)
             setValues({
                 ...values,
                 loading: false,
@@ -326,22 +351,36 @@ export const Visitor = () => {
                                                     </LocalizationProvider>
                                                     )}
                                                 </Field>
+                                                {
+                                                    values.userImage1src !== null && (
+                                                        <Dialog onClose={() => {}} disableEscapeKeyDown open={values.dlgOpen}>
+                                                            <ReactCrop
+                                                                src={values.userImage1src}
+                                                                crop={crop}
+                                                                onImageLoaded={(imageRef) => setImageRef(imageRef)}
+                                                                onComplete={(cropConfig) => cropImage(cropConfig)}
+                                                                onChange={(c) => setCrop(c)}
+                                                            />
+                                                            <DialogActions onClick={() => setValues({...values, dlgOpen: false})}>
+                                                                I'm Done
+                                                            </DialogActions>
+                                                        </Dialog>
+                                                    )
+                                                }
                                                     <div style={{ 'marginTop': '20px' }}>
                                                         <Typography variant="subtitle2" gutterBottom className={classes.helper}>
-                                                            Upload two photographs of yours with sapling.
+                                                            Upload a photograph of yours with sapling.
                                                         </Typography>
                                                         <input
                                                             accept="image/*"
                                                             className={classes.input}
                                                             id="contained-button-file"
-                                                            multiple
                                                             type="file"
                                                             onChange={handleProfilePicUpload}
                                                         />
                                                     </div>
                                                     <div className={classes.submitDiv}>
-                                                        <Avatar alt="U" src={values.userImage1src ? values.userImage1src : null} />
-                                                        <Avatar alt="U" src={values.userImage2src ? values.userImage2src : null} />
+                                                        <Avatar alt="U" src={cropImgsrc ? cropImgsrc : null} />
                                                         <span className={classes.span}></span>
                                                         <label htmlFor="contained-button-file" style={{ 'display': 'block', 'marginTop': '5px' }}>
                                                             <Button component="span" variant="contained" color='secondary' size='small' style={{ minWidth: "170px" }}>
