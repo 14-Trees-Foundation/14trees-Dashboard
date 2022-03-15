@@ -35,7 +35,7 @@ export const Login = () => {
     const textStyle = { margin: '8px auto' }
     const btnstyle = { margin: '8px 0' }
 
-    let from = location.state?.from?.pathname || "/";
+    let from = location.state?.from?.pathname || "/admin";
 
     const responseGoogle = async (response) => {
         try {
@@ -50,6 +50,7 @@ export const Login = () => {
             if (res.status === 201 && res.data.user.role) {
                 localStorage.setItem('loginInfo', JSON.stringify(response));
                 localStorage.setItem('permissions', JSON.stringify(res.data.user.permissions));
+                localStorage.setItem('token', JSON.stringify(res.data.token));
                 auth.signin(res.data.user.name, res.data.user.permissions, response.tokenId, () => {
                     navigate(from, { replace: true });
                 })

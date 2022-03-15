@@ -17,19 +17,25 @@ const columns = [
     {
         field: 'sapling_id',
         headerName: 'Sapling ID',
-        width: 150
+        headerAlign: 'center',
+        width: 150,
+        align: 'center',
     },
     {
         field: 'tree_name',
         headerName: 'Tree name',
+        headerAlign: 'center',
         width: 180,
+        align: 'center',
         editable: false,
     },
     {
         field: 'date_added',
         headerName: 'Date added',
+        headerAlign: 'center',
         width: 180,
         editable: false,
+        align: 'center',
         valueFormatter: (params) => {
             const valueFormatted = params.value.slice(0, 10);
             return `${valueFormatted}`;
@@ -38,19 +44,44 @@ const columns = [
     {
         field: 'assigned_to',
         headerName: 'Assigned To',
-        width: 180,
+        headerAlign: 'center',
+        width: 200,
         editable: false,
-        // cellClassName: (params) => `tree-assigned--${params.row.assigned_to !== undefined}`,
+        align: 'center',
+        renderCell: (params) => {
+            if (params.value !== undefined) {
+                return (
+                    <div style={{
+                        minHeight: '38px',
+                        paddingTop: '12px',
+                        lineHeight: '38px',
+                        width: '100%',
+                        padding: '0 12px',
+                        backgroundColor: '#6166B8',
+                        borderRadius: '2em',
+                        color: '#fff',
+                        textAlign: 'center'
+                    }}>
+                        {params.value}
+                    </div>
+                )
+            } else {
+                return <></>
+            }
+        }
     },
     {
         field: 'donated_by',
         headerName: 'Donated By',
+        headerAlign: 'center',
         width: 180,
         editable: false,
+        align: 'center',
     },
     {
         field: 'added_by',
         headerName: 'Added By',
+        headerAlign: 'center',
         width: 180,
         editable: false,
         align: 'center'
@@ -113,14 +144,6 @@ export const Plotwise = () => {
                             '& .MuiDataGrid-root': {
                                 height: '94%',
                             },
-                            '& .tree-assigned--true': {
-                                backgroundColor: theme.custom.color.primary.green,
-                                color: '#fff',
-                                '&:hover': {
-                                    backgroundColor: '#ffff00',
-                                    color: '#000',
-                                }
-                            },
                         }}>
                             <div style={{ display: 'flex', padding: '16px 0' }}>
                                 <Chip label={`Total - ${treeList.length}`} size={"large"} mode={"secondary"} backgroundColor={theme.custom.color.secondary.red} />
@@ -134,7 +157,6 @@ export const Plotwise = () => {
                                 pageSize={50}
                                 rowsPerPageOptions={[50]}
                                 disableSelectionOnClick
-                                getRowClassName={(params) => `tree-assigned--${params.row.assigned_to !== undefined}`}
                             />
                         </Box>
                     </Grid>

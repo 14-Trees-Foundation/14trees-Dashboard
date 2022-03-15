@@ -12,26 +12,36 @@ import { Tree } from "./tree/Tree";
 import { Forms } from "./Forms/Forms";
 import { Users } from "./users/Users";
 import logo from "../../assets/logo_white_small.png";
+import { useNavigate } from "react-router-dom";
 
 export const Admin = () => {
   const classes = useStyles();
   const [loading, setLoading] = useState(true);
   const setSummary = useSetRecoilState(summary);
   const index = useRecoilValue(adminNavIndex);
+  const token = JSON.parse(localStorage.getItem('token'));
+  const navigate = useNavigate()
 
   const fetchData = useCallback(async () => {
     setLoading(true);
     try {
-      let response = await Axios.default.get(`/analytics/summary`);
+      let response = await Axios.default.get(`/analytics/summary`, {
+        headers: {
+          "x-access-token": token,
+          "content-type": "application/json"
+      }
+      });
       if (response.status === 200) {
         setSummary(response.data);
       }
     } catch (error) {
-      console.log(error);
+      if(error.response.status === 500) {
+        navigate('/login')
+      }
     }
 
     setLoading(false);
-  }, [setSummary]);
+  }, [setSummary, navigate, token]);
 
   useEffect(() => {
     fetchData();
