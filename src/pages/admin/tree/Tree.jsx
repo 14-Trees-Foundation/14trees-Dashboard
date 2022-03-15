@@ -29,6 +29,7 @@ import { Plotwise } from "./plotwise/Plotwise";
 
 export const Tree = () => {
   const [loading, setLoading] = useState(true);
+  const [tabIndex, setTabindex] = useState(0);
   const searchTree = useRecoilValue(searchTreeData);
   const [treeByPlotsData, setTreeByPlots] = useRecoilState(treeByPlots);
   const setTreeLoggedByDate = useSetRecoilState(treeLoggedByDate);
@@ -86,6 +87,11 @@ export const Tree = () => {
     fetchData();
   }, [fetchData]);
 
+  const setPlot = (e) => {
+    setSelectedPlot(e.target.value);
+    setTabindex(1)
+  }
+
   if (loading) {
     return <Spinner text={"Fetching Tree Data!"} />;
   } else {
@@ -103,7 +109,7 @@ export const Tree = () => {
             <Select
               sx={{ mt: 1, width: "22ch" }}
               fullWidth
-              onChange={(e) => setSelectedPlot(e.target.value)}
+              onChange={setPlot}
               defaultValue="none"
             >
               <MenuItem disabled value="none">
@@ -125,11 +131,10 @@ export const Tree = () => {
         </div>
         <Divider sx={{ backgroundColor: "#ffffff" }} />
         <Box sx={{ p: 3 }}>
-          <TabsUnstyled defaultValue={0}>
+          <TabsUnstyled defaultValue={0} value={tabIndex}>
             <TabsList>
               <Tab>Overall Summary</Tab>
               <Tab>{selectedPlotName}</Tab>
-              {/* <Tab>Add Tree</Tab> */}
             </TabsList>
             <TabPanel value={0}>
               <Overall />
@@ -137,9 +142,6 @@ export const Tree = () => {
             <TabPanel value={1}>
               <Plotwise />
             </TabPanel>
-            {/* <TabPanel value={2}>
-
-                        </TabPanel> */}
           </TabsUnstyled>
           <Grid container spacing={3}>
             {Object.keys(searchTree).length > 0 && (
