@@ -6,11 +6,9 @@ import {
   StepLabel,
   Stepper,
   Typography,
-  TextField,
 } from "@mui/material";
 import { createStyles, makeStyles } from "@mui/styles";
-import { useState } from "react";
-import { Field, Form } from "react-final-form";
+import { useState, useEffect} from "react";
 
 import bg from "../../assets/bg.png";
 import vector from "../../assets/treevector.png";
@@ -21,36 +19,51 @@ import { EmailForm } from "./components/EmailForm";
 import { MoreInfo } from "./components/MoreInfo";
 
 const intitialFValues = {
-  name: "",
-  email: "",
-  loading: false,
+  name: "Abhishek Singh",
+  email: "abhisingh7294@gmail.com",
+  loading: true,
   userFound: false,
   userinfo: {},
+  treeinfo: {},
   activeStep: 0,
+  org: {},
+  orgid: '',
 };
 
 export const VisitorNew = () => {
-  let submitEmail;
   const classes = UseStyle();
   const [values, setValues] = useState(intitialFValues);
-  const [emailFormEnabled, setEmailFormEnabled] = useState(true);
   const steps = [
-    "Enter email",
-    "Confirm email",
+    "Enter info",
+    "Confirm",
     "Add tree",
     "Memories",
     "Submit",
   ];
 
+  useEffect(() => {
+    (async () => {
+        // Get Org types
+        let orgRes = await Axios.get(`/organizations`);
+        if (orgRes.status === 200) {
+            setValues({
+              ...values,
+              org: orgRes.data,
+              loading: false
+            });
+        }
+    })();
+// eslint-disable-next-line react-hooks/exhaustive-deps
+},[]);
+
   console.log(values);
 
-  // const handleNext = () => {
-  //   setActiveStep((prevActiveStep) => prevActiveStep + 1);
-  // };
-
-  const handleBack = () => {
-    // setActiveStep((prevActiveStep) => prevActiveStep - 1);
-  };
+  const handleOrgChange = (orgid) => {
+    setValues({
+        ...values,
+        orgid: orgid._id
+    })
+}
 
   const handleNameAndEmail = async (val) => {
     console.log("called");
@@ -65,7 +78,8 @@ export const VisitorNew = () => {
           ...values,
           lading: false,
           userFound: true,
-          userinfo: res.data,
+          userinfo: res.data.user,
+          treeinfo: res.data.tree,
           name: val.name,
           email: val.email,
           activeStep: 1,
@@ -93,7 +107,13 @@ export const VisitorNew = () => {
           />
         );
       case 1:
-        return <MoreInfo values={values} setValues={setValues} />;
+        return <MoreInfo values={values} setValues={setValues} handleOrgChange={handleOrgChange}/>;
+      default:
+        return(
+          <>
+            OOps! Something bad happened
+          </>
+        )
     }
   };
 
@@ -170,10 +190,10 @@ export const VisitorNew = () => {
                         key={label}
                         sx={{
                           "& .MuiStepLabel-root .Mui-completed": {
-                            color: "#1f3625", // circle color (COMPLETED)
+                            color: "#1f3625",
                           },
                           "& .MuiStepLabel-root .Mui-active": {
-                            color: "#9BC53D", // circle color (ACTIVE)
+                            color: "#9BC53D",
                           },
                         }}
                       >

@@ -65,7 +65,7 @@ export const EmailForm = ({ values, handleNameAndEmail, setValues }) => {
                   variant="contained"
                   color="primary"
                 >
-                  {values.activeStep === 4 ? "Finish" : "Next"}
+                  Next
                 </Button>
               </Box>
             </form>
