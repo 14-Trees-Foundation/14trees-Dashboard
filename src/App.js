@@ -18,6 +18,7 @@ import { AuthProvider } from "./pages/admin/auth/auth";
 import { Login } from "./pages/admin/Login/Login";
 import { Forms } from "./pages/admin/Forms/Forms";
 import { Birthday } from "./pages/events/Birthday";
+import { VisitorNew } from "./pages/Visitor/Visitor2";
 
 function App() {
 
@@ -32,6 +33,7 @@ function App() {
           <Route path="/" element={<Search />}></Route>
           <Route path="/search" element={<Search />}></Route>
           <Route path="/visitor" element={<Visitor />}></Route>
+          <Route path="/visitornew" element={<VisitorNew />}></Route>
           <Route path="/addtree" element={<AddTree />}></Route>
           <Route path="/profile/:saplingId" element={<Dashboard />}></Route>
           <Route path="/events/kpit-denso" element={<Corporate />}></Route>

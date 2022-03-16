@@ -14,7 +14,7 @@ export const AppBar = () => {
             <div className={classes.appbar}>
                 <nav className={classes.content}>
                     <div className={classes.logo}>
-                        <img style={{ width: '40px', marginLeft: '5px' }} src={logo} alt="logo banner" />
+                        <img style={{ width: '40px'}} src={logo} alt="logo banner" />
                     </div>
                     <div className={classes.right}>
                         {/* <h2 className={classes.links}>Home</h2>
@@ -40,10 +40,14 @@ export const AppBar = () => {
 const UseStyle = makeStyles((theme) =>
     createStyles({
         appbar: {
-            width: '100vw',
+            width: 'calc(100vw - 32px)',
             position: 'absolute',
+            padding: '16px',
             top: '0',
             left: '0',
+            [theme.breakpoints.down('md')]: {
+                width: 'calc(100vw - 16px)'
+            }
         },
         content: {
             height: '67px',
