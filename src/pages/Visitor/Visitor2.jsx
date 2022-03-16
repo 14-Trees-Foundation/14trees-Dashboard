@@ -8,7 +8,7 @@ import {
   Typography,
 } from "@mui/material";
 import { createStyles, makeStyles } from "@mui/styles";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 
 import bg from "../../assets/bg.png";
 import vector from "../../assets/treevector.png";
@@ -22,9 +22,10 @@ import { Memories } from "./components/Memories";
 import { Summary } from "./components/Summary";
 
 const intitialFValues = {
-  name: "Abhishek Singh",
-  email: "abhisingh7294@gmail.com",
-  loading: true,
+  name: "",
+  email: "",
+  contact: "",
+  loading: false,
   userFound: false,
   userinfo: {},
   treeinfo: {},
@@ -38,6 +39,7 @@ const intitialFValues = {
   dlgOpen: false,
   croppedImage: null,
   additionalImages: [],
+  uploaded: false,
 };
 
 export const VisitorNew = () => {
@@ -45,22 +47,9 @@ export const VisitorNew = () => {
   const [values, setValues] = useState(intitialFValues);
   const steps = ["Enter info", "Org", "Tree", "Memories", "Submit"];
 
-  useEffect(() => {
-    (async () => {
-      // Get Org types
-      let orgRes = await Axios.get(`/organizations`);
-      if (orgRes.status === 200) {
-        setValues({
-          ...values,
-          org: orgRes.data,
-          loading: false,
-        });
-      }
-    })();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  console.log(values);
+  const initialize = () => {
+    setValues(intitialFValues);
+  };
 
   const handleOrgChange = (orgid) => {
     setValues({
@@ -69,32 +58,32 @@ export const VisitorNew = () => {
     });
   };
 
-  const handleNameAndEmail = async (val) => {
+  const handleNameAndEmail = async () => {
     setValues({
       ...values,
       loading: true,
     });
     try {
-      let res = await Axios.get(`/users/?email=${val.email}&name=${val.name}`);
+      let res = await Axios.get(
+        `/users/?email=${values.email}&name=${values.name}`
+      );
+      let orgRes = await Axios.get(`/organizations`);
       if (res.status === 200) {
         setValues({
           ...values,
-          lading: false,
           userFound: true,
           userinfo: res.data.user,
           treeinfo: res.data.tree,
-          name: val.name,
-          email: val.email,
+          org: orgRes.data,
           activeStep: 1,
+          loading: false,
         });
       }
     } catch (error) {
       setValues({
         ...values,
-        lading: false,
-        name: val.name,
-        email: val.email,
         activeStep: 1,
+        loading: false,
       });
     }
   };
@@ -122,7 +111,13 @@ export const VisitorNew = () => {
       case 3:
         return <Memories values={values} setValues={setValues} />;
       case 4:
-          return <Summary values={values} setValues={setValues}/>;
+        return (
+          <Summary
+            values={values}
+            setValues={setValues}
+            initialize={initialize}
+          />
+        );
       default:
         return <>OOps! Something bad happened</>;
     }
@@ -263,12 +258,6 @@ const UseStyle = makeStyles((theme) =>
         width: "100%",
         margin: "12px 0px",
       },
-      //   "& .MuiStepLabel-root .Mui-active": {
-      //       color: "#000",
-      //   },
-      //   "& .MuiStepLabel-root .Mui-completed": {
-      //     color: "#1f3625",
-      // },
     },
     bgimg: {
       width: "100%",

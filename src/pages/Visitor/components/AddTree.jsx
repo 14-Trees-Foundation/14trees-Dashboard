@@ -144,7 +144,7 @@ export const AddTree = ({ values, setValues }) => {
         </Button>
         <Box sx={{ flex: "1 1 auto" }} />
         <Button
-            disabled={values.saplingId === ''}
+          disabled={values.saplingId === ""}
           type="submit"
           size="large"
           variant="contained"
