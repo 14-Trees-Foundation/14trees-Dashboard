@@ -8,7 +8,7 @@ import {
   Typography,
 } from "@mui/material";
 import { createStyles, makeStyles } from "@mui/styles";
-import { useState, useEffect} from "react";
+import { useState, useEffect } from "react";
 
 import bg from "../../assets/bg.png";
 import vector from "../../assets/treevector.png";
@@ -17,6 +17,9 @@ import Axios from "../../api/local";
 import { Spinner } from "../../components/Spinner";
 import { EmailForm } from "./components/EmailForm";
 import { MoreInfo } from "./components/MoreInfo";
+import { AddTree } from "./components/AddTree";
+import { Memories } from "./components/Memories";
+import { Summary } from "./components/Summary";
 
 const intitialFValues = {
   name: "Abhishek Singh",
@@ -27,46 +30,46 @@ const intitialFValues = {
   treeinfo: {},
   activeStep: 0,
   org: {},
-  orgid: '',
+  orgid: "",
+  saplingId: "",
+  userImages: [],
+  userImage1: null,
+  userImage1src: null,
+  dlgOpen: false,
+  croppedImage: null,
+  additionalImages: [],
 };
 
 export const VisitorNew = () => {
   const classes = UseStyle();
   const [values, setValues] = useState(intitialFValues);
-  const steps = [
-    "Enter info",
-    "Confirm",
-    "Add tree",
-    "Memories",
-    "Submit",
-  ];
+  const steps = ["Enter info", "Org", "Tree", "Memories", "Submit"];
 
   useEffect(() => {
     (async () => {
-        // Get Org types
-        let orgRes = await Axios.get(`/organizations`);
-        if (orgRes.status === 200) {
-            setValues({
-              ...values,
-              org: orgRes.data,
-              loading: false
-            });
-        }
+      // Get Org types
+      let orgRes = await Axios.get(`/organizations`);
+      if (orgRes.status === 200) {
+        setValues({
+          ...values,
+          org: orgRes.data,
+          loading: false,
+        });
+      }
     })();
-// eslint-disable-next-line react-hooks/exhaustive-deps
-},[]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   console.log(values);
 
   const handleOrgChange = (orgid) => {
     setValues({
-        ...values,
-        orgid: orgid._id
-    })
-}
+      ...values,
+      orgid: orgid._id,
+    });
+  };
 
   const handleNameAndEmail = async (val) => {
-    console.log("called");
     setValues({
       ...values,
       loading: true,
@@ -107,13 +110,21 @@ export const VisitorNew = () => {
           />
         );
       case 1:
-        return <MoreInfo values={values} setValues={setValues} handleOrgChange={handleOrgChange}/>;
+        return (
+          <MoreInfo
+            values={values}
+            setValues={setValues}
+            handleOrgChange={handleOrgChange}
+          />
+        );
+      case 2:
+        return <AddTree values={values} setValues={setValues} />;
+      case 3:
+        return <Memories values={values} setValues={setValues} />;
+      case 4:
+          return <Summary values={values} setValues={setValues}/>;
       default:
-        return(
-          <>
-            OOps! Something bad happened
-          </>
-        )
+        return <>OOps! Something bad happened</>;
     }
   };
 
