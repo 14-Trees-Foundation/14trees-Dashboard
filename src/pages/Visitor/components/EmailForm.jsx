@@ -3,7 +3,9 @@ import { Box, Button, TextField, Typography } from "@mui/material";
 export const EmailForm = ({ values, handleNameAndEmail, setValues }) => {
   return (
     <Box sx={{ minHeight: "350px", position: "relative" }}>
-      <Typography sx={{ fontSize: "28px", letterSpacing: "0.1px" }}>
+      <Typography
+        sx={{ fontSize: { xs: "20px", md: "28px" }, letterSpacing: "0.1px" }}
+      >
         Please enter your full name and email
       </Typography>
       <Box sx={{ mt: 2 }}>

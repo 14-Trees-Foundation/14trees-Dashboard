@@ -1,6 +1,5 @@
 import {
   Box,
-  Button,
   Paper,
   Step,
   StepLabel,
@@ -188,8 +187,11 @@ export const VisitorNew = () => {
                 mt: { xs: "24px", md: "40px" },
               }}
             >
-              <Paper sx={{ p: "24px" }}>
-                <Stepper activeStep={values.activeStep}>
+              <Paper sx={{ p: { xs: "8px", md: "24px" } }}>
+                <Stepper
+                  activeStep={values.activeStep}
+                  sx={{ display: { xs: "none", md: "flex" } }}
+                >
                   {steps.map((label, index) => {
                     return (
                       <Step
@@ -208,33 +210,7 @@ export const VisitorNew = () => {
                     );
                   })}
                 </Stepper>
-                {values.activeStep === steps.length ? (
-                  <>
-                    <Typography sx={{ mt: 2, mb: 1 }}>
-                      All steps completed - you&apos;re finished
-                    </Typography>
-                    <Box sx={{ display: "flex", flexDirection: "row", pt: 2 }}>
-                      <Box sx={{ flex: "1 1 auto" }} />
-                      <Button
-                        onClick={() =>
-                          setValues({
-                            ...values,
-                            activeStep: values.activeStep + 1,
-                          })
-                        }
-                        size="large"
-                        variant="contained"
-                        color="primary"
-                      >
-                        Add More
-                      </Button>
-                    </Box>
-                  </>
-                ) : (
-                  <>
-                    <Box sx={{ p: 3, mt: 2 }}>{items()}</Box>
-                  </>
-                )}
+                <Box sx={{ p: {xs: 1, md: 3}, mt: 2 }}>{items()}</Box>
               </Paper>
             </Box>
           </Box>

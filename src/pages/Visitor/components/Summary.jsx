@@ -16,7 +16,6 @@ import Axios from "../../../api/local";
 import { Spinner } from "../../../components/Spinner";
 
 export const Summary = ({ values, setValues, initialize }) => {
-
   const compressImageList = async (file) => {
     const options = {
       maxSizeMB: 0.8,
@@ -128,7 +127,7 @@ export const Summary = ({ values, setValues, initialize }) => {
     );
   } else {
     return (
-      <Box>
+      <Box sx={{ p: { xs: "0px", md: "24px" } }}>
         <ToastContainer />
         <Box
           sx={{

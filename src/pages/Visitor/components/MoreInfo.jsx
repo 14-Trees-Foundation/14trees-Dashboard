@@ -145,11 +145,16 @@ export const MoreInfo = ({ values, setValues, handleOrgChange }) => {
       <Box sx={{ position: "relative", minHeight: "400px" }}>
         <Box>
           <Typography
-            sx={{ fontSize: "24px", color: "#1f3625", letterSpacing: "0.1px" }}
+            sx={{
+              fontSize: "24px",
+              color: "#1f3625",
+              letterSpacing: "0.1px",
+              lineHeight: "24px",
+            }}
           >
             Uh Oh! There is no tree in your name. Lets add one.
           </Typography>
-          <Typography sx={{ mt: 3 }}>
+          <Typography sx={{ fontSize: { xs: "12px", md: "16px" }, mt: 3 }}>
             A contact number would be helpful for your tree updates
           </Typography>
           <TextField
@@ -158,7 +163,7 @@ export const MoreInfo = ({ values, setValues, handleOrgChange }) => {
             name="phone"
             onChange={(e) => setValues({ ...values, contact: e.target.value })}
           />
-          <Typography>
+          <Typography sx={{ fontSize: { xs: "12px", md: "16px" } }}>
             Do you want to add an organization for today's plantation
           </Typography>
           <Autocomplete
