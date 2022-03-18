@@ -75,12 +75,12 @@ export const TreeTypeCountByPlot = () => {
     return (
         <div>
             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                <Typography variant='subtitle1' gutterBottom>
+                <Typography variant='h6' gutterBottom>
                     Tree types in <em>{selPlot}</em>
                 </Typography>
             </div>
             <ResponsiveContainer width={'100%'} height={400}>
-                <PieChart width={'100%'} height={350}>
+                <PieChart width={'100%'}>
                     <Pie
                         activeIndex={state}
                         activeShape={renderActiveShape}
