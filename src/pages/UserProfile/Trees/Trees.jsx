@@ -41,7 +41,7 @@ export const Trees = () => {
                                                 <TreesPlanted
                                                     id={tree.tree.sapling_id}
                                                     name={tree.tree.tree_id.name}
-                                                    img={tree.tree.image[0] === '' ? tree.tree.tree_id.image[0] : tree.tree.image[0]}
+                                                    img={tree.tree.image[0] === '' ? tree.tree.image[0]: tree.tree.tree_id.image[0]}
                                                     date={date}
                                                     selected={true} />
                                                 :

@@ -18,7 +18,7 @@ import { Spinner } from "../../../components/Spinner";
 export const Summary = ({ values, setValues, initialize }) => {
   const compressImageList = async (file) => {
     const options = {
-      maxSizeMB: 0.8,
+      maxSizeMB: 2,
       maxWidthOrHeight: 1080,
       useWebWorker: true,
     };
