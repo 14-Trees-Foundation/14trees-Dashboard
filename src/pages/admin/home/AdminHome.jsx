@@ -10,6 +10,7 @@ import { useRecoilValue } from 'recoil';
 import {
     summary
 } from '../../../store/adminAtoms';
+import { TreeLogCumulative } from './TreeLogCumulative';
 
 export const AdminHome = () => {
     const adminSummary = useRecoilValue(summary);
@@ -66,6 +67,11 @@ export const AdminHome = () => {
                             <Typography variant="subtitle2" color="#1f3625">Total Plots</Typography>
                         </Box>
                     </div>
+                </Grid>
+                <Grid item xs={12}>
+                    <Box sx={{ backgroundColor: '#ffffff', p: 2, m:2, borderRadius: 3, boxShadow: '0px 0px 20px rgba(0, 0, 0, 0.15)' }}>
+                    <TreeLogCumulative />
+                    </Box>
                 </Grid>
             </Grid>
         </div>
