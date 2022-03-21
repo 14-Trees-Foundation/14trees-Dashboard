@@ -14,7 +14,6 @@ import * as Axios from "../../../api/local";
 import {
   searchTreeData,
   treeByPlots,
-  treeLoggedByDate,
   treeLogByPlotDate,
   treeTypeCount,
   treeTypeCountByPlot,
@@ -31,7 +30,6 @@ export const Tree = () => {
   const [loading, setLoading] = useState(true);
   const searchTree = useRecoilValue(searchTreeData);
   const [treeByPlotsData, setTreeByPlots] = useRecoilState(treeByPlots);
-  const setTreeLoggedByDate = useSetRecoilState(treeLoggedByDate);
   const setTreeLogByPlot = useSetRecoilState(treeLogByPlotDate);
   const setTreeTypeCountByPlot = useSetRecoilState(treeTypeCountByPlot);
   const [selectedPlotName, setSelectedPlot] = useRecoilState(selectedPlot);
@@ -43,14 +41,6 @@ export const Tree = () => {
       let response = await Axios.default.get(`/trees/groupbyplots`);
       if (response.status === 200) {
         setTreeByPlots(response.data);
-      }
-
-      response = await Axios.default.get(`/trees/loggedbydate`);
-      if (response.status === 200) {
-        response.data.forEach((element, index) => {
-          element["_id"] = element["_id"].substring(0, 10);
-        });
-        setTreeLoggedByDate(response.data);
       }
 
       response = await Axios.default.get(`/trees/treelogbyplot`);
@@ -75,7 +65,6 @@ export const Tree = () => {
     setLoading(false);
   }, [
     setTreeByPlots,
-    setTreeLoggedByDate,
     setTreeCountByType,
     setSelectedPlot,
     setTreeLogByPlot,

@@ -6,7 +6,7 @@ import * as Axios from "../../api/local";
 import { AdminLeftDrawer } from "./LeftDrawer";
 import { Spinner } from "../../components/Spinner";
 import { Box } from "@mui/material";
-import { summary, adminNavIndex } from "../../store/adminAtoms";
+import { summary, adminNavIndex,treeLoggedByDate } from "../../store/adminAtoms";
 import { AdminHome } from "./home/AdminHome";
 import { Tree } from "./tree/Tree";
 import { Forms } from "./Forms/Forms";
@@ -18,6 +18,7 @@ export const Admin = () => {
   const classes = useStyles();
   const [loading, setLoading] = useState(true);
   const setSummary = useSetRecoilState(summary);
+  const setTreeLoggedByDate = useSetRecoilState(treeLoggedByDate);
   const index = useRecoilValue(adminNavIndex);
   const token = JSON.parse(localStorage.getItem('token'));
   const navigate = useNavigate()
@@ -34,6 +35,13 @@ export const Admin = () => {
       if (response.status === 200) {
         setSummary(response.data);
       }
+      response = await Axios.default.get(`/trees/loggedbydate`);
+      if (response.status === 200) {
+        response.data.forEach((element, index) => {
+          element["_id"] = element["_id"].substring(0, 10);
+        });
+        setTreeLoggedByDate(response.data);
+      }
     } catch (error) {
       if(error.response.status === 500) {
         navigate('/login')
@@ -41,7 +49,7 @@ export const Admin = () => {
     }
 
     setLoading(false);
-  }, [setSummary, navigate, token]);
+  }, [setSummary, navigate, setTreeLoggedByDate, token]);
 
   useEffect(() => {
     fetchData();
