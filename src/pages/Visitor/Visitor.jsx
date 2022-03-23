@@ -14,9 +14,6 @@ import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import CardMedia from '@mui/material/CardMedia';
 import CardActions from '@mui/material/CardActions';
-import DesktopDatePicker from '@mui/lab/DesktopDatePicker';
-import AdapterDateFns from '@mui/lab/AdapterDateFns';
-import LocalizationProvider from '@mui/lab/LocalizationProvider';
 import 'react-image-crop/dist/ReactCrop.css';
 import ReactCrop from 'react-image-crop';
 
@@ -334,21 +331,6 @@ export const Visitor = () => {
                                                         {...input}
                                                         helperText={meta.error && meta.touched ? meta.error : ""}
                                                     />
-                                                    )}
-                                                </Field>
-                                                <Field name="dob">
-                                                {({ input, meta }) => (
-                                                    <LocalizationProvider dateAdapter={AdapterDateFns}>
-                                                        <DesktopDatePicker
-                                                            disabled
-                                                            label="Date of Birth"
-                                                            inputFormat="dd/MM/yyyy"
-                                                            error={meta.error && meta.touched ? true : false}
-                                                            {...input}
-                                                            renderInput={(params) => <TextField {...params} />}
-                                                            style={{ 'marginTop': '15px' }}
-                                                        />
-                                                    </LocalizationProvider>
                                                     )}
                                                 </Field>
                                                 {
