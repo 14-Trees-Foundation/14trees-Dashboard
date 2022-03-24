@@ -11,10 +11,8 @@ export const TreeLogCumulative = () => {
     const theme = useTheme();
     let treeByDate = useRecoilValue(treeLoggedByDate);
     let cumTree = 0;
-    console.log(treeByDate)
     treeByDate = [...treeByDate].reverse()
     const data = treeByDate.map(({_id, count}) => ({date: _id, total_tree: cumTree += count}));
-    console.log(data)
     return (
         <div style={{
             width: '100%',
@@ -40,7 +38,7 @@ export const TreeLogCumulative = () => {
           <XAxis dataKey="date" />
           <YAxis />
           <Tooltip />
-          <Area type="basisOpen" dataKey="total_tree" stroke={theme.custom.color.primary.green} fill={theme.custom.color.primary.blue} />
+          <Area type="basisOpen" dataKey="total_tree" stroke={theme.custom.color.primary.green} fill={theme.custom.color.primary.lightgreen} />
         </AreaChart>
       </ResponsiveContainer>
       </div>

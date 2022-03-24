@@ -1,18 +1,19 @@
 import { useEffect, useCallback, useState } from "react";
 import { useSetRecoilState, useRecoilValue } from "recoil";
 import { createStyles, makeStyles } from "@mui/styles";
+import { useNavigate } from "react-router-dom";
+import { Box } from "@mui/material";
 
 import * as Axios from "../../api/local";
 import { AdminLeftDrawer } from "./LeftDrawer";
 import { Spinner } from "../../components/Spinner";
-import { Box } from "@mui/material";
 import { summary, adminNavIndex,treeLoggedByDate } from "../../store/adminAtoms";
 import { AdminHome } from "./home/AdminHome";
 import { Tree } from "./tree/Tree";
 import { Forms } from "./Forms/Forms";
 import { Users } from "./users/Users";
 import logo from "../../assets/logo_white_small.png";
-import { useNavigate } from "react-router-dom";
+import { Ponds } from "./Ponds/Ponds";
 
 export const Admin = () => {
   const classes = useStyles();
@@ -69,6 +70,11 @@ export const Admin = () => {
     {
       page: Forms,
       displayName: "Forms",
+      logo: logo,
+    },
+    {
+      page: Ponds,
+      displayName: "Ponds",
       logo: logo,
     },
     {

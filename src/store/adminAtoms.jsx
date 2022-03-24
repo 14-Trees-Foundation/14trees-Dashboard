@@ -70,6 +70,21 @@ const allUserProfile = atom({
     default: {}
 })
 
+const allPonds = atom({
+    key: 'allponds',
+    default: {}
+})
+
+const selectedPond = atom({
+    key: 'selectedpond',
+    default: ''
+})
+
+const pondHistory = atom({
+    key: 'pondhistory',
+    default: ''
+})
+
 export {
     treeTypesList,
     plotsList,
@@ -84,5 +99,8 @@ export {
     selectedPlot,
     treeTypeCount,
     treeTypeCountByPlot,
-    allUserProfile
+    allUserProfile,
+    allPonds,
+    selectedPond,
+    pondHistory
 }

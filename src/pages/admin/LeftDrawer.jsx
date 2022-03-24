@@ -8,6 +8,7 @@ import IconButton from "@mui/material/IconButton";
 import LeaderBoardOutlined from "@mui/icons-material/LeaderboardOutlined";
 import ForestOutlined from "@mui/icons-material/ForestOutlined";
 import AssignmentOutlined from "@mui/icons-material/AssignmentOutlined";
+import OpacityOutlined from "@mui/icons-material/OpacityOutlined";
 import AccountCircleOutlined from "@mui/icons-material/AccountCircleOutlined";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
@@ -43,6 +44,11 @@ export const AdminLeftDrawer = () => {
     {
       displayName: "Forms",
       logo: AssignmentOutlined,
+      display: true,
+    },
+    {
+      displayName: "Ponds",
+      logo: OpacityOutlined,
       display: true,
     },
     {
