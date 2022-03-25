@@ -29,7 +29,6 @@ import Axios from "../../api/local";
 import { AppBar } from "../../components/Appbar";
 import imageCompression from 'browser-image-compression';
 import { GetCroppedImg } from '../../helpers/imageCrop';
-import { useNavigate } from 'react-router-dom';
 
 const intitialFValues = {
     userImages: [],
@@ -56,7 +55,6 @@ export const Visitor = () => {
     const [croppedImg, setCroppedImg] = useState(null);
     const [cropImgsrc, setCropImgsrc] = useState(null);
     const [imageRef, setImageRef] = useState();
-    const navigate = useNavigate();
 
     const [crop, setCrop] = useState(
         // default crop config
@@ -203,7 +201,6 @@ export const Visitor = () => {
                     uploaded: true,
                 })
                 toast.success("Data uploaded successfully!")
-                navigate()
             } else if (res.status === 204 || res.status === 400 || res.status === 409 || res.status === 404) {
                 setValues({
                     ...values,
