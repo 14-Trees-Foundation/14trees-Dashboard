@@ -11,6 +11,7 @@ import {
     summary
 } from '../../../store/adminAtoms';
 import { TreeLogCumulative } from './TreeLogCumulative';
+import { OpacityTwoTone } from '@mui/icons-material';
 
 export const AdminHome = () => {
     const adminSummary = useRecoilValue(summary);
@@ -65,6 +66,15 @@ export const AdminHome = () => {
                             <TerrainTwoToneIcon fontSize='large' />
                             <Typography variant="h3" color="#9BC53D" sx={{ pt: 1, pb: 1 }}>{adminSummary.plotCount}</Typography>
                             <Typography variant="subtitle2" color="#1f3625">Total Plots</Typography>
+                        </Box>
+                    </div>
+                </Grid>
+                <Grid item xs={4} md={3} xl={2}>
+                    <div className={classes.card}>
+                        <Box sx={{ paddingTop: '10px' }}>
+                            <OpacityTwoTone fontSize='large' />
+                            <Typography variant="h3" color="#9BC53D" sx={{ pt: 1, pb: 1 }}>{adminSummary.pondCount}</Typography>
+                            <Typography variant="subtitle2" color="#1f3625">Total Ponds</Typography>
                         </Box>
                     </div>
                 </Grid>
