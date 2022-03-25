@@ -38,7 +38,7 @@ export const TreeLogCumulative = () => {
           <XAxis dataKey="date" />
           <YAxis />
           <Tooltip />
-          <Area type="basisOpen" dataKey="total_tree" stroke={theme.custom.color.primary.green} fill={theme.custom.color.primary.lightgreen} />
+          <Area type="monotone" dataKey="total_tree" stroke={theme.custom.color.primary.green} fill={theme.custom.color.primary.lightgreen} />
         </AreaChart>
       </ResponsiveContainer>
       </div>

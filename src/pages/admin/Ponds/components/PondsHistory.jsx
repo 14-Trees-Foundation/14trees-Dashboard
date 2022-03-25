@@ -62,7 +62,7 @@ console.log(data)
           <YAxis />
           <Tooltip />
           <Area
-            type="basisOpen"
+            type="monotone"
             dataKey="level"
             stroke={theme.custom.color.primary.green}
             fill={theme.custom.color.primary.blue}
