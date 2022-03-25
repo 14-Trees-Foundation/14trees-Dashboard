@@ -1,9 +1,9 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 
 import { createStyles, makeStyles } from '@mui/styles';
 import { Field, Form } from "react-final-form";
 import Button from '@mui/material/Button';
-import Autocomplete from '@mui/material/Autocomplete';
+// import Autocomplete from '@mui/material/Autocomplete';
 import Alert from '@mui/material/Alert';
 import AlertTitle from '@mui/material/AlertTitle';
 import Backdrop from '@mui/material/Backdrop';
@@ -29,6 +29,7 @@ import Axios from "../../api/local";
 import { AppBar } from "../../components/Appbar";
 import imageCompression from 'browser-image-compression';
 import { GetCroppedImg } from '../../helpers/imageCrop';
+import { useNavigate } from 'react-router-dom';
 
 const intitialFValues = {
     userImages: [],
@@ -49,12 +50,13 @@ const intitialFValues = {
 
 export const Visitor = () => {
     const [values, setValues] = useState(intitialFValues);
-    const [org, setOrg] = useState({});
+    // const [org, setOrg] = useState({});
     const PROFILE_IMG_MAX = 1;
     const ADDITIONAL_IMG_MAX = 10;
     const [croppedImg, setCroppedImg] = useState(null);
     const [cropImgsrc, setCropImgsrc] = useState(null);
     const [imageRef, setImageRef] = useState();
+    const navigate = useNavigate();
 
     const [crop, setCrop] = useState(
         // default crop config
@@ -66,20 +68,20 @@ export const Visitor = () => {
     );
     const classes = UseStyle();
 
-    useEffect(() => {
-        (async () => {
-            // Get Org types
-            let orgRes = await Axios.get(`/organizations`);
-            if (orgRes.status === 200) {
-                setOrg(orgRes.data);
-            }
-            setValues({
-                ...values,
-                loading: false
-            });
-        })();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    },[]);
+    // useEffect(() => {
+    //     (async () => {
+    //         // Get Org types
+    //         let orgRes = await Axios.get(`/organizations`);
+    //         if (orgRes.status === 200) {
+    //             setOrg(orgRes.data);
+    //         }
+    //         setValues({
+    //             ...values,
+    //             loading: false
+    //         });
+    //     })();
+    // // eslint-disable-next-line react-hooks/exhaustive-deps
+    // },[]);
 
     const compressImageList = async (file) => {
         const options = {
@@ -150,12 +152,12 @@ export const Visitor = () => {
     }
 
 
-    const handleOrgChange = (orgid) => {
-        setValues({
-            ...values,
-            orgid: orgid._id
-        })
-    }
+    // const handleOrgChange = (orgid) => {
+    //     setValues({
+    //         ...values,
+    //         orgid: orgid._id
+    //     })
+    // }
 
     const formSubmit = async (formValues) => {
         setValues({
@@ -201,6 +203,7 @@ export const Visitor = () => {
                     uploaded: true,
                 })
                 toast.success("Data uploaded successfully!")
+                navigate()
             } else if (res.status === 204 || res.status === 400 || res.status === 409 || res.status === 404) {
                 setValues({
                     ...values,
