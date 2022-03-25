@@ -4,7 +4,6 @@ import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
 import useMediaQuery from '@mui/material/useMediaQuery';
 
 import { Popup } from "../../../stories/Popup/Popup";
-
 import { useRecoilValue, useRecoilState } from 'recoil';
 import { usersData, openMemoryPopup } from '../../../store/atoms';
 import { useState } from 'react';
