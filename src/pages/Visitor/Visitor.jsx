@@ -166,7 +166,7 @@ export const Visitor = () => {
         const formData = new FormData()
         formData.append('name', formValues.name)
         formData.append('email', formValues.email);
-        formData.append('org', values.orgid);
+        formData.append('org', '623d9312662545b6fd138572');
         formData.append('contact', formValues.phone);
         formData.append('sapling_id', formValues.saplingid);
         const extraImages = [];
@@ -384,7 +384,8 @@ export const Visitor = () => {
                                                             />
                                                             )}
                                                     </Field>
-                                                    <Autocomplete
+                                                    {/* <Autocomplete
+                                                        value={org}
                                                         id="treetype"
                                                         options={org}
                                                         autoHighlight
@@ -393,7 +394,7 @@ export const Visitor = () => {
                                                             handleOrgChange(newValue);
                                                         }}
                                                         renderInput={(params) => <TextField {...params} label="Organization" variant="outlined" />}
-                                                    />
+                                                    /> */}
                                                     <Field name="phone">
                                                         {({ input, meta }) => (
                                                             <TextField
