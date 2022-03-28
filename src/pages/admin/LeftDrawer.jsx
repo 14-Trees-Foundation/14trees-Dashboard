@@ -10,6 +10,7 @@ import ForestOutlined from "@mui/icons-material/ForestOutlined";
 import AssignmentOutlined from "@mui/icons-material/AssignmentOutlined";
 import OpacityOutlined from "@mui/icons-material/OpacityOutlined";
 import AccountCircleOutlined from "@mui/icons-material/AccountCircleOutlined";
+import FaceIcon from '@mui/icons-material/Face';
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 
@@ -51,11 +52,11 @@ export const AdminLeftDrawer = () => {
       logo: AccountCircleOutlined,
       display: auth.permissions.includes('all')
     },
-    // {
-    //   displayName: "Images",
-    //   logo: AssignmentOutlined,
-    //   display: true,
-    // },
+    {
+      displayName: "Images",
+      logo: FaceIcon,
+      display: true,
+    },
     {
       displayName: "Forms",
       logo: AssignmentOutlined,

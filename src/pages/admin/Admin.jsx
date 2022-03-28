@@ -17,6 +17,7 @@ import { Tree } from "./tree/Tree";
 import { Forms } from "./Forms/Forms";
 import { Users } from "./users/Users";
 import { Ponds } from "./Ponds/Ponds";
+import {Images} from "./images/Images";
 
 export const Admin = () => {
   const classes = useStyles();
@@ -73,11 +74,11 @@ export const Admin = () => {
       page: Users,
     },
     {
+      page: Images,
+    },
+    {
       page: Forms,
     },
-    // {
-    //   page: Forms,
-    // },
   ];
   const mainBox = () => {
     const Page = pages[index].page;
@@ -96,7 +97,7 @@ export const Admin = () => {
         {/* <img alt="bg" src={bg} className={classes.bg} style={{height: '100vh'}}/> */}
         <Box sx={{ display: "flex" }}>
           <AdminLeftDrawer />
-          <Box component="main" sx={{ minWidth: "900px", p: 2, width: "100%" }}>
+          <Box component="main" sx={{ minWidth: "1080px", p: 2, width: "100%" }}>
             {mainBox()}
           </Box>
         </Box>

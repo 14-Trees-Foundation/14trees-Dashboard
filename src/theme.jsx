@@ -49,7 +49,6 @@ const theme = createTheme({
         {
           props: { color: "secondary", variant: "contained" },
           style: {
-            margin: '5px',
             minWidth: '200px',
             borderRadius: "7px",
             backgroundColor: '#1F3625',
