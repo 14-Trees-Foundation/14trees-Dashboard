@@ -55,7 +55,7 @@ export const AdminLeftDrawer = () => {
     {
       displayName: "Images",
       logo: FaceIcon,
-      display: true,
+      display: auth.permissions.includes('all')
     },
     {
       displayName: "Forms",
