@@ -7,12 +7,15 @@ import { Box } from "@mui/material";
 import * as Axios from "../../api/local";
 import { AdminLeftDrawer } from "./LeftDrawer";
 import { Spinner } from "../../components/Spinner";
-import { summary, adminNavIndex,treeLoggedByDate } from "../../store/adminAtoms";
+import {
+  summary,
+  adminNavIndex,
+  treeLoggedByDate,
+} from "../../store/adminAtoms";
 import { AdminHome } from "./home/AdminHome";
 import { Tree } from "./tree/Tree";
 import { Forms } from "./Forms/Forms";
 import { Users } from "./users/Users";
-import logo from "../../assets/logo_white_small.png";
 import { Ponds } from "./Ponds/Ponds";
 
 export const Admin = () => {
@@ -21,8 +24,8 @@ export const Admin = () => {
   const setSummary = useSetRecoilState(summary);
   const setTreeLoggedByDate = useSetRecoilState(treeLoggedByDate);
   const index = useRecoilValue(adminNavIndex);
-  const token = JSON.parse(localStorage.getItem('token'));
-  const navigate = useNavigate()
+  const token = JSON.parse(localStorage.getItem("token"));
+  const navigate = useNavigate();
 
   const fetchData = useCallback(async () => {
     setLoading(true);
@@ -30,8 +33,8 @@ export const Admin = () => {
       let response = await Axios.default.get(`/analytics/summary`, {
         headers: {
           "x-access-token": token,
-          "content-type": "application/json"
-      }
+          "content-type": "application/json",
+        },
       });
       if (response.status === 200) {
         setSummary(response.data);
@@ -44,8 +47,8 @@ export const Admin = () => {
         setTreeLoggedByDate(response.data);
       }
     } catch (error) {
-      if(error.response.status === 500) {
-        navigate('/login')
+      if (error.response.status === 500) {
+        navigate("/login");
       }
     }
 
@@ -59,29 +62,22 @@ export const Admin = () => {
   const pages = [
     {
       page: AdminHome,
-      displayName: "Home",
-      logo: logo,
     },
     {
       page: Tree,
-      displayName: "Tree",
-      logo: logo,
-    },
-    {
-      page: Forms,
-      displayName: "Forms",
-      logo: logo,
     },
     {
       page: Ponds,
-      displayName: "Ponds",
-      logo: logo,
     },
     {
       page: Users,
-      displayName: "Users",
-      logo: logo,
     },
+    {
+      page: Forms,
+    },
+    // {
+    //   page: Forms,
+    // },
   ];
   const mainBox = () => {
     const Page = pages[index].page;

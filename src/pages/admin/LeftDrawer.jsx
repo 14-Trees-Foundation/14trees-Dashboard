@@ -42,11 +42,6 @@ export const AdminLeftDrawer = () => {
       display: true,
     },
     {
-      displayName: "Forms",
-      logo: AssignmentOutlined,
-      display: true,
-    },
-    {
       displayName: "Ponds",
       logo: OpacityOutlined,
       display: true,
@@ -55,6 +50,16 @@ export const AdminLeftDrawer = () => {
       displayName: "Users",
       logo: AccountCircleOutlined,
       display: auth.permissions.includes('all')
+    },
+    // {
+    //   displayName: "Images",
+    //   logo: AssignmentOutlined,
+    //   display: true,
+    // },
+    {
+      displayName: "Forms",
+      logo: AssignmentOutlined,
+      display: true,
     },
   ];
   const menuitem = () => {
@@ -128,7 +133,8 @@ const useStyles = makeStyles((theme) =>
       "& .MuiPaper-root": {
         width: "14%",
         maxWidth: "200px",
-        backgroundColor: "#3F5344",
+        backgroundColor: "#1f3625",
+        boxShadow: '2px 2px 8px #354639,-2px -2px 8px #49604f',
         opacity: '80%',
         borderTopRightRadius: "10px",
         borderRight: '0px',
@@ -161,7 +167,7 @@ const useStyles = makeStyles((theme) =>
       display: "flex",
       alignItems: "center",
       justifyContent: "space-evenly",
-      backgroundColor: "#3F5344",
+      backgroundColor: "#1f3625",
       "&:hover": {
         backgroundColor: "#383838",
       },
@@ -174,8 +180,8 @@ const useStyles = makeStyles((theme) =>
       display: "flex",
       alignItems: "center",
       justifyContent: "space-evenly",
-      boxShadow: 'rgba(149, 157, 165, 0.5) 0px 0px 10px',
-      background: 'linear-gradient(90deg, rgba(2,0,36,1) 0%, rgba(155,197,61,1) 0%, rgba(177,191,181,1) 100%)'
+      boxShadow: '7px 7px 11px #0d1710,-7px -7px 11px #31553a',
+      background: 'linear-gradient(145deg, #1c3121, #213a28)'
     },
     logo: {
       width: "80px",
