@@ -169,6 +169,7 @@ export const Visitor = () => {
         formData.append('org', values.orgid);
         formData.append('contact', formValues.phone);
         formData.append('sapling_id', formValues.saplingid);
+        formData.append('category', 'visitor');
         const extraImages = [];
         if (croppedImg) {
             let userImages = [];
