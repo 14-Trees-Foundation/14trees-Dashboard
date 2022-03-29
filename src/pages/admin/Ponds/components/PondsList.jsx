@@ -3,9 +3,7 @@ import { useTheme } from "@mui/material/styles";
 import { Box } from "@mui/material";
 import { DataGrid, GridToolbar } from "@mui/x-data-grid";
 
-import {
-  allPonds,
-} from "../../../../store/adminAtoms";
+import { allPonds } from "../../../../store/adminAtoms";
 import Chip from "../../../../stories/Chip/Chip";
 
 function getCapacity(params) {
@@ -44,45 +42,45 @@ export const PondsList = () => {
   const theme = useTheme();
 
   return (
-      <>
-        <Box
-          sx={{
-            backgroundColor: "#ffffff",
+    <>
+      <Box
+        sx={{
+          height: "100%",
+          minHeight: "600px",
+          background: "linear-gradient(145deg, #9faca3, #bdccc2)",
+          p: 2,
+          borderRadius: 3,
+          boxShadow: "8px 8px 16px #9eaaa1,-8px -8px 16px #c4d4c9",
+          "& .MuiButton-root": {
+            color: "#1f3625",
+            pr: 2,
+          },
+          "& .MuiDataGrid-toolbarContainer": {
             p: 2,
-            borderRadius: 3,
-            height: "100%",
-            minHeight: "600px",
-            boxShadow: '0px 0px 20px rgba(0, 0, 0, 0.15)',
-            "& .MuiButton-root": {
-              color: "#1f3625",
-              pr: 2,
-            },
-            "& .MuiDataGrid-toolbarContainer": {
-              p: 2,
-            },
-            "& .MuiDataGrid-root": {
-              height: "calc(100% - 55px)",
-            },
-          }}
-        >
-          <div style={{ display: "flex", padding: "16px 0" }}>
-            <Chip
-              label={`Total - ${ponds.length}`}
-              size={"large"}
-              mode={"secondary"}
-              backgroundColor={theme.custom.color.secondary.red}
-            />
-          </div>
-          <DataGrid
-            components={{ Toolbar: GridToolbar }}
-            getRowId={(row) => row._id}
-            rows={ponds}
-            columns={columns}
-            pageSize={50}
-            rowsPerPageOptions={[50]}
-            disableSelectionOnClick
+          },
+          "& .MuiDataGrid-root": {
+            height: "calc(100% - 55px)",
+          },
+        }}
+      >
+        <div style={{ display: "flex", padding: "16px 0" }}>
+          <Chip
+            label={`Total - ${ponds.length}`}
+            size={"large"}
+            mode={"secondary"}
+            backgroundColor={theme.custom.color.secondary.red}
           />
-        </Box>
-      </>
-    );
+        </div>
+        <DataGrid
+          components={{ Toolbar: GridToolbar }}
+          getRowId={(row) => row._id}
+          rows={ponds}
+          columns={columns}
+          pageSize={50}
+          rowsPerPageOptions={[50]}
+          disableSelectionOnClick
+        />
+      </Box>
+    </>
+  );
 };

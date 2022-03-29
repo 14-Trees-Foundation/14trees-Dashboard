@@ -59,9 +59,10 @@ export const Userlist = () => {
     <div style={{ height: "980px", maxHeight: "1200px", width: "100%" }}>
       <Box
         sx={{
-          backgroundColor: "#ffffff",
+          background: "linear-gradient(145deg, #9faca3, #bdccc2)",
           p: 2,
           borderRadius: 3,
+          boxShadow: "8px 8px 16px #9eaaa1,-8px -8px 16px #c4d4c9",
           height: "100%",
           "& .MuiButton-root": {
             color: "#1f3625",
