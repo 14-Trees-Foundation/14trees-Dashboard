@@ -90,7 +90,14 @@ export const Tree = () => {
           <Typography variant="h3">Trees</Typography>
           <div style={{ display: "flex", justifyContent: "space-between" }}>
             <Select
-              sx={{ mt: 1, width: "22ch" }}
+              sx={{
+                mt: 1,
+                width: "22ch",
+                '& .MuiOutlinedInput-notchedOutline' :{
+                  border: 'none',
+                  boxShadow: '4px 4px 8px #98a49c, -4px -4px 8px #cadace'
+                }
+              }}
               fullWidth
               onChange={(e) => setSelectedPlot(e.target.value)}
               defaultValue="none"
