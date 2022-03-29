@@ -8,6 +8,7 @@ import {
   MenuItem,
   Grid,
 } from "@mui/material";
+import { makeStyles } from "@mui/styles";
 
 import * as Axios from "../../../api/local";
 import { Spinner } from "../../../components/Spinner";
@@ -15,11 +16,31 @@ import { allPonds, selectedPond, pondHistory } from "../../../store/adminAtoms";
 import { PondsList } from "./components/PondsList";
 import { PondsHistory } from "./components/PondsHistory";
 
+const useStyles = makeStyles({
+  root: {
+    "& .MuiPaper-root": {
+      borderRadius: '20px',
+      maxHeight: '450px',
+      boxShadow: "4px 4px 6px #98a49c, -4px -4px 6px #cadace",
+    }
+  },
+  select: {
+      "& ul": {
+          backgroundColor: "#b1bfb5",
+      },
+      "& li": {
+          fontSize: 14,
+      },
+  },
+});
+
 export const Ponds = () => {
   const [loading, setLoading] = useState(false);
   const [ponds, setAllPonds] = useRecoilState(allPonds);
   const setSelectedPond = useSetRecoilState(selectedPond);
   const setPondHistory = useSetRecoilState(pondHistory);
+  const classes = useStyles();
+
   const fetchData = useCallback(async () => {
     setLoading(true);
     try {
@@ -65,22 +86,31 @@ export const Ponds = () => {
           <div style={{ display: "flex", justifyContent: "space-between" }}>
             {Object.keys(ponds).length > 0 && (
               <Select
-                sx={{ mt: 1, width: "30ch" }}
-                fullWidth
-                onChange={(e) => setSelectedPond(e.target.value)}
-                defaultValue="none"
-              >
-                <MenuItem disabled value="none">
-                  Select Pond
-                </MenuItem>
-                {ponds?.map((pond) => {
-                  return (
-                    <MenuItem key={pond._id} value={pond.name}>
+              sx={{
+                mt: 1,
+                width: "24ch",
+                "& .MuiOutlinedInput-notchedOutline": {
+                  border: "none",
+                  borderRadius: "25px",
+                  boxShadow: "4px 4px 8px #98a49c, -4px -4px 8px #cadace",
+                },
+              }}
+              fullWidth
+              onChange={(e) => setSelectedPond(e.target.value)}
+              defaultValue="none"
+              MenuProps={{ classes: { paper: classes.select, root: classes.root } }}
+            >
+              <MenuItem disabled value="none">
+                Select Pond
+              </MenuItem>
+              {ponds?.map((pond ) => {
+                return (
+                  <MenuItem key={pond._id} value={pond.name}>
                       {pond.name}
                     </MenuItem>
-                  );
-                })}
-              </Select>
+                );
+              })}
+            </Select>
             )}
           </div>
         </div>

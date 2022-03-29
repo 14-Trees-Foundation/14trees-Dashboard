@@ -8,6 +8,8 @@ import {
   MenuItem,
 } from "@mui/material";
 import TabsUnstyled from "@mui/base/TabsUnstyled";
+import { makeStyles } from "@mui/styles";
+import { useRecoilValue, useSetRecoilState, useRecoilState } from "recoil";
 
 import { Tab, TabsList, TabPanel } from "../../../components/CustomTabs";
 import * as Axios from "../../../api/local";
@@ -19,13 +21,11 @@ import {
   treeTypeCountByPlot,
   selectedPlot,
 } from "../../../store/adminAtoms";
-import { useRecoilValue, useSetRecoilState, useRecoilState } from "recoil";
 import { Spinner } from "../../../components/Spinner";
 import { SearchBox } from "./components/SearchBox";
 import { SearchResult } from "./components/SearchResult";
 import { Overall } from "./overall/Overall";
 import { Plotwise } from "./plotwise/Plotwise";
-import { makeStyles } from "@mui/styles";
 
 const useStyles = makeStyles({
   root: {
