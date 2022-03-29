@@ -1,6 +1,6 @@
 import SearchIcon from '@mui/icons-material/Search';
 import InputBase from '@mui/material/InputBase';
-import { styled, alpha } from '@mui/material/styles';
+import { styled } from '@mui/material/styles';
 import { useState } from 'react';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -11,16 +11,14 @@ import { searchTreeData } from '../../../../store/adminAtoms';
 
 const Search = styled('div')(({ theme }) => ({
     position: 'relative',
-    borderRadius: theme.shape.borderRadius,
-    backgroundColor: alpha(theme.palette.common.white, 0.15),
-    '&:hover': {
-        backgroundColor: alpha(theme.palette.common.white, 0.25),
-    },
-    marginLeft: 0,
+    borderRadius: '25px',
+    marginTop: '8px',
+    boxShadow: '4px 4px 8px #98a49c, -4px -4px 8px #cadace',
+    background: '#B1BFB5',
+    marginLeft: theme.spacing(1),
     width: '100%',
-    // height: '90%',
+    height: '90%',
     [theme.breakpoints.up('sm')]: {
-        marginLeft: theme.spacing(1),
         width: 'auto',
     },
 }));
@@ -39,14 +37,13 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
     color: 'inherit',
     '& .MuiInputBase-input': {
         padding: theme.spacing(2.5, 1, 1, 1),
-        // vertical padding + font size from searchIcon
         paddingLeft: `calc(1em + ${theme.spacing(4)})`,
         transition: theme.transitions.create('width'),
         width: '100%',
         [theme.breakpoints.up('sm')]: {
-            width: '16ch',
+            width: '20ch',
             '&:focus': {
-                width: '22ch',
+                width: '32ch',
             },
         },
     },

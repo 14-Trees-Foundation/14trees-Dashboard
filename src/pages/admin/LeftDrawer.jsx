@@ -145,7 +145,8 @@ const useStyles = makeStyles((theme) =>
       width: "20%",
       "& .MuiPaper-root": {
         width: "20%",
-        backgroundColor: "#3F5344",
+        backgroundColor: "#1f3625",
+        boxShadow: '2px 2px 8px #354639,-2px -2px 8px #49604f',
         borderTopRightRadius: "10px",
       },
     },

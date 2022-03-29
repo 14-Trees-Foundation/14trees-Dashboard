@@ -92,9 +92,10 @@ export const Tree = () => {
             <Select
               sx={{
                 mt: 1,
-                width: "22ch",
+                width: "24ch",
                 '& .MuiOutlinedInput-notchedOutline' :{
                   border: 'none',
+                  borderRadius: '25px',
                   boxShadow: '4px 4px 8px #98a49c, -4px -4px 8px #cadace'
                 }
               }}
