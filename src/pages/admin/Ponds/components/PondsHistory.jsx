@@ -19,7 +19,7 @@ export const PondsHistory = () => {
   let history = useRecoilValue(pondHistory);
   let pondName = useRecoilValue(selectedPond);
   //  let data = history.map(({levelFt, date, images, ...attrs}) => ({date, levelFt}))
-  console.log(history);
+
   let data;
   if (history.length > 0) {
     data = history.map((item) => {

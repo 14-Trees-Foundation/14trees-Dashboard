@@ -77,96 +77,97 @@ export const AddMemories = () => {
   };
 
   if (loading) {
-    return <Spinner text={'Adding Images to profiles'}/>;
-  } else {return (
-    <Box
-      sx={{
-        color: "#2D1B08",
-        ml: "auto",
-        mr: "auto",
-        mt: 4,
-        width: "800px",
-        minHeight: "400px",
-        background: "linear-gradient(145deg, #9faca3, #bdccc2)",
-        p: 2,
-        borderRadius: 3,
-        boxShadow: "8px 8px 16px #9eaaa1,-8px -8px 16px #c4d4c9",
-        "& .MuiFormControl-root": {
-          width: "100%",
-        },
-      }}
-    >
-      <ToastContainer />
+    return <Spinner text={"Adding Images to profiles"} />;
+  } else {
+    return (
       <Box
         sx={{
-          bottom: 0,
-          width: "100%",
+          color: "#2D1B08",
+          ml: "auto",
+          mr: "auto",
+          mt: 4,
+          width: "800px",
+          minHeight: "400px",
+          background: "linear-gradient(145deg, #9faca3, #bdccc2)",
+          p: 2,
+          borderRadius: 3,
+          boxShadow: "8px 8px 16px #9eaaa1,-8px -8px 16px #c4d4c9",
+          "& .MuiFormControl-root": {
+            width: "100%",
+          },
         }}
       >
-        <Typography variant="h6" gutterBottom sx={{ p: 2, pl: 0 }}>
-          Add memories to site plantation profiles
-        </Typography>
-        <LocalizationProvider dateAdapter={AdapterDateFns}>
-          <DesktopDatePicker
-            label="Select Date of Plantation (on-site)"
-            inputFormat="dd/MM/yyyy"
-            value={value}
-            onChange={handleChange}
-            renderInput={(params) => <TextField {...params} />}
-          />
-        </LocalizationProvider>
-        <div>
-          <div
-            style={{ overflowX: "auto", display: "flex", marginTop: "16px" }}
-          >
-            {memories.length > 0 &&
-              [...memories].map((img, i) => {
-                return (
-                  <img
-                    key={i}
-                    style={{
-                      width: "auto",
-                      height: "200px",
-                      margin: "16px",
-                      borderRadius: "15px",
-                      objectFit: "cover",
-                    }}
-                    src={URL.createObjectURL(img)}
-                    alt=""
-                  />
-                );
-              })}
+        <ToastContainer />
+        <Box
+          sx={{
+            bottom: 0,
+            width: "100%",
+          }}
+        >
+          <Typography variant="h6" gutterBottom sx={{ p: 2, pl: 0 }}>
+            Add memories to site plantation profiles
+          </Typography>
+          <LocalizationProvider dateAdapter={AdapterDateFns}>
+            <DesktopDatePicker
+              label="Select Date of Plantation (on-site)"
+              inputFormat="dd/MM/yyyy"
+              value={value}
+              onChange={handleChange}
+              renderInput={(params) => <TextField {...params} />}
+            />
+          </LocalizationProvider>
+          <div>
+            <div
+              style={{ overflowX: "auto", display: "flex", marginTop: "16px" }}
+            >
+              {memories.length > 0 &&
+                [...memories].map((img, i) => {
+                  return (
+                    <img
+                      key={i}
+                      style={{
+                        width: "auto",
+                        height: "200px",
+                        margin: "16px",
+                        borderRadius: "15px",
+                        objectFit: "cover",
+                      }}
+                      src={URL.createObjectURL(img)}
+                      alt=""
+                    />
+                  );
+                })}
+            </div>
+            <input
+              accept="image/*"
+              style={{ display: "none" }}
+              id="additional-image-file"
+              multiple
+              type="file"
+              onChange={handleAdditionalPicUpload}
+            />
+            <label
+              htmlFor="additional-image-file"
+              style={{ display: "block", marginTop: "5px" }}
+            >
+              <Button component="span" variant="contained" color="secondary">
+                Add Memories
+              </Button>
+            </label>
           </div>
-          <input
-            accept="image/*"
-            style={{ display: "none" }}
-            id="additional-image-file"
-            multiple
-            type="file"
-            onChange={handleAdditionalPicUpload}
-          />
-          <label
-            htmlFor="additional-image-file"
-            style={{ display: "block", marginTop: "5px" }}
-          >
-            <Button component="span" variant="contained" color="secondary">
-              Add Memories
-            </Button>
-          </label>
-        </div>
+        </Box>
+        <Button
+          style={{ marginTop: "36px" }}
+          disabled={memories.length === 0}
+          type="submit"
+          size="large"
+          variant="contained"
+          color="primary"
+          onClick={() => handleSubmit()}
+        >
+          Submit
+        </Button>
       </Box>
-      <Button
-        style={{ marginTop: "36px" }}
-        disabled={memories.length === 0}
-        type="submit"
-        size="large"
-        variant="contained"
-        color="primary"
-        onClick={() => handleSubmit()}
-      >
-        Submit
-      </Button>
-    </Box>
-  );
-            }
+    );
+  }
 };
