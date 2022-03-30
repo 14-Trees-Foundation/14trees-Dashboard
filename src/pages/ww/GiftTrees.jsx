@@ -406,6 +406,39 @@ export const GiftTrees = () => {
         }
     }
 
+    const handleDeleteAlbum = async (selectedAlbum) => {
+        setValues({
+            ...values,
+            loading: true,
+            backdropOpen: true
+        })
+        try {
+            let res = await Axios.delete(`/mytrees/albums`, { data: { user_id:  selectedAlbum.user_id, album_name: selectedAlbum.album_name} }, {
+              headers: {
+                "Content-type": "multipart/form-data",
+              },
+            });
+            if (res.status === 204) {
+              let albums = await Axios.get(`/mytrees/albums/${email}`);
+              if (albums.status === 200) {
+                setAlbums(albums.data.albums);
+              }
+              setValues({
+                ...values,
+                loading: false,
+            })
+              toast.success("Album deleted successfully!");
+            }
+          } catch (error) {
+            setValues({
+                ...values,
+                loading: false,
+                backdropOpen: false
+            })
+            toast.error(error.response.data.error);
+          }
+    }
+
     const handleCreateAlbum = async (album_name, files) => {
         setValues({
             ...values,
@@ -552,7 +585,7 @@ export const GiftTrees = () => {
                             formData={handleFormData} />
                         <div className={classes.itembox}>
                             <Albums
-                                handleCreateAlbum={handleCreateAlbum} />
+                                handleCreateAlbum={handleCreateAlbum} handleDeleteAlbum={handleDeleteAlbum} setAlbums={setAlbums}/>
                         </div>
                         <div className={classes.itembox} style={{ paddingTop: '32px' }}>
                             <Box>
