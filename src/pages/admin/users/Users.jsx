@@ -1,15 +1,19 @@
 import { useEffect, useCallback, useState } from "react";
 import { Divider, Typography, Box } from "@mui/material";
 import { useSetRecoilState } from "recoil";
+import TabsUnstyled from "@mui/base/TabsUnstyled";
 
-import { allUserProfile } from "../../../store/adminAtoms";
+import { Tab, TabsList, TabPanel } from "../../../components/CustomTabs";
+import { allUserProfile, userTreeHoldings } from "../../../store/adminAtoms";
 import { Spinner } from "../../../components/Spinner";
 import { Userlist } from "./components/Userlist";
 import * as Axios from "../../../api/local";
+import { UserTreeHoldings } from "./components/UserTreeHoldings";
 
 export const Users = () => {
   const [loading, setLoading] = useState(true);
   const setUserProfiles = useSetRecoilState(allUserProfile);
+  const setUserTreeHoldings = useSetRecoilState(userTreeHoldings);
   const fetchData = useCallback(async () => {
     setLoading(true);
     try {
@@ -17,11 +21,17 @@ export const Users = () => {
       if (response.status === 200) {
         setUserProfiles(response.data.result);
       }
+
+      response = await Axios.default.get(`/mytrees/count/usertreescount`);
+      if (response.status === 200) {
+        setUserTreeHoldings(response.data);
+      }
+
     } catch (error) {
       console.log(error);
     }
     setLoading(false);
-  }, [setUserProfiles]);
+  }, [setUserProfiles, setUserTreeHoldings]);
 
   useEffect(() => {
     fetchData();
@@ -39,11 +49,22 @@ export const Users = () => {
             padding: "8px 12px",
           }}
         >
-          <Typography variant="h3">User Profiles</Typography>
+          <Typography variant="h3">User Management</Typography>
         </div>
         <Divider sx={{ backgroundColor: "#ffffff" }} />
         <Box sx={{ p: 3 }}>
-          <Userlist />
+          <TabsUnstyled defaultValue={0}>
+            <TabsList>
+              <Tab>Tree Holdings</Tab>
+              <Tab>Assigned Users</Tab>
+            </TabsList>
+            <TabPanel value={0}>
+              <UserTreeHoldings />
+            </TabPanel>
+            <TabPanel value={1}>
+              <Userlist />
+            </TabPanel>
+          </TabsUnstyled>
         </Box>
       </>
     );

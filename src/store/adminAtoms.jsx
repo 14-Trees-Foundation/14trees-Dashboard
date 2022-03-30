@@ -70,6 +70,11 @@ const allUserProfile = atom({
     default: {}
 })
 
+const userTreeHoldings = atom({
+    key: 'treeholdings',
+    default: {}
+})
+
 const allPonds = atom({
     key: 'allponds',
     default: {}
@@ -102,5 +107,6 @@ export {
     allUserProfile,
     allPonds,
     selectedPond,
-    pondHistory
+    pondHistory,
+    userTreeHoldings
 }
