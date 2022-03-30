@@ -17,7 +17,7 @@ import {
     plotsList,
 } from '../../../../store/adminAtoms';
 
-export const TreeList = () => {
+export const TreeList = ({onTreeSelect}) => {
     const classes = useStyles();
     const plots = useRecoilValue(plotsList);
     const [selectedPlot, setSelectedPlot] = useState('');
@@ -98,7 +98,7 @@ export const TreeList = () => {
                             {
                                 unassigned.length !== 0 && unassigned.map(saplingid => {
                                     return (
-                                        <Chip key={saplingid} label={saplingid} color="success" variant="outlined" style={{ margin: '4px' }} />
+                                        <Chip key={saplingid} label={saplingid} color="success" variant="outlined" style={{ margin: '4px' }} onClick={() => onTreeSelect(saplingid)}/>
                                     )
                                 })
                             }

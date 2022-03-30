@@ -17,6 +17,7 @@ export const Forms = () => {
   const [loading, setLoading] = React.useState(true);
   const setTreeTypeslist = useSetRecoilState(treeTypesList);
   const setPlotsList = useSetRecoilState(plotsList);
+  const [selTrees, setSelectedTrees] = React.useState("");
 
   const fetchData = React.useCallback(async () => {
     setLoading(true);
@@ -40,6 +41,18 @@ export const Forms = () => {
     fetchData();
   }, [fetchData]);
 
+  const onTreeSelect = (val) => {
+    if(selTrees === "") {
+      setSelectedTrees(val)
+    } else {
+      setSelectedTrees(selTrees + "," + val);
+    }
+  }
+
+  const onTreesChanged = (val) => {
+    setSelectedTrees(val);
+  }
+
   if (loading) {
     return <Spinner text={"Fetching Tree Data!"} />;
   } else {
@@ -56,10 +69,10 @@ export const Forms = () => {
         <TabPanel value={0}>
           <Grid container spacing={1}>
             <Grid item xs={6}>
-              <TreeList />
+              <TreeList onTreeSelect={onTreeSelect}/>
             </Grid>
             <Grid item xs={6}>
-              <AssignTree />
+              <AssignTree selTrees={selTrees} onTreesChanged={onTreesChanged}/>
             </Grid>
           </Grid>
         </TabPanel>
