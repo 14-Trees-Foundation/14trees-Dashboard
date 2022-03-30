@@ -66,8 +66,8 @@ export const Forms = () => {
             <Tab>Add Tree</Tab>
           </TabsList>
         </div>
-        <TabPanel value={0}>
-          <Grid container spacing={1}>
+        <TabPanel value={0} sx={{ml: 2, mr:2}}>
+          <Grid container spacing={3}>
             <Grid item xs={6}>
               <TreeList onTreeSelect={onTreeSelect}/>
             </Grid>

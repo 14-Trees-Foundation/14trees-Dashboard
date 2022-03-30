@@ -1,16 +1,10 @@
 import { useState } from "react";
-import { Col } from "react-bootstrap";
-import { createStyles, makeStyles } from "@mui/styles";
 import {
-  Paper,
+  Box,
   Typography,
   Grid,
   TextField,
   Button,
-  Card,
-  CardContent,
-  CardMedia,
-  Alert,
 } from "@mui/material";
 import { Field, Form } from "react-final-form";
 import { ToastContainer, toast } from "react-toastify";
@@ -18,7 +12,6 @@ import "react-toastify/dist/ReactToastify.css";
 
 import { Spinner } from "../../../../components/Spinner";
 import Axios from "../../../../api/local";
-import tree from "../../../../assets/dark_logo.png";
 
 const intitialFValues = {
   name: "",
@@ -31,7 +24,6 @@ const intitialFValues = {
 };
 
 export const AssignTree = ({ selTrees, onTreesChanged }) => {
-  const classes = useStyles();
   const [values, setValues] = useState(intitialFValues);
 
   const formSubmit = async (formValues) => {
@@ -94,203 +86,150 @@ export const AssignTree = ({ selTrees, onTreesChanged }) => {
   if (values.loading) {
     return <Spinner />;
   } else {
-    if (values.uploaded) {
-      return (
-        <div
-          style={{ maxWidth: "400px", marginLeft: "auto", marginRight: "auto" }}
+    return (
+      <Box
+        sx={{
+          color: "#2D1B08",
+          mt: 4,
+          width: "90%",
+          minHeight: "700px",
+          background: "linear-gradient(145deg, #9faca3, #bdccc2)",
+          p: 2,
+          borderRadius: 3,
+          boxShadow: "8px 8px 16px #9eaaa1,-8px -8px 16px #c4d4c9",
+          "& .MuiFormControl-root": {
+            width: "100%",
+          },
+        }}
+      >
+        <ToastContainer />
+        <Box
+          sx={{
+            bottom: 0,
+            width: "100%",
+            "& .MuiTextField-root": {
+              borderRadius: "20px",
+              background: "#b1bfb5",
+              boxShadow:
+                "inset 12px 12px 20px #96a29a,inset -12px -12px 20px #ccdcd0",
+            },
+            "& .MuiOutlinedInput-notchedOutline": {
+              border: "none",
+            },
+          }}
         >
-          <div className={classes.infobox}>
-            <p className={classes.infodesc}>Trees are assigned!</p>
-          </div>
-          <div className={classes.sucessbox}>
-            <Card className={classes.maincard}>
-              <CardContent style={{ marginTop: "1%" }}>
-                <Alert severity="success">
-                  Your data has been uploaded successfuly!
-                </Alert>
-                <CardMedia
-                  className={classes.media}
-                  image={tree}
-                  title="tree"
-                />
-              </CardContent>
-            </Card>
-          </div>
-        </div>
-      );
-    } else {
-      return (
-        <>
-          <Col className={classes.left} lg={3} md={2} sm={12}></Col>
-          <Col className={classes.center} lg={6} md={8} sm={12}>
-            <Paper
-              sx={{
-                m: 2,
-                p: 2,
-                minWidth: "300px",
-                height: "600px",
-              }}
-              variant="elevation"
-              elevation={2}
-            >
-              <Typography
-                variant="h5"
-                align="center"
-                style={{ color: "#9BC53D" }}
+          <Typography variant="body1" gutterBottom sx={{ p: 0 }}>
+            Step - 2
+          </Typography>
+          <Typography variant="h5" gutterBottom sx={{ pb: 2 }}>
+            Assigners Form
+          </Typography>
+          <Form
+            onSubmit={formSubmit}
+            validate={(values) => {
+              const errors = {};
+              if (!values.name) {
+                errors.name = "Name required.";
+              }
+              if (!values.email) {
+                errors.email = "Email required.";
+              }
+              if (!values.contact) {
+                errors.contact = "Contact required.";
+              }
+              return errors;
+            }}
+            render={({ handleSubmit, form, submitting, pristine }) => (
+              <form
+                onSubmit={handleSubmit}
+                autoComplete="off"
               >
-                Step - 2
-              </Typography>
-              <Typography variant="h6" align="center" style={{}}>
-                Assign trees to buyers/volunteers
-              </Typography>
-              <ToastContainer />
-              <Form
-                onSubmit={formSubmit}
-                validate={(values) => {
-                  const errors = {};
-                  if (!values.name) {
-                    errors.name = "Name required.";
-                  }
-                  if (!values.email) {
-                    errors.email = "Email required.";
-                  }
-                  if (!values.contact) {
-                    errors.contact = "Contact required.";
-                  }
-                  return errors;
-                }}
-                render={({ handleSubmit, form, submitting, pristine }) => (
-                  <form
-                    onSubmit={handleSubmit}
-                    className={classes.root}
-                    autoComplete="off"
-                  >
-                    <Grid container sx={{ p: 2 }}>
-                      <Grid sx={{ m: 2 }} item xs={12}>
-                        <Field name="name">
-                          {({ input, meta }) => (
-                            <TextField
-                              fullWidth
-                              error={meta.error && meta.touched ? true : false}
-                              {...input}
-                              variant="outlined"
-                              label="Full Name *"
-                              name="name"
-                              helperText={
-                                meta.error && meta.touched ? meta.error : ""
-                              }
-                            />
-                          )}
-                        </Field>
-                      </Grid>
-                      <Grid item sx={{ m: 2 }} xs={12}>
-                        <Field name="email">
-                          {({ input, meta }) => (
-                            <TextField
-                              fullWidth
-                              variant="outlined"
-                              label="Email *"
-                              name="email"
-                              error={meta.error && meta.touched ? true : false}
-                              {...input}
-                              helperText={
-                                meta.error && meta.touched ? meta.error : ""
-                              }
-                            />
-                          )}
-                        </Field>
-                      </Grid>
-                      <Grid item sx={{ m: 2 }} xs={12}>
-                        <Field name="contact">
-                          {({ input, meta }) => (
-                            <TextField
-                              fullWidth
-                              variant="outlined"
-                              label="Contact *"
-                              name="contact"
-                              error={meta.error && meta.touched ? true : false}
-                              {...input}
-                              helperText={
-                                meta.error && meta.touched ? meta.error : ""
-                              }
-                            />
-                          )}
-                        </Field>
-                      </Grid>
-                      <Grid item sx={{ m: 2 }} xs={12}>
+                <Grid container sx={{ p: 2, pl: 0 }}>
+                  <Grid sx={{ m: 2 }} item xs={12}>
+                    <Field name="name">
+                      {({ input, meta }) => (
                         <TextField
-                        onChange={e => onTreesChanged(e.target.value)}
-                          value={selTrees}
+                          sx={{
+                            "& label.Mui-focused": {
+                              display: "none",
+                            },
+                            "& legend": {
+                              display: "none",
+                            },
+                          }}
+                          hiddenLabel
+                          fullWidth
+                          error={meta.error && meta.touched ? true : false}
+                          {...input}
+                          label="Full Name *"
+                          name="name"
+                          helperText={
+                            meta.error && meta.touched ? meta.error : ""
+                          }
+                        />
+                      )}
+                    </Field>
+                  </Grid>
+                  <Grid item sx={{ m: 2 }} xs={12}>
+                    <Field name="email">
+                      {({ input, meta }) => (
+                        <TextField
+                          fullWidth
+                          label="Email *"
+                          name="email"
+                          error={meta.error && meta.touched ? true : false}
+                          {...input}
+                          helperText={
+                            meta.error && meta.touched ? meta.error : ""
+                          }
+                        />
+                      )}
+                    </Field>
+                  </Grid>
+                  <Grid item sx={{ m: 2 }} xs={12}>
+                    <Field name="contact">
+                      {({ input, meta }) => (
+                        <TextField
                           fullWidth
                           variant="outlined"
-                          label="Sapling ID *"
-                          name="saplingid"
+                          label="Contact *"
+                          name="contact"
+                          error={meta.error && meta.touched ? true : false}
+                          {...input}
+                          helperText={
+                            meta.error && meta.touched ? meta.error : ""
+                          }
                         />
-                      </Grid>
-                      {
-                        <Button
-                          sx={{ m: 2 }}
-                          size="large"
-                          variant="contained"
-                          color="primary"
-                          disabled={submitting || pristine}
-                          type="submit"
-                        >
-                          Submit
-                        </Button>
-                      }
-                    </Grid>
-                  </form>
-                )}
-              />
-            </Paper>
-          </Col>
-          <Col className={classes.right} lg={3} md={2} sm={12}></Col>
-        </>
-      );
-    }
+                      )}
+                    </Field>
+                  </Grid>
+                  <Grid item sx={{ m: 2 }} xs={12}>
+                    <TextField
+                      onChange={(e) => onTreesChanged(e.target.value)}
+                      value={selTrees}
+                      fullWidth
+                      label="Sapling ID *"
+                      name="saplingid"
+                    />
+                  </Grid>
+                  {
+                    <Button
+                      sx={{ m: 2 }}
+                      size="large"
+                      variant="contained"
+                      color="primary"
+                      disabled={submitting || pristine || selTrees === ""}
+                      type="submit"
+                    >
+                      Submit
+                    </Button>
+                  }
+                </Grid>
+              </form>
+            )}
+          />
+        </Box>
+      </Box>
+    );
   }
 };
-
-const useStyles = makeStyles((theme) =>
-  createStyles({
-    left: {
-      width: "100%",
-      marginRight: "10px",
-    },
-    center: {
-      width: "100%",
-      display: "flex",
-      justifyContent: "center",
-      alignItems: "center",
-      flexDirection: "column",
-    },
-    right: {
-      width: "100%",
-      marginLeft: "10px",
-    },
-    infobox: {
-      marginTop: "5%",
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-      [theme.breakpoints.down("md")]: {
-        flexWrap: "wrap",
-      },
-    },
-    infodesc: {
-      fontSize: "30px",
-      paddingLeft: "1%",
-      fontWeight: "500",
-      color: "#ffffff",
-      alignItems: "center",
-      textAlign: "center",
-      [theme.breakpoints.down("md")]: {
-        fontSize: "20px",
-      },
-    },
-    backdrop: {
-      zIndex: theme.zIndex.drawer + 1,
-    },
-  })
-);
