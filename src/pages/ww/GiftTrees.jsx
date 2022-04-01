@@ -161,11 +161,11 @@ export const GiftTrees = () => {
         })
     }
 
-    const handleTemplateShare = (type, link) => {
-        if (type === "1") {
-            window.open(`http://dashboard.14trees.org/events/birthday/${link}`, '_blank')
-        }
-    }
+    // const handleTemplateShare = (type, link) => {
+    //     if (type === "1") {
+    //         window.open(`http://dashboard.14trees.org/events/birthday/${link}`, '_blank')
+    //     }
+    // }
     const fetchTrees = useCallback(async () => {
         try {
             let profileTrees = await Axios.get(`/mytrees/${email}`);
@@ -279,6 +279,7 @@ export const GiftTrees = () => {
         formData.append('dob', date);
         formData.append('contact', formValues.contact);
         formData.append('sapling_id', sapling_ids);
+        formData.append('planted_by', formValues.planted_by);
         formData.append('donor', values.user._id);
 
         if (img !== null) {
@@ -298,7 +299,7 @@ export const GiftTrees = () => {
         }
 
         let res;
-        if (formValues.type === "1") {
+        if (formValues.type === "1" || formValues.type === "2") {
             try {
                 res = await Axios.post('/events/addevents/', formData, {
                     headers: {
@@ -618,7 +619,7 @@ export const GiftTrees = () => {
                                             <TableCell align="center">Sapling ID</TableCell>
                                             <TableCell align="center">Plot</TableCell>
                                             <TableCell align="right"></TableCell>
-                                            <TableCell align="right"></TableCell>
+                                            {/* <TableCell align="right"></TableCell> */}
                                             <TableCell>
                                                 <Button
                                                     sx={{ ml: 'auto', mr: 'auto' }}
@@ -682,9 +683,9 @@ export const GiftTrees = () => {
                                                                 Card
                                                             </Button>
                                                         </TableCell>
-                                                        <TableCell align="center">
+                                                        {/* <TableCell align="center">
                                                             {
-                                                                (row.type !== undefined && row.type !== "") && (
+                                                                (row.type !== undefined && row.type !== "" && row.type === "2") && (
                                                                     <Button
                                                                         sx={{ ml: 'auto', mr: 'auto' }}
                                                                         variant="contained"
@@ -696,7 +697,7 @@ export const GiftTrees = () => {
                                                                     </Button>
                                                                 )
                                                             }
-                                                        </TableCell>
+                                                        </TableCell> */}
                                                         <ShareDialog
                                                             open={values.shareDlgOpen}
                                                             onClose={handleShareDlgClose}
