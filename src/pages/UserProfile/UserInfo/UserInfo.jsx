@@ -6,13 +6,18 @@ import { useRecoilValue, useRecoilState } from "recoil";
 
 import { Memories } from "../Memories/Memories";
 import { InfoChip } from "../../../stories/InfoChip/InfoChip";
-import { usersData, openProfilePopup } from "../../../store/atoms";
+import {
+  usersData,
+  selUsersData,
+  openProfilePopup,
+} from "../../../store/atoms";
 // import { navIndex } from '../../../store/atoms';
 
 export const UserInfo = () => {
   const classes = useStyles();
 
   const userinfo = useRecoilValue(usersData);
+  const selUserInfo = useRecoilValue(selUsersData);
   // const setIndex = useSetRecoilState(navIndex);
   const [open, setOpenPopup] = useRecoilState(openProfilePopup);
   const handleTreeClick = () => {
@@ -26,7 +31,7 @@ export const UserInfo = () => {
     setOpenPopup(true);
   };
 
-  const treeDoneWidth = (userinfo.trees.length / 14) * 100;
+  const treeDoneWidth = (userinfo.usertrees.length / 14) * 100;
 
   if (open) {
     return (
@@ -34,7 +39,11 @@ export const UserInfo = () => {
         <Dialog onClose={onTogglePop} open={open}>
           <img
             className={classes.imageWindow}
-            src={userinfo.user.profile_image[0]}
+            src={
+              selUserInfo.profile_image[0] === ""
+                ? selUserInfo.tree.image[0]
+                : selUserInfo.profile_image[0]
+            }
             alt={"A"}
           />
         </Dialog>
@@ -50,32 +59,32 @@ export const UserInfo = () => {
               className={classes.userimg}
               alt="Card"
               src={
-                userinfo.user.profile_image[0] === ""
-                  ? userinfo.trees[0].tree.tree_id.image[0]
-                  : userinfo.user.profile_image[0]
+                selUserInfo.profile_image[0] === ""
+                  ? selUserInfo.tree.image[0] === ""
+                    ? selUserInfo.tree.tree_type.image[0]
+                    : selUserInfo.tree.image[0]
+                  : selUserInfo.profile_image[0]
               }
             />
           </Grid>
           <Grid item xs={6} md={3} className={classes.infobox}>
             <div className={classes.info}>
-                {
-                    (userinfo.user.event && userinfo.user.event.type === '2') ? (
-                        <div className={classes.label}>In memory of</div>
-                    ) : (
-                        <div className={classes.label}>Name</div>
-                    )
-                }
-              <div className={classes.data}>{userinfo.user.user.name}</div>
-              {userinfo.user.donated_by === undefined ||
-              userinfo.user.donated_by === null ? (
+              {selUserInfo.event && selUserInfo.event.type === "2" ? (
+                <div className={classes.label}>In Memory of</div>
+              ) : (
+                <div className={classes.label}>Name</div>
+              )}
+              <div className={classes.data}>{selUserInfo.user.name}</div>
+              {selUserInfo.donated_by === undefined ||
+              selUserInfo.donated_by === null ? (
                 <Fragment>
                   <div className={classes.label}>Organization</div>
-                  <div className={classes.data}>{userinfo.user.orgid.name}</div>
+                  <div className={classes.data}>{selUserInfo.orgid.name}</div>
                   <div className={classes.growth}>
                     <div style={{ marginTop: "20px" }}>
                       <div style={{ display: "flex" }}>
                         <InfoChip
-                          count={userinfo.trees.length}
+                          count={userinfo.usertrees.length}
                           label="Trees Planted"
                           onClick={handleTreeClick}
                         />
@@ -88,7 +97,7 @@ export const UserInfo = () => {
                           style={{ width: `${treeDoneWidth}%` }}
                         ></div>
                         <div className={classes.count}>
-                          {14 - userinfo.trees.length}
+                          {14 - userinfo.usertrees.length}
                           <div className={classes.countdesc}>
                             Trees away from neutralising your carbon footprint
                           </div>
@@ -100,22 +109,20 @@ export const UserInfo = () => {
               ) : (
                 <>
                   <div className={classes.label}>Planted By</div>
-                  {userinfo.user.planted_by ? (
-                    <div className={classes.data}>
-                      {userinfo.user.planted_by}
-                    </div>
+                  {selUserInfo.planted_by ? (
+                    <div className={classes.data}>{selUserInfo.planted_by}</div>
                   ) : (
                     <div className={classes.data}>
-                      {userinfo.user.donated_by.name}
+                      {selUserInfo.donated_by.name}
                     </div>
                   )}
                   <div className={classes.label}>Tree Name</div>
                   <div className={classes.data}>
-                    {userinfo.trees[0].tree.tree_id.name}
+                    {selUserInfo.tree.tree_type.name}
                   </div>
                   <div className={classes.label}>Location</div>
                   <div className={classes.data}>
-                    {userinfo.trees[0].tree.plot_id.name}
+                    {selUserInfo.tree.plot.name}
                   </div>
                 </>
               )}

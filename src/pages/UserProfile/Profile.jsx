@@ -8,24 +8,22 @@ import { Trees } from "./Trees/Trees";
 import { Map } from "./Map/Map";
 
 import { useRecoilValue } from "recoil";
-import { usersData } from "../../store/atoms";
+import { selUsersData } from "../../store/atoms";
 
 import logo from "../../assets/icon_round.png";
 import { Button } from "@mui/material";
 
-export const Profile = () => {
+export const Profile = ({ saplingId }) => {
   const matches = useMediaQuery("(max-width:481px)");
   const classes = useStyles();
-
-  const userinfo = useRecoilValue(usersData);
+  const selUserInfo = useRecoilValue(selUsersData);
   // const [activeStep, setActiveStep] = useState(0);
 
   // const handleInfoChange = (i) => {
   //     setActiveStep(i)
   // }
 
-  const username = userinfo.user.user.name.split(" ")[0];
-  console.log(userinfo);
+  const username = selUserInfo.user.name.split(" ")[0];
 
   const header = () => {
     if (!matches) {
@@ -33,11 +31,11 @@ export const Profile = () => {
         <div className={classes.header}>
           <img src={logo} alt={logo} className={classes.img} />
           <div className={classes.username}>
-            {userinfo.user.event && userinfo.user.event.type === "2"
+            {selUserInfo.event && selUserInfo.event.type === "2"
               ? "Memorial Dashboard"
               : `${username}'s Dashboard`}
           </div>
-          {userinfo.user.event && userinfo.user.event.type === "2" ? (
+          {selUserInfo.event && selUserInfo.event.type === "2" ? (
             ""
           ) : (
             <div style={{ justifyContent: "flex-end" }}>
@@ -70,7 +68,7 @@ export const Profile = () => {
         <div className={classes.treemap}>
           <div style={{ display: matches ? "block" : "flex" }}>
             <div className={classes.tree}>
-              <Trees />
+              <Trees saplingId={saplingId} />
             </div>
             <div className={classes.map}>
               <Map />
@@ -162,6 +160,8 @@ const useStyles = makeStyles((theme) =>
       [theme.breakpoints.down("480")]: {
         width: "100%",
         height: "60%",
+        maxHeight: "400px",
+        overflowY: "auto",
         marginRight: "0",
         marginTop: "10px",
         marginBottom: "-30px",

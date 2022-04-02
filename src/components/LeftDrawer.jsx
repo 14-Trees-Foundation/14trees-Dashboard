@@ -15,7 +15,7 @@ import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import { Profile } from "../pages/UserProfile/Profile";
 
 import { useRecoilState, useRecoilValue } from "recoil";
-import { navIndex, usersData } from "../store/atoms";
+import { navIndex, selUsersData } from "../store/atoms";
 import logo from "../assets/logo_white_small.png";
 import icon from "../assets/icon_round.png";
 
@@ -53,8 +53,8 @@ export const LeftDrawer = () => {
   const [open, setOpen] = useState(false);
   const classes = useStyles();
   const [index, setIndex] = useRecoilState(navIndex);
-  const userinfo = useRecoilValue(usersData);
-  const username = userinfo.user.user.name.split(" ")[0];
+  const selUserInfo = useRecoilValue(selUsersData);
+  const username = selUserInfo.user.name.split(" ")[0];
 
   const onClickNav = (value) => {
     setIndex(value);
@@ -119,7 +119,7 @@ export const LeftDrawer = () => {
                 onClick={handleDrawerOpen}
               />
               <div className={classes.username}>
-                {userinfo.user.event && userinfo.user.event.type === "2"
+                {selUserInfo.event && selUserInfo.event.type === "2"
                   ? "Memorial Dashboard"
                   : `${username}'s Dashboard`}
               </div>

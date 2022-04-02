@@ -2,19 +2,19 @@ import { createStyles, makeStyles } from "@mui/styles";
 import { useRecoilValue, useRecoilState } from "recoil";
 
 import { TreesPlanted } from "../../../stories/TreesPlanted/TreesPlanted";
-import { usersData, currSelTree } from "../../../store/atoms";
+import { usersData, selUsersData } from "../../../store/atoms";
 
-export const Trees = () => {
+export const Trees = ({ saplingId }) => {
   const classes = useStyles();
 
   const userinfo = useRecoilValue(usersData);
-  const [currTree, setCurrTree] = useRecoilState(currSelTree);
+  const [selectedUserInfo, setSelectedUserinfo] = useRecoilState(selUsersData);
   // const setIndex = useSetRecoilState(navIndex);
-  let numTrees = userinfo.trees.length;
-  let images = [];
-  for (const tree of userinfo.trees) {
-    images.push.apply(images, tree["memories"]);
-  }
+  let numTrees = userinfo.length;
+
+  const handleTreeSelect = (item) => {
+    setSelectedUserinfo(item);
+  };
 
   return (
     <div className={classes.main}>
@@ -38,36 +38,40 @@ export const Trees = () => {
         </div>
         <div className={classes.trees}>
           <div className={classes.scroll}>
-            {userinfo.trees.map((tree, idx) => {
-              const date = tree.tree.date_added.slice(0, 10);
+            {userinfo.usertrees.map((item, idx) => {
+              const date = item.date_added.slice(0, 10);
               return (
                 <div
                   key={idx}
-                  onClick={() => setCurrTree(idx)}
+                  onClick={() => handleTreeSelect(item)}
                   style={{ cursor: "pointer" }}
                 >
-                  {currTree === idx ? (
+                  {item.tree.sapling_id === selectedUserInfo.tree.sapling_id ? (
                     <TreesPlanted
-                      id={tree.tree.sapling_id}
-                      name={tree.tree.tree_id.name}
+                      id={item.tree.sapling_id}
+                      name={item.tree.tree_type.name}
                       img={
-                        tree.tree.image.length === 0 ||
-                        tree.tree.image[0] === ""
-                          ? tree.tree.tree_id.image[0]
-                          : tree.tree.image[0]
+                        item.tree.image
+                          ? item.tree.image.length === 0 ||
+                            item.tree.image[0] === ""
+                            ? item.tree.tree_type.image[0]
+                            : item.tree.image[0]
+                          : item.tree.tree_type.image[0]
                       }
                       date={date}
                       selected={true}
                     />
                   ) : (
                     <TreesPlanted
-                      id={tree.tree.sapling_id}
-                      name={tree.tree.tree_id.name}
+                      id={item.tree.sapling_id}
+                      name={item.tree.tree_type.name}
                       img={
-                        tree.tree.image.length === 0 ||
-                        tree.tree.image[0] === ""
-                          ? tree.tree.tree_id.image[0]
-                          : tree.tree.image[0]
+                        item.tree.image
+                          ? item.tree.image.length === 0 ||
+                            item.tree.image[0] === ""
+                            ? item.tree.tree_type.image[0]
+                            : item.tree.image[0]
+                          : item.tree.tree_type.image[0]
                       }
                       date={date}
                     />
