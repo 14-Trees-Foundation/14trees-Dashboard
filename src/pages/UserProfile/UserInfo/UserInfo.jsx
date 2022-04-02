@@ -58,7 +58,13 @@ export const UserInfo = () => {
           </Grid>
           <Grid item xs={6} md={3} className={classes.infobox}>
             <div className={classes.info}>
-              <div className={classes.label}>Name</div>
+                {
+                    (userinfo.user.event && userinfo.user.event.type === 2) ? (
+                        <div className={classes.label}>In memory of</div>
+                    ) : (
+                        <div className={classes.label}>Name</div>
+                    )
+                }
               <div className={classes.data}>{userinfo.user.user.name}</div>
               {userinfo.user.donated_by === undefined ||
               userinfo.user.donated_by === null ? (
