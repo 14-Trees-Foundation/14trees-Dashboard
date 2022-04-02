@@ -59,7 +59,7 @@ export const UserInfo = () => {
           <Grid item xs={6} md={3} className={classes.infobox}>
             <div className={classes.info}>
                 {
-                    (userinfo.user.event && userinfo.user.event.type === 2) ? (
+                    (userinfo.user.event && userinfo.user.event.type === '2') ? (
                         <div className={classes.label}>In memory of</div>
                     ) : (
                         <div className={classes.label}>Name</div>
