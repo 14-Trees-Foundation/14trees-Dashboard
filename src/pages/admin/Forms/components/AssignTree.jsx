@@ -165,6 +165,15 @@ export const AssignTree = ({ selTrees, onTreesChanged }) => {
                     <Field name="email">
                       {({ input, meta }) => (
                         <TextField
+                          sx={{
+                            "& label.Mui-focused": {
+                              display: "none",
+                            },
+                            "& legend": {
+                              display: "none",
+                            },
+                          }}
+                          hiddenLabel
                           fullWidth
                           label="Email *"
                           name="email"
@@ -181,6 +190,15 @@ export const AssignTree = ({ selTrees, onTreesChanged }) => {
                     <Field name="contact">
                       {({ input, meta }) => (
                         <TextField
+                          sx={{
+                            "& label.Mui-focused": {
+                              display: "none",
+                            },
+                            "& legend": {
+                              display: "none",
+                            },
+                          }}
+                          hiddenLabel
                           fullWidth
                           variant="outlined"
                           label="Contact *"
@@ -195,7 +213,22 @@ export const AssignTree = ({ selTrees, onTreesChanged }) => {
                     </Field>
                   </Grid>
                   <Grid item sx={{ m: 2 }} xs={12}>
+                    <Typography
+                      sx={{ color: "#C72542",textAlign:'end' }}
+                    >
+                      Total selected trees :
+                      {selTrees === "" ? 0 : selTrees.split(",").length}
+                    </Typography>
                     <TextField
+                      sx={{
+                        "& label.Mui-focused": {
+                          display: "none",
+                        },
+                        "& legend": {
+                          display: "none",
+                        },
+                      }}
+                      hiddenLabel
                       onChange={(e) => onTreesChanged(e.target.value)}
                       value={selTrees}
                       fullWidth

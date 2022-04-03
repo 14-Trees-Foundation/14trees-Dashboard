@@ -45,7 +45,9 @@ export const Forms = () => {
     if (selTrees === "") {
       setSelectedTrees(val);
     } else {
-      setSelectedTrees(selTrees + "," + val);
+      let trees = selTrees + "," + val;
+      trees = Array.from(new Set(trees.split(','))).toString();
+      setSelectedTrees(trees);
     }
   };
 
