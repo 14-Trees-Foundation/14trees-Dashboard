@@ -26,7 +26,6 @@ export const Users = () => {
       if (response.status === 200) {
         setUserTreeHoldings(response.data);
       }
-
     } catch (error) {
       console.log(error);
     }

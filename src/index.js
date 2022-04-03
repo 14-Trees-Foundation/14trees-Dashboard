@@ -1,20 +1,20 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
+import React from "react";
+import ReactDOM from "react-dom";
 
-import { ThemeProvider } from '@mui/material/styles';
+import { ThemeProvider } from "@mui/material/styles";
 
-import theme from './theme';
-import './index.css';
-import App from './App';
-import reportWebVitals from './reportWebVitals';
+import theme from "./theme";
+import "./index.css";
+import App from "./App";
+import reportWebVitals from "./reportWebVitals";
 import { BrowserRouter } from "react-router-dom";
-import { makeServer } from './mockServer/server';
+import { makeServer } from "./mockServer/server";
 import { RecoilRoot } from "recoil";
-require('dotenv').config()
+require("dotenv").config();
 
-if (process.env.REACT_APP_ENV === 'development') {
+if (process.env.REACT_APP_ENV === "development") {
   makeServer({
-    environment: 'development'
+    environment: "development",
   });
 }
 
@@ -28,7 +28,7 @@ ReactDOM.render(
       </ThemeProvider>
     </BrowserRouter>
   </React.StrictMode>,
-  document.getElementById('root')
+  document.getElementById("root")
 );
 
 // If you want to start measuring performance in your app, pass a function

@@ -210,7 +210,7 @@ export const VisitorNew = () => {
                     );
                   })}
                 </Stepper>
-                <Box sx={{ p: {xs: 1, md: 3}, mt: 2 }}>{items()}</Box>
+                <Box sx={{ p: { xs: 1, md: 3 }, mt: 2 }}>{items()}</Box>
               </Paper>
             </Box>
           </Box>

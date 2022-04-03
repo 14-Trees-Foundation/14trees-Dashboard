@@ -1,9 +1,5 @@
-import React from 'react'
+import React from "react";
 
 export const Layout = (props) => {
-    return (
-        <div>
-            {props.children}
-        </div>
-    );
-}
+  return <div>{props.children}</div>;
+};

@@ -1,112 +1,112 @@
-import { atom } from 'recoil';
+import { atom } from "recoil";
 
 const treeTypesList = atom({
-    key: 'treetypes',
-    default: []
-})
+  key: "treetypes",
+  default: [],
+});
 
 const plotsList = atom({
-    key: 'plots',
-    default: []
-})
+  key: "plots",
+  default: [],
+});
 
 const albums = atom({
-    key: 'albums',
-    default: []
-})
+  key: "albums",
+  default: [],
+});
 
 const adminNavIndex = atom({
-    key: 'adminnavindex',
-    default: 0
-})
+  key: "adminnavindex",
+  default: 0,
+});
 
 const summary = atom({
-    key: 'summary',
-    default: {},
+  key: "summary",
+  default: {},
 });
 
 const treeByPlots = atom({
-    key: 'treebyplots',
-    default: {}
-})
+  key: "treebyplots",
+  default: {},
+});
 
 const treeLoggedByDate = atom({
-    key: 'treebydate',
-    default: {}
-})
+  key: "treebydate",
+  default: {},
+});
 
 const treeLogByPlotDate = atom({
-    key: 'treelogbyplotdate',
-    default: {}
-})
+  key: "treelogbyplotdate",
+  default: {},
+});
 
 const selectedPlot = atom({
-    key: 'selectedplot',
-    default: ''
-})
+  key: "selectedplot",
+  default: "",
+});
 
 const treeTypeCount = atom({
-    key: 'treetypecount',
-    default: {}
-})
+  key: "treetypecount",
+  default: {},
+});
 
 const treeTypeCountByPlot = atom({
-    key: 'treetypecountbyplot',
-    default: {}
-})
+  key: "treetypecountbyplot",
+  default: {},
+});
 
 const wwSelectedAlbumImage = atom({
-    key: 'selectedalbum',
-    default: {},
-})
+  key: "selectedalbum",
+  default: {},
+});
 
 const searchTreeData = atom({
-    key: 'tree',
-    default: {},
-})
+  key: "tree",
+  default: {},
+});
 
 const allUserProfile = atom({
-    key: 'userprofile',
-    default: {}
-})
+  key: "userprofile",
+  default: {},
+});
 
 const userTreeHoldings = atom({
-    key: 'treeholdings',
-    default: {}
-})
+  key: "treeholdings",
+  default: {},
+});
 
 const allPonds = atom({
-    key: 'allponds',
-    default: {}
-})
+  key: "allponds",
+  default: {},
+});
 
 const selectedPond = atom({
-    key: 'selectedpond',
-    default: ''
-})
+  key: "selectedpond",
+  default: "",
+});
 
 const pondHistory = atom({
-    key: 'pondhistory',
-    default: ''
-})
+  key: "pondhistory",
+  default: "",
+});
 
 export {
-    treeTypesList,
-    plotsList,
-    adminNavIndex,
-    summary,
-    treeByPlots,
-    treeLoggedByDate,
-    albums,
-    wwSelectedAlbumImage,
-    searchTreeData,
-    treeLogByPlotDate,
-    selectedPlot,
-    treeTypeCount,
-    treeTypeCountByPlot,
-    allUserProfile,
-    allPonds,
-    selectedPond,
-    pondHistory,
-    userTreeHoldings
-}
+  treeTypesList,
+  plotsList,
+  adminNavIndex,
+  summary,
+  treeByPlots,
+  treeLoggedByDate,
+  albums,
+  wwSelectedAlbumImage,
+  searchTreeData,
+  treeLogByPlotDate,
+  selectedPlot,
+  treeTypeCount,
+  treeTypeCountByPlot,
+  allUserProfile,
+  allPonds,
+  selectedPond,
+  pondHistory,
+  userTreeHoldings,
+};

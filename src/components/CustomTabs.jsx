@@ -1,8 +1,8 @@
-import { styled } from '@mui/system';
-import TabsListUnstyled from '@mui/base/TabsListUnstyled';
-import TabPanelUnstyled from '@mui/base/TabPanelUnstyled';
-import { buttonUnstyledClasses } from '@mui/base/ButtonUnstyled';
-import TabUnstyled, { tabUnstyledClasses } from '@mui/base/TabUnstyled';
+import { styled } from "@mui/system";
+import TabsListUnstyled from "@mui/base/TabsListUnstyled";
+import TabPanelUnstyled from "@mui/base/TabPanelUnstyled";
+import { buttonUnstyledClasses } from "@mui/base/ButtonUnstyled";
+import TabUnstyled, { tabUnstyledClasses } from "@mui/base/TabUnstyled";
 
 export const Tab = styled(TabUnstyled)`
   color: #1f3625;
@@ -26,13 +26,13 @@ export const Tab = styled(TabUnstyled)`
   &.${buttonUnstyledClasses.focusVisible} {
     color: #fff;
     outline: none;
-    background-color: #9BC53D;
+    background-color: #9bc53d;
   }
 
   &.${tabUnstyledClasses.selected} {
     color: #1f3625;
     font-weight: 550;
-    background: #B1BFB5;
+    background: #b1bfb5;
     box-shadow: inset 11px 11px 30px #98a49c, inset -11px -11px 30px #cadace;
   }
 
@@ -49,7 +49,7 @@ export const TabPanel = styled(TabPanelUnstyled)`
 
 export const TabsList = styled(TabsListUnstyled)`
   min-width: 220px;
-  background: #B1BFB5;
+  background: #b1bfb5;
   box-shadow: 7px 7px 10px #98a49c, -7px -7px 12px #cadace;
   border-radius: 8px;
   margin-bottom: 16px;

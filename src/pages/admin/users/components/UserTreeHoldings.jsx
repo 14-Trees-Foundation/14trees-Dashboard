@@ -28,10 +28,10 @@ const columns = [
 ];
 
 const handleClick = (e) => {
-    if(e.field === "email") {
-        window.open("https://dashboard.14trees.org/ww/"+e.formattedValue);
-    }
-}
+  if (e.field === "email") {
+    window.open("https://dashboard.14trees.org/ww/" + e.formattedValue);
+  }
+};
 
 export const UserTreeHoldings = () => {
   const treeHoldings = useRecoilValue(userTreeHoldings);

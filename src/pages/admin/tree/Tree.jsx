@@ -30,18 +30,18 @@ import { Plotwise } from "./plotwise/Plotwise";
 const useStyles = makeStyles({
   root: {
     "& .MuiPaper-root": {
-      borderRadius: '20px',
-      maxHeight: '450px',
+      borderRadius: "20px",
+      maxHeight: "450px",
       boxShadow: "4px 4px 6px #98a49c, -4px -4px 6px #cadace",
-    }
+    },
   },
   select: {
-      "& ul": {
-          backgroundColor: "#b1bfb5",
-      },
-      "& li": {
-          fontSize: 14,
-      },
+    "& ul": {
+      backgroundColor: "#b1bfb5",
+    },
+    "& li": {
+      fontSize: 14,
+    },
   },
 });
 export const Tree = () => {
@@ -121,7 +121,9 @@ export const Tree = () => {
               fullWidth
               onChange={(e) => setSelectedPlot(e.target.value)}
               defaultValue="none"
-              MenuProps={{ classes: { paper: classes.select, root: classes.root } }}
+              MenuProps={{
+                classes: { paper: classes.select, root: classes.root },
+              }}
             >
               <MenuItem disabled value="none">
                 Select Plot

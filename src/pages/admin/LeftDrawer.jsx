@@ -10,7 +10,7 @@ import ForestOutlined from "@mui/icons-material/ForestOutlined";
 import AssignmentOutlined from "@mui/icons-material/AssignmentOutlined";
 import OpacityOutlined from "@mui/icons-material/OpacityOutlined";
 import AccountCircleOutlined from "@mui/icons-material/AccountCircleOutlined";
-import FaceIcon from '@mui/icons-material/Face';
+import FaceIcon from "@mui/icons-material/Face";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 
@@ -50,12 +50,12 @@ export const AdminLeftDrawer = () => {
     {
       displayName: "Users",
       logo: AccountCircleOutlined,
-      display: auth.permissions.includes('all')
+      display: auth.permissions.includes("all"),
     },
     {
       displayName: "Images",
       logo: FaceIcon,
-      display: auth.permissions.includes('all')
+      display: auth.permissions.includes("all"),
     },
     {
       displayName: "Forms",
@@ -67,17 +67,23 @@ export const AdminLeftDrawer = () => {
     return (
       <div className={classes.itemlist}>
         {pages.map((item, i) => {
-          if(item.display) {
+          if (item.display) {
             return (
-              <div className={classes.item} onClick={() => onClickNav(i)} key={i}>
-                <div className={index === i ? classes.selected : classes.itembtn}>
+              <div
+                className={classes.item}
+                onClick={() => onClickNav(i)}
+                key={i}
+              >
+                <div
+                  className={index === i ? classes.selected : classes.itembtn}
+                >
                   <item.logo />
                   <div className={classes.itemtext}>{item.displayName}</div>
                 </div>
               </div>
             );
           } else {
-            return <></>
+            return <></>;
           }
         })}
       </div>
@@ -135,10 +141,10 @@ const useStyles = makeStyles((theme) =>
         width: "14%",
         maxWidth: "200px",
         backgroundColor: "#1f3625",
-        boxShadow: '2px 2px 8px #354639,-2px -2px 8px #49604f',
-        opacity: '80%',
+        boxShadow: "2px 2px 8px #354639,-2px -2px 8px #49604f",
+        opacity: "80%",
         borderTopRightRadius: "10px",
-        borderRight: '0px',
+        borderRight: "0px",
       },
     },
     mdrawer: {
@@ -146,7 +152,7 @@ const useStyles = makeStyles((theme) =>
       "& .MuiPaper-root": {
         width: "20%",
         backgroundColor: "#1f3625",
-        boxShadow: '2px 2px 8px #354639,-2px -2px 8px #49604f',
+        boxShadow: "2px 2px 8px #354639,-2px -2px 8px #49604f",
         borderTopRightRadius: "10px",
       },
     },
@@ -163,8 +169,8 @@ const useStyles = makeStyles((theme) =>
     itembtn: {
       padding: "0 16px",
       borderRadius: "20px",
-      borderTopRightRadius: '0px',
-      borderBottomRightRadius: '0px',
+      borderTopRightRadius: "0px",
+      borderBottomRightRadius: "0px",
       height: "40px",
       display: "flex",
       alignItems: "center",
@@ -177,13 +183,13 @@ const useStyles = makeStyles((theme) =>
     selected: {
       padding: "0 16px",
       borderTopLeftRadius: "20px",
-      borderBottomLeftRadius: '20px',
+      borderBottomLeftRadius: "20px",
       height: "40px",
       display: "flex",
       alignItems: "center",
       justifyContent: "space-evenly",
-      boxShadow: '7px 7px 11px #0d1710,-7px -7px 11px #31553a',
-      background: 'linear-gradient(145deg, #1c3121, #213a28)'
+      boxShadow: "7px 7px 11px #0d1710,-7px -7px 11px #31553a",
+      background: "linear-gradient(145deg, #1c3121, #213a28)",
     },
     logo: {
       width: "80px",

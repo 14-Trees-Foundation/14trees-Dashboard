@@ -22,11 +22,16 @@ export const TreeList = ({ onTreeSelect }) => {
   const [unassigned, setUnassigned] = useState([]);
 
   const CustomPaper = (props) => {
-    return <Paper style={{
-        borderRadius: '20px',
-        boxShadow: "4px 4px 6px #98a49c, -4px -4px 6px #cadace",
-        background: '#b1bfb5'
-    }} {...props} />;
+    return (
+      <Paper
+        style={{
+          borderRadius: "20px",
+          boxShadow: "4px 4px 6px #98a49c, -4px -4px 6px #cadace",
+          background: "#b1bfb5",
+        }}
+        {...props}
+      />
+    );
   };
 
   const fetchAndShowTreeList = async (value) => {
@@ -144,12 +149,12 @@ export const TreeList = ({ onTreeSelect }) => {
                     key={saplingid}
                     label={saplingid}
                     style={{
-                        color: '#3C79BC',
-                        marginRight: '12px',
-                        marginBottom: '12px',
-                        borderRadius: '16px',
-        boxShadow: "3px 3px 6px #737c76, -3px -3px 6px #effff4",
-        background: '#b1bfb5'
+                      color: "#3C79BC",
+                      marginRight: "12px",
+                      marginBottom: "12px",
+                      borderRadius: "16px",
+                      boxShadow: "3px 3px 6px #737c76, -3px -3px 6px #effff4",
+                      background: "#b1bfb5",
                     }}
                     onClick={() =>
                       window.open(
@@ -189,12 +194,12 @@ export const TreeList = ({ onTreeSelect }) => {
                     key={saplingid}
                     label={saplingid}
                     style={{
-                        color: '#1f3625',
-                        marginRight: '12px',
-                        marginBottom: '12px',
-                        borderRadius: '16px',
-        boxShadow: "3px 3px 6px #737c76, -3px -3px 6px #effff4",
-        background: '#b1bfb5'
+                      color: "#1f3625",
+                      marginRight: "12px",
+                      marginBottom: "12px",
+                      borderRadius: "16px",
+                      boxShadow: "3px 3px 6px #737c76, -3px -3px 6px #effff4",
+                      background: "#b1bfb5",
                     }}
                     onClick={() => onTreeSelect(saplingid)}
                   />

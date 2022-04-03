@@ -147,7 +147,7 @@ export const Map = () => {
           </Fragment>
         ))}
         {uniqBoundaries.map((marker, i) => {
-          return <Polygon paths={marker} options={options} key={i}/>;
+          return <Polygon paths={marker} options={options} key={i} />;
         })}
       </GoogleMap>
     </div>

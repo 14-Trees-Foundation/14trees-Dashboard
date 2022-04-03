@@ -42,16 +42,16 @@ export const Forms = () => {
   }, [fetchData]);
 
   const onTreeSelect = (val) => {
-    if(selTrees === "") {
-      setSelectedTrees(val)
+    if (selTrees === "") {
+      setSelectedTrees(val);
     } else {
       setSelectedTrees(selTrees + "," + val);
     }
-  }
+  };
 
   const onTreesChanged = (val) => {
     setSelectedTrees(val);
-  }
+  };
 
   if (loading) {
     return <Spinner text={"Fetching Tree Data!"} />;
@@ -66,13 +66,13 @@ export const Forms = () => {
             <Tab>Add Tree</Tab>
           </TabsList>
         </div>
-        <TabPanel value={0} sx={{ml: 2, mr:2}}>
+        <TabPanel value={0} sx={{ ml: 2, mr: 2 }}>
           <Grid container spacing={3}>
             <Grid item xs={6}>
-              <TreeList onTreeSelect={onTreeSelect}/>
+              <TreeList onTreeSelect={onTreeSelect} />
             </Grid>
             <Grid item xs={6}>
-              <AssignTree selTrees={selTrees} onTreesChanged={onTreesChanged}/>
+              <AssignTree selTrees={selTrees} onTreesChanged={onTreesChanged} />
             </Grid>
           </Grid>
         </TabPanel>

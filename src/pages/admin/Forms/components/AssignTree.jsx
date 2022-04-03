@@ -1,11 +1,5 @@
 import { useState } from "react";
-import {
-  Box,
-  Typography,
-  Grid,
-  TextField,
-  Button,
-} from "@mui/material";
+import { Box, Typography, Grid, TextField, Button } from "@mui/material";
 import { Field, Form } from "react-final-form";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -140,10 +134,7 @@ export const AssignTree = ({ selTrees, onTreesChanged }) => {
               return errors;
             }}
             render={({ handleSubmit, form, submitting, pristine }) => (
-              <form
-                onSubmit={handleSubmit}
-                autoComplete="off"
-              >
+              <form onSubmit={handleSubmit} autoComplete="off">
                 <Grid container sx={{ p: 2, pl: 0 }}>
                   <Grid sx={{ m: 2 }} item xs={12}>
                     <Field name="name">

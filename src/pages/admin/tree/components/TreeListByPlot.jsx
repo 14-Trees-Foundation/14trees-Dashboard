@@ -1,6 +1,3 @@
 export const TreeListByPlot = () => {
-    return (
-        <>
-        </>
-    )
-}
+  return <></>;
+};
