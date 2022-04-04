@@ -119,7 +119,7 @@ export const LeftDrawer = () => {
                 onClick={handleDrawerOpen}
               />
               <div className={classes.username}>
-                {selUserInfo.event && selUserInfo.event.type === "2"
+                {selUserInfo.tree.event_type && selUserInfo.tree.event_type === "2"
                   ? "Memorial Dashboard"
                   : `${username}'s Dashboard`}
               </div>
