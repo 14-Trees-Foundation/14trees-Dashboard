@@ -14,6 +14,11 @@
     "@react-google-maps/api": "^2.2.0",
     "@testing-library/react": "^11.1.0",
     "@testing-library/user-event": "^12.1.10",
+    "@types/jest": "^27.4.1",
+    "@types/node": "^17.0.23",
+    "@types/react": "^17.0.43",
+    "@types/react-dom": "^17.0.14",
+    "@types/react-router-dom": "^5.3.3",
     "axios": "^0.21.1",
     "browser-image-compression": "^1.0.16",
     "date-fns": "^2.23.0",
@@ -21,6 +26,7 @@
     "final-form": "^4.20.4",
     "miragejs": "^0.1.41",
     "moment": "^2.29.1",
+    "prettier": "^2.6.2",
     "react": "^17.0.2",
     "react-bootstrap": "^2.0.4",
     "react-csv": "^2.2.2",
@@ -41,6 +47,7 @@
     "recharts": "^2.1.8",
     "recoil": "^0.4.1",
     "sass": "^1.35.1",
+    "typescript": "^4.6.3",
     "web-vitals": "^1.0.1"
   },
   "scripts": {
@@ -48,7 +55,8 @@
     "build": "GENERATE_SOURCEMAP=false react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "build-css": "sass --watch src/index.scss:src/index.css"
+    "build-css": "sass --watch src/index.scss:src/index.css",
+    "pretty": "prettier --write \"./**/*.{js,jsx}\""
   },
   "eslintConfig": {
     "extends": [

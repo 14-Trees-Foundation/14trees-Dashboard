@@ -79,7 +79,7 @@ export const GiftTrees = () => {
       });
     } else if (event.target.value === "assigned") {
       let temp = values.trees.filter((item) => {
-        return item.assigned;
+        return item.user;
       });
       setValues({
         ...values,
@@ -87,7 +87,7 @@ export const GiftTrees = () => {
       });
     } else if (event.target.value === "unassigned") {
       let temp = values.trees.filter((item) => {
-        return !item.assigned;
+        return !item.user;
       });
       setValues({
         ...values,
@@ -282,7 +282,7 @@ export const GiftTrees = () => {
     const formData = new FormData();
     let sapling_ids = values.filteredTrees
       .filter((t) => t.selected === true)
-      .map((a) => a.tree_id.sapling_id);
+      .map((a) => a.sapling_id);
     const date = moment(formValues.dob).format("YYYY-MM-DD");
     formData.append("name", formValues.name);
     formData.append("email", formValues.email);
@@ -532,10 +532,7 @@ export const GiftTrees = () => {
 
   const handleSelectTrees = (event, value) => {
     values.filteredTrees.forEach((item, index) => {
-      if (
-        item.tree_id.sapling_id === value.tree_id.sapling_id &&
-        !item.assigned
-      ) {
+      if (item.sapling_id === value.sapling_id && !item.user) {
         item.selected = !value.selected;
       }
     });
@@ -662,9 +659,9 @@ export const GiftTrees = () => {
                   }}
                 >
                   Thank You,
-                  <p style={{ margin: "0px", fontWeight: "bold" }}>
+                  <div style={{ margin: "0px", fontWeight: "bold" }}>
                     Team, 14Trees Foundation
-                  </p>
+                  </div>
                 </Typography>
               </div>
             </Box>
@@ -794,19 +791,17 @@ export const GiftTrees = () => {
                             />
                           </TableCell>
                           <TableCell component="th" scope="row">
-                            {row.tree_id.tree_id.name}
+                            {row.tree.name}
                           </TableCell>
                           <TableCell
                             align="center"
                             style={{ cursor: "pointer" }}
                           >
-                            {row.tree_id.sapling_id}
+                            {row.sapling_id}
                           </TableCell>
+                          <TableCell align="center">{row.plot.name}</TableCell>
                           <TableCell align="center">
-                            {row.tree_id.plot_id.name}
-                          </TableCell>
-                          <TableCell align="center">
-                            {row.assigned ? (
+                            {row.user ? (
                               <>
                                 <Typography
                                   variant="subtitle2"
@@ -820,7 +815,7 @@ export const GiftTrees = () => {
                                   align="center"
                                   sx={{ fontWeight: "bold", color: "#1F3625" }}
                                 >
-                                  {row.assigned_to.name}
+                                  {row.user.name}
                                 </Typography>
                               </>
                             ) : (
@@ -832,12 +827,12 @@ export const GiftTrees = () => {
                               sx={{ ml: "auto", mr: "auto" }}
                               variant="contained"
                               color="primary"
-                              disabled={!row.assigned}
+                              disabled={!row.user}
                               onClick={() =>
                                 handleShare(
-                                  row.tree_id.sapling_id,
-                                  row.tree_id.tree_id.name,
-                                  row.assigned_to.name
+                                  row.sapling_id,
+                                  row.tree.name,
+                                  row.user.name
                                 )
                               }
                             >

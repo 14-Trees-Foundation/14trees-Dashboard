@@ -17,11 +17,6 @@ export const Profile = ({ saplingId }) => {
   const matches = useMediaQuery("(max-width:481px)");
   const classes = useStyles();
   const selUserInfo = useRecoilValue(selUsersData);
-  // const [activeStep, setActiveStep] = useState(0);
-
-  // const handleInfoChange = (i) => {
-  //     setActiveStep(i)
-  // }
 
   const username = selUserInfo.user.name.split(" ")[0];
 
@@ -31,7 +26,7 @@ export const Profile = ({ saplingId }) => {
         <div className={classes.header}>
           <img src={logo} alt={logo} className={classes.img} />
           <div className={classes.username}>
-            {selUserInfo.event && selUserInfo.event.type === "2"
+            {selUserInfo.tree.event_type && selUserInfo.tree.event_type === "2"
               ? "Memorial Dashboard"
               : `${username}'s Dashboard`}
           </div>

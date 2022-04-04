@@ -40,13 +40,18 @@ export const TreeList = ({ onTreeSelect }) => {
     try {
       let response = await Axios.get(`/trees/plot/count?id=${value._id}`);
       if (response.status === 200) {
-        let difference = response.data.alltrees
-          .filter((x) => !response.data.assignedtreee.includes(x))
+        let unMapped = response.data.trees
+          .filter((x) => !x.mapped_to)
           .sort(function (a, b) {
-            return a - b;
+            return a.sapling_id - b.sapling_id;
           });
-        setAssigned(response.data.assignedtreee);
-        setUnassigned(difference);
+        let mapped = response.data.trees
+          .filter((x) => x.mapped_to)
+          .sort(function (a, b) {
+            return a.sapling_id - b.sapling_id;
+          });
+        setAssigned(mapped);
+        setUnassigned(unMapped);
         toast.success("Tree list fetched!");
       }
     } catch (error) {
@@ -118,14 +123,19 @@ export const TreeList = ({ onTreeSelect }) => {
           <ToastContainer />
           <div style={{ paddingTop: "16px", paddingLeft: "8px" }}>
             Plot:{" "}
-            <span style={{ color: "#ff0000", fontStyle: "italic" }}>
+            <span style={{ color: "#C72542", fontStyle: "italic" }}>
               {selectedPlot}
+            </span>
+          </div>
+          <div style={{ paddingTop: "4px", paddingLeft: "8px" }}>
+            <span style={{ color: "#C72542", fontStyle: "italic" }}>
+              Highlighted trees are assigned!
             </span>
           </div>
           <div
             style={{
               width: "100%",
-              paddingTop: "8px",
+              padding: "12px",
               minHeight: "20%",
               maxHeight: "180px",
               overflowY: "auto",
@@ -133,32 +143,50 @@ export const TreeList = ({ onTreeSelect }) => {
           >
             <div style={{ display: "flex", justifyContent: "space-between" }}>
               <h4 style={{ marginTop: "0px", paddingLeft: "8px" }}>
-                Assigned Trees
+                Mapped Trees
               </h4>
-              <h4 style={{ marginTop: "0px", paddingRight: "8px" }}>
-                Total:{" "}
-                <span style={{ color: "#ff0000", fontStyle: "italic" }}>
-                  {assigned.length}
-                </span>
-              </h4>
+              <div style={{display:'flex'}}>
+                <h4 style={{ marginTop: "0px", paddingRight: "8px" }}>
+                  Total:{" "}
+                  <span style={{ color: "#C72542", fontStyle: "italic" }}>
+                    {assigned.length}
+                  </span>
+                </h4>
+                <h4 style={{ marginTop: "0px", paddingRight: "8px" }}>
+                  Assigned:{" "}
+                  <span style={{ color: "#C72542", fontStyle: "italic" }}>
+                    {
+                      assigned.filter((obj) => {
+                        if (obj.assigned_to) {
+                          return true;
+                        }
+
+                        return false;
+                      }).length
+                    }
+                  </span>
+                </h4>
+              </div>
             </div>
+            <div></div>
             {assigned.length !== 0 &&
-              assigned.map((saplingid) => {
+              assigned.map((tree) => {
                 return (
                   <Chip
-                    key={saplingid}
-                    label={saplingid}
+                    key={tree.sapling_id}
+                    label={tree.sapling_id}
                     style={{
-                      color: "#3C79BC",
+                      color: tree.assigned_to ? "#fff" : "#3C79BC",
                       marginRight: "12px",
                       marginBottom: "12px",
                       borderRadius: "16px",
-                      boxShadow: "3px 3px 6px #737c76, -3px -3px 6px #effff4",
-                      background: "#b1bfb5",
+                      boxShadow: "2px 2px 8px #737c76, -2px -2px 8px #effff4",
+                      background: tree.assigned_to ? "#1f3625" : "#b1bfb5",
                     }}
                     onClick={() =>
                       window.open(
-                        "http://dashboard.14trees.org/profile/" + saplingid,
+                        "http://dashboard.14trees.org/profile/" +
+                          tree.sapling_id,
                         "_blank"
                       )
                     }
@@ -169,8 +197,7 @@ export const TreeList = ({ onTreeSelect }) => {
           <div
             style={{
               width: "100%",
-              paddingLeft: "4px",
-              paddingTop: "16px",
+              padding: "12px",
               minHeight: "40%",
               maxHeight: "280px",
               overflowY: "auto",
@@ -178,30 +205,55 @@ export const TreeList = ({ onTreeSelect }) => {
           >
             <div style={{ display: "flex", justifyContent: "space-between" }}>
               <h4 style={{ marginTop: "0px", paddingLeft: "8px" }}>
-                UnAssigned Trees
+                UnMapped Trees
               </h4>
+              <div style={{display:'flex'}}>
               <h4 style={{ marginTop: "0px", paddingRight: "8px" }}>
                 Total:{" "}
-                <span style={{ color: "#ff0000", fontStyle: "italic" }}>
+                <span style={{ color: "#C72542", fontStyle: "italic" }}>
                   {unassigned.length}
                 </span>
               </h4>
+                <h4 style={{ marginTop: "0px", paddingRight: "8px" }}>
+                  Assigned:{" "}
+                  <span style={{ color: "#C72542", fontStyle: "italic" }}>
+                    {
+                      unassigned.filter((obj) => {
+                        if (obj.assigned_to) {
+                          return true;
+                        }
+
+                        return false;
+                      }).length
+                    }
+                  </span>
+                </h4>
+              </div>
             </div>
             {unassigned.length !== 0 &&
-              unassigned.map((saplingid) => {
+              unassigned.map((tree) => {
                 return (
                   <Chip
-                    key={saplingid}
-                    label={saplingid}
+                    key={tree.spaling_id}
+                    label={tree.sapling_id}
                     style={{
-                      color: "#1f3625",
+                      color: tree.assigned_to ? "#fff" : "#1f3625",
                       marginRight: "12px",
                       marginBottom: "12px",
                       borderRadius: "16px",
-                      boxShadow: "3px 3px 6px #737c76, -3px -3px 6px #effff4",
-                      background: "#b1bfb5",
+                      boxShadow: "2px 2px 8px #737c76, -2px -2px 8px #effff4",
+                      background: tree.assigned_to ? "#1f3625" : "#b1bfb5",
                     }}
-                    onClick={() => onTreeSelect(saplingid)}
+                    onClick={
+                      tree.assigned_to
+                        ? () =>
+                            window.open(
+                              "http://dashboard.14trees.org/profile/" +
+                                tree.sapling_id,
+                              "_blank"
+                            )
+                        : () => onTreeSelect(tree.sapling_id)
+                    }
                   />
                 );
               })}
