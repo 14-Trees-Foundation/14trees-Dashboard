@@ -4,11 +4,11 @@ import {
   Typography,
   Box,
   Grid,
-  Select,
-  MenuItem,
+  Paper,
+  Autocomplete,
+  TextField
 } from "@mui/material";
 import TabsUnstyled from "@mui/base/TabsUnstyled";
-import { makeStyles } from "@mui/styles";
 import { useRecoilValue, useSetRecoilState, useRecoilState } from "recoil";
 
 import { Tab, TabsList, TabPanel } from "../../../components/CustomTabs";
@@ -27,23 +27,21 @@ import { SearchResult } from "./components/SearchResult";
 import { Overall } from "./overall/Overall";
 import { Plotwise } from "./plotwise/Plotwise";
 
-const useStyles = makeStyles({
-  root: {
-    "& .MuiPaper-root": {
-      borderRadius: "20px",
-      maxHeight: "450px",
-      boxShadow: "4px 4px 6px #98a49c, -4px -4px 6px #cadace",
-    },
-  },
-  select: {
-    "& ul": {
-      backgroundColor: "#b1bfb5",
-    },
-    "& li": {
-      fontSize: 14,
-    },
-  },
-});
+const CustomPaper = (props) => {
+  return (
+    <Paper
+      style={{
+        minWidth: '450px',
+        marginRight:'50px',
+        borderRadius: "20px",
+        boxShadow: "4px 4px 6px #98a49c, -4px -4px 6px #cadace",
+        background: "#b1bfb5",
+      }}
+      {...props}
+    />
+  );
+};
+
 export const Tree = () => {
   const [loading, setLoading] = useState(true);
   const searchTree = useRecoilValue(searchTreeData);
@@ -52,7 +50,6 @@ export const Tree = () => {
   const setTreeTypeCountByPlot = useSetRecoilState(treeTypeCountByPlot);
   const [selectedPlotName, setSelectedPlot] = useRecoilState(selectedPlot);
   const setTreeCountByType = useSetRecoilState(treeTypeCount);
-  const classes = useStyles();
 
   const fetchData = useCallback(async () => {
     setLoading(true);
@@ -108,37 +105,31 @@ export const Tree = () => {
         >
           <Typography variant="h3">Trees</Typography>
           <div style={{ display: "flex", justifyContent: "space-between" }}>
-            <Select
+            <Autocomplete
               sx={{
                 mt: 1,
-                width: "24ch",
+                width: "35ch",
                 "& .MuiOutlinedInput-notchedOutline": {
                   border: "none",
                   borderRadius: "25px",
                   boxShadow: "4px 4px 8px #98a49c, -4px -4px 8px #cadace",
                 },
               }}
-              fullWidth
-              onChange={(e) => setSelectedPlot(e.target.value)}
-              defaultValue="none"
-              MenuProps={{
-                classes: { paper: classes.select, root: classes.root },
+              PaperComponent={CustomPaper}
+              options={treeByPlotsData}
+              autoHighlight
+              getOptionLabel={(option) => option.plot_name.name}
+              onChange={(event, newValue) => {
+                setSelectedPlot(newValue.plot_name.name)
               }}
-            >
-              <MenuItem disabled value="none">
-                Select Plot
-              </MenuItem>
-              {treeByPlotsData?.map((plot) => {
-                return (
-                  <MenuItem
-                    key={plot.plot_name.name}
-                    value={plot.plot_name.name}
-                  >
-                    {plot.plot_name.name}
-                  </MenuItem>
-                );
-              })}
-            </Select>
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  label="Select plot"
+                  variant="outlined"
+                />
+              )}
+            />
             <SearchBox setLoading={setLoading} />
           </div>
         </div>
