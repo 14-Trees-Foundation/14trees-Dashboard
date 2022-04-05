@@ -2118,6 +2118,11 @@
   resolved "https://registry.yarnpkg.com/@types/estree/-/estree-0.0.39.tgz#e177e699ee1b8c22d23174caaa7422644389509f"
   integrity sha512-EYNwp3bU+98cpU4lAWYYL7Zz+2gryWH1qbdDTidVd6hkiR6weksdbMadyXKXNPEkQFhXM+hVO9ZygomHXp+AIw==
 
+"@types/faker@^5.5.9":
+  version "5.5.9"
+  resolved "https://registry.yarnpkg.com/@types/faker/-/faker-5.5.9.tgz#588ede92186dc557bff8341d294335d50d255f0c"
+  integrity sha512-uCx6mP3UY5SIO14XlspxsGjgaemrxpssJI0Ol+GfhxtcKpv9pgRZYsS4eeKeHVLje6Qtc8lGszuBI461+gVZBA==
+
 "@types/glob@^7.1.1":
   version "7.2.0"
   resolved "https://registry.yarnpkg.com/@types/glob/-/glob-7.2.0.tgz#bc1b5bf3aa92f25bd5dd39f35c57361bdce5b2eb"
@@ -2229,6 +2234,14 @@
   version "1.5.5"
   resolved "https://registry.yarnpkg.com/@types/q/-/q-1.5.5.tgz#75a2a8e7d8ab4b230414505d92335d1dcb53a6df"
   integrity sha512-L28j2FcJfSZOnL1WBjDYp2vUHCeIFlyYI/53EwD/rKUBQ7MtUUfbQWiyKJGpcnv4/WgrhWsFKrcPstcAt/J0tQ==
+
+"@types/react-data-grid@^4.0.8":
+  version "4.0.8"
+  resolved "https://registry.yarnpkg.com/@types/react-data-grid/-/react-data-grid-4.0.8.tgz#50f2b532ce4e1e4431d7c0055069b42467332f20"
+  integrity sha512-msi6Dn5B1np7hlu1o15ftfuPMe5QYL9o+fpUiKfSTWTigmwIz12HipAEb4HiU2eACfkHl0KR+Gx79tU6/nfbgw==
+  dependencies:
+    "@types/faker" "^5.5.9"
+    "@types/react" "*"
 
 "@types/react-dom@^17.0.14":
   version "17.0.14"

@@ -1,5 +1,5 @@
 import { useRecoilValue } from "recoil";
-import { DataGrid, GridToolbar } from "@mui/x-data-grid";
+import { DataGrid, GridCellParams, GridToolbar, GridValueGetterParams } from "@mui/x-data-grid";
 
 import { userTreeHoldings } from "../../../../store/adminAtoms";
 import { Box } from "@mui/material";
@@ -9,25 +9,32 @@ const columns = [
     field: "name",
     headerName: "Name",
     width: 250,
-    valueGetter: (params) => params.row.user.name,
+    valueGetter: (params: GridValueGetterParams) => params.row.user.name,
   },
   {
     field: "email",
     headerName: "Email",
-    width: 250,
+    width: 350,
     editable: false,
-    valueGetter: (params) => params.row.user.email,
+    valueGetter: (params: GridValueGetterParams) => params.row.user.email,
   },
   {
     field: "count",
     headerName: "Tree Count",
-    width: 250,
+    width: 150,
     editable: false,
-    valueGetter: (params) => params.row.count,
+    valueGetter: (params: GridValueGetterParams) => params.row.count,
+  },
+  {
+    field: "plot",
+    headerName: "Plot",
+    width: 350,
+    editable: false,
+    valueGetter: (params: GridValueGetterParams) => params.row.plot.name,
   },
 ];
 
-const handleClick = (e) => {
+const handleClick = (e: GridCellParams<any, any, any>) => {
   if (e.field === "email") {
     window.open("https://dashboard.14trees.org/ww/" + e.formattedValue);
   }
@@ -35,7 +42,7 @@ const handleClick = (e) => {
 
 export const UserTreeHoldings = () => {
   const treeHoldings = useRecoilValue(userTreeHoldings);
-  console.log(treeHoldings);
+
   return (
     <div style={{ height: "700px", maxHeight: "900px", width: "100%" }}>
       <Box
@@ -59,7 +66,7 @@ export const UserTreeHoldings = () => {
       >
         <DataGrid
           components={{ Toolbar: GridToolbar }}
-          getRowId={(row) => row.user.name}
+          getRowId={(row) => row.user.name + row.plot.name}
           rows={treeHoldings}
           columns={columns}
           pageSize={50}

@@ -1,7 +1,6 @@
 import { Box } from "@mui/material";
 import { useRecoilValue } from "recoil";
-import { DataGrid, GridToolbar } from "@mui/x-data-grid";
-import { useTheme } from "@mui/material/styles";
+import { DataGrid, GridToolbar, GridValueGetterParams, GridValueFormatterParams } from "@mui/x-data-grid";
 
 import { allUserProfile } from "../../../../store/adminAtoms";
 import Chip from "../../../../stories/Chip/Chip";
@@ -11,29 +10,31 @@ const columns = [
     field: "name",
     headerName: "Name",
     width: 250,
-    valueGetter: (params) => params.row.user.name,
+    editable: false,
+    valueGetter: (params: GridValueGetterParams) => params.row.user.name,
   },
   {
     field: "tree_name",
     headerName: "Tree name",
     width: 180,
     editable: false,
-    valueGetter: (params) => params.row.treetype.name,
+    valueGetter: (params: GridValueGetterParams) => params.row.treetype.name,
   },
   {
     field: "sapling_id",
     headerName: "Sapling ID",
     width: 150,
     editable: false,
-    valueGetter: (params) => params.row.tree.sapling_id,
+    valueGetter: (params: GridValueGetterParams) => params.row.tree.sapling_id,
   },
   {
     field: "date_added",
     headerName: "Date added",
     width: 250,
-    valueFormatter: (params) => {
+    editable: false,
+    valueFormatter: (params: GridValueFormatterParams) => {
       const valueFormatted =
-        params.value !== undefined ? params.value.slice(0, 10) : "";
+        params.value !== undefined ? (params.value! as string).slice(0, 10) : "";
       return `${valueFormatted}`;
     },
   },
@@ -42,7 +43,7 @@ const columns = [
     headerName: "Plot name",
     width: 250,
     editable: false,
-    valueGetter: (params) => params.row.plot.name,
+    valueGetter: (params: GridValueGetterParams) => params.row.plot.name,
   },
 ];
 
@@ -51,10 +52,12 @@ export const Userlist = () => {
 
   let uniqueUsers = [
     ...new Map(
-      userProfiles.map((profiles) => [profiles.user.userid, profiles])
+      userProfiles.map((profiles: { user: { userid: any } }) => [
+        profiles.user.userid,
+        profiles,
+      ])
     ).values(),
   ];
-  const theme = useTheme();
   return (
     <div style={{ height: "980px", maxHeight: "1200px", width: "100%" }}>
       <Box
@@ -81,7 +84,7 @@ export const Userlist = () => {
             label={`Total Assigned Trees - ${userProfiles.length}`}
             size={"large"}
             mode={"secondary"}
-            backgroundColor={theme.custom.color.secondary.red}
+            backgroundColor={'#C72542'}
             handleClick={() => console.log("Todo")}
           />
           <Chip
@@ -89,6 +92,7 @@ export const Userlist = () => {
             size={"large"}
             mode={"secondary"}
             handleClick={() => console.log("Todo")}
+            backgroundColor={undefined}
           />
         </div>
         <DataGrid

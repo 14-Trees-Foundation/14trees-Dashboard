@@ -67,12 +67,10 @@ const searchTreeData = atom({
 
 const allUserProfile = atom({
   key: "userprofile",
-  default: {},
 });
 
 const userTreeHoldings = atom({
   key: "treeholdings",
-  default: {},
 });
 
 const allPonds = atom({
