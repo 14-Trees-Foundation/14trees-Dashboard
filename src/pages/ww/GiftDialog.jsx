@@ -42,6 +42,10 @@ export const GiftDialog = (props) => {
       name: "In Memory of",
       value: "2",
     },
+    {
+      name: "General gift",
+      value: "3",
+    },
   ];
   const [crop, setCrop] = useState(
     // default crop config
