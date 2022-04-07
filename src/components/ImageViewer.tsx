@@ -12,9 +12,9 @@ export const ImageViewer = ({ image, handleClick }: Props) => {
   return (
     <>
       {!load && (
-          <div >
-              <Progress />
-          </div>
+        <div className={classes.progress}>
+          <Progress />
+        </div>
       )}
       <img
         onClick={handleClick}
@@ -29,10 +29,10 @@ export const ImageViewer = ({ image, handleClick }: Props) => {
 
 const useStyles = makeStyles(() =>
   createStyles({
-      progress: {
-        width: "100%",
-        height: "100%",
-      },
+    progress: {
+      width: "100%",
+      height: "100%",
+    },
     none: {
       display: "none",
     },
