@@ -138,15 +138,8 @@ export const Memories = () => {
             {images.map((image, index) => (
               <div className={classes.slide} key={index}>
                 <div className={classes.memimage}>
-                  {/* <ImageViewer image={image} handleClick={handleOpenPopup}/> */}
                   <ImageViewer image={image} handleClick={handleOpenPopup}/>
                 </div>
-                {/* <img
-                  className={classes.memimage}
-                  src={image}
-                  alt={"A"}
-                  onClick={() => handleOpenPopup()}
-                /> */}
               </div>
             ))}
           </div>
