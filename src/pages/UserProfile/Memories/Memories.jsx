@@ -7,6 +7,7 @@ import { Popup } from "../../../stories/Popup/Popup";
 import { useRecoilValue, useRecoilState } from "recoil";
 import { usersData, openMemoryPopup } from "../../../store/atoms";
 import { useState } from "react";
+import { ImageViewer } from "../../../components/ImageViewer";
 
 export const Memories = () => {
   const classes = useStyles();
@@ -34,6 +35,7 @@ export const Memories = () => {
     return e;
   });
   images = [...images, ...allImages];
+  console.log(images)
 
   const next = () => {
     if (index < images.length - 1) {
@@ -135,12 +137,16 @@ export const Memories = () => {
           >
             {images.map((image, index) => (
               <div className={classes.slide} key={index}>
-                <img
+                <div className={classes.memimage}>
+                  {/* <ImageViewer image={image} handleClick={handleOpenPopup}/> */}
+                  <ImageViewer image={image} handleClick={handleOpenPopup}/>
+                </div>
+                {/* <img
                   className={classes.memimage}
                   src={image}
                   alt={"A"}
                   onClick={() => handleOpenPopup()}
-                />
+                /> */}
               </div>
             ))}
           </div>

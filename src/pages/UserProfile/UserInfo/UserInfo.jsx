@@ -1,4 +1,4 @@
-import { Fragment } from "react";
+import { Fragment, useState } from "react";
 import { Dialog, Grid } from "@mui/material";
 import { createStyles, makeStyles } from "@mui/styles";
 import { useRecoilValue, useRecoilState } from "recoil";
@@ -11,11 +11,13 @@ import {
   selUsersData,
   openProfilePopup,
 } from "../../../store/atoms";
+import { Progress } from "../../../components/CircularProgress";
 // import { navIndex } from '../../../store/atoms';
 
 export const UserInfo = () => {
   const classes = useStyles();
 
+  const [imgLoad, setImgLoad] = useState(false);
   const userinfo = useRecoilValue(usersData);
   const selUserInfo = useRecoilValue(selUsersData);
   // const setIndex = useSetRecoilState(navIndex);
@@ -38,7 +40,7 @@ export const UserInfo = () => {
       <div>
         <Dialog onClose={onTogglePop} open={open}>
           <img
-            className={classes.imageWindow}
+            className={imgLoad ? classes.imageWindow : classes.none}
             src={
               selUserInfo.profile_image[0] === ""
                 ? selUserInfo.tree.image[0]
@@ -54,10 +56,16 @@ export const UserInfo = () => {
       <div style={{ width: "100%", height: "100%" }}>
         <Grid container>
           <Grid item xs={6} md={3}>
+            {
+              !imgLoad && (
+                <Progress />
+              )
+            }
             <img
               onClick={() => handleOpenPopup()}
-              className={classes.userimg}
+              className={imgLoad ? classes.userimg : classes.none}
               alt="Card"
+              onLoad={() => setImgLoad(true)}
               src={
                 selUserInfo.profile_image[0] === ""
                   ? selUserInfo.tree.image[0] === ""
@@ -69,7 +77,8 @@ export const UserInfo = () => {
           </Grid>
           <Grid item xs={6} md={3} className={classes.infobox}>
             <div className={classes.info}>
-              {selUserInfo.tree.event_type && selUserInfo.tree.event_type === "2" ? (
+              {selUserInfo.tree.event_type &&
+              selUserInfo.tree.event_type === "2" ? (
                 <div className={classes.label}>In Memory of</div>
               ) : (
                 <div className={classes.label}>Name</div>
@@ -143,6 +152,9 @@ const useStyles = makeStyles((theme) =>
       // '& .MuiGrid-root': {
       //     paddingLeft: '0'
       // }
+    },
+    none: {
+      display: 'none'
     },
     userimg: {
       width: "100%",
