@@ -16,8 +16,6 @@ const useStyles = makeStyles((theme) =>
     imgLoader: {
         width: "100%",
         height: "100%",
-        maxWidth: '250px',
-        maxHeight: '260px',
         alignItems: "center",
         borderRadius: "12px",
         display: "flex",
