@@ -33,6 +33,8 @@ export const UserInfo = () => {
     setOpenPopup(true);
   };
 
+  console.log(selUserInfo)
+
   const treeDoneWidth = (userinfo.usertrees.length / 14) * 100;
 
   if (open) {
@@ -55,7 +57,7 @@ export const UserInfo = () => {
     return (
       <div style={{ width: "100%", height: "100%" }}>
         <Grid container>
-          <Grid item xs={6} md={3}>
+          <Grid item xs={6} md={3} sx={{maxHeight:'260px'}}>
             {
               !imgLoad && (
                 <Progress />
@@ -118,7 +120,7 @@ export const UserInfo = () => {
               ) : (
                 <>
                   <div className={classes.label}>Planted By</div>
-                  {selUserInfo.planted_by ? (
+                  {(selUserInfo.planted_by && selUserInfo.planted_by !== "undefined") ? (
                     <div className={classes.data}>{selUserInfo.planted_by}</div>
                   ) : (
                     <div className={classes.data}>

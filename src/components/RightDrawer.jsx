@@ -20,7 +20,7 @@ export const RightDrawer = () => {
             />
             <Impact
               count={"70+"}
-              text={"Ponds created to increase water label"}
+              text={"Ponds created to increase water table"}
             />
           </div>
           <div className={classes.infobox}>
