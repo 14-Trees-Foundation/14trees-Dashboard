@@ -17,6 +17,8 @@ import {
   FormControlLabel,
   Box,
   Checkbox,
+  Dialog,
+  DialogContent,
 } from "@mui/material";
 import { useRecoilState } from "recoil";
 import { ToastContainer, toast } from "react-toastify";
@@ -48,6 +50,8 @@ const intitialFValues = {
   backdropOpen: false,
   dlgOpen: false,
   selectedSaplingId: 0,
+  selectedTreeImg: "",
+  selectedTreeImgDlg: false,
   selectedPlotId: "",
   user: {},
   trees: [],
@@ -309,7 +313,11 @@ export const GiftTrees = () => {
     }
 
     let res;
-    if (formValues.type === "1" || formValues.type === "2" || formValues.type === "3") {
+    if (
+      formValues.type === "1" ||
+      formValues.type === "2" ||
+      formValues.type === "3"
+    ) {
       try {
         res = await Axios.post("/events/addevents/", formData, {
           headers: {
@@ -566,6 +574,14 @@ export const GiftTrees = () => {
   // }
   // console.log(selectedTrees);
 
+  const handleTreeImgClick = (img) => {
+    setValues({
+      ...values,
+      selectedTreeImg: img,
+      selectedTreeImgDlg: !values.selectedTreeImgDlg,
+    });
+  };
+
   if (values.loading) {
     return <Spinner />;
   } else {
@@ -583,6 +599,30 @@ export const GiftTrees = () => {
       return (
         <>
           <PwdDialog open={values.pwdDlgOpen} onClose={handlePwdDlgClose} />
+          <Dialog open={values.selectedTreeImgDlg} onClose={() => setValues({...values, selectedTreeImgDlg: !values.selectedTreeImgDlg})}>
+            <DialogContent
+              sx={{
+                p: 2,
+              }}
+            >
+              <div style={{ display: "flex", flexWrap: "wrap" }}>
+                {values.selectedTreeImg !== "" ? (
+                  <img
+                    src={values.selectedTreeImg}
+                    alt="album"
+                    style={{
+                      width: "100%",
+                      height: "auto",
+                      maxHeight: '720px',
+                      paddingBottom: "16px",
+                    }}
+                  />
+                ) : (
+                  <div></div>
+                )}
+              </div>
+            </DialogContent>
+          </Dialog>
           <div className={classes.bg}>
             <Box
               sx={{
@@ -750,6 +790,7 @@ export const GiftTrees = () => {
                     <TableRow sx={{ fontSize: "16px" }}>
                       <TableCell align="right"></TableCell>
                       {/* <TableCell align="left"><Checkbox onClick={(e) => handleSelectAlltree(e)} /></TableCell> */}
+                      <TableCell align="right"></TableCell>
                       <TableCell>Tree Name</TableCell>
                       <TableCell align="center">Sapling ID</TableCell>
                       <TableCell align="center">Plot</TableCell>
@@ -789,6 +830,16 @@ export const GiftTrees = () => {
                               disabled={row.assigned && row.type !== null}
                               checked={row.selected}
                             />
+                          </TableCell>
+                          <TableCell component="th" scope="row">
+                            {row.image && row.image[0] !== "" && (
+                              <img
+                                src={row.image[0]}
+                                className={classes.treeimg}
+                                alt=""
+                                onClick={() => handleTreeImgClick(row.image[0])}
+                              />
+                            )}
                           </TableCell>
                           <TableCell component="th" scope="row">
                             {row.tree.name}
@@ -983,6 +1034,12 @@ const useStyles = makeStyles((theme) =>
       backgroundImage: `url(${footer})`,
       height: "245px",
       width: "auto",
+    },
+    treeimg: {
+      width: "50px",
+      height: "50px",
+      borderRadius: "25px",
+      cursor:'pointer'
     },
   })
 );

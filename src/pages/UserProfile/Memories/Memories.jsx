@@ -24,7 +24,7 @@ export const Memories = () => {
 
   let allImages = [];
   allImages = [
-    7, 6, 1, 3, 5, 4, 8, 9, 1, 11, 12, 13, 14, 15, 23, 16, 17, 18, 19, 20, 21,
+    6, 1, 3, 5, 4, 8, 9, 1, 11, 12, 13, 14, 15, 23, 16, 17, 18, 19, 20, 21,
     22,
   ].map((number) => {
     return `https://14treesplants.s3.ap-south-1.amazonaws.com/memories/memory${number}.jpg`;
@@ -211,7 +211,7 @@ const useStyles = makeStyles((theme) =>
       },
     },
     memimageWindow: {
-      width: "auuto",
+      width: "auto",
       height: "480px",
       borderRadius: "20px",
       objectFit: "cover",
