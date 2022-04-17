@@ -52,18 +52,6 @@ const mapOptions = {
 
 const boxOptions = { closeBoxURL: "", enableEventPropagation: true };
 
-const removeDupBoundaries = (boundaries) => {
-  const flag = {};
-  const unique = [];
-  boundaries.forEach((boundary) => {
-    if (!flag[boundary[0].lat]) {
-      flag[boundary[0].lat] = true;
-      unique.push(boundary);
-    }
-  });
-  return unique;
-};
-
 export const Map = () => {
   const classes = useStyles();
   const userinfo = useRecoilValue(usersData);
@@ -71,17 +59,10 @@ export const Map = () => {
   const trees = userinfo.usertrees;
 
   let boundaries = [];
-  let treeCenters = [];
-  for (const tree of trees) {
-    let pathObj = tree.tree.plot.boundaries.coordinates[0].map(
-      ([lat, lng]) => ({ lat, lng })
-    );
-    boundaries.push(pathObj);
-    let [lat, lng] = tree.tree.location.coordinates;
-    treeCenters.push({ lat, lng });
-  }
-
-  const uniqBoundaries = removeDupBoundaries(boundaries);
+  let pathObj = currTree.tree.plot.boundaries.coordinates[0].map(
+    ([lat, lng]) => ({ lat, lng })
+  );
+  boundaries.push(pathObj);
 
   const { isLoaded } = useJsApiLoader({
     id: "google-map-script",
@@ -89,7 +70,7 @@ export const Map = () => {
   });
 
   const onMarkerClick = (i) => {
-    // TODO
+    console.log(i);
   };
   return isLoaded ? (
     <div className={classes.map}>
@@ -99,56 +80,58 @@ export const Map = () => {
         zoom={16}
         options={mapOptions}
       >
-        {treeCenters.map((marker, i) => (
+        {trees.map((tree, i) => (
           <Fragment key={i}>
-            {currTree === i && (
-              <Polygon paths={boundaries[i]} options={selectedOption} />
-            )}
-            <Marker
-              icon={icon}
-              // TODO: change this to tree location
-              position={boundaries[i][0]}
-              animation={1}
-              onClick={() => onMarkerClick(i)}
-            ></Marker>
-            {currTree === i && (
-              <InfoBox
-                options={boxOptions}
-                // TODO: change this to tree location
-                position={boundaries[i][0]}
-              >
-                <div
-                  style={{
-                    backgroundColor: "#ffffff",
-                    width: "140px",
-                    height: "70px",
-                    borderRadius: "20px",
-                    display: "flex",
-                  }}
+            {currTree.tree.sapling_id === tree.tree.sapling_id && (
+              <>
+                <Marker
+                  icon={icon}
+                  position={boundaries[0][0]}
+                  animation={1}
+                  onClick={() => onMarkerClick(i)}
+                ></Marker>
+                <Polygon paths={boundaries[0]} options={selectedOption} />
+                <InfoBox
+                  options={boxOptions}
+                  position={boundaries[0][0]}
                 >
-                  <img
-                    alt="tree"
-                    src={trees[i].tree.tree_id.image[0]}
-                    className={classes.treeimg}
-                  />
                   <div
                     style={{
-                      color: "e9e9e9",
-                      textAlign: "center",
-                      margin: "auto 0",
-                      marginLeft: "10px",
+                      backgroundColor: "#ffffff",
+                      width: "140px",
+                      height: "70px",
+                      borderRadius: "20px",
+                      display: "flex",
                     }}
                   >
-                    <h3>{trees[i].tree.tree_id.name}</h3>
+                    <img
+                      alt="tree"
+                      src={
+                        tree.tree.image
+                          ? tree.tree.image.length === 0 ||
+                            tree.tree.image[0] === ""
+                            ? tree.tree.tree_type.image[0]
+                            : tree.tree.image[0]
+                          : tree.tree.tree_type.image[0]
+                      }
+                      className={classes.treeimg}
+                    />
+                    <div
+                      style={{
+                        color: "e9e9e9",
+                        textAlign: "center",
+                        margin: "auto 0",
+                        marginLeft: "10px",
+                      }}
+                    >
+                      <h3>{tree.tree.tree_type.name}</h3>
+                    </div>
                   </div>
-                </div>
-              </InfoBox>
+                </InfoBox>
+              </>
             )}
           </Fragment>
         ))}
-        {uniqBoundaries.map((marker, i) => {
-          return <Polygon paths={marker} options={options} key={i} />;
-        })}
       </GoogleMap>
     </div>
   ) : (
