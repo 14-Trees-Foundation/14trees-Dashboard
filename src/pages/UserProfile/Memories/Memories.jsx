@@ -24,8 +24,7 @@ export const Memories = () => {
 
   let allImages = [];
   allImages = [
-    6, 1, 3, 5, 4, 8, 9, 1, 11, 12, 13, 14, 15, 23, 16, 17, 18, 19, 20, 21,
-    22,
+    6, 1, 3, 5, 4, 8, 9, 1, 11, 12, 13, 14, 15, 23, 16, 17, 18, 19, 20, 21, 22,
   ].map((number) => {
     return `https://14treesplants.s3.ap-south-1.amazonaws.com/memories/memory${number}.jpg`;
   });
@@ -35,9 +34,9 @@ export const Memories = () => {
     return e;
   });
   images = [...images, ...allImages];
-  images = images.map(image => {
-    return encodeURI(image).replace(/#/g, '%23');
-  })
+  images = images.map((image) => {
+    return encodeURI(image).replace(/#/g, "%23");
+  });
 
   const next = () => {
     if (index < images.length - 1) {
@@ -140,7 +139,7 @@ export const Memories = () => {
             {images.map((image, index) => (
               <div className={classes.slide} key={index}>
                 <div className={classes.memimage}>
-                  <ImageViewer image={image} handleClick={handleOpenPopup}/>
+                  <ImageViewer image={image} handleClick={handleOpenPopup} />
                 </div>
               </div>
             ))}

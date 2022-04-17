@@ -9,8 +9,8 @@ export const Trees = ({ saplingId }) => {
 
   const userinfo = useRecoilValue(usersData);
   const [selectedUserInfo, setSelectedUserinfo] = useRecoilState(selUsersData);
-  // const setIndex = useSetRecoilState(navIndex);
-  let numTrees = userinfo.length;
+
+  let numTrees = userinfo.usertrees.length;
 
   const handleTreeSelect = (item) => {
     setSelectedUserinfo(item);
