@@ -164,15 +164,15 @@ export const GiftTrees = () => {
     await assignTree(formData, img, images);
   };
 
-  const handleShare = (sapling_id, tree_name, name) => {
-    setValues({
-      ...values,
-      shareName: name,
-      shareTree: tree_name,
-      shareTreeId: sapling_id,
-      shareDlgOpen: true,
-    });
-  };
+  // const handleShare = (sapling_id, tree_name, name) => {
+  //   setValues({
+  //     ...values,
+  //     shareName: name,
+  //     shareTree: tree_name,
+  //     shareTreeId: sapling_id,
+  //     shareDlgOpen: true,
+  //   });
+  // };
 
   // const handleTemplateShare = (type, link) => {
   //     if (type === "1") {
@@ -599,7 +599,15 @@ export const GiftTrees = () => {
       return (
         <>
           <PwdDialog open={values.pwdDlgOpen} onClose={handlePwdDlgClose} />
-          <Dialog open={values.selectedTreeImgDlg} onClose={() => setValues({...values, selectedTreeImgDlg: !values.selectedTreeImgDlg})}>
+          <Dialog
+            open={values.selectedTreeImgDlg}
+            onClose={() =>
+              setValues({
+                ...values,
+                selectedTreeImgDlg: !values.selectedTreeImgDlg,
+              })
+            }
+          >
             <DialogContent
               sx={{
                 p: 2,
@@ -613,7 +621,7 @@ export const GiftTrees = () => {
                     style={{
                       width: "100%",
                       height: "auto",
-                      maxHeight: '720px',
+                      maxHeight: "720px",
                       paddingBottom: "16px",
                     }}
                   />
@@ -874,7 +882,7 @@ export const GiftTrees = () => {
                             )}
                           </TableCell>
                           <TableCell align="center">
-                            <Button
+                            {/* <Button
                               sx={{ ml: "auto", mr: "auto" }}
                               variant="contained"
                               color="primary"
@@ -888,6 +896,20 @@ export const GiftTrees = () => {
                               }
                             >
                               Card
+                            </Button> */}
+                            <Button
+                              sx={{ ml: "auto", mr: "auto" }}
+                              variant="contained"
+                              color="primary"
+                              disabled={!row.user}
+                              onClick={() =>
+                                window.open(
+                                  `http://dashboard.14trees.org/profile/${row.sapling_id}`,
+                                  "_blank"
+                                )
+                              }
+                            >
+                              Dashboard
                             </Button>
                           </TableCell>
                           {/* <TableCell align="center">
@@ -1039,7 +1061,7 @@ const useStyles = makeStyles((theme) =>
       width: "50px",
       height: "50px",
       borderRadius: "25px",
-      cursor:'pointer'
+      cursor: "pointer",
     },
   })
 );
