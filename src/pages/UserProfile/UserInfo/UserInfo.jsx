@@ -119,7 +119,7 @@ export const UserInfo = () => {
                 </Fragment>
               ) : (
                 <>
-                  <div className={classes.label}>Planted By</div>
+                  <div className={classes.label}>Planted/Donated By</div>
                   {(selUserInfo.planted_by && selUserInfo.planted_by !== "undefined") ? (
                     <div className={classes.data}>{selUserInfo.planted_by}</div>
                   ) : (
