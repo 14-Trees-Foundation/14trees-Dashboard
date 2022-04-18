@@ -72,6 +72,37 @@ const columns = [
     },
   },
   {
+    field: "planted_by",
+    headerName: "Planted By",
+    headerAlign: "center",
+    width: 200,
+    editable: false,
+    align: "center",
+    renderCell: (params) => {
+      if (params.value !== undefined) {
+        return (
+          <div
+            style={{
+              minHeight: "38px",
+              paddingTop: "12px",
+              lineHeight: "38px",
+              width: "100%",
+              padding: "0 12px",
+              backgroundColor: "#F94F25",
+              borderRadius: "2em",
+              color: "#fff",
+              textAlign: "center",
+            }}
+          >
+            {params.value}
+          </div>
+        );
+      } else {
+        return <></>;
+      }
+    },
+  },
+  {
     field: "donated_by",
     headerName: "Donated By",
     headerAlign: "center",
