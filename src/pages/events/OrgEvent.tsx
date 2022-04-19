@@ -65,7 +65,8 @@ export const OrgEvent = () => {
       });
       toast.error("Error occured while fetching data!");
     }
-  }, [setValues, fromdate, todate, org, values]);
+    // eslint-disable-next-line
+  }, []);
 
   useEffect(() => {
     fetchData();
