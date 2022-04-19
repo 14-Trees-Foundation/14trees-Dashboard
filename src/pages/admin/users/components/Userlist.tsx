@@ -1,6 +1,11 @@
 import { Box } from "@mui/material";
 import { useRecoilValue } from "recoil";
-import { DataGrid, GridToolbar, GridValueGetterParams, GridValueFormatterParams } from "@mui/x-data-grid";
+import {
+  DataGrid,
+  GridToolbar,
+  GridValueGetterParams,
+  GridValueFormatterParams,
+} from "@mui/x-data-grid";
 
 import { allUserProfile } from "../../../../store/adminAtoms";
 import Chip from "../../../../stories/Chip/Chip";
@@ -34,7 +39,9 @@ const columns = [
     editable: false,
     valueFormatter: (params: GridValueFormatterParams) => {
       const valueFormatted =
-        params.value !== undefined ? (params.value! as string).slice(0, 10) : "";
+        params.value !== undefined
+          ? (params.value! as string).slice(0, 10)
+          : "";
       return `${valueFormatted}`;
     },
   },
@@ -84,7 +91,7 @@ export const Userlist = () => {
             label={`Total Assigned Trees - ${userProfiles.length}`}
             size={"large"}
             mode={"secondary"}
-            backgroundColor={'#C72542'}
+            backgroundColor={"#C72542"}
             handleClick={() => console.log("Todo")}
           />
           <Chip

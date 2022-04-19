@@ -1,6 +1,12 @@
 import { useRecoilValue } from "recoil";
-import { DataGrid, GridCellParams, GridToolbar, GridValueGetterParams } from "@mui/x-data-grid";
+import {
+  DataGrid,
+  GridCellParams,
+  GridToolbar,
+  GridValueGetterParams,
+} from "@mui/x-data-grid";
 
+import Chip from "../../../../stories/Chip/Chip";
 import { userTreeHoldings } from "../../../../store/adminAtoms";
 import { Box } from "@mui/material";
 
@@ -20,10 +26,23 @@ const columns = [
   },
   {
     field: "count",
-    headerName: "Tree Count",
+    headerName: "Total Tree",
     width: 150,
     editable: false,
     valueGetter: (params: GridValueGetterParams) => params.row.count,
+  },
+  {
+    field: "matched",
+    headerName: "Assigned Tree",
+    width: 150,
+    editable: false,
+    valueGetter: (params: GridValueGetterParams) => {
+      if (params.row.matched === 0) {
+        return 0;
+      } else {
+        return params.row.matched.count;
+      }
+    },
   },
   {
     field: "plot",
@@ -42,6 +61,19 @@ const handleClick = (e: GridCellParams<any, any, any>) => {
 
 export const UserTreeHoldings = () => {
   const treeHoldings = useRecoilValue(userTreeHoldings);
+
+  let allTrees = 0;
+  let assignedTrees = 0;
+
+  treeHoldings.forEach((element: { count: number }) => {
+    allTrees += element.count;
+  });
+
+  treeHoldings.forEach((element: { matched: { count: number } }) => {
+    if (element.matched.count) {
+      assignedTrees += element.matched.count;
+    }
+  });
 
   return (
     <div style={{ height: "700px", maxHeight: "900px", width: "100%" }}>
@@ -64,6 +96,22 @@ export const UserTreeHoldings = () => {
           },
         }}
       >
+        <div style={{ display: "flex", padding: "16px 0" }}>
+          <Chip
+            label={`Total Mapped Trees - ${allTrees}`}
+            size={"large"}
+            mode={"secondary"}
+            backgroundColor={"#C72542"}
+            handleClick={() => console.log("Todo")}
+          />
+          <Chip
+            label={`Total Assigned Trees - ${assignedTrees}`}
+            size={"large"}
+            mode={"secondary"}
+            handleClick={() => console.log("Todo")}
+            backgroundColor={undefined}
+          />
+        </div>
         <DataGrid
           components={{ Toolbar: GridToolbar }}
           getRowId={(row) => row.user.name + row.plot.name}
