@@ -19,6 +19,7 @@ import { Login } from "./pages/admin/Login/Login";
 import { Forms } from "./pages/admin/Forms/Forms";
 import { Birthday } from "./pages/events/Birthday";
 import { VisitorNew } from "./pages/Visitor/Visitor2";
+import { OrgEvent } from "./pages/events/OrgEvent";
 
 function App() {
   return (
@@ -38,6 +39,7 @@ function App() {
           <Route path="/visitornew" element={<VisitorNew />}></Route>
           <Route path="/addtree" element={<AddTree />}></Route>
           <Route path="/profile/:saplingId" element={<Dashboard />}></Route>
+          <Route path="/events/org" element={<OrgEvent />}></Route>
           <Route path="/events/kpit-denso" element={<Corporate />}></Route>
           <Route path="/login" element={<Login />} />
           <Route
