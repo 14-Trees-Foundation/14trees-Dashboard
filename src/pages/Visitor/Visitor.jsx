@@ -89,8 +89,8 @@ export const Visitor = () => {
 
   const compressImageList = async (file) => {
     const options = {
-      maxSizeMB: 0.8,
-      maxWidthOrHeight: 1080,
+      maxSizeMB: 2,
+      maxWidthOrHeight: 1680,
       useWebWorker: true,
     };
 

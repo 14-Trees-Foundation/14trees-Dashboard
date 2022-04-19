@@ -32,12 +32,16 @@ type obj = {
 
 type IEvents = {
   loading: boolean;
+  found: boolean;
   org?: string;
   data?: [obj];
 };
 
 export const OrgEvent = () => {
-  const [values, setValues] = useState<IEvents>({ loading: true });
+  const [values, setValues] = useState<IEvents>({
+    loading: true,
+    found: false,
+  });
 
   const [searchParams] = useSearchParams();
   const fromdate = searchParams.get("fromdate");
@@ -50,10 +54,10 @@ export const OrgEvent = () => {
       const response = await Axios.default.get(
         `/events?fromdate=${fromdate}&todate=${todate}&org=${org}`
       );
-      console.log(response.data);
       setValues({
         ...values,
         loading: false,
+        found: true,
         org: response.data.org,
         data: response.data.result,
       });
@@ -74,7 +78,7 @@ export const OrgEvent = () => {
 
   if (values?.loading) {
     return <Spinner text={"Fetching event data!"} />;
-  } else {
+  } else if (!values?.loading && values?.found) {
     return (
       <>
         <ToastContainer />
@@ -133,9 +137,11 @@ export const OrgEvent = () => {
                         >
                           <ImageViewer
                             image={
-                              item.profile_image[0] !== ""
+                              item.profile_image[0]
                                 ? item.profile_image[0]
-                                : item.tree_image[0]
+                                : item.tree_image
+                                ? item.tree_image[0]
+                                : "https://14treesplants.s3.ap-south-1.amazonaws.com/treeimages/14trees.jpeg"
                             }
                             handleClick={function (): {} {
                               throw new Error("Function not implemented.");
