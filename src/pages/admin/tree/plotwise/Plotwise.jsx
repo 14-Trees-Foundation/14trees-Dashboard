@@ -79,7 +79,7 @@ const columns = [
     editable: false,
     align: "center",
     renderCell: (params) => {
-      if (params.value !== undefined) {
+      if (params.value !== undefined && params.value !== 'undefined') {
         return (
           <div
             style={{
