@@ -293,9 +293,12 @@ export const GiftTrees = () => {
     formData.append("dob", date);
     formData.append("contact", formValues.contact);
     formData.append("sapling_id", sapling_ids);
-    formData.append("planted_by", formValues.planted_by);
     formData.append("donor", values.user._id);
 
+    if (formValues.planted_by && formValues.planted_by !== 'undefined') {
+      formData.append("planted_by", formValues.planted_by);
+    }
+    
     if (img !== null) {
       let userImages = [];
       let image = await compressImageList(img);
