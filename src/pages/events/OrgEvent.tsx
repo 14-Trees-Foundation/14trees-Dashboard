@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useParams, useSearchParams } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import { createStyles, makeStyles } from "@mui/styles";
 import "react-toastify/dist/ReactToastify.css";
@@ -35,9 +35,11 @@ type IEvents = {
   found: boolean;
   org?: string;
   data?: [obj];
+  plotname?: string;
 };
 
 export const OrgEvent = () => {
+  const { grptype } = useParams();
   const [values, setValues] = useState<IEvents>({
     loading: true,
     found: false,
@@ -46,20 +48,29 @@ export const OrgEvent = () => {
   const [searchParams] = useSearchParams();
   const fromdate = searchParams.get("fromdate");
   const todate = searchParams.get("todate");
-  const org = searchParams.get("org");
   const classes = useStyles();
 
   const fetchData = useCallback(async () => {
     try {
-      const response = await Axios.default.get(
-        `/events?fromdate=${fromdate}&todate=${todate}&org=${org}`
-      );
+      let response;
+      if (grptype === "org") {
+        const org = searchParams.get("org");
+        response = await Axios.default.get(
+          `/events/org?fromdate=${fromdate}&todate=${todate}&org=${org}`
+        );
+      } else if (grptype === "plot") {
+        const plot = searchParams.get("plot");
+        response = await Axios.default.get(
+          `/events/plot?fromdate=${fromdate}&todate=${todate}&plot=${plot}`
+        );
+      }
       setValues({
         ...values,
         loading: false,
         found: true,
-        org: response.data.org,
-        data: response.data.result,
+        org: response?.data.org,
+        data: response?.data.result,
+        plotname: response?.data.plotname ? response?.data.plotname : "",
       });
       toast.success("Data Fetched!");
     } catch (error) {
@@ -99,7 +110,9 @@ export const OrgEvent = () => {
                 <img src={asset1} alt="asset1" className={classes.asset1} />
                 <img src={asset2} alt="asset2" className={classes.asset2} />
                 <div className={classes.hdrTxt}>
-                  {values?.org} visit to 14trees
+                  {values?.org
+                    ? `${values?.org} visit to 14trees`
+                    : `${values?.plotname}`}
                 </div>
                 <div className={classes.imgBox}>
                   <Box
