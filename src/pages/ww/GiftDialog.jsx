@@ -208,12 +208,12 @@ export const GiftDialog = (props) => {
                   />
                 )}
               </Field>
-              <Field name="planted_by">
+              <Field name="gifted_by">
                 {({ input, meta }) => (
                   <TextField
                     variant="outlined"
                     label="Planted By"
-                    name="planted_by"
+                    name="gifted_by"
                     fullWidth
                     error={meta.error && meta.touched ? true : false}
                     {...input}

@@ -295,8 +295,8 @@ export const GiftTrees = () => {
     formData.append("sapling_id", sapling_ids);
     formData.append("donor", values.user._id);
 
-    if (formValues.planted_by && formValues.planted_by !== 'undefined') {
-      formData.append("planted_by", formValues.planted_by);
+    if (formValues.gifted_by && formValues.gifted_by !== 'undefined') {
+      formData.append("gifted_by", formValues.gifted_by);
     }
     
     if (img !== null) {

@@ -72,7 +72,7 @@ const columns = [
     },
   },
   {
-    field: "planted_by",
+    field: "gifted_by",
     headerName: "Planted By",
     headerAlign: "center",
     width: 200,
