@@ -298,6 +298,10 @@ export const GiftTrees = () => {
     if (formValues.gifted_by && formValues.gifted_by !== 'undefined') {
       formData.append("gifted_by", formValues.gifted_by);
     }
+
+    if (formValues.planted_by && formValues.planted_by !== 'undefined') {
+      formData.append("planted_by", formValues.planted_by);
+    }
     
     if (img !== null) {
       let userImages = [];

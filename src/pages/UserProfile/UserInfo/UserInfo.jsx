@@ -126,10 +126,29 @@ export const UserInfo = () => {
                   <div className={classes.data}>
                     {selUserInfo.tree.tree_type.name}
                   </div>
-                  <div className={classes.label}>Location</div>
-                  <div className={classes.data}>
-                    {selUserInfo.tree.plot.name}
-                  </div>
+                  {selUserInfo.planted_by &&
+                    selUserInfo.planted_by !== "undefined" && (
+                      <>
+                        <div className={classes.label}>Planted By</div>
+                        <div
+                          style={{
+                            fontSize: "15px",
+                            fontWeight: "600",
+                            marginBottom: "8px",
+                          }}
+                        >
+                          {selUserInfo.planted_by}
+                        </div>
+                      </>
+                    )}
+                  {!selUserInfo.planted_by && (
+                    <>
+                      <div className={classes.label}>Location</div>
+                      <div className={classes.data}>
+                        {selUserInfo.tree.plot.name}
+                      </div>
+                    </>
+                  )}
                 </>
               )}
             </div>
@@ -178,7 +197,7 @@ const useStyles = makeStyles((theme) =>
       paddingTop: "10px",
       minHeight: "30%",
       [theme.breakpoints.down("480")]: {
-        paddingLeft: "10px",
+        paddingLeft: "16px",
       },
       [theme.breakpoints.between("481", "900")]: {
         paddingLeft: "0px",
@@ -195,7 +214,6 @@ const useStyles = makeStyles((theme) =>
     label: {
       fontSize: "13px",
       fontWeight: "300",
-      marginBottom: "3px",
       [theme.breakpoints.down("1025")]: {
         fontSize: "10px",
       },

@@ -212,8 +212,22 @@ export const GiftDialog = (props) => {
                 {({ input, meta }) => (
                   <TextField
                     variant="outlined"
-                    label="Planted By"
+                    label="Gifted By"
                     name="gifted_by"
+                    fullWidth
+                    error={meta.error && meta.touched ? true : false}
+                    {...input}
+                    sx={{ mb: 2 }}
+                    helperText={meta.error && meta.touched ? meta.error : ""}
+                  />
+                )}
+              </Field>
+              <Field name="planted_by">
+                {({ input, meta }) => (
+                  <TextField
+                    variant="outlined"
+                    label="Planted By"
+                    name="planted_by"
                     fullWidth
                     error={meta.error && meta.touched ? true : false}
                     {...input}
