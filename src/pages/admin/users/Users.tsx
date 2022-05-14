@@ -9,6 +9,7 @@ import { Spinner } from "../../../components/Spinner";
 import { Userlist } from "./components/Userlist";
 import * as Axios from "../../../api/local";
 import { UserTreeHoldings } from "./components/UserTreeHoldings";
+import { UserEdit } from "./components/UserEdit";
 
 export const Users = () => {
   const [loading, setLoading] = useState(true);
@@ -56,12 +57,16 @@ export const Users = () => {
             <TabsList>
               <Tab>Tree Holdings</Tab>
               <Tab>Assigned Users</Tab>
+              <Tab>Edit Users</Tab>
             </TabsList>
             <TabPanel value={0}>
               <UserTreeHoldings />
             </TabPanel>
             <TabPanel value={1}>
               <Userlist />
+            </TabPanel>
+            <TabPanel value={2}>
+              <UserEdit />
             </TabPanel>
           </TabsUnstyled>
         </Box>
