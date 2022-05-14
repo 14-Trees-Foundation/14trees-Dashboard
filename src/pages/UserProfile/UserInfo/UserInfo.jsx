@@ -80,8 +80,47 @@ export const UserInfo = () => {
                 <div className={classes.label}>Name</div>
               )}
               <div className={classes.data}>{selUserInfo.user.name}</div>
-              {selUserInfo.donated_by === undefined ||
-              selUserInfo.donated_by === null ? (
+              {selUserInfo.donated_by !== undefined &&
+                selUserInfo.donated_by !== null && (
+                  <>
+                    <div className={classes.label}>Gifted By</div>
+                    {selUserInfo.gifted_by &&
+                    selUserInfo.gifted_by !== "undefined" ? (
+                      <div className={classes.data}>
+                        {selUserInfo.gifted_by}
+                      </div>
+                    ) : (
+                      <div className={classes.data}>
+                        {selUserInfo.donated_by.name}
+                      </div>
+                    )}
+                  </>
+                )}
+              {selUserInfo.planted_by && selUserInfo.planted_by !== undefined && (
+                <>
+                  <div className={classes.label}>Planted By</div>
+                  <div
+                    style={{
+                      fontSize: "15px",
+                      fontWeight: "600",
+                      marginBottom: "8px",
+                    }}
+                  >
+                    {selUserInfo.planted_by}
+                  </div>
+                </>
+              )}
+              {(selUserInfo.planted_by || selUserInfo.donated_by) && (
+                // selUserInfo.planted_by !== undefined) || (selUserInfo.gifted_by &&
+                //   selUserInfo.gifted_by !== undefined) && (
+                <>
+                  <div className={classes.label}>Tree Name</div>
+                  <div className={classes.data}>
+                    {selUserInfo.tree.tree_type.name}
+                  </div>
+                </>
+              )}
+              {!selUserInfo.planted_by && !selUserInfo.donated_by && (
                 <Fragment>
                   <div className={classes.label}>Organization</div>
                   <div className={classes.data}>{selUserInfo.orgid.name}</div>
@@ -111,46 +150,16 @@ export const UserInfo = () => {
                     </div>
                   </div>
                 </Fragment>
-              ) : (
-                <>
-                  <div className={classes.label}>Gifted By</div>
-                  {selUserInfo.gifted_by &&
-                  selUserInfo.gifted_by !== "undefined" ? (
-                    <div className={classes.data}>{selUserInfo.gifted_by}</div>
-                  ) : (
-                    <div className={classes.data}>
-                      {selUserInfo.donated_by.name}
-                    </div>
-                  )}
-                  <div className={classes.label}>Tree Name</div>
-                  <div className={classes.data}>
-                    {selUserInfo.tree.tree_type.name}
-                  </div>
-                  {selUserInfo.planted_by &&
-                    selUserInfo.planted_by !== "undefined" && (
-                      <>
-                        <div className={classes.label}>Planted By</div>
-                        <div
-                          style={{
-                            fontSize: "15px",
-                            fontWeight: "600",
-                            marginBottom: "8px",
-                          }}
-                        >
-                          {selUserInfo.planted_by}
-                        </div>
-                      </>
-                    )}
-                  {!selUserInfo.planted_by && (
-                    <>
-                      <div className={classes.label}>Location</div>
-                      <div className={classes.data}>
-                        {selUserInfo.tree.plot.name}
-                      </div>
-                    </>
-                  )}
-                </>
               )}
+              {(selUserInfo.planted_by || selUserInfo.donated_by) &&
+                !selUserInfo.gifted_by && (
+                  <>
+                    <div className={classes.label}>Location</div>
+                    <div className={classes.data}>
+                      {selUserInfo.tree.plot.name}
+                    </div>
+                  </>
+                )}
             </div>
           </Grid>
           <Grid item xs={12} md={6}>

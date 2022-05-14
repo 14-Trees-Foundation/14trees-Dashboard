@@ -15,6 +15,8 @@ import {
   Avatar,
   Dialog,
   DialogActions,
+  Checkbox,
+  FormControlLabel
 } from "@mui/material";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
@@ -51,6 +53,7 @@ const intitialFValues = {
   loading: true,
   backdropOpen: false,
   dlgOpen: false,
+  plantedByChecked: true,
 };
 
 export const Visitor = () => {
@@ -198,6 +201,10 @@ export const Visitor = () => {
       }
     }
 
+    if (formValues.planted_by) {
+      formData.append("planted_by", formValues.planted_by);
+    }
+
     formData.append("memoryimages", extraImages);
     try {
       let res = await Axios.post("/profile/usertreereg", formData, {
@@ -236,6 +243,13 @@ export const Visitor = () => {
         toast.error(error.response.data.error);
       }
     }
+  };
+
+  const handlePlantedBy = (event) => {
+    setValues({
+      ...values,
+      plantedByChecked: event.target.checked
+    });
   };
 
   if (values.uploaded) {
@@ -348,7 +362,7 @@ export const Visitor = () => {
                                 }
                                 {...input}
                                 variant="outlined"
-                                label="Full Name *"
+                                label="In Name Of*"
                                 name="name"
                                 helperText={
                                   meta.error && meta.touched ? meta.error : ""
@@ -372,6 +386,29 @@ export const Visitor = () => {
                               />
                             )}
                           </Field>
+                          <FormControlLabel control={<Checkbox checked={values.plantedByChecked} onChange={handlePlantedBy}/>} label="'In name of' and planter is same" />
+                          {
+                            !values.plantedByChecked && (
+                              <Field name="planted_by">
+                            {({ input, meta }) => (
+                              <TextField
+                                variant="outlined"
+                                label="Planted By"
+                                name="planted_by"
+                                fullWidth
+                                error={
+                                  meta.error && meta.touched ? true : false
+                                }
+                                {...input}
+                                sx={{ mb: 2 }}
+                                helperText={
+                                  meta.error && meta.touched ? meta.error : ""
+                                }
+                              />
+                            )}
+                          </Field>
+                            )
+                          }
                           {values.userImage1src !== null && (
                             <Dialog
                               onClose={() => {}}
@@ -574,6 +611,9 @@ const UseStyle = makeStyles((theme) =>
       "& .MuiFormControl-root": {
         width: "93%",
         margin: "12px",
+      },
+      "& .MuiFormControlLabel-root": {
+        marginLeft: "4px",
       },
     },
     bgimg: {
