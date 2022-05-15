@@ -8,7 +8,6 @@ import { useState } from "react";
 import Axios from "../../../../api/local";
 import "react-toastify/dist/ReactToastify.css";
 import { Spinner } from "../../../../components/Spinner";
-import { StringifyOptions } from "querystring";
 
 const Search = styled("div")(({ theme }) => ({
   position: "relative",
@@ -94,7 +93,7 @@ export const UserEdit = () => {
   const deleteTree = async () => {
     setLoading(true);
     try {
-      let res = await Axios.delete(`/profile?id=${profile?.tree.sapling_id}`);
+      await Axios.delete(`/profile?id=${profile?.tree.sapling_id}`);
       setProfile(undefined);
       setLoading(false);
       toast.success("User Profile deleted!");
