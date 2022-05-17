@@ -32,6 +32,7 @@ export const UserInfo = () => {
   const handleOpenPopup = () => {
     setOpenPopup(true);
   };
+  console.log(selUserInfo.user);
 
   const treeDoneWidth = (userinfo.usertrees.length / 14) * 100;
 
@@ -80,8 +81,8 @@ export const UserInfo = () => {
                 <div className={classes.label}>Name</div>
               )}
               <div className={classes.data}>{selUserInfo.user.name}</div>
-              {selUserInfo.donated_by !== undefined &&
-                selUserInfo.donated_by !== null && (
+              {selUserInfo.donated_by &&
+                selUserInfo.donated_by._id !== selUserInfo.user._id && (
                   <>
                     <div className={classes.label}>Gifted By</div>
                     {selUserInfo.gifted_by &&
@@ -110,49 +111,56 @@ export const UserInfo = () => {
                   </div>
                 </>
               )}
-              {(selUserInfo.planted_by || selUserInfo.donated_by) && (
-                // selUserInfo.planted_by !== undefined) || (selUserInfo.gifted_by &&
-                //   selUserInfo.gifted_by !== undefined) && (
+              {(!selUserInfo.planted_by) && (
                 <>
-                  <div className={classes.label}>Tree Name</div>
-                  <div className={classes.data}>
-                    {selUserInfo.tree.tree_type.name}
-                  </div>
-                </>
-              )}
-              {!selUserInfo.planted_by && !selUserInfo.donated_by && (
-                <Fragment>
                   <div className={classes.label}>Organization</div>
                   <div className={classes.data}>{selUserInfo.orgid.name}</div>
-                  <div className={classes.growth}>
-                    <div style={{ marginTop: "20px" }}>
-                      <div style={{ display: "flex" }}>
-                        <InfoChip
-                          count={userinfo.usertrees.length}
-                          label="Trees Planted"
-                          onClick={handleTreeClick}
-                        />
-                        {/* TODO: Events attended configuration on backend */}
-                        {/* <InfoChip count={userinfo.trees.length} label="Events attended" /> */}
-                      </div>
-                      <div className={classes.overall}>
-                        <div
-                          className={classes.done}
-                          style={{ width: `${treeDoneWidth}%` }}
-                        ></div>
-                        <div className={classes.count}>
-                          {14 - userinfo.usertrees.length}
-                          <div className={classes.countdesc}>
-                            Trees away from neutralising your carbon footprint
+                </>
+              )}
+              {(selUserInfo.planted_by || selUserInfo.donated_by) &&
+                selUserInfo.donated_by._id !== selUserInfo.user._id && (
+                  // selUserInfo.planted_by !== undefined) || (selUserInfo.gifted_by &&
+                  //   selUserInfo.gifted_by !== undefined) && (
+                  <>
+                    <div className={classes.label}>Tree Name</div>
+                    <div className={classes.data}>
+                      {selUserInfo.tree.tree_type.name}
+                    </div>
+                  </>
+                )}
+              {((!selUserInfo.planted_by && !selUserInfo.donated_by) ||
+                (selUserInfo.donated_by._id === selUserInfo.user._id)) && (
+                  <Fragment>
+                    <div className={classes.growth}>
+                      <div style={{ marginTop: "20px" }}>
+                        <div style={{ display: "flex" }}>
+                          <InfoChip
+                            count={userinfo.usertrees.length}
+                            label="Trees Planted"
+                            onClick={handleTreeClick}
+                          />
+                          {/* TODO: Events attended configuration on backend */}
+                          {/* <InfoChip count={userinfo.trees.length} label="Events attended" /> */}
+                        </div>
+                        <div className={classes.overall}>
+                          <div
+                            className={classes.done}
+                            style={{ width: `${treeDoneWidth}%` }}
+                          ></div>
+                          <div className={classes.count}>
+                            {14 - userinfo.usertrees.length}
+                            <div className={classes.countdesc}>
+                              Trees away from neutralising your carbon footprint
+                            </div>
                           </div>
                         </div>
                       </div>
                     </div>
-                  </div>
-                </Fragment>
-              )}
+                  </Fragment>
+                )}
               {(selUserInfo.planted_by || selUserInfo.donated_by) &&
-                !selUserInfo.gifted_by && (
+                !selUserInfo.gifted_by &&
+                selUserInfo.donated_by._id !== selUserInfo.user._id && (
                   <>
                     <div className={classes.label}>Location</div>
                     <div className={classes.data}>
