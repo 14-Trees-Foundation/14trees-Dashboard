@@ -8,6 +8,8 @@ import {
   TextField,
   MenuItem,
   Select,
+  Checkbox,
+  FormControlLabel,
 } from "@mui/material";
 import { Field, Form } from "react-final-form";
 import { makeStyles } from "@mui/styles";
@@ -27,6 +29,7 @@ export const GiftDialog = (props) => {
   const classes = useStyles();
   const { onClose, open, formData } = props;
   const [croppedImg, setCroppedImg] = useState(null);
+  const [selfAssign, setSelfAssign] = useState(false);
   const [imgsrc, setImgsrc] = useState(null);
   const [cropImgsrc, setCropImgsrc] = useState(null);
   const [imageRef, setImageRef] = useState();
@@ -117,7 +120,7 @@ export const GiftDialog = (props) => {
   const formSubmit = (formValues) => {
     onClose();
     formValues["type"] = template;
-    formData(formValues, croppedImg, selAlbum);
+    formData(formValues, croppedImg, selAlbum, selfAssign);
   };
 
   const handleAlbumChange = (e) => {
@@ -141,22 +144,20 @@ export const GiftDialog = (props) => {
       maxWidth="sm"
     >
       <DialogTitle>
-        <div className={classes.title}>Gift this tree to your loved ones</div>
+        <div className={classes.title}>Gift this tree</div>
       </DialogTitle>
       <DialogContent>
         <Form
           onSubmit={formSubmit}
           validate={(values) => {
             const errors = {};
-            if (!values.name) {
-              errors.name = "Name is required.";
-            }
-            if (!values.email) {
-              errors.email = "Email required.";
-            }
-            if (!values.contact) {
-            }
-            if (!values.dob) {
+            if (!selfAssign) {
+              if (!values.name) {
+                errors.name = "Name is required.";
+              }
+              if (!values.email) {
+                errors.email = "Email required.";
+              }
             }
             return errors;
           }}
@@ -166,62 +167,85 @@ export const GiftDialog = (props) => {
               className={classes.root}
               autoComplete="off"
             >
-              <Field name="name">
-                {({ input, meta }) => (
-                  <TextField
-                    error={meta.error && meta.touched ? true : false}
-                    {...input}
-                    variant="outlined"
-                    label="Full Name *"
-                    name="name"
-                    fullWidth
-                    sx={{ mb: 2, mt: 1 }}
-                    helperText={meta.error && meta.touched ? meta.error : ""}
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    checked={selfAssign}
+                    onChange={(e) => {
+                      setSelfAssign(e.target.checked);
+                    }}
                   />
-                )}
-              </Field>
-              <Field name="email">
-                {({ input, meta }) => (
-                  <TextField
-                    variant="outlined"
-                    label="Email *"
-                    name="email"
-                    fullWidth
-                    error={meta.error && meta.touched ? true : false}
-                    {...input}
-                    sx={{ mb: 2 }}
-                    helperText={meta.error && meta.touched ? meta.error : ""}
-                  />
-                )}
-              </Field>
-              <Field name="contact">
-                {({ input, meta }) => (
-                  <TextField
-                    variant="outlined"
-                    label="Contact"
-                    name="contact"
-                    fullWidth
-                    error={meta.error && meta.touched ? true : false}
-                    {...input}
-                    sx={{ mb: 2 }}
-                    helperText={meta.error && meta.touched ? meta.error : ""}
-                  />
-                )}
-              </Field>
-              <Field name="gifted_by">
-                {({ input, meta }) => (
-                  <TextField
-                    variant="outlined"
-                    label="Gifted By"
-                    name="gifted_by"
-                    fullWidth
-                    error={meta.error && meta.touched ? true : false}
-                    {...input}
-                    sx={{ mb: 2 }}
-                    helperText={meta.error && meta.touched ? meta.error : ""}
-                  />
-                )}
-              </Field>
+                }
+                label="I'm assigning to myself"
+              />
+              {!selfAssign && (
+                <>
+                  <Field name="name">
+                    {({ input, meta }) => (
+                      <TextField
+                        error={meta.error && meta.touched ? true : false}
+                        {...input}
+                        variant="outlined"
+                        label="Full Name *"
+                        name="name"
+                        fullWidth
+                        sx={{ mb: 2, mt: 1 }}
+                        helperText={
+                          meta.error && meta.touched ? meta.error : ""
+                        }
+                      />
+                    )}
+                  </Field>
+                  <Field name="email">
+                    {({ input, meta }) => (
+                      <TextField
+                        variant="outlined"
+                        label="Email *"
+                        name="email"
+                        fullWidth
+                        error={meta.error && meta.touched ? true : false}
+                        {...input}
+                        sx={{ mb: 2 }}
+                        helperText={
+                          meta.error && meta.touched ? meta.error : ""
+                        }
+                      />
+                    )}
+                  </Field>
+                  <Field name="contact">
+                    {({ input, meta }) => (
+                      <TextField
+                        variant="outlined"
+                        label="Contact"
+                        name="contact"
+                        fullWidth
+                        error={meta.error && meta.touched ? true : false}
+                        {...input}
+                        sx={{ mb: 2 }}
+                        helperText={
+                          meta.error && meta.touched ? meta.error : ""
+                        }
+                      />
+                    )}
+                  </Field>
+                  <Field name="gifted_by">
+                    {({ input, meta }) => (
+                      <TextField
+                        variant="outlined"
+                        label="Gifted By"
+                        name="gifted_by"
+                        fullWidth
+                        error={meta.error && meta.touched ? true : false}
+                        {...input}
+                        sx={{ mb: 2 }}
+                        helperText={
+                          meta.error && meta.touched ? meta.error : ""
+                        }
+                      />
+                    )}
+                  </Field>
+                </>
+              )}
               <Field name="planted_by">
                 {({ input, meta }) => (
                   <TextField
@@ -229,10 +253,8 @@ export const GiftDialog = (props) => {
                     label="Planted By"
                     name="planted_by"
                     fullWidth
-                    error={meta.error && meta.touched ? true : false}
                     {...input}
                     sx={{ mb: 2 }}
-                    helperText={meta.error && meta.touched ? meta.error : ""}
                   />
                 )}
               </Field>
@@ -313,7 +335,7 @@ export const GiftDialog = (props) => {
                 <Button
                   variant="contained"
                   color="primary"
-                  disabled={submitting || pristine}
+                  disabled={submitting}
                   type="submit"
                 >
                   Gift

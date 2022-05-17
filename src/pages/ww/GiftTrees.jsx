@@ -154,14 +154,19 @@ export const GiftTrees = () => {
     });
   };
 
-  const handleFormData = async (formData, img, albumName) => {
+  const handleFormData = async (
+    formData,
+    img,
+    albumName,
+    selfAssign = false
+  ) => {
     let images = [];
     if (albumName !== "none") {
       images = al.filter((album) => {
         return album.album_name === albumName;
       })[0].images;
     }
-    await assignTree(formData, img, images);
+    await assignTree(formData, img, images, selfAssign);
   };
 
   // const handleShare = (sapling_id, tree_name, name) => {
@@ -277,7 +282,7 @@ export const GiftTrees = () => {
     }
   };
 
-  const assignTree = async (formValues, img, images) => {
+  const assignTree = async (formValues, img, images, selfAssign) => {
     setValues({
       ...values,
       loading: true,
@@ -288,21 +293,28 @@ export const GiftTrees = () => {
       .filter((t) => t.selected === true)
       .map((a) => a.sapling_id);
     const date = moment(formValues.dob).format("YYYY-MM-DD");
-    formData.append("name", formValues.name);
-    formData.append("email", formValues.email);
+    if (selfAssign) {
+      formData.append("name", values.user.name);
+      formData.append("email", values.user.email);
+      formData.append("contact", values.user.contact);
+    } else {
+      formData.append("name", formValues.name);
+      formData.append("email", formValues.email);
+      formData.append("contact", formValues.contact);
+    }
+
     formData.append("dob", date);
-    formData.append("contact", formValues.contact);
     formData.append("sapling_id", sapling_ids);
     formData.append("donor", values.user._id);
 
-    if (formValues.gifted_by && formValues.gifted_by !== 'undefined') {
+    if (formValues.gifted_by && formValues.gifted_by !== "undefined") {
       formData.append("gifted_by", formValues.gifted_by);
     }
 
-    if (formValues.planted_by && formValues.planted_by !== 'undefined') {
+    if (formValues.planted_by && formValues.planted_by !== "undefined") {
       formData.append("planted_by", formValues.planted_by);
     }
-    
+
     if (img !== null) {
       let userImages = [];
       let image = await compressImageList(img);
