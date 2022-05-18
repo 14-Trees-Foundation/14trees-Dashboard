@@ -32,7 +32,6 @@ export const UserInfo = () => {
   const handleOpenPopup = () => {
     setOpenPopup(true);
   };
-  console.log(selUserInfo.user);
 
   const treeDoneWidth = (userinfo.usertrees.length / 14) * 100;
 
