@@ -118,7 +118,7 @@ export const OrgEvent = () => {
                 <PwdDialog
                 open={values.pwdDlgOpen}
                 onClose={handlePwdDlgClose}
-                passwd={"kpit@14trees"}
+                passwd={"plant@14trees"}
               />
               )
             }
