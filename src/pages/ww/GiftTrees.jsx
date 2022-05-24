@@ -335,7 +335,8 @@ export const GiftTrees = () => {
     if (
       formValues.type === "1" ||
       formValues.type === "2" ||
-      formValues.type === "3"
+      formValues.type === "3" ||
+      formValues.type === "4"
     ) {
       try {
         res = await Axios.post("/events/addevents/", formData, {
