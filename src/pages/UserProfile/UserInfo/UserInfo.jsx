@@ -33,8 +33,6 @@ export const UserInfo = () => {
     setOpenPopup(true);
   };
 
-  console.log(selUserInfo.donated_by._id === selUserInfo.user._id);
-
   const treeDoneWidth = (userinfo.usertrees.length / 14) * 100;
 
   if (open) {
