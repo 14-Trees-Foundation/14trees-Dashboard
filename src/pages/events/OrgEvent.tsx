@@ -113,7 +113,7 @@ export const OrgEvent = () => {
           <NotFound />
         ) : (
           <>
-            {
+            {/* {
               link && (
                 <PwdDialog
                 open={values.pwdDlgOpen}
@@ -121,7 +121,7 @@ export const OrgEvent = () => {
                 passwd={"plant@14trees"}
               />
               )
-            }
+            } */}
             <div style={{ minHeight: "100vh", zIndex: "-10" }}>
               <div
                 style={{
