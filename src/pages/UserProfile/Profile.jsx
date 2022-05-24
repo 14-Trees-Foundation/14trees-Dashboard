@@ -30,7 +30,7 @@ export const Profile = ({ saplingId }) => {
               ? "Memorial Dashboard"
               : `${username}'s Dashboard`}
           </div>
-          {selUserInfo.event && selUserInfo.event.type === "2" ? (
+          {selUserInfo.tree.event_type && (selUserInfo.tree.event_type === "2" || selUserInfo.tree.event_type === "4") ? (
             ""
           ) : (
             <div style={{ justifyContent: "flex-end" }}>
