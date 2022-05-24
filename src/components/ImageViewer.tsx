@@ -29,12 +29,11 @@ const useStyles = makeStyles(() =>
       display: "none",
     },
     image: {
-      width: "100%",
-      height: "100%",
+      width: "96%",
+      height: "96%",
       borderRadius: "15px",
       objectFit: "cover",
       padding: "2%",
-      paddingTop: "4px",
       cursor: "pointer",
     },
   })

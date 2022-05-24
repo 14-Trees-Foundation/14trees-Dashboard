@@ -28,6 +28,7 @@ type obj = {
   sapling_id: string;
   name: string;
   tree_image: [string];
+  desc: string;
 };
 
 type IEvents = {
@@ -48,21 +49,26 @@ export const OrgEvent = () => {
   const [searchParams] = useSearchParams();
   const fromdate = searchParams.get("fromdate");
   const todate = searchParams.get("todate");
+  const plot = searchParams.get("plot");
+  const link = searchParams.get("link");
+  const org = searchParams.get("org");
   const classes = useStyles();
 
   const fetchData = useCallback(async () => {
     try {
       let response;
       if (grptype === "org") {
-        const org = searchParams.get("org");
         response = await Axios.default.get(
           `/events/org?fromdate=${fromdate}&todate=${todate}&org=${org}`
         );
       } else if (grptype === "plot") {
-        const plot = searchParams.get("plot");
-        response = await Axios.default.get(
-          `/events/plot?fromdate=${fromdate}&todate=${todate}&plot=${plot}`
-        );
+        let uri = '';
+        if(link) {
+          uri = `/events/plot?fromdate=${fromdate}&todate=${todate}&plot=${plot}&link=${link}`
+        } else {
+          uri = `/events/plot?fromdate=${fromdate}&todate=${todate}&plot=${plot}`
+        }
+        response = await Axios.default.get(uri);
       }
       setValues({
         ...values,
@@ -109,11 +115,24 @@ export const OrgEvent = () => {
                 <img src={logo} alt="logo" className={classes.imgLogo} />
                 <img src={asset1} alt="asset1" className={classes.asset1} />
                 <img src={asset2} alt="asset2" className={classes.asset2} />
-                <div className={classes.hdrTxt}>
+                {
+                  link ? (
+                    <>
+                    <div className={classes.hdrTxt}>
+                      {values.data[0].name} plantation
+                    </div>
+                    <div className={classes.hdrDesc}>
+                      {values.data[0].desc}
+                    </div>
+                    </>
+                  ) : (
+                    <div className={classes.hdrTxt}>
                   {values?.org
                     ? `${values?.org} visit to 14trees`
                     : `${values?.plotname}`}
                 </div>
+                  )
+                }
                 <div className={classes.imgBox}>
                   <Box
                     sx={{
@@ -138,13 +157,18 @@ export const OrgEvent = () => {
                         <Card
                           sx={{
                             width: {
-                              xs: "180px",
+                              xs: "160px",
                               md: "270px",
                             },
                             height: {
-                              xs: "240px",
+                              xs: "230px",
                               md: "350px",
                             },
+                            borderRadius: '15px',
+                            margin: {
+                              xs: '1px',
+                              md: '2px'
+                            }
                           }}
                           key={item.name}
                         >
@@ -261,7 +285,7 @@ const useStyles = makeStyles((theme: Theme) =>
     hdrTxt: {
       position: "absolute",
       left: "7%",
-      top: "35%",
+      top: "30%",
       color: "#ffffff",
       fontSize: "47px",
       lineHeight: "66px",
@@ -274,8 +298,28 @@ const useStyles = makeStyles((theme: Theme) =>
       },
       [theme.breakpoints.down(720)]: {
         maxWidth: "100%",
-        fontSize: "32px",
-        lineHeight: "45px",
+        fontSize: "30px",
+        lineHeight: "42px",
+      },
+    },
+    hdrDesc: {
+      position: "absolute",
+      left: "7%",
+      top: "37%",
+      color: "#ffffff",
+      fontSize: "35px",
+      lineHeight: "48px",
+      maxWidth: "50%",
+      fontFamily: "Noto Serif JP",
+      fontWeight: "500",
+      zIndex: "20",
+      [theme.breakpoints.down(1200)]: {
+        maxWidth: "70%",
+      },
+      [theme.breakpoints.down(720)]: {
+        maxWidth: "100%",
+        fontSize: "26px",
+        lineHeight: "40px",
       },
     },
     imgBox: {
