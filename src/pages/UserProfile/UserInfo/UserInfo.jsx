@@ -84,6 +84,9 @@ export const UserInfo = () => {
               <div className={classes.data}>{selUserInfo.user.name}</div>
               {selUserInfo.tree.event_type === "4" ? (
                 <>
+                 <div className={classes.data} style={{fontStyle:"italic", fontSize:'15px'}}>
+                    {selUserInfo.tree.desc}
+                  </div>
                   {selUserInfo.planted_by &&
                     selUserInfo.planted_by !== undefined && (
                       <>
@@ -102,9 +105,6 @@ export const UserInfo = () => {
                   <div className={classes.label}>Tree Name</div>
                   <div className={classes.data}>
                     {selUserInfo.tree.tree_type.name}
-                  </div>
-                  <div className={classes.data} style={{fontStyle:"italic", paddingTop: '4px'}}>
-                    {selUserInfo.tree.desc}
                   </div>
                 </>
               ) : (
