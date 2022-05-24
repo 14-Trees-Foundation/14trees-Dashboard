@@ -65,11 +65,11 @@ export const OrgEvent = () => {
           `/events/org?fromdate=${fromdate}&todate=${todate}&org=${org}`
         );
       } else if (grptype === "plot") {
-        let uri = '';
-        if(link) {
-          uri = `/events/plot?fromdate=${fromdate}&todate=${todate}&plot=${plot}&link=${link}`
+        let uri = "";
+        if (link) {
+          uri = `/events/plot?fromdate=${fromdate}&todate=${todate}&plot=${plot}&link=${link}`;
         } else {
-          uri = `/events/plot?fromdate=${fromdate}&todate=${todate}&plot=${plot}`
+          uri = `/events/plot?fromdate=${fromdate}&todate=${todate}&plot=${plot}`;
         }
         response = await Axios.default.get(uri);
       }
@@ -113,7 +113,15 @@ export const OrgEvent = () => {
           <NotFound />
         ) : (
           <>
-          <PwdDialog open={values.pwdDlgOpen} onClose={handlePwdDlgClose} passwd={"kpit@14trees"}/>
+            {
+              link && (
+                <PwdDialog
+                open={values.pwdDlgOpen}
+                onClose={handlePwdDlgClose}
+                passwd={"kpit@14trees"}
+              />
+              )
+            }
             <div style={{ minHeight: "100vh", zIndex: "-10" }}>
               <div
                 style={{
@@ -126,24 +134,20 @@ export const OrgEvent = () => {
                 <img src={logo} alt="logo" className={classes.imgLogo} />
                 <img src={asset1} alt="asset1" className={classes.asset1} />
                 <img src={asset2} alt="asset2" className={classes.asset2} />
-                {
-                  link ? (
-                    <>
+                {link ? (
+                  <>
                     <div className={classes.hdrTxt}>
                       {values.data[0].name} plantation
                     </div>
-                    <div className={classes.hdrDesc}>
-                      {values.data[0].desc}
-                    </div>
-                    </>
-                  ) : (
-                    <div className={classes.hdrTxt}>
-                  {values?.org
-                    ? `${values?.org} visit to 14trees`
-                    : `${values?.plotname}`}
-                </div>
-                  )
-                }
+                    <div className={classes.hdrDesc}>{values.data[0].desc}</div>
+                  </>
+                ) : (
+                  <div className={classes.hdrTxt}>
+                    {values?.org
+                      ? `${values?.org} visit to 14trees`
+                      : `${values?.plotname}`}
+                  </div>
+                )}
                 <div className={classes.imgBox}>
                   <Box
                     sx={{
@@ -175,11 +179,11 @@ export const OrgEvent = () => {
                               xs: "230px",
                               md: "350px",
                             },
-                            borderRadius: '15px',
+                            borderRadius: "15px",
                             margin: {
-                              xs: '1px',
-                              md: '2px'
-                            }
+                              xs: "1px",
+                              md: "2px",
+                            },
                           }}
                           key={item.name}
                         >
