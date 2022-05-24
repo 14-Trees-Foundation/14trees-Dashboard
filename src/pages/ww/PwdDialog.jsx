@@ -16,12 +16,12 @@ const Transition = React.forwardRef(function Transition(props, ref) {
 
 export const PwdDialog = (props) => {
   const classes = useStyles();
-  const { onClose, open } = props;
+  const { onClose, open, passwd } = props;
   const [error, setError] = useState(false);
   const [pwd, setPwd] = useState("");
 
   const handleSubmit = () => {
-    if (pwd === "admin@14trees") {
+    if (pwd === passwd) {
       onClose();
     } else {
       setError(true);

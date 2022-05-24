@@ -22,6 +22,7 @@ import {
 } from "@mui/material";
 import { ImageViewer } from "../../components/ImageViewer";
 import { NotFound } from "../notfound/NotFound";
+import { PwdDialog } from "../ww/PwdDialog";
 
 type obj = {
   profile_image: [string];
@@ -33,6 +34,7 @@ type obj = {
 
 type IEvents = {
   loading: boolean;
+  pwdDlgOpen: boolean;
   found: boolean;
   org?: string;
   data?: [obj];
@@ -44,6 +46,7 @@ export const OrgEvent = () => {
   const [values, setValues] = useState<IEvents>({
     loading: true,
     found: false,
+    pwdDlgOpen: true,
   });
 
   const [searchParams] = useSearchParams();
@@ -93,6 +96,13 @@ export const OrgEvent = () => {
     fetchData();
   }, [fetchData]);
 
+  const handlePwdDlgClose = () => {
+    setValues({
+      ...values,
+      pwdDlgOpen: false,
+    });
+  };
+
   if (values?.loading) {
     return <Spinner text={"Fetching event data!"} />;
   } else if (!values?.loading && values?.found) {
@@ -103,6 +113,7 @@ export const OrgEvent = () => {
           <NotFound />
         ) : (
           <>
+          <PwdDialog open={values.pwdDlgOpen} onClose={handlePwdDlgClose} passwd={"kpit@14trees"}/>
             <div style={{ minHeight: "100vh", zIndex: "-10" }}>
               <div
                 style={{

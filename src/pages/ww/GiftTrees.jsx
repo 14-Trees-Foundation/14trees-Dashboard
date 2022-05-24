@@ -618,7 +618,7 @@ export const GiftTrees = () => {
     } else {
       return (
         <>
-          <PwdDialog open={values.pwdDlgOpen} onClose={handlePwdDlgClose} />
+          <PwdDialog open={values.pwdDlgOpen} onClose={handlePwdDlgClose} passwd={"admin@14trees"}/>
           <Dialog
             open={values.selectedTreeImgDlg}
             onClose={() =>
