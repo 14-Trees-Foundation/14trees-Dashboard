@@ -82,7 +82,10 @@ export const UserInfo = () => {
               <div className={classes.data}>{selUserInfo.user.name}</div>
               {selUserInfo.tree.event_type === "4" ? (
                 <>
-                 <div className={classes.data} style={{fontStyle:"italic", fontSize:'15px'}}>
+                  <div
+                    className={classes.data}
+                    style={{ fontStyle: "italic", fontSize: "15px" }}
+                  >
                     {selUserInfo.tree.desc}
                   </div>
                   {selUserInfo.planted_by &&
@@ -146,10 +149,8 @@ export const UserInfo = () => {
                       </div>
                     </>
                   )}
-                  {(selUserInfo.planted_by || selUserInfo.donated_by) &&
-                    selUserInfo.donated_by._id !== selUserInfo.user._id && (
-                      // selUserInfo.planted_by !== undefined) || (selUserInfo.gifted_by &&
-                      //   selUserInfo.gifted_by !== undefined) && (
+                  {(selUserInfo.planted_by || (selUserInfo.donated_by !== undefined &&
+                    selUserInfo.donated_by._id !== selUserInfo.user._id))  && (
                       <>
                         <div className={classes.label}>Tree Name</div>
                         <div className={classes.data}>
@@ -158,7 +159,7 @@ export const UserInfo = () => {
                       </>
                     )}
                   {((!selUserInfo.planted_by && !selUserInfo.donated_by) ||
-                    selUserInfo.donated_by._id === selUserInfo.user._id) && (
+                    (selUserInfo.donated_by && selUserInfo.donated_by._id === selUserInfo.user._id)) && (
                     <Fragment>
                       <div className={classes.growth}>
                         <div style={{ marginTop: "20px" }}>
@@ -168,8 +169,6 @@ export const UserInfo = () => {
                               label="Trees Planted"
                               onClick={handleTreeClick}
                             />
-                            {/* TODO: Events attended configuration on backend */}
-                            {/* <InfoChip count={userinfo.trees.length} label="Events attended" /> */}
                           </div>
                           <div className={classes.overall}>
                             <div
@@ -188,9 +187,8 @@ export const UserInfo = () => {
                       </div>
                     </Fragment>
                   )}
-                  {(selUserInfo.planted_by || selUserInfo.donated_by) &&
-                    !selUserInfo.gifted_by &&
-                    selUserInfo.donated_by._id !== selUserInfo.user._id && (
+                  {(selUserInfo.planted_by ||
+                    (selUserInfo.donated_by && selUserInfo.donated_by._id !== selUserInfo.user._id)) && (
                       <>
                         <div className={classes.label}>Location</div>
                         <div className={classes.data}>
