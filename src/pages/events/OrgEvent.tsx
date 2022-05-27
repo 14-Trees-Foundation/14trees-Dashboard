@@ -134,20 +134,26 @@ export const OrgEvent = () => {
                 <img src={logo} alt="logo" className={classes.imgLogo} />
                 <img src={asset1} alt="asset1" className={classes.asset1} />
                 <img src={asset2} alt="asset2" className={classes.asset2} />
-                {link ? (
-                  <>
-                    <div className={classes.hdrTxt}>
-                      {values.data[0].name} plantation
-                    </div>
+                {
+                  values.data[0].desc ? (
                     <div className={classes.hdrDesc}>{values.data[0].desc}</div>
-                  </>
-                ) : (
-                  <div className={classes.hdrTxt}>
-                    {values?.org
-                      ? `${values?.org} visit to 14trees`
-                      : `${values?.plotname}`}
-                  </div>
-                )}
+                  ) : (
+                    (link) ? (
+                      <>
+                        <div className={classes.hdrTxt}>
+                          {values.data[0].name} plantation
+                        </div>
+                        <div className={classes.hdrDesc}>{values.data[0].desc}</div>
+                      </>
+                    ) : (
+                      <div className={classes.hdrTxt}>
+                        {values?.org
+                          ? `${values?.org} visit to 14trees`
+                          : `${values?.plotname}`}
+                      </div>
+                    )
+                  )
+                }
                 <div className={classes.imgBox}>
                   <Box
                     sx={{
