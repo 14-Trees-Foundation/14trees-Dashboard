@@ -141,13 +141,16 @@ export const UserInfo = () => {
                         </div>
                       </>
                     )}
-                  {!selUserInfo.planted_by && (
-                    <>
+                  {(!selUserInfo.planted_by) && (
+                    (selUserInfo.donated_by !== undefined &&
+                      selUserInfo.donated_by._id === selUserInfo.user._id) ? (
+                      <>
                       <div className={classes.label}>Organization</div>
                       <div className={classes.data}>
                         {selUserInfo.orgid.name}
                       </div>
                     </>
+                    ) : ("")
                   )}
                   {(selUserInfo.planted_by || (selUserInfo.donated_by !== undefined &&
                     selUserInfo.donated_by._id !== selUserInfo.user._id))  && (
@@ -159,7 +162,7 @@ export const UserInfo = () => {
                       </>
                     )}
                   {((!selUserInfo.planted_by && !selUserInfo.donated_by) ||
-                    (selUserInfo.donated_by && selUserInfo.donated_by._id === selUserInfo.user._id)) && (
+                    (selUserInfo.donated_by && selUserInfo.donated_by._id === selUserInfo.user._id)) ? (
                     <Fragment>
                       <div className={classes.growth}>
                         <div style={{ marginTop: "20px" }}>
@@ -186,16 +189,17 @@ export const UserInfo = () => {
                         </div>
                       </div>
                     </Fragment>
-                  )}
-                  {(selUserInfo.planted_by ||
-                    (selUserInfo.donated_by && selUserInfo.donated_by._id !== selUserInfo.user._id)) && (
-                      <>
-                        <div className={classes.label}>Location</div>
-                        <div className={classes.data}>
-                          {selUserInfo.tree.plot.name}
-                        </div>
-                      </>
-                    )}
+                  ): 
+                    (selUserInfo.planted_by ||
+                      (selUserInfo.donated_by && selUserInfo.donated_by._id !== selUserInfo.user._id)) && (
+                        <>
+                          <div className={classes.label}>Location</div>
+                          <div className={classes.data}>
+                            {selUserInfo.tree.plot.name}
+                          </div>
+                        </>
+                      )
+                  }
                 </>
               )}
             </div>
@@ -271,6 +275,9 @@ const useStyles = makeStyles((theme) =>
       marginBottom: "8px",
       [theme.breakpoints.down("1025")]: {
         fontSize: "16px",
+      },
+      [theme.breakpoints.down("720")]: {
+        fontSize: "14px",
       },
     },
     growth: {
