@@ -262,6 +262,18 @@ export const GiftDialog = (props) => {
                   />
                 )}
               </Field>
+              <Field name="desc">
+                {({ input, meta }) => (
+                  <TextField
+                    variant="outlined"
+                    label="Description/Event Name"
+                    name="desc"
+                    fullWidth
+                    {...input}
+                    sx={{ mb: 2 }}
+                  />
+                )}
+              </Field>
               <Select
                 fullWidth
                 onChange={handleAlbumChange}

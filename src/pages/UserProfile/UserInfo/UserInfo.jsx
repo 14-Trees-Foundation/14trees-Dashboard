@@ -80,7 +80,7 @@ export const UserInfo = () => {
                 <div className={classes.label}>Name</div>
               )}
               <div className={classes.data}>{selUserInfo.user.name}</div>
-              {selUserInfo.tree.event_type === "4" ? (
+              {(selUserInfo.tree.event_type === "4" || selUserInfo.tree.desc) ? (
                 <>
                   <div
                     className={classes.data}
@@ -107,6 +107,35 @@ export const UserInfo = () => {
                   <div className={classes.data}>
                     {selUserInfo.tree.tree_type.name}
                   </div>
+                  {!selUserInfo.planted_by && (
+                    <Fragment>
+                    <div className={classes.growth}>
+                      <div style={{ marginTop: "20px" }}>
+                        <div style={{ display: "flex" }}>
+                          <InfoChip
+                            count={userinfo.usertrees.length}
+                            label="Trees Planted"
+                            onClick={handleTreeClick}
+                          />
+                        </div>
+                        <div className={classes.overall}>
+                          <div
+                            className={classes.done}
+                            style={{ width: `${treeDoneWidth}%` }}
+                          ></div>
+                          <div className={classes.count}>
+                            {14 - userinfo.usertrees.length}
+                            <div className={classes.countdesc}>
+                              Trees away from neutralising your carbon
+                              footprint
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </Fragment>
+                  )
+                  }
                 </>
               ) : (
                 <>
