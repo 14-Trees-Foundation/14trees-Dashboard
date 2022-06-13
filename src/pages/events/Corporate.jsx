@@ -1,4 +1,4 @@
-import React, { Fragment, useState } from "react";
+import { Fragment, useCallback, useEffect, useState } from "react";
 
 import { createStyles, makeStyles } from "@mui/styles";
 import Grid from "@mui/material/Grid";
@@ -6,7 +6,6 @@ import Box from "@mui/material/Box";
 import Carousel from "react-gallery-carousel";
 
 import { Appbar } from "./Appbar";
-import logos from "../../assets/logos.png";
 import item1 from "../../assets/item1.png";
 import item2 from "../../assets/item2.png";
 import vector1 from "../../assets/vector1.png";
@@ -18,232 +17,165 @@ import footericon from "../../assets/footericon.png";
 import "react-gallery-carousel/dist/index.css";
 
 import { Divider } from "@mui/material";
-import { Chip } from "../../stories/Chip/Chip";
-
-const images = [5, 4, 6, 7, 8, 9, 10, 1, 11, 12].map((number) => ({
-  src: `https://14treesplants.s3.ap-south-1.amazonaws.com/memories/kpit${number}.jpeg`,
-}));
-
-const treeimages = [
-  {
-    img: "https://14treesplants.s3.ap-south-1.amazonaws.com/trees/rn_image_picker_lib_temp_07d6effc-6d4a-4480-9d75-e1d29780e894.jpg",
-    name: "Bahava",
-    id: "34048",
-  },
-  {
-    img: "https://14treesplants.s3.ap-south-1.amazonaws.com/trees/rn_image_picker_lib_temp_efb3533f-92b6-4219-a7f4-463e49fd2db7.jpg",
-    name: "Bahava",
-    id: "34050",
-  },
-  {
-    img: "https://14treesplants.s3.ap-south-1.amazonaws.com/trees/rn_image_picker_lib_temp_fec3b15a-62ab-49ef-8e86-cef80cef02c2.jpg",
-    name: "Bahava",
-    id: "34051",
-  },
-  {
-    img: "https://14treesplants.s3.ap-south-1.amazonaws.com/trees/rn_image_picker_lib_temp_ee6f6b8a-126a-4e82-bc8e-906e4aefc3a4.jpg",
-    name: "Bahava",
-    id: "34053",
-  },
-  {
-    img: "https://14treesplants.s3.ap-south-1.amazonaws.com/trees/rn_image_picker_lib_temp_712bbd26-de42-4d4d-b580-70f438aa13db.jpg",
-    name: "Bahava",
-    id: "34052",
-  },
-  {
-    img: "https://14treesplants.s3.ap-south-1.amazonaws.com/trees/rn_image_picker_lib_temp_d8f1b606-ae21-4de8-8adf-55cd3d23534e.jpg",
-    name: "Bahava",
-    id: "34049",
-  },
-  {
-    img: "https://14treesplants.s3.ap-south-1.amazonaws.com/trees/rn_image_picker_lib_temp_0bf4687d-b54b-4c06-9dbb-6c244a85e27b.jpg",
-    name: "Bahava",
-    id: "34055",
-  },
-  {
-    img: "https://14treesplants.s3.ap-south-1.amazonaws.com/trees/rn_image_picker_lib_temp_b730a046-a838-4243-a4c5-7ffb4590d165.jpg",
-    name: "Bahava",
-    id: "34056",
-  },
-  {
-    img: "https://14treesplants.s3.ap-south-1.amazonaws.com/trees/rn_image_picker_lib_temp_dde63c15-dc36-471f-bda9-a1300189c2c5.jpg",
-    name: "Bahava",
-    id: "34057",
-  },
-  {
-    img: "https://14treesplants.s3.ap-south-1.amazonaws.com/trees/rn_image_picker_lib_temp_245135e1-971e-4551-8b84-ffa30d6a038c.jpg",
-    name: "Bahava",
-    id: "34058",
-  },
-  {
-    img: "https://14treesplants.s3.ap-south-1.amazonaws.com/trees/rn_image_picker_lib_temp_157c6708-6ba4-4a97-bc70-5f60a88891f5.jpg",
-    name: "Bahava",
-    id: "34054",
-  },
-  {
-    img: "https://14treesplants.s3.ap-south-1.amazonaws.com/trees/rn_image_picker_lib_temp_78e638ae-aeda-4380-b14e-a5d0da4e9af5.jpg",
-    name: "Bahava",
-    id: "34063",
-  },
-  {
-    img: "https://14treesplants.s3.ap-south-1.amazonaws.com/trees/rn_image_picker_lib_temp_7f433a08-d260-432c-bf60-9cd12db33f18.jpg",
-    name: "Bahava",
-    id: "34065",
-  },
-  {
-    img: "https://14treesplants.s3.ap-south-1.amazonaws.com/trees/rn_image_picker_lib_temp_1622ed99-9eb8-48fc-b22a-68bad2470810.jpg",
-    name: "Bahava",
-    id: "34066",
-  },
-  {
-    img: "https://14treesplants.s3.ap-south-1.amazonaws.com/trees/rn_image_picker_lib_temp_dfa2714c-45a1-4741-b3cb-9c956ef8c14e.jpg",
-    name: "Bahava",
-    id: "34064",
-  },
-  {
-    img: "https://14treesplants.s3.ap-south-1.amazonaws.com/trees/rn_image_picker_lib_temp_0406cd0e-95d6-4edb-a997-13de3e980f36.jpg",
-    name: "Bahava",
-    id: "34059",
-  },
-  {
-    img: "https://14treesplants.s3.ap-south-1.amazonaws.com/trees/rn_image_picker_lib_temp_ed35e6b1-c129-43ac-af3b-9ed1f936a3de.jpg",
-    name: "Bahava",
-    id: "34061",
-  },
-  {
-    img: "https://14treesplants.s3.ap-south-1.amazonaws.com/trees/rn_image_picker_lib_temp_f9278d0f-af15-454e-b7c4-f9375e6cb826.jpg",
-    name: "Bahava",
-    id: "34060",
-  },
-  {
-    img: "https://14treesplants.s3.ap-south-1.amazonaws.com/trees/rn_image_picker_lib_temp_1c9d4a0d-f267-4452-b1da-b49e33c78036.jpg",
-    name: "Bahava",
-    id: "34062",
-  },
-  {
-    img: "https://14treesplants.s3.ap-south-1.amazonaws.com/trees/rn_image_picker_lib_temp_24fa5f0a-4aec-4114-acbf-6bde2547368b.jpg",
-    name: "Bahava",
-    id: "34067",
-  },
-];
+import { useParams } from "react-router-dom";
+import * as Axios from "../../api/local";
+import { NotFound } from "../notfound/NotFound";
+import { Spinner } from "../../components/Spinner";
 
 export const Corporate = () => {
-  const [showMore, setShowMore] = useState(true);
-  const [treeList, setTreeList] = useState(treeimages.slice(0, 8));
-  const [index, setIndex] = useState(8);
+  const { event_id } = useParams();
+  const [loading, setLoading] = useState(true);
+  const [data, setData] = useState(true);
+  const [found, setFound] = useState(true);
+//   const [index, setIndex] = useState(8);
 
-  const loadMore = () => {
-    const newIndex = index + 8;
-    const newShowMore = newIndex < 19;
-    const newList = treeimages.slice(0, newIndex);
-    setIndex(newIndex);
-    setTreeList(newList);
-    setShowMore(newShowMore);
-  };
+//   const loadMore = () => {
+//     const newIndex = index + 8;
+//     const newShowMore = newIndex < 19;
+//     const newList = treeimages.slice(0, newIndex);
+//     setIndex(newIndex);
 
-  const collapse = () => {
-    setIndex(8);
-    setTreeList(treeimages.slice(0, 8));
-    setShowMore(true);
-  };
+//   };
+
+//   const collapse = () => {
+//     setIndex(8);
+//     setTreeList(treeimages.slice(0, 8));
+//     setShowMore(true);
+//   };
+
+  const fetchData = useCallback(async () => {
+    try {
+      const response = await Axios.default.get(
+        `/events/corp?event_id=${event_id}`
+      );
+      console.log(response.data["event"][0]);
+      if (response.status === 200) {
+        setData(response.data["event"][0]);
+      } else {
+        setFound(false);
+      }
+    } catch (error) {
+      setFound(false);
+    }
+    setLoading(false);
+  }, [event_id]);
+
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
 
   const classes = useStyles();
-  return (
-    <Fragment>
-      <div className={classes.main}>
-        <Appbar />
-        <div className={classes.header}>
-          <Box>
-            <Grid container spacing={4}>
-              <Grid item xs={12} md={5}>
-                <div className={classes.logos}>
-                  <img className={classes.logo} src={logos} alt="logo" />
-                </div>
-                <p className={classes.maintxt}>
-                  Celebrating 20 years of reimagining mobility together
-                </p>
-                <Divider style={{ background: "#ffffff", width: "85%" }} />
-                <div className={classes.detail}>
-                  <div style={{ marginBottom: "5px" }}>
-                    Event name: <b>KPIT-DENSO</b>
+  if (loading) {
+    return <Spinner />;
+  } else if (!found) {
+    return <NotFound />;
+  } else {
+    return (
+      <Fragment>
+        <div className={classes.main}>
+          <Appbar />
+          <div className={classes.header}>
+            <Box>
+              <Grid container spacing={4}>
+                <Grid item xs={12} md={5}>
+                  <div className={classes.logos}>
+                    <img
+                      className={classes.logo}
+                      src={data["logo"][0]}
+                      alt="logo"
+                    />
                   </div>
-                  <div style={{ marginBottom: "20px" }}>
-                    Organized On: <b>28 October, 2021</b>
+                  <p className={classes.maintxt}>{data["title"]}</p>
+                  <Divider style={{ background: "#ffffff", width: "85%" }} />
+                  <div className={classes.detail}>
+                    <div style={{ marginBottom: "5px" }}>
+                      Event name: <b>{data["event_name"]}</b>
+                    </div>
+                    <div style={{ marginBottom: "20px" }}>
+                      Organized On: <b>{data["date_added"].slice(0, 10)}</b>
+                    </div>
                   </div>
-                </div>
-                <div style={{ display: "flex", alignItems: "center" }}>
-                  <div className={classes.num}>02</div>
-                  <div className={classes.numDetail}>People Attended</div>
-                  <div style={{ width: "20px" }}></div>
-                  <div className={classes.num}>20</div>
-                  <div className={classes.numDetail}>Trees Planted</div>
-                </div>
+                  <div style={{ display: "flex", alignItems: "center" }}>
+                    <div className={classes.num}>{data["num_people"]}</div>
+                    <div className={classes.numDetail}>People Attended</div>
+                    <div style={{ width: "20px" }}></div>
+                    <div className={classes.num}>{data["trees"].length}</div>
+                    <div className={classes.numDetail}>Trees Planted</div>
+                  </div>
+                </Grid>
+                <Grid item xs={12} md={7}>
+                  <div style={{ position: "relative" }}>
+                    <img className={classes.item2} src={item2} alt="item1" />
+                    <img
+                      className={classes.headerimg}
+                      src={data["header_img"]}
+                      alt="header logo"
+                    />
+                    <img className={classes.item1} src={item1} alt="item2" />
+                  </div>
+                </Grid>
               </Grid>
-              <Grid item xs={12} md={7}>
-                <div style={{ position: "relative" }}>
-                  <img className={classes.item2} src={item2} alt="item1" />
-                  <img
-                    className={classes.headerimg}
-                    src="https://14treesplants.s3.ap-south-1.amazonaws.com/events/denso_header-min.png"
-                    alt="header logo"
-                  />
-                  <img className={classes.item1} src={item1} alt="item2" />
-                </div>
-              </Grid>
-            </Grid>
-          </Box>
-        </div>
-        <img className={classes.topvector} src={vector1} alt="vector1" />
-        <div className={classes.general}>
-          <div className={classes.msgTitle}>
-            KPIT's commitment to Ecology Restoration by planting trees and
-            supporting environment causes
+            </Box>
           </div>
-          <div className={classes.imageC}>
-            <Carousel
-              hasMediaButton={false}
-              hasIndexBoard={false}
-              images={images}
+          <img className={classes.topvector} src={vector1} alt="vector1" />
+          <div className={classes.general}>
+            <div className={classes.msgTitle}>{data["short_desc"]}</div>
+            <div className={classes.imageC}>
+              <Carousel
+                hasMediaButton={false}
+                hasIndexBoard={false}
+                images={data["album"].map((x) => ({
+                  src: x,
+                }))}
+              />
+            </div>
+            <div className={classes.msg}>{data["long_desc"]}</div>
+            <div className={classes.gatinfo}>
+              <div
+                style={{
+                  width: "130px",
+                  marginLeft: "auto",
+                  marginRight: "auto",
+                }}
+              >
+                <img src={gatimg} alt="gat" className={classes.gatimg} />
+              </div>
+              <div className={classes.gatheader}>
+                Site of Plantation: Near {data["plot"]["name"]}
+              </div>
+              <div className={classes.gatdesc}>{data["plot_desc"]}</div>
+            </div>
+          </div>
+          <div style={{ height: "900px" }}>
+            <div
+              style={{
+                position: "relative",
+                top: "-100px",
+                height: "400px",
+                background:
+                  "linear-gradient(360deg, rgba(233, 234, 231, 0) 0%, #E5E5E7 58.96%)",
+                zIndex: "-1",
+              }}
+            ></div>
+            <img
+              src="https://14treesplants.s3.ap-south-1.amazonaws.com/gat/gat_703.jpg"
+              className={classes.plotimg}
+              alt=""
             />
+            <div
+              style={{
+                top: "-900px",
+                position: "relative",
+                height: "400px",
+                transform: "rotate(180deg)",
+                background:
+                  "linear-gradient(360deg, rgba(150, 120, 95, 0) 0%, #1F3625 85.27%)",
+                zIndex: "4",
+                marginBottom: "-550px",
+              }}
+            ></div>
           </div>
-          <div className={classes.msg}>
-            KPIT and DENSO are celebrating 20 years of their partnership on 9th
-            November. KPIT, with its commitment to supporting environmental
-            causes, is partnering with a nature conservation NGO named ‘14
-            Trees’ to celebrate this important milestone in a unique way.
-            <br />
-            <br />
-            Mr. Sanjivkumar Bajikar DENSO KPIT delivery manager and Mr. Tushar
-            Juvekar head of CSR KPIT planted 20 flowering bahava trees -- one
-            for each year of DENSO-KPIT partnership -- on a barren, ecologically
-            devastated land near village Vetale, near Pune, India.
-            <br />
-            <br />
-            The trees planted on KPIT grove will support a larger effort by 14
-            Trees Foundation to transform barren, ecologically devastated hills
-            of Sahyadri mountain range into thriving biodiverse forests full of
-            native flora and fauna, while creating local livelihoods.
-            <br />
-            <br />
-            DENSO-KPIT celebration trees are an example of how urban citizens,
-            village communities, tribal workers and corporates can join hands in
-            taking concrete action towards undoing environmental damage, in
-            creating employment and entrepreneurship and in building a
-            sustainable future for the next generation.
-          </div>
-          <div
-            style={{
-              fontSize: "15px",
-              fontWeight: "bold",
-              marginTop: "16px",
-              marginLeft: "auto",
-              marginRight: "auto",
-              width: "80%",
-            }}
-          >
-            -14 Trees Foundation.
-          </div>
-          <div className={classes.gatinfo}>
+          <div className={classes.trees}>
             <div
               style={{
                 width: "130px",
@@ -251,123 +183,85 @@ export const Corporate = () => {
                 marginRight: "auto",
               }}
             >
-              <img src={gatimg} alt="gat" className={classes.gatimg} />
+              <img src={treeicon} alt="tree" className={classes.treeicon} />
             </div>
-            <div className={classes.gatheader}>
-              Site of Plantation: Near Gat 703, Village - Vetale
+            <div className={classes.treedesc}>The Trees Planted</div>
+            <div className={classes.treeimgcontainer}>
+              <Grid container spacing={3}>
+                {data["trees"].map((tree, idx) => {
+                  return (
+                    <Grid item xs={6} md={3}>
+                      <img
+                        src={tree["image"][0]}
+                        alt=""
+                        className={classes.treeimg}
+                      />
+                      <div
+                        style={{
+                          padding: "5px",
+                          fontWeight: "400",
+                          fontSize: "13px",
+                          color: "#ffffff",
+                        }}
+                      >
+                        Tree Name: {tree["tree_types"][0]["name"]}
+                      </div>
+                      <div
+                        style={{
+                          padding: "5px",
+                          fontWeight: "400",
+                          fontSize: "13px",
+                          color: "#ffffff",
+                        }}
+                      >
+                        Tree ID: {tree["sapling_id"]}
+                      </div>
+                    </Grid>
+                  );
+                })}
+              </Grid>
+              {/* {showMore && (
+                  <div style={{ padding: "24px", textAlign: "center" }}>
+                    <Chip
+                      label={"See More"}
+                      mode={"primary"}
+                      size={"large"}
+                      handleClick={() => loadMore()}
+                    />
+                  </div>
+                )}
+                {!showMore && (
+                  <div style={{ padding: "24px", textAlign: "center" }}>
+                    <Chip
+                      label={"See less"}
+                      mode={"primary"}
+                      size={"large"}
+                      handleClick={() => collapse()}
+                    />
+                  </div>
+                )} */}
             </div>
-            <div className={classes.gatdesc}>
-              KPIT grove is a portion of a very large tract of completely barren
-              land on a hilltop in village Vetale near Pune. Slowly and
-              steadily, a team of 100+ tribal workers is restoring green cover,
-              repairing damaged ecology, creating rainwater storage ponds,
-              digging pits and planting trees.
+          </div>
+          <img src={vector2} alt="" className={classes.treefootvector} />
+          <div className={classes.footer}>
+            <div
+              style={{
+                width: "150px",
+                marginLeft: "auto",
+                marginRight: "auto",
+              }}
+            >
+              <img src={footicon} alt="" style={{ height: "120px" }} />
             </div>
+            <div className={classes.footthanks}>
+              We thank you for your contribution!
+            </div>
+            <img src={footericon} alt="" className={classes.footericon} />
           </div>
         </div>
-        <div style={{ height: "900px" }}>
-          <div
-            style={{
-              position: "relative",
-              top: "-100px",
-              height: "400px",
-              background:
-                "linear-gradient(360deg, rgba(233, 234, 231, 0) 0%, #E5E5E7 58.96%)",
-              zIndex: "-1",
-            }}
-          ></div>
-          <img
-            src="https://14treesplants.s3.ap-south-1.amazonaws.com/gat/gat_703.jpg"
-            className={classes.plotimg}
-            alt=""
-          />
-          <div
-            style={{
-              top: "-900px",
-              position: "relative",
-              height: "400px",
-              transform: "rotate(180deg)",
-              background:
-                "linear-gradient(360deg, rgba(150, 120, 95, 0) 0%, #1F3625 85.27%)",
-              zIndex: "4",
-              marginBottom: "-550px",
-            }}
-          ></div>
-        </div>
-        <div className={classes.trees}>
-          <div
-            style={{ width: "130px", marginLeft: "auto", marginRight: "auto" }}
-          >
-            <img src={treeicon} alt="tree" className={classes.treeicon} />
-          </div>
-          <div className={classes.treedesc}>The Trees Planted</div>
-          <div className={classes.treeimgcontainer}>
-            <Grid container spacing={3}>
-              {treeList.map((tree, idx) => {
-                return (
-                  <Grid item xs={6} md={3}>
-                    <img src={tree.img} alt="" className={classes.treeimg} />
-                    <div
-                      style={{
-                        padding: "5px",
-                        fontWeight: "400",
-                        fontSize: "13px",
-                        color: "#ffffff",
-                      }}
-                    >
-                      Tree Name: {tree.name}
-                    </div>
-                    <div
-                      style={{
-                        padding: "5px",
-                        fontWeight: "400",
-                        fontSize: "13px",
-                        color: "#ffffff",
-                      }}
-                    >
-                      Tree ID: {tree.id}
-                    </div>
-                  </Grid>
-                );
-              })}
-            </Grid>
-            {showMore && (
-              <div style={{ padding: "24px", textAlign: "center" }}>
-                <Chip
-                  label={"See More"}
-                  mode={"primary"}
-                  size={"large"}
-                  handleClick={() => loadMore()}
-                />
-              </div>
-            )}
-            {!showMore && (
-              <div style={{ padding: "24px", textAlign: "center" }}>
-                <Chip
-                  label={"See less"}
-                  mode={"primary"}
-                  size={"large"}
-                  handleClick={() => collapse()}
-                />
-              </div>
-            )}
-          </div>
-        </div>
-        <img src={vector2} alt="" className={classes.treefootvector} />
-        <div className={classes.footer}>
-          <div
-            style={{ width: "150px", marginLeft: "auto", marginRight: "auto" }}
-          >
-            <img src={footicon} alt="" style={{ height: "120px" }} />
-          </div>
-          <div className={classes.footthanks}>
-            We thank you for your contribution!
-          </div>
-          <img src={footericon} alt="" className={classes.footericon} />
-        </div>
-      </div>
-    </Fragment>
-  );
+      </Fragment>
+    );
+  }
 };
 
 const useStyles = makeStyles((theme) =>
@@ -514,6 +408,7 @@ const useStyles = makeStyles((theme) =>
       width: "80%",
       marginLeft: "auto",
       marginRight: "auto",
+      whiteSpace: "pre-line",
     },
     gatinfo: {
       marginTop: "80px",
