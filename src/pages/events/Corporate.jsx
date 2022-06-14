@@ -204,7 +204,7 @@ export const Corporate = () => {
                           color: "#ffffff",
                         }}
                       >
-                        Tree Name: {tree["tree_types"][0]["name"]}
+                        Tree Name: {tree["tree_types"]["name"]}
                       </div>
                       <div
                         style={{
