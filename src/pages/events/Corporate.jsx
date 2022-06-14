@@ -223,30 +223,69 @@ export const Corporate = () => {
                     <Grid item xs={6} md={3}>
                       <img
                         src={
-                            value === 0 ? tree["image"][0] : tree['updates']['photo_update'][0]['image']}
+                          value === 0
+                            ? tree["image"][0]
+                            : tree["updates"]["photo_update"][0]["image"]
+                        }
                         alt=""
                         className={classes.treeimg}
                       />
                       <div
                         style={{
-                          padding: "5px",
-                          fontWeight: "400",
-                          fontSize: "13px",
-                          color: "#ffffff",
+                          display: "flex",
+                          justifyContent: "space-between",
                         }}
                       >
-                        Tree Name: {tree["tree_types"]["name"]}
+                        <div
+                          style={{
+                            padding: "5px",
+                            fontWeight: "500",
+                            fontSize: "16px",
+                            color: "#ffffff",
+                          }}
+                        >
+                          {tree["tree_types"]["name"]}
+                        </div>
+                        <div
+                          style={{
+                            padding: "5px",
+                            fontWeight: "400",
+                            fontSize: "14px",
+                            color: "#ffffff",
+                          }}
+                        >
+                          #{tree["sapling_id"]}
+                        </div>
                       </div>
-                      <div
-                        style={{
-                          padding: "5px",
-                          fontWeight: "400",
-                          fontSize: "13px",
-                          color: "#ffffff",
-                        }}
-                      >
-                        Tree ID: {tree["sapling_id"]}
-                      </div>
+                      {value === 0 && (
+                        <div
+                          style={{
+                            padding: "5px",
+                            color: "#fff",
+                            fontSize: "13px",
+                            fontWeight: "500",
+                          }}
+                        >
+                          <i>Planted On: {tree["date_added"].slice(0, 10)}</i>
+                        </div>
+                      )}
+                      {value !== 0 && (
+                        <div
+                          style={{
+                            padding: "5px",
+                            color: "#fff",
+                            fontSize: "13px",
+                            fontWeight: "500",
+                          }}
+                        >
+                          <i>
+                            Updated On:{" "}
+                            {tree["updates"]["photo_update"][0][
+                              "date_added"
+                            ].slice(0, 10)}
+                          </i>
+                        </div>
+                      )}
                     </Grid>
                   );
                 })}
