@@ -15,6 +15,7 @@ import treeicon from "../../assets/treeicon.png";
 import footicon from "../../assets/footicon.png";
 import footericon from "../../assets/footericon.png";
 import "react-gallery-carousel/dist/index.css";
+import HorizontalTimeline from "react-horizontal-timeline";
 
 import { Divider } from "@mui/material";
 import { useParams } from "react-router-dom";
@@ -26,29 +27,45 @@ export const Corporate = () => {
   const { event_id } = useParams();
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState(true);
+  const [trees, setTrees] = useState([]);
   const [found, setFound] = useState(true);
-//   const [index, setIndex] = useState(8);
+  const [value, setValue] = useState(0);
+  const [dates, setDates] = useState([]);
 
-//   const loadMore = () => {
-//     const newIndex = index + 8;
-//     const newShowMore = newIndex < 19;
-//     const newList = treeimages.slice(0, newIndex);
-//     setIndex(newIndex);
+  //   const [index, setIndex] = useState(8);
 
-//   };
+  //   const loadMore = () => {
+  //     const newIndex = index + 8;
+  //     const newShowMore = newIndex < 19;
+  //     const newList = treeimages.slice(0, newIndex);
+  //     setIndex(newIndex);
 
-//   const collapse = () => {
-//     setIndex(8);
-//     setTreeList(treeimages.slice(0, 8));
-//     setShowMore(true);
-//   };
+  //   };
+
+  //   const collapse = () => {
+  //     setIndex(8);
+  //     setTreeList(treeimages.slice(0, 8));
+  //     setShowMore(true);
+  //   };
+
+  const formatTrees = async (data) => {
+    let dates = [];
+    dates.push(data["date_added"].slice(0, 10));
+    dates.push("2022-06-14");
+    setDates(dates);
+    setTrees(
+      data["trees"].sort(function (a, b) {
+        return a.sapling_id - b.sapling_id;
+      })
+    );
+  };
 
   const fetchData = useCallback(async () => {
     try {
       const response = await Axios.default.get(
         `/events/corp?event_id=${event_id}`
       );
-      console.log(response.data["event"][0]);
+      await formatTrees(response.data["event"][0]);
       if (response.status === 200) {
         setData(response.data["event"][0]);
       } else {
@@ -186,13 +203,27 @@ export const Corporate = () => {
               <img src={treeicon} alt="tree" className={classes.treeicon} />
             </div>
             <div className={classes.treedesc}>The Trees Planted</div>
+            <div className={classes.h}>
+              <HorizontalTimeline
+                linePadding={100}
+                minEventPadding={100}
+                maxEventPadding={100}
+                styles={{ outline: "#fff", foreground: "#9BC53D" }}
+                index={value}
+                indexClick={(index) => {
+                  setValue(index);
+                }}
+                values={dates}
+              />
+            </div>
             <div className={classes.treeimgcontainer}>
               <Grid container spacing={3}>
-                {data["trees"].map((tree, idx) => {
+                {trees.map((tree, idx) => {
                   return (
                     <Grid item xs={6} md={3}>
                       <img
-                        src={tree["image"][0]}
+                        src={
+                            value === 0 ? tree["image"][0] : tree['updates']['photo_update'][0]['image']}
                         alt=""
                         className={classes.treeimg}
                       />
@@ -479,6 +510,18 @@ const useStyles = makeStyles((theme) =>
         marginLeft: "20px",
       },
     },
+    h: {
+      width: "50%",
+      maxWidth: "540px",
+      marginTop: "20px",
+      paddingBottom: "100px",
+      marginLeft: "auto",
+      marginRight: "auto",
+      color: "#fff",
+      [theme.breakpoints.down("480")]: {
+        width: "90%",
+      },
+    },
     treedesc: {
       fontSize: "40px",
       fontWeight: "500",
@@ -488,7 +531,6 @@ const useStyles = makeStyles((theme) =>
       marginLeft: "auto",
       marginRight: "auto",
       marginTop: "20px",
-      paddingBottom: "50px",
       [theme.breakpoints.down("480")]: {
         fontSize: "25px",
         width: "80%",
