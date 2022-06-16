@@ -175,7 +175,7 @@ export const Corporate = () => {
               }}
             ></div>
             <img
-              src="https://14treesplants.s3.ap-south-1.amazonaws.com/gat/gat_703.jpg"
+              src={data["plot_img"]}
               className={classes.plotimg}
               alt=""
             />

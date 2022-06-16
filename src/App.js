@@ -4,7 +4,6 @@ import { Visitor } from "./pages/Visitor/Visitor";
 import { AddTree } from "./pages/admin/Forms/components/Addtree";
 import { AddOrg } from "./pages/admin/Forms/components/Addorg";
 import { Dashboard } from "./pages/Dashboard";
-import { Kpit } from "./pages/events/Kpit_Corporate";
 import { Events } from "./pages/events/Events";
 import { NotFound } from "./pages/notfound/NotFound";
 import { AssignTree } from "./pages/admin/Forms/components/AssignTree";
@@ -42,7 +41,6 @@ function App() {
           <Route path="/profile/:saplingId" element={<Dashboard />}></Route>
           <Route path="/group/:grptype" element={<OrgEvent />}></Route>
           <Route path="/events/corp/:event_id" element={<Corporate />}></Route>
-          <Route path="/events/kpit-denso" element={<Kpit />}></Route>
           <Route path="/login" element={<Login />} />
           <Route
             path="/admin"
