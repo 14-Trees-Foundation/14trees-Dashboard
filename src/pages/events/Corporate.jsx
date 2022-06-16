@@ -394,8 +394,8 @@ const useStyles = makeStyles((theme) =>
       },
     },
     logo: {
-      maxWidth: "320px",
-      height: "60px",
+      maxWidth: "360px",
+      height: "80px",
     },
     maintxt: {
       fontSize: "40px",
