@@ -10,13 +10,13 @@ import { AddOrg } from "./components/Addorg";
 import { AddTree } from "./components/Addtree";
 import { Grid } from "@mui/material";
 import { TreeList } from "./components/TreeList";
-import { plotsList, treeTypesList } from "../../../store/adminAtoms";
+import { treeTypesList } from "../../../store/adminAtoms";
 import { AddPlot } from "./components/AddPlot";
+import { AddTreeType } from './components/AddTreeType';
 
 export const Forms = () => {
   const [loading, setLoading] = React.useState(true);
   const setTreeTypeslist = useSetRecoilState(treeTypesList);
-  const setPlotsList = useSetRecoilState(plotsList);
   const [selTrees, setSelectedTrees] = React.useState("");
 
   const fetchData = React.useCallback(async () => {
@@ -26,16 +26,11 @@ export const Forms = () => {
       if (TreeRes.status === 200) {
         setTreeTypeslist(TreeRes.data);
       }
-
-      let plotRes = await Axios.get(`/plots`);
-      if (plotRes.status === 200) {
-        setPlotsList(plotRes.data);
-      }
     } catch (error) {
       console.log(error);
     }
     setLoading(false);
-  }, [setPlotsList, setTreeTypeslist]);
+  }, [setTreeTypeslist]);
 
   React.useEffect(() => {
     fetchData();
@@ -63,13 +58,14 @@ export const Forms = () => {
         <div style={{ margin: "16px" }}>
           <TabsList>
             <Tab>Assign Trees</Tab>
+            <Tab>Add Tree Type</Tab>
             <Tab>Add Org</Tab>
             <Tab>Add Plot</Tab>
             <Tab>Add Tree</Tab>
           </TabsList>
         </div>
-        <TabPanel value={0} sx={{ ml: 2, mr: 2 }}>
-          <Grid container spacing={3}>
+        <TabPanel value={0} sx={{ ml: 2}}>
+          <Grid container spacing={2}>
             <Grid item xs={6}>
               <TreeList onTreeSelect={onTreeSelect} />
             </Grid>
@@ -79,12 +75,15 @@ export const Forms = () => {
           </Grid>
         </TabPanel>
         <TabPanel value={1}>
-          <AddOrg />
+          <AddTreeType />
         </TabPanel>
         <TabPanel value={2}>
-          <AddPlot />
+          <AddOrg />
         </TabPanel>
         <TabPanel value={3}>
+          <AddPlot />
+        </TabPanel>
+        <TabPanel value={4}>
           <AddTree />
         </TabPanel>
       </TabsUnstyled>
