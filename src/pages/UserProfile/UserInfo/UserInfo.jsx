@@ -82,12 +82,21 @@ export const UserInfo = () => {
               <div className={classes.data}>{selUserInfo.user.name}</div>
               {(selUserInfo.tree.event_type === "4" || selUserInfo.tree.desc) ? (
                 <>
-                  <div
-                    className={classes.data}
-                    style={{ fontStyle: "italic", fontSize: "15px" }}
-                  >
-                    {selUserInfo.tree.desc}
-                  </div>
+                  {selUserInfo.gifted_by &&
+                    selUserInfo.gifted_by !== undefined && (
+                      <>
+                        <div className={classes.label}>Gifted By</div>
+                        <div
+                          style={{
+                            fontSize: "15px",
+                            fontWeight: "600",
+                            marginBottom: "8px",
+                          }}
+                        >
+                          {selUserInfo.gifted_by}
+                        </div>
+                      </>
+                  )}
                   {selUserInfo.planted_by &&
                     selUserInfo.planted_by !== undefined && (
                       <>
@@ -103,10 +112,17 @@ export const UserInfo = () => {
                         </div>
                       </>
                     )}
-                  <div className={classes.label}>Tree Name</div>
-                  <div className={classes.data}>
-                    {selUserInfo.tree.tree_type.name}
-                  </div>
+                  {
+                    <div>
+                      <div className={classes.label}>Event</div>
+                      <div
+                          className={classes.data}
+                          style={{ fontStyle: "italic", fontSize: "15px" }}
+                        >
+                          {selUserInfo.tree.desc}
+                        </div>
+                    </div>
+                  }
                   {!selUserInfo.planted_by && (
                     <Fragment>
                     <div className={classes.growth}>
