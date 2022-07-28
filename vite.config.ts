@@ -9,7 +9,7 @@ export default ({ mode }) => {
             "process.env.NODE_ENV": `"${mode}"`,
         },
         build: {
-            outDir: '../build'
+            outDir: './build'
         }
     })
 }
