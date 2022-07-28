@@ -13,8 +13,6 @@ import icon from "../../../assets/marker.png";
 import { useRecoilValue } from "recoil";
 import { usersData, selUsersData } from "../../../store/atoms";
 
-require("dotenv").config();
-
 const containerStyle = {
   width: "100%",
   height: "100%",
@@ -66,7 +64,7 @@ export const Map = () => {
 
   const { isLoaded } = useJsApiLoader({
     id: "google-map-script",
-    googleMapsApiKey: process.env.REACT_APP_API_MAP_KEY,
+    googleMapsApiKey: import.meta.env.VITE_API_MAP_KEY,
   });
 
   const onMarkerClick = (i) => {

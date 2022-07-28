@@ -10,9 +10,8 @@ import reportWebVitals from "./reportWebVitals";
 import { BrowserRouter } from "react-router-dom";
 import { makeServer } from "./mockServer/server";
 import { RecoilRoot } from "recoil";
-require("dotenv").config();
 
-if (process.env.REACT_APP_ENV === "development") {
+if (import.meta.env.VITE_ENV === "development") {
   makeServer({
     environment: "development",
   });

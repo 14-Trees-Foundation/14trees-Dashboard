@@ -15,7 +15,7 @@ import treeicon from "../../assets/treeicon.png";
 import footicon from "../../assets/footicon.png";
 import footericon from "../../assets/footericon.png";
 import "react-gallery-carousel/dist/index.css";
-import HorizontalTimeline from "react-horizontal-timeline";
+// import HorizontalTimeline from "react-horizontal-timeline";
 
 import { Divider } from "@mui/material";
 import { useParams } from "react-router-dom";
@@ -204,7 +204,7 @@ export const Corporate = () => {
             </div>
             <div className={classes.treedesc}>The Trees Planted</div>
             <div className={classes.h}>
-              <HorizontalTimeline
+              {/* <HorizontalTimeline
                 linePadding={100}
                 minEventPadding={100}
                 maxEventPadding={100}
@@ -214,7 +214,7 @@ export const Corporate = () => {
                   setValue(index);
                 }}
                 values={dates}
-              />
+              /> */}
             </div>
             <div className={classes.treeimgcontainer}>
               <Grid container spacing={3}>
