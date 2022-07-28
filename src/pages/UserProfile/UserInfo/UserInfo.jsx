@@ -2,6 +2,7 @@ import { Fragment, useState } from "react";
 import { Dialog, Grid } from "@mui/material";
 import { createStyles, makeStyles } from "@mui/styles";
 import { useRecoilValue, useRecoilState } from "recoil";
+import { strEquals } from "../../../helpers/utils";
 // import { useSetRecoilState } from 'recoil';
 
 import { Memories } from "../Memories/Memories";
@@ -83,9 +84,9 @@ export const UserInfo = () => {
               {(selUserInfo.tree.event_type === "4" || selUserInfo.tree.desc) ? (
                 <>
                   {selUserInfo.gifted_by &&
-                    selUserInfo.gifted_by !== undefined && (
+                    selUserInfo.gifted_by !== undefined && !strEquals(selUserInfo.gifted_by, selUserInfo.user.name) && (
                       <>
-                        <div className={classes.label}>Gifted By</div>
+                        <div className={classes.label}>Donated By</div>
                         <div
                           style={{
                             fontSize: "15px",
