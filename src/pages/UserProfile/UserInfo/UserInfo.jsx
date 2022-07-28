@@ -159,7 +159,7 @@ export const UserInfo = () => {
                   {selUserInfo.donated_by &&
                     selUserInfo.donated_by._id !== selUserInfo.user._id && (
                       <>
-                        <div className={classes.label}>Gifted By</div>
+                        <div className={classes.label}>Donated By</div>
                         {selUserInfo.gifted_by &&
                         selUserInfo.gifted_by !== "undefined" ? (
                           <div className={classes.data}>
