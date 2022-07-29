@@ -75,7 +75,7 @@ export const UserInfo = () => {
           <Grid item xs={6} md={3} className={classes.infobox}>
             <div className={classes.info}>
               {selUserInfo.tree.event_type &&
-              selUserInfo.tree.event_type === "2" ? (
+                selUserInfo.tree.event_type === "2" ? (
                 <div className={classes.label}>In Memory of</div>
               ) : (
                 <div className={classes.label}>Name</div>
@@ -97,7 +97,7 @@ export const UserInfo = () => {
                           {selUserInfo.gifted_by}
                         </div>
                       </>
-                  )}
+                    )}
                   {selUserInfo.planted_by &&
                     selUserInfo.planted_by !== undefined && (
                       <>
@@ -117,51 +117,51 @@ export const UserInfo = () => {
                     <div>
                       <div className={classes.label}>Event</div>
                       <div
-                          className={classes.data}
-                          style={{ fontStyle: "italic", fontSize: "15px" }}
-                        >
-                          {selUserInfo.tree.desc}
-                        </div>
+                        className={classes.data}
+                        style={{ fontStyle: "italic", fontSize: "15px" }}
+                      >
+                        {selUserInfo.tree.desc}
+                      </div>
                     </div>
                   }
                   {!selUserInfo.planted_by && (
                     <Fragment>
-                    <div className={classes.growth}>
-                      <div style={{ marginTop: "20px" }}>
-                        <div style={{ display: "flex" }}>
-                          <InfoChip
-                            count={userinfo.usertrees.length}
-                            label="Trees Planted"
-                            onClick={handleTreeClick}
-                          />
-                        </div>
-                        <div className={classes.overall}>
-                          <div
-                            className={classes.done}
-                            style={{ width: `${treeDoneWidth}%` }}
-                          ></div>
-                          <div className={classes.count}>
-                            {14 - userinfo.usertrees.length}
-                            <div className={classes.countdesc}>
-                              Trees away from neutralising your carbon
-                              footprint
+                      <div className={classes.growth}>
+                        <div style={{ marginTop: "20px" }}>
+                          <div style={{ display: "flex" }}>
+                            <InfoChip
+                              count={userinfo.usertrees.length}
+                              label="Trees Planted"
+                              onClick={handleTreeClick}
+                            />
+                          </div>
+                          <div className={classes.overall}>
+                            <div
+                              className={classes.done}
+                              style={{ width: `${treeDoneWidth}%` }}
+                            ></div>
+                            <div className={classes.count}>
+                              {14 - userinfo.usertrees.length}
+                              <div className={classes.countdesc}>
+                                Trees away from neutralising your carbon
+                                footprint
+                              </div>
                             </div>
                           </div>
                         </div>
                       </div>
-                    </div>
-                  </Fragment>
+                    </Fragment>
                   )
                   }
                 </>
               ) : (
                 <>
                   {selUserInfo.donated_by &&
-                    selUserInfo.donated_by._id !== selUserInfo.user._id && (
+                    selUserInfo.donated_by._id !== selUserInfo.user._id && selUserInfo.gifted_by !== "ACM India" && (
                       <>
                         <div className={classes.label}>Donated By</div>
                         {selUserInfo.gifted_by &&
-                        selUserInfo.gifted_by !== "undefined" ? (
+                          selUserInfo.gifted_by !== "undefined" ? (
                           <div className={classes.data}>
                             {selUserInfo.gifted_by}
                           </div>
@@ -174,8 +174,10 @@ export const UserInfo = () => {
                     )}
                   {selUserInfo.planted_by &&
                     selUserInfo.planted_by !== undefined && (
+
                       <>
-                        <div className={classes.label}>Planted By</div>
+
+                        <div className={classes.label}>{selUserInfo.planted_by === "ACM India Council" ? "Organisation" : "Planted By"}</div>
                         <div
                           style={{
                             fontSize: "15px",
@@ -191,15 +193,15 @@ export const UserInfo = () => {
                     (selUserInfo.donated_by !== undefined &&
                       selUserInfo.donated_by._id === selUserInfo.user._id) ? (
                       <>
-                      <div className={classes.label}>Organization</div>
-                      <div className={classes.data}>
-                        {selUserInfo.orgid.name}
-                      </div>
-                    </>
+                        <div className={classes.label}>Organization</div>
+                        <div className={classes.data}>
+                          {selUserInfo.orgid.name}
+                        </div>
+                      </>
                     ) : ("")
                   )}
                   {(selUserInfo.planted_by || (selUserInfo.donated_by !== undefined &&
-                    selUserInfo.donated_by._id !== selUserInfo.user._id))  && (
+                    selUserInfo.donated_by._id !== selUserInfo.user._id)) && (
                       <>
                         <div className={classes.label}>Tree Name</div>
                         <div className={classes.data}>
@@ -235,16 +237,16 @@ export const UserInfo = () => {
                         </div>
                       </div>
                     </Fragment>
-                  ): 
+                  ) :
                     (selUserInfo.planted_by ||
                       (selUserInfo.donated_by && selUserInfo.donated_by._id !== selUserInfo.user._id)) && (
-                        <>
-                          <div className={classes.label}>Location</div>
-                          <div className={classes.data}>
-                            {selUserInfo.tree.plot.name}
-                          </div>
-                        </>
-                      )
+                      <>
+                        <div className={classes.label}>Location</div>
+                        <div className={classes.data}>
+                          {selUserInfo.tree.plot.name}
+                        </div>
+                      </>
+                    )
                   }
                 </>
               )}
