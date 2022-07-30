@@ -212,6 +212,7 @@ export const GiftTrees = () => {
         };
       });
     } catch (error) {
+      console.error(error)
       if (error.response.status === 404) {
         setValues((values) => {
           return {
