@@ -101,7 +101,10 @@ export const UserInfo = () => {
                   {selUserInfo.planted_by &&
                     selUserInfo.planted_by !== undefined && (
                       <>
-                        <div className={classes.label}>Planted By</div>
+
+                        <div className={classes.label}>
+                          {selUserInfo.planted_by === "ACM India Council" ? "Organisation" : "Planted By"}
+                        </div>
                         <div
                           style={{
                             fontSize: "15px",
