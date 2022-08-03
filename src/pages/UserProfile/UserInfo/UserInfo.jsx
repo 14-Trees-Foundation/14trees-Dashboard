@@ -36,7 +36,7 @@ export const UserInfo = () => {
 
   const treeDoneWidth = (userinfo.usertrees.length / 14) * 100;
 
-
+  // TODO: use strEquals from helpers/utils instead
   function Check_String(str1) {
     if (!str1) {
       return str1;
@@ -45,6 +45,8 @@ export const UserInfo = () => {
       return str1.trim();
     }
   }
+
+
 
 
   if (open) {
@@ -95,7 +97,7 @@ export const UserInfo = () => {
               {(selUserInfo.tree.event_type === "4" || selUserInfo.tree.desc) ? (
                 <>
                   {selUserInfo.gifted_by &&
-                    selUserInfo.gifted_by !== undefined && !strEquals(selUserInfo.gifted_by, selUserInfo.user.name) && Check_String(selUserInfo.gifted_by) !== "ACM India" && Check_String(selUserInfo.gifted_by) !== "ACM India Council" && (
+                    selUserInfo.gifted_by !== undefined && !strEquals(selUserInfo.gifted_by, selUserInfo.user.name) && Check_String(selUserInfo.gifted_by) !== "ACM India" && Check_String(selUserInfo.gifted_by) !== "ACM India Council" && selUserInfo.gifted_by && (
                       <>
                         <div className={classes.label}>Donated By</div>
                         <div
@@ -168,7 +170,7 @@ export const UserInfo = () => {
               ) : (
                 <>
                   {selUserInfo.donated_by &&
-                    selUserInfo.donated_by._id !== selUserInfo.user._id && Check_String(selUserInfo.donated_by.name) !== "ACM India" && Check_String(selUserInfo.gifted_by) !== "ACM India" && Check_String(selUserInfo.gifted_by) !== "ACM India Council" && Check_String(selUserInfo.donated_by.name) !== "ACM India Council" && (
+                    selUserInfo.donated_by._id !== selUserInfo.user._id && Check_String(selUserInfo.gifted_by) !== "ACM India" && Check_String(selUserInfo.gifted_by) !== "ACM India Council" && (
                       <>
                         <div className={classes.label}>Donated By</div>
                         {selUserInfo.gifted_by &&
@@ -185,10 +187,10 @@ export const UserInfo = () => {
                     )}
                   {selUserInfo.planted_by &&
                     selUserInfo.planted_by !== undefined && (
+
                       <>
                         <div className={classes.label}>{
                           Check_String(selUserInfo.planted_by) === "ACM India Council" ? "Organisation" : "Planted By"
-
                         }</div>
                         <div
                           style={{
@@ -212,7 +214,7 @@ export const UserInfo = () => {
                       </>
                     ) : ("")
                   )}
-                  {(selUserInfo.planted_by || (selUserInfo.donated_by !== undefined &&
+                  {/* {(selUserInfo.planted_by || (selUserInfo.donated_by !== undefined &&
                     selUserInfo.donated_by._id !== selUserInfo.user._id)) && (
                       <>
                         <div className={classes.label}>Tree Name</div>
@@ -220,7 +222,7 @@ export const UserInfo = () => {
                           {selUserInfo.tree.tree_type.name}
                         </div>
                       </>
-                    )}
+                    )} */}
                   {((!selUserInfo.planted_by && !selUserInfo.donated_by) ||
                     (selUserInfo.donated_by && selUserInfo.donated_by._id === selUserInfo.user._id)) ? (
                     <Fragment>
@@ -250,15 +252,16 @@ export const UserInfo = () => {
                       </div>
                     </Fragment>
                   ) :
-                    (selUserInfo.planted_by ||
-                      (selUserInfo.donated_by && selUserInfo.donated_by._id !== selUserInfo.user._id)) && (
-                      <>
-                        <div className={classes.label}>Location</div>
-                        <div className={classes.data}>
-                          {selUserInfo.tree.plot.name}
-                        </div>
-                      </>
-                    )
+                    // (selUserInfo.planted_by ||
+                    //   (selUserInfo.donated_by && selUserInfo.donated_by._id !== selUserInfo.user._id)) && (
+                    //   <>
+                    //     <div className={classes.label}>Location</div>
+                    //     <div className={classes.data}>
+                    //       {selUserInfo.tree.plot.name}
+                    //     </div>
+                    //   </>
+                    // )
+                    <></>
                   }
                 </>
               )}
