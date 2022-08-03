@@ -185,10 +185,10 @@ export const UserInfo = () => {
                     )}
                   {selUserInfo.planted_by &&
                     selUserInfo.planted_by !== undefined && (
+
                       <>
                         <div className={classes.label}>{
                           Check_String(selUserInfo.planted_by) === "ACM India Council" ? "Organisation" : "Planted By"
-
                         }</div>
                         <div
                           style={{
