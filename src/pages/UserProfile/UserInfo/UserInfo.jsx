@@ -36,6 +36,17 @@ export const UserInfo = () => {
 
   const treeDoneWidth = (userinfo.usertrees.length / 14) * 100;
 
+  // TODO: use strEquals from helpers/utils instead
+  function Check_String(str1) {
+    if (!str1) {
+      return str1;
+    }
+    else {
+      return str1.trim();
+    }
+  }
+
+
   if (open) {
     return (
       <div>
@@ -84,7 +95,7 @@ export const UserInfo = () => {
               {(selUserInfo.tree.event_type === "4" || selUserInfo.tree.desc) ? (
                 <>
                   {selUserInfo.gifted_by &&
-                    selUserInfo.gifted_by !== undefined && !strEquals(selUserInfo.gifted_by, selUserInfo.user.name) && (
+                    selUserInfo.gifted_by !== undefined && !strEquals(selUserInfo.gifted_by, selUserInfo.user.name) && Check_String(selUserInfo.gifted_by) !== "ACM India" && Check_String(selUserInfo.gifted_by) !== "ACM India Council" && (
                       <>
                         <div className={classes.label}>Donated By</div>
                         <div
@@ -101,7 +112,7 @@ export const UserInfo = () => {
                   {selUserInfo.planted_by &&
                     selUserInfo.planted_by !== undefined && (
                       <>
-                        <div className={classes.label}>Planted By</div>
+                        <div className={classes.label}>{Check_String(selUserInfo.planted_by) === "ACM India Council" ? "Organisation" : "Planted By"}</div>
                         <div
                           style={{
                             fontSize: "15px",
@@ -157,7 +168,7 @@ export const UserInfo = () => {
               ) : (
                 <>
                   {selUserInfo.donated_by &&
-                    selUserInfo.donated_by._id !== selUserInfo.user._id && selUserInfo.gifted_by !== "ACM India" && (
+                    selUserInfo.donated_by._id !== selUserInfo.user._id && Check_String(selUserInfo.donated_by.name) !== "ACM India" && Check_String(selUserInfo.gifted_by) !== "ACM India" && Check_String(selUserInfo.gifted_by) !== "ACM India Council" && Check_String(selUserInfo.donated_by.name) !== "ACM India Council" && (
                       <>
                         <div className={classes.label}>Donated By</div>
                         {selUserInfo.gifted_by &&
@@ -176,8 +187,9 @@ export const UserInfo = () => {
                     selUserInfo.planted_by !== undefined && (
 
                       <>
-
-                        <div className={classes.label}>{selUserInfo.planted_by === "ACM India Council" ? "Organisation" : "Planted By"}</div>
+                        <div className={classes.label}>{
+                          Check_String(selUserInfo.planted_by) === "ACM India Council" ? "Organisation" : "Planted By"
+                        }</div>
                         <div
                           style={{
                             fontSize: "15px",
