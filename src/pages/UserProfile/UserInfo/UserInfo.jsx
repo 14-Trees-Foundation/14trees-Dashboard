@@ -36,7 +36,7 @@ export const UserInfo = () => {
 
   const treeDoneWidth = (userinfo.usertrees.length / 14) * 100;
 
-
+  // TODO: use strEquals from helpers/utils instead
   function Check_String(str1) {
     if (!str1) {
       return str1;
@@ -187,10 +187,10 @@ export const UserInfo = () => {
                     )}
                   {selUserInfo.planted_by &&
                     selUserInfo.planted_by !== undefined && (
+
                       <>
                         <div className={classes.label}>{
                           Check_String(selUserInfo.planted_by) === "ACM India Council" ? "Organisation" : "Planted By"
-
                         }</div>
                         <div
                           style={{
