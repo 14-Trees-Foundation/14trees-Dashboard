@@ -36,7 +36,7 @@ export const UserInfo = () => {
 
   const treeDoneWidth = (userinfo.usertrees.length / 14) * 100;
 
-
+  // TODO: use strEquals from helpers/utils instead
   function Check_String(str1) {
     if (!str1) {
       return str1;
