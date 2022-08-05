@@ -1,8 +1,8 @@
 # 14 Trees Dashboard Frontent
 
 Set the environment variables:
-- `REACT_APP_API_MAP_KEY
-- `REACT_APP_CLIENT_ID
+- `REACT_APP_API_MAP_KEY`
+- `REACT_APP_CLIENT_ID`
 
 Install dependencies `yarn install`
 and start the development server: `yarn dev`
