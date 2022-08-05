@@ -101,7 +101,7 @@ export const UserInfo = () => {
                   {selUserInfo.planted_by &&
                     selUserInfo.planted_by !== undefined && (
                       <>
-                        <div className={classes.label}>{strEquals(selUserInfo.planted_by, "ACM India Council") ? "Organisation" : "Planted By"}</div>
+                        <div className={classes.label}>{strEquals(selUserInfo.planted_by, "ACM India Council") ? "Planted via" : "Planted By"}</div>
                         <div
                           style={{
                             fontSize: "15px",
@@ -177,7 +177,7 @@ export const UserInfo = () => {
 
                       <>
                         <div className={classes.label}>{
-                          strEquals(selUserInfo.planted_by, "ACM India Council") ? "Organisation" : "Planted By"
+                          strEquals(selUserInfo.planted_by, "ACM India Council") ? "Planted via" : "Planted By"
                         }</div>
                         <div
                           style={{
