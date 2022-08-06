@@ -157,7 +157,7 @@ export const UserInfo = () => {
               ) : (
                 <>
                   {selUserInfo.donated_by &&
-                    selUserInfo.donated_by._id !== selUserInfo.user._id && !strEquals(selUserInfo.gifted_by, "ACM India") && !strEquals(selUserInfo.gifted_by, "ACM India Council") && (
+                    selUserInfo.donated_by._id !== selUserInfo.user._id && !strEquals(selUserInfo.gifted_by, "ACM India") && !strEquals(selUserInfo.gifted_by, "ACM India Council") && !(!selUserInfo.gifted_by && (strEquals(selUserInfo.donated_by.name, "ACM India") || strEquals(selUserInfo.donated_by.name, "ACM India Council"))) && (
                       <>
                         <div className={classes.label}>Donated By</div>
                         {selUserInfo.gifted_by &&
