@@ -60,7 +60,7 @@ export const Admin = () => {
     }
 
     setLoading(false);
-  }, [setSummary, navigate, setTreeLoggedByDate, token]);
+  }, [setSummary, navigate, setTreeLoggedByDate, setPlotsList, token]);
 
   useEffect(() => {
     fetchData();
