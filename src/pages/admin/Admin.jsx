@@ -11,6 +11,7 @@ import {
   summary,
   adminNavIndex,
   treeLoggedByDate,
+  plotsList
 } from "../../store/adminAtoms";
 import { AdminHome } from "./home/AdminHome";
 import { Tree } from "./tree/Tree";
@@ -24,6 +25,7 @@ export const Admin = () => {
   const [loading, setLoading] = useState(true);
   const setSummary = useSetRecoilState(summary);
   const setTreeLoggedByDate = useSetRecoilState(treeLoggedByDate);
+  const setPlotsList = useSetRecoilState(plotsList);
   const index = useRecoilValue(adminNavIndex);
   const token = JSON.parse(localStorage.getItem("token"));
   const navigate = useNavigate();
@@ -46,6 +48,10 @@ export const Admin = () => {
           element["_id"] = element["_id"].substring(0, 10);
         });
         setTreeLoggedByDate(response.data);
+      }
+      let plotRes = await Axios.default.get(`/plots`);
+      if (plotRes.status === 200) {
+        setPlotsList(plotRes.data);
       }
     } catch (error) {
       if (error.response.status === 500) {
