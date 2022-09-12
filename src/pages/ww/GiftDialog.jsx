@@ -236,7 +236,7 @@ export const GiftDialog = (props) => {
                     {({ input, meta }) => (
                       <TextField
                         variant="outlined"
-                        label="Gifted By"
+                        label="Donated By"
                         name="gifted_by"
                         fullWidth
                         error={meta.error && meta.touched ? true : false}
