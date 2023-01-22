@@ -89,7 +89,7 @@ export const Dashboard = () => {
 
     setLoading(false);
   }, [
-    setTemplate,
+    template,
     saplingId,
     setUserinfo,
     setOverallInfo,
