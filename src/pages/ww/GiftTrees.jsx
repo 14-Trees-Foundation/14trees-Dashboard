@@ -230,6 +230,7 @@ export const GiftTrees = () => {
     (async () => {
       await fetchTrees();
     })();
+   document.title = "14Trees Dashboard - Assign Trees"
   }, [fetchTrees]);
 
   const handleSaplingClick = () => {

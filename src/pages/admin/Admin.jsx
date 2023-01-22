@@ -64,6 +64,7 @@ export const Admin = () => {
 
   useEffect(() => {
     fetchData();
+    document.title = "14Trees Admin Home";
   }, [fetchData]);
 
   const pages = [

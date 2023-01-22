@@ -1,5 +1,6 @@
 import Box from "@mui/material/Box";
 import useMediaQuery from "@mui/material/useMediaQuery";
+import { createStyles, makeStyles } from "@mui/styles";
 
 import { useParams } from "react-router";
 import { useEffect, useState, useCallback } from "react";
@@ -27,6 +28,7 @@ import { Spinner } from "../components/Spinner";
 import logo from "../assets/logo_white_small.png";
 
 export const Dashboard = () => {
+  const styles = useStyles();
   const matches = useMediaQuery("(max-width:601px)");
   const { saplingId } = useParams();
 
@@ -41,6 +43,7 @@ export const Dashboard = () => {
 
   const [loading, setLoading] = useState(true);
   const [found, setFound] = useState(true);
+  const [template, setTemplate] = useState("");
 
   const onToggleVideo = () => {
     setOpen(false);
@@ -52,6 +55,8 @@ export const Dashboard = () => {
       if (response.status === 200) {
         // let data = response.data.usertrees.filter(function (data) {return data.tree.sapling_id === saplingId});
         setUserinfo(response.data);
+        setTemplate(response.data?.usertrees[0]?.tree?.plot?.name.includes("G20") ? "G20" : "");
+        console.log(response, template)
         setSelectedUserinfo(
           response.data.usertrees.filter(
             (data) => data.tree.sapling_id === saplingId
@@ -84,6 +89,7 @@ export const Dashboard = () => {
 
     setLoading(false);
   }, [
+    setTemplate,
     saplingId,
     setUserinfo,
     setOverallInfo,
@@ -113,7 +119,7 @@ export const Dashboard = () => {
       logo: logo,
     },
   ];
-  const mainBox = () => {
+  const MainBox = () => {
     const Page = pages[index].page;
     return <Page saplingId={saplingId} />;
   };
@@ -134,14 +140,53 @@ export const Dashboard = () => {
     return (
       <Box sx={{ display: "flex" }}>
         <LeftDrawer saplingId={saplingId} />
-        <Box
-          component="main"
-          sx={{ backgroundColor: "#e5e5e5", width: matches ? "100%" : "65%" }}
-        >
-          {mainBox()}
+        <Box component="main"
+          sx={{ backgroundColor: "#e5e5e5", width: matches ? "100%" : "65%" }}>
+          <MainBox/>
         </Box>
-        <RightDrawer />
+        {
+          template === "G20" ?
+            <RightDrawer showWhatsNew={false}>
+              <div className={styles.feed}>
+                <TwitterEmbed/> 
+              </div>
+            </RightDrawer> :
+            <RightDrawer showWhatsNew={true}/>
+        }
       </Box>
     );
   }
 };
+
+const TwitterEmbed = () => {
+  useEffect(() => {
+    const script = document.createElement("script");
+    script.src = "https://platform.twitter.com/widgets.js";
+    document.getElementsByClassName("twitter-embed")[0].appendChild(script);
+  }, []);
+  return (
+    <div className="twitter-embed">
+      <a class="twitter-timeline"
+        // data-width="360"
+        data-height="560"
+        href="https://twitter.com/g20org?ref_src=twsrc%5Etfw">Tweets by g20org
+      </a>
+    </div>
+  )
+}
+
+const useStyles = makeStyles((theme) =>
+  createStyles({
+    feed: {
+      marginLeft: "4%",
+      marginRight: "4%",
+      "&::-webkit-scrollbar": {
+        width: "0.6em",
+      },
+      [theme.breakpoints.down("1025")]: {
+        marginTop: "5px",
+        maxHeight: "35vh",
+      },
+    }
+  })
+);  

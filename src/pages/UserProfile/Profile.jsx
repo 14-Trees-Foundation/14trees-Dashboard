@@ -12,6 +12,7 @@ import { selUsersData } from "../../store/atoms";
 
 import logo from "../../assets/icon_round.png";
 import { Button } from "@mui/material";
+import { useEffect } from "react";
 
 export const Profile = ({ saplingId }) => {
   const matches = useMediaQuery("(max-width:481px)");
@@ -19,6 +20,10 @@ export const Profile = ({ saplingId }) => {
   const selUserInfo = useRecoilValue(selUsersData);
 
   const username = selUserInfo.user.name.split(" ")[0];
+
+  useEffect(() => {
+    document.title = "14Trees Dashboard - Profile: " + username;
+  }, [username])
 
   const header = () => {
     if (!matches) {
