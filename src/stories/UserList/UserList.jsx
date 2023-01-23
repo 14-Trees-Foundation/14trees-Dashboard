@@ -29,7 +29,7 @@ export const UserList = ({ handleClick }) => {
               <Avatar
                 className={classes.profile}
                 alt="Profile"
-                src={i.user_trees[0].profile_image[0]}
+                src={i.user_trees[0]?.profile_image?.length > 0 ? i.user_trees[0].profile_image[0] : ""}
                 sx={{ width: 40, height: 40 }}
               />
               <div className={classes.itemlong}>{i.name}</div>

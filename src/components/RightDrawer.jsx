@@ -5,7 +5,7 @@ import Drawer from "@mui/material/Drawer";
 import { NewsFeed } from "./NewsFeed";
 import { Impact } from "../stories/Impact/Impact";
 
-export const RightDrawer = () => {
+export const RightDrawer = ({showWhatsNew = true, children = null}) => {
   const classes = useStyles();
   return (
     <Drawer className={classes.rdrawer} variant="permanent" anchor="right">
@@ -30,12 +30,15 @@ export const RightDrawer = () => {
               text={"Trees planted till date"}
             />
           </div>
+        </div>
+        {children}
+        { showWhatsNew ? <div>
           <h3 style={{ marginLeft: "9%" }}>What's New</h3>
           <Divider style={{ margin: "0 9% 2% 9%" }} />
-        </div>
-        <div className={classes.feed}>
-          <NewsFeed />
-        </div>
+          <div className={classes.feed}>
+            <NewsFeed />
+          </div>
+        </div> : null}
       </div>
     </Drawer>
   );
