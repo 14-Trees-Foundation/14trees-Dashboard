@@ -94,8 +94,8 @@ export const TreeCountByType = () => {
 
   let fiilteredCount = treeCountByType.map((item) => {
     return {
-      name: item.tree_type[0].name,
-      value: item.count,
+      name: item?.tree_type[0]?.name,
+      value: item?.count,
     };
   });
 
