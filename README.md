@@ -3,6 +3,7 @@
 Set the environment variables:
 - `REACT_APP_API_MAP_KEY`
 - `REACT_APP_CLIENT_ID`
+- `REACT_APP_ENV=development|production`
 
 Install dependencies `yarn install`
 and start the development server: `yarn dev`
