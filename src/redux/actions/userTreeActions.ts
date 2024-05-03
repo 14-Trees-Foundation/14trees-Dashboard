@@ -1,29 +1,29 @@
 import ApiClient from "../../api/apiClient/apiClient";
-import treeTypeActionTypes from "../actionTypes/treeTypeActionTypes";
-import { TreeType } from "../../types/treeType";
+import userTreeActionTypes from "../actionTypes/userTreeActionTypes";
+import { UserTree } from "../../types/userTree";
 
-export const getTreeTypes = () => {
+export const getUserTrees = () => {
     const apiClient = new ApiClient()
     return (dispatch: any) => {
         dispatch({
-            type: treeTypeActionTypes.GET_TREE_TYPES_REQUESTED,
+            type: userTreeActionTypes.GET_USER_TREES_REQUESTED,
         });
-        apiClient.getTreeTypes().then(
-            (value: TreeType[]) => {
+        apiClient.getUserTrees().then(
+            (value: UserTree[]) => {
                 for (let i = 0; i < value.length; i++) {
                     if (value[i]?._id) {
                         value[i].key = value[i]._id
                     }
                 }
                 dispatch({
-                    type: treeTypeActionTypes.GET_TREE_TYPES_SUCCEEDED,
+                    type: userTreeActionTypes.GET_USER_TREES_SUCCEEDED,
                     payload: value,
                 });
             },
             (error: any) => {
                 console.log(error)
                 dispatch({
-                    type: treeTypeActionTypes.GET_TREE_TYPES_FAILED,
+                    type: userTreeActionTypes.GET_USER_TREES_FAILED,
                     payload: error
                 });
             }
@@ -31,46 +31,46 @@ export const getTreeTypes = () => {
     }
 };
 
-export const createTreeTypes = (record: TreeType) => {
+export const createUserTrees = (record: UserTree) => {
     const apiClient = new ApiClient();
     return (dispatch: any) => {
         dispatch({
-            type: treeTypeActionTypes.CREATE_TREE_TYPE_REQUESTED,
+            type: userTreeActionTypes.CREATE_USER_TREE_REQUESTED,
         });
-        apiClient.createTreeType(record).then(
-            (value: TreeType) => {
+        apiClient.createUserTree(record).then(
+            (value: UserTree) => {
                 dispatch({
-                    type: treeTypeActionTypes.CREATE_TREE_TYPE_SUCCEEDED,
+                    type: userTreeActionTypes.CREATE_USER_TREE_SUCCEEDED,
                     payload: value,
                 });
             },
             (error: any) => {
                 console.error(error);
                 dispatch({
-                    type: treeTypeActionTypes.CREATE_TREE_TYPE_FAILED,
+                    type: userTreeActionTypes.CREATE_USER_TREE_FAILED,
                 });
             }
         )
     };
 };
 
-export const updateTreeTypes = (record: TreeType) => {
+export const updateUserTrees = (record: UserTree) => {
     const apiClient = new ApiClient();
     return (dispatch: any) => {
         dispatch({
-            type: treeTypeActionTypes.UPDATE_TREE_TYPE_REQUESTED,
+            type: userTreeActionTypes.UPDATE_USER_TREE_REQUESTED,
         });
-        apiClient.updateTreeType(record).then(
-            (value: TreeType) => {
+        apiClient.updateUserTree(record).then(
+            (value: UserTree) => {
                 dispatch({
-                    type: treeTypeActionTypes.UPDATE_TREE_TYPE_SUCCEEDED,
+                    type: userTreeActionTypes.UPDATE_USER_TREE_SUCCEEDED,
                     payload: value,
                 });
             },
             (error: any) => {
                 console.error(error);
                 dispatch({
-                    type: treeTypeActionTypes.UPDATE_TREE_TYPE_FAILED,
+                    type: userTreeActionTypes.UPDATE_USER_TREE_FAILED,
                 });
             }
         )
@@ -78,23 +78,23 @@ export const updateTreeTypes = (record: TreeType) => {
 };
 
 
-export const deleteTreeTypes = (record: TreeType) => {
+export const deleteUserTrees = (record: UserTree) => {
     const apiClient = new ApiClient();
     return (dispatch: any) => {
         dispatch({
-            type: treeTypeActionTypes.DELETE_TREE_TYPE_REQUESTED,
+            type: userTreeActionTypes.DELETE_USER_TREE_REQUESTED,
         });
-        apiClient.deleteTreeType(record).then(
+        apiClient.deleteUserTree(record).then(
             (id: string) => {
                 dispatch({
-                    type: treeTypeActionTypes.DELETE_TREE_TYPE_SUCCEEDED,
+                    type: userTreeActionTypes.DELETE_USER_TREE_SUCCEEDED,
                     payload: id,
                 });
             },
             (error: any) => {
                 console.error(error);
                 dispatch({
-                    type: treeTypeActionTypes.DELETE_TREE_TYPE_FAILED,
+                    type: userTreeActionTypes.DELETE_USER_TREE_FAILED,
                 });
             }
         )

@@ -1,29 +1,29 @@
 import ApiClient from "../../api/apiClient/apiClient";
-import treeTypeActionTypes from "../actionTypes/treeTypeActionTypes";
-import { TreeType } from "../../types/treeType";
+import onsiteStaffActionTypes from "../actionTypes/onSiteStaffActionTypes";
+import { OnsiteStaff } from "../../types/onSiteStaff";
 
-export const getTreeTypes = () => {
+export const getOnsiteStaffs = () => {
     const apiClient = new ApiClient()
     return (dispatch: any) => {
         dispatch({
-            type: treeTypeActionTypes.GET_TREE_TYPES_REQUESTED,
+            type: onsiteStaffActionTypes.GET_ONSITE_STAFF_REQUESTED,
         });
-        apiClient.getTreeTypes().then(
-            (value: TreeType[]) => {
+        apiClient.getOnsiteStaff().then(
+            (value: OnsiteStaff[]) => {
                 for (let i = 0; i < value.length; i++) {
                     if (value[i]?._id) {
                         value[i].key = value[i]._id
                     }
                 }
                 dispatch({
-                    type: treeTypeActionTypes.GET_TREE_TYPES_SUCCEEDED,
+                    type: onsiteStaffActionTypes.GET_ONSITE_STAFF_SUCCEEDED,
                     payload: value,
                 });
             },
             (error: any) => {
                 console.log(error)
                 dispatch({
-                    type: treeTypeActionTypes.GET_TREE_TYPES_FAILED,
+                    type: onsiteStaffActionTypes.GET_ONSITE_STAFF_FAILED,
                     payload: error
                 });
             }
@@ -31,46 +31,46 @@ export const getTreeTypes = () => {
     }
 };
 
-export const createTreeTypes = (record: TreeType) => {
+export const createOnsiteStaff = (record: OnsiteStaff) => {
     const apiClient = new ApiClient();
     return (dispatch: any) => {
         dispatch({
-            type: treeTypeActionTypes.CREATE_TREE_TYPE_REQUESTED,
+            type: onsiteStaffActionTypes.CREATE_ONSITE_STAFF_REQUESTED,
         });
-        apiClient.createTreeType(record).then(
-            (value: TreeType) => {
+        apiClient.createOnsiteStaff(record).then(
+            (value: OnsiteStaff) => {
                 dispatch({
-                    type: treeTypeActionTypes.CREATE_TREE_TYPE_SUCCEEDED,
+                    type: onsiteStaffActionTypes.CREATE_ONSITE_STAFF_SUCCEEDED,
                     payload: value,
                 });
             },
             (error: any) => {
                 console.error(error);
                 dispatch({
-                    type: treeTypeActionTypes.CREATE_TREE_TYPE_FAILED,
+                    type: onsiteStaffActionTypes.CREATE_ONSITE_STAFF_FAILED,
                 });
             }
         )
     };
 };
 
-export const updateTreeTypes = (record: TreeType) => {
+export const updateOnsiteStaff = (record: OnsiteStaff) => {
     const apiClient = new ApiClient();
     return (dispatch: any) => {
         dispatch({
-            type: treeTypeActionTypes.UPDATE_TREE_TYPE_REQUESTED,
+            type: onsiteStaffActionTypes.UPDATE_ONSITE_STAFF_REQUESTED,
         });
-        apiClient.updateTreeType(record).then(
-            (value: TreeType) => {
+        apiClient.updateOnsiteStaff(record).then(
+            (value: OnsiteStaff) => {
                 dispatch({
-                    type: treeTypeActionTypes.UPDATE_TREE_TYPE_SUCCEEDED,
+                    type: onsiteStaffActionTypes.UPDATE_ONSITE_STAFF_SUCCEEDED,
                     payload: value,
                 });
             },
             (error: any) => {
                 console.error(error);
                 dispatch({
-                    type: treeTypeActionTypes.UPDATE_TREE_TYPE_FAILED,
+                    type: onsiteStaffActionTypes.UPDATE_ONSITE_STAFF_FAILED,
                 });
             }
         )
@@ -78,23 +78,23 @@ export const updateTreeTypes = (record: TreeType) => {
 };
 
 
-export const deleteTreeTypes = (record: TreeType) => {
+export const deleteTreeTypes = (record: OnsiteStaff) => {
     const apiClient = new ApiClient();
     return (dispatch: any) => {
         dispatch({
-            type: treeTypeActionTypes.DELETE_TREE_TYPE_REQUESTED,
+            type: onsiteStaffActionTypes.DELETE_ONSITE_STAFF_REQUESTED,
         });
-        apiClient.deleteTreeType(record).then(
+        apiClient.deleteOnsiteStaff(record).then(
             (id: string) => {
                 dispatch({
-                    type: treeTypeActionTypes.DELETE_TREE_TYPE_SUCCEEDED,
+                    type: onsiteStaffActionTypes.DELETE_ONSITE_STAFF_SUCCEEDED,
                     payload: id,
                 });
             },
             (error: any) => {
                 console.error(error);
                 dispatch({
-                    type: treeTypeActionTypes.DELETE_TREE_TYPE_FAILED,
+                    type: onsiteStaffActionTypes.DELETE_ONSITE_STAFF_FAILED,
                 });
             }
         )

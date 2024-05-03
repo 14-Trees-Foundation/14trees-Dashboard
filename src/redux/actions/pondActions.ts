@@ -1,29 +1,29 @@
 import ApiClient from "../../api/apiClient/apiClient";
-import treeTypeActionTypes from "../actionTypes/treeTypeActionTypes";
-import { TreeType } from "../../types/treeType";
+import pondActionTypes from "../actionTypes/pondActionTypes";
+import { Pond } from "../../types/pond";
 
-export const getTreeTypes = () => {
+export const getPonds = () => {
     const apiClient = new ApiClient()
     return (dispatch: any) => {
         dispatch({
-            type: treeTypeActionTypes.GET_TREE_TYPES_REQUESTED,
+            type: pondActionTypes.GET_PONDS_REQUESTED,
         });
-        apiClient.getTreeTypes().then(
-            (value: TreeType[]) => {
+        apiClient.getPonds().then(
+            (value: Pond[]) => {
                 for (let i = 0; i < value.length; i++) {
                     if (value[i]?._id) {
                         value[i].key = value[i]._id
                     }
                 }
                 dispatch({
-                    type: treeTypeActionTypes.GET_TREE_TYPES_SUCCEEDED,
+                    type: pondActionTypes.GET_PONDS_SUCCEEDED,
                     payload: value,
                 });
             },
             (error: any) => {
                 console.log(error)
                 dispatch({
-                    type: treeTypeActionTypes.GET_TREE_TYPES_FAILED,
+                    type: pondActionTypes.GET_PONDS_FAILED,
                     payload: error
                 });
             }
@@ -31,46 +31,46 @@ export const getTreeTypes = () => {
     }
 };
 
-export const createTreeTypes = (record: TreeType) => {
+export const createPond = (record: Pond) => {
     const apiClient = new ApiClient();
     return (dispatch: any) => {
         dispatch({
-            type: treeTypeActionTypes.CREATE_TREE_TYPE_REQUESTED,
+            type: pondActionTypes.CREATE_POND_REQUESTED,
         });
-        apiClient.createTreeType(record).then(
-            (value: TreeType) => {
+        apiClient.createPond(record).then(
+            (value: Pond) => {
                 dispatch({
-                    type: treeTypeActionTypes.CREATE_TREE_TYPE_SUCCEEDED,
+                    type: pondActionTypes.CREATE_POND_SUCCEEDED,
                     payload: value,
                 });
             },
             (error: any) => {
                 console.error(error);
                 dispatch({
-                    type: treeTypeActionTypes.CREATE_TREE_TYPE_FAILED,
+                    type: pondActionTypes.CREATE_POND_FAILED,
                 });
             }
         )
     };
 };
 
-export const updateTreeTypes = (record: TreeType) => {
+export const updatePond = (record: Pond) => {
     const apiClient = new ApiClient();
     return (dispatch: any) => {
         dispatch({
-            type: treeTypeActionTypes.UPDATE_TREE_TYPE_REQUESTED,
+            type: pondActionTypes.UPDATE_POND_REQUESTED,
         });
-        apiClient.updateTreeType(record).then(
-            (value: TreeType) => {
+        apiClient.updatePond(record).then(
+            (value: Pond) => {
                 dispatch({
-                    type: treeTypeActionTypes.UPDATE_TREE_TYPE_SUCCEEDED,
+                    type: pondActionTypes.UPDATE_POND_SUCCEEDED,
                     payload: value,
                 });
             },
             (error: any) => {
                 console.error(error);
                 dispatch({
-                    type: treeTypeActionTypes.UPDATE_TREE_TYPE_FAILED,
+                    type: pondActionTypes.UPDATE_POND_FAILED,
                 });
             }
         )
@@ -78,23 +78,23 @@ export const updateTreeTypes = (record: TreeType) => {
 };
 
 
-export const deleteTreeTypes = (record: TreeType) => {
+export const deletePond = (record: Pond) => {
     const apiClient = new ApiClient();
     return (dispatch: any) => {
         dispatch({
-            type: treeTypeActionTypes.DELETE_TREE_TYPE_REQUESTED,
+            type: pondActionTypes.DELETE_POND_REQUESTED,
         });
-        apiClient.deleteTreeType(record).then(
+        apiClient.deletePond(record).then(
             (id: string) => {
                 dispatch({
-                    type: treeTypeActionTypes.DELETE_TREE_TYPE_SUCCEEDED,
+                    type: pondActionTypes.DELETE_POND_SUCCEEDED,
                     payload: id,
                 });
             },
             (error: any) => {
                 console.error(error);
                 dispatch({
-                    type: treeTypeActionTypes.DELETE_TREE_TYPE_FAILED,
+                    type: pondActionTypes.DELETE_POND_FAILED,
                 });
             }
         )

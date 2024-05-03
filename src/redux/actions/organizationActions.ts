@@ -1,29 +1,29 @@
 import ApiClient from "../../api/apiClient/apiClient";
-import treeTypeActionTypes from "../actionTypes/treeTypeActionTypes";
-import { TreeType } from "../../types/treeType";
+import organizationActionTypes from "../actionTypes/organizationActionTypes";
+import { Organization } from "../../types/organization";
 
-export const getTreeTypes = () => {
+export const getOrganizations = () => {
     const apiClient = new ApiClient()
     return (dispatch: any) => {
         dispatch({
-            type: treeTypeActionTypes.GET_TREE_TYPES_REQUESTED,
+            type: organizationActionTypes.GET_ORGANIZATIONS_REQUESTED,
         });
-        apiClient.getTreeTypes().then(
-            (value: TreeType[]) => {
+        apiClient.getOrganizations().then(
+            (value: Organization[]) => {
                 for (let i = 0; i < value.length; i++) {
                     if (value[i]?._id) {
                         value[i].key = value[i]._id
                     }
                 }
                 dispatch({
-                    type: treeTypeActionTypes.GET_TREE_TYPES_SUCCEEDED,
+                    type: organizationActionTypes.GET_ORGANIZATIONS_SUCCEEDED,
                     payload: value,
                 });
             },
             (error: any) => {
                 console.log(error)
                 dispatch({
-                    type: treeTypeActionTypes.GET_TREE_TYPES_FAILED,
+                    type: organizationActionTypes.GET_ORGANIZATIONS_FAILED,
                     payload: error
                 });
             }
@@ -31,46 +31,46 @@ export const getTreeTypes = () => {
     }
 };
 
-export const createTreeTypes = (record: TreeType) => {
+export const createOrganizations = (record: Organization) => {
     const apiClient = new ApiClient();
     return (dispatch: any) => {
         dispatch({
-            type: treeTypeActionTypes.CREATE_TREE_TYPE_REQUESTED,
+            type: organizationActionTypes.CREATE_ORGANIZATION_REQUESTED,
         });
-        apiClient.createTreeType(record).then(
-            (value: TreeType) => {
+        apiClient.createOrganization(record).then(
+            (value: Organization) => {
                 dispatch({
-                    type: treeTypeActionTypes.CREATE_TREE_TYPE_SUCCEEDED,
+                    type: organizationActionTypes.CREATE_ORGANIZATION_SUCCEEDED,
                     payload: value,
                 });
             },
             (error: any) => {
                 console.error(error);
                 dispatch({
-                    type: treeTypeActionTypes.CREATE_TREE_TYPE_FAILED,
+                    type: organizationActionTypes.CREATE_ORGANIZATION_FAILED,
                 });
             }
         )
     };
 };
 
-export const updateTreeTypes = (record: TreeType) => {
+export const updateOrganizations = (record: Organization) => {
     const apiClient = new ApiClient();
     return (dispatch: any) => {
         dispatch({
-            type: treeTypeActionTypes.UPDATE_TREE_TYPE_REQUESTED,
+            type: organizationActionTypes.UPDATE_ORGANIZATION_REQUESTED,
         });
-        apiClient.updateTreeType(record).then(
-            (value: TreeType) => {
+        apiClient.updateOrganization(record).then(
+            (value: Organization) => {
                 dispatch({
-                    type: treeTypeActionTypes.UPDATE_TREE_TYPE_SUCCEEDED,
+                    type: organizationActionTypes.UPDATE_ORGANIZATION_SUCCEEDED,
                     payload: value,
                 });
             },
             (error: any) => {
                 console.error(error);
                 dispatch({
-                    type: treeTypeActionTypes.UPDATE_TREE_TYPE_FAILED,
+                    type: organizationActionTypes.UPDATE_ORGANIZATION_FAILED,
                 });
             }
         )
@@ -78,23 +78,23 @@ export const updateTreeTypes = (record: TreeType) => {
 };
 
 
-export const deleteTreeTypes = (record: TreeType) => {
+export const deleteTreeTypes = (record: Organization) => {
     const apiClient = new ApiClient();
     return (dispatch: any) => {
         dispatch({
-            type: treeTypeActionTypes.DELETE_TREE_TYPE_REQUESTED,
+            type: organizationActionTypes.DELETE_ORGANIZATION_FAILED,
         });
-        apiClient.deleteTreeType(record).then(
+        apiClient.deleteOrganization(record).then(
             (id: string) => {
                 dispatch({
-                    type: treeTypeActionTypes.DELETE_TREE_TYPE_SUCCEEDED,
+                    type: organizationActionTypes.DELETE_ORGANIZATION_SUCCEEDED,
                     payload: id,
                 });
             },
             (error: any) => {
                 console.error(error);
                 dispatch({
-                    type: treeTypeActionTypes.DELETE_TREE_TYPE_FAILED,
+                    type: organizationActionTypes.DELETE_ORGANIZATION_FAILED,
                 });
             }
         )

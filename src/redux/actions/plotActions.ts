@@ -1,29 +1,29 @@
 import ApiClient from "../../api/apiClient/apiClient";
-import treeTypeActionTypes from "../actionTypes/treeTypeActionTypes";
-import { TreeType } from "../../types/treeType";
+import plotActionTypes from "../actionTypes/plotActionTypes";
+import { Plot } from "../../types/plot";
 
-export const getTreeTypes = () => {
+export const getPlots = () => {
     const apiClient = new ApiClient()
     return (dispatch: any) => {
         dispatch({
-            type: treeTypeActionTypes.GET_TREE_TYPES_REQUESTED,
+            type: plotActionTypes.GET_PLOTS_REQUESTED,
         });
-        apiClient.getTreeTypes().then(
-            (value: TreeType[]) => {
+        apiClient.getPlots().then(
+            (value: Plot[]) => {
                 for (let i = 0; i < value.length; i++) {
                     if (value[i]?._id) {
                         value[i].key = value[i]._id
                     }
                 }
                 dispatch({
-                    type: treeTypeActionTypes.GET_TREE_TYPES_SUCCEEDED,
+                    type: plotActionTypes.GET_PLOTS_SUCCEEDED,
                     payload: value,
                 });
             },
             (error: any) => {
                 console.log(error)
                 dispatch({
-                    type: treeTypeActionTypes.GET_TREE_TYPES_FAILED,
+                    type: plotActionTypes.GET_PLOTS_FAILED,
                     payload: error
                 });
             }
@@ -31,46 +31,46 @@ export const getTreeTypes = () => {
     }
 };
 
-export const createTreeTypes = (record: TreeType) => {
+export const createPlots = (record: Plot) => {
     const apiClient = new ApiClient();
     return (dispatch: any) => {
         dispatch({
-            type: treeTypeActionTypes.CREATE_TREE_TYPE_REQUESTED,
+            type: plotActionTypes.CREATE_PLOT_REQUESTED,
         });
-        apiClient.createTreeType(record).then(
-            (value: TreeType) => {
+        apiClient.createPlot(record).then(
+            (value: Plot) => {
                 dispatch({
-                    type: treeTypeActionTypes.CREATE_TREE_TYPE_SUCCEEDED,
+                    type: plotActionTypes.CREATE_PLOT_SUCCEEDED,
                     payload: value,
                 });
             },
             (error: any) => {
                 console.error(error);
                 dispatch({
-                    type: treeTypeActionTypes.CREATE_TREE_TYPE_FAILED,
+                    type: plotActionTypes.CREATE_PLOT_FAILED,
                 });
             }
         )
     };
 };
 
-export const updateTreeTypes = (record: TreeType) => {
+export const updatePlot = (record: Plot) => {
     const apiClient = new ApiClient();
     return (dispatch: any) => {
         dispatch({
-            type: treeTypeActionTypes.UPDATE_TREE_TYPE_REQUESTED,
+            type: plotActionTypes.UPDATE_PLOT_REQUESTED,
         });
-        apiClient.updateTreeType(record).then(
-            (value: TreeType) => {
+        apiClient.updatePlot(record).then(
+            (value: Plot) => {
                 dispatch({
-                    type: treeTypeActionTypes.UPDATE_TREE_TYPE_SUCCEEDED,
+                    type: plotActionTypes.UPDATE_PLOT_SUCCEEDED,
                     payload: value,
                 });
             },
             (error: any) => {
                 console.error(error);
                 dispatch({
-                    type: treeTypeActionTypes.UPDATE_TREE_TYPE_FAILED,
+                    type: plotActionTypes.UPDATE_PLOT_FAILED,
                 });
             }
         )
@@ -78,23 +78,23 @@ export const updateTreeTypes = (record: TreeType) => {
 };
 
 
-export const deleteTreeTypes = (record: TreeType) => {
+export const deletePlot = (record: Plot) => {
     const apiClient = new ApiClient();
     return (dispatch: any) => {
         dispatch({
-            type: treeTypeActionTypes.DELETE_TREE_TYPE_REQUESTED,
+            type: plotActionTypes.DELETE_PLOT_REQUESTED,
         });
-        apiClient.deleteTreeType(record).then(
+        apiClient.deletePlot(record).then(
             (id: string) => {
                 dispatch({
-                    type: treeTypeActionTypes.DELETE_TREE_TYPE_SUCCEEDED,
+                    type: plotActionTypes.DELETE_PLOT_SUCCEEDED,
                     payload: id,
                 });
             },
             (error: any) => {
                 console.error(error);
                 dispatch({
-                    type: treeTypeActionTypes.DELETE_TREE_TYPE_FAILED,
+                    type: plotActionTypes.DELETE_PLOT_FAILED,
                 });
             }
         )
