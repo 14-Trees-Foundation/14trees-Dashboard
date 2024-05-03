@@ -27,3 +27,27 @@ Your app is ready to be deployed!
 See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+
+
+## Run this project without authentication
+
+In backend service, `app/auth/verifyToken.js` make below changes and run backend.
+```diff
+- return res.status(500).send({ auth: false, message: 'Failed to authenticate token.' });
++ // return res.status(500).send({ auth: false, message: 'Failed to authenticate token.' });
+```
+
+Check the file changes for
+- `src/api/local.js`
+    - change the base usl to your localhost url of 14trees-api service. ex: `http://localhost:7000`
+
+- `src/App.js`
+    - Comment out `RequireAuth` and `AuthProvider`
+
+- `src/pages/admin/LeftDrawer.jsx`
+    - make below changes
+    ```diff
+    - let auth = useAuth();
+    + // let auth = useAuth();
+    + let auth = { permissions: ["all"] };
+    ```

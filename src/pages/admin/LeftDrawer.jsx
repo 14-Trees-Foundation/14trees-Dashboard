@@ -25,7 +25,8 @@ export const AdminLeftDrawer = () => {
   const [open, setOpen] = useState(false);
   const classes = useStyles();
   const [index, setIndex] = useRecoilState(adminNavIndex);
-  let auth = useAuth();
+  // let auth = useAuth();
+  let auth = { permissions: ["all"] };
 
   const onClickNav = (value) => {
     setIndex(value);

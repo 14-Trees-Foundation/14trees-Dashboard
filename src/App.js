@@ -12,8 +12,8 @@ import { Layout } from "./components/Layout";
 import { GiftTrees } from "./pages/ww/GiftTrees";
 import { WW } from "./pages/ww/WW";
 // import { AdminLogin } from "./pages/admin/GoogleLogin";
-import { RequireAuth } from "./pages/admin/auth/RequireAuth";
-import { AuthProvider } from "./pages/admin/auth/auth";
+// import { RequireAuth } from "./pages/admin/auth/RequireAuth";
+// import { AuthProvider } from "./pages/admin/auth/auth";
 import { Login } from "./pages/admin/Login/Login";
 import { Forms } from "./pages/admin/Forms/Forms";
 import { Birthday } from "./pages/events/Birthday";
@@ -23,7 +23,7 @@ import { Corporate } from "./pages/events/Corporate";
 
 function App() {
   return (
-    <AuthProvider>
+    // <AuthProvider>
       <Layout>
         <Routes>
           <Route
@@ -45,9 +45,9 @@ function App() {
           <Route
             path="/admin"
             element={
-              <RequireAuth>
+              // <RequireAuth>
                 <Admin />
-              </RequireAuth>
+              // </RequireAuth>
             }
           >
             <Route path="forms" element={<Forms />}>
@@ -64,7 +64,7 @@ function App() {
           <Route path="/notfound" element={<NotFound />} />
         </Routes>
       </Layout>
-    </AuthProvider>
+    // </AuthProvider>
   );
 }
 
