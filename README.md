@@ -1,4 +1,4 @@
-# 14 Trees Dashboard Frontent
+# 14 Trees Dashboard Frontend
 
 Set the environment variables:
 - `REACT_APP_API_MAP_KEY`
