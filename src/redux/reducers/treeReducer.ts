@@ -3,7 +3,7 @@ import { Tree, TreesDataState } from "../../types/tree";
 import treeActionTypes from "../actionTypes/treeActionTypes";
 import { fetchDataFromLocal } from "../../api/apiClient/apiClient";
 
-export const treeDataReducer = (state = fetchDataFromLocal("treesDataState"), action: UnknownAction ): TreesDataState => {
+export const treesDataReducer = (state = fetchDataFromLocal("treesDataState"), action: UnknownAction ): TreesDataState => {
     switch (action.type) {
         case treeActionTypes.GET_TREES_SUCCEEDED:
             if (action.payload) {

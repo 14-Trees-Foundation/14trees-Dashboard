@@ -3,7 +3,7 @@ import { PlotsDataState, Plot } from "../../types/plot";
 import plotActionTypes from "../actionTypes/plotActionTypes";
 import { fetchDataFromLocal } from "../../api/apiClient/apiClient";
 
-export const plotDataReducer = (state = fetchDataFromLocal("PlotsDataState"), action: UnknownAction ): PlotsDataState => {
+export const plotsDataReducer = (state = fetchDataFromLocal("PlotsDataState"), action: UnknownAction ): PlotsDataState => {
     switch (action.type) {
         case plotActionTypes.GET_PLOTS_SUCCEEDED:
             if (action.payload) {

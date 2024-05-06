@@ -31,7 +31,7 @@ export const getPlots = () => {
     }
 };
 
-export const createPlots = (record: Plot) => {
+export const createPlot = (record: Plot) => {
     const apiClient = new ApiClient();
     return (dispatch: any) => {
         dispatch({

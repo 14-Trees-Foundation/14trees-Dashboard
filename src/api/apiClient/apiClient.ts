@@ -269,7 +269,7 @@ class ApiClient {
         Model- OnsiteStaff: CRUD Operations/Apis for Onsite staff
     */
 
-    async getOnsiteStaff(): Promise<OnsiteStaff[]> {
+    async getOnsiteStaffs(): Promise<OnsiteStaff[]> {
         const url = `/onsitestaff/`;
         try {
             const response = await this.api.get<OnsiteStaff[]>(url);

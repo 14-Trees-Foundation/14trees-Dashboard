@@ -31,7 +31,7 @@ export const getOrganizations = () => {
     }
 };
 
-export const createOrganizations = (record: Organization) => {
+export const createOrganization = (record: Organization) => {
     const apiClient = new ApiClient();
     return (dispatch: any) => {
         dispatch({
@@ -54,7 +54,7 @@ export const createOrganizations = (record: Organization) => {
     };
 };
 
-export const updateOrganizations = (record: Organization) => {
+export const updateOrganization = (record: Organization) => {
     const apiClient = new ApiClient();
     return (dispatch: any) => {
         dispatch({
@@ -78,7 +78,7 @@ export const updateOrganizations = (record: Organization) => {
 };
 
 
-export const deleteTreeTypes = (record: Organization) => {
+export const deleteOrganization = (record: Organization) => {
     const apiClient = new ApiClient();
     return (dispatch: any) => {
         dispatch({

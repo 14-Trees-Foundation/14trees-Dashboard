@@ -6,9 +6,9 @@ export const getOnsiteStaffs = () => {
     const apiClient = new ApiClient()
     return (dispatch: any) => {
         dispatch({
-            type: onsiteStaffActionTypes.GET_ONSITE_STAFF_REQUESTED,
+            type: onsiteStaffActionTypes.GET_ONSITE_STAFFS_REQUESTED,
         });
-        apiClient.getOnsiteStaff().then(
+        apiClient.getOnsiteStaffs().then(
             (value: OnsiteStaff[]) => {
                 for (let i = 0; i < value.length; i++) {
                     if (value[i]?._id) {
@@ -16,14 +16,14 @@ export const getOnsiteStaffs = () => {
                     }
                 }
                 dispatch({
-                    type: onsiteStaffActionTypes.GET_ONSITE_STAFF_SUCCEEDED,
+                    type: onsiteStaffActionTypes.GET_ONSITE_STAFFS_SUCCEEDED,
                     payload: value,
                 });
             },
             (error: any) => {
                 console.log(error)
                 dispatch({
-                    type: onsiteStaffActionTypes.GET_ONSITE_STAFF_FAILED,
+                    type: onsiteStaffActionTypes.GET_ONSITE_STAFFS_FAILED,
                     payload: error
                 });
             }

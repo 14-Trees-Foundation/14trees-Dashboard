@@ -31,7 +31,7 @@ export const getUsers = () => {
     }
 };
 
-export const createUsers = (record: User) => {
+export const createUser = (record: User) => {
     const apiClient = new ApiClient();
     return (dispatch: any) => {
         dispatch({
@@ -76,7 +76,7 @@ export const createBulkUsers = (data: Blob) => {
     };
 };
 
-export const updateUsers = (record: User) => {
+export const updateUser = (record: User) => {
     const apiClient = new ApiClient();
     return (dispatch: any) => {
         dispatch({
@@ -100,7 +100,7 @@ export const updateUsers = (record: User) => {
 };
 
 
-export const deleteUsers = (record: User) => {
+export const deleteUser = (record: User) => {
     const apiClient = new ApiClient();
     return (dispatch: any) => {
         dispatch({

@@ -31,7 +31,7 @@ export const getTreeTypes = () => {
     }
 };
 
-export const createTreeTypes = (record: TreeType) => {
+export const createTreeType = (record: TreeType) => {
     const apiClient = new ApiClient();
     return (dispatch: any) => {
         dispatch({
@@ -54,7 +54,7 @@ export const createTreeTypes = (record: TreeType) => {
     };
 };
 
-export const updateTreeTypes = (record: TreeType) => {
+export const updateTreeType = (record: TreeType) => {
     const apiClient = new ApiClient();
     return (dispatch: any) => {
         dispatch({
@@ -78,7 +78,7 @@ export const updateTreeTypes = (record: TreeType) => {
 };
 
 
-export const deleteTreeTypes = (record: TreeType) => {
+export const deleteTreeType = (record: TreeType) => {
     const apiClient = new ApiClient();
     return (dispatch: any) => {
         dispatch({

@@ -31,7 +31,7 @@ export const getTrees = () => {
     }
 };
 
-export const createTrees = (record: Tree) => {
+export const createTree = (record: Tree) => {
     const apiClient = new ApiClient();
     return (dispatch: any) => {
         dispatch({
@@ -54,7 +54,7 @@ export const createTrees = (record: Tree) => {
     };
 };
 
-export const updateTrees = (record: Tree) => {
+export const updateTree = (record: Tree) => {
     const apiClient = new ApiClient();
     return (dispatch: any) => {
         dispatch({
@@ -78,7 +78,7 @@ export const updateTrees = (record: Tree) => {
 };
 
 
-export const deleteTrees = (record: Tree) => {
+export const deleteTree = (record: Tree) => {
     const apiClient = new ApiClient();
     return (dispatch: any) => {
         dispatch({

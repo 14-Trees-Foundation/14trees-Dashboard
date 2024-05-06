@@ -31,7 +31,7 @@ export const getUserTrees = () => {
     }
 };
 
-export const createUserTrees = (record: UserTree) => {
+export const createUserTree = (record: UserTree) => {
     const apiClient = new ApiClient();
     return (dispatch: any) => {
         dispatch({
@@ -54,7 +54,7 @@ export const createUserTrees = (record: UserTree) => {
     };
 };
 
-export const updateUserTrees = (record: UserTree) => {
+export const updateUserTree = (record: UserTree) => {
     const apiClient = new ApiClient();
     return (dispatch: any) => {
         dispatch({
@@ -78,7 +78,7 @@ export const updateUserTrees = (record: UserTree) => {
 };
 
 
-export const deleteUserTrees = (record: UserTree) => {
+export const deleteUserTree = (record: UserTree) => {
     const apiClient = new ApiClient();
     return (dispatch: any) => {
         dispatch({

@@ -3,9 +3,9 @@ import { fetchDataFromLocal } from "../../api/apiClient/apiClient";
 import onsiteStaffActionTypes from "../actionTypes/onSiteStaffActionTypes";
 import { OnsiteStaff, OnsiteStaffDataState } from "../../types/onSiteStaff";
 
-export const onsiteStaffDataReducer = (state = fetchDataFromLocal("onsiteStaffDataState"), action: UnknownAction ): OnsiteStaffDataState => {
+export const onsiteStaffsDataReducer = (state = fetchDataFromLocal("onsiteStaffDataState"), action: UnknownAction ): OnsiteStaffDataState => {
     switch (action.type) {
-        case onsiteStaffActionTypes.GET_ONSITE_STAFF_SUCCEEDED:
+        case onsiteStaffActionTypes.GET_ONSITE_STAFFS_SUCCEEDED:
             if (action.payload) {
                 let onsiteStaffDataState: OnsiteStaffDataState = {}
                 let payload = action.payload as [OnsiteStaff]
