@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import Box from '@mui/material/Box';
-import { DataGrid, GridToolbar, GridValueGetterParams, GridValueFormatterParams, } from '@mui/x-data-grid';
+import { DataGrid, GridToolbar, GridColumns} from '@mui/x-data-grid';
 import { Button, Modal, Typography } from '@mui/material';
 import AddUser from './AddUser';
 import EditIcon from '@mui/icons-material/Edit';
@@ -8,9 +8,10 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import {type User} from '../../../types/user';
 import * as userActionCreators from '../../../redux/actions/userActions';
 import {bindActionCreators} from 'redux';
-import {useAppDispatch, useAppSelector} from '../../redux/store/hooks';
+import {useAppDispatch, useAppSelector} from '../../../redux/store/hooks';
+import { RootState } from '../../../redux/store/store';
 
-const columns = [
+const columns: GridColumns = [
     { field: 'id', headerName: 'ID', width: 90, align: 'center', headerAlign: 'center', },
     {
         field: 'name',
@@ -42,7 +43,7 @@ const columns = [
         width: 250,
         align: 'center',
         headerAlign: 'center',
-        renderCell: (params) => (
+        renderCell: (params: any) => (
             <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
                 <Button variant="outlined" style={{ margin: '0 5px' }} onClick={() => console.log('Edit', params.row)}><EditIcon /></Button>
                 <Button variant="outlined" style={{ margin: '0 5px' }} onClick={() => console.log('Delete', params.row)}><DeleteIcon /></Button>
@@ -87,7 +88,7 @@ export const User1 = () => {
 	};
 
     let usersList: User[] = [];
-	const usersMap = useAppSelector(state => state.userData);
+	const usersMap = useAppSelector((state: RootState) => state.usersData);
 	if (usersMap) {
 		usersList = Object.values(usersMap);
 	}
@@ -106,12 +107,11 @@ export const User1 = () => {
                     columns={columns}
                     initialState={{
                         pagination: {
-                            paginationModel: {
-                                pageSize: 5,
-                            },
+                            page: 1,
+                            pageSize: 5
                         },
                     }}
-                    pageSizeOptions={[5]}
+                    // pageSizeOptions= {5}
                     checkboxSelection
                     disableSelectionOnClick
                 />

@@ -214,7 +214,7 @@ class ApiClient {
     */
 
     async getUsers(): Promise<User[]> {
-        const url = `/users/`;
+        const url = `/profile/allprofile`;
         try {
             const response = await this.api.get<User[]>(url);
             return response.data;

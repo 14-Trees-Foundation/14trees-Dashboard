@@ -10,6 +10,8 @@ import reportWebVitals from "./reportWebVitals";
 import { BrowserRouter } from "react-router-dom";
 import { makeServer } from "./mockServer/server";
 import { RecoilRoot } from "recoil";
+import {Provider} from 'react-redux';
+import { store } from "./redux/store/store";
 require("dotenv").config();
 
 if (process.env.REACT_APP_ENV === "development") {
@@ -23,7 +25,9 @@ ReactDOM.render(
     <BrowserRouter>
       <ThemeProvider theme={theme}>
         <RecoilRoot>
+        <Provider store={store}>
           <App />
+          </Provider>
         </RecoilRoot>
       </ThemeProvider>
     </BrowserRouter>
