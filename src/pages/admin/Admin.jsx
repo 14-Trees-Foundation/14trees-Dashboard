@@ -19,6 +19,7 @@ import { Forms } from "./Forms/Forms";
 import { Users } from "./users/Users";
 import { Ponds } from "./Ponds/Ponds";
 import { Images } from "./images/Images";
+import  {User1}  from "./user/User1";
 
 export const Admin = () => {
   const classes = useStyles();
@@ -39,6 +40,7 @@ export const Admin = () => {
           "content-type": "application/json",
         },
       });
+      console.log("response - ",response.status)
       if (response.status === 200) {
         setSummary(response.data);
       }
@@ -86,6 +88,9 @@ export const Admin = () => {
     {
       page: Forms,
     },
+    {
+      page: User1,
+    }
   ];
   const mainBox = () => {
     const Page = pages[index].page;

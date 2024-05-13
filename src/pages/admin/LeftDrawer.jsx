@@ -50,18 +50,25 @@ export const AdminLeftDrawer = () => {
     {
       displayName: "Users",
       logo: AccountCircleOutlined,
-      display: auth.permissions.includes("all"),
+      // display: auth.permissions.includes("all"),
+      display: true,
     },
     {
       displayName: "Images",
       logo: FaceIcon,
-      display: auth.permissions.includes("all"),
+      // display: auth.permissions.includes("all"),
+      display: true,
     },
     {
       displayName: "Forms",
       logo: AssignmentOutlined,
       display: true,
     },
+    {
+      displayName: "User",
+      logo: AccountCircleOutlined,
+      display: true,
+    }
   ];
   const menuitem = () => {
     return (
