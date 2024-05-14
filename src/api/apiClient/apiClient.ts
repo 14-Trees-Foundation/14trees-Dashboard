@@ -35,7 +35,7 @@ class ApiClient {
 
     async createTreeType(data: TreeType): Promise<TreeType> {
         try {
-            const response = await axios.post<TreeType>(`/trees/addtreetype`, data);
+            const response = await this.api.post<TreeType>(`/trees/addtreetype`, data);
             return response.data;
         } catch (error) {
             console.error(error)
@@ -45,7 +45,7 @@ class ApiClient {
 
     async updateTreeType(data: TreeType): Promise<TreeType> {
         try {
-            const response = await axios.put<TreeType>(`/trees/treetypes/${data._id}`, data);
+            const response = await this.api.put<TreeType>(`/trees/treetypes/${data._id}`, data);
             return response.data;
         } catch (error) {
             console.error(error)
@@ -55,7 +55,7 @@ class ApiClient {
 
     async deleteTreeType(data: TreeType): Promise<string> {
         try {
-            await axios.delete<any>(`/trees/treetypes/${data._id}`);
+            await this.api.delete<any>(`/trees/treetypes/${data._id}`);
             return data._id;
         } catch (error) {
             console.error(error)
@@ -81,7 +81,7 @@ class ApiClient {
 
     async createPlot(data: Plot): Promise<Plot> {
         try {
-            const response = await axios.post<Plot>(`/plots/add`, data);
+            const response = await this.api.post<Plot>(`/plots/add`, data);
             return response.data;
         } catch (error) {
             console.error(error)
@@ -91,7 +91,7 @@ class ApiClient {
 
     async updatePlot(data: Plot): Promise<Plot> {
         try {
-            const response = await axios.post<Plot>(`/plots/update`, data);
+            const response = await this.api.post<Plot>(`/plots/update`, data);
             return response.data;
         } catch (error) {
             console.error(error)
@@ -101,7 +101,7 @@ class ApiClient {
 
     async deletePlot(data: Plot): Promise<string> {
         try {
-            await axios.delete<any>(`/plots/${data._id}`);
+            await this.api.delete<any>(`/plots/${data._id}`);
             return data._id;
         } catch (error) {
             console.error(error)
@@ -126,7 +126,7 @@ class ApiClient {
 
     async createOrganization(data: Organization): Promise<Organization> {
         try {
-            const response = await axios.post<Organization>(`/organizations/add`, data);
+            const response = await this.api.post<Organization>(`/organizations/add`, data);
             return response.data;
         } catch (error) {
             console.error(error)
@@ -136,7 +136,7 @@ class ApiClient {
 
     async updateOrganization(data: Organization): Promise<Organization> {
         try {
-            const response = await axios.put<Organization>(`/organizations/${data._id}`, data);
+            const response = await this.api.put<Organization>(`/organizations/${data._id}`, data);
             return response.data;
         } catch (error) {
             console.error(error)
@@ -146,7 +146,7 @@ class ApiClient {
 
     async deleteOrganization(data: Organization): Promise<string> {
         try {
-            await axios.delete<any>(`/organizations/${data._id}`);
+            await this.api.delete<any>(`/organizations/${data._id}`);
             return data._id;
         } catch (error) {
             console.error(error)
@@ -171,7 +171,7 @@ class ApiClient {
 
     async createPond(data: Pond): Promise<Pond> {
         try {
-            const response = await axios.post<Pond>(`/ponds/`, data);
+            const response = await this.api.post<Pond>(`/ponds/`, data);
             return response.data;
         } catch (error) {
             console.error(error)
@@ -181,7 +181,7 @@ class ApiClient {
 
     async updatePond(data: Pond): Promise<Pond> {
         try {
-            const response = await axios.put<Pond>(`/ponds/${data._id}`, data);
+            const response = await this.api.put<Pond>(`/ponds/${data._id}`, data);
             return response.data;
         } catch (error) {
             console.error(error)
@@ -191,7 +191,7 @@ class ApiClient {
 
     async deletePond(data: Pond): Promise<string> {
         try {
-            await axios.delete<any>(`/ponds/${data._id}`);
+            await this.api.delete<any>(`/ponds/${data._id}`);
             return data._id;
         } catch (error) {
             console.error(error)
@@ -201,7 +201,7 @@ class ApiClient {
 
     async getPondHistory(): Promise<Pond[]> {
         try {
-            let response = await axios.get<Pond[]>(`/ponds/history`);
+            let response = await this.api.get<Pond[]>(`/ponds/history`);
             return response.data;
         } catch (error) {
             console.error(error)
@@ -226,7 +226,7 @@ class ApiClient {
 
     async createUser(data: User): Promise<User> {
         try {
-            const response = await axios.post<User>(`/users/`, data);
+            const response = await this.api.post<User>(`/users/`, data);
             return response.data;
         } catch (error) {
             console.error(error)
@@ -236,7 +236,7 @@ class ApiClient {
 
     async updateUser(data: User): Promise<User> {
         try {
-            const response = await axios.put<User>(`/users/${data._id}`, data);
+            const response = await this.api.put<User>(`/users/${data._id}`, data);
             return response.data;
         } catch (error) {
             console.error(error)
@@ -246,7 +246,7 @@ class ApiClient {
 
     async deleteUser(data: User): Promise<string> {
         try {
-            await axios.delete<any>(`/users/${data._id}`);
+            await this.api.delete<any>(`/users/${data._id}`);
             return data._id;
         } catch (error) {
             console.error(error)
@@ -258,7 +258,7 @@ class ApiClient {
         try {
             const formData = new FormData();
             formData.append('csvFile', data, 'users_data.csv');
-            await axios.post<any>(`/users/bulk`, );
+            await this.api.post<any>(`/users/bulk`, );
         } catch (error) {
             console.error(error)
             throw new Error('Failed to create users in bulk');
@@ -282,7 +282,7 @@ class ApiClient {
 
     async createOnsiteStaff(data: OnsiteStaff): Promise<OnsiteStaff> {
         try {
-            const response = await axios.post<OnsiteStaff>(`/onsitestaff/`, data);
+            const response = await this.api.post<OnsiteStaff>(`/onsitestaff/`, data);
             return response.data;
         } catch (error) {
             console.error(error)
@@ -292,7 +292,7 @@ class ApiClient {
 
     async updateOnsiteStaff(data: OnsiteStaff): Promise<OnsiteStaff> {
         try {
-            const response = await axios.put<OnsiteStaff>(`/onsitestaff/${data._id}`, data);
+            const response = await this.api.put<OnsiteStaff>(`/onsitestaff/${data._id}`, data);
             return response.data;
         } catch (error) {
             console.error(error)
@@ -302,7 +302,7 @@ class ApiClient {
 
     async deleteOnsiteStaff(data: OnsiteStaff): Promise<string> {
         try {
-            await axios.delete<any>(`/onsitestaff/${data._id}`);
+            await this.api.delete<any>(`/onsitestaff/${data._id}`);
             return data._id;
         } catch (error) {
             console.error(error)
@@ -327,7 +327,7 @@ class ApiClient {
 
     async createTree(data: Tree): Promise<Tree> {
         try {
-            const response = await axios.post<Tree>(`/trees/`, data);
+            const response = await this.api.post<Tree>(`/trees/`, data);
             return response.data;
         } catch (error) {
             console.error(error)
@@ -337,7 +337,7 @@ class ApiClient {
 
     async updateTree(data: Tree): Promise<Tree> {
         try {
-            const response = await axios.put<Tree>(`/trees/${data._id}`, data);
+            const response = await this.api.put<Tree>(`/trees/${data._id}`, data);
             return response.data;
         } catch (error) {
             console.error(error)
@@ -347,7 +347,7 @@ class ApiClient {
 
     async deleteTree(data: Tree): Promise<string> {
         try {
-            await axios.delete<any>(`/trees/${data._id}`);
+            await this.api.delete<any>(`/trees/${data._id}`);
             return data._id;
         } catch (error) {
             console.error(error)
@@ -359,7 +359,7 @@ class ApiClient {
         try {
             const formData = new FormData();
             formData.append('csvFile', data, 'trees_data.csv');
-            await axios.post<any>(`/trees/bulk`, );
+            await this.api.post<any>(`/trees/bulk`, );
         } catch (error) {
             console.error(error)
             throw new Error('Failed to create Trees in bulk');
@@ -383,7 +383,7 @@ class ApiClient {
 
     async createUserTree(data: UserTree): Promise<UserTree> {
         try {
-            const response = await axios.post<UserTree>(`/profile/`, data);
+            const response = await this.api.post<UserTree>(`/profile/`, data);
             return response.data;
         } catch (error) {
             console.error(error)
@@ -393,7 +393,7 @@ class ApiClient {
 
     async updateUserTree(data: UserTree): Promise<UserTree> {
         try {
-            const response = await axios.put<UserTree>(`/profile/${data._id}`, data);
+            const response = await this.api.put<UserTree>(`/profile/${data._id}`, data);
             return response.data;
         } catch (error) {
             console.error(error)
@@ -403,7 +403,7 @@ class ApiClient {
 
     async deleteUserTree(data: UserTree): Promise<string> {
         try {
-            await axios.delete<any>(`/profile/${data._id}`);
+            await this.api.delete<any>(`/profile/${data._id}`);
             return data._id;
         } catch (error) {
             console.error(error)
