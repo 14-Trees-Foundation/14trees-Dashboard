@@ -1,5 +1,5 @@
 import axios, {AxiosInstance} from 'axios';
-import { TreeType, TreeTypesDataState } from '../../types/treeType';
+import { CreateTreeTypeResponse, TreeType, TreeTypesDataState } from '../../types/treeType';
 import { Plot } from '../../types/plot';
 import { Organization } from '../../types/organization';
 import { Pond } from '../../types/pond';
@@ -42,8 +42,8 @@ class ApiClient {
                     formData.append(key, strValue);
                 }
               });
-            const response = await this.api.post<TreeType>(`/trees/addtreetype`, data);
-            return response.data;
+            const response = await this.api.post<CreateTreeTypeResponse>(`/trees/addtreetype`, data);
+            return response.data.treetype;
         } catch (error) {
             console.error(error)
             throw new Error('Failed to create tree type.');

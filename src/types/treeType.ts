@@ -18,4 +18,9 @@ export type TreeType = {
     desc: string,
 }
 
+export type CreateTreeTypeResponse = {
+    csvupload: string,
+    treetype: TreeType
+}
+
 export type TreeTypesDataState = Record<string, TreeType>
