@@ -1,6 +1,6 @@
 import axios, {AxiosInstance} from 'axios';
 import { CreateTreeTypeResponse, TreeType, TreeTypesDataState } from '../../types/treeType';
-import { Plot } from '../../types/plot';
+import { Plot, UpsertPlotResponse } from '../../types/plot';
 import { Organization } from '../../types/organization';
 import { Pond } from '../../types/pond';
 import { User } from '../../types/user';
@@ -33,16 +33,19 @@ class ApiClient {
         }
     }
 
-    async createTreeType(data: TreeType): Promise<TreeType> {
+    async createTreeType(data: TreeType, file?: Blob): Promise<TreeType> {
         try {
             const formData = new FormData();
+            if (file) {
+                formData.append("files", file);
+            }
             Object.entries(data).forEach(([key, value]) => {
                 if (key != 'image') {
                     const strValue = value as string
                     formData.append(key, strValue);
                 }
               });
-            const response = await this.api.post<CreateTreeTypeResponse>(`/trees/addtreetype`, data);
+            const response = await this.api.post<CreateTreeTypeResponse>(`/trees/addtreetype`, formData);
             return response.data.treetype;
         } catch (error) {
             console.error(error)
@@ -50,8 +53,18 @@ class ApiClient {
         }
     }
 
-    async updateTreeType(data: TreeType): Promise<TreeType> {
+    async updateTreeType(data: TreeType, file?: Blob): Promise<TreeType> {
         try {
+            const formData = new FormData();
+            if (file) {
+                formData.append("files", file);
+            }
+            Object.entries(data).forEach(([key, value]) => {
+                if (key != 'image') {
+                    const strValue = value as string
+                    formData.append(key, strValue);
+                }
+              });
             const response = await this.api.put<TreeType>(`/trees/treetypes/${data._id}`, data);
             return response.data;
         } catch (error) {
@@ -88,8 +101,8 @@ class ApiClient {
 
     async createPlot(data: Plot): Promise<Plot> {
         try {
-            const response = await this.api.post<Plot>(`/plots/add`, data);
-            return response.data;
+            const response = await this.api.post<UpsertPlotResponse>(`/plots/add`, data);
+            return response.data.plot;
         } catch (error) {
             console.error(error)
             throw new Error('Failed to create plot');
@@ -98,8 +111,8 @@ class ApiClient {
 
     async updatePlot(data: Plot): Promise<Plot> {
         try {
-            const response = await this.api.post<Plot>(`/plots/update`, data);
-            return response.data;
+            const response = await this.api.post<UpsertPlotResponse>(`/plots/update`, { 'shortname': data.plot_id, 'boundaries': data.boundaries.coordinates[0]});
+            return response.data.plot;
         } catch (error) {
             console.error(error)
             throw new Error('Failed to update plot');

@@ -17,4 +17,8 @@ export type Plot = {
     date_added: Date
 };
 
+export type UpsertPlotResponse = {
+    plot: Plot
+}
+
 export type PlotsDataState = Record<string, Plot>;

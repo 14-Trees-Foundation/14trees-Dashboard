@@ -31,13 +31,13 @@ export const getTreeTypes = () => {
     }
 };
 
-export const createTreeType = (record: TreeType) => {
+export const createTreeType = (record: TreeType, file?: Blob) => {
     const apiClient = new ApiClient();
     return (dispatch: any) => {
         dispatch({
             type: treeTypeActionTypes.CREATE_TREE_TYPE_REQUESTED,
         });
-        apiClient.createTreeType(record).then(
+        apiClient.createTreeType(record, file).then(
             (value: TreeType) => {
                 dispatch({
                     type: treeTypeActionTypes.CREATE_TREE_TYPE_SUCCEEDED,
@@ -54,13 +54,13 @@ export const createTreeType = (record: TreeType) => {
     };
 };
 
-export const updateTreeType = (record: TreeType) => {
+export const updateTreeType = (record: TreeType, file?: Blob) => {
     const apiClient = new ApiClient();
     return (dispatch: any) => {
         dispatch({
             type: treeTypeActionTypes.UPDATE_TREE_TYPE_REQUESTED,
         });
-        apiClient.updateTreeType(record).then(
+        apiClient.updateTreeType(record, file).then(
             (value: TreeType) => {
                 dispatch({
                     type: treeTypeActionTypes.UPDATE_TREE_TYPE_SUCCEEDED,
