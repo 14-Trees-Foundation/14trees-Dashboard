@@ -35,6 +35,13 @@ class ApiClient {
 
     async createTreeType(data: TreeType): Promise<TreeType> {
         try {
+            const formData = new FormData();
+            Object.entries(data).forEach(([key, value]) => {
+                if (key != 'image') {
+                    const strValue = value as string
+                    formData.append(key, strValue);
+                }
+              });
             const response = await this.api.post<TreeType>(`/trees/addtreetype`, data);
             return response.data;
         } catch (error) {
