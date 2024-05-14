@@ -12,7 +12,7 @@ export type Tree = {
     tags: [string],
     location: {
         type: string,
-        coordinates: [number]
+        coordinates: number[]
     },
     mapped_to: string,
     link: string,
@@ -20,5 +20,17 @@ export type Tree = {
     desc: string,
     date_assigned: Date
 };
+
+export type CreateTreeRequest = {
+    sapling_id: string,
+    tree_id: string,
+    plot_id: string,
+    user_id: string,
+    images: string,
+    height: number,
+    lat: number,
+    lng: number,
+    mapped_to: string,
+}
 
 export type TreesDataState = Record<string, Tree>;

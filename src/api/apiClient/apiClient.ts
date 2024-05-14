@@ -350,13 +350,17 @@ class ApiClient {
             const formData = new FormData();
             if (file) {
                 formData.append("files", file);
+                formData.append("images", (file as File).name);
             }
-            Object.entries(data).forEach(([key, value]) => {
-                if (key != 'image') {
-                    const strValue = value as string
-                    formData.append(key, strValue);
-                }
-              });
+            formData.append('sapling_id', data.sapling_id);
+            formData.append('tree_id', data.tree_id);
+            formData.append('plot_id', data.plot_id);
+            if (data.location && data.location.coordinates && data.location.coordinates.length === 2) {
+                formData.append('lat', data.location.coordinates[0].toString());
+                formData.append('lng', data.location.coordinates[1].toString());
+            }
+            formData.append('mapped_to', data.mapped_to);
+            formData.append('user_id', data.user_id);
             const response = await this.api.post<Tree>(`/trees/`, formData);
             return response.data;
         } catch (error) {
