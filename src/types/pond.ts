@@ -25,4 +25,8 @@ export type Pond = {
     updates: [PondUpdate],
 };
 
+export type CreatePondResponse = {
+  pond: Pond,
+}
+
 export type PondDataState = Record<string, Pond>;

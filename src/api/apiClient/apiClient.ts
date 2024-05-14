@@ -2,7 +2,7 @@ import axios, {AxiosInstance} from 'axios';
 import { CreateTreeTypeResponse, TreeType, TreeTypesDataState } from '../../types/treeType';
 import { Plot, UpsertPlotResponse } from '../../types/plot';
 import { Organization } from '../../types/organization';
-import { Pond } from '../../types/pond';
+import { CreatePondResponse, Pond } from '../../types/pond';
 import { User } from '../../types/user';
 import { OnsiteStaff } from '../../types/onSiteStaff';
 import { Tree } from '../../types/tree';
@@ -191,8 +191,8 @@ class ApiClient {
 
     async createPond(data: Pond): Promise<Pond> {
         try {
-            const response = await this.api.post<Pond>(`/ponds/`, data);
-            return response.data;
+            const response = await this.api.post<CreatePondResponse>(`/ponds/`, data);
+            return response.data.pond;
         } catch (error) {
             console.error(error)
             throw new Error('Failed to create Pond');
@@ -234,7 +234,7 @@ class ApiClient {
     */
 
     async getUsers(): Promise<User[]> {
-        const url = `/profile/allprofile`;
+        const url = `/users/`;
         try {
             const response = await this.api.get<User[]>(url);
             return response.data;
@@ -345,9 +345,19 @@ class ApiClient {
         }
     }
 
-    async createTree(data: Tree): Promise<Tree> {
+    async createTree(data: Tree, file?: Blob): Promise<Tree> {
         try {
-            const response = await this.api.post<Tree>(`/trees/`, data);
+            const formData = new FormData();
+            if (file) {
+                formData.append("files", file);
+            }
+            Object.entries(data).forEach(([key, value]) => {
+                if (key != 'image') {
+                    const strValue = value as string
+                    formData.append(key, strValue);
+                }
+              });
+            const response = await this.api.post<Tree>(`/trees/`, formData);
             return response.data;
         } catch (error) {
             console.error(error)
@@ -355,9 +365,22 @@ class ApiClient {
         }
     }
 
-    async updateTree(data: Tree): Promise<Tree> {
+    async updateTree(data: Tree, file?:Blob): Promise<Tree> {
         try {
-            const response = await this.api.put<Tree>(`/trees/${data._id}`, data);
+            const formData = new FormData();
+            console.log(file)
+
+            if (file) {
+                formData.append("files", file);
+            }
+            Object.entries(data).forEach(([key, value]) => {
+                if (key != 'image') {
+                    const strValue = value as string
+                    formData.append(key, strValue);
+                }
+              });
+            console.log(formData)
+            const response = await this.api.put<Tree>(`/trees/${data._id}`, formData);
             return response.data;
         } catch (error) {
             console.error(error)
