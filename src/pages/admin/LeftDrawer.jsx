@@ -68,7 +68,22 @@ export const AdminLeftDrawer = () => {
       displayName: "User",
       logo: AccountCircleOutlined,
       display: true,
-    }
+    },
+    {
+      displayName: "tree",
+      logo: ForestOutlined,
+      display: true,
+    },
+    {
+      displayName: "TreeType",
+      logo: ForestOutlined,
+      display: true,
+    },
+    {
+      displayName: "Pond",
+      logo: OpacityOutlined,
+      display: true,
+    },
   ];
   const menuitem = () => {
     return (

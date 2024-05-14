@@ -20,6 +20,9 @@ import { Users } from "./users/Users";
 import { Ponds } from "./Ponds/Ponds";
 import { Images } from "./images/Images";
 import  {User1}  from "./user/User1";
+import {TreeNew} from "./tree-new/Tree";
+import {TreeType} from "./treeType/TreeType";
+import {Pond} from "./pond/Pond";
 
 export const Admin = () => {
   const classes = useStyles();
@@ -90,7 +93,16 @@ export const Admin = () => {
     },
     {
       page: User1,
-    }
+    },
+    {
+      page: TreeNew,
+    },
+    {
+      page: TreeType,
+    },
+    {
+      page: Pond,
+    },
   ];
   const mainBox = () => {
     const Page = pages[index].page;
