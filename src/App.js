@@ -20,6 +20,7 @@ import { Birthday } from "./pages/events/Birthday";
 import { VisitorNew } from "./pages/Visitor/Visitor2";
 import { OrgEvent } from "./pages/events/OrgEvent";
 import { Corporate } from "./pages/events/Corporate";
+import { Test } from "./pages/test/test";
 
 function App() {
   return (
@@ -62,6 +63,7 @@ function App() {
             <Route path="birthday/:id" element={<Birthday />}></Route>
           </Route>
           <Route path="/notfound" element={<NotFound />} />
+          <Route path="/test" element={<Test />} />
         </Routes>
       </Layout>
     </AuthProvider>
