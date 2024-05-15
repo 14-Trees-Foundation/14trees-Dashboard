@@ -37,6 +37,8 @@ export const pondsDataReducer = (state = fetchDataFromLocal("PondDataState"), ac
                 return nextState;
             }
             return state;
+        case pondActionTypes.UPDATE_POND_WATER_LVL_SUCCEEDED:
+            return state;
         case pondActionTypes.DELETE_POND_SUCCEEDED:
             if (action.payload) {
                 const nextState = { ...state } as PondDataState;

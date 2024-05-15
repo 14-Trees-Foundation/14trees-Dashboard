@@ -78,6 +78,29 @@ export const updatePond = (record: Pond) => {
 };
 
 
+export const updatePondWaterLevel = (pondName: string, levelFt: number, userId: string, file?: Blob) => {
+    const apiClient = new ApiClient();
+    return (dispatch: any) => {
+        dispatch({
+            type: pondActionTypes.UPDATE_POND_WATER_LVL_REQUESTED,
+        });
+        apiClient.updatePondWaterLevel(pondName, levelFt, userId, file).then(
+            () => {
+                dispatch({
+                    type: pondActionTypes.UPDATE_POND_WATER_LVL_SUCCEEDED,
+                });
+            },
+            (error: any) => {
+                console.error(error);
+                dispatch({
+                    type: pondActionTypes.UPDATE_POND_WATER_LVL_FAILED,
+                });
+            }
+        )
+    };
+};
+
+
 export const deletePond = (record: Pond) => {
     const apiClient = new ApiClient();
     return (dispatch: any) => {

@@ -209,6 +209,23 @@ class ApiClient {
         }
     }
 
+    async updatePondWaterLevel(pondName: string, levelFt: number, userId: string, file?: Blob): Promise<void> {
+        try {
+            const formData = new FormData();
+            if (file) {
+                formData.append("files", file);
+            }
+            formData.append('pond_name', pondName);
+            formData.append('levelFt', levelFt.toString());
+            formData.append('user_id', userId);
+            await this.api.post<any>(`/ponds/update-pond-level`, formData);
+            return;
+        } catch (error) {
+            console.error(error)
+            throw new Error('Failed to update Pond');
+        }
+    }
+
     async deletePond(data: Pond): Promise<string> {
         try {
             await this.api.delete<any>(`/ponds/${data._id}`);
