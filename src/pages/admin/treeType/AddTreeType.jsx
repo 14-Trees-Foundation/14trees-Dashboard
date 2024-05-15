@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { Box, Button, Grid, Modal, TextField, Typography } from '@mui/material';
+import { Height } from '@mui/icons-material';
 
-const AddTreeType = ({ open, handleClose }) => {
+const AddTreeType = ({ open, handleClose, createTreeData }) => {
 
     const style = {
         position: 'absolute',
@@ -9,18 +10,30 @@ const AddTreeType = ({ open, handleClose }) => {
         left: '50%',
         transform: 'translate(-50%, -50%)',
         width: 400,
+        height: 450,
+        overflow: 'auto',
+        scrollbarWidth: 'thin',
         bgcolor: 'background.paper',
         border: '2px solid #000',
         boxShadow: 24,
-        borderRadius:'10px',
+        borderRadius: '10px',
         p: 4,
     };
 
     const [formData, setFormData] = useState({
         name: '',
-        phone: '',
-        email: '',
-        dob: '',
+        tree_id: '',
+        desc: '',
+        scientific_name: '',
+        family: '',
+        habit: '',
+        name_english: '',
+        remarkable_char: '',
+        med_use: '',
+        other_use: '',
+        food: '',
+        eco_value: '',
+        parts_used: '',
     });
 
     const handleChange = (event) => {
@@ -32,7 +45,7 @@ const AddTreeType = ({ open, handleClose }) => {
 
     const handleSubmit = (event) => {
         event.preventDefault();
-        console.log(formData);
+        createTreeData(formData);
     };
 
     return (
@@ -44,23 +57,33 @@ const AddTreeType = ({ open, handleClose }) => {
                 aria-describedby="modal-modal-description"
             >
                 <Box sx={style}>
-
+                    <Typography variant="h6" align="center" sx={{ marginBottom: '8px' }}>Add Tree Type</Typography>
                     <form onSubmit={handleSubmit}>
                         <Grid container rowSpacing={2} columnSpacing={1} >
                             <Grid item xs={12}>
-                                <TextField name="name" label="Name" value={formData.name} onChange={handleChange} fullWidth/>
+                                <TextField name="name" label="Name" value={formData.name} onChange={handleChange} fullWidth />
                             </Grid>
                             <Grid item xs={12}>
-                                <TextField name="phone" label="Phone" value={formData.phone} onChange={handleChange} fullWidth/>
+                                <TextField name="tree_id" label="Tree ID" value={formData.phone} onChange={handleChange} fullWidth />
                             </Grid>
                             <Grid item xs={12}>
-                                <TextField name="email" label="Email" value={formData.email} onChange={handleChange} fullWidth/>
+                                <TextField name="desc" label="Description" value={formData.desc} onChange={handleChange} fullWidth />
                             </Grid>
                             <Grid item xs={12}>
-                                <TextField name="dob" label="Date of Birth" type="date" value={formData.dob} onChange={handleChange} InputLabelProps={{ shrink: true }} fullWidth/>
+                                <TextField name="scientific_name" label="Scientific Name" value={formData.scientific_name} onChange={handleChange} fullWidth />
                             </Grid>
-                            <Grid item xs={12} sx={{display:'flex', justifyContent:'center', }}>
-                                <Button type="submit">Submit</Button>
+                            <Grid item xs={12}>
+                                <TextField name="family" label="Family" value={formData.family} onChange={handleChange} fullWidth />
+                            </Grid>
+                            <Grid item xs={12}>
+                                <TextField name="habit" label="Habit" value={formData.habit} onChange={handleChange} fullWidth />
+                            </Grid>
+                            <Grid item xs={12}>
+                                <TextField name="name_english" label="Name (English)" value={formData.name_english} onChange={handleChange} fullWidth />
+                            </Grid>
+
+                            <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'center', }}>
+                                <Button variant='outlined' type="submit">Submit</Button>
                             </Grid>
                         </Grid>
                     </form>

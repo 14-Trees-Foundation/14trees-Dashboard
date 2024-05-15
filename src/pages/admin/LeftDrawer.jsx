@@ -84,6 +84,11 @@ export const AdminLeftDrawer = () => {
       logo: OpacityOutlined,
       display: true,
     },
+    {
+      displayName: "Plot",
+      logo: OpacityOutlined,
+      display: true,
+    },
   ];
   const menuitem = () => {
     return (

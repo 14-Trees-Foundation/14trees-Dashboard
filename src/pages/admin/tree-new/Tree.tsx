@@ -1,56 +1,25 @@
 import React, { useEffect, useState } from 'react';
 import Box from '@mui/material/Box';
-import { DataGrid, GridToolbar, GridColumns} from '@mui/x-data-grid';
-import { Button, Modal, Typography } from '@mui/material';
-import AddUser from './AddTree';
+import { DataGrid, GridToolbar, GridColumns } from '@mui/x-data-grid';
+import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Modal, Typography } from "@mui/material";
+import AddTree from './AddTree';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
-import {type User} from '../../../types/user';
-import * as userActionCreators from '../../../redux/actions/userActions';
-import {bindActionCreators} from 'redux';
-import {useAppDispatch, useAppSelector} from '../../../redux/store/hooks';
+import { type Tree } from '../../../types/tree';
+import * as treeActionCreators from '../../../redux/actions/treeActions';
+import { bindActionCreators } from 'redux';
+import { useAppDispatch, useAppSelector } from '../../../redux/store/hooks';
 import { RootState } from '../../../redux/store/store';
+import CircularProgress from '@mui/material/CircularProgress';
 
-const columns: GridColumns = [
-    { field: 'id', headerName: 'ID', width: 90, align: 'center', headerAlign: 'center', },
-    {
-        field: 'name',
-        headerName: 'Name',
-        width: 150,
-        editable: true,
-        align: 'center',
-        headerAlign: 'center',
-    },
-    {
-        field: 'phone',
-        headerName: 'Phone',
-        width: 150,
-        editable: true,
-        align: 'center',
-        headerAlign: 'center',
-    },
-    {
-        field: 'email',
-        headerName: 'Email',
-        width: 150,
-        editable: true,
-        align: 'center',
-        headerAlign: 'center',
-    },
-    {
-        field: 'action',
-        headerName: 'Action',
-        width: 250,
-        align: 'center',
-        headerAlign: 'center',
-        renderCell: (params: any) => (
-            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-                <Button variant="outlined" style={{ margin: '0 5px' }} onClick={() => console.log('Edit', params.row)}><EditIcon /></Button>
-                <Button variant="outlined" style={{ margin: '0 5px' }} onClick={() => console.log('Delete', params.row)}><DeleteIcon /></Button>
-            </div>
-        ),
-    },
-];
+function LoadingOverlay() {
+    return (
+        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
+            <CircularProgress />
+        </div>
+    );
+}
+
 
 const rows = [
     { id: 1, name: 'Jon Snow', phone: '123-456-7890', email: 'jon.snow@example.com' },
@@ -67,44 +36,149 @@ const rows = [
 export const TreeNew = () => {
 
     const dispatch = useAppDispatch();
-	const {getUsers, createUser, createBulkUsers, updateUser, deleteUser}
-        = bindActionCreators(userActionCreators, dispatch);
+    const { getTrees, createTree, updateTree, deleteTree, createBulkTrees }
+        = bindActionCreators(treeActionCreators, dispatch);
 
     const [open, setOpen] = useState(false);
     const handleModalOpen = () => setOpen(true);
     const handleModalClose = () => setOpen(false);
-    const [loading, setLoading] = useState(false);
+    const [openDeleteModal, setOpenDeleteModal] = useState(false);
 
     useEffect(() => {
-		getUserData();
-	}, []);
+        getTreeData();
+    }, []);
 
-    const getUserData = async () => {
-		setLoading(true);
-		setTimeout(async () => {
-			await getUsers();
-		}, 20000);
-		setLoading(false);
-	};
+    const getTreeData = async () => {
+        setTimeout(async () => {
+            await getTrees();
+        }, 1000);
+    };
+    
+    const columns: GridColumns = [
+        { field: '_id', headerName: 'ID', width: 90, align: 'center', headerAlign: 'center' },
+        {
+            field: 'sapling_id',
+            headerName: 'Sapling ID',
+            width: 150, align: 'center',
+            headerAlign: 'center'
+        },
+        {
+            field: 'tree_id',
+            headerName: 'Tree ID',
+            width: 150,
+            align: 'center',
+            headerAlign: 'center'
+        },
+        {
+            field: 'plot_id',
+            headerName: 'Plot ID',
+            width: 150,
+            align: 'center',
+            headerAlign: 'center'
+        },
+        {
+            field: 'date_added',
+            headerName: 'Date Added',
+            width: 150,
+            align: 'center',
+            headerAlign: 'center'
+        },
+        {
+            field: 'link',
+            headerName: 'Link',
+            width: 150,
+            align: 'center',
+            headerAlign: 'center'
+        },
+        {
+            field: 'mapped_to',
+            headerName: 'Mapped To',
+            width: 150,
+            align: 'center',
+            headerAlign: 'center'
+        },
+        {
+            field: 'event_type',
+            headerName: 'Event Type',
+            width: 150,
+            align: 'center',
+            headerAlign: 'center'
+        },
+        {
+            field: 'date_assigned',
+            headerName: 'Date Assigned',
+            width: 150,
+            align: 'center',
+            headerAlign: 'center'
+        },
+        {
+            field: '__v',
+            headerName: '__V',
+            width: 90,
+            align: 'center',
+            headerAlign: 'center'
+        },
+        {
+            field: 'location.type',
+            headerName: 'Location Type',
+            width: 150,
+            align: 'center',
+            headerAlign: 'center',
+            valueGetter: (params) => params.row.location?.type,
+        },
+        {
+            field: 'location.coordinates',
+            headerName: 'Location Coordinates',
+            width: 150,
+            align: 'center',
+            headerAlign: 'center',
+            valueGetter: (params) => params.row.location?.coordinates.join(', '),
+        },
+        {
+            field: 'action',
+            headerName: 'Action',
+            width: 250,
+            align: 'center',
+            headerAlign: 'center',
+            renderCell: (params: any) => (
+                <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                    <Button variant="outlined" style={{ margin: '0 5px' }} onClick={() => console.log('Edit', params.row)}><EditIcon /></Button>
+                    <Button variant="outlined" style={{ margin: '0 5px' }} onClick={() => handleDelete(params.row)}><DeleteIcon /></Button>
+                </div>
+            ),
+        },
+    ];
 
-    let usersList: User[] = [];
-	const usersMap = useAppSelector((state: RootState) => state.usersData);
-	if (usersMap) {
-		usersList = Object.values(usersMap);
-	}
+    let treesList: Tree[] = [];
+    const treesMap = useAppSelector((state: RootState) => state.treesData);
+    if (treesMap) {
+        treesList = Object.values(treesMap);
+    }
+
+    type RowType = {
+        id: string;
+        name: string;
+    };
+
+    const handleDelete = (row: RowType) => {
+        console.log('Delete', row.name);
+        setOpenDeleteModal(true);
+    };
 
     return (
         <>
             <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '20px' }}>
-                <Button variant="contained" onClick={handleModalOpen}>Add Tree</Button>
-                <AddUser open={open} handleClose={handleModalClose} />
+                <Button variant="contained" onClick={handleModalOpen}
+                disabled={true} 
+                >Add Tree</Button>
+                <AddTree open={open} handleClose={handleModalClose} />
                 <Button variant="contained" style={{ marginLeft: '10px' }} onClick={handleModalOpen}>Bulk Create</Button>
             </div>
             <Box sx={{ height: 540, width: '100%' }}>
                 <DataGrid
-                    components={{ Toolbar: GridToolbar }}
-                    rows={rows}
+                    rows={treesList}
                     columns={columns}
+                    getRowId={(row) => row._id}
                     initialState={{
                         pagination: {
                             page: 1,
@@ -114,8 +188,35 @@ export const TreeNew = () => {
                     // pageSizeOptions= {5}
                     checkboxSelection
                     disableSelectionOnClick
+                    components={{
+                        Toolbar: GridToolbar,
+                        NoRowsOverlay: LoadingOverlay,
+                    }}
                 />
             </Box>
+
+            <Dialog open={openDeleteModal} onClose={() => setOpenDeleteModal(false)}>
+                <DialogTitle>Confirm Delete</DialogTitle>
+                <DialogContent>
+                    <DialogContentText>
+                        Do you want to delete this item?
+                    </DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={() => setOpenDeleteModal(false)} color="primary">
+                        Cancel
+                    </Button>
+                    <Button
+                        onClick={() => {
+                            console.log("Deleting item...");
+                            setOpenDeleteModal(false);
+                        }}
+                        color="primary"
+                        autoFocus>
+                        Yes
+                    </Button>
+                </DialogActions>
+            </Dialog>
 
         </>
     );

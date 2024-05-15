@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Box, Button, Grid, Modal, TextField, Typography } from '@mui/material';
 
-const AddUser = ({ open, handleClose }) => {
+const AddUser = ({ open, handleClose, createUser }) => {
 
     const style = {
         position: 'absolute',
@@ -32,7 +32,14 @@ const AddUser = ({ open, handleClose }) => {
 
     const handleSubmit = (event) => {
         event.preventDefault();
-        console.log(formData);
+        createUser(formData);
+        setFormData({
+            name: '',
+            phone: '',
+            email: '',
+            dob: '',
+        });
+        handleClose();
     };
 
     return (

@@ -21,14 +21,15 @@ import { Ponds } from "./Ponds/Ponds";
 import { Images } from "./images/Images";
 import  {User1}  from "./user/User1";
 import {TreeNew} from "./tree-new/Tree";
-import {TreeType} from "./treeType/TreeType";
-import {Pond} from "./pond/Pond";
+import {TreeTypeComponent} from "./treeType/TreeType";
+import {PondComponent} from "./pond/Pond";
+import { PlotComponent } from "./plot/Plot";
 
 export const Admin = () => {
   const classes = useStyles();
   const [loading, setLoading] = useState(true);
   const setSummary = useSetRecoilState(summary);
-  const setTreeLoggedByDate = useSetRecoilState(treeLoggedByDate);
+  // const setTreeLoggedByDate = useSetRecoilState(treeLoggedByDate);
   const setPlotsList = useSetRecoilState(plotsList);
   const index = useRecoilValue(adminNavIndex);
   const token = JSON.parse(localStorage.getItem("token"));
@@ -47,13 +48,13 @@ export const Admin = () => {
       if (response.status === 200) {
         setSummary(response.data);
       }
-      response = await Axios.default.get(`/trees/loggedbydate`);
-      if (response.status === 200) {
-        response.data.forEach((element, index) => {
-          element["_id"] = element["_id"].substring(0, 10);
-        });
-        setTreeLoggedByDate(response.data);
-      }
+      // response = await Axios.default.get(`/trees/loggedbydate`);
+      // if (response.status === 200) {
+      //   response.data.forEach((element, index) => {
+      //     element["_id"] = element["_id"].substring(0, 10);
+      //   });
+      //   setTreeLoggedByDate(response.data);
+      // }
       let plotRes = await Axios.default.get(`/plots`);
       if (plotRes.status === 200) {
         setPlotsList(plotRes.data);
@@ -65,7 +66,7 @@ export const Admin = () => {
     }
 
     setLoading(false);
-  }, [setSummary, navigate, setTreeLoggedByDate, setPlotsList, token]);
+  }, [setSummary, navigate, setPlotsList, token]);
 
   useEffect(() => {
     fetchData();
@@ -98,10 +99,13 @@ export const Admin = () => {
       page: TreeNew,
     },
     {
-      page: TreeType,
+      page: TreeTypeComponent,
     },
     {
-      page: Pond,
+      page: PondComponent,
+    },
+    {
+      page: PlotComponent,
     },
   ];
   const mainBox = () => {
