@@ -37,6 +37,19 @@ export const usersDataReducer = (state = fetchDataFromLocal("usersDataState"), a
                 return nextState;
             }
             return state;
+        case userActionTypes.SEARCH_USERS_BY_EMAIL_SUCCEEDED:
+            if (action.payload) {
+                const nextState = { ...state } as UsersDataState;
+                let payload = action.payload as User[]
+                for (let i = 0; i < payload.length; i++) {
+                    if (payload[i]?._id) {
+                        payload[i].key = payload[i]._id
+                        nextState[payload[i]._id] = payload[i]
+                    }
+                }
+                return nextState;
+            }
+            return state;
         case userActionTypes.DELETE_USER_SUCCEEDED:
             if (action.payload) {
                 const nextState = { ...state } as UsersDataState;

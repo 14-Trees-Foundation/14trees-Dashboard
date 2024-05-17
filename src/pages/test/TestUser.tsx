@@ -8,7 +8,7 @@ import { Button } from '@mui/material';
 export const TestUser = () => {
 
     const dispatch = useAppDispatch();
-	const {getUsers, createUser, createBulkUsers, updateUser, deleteUser}
+	const {getUsers, createUser, createBulkUsers, updateUser, deleteUser, searchUsersByEmail}
         = bindActionCreators(userActionCreators, dispatch);
 
 	const [jsonData, setJsonData] = useState<string>('');
@@ -17,6 +17,13 @@ export const TestUser = () => {
         try {
           const parsedData = JSON.parse(jsonData) as User;
           createUser(parsedData)
+        } catch (error) {
+          console.error('Error parsing JSON:', error);
+        }
+      };
+    const handleButtonClickSearch = () => {
+        try {
+          searchUsersByEmail(jsonData);
         } catch (error) {
           console.error('Error parsing JSON:', error);
         }
@@ -49,6 +56,15 @@ export const TestUser = () => {
         <>
             <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '20px' }}>
                 <Button variant="contained" onClick={handleButtonClickGet}>Get</Button>
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '20px' }}>
+            <textarea
+                placeholder="email"
+                value={jsonData}
+                onChange={handleInputChange}
+                style={{ width: '100%', minHeight: '100px' }}
+            />
+                <Button variant="contained" onClick={handleButtonClickSearch}>Search</Button>
             </div>
             <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '20px' }}>
             <textarea
