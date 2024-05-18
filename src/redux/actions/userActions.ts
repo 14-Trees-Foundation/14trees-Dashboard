@@ -31,6 +31,35 @@ export const getUsers = () => {
     }
 };
 
+export const searchUsersByEmail = (email: string) => {
+    const apiClient = new ApiClient()
+    return (dispatch: any) => {
+        dispatch({
+            type: userActionTypes.SEARCH_USERS_BY_EMAIL_REQUESTED,
+        });
+        apiClient.searchUsersByEmail(email).then(
+            (value: User[]) => {
+                for (let i = 0; i < value.length; i++) {
+                    if (value[i]?._id) {
+                        value[i].key = value[i]._id
+                    }
+                }
+                dispatch({
+                    type: userActionTypes.SEARCH_USERS_BY_EMAIL_SUCCEEDED,
+                    payload: value,
+                });
+            },
+            (error: any) => {
+                console.log(error)
+                dispatch({
+                    type: userActionTypes.SEARCH_USERS_BY_EMAIL_FAILED,
+                    payload: error
+                });
+            }
+        )
+    }
+};
+
 export const createUser = (record: User) => {
     const apiClient = new ApiClient();
     return (dispatch: any) => {

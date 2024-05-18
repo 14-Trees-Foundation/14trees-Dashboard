@@ -261,6 +261,17 @@ class ApiClient {
         }
     }
 
+    async searchUsersByEmail(email: string): Promise<User[]> {
+        const url = `/users/${email}`;
+        try {
+            const response = await this.api.get<User[]>(url);
+            return response.data;
+        } catch (error: any) {
+            console.error(error)
+            throw new Error(`Failed to fetch users: ${error.message}`);
+        }
+    }
+
     async createUser(data: User): Promise<User> {
         try {
             const response = await this.api.post<User>(`/users/`, data);
@@ -425,6 +436,33 @@ class ApiClient {
             formData.append('csvFile', data, 'trees_data.csv');
             await this.api.post<any>(`/trees/bulk`, );
         } catch (error) {
+            console.error(error)
+            throw new Error('Failed to create Trees in bulk');
+        }
+    }
+
+    async mapTrees(saplingIds: string[], email: string): Promise<void> {
+        try {
+            await this.api.post<any>(`/mytrees/assign`, { saplingids: saplingIds.join(',') , email: email});
+        } catch (error) {
+            console.error(error)
+            throw new Error('Failed to create Trees in bulk');
+        }
+    }
+
+    async removeTreeMappings(saplingIds: string[]): Promise<void> {
+        try {
+            await this.api.post<any>(`/mytrees/unmap`, { saplingids: saplingIds.join(',')});
+        } catch (error) { 
+            console.error(error)
+            throw new Error('Failed to create Trees in bulk');
+        }
+    }
+
+    async getMappedTrees(email: string): Promise<void> {
+        try {
+            await this.api.post<any>(`/mytrees/${email}`);
+        } catch (error) { 
             console.error(error)
             throw new Error('Failed to create Trees in bulk');
         }
