@@ -13,6 +13,13 @@ import { TreeList } from "./components/TreeList";
 import { treeTypesList } from "../../../store/adminAtoms";
 import { AddPlot } from "./components/AddPlot";
 import { AddTreeType } from './components/AddTreeType';
+import Accordion from '@mui/material/Accordion';
+import AccordionSummary from '@mui/material/AccordionSummary';
+import AccordionDetails from '@mui/material/AccordionDetails';
+import Typography from '@mui/material/Typography';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import TreeMap from "./components/TreeMap";
+import { UserDetails } from "./components/UserDetails";
 
 export const Forms = () => {
   const [loading, setLoading] = React.useState(true);
@@ -57,14 +64,14 @@ export const Forms = () => {
       <TabsUnstyled defaultValue={0}>
         <div style={{ margin: "16px" }}>
           <TabsList>
-            <Tab>Assign Trees</Tab>
-            <Tab>Add Tree Type</Tab>
+            <Tab>Map Trees</Tab>
+            {/* <Tab>Add Tree Type</Tab>
             <Tab>Add Org</Tab>
             <Tab>Add Plot</Tab>
-            <Tab>Add Tree</Tab>
+            <Tab>Add Tree</Tab> */}
           </TabsList>
         </div>
-        <TabPanel value={0} sx={{ ml: 2}}>
+        {/* <TabPanel value={0} sx={{ ml: 2 }}>
           <Grid container spacing={2}>
             <Grid item xs={6}>
               <TreeList onTreeSelect={onTreeSelect} />
@@ -73,7 +80,54 @@ export const Forms = () => {
               <AssignTree selTrees={selTrees} onTreesChanged={onTreesChanged} />
             </Grid>
           </Grid>
-        </TabPanel>
+        </TabPanel> */}
+        <Accordion sx={{ 
+          borderRadius: '10px',
+          marginBottom:'20px', 
+          background: "linear-gradient(145deg, #9faca3, #bdccc2)",
+          boxShadow: "8px 8px 16px #9eaaa1,-8px -8px 16px #c4d4c9",
+           }}>
+          <AccordionSummary
+            expandIcon={<ExpandMoreIcon />}
+            aria-controls="panel1a-content"
+            id="panel1a-header"
+          >
+            <Typography variant="h6" style={{ fontWeight: 'inherit', color:'#1F3625' }}>Map using sapling count</Typography>
+          </AccordionSummary>
+          <AccordionDetails>
+            <Grid container spacing={2}>
+              <Grid item xs={6}>
+                <TreeMap />
+              </Grid>
+              <Grid item xs={6}>
+                <UserDetails selTrees={selTrees} onTreesChanged={onTreesChanged} />
+              </Grid>
+            </Grid>
+          </AccordionDetails>
+        </Accordion>
+        <Accordion sx={{ 
+          borderRadius: '10px',
+          background: "linear-gradient(145deg, #9faca3, #bdccc2)",
+          boxShadow: "8px 8px 16px #9eaaa1,-8px -8px 16px #c4d4c9",
+          }}>
+          <AccordionSummary
+            expandIcon={<ExpandMoreIcon />}
+            aria-controls="panel2a-content"
+            id="panel2a-header"
+          >
+            <Typography variant="h6" style={{ fontWeight: "inherit", color:'#1F3625' }} >Map using sapling ids</Typography>
+          </AccordionSummary>
+          <AccordionDetails>
+            <Grid container spacing={2}>
+              <Grid item xs={6}>
+                <TreeList onTreeSelect={onTreeSelect} />
+              </Grid>
+              <Grid item xs={6}>
+                <AssignTree selTrees={selTrees} onTreesChanged={onTreesChanged} />
+              </Grid>
+            </Grid>
+          </AccordionDetails>
+        </Accordion>
         <TabPanel value={1}>
           <AddTreeType />
         </TabPanel>

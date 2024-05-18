@@ -76,7 +76,7 @@ export const TreeTypeComponent = () => {
         {
             field: "tree_id",
             headerName: "Tree ID",
-            width: 150,
+            width: 120,
             editable: true,
             align: "center",
             headerAlign: "center",
@@ -180,7 +180,7 @@ export const TreeTypeComponent = () => {
                     justifyContent: "flex-end",
                     marginBottom: "20px",
                 }}>
-                <Button variant="contained" onClick={handleModalOpen}>
+                <Button variant="contained" style={{ backgroundColor:'blue' }} onClick={handleModalOpen}>
                     Add Tree type
                 </Button>
                 <AddTreeType
@@ -190,7 +190,7 @@ export const TreeTypeComponent = () => {
                 />
                 <Button
                     variant="contained"
-                    style={{ marginLeft: "10px" }}
+                    style={{ marginLeft: "10px",backgroundColor:'blue' }}
                     onClick={handleModalOpen}>
                     Bulk Create
                 </Button>

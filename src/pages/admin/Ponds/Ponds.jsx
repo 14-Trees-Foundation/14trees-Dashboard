@@ -9,7 +9,7 @@ import {
   Grid,
 } from "@mui/material";
 import { makeStyles } from "@mui/styles";
-
+import {PondComponent} from "./components/AllPondTable";
 import * as Axios from "../../../api/local";
 import { Spinner } from "../../../components/Spinner";
 import { allPonds, selectedPond, pondHistory } from "../../../store/adminAtoms";
@@ -25,12 +25,12 @@ const useStyles = makeStyles({
     }
   },
   select: {
-      "& ul": {
-          backgroundColor: "#b1bfb5",
-      },
-      "& li": {
-          fontSize: 14,
-      },
+    "& ul": {
+      backgroundColor: "#b1bfb5",
+    },
+    "& li": {
+      fontSize: 14,
+    },
   },
 });
 
@@ -79,7 +79,7 @@ export const Ponds = () => {
       );
       if (hisRes.status === 200) {
         let pondUpdate = hisRes.data[0].updates;
-        pondUpdate.sort(function(a,b){
+        pondUpdate.sort(function (a, b) {
           // Turn your strings into dates, and then subtract them
           // to get a value that is either negative, positive, or zero.
           return new Date(a.date) - new Date(b.date);
@@ -112,37 +112,40 @@ export const Ponds = () => {
           <div style={{ display: "flex", justifyContent: "space-between" }}>
             {Object.keys(ponds).length > 0 && (
               <Select
-              sx={{
-                mt: 1,
-                width: "24ch",
-                "& .MuiOutlinedInput-notchedOutline": {
-                  border: "none",
-                  borderRadius: "25px",
-                  boxShadow: "4px 4px 8px #98a49c, -4px -4px 8px #cadace",
-                },
-              }}
-              fullWidth
-              onChange={(e) => fetchPondHistory(e.target.value)}
-              defaultValue="none"
-              MenuProps={{ classes: { paper: classes.select, root: classes.root } }}
-            >
-              <MenuItem disabled value="none">
-                Select Pond
-              </MenuItem>
-              {ponds?.map((pond ) => {
-                return (
-                  <MenuItem key={pond._id} value={pond.name}>
+                sx={{
+                  mt: 1,
+                  width: "24ch",
+                  "& .MuiOutlinedInput-notchedOutline": {
+                    border: "none",
+                    borderRadius: "25px",
+                    boxShadow: "4px 4px 8px #98a49c, -4px -4px 8px #cadace",
+                  },
+                }}
+                fullWidth
+                onChange={(e) => fetchPondHistory(e.target.value)}
+                defaultValue="none"
+                MenuProps={{ classes: { paper: classes.select, root: classes.root } }}
+              >
+                <MenuItem disabled value="none">
+                  Select Pond
+                </MenuItem>
+                {ponds?.map((pond) => {
+                  return (
+                    <MenuItem key={pond._id} value={pond.name}>
                       {pond.name}
                     </MenuItem>
-                );
-              })}
-            </Select>
+                  );
+                })}
+              </Select>
             )}
           </div>
         </div>
         <Divider sx={{ backgroundColor: "#ffffff" }} />
         <Box sx={{ p: 3 }}>
           <Grid container spacing={2}>
+            <Grid item xs={12}>
+              <PondComponent />
+            </Grid>
             <Grid item xs={5}>
               <PondsList />
             </Grid>

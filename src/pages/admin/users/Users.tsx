@@ -10,6 +10,7 @@ import { Userlist } from "./components/Userlist";
 import * as Axios from "../../../api/local";
 import { UserTreeHoldings } from "./components/UserTreeHoldings";
 import { UserEdit } from "./components/UserEdit";
+import { User1 } from "./table/User1";
 
 export const Users = () => {
   const [loading, setLoading] = useState(true);
@@ -51,7 +52,9 @@ export const Users = () => {
         >
           <Typography variant="h3">User Management</Typography>
         </div>
-        <Divider sx={{ backgroundColor: "#ffffff" }} />
+        <Divider sx={{ backgroundColor: "#ffffff", marginBottom:'10px' }} />
+        <User1 />
+        <Divider sx={{ backgroundColor: "#ffffff", marginTop:'20px' }} />
         <Box sx={{ p: 3 }}>
           <TabsUnstyled defaultValue={0}>
             <TabsList>

@@ -26,6 +26,7 @@ import { SearchBox } from "./components/SearchBox";
 import { SearchResult } from "./components/SearchResult";
 import { Overall } from "./overall/Overall";
 import { Plotwise } from "./plotwise/Plotwise";
+import { TreeNew } from "./table/Tree";
 
 const CustomPaper = (props) => {
   return (
@@ -42,7 +43,7 @@ const CustomPaper = (props) => {
   );
 };
 
-export const Tree = () => {
+export const Trees = () => {
   const [loading, setLoading] = useState(true);
   const searchTree = useRecoilValue(searchTreeData);
   const [treeByPlotsData, setTreeByPlots] = useRecoilState(treeByPlots);
@@ -133,7 +134,9 @@ export const Tree = () => {
             <SearchBox setLoading={setLoading} />
           </div>
         </div>
-        <Divider sx={{ backgroundColor: "#ffffff" }} />
+        <Divider sx={{ backgroundColor: "#ffffff", marginBottom:'10px' }} />
+              <TreeNew />
+        <Divider sx={{ backgroundColor: "#ffffff", marginTop:'10px' }} />
         <Box sx={{ p: 3 }}>
           <TabsUnstyled defaultValue={0}>
             <TabsList>

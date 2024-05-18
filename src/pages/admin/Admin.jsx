@@ -14,16 +14,15 @@ import {
   plotsList
 } from "../../store/adminAtoms";
 import { AdminHome } from "./home/AdminHome";
-import { Tree } from "./tree/Tree";
+import { Trees } from "./tree/Tree";
 import { Forms } from "./Forms/Forms";
 import { Users } from "./users/Users";
 import { Ponds } from "./Ponds/Ponds";
 import { Images } from "./images/Images";
-import  {User1}  from "./user/User1";
-import {TreeNew} from "./tree-new/Tree";
+import {TreeNew} from "./tree/table/Tree";
 import {TreeTypeComponent} from "./treeType/TreeType";
-import {PondComponent} from "./pond/Pond";
 import { PlotComponent } from "./plot/Plot";
+import { OrganizationComponent } from "./organization/Organization";
 
 export const Admin = () => {
   const classes = useStyles();
@@ -78,13 +77,22 @@ export const Admin = () => {
       page: AdminHome,
     },
     {
-      page: Tree,
+      page: Trees,
+    },
+    {
+      page: TreeTypeComponent,
     },
     {
       page: Ponds,
     },
     {
+      page: PlotComponent,
+    },
+    {
       page: Users,
+    },
+    {
+      page: OrganizationComponent,
     },
     {
       page: Images,
@@ -92,21 +100,7 @@ export const Admin = () => {
     {
       page: Forms,
     },
-    {
-      page: User1,
-    },
-    {
-      page: TreeNew,
-    },
-    {
-      page: TreeTypeComponent,
-    },
-    {
-      page: PondComponent,
-    },
-    {
-      page: PlotComponent,
-    },
+    
   ];
   const mainBox = () => {
     const Page = pages[index].page;

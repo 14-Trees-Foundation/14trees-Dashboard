@@ -17,7 +17,7 @@ const intitialFValues = {
   backdropOpen: false,
 };
 
-export const AssignTree = ({ selTrees, onTreesChanged }) => {
+export const UserDetails = ({ selTrees, onTreesChanged }) => {
   const [values, setValues] = useState(intitialFValues);
 
   const formSubmit = async (formValues) => {
@@ -116,7 +116,7 @@ export const AssignTree = ({ selTrees, onTreesChanged }) => {
             Step - 2
           </Typography>
           <Typography variant="h5" gutterBottom sx={{ pb: 2 }}>
-            Map Form
+            Enter User details
           </Typography>
           <Form
             onSubmit={formSubmit}
@@ -213,12 +213,12 @@ export const AssignTree = ({ selTrees, onTreesChanged }) => {
                     </Field>
                   </Grid>
                   <Grid item sx={{ m: 2 }} xs={12}>
-                    <Typography
+                    {/* <Typography
                       sx={{ color: "#C72542",textAlign:'end' }}
                     >
                       Total selected trees :
                       {selTrees === "" ? 0 : selTrees.split(",").length}
-                    </Typography>
+                    </Typography> */}
                     <TextField
                       sx={{
                         "& label.Mui-focused": {
@@ -232,7 +232,7 @@ export const AssignTree = ({ selTrees, onTreesChanged }) => {
                       onChange={(e) => onTreesChanged(e.target.value)}
                       value={selTrees}
                       fullWidth
-                      label="Sapling ID *"
+                      label="Sapling count *"
                       name="saplingid"
                     />
                   </Grid>

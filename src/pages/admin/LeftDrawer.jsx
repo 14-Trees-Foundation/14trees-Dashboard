@@ -13,7 +13,8 @@ import AccountCircleOutlined from "@mui/icons-material/AccountCircleOutlined";
 import FaceIcon from "@mui/icons-material/Face";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
-
+import LandscapeIcon from '@mui/icons-material/Landscape';
+import CorporateFareIcon from '@mui/icons-material/CorporateFare';
 import logo from "../../assets/logo_white_small.png";
 import { useRecoilState } from "recoil";
 import { adminNavIndex } from "../../store/adminAtoms";
@@ -38,7 +39,12 @@ export const AdminLeftDrawer = () => {
       display: true,
     },
     {
-      displayName: "Tree",
+      displayName: "Trees",
+      logo: ForestOutlined,
+      display: true,
+    },
+    {
+      displayName: "TreeType",
       logo: ForestOutlined,
       display: true,
     },
@@ -48,10 +54,20 @@ export const AdminLeftDrawer = () => {
       display: true,
     },
     {
+      displayName: "Plot",
+      logo: LandscapeIcon,
+      display: true,
+    },
+    {
       displayName: "Users",
       logo: AccountCircleOutlined,
       // display: auth.permissions.includes("all"),
       display: true,
+    },
+    {
+      displayName: 'Organization',
+      logo: CorporateFareIcon,
+      display: true
     },
     {
       displayName: "Images",
@@ -64,31 +80,7 @@ export const AdminLeftDrawer = () => {
       logo: AssignmentOutlined,
       display: true,
     },
-    {
-      displayName: "User",
-      logo: AccountCircleOutlined,
-      display: true,
-    },
-    {
-      displayName: "tree",
-      logo: ForestOutlined,
-      display: true,
-    },
-    {
-      displayName: "TreeType",
-      logo: ForestOutlined,
-      display: true,
-    },
-    {
-      displayName: "Pond",
-      logo: OpacityOutlined,
-      display: true,
-    },
-    {
-      displayName: "Plot",
-      logo: OpacityOutlined,
-      display: true,
-    },
+    
   ];
   const menuitem = () => {
     return (

@@ -19,6 +19,9 @@ import {
   Checkbox,
   Dialog,
   DialogContent,
+  DialogTitle,
+  DialogContentText,
+  DialogActions,
 } from "@mui/material";
 import { useRecoilState } from "recoil";
 import { ToastContainer, toast } from "react-toastify";
@@ -63,7 +66,8 @@ const intitialFValues = {
   shareTree: "",
   shareTreeId: "",
 };
-
+console.log('selectedTreeSum - ', intitialFValues.selectedTreeSum);
+console.log('filteredTrees- ', intitialFValues.filteredTrees);
 export const GiftTrees = () => {
   let { email } = useParams();
 
@@ -73,6 +77,9 @@ export const GiftTrees = () => {
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [filter, setFilter] = useState("all");
   const [al, setAlbums] = useRecoilState(albums);
+  const [assignedSelected, setAssignedSelected] = useState(false);
+  const [unassignedSelected, setUnassignedSelected] = useState(false);
+  const [unAssignModalOpen, setUnAssignModalOpen] = useState(false);
 
   const handleFilterChange = (event) => {
     setFilter(event.target.value);
@@ -230,7 +237,7 @@ export const GiftTrees = () => {
     (async () => {
       await fetchTrees();
     })();
-   document.title = "14Trees Dashboard - Assign Trees"
+    document.title = "14Trees Dashboard - Assign Trees"
   }, [fetchTrees]);
 
   const handleSaplingClick = () => {
@@ -566,18 +573,28 @@ export const GiftTrees = () => {
 
   const handleSelectTrees = (event, value) => {
     values.filteredTrees.forEach((item, index) => {
-      if (item.sapling_id === value.sapling_id && !item.user) {
+      if (item.sapling_id === value.sapling_id) {
         item.selected = !value.selected;
       }
     });
+
+    // Calculate the sum of selected trees
     const sum = values.filteredTrees
       .map((item) => item.selected)
       .reduce((prev, curr) => prev + curr, 0);
+
+    // Update state variables based on whether the selected tree is assigned or unassigned
+    setUnassignedSelected(values.filteredTrees.some(item => item.selected && !item.user));
+    setAssignedSelected(values.filteredTrees.some(item => item.selected && item.user));
 
     setValues({
       ...values,
       selectedTreeSum: sum,
     });
+  };
+  const handleUnassignTrees = (event, value) => {
+    console.log(value);
+    setUnAssignModalOpen(false);
   };
 
   // const handleSelectAlltree = (event) => {
@@ -624,7 +641,7 @@ export const GiftTrees = () => {
     } else {
       return (
         <>
-          <PwdDialog open={values.pwdDlgOpen} onClose={handlePwdDlgClose} passwd={"admin@14trees"}/>
+          <PwdDialog open={values.pwdDlgOpen} onClose={handlePwdDlgClose} passwd={"admin@14trees"} />
           <Dialog
             open={values.selectedTreeImgDlg}
             onClose={() =>
@@ -658,7 +675,7 @@ export const GiftTrees = () => {
             </DialogContent>
           </Dialog>
           <div className={classes.bg}>
-            <Box
+            {/* <Box
               sx={{
                 textAlign: "center",
                 p: 6,
@@ -738,9 +755,9 @@ export const GiftTrees = () => {
                   </div>
                 </Typography>
               </div>
-            </Box>
+            </Box> */}
             <div style={{ position: "relative" }}>
-              <img src={bg} className={classes.landingimg} alt="bg" />
+              {/* <img src={bg} className={classes.landingimg} alt="bg" /> */}
               <div
                 style={{
                   background:
@@ -828,19 +845,54 @@ export const GiftTrees = () => {
                       <TableCell>Tree Name</TableCell>
                       <TableCell align="center">Sapling ID</TableCell>
                       <TableCell align="center">Plot</TableCell>
-                      <TableCell align="right"></TableCell>
+                      <TableCell align="right">
+                        <Button
+                          sx={{ ml: "auto", mr: "auto" }}
+                          variant="contained"
+                          color="primary"
+                          disabled={values.selectedTreeSum <= 0 || (assignedSelected && unassignedSelected)}
+                          onClick={() => setUnAssignModalOpen(true)}
+                        >
+                          UnAssign
+                        </Button>
+                      </TableCell>
                       {/* <TableCell align="right"></TableCell> */}
                       <TableCell>
                         <Button
                           sx={{ ml: "auto", mr: "auto" }}
                           variant="contained"
                           color="primary"
-                          disabled={values.selectedTreeSum <= 0}
+                          disabled={values.selectedTreeSum <= 0 || (assignedSelected && unassignedSelected)}
                           onClick={handleClickOpen}
                         >
                           Assign
                         </Button>
                       </TableCell>
+                      <Dialog
+                        open={unAssignModalOpen}
+                        onClose={() => setUnAssignModalOpen(false)}
+                        aria-labelledby="alert-dialog-title"
+                        aria-describedby="alert-dialog-description"
+                      >
+                        {/* <DialogTitle id="alert-dialog-title">{"Unassign Trees"}</DialogTitle> */}
+                        <Box p={2}>
+                        <DialogContent>
+                          <DialogContentText id="alert-dialog-description">
+                            Are you sure you want to unAssign the selected trees?
+                          </DialogContentText>
+                        </DialogContent>
+                        <DialogActions>
+                        <Box display="flex" justifyContent="center" width="100%" >
+                          <Button variant="contained" onClick={() => setUnAssignModalOpen(false)} color="primary">
+                            No
+                          </Button>
+                          <Button variant="contained" onClick={(event) => handleUnassignTrees(event, tree)} color="primary" autoFocus sx={{marginLeft:'15px'}}>
+                            Yes
+                          </Button>
+                          </Box>  
+                        </DialogActions>
+                        </Box>
+                      </Dialog>
                     </TableRow>
                   </TableHead>
                   <TableBody className={classes.tblrow}>
@@ -861,7 +913,7 @@ export const GiftTrees = () => {
                             align="center"
                           >
                             <Checkbox
-                              disabled={row.assigned && row.type !== null}
+                              // disabled={row.type !== null}
                               checked={row.selected}
                             />
                           </TableCell>

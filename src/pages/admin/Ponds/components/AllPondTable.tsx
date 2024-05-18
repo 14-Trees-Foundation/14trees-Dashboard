@@ -4,13 +4,22 @@ import { DataGrid, GridToolbar, GridColumns } from "@mui/x-data-grid";
 import AddPond from "./AddPond";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
-import { type Pond } from "../../../types/pond";
-import * as pondActionCreators from "../../../redux/actions/pondActions";
+import { type Pond } from "../../../../types/pond";
+import * as pondActionCreators from "../../../../redux/actions/pondActions";
 import { bindActionCreators } from "redux";
-import { useAppDispatch, useAppSelector } from "../../../redux/store/hooks";
-import { RootState } from "../../../redux/store/store";
+import { useAppDispatch, useAppSelector } from "../../../../redux/store/hooks";
+import { RootState } from "../../../../redux/store/store";
 import CircularProgress from "@mui/material/CircularProgress";
-import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Modal, Typography } from "@mui/material";
+import {
+    Button,
+    Dialog,
+    DialogActions,
+    DialogContent,
+    DialogContentText,
+    DialogTitle,
+    Modal,
+    Typography,
+} from "@mui/material";
 import EditPond from "./EditPond";
 
 function LoadingOverlay() {
@@ -26,74 +35,6 @@ function LoadingOverlay() {
         </div>
     );
 }
-
-const rows = [
-    {
-        boundaries: {
-            type: "Polygon",
-            coordinates: [],
-        },
-        _id: "623b4476b2621b181db4c8aa",
-        name: "521-main",
-        tags: [],
-        type: "Storage",
-        date_added: "2022-03-23T16:01:58.971Z",
-        images: [],
-        lengthFt: 60,
-        widthFt: 40,
-        depthFt: 30,
-        __v: 0,
-    },
-    {
-        boundaries: {
-            type: "Polygon",
-            coordinates: [],
-        },
-        _id: "623d68e0cc8349ed6c95b573",
-        name: "अखरवाडी गायरान तळ १",
-        tags: [],
-        type: "Storage",
-        date_added: "2022-03-25T07:01:52.191Z",
-        images: [],
-        lengthFt: 30,
-        widthFt: 30,
-        depthFt: 30,
-        __v: 0,
-    },
-    {
-        boundaries: {
-            type: "Polygon",
-            coordinates: [],
-        },
-        _id: "623d693821a217610a750f6b",
-        name: "दक्षणा तळ १ (Dakshana pond 1)",
-        tags: [],
-        type: "Storage",
-        date_added: "2022-03-25T07:03:20.186Z",
-        images: [],
-        lengthFt: 30,
-        widthFt: 30,
-        depthFt: 30,
-        __v: 0,
-    },
-    {
-        boundaries: {
-            type: "Polygon",
-            coordinates: [],
-        },
-        _id: "623d693f21a217610a750f6e",
-        name: "दक्षणा तळ २ (Dakshana pond 2)",
-        tags: [],
-        type: "Storage",
-        date_added: "2022-03-25T07:03:27.978Z",
-        images: [],
-        lengthFt: 30,
-        widthFt: 30,
-        depthFt: 30,
-        __v: 0,
-    },
-];
-
 
 export const PondComponent = () => {
     const dispatch = useAppDispatch();
@@ -112,12 +53,43 @@ export const PondComponent = () => {
 
     const columns: GridColumns = [
         {
-            field: "_id",
-            headerName: "ID",
-            width: 90,
+            field: "action",
+            headerName: "Action",
+            width: 100,
             align: "center",
             headerAlign: "center",
+            renderCell: (params: any) => (
+                <div
+                    style={{
+                        display: "flex",
+                        justifyContent: "center",
+                        alignItems: "center",
+                    }}>
+                    <Button
+                        // variant="outlined"
+                        // style={{ margin: "0 5px" }}
+                        onClick={() => {
+                            setSelectedEditRow(params.row);
+                            setEditModal(true);
+                        }}>
+                        <EditIcon />
+                    </Button>
+                    <Button
+                        // variant="outlined"
+                        // style={{ margin: "0 5px" }}
+                        onClick={() => handleDelete(params.row._id)}>
+                        <DeleteIcon />
+                    </Button>
+                </div>
+            ),
         },
+        // {
+        //     field: "_id",
+        //     headerName: "ID",
+        //     width: 90,
+        //     align: "center",
+        //     headerAlign: "center",
+        // },
         {
             field: "name",
             headerName: "Name",
@@ -182,38 +154,7 @@ export const PondComponent = () => {
             align: "center",
             headerAlign: "center",
         },
-        {
-            field: "action",
-            headerName: "Action",
-            width: 250,
-            align: "center",
-            headerAlign: "center",
-            renderCell: (params: any) => (
-                <div
-                    style={{
-                        display: "flex",
-                        justifyContent: "center",
-                        alignItems: "center",
-                    }}>
-                    <Button
-                        variant="outlined"
-                        style={{ margin: "0 5px" }}
-                        onClick={() => {
-                            setSelectedEditRow(params.row)
-                            setEditModal(true)
-                        }}
-                    >
-                        <EditIcon />
-                    </Button>
-                    <Button
-                        variant="outlined"
-                        style={{ margin: "0 5px" }}
-                        onClick={() => handleDelete(params.row._id)}>
-                        <DeleteIcon />
-                    </Button>
-                </div>
-            ),
-        },
+        
     ];
 
     useEffect(() => {
@@ -267,16 +208,14 @@ export const PondComponent = () => {
                     justifyContent: "flex-end",
                     marginBottom: "20px",
                 }}>
-                <Button variant="contained" onClick={handleModalOpen}>
+                <Button variant="contained" style={{ backgroundColor: 'blue' }} onClick={handleModalOpen}>
                     Add Pond
                 </Button>
-                <AddPond open={open} handleClose={handleModalClose} createPondData={handleCreatePondData} />
-                <Button
-                    variant="contained"
-                    style={{ marginLeft: "10px" }}
-                    onClick={handleModalOpen}>
-                    Bulk Create
-                </Button>
+                <AddPond
+                    open={open}
+                    handleClose={handleModalClose}
+                    createPondData={handleCreatePondData}
+                />
             </div>
             <Box sx={{ height: 540, width: "100%" }}>
                 <DataGrid
@@ -312,7 +251,7 @@ export const PondComponent = () => {
                     </Button>
                     <Button
                         onClick={() => {
-                            console.log("Deleting item...",selectedItem);
+                            console.log("Deleting item...", selectedItem);
                             if (selectedItem !== null) {
                                 deletePond(selectedItem);
                             }
@@ -325,7 +264,14 @@ export const PondComponent = () => {
                 </DialogActions>
             </Dialog>
 
-            {selectedEditRow && <EditPond row={selectedEditRow} openeditModal={editModal} setEditModal={setEditModal} editSubmit={handleEditSubmit} />}
+            {selectedEditRow && (
+                <EditPond
+                    row={selectedEditRow}
+                    openeditModal={editModal}
+                    setEditModal={setEditModal}
+                    editSubmit={handleEditSubmit}
+                />
+            )}
         </>
     );
 };
