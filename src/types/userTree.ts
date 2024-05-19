@@ -14,4 +14,31 @@ export type UserTree = {
     date_added: Date,
 };
 
+export type UserTreeCountObj = {
+    count: number,
+    tree_id: string[],
+    user: {
+        name: string,
+        email: string
+    },
+    plot: {
+        name: string,
+        plot_id: string
+    },
+    matched: {
+        count: number
+    }
+}
+
+export type UserTreeCountPaginationResponse = {
+    total: number,
+    result_count: number,
+    offset: number,
+    result: UserTreeCountObj[]
+}
+
 export type UserTreesDataState = Record<string, UserTree>
+export type UserTreeCountDataState = {
+    totalResults: number
+    results: UserTreeCountObj[]
+}

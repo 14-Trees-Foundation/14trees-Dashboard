@@ -1,7 +1,14 @@
 import { useRecoilValue } from "recoil";
+import React, { useEffect, useState } from 'react';
+import * as userTreesActionCreators from '../../../../redux/actions/userTreeActions';
+import {bindActionCreators} from 'redux';
+import {useAppDispatch, useAppSelector} from '../../../../redux/store/hooks';
+
 import {
   DataGrid,
+  GridCallbackDetails,
   GridCellParams,
+  GridFilterModel,
   GridToolbar,
   GridValueGetterParams,
 } from "@mui/x-data-grid";
@@ -9,6 +16,7 @@ import {
 import Chip from "../../../../stories/Chip/Chip";
 import { userTreeHoldings } from "../../../../store/adminAtoms";
 import { Box } from "@mui/material";
+import { RootState } from "../../../../redux/store/store";
 
 const columns = [
   {
@@ -60,10 +68,20 @@ const handleClick = (e: GridCellParams<any, any, any>) => {
 };
 
 export const UserTreeHoldings = () => {
-  const treeHoldings = useRecoilValue(userTreeHoldings);
 
+  const dispatch = useAppDispatch();
+    const { getUserTreeCount } =
+        bindActionCreators(userTreesActionCreators, dispatch);
+
+  const userTreeCountData = useAppSelector((state: RootState) => state.userTreeCountData)
+  // const treeHoldings = useRecoilValue(userTreeHoldings);
+  const treeHoldings = userTreeCountData.results;
   let allTrees = 0;
   let assignedTrees = 0;
+
+  useEffect(() => {
+    getUserTreeCount(0, 20);
+}, []);
 
   treeHoldings.forEach((element: { count: number }) => {
     allTrees += element.count;
@@ -113,12 +131,17 @@ export const UserTreeHoldings = () => {
           />
         </div>
         <DataGrid
+          filterMode="server"
+          onFilterModelChange={(model: GridFilterModel, details: GridCallbackDetails) => {
+            console.log(model);
+            console.log(details);
+          }}
           components={{ Toolbar: GridToolbar }}
           getRowId={(row) => row.user.name + row.plot.name}
           rows={treeHoldings}
           columns={columns}
-          pageSize={50}
-          rowsPerPageOptions={[50]}
+          pageSize={20}
+          rowsPerPageOptions={[20]}
           onCellClick={(e) => handleClick(e)}
         />
       </Box>

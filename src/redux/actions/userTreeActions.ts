@@ -1,6 +1,6 @@
 import ApiClient from "../../api/apiClient/apiClient";
 import userTreeActionTypes from "../actionTypes/userTreeActionTypes";
-import { UserTree } from "../../types/userTree";
+import { UserTree, UserTreeCountPaginationResponse } from "../../types/userTree";
 
 export const getUserTrees = () => {
     const apiClient = new ApiClient()
@@ -95,6 +95,30 @@ export const deleteUserTree = (record: UserTree) => {
                 console.error(error);
                 dispatch({
                     type: userTreeActionTypes.DELETE_USER_TREE_FAILED,
+                });
+            }
+        )
+    };
+};
+
+
+export const getUserTreeCount = (offset: number, limit: number, filters?: any) => {
+    const apiClient = new ApiClient();
+    return (dispatch: any) => {
+        dispatch({
+            type: userTreeActionTypes.GET_USER_TREE_COUNT_REQUESTED,
+        });
+        apiClient.getUserTreeCount(offset, limit, filters).then(
+            (result: UserTreeCountPaginationResponse) => {
+                dispatch({
+                    type: userTreeActionTypes.GET_USER_TREE_COUNT_SUCCEEDED,
+                    payload: result,
+                });
+            },
+            (error: any) => {
+                console.error(error);
+                dispatch({
+                    type: userTreeActionTypes.GET_USER_TREE_COUNT_FAILED,
                 });
             }
         )

@@ -123,3 +123,26 @@ export const createBulkTrees = (data: Blob) => {
         )
     };
 };
+
+export const unMapTrees = (saplingIds: string[]) => {
+    const apiClient = new ApiClient();
+    return (dispatch: any) => {
+        dispatch({
+            type: treeActionTypes.UN_MAP_TREE_REQUESTED,
+        });
+        apiClient.removeTreeMappings(saplingIds).then(
+            () => {
+                dispatch({
+                    type: treeActionTypes.UN_MAP_TREE_SUCCEEDED,
+                });
+            },
+            (error: any) => {
+                console.error(error);
+                dispatch({
+                    type: treeActionTypes.UN_MAP_TREE_FAILED,
+                    value: error
+                });
+            }
+        )
+    };
+}

@@ -1,5 +1,5 @@
 import { UnknownAction } from "redux";
-import { UserTreesDataState, UserTree } from "../../types/userTree";
+import { UserTreesDataState, UserTree, UserTreeCountDataState, UserTreeCountPaginationResponse } from "../../types/userTree";
 import userTreeActionTypes from "../actionTypes/userTreeActionTypes";
 import { fetchDataFromLocal } from "../../api/apiClient/apiClient";
 
@@ -41,6 +41,34 @@ export const userTreesDataReducer = (state = fetchDataFromLocal("userTreesDataSt
             if (action.payload) {
                 const nextState = { ...state } as UserTreesDataState;
                 Reflect.deleteProperty(nextState, action.payload as string)
+                return nextState;
+            }
+            return state;
+        
+        default:
+            return state;
+    }
+};
+
+export const userTreeCountDataReducer = (state = { results: [], totalResults: 0}, action: UnknownAction ): UserTreeCountDataState => {
+    console.log("hello");
+    switch (action.type) {
+        case userTreeActionTypes.GET_USER_TREE_COUNT_SUCCEEDED:
+            if (action.payload) {
+                console.log(action.payload);
+                let userTreeCountDataState: UserTreeCountDataState = { ...state }
+                let payload = action.payload as UserTreeCountPaginationResponse
+                if (!userTreeCountDataState || userTreeCountDataState.totalResults != payload.total) {
+                    userTreeCountDataState = {
+                        totalResults: payload.total,
+                        results: []
+                    }
+                }
+                for (let i = 0; i < payload.result_count; i++) {
+                    userTreeCountDataState.results.push(payload.result[i]);
+                }
+                const nextState: UserTreeCountDataState = userTreeCountDataState;
+                console.log(nextState);
                 return nextState;
             }
             return state;

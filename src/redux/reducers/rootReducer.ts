@@ -6,7 +6,7 @@ import { plotsDataReducer } from "./plotReducer";
 import { pondsDataReducer } from "./pondReducer";
 import { treesDataReducer } from "./treeReducer";
 import { usersDataReducer } from "./userReducer";
-import { userTreesDataReducer } from "./userTreeReducer";
+import { userTreesDataReducer, userTreeCountDataReducer } from "./userTreeReducer";
 
 const rootReducer = combineReducers({
     treeTypesData: treeTypesDataReducer,
@@ -17,7 +17,7 @@ const rootReducer = combineReducers({
     treesData: treesDataReducer,
     usersData: usersDataReducer,
     userTreesData: userTreesDataReducer,
-
+    userTreeCountData: userTreeCountDataReducer,
 });
 
 export default rootReducer;

@@ -33,4 +33,7 @@ export type CreateTreeRequest = {
     mapped_to: string,
 }
 
+const UN_MAP_TREES = "un-map-trees"
+
 export type TreesDataState = Record<string, Tree>;
+export type TreesErrorDataState = Record<string, any>;

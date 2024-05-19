@@ -6,7 +6,7 @@ import { CreatePondResponse, Pond } from '../../types/pond';
 import { User } from '../../types/user';
 import { OnsiteStaff } from '../../types/onSiteStaff';
 import { Tree } from '../../types/tree';
-import { UserTree } from '../../types/userTree';
+import { UserTree, UserTreeCountPaginationResponse } from '../../types/userTree';
 
 class ApiClient {
     private api: AxiosInstance;
@@ -452,7 +452,7 @@ class ApiClient {
 
     async removeTreeMappings(saplingIds: string[]): Promise<void> {
         try {
-            await this.api.post<any>(`/mytrees/unmap`, { saplingids: saplingIds.join(',')});
+            await this.api.post<any>(`/mytrees/unmap`, { sapling_ids: saplingIds});
         } catch (error) { 
             console.error(error)
             throw new Error('Failed to create Trees in bulk');
@@ -467,6 +467,18 @@ class ApiClient {
             throw new Error('Failed to create Trees in bulk');
         }
     }
+
+    async getUserTreeCount(offset: number, limit: number, filters?: any): Promise<UserTreeCountPaginationResponse> {
+        let url = `/mytrees/count/usertreescount?offset=${offset}&limit=${limit}`
+        try {
+            let result = await this.api.get<UserTreeCountPaginationResponse>(url, filters);
+            return result.data;
+        } catch (error) { 
+            console.error(error)
+            throw new Error('Failed to create Trees in bulk');
+        }
+    }
+
 
     /*
         Model- UserTree: CRUD Operations/Apis for user_tree_regs
