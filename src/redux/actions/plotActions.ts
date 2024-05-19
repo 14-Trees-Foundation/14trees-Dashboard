@@ -31,6 +31,35 @@ export const getPlots = () => {
     }
 };
 
+export const searchPlots = (searchStr: string) => {
+    const apiClient = new ApiClient()
+    return (dispatch: any) => {
+        dispatch({
+            type: plotActionTypes.SEARCH_PLOTS_REQUESTED,
+        });
+        apiClient.searchPlots(searchStr).then(
+            (value: Plot[]) => {
+                for (let i = 0; i < value.length; i++) {
+                    if (value[i]?._id) {
+                        value[i].key = value[i]._id
+                    }
+                }
+                dispatch({
+                    type: plotActionTypes.SEARCH_PLOTS_SUCCEEDED,
+                    payload: value,
+                });
+            },
+            (error: any) => {
+                console.log(error)
+                dispatch({
+                    type: plotActionTypes.SEARCH_PLOTS_FAILED,
+                    payload: error
+                });
+            }
+        )
+    }
+};
+
 export const createPlot = (record: Plot) => {
     const apiClient = new ApiClient();
     return (dispatch: any) => {

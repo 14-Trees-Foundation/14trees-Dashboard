@@ -22,3 +22,4 @@ export type UpsertPlotResponse = {
 }
 
 export type PlotsDataState = Record<string, Plot>;
+export type SearchPlotsDataState = Record<string, Plot>;

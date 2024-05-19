@@ -24,3 +24,4 @@ export type CreateTreeTypeResponse = {
 }
 
 export type TreeTypesDataState = Record<string, TreeType>
+export type SearchTreeTypesDataState = Record<string, TreeType>

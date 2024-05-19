@@ -31,13 +31,13 @@ export const getUsers = () => {
     }
 };
 
-export const searchUsersByEmail = (email: string) => {
+export const searchUsers = (searchStr: string) => {
     const apiClient = new ApiClient()
     return (dispatch: any) => {
         dispatch({
-            type: userActionTypes.SEARCH_USERS_BY_EMAIL_REQUESTED,
+            type: userActionTypes.SEARCH_USERS_REQUESTED,
         });
-        apiClient.searchUsersByEmail(email).then(
+        apiClient.searchUsers(searchStr).then(
             (value: User[]) => {
                 for (let i = 0; i < value.length; i++) {
                     if (value[i]?._id) {
@@ -45,14 +45,14 @@ export const searchUsersByEmail = (email: string) => {
                     }
                 }
                 dispatch({
-                    type: userActionTypes.SEARCH_USERS_BY_EMAIL_SUCCEEDED,
+                    type: userActionTypes.SEARCH_USERS_SUCCEEDED,
                     payload: value,
                 });
             },
             (error: any) => {
                 console.log(error)
                 dispatch({
-                    type: userActionTypes.SEARCH_USERS_BY_EMAIL_FAILED,
+                    type: userActionTypes.SEARCH_USERS_FAILED,
                     payload: error
                 });
             }

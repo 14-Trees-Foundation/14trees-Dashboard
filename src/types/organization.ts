@@ -8,4 +8,5 @@ export type Organization = {
     date_added: Date,
 }
 
-export type OrganizationsDataState = Record<string, Organization>
+export type OrganizationsDataState = Record<string, Organization>;
+export type SearchOrganizationsDataState = Record<string, Organization>;

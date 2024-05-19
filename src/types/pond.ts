@@ -30,3 +30,4 @@ export type CreatePondResponse = {
 }
 
 export type PondDataState = Record<string, Pond>;
+export type SearchPondsDataState = Record<string, Pond>;

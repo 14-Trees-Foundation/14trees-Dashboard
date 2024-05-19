@@ -33,6 +33,17 @@ class ApiClient {
         }
     }
 
+    async searchTreeTypes(searchStr: string): Promise<TreeType[]> {
+        const url = `/trees/${searchStr}`;
+        try {
+            const response = await this.api.get<TreeType[]>(url);
+            return response.data;
+        } catch (error: any) {
+            console.error(error)
+            throw new Error(`Failed to fetch tree types: ${error.message}`);
+        }
+    }
+
     async createTreeType(data: TreeType, file?: Blob): Promise<TreeType> {
         try {
             const formData = new FormData();
@@ -99,6 +110,17 @@ class ApiClient {
         }
     }
 
+    async searchPlots(searchStr: string): Promise<Plot[]> {
+        const url = `/plots/${searchStr}`;
+        try {
+            const response = await this.api.get<Plot[]>(url);
+            return response.data;
+        } catch (error: any) {
+            console.error(error)
+            throw new Error(`Failed to fetch plots: ${error.message}`);
+        }
+    }
+
     async createPlot(data: Plot): Promise<Plot> {
         try {
             const response = await this.api.post<UpsertPlotResponse>(`/plots/add`, data);
@@ -144,6 +166,17 @@ class ApiClient {
         }
     }
 
+    async searchOrganizations(searchStr: string): Promise<Organization[]> {
+        const url = `/organizations/${searchStr}`;
+        try {
+            const response = await this.api.get<Organization[]>(url);
+            return response.data;
+        } catch (error: any) {
+            console.error(error)
+            throw new Error(`Failed to fetch organizations: ${error.message}`);
+        }
+    }
+
     async createOrganization(data: Organization): Promise<Organization> {
         try {
             const response = await this.api.post<Organization>(`/organizations/add`, data);
@@ -180,6 +213,17 @@ class ApiClient {
 
     async getPonds(): Promise<Pond[]> {
         const url = `/ponds/`;
+        try {
+            const response = await this.api.get<Pond[]>(url);
+            return response.data;
+        } catch (error: any) {
+            console.error(error)
+            throw new Error(`Failed to fetch ponds: ${error.message}`);
+        }
+    }
+
+    async searchPonds(searchStr: string): Promise<Pond[]> {
+        const url = `/ponds/${searchStr}`;
         try {
             const response = await this.api.get<Pond[]>(url);
             return response.data;
@@ -261,8 +305,8 @@ class ApiClient {
         }
     }
 
-    async searchUsersByEmail(email: string): Promise<User[]> {
-        const url = `/users/${email}`;
+    async searchUsers(searchStr: string): Promise<User[]> {
+        const url = `/users/${searchStr}`;
         try {
             const response = await this.api.get<User[]>(url);
             return response.data;
@@ -450,6 +494,15 @@ class ApiClient {
         }
     }
 
+    async mapTreesForPlot(email: string, plotId: string, count: number): Promise<void> {
+        try {
+            await this.api.post<any>(`/mytrees/map-plot-trees`, { email: email, plot_id: plotId, count: count});
+        } catch (error) {
+            console.error(error)
+            throw new Error('Failed to create Trees in bulk');
+        }
+    }
+
     async removeTreeMappings(saplingIds: string[]): Promise<void> {
         try {
             await this.api.post<any>(`/mytrees/unmap`, { sapling_ids: saplingIds});
@@ -515,13 +568,12 @@ class ApiClient {
         }
     }
 
-    async deleteUserTree(data: UserTree): Promise<string> {
+    async unassignUserTrees(saplingIds: string[]): Promise<void> {
         try {
-            await this.api.delete<any>(`/profile/${data._id}`);
-            return data._id;
+            await this.api.post<void>(`/profile`, { sapling_ids: saplingIds });
         } catch (error) {
             console.error(error)
-            throw new Error('Failed to delete user tree profile');
+            throw new Error('Failed unassign user trees.');
         }
     }
     

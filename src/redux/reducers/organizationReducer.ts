@@ -1,5 +1,5 @@
 import { UnknownAction } from "redux";
-import { Organization, OrganizationsDataState } from "../../types/organization";
+import { Organization, OrganizationsDataState, SearchOrganizationsDataState } from "../../types/organization";
 import organizationActionTypes from "../actionTypes/organizationActionTypes";
 import { fetchDataFromLocal } from "../../api/apiClient/apiClient";
 
@@ -49,3 +49,24 @@ export const organizationsDataReducer = (state = fetchDataFromLocal("organizatio
             return state;
     }
 };
+
+export const searchOrganizationsDataReducer = (state = {}, action: UnknownAction): SearchOrganizationsDataState => {
+    switch(action.type) {
+        case organizationActionTypes.SEARCH_ORGANIZATIONS_SUCCEEDED:
+            if (action.payload) {
+                let organizationsDataState: SearchOrganizationsDataState = {}
+                let payload = action.payload as [Organization]
+                for (let i = 0; i < payload.length; i++) {
+                    if (payload[i]?._id) {
+                        payload[i].key = payload[i]._id
+                        organizationsDataState[payload[i]._id] = payload[i]
+                    }
+                }
+                const nextState: SearchOrganizationsDataState = organizationsDataState;
+                return nextState;
+            }
+            return state;
+        default:
+            return state;
+    }
+}

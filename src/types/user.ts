@@ -13,3 +13,4 @@ export type User = {
 };
 
 export type UsersDataState = Record<string,User>;
+export type SearchUsersDataState = Record<string,User>;

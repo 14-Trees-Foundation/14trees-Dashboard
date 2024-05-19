@@ -1,5 +1,5 @@
 import { UnknownAction } from "redux";
-import { User, UsersDataState } from "../../types/user";
+import { SearchUsersDataState, User, UsersDataState } from "../../types/user";
 import userActionTypes from "../actionTypes/userActionTypes";
 import { fetchDataFromLocal } from "../../api/apiClient/apiClient";
 
@@ -37,7 +37,7 @@ export const usersDataReducer = (state = fetchDataFromLocal("usersDataState"), a
                 return nextState;
             }
             return state;
-        case userActionTypes.SEARCH_USERS_BY_EMAIL_SUCCEEDED:
+        case userActionTypes.SEARCH_USERS_SUCCEEDED:
             if (action.payload) {
                 const nextState = { ...state } as UsersDataState;
                 let payload = action.payload as User[]
@@ -62,3 +62,24 @@ export const usersDataReducer = (state = fetchDataFromLocal("usersDataState"), a
             return state;
     }
 };
+
+export const searchUsersDataReducer = (state = {}, action: UnknownAction): SearchUsersDataState => {
+    switch(action.type) {
+        case userActionTypes.SEARCH_USERS_SUCCEEDED:
+            if (action.payload) {
+                let usersDataState: SearchUsersDataState = {}
+                let payload = action.payload as [User]
+                for (let i = 0; i < payload.length; i++) {
+                    if (payload[i]?._id) {
+                        payload[i].key = payload[i]._id
+                        usersDataState[payload[i]._id] = payload[i]
+                    }
+                }
+                const nextState: SearchUsersDataState = usersDataState;
+                return nextState;
+            }
+            return state;
+        default:
+            return state;
+    }
+}

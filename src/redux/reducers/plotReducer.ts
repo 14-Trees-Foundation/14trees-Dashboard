@@ -1,5 +1,5 @@
 import { UnknownAction } from "redux";
-import { PlotsDataState, Plot } from "../../types/plot";
+import { PlotsDataState, Plot, SearchPlotsDataState } from "../../types/plot";
 import plotActionTypes from "../actionTypes/plotActionTypes";
 import { fetchDataFromLocal } from "../../api/apiClient/apiClient";
 
@@ -49,3 +49,24 @@ export const plotsDataReducer = (state = fetchDataFromLocal("PlotsDataState"), a
             return state;
     }
 };
+
+export const searchPlotsDataReducer = (state = {}, action: UnknownAction): SearchPlotsDataState => {
+    switch(action.type) {
+        case plotActionTypes.SEARCH_PLOTS_SUCCEEDED:
+            if (action.payload) {
+                let plotsDataState: SearchPlotsDataState = {}
+                let payload = action.payload as [Plot]
+                for (let i = 0; i < payload.length; i++) {
+                    if (payload[i]?._id) {
+                        payload[i].key = payload[i]._id
+                        plotsDataState[payload[i]._id] = payload[i]
+                    }
+                }
+                const nextState: SearchPlotsDataState = plotsDataState;
+                return nextState;
+            }
+            return state;
+        default:
+            return state;
+    }
+}

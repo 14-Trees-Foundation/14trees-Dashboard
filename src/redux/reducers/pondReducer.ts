@@ -1,5 +1,5 @@
 import { UnknownAction } from "redux";
-import { PondDataState, Pond } from "../../types/pond";
+import { PondDataState, Pond, SearchPondsDataState } from "../../types/pond";
 import pondActionTypes from "../actionTypes/pondActionTypes";
 import { fetchDataFromLocal } from "../../api/apiClient/apiClient";
 
@@ -51,3 +51,24 @@ export const pondsDataReducer = (state = fetchDataFromLocal("PondDataState"), ac
             return state;
     }
 };
+
+export const searchPondsDataReducer = (state = {}, action: UnknownAction): SearchPondsDataState => {
+    switch(action.type) {
+        case pondActionTypes.SEARCH_PONDS_SUCCEEDED:
+            if (action.payload) {
+                let pondsDataState: SearchPondsDataState = {}
+                let payload = action.payload as [Pond]
+                for (let i = 0; i < payload.length; i++) {
+                    if (payload[i]?._id) {
+                        payload[i].key = payload[i]._id
+                        pondsDataState[payload[i]._id] = payload[i]
+                    }
+                }
+                const nextState: SearchPondsDataState = pondsDataState;
+                return nextState;
+            }
+            return state;
+        default:
+            return state;
+    }
+}

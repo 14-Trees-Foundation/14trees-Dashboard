@@ -31,6 +31,35 @@ export const getOrganizations = () => {
     }
 };
 
+export const searchOrganizations = (searchStr: string) => {
+    const apiClient = new ApiClient()
+    return (dispatch: any) => {
+        dispatch({
+            type: organizationActionTypes.SEARCH_ORGANIZATIONS_REQUESTED,
+        });
+        apiClient.searchOrganizations(searchStr).then(
+            (value: Organization[]) => {
+                for (let i = 0; i < value.length; i++) {
+                    if (value[i]?._id) {
+                        value[i].key = value[i]._id
+                    }
+                }
+                dispatch({
+                    type: organizationActionTypes.SEARCH_ORGANIZATIONS_SUCCEEDED,
+                    payload: value,
+                });
+            },
+            (error: any) => {
+                console.log(error)
+                dispatch({
+                    type: organizationActionTypes.SEARCH_ORGANIZATIONS_FAILED,
+                    payload: error
+                });
+            }
+        )
+    }
+};
+
 export const createOrganization = (record: Organization) => {
     const apiClient = new ApiClient();
     return (dispatch: any) => {

@@ -31,6 +31,35 @@ export const getPonds = () => {
     }
 };
 
+export const searchPonds = (searchStr: string) => {
+    const apiClient = new ApiClient()
+    return (dispatch: any) => {
+        dispatch({
+            type: pondActionTypes.SEARCH_PONDS_REQUESTED,
+        });
+        apiClient.searchPonds(searchStr).then(
+            (value: Pond[]) => {
+                for (let i = 0; i < value.length; i++) {
+                    if (value[i]?._id) {
+                        value[i].key = value[i]._id
+                    }
+                }
+                dispatch({
+                    type: pondActionTypes.SEARCH_PONDS_SUCCEEDED,
+                    payload: value,
+                });
+            },
+            (error: any) => {
+                console.log(error)
+                dispatch({
+                    type: pondActionTypes.SEARCH_PONDS_FAILED,
+                    payload: error
+                });
+            }
+        )
+    }
+};
+
 export const createPond = (record: Pond) => {
     const apiClient = new ApiClient();
     return (dispatch: any) => {
