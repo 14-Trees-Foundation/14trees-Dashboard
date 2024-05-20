@@ -37,7 +37,7 @@ export const userTreesDataReducer = (state = fetchDataFromLocal("userTreesDataSt
                 return nextState;
             }
             return state;
-        case userTreeActionTypes.DELETE_USER_TREE_SUCCEEDED:
+        case userTreeActionTypes.UNASSIGN_USER_TREES_SUCCEEDED:
             if (action.payload) {
                 const nextState = { ...state } as UserTreesDataState;
                 Reflect.deleteProperty(nextState, action.payload as string)
@@ -51,11 +51,9 @@ export const userTreesDataReducer = (state = fetchDataFromLocal("userTreesDataSt
 };
 
 export const userTreeCountDataReducer = (state = { results: [], totalResults: 0}, action: UnknownAction ): UserTreeCountDataState => {
-    console.log("hello");
     switch (action.type) {
         case userTreeActionTypes.GET_USER_TREE_COUNT_SUCCEEDED:
             if (action.payload) {
-                console.log(action.payload);
                 let userTreeCountDataState: UserTreeCountDataState = { ...state }
                 let payload = action.payload as UserTreeCountPaginationResponse
                 if (!userTreeCountDataState || userTreeCountDataState.totalResults != payload.total) {
@@ -68,7 +66,6 @@ export const userTreeCountDataReducer = (state = { results: [], totalResults: 0}
                     userTreeCountDataState.results.push(payload.result[i]);
                 }
                 const nextState: UserTreeCountDataState = userTreeCountDataState;
-                console.log(nextState);
                 return nextState;
             }
             return state;

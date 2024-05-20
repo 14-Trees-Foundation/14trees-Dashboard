@@ -6,8 +6,8 @@ import {useAppDispatch, useAppSelector} from '../../../../redux/store/hooks';
 
 import {
   DataGrid,
-  GridCallbackDetails,
   GridCellParams,
+  GridFilterItem,
   GridFilterModel,
   GridToolbar,
   GridValueGetterParams,
@@ -45,7 +45,7 @@ const columns = [
     width: 150,
     editable: false,
     valueGetter: (params: GridValueGetterParams) => {
-      if (params.row.matched === 0) {
+      if (!params.row.matched) {
         return 0;
       } else {
         return params.row.matched.count;
@@ -69,6 +69,9 @@ const handleClick = (e: GridCellParams<any, any, any>) => {
 
 export const UserTreeHoldings = () => {
 
+  let [ currentPage, setCurrentPage ] = useState<number>(0);
+  let [ filters, setFilters ] = useState<GridFilterItem[]>([]);
+
   const dispatch = useAppDispatch();
     const { getUserTreeCount } =
         bindActionCreators(userTreesActionCreators, dispatch);
@@ -79,16 +82,18 @@ export const UserTreeHoldings = () => {
   let allTrees = 0;
   let assignedTrees = 0;
 
-  useEffect(() => {
-    getUserTreeCount(0, 20);
-}, []);
+  const getUserTreeData = () => {
+    getUserTreeCount(currentPage*20, 20, filters);
+  }
+
+  useEffect(getUserTreeData, []);
 
   treeHoldings.forEach((element: { count: number }) => {
     allTrees += element.count;
   });
 
   treeHoldings.forEach((element: { matched: { count: number } }) => {
-    if (element.matched.count) {
+    if (element.matched?.count) {
       assignedTrees += element.matched.count;
     }
   });
@@ -132,16 +137,23 @@ export const UserTreeHoldings = () => {
         </div>
         <DataGrid
           filterMode="server"
-          onFilterModelChange={(model: GridFilterModel, details: GridCallbackDetails) => {
-            console.log(model);
-            console.log(details);
+          onFilterModelChange={(model: GridFilterModel) => {
+            console.log(model.items);
+            setFilters(model.items)
+            getUserTreeData();
           }}
           components={{ Toolbar: GridToolbar }}
           getRowId={(row) => row.user.name + row.plot.name}
+          rowCount={userTreeCountData.totalResults}
           rows={treeHoldings}
           columns={columns}
           pageSize={20}
           rowsPerPageOptions={[20]}
+          onPageChange={(page: number) => {
+            console.log(page);
+            setCurrentPage(page);
+            getUserTreeData();
+          }}
           onCellClick={(e) => handleClick(e)}
         />
       </Box>

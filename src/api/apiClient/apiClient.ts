@@ -524,7 +524,7 @@ class ApiClient {
     async getUserTreeCount(offset: number, limit: number, filters?: any): Promise<UserTreeCountPaginationResponse> {
         let url = `/mytrees/count/usertreescount?offset=${offset}&limit=${limit}`
         try {
-            let result = await this.api.get<UserTreeCountPaginationResponse>(url, filters);
+            let result = await this.api.post<UserTreeCountPaginationResponse>(url, {filters: filters});
             return result.data;
         } catch (error) { 
             console.error(error)

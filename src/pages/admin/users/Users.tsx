@@ -24,10 +24,10 @@ export const Users = () => {
         setUserProfiles(response.data.result);
       }
 
-      response = await Axios.default.get(`/mytrees/count/usertreescount`);
-      if (response.status === 200) {
-        setUserTreeHoldings(response.data);
-      }
+      // response = await Axios.default.get(`/mytrees/count/usertreescount`);
+      // if (response.status === 200) {
+      //   setUserTreeHoldings(response.data);
+      // }
     } catch (error) {
       console.log(error);
     }
