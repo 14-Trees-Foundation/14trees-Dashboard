@@ -8,7 +8,7 @@ import { Pond } from '../../types/pond';
 export const TestPond = () => {
 
   const dispatch = useAppDispatch();
-  const { getPonds, createPond, updatePond, deletePond, updatePondWaterLevel }
+  const { getPonds, createPond, updatePond, deletePond, updatePondWaterLevel, searchPonds }
     = bindActionCreators(pondActionCreators, dispatch);
 
   const [file, setFile] = useState<File>();
@@ -25,6 +25,13 @@ export const TestPond = () => {
 
   const [jsonData, setJsonData] = useState<string>('');
 
+  const handleButtonClickSearch = () => {
+    try {
+      searchPonds(jsonData);
+    } catch (error) {
+      console.error('Error parsing JSON:', error);
+    }
+  };
   const handleButtonClickCreate = () => {
     try {
       const parsedData = JSON.parse(jsonData) as Pond;
@@ -69,6 +76,15 @@ export const TestPond = () => {
     <>
       <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '20px' }}>
         <Button variant="contained" onClick={handleButtonClickGet}>Get</Button>
+      </div>
+      <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '20px' }}>
+        <textarea
+          placeholder="search string"
+          value={jsonData}
+          onChange={handleInputChange}
+          style={{ width: '100%', minHeight: '100px' }}
+        />
+        <Button variant="contained" onClick={handleButtonClickSearch}>Search</Button>
       </div>
       <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '20px' }}>
         <textarea

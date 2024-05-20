@@ -1,11 +1,11 @@
 import { combineReducers } from "redux";
-import { treeTypesDataReducer } from "./treeTypeReducer";
+import { treeTypesDataReducer, searchTreeTypesDataReducer } from "./treeTypeReducer";
 import { onsiteStaffsDataReducer } from "./onsiteStaffReducer";
-import { organizationsDataReducer } from "./organizationReducer";
-import { plotsDataReducer } from "./plotReducer";
-import { pondsDataReducer } from "./pondReducer";
+import { organizationsDataReducer, searchOrganizationsDataReducer } from "./organizationReducer";
+import { plotsDataReducer, searchPlotsDataReducer } from "./plotReducer";
+import { pondsDataReducer, searchPondsDataReducer } from "./pondReducer";
 import { treesDataReducer } from "./treeReducer";
-import { usersDataReducer } from "./userReducer";
+import { usersDataReducer, searchUsersDataReducer } from "./userReducer";
 import { userTreesDataReducer, userTreeCountDataReducer } from "./userTreeReducer";
 
 const rootReducer = combineReducers({
@@ -18,6 +18,11 @@ const rootReducer = combineReducers({
     usersData: usersDataReducer,
     userTreesData: userTreesDataReducer,
     userTreeCountData: userTreeCountDataReducer,
+    searchTreeTypesData: searchTreeTypesDataReducer,
+    searchPondsData: searchPondsDataReducer,
+    searchPlotsData: searchPlotsDataReducer,
+    searchUsersData: searchUsersDataReducer,
+    searchOrganizationsData: searchOrganizationsDataReducer,
 });
 
 export default rootReducer;

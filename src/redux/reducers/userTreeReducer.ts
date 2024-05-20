@@ -54,18 +54,15 @@ export const userTreeCountDataReducer = (state = { results: [], totalResults: 0}
     switch (action.type) {
         case userTreeActionTypes.GET_USER_TREE_COUNT_SUCCEEDED:
             if (action.payload) {
-                let userTreeCountDataState: UserTreeCountDataState = { ...state }
+                let userTreeCountDataState: UserTreeCountDataState = { totalResults: state.totalResults, results: state.results }
                 let payload = action.payload as UserTreeCountPaginationResponse
-                if (!userTreeCountDataState || userTreeCountDataState.totalResults != payload.total) {
+                if (!userTreeCountDataState || userTreeCountDataState.totalResults != payload.total || payload.offset === 0) {
                     userTreeCountDataState = {
                         totalResults: payload.total,
                         results: []
                     }
                 }
-                for (let i = 0; i < payload.result_count; i++) {
-                    userTreeCountDataState.results.push(payload.result[i]);
-                }
-                const nextState: UserTreeCountDataState = userTreeCountDataState;
+                const nextState: UserTreeCountDataState = { totalResults: userTreeCountDataState.totalResults, results: [...userTreeCountDataState.results, ...payload.result]};
                 return nextState;
             }
             return state;

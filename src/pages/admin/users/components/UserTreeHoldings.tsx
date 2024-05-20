@@ -69,7 +69,7 @@ const handleClick = (e: GridCellParams<any, any, any>) => {
 
 export const UserTreeHoldings = () => {
 
-  let [ currentPage, setCurrentPage ] = useState<number>(0);
+    let [ currentPage, setCurrentPage ] = useState<number>(0);
   let [ filters, setFilters ] = useState<GridFilterItem[]>([]);
 
   const dispatch = useAppDispatch();
@@ -83,10 +83,10 @@ export const UserTreeHoldings = () => {
   let assignedTrees = 0;
 
   const getUserTreeData = () => {
-    getUserTreeCount(currentPage*20, 20, filters);
+        getUserTreeCount(currentPage*20, 20, filters);
   }
 
-  useEffect(getUserTreeData, []);
+  useEffect(getUserTreeData, [currentPage, filters]);
 
   treeHoldings.forEach((element: { count: number }) => {
     allTrees += element.count;
@@ -138,9 +138,7 @@ export const UserTreeHoldings = () => {
         <DataGrid
           filterMode="server"
           onFilterModelChange={(model: GridFilterModel) => {
-            console.log(model.items);
             setFilters(model.items)
-            getUserTreeData();
           }}
           components={{ Toolbar: GridToolbar }}
           getRowId={(row) => row.user.name + row.plot.name}
@@ -150,9 +148,7 @@ export const UserTreeHoldings = () => {
           pageSize={20}
           rowsPerPageOptions={[20]}
           onPageChange={(page: number) => {
-            console.log(page);
             setCurrentPage(page);
-            getUserTreeData();
           }}
           onCellClick={(e) => handleClick(e)}
         />

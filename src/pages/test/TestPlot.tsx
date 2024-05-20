@@ -8,11 +8,17 @@ import { Plot } from '../../types/plot';
 export const TestPlot = () => {
 
     const dispatch = useAppDispatch();
-    const { getPlots, createPlot, updatePlot, deletePlot }
+    const { getPlots, createPlot, updatePlot, deletePlot, searchPlots }
         = bindActionCreators(plotActionCreators, dispatch);
 
     const [jsonData, setJsonData] = useState<string>('');
-
+    const handleButtonClickSearch = () => {
+        try {
+          searchPlots(jsonData);
+        } catch (error) {
+          console.error('Error parsing JSON:', error);
+        }
+      };
     const handleButtonClickCreate = () => {
         try {
             const parsedData = JSON.parse(jsonData) as Plot;
@@ -53,6 +59,15 @@ export const TestPlot = () => {
         <>
             <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '20px' }}>
                 <Button variant="contained" onClick={handleButtonClickGet}>Get</Button>
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '20px' }}>
+                <textarea
+                    placeholder="search string"
+                    value={jsonData}
+                    onChange={handleInputChange}
+                    style={{ width: '100%', minHeight: '100px' }}
+                />
+                <Button variant="contained" onClick={handleButtonClickSearch}>Search</Button>
             </div>
             <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '20px' }}>
                 <textarea

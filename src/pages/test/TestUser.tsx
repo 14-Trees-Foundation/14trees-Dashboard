@@ -8,7 +8,7 @@ import { Button } from '@mui/material';
 export const TestUser = () => {
 
     const dispatch = useAppDispatch();
-	const {getUsers, createUser, createBulkUsers, updateUser, deleteUser, searchUsersByEmail}
+	const {getUsers, createUser, createBulkUsers, updateUser, deleteUser, searchUsers}
         = bindActionCreators(userActionCreators, dispatch);
 
 	const [jsonData, setJsonData] = useState<string>('');
@@ -23,7 +23,7 @@ export const TestUser = () => {
       };
     const handleButtonClickSearch = () => {
         try {
-          searchUsersByEmail(jsonData);
+          searchUsers(jsonData);
         } catch (error) {
           console.error('Error parsing JSON:', error);
         }
