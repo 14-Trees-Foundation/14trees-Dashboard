@@ -50,14 +50,15 @@ export const OrganizationComponent = () => {
   const [selectedItem, setSelectedItem] = useState<Organization | null>(null);
   const [selectedEditRow, setSelectedEditRow] = useState<RowType | null>(null);
   const [editModal, setEditModal] = useState(false);
+  const [page, setPage] = useState(0);
 
   useEffect(() => {
     getOrganizationsData();
-  }, []);
+  }, [page]);
 
   const getOrganizationsData = async () => {
     setTimeout(async () => {
-      await getOrganizations();
+      await getOrganizations(page*10, 10);
     }, 1000);
   };
 
@@ -134,11 +135,11 @@ export const OrganizationComponent = () => {
   ];
 
   let organizationList: Organization[] = [];
-  const organizationsMap = useAppSelector(
+  const organizationsData = useAppSelector(
     (state: RootState) => state.organizationsData
   );
-  if (organizationsMap) {
-    organizationList = Object.values(organizationsMap);
+  if (organizationsData) {
+    organizationList = Object.values(organizationsData.organizations);
   }
   console.log(organizationList);
 
@@ -187,10 +188,12 @@ export const OrganizationComponent = () => {
           getRowId={(row) => row._id}
           initialState={{
             pagination: {
-              page: 1,
-              pageSize: 5,
+              page: 0,
+              pageSize: 10,
             },
           }}
+          onPageChange={(page) => { if((organizationList.length / 10) === page) setPage(page); }}
+          rowCount={organizationsData.totalOrganizations}
           checkboxSelection
           disableSelectionOnClick
           components={{

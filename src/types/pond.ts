@@ -29,5 +29,13 @@ export type CreatePondResponse = {
   pond: Pond,
 }
 
-export type PondDataState = Record<string, Pond>;
+export type PondPaginationResponse = {
+  total: number,
+  result: Pond[]
+}
+
+export type PondsDataState = {
+  totalPonds: number,
+  ponds: Record<string, Pond>
+}
 export type SearchPondsDataState = Record<string, Pond>;

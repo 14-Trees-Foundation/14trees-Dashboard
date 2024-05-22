@@ -1,18 +1,19 @@
 import { UnknownAction } from "redux";
-import { Organization, OrganizationsDataState, SearchOrganizationsDataState } from "../../types/organization";
+import { Organization, OrganizationPaginationResponse, OrganizationsDataState, SearchOrganizationsDataState } from "../../types/organization";
 import organizationActionTypes from "../actionTypes/organizationActionTypes";
-import { fetchDataFromLocal } from "../../api/apiClient/apiClient";
 
-export const organizationsDataReducer = (state = fetchDataFromLocal("organizationsDataState"), action: UnknownAction ): OrganizationsDataState => {
+export const organizationsDataReducer = (state = { totalOrganizations:0, organizations: {} }, action: UnknownAction ): OrganizationsDataState => {
     switch (action.type) {
         case organizationActionTypes.GET_ORGANIZATIONS_SUCCEEDED:
             if (action.payload) {
-                let organizationsDataState: OrganizationsDataState = {}
-                let payload = action.payload as [Organization]
-                for (let i = 0; i < payload.length; i++) {
-                    if (payload[i]?._id) {
-                        payload[i].key = payload[i]._id
-                        organizationsDataState[payload[i]._id] = payload[i]
+                let organizationsDataState: OrganizationsDataState = { totalOrganizations: state.totalOrganizations, organizations: { ...state.organizations }}
+                let payload = action.payload as OrganizationPaginationResponse
+                organizationsDataState.totalOrganizations = payload.total
+                let organizations = payload.result
+                for (let i = 0; i < organizations.length; i++) {
+                    if (organizations[i]?._id) {
+                        organizations[i].key = organizations[i]._id
+                        organizationsDataState.organizations[organizations[i]._id] = organizations[i]
                     }
                 }
                 const nextState: OrganizationsDataState = organizationsDataState;
@@ -21,26 +22,28 @@ export const organizationsDataReducer = (state = fetchDataFromLocal("organizatio
             return state;
         case organizationActionTypes.CREATE_ORGANIZATION_SUCCEEDED:
             if (action.payload) {
-                const nextState = { ...state } as OrganizationsDataState;
+                const nextState = { totalOrganizations: state.totalOrganizations, organizations: { ...state.organizations } } as OrganizationsDataState;
                 let payload = action.payload as Organization
                 payload.key = payload._id
-                nextState[payload._id] = payload;
+                nextState.organizations[payload._id] = payload;
+                nextState.totalOrganizations += 1;
                 return nextState;
             }
             return state;
         case organizationActionTypes.UPDATE_ORGANIZATION_SUCCEEDED:
             if (action.payload) {
-                const nextState = { ...state } as OrganizationsDataState;
+                const nextState = { totalOrganizations: state.totalOrganizations, organizations: { ...state.organizations } } as OrganizationsDataState;
                 let payload = action.payload as Organization
                 payload.key = payload._id
-                nextState[payload._id] = payload;
+                nextState.organizations[payload._id] = payload;
                 return nextState;
             }
             return state;
         case organizationActionTypes.DELETE_ORGANIZATION_SUCCEEDED:
             if (action.payload) {
-                const nextState = { ...state } as OrganizationsDataState;
-                Reflect.deleteProperty(nextState, action.payload as string)
+                const nextState = { totalOrganizations: state.totalOrganizations, organizations: { ...state.organizations } } as OrganizationsDataState;
+                Reflect.deleteProperty(nextState.organizations, action.payload as string)
+                nextState.totalOrganizations -= 1;
                 return nextState;
             }
             return state;

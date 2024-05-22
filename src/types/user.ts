@@ -12,5 +12,13 @@ export type User = {
     org : string
 };
 
-export type UsersDataState = Record<string,User>;
+export type UserPaginationResponse = {
+    total: number,
+    result: User[]
+}
+
+export type UsersDataState = {
+    totalUsers: number,
+    users: Record<string, User>
+}
 export type SearchUsersDataState = Record<string,User>;

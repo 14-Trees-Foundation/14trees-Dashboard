@@ -21,5 +21,13 @@ export type UpsertPlotResponse = {
     plot: Plot
 }
 
-export type PlotsDataState = Record<string, Plot>;
+export type PlotPaginationResponse = {
+    total: number,
+    result: Plot[]
+}
+
+export type PlotsDataState = {
+    totalPlots: number,
+    plots: Record<string, Plot>
+}
 export type SearchPlotsDataState = Record<string, Plot>;
