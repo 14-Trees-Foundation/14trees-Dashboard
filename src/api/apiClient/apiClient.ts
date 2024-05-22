@@ -1,11 +1,11 @@
 import axios, {AxiosInstance} from 'axios';
-import { CreateTreeTypeResponse, TreeType, TreeTypesDataState } from '../../types/treeType';
+import { CreateTreeTypeResponse, TreeType, TreeTypePaginationResponse, TreeTypesDataState } from '../../types/treeType';
 import { Plot, UpsertPlotResponse } from '../../types/plot';
 import { Organization } from '../../types/organization';
 import { CreatePondResponse, Pond } from '../../types/pond';
 import { User } from '../../types/user';
 import { OnsiteStaff } from '../../types/onSiteStaff';
-import { Tree } from '../../types/tree';
+import { PaginationTreeResponse, Tree } from '../../types/tree';
 import { UserTree, UserTreeCountPaginationResponse } from '../../types/userTree';
 
 class ApiClient {
@@ -22,10 +22,10 @@ class ApiClient {
         Model- TreeTypes: CRUD Operations/Apis for tree types 
     */
 
-    async getTreeTypes(): Promise<TreeType[]> {
-        const url = `/trees/treetypes`;
+    async getTreeTypes(offset: number, limit: number): Promise<TreeTypePaginationResponse> {
+        const url = `/trees/treetypes?offset=${offset}&limit=${limit}`;
         try {
-            const response = await this.api.get<TreeType[]>(url);
+            const response = await this.api.get<TreeTypePaginationResponse>(url);
             return response.data;
         } catch (error: any) {
             console.error(error)
@@ -406,10 +406,10 @@ class ApiClient {
         Model- Tree: CRUD Operations/Apis for trees
     */
 
-    async getTrees(): Promise<Tree[]> {
-        const url = `/trees/`;
+    async getTrees(offset: number, limit: number): Promise<PaginationTreeResponse> {
+        const url = `/trees/?offset=${offset}&limit=${limit}`;
         try {
-            const response = await this.api.get<Tree[]>(url);
+            const response = await this.api.get<PaginationTreeResponse>(url);
             return response.data;
         } catch (error: any) {
             console.error(error)

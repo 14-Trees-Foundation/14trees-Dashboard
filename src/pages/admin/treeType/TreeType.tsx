@@ -48,6 +48,7 @@ export const TreeTypeComponent = () => {
     const [selectedItem, setSelectedItem] = useState<TreeType | null>(null);
     const [selectedEditRow, setSelectedEditRow] = useState<RowType | null>(null);
     const [editModal, setEditModal] = useState(false);
+    const [page, setPage] = useState(0);
 
     const columns: GridColumns = [
         {
@@ -133,23 +134,21 @@ export const TreeTypeComponent = () => {
 
     useEffect(() => {
         getTreeTypeData();
-    }, []);
+    }, [page]);
 
     const getTreeTypeData = async () => {
         setTimeout(async () => {
-            await getTreeTypes();
+            await getTreeTypes(page*10, 10);
         }, 1000);
     };
 
     let treeTypesList: TreeType[] = [];
-    const treeTypesMap = useAppSelector(
+    const treeTypesData = useAppSelector(
         (state: RootState) => state.treeTypesData
     );
-    if (treeTypesMap) {
-        treeTypesList = Object.values(treeTypesMap);
+    if (treeTypesData) {
+        treeTypesList = Object.values(treeTypesData.treeTypes);
     }
-
-    console.log(treeTypesList);
 
     const handleCreateTreeTypeData = (formData: TreeType) => {
         console.log(formData);
@@ -203,11 +202,12 @@ export const TreeTypeComponent = () => {
                     getRowId={(row) => row._id}
                     initialState={{
                         pagination: {
-                            page: 1,
-                            pageSize: 5,
+                            page: 0,
+                            pageSize: 10,
                         },
                     }}
-                    // pageSizeOptions= {5}
+                    onPageChange={(page) => { if((treeTypesList.length / 10) === page) setPage(page); }}
+                    rowCount={treeTypesData.totalTreeTypes}
                     checkboxSelection
                     disableSelectionOnClick
                     components={{
