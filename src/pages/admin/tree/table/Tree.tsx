@@ -161,7 +161,7 @@ export const TreeNew = () => {
                 disabled={true} 
                 >Add Tree</Button>
                 <AddTree open={open} handleClose={handleModalClose} />
-                <Button variant="contained" style={{ marginLeft: '10px',backgroundColor:'blue' }} onClick={handleModalOpen}>Bulk Create</Button>
+                <Button variant="contained" style={{ marginLeft: '10px' }} onClick={handleModalOpen} disabled={true} >Bulk Create</Button>
             </div>
             <Box sx={{ height: 540, width: '100%' }}>
                 <DataGrid

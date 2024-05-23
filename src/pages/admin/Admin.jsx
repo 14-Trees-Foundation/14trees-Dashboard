@@ -75,33 +75,52 @@ export const Admin = () => {
   const pages = [
     {
       page: AdminHome,
+      displayName: "Admin Home",
     },
     {
       page: Trees,
+      displayName: "Trees",
+      subPages: [
+        {
+          page: Forms,
+        },
+        {
+          page: Trees,
+          displayName: "Subpage 2",
+        },
+        // Add more subpages as needed
+      ],
     },
     {
       page: TreeTypeComponent,
+      displayName: "Tree Types",
     },
     {
       page: Ponds,
+      displayName: "Ponds",
     },
     {
       page: PlotComponent,
+      displayName: "Plots",
     },
     {
       page: Users,
+      displayName: "Users",
     },
     {
       page: OrganizationComponent,
+      displayName: "Organizations",
     },
     {
       page: Images,
+      displayName: "Images",
     },
     {
       page: Forms,
+      displayName: "Forms",
     },
-    
   ];
+
   const mainBox = () => {
     const Page = pages[index].page;
     return (

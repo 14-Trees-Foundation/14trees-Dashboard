@@ -92,12 +92,12 @@ const renderActiveShape = (props) => {
 export const TreeCountByType = () => {
   let treeCountByType = useRecoilValue(treeTypeCount);
 
-  let fiilteredCount = treeCountByType.map((item) => {
-    return {
-      name: item?.tree_type[0]?.name,
-      value: item?.count,
-    };
-  });
+  // let fiilteredCount = treeCountByType.map((item) => {
+  //   return {
+  //     name: item?.tree_type[0]?.name,
+  //     value: item?.cou`nt,
+  //   };
+  // });
 
   // fiilteredCount = fiilteredCount.slice(0, 50);
 
@@ -134,7 +134,7 @@ export const TreeCountByType = () => {
           <Pie
             activeIndex={state}
             activeShape={renderActiveShape}
-            data={fiilteredCount}
+            data={''}
             cx="50%"
             cy="50%"
             innerRadius={70}

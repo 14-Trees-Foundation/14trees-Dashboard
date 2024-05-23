@@ -60,7 +60,7 @@ export const Users = () => {
             <TabsList>
               <Tab>Tree Holdings</Tab>
               <Tab>Assigned Users</Tab>
-              <Tab>Edit Users</Tab>
+              {/* <Tab>Edit Users</Tab> */}
             </TabsList>
             <TabPanel value={0}>
               <UserTreeHoldings />

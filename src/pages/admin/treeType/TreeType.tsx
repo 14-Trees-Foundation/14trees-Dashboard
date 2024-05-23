@@ -50,17 +50,17 @@ export const TreeTypeComponent = () => {
     const [editModal, setEditModal] = useState(false);
 
     const columns: GridColumns = [
-        {
-            field: "_id",
-            headerName: "ID",
-            width: 90,
-            align: "center",
-            headerAlign: "center",
-        },
+        // {
+        //     field: "_id",
+        //     headerName: "ID",
+        //     width: 90,
+        //     align: "center",
+        //     headerAlign: "center",
+        // },
         {
             field: "name",
             headerName: "Name",
-            width: 150,
+            width: 220,
             editable: true,
             align: "center",
             headerAlign: "center",
@@ -123,7 +123,7 @@ export const TreeTypeComponent = () => {
                     <Button
                         variant="outlined"
                         style={{ margin: "0 5px" }}
-                        onClick={() => handleDeleteTreeType(params.row._id)}>
+                        onClick={() => handleDeleteTreeType(params.row as TreeType)}>
                         <DeleteIcon />
                     </Button>
                 </div>
@@ -190,8 +190,8 @@ export const TreeTypeComponent = () => {
                 />
                 <Button
                     variant="contained"
-                    style={{ marginLeft: "10px",backgroundColor:'blue' }}
-                    onClick={handleModalOpen}>
+                    style={{ marginLeft: "10px", }}
+                    onClick={handleModalOpen} disabled={true} >
                     Bulk Create
                 </Button>
             </div>
@@ -221,7 +221,7 @@ export const TreeTypeComponent = () => {
                 <DialogTitle>Confirm Delete</DialogTitle>
                 <DialogContent>
                     <DialogContentText>
-                        Do you want to delete {selectedItem}?
+                        Do you want to delete {selectedItem?.name}?
                     </DialogContentText>
                 </DialogContent>
                 <DialogActions>

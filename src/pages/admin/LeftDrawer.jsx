@@ -27,9 +27,18 @@ export const AdminLeftDrawer = () => {
   const classes = useStyles();
   const [index, setIndex] = useRecoilState(adminNavIndex);
   let auth = useAuth();
+  const [subIndex, setSubIndex] = useState(null);
+  const [expanded, setExpanded] = useState(null);
 
-  const onClickNav = (value) => {
-    setIndex(value);
+  const onClickNav = (value, subValue) => {
+    if (subValue !== undefined) {
+      setIndex(value);
+      setSubIndex(subValue);
+    } else {
+      setIndex(value);
+      setSubIndex(null);
+      setExpanded(value !== expanded ? value : null);
+    }
   };
 
   const pages = [
@@ -42,6 +51,19 @@ export const AdminLeftDrawer = () => {
       displayName: "Trees",
       logo: ForestOutlined,
       display: true,
+      subPages: [
+        {
+          displayName: "Mapping trees",
+          logo: ForestOutlined,
+          display: true,
+        },
+        {
+          displayName: "Assigning trees",
+          logo: ForestOutlined,
+          display: true,
+        },
+        // Add more sub-pages here
+      ],
     },
     {
       displayName: "TreeType",
@@ -80,7 +102,7 @@ export const AdminLeftDrawer = () => {
       logo: AssignmentOutlined,
       display: true,
     },
-    
+
   ];
   const menuitem = () => {
     return (
@@ -99,6 +121,21 @@ export const AdminLeftDrawer = () => {
                   <item.logo />
                   <div className={classes.itemtext}>{item.displayName}</div>
                 </div>
+                {i === expanded && item.subPages && item.subPages.map((subItem, j) => (
+                  <div
+                    className={classes.item}
+                    onClick={() => onClickNav(i, j)}
+                    key={j}
+                    style={{ marginLeft: 20, marginTop: 10 }} 
+                  >
+                    <div
+                      className={index === i && subIndex === j ? classes.selected : classes.itembtn}
+                    >
+                      <subItem.logo />
+                      <div className={classes.itemtext}>{subItem.displayName}</div>
+                    </div>
+                  </div>
+                ))}
               </div>
             );
           } else {
@@ -108,6 +145,7 @@ export const AdminLeftDrawer = () => {
       </div>
     );
   };
+
   if (matches) {
     return (
       <Box>

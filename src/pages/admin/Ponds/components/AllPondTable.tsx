@@ -77,7 +77,7 @@ export const PondComponent = () => {
                     <Button
                         // variant="outlined"
                         // style={{ margin: "0 5px" }}
-                        onClick={() => handleDelete(params.row._id)}>
+                        onClick={() => handleDelete(params.row as Pond)}>
                         <DeleteIcon />
                     </Button>
                 </div>
@@ -186,6 +186,7 @@ export const PondComponent = () => {
 
     const handleDelete = (row: Pond) => {
         console.log("Delete", row);
+        console.log(row);
         setOpenDeleteModal(true);
         setSelectedItem(row);
     };
@@ -242,7 +243,7 @@ export const PondComponent = () => {
                 <DialogTitle>Confirm Delete</DialogTitle>
                 <DialogContent>
                     <DialogContentText>
-                        Do you want to delete {selectedItem}?
+                        Do you want to delete {selectedItem?._id}?
                     </DialogContentText>
                 </DialogContent>
                 <DialogActions>

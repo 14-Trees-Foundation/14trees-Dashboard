@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import Box from "@mui/material/Box";
-import { DataGrid, GridToolbar, GridColumns } from "@mui/x-data-grid";
+import { DataGrid, GridToolbar, GridColumns, GridCellParams } from "@mui/x-data-grid";
 import {
   Button,
   Dialog,
@@ -20,6 +20,7 @@ import { RootState } from "../../../../redux/store/store";
 import CircularProgress from "@mui/material/CircularProgress";
 import EditUser from "./EditUser";
 import AddBulkUser from "./AddBulkUser";
+import AccountCircleRoundedIcon from '@mui/icons-material/AccountCircleRounded';
 
 function LoadingOverlay() {
   return (
@@ -61,11 +62,17 @@ export const User1 = () => {
     }, 1000);
   };
 
+  const handleClick = (e: GridCellParams<any, any, any>) => {
+    if (e.field === "email") {
+      window.open("http://localhost:3000/ww/" + e.formattedValue);
+    }
+  };
+
   const columns: GridColumns = [
     {
       field: "action",
       headerName: "Actions",
-      width: 100,
+      width: 200,
       align: "center",
       headerAlign: "center",
       renderCell: (params: any) => (
@@ -89,6 +96,15 @@ export const User1 = () => {
             // style={{ margin: "0 5px" }}
             onClick={() => handleDelete(params.row._id)}>
             <DeleteIcon />
+          </Button>
+          <Button
+            // variant="outlined"
+            // style={{ margin: "0 5px" }}
+            onClick={() => {
+              window.open("http://localhost:3000/ww/" + params.row.email);
+            }}
+          >
+            <AccountCircleRoundedIcon />
           </Button>
         </div>
       ),
@@ -166,7 +182,7 @@ export const User1 = () => {
     createUser(formData);
   };
 
-  const handleBulkCreateUserData = (file: any) => {
+  const handleBulkCreateUserData = (file: Blob) => {
     // If file is not already a Blob
     if (!(file instanceof Blob)) {
       file = new Blob([file], { type: 'text/csv' }); // Change 'text/csv' to the actual file type if different

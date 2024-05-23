@@ -64,7 +64,7 @@ export const Forms = () => {
       <TabsUnstyled defaultValue={0}>
         <div style={{ margin: "16px" }}>
           <TabsList>
-            <Tab>Map Trees</Tab>
+            {/* <Tab>Map Trees</Tab> */}
             {/* <Tab>Add Tree Type</Tab>
             <Tab>Add Org</Tab>
             <Tab>Add Plot</Tab>

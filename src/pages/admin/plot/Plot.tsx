@@ -36,92 +36,6 @@ function LoadingOverlay() {
   );
 }
 
-const rows = [
-  {
-    boundaries: {
-      type: "Polygon",
-      coordinates: [
-        [
-          [18.92883906964203, 73.7769217462353],
-          [18.92705962338517, 73.77601906599243],
-          [18.92691470408016, 73.77663242954684],
-          [18.92764441915284, 73.77778245391168],
-          [18.92883906964203, 73.7769217462353],
-        ],
-      ],
-    },
-    center: {
-      type: "Point",
-      coordinates: [0, 0],
-    },
-    _id: "61b2f530969efcff564fa3c0",
-    name: "(14)-(वेताळे)-748()",
-    plot_id: "748",
-    tags: [],
-    __v: 0,
-    category: "6543803d302fc2b6520a9bac",
-    district: "6543803cd39dd1c57d6e1d02",
-    gat: "748",
-    land_type: null,
-    status: "",
-    taluka: "6543803f2ce60e0ea261efad",
-    village: "65438043b918bb6df695ff3d",
-    zone: "659f8b4b2523ee92ba4b55fe",
-  },
-  {
-    boundaries: {
-      type: "Polygon",
-      coordinates: [],
-    },
-    _id: "623d68e0cc8349ed6c95b573",
-    name: "अखरवाडी गायरान तळ १",
-    tags: [],
-    type: "Storage",
-    date_added: "2022-03-25T07:01:52.191Z",
-    images: [],
-    lengthFt: 30,
-    widthFt: 30,
-    depthFt: 30,
-    __v: 0,
-  },
-  {
-    boundaries: {
-      type: "Polygon",
-      coordinates: [],
-    },
-    _id: "623d693821a217610a750f6b",
-    name: "दक्षणा तळ १ (Dakshana pond 1)",
-    tags: [],
-    type: "Storage",
-    date_added: "2022-03-25T07:03:20.186Z",
-    images: [],
-    lengthFt: 30,
-    widthFt: 30,
-    depthFt: 30,
-    __v: 0,
-  },
-  {
-    boundaries: {
-      type: "Polygon",
-      coordinates: [],
-    },
-    _id: "623d693f21a217610a750f6e",
-    name: "दक्षणा तळ २ (Dakshana pond 2)",
-    tags: [],
-    type: "Storage",
-    date_added: "2022-03-25T07:03:27.978Z",
-    images: [],
-    lengthFt: 30,
-    widthFt: 30,
-    depthFt: 30,
-    __v: 0,
-  },
-];
-const flattenedRows = rows.map((row) => ({
-  ...row,
-  "boundaries.type": row.boundaries.type,
-  "boundaries.coordinates": row.boundaries.coordinates,
-}));
 
 export const PlotComponent = () => {
   const dispatch = useAppDispatch();
@@ -160,20 +74,20 @@ export const PlotComponent = () => {
             <EditIcon />
           </Button>
           <Button
-            onClick={() => handleDelete(params.row._id)}>
+            onClick={() => handleDelete(params.row as Plot)}>
             <DeleteIcon />
           </Button>
         </div>
       ),
     },
-    {
-      field: "_id",
-      headerName: "ID",
-      width: 90,
-      align: "center",
-      editable: true,
-      headerAlign: "center",
-    },
+    // {
+    //   field: "_id",
+    //   headerName: "ID",
+    //   width: 90,
+    //   align: "center",
+    //   editable: true,
+    //   headerAlign: "center",
+    // },
     {
       field: "name",
       headerName: "Name",
@@ -386,7 +300,7 @@ export const PlotComponent = () => {
         <DialogTitle>Confirm Delete</DialogTitle>
         <DialogContent>
           <DialogContentText>
-            Do you want to delete {selectedItem}?
+            Do you want to delete {selectedItem?.name}?
           </DialogContentText>
         </DialogContent>
         <DialogActions>

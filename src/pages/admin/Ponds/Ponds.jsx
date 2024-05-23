@@ -52,7 +52,7 @@ export const Ponds = () => {
       let hisRes = await Axios.default.get(
         `/ponds/history?pond_name=${response.data[0].name}`
       );
-      if (hisRes.status === 200) {
+      if (hisRes.status === 200 && hisRes.data[0]) {
         hisRes.data[0].updates.forEach((element, index) => {
           element["date"] = element["date"].substring(0, 10);
         });
