@@ -7,10 +7,12 @@ import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { type Tree } from '../../../../types/tree';
 import * as treeActionCreators from '../../../../redux/actions/treeActions';
+import * as userTreesActionCreators from '../../../../redux/actions/userTreeActions';
 import { bindActionCreators } from 'redux';
 import { useAppDispatch, useAppSelector } from '../../../../redux/store/hooks';
 import { RootState } from '../../../../redux/store/store';
 import CircularProgress from '@mui/material/CircularProgress';
+import UserModal from './UserModel';
 
 function LoadingOverlay() {
     return (
@@ -26,6 +28,8 @@ export const TreeNew = () => {
     const dispatch = useAppDispatch();
     const { getTrees, createTree, updateTree, deleteTree, createBulkTrees }
         = bindActionCreators(treeActionCreators, dispatch);
+    const { mapTrees, unMapTrees, mapTreesForPlot }
+        = bindActionCreators(userTreesActionCreators, dispatch);
 
     const [open, setOpen] = useState(false);
     const handleModalOpen = () => setOpen(true);
@@ -34,6 +38,10 @@ export const TreeNew = () => {
     const [deleteRow, setDeleteRow] = useState<any>({});
     const [ filters, setFilters ] = useState<GridFilterItem[]>([]);
     const [page, setPage] = useState(0);
+    const [disabledMapUnMapButton, setDisabledMapUnMapButton] = useState(true);
+    const [isMapTrees, setIsMapTrees] = useState(true);
+    const [isUserModalOpen, setIsUserModalOpen] = useState(false);
+    const [saplingIds , setSaplingIds] = useState<string[]>([]);
 
     useEffect(() => {
         getTreeData();
@@ -72,7 +80,7 @@ export const TreeNew = () => {
             width: 150,
             align: 'center',
             headerAlign: 'center',
-            valueGetter: (params: any) => params.row?.tree_id.name
+            valueGetter: (params: any) => params.row?.tree.name
         },
         {
             field: 'plot_id',
@@ -80,7 +88,7 @@ export const TreeNew = () => {
             width: 150,
             align: 'center',
             headerAlign: 'center',
-            valueGetter: (params: any) => params.row?.plot_id.name
+            valueGetter: (params: any) => params.row?.plot.name
         },
         {
             field: 'date_added',
@@ -101,7 +109,8 @@ export const TreeNew = () => {
             headerName: 'Mapped To',
             width: 150,
             align: 'center',
-            headerAlign: 'center'
+            headerAlign: 'center',
+            valueGetter: (params: any) => params.row?.user?.name
         },
         {
             field: 'event_type',
@@ -110,36 +119,36 @@ export const TreeNew = () => {
             align: 'center',
             headerAlign: 'center'
         },
-        {
-            field: 'date_assigned',
-            headerName: 'Date Assigned',
-            width: 150,
-            align: 'center',
-            headerAlign: 'center'
-        },
-        {
-            field: '__v',
-            headerName: '__V',
-            width: 90,
-            align: 'center',
-            headerAlign: 'center'
-        },
-        {
-            field: 'location.type',
-            headerName: 'Location Type',
-            width: 150,
-            align: 'center',
-            headerAlign: 'center',
-            valueGetter: (params) => params.row.location?.type,
-        },
-        {
-            field: 'location.coordinates',
-            headerName: 'Location Coordinates',
-            width: 150,
-            align: 'center',
-            headerAlign: 'center',
-            valueGetter: (params) => params.row.location?.coordinates.join(', '),
-        },
+        // {
+        //     field: 'date_assigned',
+        //     headerName: 'Date Assigned',
+        //     width: 150,
+        //     align: 'center',
+        //     headerAlign: 'center'
+        // },
+        // {
+        //     field: '__v',
+        //     headerName: '__V',
+        //     width: 90,
+        //     align: 'center',
+        //     headerAlign: 'center'
+        // },
+        // {
+        //     field: 'location.type',
+        //     headerName: 'Location Type',
+        //     width: 150,
+        //     align: 'center',
+        //     headerAlign: 'center',
+        //     valueGetter: (params) => params.row.location?.type,
+        // },
+        // {
+        //     field: 'location.coordinates',
+        //     headerName: 'Location Coordinates',
+        //     width: 150,
+        //     align: 'center',
+        //     headerAlign: 'center',
+        //     valueGetter: (params) => params.row.location?.coordinates.join(', '),
+        // },
         
     ];
 
@@ -160,10 +169,53 @@ export const TreeNew = () => {
         setDeleteRow(row);
     };
 
+    const handleSelectionChanges = (treeIds: string[]) => {
+        const saplingIds = treeIds.map( (treeId) => treesData.trees[treeId].sapling_id );
+        setSaplingIds(saplingIds);
+
+        let mapped = 0, unMapped = 0;
+        treeIds.forEach( (treeId) => {
+            if (treesData.trees[treeId].mapped_to) {
+                mapped++;
+            } else {
+                unMapped++;
+            }
+        } )
+
+        if (mapped !== 0  && unMapped !== 0) setDisabledMapUnMapButton(true);
+        else setDisabledMapUnMapButton(false)
+
+        if (mapped === 0 && unMapped !== 0) setIsMapTrees(true);
+        if (mapped !== 0 && unMapped === 0) setIsMapTrees(false);
+        if (mapped === 0 && unMapped === 0) setDisabledMapUnMapButton(true);
+    }
+
+    const handleMapUnMap = () => {
+        if (!isMapTrees) {
+            unMapTrees(saplingIds);
+            setSaplingIds([]);
+            setDisabledMapUnMapButton(true);
+        } else {
+            setIsUserModalOpen(true);
+        }
+
+    }
+
+    const handleMapTrees = (formData: any) => {
+        mapTrees(saplingIds, formData.email);
+        setSaplingIds([]);
+        setDisabledMapUnMapButton(true);
+        setIsUserModalOpen(false);
+    }
+
     return (
         <>
             <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '20px' }}>
-                <Button variant="contained"  onClick={handleModalOpen}
+                <Button variant="contained" onClick={handleMapUnMap}
+                disabled={disabledMapUnMapButton} 
+                >{ (isMapTrees)? "Map Trees" : "UnMap Trees" }</Button>
+                <UserModal open={isUserModalOpen} handleClose={ () => {setIsUserModalOpen(false)}} onSubmit={handleMapTrees} />
+                <Button variant="contained" style={{ marginLeft: '10px' }} onClick={handleModalOpen}
                 disabled={true} 
                 >Add Tree</Button>
                 <AddTree open={open} handleClose={handleModalClose} />
@@ -188,6 +240,9 @@ export const TreeNew = () => {
                     filterMode='server'
                     checkboxSelection
                     disableSelectionOnClick
+                    onSelectionModelChange={(ids) => {
+                        handleSelectionChanges(ids as string[]);
+                      }}
                     components={{
                         Toolbar: GridToolbar,
                         NoRowsOverlay: LoadingOverlay,

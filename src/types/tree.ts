@@ -3,14 +3,8 @@ export type Tree = {
     key: string,
     _id: string,
     sapling_id: string,
-    tree_id: { 
-        _id: string,
-        name: string,
-    },
-    plot_id: { 
-        _id: string,
-        name: string,
-    },
+    tree_id: string,
+    plot_id: string,
     user_id: string,
     image: [string],
     height: number,
@@ -24,7 +18,16 @@ export type Tree = {
     link: string,
     event_type: string,
     desc: string,
-    date_assigned: Date
+    date_assigned: Date,
+    plot?: {
+        name: string
+    },
+    tree?: {
+        name: string
+    },
+    user?: {
+        name: string
+    },
 };
 
 export type CreateTreeRequest = {
