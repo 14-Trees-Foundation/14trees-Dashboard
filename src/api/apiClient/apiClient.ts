@@ -133,7 +133,7 @@ class ApiClient {
 
     async updatePlot(data: Plot): Promise<Plot> {
         try {
-            const response = await this.api.post<UpsertPlotResponse>(`/plots/update`, { 'shortname': data.plot_id, 'boundaries': data.boundaries.coordinates[0]});
+            const response = await this.api.put<UpsertPlotResponse>(`/plots/${data._id}`, data);
             return response.data.plot;
         } catch (error) {
             console.error(error)
@@ -406,10 +406,10 @@ class ApiClient {
         Model- Tree: CRUD Operations/Apis for trees
     */
 
-    async getTrees(offset: number, limit: number): Promise<PaginationTreeResponse> {
-        const url = `/trees/?offset=${offset}&limit=${limit}`;
+    async getTrees(offset: number, limit: number, filters?: any): Promise<PaginationTreeResponse> {
+        const url = `/trees/get?offset=${offset}&limit=${limit}`;
         try {
-            const response = await this.api.get<PaginationTreeResponse>(url);
+            const response = await this.api.post<PaginationTreeResponse>(url, {filters: filters});
             return response.data;
         } catch (error: any) {
             console.error(error)
@@ -425,8 +425,8 @@ class ApiClient {
                 formData.append("images", (file as File).name);
             }
             formData.append('sapling_id', data.sapling_id);
-            formData.append('tree_id', data.tree_id);
-            formData.append('plot_id', data.plot_id);
+            formData.append('tree_id', data.tree_id._id);
+            formData.append('plot_id', data.plot_id._id);
             if (data.location && data.location.coordinates && data.location.coordinates.length === 2) {
                 formData.append('lat', data.location.coordinates[0].toString());
                 formData.append('lng', data.location.coordinates[1].toString());

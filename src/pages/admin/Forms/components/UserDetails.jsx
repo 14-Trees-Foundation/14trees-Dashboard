@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Box, Typography, Grid, TextField, Button } from "@mui/material";
+import { Box, Typography, Grid, TextField,Button } from "@mui/material";
 import { Field, Form } from "react-final-form";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -17,8 +17,9 @@ const intitialFValues = {
   backdropOpen: false,
 };
 
-export const UserDetails = ({ selTrees, onTreesChanged }) => {
+export const UserDetails = ( { selectedPlot } ) => {
   const [values, setValues] = useState(intitialFValues);
+  const [treeCount, setTreeCount] = useState(0);
 
   const formSubmit = async (formValues) => {
     setValues({
@@ -30,17 +31,18 @@ export const UserDetails = ({ selTrees, onTreesChanged }) => {
       name: formValues.name,
       email: formValues.email,
       contact: formValues.contact,
-      sapling_id: selTrees,
+      plot_id: selectedPlot._id,
+      count: treeCount,
     });
 
     try {
-      let res = await Axios.post("/mytrees/assign", params, {
+      let res = await Axios.post("/mytrees/map-plot-trees", params, {
         headers: {
           "Content-type": "application/json",
         },
       });
 
-      if (res.status === 201) {
+      if (res.status === 200) {
         setValues({
           ...values,
           loading: false,
@@ -229,10 +231,11 @@ export const UserDetails = ({ selTrees, onTreesChanged }) => {
                         },
                       }}
                       hiddenLabel
-                      onChange={(e) => onTreesChanged(e.target.value)}
-                      value={selTrees}
+                      type="number"
+                      onChange={(e) => { e.target.value > 0 ? setTreeCount(e.target.value): setTreeCount(0) }}
+                      value={treeCount}
                       fullWidth
-                      label="Sapling count *"
+                      label="Sapling Count *"
                       name="saplingid"
                     />
                   </Grid>
@@ -242,7 +245,7 @@ export const UserDetails = ({ selTrees, onTreesChanged }) => {
                       size="large"
                       variant="contained"
                       color="primary"
-                      disabled={submitting || pristine || selTrees === ""}
+                      disabled={submitting || pristine || treeCount === 0 || selectedPlot === null}
                       type="submit"
                     >
                       Submit

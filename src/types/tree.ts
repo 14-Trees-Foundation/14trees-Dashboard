@@ -3,8 +3,14 @@ export type Tree = {
     key: string,
     _id: string,
     sapling_id: string,
-    tree_id: string,
-    plot_id: string,
+    tree_id: { 
+        _id: string,
+        name: string,
+    },
+    plot_id: { 
+        _id: string,
+        name: string,
+    },
     user_id: string,
     image: [string],
     height: number,

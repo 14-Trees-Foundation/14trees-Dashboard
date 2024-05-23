@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import Box from '@mui/material/Box';
-import { DataGrid, GridToolbar, GridColumns } from '@mui/x-data-grid';
+import { DataGrid, GridToolbar, GridColumns, GridFilterItem, GridFilterModel } from '@mui/x-data-grid';
 import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Modal, Typography } from "@mui/material";
 import AddTree from './AddTree';
 import EditIcon from '@mui/icons-material/Edit';
@@ -32,15 +32,16 @@ export const TreeNew = () => {
     const handleModalClose = () => setOpen(false);
     const [openDeleteModal, setOpenDeleteModal] = useState(false);
     const [deleteRow, setDeleteRow] = useState<any>({});
+    const [ filters, setFilters ] = useState<GridFilterItem[]>([]);
     const [page, setPage] = useState(0);
 
     useEffect(() => {
         getTreeData();
-    }, [page]);
+    }, [page, filters]);
 
     const getTreeData = async () => {
         setTimeout(async () => {
-            await getTrees(page*10, 10);
+            await getTrees(page*10, 10, filters);
         }, 1000);
     };
     
@@ -67,17 +68,19 @@ export const TreeNew = () => {
         },
         {
             field: 'tree_id',
-            headerName: 'Tree ID',
+            headerName: 'Tree Type',
             width: 150,
             align: 'center',
-            headerAlign: 'center'
+            headerAlign: 'center',
+            valueGetter: (params: any) => params.row?.tree_id.name
         },
         {
             field: 'plot_id',
-            headerName: 'Plot ID',
+            headerName: 'Plot Name',
             width: 150,
             align: 'center',
-            headerAlign: 'center'
+            headerAlign: 'center',
+            valueGetter: (params: any) => params.row?.plot_id.name
         },
         {
             field: 'date_added',
@@ -179,6 +182,10 @@ export const TreeNew = () => {
                     }}
                     onPageChange={(page) => { if((treesList.length / 10) === page) setPage(page); }}
                     rowCount={treesData.totalTrees}
+                    onFilterModelChange={(model: GridFilterModel) => {
+                        setFilters(model.items)
+                    }}
+                    filterMode='server'
                     checkboxSelection
                     disableSelectionOnClick
                     components={{

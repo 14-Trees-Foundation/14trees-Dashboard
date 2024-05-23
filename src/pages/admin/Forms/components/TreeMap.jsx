@@ -14,9 +14,9 @@ import Axios from "../../../../api/local";
 import { Spinner } from "../../../../components/Spinner";
 import { plotsList } from "../../../../store/adminAtoms";
 
-function TreeMap() {
+function TreeMap( {selectedPlot, setSelectedPlot} ) {
     const plots = useRecoilValue(plotsList);
-    const [selectedPlot, setSelectedPlot] = useState("");
+    // const [selectedPlot, setSelectedPlot] = useState("");
     const [loading, setLoading] = useState(false);
     const [assigned, setAssigned] = useState([]);
     const [unassigned, setUnassigned] = useState([]);
@@ -35,7 +35,7 @@ function TreeMap() {
     };
 
     const fetchAndShowTreeList = async (value) => {
-        setSelectedPlot(value.name);
+        setSelectedPlot(value);
         setLoading(true);
         try {
             let response = await Axios.get(`/trees/plot/count?id=${value._id}`);
@@ -136,7 +136,7 @@ function TreeMap() {
                                 <h2>
                                     Plot:{" "}
                                     <span style={{ color: "#C72542", fontStyle: "italic" }}>
-                                        {selectedPlot}
+                                        {selectedPlot?.name}
                                     </span>
                                 </h2>
 

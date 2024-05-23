@@ -269,12 +269,12 @@ export const PlotComponent = () => {
           handleClose={handleModalClose}
           createPlot={handleCreatePlotData}
         />
-        <Button
+        {/* <Button
           variant="contained"
           style={{ marginLeft: "10px", backgroundColor:'blue' }}
           onClick={handleModalOpen}>
           Bulk Create
-        </Button>
+        </Button> */}
       </div>
       <Box sx={{ height: 540, width: "100%" }}>
         <DataGrid

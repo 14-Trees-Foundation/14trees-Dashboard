@@ -56,7 +56,7 @@ export const Admin = () => {
       }
       let plotRes = await Axios.default.get(`/plots`);
       if (plotRes.status === 200) {
-        setPlotsList(plotRes.data);
+        setPlotsList(plotRes.data.result);
       }
     } catch (error) {
       if (error.response.status === 500) {

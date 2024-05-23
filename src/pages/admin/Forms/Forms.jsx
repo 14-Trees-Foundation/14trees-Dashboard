@@ -25,6 +25,7 @@ export const Forms = () => {
   const [loading, setLoading] = React.useState(true);
   const setTreeTypeslist = useSetRecoilState(treeTypesList);
   const [selTrees, setSelectedTrees] = React.useState("");
+  const [selectedPlot, setSelectedPlot] = React.useState(null);
 
   const fetchData = React.useCallback(async () => {
     setLoading(true);
@@ -97,10 +98,10 @@ export const Forms = () => {
           <AccordionDetails>
             <Grid container spacing={2}>
               <Grid item xs={6}>
-                <TreeMap />
+                <TreeMap selectedPlot={selectedPlot} setSelectedPlot={setSelectedPlot}/>
               </Grid>
               <Grid item xs={6}>
-                <UserDetails selTrees={selTrees} onTreesChanged={onTreesChanged} />
+                <UserDetails selectedPlot={selectedPlot} />
               </Grid>
             </Grid>
           </AccordionDetails>

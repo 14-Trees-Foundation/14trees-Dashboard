@@ -3,13 +3,13 @@ import treeActionTypes from "../actionTypes/treeActionTypes";
 import { PaginationTreeResponse, Tree } from "../../types/tree";
 import { off } from "process";
 
-export const getTrees = (offset: number, limit: number) => {
+export const getTrees = (offset: number, limit: number, filters?: any) => {
     const apiClient = new ApiClient()
     return (dispatch: any) => {
         dispatch({
             type: treeActionTypes.GET_TREES_REQUESTED,
         });
-        apiClient.getTrees(offset, limit).then(
+        apiClient.getTrees(offset, limit, filters).then(
             (value: PaginationTreeResponse) => {
                 for (let i = 0; i < value.results.length; i++) {
                     if (value.results[i]?._id) {
