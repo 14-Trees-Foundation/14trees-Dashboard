@@ -1,11 +1,11 @@
 import axios, {AxiosInstance} from 'axios';
-import { CreateTreeTypeResponse, TreeType, TreeTypesDataState } from '../../types/treeType';
-import { Plot, UpsertPlotResponse } from '../../types/plot';
-import { Organization } from '../../types/organization';
-import { CreatePondResponse, Pond } from '../../types/pond';
-import { User } from '../../types/user';
+import { CreateTreeTypeResponse, TreeType, TreeTypePaginationResponse, TreeTypesDataState } from '../../types/treeType';
+import { Plot, PlotPaginationResponse, UpsertPlotResponse } from '../../types/plot';
+import { Organization, OrganizationPaginationResponse } from '../../types/organization';
+import { CreatePondResponse, Pond, PondPaginationResponse } from '../../types/pond';
+import { User, UserPaginationResponse } from '../../types/user';
 import { OnsiteStaff } from '../../types/onSiteStaff';
-import { Tree } from '../../types/tree';
+import { PaginationTreeResponse, Tree } from '../../types/tree';
 import { UserTree, UserTreeCountPaginationResponse } from '../../types/userTree';
 
 class ApiClient {
@@ -22,10 +22,10 @@ class ApiClient {
         Model- TreeTypes: CRUD Operations/Apis for tree types 
     */
 
-    async getTreeTypes(): Promise<TreeType[]> {
-        const url = `/trees/treetypes`;
+    async getTreeTypes(offset: number, limit: number): Promise<TreeTypePaginationResponse> {
+        const url = `/trees/treetypes?offset=${offset}&limit=${limit}`;
         try {
-            const response = await this.api.get<TreeType[]>(url);
+            const response = await this.api.get<TreeTypePaginationResponse>(url);
             return response.data;
         } catch (error: any) {
             console.error(error)
@@ -99,10 +99,10 @@ class ApiClient {
         Model- Plot: CRUD Operations/Apis for plots
     */
 
-    async getPlots(): Promise<Plot[]> {
-        const url = `/plots/`;
+    async getPlots(offset: number, limit: number): Promise<PlotPaginationResponse> {
+        const url = `/plots/?offset=${offset}&limit=${limit}`;
         try {
-            const response = await this.api.get<Plot[]>(url);
+            const response = await this.api.get<PlotPaginationResponse>(url);
             return response.data;
         } catch (error: any) {
             console.error(error)
@@ -155,10 +155,10 @@ class ApiClient {
         Model- Organization: CRUD Operations/Apis for organizations
     */
 
-    async getOrganizations(): Promise<Organization[]> {
-        const url = `/organizations/`;
+    async getOrganizations(offset: number, limit: number): Promise<OrganizationPaginationResponse> {
+        const url = `/organizations/?offset=${offset}&limit=${limit}`;
         try {
-            const response = await this.api.get<Organization[]>(url);
+            const response = await this.api.get<OrganizationPaginationResponse>(url);
             return response.data;
         } catch (error: any) {
             console.error(error)
@@ -211,10 +211,10 @@ class ApiClient {
         Model- Pond: CRUD Operations/Apis for ponds
     */
 
-    async getPonds(): Promise<Pond[]> {
-        const url = `/ponds/`;
+    async getPonds(offset: number, limit: number): Promise<PondPaginationResponse> {
+        const url = `/ponds/?offset=${offset}&limit=${limit}`;
         try {
-            const response = await this.api.get<Pond[]>(url);
+            const response = await this.api.get<PondPaginationResponse>(url);
             return response.data;
         } catch (error: any) {
             console.error(error)
@@ -294,10 +294,10 @@ class ApiClient {
         Model- User: CRUD Operations/Apis for users
     */
 
-    async getUsers(): Promise<User[]> {
-        const url = `/users/`;
+    async getUsers(offset: number, limit: number): Promise<UserPaginationResponse> {
+        const url = `/users/?offset=${offset}&limit=${limit}`;
         try {
-            const response = await this.api.get<User[]>(url);
+            const response = await this.api.get<UserPaginationResponse>(url);
             return response.data;
         } catch (error: any) {
             console.error(error)
@@ -406,10 +406,10 @@ class ApiClient {
         Model- Tree: CRUD Operations/Apis for trees
     */
 
-    async getTrees(): Promise<Tree[]> {
-        const url = `/trees/`;
+    async getTrees(offset: number, limit: number): Promise<PaginationTreeResponse> {
+        const url = `/trees/?offset=${offset}&limit=${limit}`;
         try {
-            const response = await this.api.get<Tree[]>(url);
+            const response = await this.api.get<PaginationTreeResponse>(url);
             return response.data;
         } catch (error: any) {
             console.error(error)

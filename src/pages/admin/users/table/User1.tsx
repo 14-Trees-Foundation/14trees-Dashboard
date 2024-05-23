@@ -51,14 +51,15 @@ export const User1 = () => {
   const [bulkModalOpen, setBulkModalOpen] = useState(false);
   const handleBulkModalOpen = () => setBulkModalOpen(true);
   const handleBulkModalClose = () => setBulkModalOpen(false);
+  const [page, setPage] = useState(0);
 
   useEffect(() => {
     getUserData();
-  }, []);
+  }, [page]);
 
   const getUserData = async () => {
     setTimeout(async () => {
-      await getUsers();
+      await getUsers(page*10, 10);
     }, 1000);
   };
 
@@ -156,9 +157,9 @@ export const User1 = () => {
   ];
 
   let usersList: User[] = [];
-  const usersMap = useAppSelector((state: RootState) => state.usersData);
-  if (usersMap) {
-    usersList = Object.values(usersMap);
+  const usersData = useAppSelector((state: RootState) => state.usersData);
+  if (usersData) {
+    usersList = Object.values(usersData.users);
   }
 
   type RowType = {
@@ -226,10 +227,12 @@ export const User1 = () => {
           getRowId={(row) => row._id}
           initialState={{
             pagination: {
-              page: 1,
-              pageSize: 5,
+              page: 0,
+              pageSize: 10,
             },
           }}
+          onPageChange={(page) => { if((usersList.length / 10) === page) setPage(page); }}
+          rowCount={usersData.totalUsers}
           checkboxSelection
           disableSelectionOnClick
           components={{

@@ -28,7 +28,7 @@ export const Admin = () => {
   const classes = useStyles();
   const [loading, setLoading] = useState(true);
   const setSummary = useSetRecoilState(summary);
-  // const setTreeLoggedByDate = useSetRecoilState(treeLoggedByDate);
+  const setTreeLoggedByDate = useSetRecoilState(treeLoggedByDate);
   const setPlotsList = useSetRecoilState(plotsList);
   const index = useRecoilValue(adminNavIndex);
   const token = JSON.parse(localStorage.getItem("token"));
@@ -47,13 +47,13 @@ export const Admin = () => {
       if (response.status === 200) {
         setSummary(response.data);
       }
-      // response = await Axios.default.get(`/trees/loggedbydate`);
-      // if (response.status === 200) {
-      //   response.data.forEach((element, index) => {
-      //     element["_id"] = element["_id"].substring(0, 10);
-      //   });
-      //   setTreeLoggedByDate(response.data);
-      // }
+      response = await Axios.default.get(`/trees/loggedbydate`);
+      if (response.status === 200) {
+        response.data.forEach((element, index) => {
+          element["_id"] = element["_id"].substring(0, 10);
+        });
+        setTreeLoggedByDate(response.data);
+      }
       let plotRes = await Axios.default.get(`/plots`);
       if (plotRes.status === 200) {
         setPlotsList(plotRes.data);

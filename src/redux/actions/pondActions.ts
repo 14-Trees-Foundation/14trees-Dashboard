@@ -1,18 +1,18 @@
 import ApiClient from "../../api/apiClient/apiClient";
 import pondActionTypes from "../actionTypes/pondActionTypes";
-import { Pond } from "../../types/pond";
+import { Pond, PondPaginationResponse } from "../../types/pond";
 
-export const getPonds = () => {
+export const getPonds = (offset: number, limit: number) => {
     const apiClient = new ApiClient()
     return (dispatch: any) => {
         dispatch({
             type: pondActionTypes.GET_PONDS_REQUESTED,
         });
-        apiClient.getPonds().then(
-            (value: Pond[]) => {
-                for (let i = 0; i < value.length; i++) {
-                    if (value[i]?._id) {
-                        value[i].key = value[i]._id
+        apiClient.getPonds(offset, limit).then(
+            (value: PondPaginationResponse) => {
+                for (let i = 0; i < value.result.length; i++) {
+                    if (value.result[i]?._id) {
+                        value.result[i].key = value.result[i]._id
                     }
                 }
                 dispatch({

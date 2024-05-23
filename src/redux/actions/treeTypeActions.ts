@@ -1,18 +1,18 @@
 import ApiClient from "../../api/apiClient/apiClient";
 import treeTypeActionTypes from "../actionTypes/treeTypeActionTypes";
-import { TreeType } from "../../types/treeType";
+import { TreeType, TreeTypePaginationResponse } from "../../types/treeType";
 
-export const getTreeTypes = () => {
+export const getTreeTypes = (offset: number, limit: number) => {
     const apiClient = new ApiClient()
     return (dispatch: any) => {
         dispatch({
             type: treeTypeActionTypes.GET_TREE_TYPES_REQUESTED,
         });
-        apiClient.getTreeTypes().then(
-            (value: TreeType[]) => {
-                for (let i = 0; i < value.length; i++) {
-                    if (value[i]?._id) {
-                        value[i].key = value[i]._id
+        apiClient.getTreeTypes(offset, limit).then(
+            (value: TreeTypePaginationResponse) => {
+                for (let i = 0; i < value.result.length; i++) {
+                    if (value.result[i]?._id) {
+                        value.result[i].key = value.result[i]._id
                     }
                 }
                 dispatch({

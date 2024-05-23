@@ -51,6 +51,7 @@ export const PlotComponent = () => {
   const [selectedItem, setSelectedItem] = useState<Plot | null>(null);
   const [selectedEditRow, setSelectedEditRow] = useState<RowType | null>(null);
   const [editModal, setEditModal] = useState(false);
+  const [page, setPage] = useState(0);
 
   const columns: GridColumns = [
     {
@@ -217,18 +218,18 @@ export const PlotComponent = () => {
 
   useEffect(() => {
     getPlotData();
-  }, []);
+  }, [page]);
 
   const getPlotData = async () => {
     setTimeout(async () => {
-      await getPlots();
+      await getPlots(page*10, 10);
     }, 1000);
   };
 
   let plotsList: Plot[] = [];
-  const plotsMap = useAppSelector((state: RootState) => state.plotsData);
-  if (plotsMap) {
-    plotsList = Object.values(plotsMap);
+  const plotsData = useAppSelector((state: RootState) => state.plotsData);
+  if (plotsData) {
+    plotsList = Object.values(plotsData.plots);
   }
 
   type RowType = {
@@ -282,11 +283,12 @@ export const PlotComponent = () => {
           getRowId={(row) => row._id}
           initialState={{
             pagination: {
-              page: 1,
-              pageSize: 5,
+              page: 0,
+              pageSize: 10,
             },
           }}
-          // pageSizeOptions= {5}
+          onPageChange={(page) => { if((plotsList.length / 10) === page) setPage(page); }}
+          rowCount={plotsData.totalPlots}
           checkboxSelection
           disableSelectionOnClick
           components={{

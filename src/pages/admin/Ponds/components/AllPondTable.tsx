@@ -50,6 +50,7 @@ export const PondComponent = () => {
     const [selectedItem, setSelectedItem] = useState<Pond | null>(null);
     const [selectedEditRow, setSelectedEditRow] = useState<RowType | null>(null);
     const [editModal, setEditModal] = useState(false);
+    const [page, setPage] = useState(0);
 
     const columns: GridColumns = [
         {
@@ -159,18 +160,18 @@ export const PondComponent = () => {
 
     useEffect(() => {
         getPondData();
-    }, []);
+    }, [page]);
 
     const getPondData = async () => {
         setTimeout(async () => {
-            await getPonds();
+            await getPonds(page*10, 10);
         }, 1000);
     };
 
     let pondsList: Pond[] = [];
-    const pondsMap = useAppSelector((state: RootState) => state.pondsData);
-    if (pondsMap) {
-        pondsList = Object.values(pondsMap);
+    const pondsData = useAppSelector((state: RootState) => state.pondsData);
+    if (pondsData) {
+        pondsList = Object.values(pondsData.ponds);
     }
 
     const flattenedRows = pondsList.map((row) => ({
@@ -225,11 +226,12 @@ export const PondComponent = () => {
                     getRowId={(row) => row._id}
                     initialState={{
                         pagination: {
-                            page: 1,
-                            pageSize: 5,
+                          page: 0,
+                          pageSize: 10,
                         },
-                    }}
-                    // pageSizeOptions= {5}
+                      }}
+                    onPageChange={(page) => { if((pondsList.length / 10) === page) setPage(page); }}
+                    rowCount={pondsData.totalPonds}
                     checkboxSelection
                     disableSelectionOnClick
                     components={{

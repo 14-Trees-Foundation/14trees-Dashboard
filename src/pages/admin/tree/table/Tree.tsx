@@ -31,14 +31,15 @@ export const TreeNew = () => {
     const handleModalOpen = () => setOpen(true);
     const handleModalClose = () => setOpen(false);
     const [openDeleteModal, setOpenDeleteModal] = useState(false);
+    const [page, setPage] = useState(0);
 
     useEffect(() => {
         getTreeData();
-    }, []);
+    }, [page]);
 
     const getTreeData = async () => {
         setTimeout(async () => {
-            await getTrees();
+            await getTrees(page*10, 10);
         }, 1000);
     };
     
@@ -139,9 +140,9 @@ export const TreeNew = () => {
     ];
 
     let treesList: Tree[] = [];
-    const treesMap = useAppSelector((state: RootState) => state.treesData);
-    if (treesMap) {
-        treesList = Object.values(treesMap);
+    const treesData = useAppSelector((state: RootState) => state.treesData);
+    if (treesData) {
+        treesList = Object.values(treesData.trees);
     }
 
     type RowType = {
@@ -170,11 +171,12 @@ export const TreeNew = () => {
                     getRowId={(row) => row._id}
                     initialState={{
                         pagination: {
-                            page: 1,
-                            pageSize: 5
+                            page: 0,
+                            pageSize: 10
                         },
                     }}
-                    // pageSizeOptions= {5}
+                    onPageChange={(page) => { if((treesList.length / 10) === page) setPage(page); }}
+                    rowCount={treesData.totalTrees}
                     checkboxSelection
                     disableSelectionOnClick
                     components={{

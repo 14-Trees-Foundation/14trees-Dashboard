@@ -23,5 +23,13 @@ export type CreateTreeTypeResponse = {
     treetype: TreeType
 }
 
-export type TreeTypesDataState = Record<string, TreeType>
+export type TreeTypePaginationResponse = {
+    total: number,
+    result: TreeType[]
+}
+
+export type TreeTypesDataState = {
+    totalTreeTypes: number,
+    treeTypes: Record<string, TreeType>
+}
 export type SearchTreeTypesDataState = Record<string, TreeType>
