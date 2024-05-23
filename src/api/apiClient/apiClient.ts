@@ -425,8 +425,8 @@ class ApiClient {
                 formData.append("images", (file as File).name);
             }
             formData.append('sapling_id', data.sapling_id);
-            formData.append('tree_id', data.tree_id._id);
-            formData.append('plot_id', data.plot_id._id);
+            formData.append('tree_id', data.tree_id);
+            formData.append('plot_id', data.plot_id);
             if (data.location && data.location.coordinates && data.location.coordinates.length === 2) {
                 formData.append('lat', data.location.coordinates[0].toString());
                 formData.append('lng', data.location.coordinates[1].toString());
@@ -487,7 +487,7 @@ class ApiClient {
 
     async mapTrees(saplingIds: string[], email: string): Promise<void> {
         try {
-            await this.api.post<any>(`/mytrees/assign`, { saplingids: saplingIds.join(',') , email: email});
+            await this.api.post<any>(`/mytrees/assign`, { sapling_id: saplingIds.join(',') , email: email});
         } catch (error) {
             console.error(error)
             throw new Error('Failed to create Trees in bulk');

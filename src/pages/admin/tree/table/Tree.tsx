@@ -22,11 +22,13 @@ import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { type Tree } from "../../../../types/tree";
 import * as treeActionCreators from "../../../../redux/actions/treeActions";
+import * as userTreesActionCreators from "../../../../redux/actions/userTreeActions";
 import { bindActionCreators } from "redux";
 import { useAppDispatch, useAppSelector } from "../../../../redux/store/hooks";
 import { RootState } from "../../../../redux/store/store";
 import CircularProgress from "@mui/material/CircularProgress";
 import EditTree from "./EditTree";
+import UserModal from './UserModel';
 
 function LoadingOverlay() {
     return (
@@ -44,8 +46,10 @@ function LoadingOverlay() {
 
 export const TreeNew = () => {
     const dispatch = useAppDispatch();
-    const { getTrees, createTree, updateTree, deleteTree, createBulkTrees } =
-        bindActionCreators(treeActionCreators, dispatch);
+    const { getTrees, createTree, updateTree, deleteTree, createBulkTrees }
+        = bindActionCreators(treeActionCreators, dispatch);
+    const { mapTrees, unMapTrees, mapTreesForPlot }
+        = bindActionCreators(userTreesActionCreators, dispatch);
 
     const [open, setOpen] = useState(false);
     const handleModalOpen = () => setOpen(true);
@@ -54,7 +58,11 @@ export const TreeNew = () => {
     const [deleteRow, setDeleteRow] = useState<any>({});
     const [filters, setFilters] = useState<GridFilterItem[]>([]);
     const [page, setPage] = useState(0);
-    const [selectedEditRow, setSelectedEditRow] = useState<Tree | null>(null);
+    const [disabledMapUnMapButton, setDisabledMapUnMapButton] = useState(true);
+    const [isMapTrees, setIsMapTrees] = useState(true);
+    const [isUserModalOpen, setIsUserModalOpen] = useState(false);
+    const [saplingIds , setSaplingIds] = useState<string[]>([]);
+    const [selectedEditRow, setSelectedEditRow] = useState<RowType | null>(null);
     const [editModal, setEditModal] = useState(false);
 
     useEffect(() => {
@@ -110,26 +118,8 @@ export const TreeNew = () => {
     let treesList: Tree[] = [];
     const treesData = useAppSelector((state: RootState) => state.treesData);
     if (treesData) {
-        treesList = Object.values(treesData.trees).map(tree => ({
-            ...tree,
-            'tree_id._id': tree.tree_id._id,
-            'tree_id.name': tree.tree_id.name,
-            'plot_id._id': tree.plot_id._id,
-            'plot_id.name': tree.plot_id.name,
-        }));
+        treesList = Object.values(treesData.trees);
     }
-
-    const unflattenTree = (formData: any) => ({
-        ...formData,
-        tree_id: {
-            _id: formData['tree_id._id'],
-            name: formData['tree_id.name']
-        },
-        plot_id: {
-            _id: formData['plot_id._id'],
-            name: formData['plot_id.name']
-        }
-    });
 
     console.log(treesList);
     type RowType = {
@@ -143,23 +133,60 @@ export const TreeNew = () => {
         setDeleteRow(row);
     };
 
+    const handleSelectionChanges = (treeIds: string[]) => {
+        const saplingIds = treeIds.map( (treeId) => treesData.trees[treeId].sapling_id );
+        setSaplingIds(saplingIds);
+
+        let mapped = 0, unMapped = 0;
+        treeIds.forEach( (treeId) => {
+            if (treesData.trees[treeId].mapped_to) {
+                mapped++;
+            } else {
+                unMapped++;
+            }
+        } )
+
+        if (mapped !== 0  && unMapped !== 0) setDisabledMapUnMapButton(true);
+        else setDisabledMapUnMapButton(false)
+
+        if (mapped === 0 && unMapped !== 0) setIsMapTrees(true);
+        if (mapped !== 0 && unMapped === 0) setIsMapTrees(false);
+        if (mapped === 0 && unMapped === 0) setDisabledMapUnMapButton(true);
+    }
+
+    const handleMapUnMap = () => {
+        if (!isMapTrees) {
+            unMapTrees(saplingIds);
+            setSaplingIds([]);
+            setDisabledMapUnMapButton(true);
+        } else {
+            setIsUserModalOpen(true);
+        }
+
+    }
+
+    const handleMapTrees = (formData: any) => {
+        mapTrees(saplingIds, formData.email);
+        setSaplingIds([]);
+        setDisabledMapUnMapButton(true);
+        setIsUserModalOpen(false);
+    }
+
     const handleEditSubmit = (formData: Tree) => {
-        
         console.log(formData);
-        updateTree(formData as Tree);
+        updateTree(formData);
     };
 
     return (
         <>
-            <div
-                style={{
-                    display: "flex",
-                    justifyContent: "flex-end",
-                    marginBottom: "20px",
-                }}>
-                <Button variant="contained" onClick={handleModalOpen} disabled={true}>
-                    Add Tree
-                </Button>
+            <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '20px' }}>
+                <Button variant="contained" onClick={handleMapUnMap}
+                disabled={disabledMapUnMapButton} 
+                >{ (isMapTrees)? "Map Trees" : "UnMap Trees" }</Button>
+                <UserModal open={isUserModalOpen} handleClose={ () => {setIsUserModalOpen(false)}} onSubmit={handleMapTrees} />
+                <Button variant="contained" style={{ marginLeft: '10px' }} onClick={handleModalOpen}
+                disabled={true} 
+                >Add Tree</Button>
                 <AddTree open={open} handleClose={handleModalClose} />
                 <Button
                     variant="contained"
@@ -190,6 +217,9 @@ export const TreeNew = () => {
                     filterMode="server"
                     checkboxSelection
                     disableSelectionOnClick
+                    onSelectionModelChange={(ids) => {
+                        handleSelectionChanges(ids as string[]);
+                      }}
                     components={{
                         Toolbar: GridToolbar,
                         NoRowsOverlay: LoadingOverlay,
