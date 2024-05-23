@@ -31,6 +31,7 @@ export const TreeNew = () => {
     const handleModalOpen = () => setOpen(true);
     const handleModalClose = () => setOpen(false);
     const [openDeleteModal, setOpenDeleteModal] = useState(false);
+    const [deleteRow, setDeleteRow] = useState<any>({});
     const [page, setPage] = useState(0);
 
     useEffect(() => {
@@ -151,8 +152,9 @@ export const TreeNew = () => {
     };
 
     const handleDelete = (row: RowType) => {
-        console.log('Delete', row.name);
+        console.log('Delete', row);
         setOpenDeleteModal(true);
+        setDeleteRow(row);
     };
 
     return (
@@ -190,7 +192,7 @@ export const TreeNew = () => {
                 <DialogTitle>Confirm Delete</DialogTitle>
                 <DialogContent>
                     <DialogContentText>
-                        Do you want to delete this item?
+                        Do you want to delete tree with the sapling id '{deleteRow?.sapling_id}'?
                     </DialogContentText>
                 </DialogContent>
                 <DialogActions>
@@ -199,7 +201,7 @@ export const TreeNew = () => {
                     </Button>
                     <Button
                         onClick={() => {
-                            console.log("Deleting item...");
+                            deleteTree(deleteRow);
                             setOpenDeleteModal(false);
                         }}
                         color="primary"

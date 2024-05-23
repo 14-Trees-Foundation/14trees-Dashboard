@@ -46,11 +46,11 @@ export const Ponds = () => {
     try {
       let response = await Axios.default.get(`/ponds/`);
       if (response.status === 200) {
-        setAllPonds(response.data);
-        setSelectedPond(response.data[0].name);
+        setAllPonds(response.data.result);
+        setSelectedPond(response.data.result[0].name);
       }
       let hisRes = await Axios.default.get(
-        `/ponds/history?pond_name=${response.data[0].name}`
+        `/ponds/history?pond_name=${response.data.result[0].name}`
       );
       if (hisRes.status === 200 && hisRes.data[0]) {
         hisRes.data[0].updates.forEach((element, index) => {

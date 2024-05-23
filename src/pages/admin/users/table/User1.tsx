@@ -95,7 +95,7 @@ export const User1 = () => {
           <Button
             // variant="outlined"
             // style={{ margin: "0 5px" }}
-            onClick={() => handleDelete(params.row._id)}>
+            onClick={() => handleDelete(params.row)}>
             <DeleteIcon />
           </Button>
           <Button
@@ -246,7 +246,7 @@ export const User1 = () => {
         <DialogTitle>Confirm Delete</DialogTitle>
         <DialogContent>
           <DialogContentText>
-            Do you want to delete {selectedItem}?
+            Do you want to delete {selectedItem?.name}?
           </DialogContentText>
         </DialogContent>
         <DialogActions>

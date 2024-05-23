@@ -349,8 +349,8 @@ class ApiClient {
     async createUsersBulk(data: Blob): Promise<void> {
         try {
             const formData = new FormData();
-            formData.append('csvFile', data, 'users_data.csv');
-            await this.api.post<any>(`/users/bulk`, );
+            formData.append('file', data);
+            await this.api.post<any>(`/users/bulk`, formData);
         } catch (error) {
             console.error(error)
             throw new Error('Failed to create users in bulk');

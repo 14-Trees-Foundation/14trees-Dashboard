@@ -7,7 +7,7 @@ export const treeTypesDataReducer = (state = { totalTreeTypes: 0, treeTypes: {} 
     switch (action.type) {
         case treeTypeActionTypes.GET_TREE_TYPES_SUCCEEDED:
             if (action.payload) {
-                let treeTypesDataState: TreeTypesDataState = { totalTreeTypes: state.totalTreeTypes, treeTypes: state.treeTypes }
+                let treeTypesDataState: TreeTypesDataState = { totalTreeTypes: state.totalTreeTypes, treeTypes: { ...state.treeTypes} }
                 let payload = action.payload as TreeTypePaginationResponse
                 treeTypesDataState.totalTreeTypes = payload.total;
                 let treeTypes = payload.result

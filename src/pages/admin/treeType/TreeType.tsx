@@ -206,7 +206,7 @@ export const TreeTypeComponent = () => {
                             pageSize: 10,
                         },
                     }}
-                    onPageChange={(page) => { if((treeTypesList.length / 10) === page) setPage(page); }}
+                    onPageChange={(page) => { if(treeTypesList.length < (page + 1)*10) setPage(page); }}
                     rowCount={treeTypesData.totalTreeTypes}
                     checkboxSelection
                     disableSelectionOnClick
