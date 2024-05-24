@@ -28,6 +28,9 @@ export type Tree = {
     user?: {
         name: string
     },
+    assigned_to?: {
+        user: string
+    },
 };
 
 export type CreateTreeRequest = {

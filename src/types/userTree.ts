@@ -30,6 +30,19 @@ export type UserTreeCountObj = {
     }
 }
 
+export type AssignTreeRequest = {
+    sapling_id: string,
+    name: string,
+    phone: string,
+    email: string,
+    org: string,
+    donor: string,
+    plantation_type: string,
+    gifted_by: string,
+    planted_by: string,
+    desc: string,
+}
+
 export type UserTreeCountPaginationResponse = {
     total: number,
     result_count: number,

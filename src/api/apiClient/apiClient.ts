@@ -6,7 +6,7 @@ import { CreatePondResponse, Pond, PondPaginationResponse } from '../../types/po
 import { User, UserPaginationResponse } from '../../types/user';
 import { OnsiteStaff } from '../../types/onSiteStaff';
 import { PaginationTreeResponse, Tree } from '../../types/tree';
-import { UserTree, UserTreeCountPaginationResponse } from '../../types/userTree';
+import { AssignTreeRequest, UserTree, UserTreeCountPaginationResponse } from '../../types/userTree';
 
 class ApiClient {
     private api: AxiosInstance;
@@ -571,6 +571,15 @@ class ApiClient {
     async unassignUserTrees(saplingIds: string[]): Promise<void> {
         try {
             await this.api.post<void>(`/profile`, { sapling_ids: saplingIds });
+        } catch (error) {
+            console.error(error)
+            throw new Error('Failed unassign user trees.');
+        }
+    }
+
+    async assignUserTrees(data: AssignTreeRequest): Promise<void> {
+        try {
+            await this.api.post<void>(`/profile/usertreereg/multi`, data);
         } catch (error) {
             console.error(error)
             throw new Error('Failed unassign user trees.');

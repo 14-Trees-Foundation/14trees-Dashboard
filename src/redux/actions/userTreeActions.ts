@@ -1,6 +1,6 @@
 import ApiClient from "../../api/apiClient/apiClient";
 import userTreeActionTypes from "../actionTypes/userTreeActionTypes";
-import { UserTree, UserTreeCountPaginationResponse } from "../../types/userTree";
+import { AssignTreeRequest, UserTree, UserTreeCountPaginationResponse } from "../../types/userTree";
 
 export const getUserTrees = () => {
     const apiClient = new ApiClient()
@@ -186,6 +186,29 @@ export const mapTreesForPlot = (email: string, plotId: string, count: number) =>
                 console.error(error);
                 dispatch({
                     type: userTreeActionTypes.MAP_USER_TREES_IN_PLOT_FAILED,
+                    value: error
+                });
+            }
+        )
+    };
+}
+
+export const assignTrees = (data: AssignTreeRequest) => {
+    const apiClient = new ApiClient();
+    return (dispatch: any) => {
+        dispatch({
+            type: userTreeActionTypes.ASSIGN_USER_TREES_REQUESTED,
+        });
+        apiClient.assignUserTrees(data).then(
+            () => {
+                dispatch({
+                    type: userTreeActionTypes.ASSIGN_USER_TREES_SUCCEEDED,
+                });
+            },
+            (error: any) => {
+                console.error(error);
+                dispatch({
+                    type: userTreeActionTypes.ASSIGN_USER_TREES_FAILED,
                     value: error
                 });
             }

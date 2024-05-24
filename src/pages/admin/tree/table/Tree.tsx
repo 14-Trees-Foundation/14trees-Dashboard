@@ -29,6 +29,8 @@ import { RootState } from "../../../../redux/store/store";
 import CircularProgress from "@mui/material/CircularProgress";
 import EditTree from "./EditTree";
 import UserModal from './UserModel';
+import AssignTreeModal from "./AssignTreeModal";
+import { AssignTreeRequest } from "../../../../types/userTree";
 
 function LoadingOverlay() {
     return (
@@ -48,7 +50,7 @@ export const TreeNew = () => {
     const dispatch = useAppDispatch();
     const { getTrees, createTree, updateTree, deleteTree, createBulkTrees }
         = bindActionCreators(treeActionCreators, dispatch);
-    const { mapTrees, unMapTrees, mapTreesForPlot }
+    const { mapTrees, unMapTrees, assignTrees, unassignUserTrees }
         = bindActionCreators(userTreesActionCreators, dispatch);
 
     const [open, setOpen] = useState(false);
@@ -61,6 +63,9 @@ export const TreeNew = () => {
     const [disabledMapUnMapButton, setDisabledMapUnMapButton] = useState(true);
     const [isMapTrees, setIsMapTrees] = useState(true);
     const [isUserModalOpen, setIsUserModalOpen] = useState(false);
+    const [disabledAUButton, setDisabledAUButton] = useState(true);
+    const [isAssignTrees, setIsAssignTrees] = useState(true);
+    const [isAssignTreeModalOpen, setIsAssignTreeModalOpen] = useState(false);
     const [saplingIds , setSaplingIds] = useState<string[]>([]);
     const [selectedEditRow, setSelectedEditRow] = useState<RowType | null>(null);
     const [editModal, setEditModal] = useState(false);
@@ -103,16 +108,13 @@ export const TreeNew = () => {
             ),
         },
         { field: "sapling_id", headerName: "Sapling ID", width: 150 },
-        { field: "tree_id._id", headerName: "Tree ID", width: 150 },
-        { field: "tree_id.name", headerName: "Tree Name", width: 150 },
-        { field: "plot_id._id", headerName: "Plot ID", width: 150 },
-        { field: "plot_id.name", headerName: "Plot Name", width: 150 },
+        { field: "tree_id", headerName: "Tree Name", width: 150, valueGetter: (params) => params.row?.tree?.name },
+        { field: "plot_id", headerName: "Plot Name", width: 150, valueGetter: (params) => params.row?.plot?.name },
         { field: "date_added", headerName: "Date Added", width: 150 },
-        { field: "key", headerName: "Key", width: 150 },
         { field: "link", headerName: "Link", width: 150 },
-        { field: "mapped_to", headerName: "Mapped To", width: 150 },
+        { field: "mapped_to", headerName: "Mapped To", width: 150, valueGetter: (params) => params.row?.user?.name },
         { field: "event_type", headerName: "Event Type", width: 150 },
-        { field: "date_assigned", headerName: "Date Assigned", width: 150 },
+        { field: 'assigned_to', headerName: 'Assigned To', width: 150, valueGetter: (params) => params.row?.assigned_to?.user },
     ];
 
     let treesList: Tree[] = [];
@@ -138,12 +140,13 @@ export const TreeNew = () => {
         setSaplingIds(saplingIds);
 
         let mapped = 0, unMapped = 0;
+        let assigned = 0, unassigned = 0;
         treeIds.forEach( (treeId) => {
-            if (treesData.trees[treeId].mapped_to) {
-                mapped++;
-            } else {
-                unMapped++;
-            }
+            if (treesData.trees[treeId].mapped_to) mapped++;
+            else unMapped++;
+
+            if (treesData.trees[treeId].assigned_to) assigned++;
+            else unassigned++;
         } )
 
         if (mapped !== 0  && unMapped !== 0) setDisabledMapUnMapButton(true);
@@ -152,6 +155,13 @@ export const TreeNew = () => {
         if (mapped === 0 && unMapped !== 0) setIsMapTrees(true);
         if (mapped !== 0 && unMapped === 0) setIsMapTrees(false);
         if (mapped === 0 && unMapped === 0) setDisabledMapUnMapButton(true);
+
+        if (assigned !== 0  && unassigned !== 0) setDisabledAUButton(true);
+        else setDisabledAUButton(false)
+
+        if (assigned === 0 && unassigned !== 0) setIsAssignTrees(true);
+        if (assigned !== 0 && unassigned === 0) setIsAssignTrees(false);
+        if (assigned === 0 && unassigned === 0) setDisabledAUButton(true);
     }
 
     const handleMapUnMap = () => {
@@ -165,11 +175,30 @@ export const TreeNew = () => {
 
     }
 
+    const handleAssignUnAssign = () => {
+        if (!isAssignTrees) {
+            unassignUserTrees(saplingIds);
+            setSaplingIds([]);
+            setDisabledMapUnMapButton(true);
+        } else {
+            setIsAssignTreeModalOpen(true);
+        }
+    }
+
     const handleMapTrees = (formData: any) => {
         mapTrees(saplingIds, formData.email);
         setSaplingIds([]);
         setDisabledMapUnMapButton(true);
         setIsUserModalOpen(false);
+    }
+
+    const handleAssignTrees = (formData: any) => {
+        let data = formData as AssignTreeRequest
+        data.sapling_id = saplingIds.join(",");
+        assignTrees(data);
+        setSaplingIds([]);
+        setDisabledAUButton(true);
+        setIsAssignTreeModalOpen(false);
     }
 
     const handleEditSubmit = (formData: Tree) => {
@@ -180,7 +209,11 @@ export const TreeNew = () => {
     return (
         <>
             <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '20px' }}>
-                <Button variant="contained" onClick={handleMapUnMap}
+                <Button variant="contained" onClick={handleAssignUnAssign}
+                disabled={disabledAUButton} 
+                >{ (isAssignTrees)? "Assign Trees" : "Unassign Trees" }</Button>
+                <AssignTreeModal open={isAssignTreeModalOpen} handleClose={ () => {setIsAssignTreeModalOpen(false)}} onSubmit={handleAssignTrees} />
+                <Button variant="contained" style={{ marginLeft: '10px' }} onClick={handleMapUnMap}
                 disabled={disabledMapUnMapButton} 
                 >{ (isMapTrees)? "Map Trees" : "UnMap Trees" }</Button>
                 <UserModal open={isUserModalOpen} handleClose={ () => {setIsUserModalOpen(false)}} onSubmit={handleMapTrees} />
