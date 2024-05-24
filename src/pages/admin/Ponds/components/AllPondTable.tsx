@@ -38,7 +38,7 @@ function LoadingOverlay() {
 
 export const PondComponent = () => {
     const dispatch = useAppDispatch();
-    const { getPonds, createPond, updatePond, deletePond } = bindActionCreators(
+    const { getPonds, createPond, updatePond, deletePond, getPondHistory } = bindActionCreators(
         pondActionCreators,
         dispatch
     );
@@ -51,6 +51,13 @@ export const PondComponent = () => {
     const [selectedEditRow, setSelectedEditRow] = useState<RowType | null>(null);
     const [editModal, setEditModal] = useState(false);
     const [page, setPage] = useState(0);
+    const [nameFilter, setNameFilter] = useState('');
+
+    const getPondHistoryByName = async (name: string) => {
+        setTimeout(async () => {
+            await getPondHistory(name);
+        }, 1000);
+    };
 
     const columns: GridColumns = [
         {
@@ -94,10 +101,26 @@ export const PondComponent = () => {
         {
             field: "name",
             headerName: "Name",
-            width: 150,
+            width: 250,
             editable: true,
             align: "center",
             headerAlign: "center",
+            renderCell: (params: any) => (
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                  }}>
+                  <Button
+                    onClick={() => {
+                      getPondHistoryByName(params.row.name);
+                    }}
+                  >
+                    {params.row.name}
+                  </Button>
+                </div>
+              ),
         },
         {
             field: "type",
@@ -160,11 +183,11 @@ export const PondComponent = () => {
 
     useEffect(() => {
         getPondData();
-    }, [page]);
+    }, [page, nameFilter]);
 
     const getPondData = async () => {
         setTimeout(async () => {
-            await getPonds(page*10, 10);
+            await getPonds(page*10, 10, nameFilter);
         }, 1000);
     };
 
@@ -232,6 +255,8 @@ export const PondComponent = () => {
                       }}
                     onPageChange={(page) => { if((pondsList.length / 10) === page) setPage(page); }}
                     rowCount={pondsData.totalPonds}
+                    filterMode="server"
+                    onFilterModelChange={(model) => { if (model.items[0]?.columnField === "name") setNameFilter(model.items[0].value) }}
                     checkboxSelection
                     disableSelectionOnClick
                     components={{

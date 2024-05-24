@@ -80,16 +80,6 @@ export const Admin = () => {
     {
       page: Trees,
       displayName: "Trees",
-      subPages: [
-        {
-          page: Forms,
-        },
-        {
-          page: Trees,
-          displayName: "Subpage 2",
-        },
-        // Add more subpages as needed
-      ],
     },
     {
       page: TreeTypeComponent,

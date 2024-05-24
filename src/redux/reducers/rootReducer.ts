@@ -3,7 +3,7 @@ import { treeTypesDataReducer, searchTreeTypesDataReducer } from "./treeTypeRedu
 import { onsiteStaffsDataReducer } from "./onsiteStaffReducer";
 import { organizationsDataReducer, searchOrganizationsDataReducer } from "./organizationReducer";
 import { plotsDataReducer, searchPlotsDataReducer } from "./plotReducer";
-import { pondsDataReducer, searchPondsDataReducer } from "./pondReducer";
+import { pondsDataReducer, searchPondsDataReducer, pondHistoryDataReducer } from "./pondReducer";
 import { treesDataReducer } from "./treeReducer";
 import { usersDataReducer, searchUsersDataReducer } from "./userReducer";
 import { userTreesDataReducer, userTreeCountDataReducer } from "./userTreeReducer";
@@ -14,6 +14,7 @@ const rootReducer = combineReducers({
     organizationsData: organizationsDataReducer,
     plotsData: plotsDataReducer,
     pondsData: pondsDataReducer,
+    pondHistoryData: pondHistoryDataReducer,
     treesData: treesDataReducer,
     usersData: usersDataReducer,
     userTreesData: userTreesDataReducer,

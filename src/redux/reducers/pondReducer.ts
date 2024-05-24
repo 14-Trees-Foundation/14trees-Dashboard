@@ -1,5 +1,5 @@
 import { UnknownAction } from "redux";
-import { PondsDataState, Pond, SearchPondsDataState, PondPaginationResponse } from "../../types/pond";
+import { PondsDataState, Pond, SearchPondsDataState, PondPaginationResponse, PondHistoryDataState } from "../../types/pond";
 import pondActionTypes from "../actionTypes/pondActionTypes";
 import { fetchDataFromLocal } from "../../api/apiClient/apiClient";
 
@@ -9,6 +9,9 @@ export const pondsDataReducer = (state = { totalPonds:0, ponds: {}}, action: Unk
             if (action.payload) {
                 let pondDataState: PondsDataState = { totalPonds: state.totalPonds, ponds: { ...state.ponds }};
                 let payload = action.payload as PondPaginationResponse;
+                if (pondDataState.totalPonds !== payload.total ) {
+                    pondDataState.ponds = {}
+                }
                 pondDataState.totalPonds = payload.total;
                 let ponds = payload.result;
                 for (let i = 0; i < ponds.length; i++) {
@@ -70,6 +73,21 @@ export const searchPondsDataReducer = (state = {}, action: UnknownAction): Searc
                 }
                 const nextState: SearchPondsDataState = pondsDataState;
                 return nextState;
+            }
+            return state;
+        default:
+            return state;
+    }
+}
+
+export const pondHistoryDataReducer = (state = {}, action: UnknownAction): PondHistoryDataState | {} => {
+    switch(action.type) {
+        case pondActionTypes.GET_POND_HISTORY_SUCCEEDED:
+            if (action.payload) {
+                let payload = action.payload as Pond[]
+                if (payload.length !== 0) {
+                    return payload[0];
+                }
             }
             return state;
         default:

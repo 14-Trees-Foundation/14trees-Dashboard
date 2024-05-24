@@ -42,6 +42,11 @@ export const PondsList = () => {
   const ponds = useRecoilValue(allPonds);
   const theme = useTheme();
   const pondsData = useAppSelector((state) => state.pondsData);
+  let pondsList = [];
+  if (pondsData) {
+    pondsList = Object.values(pondsData.ponds);
+  }
+
 
   return (
     <>
@@ -76,10 +81,11 @@ export const PondsList = () => {
         <DataGrid
           components={{ Toolbar: GridToolbar }}
           getRowId={(row) => row._id}
-          rows={ponds}
+          rows={pondsList}
+          rowCount={pondsData.totalPonds}
           columns={columns}
-          pageSize={50}
-          rowsPerPageOptions={[50]}
+          pageSize={10}
+          rowsPerPageOptions={[10]}
           disableSelectionOnClick
         />
       </Box>

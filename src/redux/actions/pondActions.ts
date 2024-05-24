@@ -2,13 +2,13 @@ import ApiClient from "../../api/apiClient/apiClient";
 import pondActionTypes from "../actionTypes/pondActionTypes";
 import { Pond, PondPaginationResponse } from "../../types/pond";
 
-export const getPonds = (offset: number, limit: number) => {
+export const getPonds = (offset: number, limit: number, name?: string) => {
     const apiClient = new ApiClient()
     return (dispatch: any) => {
         dispatch({
             type: pondActionTypes.GET_PONDS_REQUESTED,
         });
-        apiClient.getPonds(offset, limit).then(
+        apiClient.getPonds(offset, limit, name).then(
             (value: PondPaginationResponse) => {
                 for (let i = 0; i < value.result.length; i++) {
                     if (value.result[i]?._id) {
@@ -24,6 +24,35 @@ export const getPonds = (offset: number, limit: number) => {
                 console.log(error)
                 dispatch({
                     type: pondActionTypes.GET_PONDS_FAILED,
+                    payload: error
+                });
+            }
+        )
+    }
+};
+
+export const getPondHistory = (name: string) => {
+    const apiClient = new ApiClient()
+    return (dispatch: any) => {
+        dispatch({
+            type: pondActionTypes.GET_POND_HISTORY_REQUESTED,
+        });
+        apiClient.getPondHistory( name).then(
+            (value: Pond[]) => {
+                for (let i = 0; i < value.length; i++) {
+                    if (value[i]?._id) {
+                        value[i].key = value[i]._id
+                    }
+                }
+                dispatch({
+                    type: pondActionTypes.GET_POND_HISTORY_SUCCEEDED,
+                    payload: value,
+                });
+            },
+            (error: any) => {
+                console.log(error)
+                dispatch({
+                    type: pondActionTypes.GET_POND_HISTORY_FAILED,
                     payload: error
                 });
             }

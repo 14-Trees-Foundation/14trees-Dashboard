@@ -39,3 +39,4 @@ export type PondsDataState = {
   ponds: Record<string, Pond>
 }
 export type SearchPondsDataState = Record<string, Pond>;
+export type PondHistoryDataState = Pond;

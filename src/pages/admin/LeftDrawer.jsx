@@ -51,19 +51,6 @@ export const AdminLeftDrawer = () => {
       displayName: "Trees",
       logo: ForestOutlined,
       display: true,
-      subPages: [
-        {
-          displayName: "Mapping trees",
-          logo: ForestOutlined,
-          display: true,
-        },
-        {
-          displayName: "Assigning trees",
-          logo: ForestOutlined,
-          display: true,
-        },
-        // Add more sub-pages here
-      ],
     },
     {
       displayName: "TreeType",

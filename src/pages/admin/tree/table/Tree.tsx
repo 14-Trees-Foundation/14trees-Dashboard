@@ -169,6 +169,7 @@ export const TreeNew = () => {
             unMapTrees(saplingIds);
             setSaplingIds([]);
             setDisabledMapUnMapButton(true);
+            getTreeData();
         } else {
             setIsUserModalOpen(true);
         }
@@ -180,6 +181,7 @@ export const TreeNew = () => {
             unassignUserTrees(saplingIds);
             setSaplingIds([]);
             setDisabledMapUnMapButton(true);
+            getTreeData();
         } else {
             setIsAssignTreeModalOpen(true);
         }
@@ -190,6 +192,7 @@ export const TreeNew = () => {
         setSaplingIds([]);
         setDisabledMapUnMapButton(true);
         setIsUserModalOpen(false);
+        getTreeData();
     }
 
     const handleAssignTrees = (formData: any) => {
@@ -199,6 +202,7 @@ export const TreeNew = () => {
         setSaplingIds([]);
         setDisabledAUButton(true);
         setIsAssignTreeModalOpen(false);
+        getTreeData();
     }
 
     const handleEditSubmit = (formData: Tree) => {
@@ -217,7 +221,7 @@ export const TreeNew = () => {
                 disabled={disabledMapUnMapButton} 
                 >{ (isMapTrees)? "Map Trees" : "UnMap Trees" }</Button>
                 <UserModal open={isUserModalOpen} handleClose={ () => {setIsUserModalOpen(false)}} onSubmit={handleMapTrees} />
-                <Button variant="contained" style={{ marginLeft: '10px' }} onClick={handleModalOpen}
+                {/* <Button variant="contained" style={{ marginLeft: '10px' }} onClick={handleModalOpen}
                 disabled={true} 
                 >Add Tree</Button>
                 <AddTree open={open} handleClose={handleModalClose} />
@@ -227,7 +231,7 @@ export const TreeNew = () => {
                     onClick={handleModalOpen}
                     disabled={true}>
                     Bulk Create
-                </Button>
+                </Button> */}
             </div>
             <Box sx={{ height: 540, width: "100%" }}>
                 <DataGrid

@@ -92,14 +92,14 @@ const renderActiveShape = (props) => {
 export const TreeCountByType = () => {
   let treeCountByType = useRecoilValue(treeTypeCount);
 
-  // let fiilteredCount = treeCountByType.map((item) => {
-  //   return {
-  //     name: item?.tree_type[0]?.name,
-  //     value: item?.cou`nt,
-  //   };
-  // });
+  let fiilteredCount = treeCountByType.map((item) => {
+    return {
+      name: item?.tree_type[0]?.name,
+      value: item?.count,
+    };
+  });
 
-  // fiilteredCount = fiilteredCount.slice(0, 50);
+  fiilteredCount = fiilteredCount.slice(0, 50);
 
   const [state, setState] = useState(0);
 

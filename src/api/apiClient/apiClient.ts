@@ -211,8 +211,9 @@ class ApiClient {
         Model- Pond: CRUD Operations/Apis for ponds
     */
 
-    async getPonds(offset: number, limit: number): Promise<PondPaginationResponse> {
-        const url = `/ponds/?offset=${offset}&limit=${limit}`;
+    async getPonds(offset: number, limit: number, name?: string): Promise<PondPaginationResponse> {
+        let url = `/ponds/?offset=${offset}&limit=${limit}`;
+        if (name) url += '&name=' + name;
         try {
             const response = await this.api.get<PondPaginationResponse>(url);
             return response.data;
@@ -280,9 +281,9 @@ class ApiClient {
         }
     }
 
-    async getPondHistory(): Promise<Pond[]> {
+    async getPondHistory(name: string): Promise<Pond[]> {
         try {
-            let response = await this.api.get<Pond[]>(`/ponds/history`);
+            let response = await this.api.get<Pond[]>(`/ponds/history?pond_name=${name}`);
             return response.data;
         } catch (error) {
             console.error(error)

@@ -1,5 +1,8 @@
 import { useState } from 'react';
 import { Box, Button, Grid, Modal, TextField, Typography } from '@mui/material';
+import { useAppDispatch, useAppSelector } from '../../../../redux/store/hooks';
+import * as userActionCreators from '../../../../redux/actions/userActions';
+import { bindActionCreators } from '@reduxjs/toolkit';
 
 const UserModal = ({ open, handleClose, onSubmit }) => {
 
@@ -21,6 +24,21 @@ const UserModal = ({ open, handleClose, onSubmit }) => {
         phone: '',
         email: '',
     });
+    const [email, setEmail] = useState('');
+
+    const dispatch = useAppDispatch();
+    const { searchUsers }
+        = bindActionCreators(userActionCreators, dispatch);
+
+    const usersData = useAppSelector((state) => state.searchUsersData);
+    if (usersData) {
+        const users = Object.values(usersData);
+        if (users.length !== 0) {
+            formData.name = users[0].name;
+            formData.phone = users[0].phone;
+            formData.email = users[0].email;
+        }
+    }
 
     const handleChange = (event) => {
         setFormData({
@@ -35,6 +53,13 @@ const UserModal = ({ open, handleClose, onSubmit }) => {
         onSubmit(formData);
     };
 
+    const searchUserByMail= (event) => {
+        event.preventDefault();
+        setTimeout(async () => {
+            await searchUsers(email);
+        }, 1000);
+    }
+
     return (
         <div>
             <Modal
@@ -44,6 +69,16 @@ const UserModal = ({ open, handleClose, onSubmit }) => {
                 aria-describedby="modal-modal-description"
             >
                 <Box sx={style}>
+                    <form onSubmit={searchUserByMail}>
+                        <Grid container rowSpacing={2} columnSpacing={1} >
+                            <Grid item xs={12}>
+                                <TextField name="email" label="Email" value={email} onChange={(event) => setEmail(event.target.value) } fullWidth/>
+                            </Grid>
+                            <Grid item xs={12} sx={{display:'flex', justifyContent:'center', }}>
+                                <Button type="submit">Search</Button>
+                            </Grid>
+                        </Grid>
+                    </form>
                     <form onSubmit={handleSubmit}>
                         <Grid container rowSpacing={2} columnSpacing={1} >
                             <Grid item xs={12}>
