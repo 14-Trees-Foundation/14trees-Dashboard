@@ -179,8 +179,8 @@ class ApiClient {
 
     async createOrganization(data: Organization): Promise<Organization> {
         try {
-            const response = await this.api.post<Organization>(`/organizations/add`, data);
-            return response.data;
+            const response = await this.api.post<{org: Organization}>(`/organizations/add`, data);
+            return response.data.org;
         } catch (error) {
             console.error(error)
             throw new Error('Failed to create Organization');

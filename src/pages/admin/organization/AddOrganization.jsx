@@ -18,9 +18,8 @@ const AddOrganization = ({ open, handleClose, createOrganization }) => {
 
     const [formData, setFormData] = useState({
         name: '',
-        phone: '',
-        email: '',
-        dob: '',
+        type: '',
+        desc: '',
     });
 
     const handleChange = (event) => {
@@ -33,12 +32,6 @@ const AddOrganization = ({ open, handleClose, createOrganization }) => {
     const handleSubmit = (event) => {
         event.preventDefault();
         createOrganization(formData);
-        setFormData({
-            name: '',
-            phone: '',
-            email: '',
-            dob: '',
-        });
         handleClose();
     };
 
@@ -58,13 +51,10 @@ const AddOrganization = ({ open, handleClose, createOrganization }) => {
                                 <TextField name="name" label="Name" value={formData.name} onChange={handleChange} fullWidth/>
                             </Grid>
                             <Grid item xs={12}>
-                                <TextField name="phone" label="Phone" value={formData.phone} onChange={handleChange} fullWidth/>
+                                <TextField name="type" label="Type" value={formData.type} onChange={handleChange} fullWidth/>
                             </Grid>
                             <Grid item xs={12}>
-                                <TextField name="email" label="Email" value={formData.email} onChange={handleChange} fullWidth/>
-                            </Grid>
-                            <Grid item xs={12}>
-                                <TextField name="dob" label="Date of Birth" type="date" value={formData.dob} onChange={handleChange} InputLabelProps={{ shrink: true }} fullWidth/>
+                                <TextField name="desc" label="Description" value={formData.desc} onChange={handleChange} fullWidth/>
                             </Grid>
                             <Grid item xs={12} sx={{display:'flex', justifyContent:'center', }}>
                                 <Button type="submit">Submit</Button>

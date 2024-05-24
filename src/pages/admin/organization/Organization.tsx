@@ -126,7 +126,7 @@ export const OrganizationComponent = () => {
           <Button
             variant="outlined"
             style={{ margin: "0 5px" }}
-            onClick={() => handleDelete(params.row._id)}>
+            onClick={() => handleDelete(params.row)}>
             <DeleteIcon />
           </Button>
         </div>
@@ -173,7 +173,7 @@ export const OrganizationComponent = () => {
           marginBottom: "20px",
         }}>
         <Button variant="contained" style={{ backgroundColor:'blue' }} onClick={handleModalOpen}>
-          Add User
+          Add Organization
         </Button>
         <AddOrganization
           open={open}
@@ -207,7 +207,7 @@ export const OrganizationComponent = () => {
         <DialogTitle>Confirm Delete</DialogTitle>
         <DialogContent>
           <DialogContentText>
-            Do you want to delete {selectedItem}?
+            Do you want to delete {selectedItem?.name}?
           </DialogContentText>
         </DialogContent>
         <DialogActions>
