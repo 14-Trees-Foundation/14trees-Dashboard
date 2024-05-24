@@ -56,35 +56,16 @@ function EditTree({ row, openeditModal, setEditModal, editSubmit }) {
                         label="Tree ID"
                         type="text"
                         fullWidth
-                        value={formData.tree_id._id}
-                        onChange={handleChange}
-                    />
-                    <TextField
-                        autoFocus
-                        margin="dense"
-                        name="tree_id.name"
-                        label="Tree Name"
-                        type="text"
-                        fullWidth
-                        value={formData.tree_id.name}
+                        value={formData.tree_id}
                         onChange={handleChange}
                     />
                     <TextField
                         margin="dense"
-                        name="plot_id._id"
+                        name="plot_id"
                         label="Plot ID"
                         type="text"
                         fullWidth
-                        value={formData.plot_id._id}
-                        onChange={handleChange}
-                    />
-                    <TextField
-                        margin="dense"
-                        name="plot_id.name"
-                        label="Plot Name"
-                        type="text"
-                        fullWidth
-                        value={formData.plot_id.name}
+                        value={formData.plot_id}
                         onChange={handleChange}
                     />
                     <TextField
@@ -94,16 +75,6 @@ function EditTree({ row, openeditModal, setEditModal, editSubmit }) {
                         type="text"
                         fullWidth
                         value={formData.date_added}
-                        onChange={handleChange}
-                    />
-                    <TextField
-                        autoFocus
-                        margin="dense"
-                        name="key"
-                        label="Key"
-                        type="text"
-                        fullWidth
-                        value={formData.key}
                         onChange={handleChange}
                     />
                     <TextField
