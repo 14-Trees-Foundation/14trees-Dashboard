@@ -18,7 +18,7 @@ import { useAppSelector } from "../../../../redux/store/hooks";
 export const PondsHistory = () => {
   const theme = useTheme();
   let history = useRecoilValue(pondHistory);
-  let pondName = useRecoilValue(selectedPond);
+  // let pondName = useRecoilValue(selectedPond);
   //  let data = history.map(({levelFt, date, images, ...attrs}) => ({date, levelFt}))
   let pond = useAppSelector((state) => state.pondHistoryData);
   let data;
@@ -45,7 +45,7 @@ export const PondsHistory = () => {
             <Typography variant="h6" gutterBottom>
               Pond level (Feets):{" "}
               <em style={{ color: theme.custom.color.primary.blue }}>
-                {pondName}
+                {pond?.name}
               </em>
             </Typography>
           </div>

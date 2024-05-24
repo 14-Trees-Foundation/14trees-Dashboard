@@ -109,7 +109,7 @@ export const Ponds = () => {
           }}
         >
           <Typography variant="h3">Ponds</Typography>
-          <div style={{ display: "flex", justifyContent: "space-between" }}>
+          {/* <div style={{ display: "flex", justifyContent: "space-between" }}>
             {Object.keys(ponds).length > 0 && (
               <Select
                 sx={{
@@ -138,7 +138,7 @@ export const Ponds = () => {
                 })}
               </Select>
             )}
-          </div>
+          </div> */}
         </div>
         <Divider sx={{ backgroundColor: "#ffffff" }} />
         <Box sx={{ p: 3 }}>
