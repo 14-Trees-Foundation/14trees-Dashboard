@@ -23,6 +23,7 @@ import {TreeNew} from "./tree/table/Tree";
 import {TreeTypeComponent} from "./treeType/TreeType";
 import { PlotComponent } from "./plot/Plot";
 import { OrganizationComponent } from "./organization/Organization";
+import { DonationComponent } from "./donation/Donation";
 
 export const Admin = () => {
   const classes = useStyles();
@@ -100,6 +101,10 @@ export const Admin = () => {
     {
       page: OrganizationComponent,
       displayName: "Organizations",
+    },
+    {
+      page: DonationComponent,
+      displayName: "Donations",
     },
     {
       page: Images,

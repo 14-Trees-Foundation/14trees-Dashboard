@@ -19,6 +19,7 @@ import logo from "../../assets/logo_white_small.png";
 import { useRecoilState } from "recoil";
 import { adminNavIndex } from "../../store/adminAtoms";
 import { useAuth } from "./auth/auth";
+import VolunteerActivismIcon from '@mui/icons-material/VolunteerActivism';
 
 export const AdminLeftDrawer = () => {
   const theme = useTheme();
@@ -76,6 +77,11 @@ export const AdminLeftDrawer = () => {
     {
       displayName: 'Organization',
       logo: CorporateFareIcon,
+      display: true
+    },
+    {
+      displayName: 'Donation',
+      logo: VolunteerActivismIcon,
       display: true
     },
     {
