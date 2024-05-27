@@ -9,6 +9,9 @@ export const usersDataReducer = (state = { totalUsers:0, users: {}}, action: Unk
             if (action.payload) {
                 let usersDataState: UsersDataState = { totalUsers: state.totalUsers, users: { ...state.users }};
                 let payload = action.payload as UserPaginationResponse;
+                if (usersDataState.totalUsers != payload.total) {
+                    usersDataState.users = {}
+                }
                 usersDataState.totalUsers = payload.total;
                 let users = payload.result;
                 for (let i = 0; i < users.length; i++) {

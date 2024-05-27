@@ -25,8 +25,9 @@ export default function getColumnSearchProps<T extends object> (dataIndex: keyof
 
     const handleReset = (clearFilters: () => void, dataIndex: keyof T) => {
         clearFilters();
-        Reflect.deleteProperty(filters, dataIndex);
-        setFilters(filters);
+        let newFilters = { ...filters }
+        Reflect.deleteProperty(newFilters, dataIndex);
+        setFilters(newFilters);
     };
 
     return ({
@@ -60,13 +61,13 @@ export default function getColumnSearchProps<T extends object> (dataIndex: keyof
                 size="small"
                 onClick={() => {
                     confirm({ closeDropdown: false });
-                    filters[dataIndex.toString()] = {
+                    let newFilters = { ...filters }
+                    newFilters[dataIndex.toString()] = {
                         columnField: dataIndex.toString(),
                         operatorValue: filterOption,
                         value: (selectedKeys as string[])[0],
                     }
-                    setFilters(filters);
-                    console.log(filters);
+                    setFilters(newFilters);
                 }}
                 >
                 Filter
