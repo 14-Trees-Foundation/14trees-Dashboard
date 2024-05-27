@@ -12,6 +12,7 @@ import { makeServer } from "./mockServer/server";
 import { RecoilRoot } from "recoil";
 import {Provider} from 'react-redux';
 import { store } from "./redux/store/store";
+import { ConfigProvider } from 'antd'
 require("dotenv").config();
 
 if (process.env.REACT_APP_ENV === "development") {
@@ -22,6 +23,18 @@ if (process.env.REACT_APP_ENV === "development") {
 
 ReactDOM.render(
   <React.StrictMode>
+    <ConfigProvider
+    theme={{
+      token: {
+        // Seed Token
+        colorPrimary: '#00b96b',
+        borderRadius: 2,
+
+        // Alias Token
+        colorBgContainer: '#9AA59D',
+      },
+    }}
+    >
     <BrowserRouter>
       <ThemeProvider theme={theme}>
         <RecoilRoot>
@@ -31,6 +44,7 @@ ReactDOM.render(
         </RecoilRoot>
       </ThemeProvider>
     </BrowserRouter>
+    </ConfigProvider>
   </React.StrictMode>,
   document.getElementById("root")
 );

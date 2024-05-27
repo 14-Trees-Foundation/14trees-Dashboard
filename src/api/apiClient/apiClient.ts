@@ -306,6 +306,17 @@ class ApiClient {
         }
     }
 
+    async getUsersByFilters(offset: number, limit: number, filters?: any[]): Promise<UserPaginationResponse> {
+        const url = `/users/get?offset=${offset}&limit=${limit}`;
+        try {
+            const response = await this.api.post<UserPaginationResponse>(url, {filters: filters});
+            return response.data;
+        } catch (error: any) {
+            console.error(error)
+            throw new Error(`Failed to fetch users: ${error.message}`);
+        }
+    }
+
     async searchUsers(searchStr: string): Promise<User[]> {
         const url = `/users/${searchStr}`;
         try {

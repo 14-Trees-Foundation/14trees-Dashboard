@@ -31,6 +31,35 @@ export const getUsers = (offset: number, limit: number) => {
     }
 };
 
+export const getUsersByFilters = (offset: number, limit: number, filters?: any[]) => {
+    const apiClient = new ApiClient()
+    return (dispatch: any) => {
+        dispatch({
+            type: userActionTypes.GET_USERS_REQUESTED,
+        });
+        apiClient.getUsersByFilters(offset, limit, filters).then(
+            (value: UserPaginationResponse) => {
+                for (let i = 0; i < value.result.length; i++) {
+                    if (value.result[i]?._id) {
+                        value.result[i].key = value.result[i]._id
+                    }
+                }
+                dispatch({
+                    type: userActionTypes.GET_USERS_SUCCEEDED,
+                    payload: value,
+                });
+            },
+            (error: any) => {
+                console.log(error)
+                dispatch({
+                    type: userActionTypes.GET_USERS_FAILED,
+                    payload: error
+                });
+            }
+        )
+    }
+};
+
 export const searchUsers = (searchStr: string) => {
     const apiClient = new ApiClient()
     return (dispatch: any) => {

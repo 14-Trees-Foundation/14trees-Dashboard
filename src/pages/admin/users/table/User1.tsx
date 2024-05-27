@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Box from "@mui/material/Box";
-import { DataGrid, GridToolbar, GridColumns, GridCellParams } from "@mui/x-data-grid";
+import { DataGrid, GridToolbar, GridColumns, GridCellParams, GridFilterItem } from "@mui/x-data-grid";
 import {
   Button,
   Dialog,
@@ -22,6 +22,10 @@ import EditUser from "./EditUser";
 import AddBulkUser from "./AddBulkUser";
 import AccountCircleRoundedIcon from '@mui/icons-material/AccountCircleRounded';
 
+import { Table } from 'antd'
+import type { TableColumnsType } from 'antd';
+import getColumnSearchProps from "../../../../components/Filter";
+
 function LoadingOverlay() {
   return (
     <div
@@ -38,7 +42,7 @@ function LoadingOverlay() {
 
 export const User1 = () => {
   const dispatch = useAppDispatch();
-  const { getUsers, createUser, createBulkUsers, updateUser, deleteUser } =
+  const { getUsers, createUser, createBulkUsers, updateUser, deleteUser, getUsersByFilters } =
     bindActionCreators(userActionCreators, dispatch);
 
   const [open, setOpen] = useState(false);
@@ -46,20 +50,22 @@ export const User1 = () => {
   const handleModalClose = () => setOpen(false);
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
   const [selectedItem, setSelectedItem] = useState<User | null>(null);
-  const [selectedEditRow, setSelectedEditRow] = useState<RowType | null>(null);
+  const [selectedEditRow, setSelectedEditRow] = useState<User | null>(null);
   const [editModal, setEditModal] = useState(false);
   const [bulkModalOpen, setBulkModalOpen] = useState(false);
   const handleBulkModalOpen = () => setBulkModalOpen(true);
   const handleBulkModalClose = () => setBulkModalOpen(false);
   const [page, setPage] = useState(0);
+  const [filters, setFilters] = useState<Record<string, GridFilterItem>>({});
 
   useEffect(() => {
     getUserData();
-  }, [page]);
+  }, [page, filters]);
 
   const getUserData = async () => {
+    let filtersData = Object.values(filters);
     setTimeout(async () => {
-      await getUsers(page*10, 10);
+      await getUsersByFilters(page*10, 10, filtersData);
     }, 1000);
   };
 
@@ -67,6 +73,16 @@ export const User1 = () => {
     if (e.field === "email") {
       window.open("http://localhost:3000/ww/" + e.formattedValue);
     }
+  };
+
+
+  const rowSelection = {
+    onChange: (selectedRowKeys: React.Key[], selectedRows: User[]) => {
+        console.log(`selectedRowKeys: ${selectedRowKeys}`, 'selectedRows: ', selectedRows);
+    },
+    getCheckboxProps: (record: User) => ({
+        name: record.name,
+    }),
   };
 
   const columns: GridColumns = [
@@ -84,8 +100,6 @@ export const User1 = () => {
             alignItems: "center",
           }}>
           <Button
-            // variant="outlined"
-            // style={{ margin: "0 5px" }}
             onClick={() => {
               setSelectedEditRow(params.row);
               setEditModal(true);
@@ -93,14 +107,10 @@ export const User1 = () => {
             <EditIcon />
           </Button>
           <Button
-            // variant="outlined"
-            // style={{ margin: "0 5px" }}
             onClick={() => handleDelete(params.row)}>
             <DeleteIcon />
           </Button>
           <Button
-            // variant="outlined"
-            // style={{ margin: "0 5px" }}
             onClick={() => {
               window.open("http://localhost:3000/ww/" + params.row.email);
             }}
@@ -110,13 +120,6 @@ export const User1 = () => {
         </div>
       ),
     },
-    // {
-    //   field: "_id",
-    //   headerName: "ID",
-    //   width: 90,
-    //   align: "center",
-    //   headerAlign: "center",
-    // },
     {
       field: "name",
       headerName: "Name",
@@ -138,22 +141,72 @@ export const User1 = () => {
       headerName: "Phone",
       width: 100,
     },
-    // {
-    //   field: "userid",
-    //   headerName: "User ID",
-    //   width: 200,
-    // },
-    // {
-    //   field: "key",
-    //   headerName: "Key",
-    //   width: 200,
-    // },
-    // {
-    //   field: "__v",
-    //   headerName: "__V",
-    //   width: 200,
-    // },
     
+  ];
+
+  const antdColumns: TableColumnsType<User> = [
+    {
+      dataIndex: "action",
+      key: "action",
+      title: "Actions",
+      width: 200,
+      align: "center",
+      render: (value, record, index )=> (
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+          }}>
+          <Button
+            onClick={() => {
+              setSelectedEditRow(record);
+              setEditModal(true);
+            }}>
+            <EditIcon />
+          </Button>
+          <Button
+            onClick={() => handleDelete(record)}>
+            <DeleteIcon />
+          </Button>
+          <Button
+            onClick={() => {
+              window.open("http://localhost:3000/ww/" + record.email);
+            }}
+          >
+            <AccountCircleRoundedIcon />
+          </Button>
+        </div>
+      ),
+    },
+    {
+      dataIndex: "name",
+      key: "name",
+      title: "Name",
+      width: 150,
+      ...getColumnSearchProps('name', filters, setFilters)
+    },
+    {
+      dataIndex: "email",
+      key: "email",
+      title: "Email",
+      width: 200,
+      ...getColumnSearchProps('email', filters, setFilters)
+    },
+    {
+      dataIndex: "dob",
+      key: "dob",
+      title: "Date of Birth",
+      width: 200,
+      ...getColumnSearchProps('dob', filters, setFilters)
+    },
+    {
+      dataIndex: "phone",
+      key: "phone",
+      title: "Phone",
+      width: 100,
+      ...getColumnSearchProps('phone', filters, setFilters)
+    },    
   ];
 
   let usersList: User[] = [];
@@ -161,11 +214,6 @@ export const User1 = () => {
   if (usersData) {
     usersList = Object.values(usersData.users);
   }
-
-  type RowType = {
-    id: string;
-    name: string;
-  };
 
   const handleDelete = (row: User) => {
     console.log("Delete", row);
@@ -220,7 +268,7 @@ export const User1 = () => {
           createBulkUsers={handleBulkCreateUserData}
         />
       </div>
-      <Box sx={{ height: 540, width: "100%" }}>
+      {/* <Box sx={{ height: 540, width: "100%" }}>
         <DataGrid
           rows={usersList}
           columns={columns}
@@ -238,6 +286,19 @@ export const User1 = () => {
           components={{
             Toolbar: GridToolbar,
             NoRowsOverlay: LoadingOverlay,
+          }}
+        />
+      </Box> */}
+
+      <Box sx={{ height: 840, width: "100%" }}>
+        <Table
+          style={{ borderRadius: 20 }}
+          dataSource={usersList}
+          columns={antdColumns}
+          pagination={{ position: ['bottomRight'], pageSize: 10, defaultCurrent: 1, total: usersData.totalUsers, simple: true, onChange: (page, pageSize) => { if(page*pageSize > usersList.length) setPage(page-1); } }}
+          rowSelection={{
+            type: 'checkbox',
+            ...rowSelection,
           }}
         />
       </Box>
