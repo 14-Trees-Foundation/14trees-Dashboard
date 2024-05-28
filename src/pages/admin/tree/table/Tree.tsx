@@ -69,6 +69,8 @@ export const TreeNew = () => {
     const [saplingIds , setSaplingIds] = useState<string[]>([]);
     const [selectedEditRow, setSelectedEditRow] = useState<RowType | null>(null);
     const [editModal, setEditModal] = useState(false);
+    const [openConfirmation, setOpenConfirmation] = useState(false);
+    const [operation, setOperation] = useState('');
 
     useEffect(() => {
         getTreeData();
@@ -166,25 +168,19 @@ export const TreeNew = () => {
 
     const handleMapUnMap = () => {
         if (!isMapTrees) {
-            unMapTrees(saplingIds);
-            setSaplingIds([]);
-            setDisabledMapUnMapButton(true);
-            getTreeData();
+            setOperation('un-map');
+            setOpenConfirmation(true);
         } else {
             setIsUserModalOpen(true);
         }
 
     }
 
-    const handleAssignUnAssign = () => {
-        if (!isAssignTrees) {
-            unassignUserTrees(saplingIds);
-            setSaplingIds([]);
-            setDisabledMapUnMapButton(true);
-            getTreeData();
-        } else {
-            setIsAssignTreeModalOpen(true);
-        }
+    const handleUnMapTrees = () => {
+        unMapTrees(saplingIds);
+        setSaplingIds([]);
+        setDisabledMapUnMapButton(true);
+        getTreeData();
     }
 
     const handleMapTrees = (formData: any) => {
@@ -192,6 +188,22 @@ export const TreeNew = () => {
         setSaplingIds([]);
         setDisabledMapUnMapButton(true);
         setIsUserModalOpen(false);
+        getTreeData();
+    }
+
+    const handleAssignUnAssign = () => {
+        if (!isAssignTrees) {
+            setOperation('unassign');
+            setOpenConfirmation(true);
+        } else {
+            setIsAssignTreeModalOpen(true);
+        }
+    }
+
+    const handleUnassignTrees = () => {
+        unassignUserTrees(saplingIds);
+        setSaplingIds([]);
+        setDisabledMapUnMapButton(true);
         getTreeData();
     }
 
@@ -263,6 +275,31 @@ export const TreeNew = () => {
                     }}
                 />
             </Box>
+
+            <Dialog open={openConfirmation} onClose={() => setOpenConfirmation(false)}>
+                <DialogTitle>Confirm {operation}</DialogTitle>
+                <DialogContent>
+                    <DialogContentText>
+                        Do you want to {operation} trees with the sapling ids '
+                        {saplingIds.join(", ")}'?
+                    </DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={() => setOpenConfirmation(false)} color="primary">
+                        Cancel
+                    </Button>
+                    <Button
+                        onClick={() => {
+                            if (operation === 'un-map') handleUnMapTrees();
+                            if (operation === 'unassign') handleUnassignTrees();
+                            setOpenConfirmation(false);
+                        }}
+                        color="primary"
+                        autoFocus>
+                        Yes
+                    </Button>
+                </DialogActions>
+            </Dialog>
 
             <Dialog open={openDeleteModal} onClose={() => setOpenDeleteModal(false)}>
                 <DialogTitle>Confirm Delete</DialogTitle>
