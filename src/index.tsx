@@ -28,11 +28,29 @@ ReactDOM.render(
       token: {
         // Seed Token
         colorPrimary: '#00b96b',
-        borderRadius: 2,
+        borderRadius: 5,
 
         // Alias Token
         colorBgContainer: '#9AA59D',
       },
+      components: {
+        Button: {
+          colorPrimary: '#000000',
+          colorBgContainer: '#669471',
+          algorithm: true,
+          borderRadius: 4,
+        },
+        Select: {
+          colorPrimary: '#cef0d6',
+          algorithm: true,
+          borderRadius: 3
+        },
+        Input: {
+          colorPrimary: '#cef0d6',
+          algorithm: true,
+          borderRadius: 3
+        },
+      }
     }}
     >
     <BrowserRouter>
