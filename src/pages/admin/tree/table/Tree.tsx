@@ -23,12 +23,14 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import { type Tree } from "../../../../types/tree";
 import * as treeActionCreators from "../../../../redux/actions/treeActions";
 import * as userTreesActionCreators from "../../../../redux/actions/userTreeActions";
+import * as userActionCreators from "../../../../redux/actions/userActions";
 import { bindActionCreators } from "redux";
 import { useAppDispatch, useAppSelector } from "../../../../redux/store/hooks";
 import { RootState } from "../../../../redux/store/store";
 import CircularProgress from "@mui/material/CircularProgress";
 import EditTree from "./EditTree";
-import UserModal from './UserModel';
+// import UserModal from './UserModel';
+import UserModal from "../../../../components/UserModal";
 import AssignTreeModal from "./AssignTreeModal";
 import { AssignTreeRequest } from "../../../../types/userTree";
 
@@ -52,6 +54,8 @@ export const TreeNew = () => {
         = bindActionCreators(treeActionCreators, dispatch);
     const { mapTrees, unMapTrees, assignTrees, unassignUserTrees }
         = bindActionCreators(userTreesActionCreators, dispatch);
+    const { searchUsers }
+        = bindActionCreators(userActionCreators, dispatch);
 
     const [open, setOpen] = useState(false);
     const handleModalOpen = () => setOpen(true);
@@ -232,7 +236,7 @@ export const TreeNew = () => {
                 <Button variant="contained" style={{ marginLeft: '10px' }} onClick={handleMapUnMap}
                 disabled={disabledMapUnMapButton} 
                 >{ (isMapTrees)? "Map Trees" : "UnMap Trees" }</Button>
-                <UserModal open={isUserModalOpen} handleClose={ () => {setIsUserModalOpen(false)}} onSubmit={handleMapTrees} />
+                <UserModal open={isUserModalOpen} handleClose={ () => {setIsUserModalOpen(false)}} onSubmit={handleMapTrees} searchUser={searchUsers} />
                 {/* <Button variant="contained" style={{ marginLeft: '10px' }} onClick={handleModalOpen}
                 disabled={true} 
                 >Add Tree</Button>
