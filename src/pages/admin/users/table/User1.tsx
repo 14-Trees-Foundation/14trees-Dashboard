@@ -42,7 +42,7 @@ function LoadingOverlay() {
 
 export const User1 = () => {
   const dispatch = useAppDispatch();
-  const { getUsers, createUser, createBulkUsers, updateUser, deleteUser, getUsersByFilters } =
+  const { searchUsers, createUser, createBulkUsers, updateUser, deleteUser, getUsersByFilters } =
     bindActionCreators(userActionCreators, dispatch);
 
   const [open, setOpen] = useState(false);
@@ -255,6 +255,7 @@ export const User1 = () => {
           open={open}
           handleClose={handleModalClose}
           createUser={handleCreateUserData}
+          searchUser={searchUsers}
         />
         <Button
           variant="contained"

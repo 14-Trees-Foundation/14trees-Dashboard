@@ -1,7 +1,9 @@
-import React, { useState } from 'react';
-import { Box, Button, Grid, Modal, TextField, Typography } from '@mui/material';
+import { useState } from 'react';
+import { Autocomplete, Box, Button, Grid, Modal, TextField } from '@mui/material';
+import { useAppSelector } from '../../../../redux/store/hooks';
 
-const AddUser = ({ open, handleClose, createUser }) => {
+
+const AddUser = ({ open, handleClose, createUser, searchUser }) => {
 
     const style = {
         position: 'absolute',
@@ -23,12 +25,41 @@ const AddUser = ({ open, handleClose, createUser }) => {
         dob: '',
     });
 
+    let usersList = [];
+    const usersData = useAppSelector((state) => state.searchUsersData);
+    if (usersData) {
+        usersList = Object.values(usersData);
+    }
+
     const handleChange = (event) => {
         setFormData({
             ...formData,
             [event.target.name]: event.target.value,
         });
     };
+
+    const handleEmailChange = (event, value) => {
+        let isSet = false;
+        usersList.forEach((user) => {
+            if(`${user.name} (${user.email})` === value) {
+                isSet = true;
+                setFormData({
+                    'email': user.email,
+                    'name': user.name,
+                    'phone': user.phone ?? '',
+                    'dob': user.dob ?? '',
+                })
+            }
+        })
+
+        if (!isSet) {
+            setFormData({
+                ...formData,
+                'email': value,
+            })
+            if(value.length >= 3)  searchUser(value);
+        }
+    }
 
     const handleSubmit = (event) => {
         event.preventDefault();
@@ -61,13 +92,30 @@ const AddUser = ({ open, handleClose, createUser }) => {
                                 <TextField name="phone" label="Phone" value={formData.phone} onChange={handleChange} fullWidth/>
                             </Grid>
                             <Grid item xs={12}>
-                                <TextField name="email" label="Email" value={formData.email} onChange={handleChange} fullWidth/>
+                                <Autocomplete 
+                                    fullWidth 
+                                    options={usersList} 
+                                    name='email' 
+                                    noOptionsText="No Users" 
+                                    value={formData.email} 
+                                    onInputChange={handleEmailChange} 
+                                    getOptionLabel={(option)=> option.email ? `${option.name} (${option.email})`: option}
+                                    isOptionEqualToValue={(option, value) => true}
+                                    renderInput={(params) => (
+                                        <TextField
+                                        {...params}
+                                        label="Email"
+                                        variant="outlined"
+                                        />
+                                    )}>
+                                </Autocomplete>
                             </Grid>
                             <Grid item xs={12}>
                                 <TextField name="dob" label="Date of Birth" type="date" value={formData.dob} onChange={handleChange} InputLabelProps={{ shrink: true }} fullWidth/>
                             </Grid>
                             <Grid item xs={12} sx={{display:'flex', justifyContent:'center', }}>
                                 <Button type="submit">Submit</Button>
+                                <Button onClick={handleClose}>Cancel</Button>
                             </Grid>
                         </Grid>
                     </form>
