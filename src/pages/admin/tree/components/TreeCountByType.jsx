@@ -134,7 +134,7 @@ export const TreeCountByType = () => {
           <Pie
             activeIndex={state}
             activeShape={renderActiveShape}
-            data={''}
+            data={fiilteredCount}
             cx="50%"
             cy="50%"
             innerRadius={70}
