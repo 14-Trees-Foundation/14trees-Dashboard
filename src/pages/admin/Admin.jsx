@@ -24,6 +24,8 @@ import {TreeTypeComponent} from "./treeType/TreeType";
 import { PlotComponent } from "./plot/Plot";
 import { OrganizationComponent } from "./organization/Organization";
 import { DonationComponent } from "./donation/Donation";
+import { SitesComponent } from "./sites/Sites";
+import { EventsComponent } from "./events/Events";
 
 export const Admin = () => {
   const classes = useStyles();
@@ -101,6 +103,14 @@ export const Admin = () => {
     {
       page: OrganizationComponent,
       displayName: "Organizations",
+    },
+    {
+      page: SitesComponent,
+      displayName: "Sites",
+    },
+    {
+      page: EventsComponent,
+      displayName: "Events",
     },
     {
       page: DonationComponent,

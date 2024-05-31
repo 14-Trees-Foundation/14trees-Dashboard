@@ -20,6 +20,8 @@ import { useRecoilState } from "recoil";
 import { adminNavIndex } from "../../store/adminAtoms";
 import { useAuth } from "./auth/auth";
 import VolunteerActivismIcon from '@mui/icons-material/VolunteerActivism';
+import MapIcon from '@mui/icons-material/Map';
+import FestivalIcon from '@mui/icons-material/Festival';
 
 export const AdminLeftDrawer = () => {
   const theme = useTheme();
@@ -77,6 +79,16 @@ export const AdminLeftDrawer = () => {
     {
       displayName: 'Organization',
       logo: CorporateFareIcon,
+      display: true
+    },
+    {
+      displayName: 'Sites',
+      logo: MapIcon,
+      display: true
+    },
+    {
+      displayName: 'Events',
+      logo: FestivalIcon,
       display: true
     },
     {
