@@ -302,7 +302,7 @@ export const PlotComponent = () => {
         <DialogTitle>Confirm Delete</DialogTitle>
         <DialogContent>
           <DialogContentText>
-            Do you want to delete {selectedItem?.name}?
+            Do you want to delete "{selectedItem?.name}"?
           </DialogContentText>
         </DialogContent>
         <DialogActions>

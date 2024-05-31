@@ -13,7 +13,6 @@ import {PondComponent} from "./components/AllPondTable";
 import * as Axios from "../../../api/local";
 import { Spinner } from "../../../components/Spinner";
 import { allPonds, selectedPond, pondHistory } from "../../../store/adminAtoms";
-import { PondsList } from "./components/PondsList";
 import { PondsHistory } from "./components/PondsHistory";
 
 const useStyles = makeStyles({
@@ -146,10 +145,7 @@ export const Ponds = () => {
             <Grid item xs={12}>
               <PondComponent />
             </Grid>
-            <Grid item xs={5}>
-              <PondsList />
-            </Grid>
-            <Grid item xs={7}>
+            <Grid item xs={12}>
               <PondsHistory />
             </Grid>
           </Grid>

@@ -171,6 +171,11 @@ export const TreeTypeComponent = () => {
         updateTreeType(formData);
     };
 
+    const handleCloseEditModal = () => {
+        setEditModal(false);
+        setSelectedEditRow(null);
+    };
+
     return (
         <>
             <div
@@ -243,7 +248,7 @@ export const TreeTypeComponent = () => {
                 </DialogActions>
             </Dialog>
 
-            {selectedEditRow && <EditTreeType row={selectedEditRow} openeditModal={editModal} setEditModal={setEditModal} editSubmit={handleEditSubmit} />}
+            {selectedEditRow && <EditTreeType row={selectedEditRow} openeditModal={editModal} handleCloseEditModal={handleCloseEditModal} editSubmit={handleEditSubmit} />}
         </>
     );
 };

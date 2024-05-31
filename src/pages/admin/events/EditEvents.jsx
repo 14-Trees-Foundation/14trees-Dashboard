@@ -4,11 +4,8 @@ import {
     Dialog,
     DialogActions,
     DialogContent,
-    DialogContentText,
     DialogTitle,
-    Modal,
     TextField,
-    Typography,
 } from "@mui/material";
 
 function EditEvents({ row, openeditModal, setEditModal, editSubmit }) {

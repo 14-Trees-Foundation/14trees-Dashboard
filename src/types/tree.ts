@@ -29,7 +29,7 @@ export type Tree = {
         name: string
     },
     assigned_to?: {
-        user: string
+        name: string
     },
 };
 

@@ -21,6 +21,7 @@ import {
     Typography,
 } from "@mui/material";
 import EditPond from "./EditPond";
+import { getFormattedDate } from "../../../../helpers/utils";
 
 function LoadingOverlay() {
     return (
@@ -33,6 +34,14 @@ function LoadingOverlay() {
             }}>
             <CircularProgress />
         </div>
+    );
+}
+
+function getCapacity(params: any) {
+    return (
+      parseInt(params.row.depthFt) *
+      parseInt(params.row.widthFt) *
+      parseInt(params.row.lengthFt)
     );
 }
 
@@ -171,12 +180,22 @@ export const PondComponent = () => {
             headerAlign: "center",
         },
         {
+            field: "capacity",
+            headerName: "Pond Capacity",
+            width: 150,
+            editable: true,
+            align: "center",
+            headerAlign: "center",
+            valueGetter: getCapacity,
+        },
+        {
             field: "date_added",
             headerName: "Date Added",
             width: 150,
             editable: true,
             align: "center",
             headerAlign: "center",
+            valueGetter: (params) => getFormattedDate(params.row?.date_added),
         },
         
     ];
@@ -270,7 +289,7 @@ export const PondComponent = () => {
                 <DialogTitle>Confirm Delete</DialogTitle>
                 <DialogContent>
                     <DialogContentText>
-                        Do you want to delete {selectedItem?._id}?
+                        Do you want to delete "{selectedItem?.name}"?
                     </DialogContentText>
                 </DialogContent>
                 <DialogActions>

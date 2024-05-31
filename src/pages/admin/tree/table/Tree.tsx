@@ -33,6 +33,7 @@ import EditTree from "./EditTree";
 import UserModal from "../../../../components/UserModal";
 import AssignTreeModal from "./AssignTreeModal";
 import { AssignTreeRequest } from "../../../../types/userTree";
+import { getFormattedDate } from "../../../../helpers/utils";
 
 function LoadingOverlay() {
     return (
@@ -86,11 +87,19 @@ export const TreeNew = () => {
         }, 1000);
     };
 
+    const eventTypeMap: Record< number, string> = {
+        1: "Birthday",
+        2: "In Memory of",
+        3: "General gift",
+        4: "Corporate gift",
+    }
+
     const columns: GridColumns = [
         {
             field: "action",
             headerName: "Action",
-            width: 100,
+            // width: 100,
+            // flex: 200,
             align: "center",
             headerAlign: "center",
             renderCell: (params: any) => (
@@ -113,14 +122,19 @@ export const TreeNew = () => {
                 </div>
             ),
         },
-        { field: "sapling_id", headerName: "Sapling ID", width: 150 },
-        { field: "tree_id", headerName: "Tree Name", width: 150, valueGetter: (params) => params.row?.tree?.name },
-        { field: "plot_id", headerName: "Plot Name", width: 150, valueGetter: (params) => params.row?.plot?.name },
-        { field: "date_added", headerName: "Date Added", width: 150 },
-        { field: "link", headerName: "Link", width: 150 },
-        { field: "mapped_to", headerName: "Mapped To", width: 150, valueGetter: (params) => params.row?.user?.name },
-        { field: "event_type", headerName: "Event Type", width: 150 },
-        { field: 'assigned_to', headerName: 'Assigned To', width: 150, valueGetter: (params) => params.row?.assigned_to?.user },
+        { field: "sapling_id", headerName: "Sapling ID", flex: 200 },
+        { field: "tree_id", headerName: "Tree Name", flex: 200, valueGetter: (params) => params.row?.tree?.name },
+        { field: "plot_id", headerName: "Plot Name", flex: 200, valueGetter: (params) => params.row?.plot?.name },
+        { 
+            field: "date_added", 
+            headerName: "Date Added", 
+            flex: 200, 
+            valueGetter: (params) => getFormattedDate(params.row?.date_added), 
+        },
+        { field: "link", headerName: "Event", flex: 200 },
+        { field: "mapped_to", headerName: "Mapped To", flex: 200, valueGetter: (params) => params.row?.user?.name },
+        { field: "event_type", headerName: "Event Type", flex: 200, valueGetter: (params) => params.row?.event_type ? eventTypeMap[params.row?.event_type] : ''},
+        { field: 'assigned_to', headerName: 'Assigned To', flex: 200, valueGetter: (params) => params.row?.assigned_to?.name },
     ];
 
     let treesList: Tree[] = [];
@@ -129,7 +143,6 @@ export const TreeNew = () => {
         treesList = Object.values(treesData.trees);
     }
 
-    console.log(treesList);
     type RowType = {
         id: string;
         name: string;
@@ -224,6 +237,11 @@ export const TreeNew = () => {
     const handleEditSubmit = (formData: Tree) => {
         console.log(formData);
         updateTree(formData);
+    };
+
+    const handleCloseEditModal = () => {
+        setEditModal(false);
+        setSelectedEditRow(null);
     };
 
     return (
@@ -333,7 +351,7 @@ export const TreeNew = () => {
                 <EditTree
                     row={selectedEditRow}
                     openeditModal={editModal}
-                    setEditModal={setEditModal}
+                    handleCloseEditModal={handleCloseEditModal}
                     editSubmit={handleEditSubmit}
                 />
             )}

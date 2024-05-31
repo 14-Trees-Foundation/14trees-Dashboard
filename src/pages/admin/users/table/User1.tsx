@@ -25,6 +25,7 @@ import AccountCircleRoundedIcon from '@mui/icons-material/AccountCircleRounded';
 import { Table } from 'antd'
 import type { TableColumnsType } from 'antd';
 import getColumnSearchProps from "../../../../components/Filter";
+import { getFormattedDate } from "../../../../helpers/utils";
 
 function LoadingOverlay() {
   return (
@@ -198,6 +199,7 @@ export const User1 = () => {
       key: "dob",
       title: "Date of Birth",
       width: 200,
+      render: getFormattedDate,
       ...getColumnSearchProps('dob', filters, setFilters)
     },
     {

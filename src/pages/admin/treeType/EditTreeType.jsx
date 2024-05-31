@@ -11,7 +11,7 @@ import {
     Typography,
 } from "@mui/material";
 
-function EditTreeType({row, openeditModal, setEditModal, editSubmit}) {
+function EditTreeType({row, openeditModal, handleCloseEditModal, editSubmit}) {
 
     const [formData, setFormData] = useState(row);
 
@@ -25,11 +25,11 @@ function EditTreeType({row, openeditModal, setEditModal, editSubmit}) {
     const handleEditSubmit = (event) => {
         event.preventDefault();
         editSubmit(formData);
-        setEditModal(false);
+        handleCloseEditModal(false);
     };
 
     return (
-        <Dialog open={openeditModal} onClose={() => setEditModal(false)}>
+        <Dialog open={openeditModal} onClose={() => handleCloseEditModal(false)}>
             <DialogTitle align="center">Edit Tree Type</DialogTitle>
             <form onSubmit={handleEditSubmit}>
                 <DialogContent>
@@ -108,7 +108,7 @@ function EditTreeType({row, openeditModal, setEditModal, editSubmit}) {
                     />
                 </DialogContent>
                 <DialogActions sx={{ display: 'flex', justifyContent: 'center', marginBottom:'15px'}}>
-                    <Button variant='contained' onClick={() => setEditModal(false)} color="primary">
+                    <Button variant='contained' onClick={() => handleCloseEditModal(false)} color="primary">
                         Cancel
                     </Button>
                     <Button variant='contained' type="submit" color="primary">
