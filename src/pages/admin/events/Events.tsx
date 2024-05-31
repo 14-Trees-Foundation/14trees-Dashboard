@@ -18,7 +18,7 @@ import * as treeTypeActionCreators from "../../../redux/actions/treeTypeActions"
 import { bindActionCreators } from "redux";
 import { useAppDispatch, useAppSelector } from "../../../redux/store/hooks";
 import { RootState } from "../../../redux/store/store";
-import AddTreeType from "./AddTreeType";
+import AddTreeType from "./AddEvents";
 import CircularProgress from "@mui/material/CircularProgress";
 import EditEvents from "./EditEvents";
 
@@ -45,7 +45,7 @@ export const EventsComponent = () => {
   const handleModalOpen = () => setOpen(true);
   const handleModalClose = () => setOpen(false);
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
-  const [selectedItem, setSelectedItem] = useState<TreeType | null>(null);
+  const [selectedItem, setSelectedItem] = useState<any | null>(null);
   const [selectedEditRow, setSelectedEditRow] = useState<RowType | null>(null);
   const [editModal, setEditModal] = useState(false);
   const [page, setPage] = useState(0);
@@ -76,7 +76,7 @@ export const EventsComponent = () => {
           <Button
             variant="outlined"
             style={{ margin: "0 5px" }}
-            onClick={() => handleDeleteTreeType(params.row as TreeType)}>
+            onClick={() => handleDeleteTreeType(params.row as any)}>
             <DeleteIcon />
           </Button>
         </div>
@@ -227,44 +227,27 @@ export const EventsComponent = () => {
     }
   ];
 
-  useEffect(() => {
-    getTreeTypeData();
-  }, [page]);
-
-  const getTreeTypeData = async () => {
-    setTimeout(async () => {
-      await getTreeTypes(page * 10, 10);
-    }, 1000);
-  };
-
-  let treeTypesList: TreeType[] = [];
-  const treeTypesData = useAppSelector(
-    (state: RootState) => state.treeTypesData
-  );
-  if (treeTypesData) {
-    treeTypesList = Object.values(treeTypesData.treeTypes);
-  }
-
-  const handleCreateTreeTypeData = (formData: TreeType) => {
-    console.log(formData);
-    createTreeType(formData);
-  };
 
   type RowType = {
     id: string;
     name: string;
   };
 
-  const handleDeleteTreeType = (row: TreeType) => {
+  const handleDeleteTreeType = (row: any) => {
     // console.log("Delete", row);
     setOpenDeleteModal(true);
     setSelectedItem(row);
   };
 
-  const handleEditSubmit = (formData: TreeType) => {
+  const handleEditSubmit = (formData: any) => {
     // console.log(formData);
     updateTreeType(formData);
   };
+
+  const handleCreateEventsData = (formData: any) => {
+    console.log(formData);
+    // createEvents(formData);
+};
 
   return (
     <>
@@ -283,7 +266,7 @@ export const EventsComponent = () => {
         <AddTreeType
           open={open}
           handleClose={handleModalClose}
-          createTreeData={handleCreateTreeTypeData}
+          createEvents={handleCreateEventsData}
         />
       </div>
 
@@ -315,7 +298,7 @@ export const EventsComponent = () => {
         <DialogTitle>Confirm Delete</DialogTitle>
         <DialogContent>
           <DialogContentText>
-            Do you want to delete {selectedItem?.name}?
+            Do you want to delete {selectedItem?.id}?
           </DialogContentText>
         </DialogContent>
         <DialogActions>
@@ -325,9 +308,9 @@ export const EventsComponent = () => {
           <Button
             onClick={() => {
               console.log("Deleting item...", selectedItem);
-              if (selectedItem !== null) {
-                deleteTreeType(selectedItem);
-              }
+              // if (selectedItem !== null) {
+              //   deleteTreeType(selectedItem);
+              // }
               setOpenDeleteModal(false);
             }}
             color="primary"

@@ -11,7 +11,7 @@ import {
     Typography,
 } from "@mui/material";
 
-function EditEvents({row, openeditModal, setEditModal, editSubmit}) {
+function EditEvents({ row, openeditModal, setEditModal, editSubmit }) {
 
     const [formData, setFormData] = useState(row);
 
@@ -30,11 +30,47 @@ function EditEvents({row, openeditModal, setEditModal, editSubmit}) {
 
     return (
         <Dialog open={openeditModal} onClose={() => setEditModal(false)}>
-            <DialogTitle align="center">Edit Tree Type</DialogTitle>
+            <DialogTitle align="center">Edit Event</DialogTitle>
             <form onSubmit={handleEditSubmit}>
                 <DialogContent>
                     <TextField
                         autoFocus
+                        margin="dense"
+                        name="id"
+                        label="ID"
+                        type="text"
+                        fullWidth
+                        value={formData.id}
+                        onChange={handleChange}
+                    />
+                    <TextField
+                        margin="dense"
+                        name="assigned_by"
+                        label="Assigned By"
+                        type="text"
+                        fullWidth
+                        value={formData.assigned_by}
+                        onChange={handleChange}
+                    />
+                    <TextField
+                        margin="dense"
+                        name="site_id"
+                        label="Site ID"
+                        type="text"
+                        fullWidth
+                        value={formData.site_id}
+                        onChange={handleChange}
+                    />
+                    <TextField
+                        margin="dense"
+                        name="type"
+                        label="Type"
+                        type="text"
+                        fullWidth
+                        value={formData.type}
+                        onChange={handleChange}
+                    />
+                    <TextField
                         margin="dense"
                         name="name"
                         label="Name"
@@ -45,69 +81,51 @@ function EditEvents({row, openeditModal, setEditModal, editSubmit}) {
                     />
                     <TextField
                         margin="dense"
-                        name="name_english"
-                        label="Name (English)"
+                        name="description"
+                        label="Description"
                         type="text"
                         fullWidth
-                        value={formData.name_english}
+                        value={formData.description}
                         onChange={handleChange}
                     />
                     <TextField
                         margin="dense"
-                        name="scientific_name"
-                        label="Scientific Name"
+                        name="event_location"
+                        label="Event Location"
                         type="text"
                         fullWidth
-                        value={formData.scientific_name}
+                        value={formData.event_location}
                         onChange={handleChange}
                     />
                     <TextField
                         margin="dense"
-                        name="habit"
-                        label="Habit"
+                        name="tags"
+                        label="Tags"
                         type="text"
                         fullWidth
-                        value={formData.habit}
+                        value={formData.tags}
                         onChange={handleChange}
                     />
                     <TextField
                         margin="dense"
-                        name="tree_id"
-                        label="Tree ID"
+                        name="memories"
+                        label="Memories"
                         type="text"
                         fullWidth
-                        value={formData.tree_id}
+                        value={formData.memories}
                         onChange={handleChange}
                     />
                     <TextField
                         margin="dense"
-                        name="_id"
-                        label="ID"
+                        name="event_date"
+                        label="Event Date"
                         type="text"
                         fullWidth
-                        value={formData._id}
-                        onChange={handleChange}
-                    />
-                    <TextField
-                        margin="dense"
-                        name="__v"
-                        label="Version"
-                        type="text"
-                        fullWidth
-                        value={formData.__v}
-                        onChange={handleChange}
-                    />
-                    <TextField
-                        margin="dense"
-                        name="key"
-                        label="Key"
-                        type="text"
-                        fullWidth
-                        value={formData.key}
+                        value={formData.event_date}
                         onChange={handleChange}
                     />
                 </DialogContent>
-                <DialogActions sx={{ display: 'flex', justifyContent: 'center', marginBottom:'15px'}}>
+                <DialogActions sx={{ display: 'flex', justifyContent: 'center', marginBottom: '15px' }}>
                     <Button variant='contained' onClick={() => setEditModal(false)} color="primary">
                         Cancel
                     </Button>

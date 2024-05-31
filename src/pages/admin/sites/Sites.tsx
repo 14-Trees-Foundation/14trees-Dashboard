@@ -12,6 +12,7 @@ import {
   Typography,
 } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
+import DeleteIcon from "@mui/icons-material/Delete";
 import CircularProgress from "@mui/material/CircularProgress";
 import EditSites from "./EditSites";
 
@@ -30,14 +31,12 @@ function LoadingOverlay() {
 }
 
 export const SitesComponent = () => {
-  
-
   const [open, setOpen] = useState(false);
   const handleModalOpen = () => setOpen(true);
   const handleModalClose = () => setOpen(false);
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
-//   const [selectedItem, setSelectedItem] = useState<TreeType | null>(null);
-//   const [selectedEditRow, setSelectedEditRow] = useState<RowType | null>(null);
+  const [selectedItem, setSelectedItem] = useState<any | null>(null);
+  const [selectedEditRow, setSelectedEditRow] = useState<any | null>(null);
   const [editModal, setEditModal] = useState(false);
   const [page, setPage] = useState(0);
 
@@ -45,7 +44,7 @@ export const SitesComponent = () => {
     {
       field: "action",
       headerName: "Action",
-      width: 120,
+      width: 150,
       align: "center",
       headerAlign: "center",
       renderCell: (params: any) => (
@@ -59,10 +58,16 @@ export const SitesComponent = () => {
             variant="outlined"
             style={{ margin: "0 5px" }}
             onClick={() => {
-            //   setSelectedEditRow(params.row);
+              setSelectedEditRow(params.row);
               setEditModal(true);
             }}>
             <EditIcon />
+          </Button>
+          <Button
+            variant="outlined"
+            style={{ margin: "0 5px" }}
+            onClick={() => handleDeleteSites(params.row as any)}>
+            <DeleteIcon />
           </Button>
         </div>
       ),
@@ -70,7 +75,7 @@ export const SitesComponent = () => {
     {
       field: "id",
       headerName: "ID",
-      width: 90,
+      width: 70,
       align: "center",
       headerAlign: "center",
     },
@@ -309,161 +314,175 @@ export const SitesComponent = () => {
 
   const data = [
     {
-      "id": 1,
-      "name_marathi": "चास कमान धरण ते कडधे रस्ता",
-      "name_english": "Chas Kaman Dam To Kadadhe Road",
-      "owner": "Gram Panchayat (ग्राम पंचायत)",
-      "land_type": "Roadside (रस्ता)",
-      "land_strata": "Roadside (रस्ता काठ)",
-      "district": "Pune (पुणे)",
-      "taluka": "Khed (खेड)",
-      "village": "Kadadhe (कडधे)",
-      "area_acres": null,
-      "length_km": "0.84",
-      "tree_count": "124",
-      "unique_id": "PUB/KADAD/ROAD/0002",
-      "photo_album": "https://photos.app.goo.gl/1FXj7n3SsWMumiNq6",
-      "consent_letter": "14T - ग्राम पंचायत पत्र",
-      "grove_type": "14 T - Roadside",
-      "map_to": "#N/A",
-      "notion_db_pictures": "Combined record for Kadadhe in dB Pictures",
-      "split_village_name_1": "Kadadhe",
-      "split_village_name_2": null,
-      "create_id": "PUB/KADAD/ROAD/0002",
-      "site_key": "(कडधे)-(रस्ता)-(चास कमान धरण ते कडधे रस्ता)",
-      "site_key_2": "(कडधे)-(रस्ता)",
-      "temp_backup_copy_of_old_site_name_english_marathi": "Chas Kaman dam te Kadadhe rasta(चास कमान धरण ते कडधे रस्ता) ",
-      "temp_copy_of_old_site_key": "(कडधे)-(रस्ता)-(चास कमान धरण ते कडधे रस्ता)",
-      "temp_old_site_name_in_english": "Chas Kaman dam te Kadadhe rasta",
-      "temp_old_site_name_in_marathi": "चास कमान धरण ते कडधे रस्ता",
-      "created_at": "2021-09-16T12:39:00.000Z",
-      "updated_at": "2021-09-16T12:39:00.000Z"
+      id: 1,
+      name_marathi: "चास कमान धरण ते कडधे रस्ता",
+      name_english: "Chas Kaman Dam To Kadadhe Road",
+      owner: "Gram Panchayat (ग्राम पंचायत)",
+      land_type: "Roadside (रस्ता)",
+      land_strata: "Roadside (रस्ता काठ)",
+      district: "Pune (पुणे)",
+      taluka: "Khed (खेड)",
+      village: "Kadadhe (कडधे)",
+      area_acres: null,
+      length_km: "0.84",
+      tree_count: "124",
+      unique_id: "PUB/KADAD/ROAD/0002",
+      photo_album: "https://photos.app.goo.gl/1FXj7n3SsWMumiNq6",
+      consent_letter: "14T - ग्राम पंचायत पत्र",
+      grove_type: "14 T - Roadside",
+      map_to: "#N/A",
+      notion_db_pictures: "Combined record for Kadadhe in dB Pictures",
+      split_village_name_1: "Kadadhe",
+      split_village_name_2: null,
+      create_id: "PUB/KADAD/ROAD/0002",
+      site_key: "(कडधे)-(रस्ता)-(चास कमान धरण ते कडधे रस्ता)",
+      site_key_2: "(कडधे)-(रस्ता)",
+      temp_backup_copy_of_old_site_name_english_marathi:
+        "Chas Kaman dam te Kadadhe rasta(चास कमान धरण ते कडधे रस्ता) ",
+      temp_copy_of_old_site_key: "(कडधे)-(रस्ता)-(चास कमान धरण ते कडधे रस्ता)",
+      temp_old_site_name_in_english: "Chas Kaman dam te Kadadhe rasta",
+      temp_old_site_name_in_marathi: "चास कमान धरण ते कडधे रस्ता",
+      created_at: "2021-09-16T12:39:00.000Z",
+      updated_at: "2021-09-16T12:39:00.000Z",
     },
     {
-      "id": 2,
-      "name_marathi": "मंदिर रस्ता कडधे",
-      "name_english": "Temple Road Kadadhe",
-      "owner": "Gram Panchayat (ग्राम पंचायत)",
-      "land_type": "Roadside (रस्ता)",
-      "land_strata": "Roadside (रस्ता काठ)",
-      "district": "Pune (पुणे)",
-      "taluka": "Khed (खेड)",
-      "village": "Kadadhe (कडधे)",
-      "area_acres": null,
-      "length_km": "0.2",
-      "tree_count": null,
-      "unique_id": "PUB/KADAD/ROAD/0003",
-      "photo_album": "https://photos.app.goo.gl/1FXj7n3SsWMumiNq6",
-      "consent_letter": "14T - ग्राम पंचायत पत्र",
-      "grove_type": "14 T - Roadside",
-      "map_to": "#N/A",
-      "notion_db_pictures": "Combined record for Kadadhe in dB Pictures",
-      "split_village_name_1": "Kadadhe",
-      "split_village_name_2": null,
-      "create_id": "PUB/KADAD/ROAD/0003",
-      "site_key": "(कडधे)-(रस्ता)-(मंदिर रस्ता कडधे)",
-      "site_key_2": "(कडधे)-(रस्ता)",
-      "temp_backup_copy_of_old_site_name_english_marathi": "Mandir rasta Kadadhe(मंदिर रस्ता कडधे) ",
-      "temp_copy_of_old_site_key": "(कडधे)-(रस्ता)-(मंदिर रस्ता कडधे)",
-      "temp_old_site_name_in_english": "Mandir rasta Kadadhe",
-      "temp_old_site_name_in_marathi": "मंदिर रस्ता कडधे",
-      "created_at": "2021-09-16T12:44:54.000Z",
-      "updated_at": "2021-09-16T12:44:54.000Z"
+      id: 2,
+      name_marathi: "मंदिर रस्ता कडधे",
+      name_english: "Temple Road Kadadhe",
+      owner: "Gram Panchayat (ग्राम पंचायत)",
+      land_type: "Roadside (रस्ता)",
+      land_strata: "Roadside (रस्ता काठ)",
+      district: "Pune (पुणे)",
+      taluka: "Khed (खेड)",
+      village: "Kadadhe (कडधे)",
+      area_acres: null,
+      length_km: "0.2",
+      tree_count: null,
+      unique_id: "PUB/KADAD/ROAD/0003",
+      photo_album: "https://photos.app.goo.gl/1FXj7n3SsWMumiNq6",
+      consent_letter: "14T - ग्राम पंचायत पत्र",
+      grove_type: "14 T - Roadside",
+      map_to: "#N/A",
+      notion_db_pictures: "Combined record for Kadadhe in dB Pictures",
+      split_village_name_1: "Kadadhe",
+      split_village_name_2: null,
+      create_id: "PUB/KADAD/ROAD/0003",
+      site_key: "(कडधे)-(रस्ता)-(मंदिर रस्ता कडधे)",
+      site_key_2: "(कडधे)-(रस्ता)",
+      temp_backup_copy_of_old_site_name_english_marathi:
+        "Mandir rasta Kadadhe(मंदिर रस्ता कडधे) ",
+      temp_copy_of_old_site_key: "(कडधे)-(रस्ता)-(मंदिर रस्ता कडधे)",
+      temp_old_site_name_in_english: "Mandir rasta Kadadhe",
+      temp_old_site_name_in_marathi: "मंदिर रस्ता कडधे",
+      created_at: "2021-09-16T12:44:54.000Z",
+      updated_at: "2021-09-16T12:44:54.000Z",
     },
     {
-      "id": 3,
-      "name_marathi": "खंडोबा मंदिर पटांगण कडधे",
-      "name_english": "Khandoba Temple Ground Kadadhe",
-      "owner": "NGO (संस्था)",
-      "land_type": "Temple (मंदिर, मस्जिद)",
-      "land_strata": "Soil (माती)",
-      "district": "Pune (पुणे)",
-      "taluka": "Khed (खेड)",
-      "village": "Kadadhe (कडधे)",
-      "area_acres": null,
-      "length_km": null,
-      "tree_count": null,
-      "unique_id": "PUB/KADAD/TEMP/0004",
-      "photo_album": "https://photos.app.goo.gl/jjSj9Q2AnKM6GFuUA",
-      "consent_letter": "14T - ग्राम पंचायत पत्र",
-      "grove_type": "Sacred grove",
-      "map_to": "#N/A",
-      "notion_db_pictures": "Combined record for Kadadhe in dB Pictures",
-      "split_village_name_1": "Kadadhe",
-      "split_village_name_2": null,
-      "create_id": "PUB/KADAD/TEMP/0004",
-      "site_key": "(कडधे)-(मंदिर, मस्जिद)-(खंडोबा मंदिर पटांगण कडधे)",
-      "site_key_2": "(कडधे)-(मंदिर, मस्जिद)",
-      "temp_backup_copy_of_old_site_name_english_marathi": "Khandoba Mandir Patangan Kadadhe(खंडोबा मंदिर पटांगण कडधे) ",
-      "temp_copy_of_old_site_key": "(कडधे)-(मंदिर, मस्जिद)-(खंडोबा मंदिर पटांगण कडधे)",
-      "temp_old_site_name_in_english": "Khandoba Mandir Patangan Kadadhe",
-      "temp_old_site_name_in_marathi": "खंडोबा मंदिर पटांगण कडधे",
-      "created_at": "2021-09-16T12:50:48.000Z",
-      "updated_at": "2021-09-16T12:50:48.000Z"
+      id: 3,
+      name_marathi: "खंडोबा मंदिर पटांगण कडधे",
+      name_english: "Khandoba Temple Ground Kadadhe",
+      owner: "NGO (संस्था)",
+      land_type: "Temple (मंदिर, मस्जिद)",
+      land_strata: "Soil (माती)",
+      district: "Pune (पुणे)",
+      taluka: "Khed (खेड)",
+      village: "Kadadhe (कडधे)",
+      area_acres: null,
+      length_km: null,
+      tree_count: null,
+      unique_id: "PUB/KADAD/TEMP/0004",
+      photo_album: "https://photos.app.goo.gl/jjSj9Q2AnKM6GFuUA",
+      consent_letter: "14T - ग्राम पंचायत पत्र",
+      grove_type: "Sacred grove",
+      map_to: "#N/A",
+      notion_db_pictures: "Combined record for Kadadhe in dB Pictures",
+      split_village_name_1: "Kadadhe",
+      split_village_name_2: null,
+      create_id: "PUB/KADAD/TEMP/0004",
+      site_key: "(कडधे)-(मंदिर, मस्जिद)-(खंडोबा मंदिर पटांगण कडधे)",
+      site_key_2: "(कडधे)-(मंदिर, मस्जिद)",
+      temp_backup_copy_of_old_site_name_english_marathi:
+        "Khandoba Mandir Patangan Kadadhe(खंडोबा मंदिर पटांगण कडधे) ",
+      temp_copy_of_old_site_key:
+        "(कडधे)-(मंदिर, मस्जिद)-(खंडोबा मंदिर पटांगण कडधे)",
+      temp_old_site_name_in_english: "Khandoba Mandir Patangan Kadadhe",
+      temp_old_site_name_in_marathi: "खंडोबा मंदिर पटांगण कडधे",
+      created_at: "2021-09-16T12:50:48.000Z",
+      updated_at: "2021-09-16T12:50:48.000Z",
     },
     {
-      "id": 4,
-      "name_marathi": "कान्हेवाडी स्मशानभूमी रस्ता",
-      "name_english": "Kanhewadi Smashanbhumi Road",
-      "owner": "Gram Panchayat (ग्राम पंचायत)",
-      "land_type": "Roadside (रस्ता)",
-      "land_strata": "Roadside (रस्ता काठ)",
-      "district": "Pune (पुणे)",
-      "taluka": "Khed (खेड)",
-      "village": "Kanhewadi (कान्हेवाडी)",
-      "area_acres": null,
-      "length_km": null,
-      "tree_count": null,
-      "unique_id": "PUB/KANHE/ROAD/0005",
-      "photo_album": "https://photos.app.goo.gl/nTzaixgWPihSSkLg9",
-      "consent_letter": "14T - ग्राम पंचायत पत्र",
-      "grove_type": "14 T - Roadside",
-      "map_to": "#N/A",
-      "notion_db_pictures": "Combined record for Kanhevadi in dB Pictures",
-      "split_village_name_1": "Kanhewadi",
-      "split_village_name_2": null,
-      "create_id": "PUB/KANHE/ROAD/0005",
-      "site_key": "(कान्हेवाडी)-(रस्ता)-(कान्हेवाडी स्मशानभूमी रस्ता)",
-      "site_key_2": "(कान्हेवाडी)-(रस्ता)",
-      "temp_backup_copy_of_old_site_name_english_marathi": "Kanhevadi Smashanbhumi Rasta(कान्हेवाडी स्मशानभूमी रस्ता) ",
-      "temp_copy_of_old_site_key": "(कान्हेवाडी)-(श्मशान भूमी, कब्रिस्तान)-(कान्हेवाडी स्मशानभूमी रस्ता)",
-      "temp_old_site_name_in_english": "Kanhevadi Smashanbhumi Rasta",
-      "temp_old_site_name_in_marathi": "कान्हेवाडी स्मशानभूमी रस्ता",
-      "created_at": "2021-09-16T12:52:17.000Z",
-      "updated_at": "2021-09-16T12:52:17.000Z"
+      id: 4,
+      name_marathi: "कान्हेवाडी स्मशानभूमी रस्ता",
+      name_english: "Kanhewadi Smashanbhumi Road",
+      owner: "Gram Panchayat (ग्राम पंचायत)",
+      land_type: "Roadside (रस्ता)",
+      land_strata: "Roadside (रस्ता काठ)",
+      district: "Pune (पुणे)",
+      taluka: "Khed (खेड)",
+      village: "Kanhewadi (कान्हेवाडी)",
+      area_acres: null,
+      length_km: null,
+      tree_count: null,
+      unique_id: "PUB/KANHE/ROAD/0005",
+      photo_album: "https://photos.app.goo.gl/nTzaixgWPihSSkLg9",
+      consent_letter: "14T - ग्राम पंचायत पत्र",
+      grove_type: "14 T - Roadside",
+      map_to: "#N/A",
+      notion_db_pictures: "Combined record for Kanhevadi in dB Pictures",
+      split_village_name_1: "Kanhewadi",
+      split_village_name_2: null,
+      create_id: "PUB/KANHE/ROAD/0005",
+      site_key: "(कान्हेवाडी)-(रस्ता)-(कान्हेवाडी स्मशानभूमी रस्ता)",
+      site_key_2: "(कान्हेवाडी)-(रस्ता)",
+      temp_backup_copy_of_old_site_name_english_marathi:
+        "Kanhevadi Smashanbhumi Rasta(कान्हेवाडी स्मशानभूमी रस्ता) ",
+      temp_copy_of_old_site_key:
+        "(कान्हेवाडी)-(श्मशान भूमी, कब्रिस्तान)-(कान्हेवाडी स्मशानभूमी रस्ता)",
+      temp_old_site_name_in_english: "Kanhevadi Smashanbhumi Rasta",
+      temp_old_site_name_in_marathi: "कान्हेवाडी स्मशानभूमी रस्ता",
+      created_at: "2021-09-16T12:52:17.000Z",
+      updated_at: "2021-09-16T12:52:17.000Z",
     },
     {
-      "id": 5,
-      "name_marathi": "कान्हेवाडी सहाणेवस्ती रस्ता",
-      "name_english": "Kanhewadi Sahanevasti Road",
-      "owner": "Gram Panchayat (ग्राम पंचायत)",
-      "land_type": "Roadside (रस्ता)",
-      "land_strata": "Roadside (रस्ता काठ)",
-      "district": "Pune (पुणे)",
-      "taluka": "Khed (खेड)",
-      "village": "Kanhewadi (कान्हेवाडी)",
-      "area_acres": null,
-      "length_km": "0.415",
-      "tree_count": null,
-      "unique_id": "PUB/KANHE/ROAD/0006",
-      "photo_album": "https://photos.app.goo.gl/nTzaixgWPihSSkLg9",
-      "consent_letter": "14T - ग्राम पंचायत पत्र",
-      "grove_type": "14 T - Roadside",
-      "map_to": "#N/A",
-      "notion_db_pictures": "Combined record for Kanhevadi in dB Pictures",
-      "split_village_name_1": "Kanhewadi",
-      "split_village_name_2": null,
-      "create_id": "PUB/KANHE/ROAD/0006",
-      "site_key": "(कान्हेवाडी)-(रस्ता)-(कान्हेवाडी सहाणेवस्ती रस्ता)",
-      "site_key_2": "(कान्हेवाडी)-(रस्ता)",
-      "temp_backup_copy_of_old_site_name_english_marathi": "Kanhevadi Sahanevasti Rasta(कान्हेवाडी सहाणेवस्ती रस्ता) ",
-      "temp_copy_of_old_site_key": "(कान्हेवाडी)-(रस्ता)-(कान्हेवाडी सहाणेवस्ती रस्ता)",
-      "temp_old_site_name_in_english": "Kanhevadi Sahanevasti Rasta",
-      "temp_old_site_name_in_marathi": "कान्हेवाडी सहाणेवस्ती रस्ता",
-      "created_at": "2021-09-16T12:55:10.000Z",
-      "updated_at": "2021-09-16T12:55:10.000Z"
-    }
+      id: 5,
+      name_marathi: "कान्हेवाडी सहाणेवस्ती रस्ता",
+      name_english: "Kanhewadi Sahanevasti Road",
+      owner: "Gram Panchayat (ग्राम पंचायत)",
+      land_type: "Roadside (रस्ता)",
+      land_strata: "Roadside (रस्ता काठ)",
+      district: "Pune (पुणे)",
+      taluka: "Khed (खेड)",
+      village: "Kanhewadi (कान्हेवाडी)",
+      area_acres: null,
+      length_km: "0.415",
+      tree_count: null,
+      unique_id: "PUB/KANHE/ROAD/0006",
+      photo_album: "https://photos.app.goo.gl/nTzaixgWPihSSkLg9",
+      consent_letter: "14T - ग्राम पंचायत पत्र",
+      grove_type: "14 T - Roadside",
+      map_to: "#N/A",
+      notion_db_pictures: "Combined record for Kanhevadi in dB Pictures",
+      split_village_name_1: "Kanhewadi",
+      split_village_name_2: null,
+      create_id: "PUB/KANHE/ROAD/0006",
+      site_key: "(कान्हेवाडी)-(रस्ता)-(कान्हेवाडी सहाणेवस्ती रस्ता)",
+      site_key_2: "(कान्हेवाडी)-(रस्ता)",
+      temp_backup_copy_of_old_site_name_english_marathi:
+        "Kanhevadi Sahanevasti Rasta(कान्हेवाडी सहाणेवस्ती रस्ता) ",
+      temp_copy_of_old_site_key:
+        "(कान्हेवाडी)-(रस्ता)-(कान्हेवाडी सहाणेवस्ती रस्ता)",
+      temp_old_site_name_in_english: "Kanhevadi Sahanevasti Rasta",
+      temp_old_site_name_in_marathi: "कान्हेवाडी सहाणेवस्ती रस्ता",
+      created_at: "2021-09-16T12:55:10.000Z",
+      updated_at: "2021-09-16T12:55:10.000Z",
+    },
   ];
+
+  const handleDeleteSites = (row: any) => {
+    // console.log("Delete", row);
+    setOpenDeleteModal(true);
+    setSelectedItem(row);
+  };
 
   const handleEditSubmit = (formData: any) => {
     console.log(formData);
@@ -471,12 +490,11 @@ export const SitesComponent = () => {
 
   return (
     <>
-
       <Box sx={{ height: 540, width: "100%" }}>
         <DataGrid
           rows={data}
           columns={columns}
-        //   getRowId={(row) => row._id}
+          //   getRowId={(row) => row._id}
           initialState={{
             pagination: {
               page: 0,
@@ -486,7 +504,7 @@ export const SitesComponent = () => {
           onPageChange={(page) => {
             if (data.length < (page + 1) * 10) setPage(page);
           }}
-        //   rowCount={data}
+          //   rowCount={data}
           checkboxSelection
           disableSelectionOnClick
           components={{
@@ -496,14 +514,40 @@ export const SitesComponent = () => {
         />
       </Box>
 
-      {/* {selectedEditRow && (
+      <Dialog open={openDeleteModal} onClose={() => setOpenDeleteModal(false)}>
+        <DialogTitle>Confirm Delete</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Do you want to delete {selectedItem?.name_english}?
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setOpenDeleteModal(false)} color="primary">
+            Cancel
+          </Button>
+          <Button
+            onClick={() => {
+              console.log("Deleting item...", selectedItem);
+              // if (selectedItem !== null) {
+              //   deleteTreeType(selectedItem);
+              // }
+              setOpenDeleteModal(false);
+            }}
+            color="primary"
+            autoFocus>
+            Yes
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {selectedEditRow && (
         <EditSites
           row={selectedEditRow}
           openeditModal={editModal}
           setEditModal={setEditModal}
           editSubmit={handleEditSubmit}
         />
-      )} */}
+      )}
     </>
   );
 };
