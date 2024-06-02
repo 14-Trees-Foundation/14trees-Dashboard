@@ -61,7 +61,8 @@ export const TreeTypeComponent = () => {
         {
             field: "name",
             headerName: "Name",
-            width: 220,
+            width: 300,
+            flex: 1,
             editable: true,
             align: "center",
             headerAlign: "center",
@@ -69,7 +70,8 @@ export const TreeTypeComponent = () => {
         {
             field: "name_english",
             headerName: "Name (English)",
-            width: 150,
+            // width: 150,
+            flex: 1,
             editable: true,
             align: "center",
             headerAlign: "center",
@@ -77,7 +79,8 @@ export const TreeTypeComponent = () => {
         {
             field: "tree_id",
             headerName: "Tree ID",
-            width: 120,
+            // width: 120,
+            flex: 1,
             editable: true,
             align: "center",
             headerAlign: "center",
@@ -85,7 +88,8 @@ export const TreeTypeComponent = () => {
         {
             field: "scientific_name",
             headerName: "Scientific Name",
-            width: 150,
+            width: 300,
+            flex: 1,
             editable: true,
             align: "center",
             headerAlign: "center",
@@ -93,7 +97,8 @@ export const TreeTypeComponent = () => {
         {
             field: "habit",
             headerName: "Habit",
-            width: 150,
+            // width: 150,
+            flex: 1,
             editable: true,
             align: "center",
             headerAlign: "center",
@@ -101,7 +106,8 @@ export const TreeTypeComponent = () => {
         {
             field: "action",
             headerName: "Action",
-            width: 250,
+            // width: 250,
+            flex: 1,
             align: "center",
             headerAlign: "center",
             renderCell: (params: any) => (

@@ -31,12 +31,12 @@ ReactDOM.render(
         borderRadius: 5,
 
         // Alias Token
-        colorBgContainer: '#9AA59D',
+        colorBgContainer: '#B9C0AB1C',
       },
       components: {
         Button: {
           colorPrimary: '#000000',
-          colorBgContainer: '#669471',
+          colorBgContainer: '#9BC53D',
           algorithm: true,
           borderRadius: 4,
         },

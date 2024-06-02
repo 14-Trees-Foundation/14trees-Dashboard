@@ -4,16 +4,26 @@ import {
     Dialog,
     DialogActions,
     DialogContent,
-    DialogContentText,
+    Autocomplete,
     DialogTitle,
-    Modal,
     TextField,
-    Typography,
 } from "@mui/material";
+
+import * as treeTypeActionCreators from "../../../../redux/actions/treeTypeActions";
+import * as plotActionCreators from "../../../../redux/actions/plotActions";
+import { useAppDispatch, useAppSelector } from '../../../../redux/store/hooks';
+import { bindActionCreators } from '@reduxjs/toolkit';
 
 function EditTree({ row, openeditModal, handleCloseEditModal, editSubmit }) {
 
+    const dispatch = useAppDispatch();
+    const { getTreeTypes } =
+        bindActionCreators(treeTypeActionCreators, dispatch);
+    const { getPlots } =
+        bindActionCreators(plotActionCreators, dispatch);
+
     const [formData, setFormData] = useState(row);
+    const [page, setPage] = useState(0);
     const handleChange = (event) => {
         const { name, value } = event.target;
         setFormData(prevState => {
@@ -27,14 +37,63 @@ function EditTree({ row, openeditModal, handleCloseEditModal, editSubmit }) {
         });
     };
 
+    console.log(formData);
+
     const handleEditSubmit = (event) => {
         event.preventDefault();
         editSubmit(formData);
         handleCloseEditModal();
     };
 
+    const getTreeTypeData = async () => {
+        setTimeout(async () => {
+            await getTreeTypes(page*10, 10);
+        }, 1000);
+    };
+
+    let treeTypesList = [];
+    const treeTypesData = useAppSelector((state) => state.treeTypesData);
+    if (treeTypesData) {
+        treeTypesList = Object.values(treeTypesData.treeTypes);
+    }
+
+    if (treeTypesList.length === 0) {
+        getTreeTypeData();
+    }
+
+    const getPlotData = async () => {
+        setTimeout(async () => {
+            await getPlots(page*10, 10);
+        }, 1000);
+    };
+
+    let plotsList = [];
+    const plotsData = useAppSelector((state) => state.plotsData);
+    if (plotsData) {
+        plotsList = Object.values(plotsData.plots);
+    }
+
+    if (plotsList.length === 0) {
+        getPlotData();
+    }
+
+    const eventType = [
+        {id: "1", label: "Birthday"},
+        {id: "2", label: "In Memory of"},
+        {id: "3", label: "General gift"},
+        {id: "4", label: "Corporate gift"},
+    ]
+
+    const eventTypeMap = {
+        "1": "Birthday",
+        "2": "In Memory of",
+        "3": "General gift",
+        "4": "Corporate gift",
+    }
+
+
     return (
-        <Dialog open={openeditModal} onClose={handleCloseEditModal}>
+        <Dialog fullWidth open={openeditModal} onClose={handleCloseEditModal}>
             <DialogTitle align="center">Edit Tree</DialogTitle>
             <form onSubmit={handleEditSubmit}>
                 <DialogContent>
@@ -48,73 +107,43 @@ function EditTree({ row, openeditModal, handleCloseEditModal, editSubmit }) {
                         value={formData.sapling_id}
                         onChange={handleChange}
                     />
-                    <TextField
-                        autoFocus
-                        margin="dense"
-                        name="tree_id._id"
-                        label="Tree ID"
-                        type="text"
+                    <Autocomplete 
                         fullWidth
-                        value={formData.tree_id}
-                        onChange={handleChange}
+                        name="tree_id"
+                        disablePortal
+                        options={treeTypesList}
+                        renderInput={(params) => <TextField {...params} margin="dense" label="Tree Type" />}
+                        onChange={(event, value) => { if (value !== null) setFormData(prevState => ({ ...prevState, 'tree_id': value._id }))}}
+                        getOptionLabel={(option) => (option.name)}
                     />
-                    <TextField
-                        margin="dense"
+                    <Autocomplete 
+                        fullWidth
                         name="plot_id"
-                        label="Plot ID"
-                        type="text"
-                        fullWidth
-                        value={formData.plot_id}
-                        onChange={handleChange}
-                    />
-                    <TextField
-                        margin="dense"
-                        name="date_added"
-                        label="Date Added"
-                        type="text"
-                        fullWidth
-                        value={formData.date_added}
-                        onChange={handleChange}
+                        disablePortal
+                        options={plotsList}
+                        renderInput={(params) => <TextField {...params} margin="dense" label="Plot" />}
+                        onChange={(event, value) => { if (value !== null) setFormData(prevState => ({ ...prevState, 'plot_id': value._id }))}}
+                        getOptionLabel={(option) => (option.name)}
                     />
                     <TextField
                         autoFocus
                         margin="dense"
                         name="link"
-                        label="Link"
+                        label="Event"
                         type="text"
                         fullWidth
                         value={formData.link}
                         onChange={handleChange}
                     />
-                    <TextField
-                        autoFocus
-                        margin="dense"
-                        name="mapped_to"
-                        label="Mapped To"
-                        type="text"
+                    <Autocomplete 
                         fullWidth
-                        value={formData.mapped_to}
-                        onChange={handleChange}
-                    />
-                    <TextField
-                        autoFocus
-                        margin="dense"
                         name="event_type"
-                        label="Event Type"
-                        type="text"
-                        fullWidth
-                        value={formData.event_type}
-                        onChange={handleChange}
-                    />
-                    <TextField
-                        autoFocus
-                        margin="dense"
-                        name="date_assigned"
-                        label="Date Assigned"
-                        type="text"
-                        fullWidth
-                        value={formData.date_assigned}
-                        onChange={handleChange}
+                        disablePortal
+                        options={eventType}
+                        value={formData.event_type ? {id: formData.event_type, label: eventTypeMap[formData.event_type]} : null}
+                        renderInput={(params) => <TextField {...params} margin="dense" label="Event Type" />}
+                        onChange={(event, value) => { if (value !== null) setFormData(prevState => ({ ...prevState, 'event_type': value.id }))}}
+                        getOptionLabel={(option) => option.label}
                     />
                 </DialogContent>
                 <DialogActions sx={{ display: 'flex', justifyContent: 'center', marginBottom: '15px' }}>

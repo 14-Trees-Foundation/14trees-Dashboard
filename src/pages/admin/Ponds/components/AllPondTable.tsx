@@ -72,7 +72,7 @@ export const PondComponent = () => {
         {
             field: "action",
             headerName: "Action",
-            width: 100,
+            width: 150,
             align: "center",
             headerAlign: "center",
             renderCell: (params: any) => (
@@ -83,8 +83,8 @@ export const PondComponent = () => {
                         alignItems: "center",
                     }}>
                     <Button
-                        // variant="outlined"
-                        // style={{ margin: "0 5px" }}
+                        variant="outlined"
+                        style={{ margin: "0 5px" }}
                         onClick={() => {
                             setSelectedEditRow(params.row);
                             setEditModal(true);
@@ -92,8 +92,8 @@ export const PondComponent = () => {
                         <EditIcon />
                     </Button>
                     <Button
-                        // variant="outlined"
-                        // style={{ margin: "0 5px" }}
+                        variant="outlined"
+                        style={{ margin: "0 5px" }}
                         onClick={() => handleDelete(params.row as Pond)}>
                         <DeleteIcon />
                     </Button>

@@ -98,7 +98,7 @@ export const TreeNew = () => {
         {
             field: "action",
             headerName: "Action",
-            // width: 100,
+            width: 150,
             // flex: 200,
             align: "center",
             headerAlign: "center",
@@ -110,31 +110,35 @@ export const TreeNew = () => {
                         alignItems: "center",
                     }}>
                     <Button
+                        variant="outlined"
+                        style={{ margin: "0 5px" }}
                         onClick={() => {
                             setSelectedEditRow(params.row);
                             setEditModal(true);
                         }}>
                         <EditIcon />
                     </Button>
-                    <Button onClick={() => handleDelete(params.row)}>
+                    <Button 
+                        variant="outlined"
+                        style={{ margin: "0 5px" }}
+                        onClick={() => handleDelete(params.row)}>
                         <DeleteIcon />
                     </Button>
                 </div>
             ),
         },
-        { field: "sapling_id", headerName: "Sapling ID", flex: 200 },
-        { field: "tree_id", headerName: "Tree Name", flex: 200, valueGetter: (params) => params.row?.tree?.name },
-        { field: "plot_id", headerName: "Plot Name", flex: 200, valueGetter: (params) => params.row?.plot?.name },
+        { field: "sapling_id", headerName: "Sapling ID" },
+        { field: "tree_id", headerName: "Tree Name", width: 200, valueGetter: (params) => params.row?.tree?.name },
+        { field: "plot_id", headerName: "Plot Name", width: 350, valueGetter: (params) => params.row?.plot?.name },
         { 
             field: "date_added", 
             headerName: "Date Added", 
-            flex: 200, 
             valueGetter: (params) => getFormattedDate(params.row?.date_added), 
         },
-        { field: "link", headerName: "Event", flex: 200 },
-        { field: "mapped_to", headerName: "Mapped To", flex: 200, valueGetter: (params) => params.row?.user?.name },
-        { field: "event_type", headerName: "Event Type", flex: 200, valueGetter: (params) => params.row?.event_type ? eventTypeMap[params.row?.event_type] : ''},
-        { field: 'assigned_to', headerName: 'Assigned To', flex: 200, valueGetter: (params) => params.row?.assigned_to?.name },
+        { field: "link", headerName: "Event" },
+        { field: "mapped_to", headerName: "Mapped To", width: 250, valueGetter: (params) => params.row?.user?.name },
+        { field: "event_type", headerName: "Event Type", width: 150, valueGetter: (params) => params.row?.event_type ? eventTypeMap[params.row?.event_type] : ''},
+        { field: 'assigned_to', headerName: 'Assigned To', width: 250, valueGetter: (params) => params.row?.assigned_to?.name },
     ];
 
     let treesList: Tree[] = [];

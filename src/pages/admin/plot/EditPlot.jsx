@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import {
+    Autocomplete,
     Button,
     Dialog,
     DialogActions,
@@ -28,21 +29,22 @@ function EditPond({ row, openeditModal, setEditModal, editSubmit }) {
         setEditModal(false);
     };
 
+    const categoriesList = [
+        {id: "6543803d302fc2b6520a9bac", label: "Foundation"},
+        {id: "6543803d302fc2b6520a9bab", label: "Public"},
+    ]
+
+    const categoriesMap = {
+        "6543803d302fc2b6520a9bac": "Foundation",
+        "6543803d302fc2b6520a9bab": "Public",
+    }
+
 
     return (
         <Dialog open={openeditModal} onClose={() => setEditModal(false)}>
             <DialogTitle align="center">Edit Plot</DialogTitle>
             <form onSubmit={handleEditSubmit}>
                 <DialogContent>
-                <TextField
-                    name="_id"
-                    label="ID"
-                    value={formData._id}
-                    onChange={handleChange}
-                    fullWidth
-                    margin="dense"
-                    disabled
-                />
                 <TextField
                     name="name"
                     label="Name"
@@ -59,22 +61,24 @@ function EditPond({ row, openeditModal, setEditModal, editSubmit }) {
                     fullWidth
                     margin="dense"
                 />
-                <TextField
-                    name="category"
-                    label="Category"
-                    value={formData.category}
-                    onChange={handleChange}
+                <Autocomplete
                     fullWidth
-                    margin="dense"
+                    name="category"
+                    disablePortal
+                    options={categoriesList}
+                    value={formData.category ? { id: formData.category, label: categoriesMap[formData.category] } : null}
+                    renderInput={(params) => <TextField {...params} margin="dense" label="Category" />}
+                    onChange={(event, value) => { if (value !== null) setFormData(prevState => ({ ...prevState, 'category': value.id }))}}
+                    getOptionLabel={(option) => (option.label)}
                 />
-                <TextField
+                {/* <TextField
                     name="district"
                     label="District"
                     value={formData.district}
                     onChange={handleChange}
                     fullWidth
                     margin="dense"
-                />
+                /> */}
                 <TextField
                     name="gat"
                     label="Gat"
@@ -83,15 +87,15 @@ function EditPond({ row, openeditModal, setEditModal, editSubmit }) {
                     fullWidth
                     margin="dense"
                 />
-                <TextField
+                {/* <TextField
                     name="land_type"
                     label="Land Type"
                     value={formData.land_type}
                     onChange={handleChange}
                     fullWidth
                     margin="dense"
-                />
-                <TextField
+                /> */}
+                {/* <TextField
                     name="status"
                     label="Status"
                     value={formData.status}
@@ -122,16 +126,8 @@ function EditPond({ row, openeditModal, setEditModal, editSubmit }) {
                     onChange={handleChange}
                     fullWidth
                     margin="dense"
-                />
-                <TextField
-                    name="__v"
-                    label="__V"
-                    value={formData.__v}
-                    onChange={handleChange}
-                    fullWidth
-                    margin="dense"
-                />
-                <TextField
+                /> */}
+                {/* <TextField
                     name="boundaries.type"
                     label="Boundaries Type"
                     value={formData.boundaries.type}
@@ -162,7 +158,7 @@ function EditPond({ row, openeditModal, setEditModal, editSubmit }) {
                     onChange={handleChange}
                     fullWidth
                     margin="dense"
-                />
+                /> */}
                 </DialogContent>
                 <DialogActions sx={{ display: 'flex', justifyContent: 'center', marginBottom: '15px' }}>
                     <Button variant='contained' onClick={() => setEditModal(false)} color="primary">

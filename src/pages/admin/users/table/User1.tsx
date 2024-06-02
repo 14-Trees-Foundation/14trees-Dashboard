@@ -298,7 +298,7 @@ export const User1 = () => {
           style={{ borderRadius: 20 }}
           dataSource={usersList}
           columns={antdColumns}
-          pagination={{ position: ['bottomRight'], pageSize: 10, defaultCurrent: 1, total: usersData.totalUsers, simple: true, onChange: (page, pageSize) => { if(page*pageSize > usersList.length) setPage(page-1); } }}
+          pagination={{ position: ['bottomRight'], showSizeChanger: false, pageSize: 10, defaultCurrent: 1, total: usersData.totalUsers, simple: true, onChange: (page, pageSize) => { if(page*pageSize > usersList.length) setPage(page-1); } }}
           rowSelection={{
             type: 'checkbox',
             ...rowSelection,

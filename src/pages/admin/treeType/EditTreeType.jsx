@@ -73,37 +73,10 @@ function EditTreeType({row, openeditModal, handleCloseEditModal, editSubmit}) {
                     <TextField
                         margin="dense"
                         name="tree_id"
-                        label="Tree ID"
+                        label="Tree Type ID"
                         type="text"
                         fullWidth
                         value={formData.tree_id}
-                        onChange={handleChange}
-                    />
-                    <TextField
-                        margin="dense"
-                        name="_id"
-                        label="ID"
-                        type="text"
-                        fullWidth
-                        value={formData._id}
-                        onChange={handleChange}
-                    />
-                    <TextField
-                        margin="dense"
-                        name="__v"
-                        label="Version"
-                        type="text"
-                        fullWidth
-                        value={formData.__v}
-                        onChange={handleChange}
-                    />
-                    <TextField
-                        margin="dense"
-                        name="key"
-                        label="Key"
-                        type="text"
-                        fullWidth
-                        value={formData.key}
                         onChange={handleChange}
                     />
                 </DialogContent>

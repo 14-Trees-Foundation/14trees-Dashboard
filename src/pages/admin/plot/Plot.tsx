@@ -53,11 +53,16 @@ export const PlotComponent = () => {
   const [editModal, setEditModal] = useState(false);
   const [page, setPage] = useState(0);
 
+  const categoriesMap: Record<string, string> = {
+    "6543803d302fc2b6520a9bac": "Foundation",
+    "6543803d302fc2b6520a9bab": "Public",
+  }
+
   const columns: GridColumns = [
     {
       field: "action",
       headerName: "Action",
-      width: 100,
+      width: 150,
       align: "center",
       headerAlign: "center",
       renderCell: (params: any) => (
@@ -68,6 +73,8 @@ export const PlotComponent = () => {
             alignItems: "center",
           }}>
           <Button
+            variant="outlined"
+            style={{ margin: "0 5px" }}
             onClick={() => {
               setSelectedEditRow(params.row);
               setEditModal(true);
@@ -75,24 +82,18 @@ export const PlotComponent = () => {
             <EditIcon />
           </Button>
           <Button
+            variant="outlined"
+            style={{ margin: "0 5px" }}
             onClick={() => handleDelete(params.row as Plot)}>
             <DeleteIcon />
           </Button>
         </div>
       ),
     },
-    // {
-    //   field: "_id",
-    //   headerName: "ID",
-    //   width: 90,
-    //   align: "center",
-    //   editable: true,
-    //   headerAlign: "center",
-    // },
     {
       field: "name",
       headerName: "Name",
-      width: 150,
+      width: 250,
       align: "center",
       editable: true,
       headerAlign: "center",
@@ -112,79 +113,72 @@ export const PlotComponent = () => {
       align: "center",
       editable: true,
       headerAlign: "center",
+      valueGetter: (params) => (params.row.category ? categoriesMap[params.row.category] : '')
     },
-    {
-      field: "district",
-      headerName: "District",
-      width: 150,
-      align: "center",
-      editable: true,
-      headerAlign: "center",
-    },
+    // {
+    //   field: "district",
+    //   headerName: "District",
+    //   width: 150,
+    //   align: "center",
+    //   editable: true,
+    //   headerAlign: "center",
+    // },
     {
       field: "gat",
       headerName: "Gat",
-      width: 150,
+      width: 100,
       align: "center",
       editable: true,
       headerAlign: "center",
     },
-    {
-      field: "land_type",
-      headerName: "Land Type",
-      width: 150,
-      align: "center",
-      editable: true,
-      headerAlign: "center",
-    },
-    {
-      field: "status",
-      headerName: "Status",
-      width: 150,
-      align: "center",
-      editable: true,
-      headerAlign: "center",
-    },
-    {
-      field: "taluka",
-      headerName: "Taluka",
-      width: 150,
-      align: "center",
-      editable: true,
-      headerAlign: "center",
-    },
-    {
-      field: "village",
-      headerName: "Village",
-      width: 150,
-      align: "center",
-      editable: true,
-      headerAlign: "center",
-    },
-    {
-      field: "zone",
-      headerName: "Zone",
-      width: 150,
-      align: "center",
-      editable: true,
-      headerAlign: "center",
-    },
-    {
-      field: "__v",
-      headerName: "Version",
-      width: 90,
-      align: "center",
-      editable: true,
-      headerAlign: "center",
-    },
+    // {
+    //   field: "land_type",
+    //   headerName: "Land Type",
+    //   width: 150,
+    //   align: "center",
+    //   editable: true,
+    //   headerAlign: "center",
+    // },
+    // {
+    //   field: "status",
+    //   headerName: "Status",
+    //   width: 150,
+    //   align: "center",
+    //   editable: true,
+    //   headerAlign: "center",
+    // },
+    // {
+    //   field: "taluka",
+    //   headerName: "Taluka",
+    //   width: 150,
+    //   align: "center",
+    //   editable: true,
+    //   headerAlign: "center",
+    // },
+    // {
+    //   field: "village",
+    //   headerName: "Village",
+    //   width: 150,
+    //   align: "center",
+    //   editable: true,
+    //   headerAlign: "center",
+    // },
+    // {
+    //   field: "zone",
+    //   headerName: "Zone",
+    //   width: 150,
+    //   align: "center",
+    //   editable: true,
+    //   headerAlign: "center",
+    // },
     {
       field: "boundaries.type",
       headerName: "Boundaries Type",
-      width: 250,
+      width: 200,
       align: "center",
       editable: true,
       headerAlign: "center",
-      valueGetter: (params) => JSON.stringify(params.row.boundaries.type),
+      valueGetter: (params) => (params.row.boundaries.type),
     },
     {
       field: "boundaries.coordinates",
@@ -199,11 +193,11 @@ export const PlotComponent = () => {
     {
       field: "center.type",
       headerName: "Center Type",
-      width: 250,
+      width: 200,
       align: "center",
       editable: true,
       headerAlign: "center",
-      valueGetter: (params) => JSON.stringify(params.row.center.type),
+      valueGetter: (params) => (params.row.center.type),
     },
     {
       field: "center.coordinates",

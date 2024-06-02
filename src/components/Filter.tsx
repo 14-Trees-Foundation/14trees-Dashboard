@@ -23,7 +23,8 @@ export default function getColumnSearchProps<T extends object>(dataIndex: keyof 
         filterOptionsArray.push({ label: value, value: key })
     });
 
-    const handleReset = (clearFilters: () => void, dataIndex: keyof T) => {
+    const handleReset = (clearFilters: () => void, setSelectedKeys: (selectedKeys: React.Key[]) => void, dataIndex: keyof T) => {
+        setSelectedKeys([]);
         clearFilters();
         let newFilters = { ...filters }
         Reflect.deleteProperty(newFilters, dataIndex);
@@ -50,14 +51,13 @@ export default function getColumnSearchProps<T extends object>(dataIndex: keyof 
                 </div>
                 <Space style={{ display: 'flex', alignItems: 'center'}}>
                     <Btn
-                        onClick={() => clearFilters && handleReset(clearFilters, dataIndex)}
+                        onClick={() => clearFilters && handleReset(clearFilters, setSelectedKeys, dataIndex)}
                         size="small"
                         style={{ width: 90 }}
                     >
                         Reset
                     </Btn>
                     <Btn
-                        type="link"
                         size="small"
                         onClick={() => {
                             confirm({ closeDropdown: false });
@@ -67,13 +67,13 @@ export default function getColumnSearchProps<T extends object>(dataIndex: keyof 
                                 operatorValue: filterOption,
                                 value: (selectedKeys as string[])[0],
                             }
+                            console.log(newFilters);
                             setFilters(newFilters);
                         }}
                     >
                         Filter
                     </Btn>
                     <Btn
-                        type="link"
                         size="small"
                         onClick={() => {
                             close();
