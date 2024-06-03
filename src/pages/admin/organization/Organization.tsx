@@ -19,6 +19,7 @@ import { useAppDispatch, useAppSelector } from "../../../redux/store/hooks";
 import { RootState } from "../../../redux/store/store";
 import CircularProgress from "@mui/material/CircularProgress";
 import EditOrganization from "./EditOrganization";
+import { getFormattedDate } from "../../../helpers/utils";
 
 function LoadingOverlay() {
   return (
@@ -64,35 +65,37 @@ export const OrganizationComponent = () => {
 
   const columns: GridColumns = [
     {
-      field: "_id",
-      headerName: "ID",
-      width: 90,
-      align: "center",
-      headerAlign: "center",
-    },
-    {
       field: "name",
       headerName: "Name",
-      width: 150,
+      width: 250,
+      align: 'center',
+      headerAlign: "center",
       editable: true,
     },
     {
       field: "type",
       headerName: "Type",
-      width: 150,
+      width: 250,
+      align: 'center',
+      headerAlign: "center",
       editable: true,
     },
     {
       field: "desc",
       headerName: "Description",
-      width: 200,
+      width: 300,
+      align: 'center',
+      headerAlign: "center",
       editable: true,
     },
     {
       field: "date_added",
       headerName: "Date Added",
       width: 200,
+      align: 'center',
+      headerAlign: "center",
       editable: true,
+      valueGetter: (params) => getFormattedDate(params.row.date_added)
     },
     // {
     //   field: "__v",

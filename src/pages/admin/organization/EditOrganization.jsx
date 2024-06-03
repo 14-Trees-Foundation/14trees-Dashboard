@@ -33,15 +33,6 @@ function EditUser({ row, openeditModal, setEditModal, editSubmit }) {
       <form onSubmit={handleEditSubmit}>
         <DialogContent>
           <TextField
-            name="_id"
-            label="ID"
-            value={formData._id}
-            onChange={handleChange}
-            fullWidth
-            margin="dense"
-            disabled
-          />
-          <TextField
             name="name"
             label="Name"
             value={formData.name}
@@ -64,24 +55,6 @@ function EditUser({ row, openeditModal, setEditModal, editSubmit }) {
             onChange={handleChange}
             fullWidth
             margin="dense"
-          />
-          <TextField
-            name="date_added"
-            label="Date Added"
-            value={formData.date_added}
-            onChange={handleChange}
-            fullWidth
-            margin="dense"
-            disabled
-          />
-          <TextField
-            name="__v"
-            label="Version"
-            value={formData.__v}
-            onChange={handleChange}
-            fullWidth
-            margin="dense"
-            disabled
           />
         </DialogContent>
         <DialogActions
