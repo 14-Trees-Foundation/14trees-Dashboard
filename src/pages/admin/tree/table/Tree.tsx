@@ -80,6 +80,11 @@ export const TreeNew = () => {
     const [operation, setOperation] = useState('');
     const [filters, setFilters] = useState<Record<string, GridFilterItem>>({});
 
+    const handleSetFilters = (filters: Record<string, GridFilterItem>) => {
+        setPage(0);
+        setFilters(filters);
+    }
+
     useEffect(() => {
         getTreeData();
     }, [page, filters, editModal]);
@@ -183,7 +188,7 @@ export const TreeNew = () => {
           title: "Sapling ID",
           width: 150,
           align: 'center',
-          ...getColumnSearchProps('sapling_id', filters, setFilters)
+          ...getColumnSearchProps('sapling_id', filters, handleSetFilters)
         },
         {
           dataIndex: "tree",
@@ -192,7 +197,7 @@ export const TreeNew = () => {
           width: 250,
           align: 'center',
           render: (value, record, index) => record?.tree?.name,
-          ...getColumnSearchProps('tree', filters, setFilters)
+          ...getColumnSearchProps('tree', filters, handleSetFilters)
         },
         {
           dataIndex: "plot",
@@ -201,7 +206,7 @@ export const TreeNew = () => {
           width: 350,
           align: 'center',
           render: (value, record, index) => record?.plot?.name,
-          ...getColumnSearchProps('plot', filters, setFilters)
+          ...getColumnSearchProps('plot', filters, handleSetFilters)
         },
         {
             dataIndex: "mapped_to",
@@ -210,7 +215,7 @@ export const TreeNew = () => {
             width: 250,
             align: 'center',
             render: (value, record, index) => record?.user?.name,
-            ...getColumnSearchProps('mapped_to', filters, setFilters)
+            ...getColumnSearchProps('mapped_to', filters, handleSetFilters)
         },    
         {
             dataIndex: "assigned_to",
@@ -219,7 +224,7 @@ export const TreeNew = () => {
             width: 250,
             align: 'center',
             render: (value, record, index) => record?.assigned_to?.name,
-            ...getColumnSearchProps('assigned_to', filters, setFilters)
+            ...getColumnSearchProps('assigned_to', filters, handleSetFilters)
         },    
         {
             dataIndex: "link",
@@ -227,7 +232,7 @@ export const TreeNew = () => {
             title: "Event",
             width: 150,
             align: 'center',
-            ...getColumnSearchProps('link', filters, setFilters)
+            ...getColumnSearchProps('link', filters, handleSetFilters)
         },    
         {
             dataIndex: "event_type",

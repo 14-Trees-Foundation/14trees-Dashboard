@@ -36,6 +36,17 @@ class ApiClient {
         }
     }
 
+    async getTreeTypesByFilters(offset: number, limit: number, filters?: any[]): Promise<TreeTypePaginationResponse> {
+        const url = `/trees/get?offset=${offset}&limit=${limit}`;
+        try {
+            const response = await this.api.post<TreeTypePaginationResponse>(url, {filters: filters});
+            return response.data;
+        } catch (error: any) {
+            console.error(error)
+            throw new Error(`Failed to fetch tree types: ${error.message}`);
+        }
+    }
+
     async searchTreeTypes(searchStr: string): Promise<TreeType[]> {
         const url = `/trees/${searchStr}`;
         try {

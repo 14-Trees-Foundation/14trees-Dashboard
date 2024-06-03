@@ -9,6 +9,9 @@ export const treeTypesDataReducer = (state = { totalTreeTypes: 0, treeTypes: {} 
             if (action.payload) {
                 let treeTypesDataState: TreeTypesDataState = { totalTreeTypes: state.totalTreeTypes, treeTypes: { ...state.treeTypes} }
                 let payload = action.payload as TreeTypePaginationResponse
+                if (treeTypesDataState.totalTreeTypes !== payload.total) {
+                    treeTypesDataState.treeTypes = {}
+                }
                 treeTypesDataState.totalTreeTypes = payload.total;
                 let treeTypes = payload.result
                 for (let i = 0; i < treeTypes.length; i++) {

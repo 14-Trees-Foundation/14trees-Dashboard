@@ -4,6 +4,7 @@ export type TreeType = {
     _id: string,
     name: string,
     scientific_name: string,
+    name_english: string,
     tree_id: string,
     image: [string],
     family: string,

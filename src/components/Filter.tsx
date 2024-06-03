@@ -5,7 +5,7 @@ import { Select, Button as Btn, Input, Space } from 'antd'
 import type { TableColumnType, InputRef } from 'antd';
 import { FilterConfirmProps } from 'antd/es/table/interface';
 
-export default function getColumnSearchProps<T extends object>(dataIndex: keyof T, filters: Record<string, GridFilterItem>, setFilters: React.Dispatch<React.SetStateAction<Record<string, GridFilterItem>>>): TableColumnType<T> {
+export default function getColumnSearchProps<T extends object>(dataIndex: keyof T, filters: Record<string, GridFilterItem>, handleSetFilters: (filters: Record<string, GridFilterItem>) => void): TableColumnType<T> {
 
     let filterOption = 'contains'
     // const searchInput = useRef<InputRef>(null);
@@ -29,7 +29,7 @@ export default function getColumnSearchProps<T extends object>(dataIndex: keyof 
         confirm({ closeDropdown: false });
         let newFilters = { ...filters }
         Reflect.deleteProperty(newFilters, dataIndex);
-        setFilters(newFilters);
+        handleSetFilters(newFilters);
     };
 
     return ({
@@ -69,7 +69,7 @@ export default function getColumnSearchProps<T extends object>(dataIndex: keyof 
                                 value: (selectedKeys as string[])[0],
                             }
                             console.log(newFilters);
-                            setFilters(newFilters);
+                            handleSetFilters(newFilters);
                         }}
                     >
                         Apply

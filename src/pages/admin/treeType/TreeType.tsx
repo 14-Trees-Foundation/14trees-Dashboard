@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import Box from "@mui/material/Box";
-import { DataGrid, GridToolbar, GridColumns } from "@mui/x-data-grid";
+import { DataGrid, GridToolbar, GridColumns, GridFilterItem } from "@mui/x-data-grid";
 import {
     Button,
     Dialog,
@@ -21,6 +21,8 @@ import { RootState } from "../../../redux/store/store";
 import AddTreeType from "./AddTreeType";
 import CircularProgress from "@mui/material/CircularProgress";
 import EditTreeType from "./EditTreeType.jsx";
+import { Table, TableColumnsType } from "antd";
+import getColumnSearchProps from "../../../components/Filter";
 
 function LoadingOverlay() {
     return (
@@ -38,7 +40,7 @@ function LoadingOverlay() {
 
 export const TreeTypeComponent = () => {
     const dispatch = useAppDispatch();
-    const { getTreeTypes, createTreeType, updateTreeType, deleteTreeType } =
+    const { createTreeType, updateTreeType, deleteTreeType, getTreeTypesByFilters } =
         bindActionCreators(treeTypeActionCreators, dispatch);
 
     const [open, setOpen] = useState(false);
@@ -46,9 +48,15 @@ export const TreeTypeComponent = () => {
     const handleModalClose = () => setOpen(false);
     const [openDeleteModal, setOpenDeleteModal] = useState(false);
     const [selectedItem, setSelectedItem] = useState<TreeType | null>(null);
-    const [selectedEditRow, setSelectedEditRow] = useState<RowType | null>(null);
+    const [selectedEditRow, setSelectedEditRow] = useState<TreeType | null>(null);
     const [editModal, setEditModal] = useState(false);
     const [page, setPage] = useState(0);
+    const [filters, setFilters] = useState<Record<string, GridFilterItem>>({});
+
+    const handleSetFilters = (filters: Record<string, GridFilterItem>) => {
+        setPage(0);
+        setFilters(filters);
+    }
 
     const columns: GridColumns = [
         // {
@@ -138,13 +146,88 @@ export const TreeTypeComponent = () => {
         },
     ];
 
+    const antdColumns: TableColumnsType<TreeType> = [
+        {
+          dataIndex: "tree_id",
+          key: "tree_id",
+          title: "Tree Type ID",
+          width: 150,
+          align: "center",
+          ...getColumnSearchProps('tree_id', filters, handleSetFilters)
+        },
+        {
+          dataIndex: "name",
+          key: "name",
+          title: "Name",
+          width: 250,
+          align: "center",
+          ...getColumnSearchProps('name', filters, handleSetFilters)
+        },
+        {
+          dataIndex: "name_english",
+          key: "name_english",
+          title: "Name (English)",
+          width: 250,
+          align: "center",
+          ...getColumnSearchProps('name_english', filters, handleSetFilters)
+        },
+        {
+          dataIndex: "scientific_name",
+          key: "scientific_name",
+          title: "Scientific Name",
+          width: 250,
+          align: "center",
+          ...getColumnSearchProps('scientific_name', filters, handleSetFilters)
+        },
+        {
+          dataIndex: "habit",
+          key: "habit",
+          title: "Habit",
+          width: 200,
+          align: "center",
+          ...getColumnSearchProps('habit', filters, handleSetFilters)
+        },
+        {
+            dataIndex: "action",
+            key: "action",
+            title: "Actions",
+            align: "center",
+            render: (value, record, index )=> (
+                <div
+                    style={{
+                        display: "flex",
+                        justifyContent: "center",
+                        alignItems: "center",
+                    }}>
+                    <Button
+                        variant="outlined"
+                        style={{ margin: "0 5px" }}
+                        onClick={() => {
+                            setSelectedEditRow(record)
+                            setEditModal(true)
+                        }}
+                    >
+                        <EditIcon />
+                    </Button>
+                    <Button
+                        variant="outlined"
+                        style={{ margin: "0 5px" }}
+                        onClick={() => handleDeleteTreeType(record)}>
+                        <DeleteIcon />
+                    </Button>
+                </div>
+            ),
+          },
+      ];
+
     useEffect(() => {
         getTreeTypeData();
-    }, [page]);
+    }, [ page, filters]);
 
     const getTreeTypeData = async () => {
+        const filtersData = Object.values(filters);
         setTimeout(async () => {
-            await getTreeTypes(page*10, 10);
+            await getTreeTypesByFilters(page*10, 10, filtersData);
         }, 1000);
     };
 
@@ -159,11 +242,6 @@ export const TreeTypeComponent = () => {
     const handleCreateTreeTypeData = (formData: TreeType) => {
         console.log(formData);
         createTreeType(formData);
-    };
-
-    type RowType = {
-        id: string;
-        name: string;
     };
 
     const handleDeleteTreeType = (row: TreeType) => {
@@ -206,7 +284,7 @@ export const TreeTypeComponent = () => {
                 </Button>
             </div>
 
-            <Box sx={{ height: 540, width: "100%" }}>
+            {/* <Box sx={{ height: 540, width: "100%" }}>
                 <DataGrid
                     rows={treeTypesList}
                     columns={columns}
@@ -225,6 +303,15 @@ export const TreeTypeComponent = () => {
                         Toolbar: GridToolbar,
                         NoRowsOverlay: LoadingOverlay,
                     }}
+                />
+            </Box> */}
+            <Box sx={{ height: 840, width: "100%" }}>
+                <Table
+                    style={{ borderRadius: 20}}
+                    dataSource={treeTypesList}
+                    columns={antdColumns}
+                    pagination={{ position: ['bottomRight'], showSizeChanger: false, pageSize: 10, defaultCurrent: 1, total: treeTypesData.totalTreeTypes, simple: true, onChange: (page, pageSize) => { if(page*pageSize > treeTypesList.length) setPage(page-1); } }}
+                    scroll={{ y: "100%" }}
                 />
             </Box>
 

@@ -57,6 +57,11 @@ export const PlotComponent = () => {
   const [page, setPage] = useState(0);
   const [filters, setFilters] = useState<Record<string, GridFilterItem>>({});
 
+  const handleSetFilters = (filters: Record<string, GridFilterItem>) => {
+    setPage(0);
+    setFilters(filters);
+  }
+
   const categoriesMap: Record<string, string> = {
     "6543803d302fc2b6520a9bac": "Foundation",
     "6543803d302fc2b6520a9bab": "Public",
@@ -251,14 +256,14 @@ export const PlotComponent = () => {
       key: "name",
       title: "Name",
       width: 300,
-      ...getColumnSearchProps('name', filters, setFilters)
+      ...getColumnSearchProps('name', filters, handleSetFilters)
     },
     {
       dataIndex: "plot_id",
       key: "plot_id",
       title: "Plot ID",
       width: 150,
-      ...getColumnSearchProps('plot_id', filters, setFilters)
+      ...getColumnSearchProps('plot_id', filters, handleSetFilters)
     },
     {
       dataIndex: "category",

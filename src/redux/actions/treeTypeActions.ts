@@ -31,6 +31,35 @@ export const getTreeTypes = (offset: number, limit: number, name?: string) => {
     }
 };
 
+export const getTreeTypesByFilters = (offset: number, limit: number, filters?: any[]) => {
+    const apiClient = new ApiClient()
+    return (dispatch: any) => {
+        dispatch({
+            type: treeTypeActionTypes.GET_TREE_TYPES_REQUESTED,
+        });
+        apiClient.getTreeTypesByFilters(offset, limit, filters).then(
+            (value: TreeTypePaginationResponse) => {
+                for (let i = 0; i < value.result.length; i++) {
+                    if (value.result[i]?._id) {
+                        value.result[i].key = value.result[i]._id
+                    }
+                }
+                dispatch({
+                    type: treeTypeActionTypes.GET_TREE_TYPES_SUCCEEDED,
+                    payload: value,
+                });
+            },
+            (error: any) => {
+                console.log(error)
+                dispatch({
+                    type: treeTypeActionTypes.GET_TREE_TYPES_FAILED,
+                    payload: error
+                });
+            }
+        )
+    }
+};
+
 export const searchTreeTypes = (searchStr: string) => {
     const apiClient = new ApiClient()
     return (dispatch: any) => {

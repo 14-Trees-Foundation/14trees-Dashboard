@@ -59,6 +59,11 @@ export const User1 = () => {
   const [page, setPage] = useState(0);
   const [filters, setFilters] = useState<Record<string, GridFilterItem>>({});
 
+  const handleSetFilters = (filters: Record<string, GridFilterItem>) => {
+    setPage(0);
+    setFilters(filters);
+  }
+
   useEffect(() => {
     getUserData();
   }, [page, filters]);
@@ -185,14 +190,14 @@ export const User1 = () => {
       key: "name",
       title: "Name",
       width: 150,
-      ...getColumnSearchProps('name', filters, setFilters)
+      ...getColumnSearchProps('name', filters, handleSetFilters)
     },
     {
       dataIndex: "email",
       key: "email",
       title: "Email",
       width: 200,
-      ...getColumnSearchProps('email', filters, setFilters)
+      ...getColumnSearchProps('email', filters, handleSetFilters)
     },
     {
       dataIndex: "dob",
@@ -200,14 +205,14 @@ export const User1 = () => {
       title: "Date of Birth",
       width: 200,
       render: getFormattedDate,
-      ...getColumnSearchProps('dob', filters, setFilters)
+      ...getColumnSearchProps('dob', filters, handleSetFilters)
     },
     {
       dataIndex: "phone",
       key: "phone",
       title: "Phone",
       width: 100,
-      ...getColumnSearchProps('phone', filters, setFilters)
+      ...getColumnSearchProps('phone', filters, handleSetFilters)
     },    
   ];
 
