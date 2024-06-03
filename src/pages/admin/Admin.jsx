@@ -104,26 +104,26 @@ export const Admin = () => {
       page: OrganizationComponent,
       displayName: "Organizations",
     },
-    {
-      page: SitesComponent,
-      displayName: "Sites",
-    },
-    {
-      page: EventsComponent,
-      displayName: "Events",
-    },
-    {
-      page: DonationComponent,
-      displayName: "Donations",
-    },
+    // {
+    //   page: SitesComponent,
+    //   displayName: "Sites",
+    // },
+    // {
+    //   page: EventsComponent,
+    //   displayName: "Events",
+    // },
+    // {
+    //   page: DonationComponent,
+    //   displayName: "Donations",
+    // },
     {
       page: Images,
       displayName: "Images",
     },
-    {
-      page: Forms,
-      displayName: "Forms",
-    },
+    // {
+    //   page: Forms,
+    //   displayName: "Forms",
+    // },
   ];
 
   const mainBox = () => {

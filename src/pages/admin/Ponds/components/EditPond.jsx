@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import {
+    Autocomplete,
     Button,
     Dialog,
     DialogActions,
@@ -28,21 +29,16 @@ function EditPond({ row, openeditModal, setEditModal, editSubmit }) {
         setEditModal(false);
     };
 
+    const typesList = [
+        "Storage",
+        "Percolation",
+    ]
 
     return (
         <Dialog open={openeditModal} onClose={() => setEditModal(false)}>
-            <DialogTitle align="center">Edit User</DialogTitle>
+            <DialogTitle align="center">Edit Pond</DialogTitle>
             <form onSubmit={handleEditSubmit}>
                 <DialogContent>
-                    <TextField
-                        name="_id"
-                        label="ID"
-                        value={formData._id}
-                        onChange={handleChange}
-                        disabled
-                        fullWidth
-                        margin="dense"
-                    />
                     <TextField
                         name="name"
                         label="Name"
@@ -51,22 +47,14 @@ function EditPond({ row, openeditModal, setEditModal, editSubmit }) {
                         fullWidth
                         margin="dense"
                     />
-                    <TextField
+                    <Autocomplete
+                        fullWidth
                         name="type"
-                        label="Type"
-                        value={formData.type}
-                        onChange={handleChange}
-                        fullWidth
-                        margin="dense"
-                    />
-                    <TextField
-                        name="date_added"
-                        label="Date Added"
-                        value={formData.date_added}
-                        onChange={handleChange}
-                        fullWidth
-                        margin="dense"
-                        disabled
+                        disablePortal
+                        options={typesList}
+                        value={formData.type ? formData.type : ''}
+                        renderInput={(params) => <TextField {...params} margin="dense" label="Type" />}
+                        onChange={(event, value) => { if (value !== '') setFormData(prevState => ({ ...prevState, 'type': value }))}}
                     />
                     <TextField
                         name="lengthFt"
@@ -89,15 +77,6 @@ function EditPond({ row, openeditModal, setEditModal, editSubmit }) {
                         label="Depth (Ft)"
                         value={formData.depthFt}
                         onChange={handleChange}
-                        fullWidth
-                        margin="dense"
-                    />
-                    <TextField
-                        name="__v"
-                        label="Version"
-                        value={formData.__v}
-                        onChange={handleChange}
-                        disabled
                         fullWidth
                         margin="dense"
                     />

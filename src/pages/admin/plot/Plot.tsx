@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import Box from "@mui/material/Box";
 import { DataGrid, GridToolbar, GridColumns } from "@mui/x-data-grid";
 import AddPlot from "./AddPlot";
+import { Forms } from "../Forms/Forms"
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { type Plot } from "../../../types/plot";
@@ -291,6 +292,7 @@ export const PlotComponent = () => {
           }}
         />
       </Box>
+      <Forms />
 
       <Dialog open={openDeleteModal} onClose={() => setOpenDeleteModal(false)}>
         <DialogTitle>Confirm Delete</DialogTitle>

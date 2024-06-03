@@ -2,13 +2,13 @@ import ApiClient from "../../api/apiClient/apiClient";
 import plotActionTypes from "../actionTypes/plotActionTypes";
 import { Plot, PlotPaginationResponse } from "../../types/plot";
 
-export const getPlots = (offset: number, limit: number) => {
+export const getPlots = (offset: number, limit: number, name?: string) => {
     const apiClient = new ApiClient()
     return (dispatch: any) => {
         dispatch({
             type: plotActionTypes.GET_PLOTS_REQUESTED,
         });
-        apiClient.getPlots(offset, limit).then(
+        apiClient.getPlots(offset, limit, name).then(
             (value: PlotPaginationResponse) => {
                 for (let i = 0; i < value.result.length; i++) {
                     if (value.result[i]?._id) {

@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import {
     Button,
     Dialog,
@@ -24,6 +24,8 @@ function EditTree({ row, openeditModal, handleCloseEditModal, editSubmit }) {
 
     const [formData, setFormData] = useState(row);
     const [page, setPage] = useState(0);
+    const [treeTypeName, setTreeTypeName] = useState('');
+    const [plotName, setPlotName] = useState('');
     const handleChange = (event) => {
         const { name, value } = event.target;
         setFormData(prevState => {
@@ -37,8 +39,6 @@ function EditTree({ row, openeditModal, handleCloseEditModal, editSubmit }) {
         });
     };
 
-    console.log(formData);
-
     const handleEditSubmit = (event) => {
         event.preventDefault();
         editSubmit(formData);
@@ -47,49 +47,59 @@ function EditTree({ row, openeditModal, handleCloseEditModal, editSubmit }) {
 
     const getTreeTypeData = async () => {
         setTimeout(async () => {
-            await getTreeTypes(page*10, 10);
+            await getTreeTypes(page*10, 10, treeTypeName);
         }, 1000);
     };
 
+    useEffect(() => {
+        getTreeTypeData();
+    }, [page, treeTypeName]);
+
     let treeTypesList = [];
+    let treeTypesMap = {}
     const treeTypesData = useAppSelector((state) => state.treeTypesData);
     if (treeTypesData) {
-        treeTypesList = Object.values(treeTypesData.treeTypes);
-    }
-
-    if (treeTypesList.length === 0) {
-        getTreeTypeData();
+        treeTypesMap = { ...treeTypesData.treeTypes }
+        if (!Object.hasOwn(treeTypesMap, formData.tree_id)) {
+            treeTypesMap[formData.tree_id] = { _id: formData.tree_id, name: formData.tree.name}
+        }
+        treeTypesList = Object.values(treeTypesMap);
     }
 
     const getPlotData = async () => {
         setTimeout(async () => {
-            await getPlots(page*10, 10);
+            await getPlots(page*10, 10, plotName);
         }, 1000);
     };
 
+    useEffect(() => {
+        getPlotData();
+    }, [page, plotName]);
+
     let plotsList = [];
+    let plotsMap = {}
     const plotsData = useAppSelector((state) => state.plotsData);
     if (plotsData) {
-        plotsList = Object.values(plotsData.plots);
+        plotsMap = { ...plotsData.plots }
+        if (!Object.hasOwn(plotsMap, formData.plot_id)) {
+            plotsMap[formData.plot_id] = { _id: formData.plot_id, name: formData.plot?.name}
+        }
+        plotsList = Object.values(plotsMap);
     }
 
-    if (plotsList.length === 0) {
-        getPlotData();
-    }
+    // const eventType = [
+    //     {id: "1", label: "Birthday"},
+    //     {id: "2", label: "In Memory of"},
+    //     {id: "3", label: "General gift"},
+    //     {id: "4", label: "Corporate gift"},
+    // ]
 
-    const eventType = [
-        {id: "1", label: "Birthday"},
-        {id: "2", label: "In Memory of"},
-        {id: "3", label: "General gift"},
-        {id: "4", label: "Corporate gift"},
-    ]
-
-    const eventTypeMap = {
-        "1": "Birthday",
-        "2": "In Memory of",
-        "3": "General gift",
-        "4": "Corporate gift",
-    }
+    // const eventTypeMap = {
+    //     "1": "Birthday",
+    //     "2": "In Memory of",
+    //     "3": "General gift",
+    //     "4": "Corporate gift",
+    // }
 
 
     return (
@@ -112,8 +122,12 @@ function EditTree({ row, openeditModal, handleCloseEditModal, editSubmit }) {
                         name="tree_id"
                         disablePortal
                         options={treeTypesList}
-                        renderInput={(params) => <TextField {...params} margin="dense" label="Tree Type" />}
+                        renderInput={(params) => <TextField {...params} onChange={(event) => {
+                            const { value } = event.target;
+                            setTreeTypeName(value);
+                        }} margin="dense" label="Tree Type" />}
                         onChange={(event, value) => { if (value !== null) setFormData(prevState => ({ ...prevState, 'tree_id': value._id }))}}
+                        // value={Object.hasOwn(treeTypesMap, formData.tree_id) ? treeTypesMap[formData.tree_id] : null}
                         getOptionLabel={(option) => (option.name)}
                     />
                     <Autocomplete 
@@ -121,11 +135,15 @@ function EditTree({ row, openeditModal, handleCloseEditModal, editSubmit }) {
                         name="plot_id"
                         disablePortal
                         options={plotsList}
-                        renderInput={(params) => <TextField {...params} margin="dense" label="Plot" />}
+                        renderInput={(params) => <TextField {...params} onChange={(event) => {
+                            const { value } = event.target;
+                            setPlotName(value);
+                        }} margin="dense" label="Plot" />}
                         onChange={(event, value) => { if (value !== null) setFormData(prevState => ({ ...prevState, 'plot_id': value._id }))}}
+                        // value={Object.hasOwn(plotsMap, formData.plot_id) ? plotsMap[formData.plot_id] : null}
                         getOptionLabel={(option) => (option.name)}
                     />
-                    <TextField
+                    {/* <TextField
                         autoFocus
                         margin="dense"
                         name="link"
@@ -144,7 +162,7 @@ function EditTree({ row, openeditModal, handleCloseEditModal, editSubmit }) {
                         renderInput={(params) => <TextField {...params} margin="dense" label="Event Type" />}
                         onChange={(event, value) => { if (value !== null) setFormData(prevState => ({ ...prevState, 'event_type': value.id }))}}
                         getOptionLabel={(option) => option.label}
-                    />
+                    /> */}
                 </DialogContent>
                 <DialogActions sx={{ display: 'flex', justifyContent: 'center', marginBottom: '15px' }}>
                     <Button variant='contained' onClick={handleCloseEditModal} color="primary">

@@ -22,8 +22,11 @@ class ApiClient {
         Model- TreeTypes: CRUD Operations/Apis for tree types 
     */
 
-    async getTreeTypes(offset: number, limit: number): Promise<TreeTypePaginationResponse> {
-        const url = `/trees/treetypes?offset=${offset}&limit=${limit}`;
+    async getTreeTypes(offset: number, limit: number, name?: string): Promise<TreeTypePaginationResponse> {
+        let url = `/trees/treetypes?offset=${offset}&limit=${limit}`;
+        if (name && name !== '') {
+            url += `&name=${name}`
+        }
         try {
             const response = await this.api.get<TreeTypePaginationResponse>(url);
             return response.data;
@@ -99,8 +102,11 @@ class ApiClient {
         Model- Plot: CRUD Operations/Apis for plots
     */
 
-    async getPlots(offset: number, limit: number): Promise<PlotPaginationResponse> {
-        const url = `/plots/?offset=${offset}&limit=${limit}`;
+    async getPlots(offset: number, limit: number, name?: string): Promise<PlotPaginationResponse> {
+        let url = `/plots/?offset=${offset}&limit=${limit}`;
+        if (name && name !== '') {
+            url += `&name=${name}`
+        }
         try {
             const response = await this.api.get<PlotPaginationResponse>(url);
             return response.data;
