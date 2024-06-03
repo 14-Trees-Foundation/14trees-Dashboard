@@ -37,7 +37,7 @@ class ApiClient {
     }
 
     async getTreeTypesByFilters(offset: number, limit: number, filters?: any[]): Promise<TreeTypePaginationResponse> {
-        const url = `/trees/get?offset=${offset}&limit=${limit}`;
+        const url = `/trees/treetypes?offset=${offset}&limit=${limit}`;
         try {
             const response = await this.api.post<TreeTypePaginationResponse>(url, {filters: filters});
             return response.data;
