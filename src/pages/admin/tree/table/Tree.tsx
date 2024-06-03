@@ -34,6 +34,8 @@ import UserModal from "../../../../components/UserModal";
 import AssignTreeModal from "./AssignTreeModal";
 import { AssignTreeRequest } from "../../../../types/userTree";
 import { getFormattedDate } from "../../../../helpers/utils";
+import getColumnSearchProps from "../../../../components/Filter";
+import { Table, TableColumnsType } from "antd";
 
 function LoadingOverlay() {
     return (
@@ -51,7 +53,7 @@ function LoadingOverlay() {
 
 export const TreeNew = () => {
     const dispatch = useAppDispatch();
-    const { getTrees, createTree, updateTree, deleteTree, createBulkTrees }
+    const { getTrees, updateTree, deleteTree }
         = bindActionCreators(treeActionCreators, dispatch);
     const { mapTrees, unMapTrees, assignTrees, unassignUserTrees }
         = bindActionCreators(userTreesActionCreators, dispatch);
@@ -63,7 +65,7 @@ export const TreeNew = () => {
     const handleModalClose = () => setOpen(false);
     const [openDeleteModal, setOpenDeleteModal] = useState(false);
     const [deleteRow, setDeleteRow] = useState<any>({});
-    const [filters, setFilters] = useState<GridFilterItem[]>([]);
+    // const [filters, setFilters] = useState<GridFilterItem[]>([]);
     const [page, setPage] = useState(0);
     const [disabledMapUnMapButton, setDisabledMapUnMapButton] = useState(true);
     const [isMapTrees, setIsMapTrees] = useState(true);
@@ -72,26 +74,28 @@ export const TreeNew = () => {
     const [isAssignTrees, setIsAssignTrees] = useState(true);
     const [isAssignTreeModalOpen, setIsAssignTreeModalOpen] = useState(false);
     const [saplingIds , setSaplingIds] = useState<string[]>([]);
-    const [selectedEditRow, setSelectedEditRow] = useState<RowType | null>(null);
+    const [selectedEditRow, setSelectedEditRow] = useState<Tree | null>(null);
     const [editModal, setEditModal] = useState(false);
     const [openConfirmation, setOpenConfirmation] = useState(false);
     const [operation, setOperation] = useState('');
+    const [filters, setFilters] = useState<Record<string, GridFilterItem>>({});
 
     useEffect(() => {
         getTreeData();
     }, [page, filters, editModal]);
 
     const getTreeData = async () => {
+        const filtersData = Object.values(filters);
         setTimeout(async () => {
-            await getTrees(page * 10, 10, filters);
+            await getTrees(page * 10, 10, filtersData);
         }, 1000);
     };
 
-    const eventTypeMap: Record< number, string> = {
-        1: "Birthday",
-        2: "In Memory of",
-        3: "General gift",
-        4: "Corporate gift",
+    const eventTypeMap: Record<string, string> = {
+        "1": "Birthday",
+        "2": "In Memory of",
+        "3": "General gift",
+        "4": "Corporate gift",
     }
 
     const columns: GridColumns = [
@@ -141,18 +145,124 @@ export const TreeNew = () => {
         { field: 'assigned_to', headerName: 'Assigned To', width: 250, valueGetter: (params) => params.row?.assigned_to?.name },
     ];
 
+    const antdColumns: TableColumnsType<Tree> = [
+        {
+          dataIndex: "action",
+          key: "action",
+          title: "Actions",
+          width: 150,
+          align: "center",
+          render: (value, record, index )=> (
+            <div
+                style={{
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                }}>
+                <Button
+                    variant="outlined"
+                    style={{ margin: "0 5px" }}
+                    onClick={() => {
+                        setSelectedEditRow(record);
+                        setEditModal(true);
+                    }}>
+                    <EditIcon />
+                </Button>
+                <Button 
+                    variant="outlined"
+                    style={{ margin: "0 5px" }}
+                    onClick={() => handleDelete(record)}>
+                    <DeleteIcon />
+                </Button>
+            </div>
+          ),
+        },
+        {
+          dataIndex: "sapling_id",
+          key: "sapling_id",
+          title: "Sapling ID",
+          width: 150,
+          align: 'center',
+          ...getColumnSearchProps('sapling_id', filters, setFilters)
+        },
+        {
+          dataIndex: "tree",
+          key: "tree_id",
+          title: "Tree Type",
+          width: 250,
+          align: 'center',
+          render: (value, record, index) => record?.tree?.name,
+          ...getColumnSearchProps('tree', filters, setFilters)
+        },
+        {
+          dataIndex: "plot",
+          key: "plot",
+          title: "Plot",
+          width: 350,
+          align: 'center',
+          render: (value, record, index) => record?.plot?.name,
+          ...getColumnSearchProps('plot', filters, setFilters)
+        },
+        {
+            dataIndex: "mapped_to",
+            key: "mapped_to",
+            title: "Mapped To",
+            width: 250,
+            align: 'center',
+            render: (value, record, index) => record?.user?.name,
+            ...getColumnSearchProps('mapped_to', filters, setFilters)
+        },    
+        {
+            dataIndex: "assigned_to",
+            key: "assigned_to",
+            title: "Assigned To",
+            width: 250,
+            align: 'center',
+            render: (value, record, index) => record?.assigned_to?.name,
+            ...getColumnSearchProps('assigned_to', filters, setFilters)
+        },    
+        {
+            dataIndex: "link",
+            key: "link",
+            title: "Event",
+            width: 150,
+            align: 'center',
+            ...getColumnSearchProps('link', filters, setFilters)
+        },    
+        {
+            dataIndex: "event_type",
+            key: "event_type",
+            title: "Event Type",
+            width: 200,
+            align: 'center',
+            render: (value, record, index) => record?.event_type ? eventTypeMap[record.event_type] : ''
+        },
+        {
+            dataIndex: "date_added",
+            key: "date_added",
+            title: "Date Added",
+            width: 150,
+            align: 'center',
+            render: getFormattedDate,
+        },   
+      ];
+
+    const rowSelection = {
+        onChange: (selectedRowKeys: React.Key[], selectedRows: Tree[]) => {
+            console.log(`selectedRowKeys: ${selectedRowKeys}`, 'selectedRows: ', selectedRows);
+        },
+        getCheckboxProps: (record: Tree) => ({
+            name: record.sapling_id,
+        }),
+    };
+
     let treesList: Tree[] = [];
     const treesData = useAppSelector((state: RootState) => state.treesData);
     if (treesData) {
         treesList = Object.values(treesData.trees);
     }
 
-    type RowType = {
-        id: string;
-        name: string;
-    };
-
-    const handleDelete = (row: RowType) => {
+    const handleDelete = (row: Tree) => {
         console.log("Delete", row);
         setOpenDeleteModal(true);
         setDeleteRow(row);
@@ -271,7 +381,7 @@ export const TreeNew = () => {
                     Bulk Create
                 </Button> */}
             </div>
-            <Box sx={{ height: 540, width: "100%" }}>
+            {/* <Box sx={{ height: 540, width: "100%" }}>
                 <DataGrid
                     rows={treesList}
                     columns={columns}
@@ -300,7 +410,26 @@ export const TreeNew = () => {
                         NoRowsOverlay: LoadingOverlay,
                     }}
                 />
-            </Box>
+            </Box> */}
+
+        <Box sx={{ height: 840, width: "100%" }}>
+            <Table
+                style={{ borderRadius: 20}}
+                dataSource={treesList}
+                columns={antdColumns}
+                pagination={{ position: ['bottomRight'], showSizeChanger: false, pageSize: 10, defaultCurrent: 1, total: treesData.totalTrees, simple: true, onChange: (page, pageSize) => { if(page*pageSize > treesList.length) setPage(page-1); } }}
+                rowSelection={{
+                    type: 'checkbox',
+                    onChange: (selectedRowKeys) => {
+                        handleSelectionChanges(selectedRowKeys as string[]);
+                    },
+                    getCheckboxProps: (record) => {
+                        return { name: record.sapling_id }
+                    },
+                }}
+                scroll={{ y: "100%" }}
+            />
+        </Box>
 
             <Dialog open={openConfirmation} onClose={() => setOpenConfirmation(false)}>
                 <DialogTitle>Confirm {operation}</DialogTitle>

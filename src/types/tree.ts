@@ -47,6 +47,7 @@ export type CreateTreeRequest = {
 
 export type PaginationTreeResponse = {
     total: number,
+    offset: number,
     results: Tree[]
 }
 

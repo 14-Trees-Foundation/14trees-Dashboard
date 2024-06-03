@@ -8,7 +8,7 @@ export const treesDataReducer = (state = { totalTrees: 0, trees: {} }, action: U
             if (action.payload) {
                 let treesDataState = { totalTrees: state.totalTrees, trees: { ...state.trees } } as TreesDataState;
                 let payload = action.payload as PaginationTreeResponse;
-                if (treesDataState.totalTrees !== payload.total) {
+                if (payload.offset === 0) {
                     treesDataState.trees = {}
                 }
                 treesDataState.totalTrees = payload.total;
