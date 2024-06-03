@@ -3,6 +3,7 @@ import { GridFilterItem } from '@mui/x-data-grid';
 
 import { Select, Button as Btn, Input, Space } from 'antd'
 import type { TableColumnType, InputRef } from 'antd';
+import { FilterConfirmProps } from 'antd/es/table/interface';
 
 export default function getColumnSearchProps<T extends object>(dataIndex: keyof T, filters: Record<string, GridFilterItem>, setFilters: React.Dispatch<React.SetStateAction<Record<string, GridFilterItem>>>): TableColumnType<T> {
 
@@ -23,9 +24,9 @@ export default function getColumnSearchProps<T extends object>(dataIndex: keyof 
         filterOptionsArray.push({ label: value, value: key })
     });
 
-    const handleReset = (clearFilters: () => void, setSelectedKeys: (selectedKeys: React.Key[]) => void, dataIndex: keyof T) => {
-        setSelectedKeys([]);
+    const handleReset = (clearFilters: () => void, confirm: (param?: FilterConfirmProps | undefined) => void, dataIndex: keyof T) => {
         clearFilters();
+        confirm({ closeDropdown: false });
         let newFilters = { ...filters }
         Reflect.deleteProperty(newFilters, dataIndex);
         setFilters(newFilters);
@@ -51,7 +52,7 @@ export default function getColumnSearchProps<T extends object>(dataIndex: keyof 
                 </div>
                 <Space style={{ display: 'flex', alignItems: 'center'}}>
                     <Btn
-                        onClick={() => clearFilters && handleReset(clearFilters, setSelectedKeys, dataIndex)}
+                        onClick={() => clearFilters && handleReset(clearFilters, confirm, dataIndex)}
                         size="small"
                         style={{ width: 90 }}
                     >
@@ -71,7 +72,7 @@ export default function getColumnSearchProps<T extends object>(dataIndex: keyof 
                             setFilters(newFilters);
                         }}
                     >
-                        Filter
+                        Apply
                     </Btn>
                     <Btn
                         size="small"
