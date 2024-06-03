@@ -116,6 +116,17 @@ class ApiClient {
         }
     }
 
+    async getPlotsByFilters(offset: number, limit: number, filters?: any[]): Promise<PlotPaginationResponse> {
+        const url = `/plots/get?offset=${offset}&limit=${limit}`;
+        try {
+            const response = await this.api.post<PlotPaginationResponse>(url, {filters: filters});
+            return response.data;
+        } catch (error: any) {
+            console.error(error)
+            throw new Error(`Failed to fetch plots: ${error.message}`);
+        }
+    }
+
     async searchPlots(searchStr: string): Promise<Plot[]> {
         const url = `/plots/${searchStr}`;
         try {

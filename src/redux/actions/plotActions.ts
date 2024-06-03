@@ -31,6 +31,35 @@ export const getPlots = (offset: number, limit: number, name?: string) => {
     }
 };
 
+export const getPlotsByFilters = (offset: number, limit: number, filters?: any[]) => {
+    const apiClient = new ApiClient()
+    return (dispatch: any) => {
+        dispatch({
+            type: plotActionTypes.GET_PLOTS_REQUESTED,
+        });
+        apiClient.getPlotsByFilters(offset, limit, filters).then(
+            (value: PlotPaginationResponse) => {
+                for (let i = 0; i < value.result.length; i++) {
+                    if (value.result[i]?._id) {
+                        value.result[i].key = value.result[i]._id
+                    }
+                }
+                dispatch({
+                    type: plotActionTypes.GET_PLOTS_SUCCEEDED,
+                    payload: value,
+                });
+            },
+            (error: any) => {
+                console.log(error)
+                dispatch({
+                    type: plotActionTypes.GET_PLOTS_FAILED,
+                    payload: error
+                });
+            }
+        )
+    }
+};
+
 export const searchPlots = (searchStr: string) => {
     const apiClient = new ApiClient()
     return (dispatch: any) => {

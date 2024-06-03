@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import Box from "@mui/material/Box";
-import { DataGrid, GridToolbar, GridColumns } from "@mui/x-data-grid";
+import { DataGrid, GridToolbar, GridColumns, GridFilterItem } from "@mui/x-data-grid";
 import AddPlot from "./AddPlot";
 import { Forms } from "../Forms/Forms"
 import EditIcon from "@mui/icons-material/Edit";
@@ -22,6 +22,8 @@ import {
   Typography,
 } from "@mui/material";
 import EditPlot from "./EditPlot";
+import { Table, TableColumnsType } from "antd";
+import getColumnSearchProps from "../../../components/Filter";
 
 function LoadingOverlay() {
   return (
@@ -40,7 +42,7 @@ function LoadingOverlay() {
 
 export const PlotComponent = () => {
   const dispatch = useAppDispatch();
-  const { getPlots, createPlot, updatePlot, deletePlot } = bindActionCreators(
+  const { getPlots, createPlot, updatePlot, deletePlot, getPlotsByFilters } = bindActionCreators(
     plotActionCreators,
     dispatch
   );
@@ -50,9 +52,10 @@ export const PlotComponent = () => {
   const handleModalClose = () => setOpen(false);
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
   const [selectedItem, setSelectedItem] = useState<Plot | null>(null);
-  const [selectedEditRow, setSelectedEditRow] = useState<RowType | null>(null);
+  const [selectedEditRow, setSelectedEditRow] = useState<Plot | null>(null);
   const [editModal, setEditModal] = useState(false);
   const [page, setPage] = useState(0);
+  const [filters, setFilters] = useState<Record<string, GridFilterItem>>({});
 
   const categoriesMap: Record<string, string> = {
     "6543803d302fc2b6520a9bac": "Foundation",
@@ -211,13 +214,115 @@ export const PlotComponent = () => {
     },
   ];
 
+  const antdColumns: TableColumnsType<Plot> = [
+    {
+      dataIndex: "action",
+      key: "action",
+      title: "Actions",
+      width: 150,
+      align: "center",
+      render: (value, record, index) => (
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+          }}>
+          <Button
+            variant="outlined"
+            style={{ margin: "0 5px" }}
+            onClick={() => {
+              setSelectedEditRow(record);
+              setEditModal(true);
+            }}>
+            <EditIcon />
+          </Button>
+          <Button
+            variant="outlined"
+            style={{ margin: "0 5px" }}
+            onClick={() => handleDelete(record)}>
+            <DeleteIcon />
+          </Button>
+        </div>
+      ),
+    },
+    {
+      dataIndex: "name",
+      key: "name",
+      title: "Name",
+      width: 300,
+      ...getColumnSearchProps('name', filters, setFilters)
+    },
+    {
+      dataIndex: "plot_id",
+      key: "plot_id",
+      title: "Plot ID",
+      width: 150,
+      ...getColumnSearchProps('plot_id', filters, setFilters)
+    },
+    {
+      dataIndex: "category",
+      key: "category",
+      title: "Category",
+      width: 150,
+      render: (value, record, index) => {
+        return Object.hasOwn(record, "category") ? categoriesMap[(record as any)["category"]] : '';
+      },
+    },
+    {
+      dataIndex: "boundaries.type",
+      key: "boundaries.type",
+      title: "Boundaries Type",
+      render: (value, record, index) => {
+        if (record.boundaries.type) {
+          return record.boundaries.type;
+        }
+        return ''
+      },
+    },
+    // {
+    //   dataIndex: "boundaries.coordinates",
+    //   key: "boundaries.coordinates",
+    //   title: "Boundaries Coordinates",
+    //   render: (value, record, index) => {
+    //     if (record.boundaries.type) {
+    //       return JSON.stringify(record.boundaries.coordinates);
+    //     }
+    //     return ''
+    //   },
+    // },
+    {
+      dataIndex: "center.type",
+      key: "center.type",
+      title: "Center Type",
+      render: (value, record, index) => {
+        if (record.center.type) {
+          return record.center.type;
+        }
+        return ''
+      },
+    },
+    {
+      dataIndex: "center.coordinates",
+      key: "center.coordinates",
+      title: "Center Coordinates",
+      render: (value, record, index) => {
+        if (record.center.coordinates) {
+          return JSON.stringify(record.center.coordinates);
+        }
+        return ''
+      },
+    },
+  ];
+
   useEffect(() => {
     getPlotData();
-  }, [page]);
+  }, [page, filters]);
 
   const getPlotData = async () => {
     setTimeout(async () => {
-      await getPlots(page*10, 10);
+      let filtersData = Object.values(filters);
+      await getPlotsByFilters(page * 10, 10, filtersData);
     }, 1000);
   };
 
@@ -226,11 +331,6 @@ export const PlotComponent = () => {
   if (plotsData) {
     plotsList = Object.values(plotsData.plots);
   }
-
-  type RowType = {
-    id: string;
-    name: string;
-  };
 
   const handleDelete = (row: Plot) => {
     console.log("Delete", row);
@@ -256,7 +356,7 @@ export const PlotComponent = () => {
           justifyContent: "flex-end",
           marginBottom: "20px",
         }}>
-        <Button variant="contained" style={{ backgroundColor:'blue' }} onClick={handleModalOpen}>
+        <Button variant="contained" style={{ backgroundColor: 'blue' }} onClick={handleModalOpen}>
           Add Plot
         </Button>
         <AddPlot
@@ -271,7 +371,7 @@ export const PlotComponent = () => {
           Bulk Create
         </Button> */}
       </div>
-      <Box sx={{ height: 540, width: "100%" }}>
+      {/* <Box sx={{ height: 540, width: "100%" }}>
         <DataGrid
           rows={plotsList}
           columns={columns}
@@ -282,7 +382,7 @@ export const PlotComponent = () => {
               pageSize: 10,
             },
           }}
-          onPageChange={(page) => { if((plotsList.length / 10) === page) setPage(page); }}
+          onPageChange={(page) => { if ((plotsList.length / 10) === page) setPage(page); }}
           rowCount={plotsData.totalPlots}
           checkboxSelection
           disableSelectionOnClick
@@ -290,6 +390,14 @@ export const PlotComponent = () => {
             Toolbar: GridToolbar,
             NoRowsOverlay: LoadingOverlay,
           }}
+        />
+      </Box> */}
+      <Box sx={{ height: 840, width: "100%" }}>
+        <Table
+          style={{ borderRadius: 20}}
+          dataSource={plotsList}
+          columns={antdColumns}
+          pagination={{ position: ['bottomRight'], showSizeChanger: false, pageSize: 10, defaultCurrent: 1, total: plotsData.totalPlots, simple: true, onChange: (page, pageSize) => { if(page*pageSize > plotsList.length) setPage(page-1); } }}
         />
       </Box>
       <Forms />
