@@ -19,8 +19,8 @@ import { Forms } from "./Forms/Forms";
 import { Users } from "./users/Users";
 import { Ponds } from "./Ponds/Ponds";
 import { Images } from "./images/Images";
-import {TreeNew} from "./tree/table/Tree";
-import {TreeTypeComponent} from "./treeType/TreeType";
+import { TreeNew } from "./tree/table/Tree";
+import { TreeTypeComponent } from "./treeType/TreeType";
 import { PlotComponent } from "./plot/Plot";
 import { OrganizationComponent } from "./organization/Organization";
 import { DonationComponent } from "./donation/Donation";
@@ -46,7 +46,6 @@ export const Admin = () => {
           "content-type": "application/json",
         },
       });
-      console.log("response - ",response.status)
       if (response.status === 200) {
         setSummary(response.data);
       }
@@ -68,7 +67,7 @@ export const Admin = () => {
     }
 
     setLoading(false);
-  }, [setSummary, navigate, setPlotsList, token]);
+  }, [setSummary, navigate, setTreeLoggedByDate, setPlotsList, token]);
 
   useEffect(() => {
     fetchData();
