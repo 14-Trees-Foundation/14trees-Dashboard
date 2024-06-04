@@ -127,7 +127,7 @@ function EditTree({ row, openeditModal, handleCloseEditModal, editSubmit }) {
                             setTreeTypeName(value);
                         }} margin="dense" label="Tree Type" />}
                         onChange={(event, value) => { if (value !== null) setFormData(prevState => ({ ...prevState, 'tree_id': value._id }))}}
-                        // value={Object.hasOwn(treeTypesMap, formData.tree_id) ? treeTypesMap[formData.tree_id] : null}
+                        value={ (treeTypeName === '' && Object.hasOwn(treeTypesMap, formData.tree_id)) ? treeTypesMap[formData.tree_id] : null}
                         getOptionLabel={(option) => (option.name)}
                     />
                     <Autocomplete 
@@ -135,12 +135,18 @@ function EditTree({ row, openeditModal, handleCloseEditModal, editSubmit }) {
                         name="plot_id"
                         disablePortal
                         options={plotsList}
-                        renderInput={(params) => <TextField {...params} onChange={(event) => {
-                            const { value } = event.target;
-                            setPlotName(value);
-                        }} margin="dense" label="Plot" />}
+                        renderInput={(params) => (
+                            <TextField {...params} 
+                                onChange={(event) => {
+                                    const { value } = event.target;
+                                    setPlotName(value);
+                                }} 
+                                margin="dense" 
+                                label="Plot" 
+                            />
+                        )}
                         onChange={(event, value) => { if (value !== null) setFormData(prevState => ({ ...prevState, 'plot_id': value._id }))}}
-                        // value={Object.hasOwn(plotsMap, formData.plot_id) ? plotsMap[formData.plot_id] : null}
+                        value={ (plotName === '' && Object.hasOwn(plotsMap, formData.plot_id)) ? plotsMap[formData.plot_id] : null }
                         getOptionLabel={(option) => (option.name)}
                     />
                     {/* <TextField

@@ -15,7 +15,7 @@ function EditUser({ row, openeditModal, setEditModal, editSubmit }) {
   const [formData, setFormData] = useState(row);
 
   const handleChange = (event) => {
-    setFormData({
+        setFormData({
       ...formData,
       [event.target.name]: event.target.value,
     });
@@ -32,15 +32,6 @@ function EditUser({ row, openeditModal, setEditModal, editSubmit }) {
       <DialogTitle align="center">Edit User</DialogTitle>
       <form onSubmit={handleEditSubmit}>
         <DialogContent>
-          <TextField
-            name="_id"
-            label="ID"
-            value={formData._id}
-            onChange={handleChange}
-            fullWidth
-            margin="dense"
-            disabled
-          />
           <TextField
             name="name"
             label="Name"
@@ -60,7 +51,9 @@ function EditUser({ row, openeditModal, setEditModal, editSubmit }) {
           <TextField
             name="dob"
             label="Date of Birth"
-            value={formData.dob}
+            type="date"
+            value={formData.dob ? formData.dob.substring(0, 10): ''}
+            InputLabelProps={{ shrink: true }}
             onChange={handleChange}
             fullWidth
             margin="dense"
@@ -69,22 +62,6 @@ function EditUser({ row, openeditModal, setEditModal, editSubmit }) {
             name="phone"
             label="Phone"
             value={formData.phone}
-            onChange={handleChange}
-            fullWidth
-            margin="dense"
-          />
-          <TextField
-            name="userid"
-            label="User ID"
-            value={formData.userid}
-            onChange={handleChange}
-            fullWidth
-            margin="dense"
-          />
-          <TextField
-            name="key"
-            label="Key"
-            value={formData.key}
             onChange={handleChange}
             fullWidth
             margin="dense"
