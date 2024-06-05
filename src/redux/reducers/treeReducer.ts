@@ -1,18 +1,22 @@
 import { UnknownAction } from "redux";
-import { Tree, TreesDataState } from "../../types/tree";
+import { PaginationTreeResponse, Tree, TreesDataState } from "../../types/tree";
 import treeActionTypes from "../actionTypes/treeActionTypes";
-import { fetchDataFromLocal } from "../../api/apiClient/apiClient";
 
-export const treesDataReducer = (state = fetchDataFromLocal("treesDataState"), action: UnknownAction ): TreesDataState => {
+export const treesDataReducer = (state = { totalTrees: 0, trees: {} }, action: UnknownAction ): TreesDataState => {
     switch (action.type) {
         case treeActionTypes.GET_TREES_SUCCEEDED:
             if (action.payload) {
-                let treesDataState: TreesDataState = {}
-                let payload = action.payload as [Tree]
-                for (let i = 0; i < payload.length; i++) {
-                    if (payload[i]?._id) {
-                        payload[i].key = payload[i]._id
-                        treesDataState[payload[i]._id] = payload[i]
+                let treesDataState = { totalTrees: state.totalTrees, trees: { ...state.trees } } as TreesDataState;
+                let payload = action.payload as PaginationTreeResponse;
+                if (payload.offset === 0) {
+                    treesDataState.trees = {}
+                }
+                treesDataState.totalTrees = payload.total;
+                let trees = payload.results;
+                for (let i = 0; i < trees.length; i++) {
+                    if (trees[i]?._id) {
+                        trees[i].key = trees[i]._id
+                        treesDataState.trees[trees[i]._id] = trees[i]
                     }
                 }
                 const nextState: TreesDataState = treesDataState;
@@ -21,26 +25,28 @@ export const treesDataReducer = (state = fetchDataFromLocal("treesDataState"), a
             return state;
         case treeActionTypes.CREATE_TREE_SUCCEEDED:
             if (action.payload) {
-                const nextState = { ...state } as TreesDataState;
+                let nextState = { totalTrees: state.totalTrees, trees: { ...state.trees } } as TreesDataState;
                 let payload = action.payload as Tree
                 payload.key = payload._id
-                nextState[payload._id] = payload;
+                nextState.trees[payload._id] = payload;
+                nextState.totalTrees += 1;
                 return nextState;
             }
             return state;
         case treeActionTypes.UPDATE_TREE_SUCCEEDED:
             if (action.payload) {
-                const nextState = { ...state } as TreesDataState;
+                let nextState = { totalTrees: state.totalTrees, trees: { ...state.trees } } as TreesDataState;
                 let payload = action.payload as Tree
                 payload.key = payload._id
-                nextState[payload._id] = payload;
+                nextState.trees[payload._id] = payload;
                 return nextState;
             }
             return state;
         case treeActionTypes.DELETE_TREE_SUCCEEDED:
             if (action.payload) {
-                const nextState = { ...state } as TreesDataState;
-                Reflect.deleteProperty(nextState, action.payload as string)
+                let nextState = { totalTrees: state.totalTrees, trees: { ...state.trees } } as TreesDataState;
+                Reflect.deleteProperty(nextState.trees, action.payload as string)
+                nextState.totalTrees -= 1;
                 return nextState;
             }
             return state;

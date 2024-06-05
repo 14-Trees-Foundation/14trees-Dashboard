@@ -8,4 +8,12 @@ export type Organization = {
     date_added: Date,
 }
 
-export type OrganizationsDataState = Record<string, Organization>
+export type OrganizationPaginationResponse = {
+    total: number,
+    result: Organization[]
+}
+
+export type OrganizationsDataState = {
+    totalOrganizations: number,
+    organizations: Record<string, Organization>
+}

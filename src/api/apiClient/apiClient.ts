@@ -1,12 +1,12 @@
 import axios, {AxiosInstance} from 'axios';
-import { TreeType, TreeTypesDataState } from '../../types/treeType';
-import { Plot } from '../../types/plot';
-import { Organization } from '../../types/organization';
-import { Pond } from '../../types/pond';
-import { User } from '../../types/user';
+import { CreateTreeTypeResponse, TreeType, TreeTypePaginationResponse, TreeTypesDataState } from '../../types/treeType';
+import { Plot, PlotPaginationResponse, UpsertPlotResponse } from '../../types/plot';
+import { Organization, OrganizationPaginationResponse } from '../../types/organization';
+import { CreatePondResponse, Pond, PondPaginationResponse } from '../../types/pond';
+import { User, UserPaginationResponse } from '../../types/user';
 import { OnsiteStaff } from '../../types/onSiteStaff';
-import { Tree } from '../../types/tree';
-import { UserTree } from '../../types/userTree';
+import { PaginationTreeResponse, Tree } from '../../types/tree';
+import { AssignTreeRequest, UserTree, UserTreeCountPaginationResponse } from '../../types/userTree';
 
 class ApiClient {
     private api: AxiosInstance;
@@ -22,8 +22,33 @@ class ApiClient {
         Model- TreeTypes: CRUD Operations/Apis for tree types 
     */
 
-    async getTreeTypes(): Promise<TreeType[]> {
-        const url = `/trees/treetypes`;
+    async getTreeTypes(offset: number, limit: number, name?: string): Promise<TreeTypePaginationResponse> {
+        let url = `/trees/treetypes?offset=${offset}&limit=${limit}`;
+        if (name && name !== '') {
+            url += `&name=${name}`
+        }
+        try {
+            const response = await this.api.get<TreeTypePaginationResponse>(url);
+            return response.data;
+        } catch (error: any) {
+            console.error(error)
+            throw new Error(`Failed to fetch tree types: ${error.message}`);
+        }
+    }
+
+    async getTreeTypesByFilters(offset: number, limit: number, filters?: any[]): Promise<TreeTypePaginationResponse> {
+        const url = `/trees/treetypes?offset=${offset}&limit=${limit}`;
+        try {
+            const response = await this.api.post<TreeTypePaginationResponse>(url, {filters: filters});
+            return response.data;
+        } catch (error: any) {
+            console.error(error)
+            throw new Error(`Failed to fetch tree types: ${error.message}`);
+        }
+    }
+
+    async searchTreeTypes(searchStr: string): Promise<TreeType[]> {
+        const url = `/trees/${searchStr}`;
         try {
             const response = await this.api.get<TreeType[]>(url);
             return response.data;
@@ -33,19 +58,39 @@ class ApiClient {
         }
     }
 
-    async createTreeType(data: TreeType): Promise<TreeType> {
+    async createTreeType(data: TreeType, file?: Blob): Promise<TreeType> {
         try {
-            const response = await axios.post<TreeType>(`/trees/addtreetype`, data);
-            return response.data;
+            const formData = new FormData();
+            if (file) {
+                formData.append("files", file);
+            }
+            Object.entries(data).forEach(([key, value]) => {
+                if (key != 'image') {
+                    const strValue = value as string
+                    formData.append(key, strValue);
+                }
+              });
+            const response = await this.api.post<CreateTreeTypeResponse>(`/trees/addtreetype`, formData);
+            return response.data.treetype;
         } catch (error) {
             console.error(error)
             throw new Error('Failed to create tree type.');
         }
     }
 
-    async updateTreeType(data: TreeType): Promise<TreeType> {
+    async updateTreeType(data: TreeType, file?: Blob): Promise<TreeType> {
         try {
-            const response = await axios.put<TreeType>(`/trees/treetypes/${data._id}`, data);
+            const formData = new FormData();
+            if (file) {
+                formData.append("files", file);
+            }
+            Object.entries(data).forEach(([key, value]) => {
+                if (key != 'image') {
+                    const strValue = value as string
+                    formData.append(key, strValue);
+                }
+              });
+            const response = await this.api.put<TreeType>(`/trees/treetypes/${data._id}`, data);
             return response.data;
         } catch (error) {
             console.error(error)
@@ -55,7 +100,7 @@ class ApiClient {
 
     async deleteTreeType(data: TreeType): Promise<string> {
         try {
-            await axios.delete<any>(`/trees/treetypes/${data._id}`);
+            await this.api.delete<any>(`/trees/treetypes/${data._id}`);
             return data._id;
         } catch (error) {
             console.error(error)
@@ -68,8 +113,33 @@ class ApiClient {
         Model- Plot: CRUD Operations/Apis for plots
     */
 
-    async getPlots(): Promise<Plot[]> {
-        const url = `/plots/`;
+    async getPlots(offset: number, limit: number, name?: string): Promise<PlotPaginationResponse> {
+        let url = `/plots/?offset=${offset}&limit=${limit}`;
+        if (name && name !== '') {
+            url += `&name=${name}`
+        }
+        try {
+            const response = await this.api.get<PlotPaginationResponse>(url);
+            return response.data;
+        } catch (error: any) {
+            console.error(error)
+            throw new Error(`Failed to fetch plots: ${error.message}`);
+        }
+    }
+
+    async getPlotsByFilters(offset: number, limit: number, filters?: any[]): Promise<PlotPaginationResponse> {
+        const url = `/plots/get?offset=${offset}&limit=${limit}`;
+        try {
+            const response = await this.api.post<PlotPaginationResponse>(url, {filters: filters});
+            return response.data;
+        } catch (error: any) {
+            console.error(error)
+            throw new Error(`Failed to fetch plots: ${error.message}`);
+        }
+    }
+
+    async searchPlots(searchStr: string): Promise<Plot[]> {
+        const url = `/plots/${searchStr}`;
         try {
             const response = await this.api.get<Plot[]>(url);
             return response.data;
@@ -81,8 +151,8 @@ class ApiClient {
 
     async createPlot(data: Plot): Promise<Plot> {
         try {
-            const response = await axios.post<Plot>(`/plots/add`, data);
-            return response.data;
+            const response = await this.api.post<UpsertPlotResponse>(`/plots/add`, data);
+            return response.data.plot;
         } catch (error) {
             console.error(error)
             throw new Error('Failed to create plot');
@@ -91,8 +161,8 @@ class ApiClient {
 
     async updatePlot(data: Plot): Promise<Plot> {
         try {
-            const response = await axios.post<Plot>(`/plots/update`, data);
-            return response.data;
+            const response = await this.api.put<UpsertPlotResponse>(`/plots/${data._id}`, data);
+            return response.data.plot;
         } catch (error) {
             console.error(error)
             throw new Error('Failed to update plot');
@@ -101,7 +171,7 @@ class ApiClient {
 
     async deletePlot(data: Plot): Promise<string> {
         try {
-            await axios.delete<any>(`/plots/${data._id}`);
+            await this.api.delete<any>(`/plots/${data._id}`);
             return data._id;
         } catch (error) {
             console.error(error)
@@ -113,8 +183,19 @@ class ApiClient {
         Model- Organization: CRUD Operations/Apis for organizations
     */
 
-    async getOrganizations(): Promise<Organization[]> {
-        const url = `/organizations/`;
+    async getOrganizations(offset: number, limit: number): Promise<OrganizationPaginationResponse> {
+        const url = `/organizations/?offset=${offset}&limit=${limit}`;
+        try {
+            const response = await this.api.get<OrganizationPaginationResponse>(url);
+            return response.data;
+        } catch (error: any) {
+            console.error(error)
+            throw new Error(`Failed to fetch organizations: ${error.message}`);
+        }
+    }
+
+    async searchOrganizations(searchStr: string): Promise<Organization[]> {
+        const url = `/organizations/${searchStr}`;
         try {
             const response = await this.api.get<Organization[]>(url);
             return response.data;
@@ -126,8 +207,8 @@ class ApiClient {
 
     async createOrganization(data: Organization): Promise<Organization> {
         try {
-            const response = await axios.post<Organization>(`/organizations/add`, data);
-            return response.data;
+            const response = await this.api.post<{org: Organization}>(`/organizations/add`, data);
+            return response.data.org;
         } catch (error) {
             console.error(error)
             throw new Error('Failed to create Organization');
@@ -136,7 +217,7 @@ class ApiClient {
 
     async updateOrganization(data: Organization): Promise<Organization> {
         try {
-            const response = await axios.put<Organization>(`/organizations/${data._id}`, data);
+            const response = await this.api.put<Organization>(`/organizations/${data._id}`, data);
             return response.data;
         } catch (error) {
             console.error(error)
@@ -146,7 +227,7 @@ class ApiClient {
 
     async deleteOrganization(data: Organization): Promise<string> {
         try {
-            await axios.delete<any>(`/organizations/${data._id}`);
+            await this.api.delete<any>(`/organizations/${data._id}`);
             return data._id;
         } catch (error) {
             console.error(error)
@@ -158,8 +239,20 @@ class ApiClient {
         Model- Pond: CRUD Operations/Apis for ponds
     */
 
-    async getPonds(): Promise<Pond[]> {
-        const url = `/ponds/`;
+    async getPonds(offset: number, limit: number, name?: string): Promise<PondPaginationResponse> {
+        let url = `/ponds/?offset=${offset}&limit=${limit}`;
+        if (name) url += '&name=' + name;
+        try {
+            const response = await this.api.get<PondPaginationResponse>(url);
+            return response.data;
+        } catch (error: any) {
+            console.error(error)
+            throw new Error(`Failed to fetch ponds: ${error.message}`);
+        }
+    }
+
+    async searchPonds(searchStr: string): Promise<Pond[]> {
+        const url = `/ponds/${searchStr}`;
         try {
             const response = await this.api.get<Pond[]>(url);
             return response.data;
@@ -171,8 +264,8 @@ class ApiClient {
 
     async createPond(data: Pond): Promise<Pond> {
         try {
-            const response = await axios.post<Pond>(`/ponds/`, data);
-            return response.data;
+            const response = await this.api.post<CreatePondResponse>(`/ponds/`, data);
+            return response.data.pond;
         } catch (error) {
             console.error(error)
             throw new Error('Failed to create Pond');
@@ -181,8 +274,25 @@ class ApiClient {
 
     async updatePond(data: Pond): Promise<Pond> {
         try {
-            const response = await axios.put<Pond>(`/ponds/${data._id}`, data);
+            const response = await this.api.put<Pond>(`/ponds/${data._id}`, data);
             return response.data;
+        } catch (error) {
+            console.error(error)
+            throw new Error('Failed to update Pond');
+        }
+    }
+
+    async updatePondWaterLevel(pondName: string, levelFt: number, userId: string, file?: Blob): Promise<void> {
+        try {
+            const formData = new FormData();
+            if (file) {
+                formData.append("files", file);
+            }
+            formData.append('pond_name', pondName);
+            formData.append('levelFt', levelFt.toString());
+            formData.append('user_id', userId);
+            await this.api.post<any>(`/ponds/update-pond-level`, formData);
+            return;
         } catch (error) {
             console.error(error)
             throw new Error('Failed to update Pond');
@@ -191,7 +301,7 @@ class ApiClient {
 
     async deletePond(data: Pond): Promise<string> {
         try {
-            await axios.delete<any>(`/ponds/${data._id}`);
+            await this.api.delete<any>(`/ponds/${data._id}`);
             return data._id;
         } catch (error) {
             console.error(error)
@@ -199,9 +309,9 @@ class ApiClient {
         }
     }
 
-    async getPondHistory(): Promise<Pond[]> {
+    async getPondHistory(name: string): Promise<Pond[]> {
         try {
-            let response = await axios.get<Pond[]>(`/ponds/history`);
+            let response = await this.api.get<Pond[]>(`/ponds/history?pond_name=${name}`);
             return response.data;
         } catch (error) {
             console.error(error)
@@ -213,8 +323,30 @@ class ApiClient {
         Model- User: CRUD Operations/Apis for users
     */
 
-    async getUsers(): Promise<User[]> {
-        const url = `/users/`;
+    async getUsers(offset: number, limit: number): Promise<UserPaginationResponse> {
+        const url = `/users/?offset=${offset}&limit=${limit}`;
+        try {
+            const response = await this.api.get<UserPaginationResponse>(url);
+            return response.data;
+        } catch (error: any) {
+            console.error(error)
+            throw new Error(`Failed to fetch users: ${error.message}`);
+        }
+    }
+
+    async getUsersByFilters(offset: number, limit: number, filters?: any[]): Promise<UserPaginationResponse> {
+        const url = `/users/get?offset=${offset}&limit=${limit}`;
+        try {
+            const response = await this.api.post<UserPaginationResponse>(url, {filters: filters});
+            return response.data;
+        } catch (error: any) {
+            console.error(error)
+            throw new Error(`Failed to fetch users: ${error.message}`);
+        }
+    }
+
+    async searchUsers(searchStr: string): Promise<User[]> {
+        const url = `/users/${searchStr}`;
         try {
             const response = await this.api.get<User[]>(url);
             return response.data;
@@ -226,7 +358,7 @@ class ApiClient {
 
     async createUser(data: User): Promise<User> {
         try {
-            const response = await axios.post<User>(`/users/`, data);
+            const response = await this.api.post<User>(`/users/`, data);
             return response.data;
         } catch (error) {
             console.error(error)
@@ -236,7 +368,7 @@ class ApiClient {
 
     async updateUser(data: User): Promise<User> {
         try {
-            const response = await axios.put<User>(`/users/${data._id}`, data);
+            const response = await this.api.put<User>(`/users/${data._id}`, data);
             return response.data;
         } catch (error) {
             console.error(error)
@@ -246,7 +378,7 @@ class ApiClient {
 
     async deleteUser(data: User): Promise<string> {
         try {
-            await axios.delete<any>(`/users/${data._id}`);
+            await this.api.delete<any>(`/users/${data._id}`);
             return data._id;
         } catch (error) {
             console.error(error)
@@ -257,8 +389,8 @@ class ApiClient {
     async createUsersBulk(data: Blob): Promise<void> {
         try {
             const formData = new FormData();
-            formData.append('csvFile', data, 'users_data.csv');
-            await axios.post<any>(`/users/bulk`, );
+            formData.append('file', data);
+            await this.api.post<any>(`/users/bulk`, formData);
         } catch (error) {
             console.error(error)
             throw new Error('Failed to create users in bulk');
@@ -282,7 +414,7 @@ class ApiClient {
 
     async createOnsiteStaff(data: OnsiteStaff): Promise<OnsiteStaff> {
         try {
-            const response = await axios.post<OnsiteStaff>(`/onsitestaff/`, data);
+            const response = await this.api.post<OnsiteStaff>(`/onsitestaff/`, data);
             return response.data;
         } catch (error) {
             console.error(error)
@@ -292,7 +424,7 @@ class ApiClient {
 
     async updateOnsiteStaff(data: OnsiteStaff): Promise<OnsiteStaff> {
         try {
-            const response = await axios.put<OnsiteStaff>(`/onsitestaff/${data._id}`, data);
+            const response = await this.api.put<OnsiteStaff>(`/onsitestaff/${data._id}`, data);
             return response.data;
         } catch (error) {
             console.error(error)
@@ -302,7 +434,7 @@ class ApiClient {
 
     async deleteOnsiteStaff(data: OnsiteStaff): Promise<string> {
         try {
-            await axios.delete<any>(`/onsitestaff/${data._id}`);
+            await this.api.delete<any>(`/onsitestaff/${data._id}`);
             return data._id;
         } catch (error) {
             console.error(error)
@@ -314,10 +446,10 @@ class ApiClient {
         Model- Tree: CRUD Operations/Apis for trees
     */
 
-    async getTrees(): Promise<Tree[]> {
-        const url = `/trees/`;
+    async getTrees(offset: number, limit: number, filters?: any): Promise<PaginationTreeResponse> {
+        const url = `/trees/get?offset=${offset}&limit=${limit}`;
         try {
-            const response = await this.api.get<Tree[]>(url);
+            const response = await this.api.post<PaginationTreeResponse>(url, {filters: filters});
             return response.data;
         } catch (error: any) {
             console.error(error)
@@ -325,9 +457,23 @@ class ApiClient {
         }
     }
 
-    async createTree(data: Tree): Promise<Tree> {
+    async createTree(data: Tree, file?: Blob): Promise<Tree> {
         try {
-            const response = await axios.post<Tree>(`/trees/`, data);
+            const formData = new FormData();
+            if (file) {
+                formData.append("files", file);
+                formData.append("images", (file as File).name);
+            }
+            formData.append('sapling_id', data.sapling_id);
+            formData.append('tree_id', data.tree_id);
+            formData.append('plot_id', data.plot_id);
+            if (data.location && data.location.coordinates && data.location.coordinates.length === 2) {
+                formData.append('lat', data.location.coordinates[0].toString());
+                formData.append('lng', data.location.coordinates[1].toString());
+            }
+            formData.append('mapped_to', data.mapped_to);
+            formData.append('user_id', data.user_id);
+            const response = await this.api.post<Tree>(`/trees/`, formData);
             return response.data;
         } catch (error) {
             console.error(error)
@@ -335,9 +481,22 @@ class ApiClient {
         }
     }
 
-    async updateTree(data: Tree): Promise<Tree> {
+    async updateTree(data: Tree, file?:Blob): Promise<Tree> {
         try {
-            const response = await axios.put<Tree>(`/trees/${data._id}`, data);
+            const formData = new FormData();
+            console.log(file)
+
+            if (file) {
+                formData.append("files", file);
+            }
+            Object.entries(data).forEach(([key, value]) => {
+                if (key != 'image') {
+                    const strValue = value as string
+                    formData.append(key, strValue);
+                }
+              });
+            console.log(formData)
+            const response = await this.api.put<Tree>(`/trees/${data._id}`, formData);
             return response.data;
         } catch (error) {
             console.error(error)
@@ -347,7 +506,7 @@ class ApiClient {
 
     async deleteTree(data: Tree): Promise<string> {
         try {
-            await axios.delete<any>(`/trees/${data._id}`);
+            await this.api.delete<any>(`/trees/${data._id}`);
             return data._id;
         } catch (error) {
             console.error(error)
@@ -359,12 +518,60 @@ class ApiClient {
         try {
             const formData = new FormData();
             formData.append('csvFile', data, 'trees_data.csv');
-            await axios.post<any>(`/trees/bulk`, );
+            await this.api.post<any>(`/trees/bulk`, );
         } catch (error) {
             console.error(error)
             throw new Error('Failed to create Trees in bulk');
         }
     }
+
+    async mapTrees(saplingIds: string[], email: string): Promise<void> {
+        try {
+            await this.api.post<any>(`/mytrees/assign`, { sapling_id: saplingIds.join(',') , email: email});
+        } catch (error) {
+            console.error(error)
+            throw new Error('Failed to create Trees in bulk');
+        }
+    }
+
+    async mapTreesForPlot(email: string, plotId: string, count: number): Promise<void> {
+        try {
+            await this.api.post<any>(`/mytrees/map-plot-trees`, { email: email, plot_id: plotId, count: count});
+        } catch (error) {
+            console.error(error)
+            throw new Error('Failed to create Trees in bulk');
+        }
+    }
+
+    async removeTreeMappings(saplingIds: string[]): Promise<void> {
+        try {
+            await this.api.post<any>(`/mytrees/unmap`, { sapling_ids: saplingIds});
+        } catch (error) { 
+            console.error(error)
+            throw new Error('Failed to create Trees in bulk');
+        }
+    }
+
+    async getMappedTrees(email: string): Promise<void> {
+        try {
+            await this.api.post<any>(`/mytrees/${email}`);
+        } catch (error) { 
+            console.error(error)
+            throw new Error('Failed to create Trees in bulk');
+        }
+    }
+
+    async getUserTreeCount(offset: number, limit: number, filters?: any): Promise<UserTreeCountPaginationResponse> {
+        let url = `/mytrees/count/usertreescount?offset=${offset}&limit=${limit}`
+        try {
+            let result = await this.api.post<UserTreeCountPaginationResponse>(url, {filters: filters});
+            return result.data;
+        } catch (error) { 
+            console.error(error)
+            throw new Error('Failed to create Trees in bulk');
+        }
+    }
+
 
     /*
         Model- UserTree: CRUD Operations/Apis for user_tree_regs
@@ -383,7 +590,7 @@ class ApiClient {
 
     async createUserTree(data: UserTree): Promise<UserTree> {
         try {
-            const response = await axios.post<UserTree>(`/profile/`, data);
+            const response = await this.api.post<UserTree>(`/profile/`, data);
             return response.data;
         } catch (error) {
             console.error(error)
@@ -393,7 +600,7 @@ class ApiClient {
 
     async updateUserTree(data: UserTree): Promise<UserTree> {
         try {
-            const response = await axios.put<UserTree>(`/profile/${data._id}`, data);
+            const response = await this.api.put<UserTree>(`/profile/${data._id}`, data);
             return response.data;
         } catch (error) {
             console.error(error)
@@ -401,13 +608,21 @@ class ApiClient {
         }
     }
 
-    async deleteUserTree(data: UserTree): Promise<string> {
+    async unassignUserTrees(saplingIds: string[]): Promise<void> {
         try {
-            await axios.delete<any>(`/profile/${data._id}`);
-            return data._id;
+            await this.api.post<void>(`/profile`, { sapling_ids: saplingIds });
         } catch (error) {
             console.error(error)
-            throw new Error('Failed to delete user tree profile');
+            throw new Error('Failed unassign user trees.');
+        }
+    }
+
+    async assignUserTrees(data: AssignTreeRequest): Promise<void> {
+        try {
+            await this.api.post<void>(`/profile/usertreereg/multi`, data);
+        } catch (error) {
+            console.error(error)
+            throw new Error('Failed unassign user trees.');
         }
     }
     

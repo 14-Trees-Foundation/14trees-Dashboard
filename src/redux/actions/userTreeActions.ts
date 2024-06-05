@@ -1,6 +1,6 @@
 import ApiClient from "../../api/apiClient/apiClient";
 import userTreeActionTypes from "../actionTypes/userTreeActionTypes";
-import { UserTree } from "../../types/userTree";
+import { AssignTreeRequest, UserTree, UserTreeCountPaginationResponse } from "../../types/userTree";
 
 export const getUserTrees = () => {
     const apiClient = new ApiClient()
@@ -78,25 +78,140 @@ export const updateUserTree = (record: UserTree) => {
 };
 
 
-export const deleteUserTree = (record: UserTree) => {
+export const unassignUserTrees = (saplingIds: string[]) => {
     const apiClient = new ApiClient();
     return (dispatch: any) => {
         dispatch({
-            type: userTreeActionTypes.DELETE_USER_TREE_REQUESTED,
+            type: userTreeActionTypes.UNASSIGN_USER_TREES_REQUESTED,
         });
-        apiClient.deleteUserTree(record).then(
-            (id: string) => {
+        apiClient.unassignUserTrees(saplingIds).then(
+            () => {
                 dispatch({
-                    type: userTreeActionTypes.DELETE_USER_TREE_SUCCEEDED,
-                    payload: id,
+                    type: userTreeActionTypes.UNASSIGN_USER_TREES_SUCCEEDED,
                 });
             },
             (error: any) => {
                 console.error(error);
                 dispatch({
-                    type: userTreeActionTypes.DELETE_USER_TREE_FAILED,
+                    type: userTreeActionTypes.UNASSIGN_USER_TREES_FAILED,
                 });
             }
         )
     };
 };
+
+
+export const getUserTreeCount = (offset: number, limit: number, filters?: any) => {
+    const apiClient = new ApiClient();
+    return (dispatch: any) => {
+        dispatch({
+            type: userTreeActionTypes.GET_USER_TREE_COUNT_REQUESTED,
+        });
+        apiClient.getUserTreeCount(offset, limit, filters).then(
+            (result: UserTreeCountPaginationResponse) => {
+                dispatch({
+                    type: userTreeActionTypes.GET_USER_TREE_COUNT_SUCCEEDED,
+                    payload: result,
+                });
+            },
+            (error: any) => {
+                console.error(error);
+                dispatch({
+                    type: userTreeActionTypes.GET_USER_TREE_COUNT_FAILED,
+                });
+            }
+        )
+    };
+};
+
+export const unMapTrees = (saplingIds: string[]) => {
+    const apiClient = new ApiClient();
+    return (dispatch: any) => {
+        dispatch({
+            type: userTreeActionTypes.UN_MAP_TREES_REQUESTED,
+        });
+        apiClient.removeTreeMappings(saplingIds).then(
+            () => {
+                dispatch({
+                    type: userTreeActionTypes.UN_MAP_TREES_SUCCEEDED,
+                });
+            },
+            (error: any) => {
+                console.error(error);
+                dispatch({
+                    type: userTreeActionTypes.UN_MAP_TREES_FAILED,
+                    value: error
+                });
+            }
+        )
+    };
+}
+
+export const mapTrees = (saplingIds: string[], email: string) => {
+    const apiClient = new ApiClient();
+    return (dispatch: any) => {
+        dispatch({
+            type: userTreeActionTypes.MAP_USER_TREES_REQUESTED,
+        });
+        apiClient.mapTrees(saplingIds, email).then(
+            () => {
+                dispatch({
+                    type: userTreeActionTypes.MAP_USER_TREES_SUCCEEDED,
+                });
+            },
+            (error: any) => {
+                console.error(error);
+                dispatch({
+                    type: userTreeActionTypes.MAP_USER_TREES_FAILED,
+                    value: error
+                });
+            }
+        )
+    };
+}
+
+export const mapTreesForPlot = (email: string, plotId: string, count: number) => {
+    const apiClient = new ApiClient();
+    return (dispatch: any) => {
+        dispatch({
+            type: userTreeActionTypes.MAP_USER_TREES_IN_PLOT_REQUESTED,
+        });
+        apiClient.mapTreesForPlot(email, plotId, count).then(
+            () => {
+                dispatch({
+                    type: userTreeActionTypes.MAP_USER_TREES_IN_PLOT_SUCCEEDED,
+                });
+            },
+            (error: any) => {
+                console.error(error);
+                dispatch({
+                    type: userTreeActionTypes.MAP_USER_TREES_IN_PLOT_FAILED,
+                    value: error
+                });
+            }
+        )
+    };
+}
+
+export const assignTrees = (data: AssignTreeRequest) => {
+    const apiClient = new ApiClient();
+    return (dispatch: any) => {
+        dispatch({
+            type: userTreeActionTypes.ASSIGN_USER_TREES_REQUESTED,
+        });
+        apiClient.assignUserTrees(data).then(
+            () => {
+                dispatch({
+                    type: userTreeActionTypes.ASSIGN_USER_TREES_SUCCEEDED,
+                });
+            },
+            (error: any) => {
+                console.error(error);
+                dispatch({
+                    type: userTreeActionTypes.ASSIGN_USER_TREES_FAILED,
+                    value: error
+                });
+            }
+        )
+    };
+}

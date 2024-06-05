@@ -119,7 +119,7 @@ export const AdminHome = () => {
               boxShadow: "14px 14px 19px #9eaaa1,-14px -14px 19px #c4d4c9",
             }}
           >
-            <TreeLogCumulative />
+            { <TreeLogCumulative /> }
           </Box>
         </Grid>
       </Grid>

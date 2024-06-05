@@ -1,12 +1,12 @@
 import { combineReducers } from "redux";
-import { treeTypesDataReducer } from "./treeTypeReducer";
+import { treeTypesDataReducer, searchTreeTypesDataReducer } from "./treeTypeReducer";
 import { onsiteStaffsDataReducer } from "./onsiteStaffReducer";
-import { organizationsDataReducer } from "./organizationReducer";
-import { plotsDataReducer } from "./plotReducer";
-import { pondsDataReducer } from "./pondReducer";
+import { organizationsDataReducer, searchOrganizationsDataReducer } from "./organizationReducer";
+import { plotsDataReducer, searchPlotsDataReducer } from "./plotReducer";
+import { pondsDataReducer, searchPondsDataReducer, pondHistoryDataReducer } from "./pondReducer";
 import { treesDataReducer } from "./treeReducer";
-import { usersDataReducer } from "./userReducer";
-import { userTreesDataReducer } from "./userTreeReducer";
+import { usersDataReducer, searchUsersDataReducer } from "./userReducer";
+import { userTreesDataReducer, userTreeCountDataReducer } from "./userTreeReducer";
 
 const rootReducer = combineReducers({
     treeTypesData: treeTypesDataReducer,
@@ -14,10 +14,16 @@ const rootReducer = combineReducers({
     organizationsData: organizationsDataReducer,
     plotsData: plotsDataReducer,
     pondsData: pondsDataReducer,
+    pondHistoryData: pondHistoryDataReducer,
     treesData: treesDataReducer,
     usersData: usersDataReducer,
     userTreesData: userTreesDataReducer,
-
+    userTreeCountData: userTreeCountDataReducer,
+    searchTreeTypesData: searchTreeTypesDataReducer,
+    searchPondsData: searchPondsDataReducer,
+    searchPlotsData: searchPlotsDataReducer,
+    searchUsersData: searchUsersDataReducer,
+    searchOrganizationsData: searchOrganizationsDataReducer,
 });
 
 export default rootReducer;

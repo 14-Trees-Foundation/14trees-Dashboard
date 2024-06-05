@@ -99,7 +99,7 @@ export const TreeCountByType = () => {
     };
   });
 
-  // fiilteredCount = fiilteredCount.slice(0, 50);
+  fiilteredCount = fiilteredCount.slice(0, 50);
 
   const [state, setState] = useState(0);
 

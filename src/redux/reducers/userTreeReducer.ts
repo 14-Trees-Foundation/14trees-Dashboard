@@ -1,9 +1,8 @@
 import { UnknownAction } from "redux";
-import { UserTreesDataState, UserTree } from "../../types/userTree";
+import { UserTreesDataState, UserTree, UserTreeCountDataState, UserTreeCountPaginationResponse } from "../../types/userTree";
 import userTreeActionTypes from "../actionTypes/userTreeActionTypes";
-import { fetchDataFromLocal } from "../../api/apiClient/apiClient";
 
-export const userTreesDataReducer = (state = fetchDataFromLocal("userTreesDataState"), action: UnknownAction ): UserTreesDataState => {
+export const userTreesDataReducer = (state = {}, action: UnknownAction ): UserTreesDataState => {
     switch (action.type) {
         case userTreeActionTypes.GET_USER_TREES_SUCCEEDED:
             if (action.payload) {
@@ -37,10 +36,32 @@ export const userTreesDataReducer = (state = fetchDataFromLocal("userTreesDataSt
                 return nextState;
             }
             return state;
-        case userTreeActionTypes.DELETE_USER_TREE_SUCCEEDED:
+        case userTreeActionTypes.UNASSIGN_USER_TREES_SUCCEEDED:
             if (action.payload) {
                 const nextState = { ...state } as UserTreesDataState;
                 Reflect.deleteProperty(nextState, action.payload as string)
+                return nextState;
+            }
+            return state;
+        
+        default:
+            return state;
+    }
+};
+
+export const userTreeCountDataReducer = (state = { results: [], totalResults: 0}, action: UnknownAction ): UserTreeCountDataState => {
+    switch (action.type) {
+        case userTreeActionTypes.GET_USER_TREE_COUNT_SUCCEEDED:
+            if (action.payload) {
+                let userTreeCountDataState: UserTreeCountDataState = { totalResults: state.totalResults, results: state.results }
+                let payload = action.payload as UserTreeCountPaginationResponse
+                if (!userTreeCountDataState || userTreeCountDataState.totalResults != payload.total || payload.offset === 0) {
+                    userTreeCountDataState = {
+                        totalResults: payload.total,
+                        results: []
+                    }
+                }
+                const nextState: UserTreeCountDataState = { totalResults: userTreeCountDataState.totalResults, results: [...userTreeCountDataState.results, ...payload.result]};
                 return nextState;
             }
             return state;

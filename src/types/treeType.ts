@@ -4,6 +4,7 @@ export type TreeType = {
     _id: string,
     name: string,
     scientific_name: string,
+    name_english: string,
     tree_id: string,
     image: [string],
     family: string,
@@ -18,4 +19,17 @@ export type TreeType = {
     desc: string,
 }
 
-export type TreeTypesDataState = Record<string, TreeType>
+export type CreateTreeTypeResponse = {
+    csvupload: string,
+    treetype: TreeType
+}
+
+export type TreeTypePaginationResponse = {
+    total: number,
+    result: TreeType[]
+}
+
+export type TreeTypesDataState = {
+    totalTreeTypes: number,
+    treeTypes: Record<string, TreeType>
+}

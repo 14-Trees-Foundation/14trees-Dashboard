@@ -1,18 +1,19 @@
 import ApiClient from "../../api/apiClient/apiClient";
 import treeActionTypes from "../actionTypes/treeActionTypes";
-import { Tree } from "../../types/tree";
+import { PaginationTreeResponse, Tree } from "../../types/tree";
+import { off } from "process";
 
-export const getTrees = () => {
+export const getTrees = (offset: number, limit: number, filters?: any) => {
     const apiClient = new ApiClient()
     return (dispatch: any) => {
         dispatch({
             type: treeActionTypes.GET_TREES_REQUESTED,
         });
-        apiClient.getTrees().then(
-            (value: Tree[]) => {
-                for (let i = 0; i < value.length; i++) {
-                    if (value[i]?._id) {
-                        value[i].key = value[i]._id
+        apiClient.getTrees(offset, limit, filters).then(
+            (value: PaginationTreeResponse) => {
+                for (let i = 0; i < value.results.length; i++) {
+                    if (value.results[i]?._id) {
+                        value.results[i].key = value.results[i]._id
                     }
                 }
                 dispatch({
@@ -31,13 +32,13 @@ export const getTrees = () => {
     }
 };
 
-export const createTree = (record: Tree) => {
+export const createTree = (record: Tree, file?:Blob) => {
     const apiClient = new ApiClient();
     return (dispatch: any) => {
         dispatch({
             type: treeActionTypes.CREATE_TREE_REQUESTED,
         });
-        apiClient.createTree(record).then(
+        apiClient.createTree(record, file).then(
             (value: Tree) => {
                 dispatch({
                     type: treeActionTypes.CREATE_TREE_SUCCEEDED,
@@ -54,13 +55,13 @@ export const createTree = (record: Tree) => {
     };
 };
 
-export const updateTree = (record: Tree) => {
+export const updateTree = (record: Tree, file?: Blob) => {
     const apiClient = new ApiClient();
     return (dispatch: any) => {
         dispatch({
             type: treeActionTypes.UPDATE_TREE_REQUESTED,
         });
-        apiClient.updateTree(record).then(
+        apiClient.updateTree(record, file).then(
             (value: Tree) => {
                 dispatch({
                     type: treeActionTypes.UPDATE_TREE_SUCCEEDED,
