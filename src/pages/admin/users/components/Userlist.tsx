@@ -5,6 +5,9 @@ import {
   GridToolbar,
   GridValueGetterParams,
   GridValueFormatterParams,
+  GridEditModes,
+  GridFilterModel,
+  GridCallbackDetails,
 } from "@mui/x-data-grid";
 
 import { allUserProfile } from "../../../../store/adminAtoms";
@@ -103,6 +106,11 @@ export const Userlist = () => {
           />
         </div>
         <DataGrid
+          filterMode="server"
+          onFilterModelChange={(model: GridFilterModel, details: GridCallbackDetails) => {
+            console.log(model);
+            console.log(details);
+          }}
           components={{ Toolbar: GridToolbar }}
           getRowId={(row) => row._id}
           rows={userProfiles}

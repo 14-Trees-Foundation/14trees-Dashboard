@@ -5,6 +5,7 @@ import { DataGrid, GridToolbar } from "@mui/x-data-grid";
 
 import { allPonds } from "../../../../store/adminAtoms";
 import Chip from "../../../../stories/Chip/Chip";
+import { useAppSelector } from "../../../../redux/store/hooks";
 
 function getCapacity(params) {
   return (
@@ -40,6 +41,12 @@ const columns = [
 export const PondsList = () => {
   const ponds = useRecoilValue(allPonds);
   const theme = useTheme();
+  const pondsData = useAppSelector((state) => state.pondsData);
+  let pondsList = [];
+  if (pondsData) {
+    pondsList = Object.values(pondsData.ponds);
+  }
+
 
   return (
     <>
@@ -65,7 +72,7 @@ export const PondsList = () => {
       >
         <div style={{ display: "flex", padding: "16px 0" }}>
           <Chip
-            label={`Total - ${ponds.length}`}
+            label={`Total - ${pondsData.totalPonds}`}
             size={"large"}
             mode={"secondary"}
             backgroundColor={theme.custom.color.secondary.red}
@@ -74,10 +81,11 @@ export const PondsList = () => {
         <DataGrid
           components={{ Toolbar: GridToolbar }}
           getRowId={(row) => row._id}
-          rows={ponds}
+          rows={pondsList}
+          rowCount={pondsData.totalPonds}
           columns={columns}
-          pageSize={50}
-          rowsPerPageOptions={[50]}
+          pageSize={10}
+          rowsPerPageOptions={[10]}
           disableSelectionOnClick
         />
       </Box>
