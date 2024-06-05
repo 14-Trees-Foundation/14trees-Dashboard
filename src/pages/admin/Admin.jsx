@@ -85,7 +85,7 @@ export const Admin = () => {
     },
     {
       page: TreeTypeComponent,
-      displayName: "Tree Types",
+      displayName: "Plant Types",
     },
     {
       page: Ponds,

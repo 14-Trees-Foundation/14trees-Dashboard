@@ -28,7 +28,7 @@ const AddUser = ({ open, handleClose, createUser, searchUser }) => {
     let usersList = [];
     const usersData = useAppSelector((state) => state.searchUsersData);
     if (usersData) {
-        usersList = Object.values(usersData);
+        usersList = Object.values(usersData.users);
     }
 
     const handleChange = (event) => {
@@ -111,7 +111,7 @@ const AddUser = ({ open, handleClose, createUser, searchUser }) => {
                                 </Autocomplete>
                             </Grid>
                             <Grid item xs={12}>
-                                <TextField name="dob" label="Date of Birth" type="date" value={formData.dob} onChange={handleChange} InputLabelProps={{ shrink: true }} fullWidth/>
+                                <TextField name="dob" label="Date of Birth" type="date" value={formData.dob ? formData.dob.substring(0, 10): ''} onChange={handleChange} InputLabelProps={{ shrink: true }} fullWidth/>
                             </Grid>
                             <Grid item xs={12} sx={{display:'flex', justifyContent:'center', }}>
                                 <Button type="submit">Submit</Button>

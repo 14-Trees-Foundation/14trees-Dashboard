@@ -1,5 +1,5 @@
 import { UnknownAction } from "redux";
-import { TreeTypesDataState, TreeType, SearchTreeTypesDataState, TreeTypePaginationResponse } from "../../types/treeType";
+import { TreeTypesDataState, TreeType, TreeTypePaginationResponse } from "../../types/treeType";
 import treeTypeActionTypes from "../actionTypes/treeTypeActionTypes";
 import { fetchDataFromLocal } from "../../api/apiClient/apiClient";
 
@@ -57,19 +57,19 @@ export const treeTypesDataReducer = (state = { totalTreeTypes: 0, treeTypes: {} 
     }
 };
 
-export const searchTreeTypesDataReducer = (state = {}, action: UnknownAction): SearchTreeTypesDataState => {
+export const searchTreeTypesDataReducer = (state = { totalTreeTypes: 0, treeTypes: {} }, action: UnknownAction ): TreeTypesDataState => {
     switch(action.type) {
         case treeTypeActionTypes.SEARCH_TREE_TYPES_SUCCEEDED:
             if (action.payload) {
-                let treeTypesDataState: SearchTreeTypesDataState = {}
+                let treeTypesDataState: TreeTypesDataState = { totalTreeTypes: state.totalTreeTypes, treeTypes: { ...state.treeTypes} }
                 let payload = action.payload as [TreeType]
                 for (let i = 0; i < payload.length; i++) {
                     if (payload[i]?._id) {
                         payload[i].key = payload[i]._id
-                        treeTypesDataState[payload[i]._id] = payload[i]
+                        treeTypesDataState.treeTypes[payload[i]._id] = payload[i]
                     }
                 }
-                const nextState: SearchTreeTypesDataState = treeTypesDataState;
+                const nextState: TreeTypesDataState = treeTypesDataState;
                 return nextState;
             }
             return state;

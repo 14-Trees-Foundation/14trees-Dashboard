@@ -1,7 +1,6 @@
 import { UnknownAction } from "redux";
-import { PondsDataState, Pond, SearchPondsDataState, PondPaginationResponse, PondHistoryDataState } from "../../types/pond";
+import { PondsDataState, Pond, PondPaginationResponse, PondHistoryDataState } from "../../types/pond";
 import pondActionTypes from "../actionTypes/pondActionTypes";
-import { fetchDataFromLocal } from "../../api/apiClient/apiClient";
 
 export const pondsDataReducer = (state = { totalPonds:0, ponds: {}}, action: UnknownAction ): PondsDataState => {
     switch (action.type) {
@@ -59,19 +58,19 @@ export const pondsDataReducer = (state = { totalPonds:0, ponds: {}}, action: Unk
     }
 };
 
-export const searchPondsDataReducer = (state = {}, action: UnknownAction): SearchPondsDataState => {
+export const searchPondsDataReducer = (state = { totalPonds:0, ponds: {}}, action: UnknownAction ): PondsDataState => {
     switch(action.type) {
         case pondActionTypes.SEARCH_PONDS_SUCCEEDED:
             if (action.payload) {
-                let pondsDataState: SearchPondsDataState = {}
+                let pondsDataState: PondsDataState = { totalPonds: state.totalPonds, ponds: { ...state.ponds }};
                 let payload = action.payload as [Pond]
                 for (let i = 0; i < payload.length; i++) {
                     if (payload[i]?._id) {
                         payload[i].key = payload[i]._id
-                        pondsDataState[payload[i]._id] = payload[i]
+                        pondsDataState.ponds[payload[i]._id] = payload[i]
                     }
                 }
-                const nextState: SearchPondsDataState = pondsDataState;
+                const nextState: PondsDataState = pondsDataState;
                 return nextState;
             }
             return state;

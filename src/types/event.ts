@@ -20,4 +20,3 @@ export type EventsDataState = {
     totalEvents: number,
     Events: Record<string, Event>
 }
-export type SearchEventsDataState = Record<string,Event>;

@@ -17,4 +17,3 @@ export type OrganizationsDataState = {
     totalOrganizations: number,
     organizations: Record<string, Organization>
 }
-export type SearchOrganizationsDataState = Record<string, Organization>;

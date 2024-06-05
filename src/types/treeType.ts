@@ -33,4 +33,3 @@ export type TreeTypesDataState = {
     totalTreeTypes: number,
     treeTypes: Record<string, TreeType>
 }
-export type SearchTreeTypesDataState = Record<string, TreeType>

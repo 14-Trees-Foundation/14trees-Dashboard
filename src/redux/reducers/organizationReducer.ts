@@ -1,5 +1,5 @@
 import { UnknownAction } from "redux";
-import { Organization, OrganizationPaginationResponse, OrganizationsDataState, SearchOrganizationsDataState } from "../../types/organization";
+import { Organization, OrganizationPaginationResponse, OrganizationsDataState } from "../../types/organization";
 import organizationActionTypes from "../actionTypes/organizationActionTypes";
 
 export const organizationsDataReducer = (state = { totalOrganizations:0, organizations: {} }, action: UnknownAction ): OrganizationsDataState => {
@@ -53,19 +53,19 @@ export const organizationsDataReducer = (state = { totalOrganizations:0, organiz
     }
 };
 
-export const searchOrganizationsDataReducer = (state = {}, action: UnknownAction): SearchOrganizationsDataState => {
+export const searchOrganizationsDataReducer = (state = { totalOrganizations:0, organizations: {} }, action: UnknownAction ): OrganizationsDataState => {
     switch(action.type) {
         case organizationActionTypes.SEARCH_ORGANIZATIONS_SUCCEEDED:
             if (action.payload) {
-                let organizationsDataState: SearchOrganizationsDataState = {}
+                let organizationsDataState: OrganizationsDataState = { totalOrganizations: state.totalOrganizations, organizations: { ...state.organizations }}
                 let payload = action.payload as [Organization]
                 for (let i = 0; i < payload.length; i++) {
                     if (payload[i]?._id) {
                         payload[i].key = payload[i]._id
-                        organizationsDataState[payload[i]._id] = payload[i]
+                        organizationsDataState.organizations[payload[i]._id] = payload[i]
                     }
                 }
-                const nextState: SearchOrganizationsDataState = organizationsDataState;
+                const nextState: OrganizationsDataState = organizationsDataState;
                 return nextState;
             }
             return state;

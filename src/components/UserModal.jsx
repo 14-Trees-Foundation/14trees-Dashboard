@@ -28,7 +28,7 @@ const UserModal = ({ open, handleClose, onSubmit, searchUser }) => {
     let usersList = [];
     const usersData = useAppSelector((state) => state.searchUsersData);
     if (usersData) {
-        usersList = Object.values(usersData);
+        usersList = Object.values(usersData.users);
     }
 
     const handleChange = (event) => {
@@ -37,7 +37,8 @@ const UserModal = ({ open, handleClose, onSubmit, searchUser }) => {
             [event.target.name]: event.target.value,
         });
     };
-
+ 
+    // search based on phone will be added after postgres changes
     const handleEmailChange = (event, value) => {
         let isSet = false;
         usersList.forEach((user) => {

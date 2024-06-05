@@ -1,7 +1,6 @@
 import { UnknownAction } from "redux";
-import { SearchUsersDataState, User, UserPaginationResponse, UsersDataState } from "../../types/user";
+import { User, UserPaginationResponse, UsersDataState } from "../../types/user";
 import userActionTypes from "../actionTypes/userActionTypes";
-import { fetchDataFromLocal } from "../../api/apiClient/apiClient";
 
 export const usersDataReducer = (state = { totalUsers:0, users: {}}, action: UnknownAction ): UsersDataState => {
     switch (action.type) {
@@ -57,19 +56,19 @@ export const usersDataReducer = (state = { totalUsers:0, users: {}}, action: Unk
     }
 };
 
-export const searchUsersDataReducer = (state = {}, action: UnknownAction): SearchUsersDataState => {
+export const searchUsersDataReducer = (state = { totalUsers:0, users: {}}, action: UnknownAction ): UsersDataState => {
     switch(action.type) {
         case userActionTypes.SEARCH_USERS_SUCCEEDED:
             if (action.payload) {
-                let usersDataState: SearchUsersDataState = {}
+                let usersDataState: UsersDataState = { totalUsers: state.totalUsers, users: { ...state.users }};
                 let payload = action.payload as [User]
                 for (let i = 0; i < payload.length; i++) {
                     if (payload[i]?._id) {
                         payload[i].key = payload[i]._id
-                        usersDataState[payload[i]._id] = payload[i]
+                        usersDataState.users[payload[i]._id] = payload[i]
                     }
                 }
-                const nextState: SearchUsersDataState = usersDataState;
+                const nextState: UsersDataState = usersDataState;
                 return nextState;
             }
             return state;

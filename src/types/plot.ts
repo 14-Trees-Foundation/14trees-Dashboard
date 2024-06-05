@@ -30,4 +30,3 @@ export type PlotsDataState = {
     totalPlots: number,
     plots: Record<string, Plot>
 }
-export type SearchPlotsDataState = Record<string, Plot>;

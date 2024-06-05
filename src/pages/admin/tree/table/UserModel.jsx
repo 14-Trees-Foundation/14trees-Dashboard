@@ -32,7 +32,7 @@ const UserModal = ({ open, handleClose, onSubmit }) => {
 
     const usersData = useAppSelector((state) => state.searchUsersData);
     if (usersData) {
-        const users = Object.values(usersData);
+        const users = Object.values(usersData.users);
         if (users.length !== 0) {
             formData.name = users[0].name;
             formData.phone = users[0].phone;

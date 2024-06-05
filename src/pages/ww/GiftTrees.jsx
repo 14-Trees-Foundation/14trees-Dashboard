@@ -60,7 +60,7 @@ const intitialFValues = {
   trees: [],
   filteredTrees: [],
   selectedTreeSum: 0,
-  pwdDlgOpen: true,
+  pwdDlgOpen: false,
   shareDlgOpen: false,
   shareName: "",
   shareTree: "",

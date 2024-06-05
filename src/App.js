@@ -57,13 +57,27 @@ function App() {
             </Route>
           </Route>
           <Route path="/ww" element={<WW />}>
-            <Route path=":email" element={<GiftTrees />}></Route>
+            <Route 
+              path=":email" 
+              element={ 
+                <RequireAuth>
+                  <GiftTrees />
+                </RequireAuth>
+              } 
+            ></Route>
           </Route>
           <Route path="/events" element={<Events />}>
             <Route path="birthday/:id" element={<Birthday />}></Route>
           </Route>
           <Route path="/notfound" element={<NotFound />} />
-          <Route path="/test" element={<Test />} />
+          <Route 
+            path="/test" 
+            element={
+              <RequireAuth>
+                <Test />
+              </RequireAuth>
+            } 
+          />
         </Routes>
       </Layout>
     </AuthProvider>

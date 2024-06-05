@@ -1,5 +1,5 @@
 import { UnknownAction } from "redux";
-import { PlotsDataState, Plot, SearchPlotsDataState, PlotPaginationResponse } from "../../types/plot";
+import { PlotsDataState, Plot, PlotPaginationResponse } from "../../types/plot";
 import plotActionTypes from "../actionTypes/plotActionTypes";
 
 export const plotsDataReducer = (state = { totalPlots:0, plots: {} }, action: UnknownAction ): PlotsDataState => {
@@ -56,19 +56,19 @@ export const plotsDataReducer = (state = { totalPlots:0, plots: {} }, action: Un
     }
 };
 
-export const searchPlotsDataReducer = (state = {}, action: UnknownAction): SearchPlotsDataState => {
+export const searchPlotsDataReducer = (state = { totalPlots:0, plots: {} }, action: UnknownAction ): PlotsDataState => {
     switch(action.type) {
         case plotActionTypes.SEARCH_PLOTS_SUCCEEDED:
             if (action.payload) {
-                let plotsDataState: SearchPlotsDataState = {}
+                let plotsDataState: PlotsDataState = { totalPlots: state.totalPlots, plots: { ...state.plots }};
                 let payload = action.payload as [Plot]
                 for (let i = 0; i < payload.length; i++) {
                     if (payload[i]?._id) {
                         payload[i].key = payload[i]._id
-                        plotsDataState[payload[i]._id] = payload[i]
+                        plotsDataState.plots[payload[i]._id] = payload[i]
                     }
                 }
-                const nextState: SearchPlotsDataState = plotsDataState;
+                const nextState: PlotsDataState = plotsDataState;
                 return nextState;
             }
             return state;

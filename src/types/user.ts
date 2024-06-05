@@ -21,4 +21,3 @@ export type UsersDataState = {
     totalUsers: number,
     users: Record<string, User>
 }
-export type SearchUsersDataState = Record<string,User>;

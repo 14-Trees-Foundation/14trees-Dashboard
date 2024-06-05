@@ -1,9 +1,8 @@
 import { UnknownAction } from "redux";
 import { UserTreesDataState, UserTree, UserTreeCountDataState, UserTreeCountPaginationResponse } from "../../types/userTree";
 import userTreeActionTypes from "../actionTypes/userTreeActionTypes";
-import { fetchDataFromLocal } from "../../api/apiClient/apiClient";
 
-export const userTreesDataReducer = (state = fetchDataFromLocal("userTreesDataState"), action: UnknownAction ): UserTreesDataState => {
+export const userTreesDataReducer = (state = {}, action: UnknownAction ): UserTreesDataState => {
     switch (action.type) {
         case userTreeActionTypes.GET_USER_TREES_SUCCEEDED:
             if (action.payload) {
