@@ -77,7 +77,7 @@ export const User1 = () => {
 
   const handleClick = (e: GridCellParams<any, any, any>) => {
     if (e.field === "email") {
-      window.open("http://localhost:3000/ww/" + e.formattedValue);
+      window.open("https://dashboard.14trees.org/ww/" + e.formattedValue);
     }
   };
 
@@ -118,7 +118,7 @@ export const User1 = () => {
           </Button>
           <Button
             onClick={() => {
-              window.open("http://localhost:3000/ww/" + params.row.email);
+              window.open("https://dashboard.14trees.org/ww/" + params.row.email);
             }}
           >
             <AccountCircleRoundedIcon />
@@ -177,7 +177,7 @@ export const User1 = () => {
           </Button>
           <Button
             onClick={() => {
-              window.open("http://localhost:3000/ww/" + record.email);
+              window.open("https://dashboard.14trees.org/ww/" + record.email);
             }}
           >
             <AccountCircleRoundedIcon />
