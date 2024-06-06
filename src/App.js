@@ -12,7 +12,7 @@ import { Layout } from "./components/Layout";
 import { GiftTrees } from "./pages/ww/GiftTrees";
 import { WW } from "./pages/ww/WW";
 // import { AdminLogin } from "./pages/admin/GoogleLogin";
-import { RequireAuth } from "./pages/admin/auth/RequireAuth";
+// import { RequireAuth } from "./pages/admin/auth/RequireAuth";
 import { AuthProvider } from "./pages/admin/auth/auth";
 import { Login } from "./pages/admin/Login/Login";
 import { Forms } from "./pages/admin/Forms/Forms";
@@ -46,9 +46,9 @@ function App() {
           <Route
             path="/admin"
             element={
-              <RequireAuth>
+              // <RequireAuth>
                 <Admin />
-              </RequireAuth>
+              // </RequireAuth>
             }
           >
             <Route path="forms" element={<Forms />}>
@@ -60,9 +60,9 @@ function App() {
             <Route 
               path=":email" 
               element={ 
-                <RequireAuth>
+                // <RequireAuth>
                   <GiftTrees />
-                </RequireAuth>
+                // </RequireAuth>
               } 
             ></Route>
           </Route>
@@ -73,9 +73,9 @@ function App() {
           <Route 
             path="/test" 
             element={
-              <RequireAuth>
+              // <RequireAuth>
                 <Test />
-              </RequireAuth>
+              // </RequireAuth>
             } 
           />
         </Routes>
