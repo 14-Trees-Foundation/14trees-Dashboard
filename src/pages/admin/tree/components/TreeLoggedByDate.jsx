@@ -21,7 +21,7 @@ export const TreeLoggedByDate = () => {
   const [days, setDays] = useState(20);
   const [open, setOpen] = useState(false);
 
-  let treeByDateShow = treeByDate.slice(0, days);
+  let treeByDateShow = Array.isArray(treeByDate) ? treeByDate.slice(0, days) : [];
 
   const handleChange = (event) => {
     setDays(event.target.value);

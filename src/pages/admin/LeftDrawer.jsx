@@ -13,11 +13,15 @@ import AccountCircleOutlined from "@mui/icons-material/AccountCircleOutlined";
 import FaceIcon from "@mui/icons-material/Face";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
-
+import LandscapeIcon from '@mui/icons-material/Landscape';
+import CorporateFareIcon from '@mui/icons-material/CorporateFare';
 import logo from "../../assets/logo_white_small.png";
 import { useRecoilState } from "recoil";
 import { adminNavIndex } from "../../store/adminAtoms";
 import { useAuth } from "./auth/auth";
+import VolunteerActivismIcon from '@mui/icons-material/VolunteerActivism';
+import MapIcon from '@mui/icons-material/Map';
+import FestivalIcon from '@mui/icons-material/Festival';
 
 export const AdminLeftDrawer = () => {
   const theme = useTheme();
@@ -26,9 +30,18 @@ export const AdminLeftDrawer = () => {
   const classes = useStyles();
   const [index, setIndex] = useRecoilState(adminNavIndex);
   let auth = useAuth();
+  const [subIndex, setSubIndex] = useState(null);
+  const [expanded, setExpanded] = useState(null);
 
-  const onClickNav = (value) => {
-    setIndex(value);
+  const onClickNav = (value, subValue) => {
+    if (subValue !== undefined) {
+      setIndex(value);
+      setSubIndex(subValue);
+    } else {
+      setIndex(value);
+      setSubIndex(null);
+      setExpanded(value !== expanded ? value : null);
+    }
   };
 
   const pages = [
@@ -38,7 +51,12 @@ export const AdminLeftDrawer = () => {
       display: true,
     },
     {
-      displayName: "Tree",
+      displayName: "Trees",
+      logo: ForestOutlined,
+      display: true,
+    },
+    {
+      displayName: "TreeType",
       logo: ForestOutlined,
       display: true,
     },
@@ -48,20 +66,48 @@ export const AdminLeftDrawer = () => {
       display: true,
     },
     {
+      displayName: "Plot",
+      logo: LandscapeIcon,
+      display: true,
+    },
+    {
       displayName: "Users",
       logo: AccountCircleOutlined,
-      display: auth.permissions.includes("all"),
+      // display: auth.permissions.includes("all"),
+      display: true,
     },
+    {
+      displayName: 'Organization',
+      logo: CorporateFareIcon,
+      display: true
+    },
+    // {
+    //   displayName: 'Sites',
+    //   logo: MapIcon,
+    //   display: true
+    // },
+    // {
+    //   displayName: 'Events',
+    //   logo: FestivalIcon,
+    //   display: true
+    // },
+    // {
+    //   displayName: 'Donation',
+    //   logo: VolunteerActivismIcon,
+    //   display: true
+    // },
     {
       displayName: "Images",
       logo: FaceIcon,
-      display: auth.permissions.includes("all"),
-    },
-    {
-      displayName: "Forms",
-      logo: AssignmentOutlined,
+      // display: auth.permissions.includes("all"),
       display: true,
     },
+    // {
+    //   displayName: "Forms",
+    //   logo: AssignmentOutlined,
+    //   display: true,
+    // },
+
   ];
   const menuitem = () => {
     return (
@@ -80,6 +126,21 @@ export const AdminLeftDrawer = () => {
                   <item.logo />
                   <div className={classes.itemtext}>{item.displayName}</div>
                 </div>
+                {i === expanded && item.subPages && item.subPages.map((subItem, j) => (
+                  <div
+                    className={classes.item}
+                    onClick={() => onClickNav(i, j)}
+                    key={j}
+                    style={{ marginLeft: 20, marginTop: 10 }} 
+                  >
+                    <div
+                      className={index === i && subIndex === j ? classes.selected : classes.itembtn}
+                    >
+                      <subItem.logo />
+                      <div className={classes.itemtext}>{subItem.displayName}</div>
+                    </div>
+                  </div>
+                ))}
               </div>
             );
           } else {
@@ -89,6 +150,7 @@ export const AdminLeftDrawer = () => {
       </div>
     );
   };
+
   if (matches) {
     return (
       <Box>

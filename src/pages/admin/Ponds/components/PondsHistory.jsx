@@ -13,16 +13,17 @@ import {
 import { pondHistory, selectedPond } from "../../../../store/adminAtoms";
 import { Typography } from "@mui/material";
 import { CustomBox } from "../../../../components/CustomBox";
+import { useAppSelector } from "../../../../redux/store/hooks";
 
 export const PondsHistory = () => {
   const theme = useTheme();
   let history = useRecoilValue(pondHistory);
-  let pondName = useRecoilValue(selectedPond);
+  // let pondName = useRecoilValue(selectedPond);
   //  let data = history.map(({levelFt, date, images, ...attrs}) => ({date, levelFt}))
-
+  let pond = useAppSelector((state) => state.pondHistoryData);
   let data;
-  if (history.length > 0) {
-    data = history.map((item) => {
+  if (pond?.updates?.length > 0) {
+    data = pond?.updates.map((item) => {
       return {
         date: item.date,
         level: item.levelFt,
@@ -44,7 +45,7 @@ export const PondsHistory = () => {
             <Typography variant="h6" gutterBottom>
               Pond level (Feets):{" "}
               <em style={{ color: theme.custom.color.primary.blue }}>
-                {pondName}
+                {pond?.name}
               </em>
             </Typography>
           </div>

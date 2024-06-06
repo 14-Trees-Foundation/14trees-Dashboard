@@ -1,7 +1,14 @@
 import { useRecoilValue } from "recoil";
+import React, { useEffect, useState } from 'react';
+import * as userTreesActionCreators from '../../../../redux/actions/userTreeActions';
+import {bindActionCreators} from 'redux';
+import {useAppDispatch, useAppSelector} from '../../../../redux/store/hooks';
+
 import {
   DataGrid,
   GridCellParams,
+  GridFilterItem,
+  GridFilterModel,
   GridToolbar,
   GridValueGetterParams,
 } from "@mui/x-data-grid";
@@ -9,6 +16,7 @@ import {
 import Chip from "../../../../stories/Chip/Chip";
 import { userTreeHoldings } from "../../../../store/adminAtoms";
 import { Box } from "@mui/material";
+import { RootState } from "../../../../redux/store/store";
 
 const columns = [
   {
@@ -37,7 +45,7 @@ const columns = [
     width: 150,
     editable: false,
     valueGetter: (params: GridValueGetterParams) => {
-      if (params.row.matched === 0) {
+      if (!params.row.matched) {
         return 0;
       } else {
         return params.row.matched.count;
@@ -55,22 +63,37 @@ const columns = [
 
 const handleClick = (e: GridCellParams<any, any, any>) => {
   if (e.field === "email") {
-    window.open("https://dashboard.14trees.org/ww/" + e.formattedValue);
+    window.open("http://localhost:3000/ww/" + e.formattedValue);
   }
 };
 
 export const UserTreeHoldings = () => {
-  const treeHoldings = useRecoilValue(userTreeHoldings);
 
+    let [ currentPage, setCurrentPage ] = useState<number>(0);
+  let [ filters, setFilters ] = useState<GridFilterItem[]>([]);
+
+  const dispatch = useAppDispatch();
+    const { getUserTreeCount } =
+        bindActionCreators(userTreesActionCreators, dispatch);
+
+  const userTreeCountData = useAppSelector((state: RootState) => state.userTreeCountData)
+  // const treeHoldings = useRecoilValue(userTreeHoldings);
+  const treeHoldings = userTreeCountData.results;
   let allTrees = 0;
   let assignedTrees = 0;
+
+  const getUserTreeData = () => {
+        getUserTreeCount(currentPage*20, 20, filters);
+  }
+
+  useEffect(getUserTreeData, [currentPage, filters]);
 
   treeHoldings.forEach((element: { count: number }) => {
     allTrees += element.count;
   });
 
   treeHoldings.forEach((element: { matched: { count: number } }) => {
-    if (element.matched.count) {
+    if (element.matched?.count) {
       assignedTrees += element.matched.count;
     }
   });
@@ -113,12 +136,20 @@ export const UserTreeHoldings = () => {
           />
         </div>
         <DataGrid
+          filterMode="server"
+          onFilterModelChange={(model: GridFilterModel) => {
+            setFilters(model.items)
+          }}
           components={{ Toolbar: GridToolbar }}
           getRowId={(row) => row.user.name + row.plot.name}
+          rowCount={userTreeCountData.totalResults}
           rows={treeHoldings}
           columns={columns}
-          pageSize={50}
-          rowsPerPageOptions={[50]}
+          pageSize={20}
+          rowsPerPageOptions={[20]}
+          onPageChange={(page: number) => {
+            setCurrentPage(page);
+          }}
           onCellClick={(e) => handleClick(e)}
         />
       </Box>

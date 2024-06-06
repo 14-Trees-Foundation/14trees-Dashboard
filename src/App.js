@@ -20,6 +20,7 @@ import { Birthday } from "./pages/events/Birthday";
 import { VisitorNew } from "./pages/Visitor/Visitor2";
 import { OrgEvent } from "./pages/events/OrgEvent";
 import { Corporate } from "./pages/events/Corporate";
+import { Test } from "./pages/test/test";
 
 function App() {
   return (
@@ -56,12 +57,27 @@ function App() {
             </Route>
           </Route>
           <Route path="/ww" element={<WW />}>
-            <Route path=":email" element={<GiftTrees />}></Route>
+            <Route 
+              path=":email" 
+              element={ 
+                <RequireAuth>
+                  <GiftTrees />
+                </RequireAuth>
+              } 
+            ></Route>
           </Route>
           <Route path="/events" element={<Events />}>
             <Route path="birthday/:id" element={<Birthday />}></Route>
           </Route>
           <Route path="/notfound" element={<NotFound />} />
+          <Route 
+            path="/test" 
+            element={
+              <RequireAuth>
+                <Test />
+              </RequireAuth>
+            } 
+          />
         </Routes>
       </Layout>
     </AuthProvider>

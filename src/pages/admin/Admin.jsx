@@ -14,11 +14,18 @@ import {
   plotsList
 } from "../../store/adminAtoms";
 import { AdminHome } from "./home/AdminHome";
-import { Tree } from "./tree/Tree";
+import { Trees } from "./tree/Tree";
 import { Forms } from "./Forms/Forms";
 import { Users } from "./users/Users";
 import { Ponds } from "./Ponds/Ponds";
 import { Images } from "./images/Images";
+import { TreeNew } from "./tree/table/Tree";
+import { TreeTypeComponent } from "./treeType/TreeType";
+import { PlotComponent } from "./plot/Plot";
+import { OrganizationComponent } from "./organization/Organization";
+import { DonationComponent } from "./donation/Donation";
+import { SitesComponent } from "./sites/Sites";
+import { EventsComponent } from "./events/Events";
 
 export const Admin = () => {
   const classes = useStyles();
@@ -51,7 +58,7 @@ export const Admin = () => {
       }
       let plotRes = await Axios.default.get(`/plots`);
       if (plotRes.status === 200) {
-        setPlotsList(plotRes.data);
+        setPlotsList(plotRes.data.result);
       }
     } catch (error) {
       if (error.response.status === 500) {
@@ -70,23 +77,54 @@ export const Admin = () => {
   const pages = [
     {
       page: AdminHome,
+      displayName: "Admin Home",
     },
     {
-      page: Tree,
+      page: Trees,
+      displayName: "Trees",
+    },
+    {
+      page: TreeTypeComponent,
+      displayName: "Plant Types",
     },
     {
       page: Ponds,
+      displayName: "Ponds",
+    },
+    {
+      page: PlotComponent,
+      displayName: "Plots",
     },
     {
       page: Users,
+      displayName: "Users",
     },
+    {
+      page: OrganizationComponent,
+      displayName: "Organizations",
+    },
+    // {
+    //   page: SitesComponent,
+    //   displayName: "Sites",
+    // },
+    // {
+    //   page: EventsComponent,
+    //   displayName: "Events",
+    // },
+    // {
+    //   page: DonationComponent,
+    //   displayName: "Donations",
+    // },
     {
       page: Images,
+      displayName: "Images",
     },
-    {
-      page: Forms,
-    },
+    // {
+    //   page: Forms,
+    //   displayName: "Forms",
+    // },
   ];
+
   const mainBox = () => {
     const Page = pages[index].page;
     return (

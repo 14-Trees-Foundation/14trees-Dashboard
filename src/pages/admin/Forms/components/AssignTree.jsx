@@ -116,7 +116,7 @@ export const AssignTree = ({ selTrees, onTreesChanged }) => {
             Step - 2
           </Typography>
           <Typography variant="h5" gutterBottom sx={{ pb: 2 }}>
-            Assigners Form
+            Enter User Details and number of saplings
           </Typography>
           <Form
             onSubmit={formSubmit}
