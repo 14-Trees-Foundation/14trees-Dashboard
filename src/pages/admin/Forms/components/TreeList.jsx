@@ -1,5 +1,4 @@
-import { useState } from "react";
-import { useRecoilValue } from "recoil";
+import { useEffect,useState } from "react";
 import { ToastContainer, toast } from "react-toastify";
 import {
   Paper,
@@ -12,14 +11,37 @@ import {
 
 import Axios from "../../../../api/local";
 import { Spinner } from "../../../../components/Spinner";
-import { plotsList } from "../../../../store/adminAtoms";
+import * as plotActionCreators from "../../../../redux/actions/plotActions";
+import { bindActionCreators } from "redux";
+import { useAppDispatch, useAppSelector } from "../../../../redux/store/hooks";
 
 export const TreeList = ({ onTreeSelect }) => {
-  const plots = useRecoilValue(plotsList);
+  const [page, setPage] = useState(0);
+  const [plotName, setPlotName] = useState('');
   const [selectedPlot, setSelectedPlot] = useState("");
   const [loading, setLoading] = useState(false);
   const [assigned, setAssigned] = useState([]);
   const [unassigned, setUnassigned] = useState([]);
+
+  const dispatch = useAppDispatch();
+  const { getPlots }
+    = bindActionCreators(plotActionCreators, dispatch);
+
+  useEffect(() => {
+    getPlotsData();
+  }, [page, plotName]);
+
+  const getPlotsData = async () => {
+    setTimeout(async () => {
+      await getPlots(page * 10, 10, plotName);
+    }, 1000);
+  };
+
+  let plotsList = [];
+  const plotsData = useAppSelector((state) => state.plotsData);
+  if (plotsData) {
+    plotsList = Object.values(plotsData.plots);
+  }
 
   const CustomPaper = (props) => {
     return (
@@ -106,7 +128,7 @@ export const TreeList = ({ onTreeSelect }) => {
             }}
             PaperComponent={CustomPaper}
             id="plots"
-            options={plots}
+            options={plotsList}
             autoHighlight
             getOptionLabel={(option) => option.name}
             onChange={(event, newValue) => {
@@ -115,10 +137,23 @@ export const TreeList = ({ onTreeSelect }) => {
             renderInput={(params) => (
               <TextField
                 {...params}
+                onChange={(event) => {
+                  const { value } = event.target;
+                  setPage(0);
+                  setPlotName(value);
+                }} 
                 label="Select plot to fetch tree list"
                 variant="outlined"
               />
             )}
+            ListboxProps={{
+              onScroll: (event) => {
+                const listboxNode = event.currentTarget;
+                if (listboxNode.scrollTop + listboxNode.clientHeight === listboxNode.scrollHeight) {
+                  setPage(page + 1);
+                }
+              }
+            }}
           />
           <ToastContainer />
           <div style={{ paddingTop: "16px", paddingLeft: "8px" }}>

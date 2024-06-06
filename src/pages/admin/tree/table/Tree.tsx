@@ -1,11 +1,8 @@
 import React, { useEffect, useState } from "react";
 import Box from "@mui/material/Box";
 import {
-    DataGrid,
-    GridToolbar,
     GridColumns,
     GridFilterItem,
-    GridFilterModel,
 } from "@mui/x-data-grid";
 import {
     Button,
@@ -14,10 +11,7 @@ import {
     DialogContent,
     DialogContentText,
     DialogTitle,
-    Modal,
-    Typography,
 } from "@mui/material";
-import AddTree from "./AddTree";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { type Tree } from "../../../../types/tree";
@@ -29,7 +23,6 @@ import { useAppDispatch, useAppSelector } from "../../../../redux/store/hooks";
 import { RootState } from "../../../../redux/store/store";
 import CircularProgress from "@mui/material/CircularProgress";
 import EditTree from "./EditTree";
-// import UserModal from './UserModel';
 import UserModal from "../../../../components/UserModal";
 import AssignTreeModal from "./AssignTreeModal";
 import { AssignTreeRequest } from "../../../../types/userTree";
@@ -60,12 +53,8 @@ export const TreeNew = () => {
     const { searchUsers }
         = bindActionCreators(userActionCreators, dispatch);
 
-    const [open, setOpen] = useState(false);
-    const handleModalOpen = () => setOpen(true);
-    const handleModalClose = () => setOpen(false);
     const [openDeleteModal, setOpenDeleteModal] = useState(false);
     const [deleteRow, setDeleteRow] = useState<any>({});
-    // const [filters, setFilters] = useState<GridFilterItem[]>([]);
     const [page, setPage] = useState(0);
     const [disabledMapUnMapButton, setDisabledMapUnMapButton] = useState(true);
     const [isMapTrees, setIsMapTrees] = useState(true);
@@ -251,15 +240,6 @@ export const TreeNew = () => {
             render: getFormattedDate,
         },   
       ];
-
-    const rowSelection = {
-        onChange: (selectedRowKeys: React.Key[], selectedRows: Tree[]) => {
-            console.log(`selectedRowKeys: ${selectedRowKeys}`, 'selectedRows: ', selectedRows);
-        },
-        getCheckboxProps: (record: Tree) => ({
-            name: record.sapling_id,
-        }),
-    };
 
     let treesList: Tree[] = [];
     const treesData = useAppSelector((state: RootState) => state.treesData);
