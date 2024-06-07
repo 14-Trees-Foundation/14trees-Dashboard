@@ -33,7 +33,7 @@ const CustomPaper = (props) => {
     <Paper
       style={{
         minWidth: '450px',
-        marginRight:'50px',
+        marginRight: '50px',
         borderRadius: "20px",
         boxShadow: "4px 4px 6px #98a49c, -4px -4px 6px #cadace",
         background: "#b1bfb5",
@@ -106,9 +106,9 @@ export const Trees = () => {
         >
           <Typography variant="h3">Trees</Typography>
         </div>
-        <Divider sx={{ backgroundColor: "#ffffff", marginBottom:'10px' }} />
-              <TreeNew />
-        <Divider sx={{ backgroundColor: "#ffffff", marginTop:'10px' }} />
+        <Divider sx={{ backgroundColor: "#ffffff", marginBottom: '10px' }} />
+        <TreeNew />
+        <Divider sx={{ backgroundColor: "#ffffff", marginTop: '10px' }} />
         <div
           style={{
             display: "flex",
@@ -118,33 +118,33 @@ export const Trees = () => {
         >
           <Typography variant="h3">Summary</Typography>
           <div style={{ display: "flex", justifyContent: "space-between" }}>
-              <Autocomplete
-                sx={{
-                  mt: 1,
-                  width: "35ch",
-                  "& .MuiOutlinedInput-notchedOutline": {
-                    border: "none",
-                    borderRadius: "25px",
-                    boxShadow: "4px 4px 8px #98a49c, -4px -4px 8px #cadace",
-                  },
-                }}
-                PaperComponent={CustomPaper}
-                options={treeByPlotsData}
-                autoHighlight
-                getOptionLabel={(option) => option.plot_name.name}
-                onChange={(event, newValue) => {
-                  setSelectedPlot(newValue.plot_name.name)
-                }}
-                renderInput={(params) => (
-                  <TextField
-                    {...params}
-                    label="Select plot"
-                    variant="outlined"
-                  />
-                )}
-              />
-              <SearchBox setLoading={setLoading} />
-            </div>
+            <Autocomplete
+              sx={{
+                mt: 1,
+                width: "35ch",
+                "& .MuiOutlinedInput-notchedOutline": {
+                  border: "none",
+                  borderRadius: "25px",
+                  boxShadow: "4px 4px 8px #98a49c, -4px -4px 8px #cadace",
+                },
+              }}
+              PaperComponent={CustomPaper}
+              options={treeByPlotsData}
+              autoHighlight
+              getOptionLabel={(option) => option.plot_name.name}
+              onChange={(event, newValue) => {
+                setSelectedPlot(newValue.plot_name.name)
+              }}
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  label="Select plot"
+                  variant="outlined"
+                />
+              )}
+            />
+            <SearchBox setLoading={setLoading} />
+          </div>
         </div>
         <Box sx={{ p: 3 }}>
           <TabsUnstyled defaultValue={0}>

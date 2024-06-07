@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import Box from "@mui/material/Box";
-import { DataGrid, GridToolbar, GridColumns, GridFilterItem } from "@mui/x-data-grid";
+import {GridColumns, GridFilterItem } from "@mui/x-data-grid";
 import AddPlot from "./AddPlot";
 import { Forms } from "../Forms/Forms"
 import EditIcon from "@mui/icons-material/Edit";
@@ -18,8 +18,6 @@ import {
   DialogContent,
   DialogContentText,
   DialogTitle,
-  Modal,
-  Typography,
 } from "@mui/material";
 import EditPlot from "./EditPlot";
 import { Table, TableColumnsType } from "antd";
