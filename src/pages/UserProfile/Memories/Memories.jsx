@@ -35,7 +35,8 @@ export const Memories = () => {
   });
   images = [...images, ...allImages];
   images = images.map((image) => {
-    return encodeURI(image).replace(/#/g, "%23");
+    // return encodeURI(image).replace(/#/g, "%23");
+    return image.replace(/#/g, "%23");
   });
 
   const next = () => {
