@@ -366,8 +366,8 @@ export const TreeNew = () => {
                         )}
                         ListboxProps={{
                             onScroll: (event) => {
-                                const listboxNode = event.currentTarget;
-                                if (listboxNode.scrollTop + listboxNode.clientHeight === listboxNode.scrollHeight) {
+                                const listboxNode: any = event.target;
+                                if ( Math.ceil(listboxNode.scrollTop) + listboxNode.clientHeight === listboxNode.scrollHeight) {
                                     setPlotPage(plotPage + 1);
                                 }
                             }
