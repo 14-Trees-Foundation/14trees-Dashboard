@@ -146,8 +146,8 @@ function TreeMap( {selectedPlot, setSelectedPlot} ) {
                         )}
                         ListboxProps={{
                             onScroll: (event) => {
-                                const listboxNode = event.currentTarget;
-                                if (listboxNode.scrollTop + listboxNode.clientHeight === listboxNode.scrollHeight) {
+                                const listboxNode = event.target;
+                                if (Math.ceil(listboxNode.scrollTop) + listboxNode.clientHeight === listboxNode.scrollHeight) {
                                   setPage(page + 1);
                                 }
                               }
