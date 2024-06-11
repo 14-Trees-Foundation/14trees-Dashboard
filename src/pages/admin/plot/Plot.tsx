@@ -40,7 +40,7 @@ function LoadingOverlay() {
 
 export const PlotComponent = () => {
   const dispatch = useAppDispatch();
-  const { getPlots, createPlot, updatePlot, deletePlot, getPlotsByFilters } = bindActionCreators(
+  const { createPlot, updatePlot, deletePlot, getPlotsByFilters } = bindActionCreators(
     plotActionCreators,
     dispatch
   );
@@ -273,9 +273,28 @@ export const PlotComponent = () => {
       },
     },
     {
+      dataIndex: "trees_count",
+      key: "trees_count",
+      title: "Total Trees",
+      width: 150,
+    },
+    {
+      dataIndex: "mapped_trees_count",
+      key: "mapped_trees_count",
+      title: "Mapped Trees",
+      width: 150,
+    },
+    {
+      dataIndex: "assigned_trees_count",
+      key: "assigned_trees_count",
+      title: "Assigned Trees",
+      width: 150,
+    },
+    {
       dataIndex: "boundaries.type",
       key: "boundaries.type",
       title: "Boundaries Type",
+      width: 200,
       render: (value, record, index) => {
         if (record.boundaries.type) {
           return record.boundaries.type;
@@ -298,6 +317,7 @@ export const PlotComponent = () => {
       dataIndex: "center.type",
       key: "center.type",
       title: "Center Type",
+      width: 150,
       render: (value, record, index) => {
         if (record.center.type) {
           return record.center.type;
@@ -309,6 +329,7 @@ export const PlotComponent = () => {
       dataIndex: "center.coordinates",
       key: "center.coordinates",
       title: "Center Coordinates",
+      width: 300,
       render: (value, record, index) => {
         if (record.center.coordinates) {
           return JSON.stringify(record.center.coordinates);
@@ -401,6 +422,7 @@ export const PlotComponent = () => {
           dataSource={plotsList}
           columns={antdColumns}
           pagination={{ position: ['bottomRight'], showSizeChanger: false, pageSize: 10, defaultCurrent: 1, total: plotsData.totalPlots, simple: true, onChange: (page, pageSize) => { if(page*pageSize > plotsList.length) setPage(page-1); } }}
+          scroll={{ y: "100%" }}
         />
       </Box>
       <Forms />
