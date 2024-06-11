@@ -1,11 +1,13 @@
 import { useState } from "react";
-import { Box, Typography, Grid, TextField,Button } from "@mui/material";
-import { Field, Form } from "react-final-form";
+import { Box, Typography, Grid, TextField, Button, Autocomplete } from "@mui/material";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 import { Spinner } from "../../../../components/Spinner";
 import Axios from "../../../../api/local";
+import { useAppDispatch, useAppSelector } from "../../../../redux/store/hooks";
+import { bindActionCreators } from "@reduxjs/toolkit";
+import * as userActionCreators from "../../../../redux/actions/userActions";
 
 const intitialFValues = {
   name: "",
@@ -17,20 +19,66 @@ const intitialFValues = {
   backdropOpen: false,
 };
 
-export const UserDetails = ( { selectedPlot } ) => {
+export const UserDetails = ({ selectedPlot }) => {
+  const dispatch = useAppDispatch();
+  const { searchUsers } =
+    bindActionCreators(userActionCreators, dispatch);
+
   const [values, setValues] = useState(intitialFValues);
   const [treeCount, setTreeCount] = useState(0);
 
-  const formSubmit = async (formValues) => {
+  const [formData, setFormData] = useState({
+    'name': '',
+    'email': '',
+    'contact': '',
+    'saplingid': '',
+  });
+
+  const handleChange = (event) => {
+    setFormData({
+      ...formData,
+      [event.target.name]: event.target.value,
+    });
+  };
+
+  let usersList = [];
+  const usersData = useAppSelector((state) => state.searchUsersData);
+  if (usersData) {
+    usersList = Object.values(usersData.users);
+  }
+
+  const handleEmailChange = (event, value) => {
+    let isSet = false;
+    usersList.forEach((user) => {
+      if (`${user.name} (${user.email})` === value) {
+        isSet = true;
+        setFormData({
+          'email': user.email,
+          'name': user.name,
+          'contact': user.phone ?? '',
+        })
+      }
+    })
+
+    if (!isSet) {
+      setFormData({
+        ...formData,
+        'email': value,
+      })
+      if (value.length >= 3) searchUsers(value);
+    }
+  }
+
+  const formSubmit = async () => {
     setValues({
       ...values,
       loading: true,
       backdropOpen: true,
     });
     const params = JSON.stringify({
-      name: formValues.name,
-      email: formValues.email,
-      contact: formValues.contact,
+      name: formData.name,
+      email: formData.email,
+      contact: formData.contact,
       plot_id: selectedPlot._id,
       count: treeCount,
     });
@@ -120,141 +168,99 @@ export const UserDetails = ( { selectedPlot } ) => {
           <Typography variant="h5" gutterBottom sx={{ pb: 2 }}>
             Enter User details
           </Typography>
-          <Form
-            onSubmit={formSubmit}
-            validate={(values) => {
-              const errors = {};
-              if (!values.name) {
-                errors.name = "Name required.";
-              }
-              if (!values.email) {
-                errors.email = "Email required.";
-              }
-              if (!values.contact) {
-                errors.contact = "Contact required.";
-              }
-              return errors;
-            }}
-            render={({ handleSubmit, form, submitting, pristine }) => (
-              <form onSubmit={handleSubmit} autoComplete="off">
-                <Grid container sx={{ p: 2, pl: 0 }}>
-                  <Grid sx={{ m: 2 }} item xs={12}>
-                    <Field name="name">
-                      {({ input, meta }) => (
-                        <TextField
-                          sx={{
-                            "& label.Mui-focused": {
-                              display: "none",
-                            },
-                            "& legend": {
-                              display: "none",
-                            },
-                          }}
-                          hiddenLabel
-                          fullWidth
-                          error={meta.error && meta.touched ? true : false}
-                          {...input}
-                          label="Full Name *"
-                          name="name"
-                          helperText={
-                            meta.error && meta.touched ? meta.error : ""
-                          }
-                        />
-                      )}
-                    </Field>
-                  </Grid>
-                  <Grid item sx={{ m: 2 }} xs={12}>
-                    <Field name="email">
-                      {({ input, meta }) => (
-                        <TextField
-                          sx={{
-                            "& label.Mui-focused": {
-                              display: "none",
-                            },
-                            "& legend": {
-                              display: "none",
-                            },
-                          }}
-                          hiddenLabel
-                          fullWidth
-                          label="Email *"
-                          name="email"
-                          error={meta.error && meta.touched ? true : false}
-                          {...input}
-                          helperText={
-                            meta.error && meta.touched ? meta.error : ""
-                          }
-                        />
-                      )}
-                    </Field>
-                  </Grid>
-                  <Grid item sx={{ m: 2 }} xs={12}>
-                    <Field name="contact">
-                      {({ input, meta }) => (
-                        <TextField
-                          sx={{
-                            "& label.Mui-focused": {
-                              display: "none",
-                            },
-                            "& legend": {
-                              display: "none",
-                            },
-                          }}
-                          hiddenLabel
-                          fullWidth
-                          variant="outlined"
-                          label="Contact *"
-                          name="contact"
-                          error={meta.error && meta.touched ? true : false}
-                          {...input}
-                          helperText={
-                            meta.error && meta.touched ? meta.error : ""
-                          }
-                        />
-                      )}
-                    </Field>
-                  </Grid>
-                  <Grid item sx={{ m: 2 }} xs={12}>
-                    {/* <Typography
-                      sx={{ color: "#C72542",textAlign:'end' }}
-                    >
-                      Total selected trees :
-                      {selTrees === "" ? 0 : selTrees.split(",").length}
-                    </Typography> */}
+          <form
+            onSubmit={(e) => { e.preventDefault(); formSubmit(); }}
+          >
+            <Grid container sx={{ p: 2, pl: 0 }}>
+              <Grid sx={{ m: 2 }} item xs={12}>
+                <TextField
+                  sx={{
+                    "& label.Mui-focused": {
+                      display: "none",
+                    },
+                    "& legend": {
+                      display: "none",
+                    },
+                  }}
+                  fullWidth
+                  required
+                  value={formData.name}
+                  onChange={handleChange}
+                  label="Full Name"
+                  name="name"
+                />
+              </Grid>
+              <Grid item sx={{ m: 2 }} xs={12}>
+                <Autocomplete
+                  fullWidth
+                  options={usersList}
+                  name='email'
+                  noOptionsText="No Users"
+                  value={formData.email}
+                  onInputChange={handleEmailChange}
+                  getOptionLabel={(option) => option.email ? `${option.name} (${option.email})` : option}
+                  isOptionEqualToValue={(option, value) => true}
+                  renderInput={(params) => (
                     <TextField
-                      sx={{
-                        "& label.Mui-focused": {
-                          display: "none",
-                        },
-                        "& legend": {
-                          display: "none",
-                        },
-                      }}
-                      hiddenLabel
-                      type="number"
-                      onChange={(e) => { e.target.value > 0 ? setTreeCount(e.target.value): setTreeCount(0) }}
-                      value={treeCount}
-                      fullWidth
-                      label="Sapling Count *"
-                      name="saplingid"
+                      {...params}
+                      label="Email"
+                      variant="outlined"
                     />
-                  </Grid>
-                  {
-                    <Button
-                      sx={{ m: 2 }}
-                      size="large"
-                      variant="contained"
-                      color="primary"
-                      disabled={submitting || pristine || treeCount === 0 || selectedPlot === null}
-                      type="submit"
-                    >
-                      Submit
-                    </Button>
-                  }
-                </Grid>
-              </form>
-            )}
-          />
+                  )}>
+                </Autocomplete>
+              </Grid>
+              <Grid item sx={{ m: 2 }} xs={12}>
+                <TextField
+                  sx={{
+                    "& label.Mui-focused": {
+                      display: "none",
+                    },
+                    "& legend": {
+                      display: "none",
+                    },
+                  }}
+                  required
+                  fullWidth
+                  value={formData.contact}
+                  onChange={handleChange}
+                  variant="outlined"
+                  label="Contact"
+                  name="contact"
+                />
+              </Grid>
+              <Grid item sx={{ m: 2 }} xs={12}>
+                <TextField
+                  sx={{
+                    "& label.Mui-focused": {
+                      display: "none",
+                    },
+                    "& legend": {
+                      display: "none",
+                    },
+                  }}
+                  required
+                  type="number"
+                  onChange={(e) => { e.target.value > 0 ? setTreeCount(e.target.value) : setTreeCount(0) }}
+                  value={treeCount}
+                  fullWidth
+                  label="Sapling Count"
+                  name="saplingid"
+                />
+              </Grid>
+              {
+                <Button
+                  sx={{ m: 2 }}
+                  size="large"
+                  variant="contained"
+                  color="primary"
+                  disabled={treeCount === 0 || selectedPlot === null}
+                  type="submit"
+                >
+                  Submit
+                </Button>
+              }
+            </Grid>
+          </form>
         </Box>
       </Box>
     );

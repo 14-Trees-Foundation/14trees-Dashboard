@@ -14,7 +14,10 @@ export type Plot = {
         type: string,
         coordinates: [number]
     },
-    date_added: Date
+    date_added: Date,
+    trees_count?: number,
+    mapped_trees_count?: number,
+    assigned_trees_count?: number,
 };
 
 export type UpsertPlotResponse = {
