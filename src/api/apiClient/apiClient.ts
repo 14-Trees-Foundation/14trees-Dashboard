@@ -370,8 +370,11 @@ class ApiClient {
         try {
             const response = await this.api.put<User>(`/users/${data._id}`, data);
             return response.data;
-        } catch (error) {
+        } catch (error: any) {
             console.error(error)
+            if (error.response) {
+                throw new Error(error.response.data.message);
+              }
             throw new Error('Failed to update User');
         }
     }
@@ -602,9 +605,9 @@ class ApiClient {
         try {
             const response = await this.api.put<UserTree>(`/profile/${data._id}`, data);
             return response.data;
-        } catch (error) {
+        } catch (error: any) {
             console.error(error)
-            throw new Error('Failed to update user tree profile');
+            throw new Error(error.message);
         }
     }
 

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import Box from "@mui/material/Box";
 import { DataGrid, GridToolbar, GridColumns } from "@mui/x-data-grid";
 import AddPond from "./AddPond";
@@ -17,8 +17,6 @@ import {
     DialogContent,
     DialogContentText,
     DialogTitle,
-    Modal,
-    Typography,
 } from "@mui/material";
 import EditPond from "./EditPond";
 import { getFormattedDate } from "../../../../helpers/utils";
@@ -111,7 +109,6 @@ export const PondComponent = () => {
             field: "name",
             headerName: "Name",
             width: 250,
-            editable: true,
             align: "center",
             headerAlign: "center",
             renderCell: (params: any) => (
@@ -135,7 +132,6 @@ export const PondComponent = () => {
             field: "type",
             headerName: "Type",
             width: 150,
-            editable: true,
             align: "center",
             headerAlign: "center",
         },
@@ -143,7 +139,6 @@ export const PondComponent = () => {
             field: "boundaries.type",
             headerName: "Boundaries Type",
             width: 150,
-            editable: true,
             align: "center",
             headerAlign: "center",
         },
@@ -151,7 +146,6 @@ export const PondComponent = () => {
             field: "boundaries.coordinates",
             headerName: "Boundaries Coordinates",
             width: 150,
-            editable: true,
             align: "center",
             headerAlign: "center",
         },
@@ -159,7 +153,6 @@ export const PondComponent = () => {
             field: "lengthFt",
             headerName: "LengthFT",
             width: 150,
-            editable: true,
             align: "center",
             headerAlign: "center",
         },
@@ -167,7 +160,6 @@ export const PondComponent = () => {
             field: "widthFt",
             headerName: "WidthFT",
             width: 150,
-            editable: true,
             align: "center",
             headerAlign: "center",
         },
@@ -175,7 +167,6 @@ export const PondComponent = () => {
             field: "depthFt",
             headerName: "DeathFT",
             width: 150,
-            editable: true,
             align: "center",
             headerAlign: "center",
         },
@@ -183,7 +174,6 @@ export const PondComponent = () => {
             field: "capacity",
             headerName: "Pond Capacity",
             width: 150,
-            editable: true,
             align: "center",
             headerAlign: "center",
             valueGetter: getCapacity,
@@ -192,7 +182,6 @@ export const PondComponent = () => {
             field: "date_added",
             headerName: "Date Added",
             width: 150,
-            editable: true,
             align: "center",
             headerAlign: "center",
             valueGetter: (params) => getFormattedDate(params.row?.date_added),

@@ -11,6 +11,7 @@ import * as Axios from "../../../api/local";
 import { UserTreeHoldings } from "./components/UserTreeHoldings";
 import { UserEdit } from "./components/UserEdit";
 import { User1 } from "./table/User1";
+import { ToastContainer } from "react-toastify";
 
 export const Users = () => {
   const [loading, setLoading] = useState(true);
@@ -43,6 +44,7 @@ export const Users = () => {
   } else {
     return (
       <>
+        <ToastContainer />
         <div
           style={{
             display: "flex",

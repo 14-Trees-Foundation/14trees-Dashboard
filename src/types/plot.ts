@@ -18,6 +18,7 @@ export type Plot = {
     trees_count?: number,
     mapped_trees_count?: number,
     assigned_trees_count?: number,
+    available_trees_count?: number,
 };
 
 export type UpsertPlotResponse = {

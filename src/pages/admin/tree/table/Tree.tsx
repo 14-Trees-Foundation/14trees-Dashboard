@@ -30,8 +30,9 @@ import AssignTreeModal from "./AssignTreeModal";
 import { AssignTreeRequest } from "../../../../types/userTree";
 import { getFormattedDate } from "../../../../helpers/utils";
 import getColumnSearchProps from "../../../../components/Filter";
-import { Table, TableColumnsType } from "antd";
+import { TableColumnsType } from "antd";
 import { Plot } from "../../../../types/plot";
+import TableComponent from "../../../../components/Table";
 
 const CustomPaper = (props: any) => {
     return (
@@ -225,6 +226,13 @@ export const TreeNew = () => {
         treesList = Object.values(treesData.trees);
     }
 
+    const getAllTreesData = async () => {
+        setTimeout(async () => {
+          let filtersData = Object.values(filters);
+          await getTrees(0, treesData.totalTrees, filtersData);
+        }, 1000);
+      };
+
     const handleDelete = (row: Tree) => {
         console.log("Delete", row);
         setOpenDeleteModal(true);
@@ -377,7 +385,7 @@ export const TreeNew = () => {
                 <Button variant="contained" style={{ marginLeft: '10px' }} onClick={handleAssignUnAssign}
                     disabled={disabledAUButton}
                 >{(isAssignTrees) ? "Assign Trees" : "Unassign Trees"}</Button>
-                <AssignTreeModal open={isAssignTreeModalOpen} handleClose={() => { setIsAssignTreeModalOpen(false) }} onSubmit={handleAssignTrees} />
+                <AssignTreeModal open={isAssignTreeModalOpen} handleClose={() => { setIsAssignTreeModalOpen(false) }} onSubmit={handleAssignTrees} searchUsers={searchUsers} />
                 <Button variant="contained" style={{ marginLeft: '10px' }} onClick={handleMapUnMap}
                     disabled={disabledMapUnMapButton}
                 >{(isMapTrees) ? "Map Trees" : "UnMap Trees"}</Button>
@@ -396,21 +404,13 @@ export const TreeNew = () => {
             </div>
 
             <Box sx={{ height: 840, width: "100%" }}>
-                <Table
-                    style={{ borderRadius: 20 }}
+                <TableComponent
                     dataSource={treesList}
                     columns={antdColumns}
-                    pagination={{ position: ['bottomRight'], showSizeChanger: false, pageSize: 10, defaultCurrent: 1, total: treesData.totalTrees, simple: true, onChange: (page, pageSize) => { if (page * pageSize > treesList.length) setPage(page - 1); } }}
-                    rowSelection={{
-                        type: 'checkbox',
-                        onChange: (selectedRowKeys) => {
-                            handleSelectionChanges(selectedRowKeys as string[]);
-                        },
-                        getCheckboxProps: (record) => {
-                            return { name: record.sapling_id }
-                        },
-                    }}
-                    scroll={{ y: "100%" }}
+                    totalRecords={treesData.totalTrees}
+                    fetchAllData={getAllTreesData}
+                    setPage={setPage}
+                    handleSelectionChanges={handleSelectionChanges}
                 />
             </Box>
 

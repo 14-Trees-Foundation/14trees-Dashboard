@@ -21,11 +21,10 @@ import CircularProgress from "@mui/material/CircularProgress";
 import EditUser from "./EditUser";
 import AddBulkUser from "./AddBulkUser";
 import AccountCircleRoundedIcon from '@mui/icons-material/AccountCircleRounded';
-
-import { Table } from 'antd'
 import type { TableColumnsType } from 'antd';
 import getColumnSearchProps from "../../../../components/Filter";
 import { getFormattedDate } from "../../../../helpers/utils";
+import TableComponent from "../../../../components/Table";
 
 function LoadingOverlay() {
   return (
@@ -222,6 +221,13 @@ export const User1 = () => {
     usersList = Object.values(usersData.users);
   }
 
+  const getAllUsersData = async () => {
+    setTimeout(async () => {
+      let filtersData = Object.values(filters);
+      await getUsersByFilters(0, usersData.totalUsers, filtersData);
+    }, 1000);
+};
+
   const handleDelete = (row: User) => {
     console.log("Delete", row);
     setOpenDeleteModal(true);
@@ -299,15 +305,12 @@ export const User1 = () => {
       </Box> */}
 
       <Box sx={{ height: 840, width: "100%" }}>
-        <Table
-          style={{ borderRadius: 20 }}
+        <TableComponent
           dataSource={usersList}
           columns={antdColumns}
-          pagination={{ position: ['bottomRight'], showSizeChanger: false, pageSize: 10, defaultCurrent: 1, total: usersData.totalUsers, simple: true, onChange: (page, pageSize) => { if(page*pageSize > usersList.length) setPage(page-1); } }}
-          rowSelection={{
-            type: 'checkbox',
-            ...rowSelection,
-          }}
+          totalRecords={usersData.totalUsers}
+          fetchAllData={getAllUsersData}
+          setPage={setPage}
         />
       </Box>
 
