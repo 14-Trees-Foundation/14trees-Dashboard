@@ -1,6 +1,7 @@
 import ApiClient from "../../api/apiClient/apiClient";
 import userActionTypes from "../actionTypes/userActionTypes";
 import { User, UserPaginationResponse } from "../../types/user";
+import { toast } from "react-toastify";
 
 export const getUsers = (offset: number, limit: number) => {
     const apiClient = new ApiClient()
@@ -148,7 +149,7 @@ export const updateUser = (record: User) => {
                 });
             },
             (error: any) => {
-                console.error(error);
+                toast.error(error.message)
                 dispatch({
                     type: userActionTypes.UPDATE_USER_FAILED,
                 });

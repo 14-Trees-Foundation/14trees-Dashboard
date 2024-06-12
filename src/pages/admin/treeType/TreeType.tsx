@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import Box from "@mui/material/Box";
-import { DataGrid, GridToolbar, GridColumns, GridFilterItem } from "@mui/x-data-grid";
+import { GridColumns, GridFilterItem } from "@mui/x-data-grid";
 import {
     Button,
     Dialog,
@@ -8,8 +8,6 @@ import {
     DialogContent,
     DialogContentText,
     DialogTitle,
-    Modal,
-    Typography,
 } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -21,8 +19,10 @@ import { RootState } from "../../../redux/store/store";
 import AddTreeType from "./AddTreeType";
 import CircularProgress from "@mui/material/CircularProgress";
 import EditTreeType from "./EditTreeType.jsx";
-import { Table, TableColumnsType } from "antd";
+import { TableColumnsType } from "antd";
 import getColumnSearchProps from "../../../components/Filter";
+import TableComponent from "../../../components/Table";
+import { ToastContainer } from "react-toastify";
 
 function LoadingOverlay() {
     return (
@@ -239,6 +239,13 @@ export const TreeTypeComponent = () => {
         treeTypesList = Object.values(treeTypesData.treeTypes);
     }
 
+    const getAllTreeTypesData = async () => {
+        setTimeout(async () => {
+          let filtersData = Object.values(filters);
+          await getTreeTypesByFilters(0, treeTypesData.totalTreeTypes, filtersData);
+        }, 1000);
+    };
+
     const handleCreateTreeTypeData = (formData: TreeType) => {
         console.log(formData);
         createTreeType(formData);
@@ -262,6 +269,7 @@ export const TreeTypeComponent = () => {
 
     return (
         <>
+            <ToastContainer />
             <div
                 style={{
                     display: "flex",
@@ -306,12 +314,12 @@ export const TreeTypeComponent = () => {
                 />
             </Box> */}
             <Box sx={{ height: 840, width: "100%" }}>
-                <Table
-                    style={{ borderRadius: 20}}
+                <TableComponent
                     dataSource={treeTypesList}
                     columns={antdColumns}
-                    pagination={{ position: ['bottomRight'], showSizeChanger: false, pageSize: 10, defaultCurrent: 1, total: treeTypesData.totalTreeTypes, simple: true, onChange: (page, pageSize) => { if(page*pageSize > treeTypesList.length) setPage(page-1); } }}
-                    scroll={{ y: "100%" }}
+                    totalRecords={treeTypesData.totalTreeTypes}
+                    setPage={setPage}
+                    fetchAllData={getAllTreeTypesData}
                 />
             </Box>
 
