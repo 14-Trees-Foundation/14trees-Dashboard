@@ -1,16 +1,18 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import Box from "@mui/material/Box";
 import {
-    GridColumns,
     GridFilterItem,
 } from "@mui/x-data-grid";
 import {
+    Autocomplete,
     Button,
     Dialog,
     DialogActions,
     DialogContent,
     DialogContentText,
     DialogTitle,
+    Paper,
+    TextField,
 } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -18,31 +20,34 @@ import { type Tree } from "../../../../types/tree";
 import * as treeActionCreators from "../../../../redux/actions/treeActions";
 import * as userTreesActionCreators from "../../../../redux/actions/userTreeActions";
 import * as userActionCreators from "../../../../redux/actions/userActions";
+import * as plotActionCreators from "../../../../redux/actions/plotActions";
 import { bindActionCreators } from "redux";
 import { useAppDispatch, useAppSelector } from "../../../../redux/store/hooks";
 import { RootState } from "../../../../redux/store/store";
-import CircularProgress from "@mui/material/CircularProgress";
 import EditTree from "./EditTree";
 import UserModal from "../../../../components/UserModal";
 import AssignTreeModal from "./AssignTreeModal";
 import { AssignTreeRequest } from "../../../../types/userTree";
 import { getFormattedDate } from "../../../../helpers/utils";
 import getColumnSearchProps from "../../../../components/Filter";
-import { Table, TableColumnsType } from "antd";
+import { TableColumnsType } from "antd";
+import { Plot } from "../../../../types/plot";
+import TableComponent from "../../../../components/Table";
 
-function LoadingOverlay() {
+const CustomPaper = (props: any) => {
     return (
-        <div
+        <Paper
             style={{
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-                height: "100%",
-            }}>
-            <CircularProgress />
-        </div>
+                minWidth: '450px',
+                marginRight: '50px',
+                borderRadius: "20px",
+                boxShadow: "4px 4px 6px #98a49c, -4px -4px 6px #cadace",
+                background: "#b1bfb5",
+            }}
+            {...props}
+        />
     );
-}
+};
 
 export const TreeNew = () => {
     const dispatch = useAppDispatch();
@@ -52,6 +57,11 @@ export const TreeNew = () => {
         = bindActionCreators(userTreesActionCreators, dispatch);
     const { searchUsers }
         = bindActionCreators(userActionCreators, dispatch);
+    const { getPlots }
+        = bindActionCreators(plotActionCreators, dispatch);
+
+    const [plotPage, setPlotPage] = useState(0);
+    const [plotName, setPlotName] = useState('');
 
     const [openDeleteModal, setOpenDeleteModal] = useState(false);
     const [deleteRow, setDeleteRow] = useState<any>({});
@@ -62,7 +72,7 @@ export const TreeNew = () => {
     const [disabledAUButton, setDisabledAUButton] = useState(true);
     const [isAssignTrees, setIsAssignTrees] = useState(true);
     const [isAssignTreeModalOpen, setIsAssignTreeModalOpen] = useState(false);
-    const [saplingIds , setSaplingIds] = useState<string[]>([]);
+    const [saplingIds, setSaplingIds] = useState<string[]>([]);
     const [selectedEditRow, setSelectedEditRow] = useState<Tree | null>(null);
     const [editModal, setEditModal] = useState(false);
     const [openConfirmation, setOpenConfirmation] = useState(false);
@@ -85,6 +95,22 @@ export const TreeNew = () => {
         }, 1000);
     };
 
+    useEffect(() => {
+        getPlotsData();
+    }, [plotPage, plotName]);
+
+    const getPlotsData = async () => {
+        setTimeout(async () => {
+            await getPlots(plotPage * 10, 10, plotName);
+        }, 1000);
+    };
+
+    let plotsList: Plot[] = [];
+    const plotsData = useAppSelector((state) => state.plotsData);
+    if (plotsData) {
+        plotsList = Object.values(plotsData.plots);
+    }
+
     const eventTypeMap: Record<string, string> = {
         "1": "Birthday",
         "2": "In Memory of",
@@ -92,15 +118,14 @@ export const TreeNew = () => {
         "4": "Corporate gift",
     }
 
-    const columns: GridColumns = [
+    const antdColumns: TableColumnsType<Tree> = [
         {
-            field: "action",
-            headerName: "Action",
+            dataIndex: "action",
+            key: "action",
+            title: "Actions",
             width: 150,
-            // flex: 200,
             align: "center",
-            headerAlign: "center",
-            renderCell: (params: any) => (
+            render: (value, record, index) => (
                 <div
                     style={{
                         display: "flex",
@@ -111,91 +136,45 @@ export const TreeNew = () => {
                         variant="outlined"
                         style={{ margin: "0 5px" }}
                         onClick={() => {
-                            setSelectedEditRow(params.row);
+                            setSelectedEditRow(record);
                             setEditModal(true);
                         }}>
                         <EditIcon />
                     </Button>
-                    <Button 
+                    <Button
                         variant="outlined"
                         style={{ margin: "0 5px" }}
-                        onClick={() => handleDelete(params.row)}>
+                        onClick={() => handleDelete(record)}>
                         <DeleteIcon />
                     </Button>
                 </div>
             ),
         },
-        { field: "sapling_id", headerName: "Sapling ID" },
-        { field: "tree_id", headerName: "Tree Name", width: 200, valueGetter: (params) => params.row?.tree?.name },
-        { field: "plot_id", headerName: "Plot Name", width: 350, valueGetter: (params) => params.row?.plot?.name },
-        { 
-            field: "date_added", 
-            headerName: "Date Added", 
-            valueGetter: (params) => getFormattedDate(params.row?.date_added), 
-        },
-        { field: "link", headerName: "Event" },
-        { field: "mapped_to", headerName: "Mapped To", width: 250, valueGetter: (params) => params.row?.user?.name },
-        { field: "event_type", headerName: "Event Type", width: 150, valueGetter: (params) => params.row?.event_type ? eventTypeMap[params.row?.event_type] : ''},
-        { field: 'assigned_to', headerName: 'Assigned To', width: 250, valueGetter: (params) => params.row?.assigned_to?.name },
-    ];
-
-    const antdColumns: TableColumnsType<Tree> = [
         {
-          dataIndex: "action",
-          key: "action",
-          title: "Actions",
-          width: 150,
-          align: "center",
-          render: (value, record, index )=> (
-            <div
-                style={{
-                    display: "flex",
-                    justifyContent: "center",
-                    alignItems: "center",
-                }}>
-                <Button
-                    variant="outlined"
-                    style={{ margin: "0 5px" }}
-                    onClick={() => {
-                        setSelectedEditRow(record);
-                        setEditModal(true);
-                    }}>
-                    <EditIcon />
-                </Button>
-                <Button 
-                    variant="outlined"
-                    style={{ margin: "0 5px" }}
-                    onClick={() => handleDelete(record)}>
-                    <DeleteIcon />
-                </Button>
-            </div>
-          ),
+            dataIndex: "sapling_id",
+            key: "sapling_id",
+            title: "Sapling ID",
+            width: 150,
+            align: 'center',
+            ...getColumnSearchProps('sapling_id', filters, handleSetFilters)
         },
         {
-          dataIndex: "sapling_id",
-          key: "sapling_id",
-          title: "Sapling ID",
-          width: 150,
-          align: 'center',
-          ...getColumnSearchProps('sapling_id', filters, handleSetFilters)
+            dataIndex: "tree",
+            key: "tree_id",
+            title: "Tree Type",
+            width: 250,
+            align: 'center',
+            render: (value, record, index) => record?.tree?.name,
+            ...getColumnSearchProps('tree', filters, handleSetFilters)
         },
         {
-          dataIndex: "tree",
-          key: "tree_id",
-          title: "Tree Type",
-          width: 250,
-          align: 'center',
-          render: (value, record, index) => record?.tree?.name,
-          ...getColumnSearchProps('tree', filters, handleSetFilters)
-        },
-        {
-          dataIndex: "plot",
-          key: "plot",
-          title: "Plot",
-          width: 350,
-          align: 'center',
-          render: (value, record, index) => record?.plot?.name,
-          ...getColumnSearchProps('plot', filters, handleSetFilters)
+            dataIndex: "plot",
+            key: "plot",
+            title: "Plot",
+            width: 350,
+            align: 'center',
+            render: (value, record, index) => record?.plot?.name,
+            ...getColumnSearchProps('plot', filters, handleSetFilters)
         },
         {
             dataIndex: "mapped_to",
@@ -205,7 +184,7 @@ export const TreeNew = () => {
             align: 'center',
             render: (value, record, index) => record?.user?.name,
             ...getColumnSearchProps('mapped_to', filters, handleSetFilters)
-        },    
+        },
         {
             dataIndex: "assigned_to",
             key: "assigned_to",
@@ -214,7 +193,7 @@ export const TreeNew = () => {
             align: 'center',
             render: (value, record, index) => record?.assigned_to?.name,
             ...getColumnSearchProps('assigned_to', filters, handleSetFilters)
-        },    
+        },
         {
             dataIndex: "link",
             key: "link",
@@ -222,7 +201,7 @@ export const TreeNew = () => {
             width: 150,
             align: 'center',
             ...getColumnSearchProps('link', filters, handleSetFilters)
-        },    
+        },
         {
             dataIndex: "event_type",
             key: "event_type",
@@ -238,14 +217,21 @@ export const TreeNew = () => {
             width: 150,
             align: 'center',
             render: getFormattedDate,
-        },   
-      ];
+        },
+    ];
 
     let treesList: Tree[] = [];
     const treesData = useAppSelector((state: RootState) => state.treesData);
     if (treesData) {
         treesList = Object.values(treesData.trees);
     }
+
+    const getAllTreesData = async () => {
+        setTimeout(async () => {
+          let filtersData = Object.values(filters);
+          await getTrees(0, treesData.totalTrees, filtersData);
+        }, 1000);
+      };
 
     const handleDelete = (row: Tree) => {
         console.log("Delete", row);
@@ -254,27 +240,27 @@ export const TreeNew = () => {
     };
 
     const handleSelectionChanges = (treeIds: string[]) => {
-        const saplingIds = treeIds.map( (treeId) => treesData.trees[treeId].sapling_id );
+        const saplingIds = treeIds.map((treeId) => treesData.trees[treeId].sapling_id);
         setSaplingIds(saplingIds);
 
         let mapped = 0, unMapped = 0;
         let assigned = 0, unassigned = 0;
-        treeIds.forEach( (treeId) => {
+        treeIds.forEach((treeId) => {
             if (treesData.trees[treeId].mapped_to) mapped++;
             else unMapped++;
 
             if (treesData.trees[treeId].assigned_to) assigned++;
             else unassigned++;
-        } )
+        })
 
-        if (mapped !== 0  && unMapped !== 0) setDisabledMapUnMapButton(true);
+        if (mapped !== 0 && unMapped !== 0) setDisabledMapUnMapButton(true);
         else setDisabledMapUnMapButton(false)
 
         if (mapped === 0 && unMapped !== 0) setIsMapTrees(true);
         if (mapped !== 0 && unMapped === 0) setIsMapTrees(false);
         if (mapped === 0 && unMapped === 0) setDisabledMapUnMapButton(true);
 
-        if (assigned !== 0  && unassigned !== 0) setDisabledAUButton(true);
+        if (assigned !== 0 && unassigned !== 0) setDisabledAUButton(true);
         else setDisabledAUButton(false)
 
         if (assigned === 0 && unassigned !== 0) setIsAssignTrees(true);
@@ -346,14 +332,64 @@ export const TreeNew = () => {
     return (
         <>
             <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '20px' }}>
-                <Button variant="contained" onClick={handleAssignUnAssign}
-                disabled={disabledAUButton} 
-                >{ (isAssignTrees)? "Assign Trees" : "Unassign Trees" }</Button>
-                <AssignTreeModal open={isAssignTreeModalOpen} handleClose={ () => {setIsAssignTreeModalOpen(false)}} onSubmit={handleAssignTrees} />
+                <div style={{ display: "flex", justifyContent: "space-between" }}>
+                    <Autocomplete
+                        sx={{
+                            mt: 1,
+                            width: "35ch",
+                            "& .MuiOutlinedInput-notchedOutline": {
+                                border: "none",
+                                borderRadius: "25px",
+                                boxShadow: "4px 4px 8px #98a49c, -4px -4px 8px #cadace",
+                            },
+                        }}
+                        PaperComponent={CustomPaper}
+                        options={plotsList}
+                        autoHighlight
+                        getOptionLabel={(option) => option.name}
+                        onChange={(event, newValue) => {
+                            if (newValue !== null) {
+                                const newFilters = {
+                                    ...filters,
+                                    "plot_id": {
+                                        columnField: "plot_id",
+                                        value: newValue._id,
+                                        operatorValue: 'equals'
+                                    }
+                                }
+                                setFilters(newFilters);
+                            }
+                        }}
+                        renderInput={(params) => (
+                            <TextField
+                                {...params}
+                                onChange={(event) => {
+                                    const { value } = event.target;
+                                    setPlotPage(0);
+                                    setPlotName(value);
+                                }}
+                                label="Select a plot"
+                                variant="outlined"
+                            />
+                        )}
+                        ListboxProps={{
+                            onScroll: (event) => {
+                                const listboxNode: any = event.target;
+                                if ( Math.ceil(listboxNode.scrollTop) + listboxNode.clientHeight === listboxNode.scrollHeight) {
+                                    setPlotPage(plotPage + 1);
+                                }
+                            }
+                        }}
+                    />
+                </div>
+                <Button variant="contained" style={{ marginLeft: '10px' }} onClick={handleAssignUnAssign}
+                    disabled={disabledAUButton}
+                >{(isAssignTrees) ? "Assign Trees" : "Unassign Trees"}</Button>
+                <AssignTreeModal open={isAssignTreeModalOpen} handleClose={() => { setIsAssignTreeModalOpen(false) }} onSubmit={handleAssignTrees} searchUsers={searchUsers} />
                 <Button variant="contained" style={{ marginLeft: '10px' }} onClick={handleMapUnMap}
-                disabled={disabledMapUnMapButton} 
-                >{ (isMapTrees)? "Map Trees" : "UnMap Trees" }</Button>
-                <UserModal open={isUserModalOpen} handleClose={ () => {setIsUserModalOpen(false)}} onSubmit={handleMapTrees} searchUser={searchUsers} />
+                    disabled={disabledMapUnMapButton}
+                >{(isMapTrees) ? "Map Trees" : "UnMap Trees"}</Button>
+                <UserModal open={isUserModalOpen} handleClose={() => { setIsUserModalOpen(false) }} onSubmit={handleMapTrees} searchUser={searchUsers} />
                 {/* <Button variant="contained" style={{ marginLeft: '10px' }} onClick={handleModalOpen}
                 disabled={true} 
                 >Add Tree</Button>
@@ -366,55 +402,17 @@ export const TreeNew = () => {
                     Bulk Create
                 </Button> */}
             </div>
-            {/* <Box sx={{ height: 540, width: "100%" }}>
-                <DataGrid
-                    rows={treesList}
-                    columns={columns}
-                    getRowId={(row) => row._id}
-                    initialState={{
-                        pagination: {
-                            page: 0,
-                            pageSize: 10,
-                        },
-                    }}
-                    onPageChange={(page) => {
-                        if (treesList.length / 10 === page) setPage(page);
-                    }}
-                    rowCount={treesData.totalTrees}
-                    onFilterModelChange={(model: GridFilterModel) => {
-                        setFilters(model.items);
-                    }}
-                    filterMode="server"
-                    checkboxSelection
-                    disableSelectionOnClick
-                    onSelectionModelChange={(ids) => {
-                        handleSelectionChanges(ids as string[]);
-                      }}
-                    components={{
-                        Toolbar: GridToolbar,
-                        NoRowsOverlay: LoadingOverlay,
-                    }}
-                />
-            </Box> */}
 
-        <Box sx={{ height: 840, width: "100%" }}>
-            <Table
-                style={{ borderRadius: 20}}
-                dataSource={treesList}
-                columns={antdColumns}
-                pagination={{ position: ['bottomRight'], showSizeChanger: false, pageSize: 10, defaultCurrent: 1, total: treesData.totalTrees, simple: true, onChange: (page, pageSize) => { if(page*pageSize > treesList.length) setPage(page-1); } }}
-                rowSelection={{
-                    type: 'checkbox',
-                    onChange: (selectedRowKeys) => {
-                        handleSelectionChanges(selectedRowKeys as string[]);
-                    },
-                    getCheckboxProps: (record) => {
-                        return { name: record.sapling_id }
-                    },
-                }}
-                scroll={{ y: "100%" }}
-            />
-        </Box>
+            <Box sx={{ height: 840, width: "100%" }}>
+                <TableComponent
+                    dataSource={treesList}
+                    columns={antdColumns}
+                    totalRecords={treesData.totalTrees}
+                    fetchAllData={getAllTreesData}
+                    setPage={setPage}
+                    handleSelectionChanges={handleSelectionChanges}
+                />
+            </Box>
 
             <Dialog open={openConfirmation} onClose={() => setOpenConfirmation(false)}>
                 <DialogTitle>Confirm {operation}</DialogTitle>

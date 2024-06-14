@@ -1,7 +1,8 @@
 import { useState } from 'react';
-import { Box, Button, Grid, Modal, TextField, Typography } from '@mui/material';
+import { Autocomplete, Box, Button, Grid, Modal, TextField, Typography } from '@mui/material';
+import { useAppSelector } from '../../../../redux/store/hooks';
 
-const AssignTreeModal = ({ open, handleClose, onSubmit }) => {
+const AssignTreeModal = ({ open, handleClose, onSubmit, searchUsers }) => {
 
     const style = {
         position: 'absolute',
@@ -28,12 +29,42 @@ const AssignTreeModal = ({ open, handleClose, onSubmit }) => {
         desc: '',
     });
 
+    let usersList = [];
+    const usersData = useAppSelector((state) => state.searchUsersData);
+    if (usersData) {
+        usersList = Object.values(usersData.users);
+    }
+
     const handleChange = (event) => {
         setFormData({
             ...formData,
             [event.target.name]: event.target.value,
         });
     };
+ 
+    // search based on phone will be added after postgres changes
+    const handleEmailChange = (event, value) => {
+        let isSet = false;
+        usersList.forEach((user) => {
+            if(`${user.name} (${user.email})` === value) {
+                isSet = true;
+                setFormData({
+                    ...formData,
+                    'email': user.email,
+                    'name': user.name,
+                    'phone': user.phone ?? '',
+                })
+            }
+        })
+
+        if (!isSet) {
+            setFormData({
+                ...formData,
+                'email': value,
+            })
+            if(value.length >= 3)  searchUsers(value);
+        }
+    }
 
     const handleSubmit = (event) => {
         event.preventDefault();
@@ -59,7 +90,22 @@ const AssignTreeModal = ({ open, handleClose, onSubmit }) => {
                                 <TextField name="phone" label="Phone" value={formData.phone} onChange={handleChange} fullWidth/>
                             </Grid>
                             <Grid item xs={12}>
-                                <TextField name="email" label="Email" value={formData.email} onChange={handleChange} fullWidth/>
+                                <Autocomplete 
+                                    fullWidth 
+                                    options={usersList} 
+                                    name='email' 
+                                    noOptionsText="No Users" 
+                                    value={formData.email} 
+                                    onInputChange={handleEmailChange} 
+                                    getOptionLabel={(option)=> option.email ? `${option.name} (${option.email})`: option}
+                                    renderInput={(params) => (
+                                        <TextField
+                                        {...params}
+                                        label="Email"
+                                        variant="outlined"
+                                        />
+                                    )}>
+                                </Autocomplete>
                             </Grid>
                             <Grid item xs={12}>
                                 <TextField name="org" label="Org" value={formData.org} onChange={handleChange} fullWidth/>

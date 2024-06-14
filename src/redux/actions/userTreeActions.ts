@@ -68,7 +68,6 @@ export const updateUserTree = (record: UserTree) => {
                 });
             },
             (error: any) => {
-                console.error(error);
                 dispatch({
                     type: userTreeActionTypes.UPDATE_USER_TREE_FAILED,
                 });
@@ -118,6 +117,7 @@ export const getUserTreeCount = (offset: number, limit: number, filters?: any) =
                 console.error(error);
                 dispatch({
                     type: userTreeActionTypes.GET_USER_TREE_COUNT_FAILED,
+                    value: error
                 });
             }
         )

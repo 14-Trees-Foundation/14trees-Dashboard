@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import Box from "@mui/material/Box";
-import { DataGrid, GridToolbar, GridColumns, GridFilterItem } from "@mui/x-data-grid";
+import {GridColumns, GridFilterItem } from "@mui/x-data-grid";
 import AddPlot from "./AddPlot";
 import { Forms } from "../Forms/Forms"
 import EditIcon from "@mui/icons-material/Edit";
@@ -18,12 +18,12 @@ import {
   DialogContent,
   DialogContentText,
   DialogTitle,
-  Modal,
-  Typography,
 } from "@mui/material";
 import EditPlot from "./EditPlot";
-import { Table, TableColumnsType } from "antd";
+import { TableColumnsType } from "antd";
 import getColumnSearchProps from "../../../components/Filter";
+import TableComponent from "../../../components/Table";
+import { ToastContainer } from "react-toastify";
 
 function LoadingOverlay() {
   return (
@@ -42,7 +42,7 @@ function LoadingOverlay() {
 
 export const PlotComponent = () => {
   const dispatch = useAppDispatch();
-  const { getPlots, createPlot, updatePlot, deletePlot, getPlotsByFilters } = bindActionCreators(
+  const { createPlot, updatePlot, deletePlot, getPlotsByFilters } = bindActionCreators(
     plotActionCreators,
     dispatch
   );
@@ -275,9 +275,34 @@ export const PlotComponent = () => {
       },
     },
     {
+      dataIndex: "trees_count",
+      key: "trees_count",
+      title: "Total Trees",
+      width: 150,
+    },
+    {
+      dataIndex: "mapped_trees_count",
+      key: "mapped_trees_count",
+      title: "Booked Trees",
+      width: 150,
+    },
+    {
+      dataIndex: "assigned_trees_count",
+      key: "assigned_trees_count",
+      title: "Assigned Trees",
+      width: 150,
+    },
+    {
+      dataIndex: "available_trees_count",
+      key: "available_trees_count",
+      title: "Available Trees",
+      width: 150,
+    },
+    {
       dataIndex: "boundaries.type",
       key: "boundaries.type",
       title: "Boundaries Type",
+      width: 200,
       render: (value, record, index) => {
         if (record.boundaries.type) {
           return record.boundaries.type;
@@ -285,21 +310,11 @@ export const PlotComponent = () => {
         return ''
       },
     },
-    // {
-    //   dataIndex: "boundaries.coordinates",
-    //   key: "boundaries.coordinates",
-    //   title: "Boundaries Coordinates",
-    //   render: (value, record, index) => {
-    //     if (record.boundaries.type) {
-    //       return JSON.stringify(record.boundaries.coordinates);
-    //     }
-    //     return ''
-    //   },
-    // },
     {
       dataIndex: "center.type",
       key: "center.type",
       title: "Center Type",
+      width: 150,
       render: (value, record, index) => {
         if (record.center.type) {
           return record.center.type;
@@ -311,6 +326,7 @@ export const PlotComponent = () => {
       dataIndex: "center.coordinates",
       key: "center.coordinates",
       title: "Center Coordinates",
+      width: 320,
       render: (value, record, index) => {
         if (record.center.coordinates) {
           return JSON.stringify(record.center.coordinates);
@@ -330,12 +346,19 @@ export const PlotComponent = () => {
       await getPlotsByFilters(page * 10, 10, filtersData);
     }, 1000);
   };
-
+  
   let plotsList: Plot[] = [];
   const plotsData = useAppSelector((state: RootState) => state.plotsData);
   if (plotsData) {
     plotsList = Object.values(plotsData.plots);
   }
+
+  const getAllPlotData = async () => {
+    setTimeout(async () => {
+      let filtersData = Object.values(filters);
+      await getPlotsByFilters(0, plotsData.totalPlots, filtersData);
+    }, 1000);
+  };
 
   const handleDelete = (row: Plot) => {
     console.log("Delete", row);
@@ -355,6 +378,7 @@ export const PlotComponent = () => {
 
   return (
     <>
+      <ToastContainer />
       <div
         style={{
           display: "flex",
@@ -398,11 +422,12 @@ export const PlotComponent = () => {
         />
       </Box> */}
       <Box sx={{ height: 840, width: "100%" }}>
-        <Table
-          style={{ borderRadius: 20}}
+        <TableComponent
           dataSource={plotsList}
           columns={antdColumns}
-          pagination={{ position: ['bottomRight'], showSizeChanger: false, pageSize: 10, defaultCurrent: 1, total: plotsData.totalPlots, simple: true, onChange: (page, pageSize) => { if(page*pageSize > plotsList.length) setPage(page-1); } }}
+          totalRecords={plotsData.totalPlots}
+          fetchAllData={getAllPlotData}
+          setPage={setPage}
         />
       </Box>
       <Forms />
