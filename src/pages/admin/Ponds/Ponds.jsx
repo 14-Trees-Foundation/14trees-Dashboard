@@ -43,20 +43,20 @@ export const Ponds = () => {
   const fetchData = useCallback(async () => {
     setLoading(true);
     try {
-      let response = await Axios.default.get(`/ponds/`);
+      let response = await Axios.default.post(`/ponds/get`);
       if (response.status === 200) {
-        setAllPonds(response.data.result);
-        setSelectedPond(response.data.result[0].name);
+        setAllPonds(response.data.results);
+        setSelectedPond(response.data.results[0].name);
       }
-      let hisRes = await Axios.default.get(
-        `/ponds/history?pond_name=${response.data.result[0].name}`
-      );
-      if (hisRes.status === 200 && hisRes.data[0]) {
-        hisRes.data[0].updates.forEach((element, index) => {
-          element["date"] = element["date"].substring(0, 10);
-        });
-        setPondHistory(hisRes.data[0].updates);
-      }
+      // let hisRes = await Axios.default.get(
+      //   `/ponds/history?pond_name=${response.data.results[0].name}`
+      // );
+      // if (hisRes.status === 200 && hisRes.data[0]) {
+      //   hisRes.data[0].updates.forEach((element, index) => {
+      //     element["date"] = element["date"].substring(0, 10);
+      //   });
+      //   setPondHistory(hisRes.data[0].updates);
+      // }
       setLoading(false);
     } catch (error) {
       console.log(error);

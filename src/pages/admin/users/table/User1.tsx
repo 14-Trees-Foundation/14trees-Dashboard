@@ -1,6 +1,6 @@
-import React, { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import Box from "@mui/material/Box";
-import { DataGrid, GridToolbar, GridColumns, GridCellParams, GridFilterItem } from "@mui/x-data-grid";
+import { GridFilterItem } from "@mui/x-data-grid";
 import {
   Button,
   Dialog,
@@ -17,7 +17,6 @@ import * as userActionCreators from "../../../../redux/actions/userActions";
 import { bindActionCreators } from "redux";
 import { useAppDispatch, useAppSelector } from "../../../../redux/store/hooks";
 import { RootState } from "../../../../redux/store/store";
-import CircularProgress from "@mui/material/CircularProgress";
 import EditUser from "./EditUser";
 import AddBulkUser from "./AddBulkUser";
 import AccountCircleRoundedIcon from '@mui/icons-material/AccountCircleRounded';
@@ -26,23 +25,9 @@ import getColumnSearchProps from "../../../../components/Filter";
 import { getFormattedDate } from "../../../../helpers/utils";
 import TableComponent from "../../../../components/Table";
 
-function LoadingOverlay() {
-  return (
-    <div
-      style={{
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        height: "100%",
-      }}>
-      <CircularProgress />
-    </div>
-  );
-}
-
 export const User1 = () => {
   const dispatch = useAppDispatch();
-  const { searchUsers, createUser, createBulkUsers, updateUser, deleteUser, getUsersByFilters } =
+  const { getUsers,searchUsers, createUser, createBulkUsers, updateUser, deleteUser } =
     bindActionCreators(userActionCreators, dispatch);
 
   const [open, setOpen] = useState(false);
@@ -70,84 +55,9 @@ export const User1 = () => {
   const getUserData = async () => {
     let filtersData = Object.values(filters);
     setTimeout(async () => {
-      await getUsersByFilters(page*10, 10, filtersData);
+      await getUsers(page*10, 10, filtersData);
     }, 1000);
   };
-
-  const handleClick = (e: GridCellParams<any, any, any>) => {
-    if (e.field === "email") {
-      window.open("https://dashboard.14trees.org/ww/" + e.formattedValue);
-    }
-  };
-
-
-  const rowSelection = {
-    onChange: (selectedRowKeys: React.Key[], selectedRows: User[]) => {
-        console.log(`selectedRowKeys: ${selectedRowKeys}`, 'selectedRows: ', selectedRows);
-    },
-    getCheckboxProps: (record: User) => ({
-        name: record.name,
-    }),
-  };
-
-  const columns: GridColumns = [
-    {
-      field: "action",
-      headerName: "Actions",
-      width: 200,
-      align: "center",
-      headerAlign: "center",
-      renderCell: (params: any) => (
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-          }}>
-          <Button
-            onClick={() => {
-              setSelectedEditRow(params.row);
-              setEditModal(true);
-            }}>
-            <EditIcon />
-          </Button>
-          <Button
-            onClick={() => handleDelete(params.row)}>
-            <DeleteIcon />
-          </Button>
-          <Button
-            onClick={() => {
-              window.open("https://dashboard.14trees.org/ww/" + params.row.email);
-            }}
-          >
-            <AccountCircleRoundedIcon />
-          </Button>
-        </div>
-      ),
-    },
-    {
-      field: "name",
-      headerName: "Name",
-      width: 150,
-      editable: true,
-    },
-    {
-      field: "email",
-      headerName: "Email",
-      width: 200,
-    },
-    {
-      field: "dob",
-      headerName: "Date of Birth",
-      width: 200,
-    },
-    {
-      field: "phone",
-      headerName: "Phone",
-      width: 100,
-    },
-    
-  ];
 
   const antdColumns: TableColumnsType<User> = [
     {
@@ -199,18 +109,23 @@ export const User1 = () => {
       ...getColumnSearchProps('email', filters, handleSetFilters)
     },
     {
-      dataIndex: "dob",
-      key: "dob",
+      dataIndex: "birth_date",
+      key: "birth_date",
       title: "Date of Birth",
       width: 200,
       render: getFormattedDate,
-      ...getColumnSearchProps('dob', filters, handleSetFilters)
+      ...getColumnSearchProps('birth_date', filters, handleSetFilters)
     },
     {
       dataIndex: "phone",
       key: "phone",
       title: "Phone",
       width: 100,
+      render: (value: string) => { 
+        if (!value || value === "0") return "-";
+        if (value.endsWith('.0')) return value.slice(0, -2);
+        else return value;
+      },
       ...getColumnSearchProps('phone', filters, handleSetFilters)
     },    
   ];
@@ -220,11 +135,12 @@ export const User1 = () => {
   if (usersData) {
     usersList = Object.values(usersData.users);
   }
+  console.log(usersData)
 
   const getAllUsersData = async () => {
     setTimeout(async () => {
       let filtersData = Object.values(filters);
-      await getUsersByFilters(0, usersData.totalUsers, filtersData);
+      await getUsers(0, usersData.totalUsers, filtersData);
     }, 1000);
 };
 
@@ -282,27 +198,6 @@ export const User1 = () => {
           createBulkUsers={handleBulkCreateUserData}
         />
       </div>
-      {/* <Box sx={{ height: 540, width: "100%" }}>
-        <DataGrid
-          rows={usersList}
-          columns={columns}
-          getRowId={(row) => row._id}
-          initialState={{
-            pagination: {
-              page: 0,
-              pageSize: 10,
-            },
-          }}
-          onPageChange={(page) => { if((usersList.length / 10) === page) setPage(page); }}
-          rowCount={usersData.totalUsers}
-          checkboxSelection
-          disableSelectionOnClick
-          components={{
-            Toolbar: GridToolbar,
-            NoRowsOverlay: LoadingOverlay,
-          }}
-        />
-      </Box> */}
 
       <Box sx={{ height: 840, width: "100%" }}>
         <TableComponent

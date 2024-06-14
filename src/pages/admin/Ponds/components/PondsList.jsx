@@ -39,7 +39,6 @@ const columns = [
 ];
 
 export const PondsList = () => {
-  const ponds = useRecoilValue(allPonds);
   const theme = useTheme();
   const pondsData = useAppSelector((state) => state.pondsData);
   let pondsList = [];

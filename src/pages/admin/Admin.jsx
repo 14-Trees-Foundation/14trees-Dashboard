@@ -20,7 +20,7 @@ import { Users } from "./users/Users";
 import { Ponds } from "./Ponds/Ponds";
 import { Images } from "./images/Images";
 import { TreeNew } from "./tree/table/Tree";
-import { TreeTypeComponent } from "./treeType/TreeType";
+import { PlantTypeComponent } from "./plantType/PlantType";
 import { PlotComponent } from "./plot/Plot";
 import { OrganizationComponent } from "./organization/Organization";
 import { DonationComponent } from "./donation/Donation";
@@ -84,7 +84,7 @@ export const Admin = () => {
       displayName: "Trees",
     },
     {
-      page: TreeTypeComponent,
+      page: PlantTypeComponent,
       displayName: "Plant Types",
     },
     {

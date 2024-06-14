@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import * as treeTypeActionCreators from '../../redux/actions/treeTypeActions';
+import * as treeTypeActionCreators from '../../redux/actions/plantTypeActions';
 import { bindActionCreators } from 'redux';
 import { useAppDispatch, useAppSelector } from '../../redux/store/hooks';
 import { Button, Input } from '@mui/material';
-import { TreeType } from '../../types/treeType';
+import { TreeType } from '../../types/plantType';
 
 export const TestTreeType = () => {
 

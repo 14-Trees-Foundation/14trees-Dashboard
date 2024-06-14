@@ -1,30 +1,30 @@
 import ApiClient from "../../api/apiClient/apiClient";
-import plotActionTypes from "../actionTypes/plotActionTypes";
-import { Plot } from "../../types/plot";
+import plantTypeActionTypes from "../actionTypes/plantTypeActionTypes";
+import { PlantType } from "../../types/plantType";
 import { PaginatedResponse } from "../../types/pagination";
 
-export const getPlots = (offset: number, limit: number, filters?: any[]) => {
+export const getPlantTypes = (offset: number, limit: number, filters?: any[]) => {
     const apiClient = new ApiClient()
     return (dispatch: any) => {
         dispatch({
-            type: plotActionTypes.GET_PLOTS_REQUESTED,
+            type: plantTypeActionTypes.GET_PLANT_TYPES_REQUESTED,
         });
-        apiClient.getPlots(offset, limit, filters).then(
-            (value: PaginatedResponse<Plot>) => {
+        apiClient.getPlantTypes(offset, limit, filters).then(
+            (value: PaginatedResponse<PlantType>) => {
                 for (let i = 0; i < value.results.length; i++) {
                     if (value.results[i]?.id) {
                         value.results[i].key = value.results[i].id
                     }
                 }
                 dispatch({
-                    type: plotActionTypes.GET_PLOTS_SUCCEEDED,
+                    type: plantTypeActionTypes.GET_PLANT_TYPES_SUCCEEDED,
                     payload: value,
                 });
             },
             (error: any) => {
                 console.log(error)
                 dispatch({
-                    type: plotActionTypes.GET_PLOTS_FAILED,
+                    type: plantTypeActionTypes.GET_PLANT_TYPES_FAILED,
                     payload: error
                 });
             }
@@ -32,28 +32,28 @@ export const getPlots = (offset: number, limit: number, filters?: any[]) => {
     }
 };
 
-export const searchPlots = (searchStr: string) => {
+export const searchPlantTypes = (searchStr: string) => {
     const apiClient = new ApiClient()
     return (dispatch: any) => {
         dispatch({
-            type: plotActionTypes.SEARCH_PLOTS_REQUESTED,
+            type: plantTypeActionTypes.SEARCH_PLANT_TYPES_REQUESTED,
         });
-        apiClient.searchPlots(searchStr).then(
-            (value: Plot[]) => {
+        apiClient.searchPlantTypes(searchStr).then(
+            (value: PlantType[]) => {
                 for (let i = 0; i < value.length; i++) {
                     if (value[i]?.id) {
                         value[i].key = value[i].id
                     }
                 }
                 dispatch({
-                    type: plotActionTypes.SEARCH_PLOTS_SUCCEEDED,
+                    type: plantTypeActionTypes.SEARCH_PLANT_TYPES_SUCCEEDED,
                     payload: value,
                 });
             },
             (error: any) => {
                 console.log(error)
                 dispatch({
-                    type: plotActionTypes.SEARCH_PLOTS_FAILED,
+                    type: plantTypeActionTypes.SEARCH_PLANT_TYPES_FAILED,
                     payload: error
                 });
             }
@@ -61,46 +61,46 @@ export const searchPlots = (searchStr: string) => {
     }
 };
 
-export const createPlot = (record: Plot) => {
+export const createPlantType = (record: PlantType, file?: Blob) => {
     const apiClient = new ApiClient();
     return (dispatch: any) => {
         dispatch({
-            type: plotActionTypes.CREATE_PLOT_REQUESTED,
+            type: plantTypeActionTypes.CREATE_PLANT_TYPE_REQUESTED,
         });
-        apiClient.createPlot(record).then(
-            (value: Plot) => {
+        apiClient.createPlantType(record, file).then(
+            (value: PlantType) => {
                 dispatch({
-                    type: plotActionTypes.CREATE_PLOT_SUCCEEDED,
+                    type: plantTypeActionTypes.CREATE_PLANT_TYPE_SUCCEEDED,
                     payload: value,
                 });
             },
             (error: any) => {
                 console.error(error);
                 dispatch({
-                    type: plotActionTypes.CREATE_PLOT_FAILED,
+                    type: plantTypeActionTypes.CREATE_PLANT_TYPE_FAILED,
                 });
             }
         )
     };
 };
 
-export const updatePlot = (record: Plot) => {
+export const updatePlantType = (record: PlantType, file?: Blob) => {
     const apiClient = new ApiClient();
     return (dispatch: any) => {
         dispatch({
-            type: plotActionTypes.UPDATE_PLOT_REQUESTED,
+            type: plantTypeActionTypes.UPDATE_PLANT_TYPE_REQUESTED,
         });
-        apiClient.updatePlot(record).then(
-            (value: Plot) => {
+        apiClient.updatePlantType(record, file).then(
+            (value: PlantType) => {
                 dispatch({
-                    type: plotActionTypes.UPDATE_PLOT_SUCCEEDED,
+                    type: plantTypeActionTypes.UPDATE_PLANT_TYPE_SUCCEEDED,
                     payload: value,
                 });
             },
             (error: any) => {
                 console.error(error);
                 dispatch({
-                    type: plotActionTypes.UPDATE_PLOT_FAILED,
+                    type: plantTypeActionTypes.UPDATE_PLANT_TYPE_FAILED,
                 });
             }
         )
@@ -108,23 +108,23 @@ export const updatePlot = (record: Plot) => {
 };
 
 
-export const deletePlot = (record: Plot) => {
+export const deletePlantType = (record: PlantType) => {
     const apiClient = new ApiClient();
     return (dispatch: any) => {
         dispatch({
-            type: plotActionTypes.DELETE_PLOT_REQUESTED,
+            type: plantTypeActionTypes.DELETE_PLANT_TYPE_REQUESTED,
         });
-        apiClient.deletePlot(record).then(
+        apiClient.deletePlantType(record).then(
             (id: number) => {
                 dispatch({
-                    type: plotActionTypes.DELETE_PLOT_SUCCEEDED,
+                    type: plantTypeActionTypes.DELETE_PLANT_TYPE_SUCCEEDED,
                     payload: id,
                 });
             },
             (error: any) => {
                 console.error(error);
                 dispatch({
-                    type: plotActionTypes.DELETE_PLOT_FAILED,
+                    type: plantTypeActionTypes.DELETE_PLANT_TYPE_FAILED,
                 });
             }
         )

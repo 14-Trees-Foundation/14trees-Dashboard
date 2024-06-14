@@ -13,8 +13,8 @@ import {
 } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
-import { type TreeType } from "../../../types/treeType";
-import * as treeTypeActionCreators from "../../../redux/actions/treeTypeActions";
+import { type TreeType } from "../../../types/plantType";
+import * as treeTypeActionCreators from "../../../redux/actions/plantTypeActions";
 import { bindActionCreators } from "redux";
 import { useAppDispatch, useAppSelector } from "../../../redux/store/hooks";
 import { RootState } from "../../../redux/store/store";
@@ -234,19 +234,16 @@ export const EventsComponent = () => {
   };
 
   const handleDeleteTreeType = (row: any) => {
-    // console.log("Delete", row);
     setOpenDeleteModal(true);
     setSelectedItem(row);
   };
 
   const handleEditSubmit = (formData: any) => {
-    // console.log(formData);
     updateTreeType(formData);
   };
 
   const handleCreateEventsData = (formData: any) => {
     console.log(formData);
-    // createEvents(formData);
 };
 
   return (

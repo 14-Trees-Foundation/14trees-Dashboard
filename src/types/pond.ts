@@ -1,3 +1,4 @@
+import { Boundaries } from "./common";
 
 export type PondUpdate = {
     date: Date,
@@ -7,32 +8,19 @@ export type PondUpdate = {
   };
   
 export type Pond = {
-    key: string,
-    _id: string,
+    key: number,
+    id: number,
     name: string,
-    tags: [string],
-    desc: string,
+    tags: string[],
     type: string,
-    boundaries: {
-      type: string,
-      coordinates: [[[number]]],
-    },
-    date_added: Date,
-    images: [string],
-    lengthFt: number,
-    widthFt: number,
-    depthFt: number,
-    updates: [PondUpdate],
+    boundaries: Boundaries,
+    images: string[],
+    length_ft: number,
+    width_ft: number,
+    depth_ft: number,
+    created_at: Date,
+    updated_at: Date,
 };
-
-export type CreatePondResponse = {
-  pond: Pond,
-}
-
-export type PondPaginationResponse = {
-  total: number,
-  result: Pond[]
-}
 
 export type PondsDataState = {
   totalPonds: number,

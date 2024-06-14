@@ -68,7 +68,6 @@ export default function getColumnSearchProps<T extends object>(dataIndex: keyof 
                                 operatorValue: filterOption,
                                 value: (selectedKeys as string[])[0],
                             }
-                            console.log(newFilters);
                             handleSetFilters(newFilters);
                         }}
                     >

@@ -9,7 +9,7 @@ import {
     TextField,
 } from "@mui/material";
 
-import * as treeTypeActionCreators from "../../../../redux/actions/treeTypeActions";
+import * as treeTypeActionCreators from "../../../../redux/actions/plantTypeActions";
 import * as plotActionCreators from "../../../../redux/actions/plotActions";
 import { useAppDispatch, useAppSelector } from '../../../../redux/store/hooks';
 import { bindActionCreators } from '@reduxjs/toolkit';

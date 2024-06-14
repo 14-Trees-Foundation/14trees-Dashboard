@@ -1,6 +1,5 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Box, Button, Grid, Modal, TextField, Typography } from '@mui/material';
-import { Height } from '@mui/icons-material';
 
 const AddTreeType = ({ open, handleClose, createTreeData }) => {
 
@@ -22,7 +21,7 @@ const AddTreeType = ({ open, handleClose, createTreeData }) => {
 
     const [formData, setFormData] = useState({
         name: '',
-        tree_id: '',
+        plant_type_id: '',
         desc: '',
         scientific_name: '',
         family: '',
@@ -64,7 +63,7 @@ const AddTreeType = ({ open, handleClose, createTreeData }) => {
                                 <TextField name="name" label="Name" value={formData.name} onChange={handleChange} fullWidth />
                             </Grid>
                             <Grid item xs={12}>
-                                <TextField name="tree_id" label="Tree ID" value={formData.phone} onChange={handleChange} fullWidth />
+                                <TextField name="plant_type_id" label="Plant Type ID" value={formData.phone} onChange={handleChange} fullWidth />
                             </Grid>
                             <Grid item xs={12}>
                                 <TextField name="desc" label="Description" value={formData.desc} onChange={handleChange} fullWidth />

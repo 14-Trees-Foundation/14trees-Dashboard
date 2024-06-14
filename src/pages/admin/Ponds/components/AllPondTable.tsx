@@ -37,9 +37,9 @@ function LoadingOverlay() {
 
 function getCapacity(params: any) {
     return (
-      parseInt(params.row.depthFt) *
-      parseInt(params.row.widthFt) *
-      parseInt(params.row.lengthFt)
+      parseInt(params.row.depth_ft) *
+      parseInt(params.row.width_ft) *
+      parseInt(params.row.length_ft)
     );
 }
 
@@ -98,13 +98,6 @@ export const PondComponent = () => {
                 </div>
             ),
         },
-        // {
-        //     field: "_id",
-        //     headerName: "ID",
-        //     width: 90,
-        //     align: "center",
-        //     headerAlign: "center",
-        // },
         {
             field: "name",
             headerName: "Name",
@@ -150,21 +143,21 @@ export const PondComponent = () => {
             headerAlign: "center",
         },
         {
-            field: "lengthFt",
+            field: "length_ft",
             headerName: "LengthFT",
             width: 150,
             align: "center",
             headerAlign: "center",
         },
         {
-            field: "widthFt",
+            field: "width_ft",
             headerName: "WidthFT",
             width: 150,
             align: "center",
             headerAlign: "center",
         },
         {
-            field: "depthFt",
+            field: "depth_ft",
             headerName: "DeathFT",
             width: 150,
             align: "center",
@@ -179,12 +172,12 @@ export const PondComponent = () => {
             valueGetter: getCapacity,
         },
         {
-            field: "date_added",
-            headerName: "Date Added",
+            field: "created_at",
+            headerName: "Created At",
             width: 150,
             align: "center",
             headerAlign: "center",
-            valueGetter: (params) => getFormattedDate(params.row?.date_added),
+            valueGetter: (params) => getFormattedDate(params.row?.created_at),
         },
         
     ];
@@ -195,7 +188,7 @@ export const PondComponent = () => {
 
     const getPondData = async () => {
         setTimeout(async () => {
-            await getPonds(page*10, 10, nameFilter);
+            await getPonds(page*10, 10, [ { columnField: "name", value: nameFilter, operatorValue: "contains" } ]);
         }, 1000);
     };
 
@@ -229,7 +222,6 @@ export const PondComponent = () => {
     };
 
     const handleCreatePondData = (formData: Pond) => {
-        // console.log(formData);
         createPond(formData);
     };
 
@@ -254,7 +246,7 @@ export const PondComponent = () => {
                 <DataGrid
                     rows={flattenedRows}
                     columns={columns}
-                    getRowId={(row) => row._id}
+                    getRowId={(row) => row.id}
                     initialState={{
                         pagination: {
                           page: 0,

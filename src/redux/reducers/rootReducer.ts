@@ -1,5 +1,5 @@
 import { combineReducers } from "redux";
-import { treeTypesDataReducer, searchTreeTypesDataReducer } from "./treeTypeReducer";
+import { plantTypesDataReducer, searchPlantTypesDataReducer } from "./plantTypeReducer";
 import { onsiteStaffsDataReducer } from "./onsiteStaffReducer";
 import { organizationsDataReducer, searchOrganizationsDataReducer } from "./organizationReducer";
 import { plotsDataReducer, searchPlotsDataReducer } from "./plotReducer";
@@ -9,7 +9,7 @@ import { usersDataReducer, searchUsersDataReducer } from "./userReducer";
 import { userTreesDataReducer, userTreeCountDataReducer } from "./userTreeReducer";
 
 const rootReducer = combineReducers({
-    treeTypesData: treeTypesDataReducer,
+    plantTypesData: plantTypesDataReducer,
     onsiteStaffsData: onsiteStaffsDataReducer,
     organizationsData: organizationsDataReducer,
     plotsData: plotsDataReducer,
@@ -19,7 +19,7 @@ const rootReducer = combineReducers({
     usersData: usersDataReducer,
     userTreesData: userTreesDataReducer,
     userTreeCountData: userTreeCountDataReducer,
-    searchTreeTypesData: searchTreeTypesDataReducer,
+    searchPlantTypesData: searchPlantTypesDataReducer,
     searchPondsData: searchPondsDataReducer,
     searchPlotsData: searchPlotsDataReducer,
     searchUsersData: searchUsersDataReducer,

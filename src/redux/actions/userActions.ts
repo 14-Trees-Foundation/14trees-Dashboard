@@ -1,48 +1,20 @@
 import ApiClient from "../../api/apiClient/apiClient";
 import userActionTypes from "../actionTypes/userActionTypes";
-import { User, UserPaginationResponse } from "../../types/user";
+import { User } from "../../types/user";
 import { toast } from "react-toastify";
+import { PaginatedResponse } from "../../types/pagination";
 
-export const getUsers = (offset: number, limit: number) => {
+export const getUsers = (offset: number, limit: number, filters?: any[]) => {
     const apiClient = new ApiClient()
     return (dispatch: any) => {
         dispatch({
             type: userActionTypes.GET_USERS_REQUESTED,
         });
-        apiClient.getUsers(offset, limit).then(
-            (value: UserPaginationResponse) => {
-                for (let i = 0; i < value.result.length; i++) {
-                    if (value.result[i]?._id) {
-                        value.result[i].key = value.result[i]._id
-                    }
-                }
-                dispatch({
-                    type: userActionTypes.GET_USERS_SUCCEEDED,
-                    payload: value,
-                });
-            },
-            (error: any) => {
-                console.log(error)
-                dispatch({
-                    type: userActionTypes.GET_USERS_FAILED,
-                    payload: error
-                });
-            }
-        )
-    }
-};
-
-export const getUsersByFilters = (offset: number, limit: number, filters?: any[]) => {
-    const apiClient = new ApiClient()
-    return (dispatch: any) => {
-        dispatch({
-            type: userActionTypes.GET_USERS_REQUESTED,
-        });
-        apiClient.getUsersByFilters(offset, limit, filters).then(
-            (value: UserPaginationResponse) => {
-                for (let i = 0; i < value.result.length; i++) {
-                    if (value.result[i]?._id) {
-                        value.result[i].key = value.result[i]._id
+        apiClient.getUsers(offset, limit, filters).then(
+            (value: PaginatedResponse<User>) => {
+                for (let i = 0; i < value.results.length; i++) {
+                    if (value.results[i]?.id) {
+                        value.results[i].key = value.results[i].id
                     }
                 }
                 dispatch({
@@ -70,8 +42,8 @@ export const searchUsers = (searchStr: string) => {
         apiClient.searchUsers(searchStr).then(
             (value: User[]) => {
                 for (let i = 0; i < value.length; i++) {
-                    if (value[i]?._id) {
-                        value[i].key = value[i]._id
+                    if (value[i]?.id) {
+                        value[i].key = value[i].id
                     }
                 }
                 dispatch({
@@ -166,7 +138,7 @@ export const deleteUser = (record: User) => {
             type: userActionTypes.DELETE_USER_REQUESTED,
         });
         apiClient.deleteUser(record).then(
-            (id: string) => {
+            (id: number) => {
                 dispatch({
                     type: userActionTypes.DELETE_USER_SUCCEEDED,
                     payload: id,

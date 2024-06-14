@@ -1,12 +1,13 @@
 import axios, {AxiosInstance} from 'axios';
-import { CreateTreeTypeResponse, TreeType, TreeTypePaginationResponse, TreeTypesDataState } from '../../types/treeType';
-import { Plot, PlotPaginationResponse, UpsertPlotResponse } from '../../types/plot';
+import { PlantType } from '../../types/plantType';
+import { Plot } from '../../types/plot';
 import { Organization, OrganizationPaginationResponse } from '../../types/organization';
-import { CreatePondResponse, Pond, PondPaginationResponse } from '../../types/pond';
-import { User, UserPaginationResponse } from '../../types/user';
+import { Pond } from '../../types/pond';
+import { User } from '../../types/user';
 import { OnsiteStaff } from '../../types/onSiteStaff';
 import { PaginationTreeResponse, Tree } from '../../types/tree';
 import { AssignTreeRequest, UserTree, UserTreeCountPaginationResponse } from '../../types/userTree';
+import { PaginatedResponse } from '../../types/pagination';
 
 class ApiClient {
     private api: AxiosInstance;
@@ -19,16 +20,13 @@ class ApiClient {
     }
 
     /*
-        Model- TreeTypes: CRUD Operations/Apis for tree types 
+        Model- PlantTypes: CRUD Operations/Apis for tree types 
     */
 
-    async getTreeTypes(offset: number, limit: number, name?: string): Promise<TreeTypePaginationResponse> {
-        let url = `/trees/treetypes?offset=${offset}&limit=${limit}`;
-        if (name && name !== '') {
-            url += `&name=${name}`
-        }
+    async getPlantTypes(offset: number, limit: number, filters?: any[]): Promise<PaginatedResponse<PlantType>> {
+        const url = `/plant-types/get?offset=${offset}&limit=${limit}`;
         try {
-            const response = await this.api.get<TreeTypePaginationResponse>(url);
+            const response = await this.api.post<PaginatedResponse<PlantType>>(url, {filters: filters});
             return response.data;
         } catch (error: any) {
             console.error(error)
@@ -36,10 +34,10 @@ class ApiClient {
         }
     }
 
-    async getTreeTypesByFilters(offset: number, limit: number, filters?: any[]): Promise<TreeTypePaginationResponse> {
-        const url = `/trees/treetypes?offset=${offset}&limit=${limit}`;
+    async searchPlantTypes(searchStr: string): Promise<PlantType[]> {
+        const url = `/plant-types/${searchStr}`;
         try {
-            const response = await this.api.post<TreeTypePaginationResponse>(url, {filters: filters});
+            const response = await this.api.get<PlantType[]>(url);
             return response.data;
         } catch (error: any) {
             console.error(error)
@@ -47,18 +45,7 @@ class ApiClient {
         }
     }
 
-    async searchTreeTypes(searchStr: string): Promise<TreeType[]> {
-        const url = `/trees/${searchStr}`;
-        try {
-            const response = await this.api.get<TreeType[]>(url);
-            return response.data;
-        } catch (error: any) {
-            console.error(error)
-            throw new Error(`Failed to fetch tree types: ${error.message}`);
-        }
-    }
-
-    async createTreeType(data: TreeType, file?: Blob): Promise<TreeType> {
+    async createPlantType(data: PlantType, file?: Blob): Promise<PlantType> {
         try {
             const formData = new FormData();
             if (file) {
@@ -70,15 +57,15 @@ class ApiClient {
                     formData.append(key, strValue);
                 }
               });
-            const response = await this.api.post<CreateTreeTypeResponse>(`/trees/addtreetype`, formData);
-            return response.data.treetype;
+            const response = await this.api.post<PlantType>(`/plant-types/`, formData);
+            return response.data;
         } catch (error) {
             console.error(error)
             throw new Error('Failed to create tree type.');
         }
     }
 
-    async updateTreeType(data: TreeType, file?: Blob): Promise<TreeType> {
+    async updatePlantType(data: PlantType, file?: Blob): Promise<PlantType> {
         try {
             const formData = new FormData();
             if (file) {
@@ -90,7 +77,7 @@ class ApiClient {
                     formData.append(key, strValue);
                 }
               });
-            const response = await this.api.put<TreeType>(`/trees/treetypes/${data._id}`, data);
+            const response = await this.api.put<PlantType>(`/plant-types/${data.id}`, data);
             return response.data;
         } catch (error) {
             console.error(error)
@@ -98,10 +85,10 @@ class ApiClient {
         }
     }
 
-    async deleteTreeType(data: TreeType): Promise<string> {
+    async deletePlantType(data: PlantType): Promise<number> {
         try {
-            await this.api.delete<any>(`/trees/treetypes/${data._id}`);
-            return data._id;
+            await this.api.delete<any>(`/plant-types/${data.id}`);
+            return data.id;
         } catch (error) {
             console.error(error)
             throw new Error('Failed to delete tree type');
@@ -113,24 +100,10 @@ class ApiClient {
         Model- Plot: CRUD Operations/Apis for plots
     */
 
-    async getPlots(offset: number, limit: number, name?: string): Promise<PlotPaginationResponse> {
-        let url = `/plots/?offset=${offset}&limit=${limit}`;
-        if (name && name !== '') {
-            url += `&name=${name}`
-        }
-        try {
-            const response = await this.api.get<PlotPaginationResponse>(url);
-            return response.data;
-        } catch (error: any) {
-            console.error(error)
-            throw new Error(`Failed to fetch plots: ${error.message}`);
-        }
-    }
-
-    async getPlotsByFilters(offset: number, limit: number, filters?: any[]): Promise<PlotPaginationResponse> {
+    async getPlots(offset: number, limit: number, filters?: any[]): Promise<PaginatedResponse<Plot>> {
         const url = `/plots/get?offset=${offset}&limit=${limit}`;
         try {
-            const response = await this.api.post<PlotPaginationResponse>(url, {filters: filters});
+            const response = await this.api.post<PaginatedResponse<Plot>>(url, {filters: filters});
             return response.data;
         } catch (error: any) {
             console.error(error)
@@ -151,8 +124,8 @@ class ApiClient {
 
     async createPlot(data: Plot): Promise<Plot> {
         try {
-            const response = await this.api.post<UpsertPlotResponse>(`/plots/add`, data);
-            return response.data.plot;
+            const response = await this.api.post<Plot>(`/plots/add`, data);
+            return response.data;
         } catch (error) {
             console.error(error)
             throw new Error('Failed to create plot');
@@ -161,18 +134,18 @@ class ApiClient {
 
     async updatePlot(data: Plot): Promise<Plot> {
         try {
-            const response = await this.api.put<UpsertPlotResponse>(`/plots/${data._id}`, data);
-            return response.data.plot;
+            const response = await this.api.put<Plot>(`/plots/${data.id}`, data);
+            return response.data;
         } catch (error) {
             console.error(error)
             throw new Error('Failed to update plot');
         }
     }
 
-    async deletePlot(data: Plot): Promise<string> {
+    async deletePlot(data: Plot): Promise<number> {
         try {
-            await this.api.delete<any>(`/plots/${data._id}`);
-            return data._id;
+            await this.api.delete<any>(`/plots/${data.id}`);
+            return data.id;
         } catch (error) {
             console.error(error)
             throw new Error('Failed to delete plot');
@@ -239,11 +212,10 @@ class ApiClient {
         Model- Pond: CRUD Operations/Apis for ponds
     */
 
-    async getPonds(offset: number, limit: number, name?: string): Promise<PondPaginationResponse> {
-        let url = `/ponds/?offset=${offset}&limit=${limit}`;
-        if (name) url += '&name=' + name;
+    async getPonds(offset: number, limit: number, filters?: any[]): Promise<PaginatedResponse<Pond>> {
+        const url = `/ponds/get?offset=${offset}&limit=${limit}`;
         try {
-            const response = await this.api.get<PondPaginationResponse>(url);
+            const response = await this.api.post<PaginatedResponse<Pond>>(url, { filters: filters });
             return response.data;
         } catch (error: any) {
             console.error(error)
@@ -264,8 +236,8 @@ class ApiClient {
 
     async createPond(data: Pond): Promise<Pond> {
         try {
-            const response = await this.api.post<CreatePondResponse>(`/ponds/`, data);
-            return response.data.pond;
+            const response = await this.api.post<Pond>(`/ponds/`, data);
+            return response.data;
         } catch (error) {
             console.error(error)
             throw new Error('Failed to create Pond');
@@ -274,7 +246,7 @@ class ApiClient {
 
     async updatePond(data: Pond): Promise<Pond> {
         try {
-            const response = await this.api.put<Pond>(`/ponds/${data._id}`, data);
+            const response = await this.api.put<Pond>(`/ponds/${data.id}`, data);
             return response.data;
         } catch (error) {
             console.error(error)
@@ -299,10 +271,10 @@ class ApiClient {
         }
     }
 
-    async deletePond(data: Pond): Promise<string> {
+    async deletePond(data: Pond): Promise<number> {
         try {
-            await this.api.delete<any>(`/ponds/${data._id}`);
-            return data._id;
+            await this.api.delete<any>(`/ponds/${data.id}`);
+            return data.id;
         } catch (error) {
             console.error(error)
             throw new Error('Failed to delete Pond');
@@ -323,21 +295,10 @@ class ApiClient {
         Model- User: CRUD Operations/Apis for users
     */
 
-    async getUsers(offset: number, limit: number): Promise<UserPaginationResponse> {
-        const url = `/users/?offset=${offset}&limit=${limit}`;
-        try {
-            const response = await this.api.get<UserPaginationResponse>(url);
-            return response.data;
-        } catch (error: any) {
-            console.error(error)
-            throw new Error(`Failed to fetch users: ${error.message}`);
-        }
-    }
-
-    async getUsersByFilters(offset: number, limit: number, filters?: any[]): Promise<UserPaginationResponse> {
+    async getUsers(offset: number, limit: number, filters?: any[]): Promise<PaginatedResponse<User>> {
         const url = `/users/get?offset=${offset}&limit=${limit}`;
         try {
-            const response = await this.api.post<UserPaginationResponse>(url, {filters: filters});
+            const response = await this.api.post<PaginatedResponse<User>>(url, {filters: filters});
             return response.data;
         } catch (error: any) {
             console.error(error)
@@ -368,7 +329,7 @@ class ApiClient {
 
     async updateUser(data: User): Promise<User> {
         try {
-            const response = await this.api.put<User>(`/users/${data._id}`, data);
+            const response = await this.api.put<User>(`/users/${data.id}`, data);
             return response.data;
         } catch (error: any) {
             console.error(error)
@@ -379,10 +340,10 @@ class ApiClient {
         }
     }
 
-    async deleteUser(data: User): Promise<string> {
+    async deleteUser(data: User): Promise<number> {
         try {
-            await this.api.delete<any>(`/users/${data._id}`);
-            return data._id;
+            await this.api.delete<any>(`/users/${data.id}`);
+            return data.id;
         } catch (error) {
             console.error(error)
             throw new Error('Failed to delete User');
@@ -487,7 +448,6 @@ class ApiClient {
     async updateTree(data: Tree, file?:Blob): Promise<Tree> {
         try {
             const formData = new FormData();
-            console.log(file)
 
             if (file) {
                 formData.append("files", file);
@@ -498,7 +458,6 @@ class ApiClient {
                     formData.append(key, strValue);
                 }
               });
-            console.log(formData)
             const response = await this.api.put<Tree>(`/trees/${data._id}`, formData);
             return response.data;
         } catch (error) {

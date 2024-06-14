@@ -4,11 +4,8 @@ import {
     Dialog,
     DialogActions,
     DialogContent,
-    DialogContentText,
     DialogTitle,
-    Modal,
     TextField,
-    Typography,
 } from "@mui/material";
 
 function EditTreeType({row, openeditModal, handleCloseEditModal, editSubmit}) {
@@ -72,11 +69,11 @@ function EditTreeType({row, openeditModal, handleCloseEditModal, editSubmit}) {
                     />
                     <TextField
                         margin="dense"
-                        name="tree_id"
-                        label="Tree Type ID"
+                        name="plant_type_id"
+                        label="Plant Type ID"
                         type="text"
                         fullWidth
-                        value={formData.tree_id}
+                        value={formData.plant_type_id}
                         onChange={handleChange}
                     />
                 </DialogContent>

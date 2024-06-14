@@ -10,7 +10,6 @@ import * as plotActionCreators from "../../../redux/actions/plotActions";
 import { bindActionCreators } from "redux";
 import { useAppDispatch, useAppSelector } from "../../../redux/store/hooks";
 import { RootState } from "../../../redux/store/store";
-import CircularProgress from "@mui/material/CircularProgress";
 import {
   Button,
   Dialog,
@@ -25,24 +24,10 @@ import getColumnSearchProps from "../../../components/Filter";
 import TableComponent from "../../../components/Table";
 import { ToastContainer } from "react-toastify";
 
-function LoadingOverlay() {
-  return (
-    <div
-      style={{
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        height: "100%",
-      }}>
-      <CircularProgress />
-    </div>
-  );
-}
-
 
 export const PlotComponent = () => {
   const dispatch = useAppDispatch();
-  const { createPlot, updatePlot, deletePlot, getPlotsByFilters } = bindActionCreators(
+  const { getPlots, createPlot, updatePlot, deletePlot } = bindActionCreators(
     plotActionCreators,
     dispatch
   );
@@ -62,164 +47,7 @@ export const PlotComponent = () => {
     setFilters(filters);
   }
 
-  const categoriesMap: Record<string, string> = {
-    "6543803d302fc2b6520a9bac": "Foundation",
-    "6543803d302fc2b6520a9bab": "Public",
-  }
-
-  const columns: GridColumns = [
-    {
-      field: "action",
-      headerName: "Action",
-      width: 150,
-      align: "center",
-      headerAlign: "center",
-      renderCell: (params: any) => (
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-          }}>
-          <Button
-            variant="outlined"
-            style={{ margin: "0 5px" }}
-            onClick={() => {
-              setSelectedEditRow(params.row);
-              setEditModal(true);
-            }}>
-            <EditIcon />
-          </Button>
-          <Button
-            variant="outlined"
-            style={{ margin: "0 5px" }}
-            onClick={() => handleDelete(params.row as Plot)}>
-            <DeleteIcon />
-          </Button>
-        </div>
-      ),
-    },
-    {
-      field: "name",
-      headerName: "Name",
-      width: 250,
-      align: "center",
-      editable: true,
-      headerAlign: "center",
-    },
-    {
-      field: "plot_id",
-      headerName: "Plot ID",
-      width: 150,
-      align: "center",
-      editable: true,
-      headerAlign: "center",
-    },
-    {
-      field: "category",
-      headerName: "Category",
-      width: 150,
-      align: "center",
-      editable: true,
-      headerAlign: "center",
-      valueGetter: (params) => (params.row.category ? categoriesMap[params.row.category] : '')
-    },
-    // {
-    //   field: "district",
-    //   headerName: "District",
-    //   width: 150,
-    //   align: "center",
-    //   editable: true,
-    //   headerAlign: "center",
-    // },
-    {
-      field: "gat",
-      headerName: "Gat",
-      width: 100,
-      align: "center",
-      editable: true,
-      headerAlign: "center",
-    },
-    // {
-    //   field: "land_type",
-    //   headerName: "Land Type",
-    //   width: 150,
-    //   align: "center",
-    //   editable: true,
-    //   headerAlign: "center",
-    // },
-    // {
-    //   field: "status",
-    //   headerName: "Status",
-    //   width: 150,
-    //   align: "center",
-    //   editable: true,
-    //   headerAlign: "center",
-    // },
-    // {
-    //   field: "taluka",
-    //   headerName: "Taluka",
-    //   width: 150,
-    //   align: "center",
-    //   editable: true,
-    //   headerAlign: "center",
-    // },
-    // {
-    //   field: "village",
-    //   headerName: "Village",
-    //   width: 150,
-    //   align: "center",
-    //   editable: true,
-    //   headerAlign: "center",
-    // },
-    // {
-    //   field: "zone",
-    //   headerName: "Zone",
-    //   width: 150,
-    //   align: "center",
-    //   editable: true,
-    //   headerAlign: "center",
-    // },
-    {
-      field: "boundaries.type",
-      headerName: "Boundaries Type",
-      width: 200,
-      align: "center",
-      editable: true,
-      headerAlign: "center",
-      valueGetter: (params) => (params.row.boundaries.type),
-    },
-    {
-      field: "boundaries.coordinates",
-      headerName: "Boundaries Coordinates",
-      width: 250,
-      align: "center",
-      editable: true,
-      headerAlign: "center",
-      valueGetter: (params) =>
-        JSON.stringify(params.row.boundaries.coordinates),
-    },
-    {
-      field: "center.type",
-      headerName: "Center Type",
-      width: 200,
-      align: "center",
-      editable: true,
-      headerAlign: "center",
-      valueGetter: (params) => (params.row.center.type),
-    },
-    {
-      field: "center.coordinates",
-      headerName: "Center Coordinates",
-      width: 250,
-      align: "center",
-      editable: true,
-      headerAlign: "center",
-      valueGetter: (params) => JSON.stringify(params.row.center.coordinates),
-    },
-  ];
-
-  const antdColumns: TableColumnsType<Plot> = [
+  const columns: TableColumnsType<Plot> = [
     {
       dataIndex: "action",
       key: "action",
@@ -270,9 +98,6 @@ export const PlotComponent = () => {
       key: "category",
       title: "Category",
       width: 150,
-      render: (value, record, index) => {
-        return Object.hasOwn(record, "category") ? categoriesMap[(record as any)["category"]] : '';
-      },
     },
     {
       dataIndex: "trees_count",
@@ -304,7 +129,7 @@ export const PlotComponent = () => {
       title: "Boundaries Type",
       width: 200,
       render: (value, record, index) => {
-        if (record.boundaries.type) {
+        if (record.boundaries?.type) {
           return record.boundaries.type;
         }
         return ''
@@ -316,7 +141,7 @@ export const PlotComponent = () => {
       title: "Center Type",
       width: 150,
       render: (value, record, index) => {
-        if (record.center.type) {
+        if (record.center?.type) {
           return record.center.type;
         }
         return ''
@@ -328,7 +153,7 @@ export const PlotComponent = () => {
       title: "Center Coordinates",
       width: 320,
       render: (value, record, index) => {
-        if (record.center.coordinates) {
+        if (record.center?.coordinates) {
           return JSON.stringify(record.center.coordinates);
         }
         return ''
@@ -343,7 +168,7 @@ export const PlotComponent = () => {
   const getPlotData = async () => {
     setTimeout(async () => {
       let filtersData = Object.values(filters);
-      await getPlotsByFilters(page * 10, 10, filtersData);
+      await getPlots(page * 10, 10, filtersData);
     }, 1000);
   };
   
@@ -356,7 +181,7 @@ export const PlotComponent = () => {
   const getAllPlotData = async () => {
     setTimeout(async () => {
       let filtersData = Object.values(filters);
-      await getPlotsByFilters(0, plotsData.totalPlots, filtersData);
+      await getPlots(0, plotsData.totalPlots, filtersData);
     }, 1000);
   };
 
@@ -393,38 +218,11 @@ export const PlotComponent = () => {
           handleClose={handleModalClose}
           createPlot={handleCreatePlotData}
         />
-        {/* <Button
-          variant="contained"
-          style={{ marginLeft: "10px", backgroundColor:'blue' }}
-          onClick={handleModalOpen}>
-          Bulk Create
-        </Button> */}
       </div>
-      {/* <Box sx={{ height: 540, width: "100%" }}>
-        <DataGrid
-          rows={plotsList}
-          columns={columns}
-          getRowId={(row) => row._id}
-          initialState={{
-            pagination: {
-              page: 0,
-              pageSize: 10,
-            },
-          }}
-          onPageChange={(page) => { if ((plotsList.length / 10) === page) setPage(page); }}
-          rowCount={plotsData.totalPlots}
-          checkboxSelection
-          disableSelectionOnClick
-          components={{
-            Toolbar: GridToolbar,
-            NoRowsOverlay: LoadingOverlay,
-          }}
-        />
-      </Box> */}
       <Box sx={{ height: 840, width: "100%" }}>
         <TableComponent
           dataSource={plotsList}
-          columns={antdColumns}
+          columns={columns}
           totalRecords={plotsData.totalPlots}
           fetchAllData={getAllPlotData}
           setPage={setPage}

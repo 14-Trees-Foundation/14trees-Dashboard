@@ -56,7 +56,7 @@ export const AdminLeftDrawer = () => {
       display: true,
     },
     {
-      displayName: "TreeType",
+      displayName: "Plant Type",
       logo: ForestOutlined,
       display: true,
     },

@@ -1,18 +1,19 @@
 import ApiClient from "../../api/apiClient/apiClient";
 import pondActionTypes from "../actionTypes/pondActionTypes";
-import { Pond, PondPaginationResponse } from "../../types/pond";
+import { Pond } from "../../types/pond";
+import { PaginatedResponse } from "../../types/pagination";
 
-export const getPonds = (offset: number, limit: number, name?: string) => {
+export const getPonds = (offset: number, limit: number, filters?: any[]) => {
     const apiClient = new ApiClient()
     return (dispatch: any) => {
         dispatch({
             type: pondActionTypes.GET_PONDS_REQUESTED,
         });
-        apiClient.getPonds(offset, limit, name).then(
-            (value: PondPaginationResponse) => {
-                for (let i = 0; i < value.result.length; i++) {
-                    if (value.result[i]?._id) {
-                        value.result[i].key = value.result[i]._id
+        apiClient.getPonds(offset, limit, filters).then(
+            (value: PaginatedResponse<Pond>) => {
+                for (let i = 0; i < value.results.length; i++) {
+                    if (value.results[i]?.id) {
+                        value.results[i].key = value.results[i].id
                     }
                 }
                 dispatch({
@@ -40,8 +41,8 @@ export const getPondHistory = (name: string) => {
         apiClient.getPondHistory( name).then(
             (value: Pond[]) => {
                 for (let i = 0; i < value.length; i++) {
-                    if (value[i]?._id) {
-                        value[i].key = value[i]._id
+                    if (value[i]?.id) {
+                        value[i].key = value[i].id
                     }
                 }
                 dispatch({
@@ -69,8 +70,8 @@ export const searchPonds = (searchStr: string) => {
         apiClient.searchPonds(searchStr).then(
             (value: Pond[]) => {
                 for (let i = 0; i < value.length; i++) {
-                    if (value[i]?._id) {
-                        value[i].key = value[i]._id
+                    if (value[i]?.id) {
+                        value[i].key = value[i].id
                     }
                 }
                 dispatch({
@@ -166,7 +167,7 @@ export const deletePond = (record: Pond) => {
             type: pondActionTypes.DELETE_POND_REQUESTED,
         });
         apiClient.deletePond(record).then(
-            (id: string) => {
+            (id: number) => {
                 dispatch({
                     type: pondActionTypes.DELETE_POND_SUCCEEDED,
                     payload: id,
