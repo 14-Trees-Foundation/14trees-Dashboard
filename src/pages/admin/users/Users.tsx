@@ -57,12 +57,11 @@ export const Users = () => {
         <Divider sx={{ backgroundColor: "#ffffff", marginBottom:'10px' }} />
         <User1 />
         <Divider sx={{ backgroundColor: "#ffffff", marginTop:'20px' }} />
-        <Box sx={{ p: 3 }}>
+        {/* <Box sx={{ p: 3 }}>
           <TabsUnstyled defaultValue={0}>
             <TabsList>
               <Tab>Tree Holdings</Tab>
               <Tab>Assigned Users</Tab>
-              {/* <Tab>Edit Users</Tab> */}
             </TabsList>
             <TabPanel value={0}>
               <UserTreeHoldings />
@@ -74,7 +73,7 @@ export const Users = () => {
               <UserEdit />
             </TabPanel>
           </TabsUnstyled>
-        </Box>
+        </Box> */}
       </>
     );
   }

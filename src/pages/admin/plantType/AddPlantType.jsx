@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Box, Button, Grid, Modal, TextField, Typography } from '@mui/material';
 
-const AddTreeType = ({ open, handleClose, createTreeData }) => {
+const AddTreeType = ({ open, handleClose, createPlantType }) => {
 
     const style = {
         position: 'absolute',
@@ -44,7 +44,8 @@ const AddTreeType = ({ open, handleClose, createTreeData }) => {
 
     const handleSubmit = (event) => {
         event.preventDefault();
-        createTreeData(formData);
+        createPlantType(formData);
+        handleClose();
     };
 
     return (

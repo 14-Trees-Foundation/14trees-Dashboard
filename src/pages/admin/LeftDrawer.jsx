@@ -7,7 +7,6 @@ import MenuIcon from "@mui/icons-material/Menu";
 import IconButton from "@mui/material/IconButton";
 import LeaderBoardOutlined from "@mui/icons-material/LeaderboardOutlined";
 import ForestOutlined from "@mui/icons-material/ForestOutlined";
-import AssignmentOutlined from "@mui/icons-material/AssignmentOutlined";
 import OpacityOutlined from "@mui/icons-material/OpacityOutlined";
 import AccountCircleOutlined from "@mui/icons-material/AccountCircleOutlined";
 import FaceIcon from "@mui/icons-material/Face";
@@ -56,7 +55,7 @@ export const AdminLeftDrawer = () => {
       display: true,
     },
     {
-      displayName: "Plant Type",
+      displayName: "Plant Types",
       logo: ForestOutlined,
       display: true,
     },
@@ -66,7 +65,7 @@ export const AdminLeftDrawer = () => {
       display: true,
     },
     {
-      displayName: "Plot",
+      displayName: "Plots",
       logo: LandscapeIcon,
       display: true,
     },
@@ -102,11 +101,6 @@ export const AdminLeftDrawer = () => {
       // display: auth.permissions.includes("all"),
       display: true,
     },
-    // {
-    //   displayName: "Forms",
-    //   logo: AssignmentOutlined,
-    //   display: true,
-    // },
 
   ];
   const menuitem = () => {

@@ -48,7 +48,7 @@ export const PlantTypeComponent = () => {
         {
           dataIndex: "plant_type_id",
           key: "plant_type_id",
-          title: "Tree Type ID",
+          title: "Plant Type ID",
           width: 150,
           align: "center",
           ...getColumnSearchProps('plant_type_id', filters, handleSetFilters)
@@ -173,12 +173,12 @@ export const PlantTypeComponent = () => {
                     marginBottom: "20px",
                 }}>
                 <Button variant="contained" style={{ backgroundColor:'blue' }} onClick={handleModalOpen}>
-                    Add Tree type
+                    Add Plant type
                 </Button>
                 <AddPlantType
                     open={open}
                     handleClose={handleModalClose}
-                    createTreeData={handleCreatePlantTypeData}
+                    createPlantType={handleCreatePlantTypeData}
                 />
                 <Button
                     variant="contained"

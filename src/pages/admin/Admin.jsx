@@ -15,11 +15,9 @@ import {
 } from "../../store/adminAtoms";
 import { AdminHome } from "./home/AdminHome";
 import { Trees } from "./tree/Tree";
-import { Forms } from "./Forms/Forms";
 import { Users } from "./users/Users";
 import { Ponds } from "./Ponds/Ponds";
 import { Images } from "./images/Images";
-import { TreeNew } from "./tree/table/Tree";
 import { PlantTypeComponent } from "./plantType/PlantType";
 import { PlotComponent } from "./plot/Plot";
 import { OrganizationComponent } from "./organization/Organization";
@@ -119,10 +117,6 @@ export const Admin = () => {
       page: Images,
       displayName: "Images",
     },
-    // {
-    //   page: Forms,
-    //   displayName: "Forms",
-    // },
   ];
 
   const mainBox = () => {

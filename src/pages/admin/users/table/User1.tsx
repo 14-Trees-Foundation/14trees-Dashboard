@@ -61,10 +61,48 @@ export const User1 = () => {
 
   const antdColumns: TableColumnsType<User> = [
     {
+      dataIndex: "name",
+      key: "name",
+      title: "Name",
+      align: "center",
+      width: 150,
+      ...getColumnSearchProps('name', filters, handleSetFilters)
+    },
+    {
+      dataIndex: "email",
+      key: "email",
+      title: "Email",
+      align: "center",
+      width: 200,
+      ...getColumnSearchProps('email', filters, handleSetFilters)
+    },
+    {
+      dataIndex: "birth_date",
+      key: "birth_date",
+      title: "Date of Birth",
+      align: "center",
+      width: 100,
+      render: getFormattedDate,
+      ...getColumnSearchProps('birth_date', filters, handleSetFilters)
+    },
+    {
+      dataIndex: "phone",
+      key: "phone",
+      title: "Phone",
+      align: "center",
+      width: 100,
+      render: (value: string) => { 
+        if (!value || value === "0") return "-";
+        if (value.endsWith('.0')) return value.slice(0, -2);
+        else return value;
+      },
+      ...getColumnSearchProps('phone', filters, handleSetFilters)
+    },
+    {
       dataIndex: "action",
       key: "action",
       title: "Actions",
-      width: 200,
+      width: 100,
       align: "center",
       render: (value, record, index )=> (
         <div
@@ -73,6 +111,13 @@ export const User1 = () => {
             justifyContent: "center",
             alignItems: "center",
           }}>
+          <Button
+            onClick={() => {
+              window.open("https://dashboard.14trees.org/ww/" + record.email);
+            }}
+          >
+            <AccountCircleRoundedIcon />
+          </Button>
           <Button
             onClick={() => {
               setSelectedEditRow(record);
@@ -84,50 +129,9 @@ export const User1 = () => {
             onClick={() => handleDelete(record)}>
             <DeleteIcon />
           </Button>
-          <Button
-            onClick={() => {
-              window.open("https://dashboard.14trees.org/ww/" + record.email);
-            }}
-          >
-            <AccountCircleRoundedIcon />
-          </Button>
         </div>
       ),
-    },
-    {
-      dataIndex: "name",
-      key: "name",
-      title: "Name",
-      width: 150,
-      ...getColumnSearchProps('name', filters, handleSetFilters)
-    },
-    {
-      dataIndex: "email",
-      key: "email",
-      title: "Email",
-      width: 200,
-      ...getColumnSearchProps('email', filters, handleSetFilters)
-    },
-    {
-      dataIndex: "birth_date",
-      key: "birth_date",
-      title: "Date of Birth",
-      width: 200,
-      render: getFormattedDate,
-      ...getColumnSearchProps('birth_date', filters, handleSetFilters)
-    },
-    {
-      dataIndex: "phone",
-      key: "phone",
-      title: "Phone",
-      width: 100,
-      render: (value: string) => { 
-        if (!value || value === "0") return "-";
-        if (value.endsWith('.0')) return value.slice(0, -2);
-        else return value;
-      },
-      ...getColumnSearchProps('phone', filters, handleSetFilters)
-    },    
+    },  
   ];
 
   let usersList: User[] = [];

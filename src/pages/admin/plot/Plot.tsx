@@ -83,6 +83,7 @@ export const PlotComponent = () => {
       dataIndex: "name",
       key: "name",
       title: "Name",
+      align: "center",
       width: 300,
       ...getColumnSearchProps('name', filters, handleSetFilters)
     },
@@ -90,6 +91,7 @@ export const PlotComponent = () => {
       dataIndex: "plot_id",
       key: "plot_id",
       title: "Plot ID",
+      align: "center",
       width: 150,
       ...getColumnSearchProps('plot_id', filters, handleSetFilters)
     },
@@ -97,68 +99,73 @@ export const PlotComponent = () => {
       dataIndex: "category",
       key: "category",
       title: "Category",
+      align: "center",
       width: 150,
     },
     {
       dataIndex: "trees_count",
       key: "trees_count",
       title: "Total Trees",
+      align: "center",
       width: 150,
     },
     {
       dataIndex: "mapped_trees_count",
       key: "mapped_trees_count",
       title: "Booked Trees",
+      align: "center",
       width: 150,
     },
     {
       dataIndex: "assigned_trees_count",
       key: "assigned_trees_count",
       title: "Assigned Trees",
+      align: "center",
       width: 150,
     },
     {
       dataIndex: "available_trees_count",
       key: "available_trees_count",
       title: "Available Trees",
+      align: "center",
       width: 150,
     },
-    {
-      dataIndex: "boundaries.type",
-      key: "boundaries.type",
-      title: "Boundaries Type",
-      width: 200,
-      render: (value, record, index) => {
-        if (record.boundaries?.type) {
-          return record.boundaries.type;
-        }
-        return ''
-      },
-    },
-    {
-      dataIndex: "center.type",
-      key: "center.type",
-      title: "Center Type",
-      width: 150,
-      render: (value, record, index) => {
-        if (record.center?.type) {
-          return record.center.type;
-        }
-        return ''
-      },
-    },
-    {
-      dataIndex: "center.coordinates",
-      key: "center.coordinates",
-      title: "Center Coordinates",
-      width: 320,
-      render: (value, record, index) => {
-        if (record.center?.coordinates) {
-          return JSON.stringify(record.center.coordinates);
-        }
-        return ''
-      },
-    },
+    // {
+    //   dataIndex: "boundaries.type",
+    //   key: "boundaries.type",
+    //   title: "Boundaries Type",
+    //   width: 200,
+    //   render: (value, record, index) => {
+    //     if (record.boundaries?.type) {
+    //       return record.boundaries.type;
+    //     }
+    //     return ''
+    //   },
+    // },
+    // {
+    //   dataIndex: "center.type",
+    //   key: "center.type",
+    //   title: "Center Type",
+    //   width: 150,
+    //   render: (value, record, index) => {
+    //     if (record.center?.type) {
+    //       return record.center.type;
+    //     }
+    //     return ''
+    //   },
+    // },
+    // {
+    //   dataIndex: "center.coordinates",
+    //   key: "center.coordinates",
+    //   title: "Center Coordinates",
+    //   width: 320,
+    //   render: (value, record, index) => {
+    //     if (record.center?.coordinates) {
+    //       return JSON.stringify(record.center.coordinates);
+    //     }
+    //     return ''
+    //   },
+    // },
   ];
 
   useEffect(() => {
@@ -186,7 +193,6 @@ export const PlotComponent = () => {
   };
 
   const handleDelete = (row: Plot) => {
-    console.log("Delete", row);
     setOpenDeleteModal(true);
     setSelectedItem(row);
   };
