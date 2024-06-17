@@ -30,13 +30,13 @@ function EditPond({ row, openeditModal, setEditModal, editSubmit }) {
     };
 
     const categoriesList = [
-        {id: "6543803d302fc2b6520a9bac", label: "Foundation"},
-        {id: "6543803d302fc2b6520a9bab", label: "Public"},
+        {id: 1, label: "Public"},
+        {id: 2, label: "Foundation"},
     ]
 
     const categoriesMap = {
-        "6543803d302fc2b6520a9bac": "Foundation",
-        "6543803d302fc2b6520a9bab": "Public",
+        1: "Public",
+        2: "Foundation",
     }
 
 

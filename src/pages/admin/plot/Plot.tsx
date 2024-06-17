@@ -47,6 +47,11 @@ export const PlotComponent = () => {
     setFilters(filters);
   }
 
+  const categoriesMap: Record<number, string> = {
+    1: "Public",
+    2: "Foundation",
+}
+
   const columns: TableColumnsType<Plot> = [
     {
       dataIndex: "action",
@@ -101,6 +106,7 @@ export const PlotComponent = () => {
       title: "Category",
       align: "center",
       width: 150,
+      render: (value, record, index) => record.category ? categoriesMap[record.category] : ''
     },
     {
       dataIndex: "trees_count",

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { ToastContainer, toast } from "react-toastify";
 import {
     Paper,
@@ -15,6 +15,7 @@ import { bindActionCreators } from "redux";
 import { useAppDispatch, useAppSelector } from "../../../../redux/store/hooks";
 
 function TreeMap( {selectedPlot, setSelectedPlot} ) {
+    const isFirstRender = useRef(true);
     const [page, setPage] = useState(0);
     const [plotName, setPlotName] = useState('');
     const [loading, setLoading] = useState(false);
@@ -26,6 +27,10 @@ function TreeMap( {selectedPlot, setSelectedPlot} ) {
         = bindActionCreators(plotActionCreators, dispatch);
 
     useEffect(() => {
+        if (isFirstRender.current) {
+            isFirstRender.current = false;
+            return;
+        }
         getPlotsData();
     }, [page, plotName]);
 

@@ -6,6 +6,8 @@ export type Plot = {
     name: string,
     plot_id: string,
     tags: string[],
+    gat: string,
+    category: number,
     desc: string,
     boundaries: Boundaries,
     center: Location,
