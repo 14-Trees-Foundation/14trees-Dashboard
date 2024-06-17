@@ -5,7 +5,7 @@ import { Organization, OrganizationPaginationResponse } from '../../types/organi
 import { Pond } from '../../types/pond';
 import { User } from '../../types/user';
 import { OnsiteStaff } from '../../types/onSiteStaff';
-import { PaginationTreeResponse, Tree } from '../../types/tree';
+import { Tree } from '../../types/tree';
 import { AssignTreeRequest, UserTree, UserTreeCountPaginationResponse } from '../../types/userTree';
 import { PaginatedResponse } from '../../types/pagination';
 
@@ -410,10 +410,10 @@ class ApiClient {
         Model- Tree: CRUD Operations/Apis for trees
     */
 
-    async getTrees(offset: number, limit: number, filters?: any): Promise<PaginationTreeResponse> {
+    async getTrees(offset: number, limit: number, filters?: any[]): Promise<PaginatedResponse<Tree>> {
         const url = `/trees/get?offset=${offset}&limit=${limit}`;
         try {
-            const response = await this.api.post<PaginationTreeResponse>(url, {filters: filters});
+            const response = await this.api.post<PaginatedResponse<Tree>>(url, { filters: filters });
             return response.data;
         } catch (error: any) {
             console.error(error)
@@ -429,14 +429,13 @@ class ApiClient {
                 formData.append("images", (file as File).name);
             }
             formData.append('sapling_id', data.sapling_id);
-            formData.append('tree_id', data.tree_id);
-            formData.append('plot_id', data.plot_id);
+            formData.append('plant_type_id', data.plant_type_id.toString());
+            formData.append('plot_id', data.plot_id.toString());
             if (data.location && data.location.coordinates && data.location.coordinates.length === 2) {
                 formData.append('lat', data.location.coordinates[0].toString());
                 formData.append('lng', data.location.coordinates[1].toString());
             }
-            formData.append('mapped_to', data.mapped_to);
-            formData.append('user_id', data.user_id);
+            formData.append('mapped_to', data.mapped_to_user.toString());
             const response = await this.api.post<Tree>(`/trees/`, formData);
             return response.data;
         } catch (error) {
@@ -453,12 +452,12 @@ class ApiClient {
                 formData.append("files", file);
             }
             Object.entries(data).forEach(([key, value]) => {
-                if (key != 'image') {
+                if (key != 'image' && value != null) {
                     const strValue = value as string
                     formData.append(key, strValue);
                 }
               });
-            const response = await this.api.put<Tree>(`/trees/${data._id}`, formData);
+            const response = await this.api.put<Tree>(`/trees/${data.id}`, formData);
             return response.data;
         } catch (error) {
             console.error(error)
@@ -466,10 +465,10 @@ class ApiClient {
         }
     }
 
-    async deleteTree(data: Tree): Promise<string> {
+    async deleteTree(data: Tree): Promise<number> {
         try {
-            await this.api.delete<any>(`/trees/${data._id}`);
-            return data._id;
+            await this.api.delete<any>(`/trees/${data.id}`);
+            return data.id;
         } catch (error) {
             console.error(error)
             throw new Error('Failed to delete Tree');
@@ -487,18 +486,18 @@ class ApiClient {
         }
     }
 
-    async mapTrees(saplingIds: string[], email: string): Promise<void> {
+    async mapTrees(mapped_to: 'user' | 'group', saplingIds: string[], id: number): Promise<void> {
         try {
-            await this.api.post<any>(`/mapping/map`, { sapling_id: saplingIds.join(',') , email: email});
+            await this.api.post<any>(`/mapping/map`, { sapling_ids: saplingIds , id: id, mapped_to: mapped_to});
         } catch (error) {
             console.error(error)
             throw new Error('Failed to create Trees in bulk');
         }
     }
 
-    async mapTreesForPlot(email: string, plotId: string, count: number): Promise<void> {
+    async mapTreesForPlot(mapped_to: 'user' | 'group', id: number, plotId: string, count: number): Promise<void> {
         try {
-            await this.api.post<any>(`/mapping/map-plot-trees`, { email: email, plot_id: plotId, count: count});
+            await this.api.post<any>(`/mapping/map-plot-trees`, { mapped_to: mapped_to, id: id, plot_id: plotId, count: count});
         } catch (error) {
             console.error(error)
             throw new Error('Failed to create Trees in bulk');

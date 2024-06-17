@@ -147,13 +147,13 @@ export const unMapTrees = (saplingIds: string[]) => {
     };
 }
 
-export const mapTrees = (saplingIds: string[], email: string) => {
+export const mapTrees = (mapped_to: 'user' | 'group', saplingIds: string[], id: number) => {
     const apiClient = new ApiClient();
     return (dispatch: any) => {
         dispatch({
             type: userTreeActionTypes.MAP_USER_TREES_REQUESTED,
         });
-        apiClient.mapTrees(saplingIds, email).then(
+        apiClient.mapTrees(mapped_to, saplingIds, id).then(
             () => {
                 dispatch({
                     type: userTreeActionTypes.MAP_USER_TREES_SUCCEEDED,
@@ -170,13 +170,13 @@ export const mapTrees = (saplingIds: string[], email: string) => {
     };
 }
 
-export const mapTreesForPlot = (email: string, plotId: string, count: number) => {
+export const mapTreesForPlot = (mapped_to: 'user' | 'group',id: number, plotId: string, count: number) => {
     const apiClient = new ApiClient();
     return (dispatch: any) => {
         dispatch({
             type: userTreeActionTypes.MAP_USER_TREES_IN_PLOT_REQUESTED,
         });
-        apiClient.mapTreesForPlot(email, plotId, count).then(
+        apiClient.mapTreesForPlot(mapped_to, id, plotId, count).then(
             () => {
                 dispatch({
                     type: userTreeActionTypes.MAP_USER_TREES_IN_PLOT_SUCCEEDED,

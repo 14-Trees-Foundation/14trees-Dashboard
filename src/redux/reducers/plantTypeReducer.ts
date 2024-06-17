@@ -46,7 +46,7 @@ export const plantTypesDataReducer = (state = { totalPlantTypes: 0, plantTypes: 
         case plantTypeActionTypes.DELETE_PLANT_TYPE_SUCCEEDED:
             if (action.payload) {
                 const nextState = { totalPlantTypes: state.totalPlantTypes, plantTypes: {...state.plantTypes} } as PlantTypesDataState;
-                Reflect.deleteProperty(nextState.plantTypes, action.payload as string)
+                Reflect.deleteProperty(nextState.plantTypes, action.payload as number)
                 nextState.totalPlantTypes -= 1;
                 return nextState;
             }

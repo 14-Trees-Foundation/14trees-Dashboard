@@ -100,8 +100,9 @@ export const TreeNew = () => {
     }, [plotPage, plotName]);
 
     const getPlotsData = async () => {
+        const nameFilter =  { columnField: "name", value: plotName, operatorValue: "contains" }
         setTimeout(async () => {
-            await getPlots(plotPage * 10, 10, plotName);
+            await getPlots(plotPage * 10, 10, [nameFilter]);
         }, 1000);
     };
 
@@ -109,13 +110,6 @@ export const TreeNew = () => {
     const plotsData = useAppSelector((state) => state.plotsData);
     if (plotsData) {
         plotsList = Object.values(plotsData.plots);
-    }
-
-    const eventTypeMap: Record<string, string> = {
-        "1": "Birthday",
-        "2": "In Memory of",
-        "3": "General gift",
-        "4": "Corporate gift",
     }
 
     const antdColumns: TableColumnsType<Tree> = [
@@ -159,13 +153,12 @@ export const TreeNew = () => {
             ...getColumnSearchProps('sapling_id', filters, handleSetFilters)
         },
         {
-            dataIndex: "tree",
-            key: "tree_id",
-            title: "Tree Type",
+            dataIndex: "plant_type",
+            key: "plant_type",
+            title: "Plant Type",
             width: 250,
             align: 'center',
-            render: (value, record, index) => record?.tree?.name,
-            ...getColumnSearchProps('tree', filters, handleSetFilters)
+            ...getColumnSearchProps('plant_type', filters, handleSetFilters)
         },
         {
             dataIndex: "plot",
@@ -173,50 +166,32 @@ export const TreeNew = () => {
             title: "Plot",
             width: 350,
             align: 'center',
-            render: (value, record, index) => record?.plot?.name,
+            render: (value, record, index) => record?.plot,
             ...getColumnSearchProps('plot', filters, handleSetFilters)
         },
         {
-            dataIndex: "mapped_to",
-            key: "mapped_to",
+            dataIndex: "mapped_user_name",
+            key: "mapped_user_name",
             title: "Mapped To",
             width: 250,
             align: 'center',
-            render: (value, record, index) => record?.user?.name,
-            ...getColumnSearchProps('mapped_to', filters, handleSetFilters)
+            ...getColumnSearchProps('mapped_user_name', filters, handleSetFilters)
         },
         {
-            dataIndex: "assigned_to",
-            key: "assigned_to",
+            dataIndex: "assigned_to_name",
+            key: "assigned_to_name",
             title: "Assigned To",
             width: 250,
             align: 'center',
-            render: (value, record, index) => record?.assigned_to?.name,
-            ...getColumnSearchProps('assigned_to', filters, handleSetFilters)
+            ...getColumnSearchProps('assigned_to_name', filters, handleSetFilters)
         },
         {
-            dataIndex: "link",
-            key: "link",
+            dataIndex: "event_id",
+            key: "event_id",
             title: "Event",
             width: 150,
             align: 'center',
-            ...getColumnSearchProps('link', filters, handleSetFilters)
-        },
-        {
-            dataIndex: "event_type",
-            key: "event_type",
-            title: "Event Type",
-            width: 200,
-            align: 'center',
-            render: (value, record, index) => record?.event_type ? eventTypeMap[record.event_type] : ''
-        },
-        {
-            dataIndex: "date_added",
-            key: "date_added",
-            title: "Date Added",
-            width: 150,
-            align: 'center',
-            render: getFormattedDate,
+            ...getColumnSearchProps('event_id', filters, handleSetFilters)
         },
     ];
 
@@ -246,7 +221,7 @@ export const TreeNew = () => {
         let mapped = 0, unMapped = 0;
         let assigned = 0, unassigned = 0;
         treeIds.forEach((treeId) => {
-            if (treesData.trees[treeId].mapped_to) mapped++;
+            if (treesData.trees[treeId].mapped_to_user || treesData.trees[treeId].mapped_to_group) mapped++;
             else unMapped++;
 
             if (treesData.trees[treeId].assigned_to) assigned++;
@@ -286,7 +261,7 @@ export const TreeNew = () => {
     }
 
     const handleMapTrees = (formData: any) => {
-        mapTrees(saplingIds, formData.email);
+        mapTrees('user', saplingIds, formData.id);
         setSaplingIds([]);
         setDisabledMapUnMapButton(true);
         setIsUserModalOpen(false);
@@ -311,7 +286,7 @@ export const TreeNew = () => {
 
     const handleAssignTrees = (formData: any) => {
         let data = formData as AssignTreeRequest
-        data.sapling_id = saplingIds.join(",");
+        data.sapling_ids = saplingIds
         assignTrees(data);
         setSaplingIds([]);
         setDisabledAUButton(true);
@@ -353,7 +328,7 @@ export const TreeNew = () => {
                                     ...filters,
                                     "plot_id": {
                                         columnField: "plot_id",
-                                        value: newValue._id,
+                                        value: newValue.id,
                                         operatorValue: 'equals'
                                     }
                                 }

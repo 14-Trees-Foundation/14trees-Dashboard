@@ -26,5 +26,5 @@ export type PlantType = {
 
 export type PlantTypesDataState = {
     totalPlantTypes: number,
-    plantTypes: Record<string, PlantType>
+    plantTypes: Record<number, PlantType>
 }

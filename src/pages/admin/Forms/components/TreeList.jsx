@@ -12,21 +12,24 @@ import {
 import Axios from "../../../../api/local";
 import { Spinner } from "../../../../components/Spinner";
 import * as plotActionCreators from "../../../../redux/actions/plotActions";
+import * as treeActionCreators from "../../../../redux/actions/treeActions";
 import { bindActionCreators } from "redux";
 import { useAppDispatch, useAppSelector } from "../../../../redux/store/hooks";
 
-export const TreeList = ({ onTreeSelect }) => {
+export const TreeList = ({ onTreeSelect }) => {  
   const isFirstRender = useRef(true);
   const [page, setPage] = useState(0);
   const [plotName, setPlotName] = useState('');
   const [selectedPlot, setSelectedPlot] = useState("");
   const [loading, setLoading] = useState(false);
-  const [assigned, setAssigned] = useState([]);
-  const [unassigned, setUnassigned] = useState([]);
-
+  // const [assigned, setAssigned] = useState([]);
+  // const [unassigned, setUnassigned] = useState([]);
+  
   const dispatch = useAppDispatch();
   const { getPlots }
     = bindActionCreators(plotActionCreators, dispatch);
+  const { getTrees }
+      = bindActionCreators(treeActionCreators, dispatch);
 
   useEffect(() => {
     if (isFirstRender.current) {
@@ -48,6 +51,15 @@ export const TreeList = ({ onTreeSelect }) => {
     plotsList = Object.values(plotsData.plots);
   }
 
+  let treesList = [];
+  const treesData = useAppSelector((state) => state.treesData);
+  if (treesData) {
+    treesList = Object.values(treesData.trees);
+  }
+
+  let unMapped = treesList.filter((x) => (!x.mapped_to_user && !x.mapped_to_group)).sort(function (a, b) { return a.sapling_id - b.sapling_id; });
+  let mapped = treesList.filter((x) => (x.mapped_to_user || x.mapped_to_group)).sort(function (a, b) { return a.sapling_id - b.sapling_id; });
+
   const CustomPaper = (props) => {
     return (
       <Paper
@@ -63,28 +75,11 @@ export const TreeList = ({ onTreeSelect }) => {
 
   const fetchAndShowTreeList = async (value) => {
     setSelectedPlot(value.name);
-    setLoading(true);
-    try {
-      let response = await Axios.get(`/trees/plot/count?id=${value._id}`);
-      if (response.status === 200) {
-        let unMapped = response.data.trees
-          .filter((x) => !x.mapped_to)
-          .sort(function (a, b) {
-            return a.sapling_id - b.sapling_id;
-          });
-        let mapped = response.data.trees
-          .filter((x) => x.mapped_to)
-          .sort(function (a, b) {
-            return a.sapling_id - b.sapling_id;
-          });
-        setAssigned(mapped);
-        setUnassigned(unMapped);
-        toast.success("Tree list fetched!");
-      }
-    } catch (error) {
-      toast.error("Error fetching tree list!");
-    }
-    setLoading(false);
+    setTimeout(async () => {
+      setLoading(true);
+      await getTrees(0, -1, [ { columnField: "plot_id", value: value.id, operatorField: "equals" } ])
+      setLoading(false);
+    })
   };
 
   if (loading) {
@@ -189,14 +184,14 @@ export const TreeList = ({ onTreeSelect }) => {
                 <h4 style={{ marginTop: "0px", paddingRight: "8px" }}>
                   Total:{" "}
                   <span style={{ color: "#C72542", fontStyle: "italic" }}>
-                    {assigned.length}
+                    {mapped.length}
                   </span>
                 </h4>
                 <h4 style={{ marginTop: "0px", paddingRight: "8px" }}>
                   Assigned:{" "}
                   <span style={{ color: "#C72542", fontStyle: "italic" }}>
                     {
-                      assigned.filter((obj) => {
+                      mapped.filter((obj) => {
                         if (obj.assigned_to) {
                           return true;
                         }
@@ -209,8 +204,8 @@ export const TreeList = ({ onTreeSelect }) => {
               </div>
             </div>
             <div></div>
-            {assigned.length !== 0 &&
-              assigned.map((tree) => {
+            {mapped.length !== 0 &&
+              mapped.map((tree) => {
                 return (
                   <Chip
                     key={tree.sapling_id}
@@ -251,14 +246,14 @@ export const TreeList = ({ onTreeSelect }) => {
               <h4 style={{ marginTop: "0px", paddingRight: "8px" }}>
                 Total:{" "}
                 <span style={{ color: "#C72542", fontStyle: "italic" }}>
-                  {unassigned.length}
+                  {unMapped.length}
                 </span>
               </h4>
                 <h4 style={{ marginTop: "0px", paddingRight: "8px" }}>
                   Assigned:{" "}
                   <span style={{ color: "#C72542", fontStyle: "italic" }}>
                     {
-                      unassigned.filter((obj) => {
+                      unMapped.filter((obj) => {
                         if (obj.assigned_to) {
                           return true;
                         }
@@ -270,8 +265,8 @@ export const TreeList = ({ onTreeSelect }) => {
                 </h4>
               </div>
             </div>
-            {unassigned.length !== 0 &&
-              unassigned.map((tree) => {
+            {unMapped.length !== 0 &&
+              unMapped.map((tree) => {
                 return (
                   <Chip
                     key={tree.spaling_id}

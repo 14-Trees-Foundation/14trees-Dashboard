@@ -9,7 +9,7 @@ import {
     TextField,
 } from "@mui/material";
 
-import * as treeTypeActionCreators from "../../../../redux/actions/plantTypeActions";
+import * as plantTypeActionCreators from "../../../../redux/actions/plantTypeActions";
 import * as plotActionCreators from "../../../../redux/actions/plotActions";
 import { useAppDispatch, useAppSelector } from '../../../../redux/store/hooks';
 import { bindActionCreators } from '@reduxjs/toolkit';
@@ -17,14 +17,14 @@ import { bindActionCreators } from '@reduxjs/toolkit';
 function EditTree({ row, openeditModal, handleCloseEditModal, editSubmit }) {
 
     const dispatch = useAppDispatch();
-    const { getTreeTypes } =
-        bindActionCreators(treeTypeActionCreators, dispatch);
+    const { getPlantTypes } =
+        bindActionCreators(plantTypeActionCreators, dispatch);
     const { getPlots } =
         bindActionCreators(plotActionCreators, dispatch);
 
     const [formData, setFormData] = useState(row);
     const [page, setPage] = useState(0);
-    const [treeTypeName, setTreeTypeName] = useState('');
+    const [plantTypeName, setPlantTypeName] = useState('');
     const [plotName, setPlotName] = useState('');
     const handleChange = (event) => {
         const { name, value } = event.target;
@@ -45,30 +45,33 @@ function EditTree({ row, openeditModal, handleCloseEditModal, editSubmit }) {
         handleCloseEditModal();
     };
 
-    const getTreeTypeData = async () => {
+    const getPlantTypeData = async () => {
+        let nameFilter;
+        if (plantTypeName !== "") nameFilter = [{ columnField: "name", value: plantTypeName, operatorValue: "contains" }]
         setTimeout(async () => {
-            await getTreeTypes(page*10, 10, treeTypeName);
+            await getPlantTypes(page*10, 10, nameFilter);
         }, 1000);
     };
 
     useEffect(() => {
-        getTreeTypeData();
-    }, [page, treeTypeName]);
+        getPlantTypeData();
+    }, [page, plantTypeName]);
 
-    let treeTypesList = [];
-    let treeTypesMap = {}
-    const treeTypesData = useAppSelector((state) => state.treeTypesData);
-    if (treeTypesData) {
-        treeTypesMap = { ...treeTypesData.treeTypes }
-        if (!Object.hasOwn(treeTypesMap, formData.tree_id)) {
-            treeTypesMap[formData.tree_id] = { _id: formData.tree_id, name: formData.tree.name}
+    let plantTypesList = [];
+    let plantTypesMap = {}
+    const plantTypesData = useAppSelector((state) => state.plantTypesData);
+    if (plantTypesData) {
+        plantTypesMap = { ...plantTypesData.plantTypes }
+        if (!Object.hasOwn(plantTypesMap, formData.plant_type_id)) {
+            plantTypesMap[formData.plant_type_id] = { id: formData.plant_type_id, name: formData.plant_type}
         }
-        treeTypesList = Object.values(treeTypesMap);
+        plantTypesList = Object.values(plantTypesMap);
     }
 
     const getPlotData = async () => {
+        const nameFilter = { columnField: "name", value: plotName, operatorValue: "contains" }
         setTimeout(async () => {
-            await getPlots(page*10, 10, plotName);
+            await getPlots(page*10, 10, [nameFilter]);
         }, 1000);
     };
 
@@ -82,24 +85,10 @@ function EditTree({ row, openeditModal, handleCloseEditModal, editSubmit }) {
     if (plotsData) {
         plotsMap = { ...plotsData.plots }
         if (!Object.hasOwn(plotsMap, formData.plot_id)) {
-            plotsMap[formData.plot_id] = { _id: formData.plot_id, name: formData.plot?.name}
+            plotsMap[formData.plot_id] = { id: formData.plot_id, name: formData.plot}
         }
         plotsList = Object.values(plotsMap);
     }
-
-    // const eventType = [
-    //     {id: "1", label: "Birthday"},
-    //     {id: "2", label: "In Memory of"},
-    //     {id: "3", label: "General gift"},
-    //     {id: "4", label: "Corporate gift"},
-    // ]
-
-    // const eventTypeMap = {
-    //     "1": "Birthday",
-    //     "2": "In Memory of",
-    //     "3": "General gift",
-    //     "4": "Corporate gift",
-    // }
 
 
     return (
@@ -119,15 +108,15 @@ function EditTree({ row, openeditModal, handleCloseEditModal, editSubmit }) {
                     />
                     <Autocomplete 
                         fullWidth
-                        name="tree_id"
+                        name="plant_type_id"
                         disablePortal
-                        options={treeTypesList}
+                        options={plantTypesList}
                         renderInput={(params) => <TextField {...params} onChange={(event) => {
                             const { value } = event.target;
-                            setTreeTypeName(value);
-                        }} margin="dense" label="Tree Type" />}
-                        onChange={(event, value) => { if (value !== null) setFormData(prevState => ({ ...prevState, 'tree_id': value._id }))}}
-                        value={ (treeTypeName === '' && Object.hasOwn(treeTypesMap, formData.tree_id)) ? treeTypesMap[formData.tree_id] : null}
+                            setPlantTypeName(value);
+                        }} margin="dense" label="Plant Type" />}
+                        onChange={(event, value) => { if (value !== null) setFormData(prevState => ({ ...prevState, 'plant_type_id': value.id }))}}
+                        value={ (plantTypeName === '' && Object.hasOwn(plantTypesMap, formData.plant_type_id)) ? plantTypesMap[formData.plant_type_id] : null}
                         getOptionLabel={(option) => (option.name)}
                     />
                     <Autocomplete 
@@ -145,7 +134,7 @@ function EditTree({ row, openeditModal, handleCloseEditModal, editSubmit }) {
                                 label="Plot" 
                             />
                         )}
-                        onChange={(event, value) => { if (value !== null) setFormData(prevState => ({ ...prevState, 'plot_id': value._id }))}}
+                        onChange={(event, value) => { if (value !== null) setFormData(prevState => ({ ...prevState, 'plot_id': value.id }))}}
                         value={ (plotName === '' && Object.hasOwn(plotsMap, formData.plot_id)) ? plotsMap[formData.plot_id] : null }
                         getOptionLabel={(option) => (option.name)}
                     />

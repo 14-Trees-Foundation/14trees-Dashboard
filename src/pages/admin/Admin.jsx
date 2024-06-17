@@ -54,10 +54,10 @@ export const Admin = () => {
         });
         setTreeLoggedByDate(response.data);
       }
-      let plotRes = await Axios.default.get(`/plots`);
-      if (plotRes.status === 200) {
-        setPlotsList(plotRes.data.result);
-      }
+      // let plotRes = await Axios.default.get(`/plots`);
+      // if (plotRes.status === 200) {
+      //   setPlotsList(plotRes.data.result);
+      // }
     } catch (error) {
       if (error.response.status === 500) {
         navigate("/login");

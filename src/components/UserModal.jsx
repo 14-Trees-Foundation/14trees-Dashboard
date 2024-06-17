@@ -19,6 +19,7 @@ const UserModal = ({ open, handleClose, onSubmit, searchUser }) => {
     };
 
     const [formData, setFormData] = useState({
+        id: 0,
         name: '',
         phone: '',
         email: '',
@@ -45,6 +46,7 @@ const UserModal = ({ open, handleClose, onSubmit, searchUser }) => {
             if(`${user.name} (${user.email})` === value) {
                 isSet = true;
                 setFormData({
+                    'id': user.id,
                     'email': user.email,
                     'name': user.name,
                     'phone': user.phone ?? '',
