@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Box, Button, Grid, Modal, TextField, Typography } from '@mui/material';
+import { Box, Button, Grid, Modal, TextField } from '@mui/material';
 
 const AddPond = ({ open, handleClose, createPondData }) => {
 
@@ -30,9 +30,9 @@ const AddPond = ({ open, handleClose, createPondData }) => {
         type: '',
         date_added: '',
         images: [],
-        lengthFt: '',
-        widthFt: '',
-        depthFt: '',
+        length_ft: '',
+        width_ft: '',
+        depth_ft: '',
         __v: 0
     });
 
@@ -62,9 +62,9 @@ const AddPond = ({ open, handleClose, createPondData }) => {
             type: '',
             date_added: '',
             images: [],
-            lengthFt: '',
-            widthFt: '',
-            depthFt: '',
+            length_ft: '',
+            width_ft: '',
+            depth_ft: '',
             __v: 0
         });
         handleClose();
@@ -89,13 +89,13 @@ const AddPond = ({ open, handleClose, createPondData }) => {
                                 <TextField name="type" label="Type" value={formData.type} onChange={handleChange} fullWidth />
                             </Grid>
                             <Grid item xs={12}>
-                                <TextField name="lengthFt" label="Length Ft" value={formData.lengthFt} onChange={handleChange} fullWidth />
+                                <TextField name="length_t" label="Length Ft" value={formData.lengthFt} onChange={handleChange} fullWidth />
                             </Grid>
                             <Grid item xs={12}>
-                                <TextField name="widthFt" label="Width Ft" value={formData.widthFt} onChange={handleChange} fullWidth />
+                                <TextField name="width_t" label="Width Ft" value={formData.widthFt} onChange={handleChange} fullWidth />
                             </Grid>
                             <Grid item xs={12}>
-                                <TextField name="depthFt" label="Depth Ft" value={formData.depthFt} onChange={handleChange} fullWidth />
+                                <TextField name="depth_ft" label="Depth Ft" value={formData.depthFt} onChange={handleChange} fullWidth />
                             </Grid>
                             <Grid item xs={12}>
                                 <TextField name="boundaries.type" label="Boundaries Type" value={formData.boundaries.type} onChange={handleChange} fullWidth />

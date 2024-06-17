@@ -57,25 +57,25 @@ function EditPond({ row, openeditModal, setEditModal, editSubmit }) {
                         onChange={(event, value) => { if (value !== '') setFormData(prevState => ({ ...prevState, 'type': value }))}}
                     />
                     <TextField
-                        name="lengthFt"
+                        name="length_ft"
                         label="Length (Ft)"
-                        value={formData.lengthFt}
+                        value={formData.length_ft}
                         onChange={handleChange}
                         fullWidth
                         margin="dense"
                     />
                     <TextField
-                        name="widthFt"
+                        name="width_ft"
                         label="Width (Ft)"
-                        value={formData.widthFt}
+                        value={formData.width_ft}
                         onChange={handleChange}
                         fullWidth
                         margin="dense"
                     />
                     <TextField
-                        name="depthFt"
+                        name="depth_ft"
                         label="Depth (Ft)"
-                        value={formData.depthFt}
+                        value={formData.depth_ft}
                         onChange={handleChange}
                         fullWidth
                         margin="dense"

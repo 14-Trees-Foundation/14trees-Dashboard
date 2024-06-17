@@ -1,15 +1,15 @@
 import { useEffect, useState } from "react";
 import Box from "@mui/material/Box";
-import { DataGrid, GridToolbar, GridColumns } from "@mui/x-data-grid";
+import { GridFilterItem } from "@mui/x-data-grid";
 import AddPond from "./AddPond";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
+import WaterIcon from '@mui/icons-material/Water';
 import { type Pond } from "../../../../types/pond";
 import * as pondActionCreators from "../../../../redux/actions/pondActions";
 import { bindActionCreators } from "redux";
 import { useAppDispatch, useAppSelector } from "../../../../redux/store/hooks";
 import { RootState } from "../../../../redux/store/store";
-import CircularProgress from "@mui/material/CircularProgress";
 import {
     Button,
     Dialog,
@@ -20,26 +20,15 @@ import {
 } from "@mui/material";
 import EditPond from "./EditPond";
 import { getFormattedDate } from "../../../../helpers/utils";
+import { TableColumnsType } from "antd";
+import TableComponent from "../../../../components/Table";
+import getColumnSearchProps from "../../../../components/Filter";
 
-function LoadingOverlay() {
+function getCapacity(pond: any) {
     return (
-        <div
-            style={{
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-                height: "100%",
-            }}>
-            <CircularProgress />
-        </div>
-    );
-}
-
-function getCapacity(params: any) {
-    return (
-      parseInt(params.row.depth_ft) *
-      parseInt(params.row.width_ft) *
-      parseInt(params.row.length_ft)
+      parseInt(pond.depth_ft) *
+      parseInt(pond.width_ft) *
+      parseInt(pond.length_ft)
     );
 }
 
@@ -55,10 +44,16 @@ export const PondComponent = () => {
     const handleModalClose = () => setOpen(false);
     const [openDeleteModal, setOpenDeleteModal] = useState(false);
     const [selectedItem, setSelectedItem] = useState<Pond | null>(null);
-    const [selectedEditRow, setSelectedEditRow] = useState<RowType | null>(null);
+    const [selectedEditRow, setSelectedEditRow] = useState<Pond | null>(null);
     const [editModal, setEditModal] = useState(false);
     const [page, setPage] = useState(0);
     const [nameFilter, setNameFilter] = useState('');
+    const [filters, setFilters] = useState<Record<string, GridFilterItem>>({});
+
+    const handleSetFilters = (filters: Record<string, GridFilterItem>) => {
+        setPage(0);
+        setFilters(filters);
+    }
 
     const getPondHistoryByName = async (name: string) => {
         setTimeout(async () => {
@@ -66,14 +61,14 @@ export const PondComponent = () => {
         }, 1000);
     };
 
-    const columns: GridColumns = [
+    const columns: TableColumnsType<Pond> = [
         {
-            field: "action",
-            headerName: "Action",
-            width: 150,
+            dataIndex: "action",
+            key: "action",
+            title: "Actions",
+            width: 180,
             align: "center",
-            headerAlign: "center",
-            renderCell: (params: any) => (
+            render: (value, record, index )=> (
                 <div
                     style={{
                         display: "flex",
@@ -81,143 +76,129 @@ export const PondComponent = () => {
                         alignItems: "center",
                     }}>
                     <Button
-                        variant="outlined"
-                        style={{ margin: "0 5px" }}
+                        size="small"
+                        onClick={() => getPondHistoryByName(record.name)}>
+                        <WaterIcon />
+                    </Button>
+                    <Button
+                        size="small"
                         onClick={() => {
-                            setSelectedEditRow(params.row);
+                            setSelectedEditRow(record);
                             setEditModal(true);
                         }}>
                         <EditIcon />
                     </Button>
                     <Button
-                        variant="outlined"
-                        style={{ margin: "0 5px" }}
-                        onClick={() => handleDelete(params.row as Pond)}>
+                        size="small"
+                        color="error"
+                        onClick={() => handleDelete(record)}>
                         <DeleteIcon />
                     </Button>
                 </div>
             ),
+        },  
+        {
+          dataIndex: "name",
+          key: "name",
+          title: "Name",
+          align: "center",
+          width: 300,
+          ...getColumnSearchProps('name', filters, handleSetFilters)
         },
         {
-            field: "name",
-            headerName: "Name",
-            width: 250,
-            align: "center",
-            headerAlign: "center",
-            renderCell: (params: any) => (
-                <div
-                  style={{
-                    display: "flex",
-                    justifyContent: "center",
-                    alignItems: "center",
-                  }}>
-                  <Button
-                    onClick={() => {
-                      getPondHistoryByName(params.row.name);
-                    }}
-                  >
-                    {params.row.name}
-                  </Button>
-                </div>
-              ),
-        },
-        {
-            field: "type",
-            headerName: "Type",
+            dataIndex: "type",
+            key: "type",
+            title: "Type",
             width: 150,
             align: "center",
-            headerAlign: "center",
         },
         {
-            field: "boundaries.type",
-            headerName: "Boundaries Type",
+            dataIndex: "boundaries.type",
+            key: "boundaries.type",
+            title: "Boundaries Type",
             width: 150,
             align: "center",
-            headerAlign: "center",
+            render: (value, record, index) => record.boundaries?.type
         },
         {
-            field: "boundaries.coordinates",
-            headerName: "Boundaries Coordinates",
+            dataIndex: "boundaries.coordinates",
+            key: "boundaries.coordinates",
+            title: "Boundaries Coordinates",
             width: 150,
             align: "center",
-            headerAlign: "center",
+            render: (value, record, index) => JSON.stringify(record.boundaries?.coordinates)
         },
         {
-            field: "length_ft",
-            headerName: "LengthFT",
+            dataIndex: "length_ft",
+            key: "length_ft",
+            title: "LengthFT",
             width: 150,
             align: "center",
-            headerAlign: "center",
         },
         {
-            field: "width_ft",
-            headerName: "WidthFT",
+            dataIndex: "width_ft",
+            key: "width_ft",
+            title: "WidthFT",
             width: 150,
             align: "center",
-            headerAlign: "center",
         },
         {
-            field: "depth_ft",
-            headerName: "DeathFT",
+            dataIndex: "depth_ft",
+            key: "depth_ft",
+            title: "DeathFT",
             width: 150,
             align: "center",
-            headerAlign: "center",
         },
         {
-            field: "capacity",
-            headerName: "Pond Capacity",
+            dataIndex: "capacity",
+            key: "capacity",
+            title: "Pond Capacity",
             width: 150,
             align: "center",
-            headerAlign: "center",
-            valueGetter: getCapacity,
+            render: (value, record, index) => getCapacity(record),
         },
         {
-            field: "created_at",
-            headerName: "Created At",
+            dataIndex: "created_at",
+            key: "created_at",
+            title: "Created At",
             width: 150,
             align: "center",
-            headerAlign: "center",
-            valueGetter: (params) => getFormattedDate(params.row?.created_at),
+            render: (dateStr: string) => ( dateStr === "" ) ? "" : getFormattedDate(dateStr),
         },
         
-    ];
+      ];
 
     useEffect(() => {
         getPondData();
     }, [page, nameFilter]);
 
     const getPondData = async () => {
+        let filtersData = Object.values(filters);
         setTimeout(async () => {
-            await getPonds(page*10, 10, [ { columnField: "name", value: nameFilter, operatorValue: "contains" } ]);
+            await getPonds(page*10, 10, filtersData);
         }, 1000);
     };
 
+    
     let pondsList: Pond[] = [];
     const pondsData = useAppSelector((state: RootState) => state.pondsData);
     if (pondsData) {
         pondsList = Object.values(pondsData.ponds);
     }
 
-    const flattenedRows = pondsList.map((row) => ({
-        ...row,
-        "boundaries.type": row.boundaries.type,
-        "boundaries.coordinates": row.boundaries.coordinates,
-    }));
-
-    type RowType = {
-        id: string;
-        name: string;
+    const getAllPondsData = async () => {
+        let filtersData = Object.values(filters);
+        setTimeout(async () => {
+            await getPonds(0, pondsData.totalPonds, filtersData);
+        }, 1000);
     };
 
     const handleDelete = (row: Pond) => {
-        console.log("Delete", row);
-        console.log(row);
         setOpenDeleteModal(true);
         setSelectedItem(row);
     };
 
     const handleEditSubmit = (formData: Pond) => {
-        console.log(formData);
         updatePond(formData);
     };
 
@@ -242,27 +223,13 @@ export const PondComponent = () => {
                     createPondData={handleCreatePondData}
                 />
             </div>
-            <Box sx={{ height: 540, width: "100%" }}>
-                <DataGrid
-                    rows={flattenedRows}
-                    columns={columns}
-                    getRowId={(row) => row.id}
-                    initialState={{
-                        pagination: {
-                          page: 0,
-                          pageSize: 10,
-                        },
-                      }}
-                    onPageChange={(page) => { if((pondsList.length / 10) === page) setPage(page); }}
-                    rowCount={pondsData.totalPonds}
-                    filterMode="server"
-                    onFilterModelChange={(model) => { if (model.items[0]?.columnField === "name") setNameFilter(model.items[0].value) }}
-                    checkboxSelection
-                    disableSelectionOnClick
-                    components={{
-                        Toolbar: GridToolbar,
-                        NoRowsOverlay: LoadingOverlay,
-                    }}
+            <Box sx={{ height: 840, width: "100%" }}>
+                <TableComponent
+                dataSource={pondsList}
+                columns={columns}
+                totalRecords={pondsData.totalPonds}
+                fetchAllData={getAllPondsData}
+                setPage={setPage}
                 />
             </Box>
 

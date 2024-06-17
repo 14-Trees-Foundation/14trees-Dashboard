@@ -49,7 +49,7 @@ export const PlantTypeComponent = () => {
           dataIndex: "plant_type_id",
           key: "plant_type_id",
           title: "Plant Type ID",
-          width: 150,
+          width: 170,
           align: "center",
           ...getColumnSearchProps('plant_type_id', filters, handleSetFilters)
         },
@@ -108,7 +108,9 @@ export const PlantTypeComponent = () => {
                         <EditIcon />
                     </Button>
                     <Button
+                        disabled
                         variant="outlined"
+                        color="error"
                         style={{ margin: "0 5px" }}
                         onClick={() => handleDeletePlantType(record)}>
                         <DeleteIcon />

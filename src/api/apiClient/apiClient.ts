@@ -489,7 +489,7 @@ class ApiClient {
 
     async mapTrees(saplingIds: string[], email: string): Promise<void> {
         try {
-            await this.api.post<any>(`/mytrees/assign`, { sapling_id: saplingIds.join(',') , email: email});
+            await this.api.post<any>(`/mapping/map`, { sapling_id: saplingIds.join(',') , email: email});
         } catch (error) {
             console.error(error)
             throw new Error('Failed to create Trees in bulk');
@@ -498,7 +498,7 @@ class ApiClient {
 
     async mapTreesForPlot(email: string, plotId: string, count: number): Promise<void> {
         try {
-            await this.api.post<any>(`/mytrees/map-plot-trees`, { email: email, plot_id: plotId, count: count});
+            await this.api.post<any>(`/mapping/map-plot-trees`, { email: email, plot_id: plotId, count: count});
         } catch (error) {
             console.error(error)
             throw new Error('Failed to create Trees in bulk');
@@ -507,7 +507,7 @@ class ApiClient {
 
     async removeTreeMappings(saplingIds: string[]): Promise<void> {
         try {
-            await this.api.post<any>(`/mytrees/unmap`, { sapling_ids: saplingIds});
+            await this.api.post<any>(`/mapping/unmap`, { sapling_ids: saplingIds});
         } catch (error) { 
             console.error(error)
             throw new Error('Failed to create Trees in bulk');
@@ -516,7 +516,7 @@ class ApiClient {
 
     async getMappedTrees(email: string): Promise<void> {
         try {
-            await this.api.post<any>(`/mytrees/${email}`);
+            await this.api.post<any>(`/mapping/${email}`);
         } catch (error) { 
             console.error(error)
             throw new Error('Failed to create Trees in bulk');
@@ -524,7 +524,7 @@ class ApiClient {
     }
 
     async getUserTreeCount(offset: number, limit: number, filters?: any): Promise<UserTreeCountPaginationResponse> {
-        let url = `/mytrees/count/usertreescount?offset=${offset}&limit=${limit}`
+        let url = `/mapping/count/usertreescount?offset=${offset}&limit=${limit}`
         try {
             let result = await this.api.post<UserTreeCountPaginationResponse>(url, {filters: filters});
             return result.data;
