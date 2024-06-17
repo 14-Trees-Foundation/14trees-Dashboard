@@ -142,6 +142,7 @@ export const TreeNew = () => {
                         <EditIcon />
                     </Button>
                     <Button
+                        disabled
                         variant="outlined"
                         style={{ margin: "0 5px" }}
                         onClick={() => handleDelete(record)}>

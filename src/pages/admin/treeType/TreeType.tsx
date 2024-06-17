@@ -148,6 +148,38 @@ export const TreeTypeComponent = () => {
 
     const antdColumns: TableColumnsType<TreeType> = [
         {
+            dataIndex: "action",
+            key: "action",
+            title: "Actions",
+            align: "center",
+            render: (value, record, index )=> (
+                <div
+                    style={{
+                        display: "flex",
+                        justifyContent: "center",
+                        alignItems: "center",
+                    }}>
+                    <Button
+                        variant="outlined"
+                        style={{ margin: "0 5px" }}
+                        onClick={() => {
+                            setSelectedEditRow(record)
+                            setEditModal(true)
+                        }}
+                    >
+                        <EditIcon />
+                    </Button>
+                    <Button
+                        disabled
+                        variant="outlined"
+                        style={{ margin: "0 5px" }}
+                        onClick={() => handleDeleteTreeType(record)}>
+                        <DeleteIcon />
+                    </Button>
+                </div>
+            ),
+        },
+        {
           dataIndex: "tree_id",
           key: "tree_id",
           title: "Tree Type ID",
@@ -187,37 +219,6 @@ export const TreeTypeComponent = () => {
           align: "center",
           ...getColumnSearchProps('habit', filters, handleSetFilters)
         },
-        {
-            dataIndex: "action",
-            key: "action",
-            title: "Actions",
-            align: "center",
-            render: (value, record, index )=> (
-                <div
-                    style={{
-                        display: "flex",
-                        justifyContent: "center",
-                        alignItems: "center",
-                    }}>
-                    <Button
-                        variant="outlined"
-                        style={{ margin: "0 5px" }}
-                        onClick={() => {
-                            setSelectedEditRow(record)
-                            setEditModal(true)
-                        }}
-                    >
-                        <EditIcon />
-                    </Button>
-                    <Button
-                        variant="outlined"
-                        style={{ margin: "0 5px" }}
-                        onClick={() => handleDeleteTreeType(record)}>
-                        <DeleteIcon />
-                    </Button>
-                </div>
-            ),
-          },
       ];
 
     useEffect(() => {
