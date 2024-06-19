@@ -4,6 +4,7 @@ import { Plot } from '../../types/plot';
 import { Organization, OrganizationPaginationResponse } from '../../types/organization';
 import { Pond } from '../../types/pond';
 import { User } from '../../types/user';
+import { Site } from '../../types/site';
 import { OnsiteStaff } from '../../types/onSiteStaff';
 import { Tree } from '../../types/tree';
 import { AssignTreeRequest, UserTree, UserTreeCountPaginationResponse } from '../../types/userTree';
@@ -592,7 +593,54 @@ class ApiClient {
             throw new Error('Failed unassign user trees.');
         }
     }
-    
+
+    /*
+        Model- Site: CRUD Operations/Apis for sites
+    */
+
+    async getSites(offset: number, limit: number, filters?: any[]): Promise<PaginatedResponse<Site>> {
+        const url = `/sites/get?offset=${offset}&limit=${limit}`;
+        try {
+            const response = await this.api.post<PaginatedResponse<Site>>(url, {filters: filters});
+            return response.data;
+        } catch (error: any) {
+            console.error(error)
+            throw new Error(`Failed to fetch sites: ${error.message}`);
+        }
+    }
+
+    async createSite(data: Site): Promise<Site> {
+        try {
+            const response = await this.api.post<Site>(`/sites/`, data);
+            return response.data;
+        } catch (error) {
+            console.error(error)
+            throw new Error('Failed to create Site');
+        }
+    }
+
+    async updateSite(data: Site): Promise<Site> {
+        try {
+            const response = await this.api.put<Site>(`/sites/${data.id}`, data);
+            return response.data;
+        } catch (error: any) {
+            console.error(error)
+            if (error.response) {
+                throw new Error(error.response.data.message);
+                }
+            throw new Error('Failed to update Site');
+        }
+    }
+
+    async deleteSite(data: Site): Promise<number> {
+        try {
+            await this.api.delete<any>(`/sites/${data.id}`);
+            return data.id;
+        } catch (error) {
+            console.error(error)
+            throw new Error('Failed to delete Site');
+        }
+    }
 }
 
 // new function to fetch data form localStorage

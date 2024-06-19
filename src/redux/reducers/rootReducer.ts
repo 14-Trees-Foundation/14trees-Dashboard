@@ -3,6 +3,7 @@ import { plantTypesDataReducer, searchPlantTypesDataReducer } from "./plantTypeR
 import { onsiteStaffsDataReducer } from "./onsiteStaffReducer";
 import { organizationsDataReducer, searchOrganizationsDataReducer } from "./organizationReducer";
 import { plotsDataReducer, searchPlotsDataReducer, getPlotTagsDataReducer } from "./plotReducer";
+import { sitesDataReducer } from "./siteReducer";
 import { pondsDataReducer, searchPondsDataReducer, pondHistoryDataReducer } from "./pondReducer";
 import { treesDataReducer } from "./treeReducer";
 import { usersDataReducer, searchUsersDataReducer } from "./userReducer";
@@ -12,6 +13,7 @@ const rootReducer = combineReducers({
     plantTypesData: plantTypesDataReducer,
     onsiteStaffsData: onsiteStaffsDataReducer,
     organizationsData: organizationsDataReducer,
+    sitesData: sitesDataReducer,
     plotsData: plotsDataReducer,
     plotTags: getPlotTagsDataReducer,
     pondsData: pondsDataReducer,

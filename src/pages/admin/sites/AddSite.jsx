@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
 import { Box, Button, Grid, Modal, TextField, Typography } from '@mui/material';
-import { Height } from '@mui/icons-material';
 
-const AddTreeType = ({ open, handleClose, createTreeData }) => {
+const AddSite = ({ open, handleClose, createSite }) => {
 
     const style = {
         position: 'absolute',
@@ -45,7 +44,7 @@ const AddTreeType = ({ open, handleClose, createTreeData }) => {
 
     const handleSubmit = (event) => {
         event.preventDefault();
-        createTreeData(formData);
+        createSite(formData);
     };
 
     return (
@@ -93,4 +92,4 @@ const AddTreeType = ({ open, handleClose, createTreeData }) => {
     )
 }
 
-export default AddTreeType
+export default AddSite
