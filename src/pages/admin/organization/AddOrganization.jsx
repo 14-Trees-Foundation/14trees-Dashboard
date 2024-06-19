@@ -19,7 +19,7 @@ const AddOrganization = ({ open, handleClose, createOrganization }) => {
     const [formData, setFormData] = useState({
         name: '',
         type: '',
-        desc: '',
+        description: '',
     });
 
     const handleChange = (event) => {
@@ -54,7 +54,7 @@ const AddOrganization = ({ open, handleClose, createOrganization }) => {
                                 <TextField name="type" label="Type" value={formData.type} onChange={handleChange} fullWidth/>
                             </Grid>
                             <Grid item xs={12}>
-                                <TextField name="desc" label="Description" value={formData.desc} onChange={handleChange} fullWidth/>
+                                <TextField name="description" label="Description" value={formData.description} onChange={handleChange} fullWidth/>
                             </Grid>
                             <Grid item xs={12} sx={{display:'flex', justifyContent:'center', }}>
                                 <Button type="submit">Submit</Button>

@@ -11,7 +11,7 @@ import {
   Typography,
 } from "@mui/material";
 
-function EditUser({ row, openeditModal, setEditModal, editSubmit }) {
+function EditUser({ row, openeditModal, handleClose, editSubmit }) {
   const [formData, setFormData] = useState(row);
 
   const handleChange = (event) => {
@@ -24,11 +24,11 @@ function EditUser({ row, openeditModal, setEditModal, editSubmit }) {
   const handleEditSubmit = (event) => {
     event.preventDefault();
     editSubmit(formData);
-    setEditModal(false);
+    handleClose();
   };
 
   return (
-    <Dialog open={openeditModal} onClose={() => setEditModal(false)}>
+    <Dialog open={openeditModal} onClose={handleClose}>
       <DialogTitle align="center">Edit Organization</DialogTitle>
       <form onSubmit={handleEditSubmit}>
         <DialogContent>
@@ -49,9 +49,9 @@ function EditUser({ row, openeditModal, setEditModal, editSubmit }) {
             margin="dense"
           />
           <TextField
-            name="desc"
+            name="description"
             label="Description"
-            value={formData.desc}
+            value={formData.description}
             onChange={handleChange}
             fullWidth
             margin="dense"
@@ -65,7 +65,7 @@ function EditUser({ row, openeditModal, setEditModal, editSubmit }) {
           }}>
           <Button
             variant="contained"
-            onClick={() => setEditModal(false)}
+            onClick={handleClose}
             color="primary">
             Cancel
           </Button>

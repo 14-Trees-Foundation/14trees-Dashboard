@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import Box from "@mui/material/Box";
-import { DataGrid, GridToolbar, GridColumns } from "@mui/x-data-grid";
 import {
   Button,
   Dialog,
@@ -12,105 +11,72 @@ import {
 import AddOrganization from "./AddOrganization";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
-import { type Organization } from "../../../types/organization";
-import * as organizationActionCreators from "../../../redux/actions/organizationActions";
+import { Group } from "../../../types/Group";
+import * as groupActionCreators from "../../../redux/actions/groupActions";
 import { bindActionCreators } from "redux";
 import { useAppDispatch, useAppSelector } from "../../../redux/store/hooks";
 import { RootState } from "../../../redux/store/store";
 import CircularProgress from "@mui/material/CircularProgress";
 import EditOrganization from "./EditOrganization";
 import { getFormattedDate } from "../../../helpers/utils";
-
-function LoadingOverlay() {
-  return (
-    <div
-      style={{
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        height: "100%",
-      }}>
-      <CircularProgress />
-    </div>
-  );
-}
+import { TableColumnsType } from "antd";
+import TableComponent from "../../../components/Table";
 
 export const OrganizationComponent = () => {
   const dispatch = useAppDispatch();
   const {
-    getOrganizations,
-    createOrganization,
-    updateOrganization,
-    deleteOrganization,
-  } = bindActionCreators(organizationActionCreators, dispatch);
+    getGroups,
+    createGroup,
+    updateGroup,
+    deleteGroup,
+  } = bindActionCreators(groupActionCreators, dispatch);
 
   const [open, setOpen] = useState(false);
-  const handleModalOpen = () => setOpen(true);
-  const handleModalClose = () => setOpen(false);
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
-  const [selectedItem, setSelectedItem] = useState<Organization | null>(null);
-  const [selectedEditRow, setSelectedEditRow] = useState<RowType | null>(null);
+  const [selectedItem, setSelectedItem] = useState<Group | null>(null);
+  const [selectedEditRow, setSelectedEditRow] = useState<Group | null>(null);
   const [editModal, setEditModal] = useState(false);
   const [page, setPage] = useState(0);
 
   useEffect(() => {
-    getOrganizationsData();
+    getGroupsData();
   }, [page]);
 
-  const getOrganizationsData = async () => {
+  const getGroupsData = async () => {
     setTimeout(async () => {
-      await getOrganizations(page*10, 10);
+      await getGroups(page*10, 10);
     }, 1000);
   };
 
-  const columns: GridColumns = [
+  const columns: TableColumnsType<Group> = [
     {
-      field: "name",
-      headerName: "Name",
+      dataIndex: "name",
+      key: "name",
+      title: "Name",
       width: 250,
       align: 'center',
-      headerAlign: "center",
-      editable: true,
     },
     {
-      field: "type",
-      headerName: "Type",
-      width: 250,
+      dataIndex: "type",
+      key: "type",
+      title: "Type",
+      width: 150,
       align: 'center',
-      headerAlign: "center",
-      editable: true,
     },
     {
-      field: "desc",
-      headerName: "Description",
-      width: 300,
+      dataIndex: "description",
+      key: "description",
+      title: "Description",
+      width: 450,
       align: 'center',
-      headerAlign: "center",
-      editable: true,
     },
     {
-      field: "date_added",
-      headerName: "Date Added",
-      width: 200,
-      align: 'center',
-      headerAlign: "center",
-      editable: true,
-      valueGetter: (params) => getFormattedDate(params.row.date_added)
-    },
-    // {
-    //   field: "__v",
-    //   headerName: "Version",
-    //   width: 100,
-    //   align: "center",
-    //   headerAlign: "center",
-    // },
-    {
-      field: "action",
-      headerName: "Action",
-      width: 250,
+      dataIndex: "action",
+      key: "action",
+      title: "Action",
+      width: 150,
       align: "center",
-      headerAlign: "center",
-      renderCell: (params: any) => (
+      render: (value, record, index) => (
         <div
           style={{
             display: "flex",
@@ -121,15 +87,16 @@ export const OrganizationComponent = () => {
             variant="outlined"
             style={{ margin: "0 5px" }}
             onClick={() => {
-              setSelectedEditRow(params.row);
+              setSelectedEditRow(record);
               setEditModal(true);
             }}>
             <EditIcon />
           </Button>
           <Button
+            color="error"
             variant="outlined"
             style={{ margin: "0 5px" }}
-            onClick={() => handleDelete(params.row)}>
+            onClick={() => handleDelete(record)}>
             <DeleteIcon />
           </Button>
         </div>
@@ -137,34 +104,32 @@ export const OrganizationComponent = () => {
     },
   ];
 
-  let organizationList: Organization[] = [];
-  const organizationsData = useAppSelector(
-    (state: RootState) => state.organizationsData
+  let groupList: Group[] = [];
+  const groupsData = useAppSelector(
+    (state: RootState) => state.groupsData
   );
-  if (organizationsData) {
-    organizationList = Object.values(organizationsData.organizations);
+  if (groupsData) {
+    groupList = Object.values(groupsData.groups);
   }
-  console.log(organizationList);
 
-  type RowType = {
-    id: string;
-    name: string;
+  const getAllGroupsData = async () => {
+    setTimeout(async () => {
+      await getGroups(0, groupsData.totalGroups);
+    }, 1000);
   };
 
-  const handleDelete = (row: Organization) => {
-    console.log("Delete", row);
+  const handleDelete = (row: Group) => {
     setOpenDeleteModal(true);
     setSelectedItem(row);
   };
 
-  const handleEditSubmit = (formData: Organization) => {
-    console.log(formData);
-    updateOrganization(formData);
+  const handleEditSubmit = (formData: Group) => {
+    updateGroup(formData);
+    setSelectedEditRow(null);
   };
 
-  const handleCreateUserData = (formData: Organization) => {
-    console.log(formData);
-    createOrganization(formData);
+  const handleCreateUserData = (formData: Group) => {
+    createGroup(formData);
   };
 
   return (
@@ -175,34 +140,22 @@ export const OrganizationComponent = () => {
           justifyContent: "flex-end",
           marginBottom: "20px",
         }}>
-        <Button variant="contained" style={{ backgroundColor:'blue' }} onClick={handleModalOpen}>
+        <Button variant="contained" style={{ backgroundColor:'blue' }} onClick={() => setOpen(true)}>
           Add Organization
         </Button>
         <AddOrganization
           open={open}
-          handleClose={handleModalClose}
+          handleClose={() => setOpen(false)}
           createOrganization={handleCreateUserData}
         />
       </div>
-      <Box sx={{ height: 540, width: "100%" }}>
-        <DataGrid
-          rows={organizationList}
+      <Box sx={{ height: 840, width: "100%" }}>
+        <TableComponent
+          dataSource={groupList}
           columns={columns}
-          getRowId={(row) => row._id}
-          initialState={{
-            pagination: {
-              page: 0,
-              pageSize: 10,
-            },
-          }}
-          onPageChange={(page) => { if((organizationList.length / 10) === page) setPage(page); }}
-          rowCount={organizationsData.totalOrganizations}
-          checkboxSelection
-          disableSelectionOnClick
-          components={{
-            Toolbar: GridToolbar,
-            NoRowsOverlay: LoadingOverlay,
-          }}
+          totalRecords={groupsData.totalGroups}
+          fetchAllData={getAllGroupsData}
+          setPage={setPage}
         />
       </Box>
 
@@ -221,7 +174,7 @@ export const OrganizationComponent = () => {
             onClick={() => {
               console.log("Deleting item...", selectedItem);
               if (selectedItem !== null) {
-                deleteOrganization(selectedItem);
+                deleteGroup(selectedItem);
               }
               setOpenDeleteModal(false);
             }}
@@ -236,7 +189,7 @@ export const OrganizationComponent = () => {
         <EditOrganization
           row={selectedEditRow}
           openeditModal={editModal}
-          setEditModal={setEditModal}
+          handleClose={() => { setEditModal(false); setSelectedEditRow(null); }}
           editSubmit={handleEditSubmit}
         />
       )}

@@ -98,14 +98,6 @@ export const SitesComponent = () => {
 
   const columns: TableColumnsType<Site> = [
     {
-      dataIndex: "sr",
-      key: "sr",
-      title: "Sr. No.",
-      width: 100,
-      align: "center",
-      render: (value, record, index) => index + 1 + page * 10,
-    },
-    {
         dataIndex: "action",
         key: "action",
         title: "Actions",

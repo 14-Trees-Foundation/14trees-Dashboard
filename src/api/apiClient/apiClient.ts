@@ -1,7 +1,7 @@
 import axios, {AxiosInstance} from 'axios';
 import { PlantType } from '../../types/plantType';
 import { Plot } from '../../types/plot';
-import { Organization, OrganizationPaginationResponse } from '../../types/organization';
+import { Group } from '../../types/Group';
 import { Pond } from '../../types/pond';
 import { User } from '../../types/user';
 import { Site } from '../../types/site';
@@ -160,58 +160,47 @@ class ApiClient {
     }
 
     /*
-        Model- Organization: CRUD Operations/Apis for organizations
+        Model- Group: CRUD Operations/Apis for organizations
     */
 
-    async getOrganizations(offset: number, limit: number): Promise<OrganizationPaginationResponse> {
-        const url = `/organizations/?offset=${offset}&limit=${limit}`;
+    async getGroups(offset: number, limit: number, filters?: any[]): Promise<PaginatedResponse<Group>> {
+        const url = `/groups/get?offset=${offset}&limit=${limit}`;
         try {
-            const response = await this.api.get<OrganizationPaginationResponse>(url);
+            const response = await this.api.post<PaginatedResponse<Group>>(url,  { filters });
             return response.data;
         } catch (error: any) {
             console.error(error)
-            throw new Error(`Failed to fetch organizations: ${error.message}`);
+            throw new Error(`Failed to fetch groups: ${error.message}`);
         }
     }
 
-    async searchOrganizations(searchStr: string): Promise<Organization[]> {
-        const url = `/organizations/${searchStr}`;
+    async createGroup(data: Group): Promise<Group> {
         try {
-            const response = await this.api.get<Organization[]>(url);
-            return response.data;
-        } catch (error: any) {
-            console.error(error)
-            throw new Error(`Failed to fetch organizations: ${error.message}`);
-        }
-    }
-
-    async createOrganization(data: Organization): Promise<Organization> {
-        try {
-            const response = await this.api.post<{org: Organization}>(`/organizations/add`, data);
+            const response = await this.api.post<{org: Group}>(`/groups`, data);
             return response.data.org;
         } catch (error) {
             console.error(error)
-            throw new Error('Failed to create Organization');
+            throw new Error('Failed to create Group');
         }
     }
 
-    async updateOrganization(data: Organization): Promise<Organization> {
+    async updateGroup(data: Group): Promise<Group> {
         try {
-            const response = await this.api.put<Organization>(`/organizations/${data._id}`, data);
+            const response = await this.api.put<Group>(`/groups/${data.id}`, data);
             return response.data;
         } catch (error) {
             console.error(error)
-            throw new Error('Failed to update Organization');
+            throw new Error('Failed to update Group');
         }
     }
 
-    async deleteOrganization(data: Organization): Promise<string> {
+    async deleteGroup(data: Group): Promise<number> {
         try {
-            await this.api.delete<any>(`/organizations/${data._id}`);
-            return data._id;
+            await this.api.delete<any>(`/groups/${data.id}`);
+            return data.id;
         } catch (error) {
             console.error(error)
-            throw new Error('Failed to delete organization');
+            throw new Error('Failed to delete group');
         }
     }
 
