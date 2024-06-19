@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import {
+  Autocomplete,
   Button,
   Dialog,
   DialogActions,
@@ -10,6 +11,7 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
+import { organizationTypes } from "./organizationType";
 
 function EditUser({ row, openeditModal, handleClose, editSubmit }) {
   const [formData, setFormData] = useState(row);
@@ -40,13 +42,15 @@ function EditUser({ row, openeditModal, handleClose, editSubmit }) {
             fullWidth
             margin="dense"
           />
-          <TextField
-            name="type"
-            label="Type"
-            value={formData.type}
-            onChange={handleChange}
+          <Autocomplete
             fullWidth
-            margin="dense"
+            name="type"
+            disablePortal
+            options={organizationTypes}
+            value={formData.type ? organizationTypes.find((option) => option.id === formData.type): undefined}
+            onChange={(event, value) => { if (value !== null) setFormData(prevState => ({ ...prevState, 'type': value.id }))}}
+            getOptionLabel={(option) => (option.label)}
+            renderInput={(params) => <TextField {...params} margin="dense" label="Type" />}
           />
           <TextField
             name="description"

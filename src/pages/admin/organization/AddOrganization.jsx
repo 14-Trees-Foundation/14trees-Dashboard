@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { Box, Button, Grid, Modal, TextField, Typography } from '@mui/material';
+import { Autocomplete, Box, Button, Grid, Modal, TextField, Typography } from '@mui/material';
+import { organizationTypes } from './organizationType';
 
 const AddOrganization = ({ open, handleClose, createOrganization }) => {
 
@@ -51,7 +52,16 @@ const AddOrganization = ({ open, handleClose, createOrganization }) => {
                                 <TextField name="name" label="Name" value={formData.name} onChange={handleChange} fullWidth/>
                             </Grid>
                             <Grid item xs={12}>
-                                <TextField name="type" label="Type" value={formData.type} onChange={handleChange} fullWidth/>
+                            <Autocomplete
+                                fullWidth
+                                name="type"
+                                disablePortal
+                                options={organizationTypes}
+                                value={formData.type ? organizationTypes.find((option) => option.id === formData.type): undefined}
+                                onChange={(event, value) => { if (value !== null) setFormData(prevState => ({ ...prevState, 'type': value.id }))}}
+                                getOptionLabel={(option) => (option.label)}
+                                renderInput={(params) => <TextField {...params} margin="dense" label="Type" />}
+                            />
                             </Grid>
                             <Grid item xs={12}>
                                 <TextField name="description" label="Description" value={formData.description} onChange={handleChange} fullWidth/>
