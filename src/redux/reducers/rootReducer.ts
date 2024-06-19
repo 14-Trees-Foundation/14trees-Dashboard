@@ -2,7 +2,7 @@ import { combineReducers } from "redux";
 import { plantTypesDataReducer, searchPlantTypesDataReducer } from "./plantTypeReducer";
 import { onsiteStaffsDataReducer } from "./onsiteStaffReducer";
 import { organizationsDataReducer, searchOrganizationsDataReducer } from "./organizationReducer";
-import { plotsDataReducer, searchPlotsDataReducer } from "./plotReducer";
+import { plotsDataReducer, searchPlotsDataReducer, getPlotTagsDataReducer } from "./plotReducer";
 import { pondsDataReducer, searchPondsDataReducer, pondHistoryDataReducer } from "./pondReducer";
 import { treesDataReducer } from "./treeReducer";
 import { usersDataReducer, searchUsersDataReducer } from "./userReducer";
@@ -13,6 +13,7 @@ const rootReducer = combineReducers({
     onsiteStaffsData: onsiteStaffsDataReducer,
     organizationsData: organizationsDataReducer,
     plotsData: plotsDataReducer,
+    plotTags: getPlotTagsDataReducer,
     pondsData: pondsDataReducer,
     pondHistoryData: pondHistoryDataReducer,
     treesData: treesDataReducer,

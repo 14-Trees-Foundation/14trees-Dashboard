@@ -22,27 +22,27 @@ import TreeMap from "./components/TreeMap";
 import { UserDetails } from "./components/UserDetails";
 
 export const Forms = () => {
-  const [loading, setLoading] = React.useState(true);
+  const [loading, setLoading] = React.useState(false);
   const setTreeTypeslist = useSetRecoilState(treeTypesList);
   const [selTrees, setSelectedTrees] = React.useState("");
   const [selectedPlot, setSelectedPlot] = React.useState(null);
 
-  const fetchData = React.useCallback(async () => {
-    setLoading(true);
-    try {
-      let TreeRes = await Axios.get(`/trees/treetypes`);
-      if (TreeRes.status === 200) {
-        setTreeTypeslist(TreeRes.data);
-      }
-    } catch (error) {
-      console.log(error);
-    }
-    setLoading(false);
-  }, [setTreeTypeslist]);
+  // const fetchData = React.useCallback(async () => {
+  //   setLoading(true);
+  //   try {
+  //     let TreeRes = await Axios.get(`/trees/treetypes`);
+  //     if (TreeRes.status === 200) {
+  //       setTreeTypeslist(TreeRes.data);
+  //     }
+  //   } catch (error) {
+  //     console.log(error);
+  //   }
+  //   setLoading(false);
+  // }, [setTreeTypeslist]);
 
-  React.useEffect(() => {
-    fetchData();
-  }, [fetchData]);
+  // React.useEffect(() => {
+  //   fetchData();
+  // }, [fetchData]);
 
   const onTreeSelect = (val) => {
     if (selTrees === "") {

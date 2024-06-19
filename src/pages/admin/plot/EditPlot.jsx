@@ -5,14 +5,12 @@ import {
     Dialog,
     DialogActions,
     DialogContent,
-    DialogContentText,
     DialogTitle,
-    Modal,
     TextField,
-    Typography,
 } from "@mui/material";
+import TagSelector from "../../../components/TagSelector";
 
-function EditPond({ row, openeditModal, setEditModal, editSubmit }) {
+function EditPlot({ row, openeditModal, handleCloseModal, editSubmit, tags }) {
 
     const [formData, setFormData] = useState(row);
 
@@ -26,7 +24,7 @@ function EditPond({ row, openeditModal, setEditModal, editSubmit }) {
     const handleEditSubmit = (event) => {
         event.preventDefault();
         editSubmit(formData);
-        setEditModal(false);
+        handleCloseModal();
     };
 
     const categoriesList = [
@@ -39,9 +37,8 @@ function EditPond({ row, openeditModal, setEditModal, editSubmit }) {
         2: "Foundation",
     }
 
-
     return (
-        <Dialog open={openeditModal} onClose={() => setEditModal(false)}>
+        <Dialog open={openeditModal} onClose={() => handleCloseModal()}>
             <DialogTitle align="center">Edit Plot</DialogTitle>
             <form onSubmit={handleEditSubmit}>
                 <DialogContent>
@@ -71,14 +68,6 @@ function EditPond({ row, openeditModal, setEditModal, editSubmit }) {
                     onChange={(event, value) => { if (value !== null) setFormData(prevState => ({ ...prevState, 'category': value.id }))}}
                     getOptionLabel={(option) => (option.label)}
                 />
-                {/* <TextField
-                    name="district"
-                    label="District"
-                    value={formData.district}
-                    onChange={handleChange}
-                    fullWidth
-                    margin="dense"
-                /> */}
                 <TextField
                     name="gat"
                     label="Gat"
@@ -87,81 +76,15 @@ function EditPond({ row, openeditModal, setEditModal, editSubmit }) {
                     fullWidth
                     margin="dense"
                 />
-                {/* <TextField
-                    name="land_type"
-                    label="Land Type"
-                    value={formData.land_type}
-                    onChange={handleChange}
-                    fullWidth
-                    margin="dense"
-                /> */}
-                {/* <TextField
-                    name="status"
-                    label="Status"
-                    value={formData.status}
-                    onChange={handleChange}
-                    fullWidth
-                    margin="dense"
+                <TagSelector 
+                    tagsList={tags} 
+                    value={formData.tags} 
+                    handleChange={(tags) => setFormData({ ...formData, 'tags': tags })}
+                    margin='dense'
                 />
-                <TextField
-                    name="taluka"
-                    label="Taluka"
-                    value={formData.taluka}
-                    onChange={handleChange}
-                    fullWidth
-                    margin="dense"
-                />
-                <TextField
-                    name="village"
-                    label="Village"
-                    value={formData.village}
-                    onChange={handleChange}
-                    fullWidth
-                    margin="dense"
-                />
-                <TextField
-                    name="zone"
-                    label="Zone"
-                    value={formData.zone}
-                    onChange={handleChange}
-                    fullWidth
-                    margin="dense"
-                /> */}
-                {/* <TextField
-                    name="boundaries.type"
-                    label="Boundaries Type"
-                    value={formData.boundaries.type}
-                    onChange={handleChange}
-                    fullWidth
-                    margin="dense"
-                />
-                <TextField
-                    name="boundaries.coordinates"
-                    label="Boundaries Coordinates"
-                    value={formData.boundaries.coordinates}
-                    onChange={handleChange}
-                    fullWidth
-                    margin="dense"
-                />
-                <TextField
-                    name="center.type"
-                    label="Center Type"
-                    value={formData.center.type}
-                    onChange={handleChange}
-                    fullWidth
-                    margin="dense"
-                />
-                <TextField
-                    name="center.coordinates"
-                    label="Center Coordinates"
-                    value={formData.center.coordinates}
-                    onChange={handleChange}
-                    fullWidth
-                    margin="dense"
-                /> */}
                 </DialogContent>
                 <DialogActions sx={{ display: 'flex', justifyContent: 'center', marginBottom: '15px' }}>
-                    <Button variant='contained' onClick={() => setEditModal(false)} color="primary">
+                    <Button variant='contained' onClick={() => handleCloseModal()} color="primary">
                         Cancel
                     </Button>
                     <Button variant='contained' type="submit" color="primary">
@@ -173,4 +96,4 @@ function EditPond({ row, openeditModal, setEditModal, editSubmit }) {
     )
 }
 
-export default EditPond
+export default EditPlot

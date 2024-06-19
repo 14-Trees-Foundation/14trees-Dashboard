@@ -77,3 +77,18 @@ export const searchPlotsDataReducer = (state = { totalPlots:0, plots: {} }, acti
             return state;
     }
 }
+
+export const getPlotTagsDataReducer = (state = new Set<string>(), action: UnknownAction ): Set<string> => {
+    switch(action.type) {
+        case plotActionTypes.GET_PLOT_TAGS_SUCCEEDED:
+            if (action.payload) {
+                let tags = new Set<string>();
+                let payload = action.payload as PaginatedResponse<string>
+                payload.results.forEach(tag => tags.add(tag))
+                return tags
+            }
+            return state;
+        default:
+            return state;
+    }
+}

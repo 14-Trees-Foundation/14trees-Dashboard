@@ -124,7 +124,7 @@ class ApiClient {
 
     async createPlot(data: Plot): Promise<Plot> {
         try {
-            const response = await this.api.post<Plot>(`/plots/add`, data);
+            const response = await this.api.post<Plot>(`/plots`, data);
             return response.data;
         } catch (error) {
             console.error(error)
@@ -150,6 +150,12 @@ class ApiClient {
             console.error(error)
             throw new Error('Failed to delete plot');
         }
+    }
+
+    async getPlotTags(offset: number, limit: number): Promise<PaginatedResponse<string>> {
+        const url = `/plots/tags?offset${offset}&limit=${limit}`
+        const response = await this.api.get<PaginatedResponse<string>>(url);
+        return response.data;
     }
 
     /*

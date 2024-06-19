@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { Box, Button, Grid, Modal, TextField, Typography } from '@mui/material';
+import { Autocomplete, Box, Button, Grid, Modal, TextField, Typography } from '@mui/material';
+import TagSelector from '../../../components/TagSelector';
 
-const AddPond = ({ open, handleClose, createPlot }) => {
+const AddPlot = ({ open, handleClose, createPlot, tags }) => {
 
     const style = {
         position: 'absolute',
@@ -56,7 +57,6 @@ const AddPond = ({ open, handleClose, createPlot }) => {
 
     const handleSubmit = (event) => {
         event.preventDefault();
-        console.log(formData);
         createPlot(formData);
         setFormData({
             name: '',
@@ -83,6 +83,16 @@ const AddPond = ({ open, handleClose, createPlot }) => {
         handleClose();
     };
 
+    const categoriesList = [
+        {id: 1, label: "Public"},
+        {id: 2, label: "Foundation"},
+    ]
+
+    const categoriesMap = {
+        1: "Public",
+        2: "Foundation",
+    }
+
     return (
         <div>
             <Modal
@@ -102,13 +112,25 @@ const AddPond = ({ open, handleClose, createPlot }) => {
                                 <TextField name="plot_id" label="Plot ID" value={formData.plot_id} onChange={handleChange} fullWidth />
                             </Grid>
                             <Grid item xs={12}>
-                                <TextField name="category" label="Category" value={formData.category} onChange={handleChange} fullWidth />
-                            </Grid>
-                            <Grid item xs={12}>
-                                <TextField name="district" label="District" value={formData.district} onChange={handleChange} fullWidth />
+                                <Autocomplete
+                                    fullWidth
+                                    name="category"
+                                    disablePortal
+                                    options={categoriesList}
+                                    value={formData.category ? { id: formData.category, label: categoriesMap[formData.category] } : null}
+                                    renderInput={(params) => <TextField {...params} label="Category" />}
+                                    onChange={(event, value) => { if (value !== null) setFormData(prevState => ({ ...prevState, 'category': value.id }))}}
+                                    getOptionLabel={(option) => (option.label)}
+                                />
                             </Grid>
                             <Grid item xs={12}>
                                 <TextField name="gat" label="Gat" value={formData.gat} onChange={handleChange} fullWidth />
+                            </Grid>
+                            <Grid item xs={12}>
+                                <TagSelector tagsList={tags} value={formData.tags} handleChange={(tags) => setFormData({ ...formData, 'tags': tags })}/>
+                            </Grid>
+                            {/* <Grid item xs={12}>
+                                <TextField name="district" label="District" value={formData.district} onChange={handleChange} fullWidth />
                             </Grid>
                             <Grid item xs={12}>
                                 <TextField name="land_type" label="Land Type" value={formData.land_type} onChange={handleChange} fullWidth />
@@ -148,7 +170,7 @@ const AddPond = ({ open, handleClose, createPlot }) => {
                                     onChange={handleChange}
                                     fullWidth
                                 />
-                            </Grid>
+                            </Grid> */}
                             <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'center', }}>
                                 <Button variant='outlined' type="submit">Submit</Button>
                             </Grid>
@@ -160,4 +182,4 @@ const AddPond = ({ open, handleClose, createPlot }) => {
     )
 }
 
-export default AddPond
+export default AddPlot

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import Box from "@mui/material/Box";
-import {GridColumns, GridFilterItem } from "@mui/x-data-grid";
+import { GridFilterItem } from "@mui/x-data-grid";
 import AddPlot from "./AddPlot";
 import { Forms } from "../Forms/Forms"
 import EditIcon from "@mui/icons-material/Edit";
@@ -20,14 +20,14 @@ import {
 } from "@mui/material";
 import EditPlot from "./EditPlot";
 import { TableColumnsType } from "antd";
-import getColumnSearchProps from "../../../components/Filter";
+import getColumnSearchProps, { getColumnSelectedItemFilter } from "../../../components/Filter";
 import TableComponent from "../../../components/Table";
 import { ToastContainer } from "react-toastify";
 
 
 export const PlotComponent = () => {
   const dispatch = useAppDispatch();
-  const { getPlots, createPlot, updatePlot, deletePlot } = bindActionCreators(
+  const { getPlots, createPlot, updatePlot, deletePlot, getPlotTags } = bindActionCreators(
     plotActionCreators,
     dispatch
   );
@@ -50,7 +50,47 @@ export const PlotComponent = () => {
   const categoriesMap: Record<number, string> = {
     1: "Public",
     2: "Foundation",
-}
+  }
+
+  useEffect(() => {
+    getPlotData();
+  }, [page, filters]);
+
+  const getPlotData = async () => {
+    setTimeout(async () => {
+      let filtersData = Object.values(filters);
+      await getPlots(page * 10, 10, filtersData);
+    }, 1000);
+  };
+
+  useEffect(() => {
+    getPlotTagsData();
+  }, []);
+
+  const getPlotTagsData = async () => {
+    setTimeout(async () => {
+      await getPlotTags(page * 10, 10);
+    }, 1000);
+  };
+  
+  let plotsList: Plot[] = [];
+  const plotsData = useAppSelector((state: RootState) => state.plotsData);
+  if (plotsData) {
+    plotsList = Object.values(plotsData.plots);
+  }
+
+  let tags: string[] = [];
+  const tagsData = useAppSelector((state: RootState) => state.plotTags);
+  if (tagsData) {
+    tags = Array.from(tagsData);
+  }
+
+  const getAllPlotData = async () => {
+    setTimeout(async () => {
+      let filtersData = Object.values(filters);
+      await getPlots(0, plotsData.totalPlots, filtersData);
+    }, 1000);
+  };
 
   const columns: TableColumnsType<Plot> = [
     {
@@ -106,7 +146,16 @@ export const PlotComponent = () => {
       title: "Category",
       align: "center",
       width: 150,
-      render: (value, record, index) => record.category ? categoriesMap[record.category] : ''
+      render: (category) => category ? categoriesMap[category] : ''
+    },
+    {
+      dataIndex: "tags",
+      key: "tags",
+      title: "Tags",
+      align: "center",
+      width: 150,
+      render: (tags) => tags ? tags.join(", ") : '',
+      ...getColumnSelectedItemFilter({ dataIndex: 'tags', filters, handleSetFilters, options: tags})
     },
     {
       dataIndex: "trees_count",
@@ -174,37 +223,13 @@ export const PlotComponent = () => {
     // },
   ];
 
-  useEffect(() => {
-    getPlotData();
-  }, [page, filters]);
-
-  const getPlotData = async () => {
-    setTimeout(async () => {
-      let filtersData = Object.values(filters);
-      await getPlots(page * 10, 10, filtersData);
-    }, 1000);
-  };
-  
-  let plotsList: Plot[] = [];
-  const plotsData = useAppSelector((state: RootState) => state.plotsData);
-  if (plotsData) {
-    plotsList = Object.values(plotsData.plots);
-  }
-
-  const getAllPlotData = async () => {
-    setTimeout(async () => {
-      let filtersData = Object.values(filters);
-      await getPlots(0, plotsData.totalPlots, filtersData);
-    }, 1000);
-  };
-
   const handleDelete = (row: Plot) => {
     setOpenDeleteModal(true);
     setSelectedItem(row);
   };
 
   const handleEditSubmit = (formData: Plot) => {
-    console.log(formData);
+    setSelectedEditRow(null);
     updatePlot(formData);
   };
 
@@ -229,6 +254,7 @@ export const PlotComponent = () => {
           open={open}
           handleClose={handleModalClose}
           createPlot={handleCreatePlotData}
+          tags={tags}
         />
       </div>
       <Box sx={{ height: 840, width: "100%" }}>
@@ -272,8 +298,9 @@ export const PlotComponent = () => {
         <EditPlot
           row={selectedEditRow}
           openeditModal={editModal}
-          setEditModal={setEditModal}
+          handleCloseModal={() => { setSelectedEditRow(null); setEditModal(false); }}
           editSubmit={handleEditSubmit}
+          tags={tags}
         />
       )}
     </>

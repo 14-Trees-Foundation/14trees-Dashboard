@@ -130,3 +130,27 @@ export const deletePlot = (record: Plot) => {
         )
     };
 };
+
+export const getPlotTags = (offset: number, limit: number) => {
+    const apiClient = new ApiClient()
+    return (dispatch: any) => {
+        dispatch({
+            type: plotActionTypes.GET_PLOT_TAGS_REQUESTED,
+        });
+        apiClient.getPlotTags(offset, limit).then(
+            (value: PaginatedResponse<string>) => {
+                dispatch({
+                    type: plotActionTypes.GET_PLOT_TAGS_SUCCEEDED,
+                    payload: value,
+                });
+            },
+            (error: any) => {
+                console.log(error)
+                dispatch({
+                    type: plotActionTypes.GET_PLOT_TAGS_FAILED,
+                    payload: error
+                });
+            }
+        )
+    }
+};
