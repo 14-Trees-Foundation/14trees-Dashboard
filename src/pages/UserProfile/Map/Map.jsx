@@ -59,15 +59,19 @@ export const Map = () => {
   const trees = userinfo.usertrees;
 
   let boundaries = [];
-  let pathObj = currTree.tree.plot.boundaries.coordinates[0].map(
-    ([lat, lng]) => ({ lat, lng })
-  );
-  boundaries.push(pathObj);
+  if (currTree.tree.plot?.boundaries?.coordinates && currTree.tree.plot.boundaries.coordinates.length !== 0) {
+    let pathObj = currTree.tree.plot.boundaries.coordinates[0].map(
+      ([lat, lng]) => ({ lat, lng })
+    );
+    boundaries.push(pathObj);
+  } 
 
-  const { isLoaded } = useJsApiLoader({
+  let { isLoaded } = useJsApiLoader({
     id: "google-map-script",
     googleMapsApiKey: process.env.REACT_APP_API_MAP_KEY,
   });
+
+  if (boundaries.length === 0) isLoaded = false;
 
   const onMarkerClick = (i) => {
     console.log(i);
