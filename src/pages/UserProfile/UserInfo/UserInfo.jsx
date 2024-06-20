@@ -64,7 +64,7 @@ export const UserInfo = () => {
               alt="Card"
               onLoad={() => setImgLoad(true)}
               src={
-                selUserInfo.profile_image[0] === ""
+                ( selUserInfo.profile_image.length === 0 || selUserInfo.profile_image[0] === "")
                   ? selUserInfo.tree.image
                     ? selUserInfo.tree.image[0]
                     : selUserInfo.tree.tree_type.image[0]
