@@ -174,6 +174,9 @@ export const GiftTrees = () => {
       })[0].images;
     }
     await assignTree(formData, img, images, selfAssign);
+    await fetchTrees();
+    setUnassignedSelected(false);
+    setAssignedSelected(false);
   };
 
   // const handleShare = (sapling_id, tree_name, name) => {
@@ -292,15 +295,17 @@ export const GiftTrees = () => {
   };
 
   const assignTree = async (formValues, img, images, selfAssign) => {
+    let sapling_ids = values.filteredTrees
+      .filter((t) => t.selected === true)
+      .map((a) => a.sapling_id);
+    const removedSelected = values.filteredTrees.map((t) => ({ ...t, selected: false }));
     setValues({
       ...values,
+      filteredTrees: removedSelected,
       loading: true,
       backdropOpen: true,
     });
     const formData = new FormData();
-    let sapling_ids = values.filteredTrees
-      .filter((t) => t.selected === true)
-      .map((a) => a.sapling_id);
     const date = moment(formValues.dob).format("YYYY-MM-DD");
     if (selfAssign) {
       formData.append("name", values.user.name);
@@ -850,7 +855,7 @@ export const GiftTrees = () => {
                           sx={{ ml: "auto", mr: "auto" }}
                           variant="contained"
                           color="primary"
-                          disabled={values.selectedTreeSum <= 0 || (assignedSelected && unassignedSelected)}
+                          disabled={values.selectedTreeSum <= 0 ||  unassignedSelected}
                           onClick={() => setUnAssignModalOpen(true)}
                         >
                           UnAssign
@@ -862,7 +867,7 @@ export const GiftTrees = () => {
                           sx={{ ml: "auto", mr: "auto" }}
                           variant="contained"
                           color="primary"
-                          disabled={values.selectedTreeSum <= 0 || (assignedSelected && unassignedSelected)}
+                          disabled={values.selectedTreeSum <= 0 || assignedSelected}
                           onClick={handleClickOpen}
                         >
                           Assign
