@@ -39,7 +39,7 @@ export const Trees = ({ saplingId }) => {
         <div className={classes.trees}>
           <div className={classes.scroll}>
             {userinfo.usertrees.map((item, idx) => {
-              const date = item.date_added.slice(0, 10);
+              const date = item.tree.date_added.slice(0, 10);
               return (
                 <div
                   key={idx}
