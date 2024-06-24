@@ -1,7 +1,7 @@
 import axios, {AxiosInstance} from 'axios';
 import { PlantType } from '../../types/plantType';
 import { Plot } from '../../types/plot';
-import { Group } from '../../types/Group';
+import { BulkUserGroupMappingResponse, Group } from '../../types/Group';
 import { Pond } from '../../types/pond';
 import { User } from '../../types/user';
 import { Site } from '../../types/site';
@@ -203,6 +203,24 @@ class ApiClient {
             throw new Error('Failed to delete group');
         }
     }
+
+    /*
+        Model- UserGroup: CRUD Operations/Apis for user_groups
+    */
+
+    async bulkCreateUserGroupMapping(groupId: number, file: Blob): Promise<BulkUserGroupMappingResponse> {
+        try {
+            const formData = new FormData();
+            formData.append('file', file);
+            formData.append('group_id', groupId.toString());
+            const response = await this.api.post<BulkUserGroupMappingResponse>(`/user-groups/bulk`, formData);
+            return response.data;
+        } catch (error) {
+            console.error(error)
+            throw new Error('Failed to create user group mapping');
+        }
+    }
+
 
     /*
         Model- Pond: CRUD Operations/Apis for ponds

@@ -8,11 +8,13 @@ import { pondsDataReducer, searchPondsDataReducer, pondHistoryDataReducer } from
 import { treesDataReducer } from "./treeReducer";
 import { usersDataReducer, searchUsersDataReducer } from "./userReducer";
 import { userTreesDataReducer, userTreeCountDataReducer } from "./userTreeReducer";
+import { userGroupsDataReducer } from "./userGroupReducer";
 
 const rootReducer = combineReducers({
     plantTypesData: plantTypesDataReducer,
     onsiteStaffsData: onsiteStaffsDataReducer,
     groupsData: groupsDataReducer,
+    userGroupsData: userGroupsDataReducer,
     sitesData: sitesDataReducer,
     plotsData: plotsDataReducer,
     plotTags: getPlotTagsDataReducer,
