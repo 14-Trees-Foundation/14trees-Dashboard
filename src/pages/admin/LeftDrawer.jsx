@@ -76,7 +76,7 @@ export const AdminLeftDrawer = () => {
       display: true,
     },
     {
-      displayName: 'Organization',
+      displayName: 'Organizations',
       logo: CorporateFareIcon,
       display: true
     },

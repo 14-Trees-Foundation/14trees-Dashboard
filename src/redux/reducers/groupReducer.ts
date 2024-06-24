@@ -53,3 +53,24 @@ export const groupsDataReducer = (state = { totalGroups:0, groups: {} }, action:
             return state;
     }
 };
+
+export const searchGroupsDataReducer = (state = { totalGroups:0, groups: {}}, action: UnknownAction ): GroupsDataState => {
+    switch(action.type) {
+        case groupActionTypes.SEARCH_GROUPS_SUCCEEDED:
+            if (action.payload) {
+                let groupsDataState: GroupsDataState = { totalGroups: state.totalGroups, groups: { ...state.groups }};
+                let payload = action.payload as PaginatedResponse<Group>
+                for (let i = 0; i < payload.results.length; i++) {
+                    if (payload.results[i]?.id) {
+                        payload.results[i].key = payload.results[i].id
+                        groupsDataState.groups[payload.results[i].id] = payload.results[i]
+                    }
+                }
+                const nextState: GroupsDataState = groupsDataState;
+                return nextState;
+            }
+            return state;
+        default:
+            return state;
+    }
+}

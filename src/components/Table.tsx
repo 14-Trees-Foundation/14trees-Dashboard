@@ -11,17 +11,18 @@ interface TableComponentProps {
     totalRecords: number
     fetchAllData: () => Promise<void>
     setPage: (value: React.SetStateAction<number>) => void
-    handleSelectionChanges?: (ids: string[]) => void
+    setSrNoPage?: (value: React.SetStateAction<number>) => void
+    handleSelectionChanges?: (ids: number[]) => void
 }
 
-function TableComponent({ dataSource, columns, totalRecords, fetchAllData, setPage, handleSelectionChanges }: TableComponentProps) {
+function TableComponent({ dataSource, columns, totalRecords, fetchAllData, setPage, handleSelectionChanges, setSrNoPage }: TableComponentProps) {
 
     let rowSelection: TableRowSelection<AnyObject> | undefined;
     if (handleSelectionChanges) {
         rowSelection = {
             type: 'checkbox',
             onChange: (selectedRowKeys) => {
-                handleSelectionChanges(selectedRowKeys as string[]);
+                handleSelectionChanges(selectedRowKeys as number[]);
             },
             getCheckboxProps: (record) => {
                 return { name: record._id }
@@ -49,7 +50,17 @@ function TableComponent({ dataSource, columns, totalRecords, fetchAllData, setPa
             style={{ borderRadius: 20 }}
             dataSource={dataSource}
             columns={columns}
-            pagination={{ position: ['bottomRight'], showSizeChanger: false, pageSize: 10, defaultCurrent: 1, total: totalRecords, simple: true, onChange: (page, pageSize) => { if (dataSource && page * pageSize > dataSource.length) setPage(page - 1); } }}
+            pagination={{ 
+                position: ['bottomRight'], 
+                showSizeChanger: false, 
+                pageSize: 10, 
+                defaultCurrent: 1, 
+                total: totalRecords, 
+                simple: true, 
+                onChange: (page, pageSize) => { 
+                    if (dataSource && page * pageSize > dataSource.length) setPage(page - 1); 
+                    setSrNoPage && setSrNoPage(page-1);
+                } }}
             rowSelection={rowSelection}
             scroll={{ y: 700 }}
         />

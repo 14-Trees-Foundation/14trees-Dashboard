@@ -1,7 +1,7 @@
 import { combineReducers } from "redux";
 import { plantTypesDataReducer, searchPlantTypesDataReducer } from "./plantTypeReducer";
 import { onsiteStaffsDataReducer } from "./onsiteStaffReducer";
-import { groupsDataReducer } from "./groupReducer";
+import { groupsDataReducer, searchGroupsDataReducer } from "./groupReducer";
 import { plotsDataReducer, searchPlotsDataReducer, getPlotTagsDataReducer } from "./plotReducer";
 import { sitesDataReducer } from "./siteReducer";
 import { pondsDataReducer, searchPondsDataReducer, pondHistoryDataReducer } from "./pondReducer";
@@ -28,6 +28,7 @@ const rootReducer = combineReducers({
     searchPondsData: searchPondsDataReducer,
     searchPlotsData: searchPlotsDataReducer,
     searchUsersData: searchUsersDataReducer,
+    searchGroupsData: searchGroupsDataReducer,
 });
 
 export default rootReducer;

@@ -214,7 +214,7 @@ export const TreeNew = () => {
         setDeleteRow(row);
     };
 
-    const handleSelectionChanges = (treeIds: string[]) => {
+    const handleSelectionChanges = (treeIds: number[]) => {
         const saplingIds = treeIds.map((treeId) => treesData.trees[treeId].sapling_id);
         setSaplingIds(saplingIds);
 

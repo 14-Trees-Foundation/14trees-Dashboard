@@ -204,6 +204,17 @@ class ApiClient {
         }
     }
 
+    async searchGroups(offset: number, limit: number, searchStr: string): Promise<PaginatedResponse<Group>> {
+        const url = `/groups/${searchStr}?offset=${offset}&limit=${limit}`;
+        try {
+            const response = await this.api.get<PaginatedResponse<Group>>(url);
+            return response.data;
+        } catch (error: any) {
+            console.error(error)
+            throw new Error(`Failed to fetch groups: ${error.message}`);
+        }
+    }
+
     /*
         Model- UserGroup: CRUD Operations/Apis for user_groups
     */
@@ -221,7 +232,23 @@ class ApiClient {
         }
     }
 
+    async addUserToGroup(data: any): Promise<void> {
+        try {
+            await this.api.post(`/user-groups`, data);
+        } catch (error) {
+            console.error(error)
+            throw new Error('Failed to add user to group');
+        }
+    }
 
+    async removeGroupUsers(groupId: number, userIds: number[]): Promise<void> {
+        try {
+            await this.api.delete(`/user-groups`, { data: { user_ids: userIds, group_id: groupId }});
+        } catch (error) {
+            console.error(error)
+            throw new Error('Failed to remove users from group');
+        }
+    }
     /*
         Model- Pond: CRUD Operations/Apis for ponds
     */

@@ -8,6 +8,7 @@ import {
   DialogContent,
   DialogContentText,
   DialogTitle,
+  Divider,
   TextField,
 } from "@mui/material";
 import AddOrganization from "./AddOrganization";
@@ -25,6 +26,7 @@ import EditOrganization from "./EditOrganization";
 import { TableColumnsType } from "antd";
 import TableComponent from "../../../components/Table";
 import FailedRecordsList from "./RecordList";
+import { OrganizationUsers } from "./OrganizationUsers";
 
 export const OrganizationComponent = () => {
   const dispatch = useAppDispatch();
@@ -45,10 +47,9 @@ export const OrganizationComponent = () => {
   const [failedRecords, setFailedRecords] = useState(false);
   const [editModal, setEditModal] = useState(false);
   const [bulkCreate, setBulkCreate] = useState(false);
-  const [bulkCreateFailed, setBulkCreateFailed] = useState(false);
-  const [failedData, setFailedData] = useState<BulkUserGroupMappingResponse | null>(null);
   const [file, setFile] = useState(null);
   const [page, setPage] = useState(0);
+  const [srNoPage, SetSrNoPage] = useState(0);
 
   useEffect(() => {
     getGroupsData();
@@ -61,6 +62,14 @@ export const OrganizationComponent = () => {
   };
 
   const columns: TableColumnsType<Group> = [
+    {
+      dataIndex: "srNo",
+      key: "srNo",
+      title: "Sr. No.",
+      width: 100,
+      align: 'center',
+      render: (value, record, index) => `${index + 1 + srNoPage * 10}.`,
+    },
     {
       dataIndex: "name",
       key: "name",
@@ -196,8 +205,11 @@ export const OrganizationComponent = () => {
           totalRecords={groupsData.totalGroups}
           fetchAllData={getAllGroupsData}
           setPage={setPage}
+          setSrNoPage={SetSrNoPage}
         />
       </Box>
+      <Divider style={{ marginBottom: "20px" }} />
+      <OrganizationUsers />
 
       <Dialog open={openDeleteModal} onClose={() => setOpenDeleteModal(false)}>
         <DialogTitle>Confirm Delete</DialogTitle>
@@ -275,29 +287,6 @@ export const OrganizationComponent = () => {
             </Button>
           </DialogActions>
         </form>
-      </Dialog>
-
-      <Dialog open={bulkCreateFailed} onClose={() => setBulkCreateFailed(false)}>
-        <DialogTitle>Bulk Create Failed for '{failedData?.failed}' users</DialogTitle>
-        <DialogContent>
-          <DialogContentText>
-            Do you want to retry?
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setBulkCreateFailed(false)} variant="contained" color="primary">
-            Cancel
-          </Button>
-          <Button
-            variant="contained"
-            onClick={() => {
-              setBulkCreateFailed(false);
-            }}
-            color="primary"
-            autoFocus>
-            Yes
-          </Button>
-        </DialogActions>
       </Dialog>
     </>
   );

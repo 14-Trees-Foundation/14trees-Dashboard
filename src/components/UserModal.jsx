@@ -23,7 +23,7 @@ const UserModal = ({ open, handleClose, onSubmit, searchUser }) => {
         name: '',
         phone: '',
         email: '',
-        dob: '',
+        birth_date: '',
     });
 
     let usersList = [];
@@ -50,7 +50,7 @@ const UserModal = ({ open, handleClose, onSubmit, searchUser }) => {
                     'email': user.email,
                     'name': user.name,
                     'phone': user.phone ?? '',
-                    'dob': user.dob ?? '',
+                    'birth_date': user.birth_date ?? '',
                 })
             }
         })
@@ -71,7 +71,7 @@ const UserModal = ({ open, handleClose, onSubmit, searchUser }) => {
             name: '',
             phone: '',
             email: '',
-            dob: '',
+            birth_date: '',
         });
         handleClose();
     };
@@ -114,11 +114,11 @@ const UserModal = ({ open, handleClose, onSubmit, searchUser }) => {
                                 </Autocomplete>
                             </Grid>
                             <Grid item xs={12}>
-                                <TextField name="dob" label="Date of Birth" type="date" value={formData.dob} onChange={handleChange} InputLabelProps={{ shrink: true }} fullWidth/>
+                                <TextField name="birth_date" label="Date of Birth" type="date" value={formData.birth_date} onChange={handleChange} InputLabelProps={{ shrink: true }} fullWidth/>
                             </Grid>
                             <Grid item xs={12} sx={{display:'flex', justifyContent:'center', }}>
-                                <Button type="submit">Submit</Button>
-                                <Button onClick={handleClose}>Cancel</Button>
+                                <Button type="submit" variant="contained" color='success'>Submit</Button>
+                                <Button onClick={handleClose} style={{marginLeft: 10}} variant='outlined' color='error'>Cancel</Button>
                             </Grid>
                         </Grid>
                     </form>

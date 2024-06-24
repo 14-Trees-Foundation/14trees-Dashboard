@@ -45,5 +45,5 @@ export type CreateTreeRequest = {
 
 export type TreesDataState = {
     totalTrees: number,
-    trees: Record<string, Tree>
+    trees: Record<number, Tree>
 };
