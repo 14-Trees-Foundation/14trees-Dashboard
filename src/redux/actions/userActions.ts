@@ -98,6 +98,7 @@ export const createUser = (record: User) => {
         });
         apiClient.createUser(record).then(
             (value: User) => {
+                toast.success(`User '${record.name}' added successfully`)
                 dispatch({
                     type: userActionTypes.CREATE_USER_SUCCEEDED,
                     payload: value,
@@ -143,6 +144,7 @@ export const updateUser = (record: User) => {
         });
         apiClient.updateUser(record).then(
             (value: User) => {
+                toast.success(`User updated successfully`)
                 dispatch({
                     type: userActionTypes.UPDATE_USER_SUCCEEDED,
                     payload: value,
@@ -167,13 +169,14 @@ export const deleteUser = (record: User) => {
         });
         apiClient.deleteUser(record).then(
             (id: string) => {
+                toast.success(`User '${record.name}' deleted successfully`)
                 dispatch({
                     type: userActionTypes.DELETE_USER_SUCCEEDED,
                     payload: id,
                 });
             },
             (error: any) => {
-                console.error(error);
+                toast.error(error.message)
                 dispatch({
                     type: userActionTypes.DELETE_USER_FAILED,
                 });
