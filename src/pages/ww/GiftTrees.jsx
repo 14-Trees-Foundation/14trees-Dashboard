@@ -19,7 +19,6 @@ import {
   Checkbox,
   Dialog,
   DialogContent,
-  DialogTitle,
   DialogContentText,
   DialogActions,
 } from "@mui/material";
@@ -42,6 +41,9 @@ import bgfooter from "../../assets/gift/bgfooter.png";
 import footer from "../../assets/gift/footer.png";
 import { albums } from "../../store/adminAtoms";
 import { Albums } from "./Albums";
+import { useAppDispatch } from "../../redux/store/hooks";
+import { bindActionCreators } from "@reduxjs/toolkit";
+import * as userTreeActionCreators from "../../redux/actions/userTreeActions";
 
 const intitialFValues = {
   name: "",
@@ -70,6 +72,10 @@ console.log('selectedTreeSum - ', intitialFValues.selectedTreeSum);
 console.log('filteredTrees- ', intitialFValues.filteredTrees);
 export const GiftTrees = () => {
   let { email } = useParams();
+
+  const dispatch = useAppDispatch();
+  const { unassignUserTrees } =
+    bindActionCreators(userTreeActionCreators, dispatch);
 
   const classes = useStyles();
   const [page, setPage] = useState(0);
@@ -302,6 +308,7 @@ export const GiftTrees = () => {
     setValues({
       ...values,
       filteredTrees: removedSelected,
+      selectedTreeSum: 0,
       loading: true,
       backdropOpen: true,
     });
@@ -597,9 +604,25 @@ export const GiftTrees = () => {
       selectedTreeSum: sum,
     });
   };
-  const handleUnassignTrees = (event, value) => {
-    console.log(value);
+  const handleUnassignTrees = async (event) => {
+    event.preventDefault();
     setUnAssignModalOpen(false);
+    
+    let sapling_ids = values.filteredTrees
+      .filter((t) => t.selected === true)
+      .map((a) => a.sapling_id);
+
+    const removedSelected = values.filteredTrees.map((t) => ({ ...t, selected: false }));
+    setValues({
+      ...values,
+      filteredTrees: removedSelected,
+      selectedTreeSum: 0,
+    });
+
+    await unassignUserTrees(sapling_ids);
+    await fetchTrees();
+    setUnassignedSelected(false);
+    setAssignedSelected(false);
   };
 
   // const handleSelectAlltree = (event) => {
@@ -891,7 +914,7 @@ export const GiftTrees = () => {
                           <Button variant="contained" onClick={() => setUnAssignModalOpen(false)} color="primary">
                             No
                           </Button>
-                          <Button variant="contained" onClick={(event) => handleUnassignTrees(event, tree)} color="primary" autoFocus sx={{marginLeft:'15px'}}>
+                          <Button variant="contained" onClick={(event) => handleUnassignTrees(event)} color="primary" autoFocus sx={{marginLeft:'15px'}}>
                             Yes
                           </Button>
                           </Box>  
