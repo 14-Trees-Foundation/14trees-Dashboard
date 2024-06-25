@@ -1,6 +1,7 @@
 import ApiClient from "../../api/apiClient/apiClient";
 import userTreeActionTypes from "../actionTypes/userTreeActionTypes";
 import { AssignTreeRequest, UserTree, UserTreeCountPaginationResponse } from "../../types/userTree";
+import { toast } from "react-toastify";
 
 export const getUserTrees = () => {
     const apiClient = new ApiClient()
@@ -85,12 +86,13 @@ export const unassignUserTrees = (saplingIds: string[]) => {
         });
         apiClient.unassignUserTrees(saplingIds).then(
             () => {
+                toast.success("Trees unassigned successfully");
                 dispatch({
                     type: userTreeActionTypes.UNASSIGN_USER_TREES_SUCCEEDED,
                 });
             },
             (error: any) => {
-                console.error(error);
+                toast.error("Failed to unassign trees");
                 dispatch({
                     type: userTreeActionTypes.UNASSIGN_USER_TREES_FAILED,
                 });
