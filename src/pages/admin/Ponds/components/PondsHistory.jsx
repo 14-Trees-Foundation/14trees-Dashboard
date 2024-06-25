@@ -10,16 +10,12 @@ import {
   ResponsiveContainer,
 } from "recharts";
 
-import { pondHistory, selectedPond } from "../../../../store/adminAtoms";
 import { Typography } from "@mui/material";
 import { CustomBox } from "../../../../components/CustomBox";
 import { useAppSelector } from "../../../../redux/store/hooks";
 
 export const PondsHistory = () => {
   const theme = useTheme();
-  let history = useRecoilValue(pondHistory);
-  // let pondName = useRecoilValue(selectedPond);
-  //  let data = history.map(({levelFt, date, images, ...attrs}) => ({date, levelFt}))
   let pond = useAppSelector((state) => state.pondHistoryData);
   let data;
   if (pond?.updates?.length > 0) {
@@ -30,7 +26,6 @@ export const PondsHistory = () => {
       };
     });
   }
-  console.log(data);
 
   return (
     <div

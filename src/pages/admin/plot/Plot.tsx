@@ -117,6 +117,7 @@ export const PlotComponent = () => {
           </Button>
           <Button
             variant="outlined"
+            color="error"
             style={{ margin: "0 5px" }}
             onClick={() => handleDelete(record)}>
             <DeleteIcon />
@@ -146,7 +147,14 @@ export const PlotComponent = () => {
       title: "Category",
       align: "center",
       width: 150,
-      render: (category) => category ? categoriesMap[category] : ''
+      render: (category) => category ? categoriesMap[category] : '',
+    },
+    {
+      dataIndex: "gat",
+      key: "gat",
+      title: "Gat No.",
+      align: "center",
+      width: 150,
     },
     {
       dataIndex: "tags",
@@ -185,42 +193,6 @@ export const PlotComponent = () => {
       align: "center",
       width: 150,
     },
-    // {
-    //   dataIndex: "boundaries.type",
-    //   key: "boundaries.type",
-    //   title: "Boundaries Type",
-    //   width: 200,
-    //   render: (value, record, index) => {
-    //     if (record.boundaries?.type) {
-    //       return record.boundaries.type;
-    //     }
-    //     return ''
-    //   },
-    // },
-    // {
-    //   dataIndex: "center.type",
-    //   key: "center.type",
-    //   title: "Center Type",
-    //   width: 150,
-    //   render: (value, record, index) => {
-    //     if (record.center?.type) {
-    //       return record.center.type;
-    //     }
-    //     return ''
-    //   },
-    // },
-    // {
-    //   dataIndex: "center.coordinates",
-    //   key: "center.coordinates",
-    //   title: "Center Coordinates",
-    //   width: 320,
-    //   render: (value, record, index) => {
-    //     if (record.center?.coordinates) {
-    //       return JSON.stringify(record.center.coordinates);
-    //     }
-    //     return ''
-    //   },
-    // },
   ];
 
   const handleDelete = (row: Plot) => {

@@ -102,7 +102,7 @@ export const User1 = () => {
       dataIndex: "action",
       key: "action",
       title: "Actions",
-      width: 100,
+      width: 150,
       align: "center",
       render: (value, record, index )=> (
         <div
@@ -112,6 +112,9 @@ export const User1 = () => {
             alignItems: "center",
           }}>
           <Button
+            variant="outlined"
+            color="success"
+            style={{ margin: "0 5px" }}
             onClick={() => {
               window.open("https://dashboard.14trees.org/ww/" + record.email);
             }}
@@ -119,6 +122,8 @@ export const User1 = () => {
             <AccountCircleRoundedIcon />
           </Button>
           <Button
+            variant="outlined"
+            style={{ margin: "0 5px" }}
             onClick={() => {
               setSelectedEditRow(record);
               setEditModal(true);
@@ -126,6 +131,9 @@ export const User1 = () => {
             <EditIcon />
           </Button>
           <Button
+            variant="outlined"
+            color="error"
+            style={{ margin: "0 5px" }}
             onClick={() => handleDelete(record)}>
             <DeleteIcon />
           </Button>

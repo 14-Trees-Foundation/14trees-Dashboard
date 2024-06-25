@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import {
+    Autocomplete,
     Button,
     Dialog,
     DialogActions,
@@ -7,6 +8,7 @@ import {
     DialogTitle,
     TextField,
 } from "@mui/material";
+import { plantTypeHabitList } from './habitList';
 
 function EditTreeType({row, openeditModal, handleCloseEditModal, editSubmit}) {
 
@@ -58,14 +60,14 @@ function EditTreeType({row, openeditModal, handleCloseEditModal, editSubmit}) {
                         value={formData.scientific_name}
                         onChange={handleChange}
                     />
-                    <TextField
-                        margin="dense"
-                        name="habit"
-                        label="Habit"
-                        type="text"
+                    <Autocomplete
                         fullWidth
-                        value={formData.habit}
-                        onChange={handleChange}
+                        name="habit"
+                        disablePortal
+                        options={plantTypeHabitList}
+                        value={formData.habit ? plantTypeHabitList.find(item => item === formData.habit) : undefined}
+                        renderInput={(params) => <TextField {...params} margin="dense" label="Habit" />}
+                        onChange={(event, value) => { if (value !== null) setFormData(prevState => ({ ...prevState, 'habit': value }))}}
                     />
                     <TextField
                         margin="dense"

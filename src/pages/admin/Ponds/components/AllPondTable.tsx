@@ -22,7 +22,7 @@ import EditPond from "./EditPond";
 import { getFormattedDate } from "../../../../helpers/utils";
 import { TableColumnsType } from "antd";
 import TableComponent from "../../../../components/Table";
-import getColumnSearchProps from "../../../../components/Filter";
+import getColumnSearchProps, { getColumnSelectedItemFilter } from "../../../../components/Filter";
 
 function getCapacity(pond: any) {
     return (
@@ -47,7 +47,6 @@ export const PondComponent = () => {
     const [selectedEditRow, setSelectedEditRow] = useState<Pond | null>(null);
     const [editModal, setEditModal] = useState(false);
     const [page, setPage] = useState(0);
-    const [nameFilter, setNameFilter] = useState('');
     const [filters, setFilters] = useState<Record<string, GridFilterItem>>({});
 
     const handleSetFilters = (filters: Record<string, GridFilterItem>) => {
@@ -61,12 +60,17 @@ export const PondComponent = () => {
         }, 1000);
     };
 
+    const typesList = [
+        "Storage",
+        "Percolation",
+    ]
+
     const columns: TableColumnsType<Pond> = [
         {
             dataIndex: "action",
             key: "action",
             title: "Actions",
-            width: 180,
+            width: 250,
             align: "center",
             render: (value, record, index )=> (
                 <div
@@ -76,11 +80,16 @@ export const PondComponent = () => {
                         alignItems: "center",
                     }}>
                     <Button
+                        style={{ margin: "0 5px" }}
+                        variant="outlined"
+                        color="success"
                         size="small"
                         onClick={() => getPondHistoryByName(record.name)}>
                         <WaterIcon />
                     </Button>
                     <Button
+                        style={{ margin: "0 5px" }}
+                        variant="outlined"
                         size="small"
                         onClick={() => {
                             setSelectedEditRow(record);
@@ -89,6 +98,8 @@ export const PondComponent = () => {
                         <EditIcon />
                     </Button>
                     <Button
+                        style={{ margin: "0 5px" }}
+                        variant="outlined"
                         size="small"
                         color="error"
                         onClick={() => handleDelete(record)}>
@@ -111,41 +122,26 @@ export const PondComponent = () => {
             title: "Type",
             width: 150,
             align: "center",
-        },
-        {
-            dataIndex: "boundaries.type",
-            key: "boundaries.type",
-            title: "Boundaries Type",
-            width: 150,
-            align: "center",
-            render: (value, record, index) => record.boundaries?.type
-        },
-        {
-            dataIndex: "boundaries.coordinates",
-            key: "boundaries.coordinates",
-            title: "Boundaries Coordinates",
-            width: 150,
-            align: "center",
-            render: (value, record, index) => JSON.stringify(record.boundaries?.coordinates)
+            ...getColumnSelectedItemFilter({ dataIndex: 'type', filters, handleSetFilters, options: typesList }),
         },
         {
             dataIndex: "length_ft",
             key: "length_ft",
-            title: "LengthFT",
+            title: "Length (Ft)",
             width: 150,
             align: "center",
         },
         {
             dataIndex: "width_ft",
             key: "width_ft",
-            title: "WidthFT",
+            title: "Width (Ft)",
             width: 150,
             align: "center",
         },
         {
             dataIndex: "depth_ft",
             key: "depth_ft",
-            title: "DeathFT",
+            title: "Death (Ft)",
             width: 150,
             align: "center",
         },
@@ -163,14 +159,14 @@ export const PondComponent = () => {
             title: "Created At",
             width: 150,
             align: "center",
-            render: (dateStr: string) => ( dateStr === "" ) ? "" : getFormattedDate(dateStr),
+            render: getFormattedDate,
         },
         
       ];
 
     useEffect(() => {
         getPondData();
-    }, [page, nameFilter]);
+    }, [page, filters]);
 
     const getPondData = async () => {
         let filtersData = Object.values(filters);

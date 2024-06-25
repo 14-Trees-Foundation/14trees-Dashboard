@@ -11,8 +11,10 @@ import {
     DialogContent,
     DialogContentText,
     DialogTitle,
+    Divider,
     Paper,
     TextField,
+    Typography,
 } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -33,21 +35,6 @@ import getColumnSearchProps from "../../../../components/Filter";
 import { TableColumnsType } from "antd";
 import { Plot } from "../../../../types/plot";
 import TableComponent from "../../../../components/Table";
-
-const CustomPaper = (props: any) => {
-    return (
-        <Paper
-            style={{
-                minWidth: '450px',
-                marginRight: '50px',
-                borderRadius: "20px",
-                boxShadow: "4px 4px 6px #98a49c, -4px -4px 6px #cadace",
-                background: "#b1bfb5",
-            }}
-            {...props}
-        />
-    );
-};
 
 export const TreeNew = () => {
     const dispatch = useAppDispatch();
@@ -100,7 +87,7 @@ export const TreeNew = () => {
     }, [plotPage, plotName]);
 
     const getPlotsData = async () => {
-        const nameFilter =  { columnField: "name", value: plotName, operatorValue: "contains" }
+        const nameFilter = { columnField: "name", value: plotName, operatorValue: "contains" }
         setTimeout(async () => {
             await getPlots(plotPage * 10, 10, [nameFilter]);
         }, 1000);
@@ -112,7 +99,7 @@ export const TreeNew = () => {
         plotsList = Object.values(plotsData.plots);
     }
 
-    const antdColumns: TableColumnsType<Tree> = [
+    const columns: TableColumnsType<Tree> = [
         {
             dataIndex: "action",
             key: "action",
@@ -137,6 +124,7 @@ export const TreeNew = () => {
                     </Button>
                     <Button
                         variant="outlined"
+                        color="error"
                         style={{ margin: "0 5px" }}
                         onClick={() => handleDelete(record)}>
                         <DeleteIcon />
@@ -185,14 +173,6 @@ export const TreeNew = () => {
             align: 'center',
             ...getColumnSearchProps('assigned_to_name', filters, handleSetFilters)
         },
-        {
-            dataIndex: "event_id",
-            key: "event_id",
-            title: "Event",
-            width: 150,
-            align: 'center',
-            ...getColumnSearchProps('event_id', filters, handleSetFilters)
-        },
     ];
 
     let treesList: Tree[] = [];
@@ -203,13 +183,12 @@ export const TreeNew = () => {
 
     const getAllTreesData = async () => {
         setTimeout(async () => {
-          let filtersData = Object.values(filters);
-          await getTrees(0, treesData.totalTrees, filtersData);
+            let filtersData = Object.values(filters);
+            await getTrees(0, treesData.totalTrees, filtersData);
         }, 1000);
-      };
+    };
 
     const handleDelete = (row: Tree) => {
-        console.log("Delete", row);
         setOpenDeleteModal(true);
         setDeleteRow(row);
     };
@@ -306,66 +285,65 @@ export const TreeNew = () => {
 
     return (
         <>
-            <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '20px' }}>
-                <div style={{ display: "flex", justifyContent: "space-between" }}>
-                    <Autocomplete
-                        sx={{
-                            mt: 1,
-                            width: "35ch",
-                            "& .MuiOutlinedInput-notchedOutline": {
-                                border: "none",
-                                borderRadius: "25px",
-                                boxShadow: "4px 4px 8px #98a49c, -4px -4px 8px #cadace",
-                            },
-                        }}
-                        PaperComponent={CustomPaper}
-                        options={plotsList}
-                        autoHighlight
-                        getOptionLabel={(option) => option.name}
-                        onChange={(event, newValue) => {
-                            if (newValue !== null) {
-                                const newFilters = {
-                                    ...filters,
-                                    "plot_id": {
-                                        columnField: "plot_id",
-                                        value: newValue.id,
-                                        operatorValue: 'equals'
+            <div
+                style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    padding: "4px 12px",
+                }}
+            >
+                <Typography variant="h3">Trees</Typography>
+                <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '5px' }}>
+                    <div style={{ display: "flex", justifyContent: "space-between" }}>
+                        <Autocomplete
+                            sx={{ width: 300 }}
+                            options={plotsList}
+                            autoHighlight
+                            getOptionLabel={(option) => option.name}
+                            onChange={(event, newValue) => {
+                                if (newValue !== null) {
+                                    const newFilters = {
+                                        ...filters,
+                                        "plot_id": {
+                                            columnField: "plot_id",
+                                            value: newValue.id,
+                                            operatorValue: 'equals'
+                                        }
+                                    }
+                                    setFilters(newFilters);
+                                }
+                            }}
+                            renderInput={(params) => (
+                                <TextField
+                                    {...params}
+                                    onChange={(event) => {
+                                        const { value } = event.target;
+                                        setPlotPage(0);
+                                        setPlotName(value);
+                                    }}
+                                    label="Select a Plot"
+                                    variant="outlined"
+                                />
+                            )}
+                            ListboxProps={{
+                                onScroll: (event) => {
+                                    const listboxNode: any = event.target;
+                                    if (Math.ceil(listboxNode.scrollTop) + listboxNode.clientHeight === listboxNode.scrollHeight) {
+                                        setPlotPage(plotPage + 1);
                                     }
                                 }
-                                setFilters(newFilters);
-                            }
-                        }}
-                        renderInput={(params) => (
-                            <TextField
-                                {...params}
-                                onChange={(event) => {
-                                    const { value } = event.target;
-                                    setPlotPage(0);
-                                    setPlotName(value);
-                                }}
-                                label="Select a plot"
-                                variant="outlined"
-                            />
-                        )}
-                        ListboxProps={{
-                            onScroll: (event) => {
-                                const listboxNode: any = event.target;
-                                if ( Math.ceil(listboxNode.scrollTop) + listboxNode.clientHeight === listboxNode.scrollHeight) {
-                                    setPlotPage(plotPage + 1);
-                                }
-                            }
-                        }}
-                    />
-                </div>
-                <Button variant="contained" style={{ marginLeft: '10px' }} onClick={handleAssignUnAssign}
-                    disabled={disabledAUButton}
-                >{(isAssignTrees) ? "Assign Trees" : "Unassign Trees"}</Button>
-                <AssignTreeModal open={isAssignTreeModalOpen} handleClose={() => { setIsAssignTreeModalOpen(false) }} onSubmit={handleAssignTrees} searchUsers={searchUsers} />
-                <Button variant="contained" style={{ marginLeft: '10px' }} onClick={handleMapUnMap}
-                    disabled={disabledMapUnMapButton}
-                >{(isMapTrees) ? "Map Trees" : "UnMap Trees"}</Button>
-                <UserModal open={isUserModalOpen} handleClose={() => { setIsUserModalOpen(false) }} onSubmit={handleMapTrees} searchUser={searchUsers} />
-                {/* <Button variant="contained" style={{ marginLeft: '10px' }} onClick={handleModalOpen}
+                            }}
+                        />
+                    </div>
+                    <Button variant="contained" color={isAssignTrees ? 'success' : 'error'} style={{ marginLeft: '10px' }} onClick={handleAssignUnAssign}
+                        disabled={disabledAUButton}
+                    >{(isAssignTrees) ? "Assign Trees" : "Unassign Trees"}</Button>
+                    <AssignTreeModal open={isAssignTreeModalOpen} handleClose={() => { setIsAssignTreeModalOpen(false) }} onSubmit={handleAssignTrees} searchUsers={searchUsers} />
+                    <Button variant="contained" color={isMapTrees ? 'success' : 'error'} style={{ marginLeft: '10px' }} onClick={handleMapUnMap}
+                        disabled={disabledMapUnMapButton}
+                    >{(isMapTrees) ? "Map Trees" : "UnMap Trees"}</Button>
+                    <UserModal open={isUserModalOpen} handleClose={() => { setIsUserModalOpen(false) }} onSubmit={handleMapTrees} searchUser={searchUsers} />
+                    {/* <Button variant="contained" style={{ marginLeft: '10px' }} onClick={handleModalOpen}
                 disabled={true} 
                 >Add Tree</Button>
                 <AddTree open={open} handleClose={handleModalClose} />
@@ -376,18 +354,28 @@ export const TreeNew = () => {
                     disabled={true}>
                     Bulk Create
                 </Button> */}
+                </div>
             </div>
-
+            <Divider sx={{ backgroundColor: "black", marginBottom: '15px' }} />
             <Box sx={{ height: 840, width: "100%" }}>
                 <TableComponent
                     dataSource={treesList}
-                    columns={antdColumns}
+                    columns={columns}
                     totalRecords={treesData.totalTrees}
                     fetchAllData={getAllTreesData}
                     setPage={setPage}
                     handleSelectionChanges={handleSelectionChanges}
                 />
             </Box>
+
+            {selectedEditRow && (
+                <EditTree
+                    row={selectedEditRow}
+                    openeditModal={editModal}
+                    handleCloseEditModal={handleCloseEditModal}
+                    editSubmit={handleEditSubmit}
+                />
+            )}
 
             <Dialog open={openConfirmation} onClose={() => setOpenConfirmation(false)}>
                 <DialogTitle>Confirm {operation}</DialogTitle>
@@ -437,15 +425,6 @@ export const TreeNew = () => {
                     </Button>
                 </DialogActions>
             </Dialog>
-
-            {selectedEditRow && (
-                <EditTree
-                    row={selectedEditRow}
-                    openeditModal={editModal}
-                    handleCloseEditModal={handleCloseEditModal}
-                    editSubmit={handleEditSubmit}
-                />
-            )}
         </>
     );
 };

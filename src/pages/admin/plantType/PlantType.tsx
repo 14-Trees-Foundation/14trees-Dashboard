@@ -8,6 +8,8 @@ import {
     DialogContent,
     DialogContentText,
     DialogTitle,
+    Divider,
+    Typography,
 } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -19,9 +21,10 @@ import { RootState } from "../../../redux/store/store.js";
 import AddPlantType from "./AddPlantType";
 import EditPlantType from "./EditPlantType";
 import { TableColumnsType } from "antd";
-import getColumnSearchProps from "../../../components/Filter";
+import getColumnSearchProps, { getColumnSelectedItemFilter } from "../../../components/Filter";
 import TableComponent from "../../../components/Table";
 import { ToastContainer } from "react-toastify";
+import { plantTypeHabitList } from "./habitList";
 
 
 export const PlantTypeComponent = () => {
@@ -83,7 +86,7 @@ export const PlantTypeComponent = () => {
           title: "Habit",
           width: 200,
           align: "center",
-          ...getColumnSearchProps('habit', filters, handleSetFilters)
+          ...getColumnSelectedItemFilter({dataIndex: 'habit', filters, handleSetFilters, options: plantTypeHabitList})
         },
         {
             dataIndex: "action",
@@ -108,7 +111,6 @@ export const PlantTypeComponent = () => {
                         <EditIcon />
                     </Button>
                     <Button
-                        disabled
                         variant="outlined"
                         color="error"
                         style={{ margin: "0 5px" }}
@@ -171,25 +173,29 @@ export const PlantTypeComponent = () => {
             <div
                 style={{
                     display: "flex",
-                    justifyContent: "flex-end",
-                    marginBottom: "20px",
-                }}>
-                <Button variant="contained" style={{ backgroundColor:'blue' }} onClick={handleModalOpen}>
-                    Add Plant type
-                </Button>
-                <AddPlantType
-                    open={open}
-                    handleClose={handleModalClose}
-                    createPlantType={handleCreatePlantTypeData}
-                />
-                <Button
-                    variant="contained"
-                    style={{ marginLeft: "10px", }}
-                    onClick={handleModalOpen} disabled={true} >
-                    Bulk Create
-                </Button>
+                    justifyContent: "space-between",
+                    padding: "4px 12px",
+                }}
+            >
+                <Typography variant="h3">Plant Types</Typography>
+                <div
+                    style={{
+                        display: "flex",
+                        justifyContent: "flex-end",
+                        marginBottom: "5px",
+                        marginTop: "5px",
+                    }}>
+                    <Button variant="contained" color="success" onClick={handleModalOpen}>
+                        Add Plant type
+                    </Button>
+                    <AddPlantType
+                        open={open}
+                        handleClose={handleModalClose}
+                        createPlantType={handleCreatePlantTypeData}
+                    />
+                </div>
             </div>
-
+            <Divider sx={{ backgroundColor: "black", marginBottom: '15px' }} />
             <Box sx={{ height: 840, width: "100%" }}>
                 <TableComponent
                     dataSource={plantTypesList}

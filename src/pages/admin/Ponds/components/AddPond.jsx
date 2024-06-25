@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Box, Button, Grid, Modal, TextField } from '@mui/material';
+import { Autocomplete, Box, Button, Grid, Modal, TextField } from '@mui/material';
 
 const AddPond = ({ open, handleClose, createPondData }) => {
 
@@ -70,6 +70,11 @@ const AddPond = ({ open, handleClose, createPondData }) => {
         handleClose();
     };
 
+    const typesList = [
+        "Storage",
+        "Percolation",
+    ]
+
     return (
         <div>
             <Modal
@@ -86,7 +91,15 @@ const AddPond = ({ open, handleClose, createPondData }) => {
                                 <TextField name="name" label="Name" value={formData.name} onChange={handleChange} fullWidth />
                             </Grid>
                             <Grid item xs={12}>
-                                <TextField name="type" label="Type" value={formData.type} onChange={handleChange} fullWidth />
+                                <Autocomplete
+                                    fullWidth
+                                    name="type"
+                                    disablePortal
+                                    options={typesList}
+                                    value={formData.type ? formData.type : undefined}
+                                    renderInput={(params) => <TextField {...params} margin="dense" label="Type" />}
+                                    onChange={(event, value) => { if (value !== '') setFormData(prevState => ({ ...prevState, 'type': value }))}}
+                                />
                             </Grid>
                             <Grid item xs={12}>
                                 <TextField name="length_t" label="Length Ft" value={formData.lengthFt} onChange={handleChange} fullWidth />

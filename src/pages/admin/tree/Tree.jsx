@@ -97,16 +97,6 @@ export const Trees = () => {
   } else {
     return (
       <>
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            padding: "8px 12px",
-          }}
-        >
-          <Typography variant="h3">Trees</Typography>
-        </div>
-        <Divider sx={{ backgroundColor: "#ffffff", marginBottom: '10px' }} />
         <TreeNew />
         {/* <Divider sx={{ backgroundColor: "#ffffff", marginTop: '10px' }} />
         <div

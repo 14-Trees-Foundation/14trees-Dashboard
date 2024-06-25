@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { Box, Button, Grid, Modal, TextField, Typography } from '@mui/material';
+import { Autocomplete, Box, Button, Grid, Modal, TextField, Typography } from '@mui/material';
+import { plantTypeHabitList } from './habitList';
 
 const AddTreeType = ({ open, handleClose, createPlantType }) => {
 
@@ -76,7 +77,15 @@ const AddTreeType = ({ open, handleClose, createPlantType }) => {
                                 <TextField name="family" label="Family" value={formData.family} onChange={handleChange} fullWidth />
                             </Grid>
                             <Grid item xs={12}>
-                                <TextField name="habit" label="Habit" value={formData.habit} onChange={handleChange} fullWidth />
+                                <Autocomplete
+                                    fullWidth
+                                    name="habit"
+                                    disablePortal
+                                    options={plantTypeHabitList}
+                                    value={formData.habit ? plantTypeHabitList.find(item => item === formData.habit) : undefined}
+                                    renderInput={(params) => <TextField {...params} margin="dense" label="Habit" />}
+                                    onChange={(event, value) => { if (value !== null) setFormData(prevState => ({ ...prevState, 'habit': value }))}}
+                                />
                             </Grid>
                             <Grid item xs={12}>
                                 <TextField name="name_english" label="Name (English)" value={formData.name_english} onChange={handleChange} fullWidth />
