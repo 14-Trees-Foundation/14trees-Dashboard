@@ -383,8 +383,11 @@ class ApiClient {
         try {
             await this.api.delete<any>(`/users/${data._id}`);
             return data._id;
-        } catch (error) {
+        } catch (error: any) {
             console.error(error)
+            if (error.response && error.response.data.message) {
+                throw new Error(error.response.data.message);
+            }
             throw new Error('Failed to delete User');
         }
     }
