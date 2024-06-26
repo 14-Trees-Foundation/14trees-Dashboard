@@ -36,6 +36,8 @@ export const UserInfo = () => {
 
   const treeDoneWidth = (userinfo.usertrees.length / 14) * 100;
 
+  const showProgress = () => userinfo.usertrees && ( 0 < userinfo.usertrees.length < 14);
+
   if (open) {
     return (
       <div>
@@ -124,7 +126,7 @@ export const UserInfo = () => {
                       </div>
                     </div>
                   }
-                  {!selUserInfo.planted_by && (
+                  {!selUserInfo.planted_by && showProgress() && (
                     <Fragment>
                       <div className={classes.growth}>
                         <div style={{ marginTop: "20px" }}>
@@ -211,7 +213,7 @@ export const UserInfo = () => {
                       </>
                     )} */}
                   {((!selUserInfo.planted_by && !selUserInfo.donated_by) ||
-                    (selUserInfo.donated_by && selUserInfo.donated_by._id === selUserInfo.user._id)) ? (
+                    (selUserInfo.donated_by && selUserInfo.donated_by._id === selUserInfo.user._id)) && showProgress() ? (
                     <Fragment>
                       <div className={classes.growth}>
                         <div style={{ marginTop: "20px" }}>
