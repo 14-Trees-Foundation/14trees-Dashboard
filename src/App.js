@@ -38,7 +38,7 @@ function App() {
           <Route path="/search" element={<Search />}></Route>
           <Route path="/visitor" element={<Visitor />}></Route>
           <Route path="/visitornew" element={<VisitorNew />}></Route>
-          <Route path="/addtree" element={<AddTree />}></Route>
+          {/* <Route path="/addtree" element={<AddTree />}></Route> */}
           <Route path="/profile/:saplingId" element={<Dashboard />}></Route>
           <Route path="/group/:grptype" element={<OrgEvent />}></Route>
           <Route path="/events/corp/:event_id" element={<Corporate />}></Route>

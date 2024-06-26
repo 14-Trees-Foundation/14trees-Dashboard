@@ -17,6 +17,8 @@ import {
   DialogContent,
   DialogContentText,
   DialogTitle,
+  Divider,
+  Typography,
 } from "@mui/material";
 import EditPlot from "./EditPlot";
 import { TableColumnsType } from "antd";
@@ -47,11 +49,6 @@ export const PlotComponent = () => {
     setFilters(filters);
   }
 
-  const categoriesMap: Record<number, string> = {
-    1: "Public",
-    2: "Foundation",
-  }
-
   useEffect(() => {
     getPlotData();
   }, [page, filters]);
@@ -72,7 +69,7 @@ export const PlotComponent = () => {
       await getPlotTags(page * 10, 10);
     }, 1000);
   };
-  
+
   let plotsList: Plot[] = [];
   const plotsData = useAppSelector((state: RootState) => state.plotsData);
   if (plotsData) {
@@ -147,7 +144,7 @@ export const PlotComponent = () => {
       title: "Category",
       align: "center",
       width: 150,
-      render: (category) => category ? categoriesMap[category] : '',
+      ...getColumnSelectedItemFilter({ dataIndex: 'category', filters, handleSetFilters, options: ["Public", "Foundation"] })
     },
     {
       dataIndex: "gat",
@@ -163,7 +160,7 @@ export const PlotComponent = () => {
       align: "center",
       width: 150,
       render: (tags) => tags ? tags.join(", ") : '',
-      ...getColumnSelectedItemFilter({ dataIndex: 'tags', filters, handleSetFilters, options: tags})
+      ...getColumnSelectedItemFilter({ dataIndex: 'tags', filters, handleSetFilters, options: tags })
     },
     {
       dataIndex: "trees_count",
@@ -216,19 +213,33 @@ export const PlotComponent = () => {
       <div
         style={{
           display: "flex",
-          justifyContent: "flex-end",
-          marginBottom: "20px",
-        }}>
-        <Button variant="contained" style={{ backgroundColor: 'blue' }} onClick={handleModalOpen}>
-          Add Plot
-        </Button>
-        <AddPlot
-          open={open}
-          handleClose={handleModalClose}
-          createPlot={handleCreatePlotData}
-          tags={tags}
-        />
+          justifyContent: "space-between",
+          padding: "4px 12px",
+        }}
+      >
+        <Typography variant="h4" style={{ marginTop: '5px' }}>Plots</Typography>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "flex-end",
+            marginBottom: "5px",
+            marginTop: "5px",
+          }}>
+          <Button
+            variant="contained"
+            color="success"
+            onClick={handleModalOpen}>
+            Add Plot
+          </Button>
+          <AddPlot
+            open={open}
+            handleClose={handleModalClose}
+            createPlot={handleCreatePlotData}
+            tags={tags}
+          />
+        </div>
       </div>
+      <Divider sx={{ backgroundColor: "black", marginBottom: '15px' }} />
       <Box sx={{ height: 840, width: "100%" }}>
         <TableComponent
           dataSource={plotsList}
@@ -238,6 +249,17 @@ export const PlotComponent = () => {
           setPage={setPage}
         />
       </Box>
+
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          padding: "4px 12px",
+        }}
+      >
+        <Typography variant="h4">Map Trees</Typography>
+      </div>
+      <Divider sx={{ backgroundColor: "black", marginBottom: '15px' }} />
       <Forms />
 
       <Dialog open={openDeleteModal} onClose={() => setOpenDeleteModal(false)}>

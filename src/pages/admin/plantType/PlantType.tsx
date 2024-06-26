@@ -40,6 +40,7 @@ export const PlantTypeComponent = () => {
     const [selectedEditRow, setSelectedEditRow] = useState<PlantType | null>(null);
     const [editModal, setEditModal] = useState(false);
     const [page, setPage] = useState(0);
+    const [srNoPage, setSrNoPage] = useState(0);
     const [filters, setFilters] = useState<Record<string, GridFilterItem>>({});
 
     const handleSetFilters = (filters: Record<string, GridFilterItem>) => {
@@ -48,6 +49,14 @@ export const PlantTypeComponent = () => {
     }
 
     const columns: TableColumnsType<PlantType> = [
+        {
+          dataIndex: "sr_no",
+          key: "sr_no",
+          title: "Sr. No.",
+          width: 100,
+          align: "center",
+          render: (value, record, index) => `${index + 1 + srNoPage * 10}.`
+        },
         {
           dataIndex: "plant_type_id",
           key: "plant_type_id",
@@ -93,6 +102,7 @@ export const PlantTypeComponent = () => {
             key: "action",
             title: "Actions",
             align: "center",
+            width: 160,
             render: (value, record, index )=> (
                 <div
                     style={{
@@ -177,7 +187,7 @@ export const PlantTypeComponent = () => {
                     padding: "4px 12px",
                 }}
             >
-                <Typography variant="h3">Plant Types</Typography>
+                <Typography variant="h4" style={{ marginTop: '5px' }}>Plant Types</Typography>
                 <div
                     style={{
                         display: "flex",
@@ -203,6 +213,7 @@ export const PlantTypeComponent = () => {
                     totalRecords={plantTypesData.totalPlantTypes}
                     setPage={setPage}
                     fetchAllData={getAllPlantTypesData}
+                    setSrNoPage={setSrNoPage}
                 />
             </Box>
 

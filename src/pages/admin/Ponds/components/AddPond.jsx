@@ -1,39 +1,35 @@
 import React, { useState } from 'react';
-import { Autocomplete, Box, Button, Grid, Modal, TextField } from '@mui/material';
+import { Autocomplete, Box, Button, Grid, Modal, TextField, Typography } from '@mui/material';
+import CoordinatesInput from '../../../../components/CoordinatesInput';
+
+const style = {
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    transform: 'translate(-50%, -50%)',
+    minWidth: 300,
+    maxWidth: 600,
+    minHeight: 450,
+    maxHeight: 600,
+    overflow: 'auto',
+    scrollbarWidth: 'thin',
+    bgcolor: 'background.paper',
+    border: '2px solid #000',
+    boxShadow: 24,
+    borderRadius: '10px',
+    p: 4,
+};
 
 const AddPond = ({ open, handleClose, createPondData }) => {
 
-    const style = {
-        position: 'absolute',
-        top: '50%',
-        left: '50%',
-        transform: 'translate(-50%, -50%)',
-        width: 400,
-        height: 450,
-        overflow: 'auto',
-        scrollbarWidth: 'thin',
-        bgcolor: 'background.paper',
-        border: '2px solid #000',
-        boxShadow: 24,
-        borderRadius: '10px',
-        p: 4,
-    };
-
+    const [ coordinates, setCoordinates ] = useState([]);
     const [formData, setFormData] = useState({
-        boundaries: {
-            type: '',
-            coordinates: ''
-        },
-        _id: '',
         name: '',
         tags: [],
         type: '',
-        date_added: '',
-        images: [],
         length_ft: '',
         width_ft: '',
         depth_ft: '',
-        __v: 0
     });
 
     const handleChange = (event) => {
@@ -50,22 +46,21 @@ const AddPond = ({ open, handleClose, createPondData }) => {
 
     const handleSubmit = (event) => {
         event.preventDefault();
-        createPondData(formData);
+        const boundaries = {
+            type: 'Polygon',
+            coordinates: [coordinates.map(coord => [coord.lng, coord.lat])]
+        }
+        createPondData({
+            ...formData,
+            boundaries
+        });
         setFormData({
-            boundaries: {
-                type: '',
-                coordinates: ''
-            },
-            _id: '',
             name: '',
             tags: [],
             type: '',
-            date_added: '',
-            images: [],
             length_ft: '',
             width_ft: '',
             depth_ft: '',
-            __v: 0
         });
         handleClose();
     };
@@ -84,7 +79,9 @@ const AddPond = ({ open, handleClose, createPondData }) => {
                 aria-describedby="modal-modal-description"
             >
                 <Box sx={style}>
-
+                    <Typography style={{ display: 'flex', justifyContent: 'center', marginBottom: '15px' }} variant="h5" component="h2">
+                        Add Pond
+                    </Typography>
                     <form onSubmit={handleSubmit}>
                         <Grid container rowSpacing={2} columnSpacing={1} >
                             <Grid item xs={12}>
@@ -102,22 +99,23 @@ const AddPond = ({ open, handleClose, createPondData }) => {
                                 />
                             </Grid>
                             <Grid item xs={12}>
-                                <TextField name="length_t" label="Length Ft" value={formData.lengthFt} onChange={handleChange} fullWidth />
+                                <TextField name="length_ft" label="Length in Ft" value={formData.length_ft} onChange={handleChange} fullWidth />
                             </Grid>
                             <Grid item xs={12}>
-                                <TextField name="width_t" label="Width Ft" value={formData.widthFt} onChange={handleChange} fullWidth />
+                                <TextField name="width_ft" label="Width in Ft" value={formData.width_ft} onChange={handleChange} fullWidth />
                             </Grid>
                             <Grid item xs={12}>
-                                <TextField name="depth_ft" label="Depth Ft" value={formData.depthFt} onChange={handleChange} fullWidth />
+                                <TextField name="depth_ft" label="Depth in Ft" value={formData.depth_ft} onChange={handleChange} fullWidth />
                             </Grid>
                             <Grid item xs={12}>
-                                <TextField name="boundaries.type" label="Boundaries Type" value={formData.boundaries.type} onChange={handleChange} fullWidth />
-                            </Grid>
-                            <Grid item xs={12}>
-                                <TextField name="boundaries.coordinates" label="Boundaries Coordinates" value={formData.boundaries.coordinates} onChange={handleChange} fullWidth />
+                                <CoordinatesInput
+                                    coordinates={coordinates}
+                                    onChange={setCoordinates}
+                                />
                             </Grid>
                             <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'center', }}>
-                                <Button variant='contained' type="submit">Submit</Button>
+                                <Button variant='outlined' color='error' onClick={handleClose}>Cancel</Button>
+                                <Button variant='contained' sx={{ marginLeft: '10px' }} color='success' type="submit">Submit</Button>
                             </Grid>
                         </Grid>
                     </form>

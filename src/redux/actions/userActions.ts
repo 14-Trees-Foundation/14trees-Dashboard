@@ -12,6 +12,7 @@ export const getUsers = (offset: number, limit: number, filters?: any[]) => {
         });
         apiClient.getUsers(offset, limit, filters).then(
             (value: PaginatedResponse<User>) => {
+                toast.success("Users fetched successfully");
                 for (let i = 0; i < value.results.length; i++) {
                     if (value.results[i]?.id) {
                         value.results[i].key = value.results[i].id
@@ -23,7 +24,7 @@ export const getUsers = (offset: number, limit: number, filters?: any[]) => {
                 });
             },
             (error: any) => {
-                console.log(error)
+                toast.error(error.message);
                 dispatch({
                     type: userActionTypes.GET_USERS_FAILED,
                     payload: error
@@ -52,7 +53,7 @@ export const searchUsers = (searchStr: string) => {
                 });
             },
             (error: any) => {
-                console.log(error)
+                toast.error(error.message);
                 dispatch({
                     type: userActionTypes.SEARCH_USERS_FAILED,
                     payload: error
@@ -70,13 +71,14 @@ export const createUser = (record: User) => {
         });
         apiClient.createUser(record).then(
             (value: User) => {
+                toast.success("User created successfully");
                 dispatch({
                     type: userActionTypes.CREATE_USER_SUCCEEDED,
                     payload: value,
                 });
             },
             (error: any) => {
-                console.error(error);
+                toast.error(error.message)
                 dispatch({
                     type: userActionTypes.CREATE_USER_FAILED,
                 });
@@ -93,12 +95,13 @@ export const createBulkUsers = (data: Blob) => {
         });
         apiClient.createUsersBulk(data).then(
             () => {
+                toast.success("Users created successfully");
                 dispatch({
                     type: userActionTypes.CREATE_BULK_USERS_SUCCEEDED,
                 });
             },
             (error: any) => {
-                console.error(error);
+                toast.error(error.message)
                 dispatch({
                     type: userActionTypes.CREATE_BULK_USERS_SUCCEEDED,
                 });
@@ -115,6 +118,7 @@ export const updateUser = (record: User) => {
         });
         apiClient.updateUser(record).then(
             (value: User) => {
+                toast.success("User updated successfully");
                 dispatch({
                     type: userActionTypes.UPDATE_USER_SUCCEEDED,
                     payload: value,
@@ -139,13 +143,14 @@ export const deleteUser = (record: User) => {
         });
         apiClient.deleteUser(record).then(
             (id: number) => {
+                toast.success("User deleted successfully");
                 dispatch({
                     type: userActionTypes.DELETE_USER_SUCCEEDED,
                     payload: id,
                 });
             },
             (error: any) => {
-                console.error(error);
+                toast.error(error.message)
                 dispatch({
                     type: userActionTypes.DELETE_USER_FAILED,
                 });

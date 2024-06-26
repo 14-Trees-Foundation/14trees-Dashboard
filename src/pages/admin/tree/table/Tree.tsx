@@ -12,7 +12,6 @@ import {
     DialogContentText,
     DialogTitle,
     Divider,
-    Paper,
     TextField,
     Typography,
 } from "@mui/material";
@@ -30,11 +29,11 @@ import EditTree from "./EditTree";
 import UserModal from "../../../../components/UserModal";
 import AssignTreeModal from "./AssignTreeModal";
 import { AssignTreeRequest } from "../../../../types/userTree";
-import { getFormattedDate } from "../../../../helpers/utils";
 import getColumnSearchProps from "../../../../components/Filter";
 import { TableColumnsType } from "antd";
 import { Plot } from "../../../../types/plot";
 import TableComponent from "../../../../components/Table";
+import { AutocompleteWithPagination } from "../../../../components/AutoComplete";
 
 export const TreeNew = () => {
     const dispatch = useAppDispatch();
@@ -49,10 +48,12 @@ export const TreeNew = () => {
 
     const [plotPage, setPlotPage] = useState(0);
     const [plotName, setPlotName] = useState('');
+    const [plotsLoading, setPlotsLoading] = useState(false);
 
     const [openDeleteModal, setOpenDeleteModal] = useState(false);
     const [deleteRow, setDeleteRow] = useState<any>({});
     const [page, setPage] = useState(0);
+    const [srNoPage, setSrNoPage] = useState(0);
     const [disabledMapUnMapButton, setDisabledMapUnMapButton] = useState(true);
     const [isMapTrees, setIsMapTrees] = useState(true);
     const [isUserModalOpen, setIsUserModalOpen] = useState(false);
@@ -88,8 +89,10 @@ export const TreeNew = () => {
 
     const getPlotsData = async () => {
         const nameFilter = { columnField: "name", value: plotName, operatorValue: "contains" }
+        setPlotsLoading(true);
         setTimeout(async () => {
             await getPlots(plotPage * 10, 10, [nameFilter]);
+            setPlotsLoading(false);
         }, 1000);
     };
 
@@ -97,40 +100,22 @@ export const TreeNew = () => {
     const plotsData = useAppSelector((state) => state.plotsData);
     if (plotsData) {
         plotsList = Object.values(plotsData.plots);
+        plotsList = plotsList.sort((a, b) => {
+            // const at = new Date(a.updated_at);
+            // const bt = new Date(b.updated_at);
+
+            return b.id - a.id;
+        });
     }
 
     const columns: TableColumnsType<Tree> = [
         {
-            dataIndex: "action",
-            key: "action",
-            title: "Actions",
+            dataIndex: "sr_no",
+            key: "sr_no",
+            title: "Sr. No.",
             width: 150,
-            align: "center",
-            render: (value, record, index) => (
-                <div
-                    style={{
-                        display: "flex",
-                        justifyContent: "center",
-                        alignItems: "center",
-                    }}>
-                    <Button
-                        variant="outlined"
-                        style={{ margin: "0 5px" }}
-                        onClick={() => {
-                            setSelectedEditRow(record);
-                            setEditModal(true);
-                        }}>
-                        <EditIcon />
-                    </Button>
-                    <Button
-                        variant="outlined"
-                        color="error"
-                        style={{ margin: "0 5px" }}
-                        onClick={() => handleDelete(record)}>
-                        <DeleteIcon />
-                    </Button>
-                </div>
-            ),
+            align: 'center',
+            render: (value, record, index) => `${index + 1 + srNoPage * 10}.`,
         },
         {
             dataIndex: "sapling_id",
@@ -172,6 +157,38 @@ export const TreeNew = () => {
             width: 250,
             align: 'center',
             ...getColumnSearchProps('assigned_to_name', filters, handleSetFilters)
+        },
+        {
+            dataIndex: "action",
+            key: "action",
+            title: "Actions",
+            width: 170,
+            align: "center",
+            render: (value, record, index) => (
+                <div
+                    style={{
+                        display: "flex",
+                        justifyContent: "center",
+                        alignItems: "center",
+                    }}>
+                    <Button
+                        variant="outlined"
+                        style={{ margin: "0 5px" }}
+                        onClick={() => {
+                            setSelectedEditRow(record);
+                            setEditModal(true);
+                        }}>
+                        <EditIcon />
+                    </Button>
+                    <Button
+                        variant="outlined"
+                        color="error"
+                        style={{ margin: "0 5px" }}
+                        onClick={() => handleDelete(record)}>
+                        <DeleteIcon />
+                    </Button>
+                </div>
+            ),
         },
     ];
 
@@ -292,13 +309,13 @@ export const TreeNew = () => {
                     padding: "4px 12px",
                 }}
             >
-                <Typography variant="h3">Trees</Typography>
-                <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '5px' }}>
+                <Typography variant="h4" style={{ marginTop: '5px' }}>Trees</Typography>
+                <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '5px', marginTop: '5px' }}>
                     <div style={{ display: "flex", justifyContent: "space-between" }}>
-                        <Autocomplete
-                            sx={{ width: 300 }}
+                        <AutocompleteWithPagination
+                            loading={plotsLoading}
+                            label="Select a Plot"
                             options={plotsList}
-                            autoHighlight
                             getOptionLabel={(option) => option.name}
                             onChange={(event, newValue) => {
                                 if (newValue !== null) {
@@ -313,26 +330,13 @@ export const TreeNew = () => {
                                     setFilters(newFilters);
                                 }
                             }}
-                            renderInput={(params) => (
-                                <TextField
-                                    {...params}
-                                    onChange={(event) => {
-                                        const { value } = event.target;
-                                        setPlotPage(0);
-                                        setPlotName(value);
-                                    }}
-                                    label="Select a Plot"
-                                    variant="outlined"
-                                />
-                            )}
-                            ListboxProps={{
-                                onScroll: (event) => {
-                                    const listboxNode: any = event.target;
-                                    if (Math.ceil(listboxNode.scrollTop) + listboxNode.clientHeight === listboxNode.scrollHeight) {
-                                        setPlotPage(plotPage + 1);
-                                    }
-                                }
+                            onInputChange={(event) => {
+                                const { value } = event.target;
+                                setPlotPage(0);
+                                setPlotName(value);
                             }}
+                            setPage={setPlotPage}
+
                         />
                     </div>
                     <Button variant="contained" color={isAssignTrees ? 'success' : 'error'} style={{ marginLeft: '10px' }} onClick={handleAssignUnAssign}
@@ -365,6 +369,7 @@ export const TreeNew = () => {
                     fetchAllData={getAllTreesData}
                     setPage={setPage}
                     handleSelectionChanges={handleSelectionChanges}
+                    setSrNoPage={setSrNoPage}
                 />
             </Box>
 

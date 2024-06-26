@@ -45,16 +45,6 @@ export const Users = () => {
     return (
       <>
         <ToastContainer />
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            padding: "8px 12px",
-          }}
-        >
-          <Typography variant="h3">User Management</Typography>
-        </div>
-        <Divider sx={{ backgroundColor: "#ffffff", marginBottom:'10px' }} />
         <User1 />
         <Divider sx={{ backgroundColor: "#ffffff", marginTop:'20px' }} />
         {/* <Box sx={{ p: 3 }}>

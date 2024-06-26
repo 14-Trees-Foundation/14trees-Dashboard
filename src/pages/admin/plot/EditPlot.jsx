@@ -27,15 +27,7 @@ function EditPlot({ row, openeditModal, handleCloseModal, editSubmit, tags }) {
         handleCloseModal();
     };
 
-    const categoriesList = [
-        {id: 1, label: "Public"},
-        {id: 2, label: "Foundation"},
-    ]
-
-    const categoriesMap = {
-        1: "Public",
-        2: "Foundation",
-    }
+    const categoriesList = [ "Public", "Foundation" ];
 
     return (
         <Dialog open={openeditModal} onClose={() => handleCloseModal()}>
@@ -63,10 +55,9 @@ function EditPlot({ row, openeditModal, handleCloseModal, editSubmit, tags }) {
                     name="category"
                     disablePortal
                     options={categoriesList}
-                    value={formData.category ? { id: formData.category, label: categoriesMap[formData.category] } : null}
+                    value={formData.category}
                     renderInput={(params) => <TextField {...params} margin="dense" label="Category" />}
-                    onChange={(event, value) => { if (value !== null) setFormData(prevState => ({ ...prevState, 'category': value.id }))}}
-                    getOptionLabel={(option) => (option.label)}
+                    onChange={(event, value) => { if (categoriesList.includes(value)) setFormData(prevState => ({ ...prevState, 'category': value }))}}
                 />
                 <TextField
                     name="gat"

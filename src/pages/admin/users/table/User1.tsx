@@ -8,6 +8,8 @@ import {
   DialogContent,
   DialogContentText,
   DialogTitle,
+  Divider,
+  Typography,
 } from "@mui/material";
 import AddUser from "./AddUser";
 import EditIcon from "@mui/icons-material/Edit";
@@ -27,7 +29,7 @@ import TableComponent from "../../../../components/Table";
 
 export const User1 = () => {
   const dispatch = useAppDispatch();
-  const { getUsers,searchUsers, createUser, createBulkUsers, updateUser, deleteUser } =
+  const { getUsers, searchUsers, createUser, createBulkUsers, updateUser, deleteUser } =
     bindActionCreators(userActionCreators, dispatch);
 
   const [open, setOpen] = useState(false);
@@ -55,7 +57,7 @@ export const User1 = () => {
   const getUserData = async () => {
     let filtersData = Object.values(filters);
     setTimeout(async () => {
-      await getUsers(page*10, 10, filtersData);
+      await getUsers(page * 10, 10, filtersData);
     }, 1000);
   };
 
@@ -91,7 +93,7 @@ export const User1 = () => {
       title: "Phone",
       align: "center",
       width: 100,
-      render: (value: string) => { 
+      render: (value: string) => {
         if (!value || value === "0") return "-";
         if (value.endsWith('.0')) return value.slice(0, -2);
         else return value;
@@ -104,7 +106,7 @@ export const User1 = () => {
       title: "Actions",
       width: 150,
       align: "center",
-      render: (value, record, index )=> (
+      render: (value, record, index) => (
         <div
           style={{
             display: "flex",
@@ -116,7 +118,12 @@ export const User1 = () => {
             color="success"
             style={{ margin: "0 5px" }}
             onClick={() => {
-              window.open("https://dashboard.14trees.org/ww/" + record.email);
+              const { hostname, host } = window.location;
+              if (hostname === "localhost" || hostname === "127.0.0.1") {
+                window.open("http://" + host + "/ww/" + record.email);
+              } else {
+                window.open("https://" + hostname + "/ww/" + record.email);
+              }
             }}
           >
             <AccountCircleRoundedIcon />
@@ -139,7 +146,7 @@ export const User1 = () => {
           </Button>
         </div>
       ),
-    },  
+    },
   ];
 
   let usersList: User[] = [];
@@ -147,28 +154,24 @@ export const User1 = () => {
   if (usersData) {
     usersList = Object.values(usersData.users);
   }
-  console.log(usersData)
 
   const getAllUsersData = async () => {
     setTimeout(async () => {
       let filtersData = Object.values(filters);
       await getUsers(0, usersData.totalUsers, filtersData);
     }, 1000);
-};
+  };
 
   const handleDelete = (row: User) => {
-    console.log("Delete", row);
     setOpenDeleteModal(true);
     setSelectedItem(row);
   };
 
   const handleEditSubmit = (formData: User) => {
-    console.log(formData);
     updateUser(formData);
   };
 
   const handleCreateUserData = (formData: User) => {
-    console.log(formData);
     createUser(formData);
   };
 
@@ -177,7 +180,7 @@ export const User1 = () => {
     if (!(file instanceof Blob)) {
       file = new Blob([file], { type: 'text/csv' }); // Change 'text/csv' to the actual file type if different
     }
-  
+
     createBulkUsers(file);
   };
 
@@ -186,31 +189,42 @@ export const User1 = () => {
       <div
         style={{
           display: "flex",
-          justifyContent: "flex-end",
-          marginBottom: "20px",
-        }}>
-        <Button variant="contained" style={{ backgroundColor:'blue' }} onClick={handleModalOpen}>
-          Add User
-        </Button>
-        <AddUser
-          open={open}
-          handleClose={handleModalClose}
-          createUser={handleCreateUserData}
-          searchUser={searchUsers}
-        />
-        <Button
-          variant="contained"
-          style={{ marginLeft: "10px", backgroundColor:'blue' }}
-          onClick={handleBulkModalOpen}>
-          Bulk Create
-        </Button>
-        <AddBulkUser
-          open={bulkModalOpen}
-          handleClose={handleBulkModalClose}
-          createBulkUsers={handleBulkCreateUserData}
-        />
+          justifyContent: "space-between",
+          padding: "4px 12px",
+        }}
+      >
+        <Typography variant="h4" style={{ marginTop: '5px' }}>Users</Typography>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "flex-end",
+            marginBottom: "5px",
+            marginTop: "5px",
+          }}>
+          <Button variant="contained" color="success" onClick={handleModalOpen}>
+            Add User
+          </Button>
+          <AddUser
+            open={open}
+            handleClose={handleModalClose}
+            createUser={handleCreateUserData}
+            searchUser={searchUsers}
+          />
+          <Button
+            variant="contained"
+            color="success"
+            style={{ marginLeft: "10px" }}
+            onClick={handleBulkModalOpen}>
+            Bulk Create
+          </Button>
+          <AddBulkUser
+            open={bulkModalOpen}
+            handleClose={handleBulkModalClose}
+            createBulkUsers={handleBulkCreateUserData}
+          />
+        </div>
       </div>
-
+      <Divider sx={{ backgroundColor: "black", marginBottom: '15px' }} />
       <Box sx={{ height: 840, width: "100%" }}>
         <TableComponent
           dataSource={usersList}

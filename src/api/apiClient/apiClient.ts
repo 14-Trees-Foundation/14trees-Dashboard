@@ -342,7 +342,9 @@ class ApiClient {
             const response = await this.api.post<PaginatedResponse<User>>(url, {filters: filters});
             return response.data;
         } catch (error: any) {
-            console.error(error)
+            if (error.response) {
+                throw new Error(error.response.data.message);
+            }
             throw new Error(`Failed to fetch users: ${error.message}`);
         }
     }
@@ -353,7 +355,9 @@ class ApiClient {
             const response = await this.api.get<User[]>(url);
             return response.data;
         } catch (error: any) {
-            console.error(error)
+            if (error.response) {
+                throw new Error(error.response.data.message);
+            }
             throw new Error(`Failed to fetch users: ${error.message}`);
         }
     }
@@ -362,8 +366,10 @@ class ApiClient {
         try {
             const response = await this.api.post<User>(`/users/`, data);
             return response.data;
-        } catch (error) {
-            console.error(error)
+        } catch (error: any) {
+            if (error.response) {
+                throw new Error(error.response.data.message);
+            }
             throw new Error('Failed to create User');
         }
     }
@@ -373,10 +379,9 @@ class ApiClient {
             const response = await this.api.put<User>(`/users/${data.id}`, data);
             return response.data;
         } catch (error: any) {
-            console.error(error)
             if (error.response) {
                 throw new Error(error.response.data.message);
-              }
+            }
             throw new Error('Failed to update User');
         }
     }
@@ -385,8 +390,10 @@ class ApiClient {
         try {
             await this.api.delete<any>(`/users/${data.id}`);
             return data.id;
-        } catch (error) {
-            console.error(error)
+        } catch (error: any) {
+            if (error.response) {
+                throw new Error(error.response.data.message);
+            }
             throw new Error('Failed to delete User');
         }
     }
@@ -396,8 +403,10 @@ class ApiClient {
             const formData = new FormData();
             formData.append('file', data);
             await this.api.post<any>(`/users/bulk`, formData);
-        } catch (error) {
-            console.error(error)
+        } catch (error: any) {
+            if (error.response) {
+                throw new Error(error.response.data.message);
+            }
             throw new Error('Failed to create users in bulk');
         }
     }

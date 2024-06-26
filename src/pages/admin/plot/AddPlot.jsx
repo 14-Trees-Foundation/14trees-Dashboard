@@ -83,15 +83,7 @@ const AddPlot = ({ open, handleClose, createPlot, tags }) => {
         handleClose();
     };
 
-    const categoriesList = [
-        {id: 1, label: "Public"},
-        {id: 2, label: "Foundation"},
-    ]
-
-    const categoriesMap = {
-        1: "Public",
-        2: "Foundation",
-    }
+    const categoriesList = [ "Public", "Foundation" ]
 
     return (
         <div>
@@ -117,10 +109,9 @@ const AddPlot = ({ open, handleClose, createPlot, tags }) => {
                                     name="category"
                                     disablePortal
                                     options={categoriesList}
-                                    value={formData.category ? { id: formData.category, label: categoriesMap[formData.category] } : null}
+                                    value={formData.category}
                                     renderInput={(params) => <TextField {...params} label="Category" />}
-                                    onChange={(event, value) => { if (value !== null) setFormData(prevState => ({ ...prevState, 'category': value.id }))}}
-                                    getOptionLabel={(option) => (option.label)}
+                                    onChange={(event, value) => { if (categoriesList.includes(value)) setFormData(prevState => ({ ...prevState, 'category': value }))}}
                                 />
                             </Grid>
                             <Grid item xs={12}>

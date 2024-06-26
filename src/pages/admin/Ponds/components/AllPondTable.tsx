@@ -17,6 +17,8 @@ import {
     DialogContent,
     DialogContentText,
     DialogTitle,
+    Divider,
+    Typography,
 } from "@mui/material";
 import EditPond from "./EditPond";
 import { getFormattedDate } from "../../../../helpers/utils";
@@ -92,8 +94,8 @@ export const PondComponent = () => {
                         variant="outlined"
                         size="small"
                         onClick={() => {
-                            setSelectedEditRow(record);
                             setEditModal(true);
+                            setSelectedEditRow(record);
                         }}>
                         <EditIcon />
                     </Button>
@@ -141,7 +143,7 @@ export const PondComponent = () => {
         {
             dataIndex: "depth_ft",
             key: "depth_ft",
-            title: "Death (Ft)",
+            title: "Depth (Ft)",
             width: 150,
             align: "center",
         },
@@ -196,6 +198,7 @@ export const PondComponent = () => {
 
     const handleEditSubmit = (formData: Pond) => {
         updatePond(formData);
+        setSelectedEditRow(null);
     };
 
     const handleCreatePondData = (formData: Pond) => {
@@ -207,18 +210,33 @@ export const PondComponent = () => {
             <div
                 style={{
                     display: "flex",
-                    justifyContent: "flex-end",
-                    marginBottom: "20px",
-                }}>
-                <Button variant="contained" style={{ backgroundColor: 'blue' }} onClick={handleModalOpen}>
-                    Add Pond
-                </Button>
-                <AddPond
-                    open={open}
-                    handleClose={handleModalClose}
-                    createPondData={handleCreatePondData}
-                />
+                    justifyContent: "space-between",
+                    padding: "4px 12px",
+                }}
+            >
+                <Typography variant="h4" style={{ marginTop: '5px' }}>Ponds</Typography>
+                <div
+                    style={{
+                        display: "flex",
+                        justifyContent: "flex-end",
+                        marginBottom: "5px",
+                        marginTop: "5px",
+                    }}>
+                    <Button 
+                        variant="contained" 
+                        color="success" 
+                        onClick={handleModalOpen}>
+                        Add Pond
+                    </Button>
+                    <AddPond
+                        open={open}
+                        handleClose={handleModalClose}
+                        createPondData={handleCreatePondData}
+                    />
+                </div>
             </div>
+            <Divider sx={{ backgroundColor: "black", marginBottom: '15px' }} />
+            
             <Box sx={{ height: 840, width: "100%" }}>
                 <TableComponent
                 dataSource={pondsList}
@@ -258,8 +276,11 @@ export const PondComponent = () => {
             {selectedEditRow && (
                 <EditPond
                     row={selectedEditRow}
-                    openeditModal={editModal}
-                    setEditModal={setEditModal}
+                    openEditModal={editModal}
+                    handleClose={() => {
+                        setEditModal(false);
+                        setSelectedEditRow(null);
+                    }}
                     editSubmit={handleEditSubmit}
                 />
             )}

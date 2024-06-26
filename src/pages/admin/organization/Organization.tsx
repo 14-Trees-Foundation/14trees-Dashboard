@@ -10,13 +10,14 @@ import {
   DialogTitle,
   Divider,
   TextField,
+  Typography,
 } from "@mui/material";
 import AddOrganization from "./AddOrganization";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import GroupAdd from '@mui/icons-material/GroupAdd';
 import ErrorIcon from '@mui/icons-material/Error';
-import { BulkUserGroupMappingResponse, Group } from "../../../types/Group";
+import { Group } from "../../../types/Group";
 import * as groupActionCreators from "../../../redux/actions/groupActions";
 import * as userGroupActionCreators from "../../../redux/actions/userGroupActions";
 import { bindActionCreators } from "redux";
@@ -57,7 +58,7 @@ export const OrganizationComponent = () => {
 
   const getGroupsData = async () => {
     setTimeout(async () => {
-      await getGroups(page*10, 10);
+      await getGroups(page * 10, 10);
     }, 1000);
   };
 
@@ -144,7 +145,6 @@ export const OrganizationComponent = () => {
   }
 
   const userGroupMapping = useAppSelector((state: RootState) => state.userGroupsData);
-  console.log(userGroupMapping);
 
   const getAllGroupsData = async () => {
     setTimeout(async () => {
@@ -184,20 +184,39 @@ export const OrganizationComponent = () => {
           justifyContent: "flex-end",
           marginBottom: "20px",
         }}>
-        <Button variant="outlined" color="primary" onClick={() => setFailedRecords(true)} disabled={Object.keys(userGroupMapping).length === 0}>
-          <Badge badgeContent={Object.keys(userGroupMapping).length} color="error">
-            <ErrorIcon/>
-          </Badge>
-        </Button>
-        <Button variant="contained" color="success" style={{ marginLeft: "10px" }} onClick={() => setOpen(true)}>
-          Add Organization
-        </Button>
-        <AddOrganization
-          open={open}
-          handleClose={() => setOpen(false)}
-          createOrganization={handleCreateUserData}
-        />
+
       </div>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          padding: "4px 12px",
+        }}
+      >
+        <Typography variant="h4" style={{ marginTop: '5px' }}>Organizations</Typography>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "flex-end",
+            marginBottom: "5px",
+            marginTop: "5px",
+          }}>
+          <Button variant="outlined" color="primary" onClick={() => setFailedRecords(true)} disabled={Object.keys(userGroupMapping).length === 0}>
+            <Badge badgeContent={Object.keys(userGroupMapping).length} color="error">
+              <ErrorIcon />
+            </Badge>
+          </Button>
+          <Button variant="contained" color="success" style={{ marginLeft: "10px" }} onClick={() => setOpen(true)}>
+            Add Organization
+          </Button>
+          <AddOrganization
+            open={open}
+            handleClose={() => setOpen(false)}
+            createOrganization={handleCreateUserData}
+          />
+        </div>
+      </div>
+      <Divider sx={{ backgroundColor: "black", marginBottom: '15px' }} />
       <Box sx={{ height: 840, width: "100%" }}>
         <TableComponent
           dataSource={groupList}
@@ -255,7 +274,7 @@ export const OrganizationComponent = () => {
         />
       )}
 
-      
+
       <Dialog open={bulkCreate} onClose={() => setBulkCreate(false)}>
         <DialogTitle>Create user-group Mapping for '{selectedItem?.name}'</DialogTitle>
         <form onSubmit={handleBulkCreateUserGroupMapping}>
