@@ -10,7 +10,7 @@ export const Trees = ({ saplingId }) => {
   const userinfo = useRecoilValue(usersData);
   const [selectedUserInfo, setSelectedUserinfo] = useRecoilState(selUsersData);
 
-  let numTrees = userinfo.usertrees.length;
+  let numTrees = userinfo.user_trees.length;
 
   const handleTreeSelect = (item) => {
     setSelectedUserinfo(item);
@@ -38,40 +38,40 @@ export const Trees = ({ saplingId }) => {
         </div>
         <div className={classes.trees}>
           <div className={classes.scroll}>
-            {userinfo.usertrees.map((item, idx) => {
-              const date = item.date_added.slice(0, 10);
+            {userinfo.user_trees.map((item, idx) => {
+              const date = item.created_at.slice(0, 10);
               return (
                 <div
                   key={idx}
                   onClick={() => handleTreeSelect(item)}
                   style={{ cursor: "pointer" }}
                 >
-                  {item.tree.sapling_id === selectedUserInfo.tree.sapling_id ? (
+                  {item.sapling_id === selectedUserInfo.sapling_id ? (
                     <TreesPlanted
-                      id={item.tree.sapling_id}
-                      name={item.tree.tree_type.name}
+                      id={item.sapling_id}
+                      name={item.plant_type}
                       img={
-                        item.tree.image
-                          ? item.tree.image.length === 0 ||
-                            item.tree.image[0] === ""
-                            ? item.tree.tree_type.image[0]
-                            : item.tree.image[0]
-                          : item.tree.tree_type.image[0]
+                        item.image
+                          ? item.images.length === 0 ||
+                            item.images[0] === ""
+                            ? item.plant_type_image
+                            : item.images[0]
+                          : item.plant_type_image
                       }
                       date={date}
                       selected={true}
                     />
                   ) : (
                     <TreesPlanted
-                      id={item.tree.sapling_id}
-                      name={item.tree.tree_type.name}
+                      id={item.sapling_id}
+                      name={item.plant_type}
                       img={
-                        item.tree.image
-                          ? item.tree.image.length === 0 ||
-                            item.tree.image[0] === ""
-                            ? item.tree.tree_type.image[0]
-                            : item.tree.image[0]
-                          : item.tree.tree_type.image[0]
+                        item.image
+                          ? item.images.length === 0 ||
+                            item.images[0] === ""
+                            ? item.plant_type_image
+                            : item.images[0]
+                          : item.plant_type_image
                       }
                       date={date}
                     />

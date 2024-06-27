@@ -54,7 +54,7 @@ export const LeftDrawer = () => {
   const classes = useStyles();
   const [index, setIndex] = useRecoilState(navIndex);
   const selUserInfo = useRecoilValue(selUsersData);
-  const username = selUserInfo.user.name.split(" ")[0];
+  const username = selUserInfo.assigned_to.split(" ")[0];
 
   const onClickNav = (value) => {
     setIndex(value);
@@ -119,7 +119,7 @@ export const LeftDrawer = () => {
                 onClick={handleDrawerOpen}
               />
               <div className={classes.username}>
-                {selUserInfo.tree.event_type && selUserInfo.tree.event_type === "2"
+                {selUserInfo.event_type && selUserInfo.event_type === "2"
                   ? "Memorial Dashboard"
                   : `${username}'s Dashboard`}
               </div>

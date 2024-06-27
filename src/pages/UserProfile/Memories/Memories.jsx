@@ -18,7 +18,7 @@ export const Memories = () => {
   const [index, setIndex] = useState(0);
 
   let images = [];
-  for (const tree of userinfo.usertrees) {
+  for (const tree of userinfo.user_trees) {
     images.push.apply(images, tree["memories"]);
   }
 

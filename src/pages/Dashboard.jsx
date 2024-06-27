@@ -55,11 +55,11 @@ export const Dashboard = () => {
       if (response.status === 200) {
         // let data = response.data.usertrees.filter(function (data) {return data.tree.sapling_id === saplingId});
         setUserinfo(response.data);
-        setTemplate(response.data?.usertrees[0]?.tree?.plot?.name.includes("G20") ? "G20" : "");
+        setTemplate(response.data?.user_trees[0]?.plot?.includes("G20") ? "G20" : "");
         console.log(response, template)
         setSelectedUserinfo(
-          response.data.usertrees.filter(
-            (data) => data.tree.sapling_id === saplingId
+          response.data.user_trees.filter(
+            (data) => data.sapling_id === saplingId
           )[0]
         );
       } else if (response.status === 204) {
@@ -82,10 +82,11 @@ export const Dashboard = () => {
       setPondsImages(pondImagesRes.data);
     }
 
-    const actRes = await Axios.default.get(`/activity/`);
-    if (pondImagesRes.status === 200) {
-      setActivities(actRes.data);
-    }
+    // const actRes = await Axios.default.get(`/activity/`);
+    // if (pondImagesRes.status === 200) {
+    //   setActivities(actRes.data);
+    // }
+    setActivities([]);
 
     setLoading(false);
   }, [
