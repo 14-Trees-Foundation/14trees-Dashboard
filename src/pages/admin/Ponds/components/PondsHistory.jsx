@@ -16,15 +16,20 @@ import { useAppSelector } from "../../../../redux/store/hooks";
 
 export const PondsHistory = () => {
   const theme = useTheme();
-  let pond = useAppSelector((state) => state.pondHistoryData);
+  let waterLevelData = useAppSelector((state) => state.pondWaterLevelUpdatesData);
+  let pondsData = useAppSelector((state) => state.pondsData);
   let data;
-  if (pond?.updates?.length > 0) {
-    data = pond?.updates.map((item) => {
+  let selectedPond;
+  if (waterLevelData && waterLevelData.pondWaterLevelUpdates) {
+    const updates = Object.values(waterLevelData.pondWaterLevelUpdates);
+    data = updates.map((item) => {
       return {
-        date: item.date,
-        level: item.levelFt,
+        date: item.updated_at.substring(0, 10),
+        level: parseFloat(item.level_ft),
       };
     });
+
+    selectedPond = pondsData.ponds[updates[0]?.pond_id];
   }
 
   return (
@@ -40,7 +45,7 @@ export const PondsHistory = () => {
             <Typography variant="h6" gutterBottom>
               Pond level (Feets):{" "}
               <em style={{ color: theme.custom.color.primary.blue }}>
-                {pond?.name}
+                {selectedPond?.name}
               </em>
             </Typography>
           </div>

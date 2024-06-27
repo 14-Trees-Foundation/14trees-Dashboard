@@ -1,5 +1,5 @@
 import { UnknownAction } from "redux";
-import { PondsDataState, Pond, PondHistoryDataState } from "../../types/pond";
+import { PondsDataState, Pond } from "../../types/pond";
 import pondActionTypes from "../actionTypes/pondActionTypes";
 import { PaginatedResponse } from "../../types/pagination";
 
@@ -43,8 +43,6 @@ export const pondsDataReducer = (state = { totalPonds:0, ponds: {}}, action: Unk
                 return nextState;
             }
             return state;
-        case pondActionTypes.UPDATE_POND_WATER_LVL_SUCCEEDED:
-            return state;
         case pondActionTypes.DELETE_POND_SUCCEEDED:
             if (action.payload) {
                 const nextState = { totalPonds: state.totalPonds, ponds: { ...state.ponds }} as PondsDataState;
@@ -73,21 +71,6 @@ export const searchPondsDataReducer = (state = { totalPonds:0, ponds: {}}, actio
                 }
                 const nextState: PondsDataState = pondsDataState;
                 return nextState;
-            }
-            return state;
-        default:
-            return state;
-    }
-}
-
-export const pondHistoryDataReducer = (state = {}, action: UnknownAction): PondHistoryDataState | {} => {
-    switch(action.type) {
-        case pondActionTypes.GET_POND_HISTORY_SUCCEEDED:
-            if (action.payload) {
-                let payload = action.payload as Pond[]
-                if (payload.length !== 0) {
-                    return payload[0];
-                }
             }
             return state;
         default:

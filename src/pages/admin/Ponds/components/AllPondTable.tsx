@@ -7,6 +7,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import WaterIcon from '@mui/icons-material/Water';
 import { type Pond } from "../../../../types/pond";
 import * as pondActionCreators from "../../../../redux/actions/pondActions";
+import * as pondWaterLevelUpdateActions from "../../../../redux/actions/pondWaterLevelUpdateActions";
 import { bindActionCreators } from "redux";
 import { useAppDispatch, useAppSelector } from "../../../../redux/store/hooks";
 import { RootState } from "../../../../redux/store/store";
@@ -36,8 +37,12 @@ function getCapacity(pond: any) {
 
 export const PondComponent = () => {
     const dispatch = useAppDispatch();
-    const { getPonds, createPond, updatePond, deletePond, getPondHistory } = bindActionCreators(
+    const { getPonds, createPond, updatePond, deletePond } = bindActionCreators(
         pondActionCreators,
+        dispatch
+    );
+    const { getPondWaterLevelUpdates } = bindActionCreators(
+        pondWaterLevelUpdateActions,
         dispatch
     );
 
@@ -56,9 +61,9 @@ export const PondComponent = () => {
         setFilters(filters);
     }
 
-    const getPondHistoryByName = async (name: string) => {
+    const getPondWaterLevelUpdatesData = async (id: number) => {
         setTimeout(async () => {
-            await getPondHistory(name);
+            await getPondWaterLevelUpdates(id, 0, -1);
         }, 1000);
     };
 
@@ -86,7 +91,7 @@ export const PondComponent = () => {
                         variant="outlined"
                         color="success"
                         size="small"
-                        onClick={() => getPondHistoryByName(record.name)}>
+                        onClick={() => getPondWaterLevelUpdatesData(record.id)}>
                         <WaterIcon />
                     </Button>
                     <Button

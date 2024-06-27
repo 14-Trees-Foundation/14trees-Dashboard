@@ -4,7 +4,8 @@ import { onsiteStaffsDataReducer } from "./onsiteStaffReducer";
 import { groupsDataReducer, searchGroupsDataReducer } from "./groupReducer";
 import { plotsDataReducer, searchPlotsDataReducer, getPlotTagsDataReducer } from "./plotReducer";
 import { sitesDataReducer } from "./siteReducer";
-import { pondsDataReducer, searchPondsDataReducer, pondHistoryDataReducer } from "./pondReducer";
+import { pondsDataReducer, searchPondsDataReducer } from "./pondReducer";
+import { pondWaterLevelUpdatesDataReducer } from "./pondWaterLevelUpdateReducer";
 import { treesDataReducer } from "./treeReducer";
 import { usersDataReducer, searchUsersDataReducer } from "./userReducer";
 import { userTreesDataReducer, userTreeCountDataReducer } from "./userTreeReducer";
@@ -19,7 +20,7 @@ const rootReducer = combineReducers({
     plotsData: plotsDataReducer,
     plotTags: getPlotTagsDataReducer,
     pondsData: pondsDataReducer,
-    pondHistoryData: pondHistoryDataReducer,
+    pondWaterLevelUpdatesData: pondWaterLevelUpdatesDataReducer,
     treesData: treesDataReducer,
     usersData: usersDataReducer,
     userTreesData: userTreesDataReducer,

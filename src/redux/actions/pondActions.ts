@@ -32,35 +32,6 @@ export const getPonds = (offset: number, limit: number, filters?: any[]) => {
     }
 };
 
-export const getPondHistory = (name: string) => {
-    const apiClient = new ApiClient()
-    return (dispatch: any) => {
-        dispatch({
-            type: pondActionTypes.GET_POND_HISTORY_REQUESTED,
-        });
-        apiClient.getPondHistory( name).then(
-            (value: Pond[]) => {
-                for (let i = 0; i < value.length; i++) {
-                    if (value[i]?.id) {
-                        value[i].key = value[i].id
-                    }
-                }
-                dispatch({
-                    type: pondActionTypes.GET_POND_HISTORY_SUCCEEDED,
-                    payload: value,
-                });
-            },
-            (error: any) => {
-                console.log(error)
-                dispatch({
-                    type: pondActionTypes.GET_POND_HISTORY_FAILED,
-                    payload: error
-                });
-            }
-        )
-    }
-};
-
 export const searchPonds = (searchStr: string) => {
     const apiClient = new ApiClient()
     return (dispatch: any) => {
@@ -130,29 +101,6 @@ export const updatePond = (record: Pond) => {
                 console.error(error);
                 dispatch({
                     type: pondActionTypes.UPDATE_POND_FAILED,
-                });
-            }
-        )
-    };
-};
-
-
-export const updatePondWaterLevel = (pondName: string, levelFt: number, userId: string, file?: Blob) => {
-    const apiClient = new ApiClient();
-    return (dispatch: any) => {
-        dispatch({
-            type: pondActionTypes.UPDATE_POND_WATER_LVL_REQUESTED,
-        });
-        apiClient.updatePondWaterLevel(pondName, levelFt, userId, file).then(
-            () => {
-                dispatch({
-                    type: pondActionTypes.UPDATE_POND_WATER_LVL_SUCCEEDED,
-                });
-            },
-            (error: any) => {
-                console.error(error);
-                dispatch({
-                    type: pondActionTypes.UPDATE_POND_WATER_LVL_FAILED,
                 });
             }
         )

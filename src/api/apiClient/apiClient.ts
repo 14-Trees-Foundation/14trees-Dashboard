@@ -2,7 +2,7 @@ import axios, {AxiosInstance} from 'axios';
 import { PlantType } from '../../types/plantType';
 import { Plot } from '../../types/plot';
 import { BulkUserGroupMappingResponse, Group } from '../../types/Group';
-import { Pond } from '../../types/pond';
+import { Pond, PondWaterLevelUpdate } from '../../types/pond';
 import { User } from '../../types/user';
 import { Site } from '../../types/site';
 import { OnsiteStaff } from '../../types/onSiteStaff';
@@ -295,23 +295,6 @@ class ApiClient {
         }
     }
 
-    async updatePondWaterLevel(pondName: string, levelFt: number, userId: string, file?: Blob): Promise<void> {
-        try {
-            const formData = new FormData();
-            if (file) {
-                formData.append("files", file);
-            }
-            formData.append('pond_name', pondName);
-            formData.append('levelFt', levelFt.toString());
-            formData.append('user_id', userId);
-            await this.api.post<any>(`/ponds/update-pond-level`, formData);
-            return;
-        } catch (error) {
-            console.error(error)
-            throw new Error('Failed to update Pond');
-        }
-    }
-
     async deletePond(data: Pond): Promise<number> {
         try {
             await this.api.delete<any>(`/ponds/${data.id}`);
@@ -322,13 +305,60 @@ class ApiClient {
         }
     }
 
-    async getPondHistory(name: string): Promise<Pond[]> {
+    /*
+        Model- PondWaterLevelUpdate - Crud operations for water level updates
+    */
+
+    async getPondWaterLevelUpdates(pondId: number, offset: number, limit: number): Promise<PaginatedResponse<PondWaterLevelUpdate>> {
         try {
-            let response = await this.api.get<Pond[]>(`/ponds/history?pond_name=${name}`);
+            let response = await this.api.get<PaginatedResponse<PondWaterLevelUpdate>>(`/ponds/waterlevel/${pondId}?offset=${offset}&limit=${limit}`);
             return response.data;
         } catch (error) {
-            console.error(error)
-            throw new Error('Failed to pond history');
+            throw new Error('Failed to get pond history');
+        }
+    }
+
+    async addPondWaterLevelUpdate(pondId: number, levelFt: number, userId: number, file?: Blob): Promise<PondWaterLevelUpdate> {
+        try {
+            const formData = new FormData();
+            if (file) {
+                formData.append("files", file);
+            }
+            formData.append('pond_id', pondId.toString());
+            formData.append('level_ft', levelFt.toString());
+            formData.append('user_id', userId.toString());
+            const result = await this.api.post<PondWaterLevelUpdate>(`/ponds/waterlevel`, formData);
+            return result.data;
+        } catch (error) {
+            throw new Error('Failed to update Pond');
+        }
+    }
+
+    async updatePondWaterLevelUpdate(data: PondWaterLevelUpdate, file?: Blob): Promise<PondWaterLevelUpdate> {
+        const formData = new FormData();
+        if (file) {
+            formData.append("files", file);
+        }
+        Object.entries(data).forEach(([key, value]) => {
+            if (key != 'image') {
+                const strValue = value as string
+                formData.append(key, strValue);
+            }
+        });
+        try {
+            const response = await this.api.put<PondWaterLevelUpdate>(`/ponds/waterlevel/${data.id}`, formData);
+            return response.data;
+        } catch (error) {
+            throw new Error('Failed to update pond water level update');
+        }
+    }
+
+    async deletePondWaterLevelUpdate(data: PondWaterLevelUpdate): Promise<number> {
+        try {
+            await this.api.delete<any>(`/ponds/waterlevel/${data.id}`);
+            return data.id;
+        } catch (error) {
+            throw new Error('Failed to delete pond water level update');
         }
     }
 
