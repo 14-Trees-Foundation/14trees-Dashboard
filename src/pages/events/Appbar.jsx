@@ -1,11 +1,13 @@
 import { createStyles, makeStyles } from "@mui/styles";
 import logo from "../../assets/logo_white_small.png";
+import { useNavigate } from "react-router-dom";
 
 export const Appbar = () => {
   const classes = useStyles();
+  const navigate = useNavigate();
   return (
     <div className={classes.appbar}>
-      <img className={classes.logo} src={logo} alt="logo" />
+      <img className={classes.logo} src={logo} alt="logo" onClick={() => { navigate("/") }}/>
     </div>
   );
 };

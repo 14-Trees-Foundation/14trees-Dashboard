@@ -9,6 +9,8 @@ import {
   DialogContentText,
   DialogTitle,
   Divider,
+  Menu,
+  MenuItem,
   TextField,
   Typography,
 } from "@mui/material";
@@ -28,6 +30,10 @@ import { TableColumnsType } from "antd";
 import TableComponent from "../../../components/Table";
 import FailedRecordsList from "./RecordList";
 import { OrganizationUsers } from "./OrganizationUsers";
+import { organizationTypes } from "./organizationType";
+import { GridFilterItem } from "@mui/x-data-grid";
+import getColumnSearchProps, { getColumnSelectedItemFilter } from "../../../components/Filter";
+import { ToastContainer } from "react-toastify";
 
 export const OrganizationComponent = () => {
   const dispatch = useAppDispatch();
@@ -44,6 +50,7 @@ export const OrganizationComponent = () => {
   const [open, setOpen] = useState(false);
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
   const [selectedItem, setSelectedItem] = useState<Group | null>(null);
+  const [selectedOrg, setSelectedOrg] = useState<Group | null>(null);
   const [selectedEditRow, setSelectedEditRow] = useState<Group | null>(null);
   const [failedRecords, setFailedRecords] = useState(false);
   const [editModal, setEditModal] = useState(false);
@@ -51,14 +58,42 @@ export const OrganizationComponent = () => {
   const [file, setFile] = useState(null);
   const [page, setPage] = useState(0);
   const [srNoPage, SetSrNoPage] = useState(0);
+  const [anchorEl, setAnchorEl] = useState<any>(null);
+  const [groupType, setGroupType] = useState<string>('');
+  const [filters, setFilters] = useState<Record<string, GridFilterItem>>({});
+
+  const handleSetFilters = (filters: Record<string, GridFilterItem>) => {
+      setPage(0);
+      setFilters(filters);
+  }
+
+  const handleClick = (event: any) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
+  const handleMenuItemClick = (grpType: string) => {
+    setAnchorEl(null);
+    setGroupType(grpType);
+    setOpen(true);
+  };
 
   useEffect(() => {
     getGroupsData();
-  }, [page]);
+  }, [page, filters]);
 
   const getGroupsData = async () => {
+    const dataFilters = Object.values(filters).map(item => {
+      if (item.columnField === 'type') {
+        item.value = (item.value as string[]).map(tp => tp.toString().toLowerCase());
+      }
+      return item;
+    })
     setTimeout(async () => {
-      await getGroups(page * 10, 10);
+      await getGroups(page * 10, 10, dataFilters);
     }, 1000);
   };
 
@@ -77,6 +112,16 @@ export const OrganizationComponent = () => {
       title: "Name",
       width: 250,
       align: 'center',
+      render: (value, record, index) => (
+        <Button
+          onClick={() => setSelectedOrg(record)}
+          sx={{ textTransform: 'none', color: 'inherit' }} 
+          fullWidth
+          variant="text"
+        >
+          {value}
+        </Button>),
+      ...getColumnSearchProps('name', filters, handleSetFilters)
     },
     {
       dataIndex: "type",
@@ -84,6 +129,8 @@ export const OrganizationComponent = () => {
       title: "Type",
       width: 150,
       align: 'center',
+      render: (value) => value ? value.toString().toUpperCase() : '',
+      ...getColumnSelectedItemFilter({dataIndex: 'type', filters, handleSetFilters, options: organizationTypes.map(item => item.label.toUpperCase())})
     },
     {
       dataIndex: "description",
@@ -178,6 +225,7 @@ export const OrganizationComponent = () => {
 
   return (
     <>
+      <ToastContainer />
       <div
         style={{
           display: "flex",
@@ -193,7 +241,7 @@ export const OrganizationComponent = () => {
           padding: "4px 12px",
         }}
       >
-        <Typography variant="h4" style={{ marginTop: '5px' }}>Organizations</Typography>
+        <Typography variant="h4" style={{ marginTop: '5px' }}>Group Peoples</Typography>
         <div
           style={{
             display: "flex",
@@ -206,11 +254,32 @@ export const OrganizationComponent = () => {
               <ErrorIcon />
             </Badge>
           </Button>
-          <Button variant="contained" color="success" style={{ marginLeft: "10px" }} onClick={() => setOpen(true)}>
-            Add Organization
+          <Button
+            aria-controls="simple-menu"
+            aria-haspopup="true"
+            variant="contained"
+            color="success"
+            style={{ marginLeft: "10px" }}
+            onClick={handleClick}
+          >
+            +ADD
           </Button>
+          <Menu
+            id="simple-menu"
+            anchorEl={anchorEl}
+            keepMounted
+            open={Boolean(anchorEl)}
+            onClose={handleClose}
+          >
+            {organizationTypes.map(({ id, label }) => (
+              <MenuItem key={id} onClick={() => handleMenuItemClick(id)}>
+                Add {label} Group
+              </MenuItem>
+            ))}
+          </Menu>
           <AddOrganization
             open={open}
+            groupType={groupType}
             handleClose={() => setOpen(false)}
             createOrganization={handleCreateUserData}
           />
@@ -228,7 +297,7 @@ export const OrganizationComponent = () => {
         />
       </Box>
       <Divider style={{ marginBottom: "20px" }} />
-      <OrganizationUsers />
+      <OrganizationUsers selectedOrg={selectedOrg}/>
 
       <Dialog open={openDeleteModal} onClose={() => setOpenDeleteModal(false)}>
         <DialogTitle>Confirm Delete</DialogTitle>

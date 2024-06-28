@@ -1,10 +1,6 @@
 
 export const organizationTypes = [
     {
-        id: 'visitor',
-        label: 'Visitor',
-    },
-    {
         id: 'corporate',
         label: 'Corporate',
     },
@@ -17,15 +13,23 @@ export const organizationTypes = [
         label: 'NGO',
     },
     {
-        id: 'onsite_staff',
-        label: 'Onsite Staff',
-    },
-    {
         id: 'alumni',
         label: 'Alumni',
     },
     {
-        id: 'donors',
-        label: 'Donors',
+        id: 'beneficiary',
+        label: 'Beneficiary',
     },
+    // {
+    //     id: 'visitor',
+    //     label: 'VISITOR',
+    // },
+    // {
+    //     id: 'onsite_staff',
+    //     label: 'ONSITE STAFF',
+    // },
+    // {
+    //     id: 'donors',
+    //     label: 'DONORS',
+    // },
 ]

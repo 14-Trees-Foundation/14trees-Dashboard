@@ -21,6 +21,7 @@ import { useAuth } from "./auth/auth";
 import VolunteerActivismIcon from '@mui/icons-material/VolunteerActivism';
 import MapIcon from '@mui/icons-material/Map';
 import FestivalIcon from '@mui/icons-material/Festival';
+import { useNavigate } from "react-router-dom";
 
 export const AdminLeftDrawer = () => {
   const theme = useTheme();
@@ -28,6 +29,7 @@ export const AdminLeftDrawer = () => {
   const [open, setOpen] = useState(false);
   const classes = useStyles();
   const [index, setIndex] = useRecoilState(adminNavIndex);
+  const navigate = useNavigate();
   let auth = useAuth();
   const [subIndex, setSubIndex] = useState(null);
   const [expanded, setExpanded] = useState(null);
@@ -70,13 +72,13 @@ export const AdminLeftDrawer = () => {
       display: true,
     },
     {
-      displayName: "Users",
+      displayName: "Peoples",
       logo: AccountCircleOutlined,
       // display: auth.permissions.includes("all"),
       display: true,
     },
     {
-      displayName: 'Organizations',
+      displayName: 'People Groups',
       logo: CorporateFareIcon,
       display: true
     },
@@ -95,12 +97,12 @@ export const AdminLeftDrawer = () => {
       logo: VolunteerActivismIcon,
       display: true
     },
-    {
-      displayName: "Images",
-      logo: FaceIcon,
-      // display: auth.permissions.includes("all"),
-      display: true,
-    },
+    // {
+    //   displayName: "Images",
+    //   logo: FaceIcon,
+    //   // display: auth.permissions.includes("all"),
+    //   display: true,
+    // },
 
   ];
   const menuitem = () => {
@@ -169,7 +171,13 @@ export const AdminLeftDrawer = () => {
             )}
           </IconButton>
           <Divider />
-          <img className={classes.logo} alt={"logo"} src={logo} />
+          <img 
+            className={classes.logo} 
+            alt={"logo"} 
+            src={logo} 
+            onClick={() => { navigate("/"); }} 
+            style={{cursor: 'pointer'}}
+          />
           {menuitem()}
         </Drawer>
       </Box>
@@ -178,7 +186,13 @@ export const AdminLeftDrawer = () => {
     return (
       <Drawer className={classes.drawer} variant="permanent" anchor="left">
         <Divider />
-        <img className={classes.logo} alt={"logo"} src={logo} />
+        <img
+          className={classes.logo} 
+          alt={"logo"} 
+          src={logo}
+          onClick={() => { navigate("/"); }} 
+          style={{cursor: 'pointer'}}
+        />
         {menuitem()}
       </Drawer>
     );

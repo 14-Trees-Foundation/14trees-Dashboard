@@ -9,6 +9,9 @@ export const groupsDataReducer = (state = { totalGroups:0, groups: {} }, action:
             if (action.payload) {
                 let groupsDataState: GroupsDataState = { totalGroups: state.totalGroups, groups: { ...state.groups }}
                 let payload = action.payload as PaginatedResponse<Group>
+                if (payload.offset === 0) {
+                    groupsDataState.groups = {}
+                }
                 groupsDataState.totalGroups = payload.total
                 let groups = payload.results
                 for (let i = 0; i < groups.length; i++) {

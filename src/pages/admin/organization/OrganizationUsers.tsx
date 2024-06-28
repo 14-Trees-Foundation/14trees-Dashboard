@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Box from "@mui/material/Box";
 import { GridFilterItem } from "@mui/x-data-grid";
 import {
@@ -26,7 +26,11 @@ import TableComponent from "../../../components/Table";
 import { Group } from "../../../types/Group";
 import UserModal from "../../../components/UserModal";
 
-export const OrganizationUsers = () => {
+interface OrganizationUsersInputProps {
+    selectedOrg: Group | null
+}
+
+export const OrganizationUsers = ( { selectedOrg }: OrganizationUsersInputProps) => {
     const dispatch = useAppDispatch();
     const { getUsers, searchUsers } =
         bindActionCreators(userActionCreators, dispatch);
@@ -43,11 +47,19 @@ export const OrganizationUsers = () => {
     const [selectedUserIds, setSelectedUserIds] = useState<number[]>([]);
     const [page, setPage] = useState(0);
     const [filters, setFilters] = useState<Record<string, GridFilterItem>>({});
+    const targetRef = useRef<any>(null);
 
     const handleSetFilters = (filters: Record<string, GridFilterItem>) => {
         setPage(0);
         setFilters(filters);
     }
+
+    useEffect(() => {
+        if (selectedOrg !== null) {
+            setSelectedGroup(selectedOrg);
+            targetRef.current && targetRef.current.scrollIntoView({ behavior: 'smooth' });
+        }
+    }, [selectedOrg])
 
     useEffect(() => {
         if (selectedGroup) {
@@ -56,7 +68,15 @@ export const OrganizationUsers = () => {
     }, [page, filters, selectedGroup]);
 
     const getUserData = async () => {
-        let filtersData = Object.values(filters);
+        let filterWithGroup = { ...filters }
+        if (selectedGroup) {
+            filterWithGroup['group_id'] = {
+                columnField: 'group_id',
+                value: selectedGroup.id,
+                operatorValue: 'equals'
+            }
+        }
+        let filtersData = Object.values(filterWithGroup);
         setTimeout(async () => {
             await getUsers(page * 10, 10, filtersData);
         }, 1000);
@@ -64,7 +84,15 @@ export const OrganizationUsers = () => {
 
     const getAllUsersData = async () => {
         setTimeout(async () => {
-            let filtersData = Object.values(filters);
+            let filterWithGroup = { ...filters }
+            if (selectedGroup) {
+                filterWithGroup['group_id'] = {
+                    columnField: 'group_id',
+                    value: selectedGroup.id,
+                    operatorValue: 'equals'
+                }
+            }
+            let filtersData = Object.values(filterWithGroup);
             await getUsers(0, usersData.totalUsers, filtersData);
         }, 1000);
     };
@@ -107,14 +135,6 @@ export const OrganizationUsers = () => {
 
     const handleSearchGroupChange = (event: any, value: any) => {
         setSelectedGroup(value);
-        setFilters({
-            ...filters,
-            group_id: {
-                value: value?.id,
-                operatorValue: 'equals',
-                columnField: 'group_id'
-            }
-        });
     }
 
     const columns: TableColumnsType<User> = [
@@ -165,7 +185,7 @@ export const OrganizationUsers = () => {
 
 
     return (
-        <div>
+        <div ref={targetRef}>
             <div style={{ display: 'flex', alignItems: 'center' }}>
                 <Autocomplete
                     size="small"
@@ -196,7 +216,7 @@ export const OrganizationUsers = () => {
                 </Button>
             </div>
             <div style={{ marginTop: 26 }}>
-                <h1>{selectedGroup ? selectedGroup.name : 'Organization'} Users</h1>
+                <h1>{selectedGroup ? selectedGroup.name : ''} Users</h1>
                 <Divider />
                 <Box sx={{ height: 540, marginTop: 2, width: "100%", justifyContent: "center", display: "flex" }}>
                     {selectedGroup && (

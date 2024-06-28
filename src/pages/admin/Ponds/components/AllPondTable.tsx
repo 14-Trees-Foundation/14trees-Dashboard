@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import Box from "@mui/material/Box";
 import { GridFilterItem } from "@mui/x-data-grid";
 import AddPond from "./AddPond";
@@ -35,7 +35,11 @@ function getCapacity(pond: any) {
     );
 }
 
-export const PondComponent = () => {
+interface PondComponentInputProps {
+    setSelectedPond: React.Dispatch<React.SetStateAction<Pond | null>>
+}
+
+export const PondComponent = ({ setSelectedPond }: PondComponentInputProps) => {
     const dispatch = useAppDispatch();
     const { getPonds, createPond, updatePond, deletePond } = bindActionCreators(
         pondActionCreators,
@@ -67,6 +71,11 @@ export const PondComponent = () => {
         }, 1000);
     };
 
+    const handlePondWaterLevelFetch = (record: Pond) => {
+        setSelectedPond(record);
+        getPondWaterLevelUpdatesData(record.id);
+    };
+
     const typesList = [
         "Storage",
         "Percolation",
@@ -91,7 +100,9 @@ export const PondComponent = () => {
                         variant="outlined"
                         color="success"
                         size="small"
-                        onClick={() => getPondWaterLevelUpdatesData(record.id)}>
+                        onClick={() => {
+                            handlePondWaterLevelFetch(record);
+                        }}>
                         <WaterIcon />
                     </Button>
                     <Button

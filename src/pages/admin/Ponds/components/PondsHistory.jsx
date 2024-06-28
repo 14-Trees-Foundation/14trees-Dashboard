@@ -1,4 +1,3 @@
-import { useRecoilValue } from "recoil";
 import { useTheme } from "@mui/material/styles";
 import {
   AreaChart,
@@ -13,13 +12,14 @@ import {
 import { Typography } from "@mui/material";
 import { CustomBox } from "../../../../components/CustomBox";
 import { useAppSelector } from "../../../../redux/store/hooks";
+import { useRef } from "react";
 
-export const PondsHistory = () => {
+export const PondsHistory = ({ selectedPond }) => {
   const theme = useTheme();
+  const targetRef = useRef(null);
+
   let waterLevelData = useAppSelector((state) => state.pondWaterLevelUpdatesData);
-  let pondsData = useAppSelector((state) => state.pondsData);
   let data;
-  let selectedPond;
   if (waterLevelData && waterLevelData.pondWaterLevelUpdates) {
     const updates = Object.values(waterLevelData.pondWaterLevelUpdates);
     data = updates.map((item) => {
@@ -28,8 +28,9 @@ export const PondsHistory = () => {
         level: parseFloat(item.level_ft),
       };
     });
-
-    selectedPond = pondsData.ponds[updates[0]?.pond_id];
+  }
+  if (data && data.length > 0) {
+    targetRef.current.scrollIntoView({ behavior: 'smooth' });
   }
 
   return (
@@ -38,8 +39,9 @@ export const PondsHistory = () => {
         width: "100%",
         height: "600px",
       }}
+      ref={targetRef}
     >
-      {data && (
+      {data && data.length > 0 && (
         <CustomBox>
           <div style={{ display: "flex", justifyContent: "space-between" }}>
             <Typography variant="h6" gutterBottom>

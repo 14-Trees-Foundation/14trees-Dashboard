@@ -193,7 +193,7 @@ export const User1 = () => {
           padding: "4px 12px",
         }}
       >
-        <Typography variant="h4" style={{ marginTop: '5px' }}>Users</Typography>
+        <Typography variant="h4" style={{ marginTop: '5px' }}>Peoples</Typography>
         <div
           style={{
             display: "flex",
@@ -202,7 +202,7 @@ export const User1 = () => {
             marginTop: "5px",
           }}>
           <Button variant="contained" color="success" onClick={handleModalOpen}>
-            Add User
+            Add
           </Button>
           <AddUser
             open={open}

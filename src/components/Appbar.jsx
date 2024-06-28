@@ -25,6 +25,15 @@ export const AppBar = () => {
               color="primary"
               size="large"
               style={{ marginRight: "2%" }}
+              onClick={() => navigate("/visitor")}
+            >
+              Add Visitor
+            </Button>
+            <Button
+              variant="contained"
+              color="primary"
+              size="large"
+              style={{ marginRight: "2%" }}
               onClick={() => navigate("/admin")}
             >
               Admin

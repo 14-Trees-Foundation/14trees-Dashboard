@@ -5,11 +5,8 @@ import {
   Dialog,
   DialogActions,
   DialogContent,
-  DialogContentText,
   DialogTitle,
-  Modal,
   TextField,
-  Typography,
 } from "@mui/material";
 import { organizationTypes } from "./organizationType";
 
@@ -49,7 +46,7 @@ function EditUser({ row, openeditModal, handleClose, editSubmit }) {
             options={organizationTypes}
             value={formData.type ? organizationTypes.find((option) => option.id === formData.type): undefined}
             onChange={(event, value) => { if (value !== null) setFormData(prevState => ({ ...prevState, 'type': value.id }))}}
-            getOptionLabel={(option) => (option.label)}
+            getOptionLabel={(option) => (option.label.toUpperCase())}
             renderInput={(params) => <TextField {...params} margin="dense" label="Type" />}
           />
           <TextField
