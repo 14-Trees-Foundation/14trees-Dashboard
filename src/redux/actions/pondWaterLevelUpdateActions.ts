@@ -17,7 +17,7 @@ export const getPondWaterLevelUpdates = (pondId: number, offset: number, limit: 
                         value.results[i].key = value.results[i].id
                     }
                 }
-                toast.success('Pond water level updates retrieved successfully')
+                toast.success('Pond Water Level information has been retrieved successfully!')
                 dispatch({
                     type: pondActionTypes.GET_POND_WATER_LEVEL_UPDATES_SUCCEEDED,
                     payload: value,
@@ -42,7 +42,7 @@ export const addPondWaterLevelUpdate = (pondId: number, levelFt: number, userId:
         });
         apiClient.addPondWaterLevelUpdate(pondId, levelFt, userId, file).then(
             (value: PondWaterLevelUpdate) => {
-                toast.success('Pond water level update Added successfully')
+                toast.success('Pond Water Level information has been added successfully!')
                 dispatch({
                     type: pondActionTypes.CREATE_POND_WATER_LEVEL_UPDATE_SUCCEEDED,
                     payload: value,
@@ -67,7 +67,7 @@ export const updatePondWaterLevelUpdate = (data: PondWaterLevelUpdate) => {
         });
         apiClient.updatePondWaterLevelUpdate(data).then(
             (value: PondWaterLevelUpdate) => {
-                toast.success('Pond water level update updated successfully')
+                toast.success('Pond Water Level information has been updated successfully!')
                 dispatch({
                     type: pondActionTypes.UPDATE_POND_WATER_LEVEL_UPDATE_SUCCEEDED,
                     payload: value,
@@ -92,7 +92,7 @@ export const deletePondWaterLevelUpdate = (data: PondWaterLevelUpdate) => {
         });
         apiClient.deletePondWaterLevelUpdate(data).then(
             (value: number) => {
-                toast.success('Pond water level update deleted successfully')
+                toast.success('Pond Water Level information has been deleted successfully!')
                 dispatch({
                     type: pondActionTypes.DELETE_POND_WATER_LEVEL_UPDATE_SUCCEEDED,
                     payload: value,

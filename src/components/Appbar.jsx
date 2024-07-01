@@ -27,7 +27,7 @@ export const AppBar = () => {
               style={{ marginRight: "2%" }}
               onClick={() => navigate("/visitor")}
             >
-              Add Visitor
+              Visitor Form
             </Button>
             <Button
               variant="contained"
