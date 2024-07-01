@@ -894,12 +894,12 @@ export const GiftTrees = () => {
                             />
                           </TableCell>
                           <TableCell component="th" scope="row">
-                            {row.images && row.images[0] !== "" && (
+                            {row.image && row.image !== "" && (
                               <img
-                                src={row.images[0]}
+                                src={row.image}
                                 className={classes.treeimg}
                                 alt=""
-                                onClick={() => handleTreeImgClick(row.images[0])}
+                                onClick={() => handleTreeImgClick(row.image)}
                               />
                             )}
                           </TableCell>
