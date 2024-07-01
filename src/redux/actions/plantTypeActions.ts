@@ -2,6 +2,7 @@ import ApiClient from "../../api/apiClient/apiClient";
 import plantTypeActionTypes from "../actionTypes/plantTypeActionTypes";
 import { PlantType } from "../../types/plantType";
 import { PaginatedResponse } from "../../types/pagination";
+import { toast } from "react-toastify";
 
 export const getPlantTypes = (offset: number, limit: number, filters?: any[]) => {
     const apiClient = new ApiClient()
@@ -16,6 +17,7 @@ export const getPlantTypes = (offset: number, limit: number, filters?: any[]) =>
                         value.results[i].key = value.results[i].id
                     }
                 }
+                toast.success(`Successfully fetched plant types!`)
                 dispatch({
                     type: plantTypeActionTypes.GET_PLANT_TYPES_SUCCEEDED,
                     payload: value,
@@ -23,6 +25,7 @@ export const getPlantTypes = (offset: number, limit: number, filters?: any[]) =>
             },
             (error: any) => {
                 console.log(error)
+                toast.error(`Failed to fetch plant types!`)
                 dispatch({
                     type: plantTypeActionTypes.GET_PLANT_TYPES_FAILED,
                     payload: error
@@ -69,6 +72,7 @@ export const createPlantType = (record: PlantType, file?: Blob) => {
         });
         apiClient.createPlantType(record, file).then(
             (value: PlantType) => {
+                toast.success(`Successfully created plant type!`);
                 dispatch({
                     type: plantTypeActionTypes.CREATE_PLANT_TYPE_SUCCEEDED,
                     payload: value,
@@ -76,6 +80,7 @@ export const createPlantType = (record: PlantType, file?: Blob) => {
             },
             (error: any) => {
                 console.error(error);
+                toast.error(`Failed to create plant type!`);
                 dispatch({
                     type: plantTypeActionTypes.CREATE_PLANT_TYPE_FAILED,
                 });
@@ -92,6 +97,7 @@ export const updatePlantType = (record: PlantType, file?: Blob) => {
         });
         apiClient.updatePlantType(record, file).then(
             (value: PlantType) => {
+                toast.success(`Successfully updated plant type!`);
                 dispatch({
                     type: plantTypeActionTypes.UPDATE_PLANT_TYPE_SUCCEEDED,
                     payload: value,
@@ -99,6 +105,7 @@ export const updatePlantType = (record: PlantType, file?: Blob) => {
             },
             (error: any) => {
                 console.error(error);
+                toast.error(`Failed to update plant type!`);
                 dispatch({
                     type: plantTypeActionTypes.UPDATE_PLANT_TYPE_FAILED,
                 });
@@ -116,6 +123,7 @@ export const deletePlantType = (record: PlantType) => {
         });
         apiClient.deletePlantType(record).then(
             (id: number) => {
+                toast.success(`Successfully deleted plant type!`);
                 dispatch({
                     type: plantTypeActionTypes.DELETE_PLANT_TYPE_SUCCEEDED,
                     payload: id,
@@ -123,6 +131,7 @@ export const deletePlantType = (record: PlantType) => {
             },
             (error: any) => {
                 console.error(error);
+                toast.error(`Failed to delete plant type!`);
                 dispatch({
                     type: plantTypeActionTypes.DELETE_PLANT_TYPE_FAILED,
                 });
