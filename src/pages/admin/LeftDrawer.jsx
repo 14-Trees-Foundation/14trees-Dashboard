@@ -72,7 +72,7 @@ export const AdminLeftDrawer = () => {
       display: true,
     },
     {
-      displayName: "Peoples",
+      displayName: "People",
       logo: AccountCircleOutlined,
       // display: auth.permissions.includes("all"),
       display: true,

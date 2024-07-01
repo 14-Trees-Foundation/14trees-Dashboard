@@ -193,7 +193,7 @@ export const User1 = () => {
           padding: "4px 12px",
         }}
       >
-        <Typography variant="h4" style={{ marginTop: '5px' }}>Peoples</Typography>
+        <Typography variant="h4" style={{ marginTop: '5px' }}>People</Typography>
         <div
           style={{
             display: "flex",

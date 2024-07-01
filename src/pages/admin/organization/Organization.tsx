@@ -241,7 +241,7 @@ export const OrganizationComponent = () => {
           padding: "4px 12px",
         }}
       >
-        <Typography variant="h4" style={{ marginTop: '5px' }}>Group Peoples</Typography>
+        <Typography variant="h4" style={{ marginTop: '5px' }}>Group People</Typography>
         <div
           style={{
             display: "flex",
