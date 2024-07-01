@@ -65,12 +65,17 @@ function EditUser({ row, openeditModal, handleClose, editSubmit }) {
             marginBottom: "15px",
           }}>
           <Button
-            variant="contained"
+            variant="outlined"
             onClick={handleClose}
-            color="primary">
+            color="error">
             Cancel
           </Button>
-          <Button variant="contained" type="submit" color="primary">
+          <Button 
+            variant="contained" 
+            type="submit" 
+            color="success"
+            sx={{marginLeft:'10px'}}
+          >
             Save
           </Button>
         </DialogActions>

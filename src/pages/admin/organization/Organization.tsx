@@ -193,6 +193,10 @@ export const OrganizationComponent = () => {
   }
 
   const userGroupMapping = useAppSelector((state: RootState) => state.userGroupsData);
+  const data = Object.entries(userGroupMapping).filter(([key, value]) => {
+    return value.failed !== 0
+  })
+  const filteredUserGroupMapping = Object.fromEntries(data);
 
   const getAllGroupsData = async () => {
     setTimeout(async () => {
@@ -250,8 +254,8 @@ export const OrganizationComponent = () => {
             marginBottom: "5px",
             marginTop: "5px",
           }}>
-          <Button variant="outlined" color="primary" onClick={() => setFailedRecords(true)} disabled={Object.keys(userGroupMapping).length === 0}>
-            <Badge badgeContent={Object.keys(userGroupMapping).length} color="error">
+          <Button variant="outlined" color="primary" onClick={() => setFailedRecords(true)} disabled={Object.keys(filteredUserGroupMapping).length === 0}>
+            <Badge badgeContent={Object.keys(filteredUserGroupMapping).length} color="error">
               <ErrorIcon />
             </Badge>
           </Button>
@@ -308,7 +312,7 @@ export const OrganizationComponent = () => {
           </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setOpenDeleteModal(false)} color="primary">
+          <Button onClick={() => setOpenDeleteModal(false)} color="error" variant="outlined">
             Cancel
           </Button>
           <Button
@@ -319,7 +323,8 @@ export const OrganizationComponent = () => {
               }
               setOpenDeleteModal(false);
             }}
-            color="primary"
+            color="success"
+            variant="contained"
             autoFocus>
             Yes
           </Button>
@@ -339,7 +344,7 @@ export const OrganizationComponent = () => {
         <FailedRecordsList
           open={failedRecords}
           handleClose={() => setFailedRecords(false)}
-          failedRecords={userGroupMapping}
+          failedRecords={filteredUserGroupMapping}
           groupsMap={groupsData.groups}
         />
       )}
@@ -368,10 +373,10 @@ export const OrganizationComponent = () => {
               marginBottom: "15px",
             }}
           >
-            <Button onClick={() => setBulkCreate(false)} variant="contained" color="primary">
+            <Button onClick={() => setBulkCreate(false)} variant="outlined" color="error">
               Cancel
             </Button>
-            <Button type="submit" variant="contained" color="primary">
+            <Button type="submit" variant="contained" color="success">
               Upload
             </Button>
           </DialogActions>

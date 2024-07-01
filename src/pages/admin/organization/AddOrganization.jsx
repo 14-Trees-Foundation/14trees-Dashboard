@@ -73,7 +73,17 @@ const AddOrganization = ({ open, groupType, handleClose, createOrganization }) =
                                 <TextField name="description" label="Description" value={formData.description} onChange={handleChange} fullWidth/>
                             </Grid>
                             <Grid item xs={12} sx={{display:'flex', justifyContent:'center', }}>
-                                <Button type="submit">Submit</Button>
+                                <Button
+                                    variant='outlined'
+                                    onClick={handleClose}
+                                    color='error'
+                                > Submit </Button>
+                                <Button 
+                                    type="submit"
+                                    variant='contained'
+                                    color='success'
+                                    sx={{marginLeft:'10px'}}
+                                >Submit</Button>
                             </Grid>
                         </Grid>
                     </form>

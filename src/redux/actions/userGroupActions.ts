@@ -1,3 +1,4 @@
+import { toast } from "react-toastify";
 import ApiClient from "../../api/apiClient/apiClient";
 import { BulkUserGroupMappingResponse } from "../../types/Group";
 import userGroupActionTypes from "../actionTypes/userGroupsActionTypes";
@@ -17,6 +18,7 @@ export const bulkCreateUserGroupMapping = (groupId: number, file: Blob) => {
                         data: value
                     },
                 });
+                toast.success(`Successfully uploaded data!`)
             },
             (error: any) => {
                 console.log(error)
@@ -24,6 +26,7 @@ export const bulkCreateUserGroupMapping = (groupId: number, file: Blob) => {
                     type: userGroupActionTypes.CREATE_BULK_USER_GROUP_MAPPING_FAILED,
                     payload: error
                 });
+                toast.error(`Failed to upload data!`)
             }
         )
     }
@@ -40,6 +43,7 @@ export const createUserGroupMapping = (data: any) => {
                 dispatch({
                     type: userGroupActionTypes.CREATE_USER_GROUP_MAPPING_SUCCEEDED,
                 });
+                toast.success(`Successfully added user to group!`)
             },
             (error: any) => {
                 console.log(error)
@@ -47,6 +51,7 @@ export const createUserGroupMapping = (data: any) => {
                     type: userGroupActionTypes.CREATE_USER_GROUP_MAPPING_FAILED,
                     payload: error.message
                 });
+                toast.error(`Failed to add user to group!`)
             }
         )
     }
@@ -67,6 +72,7 @@ export const removeGroupUsers = (groupId: number, userIds: number[]) => {
                         userIds: userIds
                     },
                 });
+                toast.success(`Successfully removed users from group!`)
             },
             (error: any) => {
                 console.log(error)
@@ -74,6 +80,7 @@ export const removeGroupUsers = (groupId: number, userIds: number[]) => {
                     type: userGroupActionTypes.DELETE_USER_GROUP_MAPPING_FAILED,
                     payload: error
                 });
+                toast.error(`Failed to remove users from group!`)
             }
         )
     }
