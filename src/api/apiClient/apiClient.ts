@@ -660,7 +660,11 @@ class ApiClient {
 
     async assignUserTrees(data: AssignTreeRequest): Promise<void> {
         try {
-            await this.api.post<void>(`/profile/usertreereg/multi`, data);
+            let formData = new FormData();
+            Object.entries(data).forEach(([key, value]) => {
+                formData.append(key, value as string);
+            })
+            await this.api.post<void>(`/profile/usertreereg/multi`, formData);
         } catch (error) {
             console.error(error)
             throw new Error('Failed unassign user trees.');

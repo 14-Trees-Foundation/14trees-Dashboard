@@ -27,6 +27,7 @@ import { SearchResult } from "./components/SearchResult";
 import { Overall } from "./overall/Overall";
 import { Plotwise } from "./plotwise/Plotwise";
 import { TreeNew } from "./table/Tree";
+import { ToastContainer } from "react-toastify";
 
 const CustomPaper = (props) => {
   return (
@@ -97,6 +98,7 @@ export const Trees = () => {
   } else {
     return (
       <>
+        <ToastContainer />
         <TreeNew />
         {/* <Divider sx={{ backgroundColor: "#ffffff", marginTop: '10px' }} />
         <div
