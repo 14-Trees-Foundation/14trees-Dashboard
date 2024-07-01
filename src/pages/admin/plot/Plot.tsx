@@ -169,6 +169,7 @@ export const PlotComponent = () => {
       title: "Total Trees",
       align: "center",
       width: 150,
+      render: (value) => value ?? 0,
     },
     {
       dataIndex: "mapped_trees_count",
@@ -176,6 +177,7 @@ export const PlotComponent = () => {
       title: "Booked Trees",
       align: "center",
       width: 150,
+      render: (value) => value ?? 0,
     },
     {
       dataIndex: "assigned_trees_count",
@@ -183,6 +185,7 @@ export const PlotComponent = () => {
       title: "Assigned Trees",
       align: "center",
       width: 150,
+      render: (value) => value ?? 0,
     },
     {
       dataIndex: "available_trees_count",
@@ -190,6 +193,7 @@ export const PlotComponent = () => {
       title: "Available Trees",
       align: "center",
       width: 150,
+      render: (value) => value ?? 0,
     },
   ];
 
