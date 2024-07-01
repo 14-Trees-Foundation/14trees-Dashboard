@@ -298,7 +298,7 @@ export const GiftTrees = () => {
 
     formData.append("birth_date", date);
     formData.append("sapling_ids", sapling_ids);
-    formData.append("sponsored_by_user", values.user);
+    formData.append("sponsored_by_user", values.user?.id);
 
     if (formValues.gifted_by && formValues.gifted_by !== "undefined") {
       formData.append("gifted_by", formValues.gifted_by);

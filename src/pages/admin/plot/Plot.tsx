@@ -74,6 +74,7 @@ export const PlotComponent = () => {
   const plotsData = useAppSelector((state: RootState) => state.plotsData);
   if (plotsData) {
     plotsList = Object.values(plotsData.plots);
+    plotsList = plotsList.sort((a, b) => b.id - a.id);
   }
 
   let tags: string[] = [];

@@ -196,6 +196,7 @@ export const TreeNew = () => {
     const treesData = useAppSelector((state: RootState) => state.treesData);
     if (treesData) {
         treesList = Object.values(treesData.trees);
+        treesList = treesList.sort((a, b) => b.id - a.id)
     }
 
     const getAllTreesData = async () => {

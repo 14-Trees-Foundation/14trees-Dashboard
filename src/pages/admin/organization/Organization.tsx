@@ -189,6 +189,7 @@ export const OrganizationComponent = () => {
   );
   if (groupsData) {
     groupList = Object.values(groupsData.groups);
+    groupList = groupList.sort((a, b) => b.id - a.id);
   }
 
   const userGroupMapping = useAppSelector((state: RootState) => state.userGroupsData);

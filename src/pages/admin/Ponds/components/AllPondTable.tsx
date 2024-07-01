@@ -198,6 +198,7 @@ export const PondComponent = ({ setSelectedPond }: PondComponentInputProps) => {
     const pondsData = useAppSelector((state: RootState) => state.pondsData);
     if (pondsData) {
         pondsList = Object.values(pondsData.ponds);
+        pondsList = pondsList.sort((a, b) => b.id - a.id)
     }
 
     const getAllPondsData = async () => {

@@ -149,6 +149,7 @@ export const PlantTypeComponent = () => {
     );
     if (plantTypesData) {
         plantTypesList = Object.values(plantTypesData.plantTypes);
+        plantTypesList = plantTypesList.sort((a, b) => b.id - a.id)
     }
 
     const getAllPlantTypesData = async () => {

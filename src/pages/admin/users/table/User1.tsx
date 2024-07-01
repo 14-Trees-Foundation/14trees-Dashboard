@@ -153,6 +153,7 @@ export const User1 = () => {
   const usersData = useAppSelector((state: RootState) => state.usersData);
   if (usersData) {
     usersList = Object.values(usersData.users);
+    usersList = usersList.sort((a, b) => b.id - a.id);
   }
 
   const getAllUsersData = async () => {
@@ -202,7 +203,7 @@ export const User1 = () => {
             marginTop: "5px",
           }}>
           <Button variant="contained" color="success" onClick={handleModalOpen}>
-            Add
+            Add User
           </Button>
           <AddUser
             open={open}
@@ -215,7 +216,7 @@ export const User1 = () => {
             color="success"
             style={{ marginLeft: "10px" }}
             onClick={handleBulkModalOpen}>
-            Bulk Create
+            Bulk Add
           </Button>
           <AddBulkUser
             open={bulkModalOpen}
