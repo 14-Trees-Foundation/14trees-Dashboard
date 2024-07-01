@@ -12,7 +12,7 @@ import {
 import { Typography } from "@mui/material";
 import { CustomBox } from "../../../../components/CustomBox";
 import { useAppSelector } from "../../../../redux/store/hooks";
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 import { Empty } from "antd";
 
 export const PondsHistory = ({ selectedPond }) => {
@@ -23,16 +23,20 @@ export const PondsHistory = ({ selectedPond }) => {
   let data;
   if (waterLevelData && waterLevelData.pondWaterLevelUpdates) {
     const updates = Object.values(waterLevelData.pondWaterLevelUpdates);
+    console.log(updates)
     data = updates.map((item) => {
       return {
-        date: item.updated_at.substring(0, 10),
+        date: item.updated_at?.substring(0, 10),
         level: parseFloat(item.level_ft),
       };
     });
   }
-  if (data && targetRef.current) {
-    targetRef.current.scrollIntoView({ behavior: 'smooth' });
-  }
+
+  useEffect(() => {
+    if (data && targetRef.current) {
+      targetRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [data]);
 
   return (
     <div

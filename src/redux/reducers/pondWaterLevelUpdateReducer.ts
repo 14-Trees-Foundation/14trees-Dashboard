@@ -24,33 +24,6 @@ export const pondWaterLevelUpdatesDataReducer = (state = { totalPondWaterLevelUp
                 return nextState;
             }
             return state;
-        case pondActionTypes.CREATE_POND_SUCCEEDED:
-            if (action.payload) {
-                const nextState = { totalPondWaterLevelUpdates: state.totalPondWaterLevelUpdates, pondWaterLevelUpdates: { ...state.pondWaterLevelUpdates }} as PondWaterLevelUpdatesDataState;
-                let payload = action.payload as PondWaterLevelUpdate
-                payload.key = payload.id
-                nextState.pondWaterLevelUpdates[payload.id] = payload;
-                nextState.totalPondWaterLevelUpdates += 1;
-                return nextState;
-            }
-            return state;
-        case pondActionTypes.UPDATE_POND_SUCCEEDED:
-            if (action.payload) {
-                const nextState = { totalPondWaterLevelUpdates: state.totalPondWaterLevelUpdates, pondWaterLevelUpdates: { ...state.pondWaterLevelUpdates }} as PondWaterLevelUpdatesDataState;
-                let payload = action.payload as PondWaterLevelUpdate
-                payload.key = payload.id
-                nextState.pondWaterLevelUpdates[payload.id] = payload;
-                return nextState;
-            }
-            return state;
-        case pondActionTypes.DELETE_POND_SUCCEEDED:
-            if (action.payload) {
-                const nextState = { totalPondWaterLevelUpdates: state.totalPondWaterLevelUpdates, pondWaterLevelUpdates: { ...state.pondWaterLevelUpdates }} as PondWaterLevelUpdatesDataState;
-                Reflect.deleteProperty(nextState.pondWaterLevelUpdates, action.payload as number)
-                nextState.totalPondWaterLevelUpdates -= 1;
-                return nextState;
-            }
-            return state;
         
         default:
             return state;
