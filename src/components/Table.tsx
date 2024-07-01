@@ -2,6 +2,7 @@
 import { Table, TableColumnsType } from 'antd';
 import { AnyObject } from 'antd/es/_util/type';
 import { TableRowSelection } from 'antd/es/table/interface';
+import { useEffect, useState } from 'react';
 // import { CSVLink } from "react-csv"
 // import { toast } from 'react-toastify';
 
@@ -25,7 +26,7 @@ function TableComponent({ dataSource, columns, totalRecords, fetchAllData, setPa
                 handleSelectionChanges(selectedRowKeys as number[]);
             },
             getCheckboxProps: (record) => {
-                return { name: record._id }
+                return { name: record.id }
             },
         }
     }

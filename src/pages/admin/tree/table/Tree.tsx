@@ -254,6 +254,7 @@ export const TreeNew = () => {
         unMapTrees(saplingIds);
         setSaplingIds([]);
         setDisabledMapUnMapButton(true);
+        setDisabledAUButton(true);
         getTreeData();
     }
 
@@ -261,6 +262,7 @@ export const TreeNew = () => {
         mapTrees('user', saplingIds, formData.id);
         setSaplingIds([]);
         setDisabledMapUnMapButton(true);
+        setDisabledAUButton(true);
         setIsUserModalOpen(false);
         getTreeData();
     }
@@ -277,6 +279,7 @@ export const TreeNew = () => {
     const handleUnassignTrees = () => {
         unassignUserTrees(saplingIds);
         setSaplingIds([]);
+        setDisabledAUButton(true);
         setDisabledMapUnMapButton(true);
         getTreeData();
     }
@@ -287,6 +290,7 @@ export const TreeNew = () => {
         assignTrees(data);
         setSaplingIds([]);
         setDisabledAUButton(true);
+        setDisabledMapUnMapButton(true);
         setIsAssignTreeModalOpen(false);
         getTreeData();
     }
@@ -348,17 +352,6 @@ export const TreeNew = () => {
                         disabled={disabledMapUnMapButton}
                     >{(isMapTrees) ? "Map Trees" : "UnMap Trees"}</Button>
                     <UserModal open={isUserModalOpen} handleClose={() => { setIsUserModalOpen(false) }} onSubmit={handleMapTrees} searchUser={searchUsers} />
-                    {/* <Button variant="contained" style={{ marginLeft: '10px' }} onClick={handleModalOpen}
-                disabled={true} 
-                >Add Tree</Button>
-                <AddTree open={open} handleClose={handleModalClose} />
-                <Button
-                    variant="contained"
-                    style={{ marginLeft: "10px" }}
-                    onClick={handleModalOpen}
-                    disabled={true}>
-                    Bulk Create
-                </Button> */}
                 </div>
             </div>
             <Divider sx={{ backgroundColor: "black", marginBottom: '15px' }} />

@@ -13,6 +13,7 @@ import { Typography } from "@mui/material";
 import { CustomBox } from "../../../../components/CustomBox";
 import { useAppSelector } from "../../../../redux/store/hooks";
 import { useRef } from "react";
+import { Empty } from "antd";
 
 export const PondsHistory = ({ selectedPond }) => {
   const theme = useTheme();
@@ -29,7 +30,7 @@ export const PondsHistory = ({ selectedPond }) => {
       };
     });
   }
-  if (data && data.length > 0) {
+  if (data && targetRef.current) {
     targetRef.current.scrollIntoView({ behavior: 'smooth' });
   }
 
@@ -74,6 +75,20 @@ export const PondsHistory = ({ selectedPond }) => {
               />
             </AreaChart>
           </ResponsiveContainer>
+        </CustomBox>
+      )}
+
+      {data && data.length === 0 && (
+        <CustomBox>
+          <div style={{ display: "flex", justifyContent: "space-between" }}>
+            <Typography variant="h6" gutterBottom>
+              Pond level (Feets):{" "}
+              <em style={{ color: theme.custom.color.primary.blue }}>
+                {selectedPond?.name}
+              </em>
+            </Typography>
+          </div>
+          <Empty />
         </CustomBox>
       )}
     </div>
