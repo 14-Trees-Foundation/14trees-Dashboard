@@ -244,7 +244,7 @@ export const User1 = () => {
           </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setOpenDeleteModal(false)} color="primary">
+          <Button variant="outlined" onClick={() => setOpenDeleteModal(false)} color="error">
             Cancel
           </Button>
           <Button
@@ -255,7 +255,8 @@ export const User1 = () => {
               }
               setOpenDeleteModal(false);
             }}
-            color="primary"
+            variant="contained"
+            color="success"
             autoFocus>
             Yes
           </Button>
