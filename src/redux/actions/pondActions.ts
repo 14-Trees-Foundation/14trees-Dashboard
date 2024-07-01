@@ -2,6 +2,7 @@ import ApiClient from "../../api/apiClient/apiClient";
 import pondActionTypes from "../actionTypes/pondActionTypes";
 import { Pond } from "../../types/pond";
 import { PaginatedResponse } from "../../types/pagination";
+import { toast } from "react-toastify";
 
 export const getPonds = (offset: number, limit: number, filters?: any[]) => {
     const apiClient = new ApiClient()
@@ -20,6 +21,7 @@ export const getPonds = (offset: number, limit: number, filters?: any[]) => {
                     type: pondActionTypes.GET_PONDS_SUCCEEDED,
                     payload: value,
                 });
+                toast.success(`Successfully fetched ponds!`)
             },
             (error: any) => {
                 console.log(error)
@@ -27,6 +29,7 @@ export const getPonds = (offset: number, limit: number, filters?: any[]) => {
                     type: pondActionTypes.GET_PONDS_FAILED,
                     payload: error
                 });
+                toast.error(`Failed to fetch ponds!`)
             }
         )
     }
@@ -73,12 +76,14 @@ export const createPond = (record: Pond) => {
                     type: pondActionTypes.CREATE_POND_SUCCEEDED,
                     payload: value,
                 });
+                toast.success(`Successfully created pond!`)
             },
             (error: any) => {
                 console.error(error);
                 dispatch({
                     type: pondActionTypes.CREATE_POND_FAILED,
                 });
+                toast.error(`Failed to create pond!`)
             }
         )
     };
@@ -96,12 +101,14 @@ export const updatePond = (record: Pond) => {
                     type: pondActionTypes.UPDATE_POND_SUCCEEDED,
                     payload: value,
                 });
+                toast.success(`Successfully updated pond!`)
             },
             (error: any) => {
                 console.error(error);
                 dispatch({
                     type: pondActionTypes.UPDATE_POND_FAILED,
                 });
+                toast.error(`Failed to update pond!`)
             }
         )
     };
@@ -120,12 +127,14 @@ export const deletePond = (record: Pond) => {
                     type: pondActionTypes.DELETE_POND_SUCCEEDED,
                     payload: id,
                 });
+                toast.success(`Successfully deleted pond!`)
             },
             (error: any) => {
                 console.error(error);
                 dispatch({
                     type: pondActionTypes.DELETE_POND_FAILED,
                 });
+                toast.error(`Failed to delete pond!`)
             }
         )
     };

@@ -23,7 +23,6 @@ export const PondsHistory = ({ selectedPond }) => {
   let data;
   if (waterLevelData && waterLevelData.pondWaterLevelUpdates) {
     const updates = Object.values(waterLevelData.pondWaterLevelUpdates);
-    console.log(updates)
     data = updates.map((item) => {
       return {
         date: item.updated_at?.substring(0, 10),
@@ -33,7 +32,7 @@ export const PondsHistory = ({ selectedPond }) => {
   }
 
   useEffect(() => {
-    if (data && targetRef.current) {
+    if (data && selectedPond && targetRef.current) {
       targetRef.current.scrollIntoView({ behavior: 'smooth' });
     }
   }, [data]);
@@ -82,7 +81,7 @@ export const PondsHistory = ({ selectedPond }) => {
         </CustomBox>
       )}
 
-      {data && data.length === 0 && (
+      {data && selectedPond && data.length === 0 && (
         <CustomBox>
           <div style={{ display: "flex", justifyContent: "space-between" }}>
             <Typography variant="h6" gutterBottom>
