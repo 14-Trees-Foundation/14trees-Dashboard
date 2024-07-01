@@ -1,12 +1,30 @@
 import React, { useEffect, useState } from "react";
 import Box from "@mui/material/Box";
-import { DataGrid, GridToolbar, GridColumns } from "@mui/x-data-grid";
-import EditIcon from "@mui/icons-material/Edit";
-import DeleteIcon from "@mui/icons-material/Delete";
-import CircularProgress from "@mui/material/CircularProgress";
+
 import {
   Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
 } from "@mui/material";
+import { DataGrid, GridToolbar, GridColumns ,GridFilterItem } from "@mui/x-data-grid";
+import EditIcon from "@mui/icons-material/Edit";
+import DeleteIcon from "@mui/icons-material/Delete";
+import { TableColumnsType } from "antd";
+import TableComponent from "../../../components/Table";
+import { Donation } from "../../../types/donation";
+import CircularProgress from "@mui/material/CircularProgress";
+import getColumnSearchProps ,  { getColumnSelectedItemFilter } from "../../../components/Filter";
+
+import { useAppDispatch, useAppSelector } from "../../../redux/store/hooks";
+import * as donationActionCreators from "../../../redux/actions/donationActions";
+import { bindActionCreators } from "@reduxjs/toolkit";
+import { RootState } from "../../../redux/store/store";
+import AddDonation  from "./AddDonation";
+import EditDonation from "./EditDonation";
+
 
 function LoadingOverlay() {
   return (
@@ -23,161 +41,243 @@ function LoadingOverlay() {
 }
 
 
+
 export const DonationComponent = () => {
 
+
+  const dispatch = useAppDispatch();
+  const { getDonations, createDonation, updateDonation, deleteDonation } = bindActionCreators(
+    donationActionCreators,
+      dispatch
+  );
+
   const [open, setOpen] = useState(false);
+  const [page, setPage] = useState(0);
+  const [filters, setFilters] = useState<Record<string, GridFilterItem>>({});
+  const handleModalOpen = () => setOpen(true);
+  const handleModalClose = () => setOpen(false);
+  const [openDeleteModal, setOpenDeleteModal] = useState(false);
+  const [selectedItem, setSelectedItem] = useState<any | null>(null);
+  const [selectedEditRow, setSelectedEditRow] = useState<any | null>(null);
+  const [editModal, setEditModal] = useState(false);
+
+
+
+
+
+  const handleSetFilters = (filters: Record<string, GridFilterItem>) => {
+    setPage(0);
+    setFilters(filters);
+  }
+  
+  
+  
+  useEffect(() => {
+    getDonationData();
+  }, [page, filters]);
+
+  const getDonationData = async () => {
+      console.log('Filters Object : ' , filters)
+      let filtersData = Object.values(filters);
+      console.log('filtered data : ' , filtersData)
+      setTimeout(async () => {
+          await getDonations(page*10, 10 ,filtersData);
+      }, 1000);
+  };
+
+
+  let donationList: Donation[] = [];
+  const donationsData = useAppSelector((state: RootState) => state.donationsData);
+  console.log('Donation Data : ',donationsData)
+  if (donationsData) {
+      donationList = Object.values(donationsData.donations);
+      console.log('list of sites: ' , donationList);
+  }
+
+  const getAllDonationData = async () => {
+      let filtersData = Object.values(filters);
+      setTimeout(async () => {
+          await getDonations(0, donationsData.totalDonations ,filtersData );
+      }, 1000);
+  };
+
+
+
+  const handleCreateDonationData = (formData: Donation) => {
+    createDonation(formData);
+};
+
+
+  const handleDeleteDonations = (row: Donation) => {
+    setOpenDeleteModal(true);
+    setSelectedItem(row);
+};
+
+const handleEditSubmit = (formData: Donation) => {
+  updateDonation(formData);
+  setSelectedEditRow(null);
+};
+
+const typesList = [
+  "Society",
+  "Farmer",
+  "14T"
+]
 
   
-  const columns: GridColumns = [
+  const columns: TableColumnsType<Donation> = [
     {
-      field: "action",
-      headerName: "Action",
+      dataIndex: "action",
+      key: "action",
+      title: "Action",
       width: 100,
       align: "center",
-      headerAlign: "center",
-      renderCell: (params: any) => (
+      render: (value, record, index )=> (
         <div
           style={{
             display: "flex",
             justifyContent: "center",
             alignItems: "center",
           }}>
-          <Button>
+          <Button
+            variant="outlined"
+            style={{ margin: "0 5px" }}
+            onClick={() => {
+              setEditModal(true);
+              setSelectedEditRow(record);
+              console.log(" donation row to edit : ",record)
+            }}
+            >
             <EditIcon />
           </Button>
-          <Button>
+          <Button
+            variant="outlined"
+            color="error"
+            style={{ margin: "0 5px" }}
+            onClick={() => handleDeleteDonations(record)}
+          >
             <DeleteIcon />
           </Button>
         </div>
       ),
     },
+    // {
+    //   dataIndex: "donation_date",
+    //   key: "donation_date",
+    //   title: "Donation Date",
+    //   width: 220,
+    //   align: "center",
+    //   // ...getColumnSearchProps('donation_date', filters, handleSetFilters)
+    // },
     {
-        field: "donation_date",
-        headerName: "Donation Date",
-        width: 150,
-        align: "center",
-        editable: true,
-        headerAlign: "center",
+      dataIndex: "Name",
+      key: "donor_name",
+      title: "Name",
+      width: 220,
+      align: "center",
+      ...getColumnSearchProps('Name', filters, handleSetFilters)
     },
     {
-        field: "donor_name",
-        headerName: "Donor Name",
-        width: 150,
-        align: "center",
-        editable: true,
-        headerAlign: "center",
+      dataIndex: "Donor Type",
+      key: "donor_type",
+      title: "Donor Type",
+      width: 180,
+      align: "center",
+      ...getColumnSearchProps('Donor_type', filters, handleSetFilters)
     },
     {
-        field: "donor_type",
-        headerName: "Donor Type",
-        width: 150,
-        align: "center",
-        editable: true,
-        headerAlign: "center",
+      dataIndex: "Phone",
+      key: "Phone",
+      title: "Phone",
+      width: 150,
+      align: "center",
+      ...getColumnSearchProps('Phone', filters, handleSetFilters)
     },
     {
-        field: "Phone",
-        headerName: "Phone",
-        width: 150,
-        align: "center",
-        editable: true,
-        headerAlign: "center",
+      dataIndex: "Email Address",
+      key: "Email",
+      title: "Email",
+      width: 150,
+      align: "center",
+      ...getColumnSearchProps('Email', filters, handleSetFilters)
     },
     {
-        field: "Email",
-        headerName: "Email",
-        width: 150,
-        align: "center",
-        editable: true,
-        headerAlign: "center",
+      dataIndex: "PAN",
+      key: "PAN",
+      title: "PAN",
+      width: 150,
+      align: "center",
+      ...getColumnSearchProps('PAN', filters, handleSetFilters)
     },
     {
-        field: "PAN",
-        headerName: "PAN",
-        width: 150,
-        align: "center",
-        editable: true,
-        headerAlign: "center",
+      dataIndex: "Pledged",
+      key: "Pledged",
+      title: "Pledged",
+      width: 150,
+      align: "center",
+      ...getColumnSearchProps('Pledged', filters, handleSetFilters)
+
     },
     {
-        field: "Pledged",
-        headerName: "Pledged",
-        width: 150,
-        align: "center",
-        editable: true,
-        headerAlign: "center",
+      dataIndex: "Land type",
+      key: "Land_type",
+      title: "Land_type",
+      width: 150,
+      align: "center",
+      // ...getColumnSearchProps('Land_type', filters, handleSetFilters)
+      ...getColumnSelectedItemFilter({ dataIndex: 'Land_type', filters, handleSetFilters, options: typesList }),
+
     },
     {
-        field: "Land_type",
-        headerName: "Land Type",
-        width: 150,
-        align: "center",
-        editable: true,
-        headerAlign: "center",
+      dataIndex: "Zone",
+      key: "Zone",
+      title: "Zone",
+      width: 150,
+      align: "center",
+      ...getColumnSearchProps('Zone', filters, handleSetFilters)
+
+    },
+    // {
+    //   dataIndex: "PlantationLandType",
+    //   key: "PlantationLandType",
+    //   title: "PlantationLandType",
+    //   width: 150,
+    //   align: "center",
+    // },
+    {
+      dataIndex: "DashboardStatus",
+      key: "DashboardStatus",
+      title: "DashboardStatus",
+      width: 150,
+      align: "center",
     },
     {
-        field: "Zone",
-        headerName: "Zone",
-        width: 150,
-        align: "center",
-        editable: true,
-        headerAlign: "center",
+      dataIndex: "Assigned plot",
+      key: "Assigned_plot",
+      title: "Assigned_plot",
+      width: 180,
+      align: "center",
     },
     {
-        field: "Grove",
-        headerName: "Grove",
-        width: 150,
-        align: "center",
-        editable: true,
-        headerAlign: "center",
+      dataIndex: "Tree planted",
+      key: "Tree_planted",
+      title: "Tree_planted",
+      width: 200,
+      align: "center",
     },
+    // {
+    //   dataIndex: "Assigner's dashboard",
+    //   key: "Assigner_dashboard",
+    //   title: "Assigner_dashboard",
+    //   width: 200,
+    //   align: "center",
+    // },
     {
-        field: "PlantationLandType",
-        headerName: "Plantation Land Type",
-        width: 150,
-        align: "center",
-        editable: true,
-        headerAlign: "center",
-    },
-    {
-        field: "DashboardStatus",
-        headerName: "Dashboard Status",
-        width: 150,
-        align: "center",
-        editable: true,
-        headerAlign: "center",
-    },
-    {
-        field: "Assigned_plot",
-        headerName: "Assigned Plot",
-        width: 150,
-        align: "center",
-        editable: true,
-        headerAlign: "center",
-    },
-    {
-        field: "Tree_planted",
-        headerName: "Tree Planted",
-        width: 150,
-        align: "center",
-        editable: true,
-        headerAlign: "center",
-    },
-    {
-        field: "Assigner_dashboard",
-        headerName: "Assigner's Dashboard",
-        width: 150,
-        align: "center",
-        editable: true,
-        headerAlign: "center",
-    },
-    {
-        field: "Remarks_for_inventory",
-        headerName: "Remarks for Inventory",
-        width: 150,
-        align: "center",
-        editable: true,
-        headerAlign: "center",
+      dataIndex: "Remarks for inventory",
+      key: "Remarks_for_inventory",
+      title: "Remarks_for_inventory",
+      width: 180,
+      align: "center",
     },
 ];
 
@@ -303,26 +403,65 @@ const data = [
 
   return (
     <>
+    <div
+          style={{
+              display: "flex",
+              justifyContent: "flex-end",
+              marginBottom: "20px",
+          }}>
+          <Button variant="contained" color="success" onClick={handleModalOpen}>
+              Add Donation
+          </Button>
+          <AddDonation
+              open={open}
+              handleClose={handleModalClose}
+              createDonation={handleCreateDonationData}
+          />
+        </div>
       
       <Box sx={{ height: 540, width: "100%", marginTop:'40px' }}>
-        <DataGrid
-          rows={data}
+      <TableComponent
+          dataSource={donationList}
           columns={columns}
-          getRowId={(row) => row._id}
-          initialState={{
-            pagination: {
-              page: 0,
-              pageSize: 10,
-            },
-          }}
-          checkboxSelection
-          disableSelectionOnClick
-          components={{
-            Toolbar: GridToolbar,
-            NoRowsOverlay: LoadingOverlay,
-          }}
+          totalRecords={donationsData.totalDonations}
+          fetchAllData={getAllDonationData}
+          setPage={setPage}
         />
       </Box>
+
+      <Dialog open={openDeleteModal} onClose={() => setOpenDeleteModal(false)}>
+        <DialogTitle>Confirm Delete</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Do you want to delete ?
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setOpenDeleteModal(false)} color="primary">
+            Cancel
+          </Button>
+          <Button
+            onClick={() => {
+              if (selectedItem !== null) {
+                deleteDonation(selectedItem);
+              }
+              setOpenDeleteModal(false);
+            }}
+            color="primary"
+            autoFocus>
+            Yes
+          </Button>
+        </DialogActions>
+      </Dialog>
+      {selectedEditRow && (
+        <EditDonation
+          row={selectedEditRow}
+          openeditModal={editModal}
+          closeEditModal={() => { setEditModal(false); setSelectedEditRow(null); }}
+          editSubmit={handleEditSubmit}
+        />
+      )}
+
 
     </>
   );

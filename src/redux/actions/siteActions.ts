@@ -43,7 +43,9 @@ export const createSite = (record: Site) => {
                 dispatch({
                     type: siteActionTypes.CREATE_SITE_SUCCEEDED,
                     payload: value,
+                   
                 });
+                console.log(value)
             },
             (error: any) => {
                 console.error(error);

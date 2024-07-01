@@ -45,6 +45,8 @@ export const SitesComponent = () => {
     );
   
   const [open, setOpen] = useState(false);
+  const handleModalOpen = () => setOpen(true);
+  const handleModalClose = () => setOpen(false);
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
   const [selectedItem, setSelectedItem] = useState<any | null>(null);
   const [selectedEditRow, setSelectedEditRow] = useState<any | null>(null);
@@ -62,7 +64,9 @@ export const SitesComponent = () => {
   }, [page, filters]);
 
   const getSiteData = async () => {
+      console.log('Filters Object : ' , filters)
       let filtersData = Object.values(filters);
+      console.log('filtered data : ' , filtersData)
       setTimeout(async () => {
           await getSites(page*10, 10, filtersData);
       }, 1000);
@@ -71,12 +75,15 @@ export const SitesComponent = () => {
 
   let sitesList: Site[] = [];
   const sitesData = useAppSelector((state: RootState) => state.sitesData);
+  console.log('Sites Data : ',sitesData)
   if (sitesData) {
       sitesList = Object.values(sitesData.sites);
+      console.log('list of sites: ' , sitesList);
   }
 
   const getAllSitesData = async () => {
       let filtersData = Object.values(filters);
+      console.log('filtersData from getallsite: ' ,filtersData )
       setTimeout(async () => {
           await getSites(0, sitesData.totalSites, filtersData);
       }, 1000);
@@ -116,6 +123,7 @@ export const SitesComponent = () => {
               onClick={() => {
                 setEditModal(true);
                 setSelectedEditRow(record);
+                console.log(record)
               }}>
               <EditIcon />
             </Button>
@@ -143,6 +151,7 @@ export const SitesComponent = () => {
       title: "Name (English)",
       width: 220,
       align: "center",
+      ...getColumnSearchProps('name_english', filters, handleSetFilters)
     },
     {
       dataIndex: "owner",
@@ -150,6 +159,7 @@ export const SitesComponent = () => {
       title: "Owner",
       width: 180,
       align: "center",
+      ...getColumnSearchProps('owner', filters, handleSetFilters)
     },
     {
       dataIndex: "land_type",
@@ -157,6 +167,7 @@ export const SitesComponent = () => {
       title: "Land Type",
       width: 150,
       align: "center",
+      ...getColumnSearchProps('land_type', filters, handleSetFilters)
     },
     {
       dataIndex: "land_strata",
@@ -164,6 +175,7 @@ export const SitesComponent = () => {
       title: "Land Strata",
       width: 150,
       align: "center",
+      ...getColumnSearchProps('land_strata', filters, handleSetFilters)
     },
     {
       dataIndex: "district",
@@ -171,6 +183,7 @@ export const SitesComponent = () => {
       title: "District",
       width: 150,
       align: "center",
+      ...getColumnSearchProps('district', filters, handleSetFilters)
     },
     {
       dataIndex: "taluka",
@@ -178,6 +191,8 @@ export const SitesComponent = () => {
       title: "Taluka",
       width: 150,
       align: "center",
+      ...getColumnSearchProps('taluka', filters, handleSetFilters)
+
     },
     {
       dataIndex: "village",
@@ -185,6 +200,8 @@ export const SitesComponent = () => {
       title: "Village",
       width: 150,
       align: "center",
+      ...getColumnSearchProps('village', filters, handleSetFilters)
+
     },
     {
       dataIndex: "area_acres",
@@ -341,12 +358,12 @@ export const SitesComponent = () => {
               justifyContent: "flex-end",
               marginBottom: "20px",
           }}>
-          <Button variant="contained" style={{ backgroundColor: 'blue' }} onClick={() => setOpen(true)}>
+          <Button variant="contained" color="success" onClick={handleModalOpen}>
               Add Site
           </Button>
           <AddSite
               open={open}
-              handleClose={() => setOpen(false)}
+              handleClose={handleModalClose}
               createSite={handleCreateSiteData}
           />
         </div>

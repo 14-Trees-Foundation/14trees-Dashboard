@@ -1,226 +1,46 @@
-import React, { useState } from 'react'
 import {
-    Button,
-    Dialog,
-    DialogActions,
-    DialogContent,
-    DialogContentText,
-    DialogTitle,
-    Modal,
-    TextField,
-    // Typography,
-    Autocomplete,
-    
+  Box,
+  Button,
+  Card,
+  CardContent,
+  Dialog,
+  DialogActions,
+  TextField,
+  Autocomplete
 } from "@mui/material";
-import MenuItem from '@mui/material/MenuItem';
-import {  message, Steps, theme } from 'antd';
+import AccountCircle from "@mui/icons-material/AccountCircle";
+import "react-image-crop/dist/ReactCrop.css";
+import ReactCrop from "react-image-crop";
 
-// import {
-//   Box,
-//   Paper,
-//   Step,
-//   StepLabel,
-//   Stepper,
-//   Typography,
-// } from "@mui/material";
-// import { createStyles, makeStyles } from "@mui/styles";
-// import { useState } from "react";
+// import { GetCroppedImg } from "../../../helpers/imageCrop";
+import { useState } from "react";
 
-// import bg from "../../assets/bg.png";
-// import vector from "../../assets/treevector.png";
-// import { AppBar } from "../../../components/Appbar";
-// // import Axios from "../../api/local";
-// import { Spinner } from "../../../components/Spinner";
-// import { NameOwner } from "./components/NameOwner";
-// import { LandTypeAndStrata } from "./components/LandTypeAndStrata";
-// import { Location } from "./components/Location";
-// import { OtherDetails } from "./components/OtherDetails";
-// import { Submit } from "./components/Submit";
+export const Location = ({ values, setValues }) => {
 
-const intitialFValues = {
-  name_english: "",
-  name_marathi: "",
-  owner: "",
-  district: "",
-  taluka: "",
-  village: "",
-  area: "",
-  land_type: "",
-  land_strata: "",
-  length: "",
-  saplingId: "",
-  sampatiPatra: "",
-  activeStep: 0
-  
-};
-
- const AddSite = ({open , handleClose , createSite})=>{
-
-  // const classes = UseStyle();
-  // const [values, setValues] = useState(intitialFValues);
-  // const steps = ["Name & Owner", "Land Type & Strata", "Location", "Other Details", "Submit"];
+   const [districtFlag , setFlag] = useState('')
+    const [talukaFlag , setTalukaFlag] = useState('')
 
 
-  const [current, setCurrent] = useState(0);
+  //     const handleDistrictChange=(e , value)=>{
+  //   setDistrict(value)
+  //   console.log(value.label)
+  //   setFlag(value.label)
 
-  const next = () => {
-    setCurrent(current + 1);
-  };
-
-  const prev = () => {
-    setCurrent(current - 1);
-  };
+  // }
 
 
-  const steps = [
-    {
-      title: 'First',
-      content: 'First-content',
-    },
-    {
-      title: 'Second',
-      content: 'Second-content',
-    },
-    {
-      title: 'Last',
-      content: 'Last-content',
-    },
-  ];
-
-
-  const items = steps.map((item) => ({ key: item.title, title: item.title }));
-
-
-
-  const [name_english , setName_English] = useState('')
-  const [name_marathi , setName_Marathi] = useState('')
-  const [owner , setOwner] = useState(null)
-  
-  const [district , setDistrict] = useState(null)
-  const [districtFlag , setFlag] = useState('')
-  
-  const [taluka , setTaluka] = useState(null)
-  const [talukaFlag , setTalukaFlag] = useState('')
-  
-  const [village , setVillage] = useState(null)
-  const [area , setArea] = useState('')
-  const [land_type , setLand_Type] = useState('')
-  const [land_strata , setLand_Strata] = useState('')
-  const [length , setLength] = useState('')
-  const [sampatiPatra , setSampatiPatra]= useState('')
-
-
-  // const initialize = () => {
-  //   setValues(intitialFValues);
-  // };
-
-
-  // const handleOrgChange = (orgid) => {
-  //   setValues({
-  //     ...values,
-  //     orgid: orgid._id,
-  //   });
-  // };
-
-  // const handleNameAndEmail = () => {
-  //   setValues({
-  //     ...values,
-  //     loading: false,
-  //     activeStep: 1
-  //   });
-    // try {
-    //   let res = await Axios.get(
-    //     `/users/?email=${values.email}&name=${values.name}`
-    //   );
-    //   let orgRes = await Axios.get(`/organizations`);
-    //   if (res.status === 200) {
-    //     setValues({
-    //       ...values,
-    //       userFound: true,
-    //       userinfo: res.data.user,
-    //       treeinfo: res.data.tree,
-    //       org: orgRes.data,
-    //       activeStep: 1,
-    //       loading: false,
-    //     });
-    //   }
-    // } catch (error) {
-    //   setValues({
-    //     ...values,
-    //     activeStep: 1,
-    //     loading: false,
-    //   });
-    // }
-  
-
-
-  const handleOwnerChange=(e , value)=>{
+  // const handleTalukaChange=(e , value)=>{
     
-    console.log(value)
-    setOwner(value)
+  //   setTaluka(value)
+  //   setTalukaFlag(value.label)
+
+  // }
+
+  // const handleVillageChange=(e , value)=>{
     
-  }
-
-  const handleDistrictChange=(e , value)=>{
-    setDistrict(value)
-    console.log(value.label)
-    setFlag(value.label)
-
-  }
-
-
-  const handleTalukaChange=(e , value)=>{
+  //   setVillage(value)
     
-    setTaluka(value)
-    setTalukaFlag(value.label)
-
-  }
-
-  const handleVillageChange=(e , value)=>{
-    
-    setVillage(value)
-    
-  }
-
-  const ownerOptions = [
-    { value: 'GramPanchayat (ग्राम पंचायत)', label: 'Gram Panchayat (ग्राम पंचायत)' },
-    { value: 'Govt. Dept. (सरकारी विभाग)', label: 'Govt. Dept. (सरकारी विभाग)' },
-    { value: 'Forest Dept. (वन विभाग)', label: 'Forest Dept. (वन विभाग)' },
-    { value: '14 Trees Branch', label: '14 Trees Branch' },
-    { value: 'NGO (संस्था)', label: 'NGO (संस्था)' },
-    { value: 'Farmer (शेतकरी)', label: 'Farmer (शेतकरी)' },
-   
-  ];
-
-  const LandTypeOptions = [
-    { value: 'Roadside (रस्ता) ', label: 'Roadside (रस्ता)' },
-    { value: 'Gairan', label: 'Gairan' },
-    { value: 'School', label: 'School' },
-    { value: 'Temple', label: 'Temple' },
-    { value: 'Gavthan, Premises', label: 'Gavthan, Premises' },
-    { value: 'Cremation, burial', label: 'Cremation, burial' },
-    { value: 'Forest', label: 'Forest' },
-    { value: 'Farm', label: 'Farm' },
-
-
-  ];
-
-
-  const LandStrataOptions = [
-    { value: 'Rocky ', label: 'Rocky ' },
-    { value: 'Murum', label: 'Murum' },
-    { value: 'Soil', label: 'Soil' },
-    { value: 'Roadside', label: 'Roadside' },
-    
-  ];
-
-  const SampatiPatraOptions = [
-    { value: '14T - ग्राम पंचायत पत्र ', label: '14T - ग्राम पंचायत पत्र' },
-    { value: '14T - संस्था पत्र', label: '14T - संस्था पत्र' },
-    { value: 'वन विभाग सहकार्य पत्र', label: 'वन विभाग सहकार्य पत्र' },
-    { value: '14T - MoU with owner', label: '14T - MoU with owner' },
-    
-  ];
+  // }
 
 
   const DistrictOptions = [
@@ -1601,590 +1421,144 @@ const intitialFValues = {
       ]
       
 
-      const handleSubmit=(e)=>{
-        e.preventDefault()
-
-        const newSiteData = {
-          name_marathi: name_marathi,
-          name_english: name_english,
-          owner: owner.value,
-          taluka: taluka.value,
-          district: district.value,
-          land_type: land_type,
-          land_strata: land_strata,
-          village: village.value,
-          area: area,
-          length: length,
-          sampatiPatra: sampatiPatra
 
 
-        };
+  console.log(values);
+  // const [cropImgsrc, setCropImgsrc] = useState(null);
+  // const [imageRef, setImageRef] = useState();
+  // const [crop, setCrop] = useState(
+  //   // default crop config
+  //   {
+  //     unit: "%",
+  //     width: 40,
+  //     aspect: 9 / 11,
+  //   }
+  // );
+  // async function cropImage(crop) {
+  //   let random = Math.random().toString(36).substr(2, 5);
+  //   if (imageRef && crop.width && crop.height) {
+  //     // const croppedImage = await GetCroppedImg(
+  //     //   imageRef,
+  //     //   crop,
+  //     //   "croppedImage" + random + ".jpeg" // destination filename
+  //     // );
 
-        createSite(newSiteData);
-        console.log('New site Data : ', newSiteData)
-        handleClose();
+  //     // calling the props function to expose
+  //     setValues({
+  //       ...values,
+  //       // croppedImage: croppedImage,
+  //     });
+  //     // setCropImgsrc(croppedImage ? URL.createObjectURL(croppedImage) : null);
+  //   }
+  // }
+  // const handleProfilePicUpload = (e) => {
+  //   setValues({
+  //     ...values,
+  //     userImages: e.target.files,
+  //     userImage1: e.target.files[0] ? e.target.files[0] : null,
+  //     userImage1src: e.target.files[0]
+  //       ? URL.createObjectURL(e.target.files[0])
+  //       : null,
+  //     dlgOpen: true,
+  //   });
+  // };
+  return (
+    <Box sx={{ position: "relative", minHeight: "400px" }}>
+      {/* <Box>
+        {values.userImage1src !== null && (
+          <Dialog onClose={() => {}} disableEscapeKeyDown open={values.dlgOpen}>
+            <ReactCrop
+              src={values.userImage1src}
+              crop={crop}
+              onImageLoaded={(imageRef) => setImageRef(imageRef)}
+              onComplete={(cropConfig) => cropImage(cropConfig)}
+              onChange={(c) => setCrop(c)}
+            />
+            <DialogActions
+              onClick={() => setValues({ ...values, dlgOpen: false })}
+            >
+              I'm Done
+            </DialogActions>
+          </Dialog>
+        )}
+        <Card
+          sx={{
+            maxWidth: "380px",
+            textAlign: "center",
+            boxShadow: "#e5e5e5 0px 0px 8px 8px;",
+          }}
+        >
+          <CardContent>
+            <input
+              accept="image/*"
+              style={{ display: "none" }}
+              id="contained-button-file"
+              type="file"
+              onChange={handleProfilePicUpload}
+            />
+            <label
+              htmlFor="contained-button-file"
+              style={{ display: "block", marginTop: "5px" }}
+            >
+              {cropImgsrc ? (
+                <img
+                  src={cropImgsrc}
+                  style={{
+                    width: "180px",
+                    height: "180px",
+                    objectFit: "cover",
+                    borderRadius: "90px",
+                  }}
+                  alt=""
+                />
+              ) : (
+                <AccountCircle sx={{ width: "170px", height: "170px" }} />
+              )}
+            </label>
+            <TextField
+              variant="outlined"
+              label="Tree ID"
+              name="saplingid"
+              value={values.saplingId}
+              required
+              onChange={(e) => {
+                setValues({
+                  ...values,
+                  saplingId: e.target.value,
+                });
+              }}
+            />
+          </CardContent>
+        </Card>
+      </Box> */}
 
-      }
+      {/* <TextField
+          variant="outlined"
+          name="district"
+          label="District"          
+          required
+          onChange={(e) => setValues({ ...values, district: e.target.value })}
+        />
+        <TextField
+          variant="outlined"
+          name="taluka"
+          label="Taluka"          
+          required
+          onChange={(e) => setValues({ ...values, taluka: e.target.value })}
+        />
+        <TextField
+          variant="outlined"
+          name="village"
+          label="Village"          
+          required
+          onChange={(e) => setValues({ ...values, village: e.target.value })}
+        /> */}
 
-
-
-
-
-  return(
-   
-    // <Dialog open={open} onClose={handleClose}  fullWidth maxWidth="md">
-    //   <DialogTitle align="center">Add Site</DialogTitle>
-    //   <form  onSubmit={handleSubmit} style={{padding: '40px'}} >
-    //   <DialogContent>
-                    
-    //                 <DialogContent>
-    //                 <DialogTitle >Name & Owner</DialogTitle>
-    //                 <TextField
-    //                     autoFocus
-    //                     margin="dense"
-    //                     name="name_marathi"
-    //                     label="Name (Marathi)"
-    //                     type="text"
-    //                     fullWidth
-    //                     value={name_marathi}
-    //                     onChange={(e)=>{ setName_Marathi(e.target.value)}}
-                       
-    //                 />
-    //                 <TextField
-    //                     margin="dense"
-    //                     name="name_english"
-    //                     label="Name (English)"
-    //                     type="text"
-    //                     fullWidth
-    //                     value={name_english}
-    //                     onChange={(e)=>{ setName_English(e.target.value)}}
-    //                 />
-    //                  <Autocomplete
-    //                     options={ownerOptions}
-    //                     getOptionLabel={(option)=>option.label}
-    //                     value={owner}
-    //                     onChange={handleOwnerChange}
-    //                     renderInput={(params)=>( 
-    //                     <TextField
-    //                        {...params}
-                            
-    //                         margin="dense"
-    //                         name="owner"
-    //                         label="Owner Name"
-    //                         type="text"
-    //                         fullWidth
-                            
-    //                     />)} 
-    //                />
-    //           </DialogContent>
-    //           <DialogContent>
-    //               <DialogTitle >Land Type & Strata</DialogTitle>
-    //                 <TextField
-    //                     select
-    //                     margin="dense"
-    //                     name="land_type"
-    //                     label="Land Type"
-    //                     type="text"
-    //                     fullWidth
-    //                     value={land_type}
-    //                     onChange={(e)=>{setLand_Type(e.target.value)}}
-    //                 >
-    //                     {LandTypeOptions.map((type)=>
-    //                     <MenuItem key={type.value} value={type.value}>
-    //                         {type.label}
-    //                     </MenuItem>
-    //                     )}
-    //                 </TextField>
-
-    //                 <TextField
-    //                     select
-    //                     margin="dense"
-    //                     name="land_strata"
-    //                     label="Land Strata"
-    //                     type="text"
-    //                     fullWidth
-    //                     value={land_strata}
-    //                     onChange={(e)=>{setLand_Strata(e.target.value)}}
-    //                 >
-    //                     {LandStrataOptions.map((item)=>
-    //                     <MenuItem key={item.value} value={item.value}>
-    //                         {item.label}
-    //                     </MenuItem>
-    //                     ) }
-    //                 </TextField>
-    //                 </DialogContent>  
-
-    //                 <DialogContent>
-    //                     <DialogTitle>Location</DialogTitle>
-    //                     <Autocomplete
-    //                     options={DistrictOptions}
-    //                     getOptionLabel={(option)=>option.label}
-    //                     value={district}
-    //                     onChange={handleDistrictChange}
-    //                     renderInput={(params)=>( 
-    //                     <TextField
-    //                        {...params}
-                            
-    //                         margin="dense"
-    //                         name="district"
-    //                         label="District"
-    //                         type="text"
-    //                         fullWidth
-    //                     />)}  
-    //                />
-    //                {/* <TextField
-    //                     select
-    //                     margin="dense"
-    //                     name="taluka"
-    //                     label="Taluka"
-    //                     type="text"
-    //                     fullWidth
-    //                     value={taluka}
-    //                     onChange={(e)=>{setTaluka(e.target.value)}}
-    //                     disabled={districtFlag === ''}
-    //                />    */}
-    //                {  districtFlag === '' && 
-                   
-    //                (<TextField
-    //                     select
-    //                     margin="dense"
-    //                     name="taluka"
-    //                     label="Taluka"
-    //                     type="text"
-    //                     fullWidth
-    //                     value={taluka}
-    //                     onChange={handleTalukaChange}
-    //                     disabled={districtFlag === ''}
-    //                /> )} 
-                   
-    //                {districtFlag === 'Budhana' && 
-                   
-    //                (
-    //                   <Autocomplete
-    //                     options={BudhanaOptions}
-    //                     getOptionLabel={(option)=>option.label}
-    //                     value={taluka}
-    //                     onChange={handleTalukaChange}
-    //                     renderInput={(params)=>( 
-    //                     <TextField
-    //                       {...params}
-                            
-    //                         margin="dense"
-    //                         name="taluka"
-    //                         label="Taluka"
-    //                         type="text"
-    //                         fullWidth
-    //                     />)}  
-    //                  />)
-               
-    //                }  {districtFlag === 'Pune' && 
-    //                          (
-    //                             <Autocomplete
-    //                             options={PuneOptions }
-    //                             getOptionLabel={(option)=>option.label}
-    //                             value={taluka}
-    //                             onChange={handleTalukaChange}
-    //                             renderInput={(params)=>( 
-    //                             <TextField
-    //                               {...params}
-                                    
-    //                                 margin="dense"
-    //                                 name="taluka"
-    //                                 label="Taluka"
-    //                                 type="text"
-    //                                 fullWidth
-    //                             />)}  
-    //                       />
-    //                           )}  {districtFlag === 'Sambhajinagar' && (
-    //                             <Autocomplete
-    //                             options={SambhajinagarOptions }
-    //                             getOptionLabel={(option)=>option.label}
-    //                             value={taluka}
-    //                             onChange={handleTalukaChange}
-    //                             renderInput={(params)=>( 
-    //                             <TextField
-    //                                {...params}
-                                    
-    //                                 margin="dense"
-    //                                 name="taluka"
-    //                                 label="Taluka"
-    //                                 type="text"
-    //                                 fullWidth
-    //                             />)}  
-    //                        />
-    //                            )}  {districtFlag === 'Jalgaon' && (
-    //                             <Autocomplete
-    //                             options={JalgaonOptions}
-    //                             getOptionLabel={(option)=>option.label}
-    //                             value={taluka}
-    //                             onChange={handleTalukaChange}
-    //                             renderInput={(params)=>( 
-    //                             <TextField
-    //                                {...params}
-                                    
-    //                                 margin="dense"
-    //                                 name="taluka"
-    //                                 label="Taluka"
-    //                                 type="text"
-    //                                 fullWidth
-    //                             />)}  
-    //                        />
-    //                            )}
-                               
-                    
-           
-
-    //                { talukaFlag === '' && ( <TextField
-    //                     select
-    //                     margin="dense"
-    //                     name="village"
-    //                     label="Village"
-    //                     type="text"
-    //                     fullWidth
-    //                     value={village}
-    //                     onChange={handleVillageChange}
-    //                     disabled={talukaFlag === ''}
-    //                 ></TextField>)
-    //                }
-    //                 {districtFlag === 'Budhana' && talukaFlag === 'Budhana' && 
-                       
-    //                      (<Autocomplete
-    //                             options={ BudhanaDTOptions}
-    //                             getOptionLabel={(option)=>option.label}
-    //                             value={village}
-    //                             onChange={handleVillageChange}
-    //                             renderInput={(params)=>( 
-    //                             <TextField
-    //                                {...params}
-                                    
-    //                                 margin="dense"
-    //                                 name="village"
-    //                                 label="Village"
-    //                                 type="text"
-    //                                 fullWidth
-    //                             />)}  
-    //                        />)}
-                    
-    //                 {districtFlag === 'Budhana' && talukaFlag === 'Khamgaon (खामगाव)' && 
-                       
-    //                      (<Autocomplete
-    //                             options={ BudhanaKhamgaonOptions}
-    //                             getOptionLabel={(option)=>option.label}
-    //                             value={village}
-    //                             onChange={handleVillageChange}
-    //                             renderInput={(params)=>( 
-    //                             <TextField
-    //                                {...params}
-                                    
-    //                                 margin="dense"
-    //                                 name="village"
-    //                                 label="Village"
-    //                                 type="text"
-    //                                 fullWidth
-    //                             />)}  
-    //                        />)}
-
-    //             {districtFlag === 'Budhana' && talukaFlag === 'Malkapur' && 
-                       
-    //                    (<Autocomplete
-    //                           options={ BudhanaMalkapurOptions}
-    //                           getOptionLabel={(option)=>option.label}
-    //                           value={village}
-    //                           onChange={handleVillageChange}
-    //                           renderInput={(params)=>( 
-    //                           <TextField
-    //                              {...params}
-                                  
-    //                               margin="dense"
-    //                               name="village"
-    //                               label="Village"
-    //                               type="text"
-    //                               fullWidth
-    //                           />)}  
-    //                      />)}
-                        
-                  
-    //                {districtFlag === 'Budhana' && talukaFlag === 'Motala (मोताळा)' && 
-                       
-    //                    (<Autocomplete
-    //                           options={ BudhanaMotalaOptions}
-    //                           getOptionLabel={(option)=>option.label}
-    //                           value={village}
-    //                           onChange={handleVillageChange}
-    //                           renderInput={(params)=>( 
-    //                           <TextField
-    //                              {...params}
-                                  
-    //                               margin="dense"
-    //                               name="village"
-    //                               label="Village"
-    //                               type="text"
-    //                               fullWidth
-    //                           />)}  
-    //                      />)}
-
-    //             {districtFlag === 'Budhana' && talukaFlag === 'Nandura (नांदुरा)' && 
-                       
-    //                    (<Autocomplete
-    //                           options={BudhanaNanduraOptions}
-    //                           getOptionLabel={(option)=>option.label}
-    //                           value={village}
-    //                           onChange={handleVillageChange}
-    //                           renderInput={(params)=>( 
-    //                           <TextField
-    //                              {...params}
-                                  
-    //                               margin="dense"
-    //                               name="village"
-    //                               label="Village"
-    //                               type="text"
-    //                               fullWidth
-    //                           />)}  
-    //                      />)}
-                         
-    //                    {  districtFlag === 'Jalgaon' && talukaFlag === 'Jamner' && 
-    //                      (
-    //                       <Autocomplete
-    //                         options={JalgaonJamnerOptions}
-    //                         getOptionLabel={(option)=>option.label}
-    //                         value={village}
-    //                         onChange={handleVillageChange}
-    //                         renderInput={(params)=>( 
-    //                         <TextField
-    //                           {...params}
-                                
-    //                             margin="dense"
-    //                             name="village"
-    //                             label="Village"
-    //                             type="text"
-    //                             fullWidth
-    //                         />)}  
-    //                  />
-    //                      )}
-
-    //           {  districtFlag === 'Pune' && talukaFlag === 'Ambegaon (आंबेगाव)' && 
-    //                      (
-    //                       <Autocomplete
-    //                         options={PuneAmbegaonOptions}
-    //                         getOptionLabel={(option)=>option.label}
-    //                         value={village}
-    //                         onChange={handleVillageChange}
-    //                         renderInput={(params)=>( 
-    //                         <TextField
-    //                           {...params}
-                                
-    //                             margin="dense"
-    //                             name="village"
-    //                             label="Village"
-    //                             type="text"
-    //                             fullWidth
-    //                         />)}  
-    //                  />
-    //                      )}
-    //                      {  districtFlag === 'Pune' && talukaFlag === 'Indapur (इंदापूर)' && 
-    //                      (
-    //                       <Autocomplete
-    //                         options={PuneIndapurOptions}
-    //                         getOptionLabel={(option)=>option.label}
-    //                         value={village}
-    //                         onChange={handleVillageChange}
-    //                         renderInput={(params)=>( 
-    //                         <TextField
-    //                           {...params}
-                                
-    //                             margin="dense"
-    //                             name="village"
-    //                             label="Village"
-    //                             type="text"
-    //                             fullWidth
-    //                         />)}  
-    //                  />
-    //                      )}
-    //                          {  districtFlag === 'Pune' && talukaFlag === 'Khed (खेड)' && 
-    //                      (
-    //                       <Autocomplete
-    //                         options={PuneKhedOptions}
-    //                         getOptionLabel={(option)=>option.label}
-    //                         value={village}
-    //                         onChange={handleVillageChange}
-    //                         renderInput={(params)=>( 
-    //                         <TextField
-    //                           {...params}
-                                
-    //                             margin="dense"
-    //                             name="village"
-    //                             label="Village"
-    //                             type="text"
-    //                             fullWidth
-    //                         />)}  
-    //                  />
-    //                      )}
-    //                       {  districtFlag === 'Sambhajinagar' && talukaFlag === 'Soegaon' && 
-    //                      (
-    //                       <Autocomplete
-    //                         options={SambhajiNagarOptions}
-    //                         getOptionLabel={(option)=>option.label}
-    //                         value={village}
-    //                         onChange={handleVillageChange}
-    //                         renderInput={(params)=>( 
-    //                         <TextField
-    //                           {...params}
-                                
-    //                             margin="dense"
-    //                             name="village"
-    //                             label="Village"
-    //                             type="text"
-    //                             fullWidth
-    //                         />)}  
-    //                  />
-    //                      )}
-                             
-    //               </DialogContent>
-    //               <DialogContent>
-    //                     <DialogTitle>Other Details</DialogTitle>
-    //                 <TextField
-    //                     margin="dense"
-    //                     name="area_acres"
-    //                     label="Area (Acres)"
-    //                     type="text"
-    //                     fullWidth
-    //                     value={area}
-    //                     onChange={(e)=>{setArea(e.target.value)}}
-    //                 />
-    //                 <TextField
-    //                     margin="dense"
-    //                     name="length_km"
-    //                     label="Length (Km)"
-    //                     type="text"
-    //                     fullWidth
-    //                     value={length}
-    //                     onChange={(e)=>{setLength(e.target.value)}}
-    //                 />
-    //                 <TextField
-    //                     select
-    //                     margin="dense"
-    //                     name="sampati patra"
-    //                     label="Sampati Patra"
-    //                     type="text"
-    //                     fullWidth
-    //                     value={sampatiPatra}
-    //                     onChange={(e)=>{setSampatiPatra(e.target.value)}}
-    //                 >
-    //                     {SampatiPatraOptions.map((item)=> 
-    //                     <MenuItem key={item.value} value={item.value}>
-    //                         {item.label}
-    //                     </MenuItem>)}
-                    
-    //                 </TextField>
-    //                 </DialogContent>
-
-    //     </DialogContent>  
-    //     <DialogActions sx={{ display: 'flex', justifyContent: 'center', marginBottom: '15px' }}>
-    //                 <Button variant='contained' onClick={handleClose} color="primary">
-    //                     Cancel
-    //                 </Button>
-    //                 <Button variant='contained' type="submit" color="primary" >
-    //                     Save
-    //                 </Button>
-    //             </DialogActions>
-
-    //   </form>
-
-    // </Dialog>
-
-    <>
-    
-      <Steps current={current} items={items} />
-      {/* <div style={contentStyle}>{steps[current].content}</div> */}
-      <div>     <Dialog open={open} onClose={handleClose}  fullWidth maxWidth="md">
-      <DialogTitle align="center">Add Site</DialogTitle>
-     <form  onSubmit={handleSubmit} style={{padding: '40px'}} >
-       <DialogContent>
-                    
-                     <DialogContent>
-                   <DialogTitle >Name & Owner</DialogTitle>
-                     <TextField
-                        autoFocus
-                        margin="dense"
-                        name="name_marathi"
-                        label="Name (Marathi)"
-                        type="text"
-                        fullWidth
-                        value={name_marathi}
-                        onChange={(e)=>{ setName_Marathi(e.target.value)}}
-                       
-                    />
-                    <TextField
-                        margin="dense"
-                        name="name_english"
-                        label="Name (English)"
-                        type="text"
-                        fullWidth
-                        value={name_english}
-                        onChange={(e)=>{ setName_English(e.target.value)}}
-                    />
-                     <Autocomplete
-                        options={ownerOptions}
-                        getOptionLabel={(option)=>option.label}
-                        value={owner}
-                        onChange={handleOwnerChange}
-                        renderInput={(params)=>( 
-                        <TextField
-                           {...params}
-                            
-                            margin="dense"
-                            name="owner"
-                            label="Owner Name"
-                            type="text"
-                            fullWidth
-                            
-                        />)} 
-                   />
-              </DialogContent>
-              <DialogContent>
-                  <DialogTitle >Land Type & Strata</DialogTitle>
-                    <TextField
-                        select
-                        margin="dense"
-                        name="land_type"
-                        label="Land Type"
-                        type="text"
-                        fullWidth
-                        value={land_type}
-                        onChange={(e)=>{setLand_Type(e.target.value)}}
-                    >
-                        {LandTypeOptions.map((type)=>
-                        <MenuItem key={type.value} value={type.value}>
-                            {type.label}
-                        </MenuItem>
-                        )}
-                    </TextField>
-
-                    <TextField
-                        select
-                        margin="dense"
-                        name="land_strata"
-                        label="Land Strata"
-                        type="text"
-                        fullWidth
-                        value={land_strata}
-                        onChange={(e)=>{setLand_Strata(e.target.value)}}
-                    >
-                        {LandStrataOptions.map((item)=>
-                        <MenuItem key={item.value} value={item.value}>
-                            {item.label}
-                        </MenuItem>
-                        ) }
-                    </TextField>
-                    </DialogContent>  
-
-                    <DialogContent>
-                        <DialogTitle>Location</DialogTitle>
-                        <Autocomplete
+                       <Autocomplete
                         options={DistrictOptions}
                         getOptionLabel={(option)=>option.label}
-                        value={district}
-                        onChange={handleDistrictChange}
+                        // value={district}
+                        onChange={(e) => setValues({ ...values, district: e.target.value })}
                         renderInput={(params)=>( 
                         <TextField
                            {...params}
@@ -2216,9 +1590,9 @@ const intitialFValues = {
                         label="Taluka"
                         type="text"
                         fullWidth
-                        value={taluka}
-                        onChange={handleTalukaChange}
-                        disabled={districtFlag === ''}
+                        // value={taluka}
+                        onChange={(e) => setValues({ ...values, taluka: e.target.value })}
+                        // disabled={districtFlag === ''}
                    /> )} 
                    
                    {districtFlag === 'Budhana' && 
@@ -2227,8 +1601,8 @@ const intitialFValues = {
                       <Autocomplete
                         options={BudhanaOptions}
                         getOptionLabel={(option)=>option.label}
-                        value={taluka}
-                        onChange={handleTalukaChange}
+                        // value={taluka}
+                        onChange={(e) => setValues({ ...values, taluka: e.target.value })}
                         renderInput={(params)=>( 
                         <TextField
                           {...params}
@@ -2246,8 +1620,8 @@ const intitialFValues = {
                                 <Autocomplete
                                 options={PuneOptions }
                                 getOptionLabel={(option)=>option.label}
-                                value={taluka}
-                                onChange={handleTalukaChange}
+                                // value={taluka}
+                                onChange={(e) => setValues({ ...values, taluka: e.target.value })}
                                 renderInput={(params)=>( 
                                 <TextField
                                   {...params}
@@ -2263,8 +1637,8 @@ const intitialFValues = {
                                 <Autocomplete
                                 options={SambhajinagarOptions }
                                 getOptionLabel={(option)=>option.label}
-                                value={taluka}
-                                onChange={handleTalukaChange}
+                                // value={taluka}
+                                onChange={(e) => setValues({ ...values, taluka: e.target.value })}
                                 renderInput={(params)=>( 
                                 <TextField
                                    {...params}
@@ -2280,8 +1654,8 @@ const intitialFValues = {
                                 <Autocomplete
                                 options={JalgaonOptions}
                                 getOptionLabel={(option)=>option.label}
-                                value={taluka}
-                                onChange={handleTalukaChange}
+                                // value={taluka}
+                                onChange={(e) => setValues({ ...values, taluka: e.target.value })}
                                 renderInput={(params)=>( 
                                 <TextField
                                    {...params}
@@ -2305,9 +1679,9 @@ const intitialFValues = {
                         label="Village"
                         type="text"
                         fullWidth
-                        value={village}
-                        onChange={handleVillageChange}
-                        disabled={talukaFlag === ''}
+                        // value={village}
+                        onChange={(e) => setValues({ ...values, village: e.target.value })}
+                        // disabled={talukaFlag === ''}
                     ></TextField>)
                    }
                     {districtFlag === 'Budhana' && talukaFlag === 'Budhana' && 
@@ -2315,8 +1689,8 @@ const intitialFValues = {
                          (<Autocomplete
                                 options={ BudhanaDTOptions}
                                 getOptionLabel={(option)=>option.label}
-                                value={village}
-                                onChange={handleVillageChange}
+                                // value={village}
+                                onChange={(e) => setValues({ ...values, village: e.target.value })}
                                 renderInput={(params)=>( 
                                 <TextField
                                    {...params}
@@ -2334,8 +1708,8 @@ const intitialFValues = {
                          (<Autocomplete
                                 options={ BudhanaKhamgaonOptions}
                                 getOptionLabel={(option)=>option.label}
-                                value={village}
-                                onChange={handleVillageChange}
+                                // value={village}
+                                onChange={(e) => setValues({ ...values, village: e.target.value })}
                                 renderInput={(params)=>( 
                                 <TextField
                                    {...params}
@@ -2353,8 +1727,8 @@ const intitialFValues = {
                        (<Autocomplete
                               options={ BudhanaMalkapurOptions}
                               getOptionLabel={(option)=>option.label}
-                              value={village}
-                              onChange={handleVillageChange}
+                              // value={village}
+                              onChange={(e) => setValues({ ...values, village: e.target.value })}
                               renderInput={(params)=>( 
                               <TextField
                                  {...params}
@@ -2373,8 +1747,8 @@ const intitialFValues = {
                        (<Autocomplete
                               options={ BudhanaMotalaOptions}
                               getOptionLabel={(option)=>option.label}
-                              value={village}
-                              onChange={handleVillageChange}
+                              // value={village}
+                              onChange={(e) => setValues({ ...values, village: e.target.value })}
                               renderInput={(params)=>( 
                               <TextField
                                  {...params}
@@ -2392,8 +1766,8 @@ const intitialFValues = {
                        (<Autocomplete
                               options={BudhanaNanduraOptions}
                               getOptionLabel={(option)=>option.label}
-                              value={village}
-                              onChange={handleVillageChange}
+                              // value={village}
+                              onChange={(e) => setValues({ ...values, village: e.target.value })}
                               renderInput={(params)=>( 
                               <TextField
                                  {...params}
@@ -2411,8 +1785,8 @@ const intitialFValues = {
                           <Autocomplete
                             options={JalgaonJamnerOptions}
                             getOptionLabel={(option)=>option.label}
-                            value={village}
-                            onChange={handleVillageChange}
+                            // value={village}
+                            onChange={(e) => setValues({ ...values, village: e.target.value })}
                             renderInput={(params)=>( 
                             <TextField
                               {...params}
@@ -2431,8 +1805,8 @@ const intitialFValues = {
                           <Autocomplete
                             options={PuneAmbegaonOptions}
                             getOptionLabel={(option)=>option.label}
-                            value={village}
-                            onChange={handleVillageChange}
+                            // value={village}
+                            onChange={(e) => setValues({ ...values, village: e.target.value })}
                             renderInput={(params)=>( 
                             <TextField
                               {...params}
@@ -2450,8 +1824,8 @@ const intitialFValues = {
                           <Autocomplete
                             options={PuneIndapurOptions}
                             getOptionLabel={(option)=>option.label}
-                            value={village}
-                            onChange={handleVillageChange}
+                            // value={village}
+                            onChange={(e) => setValues({ ...values, village: e.target.value })}
                             renderInput={(params)=>( 
                             <TextField
                               {...params}
@@ -2469,8 +1843,8 @@ const intitialFValues = {
                           <Autocomplete
                             options={PuneKhedOptions}
                             getOptionLabel={(option)=>option.label}
-                            value={village}
-                            onChange={handleVillageChange}
+                            // value={village}
+                            onChange={(e) => setValues({ ...values, village: e.target.value })}
                             renderInput={(params)=>( 
                             <TextField
                               {...params}
@@ -2488,8 +1862,8 @@ const intitialFValues = {
                           <Autocomplete
                             options={SambhajiNagarOptions}
                             getOptionLabel={(option)=>option.label}
-                            value={village}
-                            onChange={handleVillageChange}
+                            // value={village}
+                            onChange={(e) => setValues({ ...values, village: e.target.value })}
                             renderInput={(params)=>( 
                             <TextField
                               {...params}
@@ -2502,87 +1876,42 @@ const intitialFValues = {
                             />)}  
                      />
                          )}
-                             
-                  </DialogContent>
-                  <DialogContent>
-                        <DialogTitle>Other Details</DialogTitle>
-                    <TextField
-                        margin="dense"
-                        name="area_acres"
-                        label="Area (Acres)"
-                        type="text"
-                        fullWidth
-                        value={area}
-                        onChange={(e)=>{setArea(e.target.value)}}
-                    />
-                    <TextField
-                        margin="dense"
-                        name="length_km"
-                        label="Length (Km)"
-                        type="text"
-                        fullWidth
-                        value={length}
-                        onChange={(e)=>{setLength(e.target.value)}}
-                    />
-                    <TextField
-                        select
-                        margin="dense"
-                        name="sampati patra"
-                        label="Sampati Patra"
-                        type="text"
-                        fullWidth
-                        value={sampatiPatra}
-                        onChange={(e)=>{setSampatiPatra(e.target.value)}}
-                    >
-                        {SampatiPatraOptions.map((item)=> 
-                        <MenuItem key={item.value} value={item.value}>
-                            {item.label}
-                        </MenuItem>)}
-                    
-                    </TextField>
-                    </DialogContent>
-
-        </DialogContent>  
-        <DialogActions sx={{ display: 'flex', justifyContent: 'center', marginBottom: '15px' }}>
-                    <Button variant='contained' onClick={handleClose} color="primary">
-                        Cancel
-                    </Button>
-                    <Button variant='contained' type="submit" color="primary" >
-                        Save
-                    </Button>
-                </DialogActions>
-
-      </form>
-
-    </Dialog>
-</div>
-      <div style={{ marginTop: 24 }}>
-        {current < steps.length - 1 && (
-          <Button type="primary" onClick={() => next()}>
-            Next
-          </Button>
-        )}
-        {current === steps.length - 1 && (
-          <Button type="primary" onClick={() => message.success('Processing complete!')}>
-            Done
-          </Button>
-        )}
-        {current > 0 && (
-          <Button style={{ margin: '0 8px' }} onClick={() => prev()}>
-            Previous
-          </Button>
-        )}
-      </div>
-    </>
-
-                        
-
-  )};
 
 
 
-
-
-export default AddSite;
-
-
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "row",
+          position: "absolute",
+          bottom: 0,
+          width: "100%",
+        }}
+      >
+        <Button
+          color="inherit"
+          disabled={values.activeStep === 0}
+          onClick={() =>
+            setValues({ ...values, activeStep: values.activeStep - 1 })
+          }
+          sx={{ mr: 1 }}
+        >
+          Back
+        </Button>
+        <Box sx={{ flex: "1 1 auto" }} />
+        <Button
+          // disabled={values.saplingId === ""}
+          type="submit"
+          size="large"
+          variant="contained"
+          color="primary"
+          onClick={() =>
+            setValues({ ...values, activeStep: values.activeStep + 1 })
+          }
+        >
+          Next
+        </Button>
+      </Box>
+    </Box>
+  );
+};
