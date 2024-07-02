@@ -7,6 +7,7 @@ import MenuIcon from "@mui/icons-material/Menu";
 import IconButton from "@mui/material/IconButton";
 import LeaderBoardOutlined from "@mui/icons-material/LeaderboardOutlined";
 import ForestOutlined from "@mui/icons-material/ForestOutlined";
+import GrassTwoToneIcon from "@mui/icons-material/GrassTwoTone";
 import OpacityOutlined from "@mui/icons-material/OpacityOutlined";
 import AccountCircleOutlined from "@mui/icons-material/AccountCircleOutlined";
 import FaceIcon from "@mui/icons-material/Face";
@@ -58,7 +59,7 @@ export const AdminLeftDrawer = () => {
     },
     {
       displayName: "Plant Types",
-      logo: ForestOutlined,
+      logo: GrassTwoToneIcon,
       display: true,
     },
     {
