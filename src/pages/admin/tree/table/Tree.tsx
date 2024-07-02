@@ -284,10 +284,13 @@ export const TreeNew = () => {
         getTreeData();
     }
 
-    const handleAssignTrees = (formData: any) => {
-        let data = formData as AssignTreeRequest
-        data.sapling_ids = saplingIds
-        assignTrees(data);
+    const handleAssignTrees = (data: any) => {
+        data['sapling_ids'] = saplingIds
+        let formData = new FormData();
+        Object.entries(data).forEach(([key, value]) => {
+            formData.append(key, value as string);
+        })
+        assignTrees(formData);
         setSaplingIds([]);
         setDisabledAUButton(true);
         setDisabledMapUnMapButton(true);

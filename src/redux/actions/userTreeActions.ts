@@ -202,7 +202,7 @@ export const mapTreesForPlot = (mapped_to: 'user' | 'group',id: number, plotId: 
     };
 }
 
-export const assignTrees = (data: AssignTreeRequest) => {
+export const assignTrees = (data: FormData) => {
     const apiClient = new ApiClient();
     return (dispatch: any) => {
         dispatch({
