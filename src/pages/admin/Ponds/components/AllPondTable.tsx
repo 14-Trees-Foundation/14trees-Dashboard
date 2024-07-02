@@ -51,6 +51,7 @@ export const PondComponent = ({ setSelectedPond }: PondComponentInputProps) => {
     );
 
     const [open, setOpen] = useState(false);
+    const [loading, setLoading] = useState(false);
     const handleModalOpen = () => setOpen(true);
     const handleModalClose = () => setOpen(false);
     const [openDeleteModal, setOpenDeleteModal] = useState(false);
@@ -188,8 +189,10 @@ export const PondComponent = ({ setSelectedPond }: PondComponentInputProps) => {
 
     const getPondData = async () => {
         let filtersData = Object.values(filters);
+        setLoading(true);
         setTimeout(async () => {
             await getPonds(page*10, 10, filtersData);
+            setLoading(false);
         }, 1000);
     };
 
@@ -256,11 +259,12 @@ export const PondComponent = ({ setSelectedPond }: PondComponentInputProps) => {
             
             <Box sx={{ height: 840, width: "100%" }}>
                 <TableComponent
-                dataSource={pondsList}
-                columns={columns}
-                totalRecords={pondsData.totalPonds}
-                fetchAllData={getAllPondsData}
-                setPage={setPage}
+                    loading={loading}
+                    dataSource={pondsList}
+                    columns={columns}
+                    totalRecords={pondsData.totalPonds}
+                    fetchAllData={getAllPondsData}
+                    setPage={setPage}
                 />
             </Box>
 

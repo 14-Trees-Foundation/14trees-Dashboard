@@ -7,6 +7,7 @@ import { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 
 interface TableComponentProps {
+    loading?: boolean
     dataSource: any[] | undefined
     columns: TableColumnsType<any> | undefined
     totalRecords: number
@@ -16,9 +17,10 @@ interface TableComponentProps {
     handleSelectionChanges?: (ids: number[]) => void
 }
 
-function TableComponent({ dataSource, columns, totalRecords, fetchAllData, setPage, handleSelectionChanges, setSrNoPage }: TableComponentProps) {
+function TableComponent({ loading, dataSource, columns, totalRecords, fetchAllData, setPage, handleSelectionChanges, setSrNoPage }: TableComponentProps) {
 
     const [download, setDownload] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
 
     let rowSelection: TableRowSelection<AnyObject> | undefined;
     if (handleSelectionChanges) {
@@ -68,8 +70,13 @@ function TableComponent({ dataSource, columns, totalRecords, fetchAllData, setPa
 
     }, [dataSource]);
 
+    useEffect(() => {
+        if (loading !== undefined) setIsLoading(loading);
+    }, [loading]);
+
     return (
         <Table
+            loading={isLoading}
             style={{ borderRadius: 20 }}
             dataSource={dataSource}
             columns={columns}
@@ -85,9 +92,10 @@ function TableComponent({ dataSource, columns, totalRecords, fetchAllData, setPa
                     setSrNoPage && setSrNoPage(page-1);
                 } }}
             rowSelection={rowSelection}
-            scroll={{ y: 700 }}
-            title={() => (
-                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+            scroll={{ y: 550 }}
+            footer={() => (
+                <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                    <div style={{ marginRight: '10px', display: 'flex', alignItems: 'center' }}><strong>Export table data in a csv file:</strong></div>
                     <Button 
                         color="success" 
                         variant='contained'

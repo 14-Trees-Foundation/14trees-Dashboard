@@ -34,6 +34,7 @@ export const PlotComponent = () => {
     dispatch
   );
 
+  const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
   const handleModalOpen = () => setOpen(true);
   const handleModalClose = () => setOpen(false);
@@ -54,9 +55,11 @@ export const PlotComponent = () => {
   }, [page, filters]);
 
   const getPlotData = async () => {
+    setLoading(true);
     setTimeout(async () => {
       let filtersData = Object.values(filters);
       await getPlots(page * 10, 10, filtersData);
+      setLoading(false);
     }, 1000);
   };
 
@@ -247,6 +250,7 @@ export const PlotComponent = () => {
       <Divider sx={{ backgroundColor: "black", marginBottom: '15px' }} />
       <Box sx={{ height: 840, width: "100%" }}>
         <TableComponent
+          loading={loading}
           dataSource={plotsList}
           columns={columns}
           totalRecords={plotsData.totalPlots}

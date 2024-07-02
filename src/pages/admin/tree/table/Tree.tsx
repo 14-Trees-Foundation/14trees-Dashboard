@@ -50,6 +50,7 @@ export const TreeNew = () => {
     const [plotName, setPlotName] = useState('');
     const [plotsLoading, setPlotsLoading] = useState(false);
 
+    const [loading, setLoading] = useState(false);
     const [openDeleteModal, setOpenDeleteModal] = useState(false);
     const [deleteRow, setDeleteRow] = useState<any>({});
     const [page, setPage] = useState(0);
@@ -78,8 +79,10 @@ export const TreeNew = () => {
 
     const getTreeData = async () => {
         const filtersData = Object.values(filters);
+        setLoading(true);
         setTimeout(async () => {
             await getTrees(page * 10, 10, filtersData);
+            setLoading(false);
         }, 1000);
     };
 
@@ -360,6 +363,7 @@ export const TreeNew = () => {
             <Divider sx={{ backgroundColor: "black", marginBottom: '15px' }} />
             <Box sx={{ height: 840, width: "100%" }}>
                 <TableComponent
+                    loading={loading}
                     dataSource={treesList}
                     columns={columns}
                     totalRecords={treesData.totalTrees}

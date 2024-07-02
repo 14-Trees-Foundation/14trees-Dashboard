@@ -47,6 +47,7 @@ export const OrganizationComponent = () => {
     bulkCreateUserGroupMapping
   } = bindActionCreators(userGroupActionCreators, dispatch);
 
+  const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
   const [selectedItem, setSelectedItem] = useState<Group | null>(null);
@@ -92,8 +93,11 @@ export const OrganizationComponent = () => {
       }
       return item;
     })
+
+    setLoading(true);
     setTimeout(async () => {
       await getGroups(page * 10, 10, dataFilters);
+      setLoading(false);
     }, 1000);
   };
 
@@ -293,6 +297,7 @@ export const OrganizationComponent = () => {
       <Divider sx={{ backgroundColor: "black", marginBottom: '15px' }} />
       <Box sx={{ height: 840, width: "100%" }}>
         <TableComponent
+          loading={loading}
           dataSource={groupList}
           columns={columns}
           totalRecords={groupsData.totalGroups}

@@ -32,6 +32,7 @@ export const User1 = () => {
   const { getUsers, searchUsers, createUser, createBulkUsers, updateUser, deleteUser } =
     bindActionCreators(userActionCreators, dispatch);
 
+  const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
   const handleModalOpen = () => setOpen(true);
   const handleModalClose = () => setOpen(false);
@@ -56,8 +57,10 @@ export const User1 = () => {
 
   const getUserData = async () => {
     let filtersData = Object.values(filters);
+    setLoading(true);
     setTimeout(async () => {
       await getUsers(page * 10, 10, filtersData);
+      setLoading(false);
     }, 1000);
   };
 
@@ -228,6 +231,7 @@ export const User1 = () => {
       <Divider sx={{ backgroundColor: "black", marginBottom: '15px' }} />
       <Box sx={{ height: 840, width: "100%" }}>
         <TableComponent
+          loading={loading}
           dataSource={usersList}
           columns={antdColumns}
           totalRecords={usersData.totalUsers}

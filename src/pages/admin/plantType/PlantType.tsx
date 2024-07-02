@@ -32,6 +32,7 @@ export const PlantTypeComponent = () => {
     const { getPlantTypes, createPlantType, updatePlantType, deletePlantType } =
         bindActionCreators(plantTypeActionCreators, dispatch);
 
+    const [loading, setLoading] = useState(false);
     const [open, setOpen] = useState(false);
     const handleModalOpen = () => setOpen(true);
     const handleModalClose = () => setOpen(false);
@@ -138,8 +139,10 @@ export const PlantTypeComponent = () => {
 
     const getPlantTypeData = async () => {
         const filtersData = Object.values(filters);
+        setLoading(true);
         setTimeout(async () => {
             await getPlantTypes(page*10, 10, filtersData);
+            setLoading(false);
         }, 1000);
     };
 
@@ -209,6 +212,7 @@ export const PlantTypeComponent = () => {
             <Divider sx={{ backgroundColor: "black", marginBottom: '15px' }} />
             <Box sx={{ height: 840, width: "100%" }}>
                 <TableComponent
+                    loading={loading}
                     dataSource={plantTypesList}
                     columns={columns}
                     totalRecords={plantTypesData.totalPlantTypes}
