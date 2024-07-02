@@ -1,10 +1,10 @@
-// import { Button } from '@mui/material';
+import { Button } from '@mui/material';
 import { Table, TableColumnsType } from 'antd';
 import { AnyObject } from 'antd/es/_util/type';
 import { TableRowSelection } from 'antd/es/table/interface';
+import { Parser } from 'json2csv';
 import { useEffect, useState } from 'react';
-// import { CSVLink } from "react-csv"
-// import { toast } from 'react-toastify';
+import { toast } from 'react-toastify';
 
 interface TableComponentProps {
     dataSource: any[] | undefined
@@ -17,6 +17,8 @@ interface TableComponentProps {
 }
 
 function TableComponent({ dataSource, columns, totalRecords, fetchAllData, setPage, handleSelectionChanges, setSrNoPage }: TableComponentProps) {
+
+    const [download, setDownload] = useState(false);
 
     let rowSelection: TableRowSelection<AnyObject> | undefined;
     if (handleSelectionChanges) {
@@ -31,21 +33,41 @@ function TableComponent({ dataSource, columns, totalRecords, fetchAllData, setPa
         }
     }
 
-    /* <Button  
-        variant="contained"
-    >
-        <CSVLink
-            data={dataSource ?? ''}
-            asyncOnClick={true}
-            className="btn btn-primary"
-            onClick={(event, done) => {
-                toast.info("The file is downloading")
-                fetchAllData().then(() => { done(); toast.success("Downloaded the file")});
-            }}
-        >
-            Export
-        </CSVLink>
-    </Button> */
+    const handleDownload = (data: any) => {
+        const json2csvParser = new Parser();
+        const csv = json2csvParser.parse(data);
+    
+        // Create a Blob from the CSV string
+        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.setAttribute('download', `${new Date().getTime()}.csv`);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    };
+
+    useEffect(() => {
+        if (download) {
+            const data = dataSource?.map((item) => {
+                const row: any = {}
+                columns?.forEach((column: any) => {
+                    if (column.dataIndex === 'srNo' || column.dataIndex === 'action') return;
+                    if (column.render) {
+                        const value = column.render(item[column.dataIndex], item, 0);
+                        row[column.title] = value?.props?.children ? value.props.children : value;
+                    }
+                    else row[column.title] = item[column.dataIndex];
+                })
+                return row
+            })
+            handleDownload(data);
+            setDownload(false);
+            toast.success('File downloaded successfully!');
+        }
+
+    }, [dataSource]);
+
     return (
         <Table
             style={{ borderRadius: 20 }}
@@ -64,6 +86,18 @@ function TableComponent({ dataSource, columns, totalRecords, fetchAllData, setPa
                 } }}
             rowSelection={rowSelection}
             scroll={{ y: 700 }}
+            title={() => (
+                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                    <Button 
+                        color="success" 
+                        variant='contained'
+                        onClick={() =>{
+                        fetchAllData();
+                        setDownload(true);
+                    }}>Export</Button>
+                    <div></div>
+                </div>
+            )}
         />
     )
 }

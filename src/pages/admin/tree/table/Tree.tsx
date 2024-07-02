@@ -110,8 +110,8 @@ export const TreeNew = () => {
 
     const columns: TableColumnsType<Tree> = [
         {
-            dataIndex: "sr_no",
-            key: "sr_no",
+            dataIndex: "srNo",
+            key: "srNo",
             title: "Sr. No.",
             width: 150,
             align: 'center',

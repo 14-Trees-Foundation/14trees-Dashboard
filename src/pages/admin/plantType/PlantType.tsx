@@ -50,8 +50,8 @@ export const PlantTypeComponent = () => {
 
     const columns: TableColumnsType<PlantType> = [
         {
-          dataIndex: "sr_no",
-          key: "sr_no",
+          dataIndex: "srNo",
+          key: "srNo",
           title: "Sr. No.",
           width: 100,
           align: "center",
