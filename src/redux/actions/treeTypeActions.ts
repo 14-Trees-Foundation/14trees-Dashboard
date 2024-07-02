@@ -1,6 +1,7 @@
 import ApiClient from "../../api/apiClient/apiClient";
 import treeTypeActionTypes from "../actionTypes/treeTypeActionTypes";
 import { TreeType, TreeTypePaginationResponse } from "../../types/treeType";
+import { toast } from "react-toastify";
 
 export const getTreeTypes = (offset: number, limit: number, name?: string) => {
     const apiClient = new ApiClient()
@@ -101,12 +102,14 @@ export const createTreeType = (record: TreeType, file?: Blob) => {
                     type: treeTypeActionTypes.CREATE_TREE_TYPE_SUCCEEDED,
                     payload: value,
                 });
+                toast.success("Tree Type created successfully!");
             },
             (error: any) => {
                 console.error(error);
                 dispatch({
                     type: treeTypeActionTypes.CREATE_TREE_TYPE_FAILED,
                 });
+                toast.error("Failed to create Tree Type!");
             }
         )
     };

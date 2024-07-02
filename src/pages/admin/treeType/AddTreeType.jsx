@@ -45,6 +45,7 @@ const AddTreeType = ({ open, handleClose, createTreeData }) => {
 
     const handleSubmit = (event) => {
         event.preventDefault();
+        handleClose();
         createTreeData(formData);
     };
 

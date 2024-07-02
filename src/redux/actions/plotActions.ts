@@ -1,6 +1,7 @@
 import ApiClient from "../../api/apiClient/apiClient";
 import plotActionTypes from "../actionTypes/plotActionTypes";
 import { Plot, PlotPaginationResponse } from "../../types/plot";
+import { toast } from "react-toastify";
 
 export const getPlots = (offset: number, limit: number, name?: string) => {
     const apiClient = new ApiClient()
@@ -101,12 +102,14 @@ export const createPlot = (record: Plot) => {
                     type: plotActionTypes.CREATE_PLOT_SUCCEEDED,
                     payload: value,
                 });
+                toast.success("Plot created successfully");
             },
             (error: any) => {
                 console.error(error);
                 dispatch({
                     type: plotActionTypes.CREATE_PLOT_FAILED,
                 });
+                toast.error("Failed to create Plot");
             }
         )
     };
