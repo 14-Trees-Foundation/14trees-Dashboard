@@ -19,7 +19,7 @@ export const Memories = () => {
 
   let images = [];
   for (const tree of userinfo.user_trees) {
-    images.push.apply(images, tree["memories"]);
+    images.push.apply(images, tree["memory_images"]);
   }
 
   let allImages = [];
