@@ -101,7 +101,7 @@ export const createBulkUsers = (data: Blob) => {
                 });
             },
             (error: any) => {
-                toast.error(error.message)
+                toast.error(error.message || "Failed to create users")
                 dispatch({
                     type: userActionTypes.CREATE_BULK_USERS_SUCCEEDED,
                 });

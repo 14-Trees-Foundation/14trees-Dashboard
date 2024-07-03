@@ -2,6 +2,7 @@ import ApiClient from "../../api/apiClient/apiClient";
 import groupActionTypes from "../actionTypes/groupActionTypes";
 import { Group } from "../../types/Group";
 import { PaginatedResponse } from "../../types/pagination";
+import { toast } from "react-toastify";
 
 export const getGroups = (offset: number, limit: number, filters?: any[]) => {
     const apiClient = new ApiClient()
@@ -20,6 +21,7 @@ export const getGroups = (offset: number, limit: number, filters?: any[]) => {
                     type: groupActionTypes.GET_GROUPS_SUCCEEDED,
                     payload: value,
                 });
+                toast.success(`Successfully fetched groups!`)
             },
             (error: any) => {
                 console.log(error)
@@ -27,6 +29,7 @@ export const getGroups = (offset: number, limit: number, filters?: any[]) => {
                     type: groupActionTypes.GET_GROUPS_FAILED,
                     payload: error
                 });
+                toast.error(`Failed to fetch groups!`)
             }
         )
     }
@@ -44,12 +47,14 @@ export const createGroup = (record: Group) => {
                     type: groupActionTypes.CREATE_GROUP_SUCCEEDED,
                     payload: value,
                 });
+                toast.success(`Successfully created group!`)
             },
             (error: any) => {
                 console.error(error);
                 dispatch({
                     type: groupActionTypes.CREATE_GROUP_FAILED,
                 });
+                toast.error(`Failed to create group!`)
             }
         )
     };
@@ -67,12 +72,14 @@ export const updateGroup = (record: Group) => {
                     type: groupActionTypes.UPDATE_GROUP_SUCCEEDED,
                     payload: value,
                 });
+                toast.success(`Successfully updated group!`)
             },
             (error: any) => {
                 console.error(error);
                 dispatch({
                     type: groupActionTypes.UPDATE_GROUP_FAILED,
                 });
+                toast.error(`Failed to update group!`)
             }
         )
     };
@@ -91,12 +98,14 @@ export const deleteGroup = (record: Group) => {
                     type: groupActionTypes.DELETE_GROUP_SUCCEEDED,
                     payload: id,
                 });
+                toast.success(`Successfully deleted group!`)
             },
             (error: any) => {
                 console.error(error);
                 dispatch({
                     type: groupActionTypes.DELETE_GROUP_FAILED,
                 });
+                toast.error(`Failed to delete group!`)
             }
         )
     };

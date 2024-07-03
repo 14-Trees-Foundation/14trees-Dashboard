@@ -64,11 +64,11 @@ export const UserInfo = () => {
               alt="Card"
               onLoad={() => setImgLoad(true)}
               src={
-                selUserInfo.profile_image === ""
-                  ? selUserInfo.images
-                    ? selUserInfo.images[0]
-                    : selUserInfo.tree_type_image
-                  : selUserInfo.profile_image
+                !selUserInfo.user_tree_image || selUserInfo.user_tree_image === ""
+                  ? selUserInfo.image
+                    ? selUserInfo.image
+                    : selUserInfo.tree_type_images[0]
+                  : selUserInfo.user_tree_image
               }
             />
           </Grid>

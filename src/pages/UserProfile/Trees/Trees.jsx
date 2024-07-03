@@ -52,10 +52,9 @@ export const Trees = ({ saplingId }) => {
                       name={item.plant_type}
                       img={
                         item.image
-                          ? item.images.length === 0 ||
-                            item.images[0] === ""
+                          ? item.image === ""
                             ? item.plant_type_image
-                            : item.images[0]
+                            : item.image
                           : item.plant_type_image
                       }
                       date={date}

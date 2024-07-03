@@ -7,6 +7,7 @@ import MenuIcon from "@mui/icons-material/Menu";
 import IconButton from "@mui/material/IconButton";
 import LeaderBoardOutlined from "@mui/icons-material/LeaderboardOutlined";
 import ForestOutlined from "@mui/icons-material/ForestOutlined";
+import GrassTwoToneIcon from "@mui/icons-material/GrassTwoTone";
 import OpacityOutlined from "@mui/icons-material/OpacityOutlined";
 import AccountCircleOutlined from "@mui/icons-material/AccountCircleOutlined";
 import FaceIcon from "@mui/icons-material/Face";
@@ -58,7 +59,7 @@ export const AdminLeftDrawer = () => {
     },
     {
       displayName: "Plant Types",
-      logo: ForestOutlined,
+      logo: GrassTwoToneIcon,
       display: true,
     },
     {
@@ -72,7 +73,7 @@ export const AdminLeftDrawer = () => {
       display: true,
     },
     {
-      displayName: "Peoples",
+      displayName: "People",
       logo: AccountCircleOutlined,
       // display: auth.permissions.includes("all"),
       display: true,
@@ -82,21 +83,21 @@ export const AdminLeftDrawer = () => {
       logo: CorporateFareIcon,
       display: true
     },
-    {
-      displayName: 'Sites',
-      logo: MapIcon,
-      display: true
-    },
-    {
-      displayName: 'Events',
-      logo: FestivalIcon,
-      display: true
-    },
-    {
-      displayName: 'Donation',
-      logo: VolunteerActivismIcon,
-      display: true
-    },
+    // {
+    //   displayName: 'Sites',
+    //   logo: MapIcon,
+    //   display: true
+    // },
+    // {
+    //   displayName: 'Events',
+    //   logo: FestivalIcon,
+    //   display: true
+    // },
+    // {
+    //   displayName: 'Donation',
+    //   logo: VolunteerActivismIcon,
+    //   display: true
+    // },
     // {
     //   displayName: "Images",
     //   logo: FaceIcon,

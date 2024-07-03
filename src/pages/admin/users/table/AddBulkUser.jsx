@@ -19,16 +19,20 @@ function AddBulkUser({ open, handleClose, createBulkUsers }) {
     return (
         <div>
             <Dialog open={open} onClose={handleClose}>
-                <DialogTitle>Add Bulk User</DialogTitle>
+                <DialogTitle>Download sample file from <a href="https://docs.google.com/spreadsheets/d/1ypVdbR44nQXuaHAEOrwywY3k-lfJdsRZ9iKp0Jpq7Kw/edit?usp=sharing">here</a> and fill the details.</DialogTitle>
+                
                 <form onSubmit={handleSubmit}>
                     <DialogContent>
+                        <InputLabel htmlFor="file">CSV File</InputLabel>
                         <FormControl>
-                            {/* <InputLabel htmlFor="file">Upload File</InputLabel> */}
-                            <Input type="file" id="file" onChange={handleFileChange} />
+                            <Input type="file" id="file" accept=".csv" onChange={handleFileChange} />
                         </FormControl>
                     </DialogContent>
                     <DialogActions>
-                        <Button type="submit" color="primary">
+                        <Button variant='outlined' color="error" onClick={handleClose}>
+                            Cancel
+                        </Button>
+                        <Button variant='contained' type="submit" color="success">
                             Submit
                         </Button>
                     </DialogActions>

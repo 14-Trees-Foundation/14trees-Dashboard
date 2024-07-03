@@ -34,6 +34,7 @@ export const PlotComponent = () => {
     dispatch
   );
 
+  const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
   const handleModalOpen = () => setOpen(true);
   const handleModalClose = () => setOpen(false);
@@ -54,9 +55,11 @@ export const PlotComponent = () => {
   }, [page, filters]);
 
   const getPlotData = async () => {
+    setLoading(true);
     setTimeout(async () => {
       let filtersData = Object.values(filters);
       await getPlots(page * 10, 10, filtersData);
+      setLoading(false);
     }, 1000);
   };
 
@@ -74,6 +77,7 @@ export const PlotComponent = () => {
   const plotsData = useAppSelector((state: RootState) => state.plotsData);
   if (plotsData) {
     plotsList = Object.values(plotsData.plots);
+    plotsList = plotsList.sort((a, b) => b.id - a.id);
   }
 
   let tags: string[] = [];
@@ -168,6 +172,7 @@ export const PlotComponent = () => {
       title: "Total Trees",
       align: "center",
       width: 150,
+      render: (value) => value ?? 0,
     },
     {
       dataIndex: "mapped_trees_count",
@@ -175,6 +180,7 @@ export const PlotComponent = () => {
       title: "Booked Trees",
       align: "center",
       width: 150,
+      render: (value) => value ?? 0,
     },
     {
       dataIndex: "assigned_trees_count",
@@ -182,6 +188,7 @@ export const PlotComponent = () => {
       title: "Assigned Trees",
       align: "center",
       width: 150,
+      render: (value) => value ?? 0,
     },
     {
       dataIndex: "available_trees_count",
@@ -189,6 +196,7 @@ export const PlotComponent = () => {
       title: "Available Trees",
       align: "center",
       width: 150,
+      render: (value) => value ?? 0,
     },
   ];
 
@@ -242,6 +250,7 @@ export const PlotComponent = () => {
       <Divider sx={{ backgroundColor: "black", marginBottom: '15px' }} />
       <Box sx={{ height: 840, width: "100%" }}>
         <TableComponent
+          loading={loading}
           dataSource={plotsList}
           columns={columns}
           totalRecords={plotsData.totalPlots}

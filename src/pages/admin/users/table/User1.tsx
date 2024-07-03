@@ -32,6 +32,7 @@ export const User1 = () => {
   const { getUsers, searchUsers, createUser, createBulkUsers, updateUser, deleteUser } =
     bindActionCreators(userActionCreators, dispatch);
 
+  const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
   const handleModalOpen = () => setOpen(true);
   const handleModalClose = () => setOpen(false);
@@ -56,8 +57,10 @@ export const User1 = () => {
 
   const getUserData = async () => {
     let filtersData = Object.values(filters);
+    setLoading(true);
     setTimeout(async () => {
       await getUsers(page * 10, 10, filtersData);
+      setLoading(false);
     }, 1000);
   };
 
@@ -153,6 +156,7 @@ export const User1 = () => {
   const usersData = useAppSelector((state: RootState) => state.usersData);
   if (usersData) {
     usersList = Object.values(usersData.users);
+    usersList = usersList.sort((a, b) => b.id - a.id);
   }
 
   const getAllUsersData = async () => {
@@ -193,7 +197,7 @@ export const User1 = () => {
           padding: "4px 12px",
         }}
       >
-        <Typography variant="h4" style={{ marginTop: '5px' }}>Peoples</Typography>
+        <Typography variant="h4" style={{ marginTop: '5px' }}>People</Typography>
         <div
           style={{
             display: "flex",
@@ -202,7 +206,7 @@ export const User1 = () => {
             marginTop: "5px",
           }}>
           <Button variant="contained" color="success" onClick={handleModalOpen}>
-            Add
+            Add User
           </Button>
           <AddUser
             open={open}
@@ -215,7 +219,7 @@ export const User1 = () => {
             color="success"
             style={{ marginLeft: "10px" }}
             onClick={handleBulkModalOpen}>
-            Bulk Create
+            Bulk Add
           </Button>
           <AddBulkUser
             open={bulkModalOpen}
@@ -227,6 +231,7 @@ export const User1 = () => {
       <Divider sx={{ backgroundColor: "black", marginBottom: '15px' }} />
       <Box sx={{ height: 840, width: "100%" }}>
         <TableComponent
+          loading={loading}
           dataSource={usersList}
           columns={antdColumns}
           totalRecords={usersData.totalUsers}
@@ -243,7 +248,7 @@ export const User1 = () => {
           </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setOpenDeleteModal(false)} color="primary">
+          <Button variant="outlined" onClick={() => setOpenDeleteModal(false)} color="error">
             Cancel
           </Button>
           <Button
@@ -254,7 +259,8 @@ export const User1 = () => {
               }
               setOpenDeleteModal(false);
             }}
-            color="primary"
+            variant="contained"
+            color="success"
             autoFocus>
             Yes
           </Button>

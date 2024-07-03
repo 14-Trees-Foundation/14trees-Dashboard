@@ -2,6 +2,7 @@ import ApiClient from "../../api/apiClient/apiClient";
 import plotActionTypes from "../actionTypes/plotActionTypes";
 import { Plot } from "../../types/plot";
 import { PaginatedResponse } from "../../types/pagination";
+import { toast } from "react-toastify";
 
 export const getPlots = (offset: number, limit: number, filters?: any[]) => {
     const apiClient = new ApiClient()
@@ -20,6 +21,7 @@ export const getPlots = (offset: number, limit: number, filters?: any[]) => {
                     type: plotActionTypes.GET_PLOTS_SUCCEEDED,
                     payload: value,
                 });
+                toast.success(`Successfully fetched plots!`)
             },
             (error: any) => {
                 console.log(error)
@@ -27,6 +29,7 @@ export const getPlots = (offset: number, limit: number, filters?: any[]) => {
                     type: plotActionTypes.GET_PLOTS_FAILED,
                     payload: error
                 });
+                toast.error(`Failed to fetch plots!`)
             }
         )
     }
@@ -73,12 +76,14 @@ export const createPlot = (record: Plot) => {
                     type: plotActionTypes.CREATE_PLOT_SUCCEEDED,
                     payload: value,
                 });
+                toast.success(`Successfully created plot!`)
             },
             (error: any) => {
                 console.error(error);
                 dispatch({
                     type: plotActionTypes.CREATE_PLOT_FAILED,
                 });
+                toast.error(`Failed to create plot!`)
             }
         )
     };
@@ -96,12 +101,14 @@ export const updatePlot = (record: Plot) => {
                     type: plotActionTypes.UPDATE_PLOT_SUCCEEDED,
                     payload: value,
                 });
+                toast.success(`Successfully updated plot!`)
             },
             (error: any) => {
                 console.error(error);
                 dispatch({
                     type: plotActionTypes.UPDATE_PLOT_FAILED,
                 });
+                toast.error(`Failed to update plot!`)
             }
         )
     };
@@ -120,12 +127,14 @@ export const deletePlot = (record: Plot) => {
                     type: plotActionTypes.DELETE_PLOT_SUCCEEDED,
                     payload: id,
                 });
+                toast.success(`Successfully deleted plot!`)
             },
             (error: any) => {
                 console.error(error);
                 dispatch({
                     type: plotActionTypes.DELETE_PLOT_FAILED,
                 });
+                toast.error(`Failed to delete plot!`)
             }
         )
     };

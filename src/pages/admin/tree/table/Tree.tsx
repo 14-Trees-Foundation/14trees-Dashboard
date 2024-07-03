@@ -50,6 +50,7 @@ export const TreeNew = () => {
     const [plotName, setPlotName] = useState('');
     const [plotsLoading, setPlotsLoading] = useState(false);
 
+    const [loading, setLoading] = useState(false);
     const [openDeleteModal, setOpenDeleteModal] = useState(false);
     const [deleteRow, setDeleteRow] = useState<any>({});
     const [page, setPage] = useState(0);
@@ -78,8 +79,10 @@ export const TreeNew = () => {
 
     const getTreeData = async () => {
         const filtersData = Object.values(filters);
+        setLoading(true);
         setTimeout(async () => {
             await getTrees(page * 10, 10, filtersData);
+            setLoading(false);
         }, 1000);
     };
 
@@ -110,8 +113,8 @@ export const TreeNew = () => {
 
     const columns: TableColumnsType<Tree> = [
         {
-            dataIndex: "sr_no",
-            key: "sr_no",
+            dataIndex: "srNo",
+            key: "srNo",
             title: "Sr. No.",
             width: 150,
             align: 'center',
@@ -196,6 +199,7 @@ export const TreeNew = () => {
     const treesData = useAppSelector((state: RootState) => state.treesData);
     if (treesData) {
         treesList = Object.values(treesData.trees);
+        treesList = treesList.sort((a, b) => b.id - a.id)
     }
 
     const getAllTreesData = async () => {
@@ -253,6 +257,7 @@ export const TreeNew = () => {
         unMapTrees(saplingIds);
         setSaplingIds([]);
         setDisabledMapUnMapButton(true);
+        setDisabledAUButton(true);
         getTreeData();
     }
 
@@ -260,6 +265,7 @@ export const TreeNew = () => {
         mapTrees('user', saplingIds, formData.id);
         setSaplingIds([]);
         setDisabledMapUnMapButton(true);
+        setDisabledAUButton(true);
         setIsUserModalOpen(false);
         getTreeData();
     }
@@ -276,16 +282,21 @@ export const TreeNew = () => {
     const handleUnassignTrees = () => {
         unassignUserTrees(saplingIds);
         setSaplingIds([]);
+        setDisabledAUButton(true);
         setDisabledMapUnMapButton(true);
         getTreeData();
     }
 
-    const handleAssignTrees = (formData: any) => {
-        let data = formData as AssignTreeRequest
-        data.sapling_ids = saplingIds
-        assignTrees(data);
+    const handleAssignTrees = (data: any) => {
+        data['sapling_ids'] = saplingIds
+        let formData = new FormData();
+        Object.entries(data).forEach(([key, value]) => {
+            formData.append(key, value as string);
+        })
+        assignTrees(formData);
         setSaplingIds([]);
         setDisabledAUButton(true);
+        setDisabledMapUnMapButton(true);
         setIsAssignTreeModalOpen(false);
         getTreeData();
     }
@@ -347,22 +358,12 @@ export const TreeNew = () => {
                         disabled={disabledMapUnMapButton}
                     >{(isMapTrees) ? "Map Trees" : "UnMap Trees"}</Button>
                     <UserModal open={isUserModalOpen} handleClose={() => { setIsUserModalOpen(false) }} onSubmit={handleMapTrees} searchUser={searchUsers} />
-                    {/* <Button variant="contained" style={{ marginLeft: '10px' }} onClick={handleModalOpen}
-                disabled={true} 
-                >Add Tree</Button>
-                <AddTree open={open} handleClose={handleModalClose} />
-                <Button
-                    variant="contained"
-                    style={{ marginLeft: "10px" }}
-                    onClick={handleModalOpen}
-                    disabled={true}>
-                    Bulk Create
-                </Button> */}
                 </div>
             </div>
             <Divider sx={{ backgroundColor: "black", marginBottom: '15px' }} />
             <Box sx={{ height: 840, width: "100%" }}>
                 <TableComponent
+                    loading={loading}
                     dataSource={treesList}
                     columns={columns}
                     totalRecords={treesData.totalTrees}

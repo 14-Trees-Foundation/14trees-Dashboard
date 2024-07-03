@@ -26,6 +26,7 @@ export const groupsDataReducer = (state = { totalGroups:0, groups: {} }, action:
             return state;
         case groupActionTypes.CREATE_GROUP_SUCCEEDED:
             if (action.payload) {
+                console.log(action.payload)
                 const nextState = { totalGroups: state.totalGroups, groups: { ...state.groups } } as GroupsDataState;
                 let payload = action.payload as Group
                 payload.key = payload.id

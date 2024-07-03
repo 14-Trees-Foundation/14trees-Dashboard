@@ -20,15 +20,15 @@ export const AppBar = () => {
                         <h2 className={classes.links}>Events</h2>
                         <h2 className={classes.links}>Search</h2>
                         <h2 className={classes.links}>About</h2> */}
-            <Button
+            {/* <Button
               variant="contained"
               color="primary"
               size="large"
               style={{ marginRight: "2%" }}
               onClick={() => navigate("/visitor")}
             >
-              Add Visitor
-            </Button>
+              Visitor Form
+            </Button> */}
             <Button
               variant="contained"
               color="primary"

@@ -47,6 +47,7 @@ export const OrganizationComponent = () => {
     bulkCreateUserGroupMapping
   } = bindActionCreators(userGroupActionCreators, dispatch);
 
+  const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
   const [selectedItem, setSelectedItem] = useState<Group | null>(null);
@@ -92,8 +93,11 @@ export const OrganizationComponent = () => {
       }
       return item;
     })
+
+    setLoading(true);
     setTimeout(async () => {
       await getGroups(page * 10, 10, dataFilters);
+      setLoading(false);
     }, 1000);
   };
 
@@ -189,9 +193,14 @@ export const OrganizationComponent = () => {
   );
   if (groupsData) {
     groupList = Object.values(groupsData.groups);
+    groupList = groupList.sort((a, b) => b.id - a.id);
   }
 
   const userGroupMapping = useAppSelector((state: RootState) => state.userGroupsData);
+  const data = Object.entries(userGroupMapping).filter(([key, value]) => {
+    return value.failed !== 0
+  })
+  const filteredUserGroupMapping = Object.fromEntries(data);
 
   const getAllGroupsData = async () => {
     setTimeout(async () => {
@@ -241,7 +250,7 @@ export const OrganizationComponent = () => {
           padding: "4px 12px",
         }}
       >
-        <Typography variant="h4" style={{ marginTop: '5px' }}>Group Peoples</Typography>
+        <Typography variant="h4" style={{ marginTop: '5px' }}>Group People</Typography>
         <div
           style={{
             display: "flex",
@@ -249,8 +258,8 @@ export const OrganizationComponent = () => {
             marginBottom: "5px",
             marginTop: "5px",
           }}>
-          <Button variant="outlined" color="primary" onClick={() => setFailedRecords(true)} disabled={Object.keys(userGroupMapping).length === 0}>
-            <Badge badgeContent={Object.keys(userGroupMapping).length} color="error">
+          <Button variant="outlined" color="primary" onClick={() => setFailedRecords(true)} disabled={Object.keys(filteredUserGroupMapping).length === 0}>
+            <Badge badgeContent={Object.keys(filteredUserGroupMapping).length} color="error">
               <ErrorIcon />
             </Badge>
           </Button>
@@ -288,6 +297,7 @@ export const OrganizationComponent = () => {
       <Divider sx={{ backgroundColor: "black", marginBottom: '15px' }} />
       <Box sx={{ height: 840, width: "100%" }}>
         <TableComponent
+          loading={loading}
           dataSource={groupList}
           columns={columns}
           totalRecords={groupsData.totalGroups}
@@ -307,7 +317,7 @@ export const OrganizationComponent = () => {
           </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setOpenDeleteModal(false)} color="primary">
+          <Button onClick={() => setOpenDeleteModal(false)} color="error" variant="outlined">
             Cancel
           </Button>
           <Button
@@ -318,7 +328,8 @@ export const OrganizationComponent = () => {
               }
               setOpenDeleteModal(false);
             }}
-            color="primary"
+            color="success"
+            variant="contained"
             autoFocus>
             Yes
           </Button>
@@ -338,7 +349,7 @@ export const OrganizationComponent = () => {
         <FailedRecordsList
           open={failedRecords}
           handleClose={() => setFailedRecords(false)}
-          failedRecords={userGroupMapping}
+          failedRecords={filteredUserGroupMapping}
           groupsMap={groupsData.groups}
         />
       )}
@@ -367,10 +378,10 @@ export const OrganizationComponent = () => {
               marginBottom: "15px",
             }}
           >
-            <Button onClick={() => setBulkCreate(false)} variant="contained" color="primary">
+            <Button onClick={() => setBulkCreate(false)} variant="outlined" color="error">
               Cancel
             </Button>
-            <Button type="submit" variant="contained" color="primary">
+            <Button type="submit" variant="contained" color="success">
               Upload
             </Button>
           </DialogActions>

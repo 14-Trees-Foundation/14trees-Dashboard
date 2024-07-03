@@ -12,7 +12,8 @@ import {
 import { Typography } from "@mui/material";
 import { CustomBox } from "../../../../components/CustomBox";
 import { useAppSelector } from "../../../../redux/store/hooks";
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
+import { Empty } from "antd";
 
 export const PondsHistory = ({ selectedPond }) => {
   const theme = useTheme();
@@ -24,14 +25,17 @@ export const PondsHistory = ({ selectedPond }) => {
     const updates = Object.values(waterLevelData.pondWaterLevelUpdates);
     data = updates.map((item) => {
       return {
-        date: item.updated_at.substring(0, 10),
+        date: item.updated_at?.substring(0, 10),
         level: parseFloat(item.level_ft),
       };
     });
   }
-  if (data && data.length > 0) {
-    targetRef.current.scrollIntoView({ behavior: 'smooth' });
-  }
+
+  useEffect(() => {
+    if (data && selectedPond && targetRef.current) {
+      targetRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [data]);
 
   return (
     <div
@@ -74,6 +78,20 @@ export const PondsHistory = ({ selectedPond }) => {
               />
             </AreaChart>
           </ResponsiveContainer>
+        </CustomBox>
+      )}
+
+      {data && selectedPond && data.length === 0 && (
+        <CustomBox>
+          <div style={{ display: "flex", justifyContent: "space-between" }}>
+            <Typography variant="h6" gutterBottom>
+              Pond level (Feets):{" "}
+              <em style={{ color: theme.custom.color.primary.blue }}>
+                {selectedPond?.name}
+              </em>
+            </Typography>
+          </div>
+          <Empty />
         </CustomBox>
       )}
     </div>

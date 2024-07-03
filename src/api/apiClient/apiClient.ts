@@ -178,8 +178,8 @@ class ApiClient {
 
     async createGroup(data: Group): Promise<Group> {
         try {
-            const response = await this.api.post<{org: Group}>(`/groups`, data);
-            return response.data.org;
+            const response = await this.api.post<Group>(`/groups`, data);
+            return response.data;
         } catch (error) {
             console.error(error)
             throw new Error('Failed to create Group');
@@ -660,7 +660,7 @@ class ApiClient {
         }
     }
 
-    async assignUserTrees(data: AssignTreeRequest): Promise<void> {
+    async assignUserTrees(data: FormData): Promise<void> {
         try {
             await this.api.post<void>(`/profile/usertreereg/multi`, data);
         } catch (error) {

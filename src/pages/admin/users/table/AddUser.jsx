@@ -114,8 +114,8 @@ const AddUser = ({ open, handleClose, createUser, searchUser }) => {
                                 <TextField name="birth_date" label="Date of Birth" type="date" value={formData.birth_date ? formData.birth_date.substring(0, 10): ''} onChange={handleChange} InputLabelProps={{ shrink: true }} fullWidth/>
                             </Grid>
                             <Grid item xs={12} sx={{display:'flex', justifyContent:'center', }}>
-                                <Button type="submit">Submit</Button>
-                                <Button onClick={handleClose}>Cancel</Button>
+                                <Button variant='outlined' color='error' onClick={handleClose}>Cancel</Button>
+                                <Button variant='contained' color='success' type="submit" sx={{marginLeft:'10px'}}>Submit</Button>
                             </Grid>
                         </Grid>
                     </form>
