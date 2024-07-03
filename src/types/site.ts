@@ -1,4 +1,8 @@
 
+export enum maintainence_type {
+    Full = 'FULL',
+    Partial = 'PARTIAL'
+}
 export type Site = {
     id: number;
     key: number;
@@ -30,6 +34,7 @@ export type Site = {
     temp_old_site_name_in_marathi: string;
     created_at: string;
     updated_at: string;
+    maintenence_type: maintainence_type | null;
 };
 
 export type SitesDataState = {

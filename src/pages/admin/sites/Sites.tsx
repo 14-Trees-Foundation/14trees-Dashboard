@@ -94,7 +94,7 @@ export const SitesComponent = () => {
       setSelectedItem(row);
   };
 
-  const handleEditSubmit = (formData: Site) => {
+  const handleEditSubmit =  (formData: Site) => {
       updateSite(formData);
       setSelectedEditRow(null);
   };
@@ -123,7 +123,7 @@ export const SitesComponent = () => {
               onClick={() => {
                 setEditModal(true);
                 setSelectedEditRow(record);
-                console.log(record)
+                console.log('Row data to edit : ',record)
               }}>
               <EditIcon />
             </Button>
@@ -237,7 +237,7 @@ export const SitesComponent = () => {
       title: "Photo Album",
       width: 200,
       align: "center",
-      render: (value) => (
+      render: (value: any) => (
         <a href={value} target="_blank" rel="noopener noreferrer">
           View Photos
         </a>
@@ -249,6 +249,7 @@ export const SitesComponent = () => {
       title: "Consent Letter",
       width: 200,
       align: "center",
+      ...getColumnSearchProps('consent_letter', filters, handleSetFilters)
     },
     {
       dataIndex: "grove_type",
@@ -258,82 +259,91 @@ export const SitesComponent = () => {
       align: "center",
     },
     {
-      dataIndex: "map_to",
-      key: "map_to",
-      title: "Map To",
-      width: 150,
+      dataIndex: "maintenence_type",
+      key: "maintenence_type",
+      title: "Maintenence Type",
+      width: 180,
       align: "center",
     },
-    {
-      dataIndex: "notion_db_pictures",
-      key: "notion_db_pictures",
-      title: "Notion DB Pictures",
-      width: 220,
-      align: "center",
-    },
-    {
-      dataIndex: "split_village_name_1",
-      key: "split_village_name_1",
-      title: "Split Village Name 1",
-      width: 200,
-      align: "center",
-    },
-    {
-      dataIndex: "split_village_name_2",
-      key: "split_village_name_2",
-      title: "Split Village Name 2",
-      width: 200,
-      align: "center",
-    },
-    {
-      dataIndex: "create_id",
-      key: "create_id",
-      title: "Create ID",
-      width: 200,
-      align: "center",
-    },
-    {
-      dataIndex: "site_key",
-      key: "site_key",
-      title: "Site Key",
-      width: 250,
-      align: "center",
-    },
-    {
-      dataIndex: "site_key_2",
-      key: "site_key_2",
-      title: "Site Key 2",
-      width: 200,
-      align: "center",
-    },
-    {
-      dataIndex: "temp_backup_copy_of_old_site_name_english_marathi",
-      key: "temp_backup_copy_of_old_site_name_english_marathi",
-      title: "Temp Backup Copy of Old Site Name",
-      width: 300,
-      align: "center",
-    },
-    {
-      dataIndex: "temp_copy_of_old_site_key",
-      key: "temp_copy_of_old_site_key",
-      title: "Temp Copy of Old Site Key",
-      width: 300,
-      align: "center",
-    },
-    {
-      dataIndex: "temp_old_site_name_in_english",
-      key: "temp_old_site_name_in_english",
-      title: "Temp Old Site Name (English)",
-      width: 300,
-      align: "center",
-    },
-    {
-      dataIndex: "temp_old_site_name_in_marathi",
-      key: "temp_old_site_name_in_marathi",
-      title: "Temp Old Site Name (Marathi)",
-      width: 300,
-      align: "center",
-    },
+
+    
+    // {
+    //   dataIndex: "map_to",
+    //   key: "map_to",
+    //   title: "Map To",
+    //   width: 150,
+    //   align: "center",
+    // },
+    // {
+    //   dataIndex: "notion_db_pictures",
+    //   key: "notion_db_pictures",
+    //   title: "Notion DB Pictures",
+    //   width: 220,
+    //   align: "center",
+    // },
+    // {
+    //   dataIndex: "split_village_name_1",
+    //   key: "split_village_name_1",
+    //   title: "Split Village Name 1",
+    //   width: 200,
+    //   align: "center",
+    // },
+    // {
+    //   dataIndex: "split_village_name_2",
+    //   key: "split_village_name_2",
+    //   title: "Split Village Name 2",
+    //   width: 200,
+    //   align: "center",
+    // },
+    // {
+    //   dataIndex: "create_id",
+    //   key: "create_id",
+    //   title: "Create ID",
+    //   width: 200,
+    //   align: "center",
+    // },
+    // {
+    //   dataIndex: "site_key",
+    //   key: "site_key",
+    //   title: "Site Key",
+    //   width: 250,
+    //   align: "center",
+    // },
+    // {
+    //   dataIndex: "site_key_2",
+    //   key: "site_key_2",
+    //   title: "Site Key 2",
+    //   width: 200,
+    //   align: "center",
+    // },
+    // {
+    //   dataIndex: "temp_backup_copy_of_old_site_name_english_marathi",
+    //   key: "temp_backup_copy_of_old_site_name_english_marathi",
+    //   title: "Temp Backup Copy of Old Site Name",
+    //   width: 300,
+    //   align: "center",
+    // },
+    // {
+    //   dataIndex: "temp_copy_of_old_site_key",
+    //   key: "temp_copy_of_old_site_key",
+    //   title: "Temp Copy of Old Site Key",
+    //   width: 300,
+    //   align: "center",
+    // },
+    // {
+    //   dataIndex: "temp_old_site_name_in_english",
+    //   key: "temp_old_site_name_in_english",
+    //   title: "Temp Old Site Name (English)",
+    //   width: 300,
+    //   align: "center",
+    // },
+    // {
+    //   dataIndex: "temp_old_site_name_in_marathi",
+    //   key: "temp_old_site_name_in_marathi",
+    //   title: "Temp Old Site Name (Marathi)",
+    //   width: 300,
+    //   align: "center",
+    // },
     {
       dataIndex: "created_at",
       key: "created_at",

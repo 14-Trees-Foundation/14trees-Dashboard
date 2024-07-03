@@ -203,7 +203,7 @@ export const PlotComponent = () => {
   };
 
   const handleCreatePlotData = (formData: Plot) => {
-    console.log(formData);
+    console.log('New Plot data: ',formData);
     createPlot(formData);
   };
 

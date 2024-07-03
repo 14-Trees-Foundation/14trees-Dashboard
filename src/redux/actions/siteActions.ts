@@ -45,13 +45,15 @@ export const createSite = (record: Site) => {
                     payload: value,
                    
                 });
-                console.log(value)
+                console.log("Added new Site : ",value)
+                return(value)
             },
             (error: any) => {
                 console.error(error);
                 dispatch({
                     type: siteActionTypes.CREATE_SITE_FAILED,
                 });
+                return(error)
             }
         )
     };
@@ -63,17 +65,21 @@ export const updateSite = (record: Site) => {
         dispatch({
             type: siteActionTypes.UPDATE_SITE_REQUESTED,
         });
-        apiClient.updateSite(record).then(
+         apiClient.updateSite(record).then(
             (value: Site) => {
                 dispatch({
                     type: siteActionTypes.UPDATE_SITE_SUCCEEDED,
                     payload: value,
+                   
                 });
+                
             },
             (error: any) => {
                 dispatch({
                     type: siteActionTypes.UPDATE_SITE_FAILED,
+                    payload: error
                 });
+                
             }
         )
     };
