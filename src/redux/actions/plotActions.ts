@@ -109,7 +109,8 @@ export const createPlot = (record: Plot) => {
                 dispatch({
                     type: plotActionTypes.CREATE_PLOT_FAILED,
                 });
-                toast.error("Failed to create Plot");
+                if (error?.response?.data?.error) toast.error(error?.response?.data?.error)
+                else toast.error(`Failed to create plot!`)
             }
         )
     };
