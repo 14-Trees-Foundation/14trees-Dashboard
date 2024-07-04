@@ -8,10 +8,10 @@ const AddSite = ({ open, handleClose, createSite }) => {
     district: null,
     taluka: null,
     village: null,
-    area: "",
+    area_acres: "",
     land_type: "",
     land_strata: "",
-    length: "",
+    length_km: "",
     sampatiPatra: "",
     maintenence_type: "",
   };

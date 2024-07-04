@@ -2,6 +2,7 @@ import ApiClient from "../../api/apiClient/apiClient";
 import donationActionTypes from "../actionTypes/donationActionTypes";
 import { Donation } from "../../types/donation";
 import { PaginatedResponse } from "../../types/pagination";
+import { toast } from "react-toastify";
 
 export const getDonations = (offset: number, limit: number,filters?: any[]) => {
   const apiClient = new ApiClient()
@@ -42,6 +43,7 @@ export const createDonation= (record: Donation) => {
       });
       apiClient.createDonation(record).then(
           (value: Donation) => {
+            toast.success('New Donation Added')
               dispatch({
                   type: donationActionTypes.CREATE_DONATION_SUCCEEDED,
                   payload: value,
@@ -51,6 +53,7 @@ export const createDonation= (record: Donation) => {
           },
           (error: any) => {
               console.error(error);
+              toast.error('Failed to add Donation')
               dispatch({
                   type: donationActionTypes.CREATE_DONATION_FAILED,
               });
@@ -67,12 +70,15 @@ export const updateDonation = (record: Donation) => {
       });
       apiClient.updateDonation(record).then(
           (value: Donation) => {
+            toast.success('Donation data updated')
               dispatch({
                   type: donationActionTypes.UPDATE_DONATION_SUCCEEDED,
                   payload: value,
               });
           },
           (error: any) => {
+            toast.error('Failed to update Donation data')
+            console.log(error)
               dispatch({
                   type: donationActionTypes.UPDATE_DONATION_FAILED,
               });

@@ -22,6 +22,7 @@ import * as siteActionCreators from "../../../redux/actions/siteActions";
 import { bindActionCreators } from "@reduxjs/toolkit";
 import { RootState } from "../../../redux/store/store";
 import AddSite from "./AddSite";
+import { ToastContainer } from "react-toastify";
 
 function LoadingOverlay() {
   return (
@@ -78,7 +79,7 @@ export const SitesComponent = () => {
   console.log('Sites Data : ',sitesData)
   if (sitesData) {
       sitesList = Object.values(sitesData.sites);
-      console.log('list of sites: ' , sitesList);
+      sitesList = sitesList.sort((a,b)=>b.id - a.id);
   }
 
   const getAllSitesData = async () => {
@@ -362,6 +363,7 @@ export const SitesComponent = () => {
 
   return (
     <>
+    <ToastContainer/>
       <div
           style={{
               display: "flex",

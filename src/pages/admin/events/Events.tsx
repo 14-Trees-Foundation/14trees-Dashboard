@@ -76,10 +76,10 @@ export const EventsComponent = () => {
 
 let eventsList: Event[] = [];
 const eventsData = useAppSelector((state: RootState) => state.eventsData);
-console.log('Sites Data : ',eventsData)
+console.log('events Data : ',eventsData)
 if (eventsData) {
   eventsList = Object.values(eventsData.Events);
-    console.log('list of sites: ' , eventsList);
+    console.log('list of events: ' , eventsList);
 }
 
 const getAllEventsData = async () => {

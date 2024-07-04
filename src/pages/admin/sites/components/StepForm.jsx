@@ -35,8 +35,6 @@ import {
   PuneKhedOptions,
   SambhajiNagarOptions,
 } from "../temp_data/Form_Data";
-import { ToastContainer, toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
 
 const StepForm = ({ open, handleClose, useCase, data, submitFunction }) => {
   const [current, setCurrent] = useState(0);
@@ -88,10 +86,10 @@ const StepForm = ({ open, handleClose, useCase, data, submitFunction }) => {
   const [talukaFlag, setTalukaFlag] = useState(data.taluka?.value);
 
   const [village, setVillage] = useState(data.village);
-  const [area, setArea] = useState(data.area);
+  const [area, setArea] = useState(data.area_acres);
   const [land_type, setLand_Type] = useState(data.land_type);
   const [land_strata, setLand_Strata] = useState(data.land_strata);
-  const [length, setLength] = useState(data.length);
+  const [length, setLength] = useState(data.length_km);
   const [sampatiPatra, setSampatiPatra] = useState(data.sampatiPatra);
   const [maintenence_type, setMaintenenceType] = useState(
     data.maintenence_type
@@ -136,26 +134,25 @@ const StepForm = ({ open, handleClose, useCase, data, submitFunction }) => {
         land_type: land_type,
         land_strata: land_strata,
         village: village.value,
-        area: area,
-        length: length,
-        sampatiPatra: sampatiPatra.value,
+        area_acres: area,
+        length_km: length,
+        consent_letter: sampatiPatra.value,
         maintenence_type: maintenence_type,
       };
 
       try {
         const response = submitFunction(newSiteData);
-        toast.success("New Site Added", response);
+
         console.log("New site Data : ", response);
       } catch (error) {
-        toast.error("Failed to add new site");
         console.log("Error : ", error.message);
       }
       setName_English("");
       setName_Marathi("");
-      setOwner("");
-      setDistrict("");
-      setTaluka("");
-      setVillage("");
+      setOwner(null);
+      setDistrict(null);
+      setTaluka(null);
+      setVillage(null);
       setArea("");
       setLand_Type("");
       setLand_Strata("");
@@ -178,14 +175,14 @@ const StepForm = ({ open, handleClose, useCase, data, submitFunction }) => {
         village: village.value,
         area: area,
         length: length,
-        sampatiPatra: sampatiPatra,
+        consent_letter: sampatiPatra,
+        maintenence_type: maintenence_type,
       };
       try {
         const response = submitFunction(updatedSiteData);
-        toast.success("Updated Site Data");
+
         console.log("response from backend: ", response);
       } catch (error) {
-        toast.error("Failed to update site data");
         console.log("Error in updating: ", error.message);
       }
 
@@ -215,11 +212,11 @@ const StepForm = ({ open, handleClose, useCase, data, submitFunction }) => {
     console.log("value of sampati patra : ", sampatiPatra);
 
     console.log("value of district flag : ", districtFlag);
+    console.log("Area Acres initial Data: ", area);
   }, data);
 
   return (
     <>
-      <ToastContainer />
       <div>
         <Dialog open={open} onClose={handleClose} fullWidth maxWidth="md">
           <DialogTitle align="center">{useCase}</DialogTitle>{" "}
@@ -277,32 +274,6 @@ const StepForm = ({ open, handleClose, useCase, data, submitFunction }) => {
               {current === 1 && (
                 <DialogContent>
                   <TextField
-                    margin="dense"
-                    name="area_acres"
-                    label="Area (Acres)"
-                    type="text"
-                    fullWidth
-                    value={area}
-                    // disabled={landtypeflag === "Roadside (रस्ता)"}
-                    onChange={(e) => {
-                      setArea(e.target.value);
-                    }}
-                  />
-
-                  <TextField
-                    margin="dense"
-                    name="length_km"
-                    label="Length (Km)"
-                    type="text"
-                    fullWidth
-                    value={length}
-                    // disabled={landtypeflag !== "Roadside (रस्ता)"}
-                    onChange={(e) => {
-                      setLength(e.target.value);
-                    }}
-                  />
-
-                  <TextField
                     select
                     margin="dense"
                     name="land_type"
@@ -337,6 +308,30 @@ const StepForm = ({ open, handleClose, useCase, data, submitFunction }) => {
                       </MenuItem>
                     ))}
                   </TextField>
+
+                  <TextField
+                    margin="dense"
+                    name="area_acres"
+                    label="Area (Acres)"
+                    type="text"
+                    fullWidth
+                    value={area}
+                    onChange={(e) => {
+                      setArea(e.target.value);
+                    }}
+                  />
+
+                  <TextField
+                    margin="dense"
+                    name="length_km"
+                    label="Length (Km)"
+                    type="text"
+                    fullWidth
+                    value={length}
+                    onChange={(e) => {
+                      setLength(e.target.value);
+                    }}
+                  />
                 </DialogContent>
               )}
 

@@ -3,7 +3,7 @@ import StepForm from "../sites/components/StepForm";
 import { ownerOptions } from "./temp_data/Form_Data";
 import { maintainence_type } from "../../../types/site";
 function EditSites({ row, openeditModal, closeEditModal, editSubmit }) {
-  const [formData, setFormData] = useState(row);
+  const formData = row;
 
   const initialValues = {
     id: formData.id,
@@ -25,10 +25,10 @@ function EditSites({ row, openeditModal, closeEditModal, editSubmit }) {
       value: formData.village,
       label: formData.village,
     },
-    area: formData.area_acres,
+    area_acres: formData.area_acres,
     land_type: formData.land_type,
     land_strata: formData.land_strata,
-    length: formData.length_km,
+    length_km: formData.length_km,
     sampatiPatra: formData.consent_letter,
     maintainence_type: formData.maintainence_type,
   };

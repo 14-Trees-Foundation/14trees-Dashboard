@@ -24,6 +24,7 @@ import { bindActionCreators } from "@reduxjs/toolkit";
 import { RootState } from "../../../redux/store/store";
 import AddDonation  from "./AddDonation";
 import EditDonation from "./EditDonation";
+import { ToastContainer } from "react-toastify";
 
 
 function LoadingOverlay() {
@@ -91,7 +92,7 @@ export const DonationComponent = () => {
   console.log('Donation Data : ',donationsData)
   if (donationsData) {
       donationList = Object.values(donationsData.donations);
-      console.log('list of sites: ' , donationList);
+      donationList = donationList.sort((a,b)=>b.id - a.id);
   }
 
   const getAllDonationData = async () => {
@@ -281,128 +282,12 @@ const typesList = [
     },
 ];
 
-const data = [
-  {
-    '_id': '60f5f7d4c1c9a4001b2b7f4c',
-    'donation_date': '2020-07-27',
-    'donor_name': 'Zubin Kabraji',
-    'donor_type': 'Individual - Non IIT',
-    'Phone': '',
-    'Email': 'goodfrogfried@gmail.com',
-    'PAN': 'AKMPK0863F',
-    'Pledged': 4,
-    'Land_type': 'Society',
-    'Zone': 'Anand Park',
-    'Grove': 'Anand Park',
-    'PlantationLandType': 'I want my trees to be planted on Anand Park plot #1 only. Do not plant my sponsored tree anywhere else.',
-    'DashboardStatus': 'Dashboards already exist',
-    'Assigned_plot': 'Plot 1',
-    'Tree_planted': 'Assign',
-    "Assigner_dashboard": 'https://dashboard.14trees.org/profile/10077',
-    'Remarks_for_inventory': 'Paid for 294 trees but form for 300 trees',
-  },
-  {
-    '_id': '60f5f7d4c1c9a491b2b7f4c',
-    'donation_date': '2020-07-27',
-    'donor_name': 'Zubin Kabraji',
-    'donor_type': 'Individual - Non IIT',
-    'Phone': '9881491487',
-    'Email': 'goodfrogfried@gmail.com',
-    'PAN': 'AKMPK0863F',
-    'Pledged': 4,
-    'Land_type': 'Society',
-    'Zone': 'Anand Park',
-    'Grove': 'Anand Park',
-    'PlantationLandType': 'I want my trees to be planted on Anand Park plot #1 only. Do not plant my sponsored tree anywhere else.',
-    'DashboardStatus': 'Dashboards already exist',
-    'Assigned_plot': 'Plot 1',
-    'Tree_planted': 'Assign',
-    "Assigner_dashboard": 'https://dashboard.14trees.org/profile/10077',
-    'Remarks_for_inventory': 'Paid for 294 trees but form for 300 trees',
-  },
-  {
-    '_id': '60f5f7d4c1c9a1201b2b7f4c',
-    'donation_date': '2020-07-27',
-    'donor_name': 'Zubin Kabraji',
-    'donor_type': 'Individual - Non IIT',
-    'Phone': '9881491487',
-    'Email': 'goodfrogfried@gmail.com',
-    'PAN': 'AKMPK0863F',
-    'Pledged': 4,
-    'Land_type': 'Society',
-    'Zone': 'Anand Park',
-    'Grove': 'Anand Park',
-    'PlantationLandType': 'I want my trees to be planted on Anand Park plot #1 only. Do not plant my sponsored tree anywhere else.',
-    'DashboardStatus': 'Dashboards already exist',
-    'Assigned_plot': 'Plot 1',
-    'Tree_planted': 'Assign',
-    "Assigner_dashboard": 'https://dashboard.14trees.org/profile/10077',
-    'Remarks_for_inventory': 'Paid for 294 trees but form for 300 trees',
-  },
-  {
-    '_id': '60f5f7d4c1c9a4043b2b7f4c',
-    'donation_date': '2020-07-27',
-    'donor_name': 'Zubin Kabraji',
-    'donor_type': 'Individual - Non IIT',
-    'Phone': '9881491487',
-    'Email': 'goodfrogfried@gmail.com',
-    'PAN': 'AKMPK0863F',
-    'Pledged': 4,
-    'Land_type': 'Society',
-    'Zone': 'Anand Park',
-    'Grove': 'Anand Park',
-    'PlantationLandType': 'I want my trees to be planted on Anand Park plot #1 only. Do not plant my sponsored tree anywhere else.',
-    'DashboardStatus': 'Dashboards already exist',
-    'Assigned_plot': 'Plot 1',
-    'Tree_planted': 'Assign',
-    "Assigner_dashboard": 'https://dashboard.14trees.org/profile/10077',
-    'Remarks_for_inventory': 'Paid for 294 trees but form for 300 trees',
-  },
-  {
-    '_id': '60f5f7d4c1c9a4001b32334c',
-    'donation_date': '2020-07-27',
-    'donor_name': 'Zubin Kabraji',
-    'donor_type': 'Individual - Non IIT',
-    'Phone': '9881491487',
-    'Email': 'goodfrogfried@gmail.com',
-    'PAN': 'AKMPK0863F',
-    'Pledged': 4,
-    'Land_type': 'Society',
-    'Zone': 'Anand Park',
-    'Grove': 'Anand Park',
-    'PlantationLandType': 'I want my trees to be planted on Anand Park plot #1 only. Do not plant my sponsored tree anywhere else.',
-    'DashboardStatus': 'Dashboards already exist',
-    'Assigned_plot': 'Plot 1',
-    'Tree_planted': 'Assign',
-    "Assigner_dashboard": 'https://dashboard.14trees.org/profile/10077',
-    'Remarks_for_inventory': '',
-  },
-  {
-    '_id': '60f5f7d4c1c9a4001b2b721c',
-    'donation_date': '2020-07-27',
-    'donor_name': 'Zubin Kabraji',
-    'donor_type': 'Individual - Non IIT',
-    'Phone': '9881491487',
-    'Email': 'goodfrogfried@gmail.com',
-    'PAN': 'AKMPK0863F',
-    'Pledged': 4,
-    'Land_type': 'Society',
-    'Zone': 'Anand Park',
-    'Grove': 'Anand Park',
-    'PlantationLandType': 'I want my trees to be planted on Anand Park plot #1 only. Do not plant my sponsored tree anywhere else.',
-    'DashboardStatus': 'Dashboards already exist',
-    'Assigned_plot': 'Plot 1',
-    'Tree_planted': 'Assign',
-    "Assigner_dashboard": 'https://dashboard.14trees.org/profile/10077',
-    'Remarks_for_inventory': '',
-  },
-  // ... Add the rest of the data here
-];
 
 
 
   return (
     <>
+    <ToastContainer/>
     <div
           style={{
               display: "flex",
