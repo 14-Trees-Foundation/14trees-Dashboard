@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import StepForm from "../sites/components/StepForm";
-import { ownerOptions } from "./temp_data/Form_Data";
-import { maintainence_type } from "../../../types/site";
+
 function EditSites({ row, openeditModal, closeEditModal, editSubmit }) {
   const formData = row;
 
@@ -30,7 +29,10 @@ function EditSites({ row, openeditModal, closeEditModal, editSubmit }) {
     land_strata: formData.land_strata,
     length_km: formData.length_km,
     sampatiPatra: formData.consent_letter,
-    maintainence_type: formData.maintainence_type,
+    maintenance_type: formData.maintenance_type,
+    consent_document_link: formData.consent_document_link,
+    google_earth_link: formData.google_earth_link,
+    account: formData.account,
   };
 
   return (

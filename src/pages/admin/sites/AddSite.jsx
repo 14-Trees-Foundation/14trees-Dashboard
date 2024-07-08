@@ -13,7 +13,10 @@ const AddSite = ({ open, handleClose, createSite }) => {
     land_strata: "",
     length_km: "",
     sampatiPatra: "",
-    maintenence_type: "",
+    maintenance_type: "",
+    consent_document_link: "",
+    google_earth_link: "",
+    account: "",
   };
 
   return (

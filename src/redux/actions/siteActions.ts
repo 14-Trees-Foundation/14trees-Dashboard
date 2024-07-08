@@ -65,11 +65,13 @@ export const createSite = (record: Site) => {
 export const updateSite = (record: Site) => {
     const apiClient = new ApiClient();
     return (dispatch: any) => {
+
         dispatch({
             type: siteActionTypes.UPDATE_SITE_REQUESTED,
         });
          apiClient.updateSite(record).then(
             (value: Site) => {
+                toast.success('Site data Edited successfully')
                 dispatch({
                     type: siteActionTypes.UPDATE_SITE_SUCCEEDED,
                     payload: value,
@@ -78,6 +80,7 @@ export const updateSite = (record: Site) => {
                 
             },
             (error: any) => {
+                toast.error('Failed to edit site data')
                 dispatch({
                     type: siteActionTypes.UPDATE_SITE_FAILED,
                     payload: error

@@ -34,7 +34,7 @@ import {
   PuneIndapurOptions,
   PuneKhedOptions,
   SambhajiNagarOptions,
-} from "../temp_data/Form_Data";
+} from "../utils/Form_Data";
 
 const StepForm = ({ open, handleClose, useCase, data, submitFunction }) => {
   const [current, setCurrent] = useState(0);
@@ -91,10 +91,22 @@ const StepForm = ({ open, handleClose, useCase, data, submitFunction }) => {
   const [land_strata, setLand_Strata] = useState(data.land_strata);
   const [length, setLength] = useState(data.length_km);
   const [sampatiPatra, setSampatiPatra] = useState(data.sampatiPatra);
-  const [maintenence_type, setMaintenenceType] = useState(
-    data.maintenence_type
+  const [maintenance_type, setMaintenanceType] = useState(
+    data.maintenance_type
   );
-  // const [landtypeflag, setLandTypeFlag] = useState("");
+  const [consent_document_link, setConsentDocumentLink] = useState(
+    data.consent_document_link
+  );
+  const [google_earth_link, setGoogleEarthLink] = useState(
+    data.google_earth_link
+  );
+  const [account, setAccount] = useState(data.account);
+
+  const maintenance_type_options = [
+    { value: "1", label: "FULL_MAINTENANCE" },
+    { value: "2", label: "PLANTATION_ONLY" },
+    { value: "3", label: "DISTRIBUTION_ONLY" },
+  ];
 
   const handleOwnerChange = (e, value) => {
     console.log("owner change value for backend : ", value);
@@ -136,9 +148,18 @@ const StepForm = ({ open, handleClose, useCase, data, submitFunction }) => {
         village: village.value,
         area_acres: area,
         length_km: length,
-        consent_letter: sampatiPatra.value,
-        maintenence_type: maintenence_type,
+        consent_letter: sampatiPatra,
+        maintenance_type: maintenance_type,
+        consent_document_link: consent_document_link,
+        google_earth_link: google_earth_link,
+        account: account,
       };
+      console.log(
+        "maintenace type value on submit : ",
+        maintenance_type,
+        "consent letter value on submit: ",
+        sampatiPatra
+      );
 
       try {
         const response = submitFunction(newSiteData);
@@ -158,7 +179,10 @@ const StepForm = ({ open, handleClose, useCase, data, submitFunction }) => {
       setLand_Strata("");
       setLength("");
       setSampatiPatra("");
-      setMaintenenceType("");
+      setMaintenanceType("");
+      setConsentDocumentLink("");
+      setGoogleEarthLink("");
+      setAccount("");
 
       handleClose();
       setCurrent(0);
@@ -176,7 +200,10 @@ const StepForm = ({ open, handleClose, useCase, data, submitFunction }) => {
         area: area,
         length: length,
         consent_letter: sampatiPatra,
-        maintenence_type: maintenence_type,
+        maintenance_type: maintenance_type,
+        consent_document_link: consent_document_link,
+        google_earth_link: google_earth_link,
+        account: account,
       };
       try {
         const response = submitFunction(updatedSiteData);
@@ -198,22 +225,15 @@ const StepForm = ({ open, handleClose, useCase, data, submitFunction }) => {
       setLand_Strata("");
       setLength("");
       setSampatiPatra("");
-      setMaintenenceType("");
+      setMaintenanceType("");
+      setConsentDocumentLink("");
+      setGoogleEarthLink("");
+      setAccount("");
 
       handleClose();
       setCurrent(0);
     }
   };
-
-  useEffect(() => {
-    console.log("intial data : ", data);
-    console.log("value of taluka: ", taluka);
-    console.log("value of taluka flag: ", talukaFlag);
-    console.log("value of sampati patra : ", sampatiPatra);
-
-    console.log("value of district flag : ", districtFlag);
-    console.log("Area Acres initial Data: ", area);
-  }, data);
 
   return (
     <>
@@ -665,12 +685,13 @@ const StepForm = ({ open, handleClose, useCase, data, submitFunction }) => {
                     select
                     margin="dense"
                     name="sampatiPatra"
-                    label="Sampati Patra"
+                    label="Consent Letter Type"
                     type="text"
                     fullWidth
                     value={sampatiPatra}
                     onChange={(e) => {
                       setSampatiPatra(e.target.value);
+                      console.log("sampati pater value: ", e.target.value);
                     }}
                   >
                     {SampatiPatraOptions.map((item) => (
@@ -681,14 +702,60 @@ const StepForm = ({ open, handleClose, useCase, data, submitFunction }) => {
                   </TextField>
 
                   <TextField
+                    select
                     margin="dense"
-                    name="maintenence_type"
-                    label="Maintenece Type"
+                    name="maintenance_type"
+                    label="Service Type"
                     type="text"
                     fullWidth
-                    value={maintenence_type}
+                    value={maintenance_type}
                     onChange={(e) => {
-                      setMaintenenceType(e.target.value);
+                      setMaintenanceType(e.target.value);
+                      console.log("Maintenance type value: ", e.target.value);
+                      console.log(
+                        "Maintenance type varaible: ",
+                        maintenance_type
+                      );
+                    }}
+                  >
+                    {maintenance_type_options.map((item) => (
+                      <MenuItem key={item.value} value={item.label}>
+                        {item.label}
+                      </MenuItem>
+                    ))}
+                  </TextField>
+                  <TextField
+                    margin="dense"
+                    name="consent_document_link"
+                    label="Consent Document Link"
+                    type="text"
+                    fullWidth
+                    value={consent_document_link}
+                    onChange={(e) => {
+                      setConsentDocumentLink(e.target.value);
+                    }}
+                  />
+                  <TextField
+                    margin="dense"
+                    name="google_earth_link"
+                    label="Google Earth Link"
+                    type="text"
+                    fullWidth
+                    value={google_earth_link}
+                    onChange={(e) => {
+                      setGoogleEarthLink(e.target.value);
+                    }}
+                  />
+
+                  <TextField
+                    margin="dense"
+                    name="account"
+                    label="Account"
+                    type="text"
+                    fullWidth
+                    value={account}
+                    onChange={(e) => {
+                      setAccount(e.target.value);
                     }}
                   />
                 </DialogContent>
@@ -715,7 +782,10 @@ const StepForm = ({ open, handleClose, useCase, data, submitFunction }) => {
                 type="primary"
                 color="primary"
                 style={{ margin: "0 8px 20px 8px" }}
-                onClick={() => handleClose()}
+                onClick={() => {
+                  handleClose();
+                  setCurrent(0);
+                }}
               >
                 Cancel
               </Button>

@@ -107,7 +107,9 @@ class ApiClient {
         const url = `/plots/get?offset=${offset}&limit=${limit}`;
         try {
             const response = await this.api.post<PaginatedResponse<Plot>>(url, {filters: filters});
+            console.log("plots data: " , response.data);
             return response.data;
+            
         } catch (error: any) {
             console.error(error)
             throw new Error(`Failed to fetch plots: ${error.message}`);
@@ -765,7 +767,7 @@ class ApiClient {
                 return data.id;
             } catch (error) {
                 console.error(error)
-                throw new Error('Failed to delete Site');
+                throw new Error('Failed to delete Donation');
             }
         }
 
@@ -784,6 +786,31 @@ class ApiClient {
                 throw new Error(`Failed to fetch events: ${error.message}`);
             }
         }
+
+        // async updateEvent(data: Event): Promise<Event>{
+        //     try {
+        //         const response = await this.api.put<Event>(`/events/${data.id}`, data);
+        //         return response.data;
+        //     } catch (error: any) {
+        //         console.error(error)
+        //         if (error.response) {
+        //             throw new Error(error.response.data.message);
+        //             }
+        //         throw new Error('Failed to update Site');
+        //     }
+
+        // }
+
+        // async deleteEvent(data: Event): Promise<number>{
+           
+        //     try{
+        //        await this.api.delete<any>(  `/events/${data.id}`);
+        //        return data.id;
+        //     }catch(error: any){
+        //         console.error(error)
+        //         throw new Error(`Failed to delete event: ${error.message}`);
+        //     }
+        // }
     
     
 }
