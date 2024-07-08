@@ -77,6 +77,8 @@ export const PlotComponent = () => {
   const plotsData = useAppSelector((state: RootState) => state.plotsData);
   if (plotsData) {
     plotsList = Object.values(plotsData.plots);
+    console.log("Plots list for UI: " , plotsList);
+    
     plotsList = plotsList.sort((a, b) => b.id - a.id);
   }
 
@@ -197,6 +199,14 @@ export const PlotComponent = () => {
       align: "center",
       width: 150,
       render: (value) => value ?? 0,
+    },
+    {
+      dataIndex: "site_id",
+      key: "site_id",
+      title: "Site Name",
+      align: "center",
+      width: 150,
+      ...getColumnSearchProps('site_id', filters, handleSetFilters)
     },
   ];
 
