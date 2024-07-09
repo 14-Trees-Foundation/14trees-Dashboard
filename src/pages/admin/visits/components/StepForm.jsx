@@ -109,8 +109,8 @@ const StepForm = ({ open, handleClose, useCase, data, submitFunction }) => {
                     autoFocus
                     margin="dense"
                     name="visit_date"
-                    label="visit_date"
-                    type="text"
+                    label="Visit date"
+                    type="Date"
                     fullWidth
                     value={visit_date}
                     onChange={(e) => {

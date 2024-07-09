@@ -12,6 +12,8 @@ import { bindActionCreators } from "@reduxjs/toolkit";
 import { RootState } from "../../../redux/store/store";
 import { ToastContainer } from "react-toastify";
 import { Visit } from "../../../types/visits";
+import { OrganizationUsers } from "../organization/OrganizationUsers";
+
 import {
   Button,
   Dialog,
@@ -59,6 +61,7 @@ export const VisitsComponent = () => {
   const [editModal, setEditModal] = useState(false);
   const [page, setPage] = useState(0);
   const [filters, setFilters] = useState<Record<string, GridFilterItem>>({});
+  const [selectedVisit , setSelectedVisit] = useState<Visit | null>(null);
 
   const handleSetFilters = (filters: Record<string, GridFilterItem>) => {
     setPage(0);
@@ -73,8 +76,8 @@ export const VisitsComponent = () => {
     
     let filtersData = Object.values(filters);
    
-    setTimeout( () => {
-      getVisits(page * 10, 10, filtersData);
+    setTimeout( async() => {
+     await getVisits(page * 10, 10, filtersData);
     }, 1000);
   };
 
@@ -82,15 +85,16 @@ export const VisitsComponent = () => {
   const visitsData = useAppSelector((state: RootState) => state.visitsData);
   if (visitsData) {
     visitsList = Object.values(visitsData.visits);
-    visitsList = visitsList.sort((a, b) => b.id - a.id);
+    if(visitsList.length > 1)
+    {visitsList = visitsList.sort((a, b) => b.id - a.id);}
   }
 
 
   const getAllVisitsData = async () => {
     let filtersData = Object.values(filters);
     
-    setTimeout( () => {
-     getVisits(0, visitsData.totalVisits, filtersData);
+    setTimeout( async() => {
+     await getVisits(0, visitsData.totalVisits, filtersData);
     }, 1000);
   };
 
@@ -152,6 +156,15 @@ export const VisitsComponent = () => {
       title: "Visit Name",
       width: 220,
       align: "center",
+      render: (value, record, index) => (
+        <Button
+          onClick={() => setSelectedVisit(record)}
+          sx={{ textTransform: 'none', color: 'inherit' }} 
+          fullWidth
+          variant="text"
+        >
+          {value}
+        </Button>),
       ...getColumnSearchProps("visit_name", filters, handleSetFilters),
     },
 
@@ -194,7 +207,7 @@ export const VisitsComponent = () => {
           setPage={setPage}
         />
       </Box>
-
+     
       <Dialog open={openDeleteModal} onClose={() => setOpenDeleteModal(false)}>
         <DialogTitle>Confirm Delete</DialogTitle>
         <DialogContent>
