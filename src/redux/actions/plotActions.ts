@@ -75,8 +75,10 @@ export const createPlot = (record: Plot) => {
                 dispatch({
                     type: plotActionTypes.CREATE_PLOT_SUCCEEDED,
                     payload: value,
+                    
                 });
                 toast.success(`Successfully created plot!`)
+                console.log("Payload of Add : ", value);
             },
             (error: any) => {
                 console.error(error);

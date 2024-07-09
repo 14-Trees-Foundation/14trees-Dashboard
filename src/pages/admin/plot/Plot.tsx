@@ -80,6 +80,13 @@ export const PlotComponent = () => {
     console.log("Plots list for UI: " , plotsList);
     
     plotsList = plotsList.sort((a, b) => b.id - a.id);
+
+    for(let  i=0 ; i<plotsList.length ; i++){
+      if(plotsList[i].name_english){
+        plotsList[i].site_id = plotsList[i].name_english;
+        console.log("Site Name for each plot : ", plotsList[i].site_id);
+      }
+    }
   }
 
   let tags: string[] = [];
@@ -115,6 +122,7 @@ export const PlotComponent = () => {
             onClick={() => {
               setSelectedEditRow(record);
               setEditModal(true);
+              console.log("Row to edit: ", record);
             }}>
             <EditIcon />
           </Button>
