@@ -12,6 +12,7 @@ import { userTreesDataReducer, userTreeCountDataReducer } from "./userTreeReduce
 import { userGroupsDataReducer } from "./userGroupReducer";
 import { donationsDataReducer } from "./donationReducer";
 import { eventsDataReducer } from "./eventReducer";
+import { visitsDataReducer } from "./visitReducer";
 
 const rootReducer = combineReducers({
     plantTypesData: plantTypesDataReducer,
@@ -33,7 +34,8 @@ const rootReducer = combineReducers({
     searchUsersData: searchUsersDataReducer,
     searchGroupsData: searchGroupsDataReducer,
     donationsData: donationsDataReducer,
-    eventsData: eventsDataReducer
+    eventsData: eventsDataReducer,
+    visitsData:visitsDataReducer
 });
 
 export default rootReducer;

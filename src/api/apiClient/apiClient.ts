@@ -11,6 +11,7 @@ import { Tree } from '../../types/tree';
 import { AssignTreeRequest, UserTree, UserTreeCountPaginationResponse } from '../../types/userTree';
 import { PaginatedResponse } from '../../types/pagination';
 import { Event } from '../../types/event';
+import { Visit } from '../../types/visits';
 
 class ApiClient {
     private api: AxiosInstance;
@@ -130,6 +131,7 @@ class ApiClient {
     async createPlot(data: Plot): Promise<Plot> {
         try {
             const response = await this.api.post<Plot>(`/plots`, data);
+            console.log("create plot response: ", response.data);
             return response.data;
         } catch (error) {
             console.error(error)
@@ -812,6 +814,55 @@ class ApiClient {
         //     }
         // }
     
+
+     /*
+        Model- Visit: CRUD Operations/Apis for visits
+    */
+        async getVisits(offset: number, limit: number, filters?: any[]): Promise<PaginatedResponse<Visit>> {
+            const url = `/visits/get?offset=${offset}&limit=${limit}`;
+            try {
+                const response = await this.api.post<PaginatedResponse<Visit>>(url, {filters: filters});
+                return response.data;
+            } catch (error: any) {
+                console.error(error)
+                throw new Error(`Failed to fetch Visits: ${error.message}`);
+            }
+        }
+
+        async createVisit(data: Visit): Promise<Visit> {
+            try {
+                const response = await this.api.post<Visit>(`/visits/`, data);
+                return response.data;
+            } catch (error) {
+                console.error(error)
+                throw new Error('Failed to create visit');
+            }
+        }
+
+        async updateVisit(data: Visit): Promise<Visit> {
+            try {
+                const response = await this.api.put<Visit>(`/visits/${data.id}`, data);
+                return response.data;
+            } catch (error: any) {
+                console.error(error)
+                if (error.response) {
+                    throw new Error(error.response.data.message);
+                    }
+                throw new Error('Failed to update visit');
+            }
+        }
+
+        async deleteVisit(data: Visit): Promise<number> {
+            try {
+                await this.api.delete<any>(`/visits/${data.id}`);
+                return data.id;
+            } catch (error) {
+                console.error(error)
+                throw new Error('Failed to delete visit');
+            }
+        }
+    
+
     
 }
 

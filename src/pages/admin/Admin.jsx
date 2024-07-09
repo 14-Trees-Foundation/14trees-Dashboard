@@ -11,7 +11,7 @@ import {
   summary,
   adminNavIndex,
   treeLoggedByDate,
-  plotsList
+  plotsList,
 } from "../../store/adminAtoms";
 import { AdminHome } from "./home/AdminHome";
 import { Trees } from "./tree/Tree";
@@ -24,6 +24,7 @@ import { OrganizationComponent } from "./organization/Organization";
 import { DonationComponent } from "./donation/Donation";
 import { SitesComponent } from "./sites/Sites";
 import { EventsComponent } from "./events/Events";
+import { VisitsComponent } from "./visits/Visits";
 
 export const Admin = () => {
   const classes = useStyles();
@@ -112,6 +113,10 @@ export const Admin = () => {
     {
       page: DonationComponent,
       displayName: "Donations",
+    },
+    {
+      page: VisitsComponent,
+      displayName: "Visits",
     },
     {
       page: Images,

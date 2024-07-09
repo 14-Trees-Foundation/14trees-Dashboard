@@ -98,6 +98,11 @@ export const AdminLeftDrawer = () => {
       logo: VolunteerActivismIcon,
       display: true,
     },
+    {
+      displayName: "Visits",
+      logo: VolunteerActivismIcon,
+      display: true,
+    },
     // {
     //   displayName: "Images",
     //   logo: FaceIcon,
