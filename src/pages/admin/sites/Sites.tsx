@@ -171,6 +171,15 @@ export const SitesComponent = () => {
       ...getColumnSearchProps("owner", filters, handleSetFilters),
     },
     {
+      dataIndex: "maintenance_type",
+      key: "maintenance_type",
+      title: "Service Type",
+      width: 180,
+      align: "center",
+      ...getColumnSearchProps("maintenance_type", filters, handleSetFilters),
+
+    },
+    {
       dataIndex: "land_type",
       key: "land_type",
       title: "Land Type",
@@ -225,20 +234,6 @@ export const SitesComponent = () => {
       align: "center",
     },
     {
-      dataIndex: "tree_count",
-      key: "tree_count",
-      title: "Tree Count",
-      width: 150,
-      align: "center",
-    },
-    {
-      dataIndex: "unique_id",
-      key: "unique_id",
-      title: "Unique ID",
-      width: 180,
-      align: "center",
-    },
-    {
       dataIndex: "photo_album",
       key: "photo_album",
       title: "Photo Album",
@@ -282,36 +277,12 @@ export const SitesComponent = () => {
       ...getColumnSearchProps("google_earth_link", filters, handleSetFilters),
     },
     {
-      dataIndex: "trees_planted",
-      key: "trees_planted",
-      title: "Trees Planted",
-      width: 200,
-      align: "center",
-      ...getColumnSearchProps("trees_planted", filters, handleSetFilters),
-    },
-    {
       dataIndex: "account",
       key: "account",
       title: "Account",
       width: 200,
       align: "center",
       ...getColumnSearchProps("account", filters, handleSetFilters),
-    },
-    {
-      dataIndex: "data_errors",
-      key: "data_errors",
-      title: "Data Errors",
-      width: 200,
-      align: "center",
-      ...getColumnSearchProps("data_errors", filters, handleSetFilters),
-    },
-    {
-      dataIndex: "date_planted",
-      key: "date_planted",
-      title: "Date Planted",
-      width: 200,
-      align: "center",
-      ...getColumnSearchProps("date_planted", filters, handleSetFilters),
     },
     {
       dataIndex: "site_data_check",
@@ -321,17 +292,6 @@ export const SitesComponent = () => {
       align: "center",
       ...getColumnSearchProps("site_data_check", filters, handleSetFilters),
     },
-
-    {
-      dataIndex: "maintenance_type",
-      key: "maintenance_type",
-      title: "Service Type",
-      width: 180,
-      align: "center",
-      ...getColumnSearchProps("maintenance_type", filters, handleSetFilters),
-
-    },
-
     {
       dataIndex: "created_at",
       key: "created_at",

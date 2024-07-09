@@ -83,10 +83,11 @@ export const VisitsComponent = () => {
 
   let visitsList: Visit[] = [];
   const visitsData = useAppSelector((state: RootState) => state.visitsData);
+  console.log("Visit data in state: ", visitsData);
   if (visitsData) {
     visitsList = Object.values(visitsData.visits);
-    if(visitsList.length > 1)
-    {visitsList = visitsList.sort((a, b) => b.id - a.id);}
+    
+    visitsList = visitsList.sort((a, b) => b.id - a.id);
   }
 
 

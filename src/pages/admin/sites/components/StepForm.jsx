@@ -329,29 +329,29 @@ const StepForm = ({ open, handleClose, useCase, data, submitFunction }) => {
                     ))}
                   </TextField>
 
-                  <TextField
+                  {(land_type != "" && !land_type.includes("Roadside")) && (<TextField
                     margin="dense"
                     name="area_acres"
                     label="Area (Acres)"
-                    type="text"
+                    type="number"
                     fullWidth
                     value={area}
                     onChange={(e) => {
                       setArea(e.target.value);
                     }}
-                  />
+                  />)}
 
-                  <TextField
+                  {(land_type.includes("Roadside")) && (<TextField
                     margin="dense"
                     name="length_km"
                     label="Length (Km)"
-                    type="text"
+                    type="number"
                     fullWidth
                     value={length}
                     onChange={(e) => {
                       setLength(e.target.value);
                     }}
-                  />
+                  />)}
                 </DialogContent>
               )}
 
@@ -702,6 +702,18 @@ const StepForm = ({ open, handleClose, useCase, data, submitFunction }) => {
                   </TextField>
 
                   <TextField
+                    margin="dense"
+                    name="consent_document_link"
+                    label="Consent Document Link"
+                    type="url"
+                    fullWidth
+                    value={consent_document_link}
+                    onChange={(e) => {
+                      setConsentDocumentLink(e.target.value);
+                    }}
+                  />
+
+                  <TextField
                     select
                     margin="dense"
                     name="maintenance_type"
@@ -724,22 +736,12 @@ const StepForm = ({ open, handleClose, useCase, data, submitFunction }) => {
                       </MenuItem>
                     ))}
                   </TextField>
-                  <TextField
-                    margin="dense"
-                    name="consent_document_link"
-                    label="Consent Document Link"
-                    type="text"
-                    fullWidth
-                    value={consent_document_link}
-                    onChange={(e) => {
-                      setConsentDocumentLink(e.target.value);
-                    }}
-                  />
+
                   <TextField
                     margin="dense"
                     name="google_earth_link"
                     label="Google Earth Link"
-                    type="text"
+                    type="url"
                     fullWidth
                     value={google_earth_link}
                     onChange={(e) => {

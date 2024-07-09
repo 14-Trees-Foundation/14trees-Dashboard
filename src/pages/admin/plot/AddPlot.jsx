@@ -33,11 +33,12 @@ const AddPlot = ({ open, handleClose, createPlot, tags }) => {
     borderRadius: "10px",
     p: 4,
   };
-  const [sitePage, setSitePage] = useState(0);
+  const [sitePageNo, setSitePageNo] = useState(0);
   const [siteNameInput, setSiteNameInput] = useState("");
   const [sitesLoading, setSitesLoading] = useState(false);
   const dispatch = useAppDispatch();
   const { getSites } = bindActionCreators(siteActionCreators, dispatch);
+
   const [formData, setFormData] = useState({
     name: "",
     plot_id: "",
@@ -64,10 +65,10 @@ const AddPlot = ({ open, handleClose, createPlot, tags }) => {
 
   useEffect(() => {
     getSitesData();
-  }, [sitePage, siteNameInput]);
+  }, [sitePageNo, siteNameInput]);
 
   const getSitesData = async () => {
-    console.log("Fecthing sites data in useEffect");
+    console.log("Fetching sites data in useEffect");
     const siteNameFilter = {
       columnField: "name_english",
       value: siteNameInput,
@@ -76,7 +77,7 @@ const AddPlot = ({ open, handleClose, createPlot, tags }) => {
 
     setTimeout(async () => {
       setSitesLoading(true);
-      await getSites(sitePage * 10, 10, [siteNameFilter]);
+      await getSites(sitePageNo * 10, 10, [siteNameFilter]);
     }, 1000);
     setSitesLoading(false);
   };
@@ -184,7 +185,7 @@ const AddPlot = ({ open, handleClose, createPlot, tags }) => {
                     console.log("on change ", event, newValue);
                     if (newValue !== null) {
                       setFormData((prevState) => {
-                        return { ...prevState, ["site_id"]: newValue.id };
+                        return { ...prevState, ["site_id"]: newValue.id, ["site_name_english"]: newValue.name_english };
                       });
                     }
                   }}
@@ -192,11 +193,11 @@ const AddPlot = ({ open, handleClose, createPlot, tags }) => {
                     console.log("on input change ", event);
                     const { value } = event.target;
                     console.log("value from event :  ", event.nativeEvent.data);
-                    setSitePage(0);
+                    setSitePageNo(0);
                     setSiteNameInput(value);
                     handleChange(event);
                   }}
-                  setPage={setSitePage}
+                  setPage={setSitePageNo}
                 />
               </Grid>
               <Grid item xs={12}>

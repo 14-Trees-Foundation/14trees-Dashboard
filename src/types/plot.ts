@@ -16,7 +16,7 @@ export type Plot = {
     assigned_trees_count?: number,
     available_trees_count?: number,
     site_id: string,
-    name_english: string,
+    site_name_english: string,
     created_at: Date,
     updated_at: Date,
 };
