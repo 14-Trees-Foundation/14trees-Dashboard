@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import StepForm from "../sites/components/StepForm";
+import StepForm from "../visits/components/StepForm";
 const AddVisit = ({ open, handleClose, createVisit }) => {
   const initialValues = {
     visit_name: "",

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import StepForm from "../sites/components/StepForm";
+import StepForm from "../visits/components/StepForm";
 
 function EditVisit({ row, openeditModal, closeEditModal, editSubmit }) {
   const formData = row;
