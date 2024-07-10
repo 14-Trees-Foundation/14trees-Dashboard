@@ -64,13 +64,13 @@ export const searchPlantTypes = (searchStr: string) => {
     }
 };
 
-export const createPlantType = (record: PlantType, file?: Blob) => {
+export const createPlantType = (record: PlantType, files?: Blob[]) => {
     const apiClient = new ApiClient();
     return (dispatch: any) => {
         dispatch({
             type: plantTypeActionTypes.CREATE_PLANT_TYPE_REQUESTED,
         });
-        apiClient.createPlantType(record, file).then(
+        apiClient.createPlantType(record, files?files:[]).then(
             (value: PlantType) => {
                 toast.success(`Successfully created plant type!`);
                 dispatch({

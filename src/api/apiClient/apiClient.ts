@@ -49,11 +49,13 @@ class ApiClient {
         }
     }
 
-    async createPlantType(data: PlantType, file?: Blob): Promise<PlantType> {
+    async createPlantType(data: PlantType, files: Blob[]): Promise<PlantType> {
         try {
             const formData = new FormData();
-            if (file) {
-                formData.append("files", file);
+            if (files) {
+                files.forEach( (file) => {
+                    formData.append("files", file);
+                });
             }
             Object.entries(data).forEach(([key, value]) => {
                 if (key != 'image') {

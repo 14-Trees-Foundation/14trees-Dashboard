@@ -42,7 +42,7 @@ const AddTreeType = ({ open, handleClose, createPlantType }) => {
     common_name_in_english: "",
     common_name_in_marathi: "",
     category: "",
-    tags: "",
+    // tags: [],
     images: [],
     remarkable_char: "",
 
@@ -60,8 +60,8 @@ const AddTreeType = ({ open, handleClose, createPlantType }) => {
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    // createPlantType(formData);
     console.log("data of form: ", formData);
+    createPlantType(formData, files);
     handleClose();
   };
 
@@ -86,13 +86,6 @@ const AddTreeType = ({ open, handleClose, createPlantType }) => {
           })
         )
       );
-
-      for (let i = 0; i < acceptedFiles.length; i++) {
-        setFormData((prevFormData) => ({
-          ...prevFormData,
-          images: [...(prevFormData.images || []), acceptedFiles[i].preview],
-        }));
-      }
     },
     onDropRejected: (rejectedFiles) => {
       // toast.error("Only 10 images allowed!");
@@ -187,7 +180,7 @@ const AddTreeType = ({ open, handleClose, createPlantType }) => {
                   fullWidth
                 />
               </Grid>
-              <Grid item xs={12}>
+              {/* <Grid item xs={12}>
                 <TextField
                   name="tags"
                   label="Tags"
@@ -195,7 +188,7 @@ const AddTreeType = ({ open, handleClose, createPlantType }) => {
                   onChange={handleChange}
                   fullWidth
                 />
-              </Grid>
+              </Grid> */}
               <Grid item xs={12}>
                 <div className={classes.imgdiv}>
                   <section>

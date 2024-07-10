@@ -218,9 +218,9 @@ export const PlantTypeComponent = () => {
         }, 1000);
     };
 
-    const handleCreatePlantTypeData = (formData: PlantType) => {
+    const handleCreatePlantTypeData = (formData: PlantType, files: Blob[]) => {
         console.log(formData);
-        createPlantType(formData);
+        createPlantType(formData, files);
     };
 
     const handleDeletePlantType = (row: PlantType) => {
