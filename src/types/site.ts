@@ -1,4 +1,15 @@
 
+export enum maintenance_type {
+ 
+
+    FULL_MAINTENANCE= 'FULL_MAINTENANCE',
+	PLANTATION_ONLY='PLANTATION_ONLY',
+	DISTRIBUTION_ONLY='DISTRIBUTION_ONLY'
+}
+export enum site_data_check_type {
+    Yes="Yes",
+    No ="No"
+}
 export type Site = {
     id: number;
     key: number;
@@ -17,19 +28,19 @@ export type Site = {
     photo_album: string;
     consent_letter: string;
     grove_type: string;
-    map_to: string;
-    notion_db_pictures: string;
-    split_village_name_1: string;
-    split_village_name_2: string | null;
+    consent_document_link:  string| null;
+    google_earth_link: string|null;
+    trees_planted: Number|null;
+    account: string|null;
+    data_errors: string|null;
+    date_planted: Date|null;
+    site_data_check: site_data_check_type|null;
+   
     create_id: string;
-    site_key: string;
-    site_key_2: string;
-    temp_backup_copy_of_old_site_name_english_marathi: string;
-    temp_copy_of_old_site_key: string;
-    temp_old_site_name_in_english: string;
-    temp_old_site_name_in_marathi: string;
+    
     created_at: string;
     updated_at: string;
+    maintenance_type: maintenance_type | null;
 };
 
 export type SitesDataState = {

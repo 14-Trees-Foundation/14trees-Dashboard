@@ -5,10 +5,13 @@ import { BulkUserGroupMappingResponse, Group } from '../../types/Group';
 import { Pond, PondWaterLevelUpdate } from '../../types/pond';
 import { User } from '../../types/user';
 import { Site } from '../../types/site';
+import { Donation } from '../../types/donation';
 import { OnsiteStaff } from '../../types/onSiteStaff';
 import { Tree } from '../../types/tree';
 import { AssignTreeRequest, UserTree, UserTreeCountPaginationResponse } from '../../types/userTree';
 import { PaginatedResponse } from '../../types/pagination';
+import { Event } from '../../types/event';
+import { Visit } from '../../types/visits';
 
 class ApiClient {
     private api: AxiosInstance;
@@ -46,11 +49,13 @@ class ApiClient {
         }
     }
 
-    async createPlantType(data: PlantType, file?: Blob): Promise<PlantType> {
+    async createPlantType(data: PlantType, files: Blob[]): Promise<PlantType> {
         try {
             const formData = new FormData();
-            if (file) {
-                formData.append("files", file);
+            if (files) {
+                files.forEach( (file) => {
+                    formData.append("files", file);
+                });
             }
             Object.entries(data).forEach(([key, value]) => {
                 if (key != 'image') {
@@ -105,7 +110,9 @@ class ApiClient {
         const url = `/plots/get?offset=${offset}&limit=${limit}`;
         try {
             const response = await this.api.post<PaginatedResponse<Plot>>(url, {filters: filters});
+            console.log("plots data: " , response.data);
             return response.data;
+            
         } catch (error: any) {
             console.error(error)
             throw new Error(`Failed to fetch plots: ${error.message}`);
@@ -126,6 +133,7 @@ class ApiClient {
     async createPlot(data: Plot): Promise<Plot> {
         try {
             const response = await this.api.post<Plot>(`/plots`, data);
+            console.log("create plot response: ", response.data);
             return response.data;
         } catch (error) {
             console.error(error)
@@ -714,7 +722,156 @@ class ApiClient {
             throw new Error('Failed to delete Site');
         }
     }
+
+
+     /*
+        Model- Donation: CRUD Operations/Apis for Donations
+    */
+
+    async getDonations(offset: number, limit: number , filters?: any[]): Promise<PaginatedResponse<Donation>> {
+        const url = `/donations/get?offset=${offset}&limit=${limit}`;
+        try {
+            const response = await this.api.post<PaginatedResponse<Donation>>(url ,  {filters: filters});
+            console.log("Response in api client: ", response);
+            return response.data;
+        } catch (error: any) {
+            console.error(error)
+            throw new Error(`Failed to fetch donations: ${error.message}`);
+        }
+    }
+
+
+    async createDonation(data: Donation): Promise<Donation> {
+        try {
+            const response = await this.api.post<Donation>(`/donations`, data);
+            return response.data;
+        } catch (error) {
+            console.error(error)
+            throw new Error('Failed to create Donation');
+        }
+    }    
+
+
+    async updateDonation(data: Donation): Promise<Donation> {
+        try {
+            const response = await this.api.put<Donation>(`/donations/${data.id}`, data);
+            return response.data;
+        } catch (error: any) {
+            console.error(error)
+            if (error.response) {
+                throw new Error(error.response.data.message);
+                }
+            throw new Error('Failed to update donation');
+        }
+    }
+
+    async deleteDonation(data: Donation): Promise<number> {
+        try {
+            await this.api.delete<any>(`/donations/${data.id}`);
+            return data.id;
+        } catch (error) {
+            console.error(error)
+            throw new Error('Failed to delete Donation');
+        }
+    }
+
+  /*
+        Model- Event : CRUD Operations/Apis for Event
+    */
+
+        async getEvents(offset: number, limit: number , filters?: any[]): Promise<PaginatedResponse<Event>> {
+            const url = `/events/get?offset=${offset}&limit=${limit}`;
+            try {
+                const response = await this.api.post<PaginatedResponse<Event>>(url , {filters: filters});
+                console.log("Response in api client: ", response);
+                return response.data;
+            } catch (error: any) {
+                console.error(error)
+                throw new Error(`Failed to fetch events: ${error.message}`);
+            }
+        }
+
+        // async updateEvent(data: Event): Promise<Event>{
+        //     try {
+        //         const response = await this.api.put<Event>(`/events/${data.id}`, data);
+        //         return response.data;
+        //     } catch (error: any) {
+        //         console.error(error)
+        //         if (error.response) {
+        //             throw new Error(error.response.data.message);
+        //             }
+        //         throw new Error('Failed to update Site');
+        //     }
+
+        // }
+
+        // async deleteEvent(data: Event): Promise<number>{
+           
+        //     try{
+        //        await this.api.delete<any>(  `/events/${data.id}`);
+        //        return data.id;
+        //     }catch(error: any){
+        //         console.error(error)
+        //         throw new Error(`Failed to delete event: ${error.message}`);
+        //     }
+        // }
+    
+
+     /*
+        Model- Visit: CRUD Operations/Apis for visits
+    */
+        async getVisits(offset: number, limit: number, filters?: any[]): Promise<PaginatedResponse<Visit>> {
+            const url = `/visits/get?offset=${offset}&limit=${limit}`;
+            try {
+                const response = await this.api.post<PaginatedResponse<Visit>>(url, {filters: filters});
+                return response.data;
+            } catch (error: any) {
+                console.error(error)
+                throw new Error(`Failed to fetch Visits: ${error.message}`);
+            }
+        }
+
+        async createVisit(data: Visit): Promise<Visit> {
+            try {
+                const response = await this.api.post<Visit>(`/visits/`, data);
+                return response.data;
+            } catch (error) {
+                console.error(error)
+                throw new Error('Failed to create visit');
+            }
+        }
+
+        async updateVisit(data: Visit): Promise<Visit> {
+            try {
+                const response = await this.api.put<Visit>(`/visits/${data.id}`, data);
+                return response.data;
+            } catch (error: any) {
+                console.error(error)
+                if (error.response) {
+                    throw new Error(error.response.data.message);
+                    }
+                throw new Error('Failed to update visit');
+            }
+        }
+
+        async deleteVisit(data: Visit): Promise<number> {
+            try {
+                await this.api.delete<any>(`/visits/${data.id}`);
+                return data.id;
+            } catch (error) {
+                console.error(error)
+                throw new Error('Failed to delete visit');
+            }
+        }
+    
+
+    
 }
+
+
+  
+
+
 
 // new function to fetch data form localStorage
 export const fetchDataFromLocal = (key: string) => {

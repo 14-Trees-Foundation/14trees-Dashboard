@@ -1,14 +1,18 @@
+
+type EventLocation = 'onsite' | 'offsite'
+
 export type Event = {
-    key: string,
-    _id: string,
+    id: number,
+    key: number;
+    assigned_by: number,
+    site_id: number,
     name: string,
-    Eventid: string,
-    phone: number,
-    email: string,
-    dob: Date,
-    date_added: Date,
-    pin : number,
-    org : string
+      type: number,
+    description?: string,
+      tags?: string[],
+    event_date: Date,
+    memories?: string[],
+    event_location: EventLocation
 };
 
 export type EventPaginationResponse = {

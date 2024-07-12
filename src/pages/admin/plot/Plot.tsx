@@ -77,7 +77,11 @@ export const PlotComponent = () => {
   const plotsData = useAppSelector((state: RootState) => state.plotsData);
   if (plotsData) {
     plotsList = Object.values(plotsData.plots);
+    console.log("Plots list for UI: " , plotsList);
+    
     plotsList = plotsList.sort((a, b) => b.id - a.id);
+
+ 
   }
 
   let tags: string[] = [];
@@ -113,6 +117,7 @@ export const PlotComponent = () => {
             onClick={() => {
               setSelectedEditRow(record);
               setEditModal(true);
+              console.log("Row to edit: ", record);
             }}>
             <EditIcon />
           </Button>
@@ -198,6 +203,14 @@ export const PlotComponent = () => {
       width: 150,
       render: (value) => value ?? 0,
     },
+    {
+      dataIndex: "site_name_english",
+      key: "site_name_english",
+      title: "Site Name",
+      align: "center",
+      width: 150,
+      ...getColumnSearchProps('site_name_english', filters, handleSetFilters)
+    },
   ];
 
   const handleDelete = (row: Plot) => {
@@ -211,7 +224,7 @@ export const PlotComponent = () => {
   };
 
   const handleCreatePlotData = (formData: Plot) => {
-    console.log(formData);
+    console.log('New Plot data: ',formData);
     createPlot(formData);
   };
 

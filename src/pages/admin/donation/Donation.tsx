@@ -1,328 +1,301 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import Box from "@mui/material/Box";
-import { DataGrid, GridToolbar, GridColumns } from "@mui/x-data-grid";
-import EditIcon from "@mui/icons-material/Edit";
-import DeleteIcon from "@mui/icons-material/Delete";
-import CircularProgress from "@mui/material/CircularProgress";
+
 import {
   Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
 } from "@mui/material";
+import { GridFilterItem } from "@mui/x-data-grid";
+import EditIcon from "@mui/icons-material/Edit";
+import DeleteIcon from "@mui/icons-material/Delete";
+import { TableColumnsType } from "antd";
+import TableComponent from "../../../components/Table";
+import { Donation } from "../../../types/donation";
+import CircularProgress from "@mui/material/CircularProgress";
+import getColumnSearchProps, { getColumnSelectedItemFilter } from "../../../components/Filter";
 
-function LoadingOverlay() {
-  return (
-    <div
-      style={{
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        height: "100%",
-      }}>
-      <CircularProgress />
-    </div>
-  );
-}
-
+import { useAppDispatch, useAppSelector } from "../../../redux/store/hooks";
+import * as donationActionCreators from "../../../redux/actions/donationActions";
+import { bindActionCreators } from "@reduxjs/toolkit";
+import { RootState } from "../../../redux/store/store";
+import AddDonation from "./AddDonation";
+import EditDonation from "./EditDonation";
+import { ToastContainer } from "react-toastify";
 
 export const DonationComponent = () => {
 
-  const [open, setOpen] = useState(false);
 
-  
-  const columns: GridColumns = [
+  const dispatch = useAppDispatch();
+  const { getDonations, createDonation, updateDonation, deleteDonation } = bindActionCreators(
+    donationActionCreators,
+    dispatch
+  );
+
+  const [open, setOpen] = useState(false);
+  const [page, setPage] = useState(0);
+  const [filters, setFilters] = useState<Record<string, GridFilterItem>>({});
+  const handleModalOpen = () => setOpen(true);
+  const handleModalClose = () => setOpen(false);
+  const [openDeleteModal, setOpenDeleteModal] = useState(false);
+  const [selectedItem, setSelectedItem] = useState<any | null>(null);
+  const [selectedEditRow, setSelectedEditRow] = useState<any | null>(null);
+  const [editModal, setEditModal] = useState(false);
+
+  const handleSetFilters = (filters: Record<string, GridFilterItem>) => {
+    setPage(0);
+    setFilters(filters);
+  }
+
+  useEffect(() => {
+    getDonationData();
+  }, [page, filters]);
+
+  const getDonationData = async () => {
+    let filtersData = Object.values(filters);
+    setTimeout(async () => {
+      await getDonations(page * 10, 10, filtersData);
+    }, 1000);
+  };
+
+
+  let donationList: Donation[] = [];
+  const donationsData = useAppSelector((state: RootState) => state.donationsData);
+  if (donationsData) {
+    donationList = Object.values(donationsData.donations);
+    donationList = donationList.sort((a, b) => b.id - a.id);
+  }
+
+  const getAllDonationData = async () => {
+    let filtersData = Object.values(filters);
+    setTimeout(async () => {
+      await getDonations(0, donationsData.totalDonations, filtersData);
+    }, 1000);
+  };
+
+  const handleCreateDonationData = (formData: Donation) => {
+    createDonation(formData);
+  };
+
+
+  const handleDeleteDonations = (row: Donation) => {
+    setOpenDeleteModal(true);
+    setSelectedItem(row);
+  };
+
+  const handleEditSubmit = (formData: Donation) => {
+    updateDonation(formData);
+    setSelectedEditRow(null);
+  };
+
+  const typesList = [
+    "Society",
+    "Farmer",
+    "14T"
+  ]
+
+
+  const columns: TableColumnsType<Donation> = [
     {
-      field: "action",
-      headerName: "Action",
+      dataIndex: "action",
+      key: "action",
+      title: "Action",
       width: 100,
       align: "center",
-      headerAlign: "center",
-      renderCell: (params: any) => (
+      render: (value, record, index) => (
         <div
           style={{
             display: "flex",
             justifyContent: "center",
             alignItems: "center",
           }}>
-          <Button>
+          <Button
+            variant="outlined"
+            style={{ margin: "0 5px" }}
+            onClick={() => {
+              setEditModal(true);
+              setSelectedEditRow(record);
+              console.log(" donation row to edit : ", record)
+            }}
+          >
             <EditIcon />
           </Button>
-          <Button>
+          <Button
+            variant="outlined"
+            color="error"
+            style={{ margin: "0 5px" }}
+            onClick={() => handleDeleteDonations(record)}
+          >
             <DeleteIcon />
           </Button>
         </div>
       ),
     },
     {
-        field: "donation_date",
-        headerName: "Donation Date",
-        width: 150,
-        align: "center",
-        editable: true,
-        headerAlign: "center",
+      dataIndex: "name",
+      key: "name",
+      title: "Name",
+      width: 220,
+      align: "center",
+      ...getColumnSearchProps('name', filters, handleSetFilters)
     },
     {
-        field: "donor_name",
-        headerName: "Donor Name",
-        width: 150,
-        align: "center",
-        editable: true,
-        headerAlign: "center",
+      dataIndex: "donor_type",
+      key: "donor_type",
+      title: "Donor Type",
+      width: 180,
+      align: "center",
+      ...getColumnSearchProps('donor_type', filters, handleSetFilters)
     },
     {
-        field: "donor_type",
-        headerName: "Donor Type",
-        width: 150,
-        align: "center",
-        editable: true,
-        headerAlign: "center",
+      dataIndex: "phone",
+      key: "phone",
+      title: "Phone",
+      width: 150,
+      align: "center",
+      ...getColumnSearchProps('phone', filters, handleSetFilters)
     },
     {
-        field: "Phone",
-        headerName: "Phone",
-        width: 150,
-        align: "center",
-        editable: true,
-        headerAlign: "center",
+      dataIndex: "email_address",
+      key: "email_address",
+      title: "Email",
+      width: 150,
+      align: "center",
+      ...getColumnSearchProps('email_address', filters, handleSetFilters)
     },
     {
-        field: "Email",
-        headerName: "Email",
-        width: 150,
-        align: "center",
-        editable: true,
-        headerAlign: "center",
+      dataIndex: "pan",
+      key: "pan",
+      title: "PAN",
+      width: 150,
+      align: "center",
+      ...getColumnSearchProps('pan', filters, handleSetFilters)
     },
     {
-        field: "PAN",
-        headerName: "PAN",
-        width: 150,
-        align: "center",
-        editable: true,
-        headerAlign: "center",
-    },
-    {
-        field: "Pledged",
-        headerName: "Pledged",
-        width: 150,
-        align: "center",
-        editable: true,
-        headerAlign: "center",
-    },
-    {
-        field: "Land_type",
-        headerName: "Land Type",
-        width: 150,
-        align: "center",
-        editable: true,
-        headerAlign: "center",
-    },
-    {
-        field: "Zone",
-        headerName: "Zone",
-        width: 150,
-        align: "center",
-        editable: true,
-        headerAlign: "center",
-    },
-    {
-        field: "Grove",
-        headerName: "Grove",
-        width: 150,
-        align: "center",
-        editable: true,
-        headerAlign: "center",
-    },
-    {
-        field: "PlantationLandType",
-        headerName: "Plantation Land Type",
-        width: 150,
-        align: "center",
-        editable: true,
-        headerAlign: "center",
-    },
-    {
-        field: "DashboardStatus",
-        headerName: "Dashboard Status",
-        width: 150,
-        align: "center",
-        editable: true,
-        headerAlign: "center",
-    },
-    {
-        field: "Assigned_plot",
-        headerName: "Assigned Plot",
-        width: 150,
-        align: "center",
-        editable: true,
-        headerAlign: "center",
-    },
-    {
-        field: "Tree_planted",
-        headerName: "Tree Planted",
-        width: 150,
-        align: "center",
-        editable: true,
-        headerAlign: "center",
-    },
-    {
-        field: "Assigner_dashboard",
-        headerName: "Assigner's Dashboard",
-        width: 150,
-        align: "center",
-        editable: true,
-        headerAlign: "center",
-    },
-    {
-        field: "Remarks_for_inventory",
-        headerName: "Remarks for Inventory",
-        width: 150,
-        align: "center",
-        editable: true,
-        headerAlign: "center",
-    },
-];
+      dataIndex: "pledged",
+      key: "pledged",
+      title: "Pledged",
+      width: 150,
+      align: "center",
+      ...getColumnSearchProps('pledged', filters, handleSetFilters)
 
-const data = [
-  {
-    '_id': '60f5f7d4c1c9a4001b2b7f4c',
-    'donation_date': '2020-07-27',
-    'donor_name': 'Zubin Kabraji',
-    'donor_type': 'Individual - Non IIT',
-    'Phone': '',
-    'Email': 'goodfrogfried@gmail.com',
-    'PAN': 'AKMPK0863F',
-    'Pledged': 4,
-    'Land_type': 'Society',
-    'Zone': 'Anand Park',
-    'Grove': 'Anand Park',
-    'PlantationLandType': 'I want my trees to be planted on Anand Park plot #1 only. Do not plant my sponsored tree anywhere else.',
-    'DashboardStatus': 'Dashboards already exist',
-    'Assigned_plot': 'Plot 1',
-    'Tree_planted': 'Assign',
-    "Assigner_dashboard": 'https://dashboard.14trees.org/profile/10077',
-    'Remarks_for_inventory': 'Paid for 294 trees but form for 300 trees',
-  },
-  {
-    '_id': '60f5f7d4c1c9a491b2b7f4c',
-    'donation_date': '2020-07-27',
-    'donor_name': 'Zubin Kabraji',
-    'donor_type': 'Individual - Non IIT',
-    'Phone': '9881491487',
-    'Email': 'goodfrogfried@gmail.com',
-    'PAN': 'AKMPK0863F',
-    'Pledged': 4,
-    'Land_type': 'Society',
-    'Zone': 'Anand Park',
-    'Grove': 'Anand Park',
-    'PlantationLandType': 'I want my trees to be planted on Anand Park plot #1 only. Do not plant my sponsored tree anywhere else.',
-    'DashboardStatus': 'Dashboards already exist',
-    'Assigned_plot': 'Plot 1',
-    'Tree_planted': 'Assign',
-    "Assigner_dashboard": 'https://dashboard.14trees.org/profile/10077',
-    'Remarks_for_inventory': 'Paid for 294 trees but form for 300 trees',
-  },
-  {
-    '_id': '60f5f7d4c1c9a1201b2b7f4c',
-    'donation_date': '2020-07-27',
-    'donor_name': 'Zubin Kabraji',
-    'donor_type': 'Individual - Non IIT',
-    'Phone': '9881491487',
-    'Email': 'goodfrogfried@gmail.com',
-    'PAN': 'AKMPK0863F',
-    'Pledged': 4,
-    'Land_type': 'Society',
-    'Zone': 'Anand Park',
-    'Grove': 'Anand Park',
-    'PlantationLandType': 'I want my trees to be planted on Anand Park plot #1 only. Do not plant my sponsored tree anywhere else.',
-    'DashboardStatus': 'Dashboards already exist',
-    'Assigned_plot': 'Plot 1',
-    'Tree_planted': 'Assign',
-    "Assigner_dashboard": 'https://dashboard.14trees.org/profile/10077',
-    'Remarks_for_inventory': 'Paid for 294 trees but form for 300 trees',
-  },
-  {
-    '_id': '60f5f7d4c1c9a4043b2b7f4c',
-    'donation_date': '2020-07-27',
-    'donor_name': 'Zubin Kabraji',
-    'donor_type': 'Individual - Non IIT',
-    'Phone': '9881491487',
-    'Email': 'goodfrogfried@gmail.com',
-    'PAN': 'AKMPK0863F',
-    'Pledged': 4,
-    'Land_type': 'Society',
-    'Zone': 'Anand Park',
-    'Grove': 'Anand Park',
-    'PlantationLandType': 'I want my trees to be planted on Anand Park plot #1 only. Do not plant my sponsored tree anywhere else.',
-    'DashboardStatus': 'Dashboards already exist',
-    'Assigned_plot': 'Plot 1',
-    'Tree_planted': 'Assign',
-    "Assigner_dashboard": 'https://dashboard.14trees.org/profile/10077',
-    'Remarks_for_inventory': 'Paid for 294 trees but form for 300 trees',
-  },
-  {
-    '_id': '60f5f7d4c1c9a4001b32334c',
-    'donation_date': '2020-07-27',
-    'donor_name': 'Zubin Kabraji',
-    'donor_type': 'Individual - Non IIT',
-    'Phone': '9881491487',
-    'Email': 'goodfrogfried@gmail.com',
-    'PAN': 'AKMPK0863F',
-    'Pledged': 4,
-    'Land_type': 'Society',
-    'Zone': 'Anand Park',
-    'Grove': 'Anand Park',
-    'PlantationLandType': 'I want my trees to be planted on Anand Park plot #1 only. Do not plant my sponsored tree anywhere else.',
-    'DashboardStatus': 'Dashboards already exist',
-    'Assigned_plot': 'Plot 1',
-    'Tree_planted': 'Assign',
-    "Assigner_dashboard": 'https://dashboard.14trees.org/profile/10077',
-    'Remarks_for_inventory': '',
-  },
-  {
-    '_id': '60f5f7d4c1c9a4001b2b721c',
-    'donation_date': '2020-07-27',
-    'donor_name': 'Zubin Kabraji',
-    'donor_type': 'Individual - Non IIT',
-    'Phone': '9881491487',
-    'Email': 'goodfrogfried@gmail.com',
-    'PAN': 'AKMPK0863F',
-    'Pledged': 4,
-    'Land_type': 'Society',
-    'Zone': 'Anand Park',
-    'Grove': 'Anand Park',
-    'PlantationLandType': 'I want my trees to be planted on Anand Park plot #1 only. Do not plant my sponsored tree anywhere else.',
-    'DashboardStatus': 'Dashboards already exist',
-    'Assigned_plot': 'Plot 1',
-    'Tree_planted': 'Assign',
-    "Assigner_dashboard": 'https://dashboard.14trees.org/profile/10077',
-    'Remarks_for_inventory': '',
-  },
-  // ... Add the rest of the data here
-];
+    },
+    {
+      dataIndex: "land_type",
+      key: "land_type",
+      title: "Land_type",
+      width: 150,
+      align: "center",
+      ...getColumnSelectedItemFilter({ dataIndex: 'land_type', filters, handleSetFilters, options: typesList }),
+
+    },
+    {
+      dataIndex: "zone",
+      key: "zone",
+      title: "Zone",
+      width: 150,
+      align: "center",
+      ...getColumnSearchProps('zone', filters, handleSetFilters)
+
+    },
+    {
+      dataIndex: "dashboard_status",
+      key: "dashboard_status",
+      title: "Dashboard Status",
+      width: 150,
+      align: "center",
+    },
+    {
+      dataIndex: "assigned_plot",
+      key: "assigned_plot",
+      title: "Assigned Plot",
+      width: 180,
+      align: "center",
+    },
+    {
+      dataIndex: "tree_planted",
+      key: "tree_planted",
+      title: "Trees Planted",
+      width: 200,
+      align: "center",
+    },
+    {
+      dataIndex: "remarks_for_inventory",
+      key: "remarks_for_inventory",
+      title: "Remarks for inventory",
+      width: 180,
+      align: "center",
+    },
+  ];
+
 
 
 
   return (
     <>
-      
-      <Box sx={{ height: 540, width: "100%", marginTop:'40px' }}>
-        <DataGrid
-          rows={data}
+      <ToastContainer />
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "flex-end",
+          marginBottom: "20px",
+        }}>
+        <Button variant="contained" color="success" onClick={handleModalOpen}>
+          Add Donation
+        </Button>
+        <AddDonation
+          open={open}
+          handleClose={handleModalClose}
+          createDonation={handleCreateDonationData}
+        />
+      </div>
+
+      <Box sx={{ height: 540, width: "100%", marginTop: '40px' }}>
+        <TableComponent
+          dataSource={donationList}
           columns={columns}
-          getRowId={(row) => row._id}
-          initialState={{
-            pagination: {
-              page: 0,
-              pageSize: 10,
-            },
-          }}
-          checkboxSelection
-          disableSelectionOnClick
-          components={{
-            Toolbar: GridToolbar,
-            NoRowsOverlay: LoadingOverlay,
-          }}
+          totalRecords={donationsData.totalDonations}
+          fetchAllData={getAllDonationData}
+          setPage={setPage}
         />
       </Box>
+
+      <Dialog open={openDeleteModal} onClose={() => setOpenDeleteModal(false)}>
+        <DialogTitle>Confirm Delete</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Do you want to delete ?
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setOpenDeleteModal(false)} color="primary">
+            Cancel
+          </Button>
+          <Button
+            onClick={() => {
+              if (selectedItem !== null) {
+                deleteDonation(selectedItem);
+              }
+              setOpenDeleteModal(false);
+            }}
+            color="primary"
+            autoFocus>
+            Yes
+          </Button>
+        </DialogActions>
+      </Dialog>
+      {selectedEditRow && (
+        <EditDonation
+          row={selectedEditRow}
+          openeditModal={editModal}
+          closeEditModal={() => { setEditModal(false); setSelectedEditRow(null); }}
+          editSubmit={handleEditSubmit}
+        />
+      )}
+
 
     </>
   );

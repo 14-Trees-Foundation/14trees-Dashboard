@@ -2,6 +2,7 @@ import ApiClient from "../../api/apiClient/apiClient";
 import siteActionTypes from "../actionTypes/siteActionTypes";
 import { Site } from "../../types/site";
 import { PaginatedResponse } from "../../types/pagination";
+import { toast } from 'react-toastify';
 
 export const getSites = (offset: number, limit: number, filters?: any[]) => {
     const apiClient = new ApiClient()
@@ -40,16 +41,22 @@ export const createSite = (record: Site) => {
         });
         apiClient.createSite(record).then(
             (value: Site) => {
+                toast.success('New Site Added successfully')
                 dispatch({
                     type: siteActionTypes.CREATE_SITE_SUCCEEDED,
                     payload: value,
+                   
                 });
+                console.log("Added new Site : ",value)
+                return(value)
             },
             (error: any) => {
                 console.error(error);
+                toast.error('Failed to add new Site')
                 dispatch({
                     type: siteActionTypes.CREATE_SITE_FAILED,
                 });
+                return(error)
             }
         )
     };
@@ -58,20 +65,27 @@ export const createSite = (record: Site) => {
 export const updateSite = (record: Site) => {
     const apiClient = new ApiClient();
     return (dispatch: any) => {
+
         dispatch({
             type: siteActionTypes.UPDATE_SITE_REQUESTED,
         });
-        apiClient.updateSite(record).then(
+         apiClient.updateSite(record).then(
             (value: Site) => {
+                toast.success('Site data Edited successfully')
                 dispatch({
                     type: siteActionTypes.UPDATE_SITE_SUCCEEDED,
                     payload: value,
+                   
                 });
+                
             },
             (error: any) => {
+                toast.error('Failed to edit site data')
                 dispatch({
                     type: siteActionTypes.UPDATE_SITE_FAILED,
+                    payload: error
                 });
+                
             }
         )
     };
@@ -81,11 +95,13 @@ export const updateSite = (record: Site) => {
 export const deleteSite = (record: Site) => {
     const apiClient = new ApiClient();
     return (dispatch: any) => {
+        
         dispatch({
             type: siteActionTypes.DELETE_SITE_REQUESTED,
         });
         apiClient.deleteSite(record).then(
             (id: number) => {
+                toast.success('Site deleted successfully')
                 dispatch({
                     type: siteActionTypes.DELETE_SITE_SUCCEEDED,
                     payload: id,
@@ -93,6 +109,7 @@ export const deleteSite = (record: Site) => {
             },
             (error: any) => {
                 console.error(error);
+                toast.error('Failed to delete Site')
                 dispatch({
                     type: siteActionTypes.DELETE_SITE_FAILED,
                 });

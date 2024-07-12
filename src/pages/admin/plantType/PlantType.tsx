@@ -75,13 +75,29 @@ export const PlantTypeComponent = () => {
           ...getColumnSearchProps('name', filters, handleSetFilters)
         },
         {
-          dataIndex: "name_english",
-          key: "name_english",
+          dataIndex: "english_name",
+          key: "english_name",
           title: "Name (English)",
           width: 250,
           align: "center",
-          ...getColumnSearchProps('name_english', filters, handleSetFilters)
+          ...getColumnSearchProps('english_name', filters, handleSetFilters)
         },
+        {
+            dataIndex: "common_name_in_english",
+            key: "common_name_in_english",
+            title: "Common Name in English",
+            width: 250,
+            align: "center",
+            ...getColumnSearchProps('common_name_in_english', filters, handleSetFilters)
+          },
+          {
+            dataIndex: "common_name_in_marathi",
+            key: "common_name_in_marathi",
+            title: "Common Name in Marathi",
+            width: 250,
+            align: "center",
+            ...getColumnSearchProps('common_name_in_marathi', filters, handleSetFilters)
+          },
         {
           dataIndex: "scientific_name",
           key: "scientific_name",
@@ -90,6 +106,46 @@ export const PlantTypeComponent = () => {
           align: "center",
           ...getColumnSearchProps('scientific_name', filters, handleSetFilters)
         },
+        {
+            dataIndex: "known_as",
+            key: "known_as",
+            title: "Known As",
+            width: 250,
+            align: "center",
+            ...getColumnSearchProps('known_as', filters, handleSetFilters)
+          },
+          {
+            dataIndex: "category",
+            key: "category",
+            title: "Category",
+            width: 250,
+            align: "center",
+            ...getColumnSearchProps('category', filters, handleSetFilters)
+          },
+          {
+            dataIndex: "tags",
+            key: "tags",
+            title: "Tags",
+            width: 250,
+            align: "center",
+            ...getColumnSearchProps('tags', filters, handleSetFilters)
+          },
+          {
+            dataIndex: "use",
+            key: "use",
+            title: "Use",
+            width: 250,
+            align: "center",
+            ...getColumnSearchProps('use', filters, handleSetFilters)
+          },
+          {
+            dataIndex: "images",
+            key: "images",
+            title: "Images",
+            width: 250,
+            align: "center",
+            ...getColumnSearchProps('images', filters, handleSetFilters)
+          },
         {
           dataIndex: "habit",
           key: "habit",
@@ -162,9 +218,9 @@ export const PlantTypeComponent = () => {
         }, 1000);
     };
 
-    const handleCreatePlantTypeData = (formData: PlantType) => {
+    const handleCreatePlantTypeData = (formData: PlantType, files: Blob[]) => {
         console.log(formData);
-        createPlantType(formData);
+        createPlantType(formData, files);
     };
 
     const handleDeletePlantType = (row: PlantType) => {
