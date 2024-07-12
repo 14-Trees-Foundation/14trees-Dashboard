@@ -28,7 +28,7 @@ import { bindActionCreators } from "@reduxjs/toolkit";
 import { RootState } from "../../../redux/store/store";
 import AddSite from "./AddSite";
 import { ToastContainer } from "react-toastify";
-
+import { SiteMap } from "./components/SiteMap";
 function LoadingOverlay() {
   return (
     <div
@@ -335,7 +335,10 @@ export const SitesComponent = () => {
           fetchAllData={getAllSitesData}
           setPage={setPage}
         />
+         <SiteMap/>
       </Box>
+
+    
 
       <Dialog open={openDeleteModal} onClose={() => setOpenDeleteModal(false)}>
         <DialogTitle>Confirm Delete</DialogTitle>
