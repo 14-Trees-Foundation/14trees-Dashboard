@@ -4,24 +4,17 @@ import {
   Dialog,
   DialogActions,
   DialogContent,
-  DialogContentText,
   DialogTitle,
-  Modal,
   TextField,
-  Typography,
-  Autocomplete,
   Grid,
   Radio,
   RadioGroup,
   FormControlLabel,
-  Box,
 } from "@mui/material";
 import "./Donation";
 import MenuItem from "@mui/material/MenuItem";
-import { message, Steps, theme } from "antd";
+import { Steps } from "antd";
 import PaymentQR14tree from "../../../assets/PaymentQR14tree.jpg";
-import { Email } from "@mui/icons-material";
-import { watch } from "fs";
 
 const AddDonation = ({ open, handleClose, createDonation }) => {
   const [current, setCurrent] = useState(0);
@@ -146,20 +139,20 @@ const AddDonation = ({ open, handleClose, createDonation }) => {
 
   const handleSubmit = () => {
     const newDonation = {
-      Name: name,
-      Email_Address: email,
-      No_of_Trees: No_of_Trees,
-      No_of_Acres: No_of_Acres,
-      Grove: Grove,
-      Site_Type: Site_Type,
+      name: name,
+      email_address: email,
+      no_of_trees: No_of_Trees,
+      no_of_acres: No_of_Acres,
+      grove: Grove,
+      site_type: Site_Type,
       QRCode: QRCode,
-      Total_Payment_based_on_selection: Total_Payment_based_on_selection,
-      Contribution_dropdown_Screenshot: Contribution_dropdown_Screenshot,
-      PAN: PAN,
+      total_payment_based_on_selection: Total_Payment_based_on_selection,
+      contribution_dropdown_screenshot: Contribution_dropdown_Screenshot,
+      pan: PAN,
       FCRA_matters: FCRA_matters,
-      List_of_people_names: List_of_people_names,
-      Summary: Summary,
-      Comments: Comments,
+      list_of_people_names: List_of_people_names,
+      summary: Summary,
+      comments: Comments,
     };
 
     createDonation(newDonation);

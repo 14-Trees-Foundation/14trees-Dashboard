@@ -1,25 +1,27 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import {
   Button,
   Dialog,
   DialogActions,
   DialogContent,
-  DialogContentText,
   DialogTitle,
-  Modal,
   TextField,
-  Typography,
-  Autocomplete,
 } from "@mui/material";
-import { message, Steps, theme } from "antd";
+import { Steps } from "antd";
 
-import MenuItem from "@mui/material/MenuItem";
-import { Dashboard } from "@mui/icons-material";
-import { ToastContainer, toast } from "react-toastify";
+import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 const EditDonation = ({ row, openeditModal, closeEditModal, editSubmit }) => {
   const [current, setCurrent] = useState(0);
+  const [formData, setFormData] = useState(row);
+
+  const handleChange = (event) => {
+    setFormData({
+      ...formData,
+      [event.target.name]: event.target.value,
+    });
+  };
 
   const nextStep = () => {
     console.log(
@@ -57,40 +59,10 @@ const EditDonation = ({ row, openeditModal, closeEditModal, editSubmit }) => {
     title: item.title,
   }));
 
-  const [name, setName] = useState(row.Name);
-  const [email, setEmail] = useState(row.Email_Address || "");
-  const [donor_type, setDonor_type] = useState(row.donor_type);
-
-  const [Grove, setGrove] = useState(row.Grove);
-
-  const [Land_Type, setLand_Type] = useState(row.Land_Type);
-  const [Zone, setZone] = useState(row.Zone);
-  const [phone, setPhone] = useState(row.phone || "");
-  const [pledged, setPledged] = useState(row.Pledged);
-  const [PAN, setPAN] = useState(row.PAN);
-  const [dashboard_status, setStatus] = useState(row.DashboardStatus);
-  const [assignedPlot, setAssignedPlot] = useState(row.assignedPlot);
-  const [remarks, setRemarks] = useState(row.remarks || "");
-
   const handleSubmit = () => {
-    const updatedData = {
-      id: row.id,
-      Name: name,
-      "Email Address": email,
-      "Donor Type": donor_type,
-      Grove: Grove,
-      "Land Type": Land_Type,
-      Zone: Zone,
-      Phone: phone,
-      Pledged: pledged,
-      PAN: PAN,
-      DashboardStatus: dashboard_status,
-      Assigned_Plot: assignedPlot,
-      "Remarks for inventory": remarks,
-    };
 
-    console.log("updated donation data - ", updatedData);
-    editSubmit(updatedData);
+    console.log("updated donation data - ", formData);
+    editSubmit(formData);
     closeEditModal();
   };
 
@@ -113,60 +85,50 @@ const EditDonation = ({ row, openeditModal, closeEditModal, editSubmit }) => {
                     label="Name"
                     type="text"
                     fullWidth
-                    value={name}
-                    onChange={(e) => {
-                      setName(e.target.value);
-                    }}
+                    value={formData.name}
+                    onChange={handleChange}
                   />
                   <TextField
                     margin="dense"
-                    name="email"
+                    name="email_address"
                     label="Email"
                     type="text"
                     fullWidth
-                    value={email}
-                    onChange={(e) => {
-                      setEmail(e.target.value);
-                    }}
+                    value={formData.email_address}
+                    onChange={handleChange}
                   />
 
                   <TextField
                     autoFocus
                     margin="dense"
-                    name="Donor_Type"
+                    name="donor_type"
                     label="Donor Type"
                     type="text"
                     fullWidth
-                    value={donor_type}
-                    onChange={(e) => {
-                      setDonor_type(e.target.value);
-                    }}
+                    value={formData.donor_type}
+                    onChange={handleChange}
                   />
 
                   <TextField
                     autoFocus
                     margin="dense"
-                    name="Pledged"
+                    name="pledged"
                     label="Pledged"
                     type="text"
                     fullWidth
-                    value={pledged}
-                    onChange={(e) => {
-                      setPledged(e.target.value);
-                    }}
+                    value={formData.pledged}
+                    onChange={handleChange}
                   />
 
                   <TextField
                     autoFocus
                     margin="dense"
-                    name="Phone"
+                    name="phone"
                     label="Phone"
                     type="text"
                     fullWidth
-                    value={phone}
-                    onChange={(e) => {
-                      setPhone(e.target.value);
-                    }}
+                    value={formData.phone}
+                    onChange={handleChange}
                   />
                 </DialogContent>
               )}
@@ -176,53 +138,45 @@ const EditDonation = ({ row, openeditModal, closeEditModal, editSubmit }) => {
                   <TextField
                     autoFocus
                     margin="dense"
-                    name="Land_Type"
-                    label="Land_Type"
+                    name="land_type"
+                    label="Land Type"
                     type="text"
                     fullWidth
-                    value={Land_Type}
-                    onChange={(e) => {
-                      setLand_Type(e.target.value);
-                    }}
+                    value={formData.land_type}
+                    onChange={handleChange}
                   />
 
                   <TextField
                     autoFocus
                     margin="dense"
-                    name="Assigned Plot"
+                    name="assigned_plot"
                     label="Assigned Plot"
                     type="text"
                     fullWidth
-                    value={assignedPlot}
-                    onChange={(e) => {
-                      setAssignedPlot(e.target.value);
-                    }}
+                    value={formData.assigned_plot}
+                    onChange={handleChange}
                   />
 
                   <TextField
                     autoFocus
                     margin="dense"
-                    name="Grove"
+                    name="grove"
                     label="Grove"
                     type="text"
                     fullWidth
-                    value={Grove}
-                    onChange={(e) => {
-                      setGrove(e.target.value);
-                    }}
+                    value={formData.grove}
+                    onChange={handleChange}
                   />
 
                   <TextField
                     autoFocus
                     margin="dense"
-                    name="Zone"
+                    name="zone"
                     label="Zone"
                     type="text"
                     fullWidth
-                    value={Zone}
-                    onChange={(e) => {
-                      setZone(e.target.value);
-                    }}
+                    value={formData.zone}
+                    onChange={handleChange}
                   />
                 </DialogContent>
               )}
@@ -231,14 +185,12 @@ const EditDonation = ({ row, openeditModal, closeEditModal, editSubmit }) => {
                 <DialogContent>
                   <TextField
                     margin="dense"
-                    name="PAN"
+                    name="pan"
                     label="PAN Number"
                     type="text"
                     fullWidth
-                    value={PAN}
-                    onChange={(e) => {
-                      setPAN(e.target.value);
-                    }}
+                    value={formData.pan}
+                    onChange={handleChange}
                   />
                 </DialogContent>
               )}
@@ -247,26 +199,22 @@ const EditDonation = ({ row, openeditModal, closeEditModal, editSubmit }) => {
                 <DialogContent>
                   <TextField
                     margin="dense"
-                    name="Dashboard_Status"
-                    label="Dashboard_Status"
+                    name="dashboard_status"
+                    label="Dashboard Status"
                     type="text"
                     fullWidth
-                    value={dashboard_status}
-                    onChange={(e) => {
-                      setStatus(e.target.value);
-                    }}
+                    value={formData.dashboard_status}
+                    onChange={handleChange}
                   />
 
                   <TextField
                     margin="dense"
-                    name="Remarks"
+                    name="remarks_for_inventory"
                     label="Remarks"
                     type="text"
                     fullWidth
-                    value={remarks}
-                    onChange={(e) => {
-                      setRemarks(e.target.value);
-                    }}
+                    value={formData.remarks_for_inventory}
+                    onChange={handleChange}
                   />
                 </DialogContent>
               )}

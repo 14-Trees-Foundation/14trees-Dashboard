@@ -4,22 +4,22 @@ export type Donation = {
   id: number;
   key: number;
 
-  Date_Recieved: string;
-  Name: string;
-  Donor_type: string;
-  Phone: string;
-  Email: string;
-  PAN: string;
-  Pledged: string;
-  Land_type: string;
-  Zone: number | null;
-  Grove: string;
-  PlantationLandType: string;
-  DashboardStatus: string;
-  Assigned_plot: string;
-  Tree_planted: string;
-  Assigner_dashboard: string;
-  Remarks_for_inventory: string;
+  date_received: string;
+  name: string;
+  donor_type: string;
+  phone: string;
+  email_address: string;
+  pan: string;
+  pledged: string;
+  land_type: string;
+  zone: number | null;
+  grove: string;
+  plantation_land_type: string;
+  dashboard_status: string;
+  assigned_plot: string;
+  tree_planted: string;
+  assigner_dashboard: string;
+  remarks_for_inventory: string;
 };
 
 export type DonationDataState = {
