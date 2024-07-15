@@ -9,6 +9,9 @@ interface AutoCompleteProps {
   onChange?: (event: React.SyntheticEvent<Element, Event>, value: any) => void,
   onInputChange?: (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void,
   setPage?: (value: React.SetStateAction<number>) => void
+  fullWidth?: boolean
+  size?: 'small' | 'medium'
+  value?: any
 }
 
 const AutocompleteWithPagination = ({
@@ -18,7 +21,10 @@ const AutocompleteWithPagination = ({
   getOptionLabel, 
   onChange, 
   onInputChange, 
-  setPage 
+  setPage,
+  fullWidth,
+  size,
+  value,
 }: AutoCompleteProps) => {
   const [position, setPosition] = useState(0);
   const listElem: any = useRef();
@@ -52,12 +58,16 @@ const AutocompleteWithPagination = ({
     } as any;
   }
 
+  const sx = fullWidth ? undefined : { width: 400 }
+
   return (
     <Autocomplete
-      sx={{ width: 400 }}
+      sx={sx}
+      fullWidth={fullWidth}
       freeSolo
-      size='small'
+      size={size ? size : 'small'}
       autoHighlight
+      value={value ? value : null}
       options={options}
       getOptionLabel={getOptionLabel}
       onChange={onChange}
@@ -65,6 +75,7 @@ const AutocompleteWithPagination = ({
       renderInput={(params) => (
         <TextField
           {...params}
+          margin={ sx ? undefined : 'dense' }
           label={label}
           onChange={handleInputChange}
           InputProps={{

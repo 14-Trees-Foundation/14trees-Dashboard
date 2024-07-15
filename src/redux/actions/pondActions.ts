@@ -21,7 +21,6 @@ export const getPonds = (offset: number, limit: number, filters?: any[]) => {
                     type: pondActionTypes.GET_PONDS_SUCCEEDED,
                     payload: value,
                 });
-                toast.success(`Successfully fetched ponds!`)
             },
             (error: any) => {
                 console.log(error)

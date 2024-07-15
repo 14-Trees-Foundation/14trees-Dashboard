@@ -10,9 +10,7 @@ import {
 } from "@mui/material";
 import TagSelector from "../../../components/TagSelector";
 import * as siteActionCreators from "../../../redux/actions/siteActions";
-import Site from "../../../types/site";
 import { useAppSelector, useAppDispatch } from "../../../redux/store/hooks";
-import { getSites } from "../../../redux/actions/siteActions";
 import { bindActionCreators } from "redux";
 import { AutocompleteWithPagination } from "../../../components/AutoComplete";
 
@@ -43,7 +41,6 @@ function EditPlot({ row, openeditModal, handleCloseModal, editSubmit, tags }) {
   }, [sitePage, siteNameInput]);
 
   const getSitesData = async () => {
-    console.log("Fecthing sites data in useEffect");
     const siteNameFilter = {
       columnField: "name_english",
       value: siteNameInput,
@@ -53,27 +50,24 @@ function EditPlot({ row, openeditModal, handleCloseModal, editSubmit, tags }) {
     setTimeout(async () => {
       setSitesLoading(true);
       await getSites(sitePage * 10, 10, [siteNameFilter]);
+      setSitesLoading(false);
     }, 1000);
-    setSitesLoading(false);
   };
 
   const categoriesList = ["Public", "Foundation"];
 
   let sitesList = [];
+  let sitesMap = {};
   const siteData = useAppSelector((state) => state.sitesData);
-  console.log("siteData in AddPlot component: ", siteData);
+
   if (siteData) {
-    sitesList = Object.values(siteData.sites);
-    console.log("sites list : ", sitesList);
+    sitesMap = { ...siteData.sites };
+    if (!Object.hasOwn(sitesMap, formData.site_id)) {
+      sitesMap[formData.site_id] = { id: formData.site_id, name_english: formData.site_name }
+    }
+    sitesList = Object.values(sitesMap);
     sitesList = sitesList.sort((a, b) => {
       return b.id - a.id;
-    });
-
-    sitesList.find((item) => {
-      if (formData.site_id === item.id) {
-        formData.site_id = item.name_english;
-      }
-      console.log("site_id", formData.site_id);
     });
   }
 
@@ -104,11 +98,9 @@ function EditPlot({ row, openeditModal, handleCloseModal, editSubmit, tags }) {
             options={sitesList}
             getOptionLabel={(option) => option.name_english}
             isOptionEqualToValue={(option, value) => {
-              console.log("Option: ", option, "Value: ", value);
               return option.id === value.id;
             }}
             onChange={(event, newValue) => {
-              console.log("on change ", event, newValue);
               if (newValue !== null) {
                 setFormData((prevState) => {
                   return { ...prevState, ["site_id"]: newValue.id };
@@ -116,14 +108,16 @@ function EditPlot({ row, openeditModal, handleCloseModal, editSubmit, tags }) {
               }
             }}
             onInputChange={(event) => {
-              console.log("on input change ", event);
               const { value } = event.target;
-              console.log("value from event :  ", event.nativeEvent.data);
               setSitePage(0);
               setSiteNameInput(value);
               handleChange(event);
             }}
             setPage={setSitePage}
+            fullWidth
+            size="medium"
+            loading={sitesLoading}
+            value={(siteNameInput === '' && Object.hasOwn(sitesMap, formData.site_id)) ? sitesMap[formData.site_id] : null}
           />
           <Autocomplete
             fullWidth
@@ -162,13 +156,13 @@ function EditPlot({ row, openeditModal, handleCloseModal, editSubmit, tags }) {
           }}
         >
           <Button
-            variant="contained"
+            variant="outlined"
             onClick={() => handleCloseModal()}
-            color="primary"
+            color="error"
           >
             Cancel
           </Button>
-          <Button variant="contained" type="submit" color="primary">
+          <Button variant="contained" type="submit" color="success">
             Save
           </Button>
         </DialogActions>

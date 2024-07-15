@@ -77,11 +77,7 @@ export const PlotComponent = () => {
   const plotsData = useAppSelector((state: RootState) => state.plotsData);
   if (plotsData) {
     plotsList = Object.values(plotsData.plots);
-    console.log("Plots list for UI: " , plotsList);
-    
     plotsList = plotsList.sort((a, b) => b.id - a.id);
-
- 
   }
 
   let tags: string[] = [];
@@ -204,12 +200,12 @@ export const PlotComponent = () => {
       render: (value) => value ?? 0,
     },
     {
-      dataIndex: "site_name_english",
-      key: "site_name_english",
+      dataIndex: "site_name",
+      key: "site_name",
       title: "Site Name",
       align: "center",
-      width: 150,
-      ...getColumnSearchProps('site_name_english', filters, handleSetFilters)
+      width: 300,
+      ...getColumnSearchProps('site_name', filters, handleSetFilters)
     },
   ];
 
@@ -292,7 +288,7 @@ export const PlotComponent = () => {
           </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setOpenDeleteModal(false)} color="primary">
+          <Button onClick={() => setOpenDeleteModal(false)}>
             Cancel
           </Button>
           <Button
@@ -303,7 +299,8 @@ export const PlotComponent = () => {
               }
               setOpenDeleteModal(false);
             }}
-            color="primary"
+            color="error"
+            variant="outlined"
             autoFocus>
             Yes
           </Button>

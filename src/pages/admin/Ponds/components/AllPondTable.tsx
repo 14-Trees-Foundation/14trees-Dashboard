@@ -144,12 +144,12 @@ export const PondComponent = ({ setSelectedPond }: PondComponentInputProps) => {
             ...getColumnSelectedItemFilter({ dataIndex: 'type', filters, handleSetFilters, options: typesList }),
         },
         {
-            dataIndex: "site_id",
-            key: "site_id",
+            dataIndex: "site_name",
+            key: "site_name",
             title: "Site Name",
-            width: 150,
+            width: 350,
             align: "center",
-            ...getColumnSearchProps( 'site_id', filters, handleSetFilters ),
+            ...getColumnSearchProps( 'site_name', filters, handleSetFilters ),
         },
         {
             dataIndex: "length_ft",

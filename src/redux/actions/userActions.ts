@@ -12,7 +12,6 @@ export const getUsers = (offset: number, limit: number, filters?: any[]) => {
         });
         apiClient.getUsers(offset, limit, filters).then(
             (value: PaginatedResponse<User>) => {
-                toast.success("Users fetched successfully");
                 for (let i = 0; i < value.results.length; i++) {
                     if (value.results[i]?.id) {
                         value.results[i].key = value.results[i].id

@@ -17,7 +17,6 @@ export const getPondWaterLevelUpdates = (pondId: number, offset: number, limit: 
                         value.results[i].key = value.results[i].id
                     }
                 }
-                toast.success('Pond Water Level information has been retrieved successfully!')
                 dispatch({
                     type: pondActionTypes.GET_POND_WATER_LEVEL_UPDATES_SUCCEEDED,
                     payload: value,

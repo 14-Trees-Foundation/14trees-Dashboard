@@ -17,6 +17,7 @@ export type Pond = {
   tags: string[],
   type: string,
   site_id: number,
+  site_name: string,
   boundaries: Boundaries,
   images: string[],
   length_ft: number,

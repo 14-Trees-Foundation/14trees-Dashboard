@@ -11,10 +11,7 @@ import {
 import TagSelector from "../../../components/TagSelector";
 import { AutocompleteWithPagination } from "../../../components/AutoComplete";
 import * as siteActionCreators from "../../../redux/actions/siteActions";
-import Site from "../../../types/site";
 import { useAppSelector, useAppDispatch } from "../../../redux/store/hooks";
-import { GridFilterItem } from "@mui/x-data-grid";
-import { getSites } from "../../../redux/actions/siteActions";
 import { bindActionCreators } from "redux";
 
 const AddPlot = ({ open, handleClose, createPlot, tags }) => {
@@ -23,8 +20,9 @@ const AddPlot = ({ open, handleClose, createPlot, tags }) => {
     top: "50%",
     left: "50%",
     transform: "translate(-50%, -50%)",
-    width: 400,
-    height: 450,
+    minWidth: 400,
+    maxWidth: 600,
+    height: 550,
     overflow: "auto",
     scrollbarWidth: "thin",
     bgcolor: "background.paper",
@@ -33,6 +31,7 @@ const AddPlot = ({ open, handleClose, createPlot, tags }) => {
     borderRadius: "10px",
     p: 4,
   };
+
   const [sitePageNo, setSitePageNo] = useState(0);
   const [siteNameInput, setSiteNameInput] = useState("");
   const [sitesLoading, setSitesLoading] = useState(false);
@@ -68,7 +67,6 @@ const AddPlot = ({ open, handleClose, createPlot, tags }) => {
   }, [sitePageNo, siteNameInput]);
 
   const getSitesData = async () => {
-    console.log("Fetching sites data in useEffect");
     const siteNameFilter = {
       columnField: "name_english",
       value: siteNameInput,
@@ -78,8 +76,8 @@ const AddPlot = ({ open, handleClose, createPlot, tags }) => {
     setTimeout(async () => {
       setSitesLoading(true);
       await getSites(sitePageNo * 10, 10, [siteNameFilter]);
-    }, 1000);
-    setSitesLoading(false);
+      setSitesLoading(false);
+    }, 100);
   };
 
   const handleChange = (event) => {
@@ -130,10 +128,8 @@ const AddPlot = ({ open, handleClose, createPlot, tags }) => {
 
   let sitesList = [];
   const siteData = useAppSelector((state) => state.sitesData);
-  console.log("siteData in AddPlot component: ", siteData);
   if (siteData) {
     sitesList = Object.values(siteData.sites);
-    console.log("sites list : ", sitesList);
     sitesList = sitesList.sort((a, b) => {
       return b.id - a.id;
     });
@@ -178,11 +174,9 @@ const AddPlot = ({ open, handleClose, createPlot, tags }) => {
                   options={sitesList}
                   getOptionLabel={(option) => option.name_english}
                   isOptionEqualToValue={(option, value) => {
-                    console.log("Option: ", option, "Value: ", value);
                     return option.id === value.id;
                   }}
                   onChange={(event, newValue) => {
-                    console.log("on change ", event, newValue);
                     if (newValue !== null) {
                       setFormData((prevState) => {
                         return { ...prevState, ["site_id"]: newValue.id, ["site_name_english"]: newValue.name_english };
@@ -190,14 +184,15 @@ const AddPlot = ({ open, handleClose, createPlot, tags }) => {
                     }
                   }}
                   onInputChange={(event) => {
-                    console.log("on input change ", event);
                     const { value } = event.target;
-                    console.log("value from event :  ", event.nativeEvent.data);
                     setSitePageNo(0);
                     setSiteNameInput(value);
                     handleChange(event);
                   }}
                   setPage={setSitePageNo}
+                  loading={sitesLoading}
+                  fullWidth
+                  size="medium"
                 />
               </Grid>
               <Grid item xs={12}>
@@ -237,54 +232,15 @@ const AddPlot = ({ open, handleClose, createPlot, tags }) => {
                   }
                 />
               </Grid>
-              {/* <Grid item xs={12}>
-                                <TextField name="district" label="District" value={formData.district} onChange={handleChange} fullWidth />
-                            </Grid>
-                            <Grid item xs={12}>
-                                <TextField name="land_type" label="Land Type" value={formData.land_type} onChange={handleChange} fullWidth />
-                            </Grid>
-                            <Grid item xs={12}>
-                                <TextField name="status" label="Status" value={formData.status} onChange={handleChange} fullWidth />
-                            </Grid>
-                            <Grid item xs={12}>
-                                <TextField name="taluka" label="Taluka" value={formData.taluka} onChange={handleChange} fullWidth />
-                            </Grid>
-                            <Grid item xs={12}>
-                                <TextField name="village" label="Village" value={formData.village} onChange={handleChange} fullWidth />
-                            </Grid>
-                            <Grid item xs={12}>
-                                <TextField name="zone" label="Zone" value={formData.zone} onChange={handleChange} fullWidth />
-                            </Grid>
-                            <Grid item xs={12}>
-                                <TextField name="boundaries.type" label="Boundaries Type" value={formData.boundaries.type} onChange={handleChange} fullWidth />
-                            </Grid>
-                            <Grid item xs={12}>
-                                <TextField
-                                    name="boundaries.coordinates"
-                                    label="Boundaries Coordinates"
-                                    value={formData.boundaries.coordinates}
-                                    onChange={handleChange}
-                                    fullWidth
-                                />
-                            </Grid>
-                            <Grid item xs={12}>
-                                <TextField name="center.type" label="Center Type" value={formData.center.type} onChange={handleChange} fullWidth />
-                            </Grid>
-                            <Grid item xs={12}>
-                                <TextField
-                                    name="center.coordinates"
-                                    label="Center Coordinates"
-                                    value={formData.center.coordinates}
-                                    onChange={handleChange}
-                                    fullWidth
-                                />
-                            </Grid> */}
               <Grid
                 item
                 xs={12}
                 sx={{ display: "flex", justifyContent: "center" }}
               >
-                <Button variant="outlined" type="submit">
+                <Button variant="outlined" color="error" onClick={handleClose} sx={{ marginRight: "8px" }}>
+                  Cancel
+                </Button>
+                <Button variant="contained" type="submit" color="success">
                   Submit
                 </Button>
               </Grid>

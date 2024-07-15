@@ -21,7 +21,6 @@ export const getGroups = (offset: number, limit: number, filters?: any[]) => {
                     type: groupActionTypes.GET_GROUPS_SUCCEEDED,
                     payload: value,
                 });
-                toast.success(`Successfully fetched groups!`)
             },
             (error: any) => {
                 console.log(error)

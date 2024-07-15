@@ -17,7 +17,6 @@ export const getPlantTypes = (offset: number, limit: number, filters?: any[]) =>
                         value.results[i].key = value.results[i].id
                     }
                 }
-                toast.success(`Successfully fetched plant types!`)
                 dispatch({
                     type: plantTypeActionTypes.GET_PLANT_TYPES_SUCCEEDED,
                     payload: value,

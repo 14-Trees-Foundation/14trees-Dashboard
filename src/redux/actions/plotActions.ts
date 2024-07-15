@@ -21,7 +21,6 @@ export const getPlots = (offset: number, limit: number, filters?: any[]) => {
                     type: plotActionTypes.GET_PLOTS_SUCCEEDED,
                     payload: value,
                 });
-                toast.success(`Successfully fetched plots!`)
             },
             (error: any) => {
                 console.log(error)

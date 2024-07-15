@@ -21,7 +21,6 @@ export const getTrees = (offset: number, limit: number, filters?: any) => {
                     type: treeActionTypes.GET_TREES_SUCCEEDED,
                     payload: value,
                 });
-                toast.success(`Successfully fetched trees!`)
             },
             (error: any) => {
                 console.log(error)

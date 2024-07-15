@@ -54,7 +54,6 @@ const AddPond = ({ open, handleClose, createPondData }) => {
   }, [sitePage, siteNameInput]);
 
   const getSitesData = async () => {
-    console.log("Fecthing sites data in useEffect");
     const siteNameFilter = {
       columnField: "name_english",
       value: siteNameInput,
@@ -175,11 +174,9 @@ const AddPond = ({ open, handleClose, createPondData }) => {
                   options={sitesList}
                   getOptionLabel={(option) => option.name_english}
                   isOptionEqualToValue={(option, value) => {
-                    console.log("Option: ", option, "Value: ", value);
                     return option.id === value.id;
                   }}
                   onChange={(event, newValue) => {
-                    console.log("on change ", event, newValue);
                     if (newValue !== null) {
                       setFormData((prevState) => {
                         return { ...prevState, ["site_id"]: newValue.id };
@@ -187,14 +184,14 @@ const AddPond = ({ open, handleClose, createPondData }) => {
                     }
                   }}
                   onInputChange={(event) => {
-                    console.log("on input change ", event);
                     const { value } = event.target;
-                    console.log("value from event :  ", event.nativeEvent.data);
                     setSitePage(0);
                     setSiteNameInput(value);
                     handleChange(event);
                   }}
                   setPage={setSitePage}
+                  fullWidth={true}
+                  size="medium"
                 />
               </Grid>
               <Grid item xs={12}>
