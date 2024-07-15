@@ -1,8 +1,7 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import Box from "@mui/material/Box";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
-import CircularProgress from "@mui/material/CircularProgress";
 import { TableColumnsType } from "antd";
 import getColumnSearchProps from "../../../components/Filter";
 import TableComponent from "../../../components/Table";
@@ -12,7 +11,6 @@ import { bindActionCreators } from "@reduxjs/toolkit";
 import { RootState } from "../../../redux/store/store";
 import { ToastContainer } from "react-toastify";
 import { Visit } from "../../../types/visits";
-import { OrganizationUsers } from "../organization/OrganizationUsers";
 
 import {
   Button,
@@ -21,29 +19,15 @@ import {
   DialogContent,
   DialogContentText,
   DialogTitle,
+  Divider,
+  Typography,
 } from "@mui/material";
 import {
- 
+
   GridFilterItem,
 } from "@mui/x-data-grid";
 import AddVisit from "./AddVisit";
 import EditVisit from "./EditVisit";
-
-
-function LoadingOverlay() {
-  return (
-    <div
-      style={{
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        height: "100%",
-      }}
-    >
-      <CircularProgress />
-    </div>
-  );
-}
 
 export const VisitsComponent = () => {
   const dispatch = useAppDispatch();
@@ -61,7 +45,7 @@ export const VisitsComponent = () => {
   const [editModal, setEditModal] = useState(false);
   const [page, setPage] = useState(0);
   const [filters, setFilters] = useState<Record<string, GridFilterItem>>({});
-  const [selectedVisit , setSelectedVisit] = useState<Visit | null>(null);
+  const [selectedVisit, setSelectedVisit] = useState<Visit | null>(null);
 
   const handleSetFilters = (filters: Record<string, GridFilterItem>) => {
     setPage(0);
@@ -73,11 +57,11 @@ export const VisitsComponent = () => {
   }, [page, filters]);
 
   const getVisitData = async () => {
-    
+
     let filtersData = Object.values(filters);
-   
-    setTimeout( async() => {
-     await getVisits(page * 10, 10, filtersData);
+
+    setTimeout(async () => {
+      await getVisits(page * 10, 10, filtersData);
     }, 1000);
   };
 
@@ -86,16 +70,16 @@ export const VisitsComponent = () => {
   console.log("Visit data in state: ", visitsData);
   if (visitsData) {
     visitsList = Object.values(visitsData.visits);
-    
+
     visitsList = visitsList.sort((a, b) => b.id - a.id);
   }
 
 
   const getAllVisitsData = async () => {
     let filtersData = Object.values(filters);
-    
-    setTimeout( async() => {
-     await getVisits(0, visitsData.totalVisits, filtersData);
+
+    setTimeout(async () => {
+      await getVisits(0, visitsData.totalVisits, filtersData);
     }, 1000);
   };
 
@@ -113,12 +97,12 @@ export const VisitsComponent = () => {
     createVisit(formData);
   };
 
-  const columns: TableColumnsType<Visit>=[
+  const columns: TableColumnsType<Visit> = [
     {
       dataIndex: "action",
       key: "action",
       title: "Actions",
-      width: 180,
+      width: 150,
       align: "center",
       render: (value, record, index) => (
         <div
@@ -134,7 +118,7 @@ export const VisitsComponent = () => {
             onClick={() => {
               setEditModal(true);
               setSelectedEditRow(record);
-              
+
             }}
           >
             <EditIcon />
@@ -155,12 +139,12 @@ export const VisitsComponent = () => {
       dataIndex: "visit_name",
       key: "visit_name",
       title: "Visit Name",
-      width: 220,
+      width: 320,
       align: "center",
       render: (value, record, index) => (
         <Button
           onClick={() => setSelectedVisit(record)}
-          sx={{ textTransform: 'none', color: 'inherit' }} 
+          sx={{ textTransform: 'none', color: 'inherit' }}
           fullWidth
           variant="text"
         >
@@ -181,24 +165,33 @@ export const VisitsComponent = () => {
 
   return (
     <>
-    <ToastContainer />
-    <div
+      <ToastContainer />
+      <div
         style={{
           display: "flex",
-          justifyContent: "flex-end",
-          marginBottom: "20px",
+          justifyContent: "space-between",
+          padding: "4px 12px",
         }}
       >
-        <Button variant="contained" color="success" onClick={handleModalOpen}>
-          Add Visit
-        </Button>
-        <AddVisit
-          open={open}
-          handleClose={handleModalClose}
-          createVisit={handleCreateVisitData}
-        />
-   
+        <Typography variant="h4" style={{ marginTop: '5px' }}>Visits</Typography>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "flex-end",
+            marginBottom: "5px",
+            marginTop: "5px",
+          }}>
+          <Button variant="contained" color="success" onClick={handleModalOpen}>
+            Add Visit
+          </Button>
+          <AddVisit
+            open={open}
+            handleClose={handleModalClose}
+            createVisit={handleCreateVisitData}
+          />
+        </div>
       </div>
+      <Divider sx={{ backgroundColor: "black", marginBottom: '15px' }} />
       <Box sx={{ height: 840, width: "100%" }}>
         <TableComponent
           dataSource={visitsList}
@@ -208,7 +201,7 @@ export const VisitsComponent = () => {
           setPage={setPage}
         />
       </Box>
-     
+
       <Dialog open={openDeleteModal} onClose={() => setOpenDeleteModal(false)}>
         <DialogTitle>Confirm Delete</DialogTitle>
         <DialogContent>

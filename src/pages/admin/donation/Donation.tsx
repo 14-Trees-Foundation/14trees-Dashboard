@@ -8,6 +8,8 @@ import {
   DialogContent,
   DialogContentText,
   DialogTitle,
+  Divider,
+  Typography,
 } from "@mui/material";
 import { GridFilterItem } from "@mui/x-data-grid";
 import EditIcon from "@mui/icons-material/Edit";
@@ -103,7 +105,7 @@ export const DonationComponent = () => {
       dataIndex: "action",
       key: "action",
       title: "Action",
-      width: 100,
+      width: 150,
       align: "center",
       render: (value, record, index) => (
         <div
@@ -240,20 +242,31 @@ export const DonationComponent = () => {
       <div
         style={{
           display: "flex",
-          justifyContent: "flex-end",
-          marginBottom: "20px",
-        }}>
-        <Button variant="contained" color="success" onClick={handleModalOpen}>
-          Add Donation
-        </Button>
-        <AddDonation
-          open={open}
-          handleClose={handleModalClose}
-          createDonation={handleCreateDonationData}
-        />
+          justifyContent: "space-between",
+          padding: "4px 12px",
+        }}
+      >
+        <Typography variant="h4" style={{ marginTop: '5px' }}>Donations</Typography>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "flex-end",
+            marginBottom: "5px",
+            marginTop: "5px",
+          }}>
+          <Button variant="contained" color="success" onClick={handleModalOpen}>
+            Add Donation
+          </Button>
+          <AddDonation
+            open={open}
+            handleClose={handleModalClose}
+            createDonation={handleCreateDonationData}
+          />
+        </div>
       </div>
+      <Divider sx={{ backgroundColor: "black", marginBottom: '15px' }} />
 
-      <Box sx={{ height: 540, width: "100%", marginTop: '40px' }}>
+      <Box sx={{ height: 540, width: "100%" }}>
         <TableComponent
           dataSource={donationList}
           columns={columns}

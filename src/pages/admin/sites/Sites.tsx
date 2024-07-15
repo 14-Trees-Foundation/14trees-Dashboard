@@ -13,6 +13,8 @@ import {
   DialogContent,
   DialogContentText,
   DialogTitle,
+  Divider,
+  Typography,
 } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -29,20 +31,7 @@ import { RootState } from "../../../redux/store/store";
 import AddSite from "./AddSite";
 import { ToastContainer } from "react-toastify";
 import { SiteMap } from "./components/SiteMap";
-function LoadingOverlay() {
-  return (
-    <div
-      style={{
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        height: "100%",
-      }}
-    >
-      <CircularProgress />
-    </div>
-  );
-}
+
 
 export const SitesComponent = () => {
   const dispatch = useAppDispatch();
@@ -314,19 +303,29 @@ export const SitesComponent = () => {
       <div
         style={{
           display: "flex",
-          justifyContent: "flex-end",
-          marginBottom: "20px",
+          justifyContent: "space-between",
+          padding: "4px 12px",
         }}
       >
-        <Button variant="contained" color="success" onClick={handleModalOpen}>
-          Add Site
-        </Button>
-        <AddSite
-          open={open}
-          handleClose={handleModalClose}
-          createSite={handleCreateSiteData}
-        />
+        <Typography variant="h4" style={{ marginTop: '5px' }}>Sites</Typography>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "flex-end",
+            marginBottom: "5px",
+            marginTop: "5px",
+          }}>
+          <Button variant="contained" color="success" onClick={handleModalOpen}>
+            Add Site
+          </Button>
+          <AddSite
+            open={open}
+            handleClose={handleModalClose}
+            createSite={handleCreateSiteData}
+          />
+        </div>
       </div>
+      <Divider sx={{ backgroundColor: "black", marginBottom: '15px' }} />
       <Box sx={{ height: 840, width: "100%" }}>
         <TableComponent
           dataSource={sitesList}
@@ -335,10 +334,10 @@ export const SitesComponent = () => {
           fetchAllData={getAllSitesData}
           setPage={setPage}
         />
-         <SiteMap/>
+        <SiteMap />
       </Box>
 
-    
+
 
       <Dialog open={openDeleteModal} onClose={() => setOpenDeleteModal(false)}>
         <DialogTitle>Confirm Delete</DialogTitle>

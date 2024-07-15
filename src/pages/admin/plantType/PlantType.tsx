@@ -51,108 +51,12 @@ export const PlantTypeComponent = () => {
 
     const columns: TableColumnsType<PlantType> = [
         {
-          dataIndex: "srNo",
-          key: "srNo",
-          title: "Sr. No.",
-          width: 100,
-          align: "center",
-          render: (value, record, index) => `${index + 1 + srNoPage * 10}.`
-        },
-        {
-          dataIndex: "plant_type_id",
-          key: "plant_type_id",
-          title: "Plant Type ID",
-          width: 170,
-          align: "center",
-          ...getColumnSearchProps('plant_type_id', filters, handleSetFilters)
-        },
-        {
-          dataIndex: "name",
-          key: "name",
-          title: "Name",
-          width: 250,
-          align: "center",
-          ...getColumnSearchProps('name', filters, handleSetFilters)
-        },
-        {
-          dataIndex: "english_name",
-          key: "english_name",
-          title: "Name (English)",
-          width: 250,
-          align: "center",
-          ...getColumnSearchProps('english_name', filters, handleSetFilters)
-        },
-        {
-            dataIndex: "common_name_in_english",
-            key: "common_name_in_english",
-            title: "Common Name in English",
-            width: 250,
+            dataIndex: "srNo",
+            key: "srNo",
+            title: "Sr. No.",
+            width: 100,
             align: "center",
-            ...getColumnSearchProps('common_name_in_english', filters, handleSetFilters)
-          },
-          {
-            dataIndex: "common_name_in_marathi",
-            key: "common_name_in_marathi",
-            title: "Common Name in Marathi",
-            width: 250,
-            align: "center",
-            ...getColumnSearchProps('common_name_in_marathi', filters, handleSetFilters)
-          },
-        {
-          dataIndex: "scientific_name",
-          key: "scientific_name",
-          title: "Scientific Name",
-          width: 250,
-          align: "center",
-          ...getColumnSearchProps('scientific_name', filters, handleSetFilters)
-        },
-        {
-            dataIndex: "known_as",
-            key: "known_as",
-            title: "Known As",
-            width: 250,
-            align: "center",
-            ...getColumnSearchProps('known_as', filters, handleSetFilters)
-          },
-          {
-            dataIndex: "category",
-            key: "category",
-            title: "Category",
-            width: 250,
-            align: "center",
-            ...getColumnSearchProps('category', filters, handleSetFilters)
-          },
-          {
-            dataIndex: "tags",
-            key: "tags",
-            title: "Tags",
-            width: 250,
-            align: "center",
-            ...getColumnSearchProps('tags', filters, handleSetFilters)
-          },
-          {
-            dataIndex: "use",
-            key: "use",
-            title: "Use",
-            width: 250,
-            align: "center",
-            ...getColumnSearchProps('use', filters, handleSetFilters)
-          },
-          {
-            dataIndex: "images",
-            key: "images",
-            title: "Images",
-            width: 250,
-            align: "center",
-            ...getColumnSearchProps('images', filters, handleSetFilters)
-          },
-        {
-          dataIndex: "habit",
-          key: "habit",
-          title: "Habit",
-          width: 200,
-          align: "center",
-          ...getColumnSelectedItemFilter({dataIndex: 'habit', filters, handleSetFilters, options: plantTypeHabitList})
+            render: (value, record, index) => `${index + 1 + srNoPage * 10}.`
         },
         {
             dataIndex: "action",
@@ -160,7 +64,7 @@ export const PlantTypeComponent = () => {
             title: "Actions",
             align: "center",
             width: 160,
-            render: (value, record, index )=> (
+            render: (value, record, index) => (
                 <div
                     style={{
                         display: "flex",
@@ -186,18 +90,114 @@ export const PlantTypeComponent = () => {
                     </Button>
                 </div>
             ),
-          },
-      ];
+        },
+        {
+            dataIndex: "plant_type_id",
+            key: "plant_type_id",
+            title: "Plant Type ID",
+            width: 170,
+            align: "center",
+            ...getColumnSearchProps('plant_type_id', filters, handleSetFilters)
+        },
+        {
+            dataIndex: "name",
+            key: "name",
+            title: "Name",
+            width: 250,
+            align: "center",
+            ...getColumnSearchProps('name', filters, handleSetFilters)
+        },
+        {
+            dataIndex: "english_name",
+            key: "english_name",
+            title: "Name (English)",
+            width: 250,
+            align: "center",
+            ...getColumnSearchProps('english_name', filters, handleSetFilters)
+        },
+        {
+            dataIndex: "common_name_in_english",
+            key: "common_name_in_english",
+            title: "Common Name in English",
+            width: 250,
+            align: "center",
+            ...getColumnSearchProps('common_name_in_english', filters, handleSetFilters)
+        },
+        {
+            dataIndex: "common_name_in_marathi",
+            key: "common_name_in_marathi",
+            title: "Common Name in Marathi",
+            width: 250,
+            align: "center",
+            ...getColumnSearchProps('common_name_in_marathi', filters, handleSetFilters)
+        },
+        {
+            dataIndex: "scientific_name",
+            key: "scientific_name",
+            title: "Scientific Name",
+            width: 250,
+            align: "center",
+            ...getColumnSearchProps('scientific_name', filters, handleSetFilters)
+        },
+        {
+            dataIndex: "known_as",
+            key: "known_as",
+            title: "Known As",
+            width: 250,
+            align: "center",
+            ...getColumnSearchProps('known_as', filters, handleSetFilters)
+        },
+        {
+            dataIndex: "category",
+            key: "category",
+            title: "Category",
+            width: 250,
+            align: "center",
+            ...getColumnSearchProps('category', filters, handleSetFilters)
+        },
+        {
+            dataIndex: "tags",
+            key: "tags",
+            title: "Tags",
+            width: 250,
+            align: "center",
+            ...getColumnSearchProps('tags', filters, handleSetFilters)
+        },
+        {
+            dataIndex: "use",
+            key: "use",
+            title: "Use",
+            width: 250,
+            align: "center",
+            ...getColumnSearchProps('use', filters, handleSetFilters)
+        },
+        {
+            dataIndex: "images",
+            key: "images",
+            title: "Images",
+            width: 250,
+            align: "center",
+            ...getColumnSearchProps('images', filters, handleSetFilters)
+        },
+        {
+            dataIndex: "habit",
+            key: "habit",
+            title: "Habit",
+            width: 200,
+            align: "center",
+            ...getColumnSelectedItemFilter({ dataIndex: 'habit', filters, handleSetFilters, options: plantTypeHabitList })
+        },
+    ];
 
     useEffect(() => {
         getPlantTypeData();
-    }, [ page, filters]);
+    }, [page, filters]);
 
     const getPlantTypeData = async () => {
         const filtersData = Object.values(filters);
         setLoading(true);
         setTimeout(async () => {
-            await getPlantTypes(page*10, 10, filtersData);
+            await getPlantTypes(page * 10, 10, filtersData);
             setLoading(false);
         }, 1000);
     };
@@ -213,8 +213,8 @@ export const PlantTypeComponent = () => {
 
     const getAllPlantTypesData = async () => {
         setTimeout(async () => {
-          let filtersData = Object.values(filters);
-          await getPlantTypes(0, plantTypesData.totalPlantTypes, filtersData);
+            let filtersData = Object.values(filters);
+            await getPlantTypes(0, plantTypesData.totalPlantTypes, filtersData);
         }, 1000);
     };
 
