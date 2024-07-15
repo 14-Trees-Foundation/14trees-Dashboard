@@ -9,7 +9,7 @@ export const donationsDataReducer = (state = { totalDonations:0, donations: {}},
           if (action.payload) {
               let donationDataState: DonationDataState = { totalDonations: state.totalDonations, donations: {...state.donations}};
               let payload = action.payload as PaginatedResponse<Donation>;
-              console.log(payload)
+
               if (donationDataState.totalDonations != payload.total) {
                 donationDataState.donations = {}
               }

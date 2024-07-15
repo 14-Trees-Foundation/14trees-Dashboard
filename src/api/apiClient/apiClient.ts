@@ -750,52 +750,52 @@ class ApiClient {
         Model- Donation: CRUD Operations/Apis for Donations
     */
 
-        async getDonations(offset: number, limit: number , filters?: any[]): Promise<PaginatedResponse<Donation>> {
-            const url = `/donations/getDonations?offset=${offset}&limit=${limit}`;
-            try {
-                const response = await this.api.post<PaginatedResponse<Donation>>(url ,  {filters: filters});
-                console.log("Response in api client: ", response);
-                return response.data;
-            } catch (error: any) {
-                console.error(error)
-                throw new Error(`Failed to fetch donations: ${error.message}`);
-            }
+    async getDonations(offset: number, limit: number , filters?: any[]): Promise<PaginatedResponse<Donation>> {
+        const url = `/donations/get?offset=${offset}&limit=${limit}`;
+        try {
+            const response = await this.api.post<PaginatedResponse<Donation>>(url ,  {filters: filters});
+            console.log("Response in api client: ", response);
+            return response.data;
+        } catch (error: any) {
+            console.error(error)
+            throw new Error(`Failed to fetch donations: ${error.message}`);
         }
+    }
 
 
-        async createDonation(data: Donation): Promise<Donation> {
-            try {
-                const response = await this.api.post<Donation>(`/donations/add`, data);
-                return response.data;
-            } catch (error) {
-                console.error(error)
-                throw new Error('Failed to create Donation');
-            }
-        }    
-
-
-        async updateDonation(data: Donation): Promise<Donation> {
-            try {
-                const response = await this.api.put<Donation>(`/donations/${data.id}`, data);
-                return response.data;
-            } catch (error: any) {
-                console.error(error)
-                if (error.response) {
-                    throw new Error(error.response.data.message);
-                    }
-                throw new Error('Failed to update donation');
-            }
+    async createDonation(data: Donation): Promise<Donation> {
+        try {
+            const response = await this.api.post<Donation>(`/donations`, data);
+            return response.data;
+        } catch (error) {
+            console.error(error)
+            throw new Error('Failed to create Donation');
         }
-    
-        async deleteDonation(data: Donation): Promise<number> {
-            try {
-                await this.api.delete<any>(`/donations/${data.id}`);
-                return data.id;
-            } catch (error) {
-                console.error(error)
-                throw new Error('Failed to delete Donation');
-            }
+    }    
+
+
+    async updateDonation(data: Donation): Promise<Donation> {
+        try {
+            const response = await this.api.put<Donation>(`/donations/${data.id}`, data);
+            return response.data;
+        } catch (error: any) {
+            console.error(error)
+            if (error.response) {
+                throw new Error(error.response.data.message);
+                }
+            throw new Error('Failed to update donation');
         }
+    }
+
+    async deleteDonation(data: Donation): Promise<number> {
+        try {
+            await this.api.delete<any>(`/donations/${data.id}`);
+            return data.id;
+        } catch (error) {
+            console.error(error)
+            throw new Error('Failed to delete Donation');
+        }
+    }
 
   /*
         Model- Event : CRUD Operations/Apis for Event
