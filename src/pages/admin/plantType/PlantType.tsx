@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import Box from "@mui/material/Box";
 import { GridFilterItem } from "@mui/x-data-grid";
 import {
+    Avatar,
     Button,
     Dialog,
     DialogActions,
@@ -177,6 +178,25 @@ export const PlantTypeComponent = () => {
             title: "Images",
             width: 250,
             align: "center",
+            render: (value) => {
+                return (
+                    <div
+                        style={{
+                            display: "flex",
+                            justifyContent: "center",
+                            alignItems: "center",
+                        }}>
+                        {value && value.map((image: string) => (
+                            <Avatar
+                                style={{ marginLeft: 5 }}
+                                alt="Profile"
+                                src={image ? image : ""}
+                                sx={{ width: 40, height: 40 }}
+                            />
+                        ))}
+                    </div>
+                )
+            },
             ...getColumnSearchProps('images', filters, handleSetFilters)
         },
         {
@@ -297,7 +317,8 @@ export const PlantTypeComponent = () => {
                             }
                             setOpenDeleteModal(false);
                         }}
-                        color="primary"
+                        color="error"
+                        variant="outlined"
                         autoFocus>
                         Yes
                     </Button>

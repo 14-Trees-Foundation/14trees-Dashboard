@@ -163,13 +163,13 @@ function EditTreeType({
           }}
         >
           <Button
-            variant="contained"
+            variant="outlined"
             onClick={() => handleCloseEditModal(false)}
-            color="primary"
+            color="error"
           >
             Cancel
           </Button>
-          <Button variant="contained" type="submit" color="primary">
+          <Button variant="contained" type="submit" color="success">
             Save
           </Button>
         </DialogActions>

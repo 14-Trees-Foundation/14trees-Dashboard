@@ -252,7 +252,10 @@ const AddTreeType = ({ open, handleClose, createPlantType }) => {
                 xs={12}
                 sx={{ display: "flex", justifyContent: "center" }}
               >
-                <Button variant="outlined" type="submit">
+                <Button variant="outlined" color="error" onClick={handleClose} style={{ marginRight: "8px" }}>
+                  Cancel
+                </Button>
+                <Button variant="contained" type="submit" color="success">
                   Submit
                 </Button>
               </Grid>
