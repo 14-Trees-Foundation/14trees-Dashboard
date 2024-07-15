@@ -59,11 +59,13 @@ class ApiClient {
             }
             Object.entries(data).forEach(([key, value]) => {
                 if (key != 'image') {
+                   
                     const strValue = value as string
                     formData.append(key, strValue);
                 }
               });
             const response = await this.api.post<PlantType>(`/plant-types/`, formData);
+            
             return response.data;
         } catch (error) {
             console.error(error)
@@ -700,9 +702,28 @@ class ApiClient {
         }
     }
 
-    async updateSite(data: Site): Promise<Site> {
+    async updateSite(data: Site , files:Blob[]): Promise<Site> {
         try {
-            const response = await this.api.put<Site>(`/sites/${data.id}`, data);
+            
+            const formData = new FormData();
+            if (files) {
+                files.forEach( (file) => {
+                    formData.append("files", file);
+                });
+            }
+            Object.entries(data).forEach(([key, value]) => {
+                if (value === null || value === "" ) return;
+                if (key !== 'google_earth_link' && key !== 'tags') {
+                        const strValue = value as string
+                    formData.append(key, strValue);
+                }
+                if (key === 'tags'){
+                    formData.append(key, JSON.stringify(value));
+                }
+              });
+            console.log("Form data in updateSite action : ", formData);
+
+            const response = await this.api.put<Site>(`/sites/${data.id}`, formData);
             return response.data;
         } catch (error: any) {
             console.error(error)

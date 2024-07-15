@@ -99,6 +99,7 @@ const AddPlot = ({ open, handleClose, createPlot, tags }) => {
 
   const handleSubmit = (event) => {
     event.preventDefault();
+    console.log("Plot data in handleSubmit:  ");
     createPlot(formData);
     setFormData({
       name: "",
@@ -185,7 +186,11 @@ const AddPlot = ({ open, handleClose, createPlot, tags }) => {
                     console.log("on change ", event, newValue);
                     if (newValue !== null) {
                       setFormData((prevState) => {
-                        return { ...prevState, ["site_id"]: newValue.id, ["site_name_english"]: newValue.name_english };
+                        return {
+                          ...prevState,
+                          ["site_id"]: newValue.id,
+                          ["site_name_english"]: newValue.name_english,
+                        };
                       });
                     }
                   }}

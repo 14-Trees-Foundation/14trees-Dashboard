@@ -17,14 +17,13 @@ import * as eventActionCreators from "../../../redux/actions/eventActions";
 import { bindActionCreators } from "redux";
 import { useAppDispatch, useAppSelector } from "../../../redux/store/hooks";
 import { RootState } from "../../../redux/store/store";
-import AddTreeType from "./AddEvents";
 import CircularProgress from "@mui/material/CircularProgress";
 import getColumnSearchProps from "../../../components/Filter";
 
 import EditEvents from "./EditEvents";
 import { TableColumnsType } from "antd";
 import TableComponent from "../../../components/Table";
-
+import { ToastContainer } from "react-toastify";
 
 function LoadingOverlay() {
   return (
@@ -42,7 +41,7 @@ function LoadingOverlay() {
 
 export const EventsComponent = () => {
   const dispatch = useAppDispatch();
-  const { getEvents  } =
+  const { getEvents , deleteEvent , updateEvent } =
     bindActionCreators(eventActionCreators, dispatch);
 
   const [open, setOpen] = useState(false);
@@ -50,7 +49,7 @@ export const EventsComponent = () => {
   const handleModalClose = () => setOpen(false);
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
   const [selectedItem, setSelectedItem] = useState<any | null>(null);
-  const [selectedEditRow, setSelectedEditRow] = useState<RowType | null>(null);
+  const [selectedEditRow, setSelectedEditRow] = useState<any | null>(null);
   const [editModal, setEditModal] = useState(false);
   const [page, setPage] = useState(0);
   const [filters, setFilters] = useState<Record<string, GridFilterItem>>({});
@@ -110,8 +109,8 @@ const getAllEventsData = async () => {
             variant="outlined"
             style={{ margin: "0 5px" }}
             onClick={() => {
-              // setEditModal(true);
-              // setSelectedEditRow(record);
+              setEditModal(true);
+              setSelectedEditRow(record);
               console.log(" donation row to edit : ")
             }}
             >
@@ -121,7 +120,7 @@ const getAllEventsData = async () => {
             variant="outlined"
             color="error"
             style={{ margin: "0 5px" }}
-        
+            onClick={()=>handleDeleteEvent(record)}
           >
             <DeleteIcon />
           </Button>
@@ -273,14 +272,14 @@ const getAllEventsData = async () => {
     name: string;
   };
 
-//   const handleDeleteTreeType = (row: any) => {
-//     setOpenDeleteModal(true);
-//     setSelectedItem(row);
-//   };
+  const handleDeleteEvent = (row: any) => {
+    setOpenDeleteModal(true);
+    setSelectedItem(row);
+  };
 
-//   const handleEditSubmit = (formData: any) => {
-//     updateTreeType(formData);
-//   };
+  const handleEditSubmit = (formData: any) => {
+    updateEvent(formData);
+  };
 
 //   const handleCreateEventsData = (formData: any) => {
 //     console.log(formData);
@@ -288,6 +287,7 @@ const getAllEventsData = async () => {
 
   return (
     <>
+    <ToastContainer/>
       <div
         style={{
           display: "flex",
@@ -331,9 +331,9 @@ const getAllEventsData = async () => {
           <Button
             onClick={() => {
               console.log("Deleting item...", selectedItem);
-              // if (selectedItem !== null) {
-              //   deleteTreeType(selectedItem);
-              // }
+              if (selectedItem !== null) {
+                deleteEvent(selectedItem);
+              }
               setOpenDeleteModal(false);
             }}
             color="primary"
@@ -343,14 +343,14 @@ const getAllEventsData = async () => {
         </DialogActions>
       </Dialog>
 
-      {/* {selectedEditRow && (
+      {selectedEditRow && (
         <EditEvents
           row={selectedEditRow}
           openeditModal={editModal}
           setEditModal={setEditModal}
           editSubmit={handleEditSubmit}
         />
-      )} */}
+      )}
     </>
   );
 };

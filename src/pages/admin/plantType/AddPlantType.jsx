@@ -12,6 +12,7 @@ import { plantTypeHabitList } from "./habitList";
 import { CreateAlbumDialog } from "../../ww/CreateAlbumDialog";
 import { makeStyles } from "@mui/styles";
 import { useDropzone } from "react-dropzone";
+import TagSelector from "../../../components/TagSelector";
 
 const AddTreeType = ({ open, handleClose, createPlantType }) => {
   const style = {
@@ -42,7 +43,7 @@ const AddTreeType = ({ open, handleClose, createPlantType }) => {
     common_name_in_english: "",
     common_name_in_marathi: "",
     category: "",
-    // tags: [],
+    tags: [],
     images: [],
     remarkable_char: "",
 
@@ -180,15 +181,14 @@ const AddTreeType = ({ open, handleClose, createPlantType }) => {
                   fullWidth
                 />
               </Grid>
-              {/* <Grid item xs={12}>
-                <TextField
-                  name="tags"
-                  label="Tags"
+              <Grid item xs={12}>
+                <TagSelector
                   value={formData.tags}
-                  onChange={handleChange}
-                  fullWidth
+                  handleChange={(tags) =>
+                    setFormData({ ...formData, tags: tags })
+                  }
                 />
-              </Grid> */}
+              </Grid>
               <Grid item xs={12}>
                 <div className={classes.imgdiv}>
                   <section>

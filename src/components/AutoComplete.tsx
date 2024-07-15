@@ -11,7 +11,7 @@ interface AutoCompleteProps {
   setPage?: (value: React.SetStateAction<number>) => void
 }
 
-const AutocompleteWithPagination = ({
+const  AutocompleteWithPagination = ({
   loading,
   label,
   options,
