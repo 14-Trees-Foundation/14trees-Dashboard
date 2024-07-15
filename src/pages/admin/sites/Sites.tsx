@@ -31,6 +31,7 @@ import { RootState } from "../../../redux/store/store";
 import AddSite from "./AddSite";
 import { ToastContainer } from "react-toastify";
 import { SiteMap } from "./components/SiteMap";
+import { getFormattedDate } from "../../../helpers/utils";
 
 
 export const SitesComponent = () => {
@@ -282,18 +283,12 @@ export const SitesComponent = () => {
       ...getColumnSearchProps("site_data_check", filters, handleSetFilters),
     },
     {
-      dataIndex: "created_at",
-      key: "created_at",
-      title: "Created At",
-      width: 200,
-      align: "center",
-    },
-    {
       dataIndex: "updated_at",
       key: "updated_at",
       title: "Updated At",
       width: 200,
       align: "center",
+      render: getFormattedDate
     },
   ];
 

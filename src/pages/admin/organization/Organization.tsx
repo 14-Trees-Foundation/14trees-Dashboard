@@ -9,6 +9,7 @@ import {
   DialogContentText,
   DialogTitle,
   Divider,
+  InputLabel,
   Menu,
   MenuItem,
   TextField,
@@ -359,6 +360,7 @@ export const OrganizationComponent = () => {
         <DialogTitle>Create user-group Mapping for '{selectedItem?.name}'</DialogTitle>
         <form onSubmit={handleBulkCreateUserGroupMapping}>
           <DialogContent>
+            <InputLabel>Download sample file from <a href="https://docs.google.com/spreadsheets/d/1ypVdbR44nQXuaHAEOrwywY3k-lfJdsRZ9iKp0Jpq7Kw/edit?usp=sharing">here</a> and fill the details.</InputLabel>
             <TextField
               type="file"
               inputProps={{ accept: '.csv' }}

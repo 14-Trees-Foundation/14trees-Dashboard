@@ -780,9 +780,8 @@ const StepForm = ({ open, handleClose, useCase, data, submitFunction }) => {
           >
             {current <= StepFormSteps.length - 1 && (
               <Button
-                variant="contained"
-                type="primary"
-                color="primary"
+                variant="outlined"
+                color="error"
                 style={{ margin: "0 8px 20px 8px" }}
                 onClick={() => {
                   handleClose();
@@ -795,8 +794,7 @@ const StepForm = ({ open, handleClose, useCase, data, submitFunction }) => {
             {current > 0 && (
               <Button
                 variant="contained"
-                type="primary"
-                color="primary"
+                color="success"
                 style={{ margin: "0 8px 20px 8px" }}
                 onClick={() => prevStep()}
               >
@@ -806,8 +804,7 @@ const StepForm = ({ open, handleClose, useCase, data, submitFunction }) => {
             {current < StepFormSteps.length - 1 && (
               <Button
                 variant="contained"
-                type="primary"
-                color="primary"
+                color="success"
                 style={{ margin: "0 8px 20px 8px" }}
                 onClick={() => nextStep()}
               >
@@ -819,7 +816,7 @@ const StepForm = ({ open, handleClose, useCase, data, submitFunction }) => {
               <Button
                 variant="contained"
                 type="submit"
-                color="primary"
+                color="success"
                 style={{ margin: "0 8px 20px 8px" }}
                 onClick={() => handleSubmit()}
               >

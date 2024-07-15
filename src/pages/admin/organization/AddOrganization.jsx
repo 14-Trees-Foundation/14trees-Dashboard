@@ -77,7 +77,7 @@ const AddOrganization = ({ open, groupType, handleClose, createOrganization }) =
                                     variant='outlined'
                                     onClick={handleClose}
                                     color='error'
-                                > Submit </Button>
+                                > Cancel </Button>
                                 <Button 
                                     type="submit"
                                     variant='contained'
