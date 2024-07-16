@@ -52,10 +52,10 @@ export const Login = () => {
           },
         }
       );
-      if (res.status === 201 && res.data.user.role) {
+      if (res.status === 201 && res.data.user.roles) {
         localStorage.setItem("loginInfo", JSON.stringify(response));
         let permissions = [];
-        if (response.user.roles && response.user.roles.includes("admin")) {
+        if (res.data.user.roles && res.data.user.roles.includes("admin")) {
           permissions = ["all"]
         }
         localStorage.setItem(
