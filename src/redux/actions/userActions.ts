@@ -70,7 +70,7 @@ export const createUser = (record: User) => {
         });
         apiClient.createUser(record).then(
             (value: User) => {
-                toast.success("User created successfully");
+                toast.success(`User '${record.name}' added successfully`)
                 dispatch({
                     type: userActionTypes.CREATE_USER_SUCCEEDED,
                     payload: value,

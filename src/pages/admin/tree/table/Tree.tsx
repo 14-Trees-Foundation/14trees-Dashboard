@@ -184,6 +184,7 @@ export const TreeNew = () => {
                         <EditIcon />
                     </Button>
                     <Button
+                        disabled
                         variant="outlined"
                         color="error"
                         style={{ margin: "0 5px" }}

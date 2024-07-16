@@ -64,10 +64,12 @@ export const Map = () => {
   );
   boundaries.push(pathObj);
 
-  const { isLoaded } = useJsApiLoader({
+  let { isLoaded } = useJsApiLoader({
     id: "google-map-script",
     googleMapsApiKey: process.env.REACT_APP_API_MAP_KEY,
   });
+
+  if (boundaries.length === 0) isLoaded = false;
 
   const onMarkerClick = (i) => {
     console.log(i);
