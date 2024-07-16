@@ -1,6 +1,6 @@
-import React, { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import Box from "@mui/material/Box";
-import { DataGrid, GridToolbar, GridColumns, GridCellParams, GridFilterItem } from "@mui/x-data-grid";
+import { GridFilterItem } from "@mui/x-data-grid";
 import {
   Button,
   Dialog,
@@ -8,6 +8,8 @@ import {
   DialogContent,
   DialogContentText,
   DialogTitle,
+  Divider,
+  Typography,
 } from "@mui/material";
 import AddUser from "./AddUser";
 import EditIcon from "@mui/icons-material/Edit";
@@ -17,7 +19,6 @@ import * as userActionCreators from "../../../../redux/actions/userActions";
 import { bindActionCreators } from "redux";
 import { useAppDispatch, useAppSelector } from "../../../../redux/store/hooks";
 import { RootState } from "../../../../redux/store/store";
-import CircularProgress from "@mui/material/CircularProgress";
 import EditUser from "./EditUser";
 import AddBulkUser from "./AddBulkUser";
 import AccountCircleRoundedIcon from '@mui/icons-material/AccountCircleRounded';
@@ -26,25 +27,12 @@ import getColumnSearchProps from "../../../../components/Filter";
 import { getFormattedDate } from "../../../../helpers/utils";
 import TableComponent from "../../../../components/Table";
 
-function LoadingOverlay() {
-  return (
-    <div
-      style={{
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        height: "100%",
-      }}>
-      <CircularProgress />
-    </div>
-  );
-}
-
 export const User1 = () => {
   const dispatch = useAppDispatch();
-  const { searchUsers, createUser, createBulkUsers, updateUser, deleteUser, getUsersByFilters } =
+  const { getUsers, searchUsers, createUser, createBulkUsers, updateUser, deleteUser } =
     bindActionCreators(userActionCreators, dispatch);
 
+  const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
   const handleModalOpen = () => setOpen(true);
   const handleModalClose = () => setOpen(false);
@@ -69,125 +57,19 @@ export const User1 = () => {
 
   const getUserData = async () => {
     let filtersData = Object.values(filters);
+    setLoading(true);
     setTimeout(async () => {
-      await getUsersByFilters(page*10, 10, filtersData);
+      await getUsers(page * 10, 10, filtersData);
+      setLoading(false);
     }, 1000);
   };
 
-  const handleClick = (e: GridCellParams<any, any, any>) => {
-    if (e.field === "email") {
-      window.open("https://dashboard.14trees.org/ww/" + e.formattedValue);
-    }
-  };
-
-
-  const rowSelection = {
-    onChange: (selectedRowKeys: React.Key[], selectedRows: User[]) => {
-        console.log(`selectedRowKeys: ${selectedRowKeys}`, 'selectedRows: ', selectedRows);
-    },
-    getCheckboxProps: (record: User) => ({
-        name: record.name,
-    }),
-  };
-
-  const columns: GridColumns = [
-    {
-      field: "action",
-      headerName: "Actions",
-      width: 200,
-      align: "center",
-      headerAlign: "center",
-      renderCell: (params: any) => (
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-          }}>
-          <Button
-            onClick={() => {
-              setSelectedEditRow(params.row);
-              setEditModal(true);
-            }}>
-            <EditIcon />
-          </Button>
-          <Button
-            onClick={() => handleDelete(params.row)}>
-            <DeleteIcon />
-          </Button>
-          <Button
-            onClick={() => {
-              window.open("https://dashboard.14trees.org/ww/" + params.row.email);
-            }}
-          >
-            <AccountCircleRoundedIcon />
-          </Button>
-        </div>
-      ),
-    },
-    {
-      field: "name",
-      headerName: "Name",
-      width: 150,
-      editable: true,
-    },
-    {
-      field: "email",
-      headerName: "Email",
-      width: 200,
-    },
-    {
-      field: "dob",
-      headerName: "Date of Birth",
-      width: 200,
-    },
-    {
-      field: "phone",
-      headerName: "Phone",
-      width: 100,
-    },
-    
-  ];
-
   const antdColumns: TableColumnsType<User> = [
-    {
-      dataIndex: "action",
-      key: "action",
-      title: "Actions",
-      width: 200,
-      align: "center",
-      render: (value, record, index )=> (
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-          }}>
-          <Button
-            onClick={() => {
-              setSelectedEditRow(record);
-              setEditModal(true);
-            }}>
-            <EditIcon />
-          </Button>
-          <Button
-            onClick={() => handleDelete(record)}>
-            <DeleteIcon />
-          </Button>
-          <Button
-            onClick={() => {
-              window.open("https://dashboard.14trees.org/ww/" + record.email);
-            }}
-          >
-            <AccountCircleRoundedIcon />
-          </Button>
-        </div>
-      ),
-    },
     {
       dataIndex: "name",
       key: "name",
       title: "Name",
+      align: "center",
       width: 150,
       ...getColumnSearchProps('name', filters, handleSetFilters)
     },
@@ -195,52 +77,105 @@ export const User1 = () => {
       dataIndex: "email",
       key: "email",
       title: "Email",
+      align: "center",
       width: 200,
       ...getColumnSearchProps('email', filters, handleSetFilters)
     },
     {
-      dataIndex: "dob",
-      key: "dob",
+      dataIndex: "birth_date",
+      key: "birth_date",
       title: "Date of Birth",
-      width: 200,
+      align: "center",
+      width: 100,
       render: getFormattedDate,
-      ...getColumnSearchProps('dob', filters, handleSetFilters)
+      ...getColumnSearchProps('birth_date', filters, handleSetFilters)
     },
     {
       dataIndex: "phone",
       key: "phone",
       title: "Phone",
+      align: "center",
       width: 100,
+      render: (value: string) => {
+        if (!value || value === "0") return "-";
+        if (value.endsWith('.0')) return value.slice(0, -2);
+        else return value;
+      },
       ...getColumnSearchProps('phone', filters, handleSetFilters)
-    },    
+    },
+    {
+      dataIndex: "action",
+      key: "action",
+      title: "Actions",
+      width: 150,
+      align: "center",
+      render: (value, record, index) => (
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+          }}>
+          <Button
+            variant="outlined"
+            color="success"
+            style={{ margin: "0 5px" }}
+            onClick={() => {
+              const { hostname, host } = window.location;
+              if (hostname === "localhost" || hostname === "127.0.0.1") {
+                window.open("http://" + host + "/ww/" + record.email);
+              } else {
+                window.open("https://" + hostname + "/ww/" + record.email);
+              }
+            }}
+          >
+            <AccountCircleRoundedIcon />
+          </Button>
+          <Button
+            variant="outlined"
+            style={{ margin: "0 5px" }}
+            onClick={() => {
+              setSelectedEditRow(record);
+              setEditModal(true);
+            }}>
+            <EditIcon />
+          </Button>
+          <Button
+            variant="outlined"
+            color="error"
+            style={{ margin: "0 5px" }}
+            onClick={() => handleDelete(record)}>
+            <DeleteIcon />
+          </Button>
+        </div>
+      ),
+    },
   ];
 
   let usersList: User[] = [];
   const usersData = useAppSelector((state: RootState) => state.usersData);
   if (usersData) {
     usersList = Object.values(usersData.users);
+    usersList = usersList.sort((a, b) => b.id - a.id);
   }
 
   const getAllUsersData = async () => {
     setTimeout(async () => {
       let filtersData = Object.values(filters);
-      await getUsersByFilters(0, usersData.totalUsers, filtersData);
+      await getUsers(0, usersData.totalUsers, filtersData);
     }, 1000);
-};
+  };
 
   const handleDelete = (row: User) => {
-    console.log("Delete", row);
     setOpenDeleteModal(true);
     setSelectedItem(row);
   };
 
   const handleEditSubmit = (formData: User) => {
-    console.log(formData);
     updateUser(formData);
   };
 
   const handleCreateUserData = (formData: User) => {
-    console.log(formData);
     createUser(formData);
   };
 
@@ -249,7 +184,7 @@ export const User1 = () => {
     if (!(file instanceof Blob)) {
       file = new Blob([file], { type: 'text/csv' }); // Change 'text/csv' to the actual file type if different
     }
-  
+
     createBulkUsers(file);
   };
 
@@ -258,54 +193,45 @@ export const User1 = () => {
       <div
         style={{
           display: "flex",
-          justifyContent: "flex-end",
-          marginBottom: "20px",
-        }}>
-        <Button variant="contained" style={{ backgroundColor:'blue' }} onClick={handleModalOpen}>
-          Add User
-        </Button>
-        <AddUser
-          open={open}
-          handleClose={handleModalClose}
-          createUser={handleCreateUserData}
-          searchUser={searchUsers}
-        />
-        <Button
-          variant="contained"
-          style={{ marginLeft: "10px", backgroundColor:'blue' }}
-          onClick={handleBulkModalOpen}>
-          Bulk Create
-        </Button>
-        <AddBulkUser
-          open={bulkModalOpen}
-          handleClose={handleBulkModalClose}
-          createBulkUsers={handleBulkCreateUserData}
-        />
+          justifyContent: "space-between",
+          padding: "4px 12px",
+        }}
+      >
+        <Typography variant="h4" style={{ marginTop: '5px' }}>People</Typography>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "flex-end",
+            marginBottom: "5px",
+            marginTop: "5px",
+          }}>
+          <Button variant="contained" color="success" onClick={handleModalOpen}>
+            Add User
+          </Button>
+          <AddUser
+            open={open}
+            handleClose={handleModalClose}
+            createUser={handleCreateUserData}
+            searchUser={searchUsers}
+          />
+          <Button
+            variant="contained"
+            color="success"
+            style={{ marginLeft: "10px" }}
+            onClick={handleBulkModalOpen}>
+            Bulk Add
+          </Button>
+          <AddBulkUser
+            open={bulkModalOpen}
+            handleClose={handleBulkModalClose}
+            createBulkUsers={handleBulkCreateUserData}
+          />
+        </div>
       </div>
-      {/* <Box sx={{ height: 540, width: "100%" }}>
-        <DataGrid
-          rows={usersList}
-          columns={columns}
-          getRowId={(row) => row._id}
-          initialState={{
-            pagination: {
-              page: 0,
-              pageSize: 10,
-            },
-          }}
-          onPageChange={(page) => { if((usersList.length / 10) === page) setPage(page); }}
-          rowCount={usersData.totalUsers}
-          checkboxSelection
-          disableSelectionOnClick
-          components={{
-            Toolbar: GridToolbar,
-            NoRowsOverlay: LoadingOverlay,
-          }}
-        />
-      </Box> */}
-
+      <Divider sx={{ backgroundColor: "black", marginBottom: '15px' }} />
       <Box sx={{ height: 840, width: "100%" }}>
         <TableComponent
+          loading={loading}
           dataSource={usersList}
           columns={antdColumns}
           totalRecords={usersData.totalUsers}
@@ -322,7 +248,7 @@ export const User1 = () => {
           </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setOpenDeleteModal(false)} color="primary">
+          <Button variant="outlined" onClick={() => setOpenDeleteModal(false)} color="error">
             Cancel
           </Button>
           <Button
@@ -333,7 +259,8 @@ export const User1 = () => {
               }
               setOpenDeleteModal(false);
             }}
-            color="primary"
+            variant="contained"
+            color="success"
             autoFocus>
             Yes
           </Button>

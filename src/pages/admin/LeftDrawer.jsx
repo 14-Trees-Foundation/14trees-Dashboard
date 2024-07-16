@@ -7,21 +7,22 @@ import MenuIcon from "@mui/icons-material/Menu";
 import IconButton from "@mui/material/IconButton";
 import LeaderBoardOutlined from "@mui/icons-material/LeaderboardOutlined";
 import ForestOutlined from "@mui/icons-material/ForestOutlined";
-import AssignmentOutlined from "@mui/icons-material/AssignmentOutlined";
+import GrassTwoToneIcon from "@mui/icons-material/GrassTwoTone";
 import OpacityOutlined from "@mui/icons-material/OpacityOutlined";
 import AccountCircleOutlined from "@mui/icons-material/AccountCircleOutlined";
 import FaceIcon from "@mui/icons-material/Face";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
-import LandscapeIcon from '@mui/icons-material/Landscape';
-import CorporateFareIcon from '@mui/icons-material/CorporateFare';
+import LandscapeIcon from "@mui/icons-material/Landscape";
+import CorporateFareIcon from "@mui/icons-material/CorporateFare";
 import logo from "../../assets/logo_white_small.png";
 import { useRecoilState } from "recoil";
 import { adminNavIndex } from "../../store/adminAtoms";
 import { useAuth } from "./auth/auth";
-import VolunteerActivismIcon from '@mui/icons-material/VolunteerActivism';
-import MapIcon from '@mui/icons-material/Map';
-import FestivalIcon from '@mui/icons-material/Festival';
+import VolunteerActivismIcon from "@mui/icons-material/VolunteerActivism";
+import MapIcon from "@mui/icons-material/Map";
+import FestivalIcon from "@mui/icons-material/Festival";
+import { useNavigate } from "react-router-dom";
 
 export const AdminLeftDrawer = () => {
   const theme = useTheme();
@@ -29,6 +30,7 @@ export const AdminLeftDrawer = () => {
   const [open, setOpen] = useState(false);
   const classes = useStyles();
   const [index, setIndex] = useRecoilState(adminNavIndex);
+  const navigate = useNavigate();
   let auth = useAuth();
   const [subIndex, setSubIndex] = useState(null);
   const [expanded, setExpanded] = useState(null);
@@ -56,8 +58,8 @@ export const AdminLeftDrawer = () => {
       display: true,
     },
     {
-      displayName: "TreeType",
-      logo: ForestOutlined,
+      displayName: "Plant Types",
+      logo: GrassTwoToneIcon,
       display: true,
     },
     {
@@ -66,48 +68,47 @@ export const AdminLeftDrawer = () => {
       display: true,
     },
     {
-      displayName: "Plot",
+      displayName: "Plots",
       logo: LandscapeIcon,
       display: true,
     },
     {
-      displayName: "Users",
+      displayName: "People",
       logo: AccountCircleOutlined,
       // display: auth.permissions.includes("all"),
       display: true,
     },
     {
-      displayName: 'Organization',
+      displayName: "People Groups",
       logo: CorporateFareIcon,
-      display: true
+      display: true,
     },
-    // {
-    //   displayName: 'Sites',
-    //   logo: MapIcon,
-    //   display: true
-    // },
-    // {
-    //   displayName: 'Events',
-    //   logo: FestivalIcon,
-    //   display: true
-    // },
-    // {
-    //   displayName: 'Donation',
-    //   logo: VolunteerActivismIcon,
-    //   display: true
-    // },
     {
-      displayName: "Images",
-      logo: FaceIcon,
-      // display: auth.permissions.includes("all"),
+      displayName: "Sites",
+      logo: MapIcon,
+      display: true,
+    },
+    {
+      displayName: "Events",
+      logo: FestivalIcon,
+      display: true,
+    },
+    {
+      displayName: "Donation",
+      logo: VolunteerActivismIcon,
+      display: true,
+    },
+    {
+      displayName: "Visits",
+      logo: VolunteerActivismIcon,
       display: true,
     },
     // {
-    //   displayName: "Forms",
-    //   logo: AssignmentOutlined,
+    //   displayName: "Images",
+    //   logo: FaceIcon,
+    //   // display: auth.permissions.includes("all"),
     //   display: true,
     // },
-
   ];
   const menuitem = () => {
     return (
@@ -126,21 +127,29 @@ export const AdminLeftDrawer = () => {
                   <item.logo />
                   <div className={classes.itemtext}>{item.displayName}</div>
                 </div>
-                {i === expanded && item.subPages && item.subPages.map((subItem, j) => (
-                  <div
-                    className={classes.item}
-                    onClick={() => onClickNav(i, j)}
-                    key={j}
-                    style={{ marginLeft: 20, marginTop: 10 }} 
-                  >
+                {i === expanded &&
+                  item.subPages &&
+                  item.subPages.map((subItem, j) => (
                     <div
-                      className={index === i && subIndex === j ? classes.selected : classes.itembtn}
+                      className={classes.item}
+                      onClick={() => onClickNav(i, j)}
+                      key={j}
+                      style={{ marginLeft: 20, marginTop: 10 }}
                     >
-                      <subItem.logo />
-                      <div className={classes.itemtext}>{subItem.displayName}</div>
+                      <div
+                        className={
+                          index === i && subIndex === j
+                            ? classes.selected
+                            : classes.itembtn
+                        }
+                      >
+                        <subItem.logo />
+                        <div className={classes.itemtext}>
+                          {subItem.displayName}
+                        </div>
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  ))}
               </div>
             );
           } else {
@@ -175,7 +184,15 @@ export const AdminLeftDrawer = () => {
             )}
           </IconButton>
           <Divider />
-          <img className={classes.logo} alt={"logo"} src={logo} />
+          <img
+            className={classes.logo}
+            alt={"logo"}
+            src={logo}
+            onClick={() => {
+              navigate("/");
+            }}
+            style={{ cursor: "pointer" }}
+          />
           {menuitem()}
         </Drawer>
       </Box>
@@ -184,7 +201,15 @@ export const AdminLeftDrawer = () => {
     return (
       <Drawer className={classes.drawer} variant="permanent" anchor="left">
         <Divider />
-        <img className={classes.logo} alt={"logo"} src={logo} />
+        <img
+          className={classes.logo}
+          alt={"logo"}
+          src={logo}
+          onClick={() => {
+            navigate("/");
+          }}
+          style={{ cursor: "pointer" }}
+        />
         {menuitem()}
       </Drawer>
     );

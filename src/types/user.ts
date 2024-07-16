@@ -1,23 +1,17 @@
 
 export type User = {
-    key: string,
-    _id: string,
+    key: number,
+    id: number,
     name: string,
-    userid: string,
-    phone: number,
+    user_id: string,
+    phone: string,
     email: string,
-    dob: Date,
-    date_added: Date,
-    pin : number,
-    org : string
+    birth_date: Date,
+    created_at: Date,
+    updated_at: Date,
 };
-
-export type UserPaginationResponse = {
-    total: number,
-    result: User[]
-}
 
 export type UsersDataState = {
     totalUsers: number,
-    users: Record<string, User>
+    users: Record<number, User>
 }

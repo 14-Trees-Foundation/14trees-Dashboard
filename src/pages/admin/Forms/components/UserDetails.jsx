@@ -28,10 +28,10 @@ export const UserDetails = ({ selectedPlot }) => {
   const [treeCount, setTreeCount] = useState(0);
 
   const [formData, setFormData] = useState({
+    'id': 0,
     'name': '',
     'email': '',
     'contact': '',
-    'saplingid': '',
   });
 
   const handleChange = (event) => {
@@ -53,6 +53,7 @@ export const UserDetails = ({ selectedPlot }) => {
       if (`${user.name} (${user.email})` === value) {
         isSet = true;
         setFormData({
+          'id': user.id,
           'email': user.email,
           'name': user.name,
           'contact': user.phone ?? '',
@@ -76,15 +77,17 @@ export const UserDetails = ({ selectedPlot }) => {
       backdropOpen: true,
     });
     const params = JSON.stringify({
+      mapped_to: 'user',
+      id: formData.id,
       name: formData.name,
       email: formData.email,
       contact: formData.contact,
-      plot_id: selectedPlot._id,
+      plot_id: selectedPlot.id,
       count: treeCount,
     });
 
     try {
-      let res = await Axios.post("/mytrees/map-plot-trees", params, {
+      let res = await Axios.post("/mapping/map-plot-trees", params, {
         headers: {
           "Content-type": "application/json",
         },

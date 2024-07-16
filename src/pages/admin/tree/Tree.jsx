@@ -27,6 +27,7 @@ import { SearchResult } from "./components/SearchResult";
 import { Overall } from "./overall/Overall";
 import { Plotwise } from "./plotwise/Plotwise";
 import { TreeNew } from "./table/Tree";
+import { ToastContainer } from "react-toastify";
 
 const CustomPaper = (props) => {
   return (
@@ -44,7 +45,7 @@ const CustomPaper = (props) => {
 };
 
 export const Trees = () => {
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const searchTree = useRecoilValue(searchTreeData);
   const [treeByPlotsData, setTreeByPlots] = useRecoilState(treeByPlots);
   const setTreeLogByPlot = useSetRecoilState(treeLogByPlotDate);
@@ -52,63 +53,54 @@ export const Trees = () => {
   const [selectedPlotName, setSelectedPlot] = useRecoilState(selectedPlot);
   const setTreeCountByType = useSetRecoilState(treeTypeCount);
 
-  const fetchData = useCallback(async () => {
-    setLoading(true);
-    try {
-      let response = await Axios.default.get(`/trees/groupbyplots`);
-      if (response.status === 200) {
-        setTreeByPlots(response.data);
-      }
+  // const fetchData = useCallback(async () => {
+  //   setLoading(true);
+  //   try {
+  //     let response = await Axios.default.get(`/trees/groupbyplots`);
+  //     if (response.status === 200) {
+  //       setTreeByPlots(response.data);
+  //     }
 
-      response = await Axios.default.get(`/trees/treelogbyplot`);
-      if (response.status === 200) {
-        response.data.forEach((element, index) => {
-          element["_id"]["date"] = element["_id"]["date"].substring(0, 10);
-        });
-        setTreeLogByPlot(response.data);
-        setSelectedPlot(response.data[0].plot.name);
-      }
-      response = await Axios.default.get(`/trees/treetypecount`);
-      if (response.status === 200) {
-        setTreeCountByType(response.data);
-      }
-      response = await Axios.default.get(`/trees/treetypecount/plotwise`);
-      if (response.status === 200) {
-        setTreeTypeCountByPlot(response.data);
-      }
-    } catch (error) {
-      console.log(error);
-    }
-    setLoading(false);
-  }, [
-    setTreeByPlots,
-    setTreeCountByType,
-    setSelectedPlot,
-    setTreeLogByPlot,
-    setTreeTypeCountByPlot,
-  ]);
+  //     response = await Axios.default.get(`/trees/treelogbyplot`);
+  //     if (response.status === 200) {
+  //       response.data.forEach((element, index) => {
+  //         element["_id"]["date"] = element["_id"]["date"].substring(0, 10);
+  //       });
+  //       setTreeLogByPlot(response.data);
+  //       setSelectedPlot(response.data[0].plot.name);
+  //     }
+  //     response = await Axios.default.get(`/trees/treetypecount`);
+  //     if (response.status === 200) {
+  //       setTreeCountByType(response.data);
+  //     }
+  //     response = await Axios.default.get(`/trees/treetypecount/plotwise`);
+  //     if (response.status === 200) {
+  //       setTreeTypeCountByPlot(response.data);
+  //     }
+  //   } catch (error) {
+  //     console.log(error);
+  //   }
+  //   setLoading(false);
+  // }, [
+  //   setTreeByPlots,
+  //   setTreeCountByType,
+  //   setSelectedPlot,
+  //   setTreeLogByPlot,
+  //   setTreeTypeCountByPlot,
+  // ]);
 
-  useEffect(() => {
-    fetchData();
-  }, [fetchData]);
+  // useEffect(() => {
+  //   fetchData();
+  // }, [fetchData]);
 
   if (loading) {
     return <Spinner text={"Fetching Tree Data!"} />;
   } else {
     return (
       <>
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            padding: "8px 12px",
-          }}
-        >
-          <Typography variant="h3">Trees</Typography>
-        </div>
-        <Divider sx={{ backgroundColor: "#ffffff", marginBottom: '10px' }} />
+        <ToastContainer />
         <TreeNew />
-        <Divider sx={{ backgroundColor: "#ffffff", marginTop: '10px' }} />
+        {/* <Divider sx={{ backgroundColor: "#ffffff", marginTop: '10px' }} />
         <div
           style={{
             display: "flex",
@@ -175,7 +167,7 @@ export const Trees = () => {
               </Grid>
             )}
           </Grid>
-        </Box>
+        </Box> */}
       </>
     );
   }

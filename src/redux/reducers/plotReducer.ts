@@ -1,22 +1,23 @@
 import { UnknownAction } from "redux";
-import { PlotsDataState, Plot, PlotPaginationResponse } from "../../types/plot";
+import { PlotsDataState, Plot } from "../../types/plot";
 import plotActionTypes from "../actionTypes/plotActionTypes";
+import { PaginatedResponse } from "../../types/pagination";
 
 export const plotsDataReducer = (state = { totalPlots:0, plots: {} }, action: UnknownAction ): PlotsDataState => {
     switch (action.type) {
         case plotActionTypes.GET_PLOTS_SUCCEEDED:
             if (action.payload) {
                 let plotsDataState: PlotsDataState = { totalPlots: state.totalPlots, plots: { ...state.plots }};
-                let payload = action.payload as PlotPaginationResponse;
+                let payload = action.payload as PaginatedResponse<Plot>;
                 if (payload.total !== plotsDataState.totalPlots) {
                     plotsDataState.plots = {}
                 }
                 plotsDataState.totalPlots = payload.total;
-                let plots = payload.result;
+                let plots = payload.results;
                 for (let i = 0; i < plots.length; i++) {
-                    if (plots[i]?._id) {
-                        plots[i].key = plots[i]._id
-                        plotsDataState.plots[plots[i]._id] = plots[i]
+                    if (plots[i]?.id) {
+                        plots[i].key = plots[i].id
+                        plotsDataState.plots[plots[i].id] = plots[i]
                     }
                 }
                 const nextState: PlotsDataState = plotsDataState;
@@ -27,8 +28,8 @@ export const plotsDataReducer = (state = { totalPlots:0, plots: {} }, action: Un
             if (action.payload) {
                 const nextState = { totalPlots: state.totalPlots, plots: { ...state.plots }} as PlotsDataState;
                 let payload = action.payload as Plot
-                payload.key = payload._id
-                nextState.plots[payload._id] = payload;
+                payload.key = payload.id
+                nextState.plots[payload.id] = payload;
                 nextState.totalPlots += 1;
                 return nextState;
             }
@@ -37,15 +38,15 @@ export const plotsDataReducer = (state = { totalPlots:0, plots: {} }, action: Un
             if (action.payload) {
                 const nextState = { totalPlots: state.totalPlots, plots: { ...state.plots }} as PlotsDataState;
                 let payload = action.payload as Plot
-                payload.key = payload._id
-                nextState.plots[payload._id] = payload;
+                payload.key = payload.id
+                nextState.plots[payload.id] = payload;
                 return nextState;
             }
             return state;
         case plotActionTypes.DELETE_PLOT_SUCCEEDED:
             if (action.payload) {
                 const nextState = { totalPlots: state.totalPlots, plots: { ...state.plots }} as PlotsDataState;
-                Reflect.deleteProperty(nextState.plots, action.payload as string)
+                Reflect.deleteProperty(nextState.plots, action.payload as number)
                 nextState.totalPlots -= 1;
                 return nextState;
             }
@@ -63,13 +64,28 @@ export const searchPlotsDataReducer = (state = { totalPlots:0, plots: {} }, acti
                 let plotsDataState: PlotsDataState = { totalPlots: state.totalPlots, plots: { ...state.plots }};
                 let payload = action.payload as [Plot]
                 for (let i = 0; i < payload.length; i++) {
-                    if (payload[i]?._id) {
-                        payload[i].key = payload[i]._id
-                        plotsDataState.plots[payload[i]._id] = payload[i]
+                    if (payload[i]?.id) {
+                        payload[i].key = payload[i].id
+                        plotsDataState.plots[payload[i].id] = payload[i]
                     }
                 }
                 const nextState: PlotsDataState = plotsDataState;
                 return nextState;
+            }
+            return state;
+        default:
+            return state;
+    }
+}
+
+export const getPlotTagsDataReducer = (state = new Set<string>(), action: UnknownAction ): Set<string> => {
+    switch(action.type) {
+        case plotActionTypes.GET_PLOT_TAGS_SUCCEEDED:
+            if (action.payload) {
+                let tags = new Set<string>();
+                let payload = action.payload as PaginatedResponse<string>
+                payload.results.forEach(tag => tags.add(tag))
+                return tags
             }
             return state;
         default:

@@ -1,4 +1,3 @@
-import React from "react";
 import { createStyles, makeStyles } from "@mui/styles";
 import Avatar from "@mui/material/Avatar";
 import { useRecoilValue } from "recoil";
@@ -6,6 +5,19 @@ import { searchResults } from "../../store/atoms";
 
 export const UserList = ({ handleClick }) => {
   const searchResult = useRecoilValue(searchResults);
+
+  let lastVisit = {}
+  searchResult.users.map((i) => {
+    let last = i.assigned_trees[0]?.assigned_at;
+    i.assigned_trees.map((j) => {
+      if (j.assigned_at > last) {
+        last = j.assigned_at
+      }
+    })
+
+    lastVisit[i.id] = last
+  })
+
 
   const classes = UseStyle();
   if (Object.keys(searchResult.users).length !== 0) {
@@ -23,21 +35,19 @@ export const UserList = ({ handleClick }) => {
               className={classes.box}
               key={i._id}
               onClick={() => {
-                handleClick(i.user_trees[0]);
+                handleClick(i.assigned_trees[0]);
               }}
             >
               <Avatar
                 className={classes.profile}
                 alt="Profile"
-                src={i.user_trees[0]?.profile_image?.length > 0 ? i.user_trees[0].profile_image[0] : ""}
+                src={i.assigned_trees[0]?.profile_image ? i.assigned_trees[0].profile_image : ""}
                 sx={{ width: 40, height: 40 }}
               />
               <div className={classes.itemlong}>{i.name}</div>
-              <div className={classes.itemshort}>{i.user_trees.length}</div>
+              <div className={classes.itemshort}>{i.assigned_trees.length}</div>
               <div className={classes.itemshort}>
-                {i.user_trees[0].date_added
-                  ? i.user_trees[0].date_added.slice(0, 10)
-                  : ""}
+                {lastVisit[i.id].slice(0, 10)}
               </div>
             </div>
           );

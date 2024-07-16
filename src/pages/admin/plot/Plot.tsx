@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import Box from "@mui/material/Box";
-import {GridColumns, GridFilterItem } from "@mui/x-data-grid";
+import { GridFilterItem } from "@mui/x-data-grid";
 import AddPlot from "./AddPlot";
 import { Forms } from "../Forms/Forms"
 import EditIcon from "@mui/icons-material/Edit";
@@ -10,7 +10,6 @@ import * as plotActionCreators from "../../../redux/actions/plotActions";
 import { bindActionCreators } from "redux";
 import { useAppDispatch, useAppSelector } from "../../../redux/store/hooks";
 import { RootState } from "../../../redux/store/store";
-import CircularProgress from "@mui/material/CircularProgress";
 import {
   Button,
   Dialog,
@@ -18,35 +17,24 @@ import {
   DialogContent,
   DialogContentText,
   DialogTitle,
+  Divider,
+  Typography,
 } from "@mui/material";
 import EditPlot from "./EditPlot";
 import { TableColumnsType } from "antd";
-import getColumnSearchProps from "../../../components/Filter";
+import getColumnSearchProps, { getColumnSelectedItemFilter } from "../../../components/Filter";
 import TableComponent from "../../../components/Table";
 import { ToastContainer } from "react-toastify";
-
-function LoadingOverlay() {
-  return (
-    <div
-      style={{
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        height: "100%",
-      }}>
-      <CircularProgress />
-    </div>
-  );
-}
 
 
 export const PlotComponent = () => {
   const dispatch = useAppDispatch();
-  const { createPlot, updatePlot, deletePlot, getPlotsByFilters } = bindActionCreators(
+  const { getPlots, createPlot, updatePlot, deletePlot, getPlotTags } = bindActionCreators(
     plotActionCreators,
     dispatch
   );
 
+  const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
   const handleModalOpen = () => setOpen(true);
   const handleModalClose = () => setOpen(false);
@@ -62,164 +50,50 @@ export const PlotComponent = () => {
     setFilters(filters);
   }
 
-  const categoriesMap: Record<string, string> = {
-    "6543803d302fc2b6520a9bac": "Foundation",
-    "6543803d302fc2b6520a9bab": "Public",
+  useEffect(() => {
+    getPlotData();
+  }, [page, filters]);
+
+  const getPlotData = async () => {
+    setLoading(true);
+    setTimeout(async () => {
+      let filtersData = Object.values(filters);
+      await getPlots(page * 10, 10, filtersData);
+      setLoading(false);
+    }, 1000);
+  };
+
+  useEffect(() => {
+    getPlotTagsData();
+  }, []);
+
+  const getPlotTagsData = async () => {
+    setTimeout(async () => {
+      await getPlotTags(page * 10, 10);
+    }, 1000);
+  };
+
+  let plotsList: Plot[] = [];
+  const plotsData = useAppSelector((state: RootState) => state.plotsData);
+  if (plotsData) {
+    plotsList = Object.values(plotsData.plots);
+    plotsList = plotsList.sort((a, b) => b.id - a.id);
   }
 
-  const columns: GridColumns = [
-    {
-      field: "action",
-      headerName: "Action",
-      width: 150,
-      align: "center",
-      headerAlign: "center",
-      renderCell: (params: any) => (
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-          }}>
-          <Button
-            variant="outlined"
-            style={{ margin: "0 5px" }}
-            onClick={() => {
-              setSelectedEditRow(params.row);
-              setEditModal(true);
-            }}>
-            <EditIcon />
-          </Button>
-          <Button
-            variant="outlined"
-            style={{ margin: "0 5px" }}
-            onClick={() => handleDelete(params.row as Plot)}>
-            <DeleteIcon />
-          </Button>
-        </div>
-      ),
-    },
-    {
-      field: "name",
-      headerName: "Name",
-      width: 250,
-      align: "center",
-      editable: true,
-      headerAlign: "center",
-    },
-    {
-      field: "plot_id",
-      headerName: "Plot ID",
-      width: 150,
-      align: "center",
-      editable: true,
-      headerAlign: "center",
-    },
-    {
-      field: "category",
-      headerName: "Category",
-      width: 150,
-      align: "center",
-      editable: true,
-      headerAlign: "center",
-      valueGetter: (params) => (params.row.category ? categoriesMap[params.row.category] : '')
-    },
-    // {
-    //   field: "district",
-    //   headerName: "District",
-    //   width: 150,
-    //   align: "center",
-    //   editable: true,
-    //   headerAlign: "center",
-    // },
-    {
-      field: "gat",
-      headerName: "Gat",
-      width: 100,
-      align: "center",
-      editable: true,
-      headerAlign: "center",
-    },
-    // {
-    //   field: "land_type",
-    //   headerName: "Land Type",
-    //   width: 150,
-    //   align: "center",
-    //   editable: true,
-    //   headerAlign: "center",
-    // },
-    // {
-    //   field: "status",
-    //   headerName: "Status",
-    //   width: 150,
-    //   align: "center",
-    //   editable: true,
-    //   headerAlign: "center",
-    // },
-    // {
-    //   field: "taluka",
-    //   headerName: "Taluka",
-    //   width: 150,
-    //   align: "center",
-    //   editable: true,
-    //   headerAlign: "center",
-    // },
-    // {
-    //   field: "village",
-    //   headerName: "Village",
-    //   width: 150,
-    //   align: "center",
-    //   editable: true,
-    //   headerAlign: "center",
-    // },
-    // {
-    //   field: "zone",
-    //   headerName: "Zone",
-    //   width: 150,
-    //   align: "center",
-    //   editable: true,
-    //   headerAlign: "center",
-    // },
-    {
-      field: "boundaries.type",
-      headerName: "Boundaries Type",
-      width: 200,
-      align: "center",
-      editable: true,
-      headerAlign: "center",
-      valueGetter: (params) => (params.row.boundaries.type),
-    },
-    {
-      field: "boundaries.coordinates",
-      headerName: "Boundaries Coordinates",
-      width: 250,
-      align: "center",
-      editable: true,
-      headerAlign: "center",
-      valueGetter: (params) =>
-        JSON.stringify(params.row.boundaries.coordinates),
-    },
-    {
-      field: "center.type",
-      headerName: "Center Type",
-      width: 200,
-      align: "center",
-      editable: true,
-      headerAlign: "center",
-      valueGetter: (params) => (params.row.center.type),
-    },
-    {
-      field: "center.coordinates",
-      headerName: "Center Coordinates",
-      width: 250,
-      align: "center",
-      editable: true,
-      headerAlign: "center",
-      valueGetter: (params) => JSON.stringify(params.row.center.coordinates),
-    },
-  ];
+  let tags: string[] = [];
+  const tagsData = useAppSelector((state: RootState) => state.plotTags);
+  if (tagsData) {
+    tags = Array.from(tagsData);
+  }
 
-  const antdColumns: TableColumnsType<Plot> = [
+  const getAllPlotData = async () => {
+    setTimeout(async () => {
+      let filtersData = Object.values(filters);
+      await getPlots(0, plotsData.totalPlots, filtersData);
+    }, 1000);
+  };
+
+  const columns: TableColumnsType<Plot> = [
     {
       dataIndex: "action",
       key: "action",
@@ -239,11 +113,13 @@ export const PlotComponent = () => {
             onClick={() => {
               setSelectedEditRow(record);
               setEditModal(true);
+              console.log("Row to edit: ", record);
             }}>
             <EditIcon />
           </Button>
           <Button
             variant="outlined"
+            color="error"
             style={{ margin: "0 5px" }}
             onClick={() => handleDelete(record)}>
             <DeleteIcon />
@@ -255,6 +131,7 @@ export const PlotComponent = () => {
       dataIndex: "name",
       key: "name",
       title: "Name",
+      align: "center",
       width: 300,
       ...getColumnSearchProps('name', filters, handleSetFilters)
     },
@@ -262,6 +139,7 @@ export const PlotComponent = () => {
       dataIndex: "plot_id",
       key: "plot_id",
       title: "Plot ID",
+      align: "center",
       width: 150,
       ...getColumnSearchProps('plot_id', filters, handleSetFilters)
     },
@@ -269,110 +147,80 @@ export const PlotComponent = () => {
       dataIndex: "category",
       key: "category",
       title: "Category",
+      align: "center",
       width: 150,
-      render: (value, record, index) => {
-        return Object.hasOwn(record, "category") ? categoriesMap[(record as any)["category"]] : '';
-      },
+      ...getColumnSelectedItemFilter({ dataIndex: 'category', filters, handleSetFilters, options: ["Public", "Foundation"] })
+    },
+    {
+      dataIndex: "gat",
+      key: "gat",
+      title: "Gat No.",
+      align: "center",
+      width: 150,
+    },
+    {
+      dataIndex: "tags",
+      key: "tags",
+      title: "Tags",
+      align: "center",
+      width: 150,
+      render: (tags) => tags ? tags.join(", ") : '',
+      ...getColumnSelectedItemFilter({ dataIndex: 'tags', filters, handleSetFilters, options: tags })
     },
     {
       dataIndex: "trees_count",
       key: "trees_count",
       title: "Total Trees",
+      align: "center",
       width: 150,
+      render: (value) => value ?? 0,
     },
     {
       dataIndex: "mapped_trees_count",
       key: "mapped_trees_count",
       title: "Booked Trees",
+      align: "center",
       width: 150,
+      render: (value) => value ?? 0,
     },
     {
       dataIndex: "assigned_trees_count",
       key: "assigned_trees_count",
       title: "Assigned Trees",
+      align: "center",
       width: 150,
+      render: (value) => value ?? 0,
     },
     {
       dataIndex: "available_trees_count",
       key: "available_trees_count",
       title: "Available Trees",
+      align: "center",
       width: 150,
+      render: (value) => value ?? 0,
     },
     {
-      dataIndex: "boundaries.type",
-      key: "boundaries.type",
-      title: "Boundaries Type",
-      width: 200,
-      render: (value, record, index) => {
-        if (record.boundaries.type) {
-          return record.boundaries.type;
-        }
-        return ''
-      },
-    },
-    {
-      dataIndex: "center.type",
-      key: "center.type",
-      title: "Center Type",
-      width: 150,
-      render: (value, record, index) => {
-        if (record.center.type) {
-          return record.center.type;
-        }
-        return ''
-      },
-    },
-    {
-      dataIndex: "center.coordinates",
-      key: "center.coordinates",
-      title: "Center Coordinates",
-      width: 320,
-      render: (value, record, index) => {
-        if (record.center.coordinates) {
-          return JSON.stringify(record.center.coordinates);
-        }
-        return ''
-      },
+      dataIndex: "site_name",
+      key: "site_name",
+      title: "Site Name",
+      align: "center",
+      width: 300,
+      ...getColumnSearchProps('site_name', filters, handleSetFilters)
     },
   ];
 
-  useEffect(() => {
-    getPlotData();
-  }, [page, filters]);
-
-  const getPlotData = async () => {
-    setTimeout(async () => {
-      let filtersData = Object.values(filters);
-      await getPlotsByFilters(page * 10, 10, filtersData);
-    }, 1000);
-  };
-  
-  let plotsList: Plot[] = [];
-  const plotsData = useAppSelector((state: RootState) => state.plotsData);
-  if (plotsData) {
-    plotsList = Object.values(plotsData.plots);
-  }
-
-  const getAllPlotData = async () => {
-    setTimeout(async () => {
-      let filtersData = Object.values(filters);
-      await getPlotsByFilters(0, plotsData.totalPlots, filtersData);
-    }, 1000);
-  };
-
   const handleDelete = (row: Plot) => {
-    console.log("Delete", row);
     setOpenDeleteModal(true);
     setSelectedItem(row);
   };
 
   const handleEditSubmit = (formData: Plot) => {
-    console.log(formData);
+    setSelectedEditRow(null);
     updatePlot(formData);
   };
 
   const handleCreatePlotData = (formData: Plot) => {
-    console.log(formData);
+    console.log('New Plot data: ',formData);
     createPlot(formData);
   };
 
@@ -382,54 +230,54 @@ export const PlotComponent = () => {
       <div
         style={{
           display: "flex",
-          justifyContent: "flex-end",
-          marginBottom: "20px",
-        }}>
-        <Button variant="contained" style={{ backgroundColor: 'blue' }} onClick={handleModalOpen}>
-          Add Plot
-        </Button>
-        <AddPlot
-          open={open}
-          handleClose={handleModalClose}
-          createPlot={handleCreatePlotData}
-        />
-        {/* <Button
-          variant="contained"
-          style={{ marginLeft: "10px", backgroundColor:'blue' }}
-          onClick={handleModalOpen}>
-          Bulk Create
-        </Button> */}
+          justifyContent: "space-between",
+          padding: "4px 12px",
+        }}
+      >
+        <Typography variant="h4" style={{ marginTop: '5px' }}>Plots</Typography>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "flex-end",
+            marginBottom: "5px",
+            marginTop: "5px",
+          }}>
+          <Button
+            variant="contained"
+            color="success"
+            onClick={handleModalOpen}>
+            Add Plot
+          </Button>
+          <AddPlot
+            open={open}
+            handleClose={handleModalClose}
+            createPlot={handleCreatePlotData}
+            tags={tags}
+          />
+        </div>
       </div>
-      {/* <Box sx={{ height: 540, width: "100%" }}>
-        <DataGrid
-          rows={plotsList}
-          columns={columns}
-          getRowId={(row) => row._id}
-          initialState={{
-            pagination: {
-              page: 0,
-              pageSize: 10,
-            },
-          }}
-          onPageChange={(page) => { if ((plotsList.length / 10) === page) setPage(page); }}
-          rowCount={plotsData.totalPlots}
-          checkboxSelection
-          disableSelectionOnClick
-          components={{
-            Toolbar: GridToolbar,
-            NoRowsOverlay: LoadingOverlay,
-          }}
-        />
-      </Box> */}
+      <Divider sx={{ backgroundColor: "black", marginBottom: '15px' }} />
       <Box sx={{ height: 840, width: "100%" }}>
         <TableComponent
+          loading={loading}
           dataSource={plotsList}
-          columns={antdColumns}
+          columns={columns}
           totalRecords={plotsData.totalPlots}
           fetchAllData={getAllPlotData}
           setPage={setPage}
         />
       </Box>
+
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          padding: "4px 12px",
+        }}
+      >
+        <Typography variant="h4">Map Trees</Typography>
+      </div>
+      <Divider sx={{ backgroundColor: "black", marginBottom: '15px' }} />
       <Forms />
 
       <Dialog open={openDeleteModal} onClose={() => setOpenDeleteModal(false)}>
@@ -440,7 +288,7 @@ export const PlotComponent = () => {
           </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setOpenDeleteModal(false)} color="primary">
+          <Button onClick={() => setOpenDeleteModal(false)}>
             Cancel
           </Button>
           <Button
@@ -451,7 +299,8 @@ export const PlotComponent = () => {
               }
               setOpenDeleteModal(false);
             }}
-            color="primary"
+            color="error"
+            variant="outlined"
             autoFocus>
             Yes
           </Button>
@@ -462,8 +311,9 @@ export const PlotComponent = () => {
         <EditPlot
           row={selectedEditRow}
           openeditModal={editModal}
-          setEditModal={setEditModal}
+          handleCloseModal={() => { setSelectedEditRow(null); setEditModal(false); }}
           editSubmit={handleEditSubmit}
+          tags={tags}
         />
       )}
     </>

@@ -19,7 +19,7 @@ export const Profile = ({ saplingId }) => {
   const classes = useStyles();
   const selUserInfo = useRecoilValue(selUsersData);
 
-  const username = selUserInfo.user.name.split(" ")[0];
+  const username = selUserInfo.assigned_to.split(" ")[0];
 
   useEffect(() => {
     document.title = "14Trees Dashboard - Profile: " + username;
@@ -31,11 +31,11 @@ export const Profile = ({ saplingId }) => {
         <div className={classes.header}>
           <img src={logo} alt={logo} className={classes.img} />
           <div className={classes.username}>
-            {selUserInfo.tree.event_type && selUserInfo.tree.event_type === "2"
+            {selUserInfo.event_type && selUserInfo.event_type === "2"
               ? "Memorial Dashboard"
               : `${username}'s Dashboard`}
           </div>
-          {selUserInfo.tree.event_type && (selUserInfo.tree.event_type === "2" || selUserInfo.tree.event_type === "4") ? (
+          {selUserInfo.event_type && (selUserInfo.event_type === "2" || selUserInfo.event_type === "4") ? (
             ""
           ) : (
             <div style={{ justifyContent: "flex-end" }}>

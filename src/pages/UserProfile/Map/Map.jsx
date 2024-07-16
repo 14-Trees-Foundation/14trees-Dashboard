@@ -56,15 +56,13 @@ export const Map = () => {
   const classes = useStyles();
   const userinfo = useRecoilValue(usersData);
   const currTree = useRecoilValue(selUsersData);
-  const trees = userinfo.usertrees;
+  const trees = userinfo.user_trees;
 
   let boundaries = [];
-  if (currTree.tree.plot?.boundaries?.coordinates && currTree.tree.plot.boundaries.coordinates.length !== 0) {
-    let pathObj = currTree.tree.plot.boundaries.coordinates[0].map(
-      ([lat, lng]) => ({ lat, lng })
-    );
-    boundaries.push(pathObj);
-  } 
+  let pathObj = currTree.boundaries.coordinates[0].map(
+    ([lat, lng]) => ({ lat, lng })
+  );
+  boundaries.push(pathObj);
 
   let { isLoaded } = useJsApiLoader({
     id: "google-map-script",
@@ -86,7 +84,7 @@ export const Map = () => {
       >
         {trees.map((tree, i) => (
           <Fragment key={i}>
-            {currTree.tree.sapling_id === tree.tree.sapling_id && (
+            {currTree.sapling_id === tree.sapling_id && (
               <>
                 <Marker
                   icon={icon}
@@ -111,12 +109,12 @@ export const Map = () => {
                     <img
                       alt="tree"
                       src={
-                        tree.tree.image
-                          ? tree.tree.image.length === 0 ||
-                            tree.tree.image[0] === ""
-                            ? tree.tree.tree_type.image[0]
-                            : tree.tree.image[0]
-                          : tree.tree.tree_type.image[0]
+                        tree.images
+                          ? tree.images.length === 0 ||
+                            tree.images[0] === ""
+                            ? tree.plant_type_image
+                            : tree.images[0]
+                          : tree.tree_type_image
                       }
                       className={classes.treeimg}
                     />
@@ -128,7 +126,7 @@ export const Map = () => {
                         marginLeft: "10px",
                       }}
                     >
-                      <h3>{tree.tree.tree_type.name}</h3>
+                      <h3>{tree.plant_type}</h3>
                     </div>
                   </div>
                 </InfoBox>

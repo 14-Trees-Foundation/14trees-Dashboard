@@ -1,36 +1,27 @@
+import { Boundaries, Location } from "./common";
 
 export type Plot = {
-    key: string,
-    _id: string,
+    key: number,
+    id: number,
     name: string,
     plot_id: string,
-    tags: [string],
+    tags: string[],
+    gat: string,
+    category: number,
     desc: string,
-    boundaries: {
-        type: string,
-        coordinates: [[[number]]]
-    },
-    center: {
-        type: string,
-        coordinates: [number]
-    },
-    date_added: Date,
+    boundaries: Boundaries,
+    center: Location,
     trees_count?: number,
     mapped_trees_count?: number,
     assigned_trees_count?: number,
     available_trees_count?: number,
+    site_id: string,
+    site_name: string,
+    created_at: Date,
+    updated_at: Date,
 };
-
-export type UpsertPlotResponse = {
-    plot: Plot
-}
-
-export type PlotPaginationResponse = {
-    total: number,
-    result: Plot[]
-}
 
 export type PlotsDataState = {
     totalPlots: number,
-    plots: Record<string, Plot>
+    plots: Record<number, Plot>
 }

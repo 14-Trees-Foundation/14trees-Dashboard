@@ -55,11 +55,11 @@ export const Dashboard = () => {
       if (response.status === 200) {
         // let data = response.data.usertrees.filter(function (data) {return data.tree.sapling_id === saplingId});
         setUserinfo(response.data);
-        setTemplate(response.data?.usertrees[0]?.tree?.plot?.name.includes("G20") ? "G20" : "");
+        setTemplate(response.data?.user_trees[0]?.plot?.includes("G20") ? "G20" : "");
         console.log(response, template)
         setSelectedUserinfo(
-          response.data.usertrees.filter(
-            (data) => data.tree.sapling_id === saplingId
+          response.data.user_trees.filter(
+            (data) => data.sapling_id === saplingId
           )[0]
         );
       } else if (response.status === 204) {
@@ -82,10 +82,30 @@ export const Dashboard = () => {
       setPondsImages(pondImagesRes.data);
     }
 
-    const actRes = await Axios.default.get(`/activity/`);
-    if (pondImagesRes.status === 200) {
-      setActivities(actRes.data);
-    }
+    setActivities([
+      {
+          "images": [],
+          "_id": "614efee3e9781c14cd80fd32",
+          "title": "Project 40,000 trees for IIT Kanpur Diamond Jubilee Celebration",
+          "type": "2",
+          "date": "2021-09-24T18:30:00.000Z",
+          "desc": "On the occasion of IIT Kanpur's Diamond Jubilee, let us plant one tree in the name of each IIT Kanpur alum. ",
+          "author": "Abhishek Singh",
+          "video": "https://www.youtube.com/watch?v=YCVP3bon5Zs",
+          "__v": 0
+      },
+      {
+          "_id": "61da41a5979ec94446ff66b1",
+          "title": "Project 14 Trees: What, Why and How",
+          "type": "2",
+          "date": "2022-01-07T18:30:00.000Z",
+          "desc": "14 Trees Foundation is a charitable organisation dedicated to building sustainable, carbon-footprint-neutral eco-systems through re-forestation. We are on a mission to transform barren, unused patches of land into sustainable forests.",
+          "author": "Pravin Bhagwat",
+          "images": [],
+          "video": "https://www.youtube.com/watch?v=V-fZmDAyFVs",
+          "__v": 0
+      }
+    ]);
 
     setLoading(false);
   }, [

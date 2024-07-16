@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import Box from "@mui/material/Box";
-import { DataGrid, GridToolbar, GridColumns } from "@mui/x-data-grid";
+
 import {
   Button,
   Dialog,
@@ -8,56 +8,80 @@ import {
   DialogContent,
   DialogContentText,
   DialogTitle,
-  Modal,
+  Divider,
   Typography,
 } from "@mui/material";
+import { GridFilterItem } from "@mui/x-data-grid";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
-import { type TreeType } from "../../../types/treeType";
-import * as treeTypeActionCreators from "../../../redux/actions/treeTypeActions";
+import { Event } from "../../../types/event";
+import * as eventActionCreators from "../../../redux/actions/eventActions";
 import { bindActionCreators } from "redux";
 import { useAppDispatch, useAppSelector } from "../../../redux/store/hooks";
 import { RootState } from "../../../redux/store/store";
-import AddTreeType from "./AddEvents";
-import CircularProgress from "@mui/material/CircularProgress";
-import EditEvents from "./EditEvents";
+import getColumnSearchProps from "../../../components/Filter";
 
-function LoadingOverlay() {
-  return (
-    <div
-      style={{
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        height: "100%",
-      }}>
-      <CircularProgress />
-    </div>
-  );
-}
+import EditEvents from "./EditEvents";
+import { TableColumnsType } from "antd";
+import TableComponent from "../../../components/Table";
+import AddEvents from "./AddEvents";
 
 export const EventsComponent = () => {
   const dispatch = useAppDispatch();
-  const { getTreeTypes, createTreeType, updateTreeType, deleteTreeType } =
-    bindActionCreators(treeTypeActionCreators, dispatch);
+  const { getEvents } =
+    bindActionCreators(eventActionCreators, dispatch);
 
   const [open, setOpen] = useState(false);
   const handleModalOpen = () => setOpen(true);
   const handleModalClose = () => setOpen(false);
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
-  const [selectedItem, setSelectedItem] = useState<any | null>(null);
-  const [selectedEditRow, setSelectedEditRow] = useState<RowType | null>(null);
+  const [selectedItem, setSelectedItem] = useState<Event | null>(null);
+  const [selectedEditRow, setSelectedEditRow] = useState<Event | null>(null);
   const [editModal, setEditModal] = useState(false);
   const [page, setPage] = useState(0);
+  const [filters, setFilters] = useState<Record<string, GridFilterItem>>({});
 
-  const columns: GridColumns = [
+
+  const handleSetFilters = (filters: Record<string, GridFilterItem>) => {
+    setPage(0);
+    setFilters(filters);
+  }
+
+  useEffect(() => {
+    getEventsData();
+  }, [page, filters]);
+
+  const getEventsData = async () => {
+    let filtersData = Object.values(filters);
+    setTimeout(async () => {
+      await getEvents(page * 10, 10, filtersData);
+    }, 1000);
+  };
+
+  let eventsList: Event[] = [];
+  const eventsData = useAppSelector((state: RootState) => state.eventsData);
+  if (eventsData) {
+    eventsList = Object.values(eventsData.Events);
+  }
+
+  const getAllEventsData = async () => {
+    let filtersData = Object.values(filters);
+    setTimeout(async () => {
+      await getEvents(0, eventsData.totalEvents, filtersData);
+    }, 1000);
+  };
+
+
+
+
+  const columns: TableColumnsType<Event> = [
     {
-      field: "action",
-      headerName: "Action",
+      dataIndex: "action",
+      key: "action",
+      title: "Action",
       width: 150,
       align: "center",
-      headerAlign: "center",
-      renderCell: (params: any) => (
+      render: (value, record, index) => (
         <div
           style={{
             display: "flex",
@@ -68,229 +92,149 @@ export const EventsComponent = () => {
             variant="outlined"
             style={{ margin: "0 5px" }}
             onClick={() => {
-              setSelectedEditRow(params.row);
               setEditModal(true);
-            }}>
+              setSelectedEditRow(record);
+              console.log(" donation row to edit : ")
+            }}
+          >
             <EditIcon />
           </Button>
           <Button
             variant="outlined"
+            color="error"
             style={{ margin: "0 5px" }}
-            onClick={() => handleDeleteTreeType(params.row as any)}>
+
+          >
             <DeleteIcon />
           </Button>
         </div>
       ),
     },
+
     {
-      field: "id",
-      headerName: "ID",
-      width: 50,
+      dataIndex: "assigned_by",
+      key: "assigned_by",
+      title: "assigned_by",
+      width: 220,
       align: "center",
-      headerAlign: "center",
+      ...getColumnSearchProps('assigned_by', filters, handleSetFilters)
     },
     {
-      field: "assigned_by",
-      headerName: "Assigned By",
-      width: 120,
-      editable: true,
+      dataIndex: "site_id",
+      key: "site_id",
+      title: "site_id",
+      width: 220,
       align: "center",
-      headerAlign: "center",
+      ...getColumnSearchProps('site_id', filters, handleSetFilters)
     },
     {
-      field: "site_id",
-      headerName: "Site ID",
-      width: 120,
-      editable: true,
+      dataIndex: "type",
+      key: "type",
+      title: "type",
+      width: 220,
       align: "center",
-      headerAlign: "center",
+      ...getColumnSearchProps('type', filters, handleSetFilters)
     },
     {
-      field: "type",
-      headerName: "Type",
-      width: 100,
-      editable: true,
+      dataIndex: "name",
+      key: "name",
+      title: "name",
+      width: 220,
       align: "center",
-      headerAlign: "center",
+      ...getColumnSearchProps('name', filters, handleSetFilters)
     },
     {
-      field: "name",
-      headerName: "Name",
-      width: 150,
-      editable: true,
+      dataIndex: "description",
+      key: "description",
+      title: "description",
+      width: 220,
       align: "center",
-      headerAlign: "center",
+      ...getColumnSearchProps('description', filters, handleSetFilters)
     },
     {
-      field: "description",
-      headerName: "Description",
-      width: 150,
-      editable: true,
+      dataIndex: "event_location",
+      key: "event_location",
+      title: "event_location",
+      width: 220,
       align: "center",
-      headerAlign: "center",
+      ...getColumnSearchProps('event_location', filters, handleSetFilters)
     },
     {
-      field: "event_location",
-      headerName: "Event Location",
-      width: 150,
-      editable: true,
+      dataIndex: "tags",
+      key: "tags",
+      title: "tags",
+      width: 220,
       align: "center",
-      headerAlign: "center",
+      ...getColumnSearchProps('tags', filters, handleSetFilters)
     },
     {
-      field: "tags",
-      headerName: "Tags",
-      width: 200,
-      editable: true,
+      dataIndex: "memories",
+      key: "memories",
+      title: "memories",
+      width: 220,
       align: "center",
-      headerAlign: "center",
+      ...getColumnSearchProps('memories', filters, handleSetFilters)
     },
     {
-      field: "memories",
-      headerName: "Memories",
-      width: 250,
-      editable: true,
+      dataIndex: "event_date",
+      key: "event_date",
+      title: "event_date",
+      width: 220,
       align: "center",
-      headerAlign: "center",
+      ...getColumnSearchProps('event_date', filters, handleSetFilters)
     },
-    {
-      field: "event_date",
-      headerName: "Event Date",
-      width: 200,
-      editable: false,
-      align: "center",
-      headerAlign: "center",
-      type: "dateTime",
-    },
+
   ];
 
-  const data = [
-    {
-      "id": 1,
-      "assigned_by": 294,
-      "site_id": null,
-      "type": "1",
-      "name": null,
-      "description": null,
-      "event_location": null,
-      "tags": "[]",
-      "memories": null,
-      "event_date": "2022-01-04T22:03:14.000Z"
-    },
-    {
-      "id": 2,
-      "assigned_by": 265,
-      "site_id": null,
-      "type": "1",
-      "name": null,
-      "description": null,
-      "event_location": null,
-      "tags": "[]",
-      "memories": null,
-      "event_date": "2022-02-28T10:12:06.000Z"
-    },
-    {
-      "id": 3,
-      "assigned_by": 265,
-      "site_id": null,
-      "type": "1",
-      "name": null,
-      "description": null,
-      "event_location": null,
-      "tags": "[]",
-      "memories": null,
-      "event_date": "2022-02-28T10:22:02.000Z"
-    },
-    {
-      "id": 4,
-      "assigned_by": 336,
-      "site_id": null,
-      "type": "2",
-      "name": null,
-      "description": null,
-      "event_location": null,
-      "tags": "[]",
-      "memories": null,
-      "event_date": "2022-04-02T01:56:54.000Z"
-    },
-    {
-      "id": 5,
-      "assigned_by": 294,
-      "site_id": null,
-      "type": "1",
-      "name": null,
-      "description": null,
-      "event_location": null,
-      "tags": "[]",
-      "memories": null,
-      "event_date": "2022-02-18T06:49:39.000Z"
-    }
-  ];
+    const handleDeleteTreeType = (row: any) => {
+      setOpenDeleteModal(true);
+      setSelectedItem(row);
+    };
 
+    const handleEditSubmit = (formData: any) => {
+      console.log(formData);
+    };
 
-  type RowType = {
-    id: string;
-    name: string;
+    const handleCreateEventsData = (formData: any) => {
+      console.log(formData);
   };
-
-  const handleDeleteTreeType = (row: any) => {
-    // console.log("Delete", row);
-    setOpenDeleteModal(true);
-    setSelectedItem(row);
-  };
-
-  const handleEditSubmit = (formData: any) => {
-    // console.log(formData);
-    updateTreeType(formData);
-  };
-
-  const handleCreateEventsData = (formData: any) => {
-    console.log(formData);
-    // createEvents(formData);
-};
 
   return (
     <>
       <div
         style={{
           display: "flex",
-          justifyContent: "flex-end",
-          marginBottom: "20px",
-        }}>
-        <Button
-          variant="contained"
-          style={{ backgroundColor: "blue" }}
-          onClick={handleModalOpen}>
-          Add Events
-        </Button>
-        <AddTreeType
-          open={open}
-          handleClose={handleModalClose}
-          createEvents={handleCreateEventsData}
-        />
+          justifyContent: "space-between",
+          padding: "4px 12px",
+        }}
+      >
+        <Typography variant="h4" style={{ marginTop: '5px' }}>Events</Typography>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "flex-end",
+            marginBottom: "5px",
+            marginTop: "5px",
+          }}>
+          <Button variant="contained" color="success" onClick={handleModalOpen}>
+            Add Event
+          </Button>
+          <AddEvents
+            open={open}
+            handleClose={handleModalClose}
+            createEvents={handleCreateEventsData}
+          />
+        </div>
       </div>
+      <Divider sx={{ backgroundColor: "black", marginBottom: '15px' }} />
 
       <Box sx={{ height: 540, width: "100%" }}>
-        <DataGrid
-          rows={data}
+        <TableComponent
+          dataSource={eventsList}
           columns={columns}
-        //   getRowId={(row) => row._id}
-          initialState={{
-            pagination: {
-              page: 0,
-              pageSize: 10,
-            },
-          }}
-          onPageChange={(page) => {
-            if (data.length < (page + 1) * 10) setPage(page);
-          }}
-        //   rowCount={treeTypesData.totalTreeTypes}
-          checkboxSelection
-          disableSelectionOnClick
-          components={{
-            Toolbar: GridToolbar,
-            NoRowsOverlay: LoadingOverlay,
-          }}
+          totalRecords={eventsData.totalEvents}
+          fetchAllData={getAllEventsData}
+          setPage={setPage}
         />
       </Box>
 

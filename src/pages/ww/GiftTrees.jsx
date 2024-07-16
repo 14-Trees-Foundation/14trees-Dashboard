@@ -25,7 +25,7 @@ import {
 import { useRecoilState } from "recoil";
 import { ToastContainer, toast } from "react-toastify";
 import moment from "moment";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import "react-toastify/dist/ReactToastify.css";
 import imageCompression from "browser-image-compression";
 
@@ -34,16 +34,14 @@ import { GiftDialog } from "./GiftDialog";
 import { PwdDialog } from "./PwdDialog";
 import { ShareDialog } from "./ShareDialog";
 import Axios from "../../api/local";
-import logo from "../../assets/gift/logogift.png";
 import tree from "../../assets/dark_logo.png";
-import bg from "../../assets/gift/bg.png";
 import bgfooter from "../../assets/gift/bgfooter.png";
 import footer from "../../assets/gift/footer.png";
 import { albums } from "../../store/adminAtoms";
 import { Albums } from "./Albums";
 import { useAppDispatch } from "../../redux/store/hooks";
 import { bindActionCreators } from "@reduxjs/toolkit";
-import * as userTreeActionCreators from "../../redux/actions/userTreeActions";
+import * as userTreeActions from "../../redux/actions/userTreeActions";
 
 const intitialFValues = {
   name: "",
@@ -68,16 +66,15 @@ const intitialFValues = {
   shareTree: "",
   shareTreeId: "",
 };
-console.log('selectedTreeSum - ', intitialFValues.selectedTreeSum);
-console.log('filteredTrees- ', intitialFValues.filteredTrees);
+
 export const GiftTrees = () => {
   let { email } = useParams();
 
   const dispatch = useAppDispatch();
-  const { unassignUserTrees } =
-    bindActionCreators(userTreeActionCreators, dispatch);
+  const { assignTrees, unassignUserTrees } = bindActionCreators(userTreeActions, dispatch);
 
   const classes = useStyles();
+  const navigate = useNavigate();
   const [page, setPage] = useState(0);
   const [values, setValues] = useState(intitialFValues);
   const [rowsPerPage, setRowsPerPage] = useState(10);
@@ -96,7 +93,7 @@ export const GiftTrees = () => {
       });
     } else if (event.target.value === "assigned") {
       let temp = values.trees.filter((item) => {
-        return item.user;
+        return item.assigned_to;
       });
       setValues({
         ...values,
@@ -104,7 +101,7 @@ export const GiftTrees = () => {
       });
     } else if (event.target.value === "unassigned") {
       let temp = values.trees.filter((item) => {
-        return !item.user;
+        return !item.assigned_to;
       });
       setValues({
         ...values,
@@ -179,44 +176,29 @@ export const GiftTrees = () => {
         return album.album_name === albumName;
       })[0].images;
     }
-    await assignTree(formData, img, images, selfAssign);
-    await fetchTrees();
+    await assignTrees2(formData, img, images, selfAssign);
     setUnassignedSelected(false);
     setAssignedSelected(false);
   };
 
-  // const handleShare = (sapling_id, tree_name, name) => {
-  //   setValues({
-  //     ...values,
-  //     shareName: name,
-  //     shareTree: tree_name,
-  //     shareTreeId: sapling_id,
-  //     shareDlgOpen: true,
-  //   });
-  // };
 
-  // const handleTemplateShare = (type, link) => {
-  //     if (type === "1") {
-  //         window.open(`http://dashboard.14trees.org/events/birthday/${link}`, '_blank')
-  //     }
-  // }
   const fetchTrees = useCallback(async () => {
     try {
-      let profileTrees = await Axios.get(`/mytrees/${email}`);
+      let profileTrees = await Axios.get(`/mapping/${email}`);
       if (profileTrees.status === 200) {
-        let data = profileTrees.data.trees;
+        let data = profileTrees.data.trees.results;
         data = data.map((tree) => ({ ...tree, selected: false }));
         setValues((values) => {
           return {
             ...values,
-            user: profileTrees.data.user[0],
+            user: profileTrees.data.user,
             trees: data,
             filteredTrees: data,
           };
         });
       }
 
-      let albums = await Axios.get(`/mytrees/albums/${email}`);
+      let albums = await Axios.get(`/albums/${email}`);
       if (albums.status === 200) {
         setAlbums(albums.data.albums);
       }
@@ -237,7 +219,7 @@ export const GiftTrees = () => {
             backdropOpen: false,
           };
         });
-        toast.error(error.response.data.error);
+        toast.error(error.response.data.message);
       }
     }
   }, [email, setAlbums]);
@@ -250,7 +232,7 @@ export const GiftTrees = () => {
   }, [fetchTrees]);
 
   const handleSaplingClick = () => {
-    window.open("http://dashboard.14trees.org/profile/" + values.shareTreeId);
+    navigate("/profile/" + values.shareTreeId);
   };
 
   const download = (type) => {
@@ -286,7 +268,7 @@ export const GiftTrees = () => {
         ...values,
         loading: false,
       });
-      toast.success("Image downloded successfully!");
+      toast.success("Image downloaded successfully!");
     } catch (error) {
       setValues({
         ...values,
@@ -300,185 +282,60 @@ export const GiftTrees = () => {
     }
   };
 
-  const assignTree = async (formValues, img, images, selfAssign) => {
-    let sapling_ids = values.filteredTrees
-      .filter((t) => t.selected === true)
-      .map((a) => a.sapling_id);
-    const removedSelected = values.filteredTrees.map((t) => ({ ...t, selected: false }));
+  const assignTrees2 = async (formValues, img, images, selfAssign) => {
     setValues({
       ...values,
-      filteredTrees: removedSelected,
-      selectedTreeSum: 0,
       loading: true,
       backdropOpen: true,
     });
+
     const formData = new FormData();
+    let sapling_ids = values.filteredTrees
+      .filter((t) => t.selected === true)
+      .map((a) => a.sapling_id);
     const date = moment(formValues.dob).format("YYYY-MM-DD");
     if (selfAssign) {
       formData.append("name", values.user.name);
       formData.append("email", values.user.email);
-      formData.append("contact", values.user.contact);
+      formData.append("phone", values.user.contact);
     } else {
       formData.append("name", formValues.name);
       formData.append("email", formValues.email);
-      formData.append("contact", formValues.contact);
+      formData.append("phone", formValues.contact);
     }
 
-    formData.append("dob", date);
-    formData.append("sapling_id", sapling_ids);
-    formData.append("donor", values.user._id);
+    formData.append("birth_date", date);
+    formData.append("sapling_ids", sapling_ids);
+    formData.append("sponsored_by_user", values.user?.id);
 
-    if (formValues.gifted_by && formValues.gifted_by !== "undefined") {
-      formData.append("gifted_by", formValues.gifted_by);
-    }
-
-    if (formValues.planted_by && formValues.planted_by !== "undefined") {
-      formData.append("planted_by", formValues.planted_by);
-    }
-
-    if (formValues.desc && formValues.desc !== "undefined") {
-      formData.append("desc", formValues.desc);
-    }
-
+    if (formValues.gifted_by && formValues.gifted_by !== "undefined") formData.append("gifted_by", formValues.gifted_by);
+    if (formValues.planted_by && formValues.planted_by !== "undefined") formData.append("planted_by", formValues.planted_by);
+    if (formValues.desc && formValues.desc !== "undefined") formData.append("description", formValues.desc);
+    if (formValues.type !== "") formData.append("type", formValues.type);
+    if (images.length > 0) formData.append("album_images", images);
     if (img !== null) {
-      let userImages = [];
       let image = await compressImageList(img);
       formData.append("files", image);
-      userImages.push(img.name);
-      formData.append("userimages", userImages);
+      formData.append("user_image", img.name);
     }
 
-    if (formValues.type !== "") {
-      formData.append("type", formValues.type);
+    await assignTrees(formData);
+
+    let profileTrees = await Axios.get(`/mapping/${email}`);
+    if (profileTrees.status === 200 || profileTrees.status === 304) {
+      setValues((values) => ({
+        ...values,
+        loading: false,
+        user: profileTrees.data.user,
+        trees: profileTrees.data.trees?.results?.map((t) => ({ ...t, selected: false })),
+        filteredTrees: profileTrees.data.trees?.results?.map((t) => ({ ...t, selected: false })),
+        selectedTreeSum: 0,
+        dlgOpen: false,
+        uploaded: true,
+      }));
     }
 
-    if (images.length > 0) {
-      formData.append("albumimages", images);
-    }
-
-    let res;
-    if (
-      formValues.type === "1" ||
-      formValues.type === "2" ||
-      formValues.type === "3" ||
-      formValues.type === "4"
-    ) {
-      try {
-        res = await Axios.post("/events/addevents/", formData, {
-          headers: {
-            "Content-type": "multipart/form-data",
-          },
-        });
-
-        if (res.status === 201) {
-          const params = JSON.stringify({
-            sapling_ids: sapling_ids,
-            user_id: res.data.result.assigned_to[0],
-            link: res.data.result.link,
-            type: res.data.result.type,
-          });
-          await Axios.post("/mytrees/update", params, {
-            headers: {
-              "Content-type": "application/json",
-            },
-          });
-
-          let profileTrees = await Axios.get(`/mytrees/${email}`);
-          if (profileTrees.status === 200) {
-            setValues((values) => ({
-              ...values,
-              loading: false,
-              user: profileTrees.data.user[0],
-              trees: profileTrees.data.trees,
-              filteredTrees: profileTrees.data.trees,
-              dlgOpen: false,
-              uploaded: true,
-            }));
-          }
-          toast.success("Data uploaded successfully!");
-        } else if (
-          res.status === 204 ||
-          res.status === 400 ||
-          res.status === 409 ||
-          res.status === 404
-        ) {
-          setValues({
-            ...values,
-            loading: false,
-            dlgOpen: false,
-            backdropOpen: false,
-          });
-          toast.error(res.status.error);
-        }
-      } catch (error) {
-        setValues({
-          ...values,
-          loading: false,
-          dlgOpen: false,
-          backdropOpen: false,
-        });
-        if (error.response.status === 409 || error.response.status === 404) {
-          toast.error(error.response.data.error);
-        }
-      }
-    } else {
-      try {
-        res = await Axios.post("/profile/usertreereg/multi", formData, {
-          headers: {
-            "Content-type": "multipart/form-data",
-          },
-        });
-
-        if (res.status === 201) {
-          const params = JSON.stringify({
-            sapling_ids: sapling_ids,
-            user_id: res.data.usertreereg.user,
-          });
-          await Axios.post("/mytrees/update", params, {
-            headers: {
-              "Content-type": "application/json",
-            },
-          });
-
-          let profileTrees = await Axios.get(`/mytrees/${email}`);
-          if (profileTrees.status === 200) {
-            setValues({
-              ...values,
-              loading: false,
-              user: profileTrees.data.user[0],
-              trees: profileTrees.data.trees,
-              dlgOpen: false,
-              uploaded: true,
-            });
-          }
-          toast.success("Data uploaded successfully!");
-        } else if (
-          res.status === 204 ||
-          res.status === 400 ||
-          res.status === 409 ||
-          res.status === 404
-        ) {
-          setValues({
-            ...values,
-            loading: false,
-            dlgOpen: false,
-            backdropOpen: false,
-          });
-          toast.error(res.status.error);
-        }
-      } catch (error) {
-        setValues({
-          ...values,
-          loading: false,
-          dlgOpen: false,
-          backdropOpen: false,
-        });
-        if (error.response.status === 409 || error.response.status === 404) {
-          toast.error(error.response.data.error);
-        }
-      }
-    }
-  };
+  }
 
   const handleDeleteAlbum = async (selectedAlbum) => {
     setValues({
@@ -488,21 +345,15 @@ export const GiftTrees = () => {
     });
     try {
       let res = await Axios.delete(
-        `/mytrees/albums`,
-        {
-          data: {
-            user_id: selectedAlbum.user_id,
-            album_name: selectedAlbum.album_name,
-          },
-        },
+        `/albums/${selectedAlbum.id}`,
         {
           headers: {
             "Content-type": "multipart/form-data",
           },
         }
       );
-      if (res.status === 204) {
-        let albums = await Axios.get(`/mytrees/albums/${email}`);
+      if (res.status === 200) {
+        let albums = await Axios.get(`/albums/${email}`);
         if (albums.status === 200) {
           setAlbums(albums.data.albums);
         }
@@ -531,24 +382,24 @@ export const GiftTrees = () => {
     const formData = new FormData();
     formData.append("album_name", album_name);
     formData.append("name", values.user.name);
-    const albumimages = [];
+    const imagesNames = [];
     if (files) {
       for (const key of Object.keys(files)) {
         let image = await compressImageList(files[key]);
         formData.append("images", image);
-        albumimages.push(files[key].name);
+        imagesNames.push(files[key].name);
       }
     }
-    formData.append("files", albumimages);
+    formData.append("file_names", imagesNames);
     try {
-      let res = await Axios.post(`/mytrees/albums/${email}`, formData, {
+      let res = await Axios.post(`/albums/${email}`, formData, {
         headers: {
           "Content-type": "multipart/form-data",
         },
       });
 
       if (res.status === 201) {
-        let albums = await Axios.get(`/mytrees/albums/${email}`);
+        let albums = await Axios.get(`/albums/${email}`);
         if (albums.status === 200) {
           setAlbums(albums.data.albums);
         }
@@ -596,8 +447,8 @@ export const GiftTrees = () => {
       .reduce((prev, curr) => prev + curr, 0);
 
     // Update state variables based on whether the selected tree is assigned or unassigned
-    setUnassignedSelected(values.filteredTrees.some(item => item.selected && !item.user));
-    setAssignedSelected(values.filteredTrees.some(item => item.selected && item.user));
+    setUnassignedSelected(values.filteredTrees.some(item => item.selected && !item.assigned_to));
+    setAssignedSelected(values.filteredTrees.some(item => item.selected && item.assigned_to));
 
     setValues({
       ...values,
@@ -607,7 +458,7 @@ export const GiftTrees = () => {
   const handleUnassignTrees = async (event) => {
     event.preventDefault();
     setUnAssignModalOpen(false);
-    
+
     let sapling_ids = values.filteredTrees
       .filter((t) => t.selected === true)
       .map((a) => a.sapling_id);
@@ -624,26 +475,6 @@ export const GiftTrees = () => {
     setUnassignedSelected(false);
     setAssignedSelected(false);
   };
-
-  // const handleSelectAlltree = (event) => {
-  //     let selTrees = values.filteredTrees.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-  //     if (event.target.checked) {
-  //         // selTrees = selTrees.filter(tree => { return tree.assigned === false })
-  //         values.filteredTrees.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map(tree => (tree.assigned === false ? { ...tree, selected: true } : { ...tree }));
-  //     } else {
-  //         values.filteredTrees.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map(tree => ({ ...tree, selected: false }))
-  //     }
-  //     const sum = selTrees
-  //         .map(item => item.selected)
-  //         .reduce((prev, curr) => prev + curr, 0);
-
-  //     setValues({
-  //         ...values,
-  //         selectedTreeSum: sum,
-  //         // filteredTrees: selTrees
-  //     })
-  // }
-  // console.log(selectedTrees);
 
   const handleTreeImgClick = (img) => {
     setValues({
@@ -878,7 +709,7 @@ export const GiftTrees = () => {
                           sx={{ ml: "auto", mr: "auto" }}
                           variant="contained"
                           color="primary"
-                          disabled={values.selectedTreeSum <= 0 ||  unassignedSelected}
+                          disabled={values.selectedTreeSum <= 0 || unassignedSelected}
                           onClick={() => setUnAssignModalOpen(true)}
                         >
                           UnAssign
@@ -931,7 +762,7 @@ export const GiftTrees = () => {
                       )
                       .map((row) => (
                         <TableRow
-                          key={row._id}
+                          key={row.id}
                           sx={{
                             m: 2,
                           }}
@@ -946,17 +777,17 @@ export const GiftTrees = () => {
                             />
                           </TableCell>
                           <TableCell component="th" scope="row">
-                            {row.image && row.image[0] !== "" && (
+                            {row.image && row.image !== "" && (
                               <img
-                                src={row.image[0]}
+                                src={row.image}
                                 className={classes.treeimg}
                                 alt=""
-                                onClick={() => handleTreeImgClick(row.image[0])}
+                                onClick={() => handleTreeImgClick(row.image)}
                               />
                             )}
                           </TableCell>
                           <TableCell component="th" scope="row">
-                            {row.tree.name}
+                            {row.plant_type}
                           </TableCell>
                           <TableCell
                             align="center"
@@ -964,9 +795,9 @@ export const GiftTrees = () => {
                           >
                             {row.sapling_id}
                           </TableCell>
-                          <TableCell align="center">{row.plot.name}</TableCell>
+                          <TableCell align="center">{row.plot}</TableCell>
                           <TableCell align="center">
-                            {row.user ? (
+                            {row.assigned_to ? (
                               <>
                                 <Typography
                                   variant="subtitle2"
@@ -980,7 +811,7 @@ export const GiftTrees = () => {
                                   align="center"
                                   sx={{ fontWeight: "bold", color: "#1F3625" }}
                                 >
-                                  {row.user.name}
+                                  {row.assigned_to}
                                 </Typography>
                               </>
                             ) : (
@@ -1007,11 +838,12 @@ export const GiftTrees = () => {
                               sx={{ ml: "auto", mr: "auto" }}
                               variant="contained"
                               color="primary"
-                              disabled={!row.user}
+                              disabled={!row.assigned_to}
                               onClick={() =>
                                 window.open(
-                                  `http://dashboard.14trees.org/profile/${row.sapling_id}`,
-                                  "_blank"
+                                  `/profile/${row.sapling_id}`,
+                                  "_blank",
+                                  'noopener,noreferrer'
                                 )
                               }
                             >

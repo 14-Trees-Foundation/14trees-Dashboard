@@ -1,17 +1,16 @@
 import React, { useState } from "react";
 import {
+  Autocomplete,
   Button,
   Dialog,
   DialogActions,
   DialogContent,
-  DialogContentText,
   DialogTitle,
-  Modal,
   TextField,
-  Typography,
 } from "@mui/material";
+import { organizationTypes } from "./organizationType";
 
-function EditUser({ row, openeditModal, setEditModal, editSubmit }) {
+function EditUser({ row, openeditModal, handleClose, editSubmit }) {
   const [formData, setFormData] = useState(row);
 
   const handleChange = (event) => {
@@ -24,11 +23,11 @@ function EditUser({ row, openeditModal, setEditModal, editSubmit }) {
   const handleEditSubmit = (event) => {
     event.preventDefault();
     editSubmit(formData);
-    setEditModal(false);
+    handleClose();
   };
 
   return (
-    <Dialog open={openeditModal} onClose={() => setEditModal(false)}>
+    <Dialog open={openeditModal} onClose={handleClose}>
       <DialogTitle align="center">Edit Organization</DialogTitle>
       <form onSubmit={handleEditSubmit}>
         <DialogContent>
@@ -40,18 +39,20 @@ function EditUser({ row, openeditModal, setEditModal, editSubmit }) {
             fullWidth
             margin="dense"
           />
-          <TextField
-            name="type"
-            label="Type"
-            value={formData.type}
-            onChange={handleChange}
+          <Autocomplete
             fullWidth
-            margin="dense"
+            name="type"
+            disablePortal
+            options={organizationTypes}
+            value={formData.type ? organizationTypes.find((option) => option.id === formData.type): undefined}
+            onChange={(event, value) => { if (value !== null) setFormData(prevState => ({ ...prevState, 'type': value.id }))}}
+            getOptionLabel={(option) => (option.label.toUpperCase())}
+            renderInput={(params) => <TextField {...params} margin="dense" label="Type" />}
           />
           <TextField
-            name="desc"
+            name="description"
             label="Description"
-            value={formData.desc}
+            value={formData.description}
             onChange={handleChange}
             fullWidth
             margin="dense"
@@ -64,12 +65,17 @@ function EditUser({ row, openeditModal, setEditModal, editSubmit }) {
             marginBottom: "15px",
           }}>
           <Button
-            variant="contained"
-            onClick={() => setEditModal(false)}
-            color="primary">
+            variant="outlined"
+            onClick={handleClose}
+            color="error">
             Cancel
           </Button>
-          <Button variant="contained" type="submit" color="primary">
+          <Button 
+            variant="contained" 
+            type="submit" 
+            color="success"
+            sx={{marginLeft:'10px'}}
+          >
             Save
           </Button>
         </DialogActions>

@@ -40,10 +40,10 @@ export const AdminHome = () => {
             <Box sx={{ paddingTop: "10px" }}>
               <GrassTwoToneIcon fontSize="large" style={{ color: "#F94F25" }} />
               <Typography variant="h3" color="#fff" sx={{ pt: 1, pb: 1 }}>
-                {adminSummary.treeTypeCount}
+                {adminSummary.plantTypeCount}
               </Typography>
               <Typography variant="subtitle2" color="#1f3625">
-                Tree Types
+                Plant Types
               </Typography>
             </Box>
           </div>

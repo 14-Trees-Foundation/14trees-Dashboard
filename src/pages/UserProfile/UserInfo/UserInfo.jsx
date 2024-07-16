@@ -34,7 +34,7 @@ export const UserInfo = () => {
     setOpenPopup(true);
   };
 
-  const treeDoneWidth = (userinfo.usertrees.length / 14) * 100;
+  const treeDoneWidth = (userinfo.user_trees.length / 14) * 100;
 
   if (open) {
     return (
@@ -43,9 +43,9 @@ export const UserInfo = () => {
           <img
             className={imgLoad ? classes.imageWindow : classes.none}
             src={
-              selUserInfo.profile_image[0] === ""
-                ? selUserInfo.tree.image[0]
-                : selUserInfo.profile_image[0]
+              selUserInfo.profile_image === ""
+                ? selUserInfo.images[0]
+                : selUserInfo.profile_image
             }
             alt={"A"}
           />
@@ -64,27 +64,27 @@ export const UserInfo = () => {
               alt="Card"
               onLoad={() => setImgLoad(true)}
               src={
-                ( selUserInfo.profile_image.length === 0 || selUserInfo.profile_image[0] === "")
-                  ? selUserInfo.tree.image
-                    ? selUserInfo.tree.image[0]
-                    : selUserInfo.tree.tree_type.image[0]
-                  : selUserInfo.profile_image[0]
+                !selUserInfo.user_tree_image || selUserInfo.user_tree_image === ""
+                  ? selUserInfo.image
+                    ? selUserInfo.image
+                    : selUserInfo.tree_type_images[0]
+                  : selUserInfo.user_tree_image
               }
             />
           </Grid>
           <Grid item xs={6} md={3} className={classes.infobox}>
             <div className={classes.info}>
-              {selUserInfo.tree.event_type &&
-                selUserInfo.tree.event_type === "2" ? (
+              {selUserInfo.event_type &&
+                selUserInfo.event_type === "2" ? (
                 <div className={classes.label}>In Memory of</div>
               ) : (
                 <div className={classes.label}>Name</div>
               )}
-              <div className={classes.data}>{selUserInfo.user.name}</div>
-              {(selUserInfo.tree.event_type === "4" || selUserInfo.tree.desc) ? (
+              <div className={classes.data}>{selUserInfo.assigned_to}</div>
+              {(selUserInfo.event_type === "4" || selUserInfo.description) ? (
                 <>
                   {selUserInfo.gifted_by &&
-                    selUserInfo.gifted_by !== undefined && !strEquals(selUserInfo.gifted_by, selUserInfo.user.name) && !strEquals(selUserInfo.gifted_by, "ACM India") && !strEquals(selUserInfo.gifted_by, "ACM India Council") && selUserInfo.gifted_by && (
+                    selUserInfo.gifted_by !== undefined && !strEquals(selUserInfo.gifted_by, selUserInfo.assigned_to) && !strEquals(selUserInfo.gifted_by, "ACM India") && !strEquals(selUserInfo.gifted_by, "ACM India Council") && selUserInfo.gifted_by && (
                       <>
                         <div className={classes.label}>Donated By</div>
                         <div
@@ -120,7 +120,7 @@ export const UserInfo = () => {
                         className={classes.data}
                         style={{ fontStyle: "italic", fontSize: "15px" }}
                       >
-                        {selUserInfo.tree.desc}
+                        {selUserInfo.description}
                       </div>
                     </div>
                   }
@@ -130,7 +130,7 @@ export const UserInfo = () => {
                         <div style={{ marginTop: "20px" }}>
                           <div style={{ display: "flex" }}>
                             <InfoChip
-                              count={userinfo.usertrees.length}
+                              count={userinfo.user_trees.length}
                               label="Trees Planted"
                               onClick={handleTreeClick}
                             />
@@ -141,7 +141,7 @@ export const UserInfo = () => {
                               style={{ width: `${treeDoneWidth}%` }}
                             ></div>
                             <div className={classes.count}>
-                              {14 - userinfo.usertrees.length}
+                              {14 - userinfo.user_trees.length}
                               <div className={classes.countdesc}>
                                 Trees away from neutralising your carbon
                                 footprint
@@ -156,18 +156,18 @@ export const UserInfo = () => {
                 </>
               ) : (
                 <>
-                  {selUserInfo.donated_by &&
-                    selUserInfo.donated_by._id !== selUserInfo.user._id && !strEquals(selUserInfo.gifted_by, "ACM India") && !strEquals(selUserInfo.gifted_by, "ACM India Council") && !(!selUserInfo.gifted_by && (strEquals(selUserInfo.donated_by.name, "ACM India") || strEquals(selUserInfo.donated_by.name, "ACM India Council"))) && (
+                  {selUserInfo.sponsored_by &&
+                    selUserInfo.sponsored_by !== selUserInfo.assigned_to_id && !strEquals(selUserInfo.gifted_by_name, "ACM India") && !strEquals(selUserInfo.gifted_by_name, "ACM India Council") && !(!selUserInfo.gifted_by && (strEquals(selUserInfo.sponsored_by_name, "ACM India") || strEquals(selUserInfo.sponsored_by_name, "ACM India Council"))) && (
                       <>
                         <div className={classes.label}>Donated By</div>
-                        {selUserInfo.gifted_by &&
-                          selUserInfo.gifted_by !== "undefined" ? (
+                        {selUserInfo.gifted_by_name &&
+                          selUserInfo.gifted_by_name !== "undefined" ? (
                           <div className={classes.data}>
-                            {selUserInfo.gifted_by}
+                            {selUserInfo.gifted_by_name}
                           </div>
                         ) : (
                           <div className={classes.data}>
-                            {selUserInfo.donated_by.name}
+                            {selUserInfo.sponsored_by_name}
                           </div>
                         )}
                       </>
@@ -191,12 +191,12 @@ export const UserInfo = () => {
                       </>
                     )}
                   {(!selUserInfo.planted_by) && (
-                    (selUserInfo.donated_by !== undefined &&
-                      selUserInfo.donated_by._id === selUserInfo.user._id) ? (
+                    (selUserInfo.sponsored_by !== undefined &&
+                      selUserInfo.sponsored_by === selUserInfo.assigned_to) ? (
                       <>
                         <div className={classes.label}>Organization</div>
                         <div className={classes.data}>
-                          {selUserInfo.orgid.name}
+                          {selUserInfo.orgid?.name}
                         </div>
                       </>
                     ) : ("")
@@ -211,13 +211,13 @@ export const UserInfo = () => {
                       </>
                     )} */}
                   {((!selUserInfo.planted_by && !selUserInfo.donated_by) ||
-                    (selUserInfo.donated_by && selUserInfo.donated_by._id === selUserInfo.user._id)) ? (
+                    (selUserInfo.donated_by && selUserInfo.donated_by === selUserInfo.assigned_to)) ? (
                     <Fragment>
                       <div className={classes.growth}>
                         <div style={{ marginTop: "20px" }}>
                           <div style={{ display: "flex" }}>
                             <InfoChip
-                              count={userinfo.usertrees.length}
+                              count={userinfo.user_trees.length}
                               label="Trees Planted"
                               onClick={handleTreeClick}
                             />
@@ -228,7 +228,7 @@ export const UserInfo = () => {
                               style={{ width: `${treeDoneWidth}%` }}
                             ></div>
                             <div className={classes.count}>
-                              {14 - userinfo.usertrees.length}
+                              {14 - userinfo.user_trees.length}
                               <div className={classes.countdesc}>
                                 Trees away from neutralising your carbon
                                 footprint

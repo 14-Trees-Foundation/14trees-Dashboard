@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
-import { Box, Button, Grid, Modal, TextField, Typography } from '@mui/material';
+import React, { useEffect, useState } from 'react';
+import { Autocomplete, Box, Button, Grid, Modal, TextField, Typography } from '@mui/material';
+import { organizationTypes } from './organizationType';
 
-const AddOrganization = ({ open, handleClose, createOrganization }) => {
-
+const AddOrganization = ({ open, groupType, handleClose, createOrganization }) => {
     const style = {
         position: 'absolute',
         top: '50%',
@@ -19,8 +19,15 @@ const AddOrganization = ({ open, handleClose, createOrganization }) => {
     const [formData, setFormData] = useState({
         name: '',
         type: '',
-        desc: '',
+        description: '',
     });
+
+    useEffect(() => {
+        setFormData((prevFormData) => ({
+          ...prevFormData,
+          type: groupType,
+        }));
+    }, [groupType]);
 
     const handleChange = (event) => {
         setFormData({
@@ -51,13 +58,32 @@ const AddOrganization = ({ open, handleClose, createOrganization }) => {
                                 <TextField name="name" label="Name" value={formData.name} onChange={handleChange} fullWidth/>
                             </Grid>
                             <Grid item xs={12}>
-                                <TextField name="type" label="Type" value={formData.type} onChange={handleChange} fullWidth/>
+                            <Autocomplete
+                                fullWidth
+                                name="type"
+                                disablePortal
+                                options={organizationTypes}
+                                value={formData.type ? organizationTypes.find((option) => option.id === formData.type): null}
+                                onChange={(event, value) => { if (value !== null) setFormData(prevState => ({ ...prevState, 'type': value.id }))}}
+                                getOptionLabel={(option) => (option.label.toUpperCase())}
+                                renderInput={(params) => <TextField {...params} margin="dense" label="Type" />}
+                            />
                             </Grid>
                             <Grid item xs={12}>
-                                <TextField name="desc" label="Description" value={formData.desc} onChange={handleChange} fullWidth/>
+                                <TextField name="description" label="Description" value={formData.description} onChange={handleChange} fullWidth/>
                             </Grid>
                             <Grid item xs={12} sx={{display:'flex', justifyContent:'center', }}>
-                                <Button type="submit">Submit</Button>
+                                <Button
+                                    variant='outlined'
+                                    onClick={handleClose}
+                                    color='error'
+                                > Cancel </Button>
+                                <Button 
+                                    type="submit"
+                                    variant='contained'
+                                    color='success'
+                                    sx={{marginLeft:'10px'}}
+                                >Submit</Button>
                             </Grid>
                         </Grid>
                     </form>

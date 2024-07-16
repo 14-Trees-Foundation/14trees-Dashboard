@@ -86,13 +86,14 @@ export const unassignUserTrees = (saplingIds: string[]) => {
         });
         apiClient.unassignUserTrees(saplingIds).then(
             () => {
-                toast.success("Trees unassigned successfully");
+                toast.success("Unassigned trees successfully!");
                 dispatch({
                     type: userTreeActionTypes.UNASSIGN_USER_TREES_SUCCEEDED,
                 });
             },
             (error: any) => {
-                toast.error("Failed to unassign trees");
+                console.error(error);
+                toast.error("Failed to unassign trees!");
                 dispatch({
                     type: userTreeActionTypes.UNASSIGN_USER_TREES_FAILED,
                 });
@@ -134,12 +135,14 @@ export const unMapTrees = (saplingIds: string[]) => {
         });
         apiClient.removeTreeMappings(saplingIds).then(
             () => {
+                toast.success("Unmapped trees successfully!");
                 dispatch({
                     type: userTreeActionTypes.UN_MAP_TREES_SUCCEEDED,
                 });
             },
             (error: any) => {
                 console.error(error);
+                toast.error("Failed to unmap trees!");
                 dispatch({
                     type: userTreeActionTypes.UN_MAP_TREES_FAILED,
                     value: error
@@ -149,20 +152,22 @@ export const unMapTrees = (saplingIds: string[]) => {
     };
 }
 
-export const mapTrees = (saplingIds: string[], email: string) => {
+export const mapTrees = (mapped_to: 'user' | 'group', saplingIds: string[], id: number) => {
     const apiClient = new ApiClient();
     return (dispatch: any) => {
         dispatch({
             type: userTreeActionTypes.MAP_USER_TREES_REQUESTED,
         });
-        apiClient.mapTrees(saplingIds, email).then(
+        apiClient.mapTrees(mapped_to, saplingIds, id).then(
             () => {
+                toast.success("Mapped trees successfully!");
                 dispatch({
                     type: userTreeActionTypes.MAP_USER_TREES_SUCCEEDED,
                 });
             },
             (error: any) => {
                 console.error(error);
+                toast.error("Failed to map trees!");
                 dispatch({
                     type: userTreeActionTypes.MAP_USER_TREES_FAILED,
                     value: error
@@ -172,20 +177,22 @@ export const mapTrees = (saplingIds: string[], email: string) => {
     };
 }
 
-export const mapTreesForPlot = (email: string, plotId: string, count: number) => {
+export const mapTreesForPlot = (mapped_to: 'user' | 'group',id: number, plotId: string, count: number) => {
     const apiClient = new ApiClient();
     return (dispatch: any) => {
         dispatch({
             type: userTreeActionTypes.MAP_USER_TREES_IN_PLOT_REQUESTED,
         });
-        apiClient.mapTreesForPlot(email, plotId, count).then(
+        apiClient.mapTreesForPlot(mapped_to, id, plotId, count).then(
             () => {
+                toast.success("Mapped trees successfully!");
                 dispatch({
                     type: userTreeActionTypes.MAP_USER_TREES_IN_PLOT_SUCCEEDED,
                 });
             },
             (error: any) => {
                 console.error(error);
+                toast.error("Failed to map trees!");
                 dispatch({
                     type: userTreeActionTypes.MAP_USER_TREES_IN_PLOT_FAILED,
                     value: error
@@ -195,7 +202,7 @@ export const mapTreesForPlot = (email: string, plotId: string, count: number) =>
     };
 }
 
-export const assignTrees = (data: AssignTreeRequest) => {
+export const assignTrees = (data: FormData) => {
     const apiClient = new ApiClient();
     return (dispatch: any) => {
         dispatch({
@@ -203,12 +210,14 @@ export const assignTrees = (data: AssignTreeRequest) => {
         });
         apiClient.assignUserTrees(data).then(
             () => {
+                toast.success("Assigned trees successfully!");
                 dispatch({
                     type: userTreeActionTypes.ASSIGN_USER_TREES_SUCCEEDED,
                 });
             },
             (error: any) => {
                 console.error(error);
+                toast.error("Failed to assign trees!");
                 dispatch({
                     type: userTreeActionTypes.ASSIGN_USER_TREES_FAILED,
                     value: error

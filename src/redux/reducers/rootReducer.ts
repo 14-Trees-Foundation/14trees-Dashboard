@@ -1,29 +1,41 @@
 import { combineReducers } from "redux";
-import { treeTypesDataReducer, searchTreeTypesDataReducer } from "./treeTypeReducer";
+import { plantTypesDataReducer, searchPlantTypesDataReducer } from "./plantTypeReducer";
 import { onsiteStaffsDataReducer } from "./onsiteStaffReducer";
-import { organizationsDataReducer, searchOrganizationsDataReducer } from "./organizationReducer";
-import { plotsDataReducer, searchPlotsDataReducer } from "./plotReducer";
-import { pondsDataReducer, searchPondsDataReducer, pondHistoryDataReducer } from "./pondReducer";
+import { groupsDataReducer, searchGroupsDataReducer } from "./groupReducer";
+import { plotsDataReducer, searchPlotsDataReducer, getPlotTagsDataReducer } from "./plotReducer";
+import { sitesDataReducer } from "./siteReducer";
+import { pondsDataReducer, searchPondsDataReducer } from "./pondReducer";
+import { pondWaterLevelUpdatesDataReducer } from "./pondWaterLevelUpdateReducer";
 import { treesDataReducer } from "./treeReducer";
 import { usersDataReducer, searchUsersDataReducer } from "./userReducer";
 import { userTreesDataReducer, userTreeCountDataReducer } from "./userTreeReducer";
+import { userGroupsDataReducer } from "./userGroupReducer";
+import { donationsDataReducer } from "./donationReducer";
+import { eventsDataReducer } from "./eventReducer";
+import { visitsDataReducer } from "./visitReducer";
 
 const rootReducer = combineReducers({
-    treeTypesData: treeTypesDataReducer,
+    plantTypesData: plantTypesDataReducer,
     onsiteStaffsData: onsiteStaffsDataReducer,
-    organizationsData: organizationsDataReducer,
+    groupsData: groupsDataReducer,
+    userGroupsData: userGroupsDataReducer,
+    sitesData: sitesDataReducer,
     plotsData: plotsDataReducer,
+    plotTags: getPlotTagsDataReducer,
     pondsData: pondsDataReducer,
-    pondHistoryData: pondHistoryDataReducer,
+    pondWaterLevelUpdatesData: pondWaterLevelUpdatesDataReducer,
     treesData: treesDataReducer,
     usersData: usersDataReducer,
     userTreesData: userTreesDataReducer,
     userTreeCountData: userTreeCountDataReducer,
-    searchTreeTypesData: searchTreeTypesDataReducer,
+    searchPlantTypesData: searchPlantTypesDataReducer,
     searchPondsData: searchPondsDataReducer,
     searchPlotsData: searchPlotsDataReducer,
     searchUsersData: searchUsersDataReducer,
-    searchOrganizationsData: searchOrganizationsDataReducer,
+    searchGroupsData: searchGroupsDataReducer,
+    donationsData: donationsDataReducer,
+    eventsData: eventsDataReducer,
+    visitsData:visitsDataReducer
 });
 
 export default rootReducer;

@@ -1,5 +1,4 @@
-import { useEffect, useState } from "react";
-import { ToastContainer, toast } from "react-toastify";
+import { useEffect, useState, useRef } from "react";
 import {
     Paper,
     Typography,
@@ -8,30 +7,31 @@ import {
     Box,
 } from "@mui/material";
 
-import Axios from "../../../../api/local";
-import { Spinner } from "../../../../components/Spinner";
 import * as plotActionCreators from "../../../../redux/actions/plotActions";
 import { bindActionCreators } from "redux";
 import { useAppDispatch, useAppSelector } from "../../../../redux/store/hooks";
 
-function TreeMap( {selectedPlot, setSelectedPlot} ) {
+function TreeMap({ selectedPlot, setSelectedPlot }) {
+    const isFirstRender = useRef(true);
     const [page, setPage] = useState(0);
     const [plotName, setPlotName] = useState('');
-    const [loading, setLoading] = useState(false);
-    const [assigned, setAssigned] = useState([]);
-    const [unassigned, setUnassigned] = useState([]);
 
     const dispatch = useAppDispatch();
     const { getPlots }
         = bindActionCreators(plotActionCreators, dispatch);
 
     useEffect(() => {
+        if (isFirstRender.current) {
+            isFirstRender.current = false;
+            return;
+        }
         getPlotsData();
     }, [page, plotName]);
 
     const getPlotsData = async () => {
+        const nameFilter = { columnField: "name", value: plotName, operatorValue: "contains" }
         setTimeout(async () => {
-            await getPlots(page * 10, 10, plotName);
+            await getPlots(page * 10, 10, [nameFilter]);
         }, 1000);
     };
 
@@ -54,151 +54,124 @@ function TreeMap( {selectedPlot, setSelectedPlot} ) {
         );
     };
 
-    const fetchAndShowTreeList = async (value) => {
-        setSelectedPlot(value);
-        setLoading(true);
-        try {
-            let response = await Axios.get(`/trees/plot/count?id=${value._id}`);
-            if (response.status === 200) {
-                let unMapped = response.data.trees
-                    .filter((x) => !x.mapped_to)
-                    .sort(function (a, b) {
-                        return a.sapling_id - b.sapling_id;
-                    });
-                let mapped = response.data.trees
-                    .filter((x) => x.mapped_to)
-                    .sort(function (a, b) {
-                        return a.sapling_id - b.sapling_id;
-                    });
-                setAssigned(mapped);
-                setUnassigned(unMapped);
-                toast.success("Tree list fetched!");
-            }
-        } catch (error) {
-            toast.error("Error fetching tree list!");
-        }
-        setLoading(false);
-    };
-
-    if (loading) {
-        return <Spinner text={"Fetching Tree Data!"} />;
-    } else {
-        return (
+    return (
+        <Box
+            sx={{
+                color: "#2D1B08",
+                ml: "auto",
+                mr: "auto",
+                mt: 4,
+                width: "90%",
+                minHeight: "700px",
+                background: "linear-gradient(145deg, #9faca3, #bdccc2)",
+                p: 2,
+                borderRadius: 3,
+                boxShadow: "8px 8px 16px #9eaaa1,-8px -8px 16px #c4d4c9",
+                "& .MuiFormControl-root": {
+                    width: "100%",
+                },
+            }}
+        >
             <Box
                 sx={{
-                    color: "#2D1B08",
-                    ml: "auto",
-                    mr: "auto",
-                    mt: 4,
-                    width: "90%",
-                    minHeight: "700px",
-                    background: "linear-gradient(145deg, #9faca3, #bdccc2)",
-                    p: 2,
-                    borderRadius: 3,
-                    boxShadow: "8px 8px 16px #9eaaa1,-8px -8px 16px #c4d4c9",
-                    "& .MuiFormControl-root": {
-                        width: "100%",
-                    },
+                    bottom: 0,
+                    width: "100%",
                 }}
             >
-                <ToastContainer />
-                <Box
+                <Typography variant="body1" gutterBottom sx={{ p: 0 }}>
+                    Step - 1
+                </Typography>
+                <Typography variant="h5" gutterBottom sx={{ pb: 2 }}>
+                    Select a plot
+                </Typography>
+                <Autocomplete
                     sx={{
-                        bottom: 0,
+                        mt: 1,
+                        width: "75%",
+                        "& .MuiOutlinedInput-notchedOutline": {
+                            border: "none",
+                            borderRadius: "25px",
+                            boxShadow: "4px 4px 8px #98a49c, -4px -4px 8px #cadace",
+                        },
+                    }}
+                    PaperComponent={CustomPaper}
+                    id="plots"
+                    options={plotsList}
+                    autoHighlight
+                    getOptionLabel={(option) => option.name}
+                    onChange={(event, newValue) => {
+                        if (newValue !== null) setSelectedPlot(newValue)
+                    }}
+                    renderInput={(params) => (
+                        <TextField
+                            {...params}
+                            onChange={(event) => {
+                                const { value } = event.target;
+                                setPage(0);
+                                setPlotName(value);
+                            }}
+                            label="Select a plot"
+                            variant="outlined"
+                        />
+                    )}
+                    ListboxProps={{
+                        onScroll: (event) => {
+                            const listboxNode = event.target;
+                            if (Math.ceil(listboxNode.scrollTop) + listboxNode.clientHeight === listboxNode.scrollHeight) {
+                                setPage(page + 1);
+                            }
+                        }
+                    }}
+                />
+
+                <div
+                    style={{
                         width: "100%",
+                        padding: "12px",
+                        minHeight: "20%",
+                        maxHeight: "180px",
+                        overflowY: "auto",
                     }}
                 >
-                    <Typography variant="body1" gutterBottom sx={{ p: 0 }}>
-                        Step - 1
-                    </Typography>
-                    <Typography variant="h5" gutterBottom sx={{ pb: 2 }}>
-                        Select a plot
-                    </Typography>
-                    <Autocomplete
-                        sx={{
-                            mt: 1,
-                            width: "75%",
-                            "& .MuiOutlinedInput-notchedOutline": {
-                                border: "none",
-                                borderRadius: "25px",
-                                boxShadow: "4px 4px 8px #98a49c, -4px -4px 8px #cadace",
-                            },
-                        }}
-                        PaperComponent={CustomPaper}
-                        id="plots"
-                        options={plotsList}
-                        autoHighlight
-                        getOptionLabel={(option) => option.name}
-                        onChange={(event, newValue) => {
-                            if (newValue !== null) fetchAndShowTreeList(newValue);
-                        }}
-                        renderInput={(params) => (
-                            <TextField
-                                {...params}
-                                onChange={(event) => {
-                                    const { value } = event.target;
-                                    setPage(0);
-                                    setPlotName(value);
-                                }} 
-                                label="Select a plot"
-                                variant="outlined"
-                            />
-                        )}
-                        ListboxProps={{
-                            onScroll: (event) => {
-                                const listboxNode = event.target;
-                                if (Math.ceil(listboxNode.scrollTop) + listboxNode.clientHeight === listboxNode.scrollHeight) {
-                                  setPage(page + 1);
-                                }
-                              }
-                        }}
-                    />
-                    <ToastContainer />
+                    <div style={{ display: "flex", justifyContent: "space-between", flexDirection: 'column' }}>
+                        <div >
+                            <h2>
+                                Plot:{" "}
+                                <span style={{ color: "#C72542", fontStyle: "italic" }}>
+                                    {selectedPlot?.name}
+                                </span>
+                            </h2>
 
-                    <div
-                        style={{
-                            width: "100%",
-                            padding: "12px",
-                            minHeight: "20%",
-                            maxHeight: "180px",
-                            overflowY: "auto",
-                        }}
-                    >
-                        <div style={{ display: "flex", justifyContent: "space-between", flexDirection: 'column' }}>
-                            <div >
-                                <h2>
-                                    Plot:{" "}
-                                    <span style={{ color: "#C72542", fontStyle: "italic" }}>
-                                        {selectedPlot?.name}
-                                    </span>
-                                </h2>
-
-                            </div>
-                            <div style={{ display: 'flex' }}>
-                                <h2 style={{ marginTop: "0px", paddingRight: "8px" }}>
-                                    Total:{" "}
-                                    <span style={{ color: "#C72542", fontStyle: "italic" }}>
-                                        {assigned.length}
-                                    </span>
-                                </h2>
-                                <h2 style={{ marginTop: "0px", paddingRight: "8px" }}>
-                                    Assigned:{" "}
-                                    <span style={{ color: "#C72542", fontStyle: "italic" }}>
-                                        {
-                                            assigned.filter((obj) => {
-                                                if (obj.assigned_to) {
-                                                    return true;
-                                                }
-
-                                                return false;
-                                            }).length
-                                        }
-                                    </span>
-                                </h2>
-                            </div>
                         </div>
-                        <div></div>
-                        {/* {assigned.length !== 0 &&
+                        <div style={{ display: 'flex' }}>
+                            <h2 style={{ marginTop: "0px", paddingRight: "8px" }}>
+                                Total:{" "}
+                                <span style={{ color: "#C72542", fontStyle: "italic" }}>
+                                    {selectedPlot?.trees_count ?? 0}
+                                </span>
+                            </h2>
+                            <h2 style={{ marginTop: "0px", paddingRight: "8px" }}>
+                                Mapped:{" "}
+                                <span style={{ color: "#C72542", fontStyle: "italic" }}>
+                                    {selectedPlot?.mapped_trees_count ?? 0}
+                                </span>
+                            </h2>
+                            <h2 style={{ marginTop: "0px", paddingRight: "8px" }}>
+                                Assigned:{" "}
+                                <span style={{ color: "#C72542", fontStyle: "italic" }}>
+                                    {selectedPlot?.assigned_trees_count ?? 0}
+                                </span>
+                            </h2>
+                            <h2 style={{ marginTop: "0px", paddingRight: "8px" }}>
+                                Available:{" "}
+                                <span style={{ color: "#C72542", fontStyle: "italic" }}>
+                                    {selectedPlot?.available_trees_count ?? 0}
+                                </span>
+                            </h2>
+                        </div>
+                    </div>
+                    <div></div>
+                    {/* {assigned.length !== 0 &&
               assigned.map((tree) => {
                 return (
                   <Chip
@@ -222,21 +195,20 @@ function TreeMap( {selectedPlot, setSelectedPlot} ) {
                   />
                 );
               })} */}
-                    </div>
-                    <div
-                        style={{
-                            width: "100%",
-                            padding: "12px",
-                            minHeight: "40%",
-                            maxHeight: "280px",
-                            overflowY: "auto",
-                        }}
-                    >
-                    </div>
-                </Box>
+                </div>
+                <div
+                    style={{
+                        width: "100%",
+                        padding: "12px",
+                        minHeight: "40%",
+                        maxHeight: "280px",
+                        overflowY: "auto",
+                    }}
+                >
+                </div>
             </Box>
-        );
-    }
+        </Box>
+    );
 };
 
 export default TreeMap;

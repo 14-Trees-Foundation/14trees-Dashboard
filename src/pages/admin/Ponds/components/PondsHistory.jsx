@@ -1,4 +1,3 @@
-import { useRecoilValue } from "recoil";
 import { useTheme } from "@mui/material/styles";
 import {
   AreaChart,
@@ -10,27 +9,33 @@ import {
   ResponsiveContainer,
 } from "recharts";
 
-import { pondHistory, selectedPond } from "../../../../store/adminAtoms";
 import { Typography } from "@mui/material";
 import { CustomBox } from "../../../../components/CustomBox";
 import { useAppSelector } from "../../../../redux/store/hooks";
+import { useEffect, useRef } from "react";
+import { Empty } from "antd";
 
-export const PondsHistory = () => {
+export const PondsHistory = ({ selectedPond }) => {
   const theme = useTheme();
-  let history = useRecoilValue(pondHistory);
-  // let pondName = useRecoilValue(selectedPond);
-  //  let data = history.map(({levelFt, date, images, ...attrs}) => ({date, levelFt}))
-  let pond = useAppSelector((state) => state.pondHistoryData);
+  const targetRef = useRef(null);
+
+  let waterLevelData = useAppSelector((state) => state.pondWaterLevelUpdatesData);
   let data;
-  if (pond?.updates?.length > 0) {
-    data = pond?.updates.map((item) => {
+  if (waterLevelData && waterLevelData.pondWaterLevelUpdates) {
+    const updates = Object.values(waterLevelData.pondWaterLevelUpdates);
+    data = updates.map((item) => {
       return {
-        date: item.date,
-        level: item.levelFt,
+        date: item.updated_at?.substring(0, 10),
+        level: parseFloat(item.level_ft),
       };
     });
   }
-  console.log(data);
+
+  useEffect(() => {
+    if (data && selectedPond && targetRef.current) {
+      targetRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [data]);
 
   return (
     <div
@@ -38,14 +43,15 @@ export const PondsHistory = () => {
         width: "100%",
         height: "600px",
       }}
+      ref={targetRef}
     >
-      {data && (
+      {data && data.length > 0 && (
         <CustomBox>
           <div style={{ display: "flex", justifyContent: "space-between" }}>
             <Typography variant="h6" gutterBottom>
               Pond level (Feets):{" "}
               <em style={{ color: theme.custom.color.primary.blue }}>
-                {pond?.name}
+                {selectedPond?.name}
               </em>
             </Typography>
           </div>
@@ -72,6 +78,20 @@ export const PondsHistory = () => {
               />
             </AreaChart>
           </ResponsiveContainer>
+        </CustomBox>
+      )}
+
+      {data && selectedPond && data.length === 0 && (
+        <CustomBox>
+          <div style={{ display: "flex", justifyContent: "space-between" }}>
+            <Typography variant="h6" gutterBottom>
+              Pond level (Feets):{" "}
+              <em style={{ color: theme.custom.color.primary.blue }}>
+                {selectedPond?.name}
+              </em>
+            </Typography>
+          </div>
+          <Empty />
         </CustomBox>
       )}
     </div>

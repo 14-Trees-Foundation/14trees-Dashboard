@@ -1,12 +1,17 @@
 import axios, {AxiosInstance} from 'axios';
-import { CreateTreeTypeResponse, TreeType, TreeTypePaginationResponse, TreeTypesDataState } from '../../types/treeType';
-import { Plot, PlotPaginationResponse, UpsertPlotResponse } from '../../types/plot';
-import { Organization, OrganizationPaginationResponse } from '../../types/organization';
-import { CreatePondResponse, Pond, PondPaginationResponse } from '../../types/pond';
-import { User, UserPaginationResponse } from '../../types/user';
+import { PlantType } from '../../types/plantType';
+import { Plot } from '../../types/plot';
+import { BulkUserGroupMappingResponse, Group } from '../../types/Group';
+import { Pond, PondWaterLevelUpdate } from '../../types/pond';
+import { User } from '../../types/user';
+import { Site } from '../../types/site';
+import { Donation } from '../../types/donation';
 import { OnsiteStaff } from '../../types/onSiteStaff';
-import { PaginationTreeResponse, Tree } from '../../types/tree';
+import { Tree } from '../../types/tree';
 import { AssignTreeRequest, UserTree, UserTreeCountPaginationResponse } from '../../types/userTree';
+import { PaginatedResponse } from '../../types/pagination';
+import { Event } from '../../types/event';
+import { Visit } from '../../types/visits';
 
 class ApiClient {
     private api: AxiosInstance;
@@ -19,16 +24,13 @@ class ApiClient {
     }
 
     /*
-        Model- TreeTypes: CRUD Operations/Apis for tree types 
+        Model- PlantTypes: CRUD Operations/Apis for tree types 
     */
 
-    async getTreeTypes(offset: number, limit: number, name?: string): Promise<TreeTypePaginationResponse> {
-        let url = `/trees/treetypes?offset=${offset}&limit=${limit}`;
-        if (name && name !== '') {
-            url += `&name=${name}`
-        }
+    async getPlantTypes(offset: number, limit: number, filters?: any[]): Promise<PaginatedResponse<PlantType>> {
+        const url = `/plant-types/get?offset=${offset}&limit=${limit}`;
         try {
-            const response = await this.api.get<TreeTypePaginationResponse>(url);
+            const response = await this.api.post<PaginatedResponse<PlantType>>(url, {filters: filters});
             return response.data;
         } catch (error: any) {
             console.error(error)
@@ -36,10 +38,10 @@ class ApiClient {
         }
     }
 
-    async getTreeTypesByFilters(offset: number, limit: number, filters?: any[]): Promise<TreeTypePaginationResponse> {
-        const url = `/trees/treetypes?offset=${offset}&limit=${limit}`;
+    async searchPlantTypes(searchStr: string): Promise<PlantType[]> {
+        const url = `/plant-types/${searchStr}`;
         try {
-            const response = await this.api.post<TreeTypePaginationResponse>(url, {filters: filters});
+            const response = await this.api.get<PlantType[]>(url);
             return response.data;
         } catch (error: any) {
             console.error(error)
@@ -47,22 +49,13 @@ class ApiClient {
         }
     }
 
-    async searchTreeTypes(searchStr: string): Promise<TreeType[]> {
-        const url = `/trees/${searchStr}`;
-        try {
-            const response = await this.api.get<TreeType[]>(url);
-            return response.data;
-        } catch (error: any) {
-            console.error(error)
-            throw new Error(`Failed to fetch tree types: ${error.message}`);
-        }
-    }
-
-    async createTreeType(data: TreeType, file?: Blob): Promise<TreeType> {
+    async createPlantType(data: PlantType, files: Blob[]): Promise<PlantType> {
         try {
             const formData = new FormData();
-            if (file) {
-                formData.append("files", file);
+            if (files) {
+                files.forEach( (file) => {
+                    formData.append("files", file);
+                });
             }
             Object.entries(data).forEach(([key, value]) => {
                 if (key != 'image') {
@@ -70,15 +63,15 @@ class ApiClient {
                     formData.append(key, strValue);
                 }
               });
-            const response = await this.api.post<CreateTreeTypeResponse>(`/trees/addtreetype`, formData);
-            return response.data.treetype;
+            const response = await this.api.post<PlantType>(`/plant-types/`, formData);
+            return response.data;
         } catch (error) {
             console.error(error)
             throw new Error('Failed to create tree type.');
         }
     }
 
-    async updateTreeType(data: TreeType, file?: Blob): Promise<TreeType> {
+    async updatePlantType(data: PlantType, file?: Blob): Promise<PlantType> {
         try {
             const formData = new FormData();
             if (file) {
@@ -90,7 +83,7 @@ class ApiClient {
                     formData.append(key, strValue);
                 }
               });
-            const response = await this.api.put<TreeType>(`/trees/treetypes/${data._id}`, data);
+            const response = await this.api.put<PlantType>(`/plant-types/${data.id}`, data);
             return response.data;
         } catch (error) {
             console.error(error)
@@ -98,10 +91,10 @@ class ApiClient {
         }
     }
 
-    async deleteTreeType(data: TreeType): Promise<string> {
+    async deletePlantType(data: PlantType): Promise<number> {
         try {
-            await this.api.delete<any>(`/trees/treetypes/${data._id}`);
-            return data._id;
+            await this.api.delete<any>(`/plant-types/${data.id}`);
+            return data.id;
         } catch (error) {
             console.error(error)
             throw new Error('Failed to delete tree type');
@@ -113,25 +106,13 @@ class ApiClient {
         Model- Plot: CRUD Operations/Apis for plots
     */
 
-    async getPlots(offset: number, limit: number, name?: string): Promise<PlotPaginationResponse> {
-        let url = `/plots/?offset=${offset}&limit=${limit}`;
-        if (name && name !== '') {
-            url += `&name=${name}`
-        }
-        try {
-            const response = await this.api.get<PlotPaginationResponse>(url);
-            return response.data;
-        } catch (error: any) {
-            console.error(error)
-            throw new Error(`Failed to fetch plots: ${error.message}`);
-        }
-    }
-
-    async getPlotsByFilters(offset: number, limit: number, filters?: any[]): Promise<PlotPaginationResponse> {
+    async getPlots(offset: number, limit: number, filters?: any[]): Promise<PaginatedResponse<Plot>> {
         const url = `/plots/get?offset=${offset}&limit=${limit}`;
         try {
-            const response = await this.api.post<PlotPaginationResponse>(url, {filters: filters});
+            const response = await this.api.post<PaginatedResponse<Plot>>(url, {filters: filters});
+            console.log("plots data: " , response.data);
             return response.data;
+            
         } catch (error: any) {
             console.error(error)
             throw new Error(`Failed to fetch plots: ${error.message}`);
@@ -151,8 +132,9 @@ class ApiClient {
 
     async createPlot(data: Plot): Promise<Plot> {
         try {
-            const response = await this.api.post<UpsertPlotResponse>(`/plots/add`, data);
-            return response.data.plot;
+            const response = await this.api.post<Plot>(`/plots`, data);
+            console.log("create plot response: ", response.data);
+            return response.data;
         } catch (error) {
             console.error(error)
             throw new Error('Failed to create plot');
@@ -161,89 +143,128 @@ class ApiClient {
 
     async updatePlot(data: Plot): Promise<Plot> {
         try {
-            const response = await this.api.put<UpsertPlotResponse>(`/plots/${data._id}`, data);
-            return response.data.plot;
+            const response = await this.api.put<Plot>(`/plots/${data.id}`, data);
+            return response.data;
         } catch (error) {
             console.error(error)
             throw new Error('Failed to update plot');
         }
     }
 
-    async deletePlot(data: Plot): Promise<string> {
+    async deletePlot(data: Plot): Promise<number> {
         try {
-            await this.api.delete<any>(`/plots/${data._id}`);
-            return data._id;
+            await this.api.delete<any>(`/plots/${data.id}`);
+            return data.id;
         } catch (error) {
             console.error(error)
             throw new Error('Failed to delete plot');
         }
     }
 
+    async getPlotTags(offset: number, limit: number): Promise<PaginatedResponse<string>> {
+        const url = `/plots/tags?offset${offset}&limit=${limit}`
+        const response = await this.api.get<PaginatedResponse<string>>(url);
+        return response.data;
+    }
+
     /*
-        Model- Organization: CRUD Operations/Apis for organizations
+        Model- Group: CRUD Operations/Apis for organizations
     */
 
-    async getOrganizations(offset: number, limit: number): Promise<OrganizationPaginationResponse> {
-        const url = `/organizations/?offset=${offset}&limit=${limit}`;
+    async getGroups(offset: number, limit: number, filters?: any[]): Promise<PaginatedResponse<Group>> {
+        const url = `/groups/get?offset=${offset}&limit=${limit}`;
         try {
-            const response = await this.api.get<OrganizationPaginationResponse>(url);
+            const response = await this.api.post<PaginatedResponse<Group>>(url,  { filters });
             return response.data;
         } catch (error: any) {
             console.error(error)
-            throw new Error(`Failed to fetch organizations: ${error.message}`);
+            throw new Error(`Failed to fetch groups: ${error.message}`);
         }
     }
 
-    async searchOrganizations(searchStr: string): Promise<Organization[]> {
-        const url = `/organizations/${searchStr}`;
+    async createGroup(data: Group): Promise<Group> {
         try {
-            const response = await this.api.get<Organization[]>(url);
+            const response = await this.api.post<Group>(`/groups`, data);
+            return response.data;
+        } catch (error) {
+            console.error(error)
+            throw new Error('Failed to create Group');
+        }
+    }
+
+    async updateGroup(data: Group): Promise<Group> {
+        try {
+            const response = await this.api.put<Group>(`/groups/${data.id}`, data);
+            return response.data;
+        } catch (error) {
+            console.error(error)
+            throw new Error('Failed to update Group');
+        }
+    }
+
+    async deleteGroup(data: Group): Promise<number> {
+        try {
+            await this.api.delete<any>(`/groups/${data.id}`);
+            return data.id;
+        } catch (error) {
+            console.error(error)
+            throw new Error('Failed to delete group');
+        }
+    }
+
+    async searchGroups(offset: number, limit: number, searchStr: string): Promise<PaginatedResponse<Group>> {
+        const url = `/groups/${searchStr}?offset=${offset}&limit=${limit}`;
+        try {
+            const response = await this.api.get<PaginatedResponse<Group>>(url);
             return response.data;
         } catch (error: any) {
             console.error(error)
-            throw new Error(`Failed to fetch organizations: ${error.message}`);
+            throw new Error(`Failed to fetch groups: ${error.message}`);
         }
     }
 
-    async createOrganization(data: Organization): Promise<Organization> {
-        try {
-            const response = await this.api.post<{org: Organization}>(`/organizations/add`, data);
-            return response.data.org;
-        } catch (error) {
-            console.error(error)
-            throw new Error('Failed to create Organization');
-        }
-    }
+    /*
+        Model- UserGroup: CRUD Operations/Apis for user_groups
+    */
 
-    async updateOrganization(data: Organization): Promise<Organization> {
+    async bulkCreateUserGroupMapping(groupId: number, file: Blob): Promise<BulkUserGroupMappingResponse> {
         try {
-            const response = await this.api.put<Organization>(`/organizations/${data._id}`, data);
+            const formData = new FormData();
+            formData.append('file', file);
+            formData.append('group_id', groupId.toString());
+            const response = await this.api.post<BulkUserGroupMappingResponse>(`/user-groups/bulk`, formData);
             return response.data;
         } catch (error) {
             console.error(error)
-            throw new Error('Failed to update Organization');
+            throw new Error('Failed to create user group mapping');
         }
     }
 
-    async deleteOrganization(data: Organization): Promise<string> {
+    async addUserToGroup(data: any): Promise<void> {
         try {
-            await this.api.delete<any>(`/organizations/${data._id}`);
-            return data._id;
+            await this.api.post(`/user-groups`, data);
         } catch (error) {
             console.error(error)
-            throw new Error('Failed to delete organization');
+            throw new Error('Failed to add user to group');
         }
     }
 
+    async removeGroupUsers(groupId: number, userIds: number[]): Promise<void> {
+        try {
+            await this.api.delete(`/user-groups`, { data: { user_ids: userIds, group_id: groupId }});
+        } catch (error) {
+            console.error(error)
+            throw new Error('Failed to remove users from group');
+        }
+    }
     /*
         Model- Pond: CRUD Operations/Apis for ponds
     */
 
-    async getPonds(offset: number, limit: number, name?: string): Promise<PondPaginationResponse> {
-        let url = `/ponds/?offset=${offset}&limit=${limit}`;
-        if (name) url += '&name=' + name;
+    async getPonds(offset: number, limit: number, filters?: any[]): Promise<PaginatedResponse<Pond>> {
+        const url = `/ponds/get?offset=${offset}&limit=${limit}`;
         try {
-            const response = await this.api.get<PondPaginationResponse>(url);
+            const response = await this.api.post<PaginatedResponse<Pond>>(url, { filters: filters });
             return response.data;
         } catch (error: any) {
             console.error(error)
@@ -264,8 +285,8 @@ class ApiClient {
 
     async createPond(data: Pond): Promise<Pond> {
         try {
-            const response = await this.api.post<CreatePondResponse>(`/ponds/`, data);
-            return response.data.pond;
+            const response = await this.api.post<Pond>(`/ponds/`, data);
+            return response.data;
         } catch (error) {
             console.error(error)
             throw new Error('Failed to create Pond');
@@ -274,7 +295,7 @@ class ApiClient {
 
     async updatePond(data: Pond): Promise<Pond> {
         try {
-            const response = await this.api.put<Pond>(`/ponds/${data._id}`, data);
+            const response = await this.api.put<Pond>(`/ponds/${data.id}`, data);
             return response.data;
         } catch (error) {
             console.error(error)
@@ -282,40 +303,70 @@ class ApiClient {
         }
     }
 
-    async updatePondWaterLevel(pondName: string, levelFt: number, userId: string, file?: Blob): Promise<void> {
+    async deletePond(data: Pond): Promise<number> {
         try {
-            const formData = new FormData();
-            if (file) {
-                formData.append("files", file);
-            }
-            formData.append('pond_name', pondName);
-            formData.append('levelFt', levelFt.toString());
-            formData.append('user_id', userId);
-            await this.api.post<any>(`/ponds/update-pond-level`, formData);
-            return;
-        } catch (error) {
-            console.error(error)
-            throw new Error('Failed to update Pond');
-        }
-    }
-
-    async deletePond(data: Pond): Promise<string> {
-        try {
-            await this.api.delete<any>(`/ponds/${data._id}`);
-            return data._id;
+            await this.api.delete<any>(`/ponds/${data.id}`);
+            return data.id;
         } catch (error) {
             console.error(error)
             throw new Error('Failed to delete Pond');
         }
     }
 
-    async getPondHistory(name: string): Promise<Pond[]> {
+    /*
+        Model- PondWaterLevelUpdate - Crud operations for water level updates
+    */
+
+    async getPondWaterLevelUpdates(pondId: number, offset: number, limit: number): Promise<PaginatedResponse<PondWaterLevelUpdate>> {
         try {
-            let response = await this.api.get<Pond[]>(`/ponds/history?pond_name=${name}`);
+            let response = await this.api.get<PaginatedResponse<PondWaterLevelUpdate>>(`/ponds/waterlevel/${pondId}?offset=${offset}&limit=${limit}`);
             return response.data;
         } catch (error) {
-            console.error(error)
-            throw new Error('Failed to pond history');
+            throw new Error('Failed to get pond history');
+        }
+    }
+
+    async addPondWaterLevelUpdate(pondId: number, levelFt: number, userId: number, file?: Blob): Promise<PondWaterLevelUpdate> {
+        try {
+            const formData = new FormData();
+            if (file) {
+                formData.append("files", file);
+            }
+            formData.append('pond_id', pondId.toString());
+            formData.append('level_ft', levelFt.toString());
+            formData.append('user_id', userId.toString());
+            const result = await this.api.post<PondWaterLevelUpdate>(`/ponds/waterlevel`, formData);
+            return result.data;
+        } catch (error) {
+            throw new Error('Failed to update Pond');
+        }
+    }
+
+    async updatePondWaterLevelUpdate(data: PondWaterLevelUpdate, file?: Blob): Promise<PondWaterLevelUpdate> {
+        const formData = new FormData();
+        if (file) {
+            formData.append("files", file);
+        }
+        Object.entries(data).forEach(([key, value]) => {
+            if (key != 'image') {
+                const strValue = value as string
+                formData.append(key, strValue);
+            }
+        });
+        try {
+            const response = await this.api.put<PondWaterLevelUpdate>(`/ponds/waterlevel/${data.id}`, formData);
+            return response.data;
+        } catch (error) {
+            throw new Error('Failed to update pond water level update');
+        }
+    }
+
+    async deletePondWaterLevelUpdate(data: PondWaterLevelUpdate): Promise<number> {
+        try {
+            await this.api.delete<any>(`/ponds/waterlevel/${data.id}`);
+            return data.id;
+        } catch (error) {
+            throw new Error('Failed to delete pond water level update');
         }
     }
 
@@ -323,24 +374,15 @@ class ApiClient {
         Model- User: CRUD Operations/Apis for users
     */
 
-    async getUsers(offset: number, limit: number): Promise<UserPaginationResponse> {
-        const url = `/users/?offset=${offset}&limit=${limit}`;
-        try {
-            const response = await this.api.get<UserPaginationResponse>(url);
-            return response.data;
-        } catch (error: any) {
-            console.error(error)
-            throw new Error(`Failed to fetch users: ${error.message}`);
-        }
-    }
-
-    async getUsersByFilters(offset: number, limit: number, filters?: any[]): Promise<UserPaginationResponse> {
+    async getUsers(offset: number, limit: number, filters?: any[]): Promise<PaginatedResponse<User>> {
         const url = `/users/get?offset=${offset}&limit=${limit}`;
         try {
-            const response = await this.api.post<UserPaginationResponse>(url, {filters: filters});
+            const response = await this.api.post<PaginatedResponse<User>>(url, {filters: filters});
             return response.data;
         } catch (error: any) {
-            console.error(error)
+            if (error.response) {
+                throw new Error(error.response.data.message);
+            }
             throw new Error(`Failed to fetch users: ${error.message}`);
         }
     }
@@ -351,7 +393,9 @@ class ApiClient {
             const response = await this.api.get<User[]>(url);
             return response.data;
         } catch (error: any) {
-            console.error(error)
+            if (error.response) {
+                throw new Error(error.response.data.message);
+            }
             throw new Error(`Failed to fetch users: ${error.message}`);
         }
     }
@@ -360,32 +404,32 @@ class ApiClient {
         try {
             const response = await this.api.post<User>(`/users/`, data);
             return response.data;
-        } catch (error) {
-            console.error(error)
+        } catch (error: any) {
+            if (error.response) {
+                throw new Error(error.response.data.message);
+            }
             throw new Error('Failed to create User');
         }
     }
 
     async updateUser(data: User): Promise<User> {
         try {
-            const response = await this.api.put<User>(`/users/${data._id}`, data);
+            const response = await this.api.put<User>(`/users/${data.id}`, data);
             return response.data;
         } catch (error: any) {
-            console.error(error)
             if (error.response) {
                 throw new Error(error.response.data.message);
-              }
+            }
             throw new Error('Failed to update User');
         }
     }
 
-    async deleteUser(data: User): Promise<string> {
+    async deleteUser(data: User): Promise<number> {
         try {
-            await this.api.delete<any>(`/users/${data._id}`);
-            return data._id;
+            await this.api.delete<any>(`/users/${data.id}`);
+            return data.id;
         } catch (error: any) {
-            console.error(error)
-            if (error.response && error.response.data.message) {
+            if (error.response) {
                 throw new Error(error.response.data.message);
             }
             throw new Error('Failed to delete User');
@@ -397,8 +441,10 @@ class ApiClient {
             const formData = new FormData();
             formData.append('file', data);
             await this.api.post<any>(`/users/bulk`, formData);
-        } catch (error) {
-            console.error(error)
+        } catch (error: any) {
+            if (error.response) {
+                throw new Error(error.response.data.message);
+            }
             throw new Error('Failed to create users in bulk');
         }
     }
@@ -452,10 +498,10 @@ class ApiClient {
         Model- Tree: CRUD Operations/Apis for trees
     */
 
-    async getTrees(offset: number, limit: number, filters?: any): Promise<PaginationTreeResponse> {
+    async getTrees(offset: number, limit: number, filters?: any[]): Promise<PaginatedResponse<Tree>> {
         const url = `/trees/get?offset=${offset}&limit=${limit}`;
         try {
-            const response = await this.api.post<PaginationTreeResponse>(url, {filters: filters});
+            const response = await this.api.post<PaginatedResponse<Tree>>(url, { filters: filters });
             return response.data;
         } catch (error: any) {
             console.error(error)
@@ -471,14 +517,13 @@ class ApiClient {
                 formData.append("images", (file as File).name);
             }
             formData.append('sapling_id', data.sapling_id);
-            formData.append('tree_id', data.tree_id);
-            formData.append('plot_id', data.plot_id);
+            formData.append('plant_type_id', data.plant_type_id.toString());
+            formData.append('plot_id', data.plot_id.toString());
             if (data.location && data.location.coordinates && data.location.coordinates.length === 2) {
                 formData.append('lat', data.location.coordinates[0].toString());
                 formData.append('lng', data.location.coordinates[1].toString());
             }
-            formData.append('mapped_to', data.mapped_to);
-            formData.append('user_id', data.user_id);
+            formData.append('mapped_to', data.mapped_to_user.toString());
             const response = await this.api.post<Tree>(`/trees/`, formData);
             return response.data;
         } catch (error) {
@@ -490,19 +535,17 @@ class ApiClient {
     async updateTree(data: Tree, file?:Blob): Promise<Tree> {
         try {
             const formData = new FormData();
-            console.log(file)
 
             if (file) {
                 formData.append("files", file);
             }
             Object.entries(data).forEach(([key, value]) => {
-                if (key != 'image') {
+                if (key != 'image' && value != null) {
                     const strValue = value as string
                     formData.append(key, strValue);
                 }
               });
-            console.log(formData)
-            const response = await this.api.put<Tree>(`/trees/${data._id}`, formData);
+            const response = await this.api.put<Tree>(`/trees/${data.id}`, formData);
             return response.data;
         } catch (error) {
             console.error(error)
@@ -510,10 +553,10 @@ class ApiClient {
         }
     }
 
-    async deleteTree(data: Tree): Promise<string> {
+    async deleteTree(data: Tree): Promise<number> {
         try {
-            await this.api.delete<any>(`/trees/${data._id}`);
-            return data._id;
+            await this.api.delete<any>(`/trees/${data.id}`);
+            return data.id;
         } catch (error) {
             console.error(error)
             throw new Error('Failed to delete Tree');
@@ -531,18 +574,18 @@ class ApiClient {
         }
     }
 
-    async mapTrees(saplingIds: string[], email: string): Promise<void> {
+    async mapTrees(mapped_to: 'user' | 'group', saplingIds: string[], id: number): Promise<void> {
         try {
-            await this.api.post<any>(`/mytrees/assign`, { sapling_id: saplingIds.join(',') , email: email});
+            await this.api.post<any>(`/mapping/map`, { sapling_ids: saplingIds , id: id, mapped_to: mapped_to});
         } catch (error) {
             console.error(error)
             throw new Error('Failed to create Trees in bulk');
         }
     }
 
-    async mapTreesForPlot(email: string, plotId: string, count: number): Promise<void> {
+    async mapTreesForPlot(mapped_to: 'user' | 'group', id: number, plotId: string, count: number): Promise<void> {
         try {
-            await this.api.post<any>(`/mytrees/map-plot-trees`, { email: email, plot_id: plotId, count: count});
+            await this.api.post<any>(`/mapping/map-plot-trees`, { mapped_to: mapped_to, id: id, plot_id: plotId, count: count});
         } catch (error) {
             console.error(error)
             throw new Error('Failed to create Trees in bulk');
@@ -551,7 +594,7 @@ class ApiClient {
 
     async removeTreeMappings(saplingIds: string[]): Promise<void> {
         try {
-            await this.api.post<any>(`/mytrees/unmap`, { sapling_ids: saplingIds});
+            await this.api.post<any>(`/mapping/unmap`, { sapling_ids: saplingIds});
         } catch (error) { 
             console.error(error)
             throw new Error('Failed to create Trees in bulk');
@@ -560,7 +603,7 @@ class ApiClient {
 
     async getMappedTrees(email: string): Promise<void> {
         try {
-            await this.api.post<any>(`/mytrees/${email}`);
+            await this.api.post<any>(`/mapping/${email}`);
         } catch (error) { 
             console.error(error)
             throw new Error('Failed to create Trees in bulk');
@@ -568,7 +611,7 @@ class ApiClient {
     }
 
     async getUserTreeCount(offset: number, limit: number, filters?: any): Promise<UserTreeCountPaginationResponse> {
-        let url = `/mytrees/count/usertreescount?offset=${offset}&limit=${limit}`
+        let url = `/mapping/count/usertreescount?offset=${offset}&limit=${limit}`
         try {
             let result = await this.api.post<UserTreeCountPaginationResponse>(url, {filters: filters});
             return result.data;
@@ -623,7 +666,7 @@ class ApiClient {
         }
     }
 
-    async assignUserTrees(data: AssignTreeRequest): Promise<void> {
+    async assignUserTrees(data: FormData): Promise<void> {
         try {
             await this.api.post<void>(`/profile/usertreereg/multi`, data);
         } catch (error) {
@@ -631,8 +674,204 @@ class ApiClient {
             throw new Error('Failed unassign user trees.');
         }
     }
+
+    /*
+        Model- Site: CRUD Operations/Apis for sites
+    */
+
+    async getSites(offset: number, limit: number, filters?: any[]): Promise<PaginatedResponse<Site>> {
+        const url = `/sites/get?offset=${offset}&limit=${limit}`;
+        try {
+            const response = await this.api.post<PaginatedResponse<Site>>(url, {filters: filters});
+            return response.data;
+        } catch (error: any) {
+            console.error(error)
+            throw new Error(`Failed to fetch sites: ${error.message}`);
+        }
+    }
+
+    async createSite(data: Site): Promise<Site> {
+        try {
+            const response = await this.api.post<Site>(`/sites/`, data);
+            return response.data;
+        } catch (error) {
+            console.error(error)
+            throw new Error('Failed to create Site');
+        }
+    }
+
+    async updateSite(data: Site): Promise<Site> {
+        try {
+            const response = await this.api.put<Site>(`/sites/${data.id}`, data);
+            return response.data;
+        } catch (error: any) {
+            console.error(error)
+            if (error.response) {
+                throw new Error(error.response.data.message);
+                }
+            throw new Error('Failed to update Site');
+        }
+    }
+
+    async deleteSite(data: Site): Promise<number> {
+        try {
+            await this.api.delete<any>(`/sites/${data.id}`);
+            return data.id;
+        } catch (error) {
+            console.error(error)
+            throw new Error('Failed to delete Site');
+        }
+    }
+
+
+     /*
+        Model- Donation: CRUD Operations/Apis for Donations
+    */
+
+    async getDonations(offset: number, limit: number , filters?: any[]): Promise<PaginatedResponse<Donation>> {
+        const url = `/donations/get?offset=${offset}&limit=${limit}`;
+        try {
+            const response = await this.api.post<PaginatedResponse<Donation>>(url ,  {filters: filters});
+            console.log("Response in api client: ", response);
+            return response.data;
+        } catch (error: any) {
+            console.error(error)
+            throw new Error(`Failed to fetch donations: ${error.message}`);
+        }
+    }
+
+
+    async createDonation(data: Donation): Promise<Donation> {
+        try {
+            const response = await this.api.post<Donation>(`/donations`, data);
+            return response.data;
+        } catch (error) {
+            console.error(error)
+            throw new Error('Failed to create Donation');
+        }
+    }    
+
+
+    async updateDonation(data: Donation): Promise<Donation> {
+        try {
+            const response = await this.api.put<Donation>(`/donations/${data.id}`, data);
+            return response.data;
+        } catch (error: any) {
+            console.error(error)
+            if (error.response) {
+                throw new Error(error.response.data.message);
+                }
+            throw new Error('Failed to update donation');
+        }
+    }
+
+    async deleteDonation(data: Donation): Promise<number> {
+        try {
+            await this.api.delete<any>(`/donations/${data.id}`);
+            return data.id;
+        } catch (error) {
+            console.error(error)
+            throw new Error('Failed to delete Donation');
+        }
+    }
+
+  /*
+        Model- Event : CRUD Operations/Apis for Event
+    */
+
+        async getEvents(offset: number, limit: number , filters?: any[]): Promise<PaginatedResponse<Event>> {
+            const url = `/events/get?offset=${offset}&limit=${limit}`;
+            try {
+                const response = await this.api.post<PaginatedResponse<Event>>(url , {filters: filters});
+                console.log("Response in api client: ", response);
+                return response.data;
+            } catch (error: any) {
+                console.error(error)
+                throw new Error(`Failed to fetch events: ${error.message}`);
+            }
+        }
+
+        // async updateEvent(data: Event): Promise<Event>{
+        //     try {
+        //         const response = await this.api.put<Event>(`/events/${data.id}`, data);
+        //         return response.data;
+        //     } catch (error: any) {
+        //         console.error(error)
+        //         if (error.response) {
+        //             throw new Error(error.response.data.message);
+        //             }
+        //         throw new Error('Failed to update Site');
+        //     }
+
+        // }
+
+        // async deleteEvent(data: Event): Promise<number>{
+           
+        //     try{
+        //        await this.api.delete<any>(  `/events/${data.id}`);
+        //        return data.id;
+        //     }catch(error: any){
+        //         console.error(error)
+        //         throw new Error(`Failed to delete event: ${error.message}`);
+        //     }
+        // }
+    
+
+     /*
+        Model- Visit: CRUD Operations/Apis for visits
+    */
+        async getVisits(offset: number, limit: number, filters?: any[]): Promise<PaginatedResponse<Visit>> {
+            const url = `/visits/get?offset=${offset}&limit=${limit}`;
+            try {
+                const response = await this.api.post<PaginatedResponse<Visit>>(url, {filters: filters});
+                return response.data;
+            } catch (error: any) {
+                console.error(error)
+                throw new Error(`Failed to fetch Visits: ${error.message}`);
+            }
+        }
+
+        async createVisit(data: Visit): Promise<Visit> {
+            try {
+                const response = await this.api.post<Visit>(`/visits/`, data);
+                return response.data;
+            } catch (error) {
+                console.error(error)
+                throw new Error('Failed to create visit');
+            }
+        }
+
+        async updateVisit(data: Visit): Promise<Visit> {
+            try {
+                const response = await this.api.put<Visit>(`/visits/${data.id}`, data);
+                return response.data;
+            } catch (error: any) {
+                console.error(error)
+                if (error.response) {
+                    throw new Error(error.response.data.message);
+                    }
+                throw new Error('Failed to update visit');
+            }
+        }
+
+        async deleteVisit(data: Visit): Promise<number> {
+            try {
+                await this.api.delete<any>(`/visits/${data.id}`);
+                return data.id;
+            } catch (error) {
+                console.error(error)
+                throw new Error('Failed to delete visit');
+            }
+        }
+    
+
     
 }
+
+
+  
+
+
 
 // new function to fetch data form localStorage
 export const fetchDataFromLocal = (key: string) => {

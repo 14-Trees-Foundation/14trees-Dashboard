@@ -22,7 +22,7 @@ const AddUser = ({ open, handleClose, createUser, searchUser }) => {
         name: '',
         phone: '',
         email: '',
-        dob: '',
+        birth_date: '',
     });
 
     let usersList = [];
@@ -47,7 +47,7 @@ const AddUser = ({ open, handleClose, createUser, searchUser }) => {
                     'email': user.email,
                     'name': user.name,
                     'phone': user.phone ?? '',
-                    'dob': user.dob ?? '',
+                    'birth_date': user.birth_date ?? '',
                 })
             }
         })
@@ -68,7 +68,7 @@ const AddUser = ({ open, handleClose, createUser, searchUser }) => {
             name: '',
             phone: '',
             email: '',
-            dob: '',
+            birth_date: '',
         });
         handleClose();
     };
@@ -111,11 +111,11 @@ const AddUser = ({ open, handleClose, createUser, searchUser }) => {
                                 </Autocomplete>
                             </Grid>
                             <Grid item xs={12}>
-                                <TextField name="dob" label="Date of Birth" type="date" value={formData.dob ? formData.dob.substring(0, 10): ''} onChange={handleChange} InputLabelProps={{ shrink: true }} fullWidth/>
+                                <TextField name="birth_date" label="Date of Birth" type="date" value={formData.birth_date ? formData.birth_date.substring(0, 10): ''} onChange={handleChange} InputLabelProps={{ shrink: true }} fullWidth/>
                             </Grid>
                             <Grid item xs={12} sx={{display:'flex', justifyContent:'center', }}>
-                                <Button type="submit">Submit</Button>
-                                <Button onClick={handleClose}>Cancel</Button>
+                                <Button variant='outlined' color='error' onClick={handleClose}>Cancel</Button>
+                                <Button variant='contained' color='success' type="submit" sx={{marginLeft:'10px'}}>Submit</Button>
                             </Grid>
                         </Grid>
                     </form>

@@ -1,7 +1,7 @@
-import * as React from "react";
+import React, { useState } from "react";
 import { createStyles, makeStyles } from "@mui/styles";
 import { useRecoilValue } from "recoil";
-import { ToastContainer } from "react-toastify";
+import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useNavigate } from "react-router-dom";
 
@@ -9,21 +9,18 @@ import { AppBar } from "../../components/Appbar";
 import { Spinner } from "../../components/Spinner";
 import { UserList } from "../../stories/UserList/UserList";
 import bg from "../../assets/bg.png";
-import { searchResults, searchKey, searchError } from "../../store/atoms";
+import { searchResults } from "../../store/atoms";
 import { SearchBar } from "../../components/Searchbar";
-import { useSetRecoilState, useRecoilState } from "recoil";
+import { useSetRecoilState } from "recoil";
 import api from "../../api/local";
 
 export const Search = () => {
   const classes = UseStyle();
   const navigate = useNavigate();
   let results = useRecoilValue(searchResults);
-  const [key, setKey] = useRecoilState(searchKey);
+  const [key, setKey] = useState('');
   const setSearchResult = useSetRecoilState(searchResults);
-  const setSearchError = useSetRecoilState(searchError);
-  const [loading, setLoading] = React.useState(false);
-  let searchSize = 10;
-  let currPage = 1;
+  const [loading, setLoading] = useState(false);
 
   const handleSearch = (value) => {
     setKey(value);
@@ -34,42 +31,22 @@ export const Search = () => {
   const fetchData = async (searchKey) => {
     let params = {
       key: searchKey,
-      size: searchSize,
-      index: currPage,
     };
     setLoading(true);
     const res = await api.get("/search/", {
       params: params,
     });
 
-    if (res.data.total_results === 0) {
-      setSearchError(true);
-    }
-
     if (res.status === 200) {
-      for (let i = 0; i < res.data.users.length; i++) {
-        if (res.data.users[i].user_trees.length < 1) {
-          delete res.data.users[i];
-        }
-      }
       setSearchResult(res.data);
     } else {
-      console.log("Fetch error");
+      toast.error(res.data?.message ?? "Something went wrong");
     }
     setLoading(false);
   };
 
   const onUserClick = async (value) => {
-    setLoading(true);
-    let params = {
-      id: value.tree,
-    };
-    const res = await api.get("/trees/getsaplingid", {
-      params: params,
-    });
-    setLoading(false);
-
-    navigate("/profile/" + res.data.sapling_id);
+    navigate("/profile/" + value.sapling_id);
   };
 
   if (loading) {
@@ -97,12 +74,6 @@ export const Search = () => {
                 <div className={classes.inputBox}>
                   <SearchBar searchSubmit={handleSearch} />
                 </div>
-                {/* <p className={classes.sep}>OR</p>
-                            <div className={classes.btnGrp}>
-                                <Button variant="contained" color="secondary" size="large" className="s-s-btn" onClick={() => onUserClick()}>See all the people</Button>
-                                <Button variant="contained" color="secondary" size="large" className="s-s-btn">See all the events</Button>
-                                <Button variant="contained" color="secondary" size="large" className="s-s-btn">See all the organization</Button>
-                            </div> */}
               </div>
             </div>
           </div>
@@ -113,9 +84,6 @@ export const Search = () => {
         <div className={classes.box}>
           <AppBar />
           <ToastContainer />
-          {/* {searchError &&
-                    toast.warn("No results found!")
-                } */}
           <img
             alt="bg"
             src={bg}
@@ -152,44 +120,6 @@ export const Search = () => {
                 </div>
               )}
             </div>
-            {/* <div className="s-input-box">
-                            <InputBar type={type} setData={handleData} />
-                            <div className="s-search-info">
-                                <div className="s-searchby">
-                                    Search by:
-                                </div>
-                                <div className="s-search-filter">
-                                    {
-                                        Object.keys(searchChips).map(key =>
-                                            <Chip label={key} mode={searchChips[key]} handleClick={onChipSelect} />
-                                        )
-                                    }
-                                </div>
-                            </div>
-                        </div>
-                        <div className="s-results">
-                            <div className="s-results-for">
-                                Search Results for: {key}
-                            </div>
-                            {
-                                (selectedChips === "Organization" || selectedChips === "All") &&
-                                <div>
-                                    <div className="s-results-ind">
-                                        Organization Found
-                                    </div>
-                                    <OrgList />
-                                </div>
-                            }
-                            {
-                                (selectedChips === "Tree" || selectedChips === "All") &&
-                                <div>
-                                    <div className="s-results-ind">
-                                        Trees Found
-                                    </div>
-                                    <TreeList />
-                                </div>
-                            }
-                        </div> */}
           </div>
         </div>
       );

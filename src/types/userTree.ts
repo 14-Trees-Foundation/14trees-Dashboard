@@ -31,7 +31,7 @@ export type UserTreeCountObj = {
 }
 
 export type AssignTreeRequest = {
-    sapling_id: string,
+    sapling_ids: string[],
     name: string,
     phone: string,
     email: string,

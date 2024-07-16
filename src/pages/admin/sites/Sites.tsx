@@ -1,6 +1,11 @@
 import React, { useEffect, useState } from "react";
 import Box from "@mui/material/Box";
-import { DataGrid, GridToolbar, GridColumns } from "@mui/x-data-grid";
+import {
+  DataGrid,
+  GridToolbar,
+  GridColumns,
+  GridFilterItem,
+} from "@mui/x-data-grid";
 import {
   Button,
   Dialog,
@@ -8,29 +13,34 @@ import {
   DialogContent,
   DialogContentText,
   DialogTitle,
-  Modal,
+  Divider,
   Typography,
 } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import CircularProgress from "@mui/material/CircularProgress";
 import EditSites from "./EditSites";
+import { TableColumnsType } from "antd";
+import { Site } from "../../../types/site";
+import getColumnSearchProps from "../../../components/Filter";
+import TableComponent from "../../../components/Table";
+import { useAppDispatch, useAppSelector } from "../../../redux/store/hooks";
+import * as siteActionCreators from "../../../redux/actions/siteActions";
+import { bindActionCreators } from "@reduxjs/toolkit";
+import { RootState } from "../../../redux/store/store";
+import AddSite from "./AddSite";
+import { ToastContainer } from "react-toastify";
+import { SiteMap } from "./components/SiteMap";
+import { getFormattedDate } from "../../../helpers/utils";
 
-function LoadingOverlay() {
-  return (
-    <div
-      style={{
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        height: "100%",
-      }}>
-      <CircularProgress />
-    </div>
-  );
-}
 
 export const SitesComponent = () => {
+  const dispatch = useAppDispatch();
+  const { getSites, createSite, updateSite, deleteSite } = bindActionCreators(
+    siteActionCreators,
+    dispatch
+  );
+
   const [open, setOpen] = useState(false);
   const handleModalOpen = () => setOpen(true);
   const handleModalClose = () => setOpen(false);
@@ -39,486 +49,296 @@ export const SitesComponent = () => {
   const [selectedEditRow, setSelectedEditRow] = useState<any | null>(null);
   const [editModal, setEditModal] = useState(false);
   const [page, setPage] = useState(0);
+  const [filters, setFilters] = useState<Record<string, GridFilterItem>>({});
 
-  const columns: GridColumns = [
+  const handleSetFilters = (filters: Record<string, GridFilterItem>) => {
+    setPage(0);
+    setFilters(filters);
+  };
+
+  useEffect(() => {
+    getSiteData();
+  }, [page, filters]);
+
+  const getSiteData = async () => {
+    console.log("Filters Object : ", filters);
+    let filtersData = Object.values(filters);
+    console.log("filtered data : ", filtersData);
+    setTimeout(async () => {
+      await getSites(page * 10, 10, filtersData);
+    }, 1000);
+  };
+
+  let sitesList: Site[] = [];
+  const sitesData = useAppSelector((state: RootState) => state.sitesData);
+  console.log("Sites Data : ", sitesData);
+  if (sitesData) {
+    sitesList = Object.values(sitesData.sites);
+    sitesList = sitesList.sort((a, b) => b.id - a.id);
+  }
+
+  const getAllSitesData = async () => {
+    let filtersData = Object.values(filters);
+    console.log("filtersData from getallsite: ", filtersData);
+    setTimeout(async () => {
+      await getSites(0, sitesData.totalSites, filtersData);
+    }, 1000);
+  };
+
+  const handleDeleteSites = (row: Site) => {
+    setOpenDeleteModal(true);
+    setSelectedItem(row);
+  };
+
+  const handleEditSubmit = (formData: Site) => {
+    updateSite(formData);
+    setSelectedEditRow(null);
+  };
+
+  const handleCreateSiteData = (formData: Site) => {
+    createSite(formData);
+  };
+
+  const columns: TableColumnsType<Site> = [
     {
-      field: "action",
-      headerName: "Action",
-      width: 150,
+      dataIndex: "action",
+      key: "action",
+      title: "Actions",
+      width: 180,
       align: "center",
-      headerAlign: "center",
-      renderCell: (params: any) => (
+      render: (value, record, index) => (
         <div
           style={{
             display: "flex",
             justifyContent: "center",
             alignItems: "center",
-          }}>
+          }}
+        >
           <Button
             variant="outlined"
             style={{ margin: "0 5px" }}
             onClick={() => {
-              setSelectedEditRow(params.row);
               setEditModal(true);
-            }}>
+              setSelectedEditRow(record);
+              console.log("Row data to edit : ", record);
+            }}
+          >
             <EditIcon />
           </Button>
           <Button
             variant="outlined"
+            color="error"
             style={{ margin: "0 5px" }}
-            onClick={() => handleDeleteSites(params.row as any)}>
+            onClick={() => handleDeleteSites(record)}
+          >
             <DeleteIcon />
           </Button>
         </div>
       ),
     },
     {
-      field: "id",
-      headerName: "ID",
-      width: 70,
-      align: "center",
-      headerAlign: "center",
-    },
-    {
-      field: "name_marathi",
-      headerName: "Name (Marathi)",
+      dataIndex: "name_marathi",
+      key: "name_marathi",
+      title: "Name (Marathi)",
       width: 220,
-      editable: true,
       align: "center",
-      headerAlign: "center",
+      ...getColumnSearchProps("name_marathi", filters, handleSetFilters),
     },
     {
-      field: "name_english",
-      headerName: "Name (English)",
+      dataIndex: "name_english",
+      key: "name_english",
+      title: "Name (English)",
       width: 220,
-      editable: true,
       align: "center",
-      headerAlign: "center",
+      ...getColumnSearchProps("name_english", filters, handleSetFilters),
     },
     {
-      field: "owner",
-      headerName: "Owner",
+      dataIndex: "owner",
+      key: "owner",
+      title: "Owner",
       width: 180,
-      editable: true,
       align: "center",
-      headerAlign: "center",
+      ...getColumnSearchProps("owner", filters, handleSetFilters),
     },
     {
-      field: "land_type",
-      headerName: "Land Type",
-      width: 150,
-      editable: true,
-      align: "center",
-      headerAlign: "center",
-    },
-    {
-      field: "land_strata",
-      headerName: "Land Strata",
-      width: 150,
-      editable: true,
-      align: "center",
-      headerAlign: "center",
-    },
-    {
-      field: "district",
-      headerName: "District",
-      width: 150,
-      editable: true,
-      align: "center",
-      headerAlign: "center",
-    },
-    {
-      field: "taluka",
-      headerName: "Taluka",
-      width: 150,
-      editable: true,
-      align: "center",
-      headerAlign: "center",
-    },
-    {
-      field: "village",
-      headerName: "Village",
-      width: 150,
-      editable: true,
-      align: "center",
-      headerAlign: "center",
-    },
-    {
-      field: "area_acres",
-      headerName: "Area (Acres)",
-      width: 150,
-      editable: true,
-      align: "center",
-      headerAlign: "center",
-    },
-    {
-      field: "length_km",
-      headerName: "Length (Km)",
-      width: 150,
-      editable: true,
-      align: "center",
-      headerAlign: "center",
-    },
-    {
-      field: "tree_count",
-      headerName: "Tree Count",
-      width: 150,
-      editable: true,
-      align: "center",
-      headerAlign: "center",
-    },
-    {
-      field: "unique_id",
-      headerName: "Unique ID",
+      dataIndex: "maintenance_type",
+      key: "maintenance_type",
+      title: "Service Type",
       width: 180,
-      editable: true,
       align: "center",
-      headerAlign: "center",
+      ...getColumnSearchProps("maintenance_type", filters, handleSetFilters),
+
     },
     {
-      field: "photo_album",
-      headerName: "Photo Album",
+      dataIndex: "land_type",
+      key: "land_type",
+      title: "Land Type",
+      width: 150,
+      align: "center",
+      ...getColumnSearchProps("land_type", filters, handleSetFilters),
+    },
+    {
+      dataIndex: "land_strata",
+      key: "land_strata",
+      title: "Land Strata",
+      width: 150,
+      align: "center",
+      ...getColumnSearchProps("land_strata", filters, handleSetFilters),
+    },
+    {
+      dataIndex: "district",
+      key: "district",
+      title: "District",
+      width: 150,
+      align: "center",
+      ...getColumnSearchProps("district", filters, handleSetFilters),
+    },
+    {
+      dataIndex: "taluka",
+      key: "taluka",
+      title: "Taluka",
+      width: 150,
+      align: "center",
+      ...getColumnSearchProps("taluka", filters, handleSetFilters),
+    },
+    {
+      dataIndex: "village",
+      key: "village",
+      title: "Village",
+      width: 150,
+      align: "center",
+      ...getColumnSearchProps("village", filters, handleSetFilters),
+    },
+    {
+      dataIndex: "area_acres",
+      key: "area_acres",
+      title: "Area (Acres)",
+      width: 150,
+      align: "center",
+    },
+    {
+      dataIndex: "length_km",
+      key: "length_km",
+      title: "Length (Km)",
+      width: 150,
+      align: "center",
+    },
+    {
+      dataIndex: "photo_album",
+      key: "photo_album",
+      title: "Photo Album",
       width: 200,
-      editable: true,
       align: "center",
-      headerAlign: "center",
-      renderCell: (params) => (
-        <a href={params.value} target="_blank" rel="noopener noreferrer">
+      render: (value: any) => (
+        <a href={value} target="_blank" rel="noopener noreferrer">
           View Photos
         </a>
       ),
     },
     {
-      field: "consent_letter",
-      headerName: "Consent Letter",
+      dataIndex: "consent_letter",
+      key: "consent_letter",
+      title: "Consent Letter",
       width: 200,
-      editable: true,
       align: "center",
-      headerAlign: "center",
+      ...getColumnSearchProps("consent_letter", filters, handleSetFilters),
     },
     {
-      field: "grove_type",
-      headerName: "Grove Type",
+      dataIndex: "grove_type",
+      key: "grove_type",
+      title: "Grove Type",
       width: 180,
-      editable: true,
       align: "center",
-      headerAlign: "center",
     },
     {
-      field: "map_to",
-      headerName: "Map To",
-      width: 150,
-      editable: true,
-      align: "center",
-      headerAlign: "center",
-    },
-    {
-      field: "notion_db_pictures",
-      headerName: "Notion DB Pictures",
-      width: 220,
-      editable: true,
-      align: "center",
-      headerAlign: "center",
-    },
-    {
-      field: "split_village_name_1",
-      headerName: "Split Village Name 1",
+      dataIndex: "consent_document_link",
+      key: "consent_document_link",
+      title: "Consent Document Link",
       width: 200,
-      editable: true,
       align: "center",
-      headerAlign: "center",
+      ...getColumnSearchProps("consent_document_link", filters, handleSetFilters),
     },
     {
-      field: "split_village_name_2",
-      headerName: "Split Village Name 2",
+      dataIndex: "google_earth_link",
+      key: "google_earth_link",
+      title: "Google Earth Link",
       width: 200,
-      editable: true,
       align: "center",
-      headerAlign: "center",
+      ...getColumnSearchProps("google_earth_link", filters, handleSetFilters),
     },
     {
-      field: "create_id",
-      headerName: "Create ID",
+      dataIndex: "account",
+      key: "account",
+      title: "Account",
       width: 200,
-      editable: true,
       align: "center",
-      headerAlign: "center",
+      ...getColumnSearchProps("account", filters, handleSetFilters),
     },
     {
-      field: "site_key",
-      headerName: "Site Key",
-      width: 250,
-      editable: true,
-      align: "center",
-      headerAlign: "center",
-    },
-    {
-      field: "site_key_2",
-      headerName: "Site Key 2",
+      dataIndex: "site_data_check",
+      key: "site_data_check",
+      title: "Site Data Check",
       width: 200,
-      editable: true,
       align: "center",
-      headerAlign: "center",
+      ...getColumnSearchProps("site_data_check", filters, handleSetFilters),
     },
     {
-      field: "temp_backup_copy_of_old_site_name_english_marathi",
-      headerName: "Temp Backup Copy of Old Site Name",
-      width: 300,
-      editable: true,
-      align: "center",
-      headerAlign: "center",
-    },
-    {
-      field: "temp_copy_of_old_site_key",
-      headerName: "Temp Copy of Old Site Key",
-      width: 300,
-      editable: true,
-      align: "center",
-      headerAlign: "center",
-    },
-    {
-      field: "temp_old_site_name_in_english",
-      headerName: "Temp Old Site Name (English)",
-      width: 300,
-      editable: true,
-      align: "center",
-      headerAlign: "center",
-    },
-    {
-      field: "temp_old_site_name_in_marathi",
-      headerName: "Temp Old Site Name (Marathi)",
-      width: 300,
-      editable: true,
-      align: "center",
-      headerAlign: "center",
-    },
-    {
-      field: "created_at",
-      headerName: "Created At",
+      dataIndex: "updated_at",
+      key: "updated_at",
+      title: "Updated At",
       width: 200,
-      editable: false,
       align: "center",
-      headerAlign: "center",
-      type: "dateTime",
-    },
-    {
-      field: "updated_at",
-      headerName: "Updated At",
-      width: 200,
-      editable: false,
-      align: "center",
-      headerAlign: "center",
-      type: "dateTime",
+      render: getFormattedDate
     },
   ];
-
-  const data = [
-    {
-      id: 1,
-      name_marathi: "चास कमान धरण ते कडधे रस्ता",
-      name_english: "Chas Kaman Dam To Kadadhe Road",
-      owner: "Gram Panchayat (ग्राम पंचायत)",
-      land_type: "Roadside (रस्ता)",
-      land_strata: "Roadside (रस्ता काठ)",
-      district: "Pune (पुणे)",
-      taluka: "Khed (खेड)",
-      village: "Kadadhe (कडधे)",
-      area_acres: null,
-      length_km: "0.84",
-      tree_count: "124",
-      unique_id: "PUB/KADAD/ROAD/0002",
-      photo_album: "https://photos.app.goo.gl/1FXj7n3SsWMumiNq6",
-      consent_letter: "14T - ग्राम पंचायत पत्र",
-      grove_type: "14 T - Roadside",
-      map_to: "#N/A",
-      notion_db_pictures: "Combined record for Kadadhe in dB Pictures",
-      split_village_name_1: "Kadadhe",
-      split_village_name_2: null,
-      create_id: "PUB/KADAD/ROAD/0002",
-      site_key: "(कडधे)-(रस्ता)-(चास कमान धरण ते कडधे रस्ता)",
-      site_key_2: "(कडधे)-(रस्ता)",
-      temp_backup_copy_of_old_site_name_english_marathi:
-        "Chas Kaman dam te Kadadhe rasta(चास कमान धरण ते कडधे रस्ता) ",
-      temp_copy_of_old_site_key: "(कडधे)-(रस्ता)-(चास कमान धरण ते कडधे रस्ता)",
-      temp_old_site_name_in_english: "Chas Kaman dam te Kadadhe rasta",
-      temp_old_site_name_in_marathi: "चास कमान धरण ते कडधे रस्ता",
-      created_at: "2021-09-16T12:39:00.000Z",
-      updated_at: "2021-09-16T12:39:00.000Z",
-    },
-    {
-      id: 2,
-      name_marathi: "मंदिर रस्ता कडधे",
-      name_english: "Temple Road Kadadhe",
-      owner: "Gram Panchayat (ग्राम पंचायत)",
-      land_type: "Roadside (रस्ता)",
-      land_strata: "Roadside (रस्ता काठ)",
-      district: "Pune (पुणे)",
-      taluka: "Khed (खेड)",
-      village: "Kadadhe (कडधे)",
-      area_acres: null,
-      length_km: "0.2",
-      tree_count: null,
-      unique_id: "PUB/KADAD/ROAD/0003",
-      photo_album: "https://photos.app.goo.gl/1FXj7n3SsWMumiNq6",
-      consent_letter: "14T - ग्राम पंचायत पत्र",
-      grove_type: "14 T - Roadside",
-      map_to: "#N/A",
-      notion_db_pictures: "Combined record for Kadadhe in dB Pictures",
-      split_village_name_1: "Kadadhe",
-      split_village_name_2: null,
-      create_id: "PUB/KADAD/ROAD/0003",
-      site_key: "(कडधे)-(रस्ता)-(मंदिर रस्ता कडधे)",
-      site_key_2: "(कडधे)-(रस्ता)",
-      temp_backup_copy_of_old_site_name_english_marathi:
-        "Mandir rasta Kadadhe(मंदिर रस्ता कडधे) ",
-      temp_copy_of_old_site_key: "(कडधे)-(रस्ता)-(मंदिर रस्ता कडधे)",
-      temp_old_site_name_in_english: "Mandir rasta Kadadhe",
-      temp_old_site_name_in_marathi: "मंदिर रस्ता कडधे",
-      created_at: "2021-09-16T12:44:54.000Z",
-      updated_at: "2021-09-16T12:44:54.000Z",
-    },
-    {
-      id: 3,
-      name_marathi: "खंडोबा मंदिर पटांगण कडधे",
-      name_english: "Khandoba Temple Ground Kadadhe",
-      owner: "NGO (संस्था)",
-      land_type: "Temple (मंदिर, मस्जिद)",
-      land_strata: "Soil (माती)",
-      district: "Pune (पुणे)",
-      taluka: "Khed (खेड)",
-      village: "Kadadhe (कडधे)",
-      area_acres: null,
-      length_km: null,
-      tree_count: null,
-      unique_id: "PUB/KADAD/TEMP/0004",
-      photo_album: "https://photos.app.goo.gl/jjSj9Q2AnKM6GFuUA",
-      consent_letter: "14T - ग्राम पंचायत पत्र",
-      grove_type: "Sacred grove",
-      map_to: "#N/A",
-      notion_db_pictures: "Combined record for Kadadhe in dB Pictures",
-      split_village_name_1: "Kadadhe",
-      split_village_name_2: null,
-      create_id: "PUB/KADAD/TEMP/0004",
-      site_key: "(कडधे)-(मंदिर, मस्जिद)-(खंडोबा मंदिर पटांगण कडधे)",
-      site_key_2: "(कडधे)-(मंदिर, मस्जिद)",
-      temp_backup_copy_of_old_site_name_english_marathi:
-        "Khandoba Mandir Patangan Kadadhe(खंडोबा मंदिर पटांगण कडधे) ",
-      temp_copy_of_old_site_key:
-        "(कडधे)-(मंदिर, मस्जिद)-(खंडोबा मंदिर पटांगण कडधे)",
-      temp_old_site_name_in_english: "Khandoba Mandir Patangan Kadadhe",
-      temp_old_site_name_in_marathi: "खंडोबा मंदिर पटांगण कडधे",
-      created_at: "2021-09-16T12:50:48.000Z",
-      updated_at: "2021-09-16T12:50:48.000Z",
-    },
-    {
-      id: 4,
-      name_marathi: "कान्हेवाडी स्मशानभूमी रस्ता",
-      name_english: "Kanhewadi Smashanbhumi Road",
-      owner: "Gram Panchayat (ग्राम पंचायत)",
-      land_type: "Roadside (रस्ता)",
-      land_strata: "Roadside (रस्ता काठ)",
-      district: "Pune (पुणे)",
-      taluka: "Khed (खेड)",
-      village: "Kanhewadi (कान्हेवाडी)",
-      area_acres: null,
-      length_km: null,
-      tree_count: null,
-      unique_id: "PUB/KANHE/ROAD/0005",
-      photo_album: "https://photos.app.goo.gl/nTzaixgWPihSSkLg9",
-      consent_letter: "14T - ग्राम पंचायत पत्र",
-      grove_type: "14 T - Roadside",
-      map_to: "#N/A",
-      notion_db_pictures: "Combined record for Kanhevadi in dB Pictures",
-      split_village_name_1: "Kanhewadi",
-      split_village_name_2: null,
-      create_id: "PUB/KANHE/ROAD/0005",
-      site_key: "(कान्हेवाडी)-(रस्ता)-(कान्हेवाडी स्मशानभूमी रस्ता)",
-      site_key_2: "(कान्हेवाडी)-(रस्ता)",
-      temp_backup_copy_of_old_site_name_english_marathi:
-        "Kanhevadi Smashanbhumi Rasta(कान्हेवाडी स्मशानभूमी रस्ता) ",
-      temp_copy_of_old_site_key:
-        "(कान्हेवाडी)-(श्मशान भूमी, कब्रिस्तान)-(कान्हेवाडी स्मशानभूमी रस्ता)",
-      temp_old_site_name_in_english: "Kanhevadi Smashanbhumi Rasta",
-      temp_old_site_name_in_marathi: "कान्हेवाडी स्मशानभूमी रस्ता",
-      created_at: "2021-09-16T12:52:17.000Z",
-      updated_at: "2021-09-16T12:52:17.000Z",
-    },
-    {
-      id: 5,
-      name_marathi: "कान्हेवाडी सहाणेवस्ती रस्ता",
-      name_english: "Kanhewadi Sahanevasti Road",
-      owner: "Gram Panchayat (ग्राम पंचायत)",
-      land_type: "Roadside (रस्ता)",
-      land_strata: "Roadside (रस्ता काठ)",
-      district: "Pune (पुणे)",
-      taluka: "Khed (खेड)",
-      village: "Kanhewadi (कान्हेवाडी)",
-      area_acres: null,
-      length_km: "0.415",
-      tree_count: null,
-      unique_id: "PUB/KANHE/ROAD/0006",
-      photo_album: "https://photos.app.goo.gl/nTzaixgWPihSSkLg9",
-      consent_letter: "14T - ग्राम पंचायत पत्र",
-      grove_type: "14 T - Roadside",
-      map_to: "#N/A",
-      notion_db_pictures: "Combined record for Kanhevadi in dB Pictures",
-      split_village_name_1: "Kanhewadi",
-      split_village_name_2: null,
-      create_id: "PUB/KANHE/ROAD/0006",
-      site_key: "(कान्हेवाडी)-(रस्ता)-(कान्हेवाडी सहाणेवस्ती रस्ता)",
-      site_key_2: "(कान्हेवाडी)-(रस्ता)",
-      temp_backup_copy_of_old_site_name_english_marathi:
-        "Kanhevadi Sahanevasti Rasta(कान्हेवाडी सहाणेवस्ती रस्ता) ",
-      temp_copy_of_old_site_key:
-        "(कान्हेवाडी)-(रस्ता)-(कान्हेवाडी सहाणेवस्ती रस्ता)",
-      temp_old_site_name_in_english: "Kanhevadi Sahanevasti Rasta",
-      temp_old_site_name_in_marathi: "कान्हेवाडी सहाणेवस्ती रस्ता",
-      created_at: "2021-09-16T12:55:10.000Z",
-      updated_at: "2021-09-16T12:55:10.000Z",
-    },
-  ];
-
-  const handleDeleteSites = (row: any) => {
-    // console.log("Delete", row);
-    setOpenDeleteModal(true);
-    setSelectedItem(row);
-  };
-
-  const handleEditSubmit = (formData: any) => {
-    console.log(formData);
-  };
 
   return (
     <>
-      <Box sx={{ height: 540, width: "100%" }}>
-        <DataGrid
-          rows={data}
+      <ToastContainer />
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          padding: "4px 12px",
+        }}
+      >
+        <Typography variant="h4" style={{ marginTop: '5px' }}>Sites</Typography>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "flex-end",
+            marginBottom: "5px",
+            marginTop: "5px",
+          }}>
+          <Button variant="contained" color="success" onClick={handleModalOpen}>
+            Add Site
+          </Button>
+          <AddSite
+            open={open}
+            handleClose={handleModalClose}
+            createSite={handleCreateSiteData}
+          />
+        </div>
+      </div>
+      <Divider sx={{ backgroundColor: "black", marginBottom: '15px' }} />
+      <Box sx={{ height: 840, width: "100%" }}>
+        <TableComponent
+          dataSource={sitesList}
           columns={columns}
-          //   getRowId={(row) => row._id}
-          initialState={{
-            pagination: {
-              page: 0,
-              pageSize: 10,
-            },
-          }}
-          onPageChange={(page) => {
-            if (data.length < (page + 1) * 10) setPage(page);
-          }}
-          //   rowCount={data}
-          checkboxSelection
-          disableSelectionOnClick
-          components={{
-            Toolbar: GridToolbar,
-            NoRowsOverlay: LoadingOverlay,
-          }}
+          totalRecords={sitesData.totalSites}
+          fetchAllData={getAllSitesData}
+          setPage={setPage}
         />
+        <SiteMap />
       </Box>
+
+
 
       <Dialog open={openDeleteModal} onClose={() => setOpenDeleteModal(false)}>
         <DialogTitle>Confirm Delete</DialogTitle>
         <DialogContent>
           <DialogContentText>
-            Do you want to delete {selectedItem?.name_english}?
+            Do you want to delete '{selectedItem?.name_english}'?
           </DialogContentText>
         </DialogContent>
         <DialogActions>
@@ -527,14 +347,14 @@ export const SitesComponent = () => {
           </Button>
           <Button
             onClick={() => {
-              console.log("Deleting item...", selectedItem);
-              // if (selectedItem !== null) {
-              //   deleteTreeType(selectedItem);
-              // }
+              if (selectedItem !== null) {
+                deleteSite(selectedItem);
+              }
               setOpenDeleteModal(false);
             }}
             color="primary"
-            autoFocus>
+            autoFocus
+          >
             Yes
           </Button>
         </DialogActions>
@@ -544,7 +364,10 @@ export const SitesComponent = () => {
         <EditSites
           row={selectedEditRow}
           openeditModal={editModal}
-          setEditModal={setEditModal}
+          closeEditModal={() => {
+            setEditModal(false);
+            setSelectedEditRow(null);
+          }}
           editSubmit={handleEditSubmit}
         />
       )}

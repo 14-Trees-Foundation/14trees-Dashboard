@@ -11,21 +11,20 @@ import {
   summary,
   adminNavIndex,
   treeLoggedByDate,
-  plotsList
+  plotsList,
 } from "../../store/adminAtoms";
 import { AdminHome } from "./home/AdminHome";
 import { Trees } from "./tree/Tree";
-import { Forms } from "./Forms/Forms";
 import { Users } from "./users/Users";
 import { Ponds } from "./Ponds/Ponds";
 import { Images } from "./images/Images";
-import { TreeNew } from "./tree/table/Tree";
-import { TreeTypeComponent } from "./treeType/TreeType";
+import { PlantTypeComponent } from "./plantType/PlantType";
 import { PlotComponent } from "./plot/Plot";
 import { OrganizationComponent } from "./organization/Organization";
 import { DonationComponent } from "./donation/Donation";
 import { SitesComponent } from "./sites/Sites";
 import { EventsComponent } from "./events/Events";
+import { VisitsComponent } from "./visits/Visits";
 
 export const Admin = () => {
   const classes = useStyles();
@@ -56,10 +55,10 @@ export const Admin = () => {
         });
         setTreeLoggedByDate(response.data);
       }
-      let plotRes = await Axios.default.get(`/plots`);
-      if (plotRes.status === 200) {
-        setPlotsList(plotRes.data.result);
-      }
+      // let plotRes = await Axios.default.get(`/plots`);
+      // if (plotRes.status === 200) {
+      //   setPlotsList(plotRes.data.result);
+      // }
     } catch (error) {
       if (error.response.status === 500) {
         navigate("/login");
@@ -84,7 +83,7 @@ export const Admin = () => {
       displayName: "Trees",
     },
     {
-      page: TreeTypeComponent,
+      page: PlantTypeComponent,
       displayName: "Plant Types",
     },
     {
@@ -103,26 +102,26 @@ export const Admin = () => {
       page: OrganizationComponent,
       displayName: "Organizations",
     },
-    // {
-    //   page: SitesComponent,
-    //   displayName: "Sites",
-    // },
-    // {
-    //   page: EventsComponent,
-    //   displayName: "Events",
-    // },
-    // {
-    //   page: DonationComponent,
-    //   displayName: "Donations",
-    // },
+    {
+      page: SitesComponent,
+      displayName: "Sites",
+    },
+    {
+      page: EventsComponent,
+      displayName: "Events",
+    },
+    {
+      page: DonationComponent,
+      displayName: "Donations",
+    },
+    {
+      page: VisitsComponent,
+      displayName: "Visits",
+    },
     {
       page: Images,
       displayName: "Images",
     },
-    // {
-    //   page: Forms,
-    //   displayName: "Forms",
-    // },
   ];
 
   const mainBox = () => {

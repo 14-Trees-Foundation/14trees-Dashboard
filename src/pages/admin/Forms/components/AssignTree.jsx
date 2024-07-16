@@ -11,10 +11,11 @@ import { useAppDispatch, useAppSelector } from "../../../../redux/store/hooks";
 import * as userActionCreators from "../../../../redux/actions/userActions";
 
 const intitialFValues = {
+  id: 0,
   name: "",
   email: "",
   contact: "",
-  saplingid: "",
+  sapling_ids: [],
   uploaded: false,
   loading: false,
   backdropOpen: false,
@@ -47,6 +48,7 @@ export const AssignTree = ({ selTrees, onTreesChanged }) => {
         isSet = true;
         setValues({
           ...values,
+          'id': user.id,
           'email': user.email,
           'name': user.name,
           'contact': user.phone ?? '',
@@ -70,14 +72,16 @@ export const AssignTree = ({ selTrees, onTreesChanged }) => {
       backdropOpen: true,
     });
     const params = JSON.stringify({
+      mapped_to: 'user',
+      id: values.id,
       name: values.name,
       email: values.email,
       contact: values.contact,
-      sapling_id: selTrees,
+      sapling_ids: selTrees.split(","),
     });
 
     try {
-      let res = await Axios.post("/mytrees/assign", params, {
+      let res = await Axios.post("/mapping/map", params, {
         headers: {
           "Content-type": "application/json",
         },

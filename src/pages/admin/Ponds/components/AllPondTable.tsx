@@ -1,15 +1,16 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import Box from "@mui/material/Box";
-import { DataGrid, GridToolbar, GridColumns } from "@mui/x-data-grid";
+import { GridFilterItem } from "@mui/x-data-grid";
 import AddPond from "./AddPond";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
+import WaterIcon from '@mui/icons-material/Water';
 import { type Pond } from "../../../../types/pond";
 import * as pondActionCreators from "../../../../redux/actions/pondActions";
+import * as pondWaterLevelUpdateActions from "../../../../redux/actions/pondWaterLevelUpdateActions";
 import { bindActionCreators } from "redux";
 import { useAppDispatch, useAppSelector } from "../../../../redux/store/hooks";
 import { RootState } from "../../../../redux/store/store";
-import CircularProgress from "@mui/material/CircularProgress";
 import {
     Button,
     Dialog,
@@ -17,63 +18,78 @@ import {
     DialogContent,
     DialogContentText,
     DialogTitle,
+    Divider,
+    Typography,
 } from "@mui/material";
 import EditPond from "./EditPond";
 import { getFormattedDate } from "../../../../helpers/utils";
+import { TableColumnsType } from "antd";
+import TableComponent from "../../../../components/Table";
+import getColumnSearchProps, { getColumnSelectedItemFilter } from "../../../../components/Filter";
 
-function LoadingOverlay() {
+function getCapacity(pond: any) {
     return (
-        <div
-            style={{
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-                height: "100%",
-            }}>
-            <CircularProgress />
-        </div>
+      parseInt(pond.depth_ft) *
+      parseInt(pond.width_ft) *
+      parseInt(pond.length_ft)
     );
 }
 
-function getCapacity(params: any) {
-    return (
-      parseInt(params.row.depthFt) *
-      parseInt(params.row.widthFt) *
-      parseInt(params.row.lengthFt)
-    );
+interface PondComponentInputProps {
+    setSelectedPond: React.Dispatch<React.SetStateAction<Pond | null>>
 }
 
-export const PondComponent = () => {
+export const PondComponent = ({ setSelectedPond }: PondComponentInputProps) => {
     const dispatch = useAppDispatch();
-    const { getPonds, createPond, updatePond, deletePond, getPondHistory } = bindActionCreators(
+    const { getPonds, createPond, updatePond, deletePond } = bindActionCreators(
         pondActionCreators,
+        dispatch
+    );
+    const { getPondWaterLevelUpdates } = bindActionCreators(
+        pondWaterLevelUpdateActions,
         dispatch
     );
 
     const [open, setOpen] = useState(false);
+    const [loading, setLoading] = useState(false);
     const handleModalOpen = () => setOpen(true);
     const handleModalClose = () => setOpen(false);
     const [openDeleteModal, setOpenDeleteModal] = useState(false);
     const [selectedItem, setSelectedItem] = useState<Pond | null>(null);
-    const [selectedEditRow, setSelectedEditRow] = useState<RowType | null>(null);
+    const [selectedEditRow, setSelectedEditRow] = useState<Pond | null>(null);
     const [editModal, setEditModal] = useState(false);
     const [page, setPage] = useState(0);
-    const [nameFilter, setNameFilter] = useState('');
+    const [filters, setFilters] = useState<Record<string, GridFilterItem>>({});
 
-    const getPondHistoryByName = async (name: string) => {
+    const handleSetFilters = (filters: Record<string, GridFilterItem>) => {
+        setPage(0);
+        setFilters(filters);
+    }
+
+    const getPondWaterLevelUpdatesData = async (id: number) => {
         setTimeout(async () => {
-            await getPondHistory(name);
+            await getPondWaterLevelUpdates(id, 0, -1);
         }, 1000);
     };
 
-    const columns: GridColumns = [
+    const handlePondWaterLevelFetch = (record: Pond) => {
+        setSelectedPond(record);
+        getPondWaterLevelUpdatesData(record.id);
+    };
+
+    const typesList = [
+        "Storage",
+        "Percolation",
+    ]
+
+    const columns: TableColumnsType<Pond> = [
         {
-            field: "action",
-            headerName: "Action",
-            width: 150,
+            dataIndex: "action",
+            key: "action",
+            title: "Actions",
+            width: 250,
             align: "center",
-            headerAlign: "center",
-            renderCell: (params: any) => (
+            render: (value, record, index )=> (
                 <div
                     style={{
                         display: "flex",
@@ -81,155 +97,139 @@ export const PondComponent = () => {
                         alignItems: "center",
                     }}>
                     <Button
-                        variant="outlined"
                         style={{ margin: "0 5px" }}
+                        variant="outlined"
+                        color="success"
+                        size="small"
                         onClick={() => {
-                            setSelectedEditRow(params.row);
+                            handlePondWaterLevelFetch(record);
+                        }}>
+                        <WaterIcon />
+                    </Button>
+                    <Button
+                        style={{ margin: "0 5px" }}
+                        variant="outlined"
+                        size="small"
+                        onClick={() => {
                             setEditModal(true);
+                            setSelectedEditRow(record);
                         }}>
                         <EditIcon />
                     </Button>
                     <Button
-                        variant="outlined"
                         style={{ margin: "0 5px" }}
-                        onClick={() => handleDelete(params.row as Pond)}>
+                        variant="outlined"
+                        size="small"
+                        color="error"
+                        onClick={() => handleDelete(record)}>
                         <DeleteIcon />
                     </Button>
                 </div>
             ),
-        },
-        // {
-        //     field: "_id",
-        //     headerName: "ID",
-        //     width: 90,
-        //     align: "center",
-        //     headerAlign: "center",
-        // },
+        },  
         {
-            field: "name",
-            headerName: "Name",
-            width: 250,
-            align: "center",
-            headerAlign: "center",
-            renderCell: (params: any) => (
-                <div
-                  style={{
-                    display: "flex",
-                    justifyContent: "center",
-                    alignItems: "center",
-                  }}>
-                  <Button
-                    onClick={() => {
-                      getPondHistoryByName(params.row.name);
-                    }}
-                  >
-                    {params.row.name}
-                  </Button>
-                </div>
-              ),
+          dataIndex: "name",
+          key: "name",
+          title: "Name",
+          align: "center",
+          width: 300,
+          ...getColumnSearchProps('name', filters, handleSetFilters)
         },
         {
-            field: "type",
-            headerName: "Type",
+            dataIndex: "type",
+            key: "type",
+            title: "Type",
             width: 150,
             align: "center",
-            headerAlign: "center",
+            ...getColumnSelectedItemFilter({ dataIndex: 'type', filters, handleSetFilters, options: typesList }),
         },
         {
-            field: "boundaries.type",
-            headerName: "Boundaries Type",
-            width: 150,
+            dataIndex: "site_name",
+            key: "site_name",
+            title: "Site Name",
+            width: 350,
             align: "center",
-            headerAlign: "center",
+            ...getColumnSearchProps( 'site_name', filters, handleSetFilters ),
         },
         {
-            field: "boundaries.coordinates",
-            headerName: "Boundaries Coordinates",
+            dataIndex: "length_ft",
+            key: "length_ft",
+            title: "Length (Ft)",
             width: 150,
             align: "center",
-            headerAlign: "center",
         },
         {
-            field: "lengthFt",
-            headerName: "LengthFT",
+            dataIndex: "width_ft",
+            key: "width_ft",
+            title: "Width (Ft)",
             width: 150,
             align: "center",
-            headerAlign: "center",
         },
         {
-            field: "widthFt",
-            headerName: "WidthFT",
+            dataIndex: "depth_ft",
+            key: "depth_ft",
+            title: "Depth (Ft)",
             width: 150,
             align: "center",
-            headerAlign: "center",
         },
         {
-            field: "depthFt",
-            headerName: "DeathFT",
+            dataIndex: "capacity",
+            key: "capacity",
+            title: "Pond Capacity",
             width: 150,
             align: "center",
-            headerAlign: "center",
+            render: (value, record, index) => getCapacity(record),
         },
         {
-            field: "capacity",
-            headerName: "Pond Capacity",
+            dataIndex: "created_at",
+            key: "created_at",
+            title: "Created At",
             width: 150,
             align: "center",
-            headerAlign: "center",
-            valueGetter: getCapacity,
-        },
-        {
-            field: "date_added",
-            headerName: "Date Added",
-            width: 150,
-            align: "center",
-            headerAlign: "center",
-            valueGetter: (params) => getFormattedDate(params.row?.date_added),
+            render: getFormattedDate,
         },
         
-    ];
+      ];
 
     useEffect(() => {
         getPondData();
-    }, [page, nameFilter]);
+    }, [page, filters]);
 
     const getPondData = async () => {
+        let filtersData = Object.values(filters);
+        setLoading(true);
         setTimeout(async () => {
-            await getPonds(page*10, 10, nameFilter);
+            await getPonds(page*10, 10, filtersData);
+            setLoading(false);
         }, 1000);
     };
 
+    
     let pondsList: Pond[] = [];
     const pondsData = useAppSelector((state: RootState) => state.pondsData);
     if (pondsData) {
         pondsList = Object.values(pondsData.ponds);
+        pondsList = pondsList.sort((a, b) => b.id - a.id)
     }
 
-    const flattenedRows = pondsList.map((row) => ({
-        ...row,
-        "boundaries.type": row.boundaries.type,
-        "boundaries.coordinates": row.boundaries.coordinates,
-    }));
-
-    type RowType = {
-        id: string;
-        name: string;
+    const getAllPondsData = async () => {
+        let filtersData = Object.values(filters);
+        setTimeout(async () => {
+            await getPonds(0, pondsData.totalPonds, filtersData);
+        }, 1000);
     };
 
     const handleDelete = (row: Pond) => {
-        console.log("Delete", row);
-        console.log(row);
         setOpenDeleteModal(true);
         setSelectedItem(row);
     };
 
     const handleEditSubmit = (formData: Pond) => {
-        console.log(formData);
         updatePond(formData);
+        setSelectedEditRow(null);
     };
 
     const handleCreatePondData = (formData: Pond) => {
-        // console.log(formData);
         createPond(formData);
     };
 
@@ -238,39 +238,41 @@ export const PondComponent = () => {
             <div
                 style={{
                     display: "flex",
-                    justifyContent: "flex-end",
-                    marginBottom: "20px",
-                }}>
-                <Button variant="contained" style={{ backgroundColor: 'blue' }} onClick={handleModalOpen}>
-                    Add Pond
-                </Button>
-                <AddPond
-                    open={open}
-                    handleClose={handleModalClose}
-                    createPondData={handleCreatePondData}
-                />
+                    justifyContent: "space-between",
+                    padding: "4px 12px",
+                }}
+            >
+                <Typography variant="h4" style={{ marginTop: '5px' }}>Ponds</Typography>
+                <div
+                    style={{
+                        display: "flex",
+                        justifyContent: "flex-end",
+                        marginBottom: "5px",
+                        marginTop: "5px",
+                    }}>
+                    <Button 
+                        variant="contained" 
+                        color="success" 
+                        onClick={handleModalOpen}>
+                        Add Pond
+                    </Button>
+                    <AddPond
+                        open={open}
+                        handleClose={handleModalClose}
+                        createPondData={handleCreatePondData}
+                    />
+                </div>
             </div>
-            <Box sx={{ height: 540, width: "100%" }}>
-                <DataGrid
-                    rows={flattenedRows}
+            <Divider sx={{ backgroundColor: "black", marginBottom: '15px' }} />
+            
+            <Box sx={{ height: 840, width: "100%" }}>
+                <TableComponent
+                    loading={loading}
+                    dataSource={pondsList}
                     columns={columns}
-                    getRowId={(row) => row._id}
-                    initialState={{
-                        pagination: {
-                          page: 0,
-                          pageSize: 10,
-                        },
-                      }}
-                    onPageChange={(page) => { if((pondsList.length / 10) === page) setPage(page); }}
-                    rowCount={pondsData.totalPonds}
-                    filterMode="server"
-                    onFilterModelChange={(model) => { if (model.items[0]?.columnField === "name") setNameFilter(model.items[0].value) }}
-                    checkboxSelection
-                    disableSelectionOnClick
-                    components={{
-                        Toolbar: GridToolbar,
-                        NoRowsOverlay: LoadingOverlay,
-                    }}
+                    totalRecords={pondsData.totalPonds}
+                    fetchAllData={getAllPondsData}
+                    setPage={setPage}
                 />
             </Box>
 
@@ -303,8 +305,11 @@ export const PondComponent = () => {
             {selectedEditRow && (
                 <EditPond
                     row={selectedEditRow}
-                    openeditModal={editModal}
-                    setEditModal={setEditModal}
+                    openEditModal={editModal}
+                    handleClose={() => {
+                        setEditModal(false);
+                        setSelectedEditRow(null);
+                    }}
                     editSubmit={handleEditSubmit}
                 />
             )}

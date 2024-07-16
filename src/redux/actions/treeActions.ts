@@ -1,7 +1,8 @@
 import ApiClient from "../../api/apiClient/apiClient";
 import treeActionTypes from "../actionTypes/treeActionTypes";
-import { PaginationTreeResponse, Tree } from "../../types/tree";
-import { off } from "process";
+import { Tree } from "../../types/tree";
+import { PaginatedResponse } from "../../types/pagination";
+import { toast } from "react-toastify";
 
 export const getTrees = (offset: number, limit: number, filters?: any) => {
     const apiClient = new ApiClient()
@@ -10,10 +11,10 @@ export const getTrees = (offset: number, limit: number, filters?: any) => {
             type: treeActionTypes.GET_TREES_REQUESTED,
         });
         apiClient.getTrees(offset, limit, filters).then(
-            (value: PaginationTreeResponse) => {
+            (value: PaginatedResponse<Tree>) => {
                 for (let i = 0; i < value.results.length; i++) {
-                    if (value.results[i]?._id) {
-                        value.results[i].key = value.results[i]._id
+                    if (value.results[i]?.id) {
+                        value.results[i].key = value.results[i].id
                     }
                 }
                 dispatch({
@@ -27,6 +28,7 @@ export const getTrees = (offset: number, limit: number, filters?: any) => {
                     type: treeActionTypes.GET_TREES_FAILED,
                     payload: error
                 });
+                toast.error(`Failed to fetch trees!`)
             }
         )
     }
@@ -67,12 +69,14 @@ export const updateTree = (record: Tree, file?: Blob) => {
                     type: treeActionTypes.UPDATE_TREE_SUCCEEDED,
                     payload: value,
                 });
+                toast.success(`Successfully updated tree!`)
             },
             (error: any) => {
                 console.error(error);
                 dispatch({
                     type: treeActionTypes.UPDATE_TREE_FAILED,
                 });
+                toast.error(`Failed to update tree!`)
             }
         )
     };
@@ -86,17 +90,19 @@ export const deleteTree = (record: Tree) => {
             type: treeActionTypes.DELETE_TREE_REQUESTED,
         });
         apiClient.deleteTree(record).then(
-            (id: string) => {
+            (id: number) => {
                 dispatch({
                     type: treeActionTypes.DELETE_TREE_SUCCEEDED,
                     payload: id,
                 });
+                toast.success(`Successfully deleted tree!`)
             },
             (error: any) => {
                 console.error(error);
                 dispatch({
                     type: treeActionTypes.DELETE_TREE_FAILED,
                 });
+                toast.error(`Failed to delete tree!`)
             }
         )
     };

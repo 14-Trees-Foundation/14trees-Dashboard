@@ -49,10 +49,10 @@ function EditUser({ row, openeditModal, setEditModal, editSubmit }) {
             margin="dense"
           />
           <TextField
-            name="dob"
+            name="birth_date"
             label="Date of Birth"
             type="date"
-            value={formData.dob ? formData.dob.substring(0, 10): ''}
+            value={formData.birth_date ? formData.birth_date.substring(0, 10): ''}
             InputLabelProps={{ shrink: true }}
             onChange={handleChange}
             fullWidth
@@ -74,12 +74,12 @@ function EditUser({ row, openeditModal, setEditModal, editSubmit }) {
             marginBottom: "15px",
           }}>
           <Button
-            variant="contained"
+            variant="outlined"
             onClick={() => setEditModal(false)}
-            color="primary">
+            color="error">
             Cancel
           </Button>
-          <Button variant="contained" type="submit" color="primary">
+          <Button variant="contained" type="submit" color="success">
             Save
           </Button>
         </DialogActions>
