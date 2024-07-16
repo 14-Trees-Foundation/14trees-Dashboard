@@ -54,14 +54,18 @@ export const Login = () => {
       );
       if (res.status === 201 && res.data.user.role) {
         localStorage.setItem("loginInfo", JSON.stringify(response));
+        let permissions = [];
+        if (response.user.roles && response.user.roles.includes("admin")) {
+          permissions = ["all"]
+        }
         localStorage.setItem(
           "permissions",
-          JSON.stringify(res.data.user.permissions)
+          JSON.stringify(permissions)
         );
         localStorage.setItem("token", JSON.stringify(res.data.token));
         auth.signin(
           res.data.user.name,
-          res.data.user.permissions,
+          permissions,
           response.tokenId,
           () => {
             navigate(from, { replace: true });
