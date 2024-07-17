@@ -1,19 +1,18 @@
 import { useEffect, useState, useRef } from "react";
 import {
-    Paper,
     Typography,
-    Autocomplete,
-    TextField,
     Box,
 } from "@mui/material";
 
 import * as plotActionCreators from "../../../../redux/actions/plotActions";
 import { bindActionCreators } from "redux";
 import { useAppDispatch, useAppSelector } from "../../../../redux/store/hooks";
+import { AutocompleteWithPagination } from "../../../../components/AutoComplete";
 
 function TreeMap({ selectedPlot, setSelectedPlot }) {
     const isFirstRender = useRef(true);
     const [page, setPage] = useState(0);
+    const [loading, setLoading] = useState(false);
     const [plotName, setPlotName] = useState('');
 
     const dispatch = useAppDispatch();
@@ -25,13 +24,17 @@ function TreeMap({ selectedPlot, setSelectedPlot }) {
             isFirstRender.current = false;
             return;
         }
+        if (loading) return;
         getPlotsData();
     }, [page, plotName]);
 
     const getPlotsData = async () => {
         const nameFilter = { columnField: "name", value: plotName, operatorValue: "contains" }
+        const filters = plotName.length >= 3 ? [] : [nameFilter]
         setTimeout(async () => {
-            await getPlots(page * 10, 10, [nameFilter]);
+            setLoading(true);
+            await getPlots(page * 10, 10, filters);
+            setLoading(false);
         }, 1000);
     };
 
@@ -39,20 +42,8 @@ function TreeMap({ selectedPlot, setSelectedPlot }) {
     const plotsData = useAppSelector((state) => state.plotsData);
     if (plotsData) {
         plotsList = Object.values(plotsData.plots);
+        plotsList = plotsList.sort((a, b) => b.id - a.id)
     }
-
-    const CustomPaper = (props) => {
-        return (
-            <Paper
-                style={{
-                    borderRadius: "20px",
-                    boxShadow: "4px 4px 6px #98a49c, -4px -4px 6px #cadace",
-                    background: "#b1bfb5",
-                }}
-                {...props}
-            />
-        );
-    };
 
     return (
         <Box
@@ -84,46 +75,24 @@ function TreeMap({ selectedPlot, setSelectedPlot }) {
                 <Typography variant="h5" gutterBottom sx={{ pb: 2 }}>
                     Select a plot
                 </Typography>
-                <Autocomplete
-                    sx={{
-                        mt: 1,
-                        width: "75%",
-                        "& .MuiOutlinedInput-notchedOutline": {
-                            border: "none",
-                            borderRadius: "25px",
-                            boxShadow: "4px 4px 8px #98a49c, -4px -4px 8px #cadace",
-                        },
-                    }}
-                    PaperComponent={CustomPaper}
-                    id="plots"
+                <AutocompleteWithPagination 
+                    size="medium"
+                    loading={loading}
                     options={plotsList}
-                    autoHighlight
                     getOptionLabel={(option) => option.name}
                     onChange={(event, newValue) => {
                         if (newValue !== null) setSelectedPlot(newValue)
                     }}
-                    renderInput={(params) => (
-                        <TextField
-                            {...params}
-                            onChange={(event) => {
-                                const { value } = event.target;
-                                setPage(0);
-                                setPlotName(value);
-                            }}
-                            label="Select a plot"
-                            variant="outlined"
-                        />
-                    )}
-                    ListboxProps={{
-                        onScroll: (event) => {
-                            const listboxNode = event.target;
-                            if (Math.ceil(listboxNode.scrollTop) + listboxNode.clientHeight === listboxNode.scrollHeight) {
-                                setPage(page + 1);
-                            }
-                        }
+                    onInputChange={(event) => {
+                        const { value } = event.target;
+                        setPage(0);
+                        setPlotName(value);
                     }}
+                    setPage={setPage}
+                    fullWidth
+                    label="Select a plot"
+                    value={selectedPlot}
                 />
-
                 <div
                     style={{
                         width: "100%",

@@ -41,8 +41,8 @@ const AddPlot = ({ open, handleClose, createPlot, tags }) => {
   const [formData, setFormData] = useState({
     name: "",
     plot_id: "",
-    site_id: "",
-    category: "",
+    site_id: null,
+    category: null,
     district: "",
     gat: "",
     land_type: "",
@@ -151,6 +151,7 @@ const AddPlot = ({ open, handleClose, createPlot, tags }) => {
             <Grid container rowSpacing={2} columnSpacing={1}>
               <Grid item xs={12}>
                 <TextField
+                  required
                   name="name"
                   label="Name"
                   value={formData.name}
@@ -160,6 +161,7 @@ const AddPlot = ({ open, handleClose, createPlot, tags }) => {
               </Grid>
               <Grid item xs={12}>
                 <TextField
+                  required
                   name="plot_id"
                   label="Plot ID"
                   value={formData.plot_id}
@@ -203,7 +205,7 @@ const AddPlot = ({ open, handleClose, createPlot, tags }) => {
                   options={categoriesList}
                   value={formData.category}
                   renderInput={(params) => (
-                    <TextField {...params} label="Category" />
+                    <TextField {...params} label="Category" required />
                   )}
                   onChange={(event, value) => {
                     if (categoriesList.includes(value))

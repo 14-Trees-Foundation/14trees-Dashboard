@@ -77,6 +77,7 @@ function EditPlot({ row, openeditModal, handleCloseModal, editSubmit, tags }) {
       <form onSubmit={handleEditSubmit}>
         <DialogContent>
           <TextField
+            required
             name="name"
             label="Name"
             value={formData.name}
@@ -85,6 +86,7 @@ function EditPlot({ row, openeditModal, handleCloseModal, editSubmit, tags }) {
             margin="dense"
           />
           <TextField
+            required
             name="plot_id"
             label="Plot ID"
             value={formData.plot_id}
@@ -96,7 +98,7 @@ function EditPlot({ row, openeditModal, handleCloseModal, editSubmit, tags }) {
             name="site"
             label="Select a Site"
             options={sitesList}
-            getOptionLabel={(option) => option.name_english}
+            getOptionLabel={(option) => option?.name_english || ''}
             isOptionEqualToValue={(option, value) => {
               return option.id === value.id;
             }}
@@ -126,7 +128,7 @@ function EditPlot({ row, openeditModal, handleCloseModal, editSubmit, tags }) {
             options={categoriesList}
             value={formData.category}
             renderInput={(params) => (
-              <TextField {...params} margin="dense" label="Category" />
+              <TextField {...params} margin="dense" label="Category" required />
             )}
             onChange={(event, value) => {
               if (categoriesList.includes(value))
