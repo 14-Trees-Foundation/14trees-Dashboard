@@ -1,27 +1,25 @@
 import { useEffect,useRef,useState } from "react";
 import { ToastContainer, toast } from "react-toastify";
 import {
-  Paper,
   Typography,
-  Autocomplete,
-  TextField,
   Chip,
   Box,
 } from "@mui/material";
 
-import Axios from "../../../../api/local";
 import { Spinner } from "../../../../components/Spinner";
 import * as plotActionCreators from "../../../../redux/actions/plotActions";
 import * as treeActionCreators from "../../../../redux/actions/treeActions";
 import { bindActionCreators } from "redux";
 import { useAppDispatch, useAppSelector } from "../../../../redux/store/hooks";
+import { AutocompleteWithPagination } from "../../../../components/AutoComplete";
 
 export const TreeList = ({ onTreeSelect }) => {  
   const isFirstRender = useRef(true);
   const [page, setPage] = useState(0);
   const [plotName, setPlotName] = useState('');
-  const [selectedPlot, setSelectedPlot] = useState("");
+  const [selectedPlot, setSelectedPlot] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [plotLoading, setPlotLoading] = useState(false);
   // const [assigned, setAssigned] = useState([]);
   // const [unassigned, setUnassigned] = useState([]);
   
@@ -36,12 +34,19 @@ export const TreeList = ({ onTreeSelect }) => {
       isFirstRender.current = false;
       return;
     }
+    if (plotLoading) return;
     getPlotsData();
   }, [page, plotName]);
 
   const getPlotsData = async () => {
     setTimeout(async () => {
-      await getPlots(page * 10, 10, plotName);
+      let filters = [];
+      if (plotName.length >= 3) {
+        filters = [{ columnField: 'name', operatorValue: 'contains', value: plotName }]
+      } 
+      setPlotLoading(true);
+      await getPlots(page * 10, 10, filters);
+      setPlotLoading(false);
     }, 1000);
   };
 
@@ -49,6 +54,7 @@ export const TreeList = ({ onTreeSelect }) => {
   const plotsData = useAppSelector((state) => state.plotsData);
   if (plotsData) {
     plotsList = Object.values(plotsData.plots);
+    plotsList = plotsList.sort((a, b) => b.id - a.id)
   }
 
   let treesList = [];
@@ -60,21 +66,8 @@ export const TreeList = ({ onTreeSelect }) => {
   let unMapped = treesList.filter((x) => (!x.mapped_to_user && !x.mapped_to_group)).sort(function (a, b) { return a.sapling_id - b.sapling_id; });
   let mapped = treesList.filter((x) => (x.mapped_to_user || x.mapped_to_group)).sort(function (a, b) { return a.sapling_id - b.sapling_id; });
 
-  const CustomPaper = (props) => {
-    return (
-      <Paper
-        style={{
-          borderRadius: "20px",
-          boxShadow: "4px 4px 6px #98a49c, -4px -4px 6px #cadace",
-          background: "#b1bfb5",
-        }}
-        {...props}
-      />
-    );
-  };
-
   const fetchAndShowTreeList = async (value) => {
-    setSelectedPlot(value.name);
+    setSelectedPlot(value);
     setTimeout(async () => {
       setLoading(true);
       await getTrees(0, -1, [ { columnField: "plot_id", value: value.id, operatorField: "equals" } ])
@@ -116,50 +109,29 @@ export const TreeList = ({ onTreeSelect }) => {
           <Typography variant="h5" gutterBottom sx={{ pb: 2 }}>
             Select Plot and Select tree from UnAssigned Trees
           </Typography>
-          <Autocomplete
-            sx={{
-              mt: 1,
-              width: "75%",
-              "& .MuiOutlinedInput-notchedOutline": {
-                border: "none",
-                borderRadius: "25px",
-                boxShadow: "4px 4px 8px #98a49c, -4px -4px 8px #cadace",
-              },
-            }}
-            PaperComponent={CustomPaper}
-            id="plots"
+          <AutocompleteWithPagination 
+            size="medium"
+            loading={plotLoading}
             options={plotsList}
-            autoHighlight
             getOptionLabel={(option) => option.name}
             onChange={(event, newValue) => {
-              fetchAndShowTreeList(newValue);
+                if (newValue !== null) fetchAndShowTreeList(newValue);
             }}
-            renderInput={(params) => (
-              <TextField
-                {...params}
-                onChange={(event) => {
-                  const { value } = event.target;
-                  setPage(0);
-                  setPlotName(value);
-                }} 
-                label="Select plot to fetch tree list"
-                variant="outlined"
-              />
-            )}
-            ListboxProps={{
-              onScroll: (event) => {
-                const listboxNode = event.target;
-                if (Math.ceil(listboxNode.scrollTop) + listboxNode.clientHeight === listboxNode.scrollHeight) {
-                  setPage(page + 1);
-                }
-              }
+            onInputChange={(event) => {
+                const { value } = event.target;
+                setPage(0);
+                setPlotName(value);
             }}
+            setPage={setPage}
+            fullWidth
+            label="Select a plot"
+            value={selectedPlot}
           />
           <ToastContainer />
           <div style={{ paddingTop: "16px", paddingLeft: "8px" }}>
             Plot:{" "}
             <span style={{ color: "#C72542", fontStyle: "italic" }}>
-              {selectedPlot}
+              {selectedPlot?.name}
             </span>
           </div>
           <div style={{ paddingTop: "4px", paddingLeft: "8px" }}>
