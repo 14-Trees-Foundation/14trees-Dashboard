@@ -26,7 +26,7 @@ const AssignTreeModal = ({ open, handleClose, onSubmit, searchUsers }) => {
         plantation_type: '',
         gifted_by: '',
         planted_by: '',
-        desc: '',
+        description: '',
     });
 
     let usersList = [];
@@ -123,7 +123,7 @@ const AssignTreeModal = ({ open, handleClose, onSubmit, searchUsers }) => {
                                 <TextField name="planted_by" label="Planted By" value={formData.planted_by} onChange={handleChange} fullWidth/>
                             </Grid>
                             <Grid item xs={12}>
-                                <TextField name="desc" label="Desc" value={formData.desc} onChange={handleChange} fullWidth/>
+                                <TextField name="description" label="Description" value={formData.description} onChange={handleChange} fullWidth/>
                             </Grid>
                             <Grid item xs={12} sx={{display:'flex', justifyContent:'center', }}>
                                 <Button type="submit">Submit</Button>
