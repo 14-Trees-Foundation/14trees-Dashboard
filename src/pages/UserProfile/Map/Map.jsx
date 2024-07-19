@@ -59,10 +59,10 @@ export const Map = () => {
   const trees = userinfo.user_trees;
 
   let boundaries = [];
-  let pathObj = currTree.boundaries.coordinates[0].map(
+  let pathObj = currTree.boundaries?.coordinates[0]?.map(
     ([lat, lng]) => ({ lat, lng })
   );
-  boundaries.push(pathObj);
+  pathObj && boundaries.push(pathObj);
 
   let { isLoaded } = useJsApiLoader({
     id: "google-map-script",
