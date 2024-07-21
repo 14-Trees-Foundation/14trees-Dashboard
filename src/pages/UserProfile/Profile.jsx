@@ -44,7 +44,7 @@ export const Profile = ({ saplingId }) => {
                 variant="contained"
                 onClick={() => {
                   window.open(
-                    "https://14trees.org/projects/reforestation-vetale/"
+                    "https://docs.google.com/forms/d/e/1FAIpQLSfumyti7x9f26BPvUb0FDYzI2nnuEl5HA63EO8svO3DG2plXg/viewform"
                   );
                 }}
               >
