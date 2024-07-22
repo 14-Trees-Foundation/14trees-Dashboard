@@ -17,7 +17,7 @@ import {
 } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
-import { type Tree } from "../../../../types/tree";
+import { MapTreesUsingSaplingIdsRequest, type Tree } from "../../../../types/tree";
 import * as treeActionCreators from "../../../../redux/actions/treeActions";
 import * as userTreesActionCreators from "../../../../redux/actions/userTreeActions";
 import * as userActionCreators from "../../../../redux/actions/userActions";
@@ -263,7 +263,15 @@ export const TreeNew = () => {
     }
 
     const handleMapTrees = (formData: any) => {
-        mapTrees('user', saplingIds, formData.id);
+        const req: MapTreesUsingSaplingIdsRequest = {
+            mapped_to: 'user',
+            id: formData.id,
+            sapling_ids: saplingIds,
+            name: formData.name,
+            email: formData.email,
+            phone: formData.phone
+        }
+        mapTrees(req);
         setSaplingIds([]);
         setDisabledMapUnMapButton(true);
         setDisabledAUButton(true);
