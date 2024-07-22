@@ -76,7 +76,7 @@ export const AssignTree = ({ selTrees, onTreesChanged }) => {
       id: values.id,
       name: values.name,
       email: values.email,
-      contact: values.contact,
+      phone: values.contact,
       sapling_ids: selTrees.split(","),
     });
 

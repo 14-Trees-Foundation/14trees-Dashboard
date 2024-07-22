@@ -256,6 +256,7 @@ const AssignTreeModal = ({ open, handleClose, onSubmit, searchUsers }) => {
                                     options={usersList}
                                     name='sponsored_by_user'
                                     onChange={(event, value) => { handleAutocompleteChange('sponsored_by_user', value) }}
+                                    onInputChange={handleSearch}
                                     getOptionLabel={(option) => option.email ? `${option.name} (${option.email})` : option}
                                     renderInput={(params) => (
                                         <TextField {...params} label="Donor" variant="outlined" />
@@ -271,7 +272,7 @@ const AssignTreeModal = ({ open, handleClose, onSubmit, searchUsers }) => {
                                     onChange={(event, value) => { handleAutocompleteChange('plantation_type', value) }}
                                     getOptionLabel={(option) => option.value}
                                     renderInput={(params) => (
-                                        <TextField {...params} label="Planted Type" variant="outlined" />
+                                        <TextField {...params} required label="Planted Type" variant="outlined" />
                                     )}>
                                 </Autocomplete>
                                 {/* <TextField name="plantation_type" label="Planted Type" value={formData.plantation_type} onChange={handleChange} fullWidth/> */}

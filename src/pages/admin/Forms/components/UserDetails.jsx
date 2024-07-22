@@ -81,7 +81,7 @@ export const UserDetails = ({ selectedPlot }) => {
       id: formData.id,
       name: formData.name,
       email: formData.email,
-      contact: formData.contact,
+      phone: formData.contact,
       plot_id: selectedPlot.id,
       count: treeCount,
     });

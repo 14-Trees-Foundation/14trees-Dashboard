@@ -2,6 +2,7 @@ import ApiClient from "../../api/apiClient/apiClient";
 import userTreeActionTypes from "../actionTypes/userTreeActionTypes";
 import { AssignTreeRequest, UserTree, UserTreeCountPaginationResponse } from "../../types/userTree";
 import { toast } from "react-toastify";
+import { MapTreesUsingPlotIdRequest, MapTreesUsingSaplingIdsRequest } from "../../types/tree";
 
 export const getUserTrees = () => {
     const apiClient = new ApiClient()
@@ -152,13 +153,13 @@ export const unMapTrees = (saplingIds: string[]) => {
     };
 }
 
-export const mapTrees = (mapped_to: 'user' | 'group', saplingIds: string[], id: number) => {
+export const mapTrees = (request: MapTreesUsingSaplingIdsRequest) => {
     const apiClient = new ApiClient();
     return (dispatch: any) => {
         dispatch({
             type: userTreeActionTypes.MAP_USER_TREES_REQUESTED,
         });
-        apiClient.mapTrees(mapped_to, saplingIds, id).then(
+        apiClient.mapTrees(request).then(
             () => {
                 toast.success("Mapped trees successfully!");
                 dispatch({
@@ -177,13 +178,13 @@ export const mapTrees = (mapped_to: 'user' | 'group', saplingIds: string[], id: 
     };
 }
 
-export const mapTreesForPlot = (mapped_to: 'user' | 'group',id: number, plotId: string, count: number) => {
+export const mapTreesForPlot = (request: MapTreesUsingPlotIdRequest) => {
     const apiClient = new ApiClient();
     return (dispatch: any) => {
         dispatch({
             type: userTreeActionTypes.MAP_USER_TREES_IN_PLOT_REQUESTED,
         });
-        apiClient.mapTreesForPlot(mapped_to, id, plotId, count).then(
+        apiClient.mapTreesForPlot(request).then(
             () => {
                 toast.success("Mapped trees successfully!");
                 dispatch({

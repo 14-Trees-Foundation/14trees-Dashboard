@@ -7,7 +7,7 @@ import { User } from '../../types/user';
 import { Site } from '../../types/site';
 import { Donation } from '../../types/donation';
 import { OnsiteStaff } from '../../types/onSiteStaff';
-import { Tree } from '../../types/tree';
+import { MapTreesUsingPlotIdRequest, MapTreesUsingSaplingIdsRequest, Tree } from '../../types/tree';
 import { AssignTreeRequest, UserTree, UserTreeCountPaginationResponse } from '../../types/userTree';
 import { PaginatedResponse } from '../../types/pagination';
 import { Event } from '../../types/event';
@@ -574,18 +574,18 @@ class ApiClient {
         }
     }
 
-    async mapTrees(mapped_to: 'user' | 'group', saplingIds: string[], id: number): Promise<void> {
+    async mapTrees(request: MapTreesUsingSaplingIdsRequest): Promise<void> {
         try {
-            await this.api.post<any>(`/mapping/map`, { sapling_ids: saplingIds , id: id, mapped_to: mapped_to});
+            await this.api.post<any>(`/mapping/map`, request);
         } catch (error) {
             console.error(error)
             throw new Error('Failed to create Trees in bulk');
         }
     }
 
-    async mapTreesForPlot(mapped_to: 'user' | 'group', id: number, plotId: string, count: number): Promise<void> {
+    async mapTreesForPlot(request: MapTreesUsingPlotIdRequest): Promise<void> {
         try {
-            await this.api.post<any>(`/mapping/map-plot-trees`, { mapped_to: mapped_to, id: id, plot_id: plotId, count: count});
+            await this.api.post<any>(`/mapping/map-plot-trees`, request);
         } catch (error) {
             console.error(error)
             throw new Error('Failed to create Trees in bulk');
