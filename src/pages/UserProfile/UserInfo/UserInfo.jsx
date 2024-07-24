@@ -43,9 +43,9 @@ export const UserInfo = () => {
           <img
             className={imgLoad ? classes.imageWindow : classes.none}
             src={
-              selUserInfo.profile_image === ""
-                ? selUserInfo.images[0]
-                : selUserInfo.profile_image
+              selUserInfo.user_tree_image === ""
+                ? selUserInfo.image
+                : selUserInfo.user_tree_image
             }
             alt={"A"}
           />
