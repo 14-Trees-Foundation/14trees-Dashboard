@@ -43,9 +43,9 @@ export const UserInfo = () => {
           <img
             className={imgLoad ? classes.imageWindow : classes.none}
             src={
-              selUserInfo.profile_image === ""
-                ? selUserInfo.images[0]
-                : selUserInfo.profile_image
+              selUserInfo.user_tree_image === ""
+                ? selUserInfo.image
+                : selUserInfo.user_tree_image
             }
             alt={"A"}
           />
@@ -83,8 +83,8 @@ export const UserInfo = () => {
               <div className={classes.data}>{selUserInfo.assigned_to}</div>
               {(selUserInfo.event_type === "4" || selUserInfo.description) ? (
                 <>
-                  {selUserInfo.gifted_by &&
-                    selUserInfo.gifted_by !== undefined && !strEquals(selUserInfo.gifted_by, selUserInfo.assigned_to) && !strEquals(selUserInfo.gifted_by, "ACM India") && !strEquals(selUserInfo.gifted_by, "ACM India Council") && selUserInfo.gifted_by && (
+                  {selUserInfo.gifted_by_name &&
+                    selUserInfo.gifted_by_name !== undefined && !strEquals(selUserInfo.gifted_by_name, selUserInfo.assigned_to) && !strEquals(selUserInfo.gifted_by_name, "ACM India") && !strEquals(selUserInfo.gifted_by_name, "ACM India Council") && selUserInfo.gifted_by && (
                       <>
                         <div className={classes.label}>Donated By</div>
                         <div
@@ -94,7 +94,7 @@ export const UserInfo = () => {
                             marginBottom: "8px",
                           }}
                         >
-                          {selUserInfo.gifted_by}
+                          {selUserInfo.gifted_by_name}
                         </div>
                       </>
                     )}

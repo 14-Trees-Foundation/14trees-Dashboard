@@ -47,3 +47,20 @@ export type TreesDataState = {
     totalTrees: number,
     trees: Record<number, Tree>
 };
+
+type MapTreesBaseRequest = {
+    mapped_to: 'user' | 'group',
+    id: number,
+    name?: string,
+    email?: string,
+    phone?: string,
+}
+
+export type MapTreesUsingSaplingIdsRequest = MapTreesBaseRequest & {
+    sapling_ids: string[],
+}
+
+export type MapTreesUsingPlotIdRequest = MapTreesBaseRequest & {
+    plot_id: number,
+    count: number,
+}
