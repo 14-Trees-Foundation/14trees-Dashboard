@@ -5,6 +5,7 @@ export type Visit = {
   id: number;
   visit_name: string | null;
   visit_date: Date|null;
+  visit_type: string;
 };
 
 
@@ -16,7 +17,7 @@ export type BulkVisitUsersMappingResponse = {
 
 export type VisitUsersMappingState = Record<number, BulkVisitUsersMappingResponse>
 
-export type VistsDataState = {
+export type VisitsDataState = {
   totalVisits: number,
   visits: Record<number, Visit>
 }

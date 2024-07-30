@@ -26,6 +26,7 @@ import EditEvents from "./EditEvents";
 import { TableColumnsType } from "antd";
 import TableComponent from "../../../components/Table";
 import { ToastContainer } from "react-toastify";
+import AddEvents from "./AddEvents";
 
 function LoadingOverlay() {
   return (
@@ -40,7 +41,6 @@ function LoadingOverlay() {
     </div>
   );
 }
-import AddEvents from "./AddEvents";
 
 export const EventsComponent = () => {
   const dispatch = useAppDispatch();
