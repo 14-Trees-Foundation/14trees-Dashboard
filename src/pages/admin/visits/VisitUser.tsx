@@ -2,7 +2,6 @@ import { useEffect, useRef, useState } from "react";
 import Box from "@mui/material/Box";
 import { GridFilterItem } from "@mui/x-data-grid";
 import {
-    Autocomplete,
     Button,
     Dialog,
     DialogActions,
@@ -10,7 +9,6 @@ import {
     DialogContentText,
     DialogTitle,
     Divider,
-    TextField,
 } from "@mui/material";
 import * as visitUserActionCreators from "../../../redux/actions/visitUserActions";
 import * as userActionCreators from "../../../redux/actions/userActions";
@@ -29,147 +27,141 @@ import TableComponent from "../../../components/Table";
 
 
 interface VisitUsersInputProps {
-  selectedVisit: Visit
+    selectedVisit: Visit | null
 }
 
 
-export const VisitUsers = ( { selectedVisit }: VisitUsersInputProps) => {
-  
-const dispatch = useAppDispatch();
-const { createVisitUser  , removeVisitUsers, getVisitUsers, createVisitUsersBulk} = bindActionCreators(visitUserActionCreators , dispatch)
-const { searchUsers } = bindActionCreators(userActionCreators , dispatch)
+export const VisitUsers = ({ selectedVisit }: VisitUsersInputProps) => {
+
+    const dispatch = useAppDispatch();
+    const { createVisitUser, removeVisitUsers, getVisitUsers, createVisitUsersBulk } = bindActionCreators(visitUserActionCreators, dispatch)
+    const { getUsers, searchUsers } = bindActionCreators(userActionCreators, dispatch)
 
 
-const [selectedVisitForUser, setSelectedVisitForUser] = useState<Visit | null>(null);
-const [filters, setFilters] = useState<Record<string, GridFilterItem>>({});
-const [page, setPage] = useState(0);
-const [addUserModal, setAddUserModal] = useState(false);
-const [openDeleteUserGroups, setOpenDeleteUserGroups] = useState(false);
-const [selectedUserIds, setSelectedUserIds] = useState<number[]>([]);
-    
- const targetRef = useRef<any>(null);
+    const [selectedVisitForUser, setSelectedVisitForUser] = useState<Visit | null>(null);
+    const [filters, setFilters] = useState<Record<string, GridFilterItem>>({});
+    const [page, setPage] = useState(0);
+    const [addUserModal, setAddUserModal] = useState(false);
+    const [openDeleteUserGroups, setOpenDeleteUserGroups] = useState(false);
+    const [selectedUserIds, setSelectedUserIds] = useState<number[]>([]);
 
- const handleSetFilters = (filters: Record<string, GridFilterItem>) => {
-  setPage(0);
-  setFilters(filters);
-}
+    const targetRef = useRef<any>(null);
 
-
- useEffect(() => {
-  if (selectedVisit !== null) {
-    setSelectedVisitForUser(selectedVisit);
-      targetRef.current && targetRef.current.scrollIntoView({ behavior: 'smooth' });
-  }
-}, [selectedVisit])
-
-useEffect(() => {
-  if (selectedVisit) {
-    console.log("Selected Visit : ", selectedVisit)
-      getVisitUsersData();
-  }
-}, [page, filters, selectedVisit]);
-
-const getVisitUsersData = async () => {
-  setTimeout(async () => {
-      await getVisitUsers(selectedVisit.id, page * 10, 10);
-  }, 1000);
-};
-
-const getAllUsersData = async () => {
-  setTimeout(async () => {
-      await getVisitUsers(selectedVisit.id, page * 10, 10);
-  }, 1000);
-};
-
-const handleAddUserToVisit = (formData: any) => {
-    if (selectedVisit) {
-        let reqBody = { ...formData, visit_id: selectedVisit.id };
-        if (reqBody.id) reqBody = { ...reqBody};
-        createVisitUser(reqBody);
+    const handleSetFilters = (filters: Record<string, GridFilterItem>) => {
+        setPage(0);
+        setFilters(filters);
     }
-    setAddUserModal(false);
-    getVisitUsersData();
-}
-
-const handleRemoveGroupUsers = () => {
-    removeVisitUsers(selectedVisit.id, selectedUserIds);
-    setOpenDeleteUserGroups(false);
-    getVisitUsersData();
-}
-
-const handleSelectionChanges = (selectedIds: number[]) => {
-    setSelectedUserIds(selectedIds);
-}
 
 
+    useEffect(() => {
+        if (selectedVisit !== null) {
+            setSelectedVisitForUser(selectedVisit);
+            targetRef.current && targetRef.current.scrollIntoView({ behavior: 'smooth' });
+        }
+    }, [selectedVisit])
 
+    useEffect(() => {
+        getVisitUsersData();
+    }, [page, filters, selectedVisitForUser]);
 
-const columns: TableColumnsType<User> = [
-  {
-      dataIndex: "name",
-      key: "name",
-      title: "Name",
-      align: "center",
-      width: 150,
-      ...getColumnSearchProps('name', filters, handleSetFilters)
-  },
-  {
-      dataIndex: "email",
-      key: "email",
-      title: "Email",
-      align: "center",
-      width: 200,
-      ...getColumnSearchProps('email', filters, handleSetFilters)
-  },
-  {
-      dataIndex: "phone",
-      key: "phone",
-      title: "Phone",
-      align: "center",
-      width: 100,
-      render: (value: string) => {
-          if (!value || value === "0") return "-";
-          if (value.endsWith('.0')) return value.slice(0, -2);
-          else return value;
-      },
-      ...getColumnSearchProps('phone', filters, handleSetFilters)
-  }
- 
-];
+    const getVisitUsersData = async () => {
+        setTimeout(async () => {
+            selectedVisitForUser && getVisitUsers(selectedVisitForUser.id, page * 10, 10);
+        }, 10);
+    };
 
-let usersList: User[] = [];
-const visitUsersData = useAppSelector((state: RootState) => state.visitUserData);
-if (visitUsersData) {
-    usersList = Object.values(visitUsersData.users);
-    console.log("Visit Users list : " , usersList);
-}
+    const getAllUsersData = async () => {
+        setTimeout(async () => {
+            selectedVisitForUser && getVisitUsers(selectedVisitForUser.id, page * 10, 10);
+        }, 1000);
+    };
+
+    const handleAddUserToVisit = (formData: any) => {
+        if (selectedVisitForUser) {
+            let reqBody = { ...formData, visit_id: selectedVisitForUser.id };
+            if (reqBody.id) reqBody = { ...reqBody };
+            createVisitUser(reqBody);
+        }
+        setAddUserModal(false);
+        getVisitUsersData();
+    }
+
+    const handleRemoveGroupUsers = () => {
+        selectedVisitForUser && removeVisitUsers(selectedVisitForUser.id, selectedUserIds);
+        setOpenDeleteUserGroups(false);
+        getVisitUsersData();
+    }
+
+    const handleSelectionChanges = (selectedIds: number[]) => {
+        setSelectedUserIds(selectedIds);
+    }
+
+    const columns: TableColumnsType<User> = [
+        {
+            dataIndex: "name",
+            key: "name",
+            title: "Name",
+            align: "center",
+            width: 150,
+            ...getColumnSearchProps('name', filters, handleSetFilters)
+        },
+        {
+            dataIndex: "email",
+            key: "email",
+            title: "Email",
+            align: "center",
+            width: 200,
+            ...getColumnSearchProps('email', filters, handleSetFilters)
+        },
+        {
+            dataIndex: "phone",
+            key: "phone",
+            title: "Phone",
+            align: "center",
+            width: 100,
+            render: (value: string) => {
+                if (!value || value === "0") return "-";
+                if (value.endsWith('.0')) return value.slice(0, -2);
+                else return value;
+            },
+            ...getColumnSearchProps('phone', filters, handleSetFilters)
+        }
+
+    ];
+
+    let usersList: User[] = [];
+    const visitUsersData = useAppSelector((state: RootState) => state.visitUserData);
+    if (visitUsersData) {
+        usersList = Object.values(visitUsersData.users);
+        console.log("Visit Users list : ", usersList);
+    }
 
     return (
-      <div ref={targetRef}>
-         <div style={{ display: 'flex', alignItems: 'center' }}>
-                <Button 
+        <div ref={targetRef}>
+            <div style={{ display: 'flex', alignItems: 'center' }}>
+                <h1 style={{ flexGrow: 1 }}>{selectedVisit ? selectedVisit.visit_name : ''} Users</h1>
+                <Button
                     variant="contained"
                     color="success"
-                    onClick={() => { setAddUserModal(true) }} 
+                    onClick={() => { setAddUserModal(true) }}
                     style={{ marginLeft: 16, width: 150 }}
                     disabled={!selectedVisitForUser}
                 >
                     Add User
                 </Button>
-                <Button 
-                    variant="contained" 
-                    color="error" 
-                    onClick={() => { setOpenDeleteUserGroups(true) }} 
+                <Button
+                    variant="contained"
+                    color="error"
+                    onClick={() => { setOpenDeleteUserGroups(true) }}
                     disabled={!selectedVisitForUser}
                     style={{ marginLeft: 16, width: 190 }}
                 >
                     Remove Users
                 </Button>
-         </div>
-         <div style={{ marginTop: 26 }}>
-         <h1>{selectedVisit ? selectedVisit.visit_name : ''} Users</h1>
-         <Divider />
-         <Box sx={{ height: 540, marginTop: 2, width: "100%", justifyContent: "center", display: "flex" }}>
+            </div>
+            <div style={{ marginTop: 2}}>
+                <Divider />
+                <Box sx={{ height: 540, marginTop: 2, width: "100%", justifyContent: "center", display: "flex" }}>
                     {selectedVisit && (
                         <TableComponent
                             dataSource={usersList}
@@ -178,14 +170,14 @@ if (visitUsersData) {
                             fetchAllData={getAllUsersData}
                             setPage={setPage}
                             handleSelectionChanges={handleSelectionChanges}
-                            
+
                         />
                     )}
                 </Box>
 
-         </div>
-         
-         {addUserModal && (
+            </div>
+
+            {addUserModal && (
                 <UserModal
                     open={addUserModal}
                     handleClose={() => setAddUserModal(false)}
@@ -194,7 +186,7 @@ if (visitUsersData) {
                 />
             )}
 
-        <Dialog open={openDeleteUserGroups} onClose={() => setOpenDeleteUserGroups(false)}>
+            <Dialog open={openDeleteUserGroups} onClose={() => setOpenDeleteUserGroups(false)}>
                 <DialogTitle>Confirm Remove</DialogTitle>
                 <DialogContent>
                     <DialogContentText>
@@ -202,8 +194,8 @@ if (visitUsersData) {
                     </DialogContentText>
                 </DialogContent>
                 <DialogActions>
-                    <Button 
-                        onClick={() => setOpenDeleteUserGroups(false)} 
+                    <Button
+                        onClick={() => setOpenDeleteUserGroups(false)}
                         color="primary"
                         variant="outlined"
                     >
@@ -219,9 +211,9 @@ if (visitUsersData) {
                     </Button>
                 </DialogActions>
             </Dialog>
-      </div>
-      
+        </div>
+
     )
-   
+
 
 }

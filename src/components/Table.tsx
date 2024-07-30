@@ -52,6 +52,11 @@ function TableComponent({ loading, dataSource, columns, totalRecords, fetchAllDa
         document.body.removeChild(link);
     };
 
+    const expandable = {
+        expandedRowRender: (record: any)=> expandableFunction?expandableFunction(record):null,
+        rowExpandable: (record: any) => { return isExpandable?isExpandable:false},
+      }
+
     useEffect(() => {
         if (download) {
             const data = dataSource?.map((item) => {
@@ -83,10 +88,7 @@ function TableComponent({ loading, dataSource, columns, totalRecords, fetchAllDa
             style={{ borderRadius: 20 }}
             dataSource={dataSource}
             columns={columns}
-            expandable={{
-                expandedRowRender: (record)=> expandableFunction?expandableFunction(record):null,
-                rowExpandable: (record) => { return isExpandable?isExpandable:false},
-              }}
+            expandable={isExpandable ? expandable : undefined}
             pagination={{ 
                 position: ['bottomRight'], 
                 showSizeChanger: false, 

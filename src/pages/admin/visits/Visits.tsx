@@ -29,11 +29,11 @@ import { bindActionCreators } from "@reduxjs/toolkit";
 import AddVisit from "./AddVisit";
 import EditVisit from "./EditVisit";
 import { VisitUsers } from "./VisitUser";
-import getColumnSearchProps from "../../../components/Filter";
+import getColumnSearchProps, { getColumnSelectedItemFilter } from "../../../components/Filter";
 import TableComponent from "../../../components/Table";
 
 //import types
-import { Visit } from "../../../types/visits";
+import { Visit, VisitTypeList } from "../../../types/visits";
 
 //import actions
 import * as visitActionCreators from "../../../redux/actions/visitActions";
@@ -41,6 +41,8 @@ import * as visitUserActionCreators from "../../../redux/actions/visitUserAction
 
 //import state
 import { RootState } from "../../../redux/store/store";
+import { getHumanReadableDate } from "../../../helpers/utils";
+import VisitForm from "./EditVisit";
 
 
 export const VisitsComponent = () => {
@@ -59,7 +61,7 @@ export const VisitsComponent = () => {
   const [editModal, setEditModal] = useState(false);
   const [page, setPage] = useState(0);
   const [filters, setFilters] = useState<Record<string, GridFilterItem>>({});
-  const [selectedVisit , setSelectedVisit] = useState<Visit>({} as Visit);
+  const [selectedVisit , setSelectedVisit] = useState<Visit | null>(null);
   const [bulkCreate, setBulkCreate] = useState(false);
   const [file, setFile] = useState(null);
 
@@ -120,12 +122,16 @@ export const VisitsComponent = () => {
     createVisit(formData);
   };
 
+  const getVisitType = (type: string) => {
+    return VisitTypeList.find((visitType) => visitType.id === type)?.label || '';
+  }
+
   const columns: TableColumnsType<Visit> = [
     {
       dataIndex: "action",
       key: "action",
       title: "Actions",
-      width: 150,
+      width: 250,
       align: "center",
       render: (value, record, index) => (
         <div
@@ -185,14 +191,36 @@ export const VisitsComponent = () => {
         </Button>),
       ...getColumnSearchProps("visit_name", filters, handleSetFilters),
     },
-
+    {
+      dataIndex: "visit_type",
+      key: "visit_type",
+      title: "Visit Type",
+      width: 220,
+      align: "center",
+      render: getVisitType,
+      ...getColumnSelectedItemFilter({dataIndex: "visit_type", filters, handleSetFilters, options: VisitTypeList.map(item => item.id)}),
+    },
     {
       dataIndex: "visit_date",
       key: "visit_date",
       title: "Visit Date",
       width: 220,
       align: "center",
-      ...getColumnSearchProps("visit_date", filters, handleSetFilters),
+      render: getHumanReadableDate,
+    },
+    {
+      dataIndex: "visit_users",
+      key: "visit_users",
+      title: "Users #",
+      width: 100,
+      align: "center",
+    },
+    {
+      dataIndex: "visit_images",
+      key: "visit_images",
+      title: "Images #",
+      width: 100,
+      align: "center",
     },
   ]
 
@@ -228,10 +256,13 @@ export const VisitsComponent = () => {
           <Button variant="contained" color="success" onClick={handleModalOpen}>
             Add Visit
           </Button>
-          <AddVisit
+          <VisitForm
+            mode={"add"}
             open={open}
-            handleClose={handleModalClose}
-            createVisit={handleCreateVisitData}
+            handleClose={() => {
+              setOpen(false);
+            }}
+            onSubmit={() => { setOpen(false); }}
           />
         </div>
       </div>
@@ -274,14 +305,15 @@ export const VisitsComponent = () => {
       </Dialog>
 
       {selectedEditRow && (
-        <EditVisit
-          row={selectedEditRow}
-          openeditModal={editModal}
-          closeEditModal={() => {
+        <VisitForm
+          mode={"edit"}
+          visit={selectedEditRow}
+          open={editModal}
+          handleClose={() => {
             setEditModal(false);
             setSelectedEditRow(null);
           }}
-          editSubmit={handleEditSubmit}
+          onSubmit={handleEditSubmit}
         />
       )}
 
