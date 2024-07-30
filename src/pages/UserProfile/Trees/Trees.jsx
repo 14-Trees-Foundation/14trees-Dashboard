@@ -51,11 +51,11 @@ export const Trees = ({ saplingId }) => {
                       id={item.sapling_id}
                       name={item.plant_type}
                       img={
-                        item.image
-                          ? item.image === ""
-                            ? item.plant_type_image
-                            : item.image
-                          : item.plant_type_image
+                        item.image && item.image !== ''
+                          ? item.image
+                          : item.plant_type_images && item.plant_type_images.length > 0
+                          ? item.plant_type_images[0]
+                          : ""
                       }
                       date={date}
                       selected={true}
@@ -65,11 +65,11 @@ export const Trees = ({ saplingId }) => {
                       id={item.sapling_id}
                       name={item.plant_type}
                       img={
-                        item.image
-                          ? item.image === ""
-                            ? item.plant_type_image
-                            : item.image
-                          : item.plant_type_image
+                        item.image && item.image !== ''
+                          ? item.image
+                          : item.plant_type_images && item.plant_type_images.length > 0
+                          ? item.plant_type_images[0]
+                          : ""
                       }
                       date={date}
                     />
