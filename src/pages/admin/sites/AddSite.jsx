@@ -15,7 +15,8 @@ const AddSite = ({ open, handleClose, createSite }) => {
     sampatiPatra: "",
     maintenance_type: "",
     consent_document_link: "",
-    google_earth_link: "",
+    google_earth_link: [],
+    tags: [],
     account: "",
   };
 

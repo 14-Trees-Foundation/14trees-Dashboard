@@ -11,7 +11,8 @@ import { MapTreesUsingPlotIdRequest, MapTreesUsingSaplingIdsRequest, Tree } from
 import { AssignTreeRequest, UserTree, UserTreeCountPaginationResponse } from '../../types/userTree';
 import { PaginatedResponse } from '../../types/pagination';
 import { Event } from '../../types/event';
-import { Visit } from '../../types/visits';
+import { Visit , BulkVisitUsersMappingResponse } from '../../types/visits';
+
 
 class ApiClient {
     private api: AxiosInstance;
@@ -59,11 +60,13 @@ class ApiClient {
             }
             Object.entries(data).forEach(([key, value]) => {
                 if (key != 'image') {
+                   
                     const strValue = value as string
                     formData.append(key, strValue);
                 }
               });
             const response = await this.api.post<PlantType>(`/plant-types/`, formData);
+            
             return response.data;
         } catch (error) {
             console.error(error)
@@ -700,9 +703,28 @@ class ApiClient {
         }
     }
 
-    async updateSite(data: Site): Promise<Site> {
+    async updateSite(data: Site , files:Blob[]): Promise<Site> {
         try {
-            const response = await this.api.put<Site>(`/sites/${data.id}`, data);
+            
+            const formData = new FormData();
+            if (files) {
+                files.forEach( (file) => {
+                    formData.append("files", file);
+                });
+            }
+            Object.entries(data).forEach(([key, value]) => {
+                if (value === null || value === "" ) return;
+                if (key !== 'google_earth_link' && key !== 'tags') {
+                        const strValue = value as string
+                    formData.append(key, strValue);
+                }
+                if (key === 'tags'){
+                    formData.append(key, JSON.stringify(value));
+                }
+              });
+            console.log("Form data in updateSite action : ", formData);
+
+            const response = await this.api.put<Site>(`/sites/${data.id}`, formData);
             return response.data;
         } catch (error: any) {
             console.error(error)
@@ -861,6 +883,53 @@ class ApiClient {
             } catch (error) {
                 console.error(error)
                 throw new Error('Failed to delete visit');
+            }
+        }
+   /*
+        Model- VisitUser: CRUD Operations/Apis for visit-user
+    */
+
+        async getVisitUsers(visitId: number, offset: number, limit: number): Promise<PaginatedResponse<User>> {
+            const url = `/visit-users?visit_id=${visitId}&offset=${offset}&limit=${limit}`;
+            try {
+                const response = await this.api.get<PaginatedResponse<User>>(url);
+                return response.data;
+            } catch (error: any) {
+                if (error.response) {
+                    throw new Error(error.response.data.message);
+                }
+                throw new Error(`Failed to fetch visit users: ${error.message}`);
+            }
+        }
+
+        async addUserToVisit(data: any): Promise<void> {
+            try {
+                await this.api.post(`/visit-users`, data);
+            } catch (error) {
+                console.error(error)
+                throw new Error('Failed to add user to visit');
+            }
+        }
+    
+        async removeVisitUsers(visitId: number, userIds: number[]): Promise<void> {
+            try {
+                await this.api.delete(`/visit-users`, { data: { user_ids: userIds, visit_id: visitId }});
+            } catch (error) {
+                console.error(error)
+                throw new Error('Failed to remove users from visit');
+            }
+        }
+
+        async bulkCreateVisitUsersMapping(visitId: number, file: Blob): Promise<BulkVisitUsersMappingResponse> {
+            try {
+                const formData = new FormData();
+                formData.append('file', file);
+                formData.append('visit_id', visitId.toString());
+                const response = await this.api.post<BulkVisitUsersMappingResponse>(`/visit-users/bulk`, formData);
+                return response.data;
+            } catch (error) {
+                console.error(error)
+                throw new Error('Failed to create visit user mapping');
             }
         }
     

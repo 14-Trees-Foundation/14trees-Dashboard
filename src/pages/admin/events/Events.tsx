@@ -19,16 +19,32 @@ import * as eventActionCreators from "../../../redux/actions/eventActions";
 import { bindActionCreators } from "redux";
 import { useAppDispatch, useAppSelector } from "../../../redux/store/hooks";
 import { RootState } from "../../../redux/store/store";
+import CircularProgress from "@mui/material/CircularProgress";
 import getColumnSearchProps from "../../../components/Filter";
 
 import EditEvents from "./EditEvents";
 import { TableColumnsType } from "antd";
 import TableComponent from "../../../components/Table";
+import { ToastContainer } from "react-toastify";
+
+function LoadingOverlay() {
+  return (
+    <div
+      style={{
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        height: "100%",
+      }}>
+      <CircularProgress />
+    </div>
+  );
+}
 import AddEvents from "./AddEvents";
 
 export const EventsComponent = () => {
   const dispatch = useAppDispatch();
-  const { getEvents } =
+  const { getEvents , deleteEvent , updateEvent } =
     bindActionCreators(eventActionCreators, dispatch);
 
   const [open, setOpen] = useState(false);
@@ -103,7 +119,7 @@ export const EventsComponent = () => {
             variant="outlined"
             color="error"
             style={{ margin: "0 5px" }}
-
+            onClick={()=>handleDeleteEvent(record)}
           >
             <DeleteIcon />
           </Button>
@@ -186,14 +202,83 @@ export const EventsComponent = () => {
 
   ];
 
-    const handleDeleteTreeType = (row: any) => {
-      setOpenDeleteModal(true);
-      setSelectedItem(row);
-    };
+  const data = [
+    {
+      "id": 1,
+      "assigned_by": 294,
+      "site_id": null,
+      "type": "1",
+      "name": null,
+      "description": null,
+      "event_location": null,
+      "tags": "[]",
+      "memories": null,
+      "event_date": "2022-01-04T22:03:14.000Z"
+    },
+    {
+      "id": 2,
+      "assigned_by": 265,
+      "site_id": null,
+      "type": "1",
+      "name": null,
+      "description": null,
+      "event_location": null,
+      "tags": "[]",
+      "memories": null,
+      "event_date": "2022-02-28T10:12:06.000Z"
+    },
+    {
+      "id": 3,
+      "assigned_by": 265,
+      "site_id": null,
+      "type": "1",
+      "name": null,
+      "description": null,
+      "event_location": null,
+      "tags": "[]",
+      "memories": null,
+      "event_date": "2022-02-28T10:22:02.000Z"
+    },
+    {
+      "id": 4,
+      "assigned_by": 336,
+      "site_id": null,
+      "type": "2",
+      "name": null,
+      "description": null,
+      "event_location": null,
+      "tags": "[]",
+      "memories": null,
+      "event_date": "2022-04-02T01:56:54.000Z"
+    },
+    {
+      "id": 5,
+      "assigned_by": 294,
+      "site_id": null,
+      "type": "1",
+      "name": null,
+      "description": null,
+      "event_location": null,
+      "tags": "[]",
+      "memories": null,
+      "event_date": "2022-02-18T06:49:39.000Z"
+    }
+  ];
 
-    const handleEditSubmit = (formData: any) => {
-      console.log(formData);
-    };
+
+  type RowType = {
+    id: string;
+    name: string;
+  };
+
+  const handleDeleteEvent = (row: any) => {
+    setOpenDeleteModal(true);
+    setSelectedItem(row);
+  };
+
+  const handleEditSubmit = (formData: any) => {
+    updateEvent(formData);
+  };
 
     const handleCreateEventsData = (formData: any) => {
       console.log(formData);
@@ -201,6 +286,7 @@ export const EventsComponent = () => {
 
   return (
     <>
+    <ToastContainer/>
       <div
         style={{
           display: "flex",
@@ -252,9 +338,9 @@ export const EventsComponent = () => {
           <Button
             onClick={() => {
               console.log("Deleting item...", selectedItem);
-              // if (selectedItem !== null) {
-              //   deleteTreeType(selectedItem);
-              // }
+              if (selectedItem !== null) {
+                deleteEvent(selectedItem);
+              }
               setOpenDeleteModal(false);
             }}
             color="primary"

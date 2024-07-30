@@ -1,17 +1,11 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
+import { ToastContainer } from "react-toastify";
 import Box from "@mui/material/Box";
+import { TextField } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
-import { TableColumnsType } from "antd";
-import getColumnSearchProps from "../../../components/Filter";
-import TableComponent from "../../../components/Table";
-import { useAppDispatch, useAppSelector } from "../../../redux/store/hooks";
-import * as visitActionCreators from "../../../redux/actions/visitActions";
-import { bindActionCreators } from "@reduxjs/toolkit";
-import { RootState } from "../../../redux/store/store";
-import { ToastContainer } from "react-toastify";
-import { Visit } from "../../../types/visits";
-
+import CircularProgress from "@mui/material/CircularProgress";
+import GroupAdd from '@mui/icons-material/GroupAdd';
 import {
   Button,
   Dialog,
@@ -26,8 +20,28 @@ import {
 
   GridFilterItem,
 } from "@mui/x-data-grid";
+import { TableColumnsType } from "antd";
+
+import { useAppDispatch, useAppSelector } from "../../../redux/store/hooks";
+import { bindActionCreators } from "@reduxjs/toolkit";
+
+//import components
 import AddVisit from "./AddVisit";
 import EditVisit from "./EditVisit";
+import { VisitUsers } from "./VisitUser";
+import getColumnSearchProps from "../../../components/Filter";
+import TableComponent from "../../../components/Table";
+
+//import types
+import { Visit } from "../../../types/visits";
+
+//import actions
+import * as visitActionCreators from "../../../redux/actions/visitActions";
+import * as visitUserActionCreators from "../../../redux/actions/visitUserActions";
+
+//import state
+import { RootState } from "../../../redux/store/store";
+
 
 export const VisitsComponent = () => {
   const dispatch = useAppDispatch();
@@ -45,7 +59,11 @@ export const VisitsComponent = () => {
   const [editModal, setEditModal] = useState(false);
   const [page, setPage] = useState(0);
   const [filters, setFilters] = useState<Record<string, GridFilterItem>>({});
-  const [selectedVisit, setSelectedVisit] = useState<Visit | null>(null);
+  const [selectedVisit , setSelectedVisit] = useState<Visit>({} as Visit);
+  const [bulkCreate, setBulkCreate] = useState(false);
+  const [file, setFile] = useState(null);
+
+
 
   const handleSetFilters = (filters: Record<string, GridFilterItem>) => {
     setPage(0);
@@ -64,6 +82,11 @@ export const VisitsComponent = () => {
       await getVisits(page * 10, 10, filtersData);
     }, 1000);
   };
+
+  const {
+    createVisitUsersBulk
+  } = bindActionCreators(visitUserActionCreators, dispatch);
+
 
   let visitsList: Visit[] = [];
   const visitsData = useAppSelector((state: RootState) => state.visitsData);
@@ -112,6 +135,16 @@ export const VisitsComponent = () => {
             alignItems: "center",
           }}
         >
+          <Button
+            color="success"
+            variant="outlined"
+            style={{ margin: "0 5px" }}
+            onClick={() => {
+              setSelectedItem(record);
+              setBulkCreate(true);
+            }}>
+            <GroupAdd />
+          </Button>
           <Button
             variant="outlined"
             style={{ margin: "0 5px" }}
@@ -163,6 +196,17 @@ export const VisitsComponent = () => {
     },
   ]
 
+  const handleBulkCreateVisitUserMapping = (e: any) => {
+    e.preventDefault();
+    setBulkCreate(false);
+    if (file && selectedItem) {
+      setTimeout(async () => {
+        await createVisitUsersBulk(selectedItem.id, file);
+      }, 1000);
+    }
+  }
+
+
   return (
     <>
       <ToastContainer />
@@ -201,6 +245,7 @@ export const VisitsComponent = () => {
           setPage={setPage}
         />
       </Box>
+     <VisitUsers selectedVisit={selectedVisit}/>
 
       <Dialog open={openDeleteModal} onClose={() => setOpenDeleteModal(false)}>
         <DialogTitle>Confirm Delete</DialogTitle>
@@ -239,6 +284,39 @@ export const VisitsComponent = () => {
           editSubmit={handleEditSubmit}
         />
       )}
+
+    <Dialog open={bulkCreate} onClose={() => setBulkCreate(false)}>
+        <DialogTitle>Create visit-user Mapping for '{selectedItem?.visit_name}'</DialogTitle>
+        <form onSubmit={handleBulkCreateVisitUserMapping}>
+          <DialogContent>
+            <TextField
+              type="file"
+              inputProps={{ accept: '.csv' }}
+              onChange={(e: any) => {
+                if (e.target.files) {
+                  setFile(e.target.files[0]);
+                }
+              }}
+              fullWidth
+              margin="normal"
+            />
+          </DialogContent>
+          <DialogActions
+            sx={{
+              display: "flex",
+              justifyContent: "center",
+              marginBottom: "15px",
+            }}
+          >
+            <Button onClick={() => setBulkCreate(false)} variant="outlined" color="error">
+              Cancel
+            </Button>
+            <Button type="submit" variant="contained" color="success">
+              Upload
+            </Button>
+          </DialogActions>
+        </form>
+      </Dialog>
     </>
   )
 

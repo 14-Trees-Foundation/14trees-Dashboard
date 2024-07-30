@@ -30,7 +30,7 @@ import { bindActionCreators } from "@reduxjs/toolkit";
 import { RootState } from "../../../redux/store/store";
 import AddSite from "./AddSite";
 import { ToastContainer } from "react-toastify";
-import { SiteMap } from "./components/SiteMap";
+import  {SiteMap}   from "./components/SiteMap";
 import { getFormattedDate } from "../../../helpers/utils";
 
 
@@ -90,8 +90,8 @@ export const SitesComponent = () => {
     setSelectedItem(row);
   };
 
-  const handleEditSubmit = (formData: Site) => {
-    updateSite(formData);
+  const handleEditSubmit = (formData: Site , files: Blob[]) => {
+    updateSite(formData , files);
     setSelectedEditRow(null);
   };
 
@@ -224,6 +224,13 @@ export const SitesComponent = () => {
       align: "center",
     },
     {
+      dataIndex: "tags",
+      key: "tags",
+      title: "Tags",
+      width: 150,
+      align: "center",
+    },
+    {
       dataIndex: "photo_album",
       key: "photo_album",
       title: "Photo Album",
@@ -325,9 +332,12 @@ export const SitesComponent = () => {
         <TableComponent
           dataSource={sitesList}
           columns={columns}
+
           totalRecords={sitesData.totalSites}
           fetchAllData={getAllSitesData}
           setPage={setPage}
+          isExpandable={true}
+          expandableFunction={(record) => <SiteMap KmlSource={record.google_earth_link[0] }/>}
         />
         <SiteMap />
       </Box>
