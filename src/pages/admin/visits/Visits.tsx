@@ -27,7 +27,7 @@ import { bindActionCreators } from "@reduxjs/toolkit";
 
 //import components
 import { VisitUsers } from "./VisitUser";
-import getColumnSearchProps, { getColumnSelectedItemFilter } from "../../../components/Filter";
+import getColumnSearchProps, { getColumnDateFilter, getColumnSelectedItemFilter } from "../../../components/Filter";
 import TableComponent from "../../../components/Table";
 
 //import types
@@ -206,6 +206,7 @@ export const VisitsComponent = () => {
       width: 220,
       align: "center",
       render: getHumanReadableDate,
+      ...getColumnDateFilter({dataIndex: "visit_date", filters, handleSetFilters}),
     },
     {
       dataIndex: "user_count",
