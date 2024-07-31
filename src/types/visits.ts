@@ -13,6 +13,8 @@ export type Visit = {
   visit_name: string | null;
   visit_date: Date|null;
   visit_type: VisitType;
+  user_count: number;
+  visit_images: string[];
   created_at: Date;
   updated_at: Date;
 };

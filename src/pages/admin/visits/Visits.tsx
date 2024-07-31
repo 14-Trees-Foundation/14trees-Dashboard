@@ -4,8 +4,8 @@ import Box from "@mui/material/Box";
 import { TextField } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
-import CircularProgress from "@mui/material/CircularProgress";
 import GroupAdd from '@mui/icons-material/GroupAdd';
+import Collections from '@mui/icons-material/Collections';
 import {
   Button,
   Dialog,
@@ -26,8 +26,6 @@ import { useAppDispatch, useAppSelector } from "../../../redux/store/hooks";
 import { bindActionCreators } from "@reduxjs/toolkit";
 
 //import components
-import AddVisit from "./AddVisit";
-import EditVisit from "./EditVisit";
 import { VisitUsers } from "./VisitUser";
 import getColumnSearchProps, { getColumnSelectedItemFilter } from "../../../components/Filter";
 import TableComponent from "../../../components/Table";
@@ -43,6 +41,7 @@ import * as visitUserActionCreators from "../../../redux/actions/visitUserAction
 import { RootState } from "../../../redux/store/store";
 import { getHumanReadableDate } from "../../../helpers/utils";
 import VisitForm from "./EditVisit";
+import ImageGridModal from "../../../components/ImagesGrid";
 
 
 export const VisitsComponent = () => {
@@ -54,7 +53,6 @@ export const VisitsComponent = () => {
 
   const [open, setOpen] = useState(false);
   const handleModalOpen = () => setOpen(true);
-  const handleModalClose = () => setOpen(false);
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
   const [selectedItem, setSelectedItem] = useState<any | null>(null);
   const [selectedEditRow, setSelectedEditRow] = useState<any | null>(null);
@@ -64,7 +62,8 @@ export const VisitsComponent = () => {
   const [selectedVisit , setSelectedVisit] = useState<Visit | null>(null);
   const [bulkCreate, setBulkCreate] = useState(false);
   const [file, setFile] = useState(null);
-
+  const [selectedVisitForImages , setSelectedVisitForImages] = useState<Visit | null>(null);
+  const [imagesModalOpen, setImagesModalOpen] = useState(false);
 
 
   const handleSetFilters = (filters: Record<string, GridFilterItem>) => {
@@ -209,8 +208,8 @@ export const VisitsComponent = () => {
       render: getHumanReadableDate,
     },
     {
-      dataIndex: "visit_users",
-      key: "visit_users",
+      dataIndex: "user_count",
+      key: "user_count",
       title: "Users #",
       width: 100,
       align: "center",
@@ -218,9 +217,30 @@ export const VisitsComponent = () => {
     {
       dataIndex: "visit_images",
       key: "visit_images",
-      title: "Images #",
+      title: "Images",
       width: 100,
       align: "center",
+      render: (value, record, index) => (
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
+          <Button
+            variant="outlined"
+            style={{ margin: "0 5px" }}
+            onClick={() => {
+              setImagesModalOpen(true);
+              setSelectedVisitForImages(record);
+            }}
+            disabled={!(value?.length)}
+          >
+            <Collections /> {value?.length}
+          </Button>
+        </div>
+      ),
     },
   ]
 
@@ -276,7 +296,13 @@ export const VisitsComponent = () => {
           setPage={setPage}
         />
       </Box>
-     <VisitUsers selectedVisit={selectedVisit}/>
+      {selectedVisit && <VisitUsers selectedVisit={selectedVisit}/>}
+      {selectedVisitForImages && <ImageGridModal 
+        open={imagesModalOpen}
+        onClose={() => setImagesModalOpen(false)}
+        imageUris={selectedVisitForImages.visit_images}
+        title={selectedVisitForImages.visit_name || 'Images'}
+      />}
 
       <Dialog open={openDeleteModal} onClose={() => setOpenDeleteModal(false)}>
         <DialogTitle>Confirm Delete</DialogTitle>

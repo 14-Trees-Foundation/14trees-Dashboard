@@ -17,7 +17,7 @@ const albums = atom({
 
 const adminNavIndex = atom({
   key: "adminnavindex",
-  default: 0,
+  default: 10,
 });
 
 const summary = atom({

@@ -12,7 +12,7 @@ export const visitUsersDataReducer = (state = { totalUsers:0, users: {}}, action
             if (action.payload) {
                 let usersDataState: VisitUsersDataState = { totalUsers: state.totalUsers, users: { ...state.users }};
                 let payload = action.payload as PaginatedResponse<User>;
-                console.log(payload)
+                console.log('Here', payload)
                 if (usersDataState.totalUsers != payload.total) {
                     usersDataState.users = {}
                 }
