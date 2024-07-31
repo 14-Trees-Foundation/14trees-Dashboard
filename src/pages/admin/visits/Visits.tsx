@@ -282,7 +282,7 @@ export const VisitsComponent = () => {
             handleClose={() => {
               setOpen(false);
             }}
-            onSubmit={() => { setOpen(false); }}
+            onSubmit={handleCreateVisitData}
           />
         </div>
       </div>
@@ -344,9 +344,10 @@ export const VisitsComponent = () => {
       )}
 
     <Dialog open={bulkCreate} onClose={() => setBulkCreate(false)}>
-        <DialogTitle>Create visit-user Mapping for '{selectedItem?.visit_name}'</DialogTitle>
+        <DialogTitle>Add users to '{selectedItem?.visit_name}'</DialogTitle>
         <form onSubmit={handleBulkCreateVisitUserMapping}>
           <DialogContent>
+            <DialogContentText>Download sample file from <a href="https://docs.google.com/spreadsheets/d/1ypVdbR44nQXuaHAEOrwywY3k-lfJdsRZ9iKp0Jpq7Kw/gviz/tq?tqx=out:csv&sheet=Sheet1">here</a> and fill the details.</DialogContentText>
             <TextField
               type="file"
               inputProps={{ accept: '.csv' }}
