@@ -14,6 +14,7 @@ import { donationsDataReducer } from "./donationReducer";
 import { eventsDataReducer } from "./eventReducer";
 import { visitsDataReducer } from "./visitReducer";
 import { visitUsersDataReducer} from "./visitUserReducer";
+import { treeImagesDataReducer } from "./treeImageReducer";
 
 const rootReducer = combineReducers({
     plantTypesData: plantTypesDataReducer,
@@ -26,6 +27,7 @@ const rootReducer = combineReducers({
     pondsData: pondsDataReducer,
     pondWaterLevelUpdatesData: pondWaterLevelUpdatesDataReducer,
     treesData: treesDataReducer,
+    treeImagesData: treeImagesDataReducer,
     usersData: usersDataReducer,
     userTreesData: userTreesDataReducer,
     userTreeCountData: userTreeCountDataReducer,
