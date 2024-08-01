@@ -6,7 +6,7 @@ export type Tree = {
     sapling_id: string,
     plant_type_id: number,
     plot_id: number,
-    image: [string],
+    image: string,
     tags: [string],
     location: Location,
     planted_by: string,
@@ -24,6 +24,7 @@ export type Tree = {
     event_id: number,
     created_at: Date,
     updated_at: Date,
+    tree_status: string,
 
     plant_type?: string,
     plot?: string,

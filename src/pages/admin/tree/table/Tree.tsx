@@ -104,6 +104,18 @@ export const TreeNew = () => {
     const treeImagesData = useAppSelector((state) => state.treeImagesData);
     if (treeImagesData) {
         treeImages = Object.values(treeImagesData.treeImages);
+        if (selectedTreeForTimeline && selectedTreeForTimeline.image) {
+            treeImages.push({
+                image: selectedTreeForTimeline.image,
+                image_date: selectedTreeForTimeline.created_at,
+                tree_status: selectedTreeForTimeline.tree_status,
+                created_at: selectedTreeForTimeline.created_at,
+                id: 0,
+                key: 0,
+                user_id: 0,
+                sapling_id: selectedTreeForTimeline.sapling_id,
+            })
+        }
         treeImages = treeImages.sort((a, b) => {
             if (b.image_date > a.image_date) return 1;
             if (b.image_date < a.image_date) return -1;
