@@ -60,8 +60,6 @@ export const VisitsComponent = () => {
   const [page, setPage] = useState(0);
   const [filters, setFilters] = useState<Record<string, GridFilterItem>>({});
   const [selectedVisit , setSelectedVisit] = useState<Visit | null>(null);
-  const [bulkCreate, setBulkCreate] = useState(false);
-  const [file, setFile] = useState(null);
   const [selectedVisitForImages , setSelectedVisitForImages] = useState<Visit | null>(null);
   const [imagesModalOpen, setImagesModalOpen] = useState(false);
 
@@ -145,8 +143,7 @@ export const VisitsComponent = () => {
             variant="outlined"
             style={{ margin: "0 5px" }}
             onClick={() => {
-              setSelectedItem(record);
-              setBulkCreate(true);
+              setSelectedVisit(record);
             }}>
             <GroupAdd />
           </Button>
@@ -156,7 +153,6 @@ export const VisitsComponent = () => {
             onClick={() => {
               setEditModal(true);
               setSelectedEditRow(record);
-
             }}
           >
             <EditIcon />
@@ -179,15 +175,6 @@ export const VisitsComponent = () => {
       title: "Visit Name",
       width: 320,
       align: "center",
-      render: (value, record, index) => (
-        <Button
-          onClick={() => setSelectedVisit(record)}
-          sx={{ textTransform: 'none', color: 'inherit' }}
-          fullWidth
-          variant="text"
-        >
-          {value}
-        </Button>),
       ...getColumnSearchProps("visit_name", filters, handleSetFilters),
     },
     {
@@ -214,6 +201,7 @@ export const VisitsComponent = () => {
       title: "Users #",
       width: 100,
       align: "center",
+      render: (value: string) => (value ? value : "0"),
     },
     {
       dataIndex: "visit_images",
@@ -238,23 +226,12 @@ export const VisitsComponent = () => {
             }}
             disabled={!(value?.length)}
           >
-            <Collections /> {value?.length}
+            <Collections /> {value?.length || '0'}
           </Button>
         </div>
       ),
     },
   ]
-
-  const handleBulkCreateVisitUserMapping = (e: any) => {
-    e.preventDefault();
-    setBulkCreate(false);
-    if (file && selectedItem) {
-      setTimeout(async () => {
-        await createVisitUsersBulk(selectedItem.id, file);
-      }, 1000);
-    }
-  }
-
 
   return (
     <>
@@ -288,7 +265,7 @@ export const VisitsComponent = () => {
         </div>
       </div>
       <Divider sx={{ backgroundColor: "black", marginBottom: '15px' }} />
-      <Box sx={{ height: 840, width: "100%" }}>
+      <Box sx={{ maxHeight: 840, width: "100%", overflowY: 'auto', marginBottom: '40px' }}>
         <TableComponent
           dataSource={visitsList}
           columns={columns}
@@ -344,39 +321,6 @@ export const VisitsComponent = () => {
         />
       )}
 
-    <Dialog open={bulkCreate} onClose={() => setBulkCreate(false)}>
-        <DialogTitle>Add users to '{selectedItem?.visit_name}'</DialogTitle>
-        <form onSubmit={handleBulkCreateVisitUserMapping}>
-          <DialogContent>
-            <DialogContentText>Download sample file from <a href="https://docs.google.com/spreadsheets/d/1ypVdbR44nQXuaHAEOrwywY3k-lfJdsRZ9iKp0Jpq7Kw/gviz/tq?tqx=out:csv&sheet=Sheet1">here</a> and fill the details.</DialogContentText>
-            <TextField
-              type="file"
-              inputProps={{ accept: '.csv' }}
-              onChange={(e: any) => {
-                if (e.target.files) {
-                  setFile(e.target.files[0]);
-                }
-              }}
-              fullWidth
-              margin="normal"
-            />
-          </DialogContent>
-          <DialogActions
-            sx={{
-              display: "flex",
-              justifyContent: "center",
-              marginBottom: "15px",
-            }}
-          >
-            <Button onClick={() => setBulkCreate(false)} variant="outlined" color="error">
-              Cancel
-            </Button>
-            <Button type="submit" variant="contained" color="success">
-              Upload
-            </Button>
-          </DialogActions>
-        </form>
-      </Dialog>
     </>
   )
 

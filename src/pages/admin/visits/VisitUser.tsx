@@ -9,6 +9,7 @@ import {
     DialogContentText,
     DialogTitle,
     Divider,
+    TextField,
 } from "@mui/material";
 import * as visitUserActionCreators from "../../../redux/actions/visitUserActions";
 import * as userActionCreators from "../../../redux/actions/userActions";
@@ -44,6 +45,8 @@ export const VisitUsers = ({ selectedVisit }: VisitUsersInputProps) => {
     const [addUserModal, setAddUserModal] = useState(false);
     const [openDeleteUserGroups, setOpenDeleteUserGroups] = useState(false);
     const [selectedUserIds, setSelectedUserIds] = useState<number[]>([]);
+    const [bulkCreate, setBulkCreate] = useState(false);
+    const [file, setFile] = useState(null);
 
     const targetRef = useRef<any>(null);
 
@@ -96,6 +99,16 @@ export const VisitUsers = ({ selectedVisit }: VisitUsersInputProps) => {
         setSelectedUserIds(selectedIds);
     }
 
+    const handleBulkCreateVisitUserMapping = (e: any) => {
+        e.preventDefault();
+        setBulkCreate(false);
+        if (file && selectedVisitForUser) {
+            setTimeout(async () => {
+                createVisitUsersBulk(selectedVisitForUser.id, file);
+            }, 10);
+        }
+    }
+
     const columns: TableColumnsType<User> = [
         {
             dataIndex: "name",
@@ -143,6 +156,15 @@ export const VisitUsers = ({ selectedVisit }: VisitUsersInputProps) => {
                 <Button
                     variant="contained"
                     color="success"
+                    onClick={() => { setBulkCreate(true) }}
+                    style={{ marginLeft: 16, width: 150 }}
+                    disabled={!selectedVisitForUser}
+                >
+                    Bulk Add
+                </Button>
+                <Button
+                    variant="contained"
+                    color="success"
                     onClick={() => { setAddUserModal(true) }}
                     style={{ marginLeft: 16, width: 150 }}
                     disabled={!selectedVisitForUser}
@@ -153,13 +175,13 @@ export const VisitUsers = ({ selectedVisit }: VisitUsersInputProps) => {
                     variant="contained"
                     color="error"
                     onClick={() => { setOpenDeleteUserGroups(true) }}
-                    disabled={!selectedVisitForUser}
+                    disabled={!selectedVisitForUser || selectedUserIds.length === 0}
                     style={{ marginLeft: 16, width: 190 }}
                 >
                     Remove Users
                 </Button>
             </div>
-            <div style={{ marginTop: 2}}>
+            <div style={{ marginTop: 2 }}>
                 <Divider />
                 <Box sx={{ height: 540, marginTop: 2, width: "100%", justifyContent: "center", display: "flex" }}>
                     {selectedVisit && (
@@ -210,6 +232,40 @@ export const VisitUsers = ({ selectedVisit }: VisitUsersInputProps) => {
                         Yes
                     </Button>
                 </DialogActions>
+            </Dialog>
+
+            <Dialog open={bulkCreate} onClose={() => setBulkCreate(false)}>
+                <DialogTitle>Add users to '{selectedVisitForUser?.visit_name}'</DialogTitle>
+                <form onSubmit={handleBulkCreateVisitUserMapping}>
+                    <DialogContent>
+                        <DialogContentText>Download sample file from <a href="https://docs.google.com/spreadsheets/d/1ypVdbR44nQXuaHAEOrwywY3k-lfJdsRZ9iKp0Jpq7Kw/gviz/tq?tqx=out:csv&sheet=Sheet1">here</a> and fill the details.</DialogContentText>
+                        <TextField
+                            type="file"
+                            inputProps={{ accept: '.csv' }}
+                            onChange={(e: any) => {
+                                if (e.target.files) {
+                                    setFile(e.target.files[0]);
+                                }
+                            }}
+                            fullWidth
+                            margin="normal"
+                        />
+                    </DialogContent>
+                    <DialogActions
+                        sx={{
+                            display: "flex",
+                            justifyContent: "center",
+                            marginBottom: "15px",
+                        }}
+                    >
+                        <Button onClick={() => setBulkCreate(false)} variant="outlined" color="error">
+                            Cancel
+                        </Button>
+                        <Button type="submit" variant="contained" color="success">
+                            Upload
+                        </Button>
+                    </DialogActions>
+                </form>
             </Dialog>
         </div>
 

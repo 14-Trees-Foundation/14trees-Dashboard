@@ -10,11 +10,11 @@ import ForestOutlined from "@mui/icons-material/ForestOutlined";
 import GrassTwoToneIcon from "@mui/icons-material/GrassTwoTone";
 import OpacityOutlined from "@mui/icons-material/OpacityOutlined";
 import AccountCircleOutlined from "@mui/icons-material/AccountCircleOutlined";
-import FaceIcon from "@mui/icons-material/Face";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import LandscapeIcon from "@mui/icons-material/Landscape";
 import CorporateFareIcon from "@mui/icons-material/CorporateFare";
+import TourIcon from "@mui/icons-material/TourOutlined";
 import logo from "../../assets/logo_white_small.png";
 import { useRecoilState } from "recoil";
 import { adminNavIndex } from "../../store/adminAtoms";
@@ -100,7 +100,7 @@ export const AdminLeftDrawer = () => {
     },
     {
       displayName: "Visits",
-      logo: VolunteerActivismIcon,
+      logo: TourIcon,
       display: true,
     },
     // {
