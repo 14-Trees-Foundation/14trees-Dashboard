@@ -1,10 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { ToastContainer } from "react-toastify";
 import Box from "@mui/material/Box";
-import { TextField } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
-import GroupAdd from '@mui/icons-material/GroupAdd';
+import GroupIcon from '@mui/icons-material/Group';
 import Collections from '@mui/icons-material/Collections';
 import {
   Button,
@@ -35,7 +34,6 @@ import { Visit, VisitTypeList } from "../../../types/visits";
 
 //import actions
 import * as visitActionCreators from "../../../redux/actions/visitActions";
-import * as visitUserActionCreators from "../../../redux/actions/visitUserActions";
 
 //import state
 import { RootState } from "../../../redux/store/store";
@@ -78,13 +76,9 @@ export const VisitsComponent = () => {
     let filtersData = Object.values(filters);
 
     setTimeout(async () => {
-      await getVisits(page * 10, 10, filtersData);
-    }, 1000);
+      getVisits(page * 10, 10, filtersData);
+    }, 10);
   };
-
-  const {
-    createVisitUsersBulk
-  } = bindActionCreators(visitUserActionCreators, dispatch);
 
 
   let visitsList: Visit[] = [];
@@ -145,7 +139,7 @@ export const VisitsComponent = () => {
             onClick={() => {
               setSelectedVisit(record);
             }}>
-            <GroupAdd />
+            <GroupIcon />
           </Button>
           <Button
             variant="outlined"

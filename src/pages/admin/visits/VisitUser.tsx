@@ -36,7 +36,7 @@ export const VisitUsers = ({ selectedVisit }: VisitUsersInputProps) => {
 
     const dispatch = useAppDispatch();
     const { createVisitUser, removeVisitUsers, getVisitUsers, createVisitUsersBulk } = bindActionCreators(visitUserActionCreators, dispatch)
-    const { getUsers, searchUsers } = bindActionCreators(userActionCreators, dispatch)
+    const { searchUsers } = bindActionCreators(userActionCreators, dispatch)
 
 
     const [selectedVisitForUser, setSelectedVisitForUser] = useState<Visit | null>(null);
