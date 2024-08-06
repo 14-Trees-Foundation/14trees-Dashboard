@@ -16,6 +16,7 @@ export type Donation = {
   dashboard_status: string;
   assigned_plot: string;
   tree_planted: string;
+  assigned_trees: string;
   assigner_dashboard: string;
   remarks_for_inventory: string;
   created_at: string;

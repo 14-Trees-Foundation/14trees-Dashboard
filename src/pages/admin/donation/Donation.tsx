@@ -60,8 +60,8 @@ export const DonationComponent = () => {
   const getDonationData = async () => {
     let filtersData = Object.values(filters);
     setTimeout(async () => {
-      await getDonations(page * 10, 10, filtersData);
-    }, 1000);
+      getDonations(page * 10, 10, filtersData);
+    }, 10);
   };
 
 
@@ -180,14 +180,6 @@ export const DonationComponent = () => {
       ...getColumnSearchProps('email_address', filters, handleSetFilters)
     },
     {
-      dataIndex: "pan",
-      key: "pan",
-      title: "PAN",
-      width: 150,
-      align: "center",
-      ...getColumnSearchProps('pan', filters, handleSetFilters)
-    },
-    {
       dataIndex: "pledged",
       key: "pledged",
       title: "Pledged",
@@ -195,6 +187,13 @@ export const DonationComponent = () => {
       align: "center",
       ...getColumnSearchProps('pledged', filters, handleSetFilters)
 
+    },
+    {
+      dataIndex: "assigned_trees",
+      key: "assigned_trees",
+      title: "Assigned Trees",
+      width: 200,
+      align: "center",
     },
     {
       dataIndex: "land_type",
@@ -211,6 +210,14 @@ export const DonationComponent = () => {
       width: 150,
       align: "center",
       ...getColumnSelectedItemFilter({ dataIndex: 'grove', filters, handleSetFilters, options: typesList }),
+    },
+    {
+      dataIndex: "pan",
+      key: "pan",
+      title: "PAN",
+      width: 150,
+      align: "center",
+      ...getColumnSearchProps('pan', filters, handleSetFilters)
     },
     // {
     //   dataIndex: "zone",
@@ -235,13 +242,6 @@ export const DonationComponent = () => {
     //   width: 180,
     //   align: "center",
     // },
-    {
-      dataIndex: "trees_planted",
-      key: "trees_planted",
-      title: "Trees Planted",
-      width: 200,
-      align: "center",
-    },
     // {
     //   dataIndex: "remarks_for_inventory",
     //   key: "remarks_for_inventory",

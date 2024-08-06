@@ -76,6 +76,9 @@ const AddDonation = ({ open, handleClose, createDonation }) => {
     settaxBenefitRadioButton("yes");
     setRadioButton("yes");
 
+    setTag("");
+    setUsers([]);
+
     setCurrent(0);
     handleClose();
   };
@@ -223,28 +226,7 @@ const AddDonation = ({ open, handleClose, createDonation }) => {
     createDonation(newDonation);
     console.log("New Donation Data : ", newDonation);
 
-    setName("");
-    setPhone("");
-    setEmail("");
-    setNo_of_Trees(0);
-    setNo_of_Acres(0);
-    setGrove("");
-    setSite_Type("");
-    setQRCode("");
-    setTotal_Payment("");
-    setContribution("");
-    setPAN("");
-    setFCRA("");
-    setListOfNames("");
-    setSummary("");
-    setComments("");
-    setIsTextFieldEnabled(true);
-    setTaxBenefit(true);
-    settaxBenefitRadioButton("yes");
-    setRadioButton("yes");
-
-    handleClose();
-    setCurrent(0);
+    handleCancelButton();
   };
 
   const handleNameChange = (e) => {
