@@ -144,14 +144,14 @@ export const DonationComponent = () => {
       align: "center",
       ...getColumnSearchProps('name', filters, handleSetFilters)
     },
-    {
-      dataIndex: "donor_type",
-      key: "donor_type",
-      title: "Donor Type",
-      width: 180,
-      align: "center",
-      ...getColumnSearchProps('donor_type', filters, handleSetFilters)
-    },
+    // {
+    //   dataIndex: "donor_type",
+    //   key: "donor_type",
+    //   title: "Donor Type",
+    //   width: 180,
+    //   align: "center",
+    //   ...getColumnSearchProps('donor_type', filters, handleSetFilters)
+    // },
     {
       dataIndex: "phone",
       key: "phone",
@@ -164,7 +164,7 @@ export const DonationComponent = () => {
       dataIndex: "email_address",
       key: "email_address",
       title: "Email",
-      width: 150,
+      width: 250,
       align: "center",
       ...getColumnSearchProps('email_address', filters, handleSetFilters)
     },
@@ -192,42 +192,56 @@ export const DonationComponent = () => {
       width: 150,
       align: "center",
       ...getColumnSelectedItemFilter({ dataIndex: 'land_type', filters, handleSetFilters, options: typesList }),
-
     },
     {
-      dataIndex: "zone",
-      key: "zone",
-      title: "Zone",
+      dataIndex: "grove",
+      key: "grove",
+      title: "Grove",
       width: 150,
       align: "center",
-      ...getColumnSearchProps('zone', filters, handleSetFilters)
+      ...getColumnSelectedItemFilter({ dataIndex: 'grove', filters, handleSetFilters, options: typesList }),
+    },
+    // {
+    //   dataIndex: "zone",
+    //   key: "zone",
+    //   title: "Zone",
+    //   width: 150,
+    //   align: "center",
+    //   ...getColumnSearchProps('zone', filters, handleSetFilters)
 
-    },
+    // },
+    // {
+    //   dataIndex: "dashboard_status",
+    //   key: "dashboard_status",
+    //   title: "Dashboard Status",
+    //   width: 150,
+    //   align: "center",
+    // },
+    // {
+    //   dataIndex: "assigned_plot",
+    //   key: "assigned_plot",
+    //   title: "Assigned Plot",
+    //   width: 180,
+    //   align: "center",
+    // },
     {
-      dataIndex: "dashboard_status",
-      key: "dashboard_status",
-      title: "Dashboard Status",
-      width: 150,
-      align: "center",
-    },
-    {
-      dataIndex: "assigned_plot",
-      key: "assigned_plot",
-      title: "Assigned Plot",
-      width: 180,
-      align: "center",
-    },
-    {
-      dataIndex: "tree_planted",
-      key: "tree_planted",
+      dataIndex: "trees_planted",
+      key: "trees_planted",
       title: "Trees Planted",
       width: 200,
       align: "center",
     },
+    // {
+    //   dataIndex: "remarks_for_inventory",
+    //   key: "remarks_for_inventory",
+    //   title: "Remarks for inventory",
+    //   width: 180,
+    //   align: "center",
+    // },
     {
-      dataIndex: "remarks_for_inventory",
-      key: "remarks_for_inventory",
-      title: "Remarks for inventory",
+      dataIndex: "associated_tag",
+      key: "associated_tag",
+      title: "Associated Tag",
       width: 180,
       align: "center",
     },

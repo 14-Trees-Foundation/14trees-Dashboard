@@ -1,9 +1,7 @@
 
 export type Donation = {
-  
   id: number;
   key: number;
-
   date_received: string;
   name: string;
   donor_type: string;
@@ -20,6 +18,9 @@ export type Donation = {
   tree_planted: string;
   assigner_dashboard: string;
   remarks_for_inventory: string;
+  created_at: string;
+  updated_at: string;
+  associated_tag: string;
 };
 
 export type DonationDataState = {

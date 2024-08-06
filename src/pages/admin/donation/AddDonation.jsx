@@ -10,13 +10,41 @@ import {
   Radio,
   RadioGroup,
   FormControlLabel,
+  Autocomplete,
 } from "@mui/material";
 import "./Donation";
 import MenuItem from "@mui/material/MenuItem";
-import { Steps } from "antd";
+import DeleteIcon from "@mui/icons-material/Delete";
+import { Steps, Table } from "antd";
 import PaymentQR14tree from "../../../assets/PaymentQR14tree.jpg";
+import { UserForm } from "./components/UserForm";
+import { BulkUserForm } from "./components/UserBulkForm";
+import { useAppDispatch, useAppSelector } from "../../../redux/store/hooks";
+import { bindActionCreators } from "@reduxjs/toolkit";
+import * as userActionCreators from "../../../redux/actions/userActions";
+
+function equallyDistributeTrees(totalTrees, users) {
+  const usersCount = users.length;
+  if (usersCount === 0) return [];
+
+  const baseCount = Math.floor(totalTrees / usersCount);
+  const remainder = totalTrees % usersCount;
+
+  let newUsers = users.map((user, idx) => ({ ...user, gifted_trees: baseCount + (remainder > idx ? 1 : 0) }));
+
+  return newUsers;
+}
 
 const AddDonation = ({ open, handleClose, createDonation }) => {
+  const dispatch = useAppDispatch();
+  const { searchUsers } = bindActionCreators(userActionCreators, dispatch);
+
+  const usersData = useAppSelector((state) => state.searchUsersData);
+  let usersList = [];
+  if (usersData) {
+    usersList = Object.values(usersData.users);
+  }
+
   const [current, setCurrent] = useState(0);
 
   const nextStep = () => {
@@ -30,8 +58,9 @@ const AddDonation = ({ open, handleClose, createDonation }) => {
   const handleCancelButton = () => {
     setName("");
     setEmail("");
-    setNo_of_Trees("");
-    setNo_of_Acres("");
+    setPhone("");
+    setNo_of_Trees(0);
+    setNo_of_Acres(0);
     setGrove("");
     setSite_Type("");
     setQRCode("");
@@ -91,14 +120,17 @@ const AddDonation = ({ open, handleClose, createDonation }) => {
     title: item.title,
   }));
 
+  const [userAddOption, setUserAddOption] = useState('single');
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
-  const [No_of_Trees, setNo_of_Trees] = useState("");
-  const [No_of_Acres, setNo_of_Acres] = useState("");
+  const [phone, setPhone] = useState("");
 
+  const [No_of_Trees, setNo_of_Trees] = useState(0);
+  const [No_of_Acres, setNo_of_Acres] = useState(0);
   const [Grove, setGrove] = useState("");
-
   const [Site_Type, setSite_Type] = useState("");
+  const [tag, setTag] = useState("");
+
   const [QRCode, setQRCode] = useState("");
   const [Total_Payment_based_on_selection, setTotal_Payment] = useState(0);
   const [Contribution_dropdown_Screenshot, setContribution] = useState("");
@@ -110,6 +142,7 @@ const AddDonation = ({ open, handleClose, createDonation }) => {
 
   const [nameError, setNameError] = useState(false);
   const [emailError, setEmailError] = useState(false);
+  const [phoneError, setPhoneError] = useState(false);
   const [numOfTreeError, setNumOfTreeError] = useState("");
 
   const [isTextFieldEnabled, setIsTextFieldEnabled] = useState(true);
@@ -119,13 +152,30 @@ const AddDonation = ({ open, handleClose, createDonation }) => {
   const [tags, setTags] = useState([]);
   const [tree_acre_radio_button, setRadioButton] = useState("yes");
   const [taxBenefitRadioButton, settaxBenefitRadioButton] = useState("yes");
-
-  const [stageCheck, setStageCheck] = useState(false);
+  const [users, setUsers] = useState([]);
 
   const SiteTypeOptions = [
-    { value: "1", label: "Pubilc" },
+    { value: "1", label: "Public" },
     { value: "2 ", label: "Foundation" },
   ];
+
+  const GroveType = {
+    "Public": [
+      { value: "1.5K-Visitors", label: "Visitor's grove" },
+      { value: "1.5K-Memorial-Trees", label: "Memorial grove" },
+      { value: "1.5K-Alumni-Grove", label: "School/College alumni grove" },
+      { value: "1.5K-Corporate-Gift", label: "Corporate grove" },
+      { value: "1.5K-Conference-Gift", label: "Conference grove" },
+    ],
+    "Foundation": [
+      { value: "3K-Visitors", label: "Visitor's grove" },
+      { value: "3K-Family-Grove", label: "Family grove" },
+      { value: "3K-Memorial-Grove", label: "Memorial grove" },
+      { value: "3K-IIT-Alumni-Grove", label: "School/College alumni grove" },
+      { value: "3K-Corporate-Gift", label: "Corporate grove" },
+      { value: "3K-Conference-Gift", label: "Conference grove" },
+    ]
+  }
 
   const GroveTypeOptions = [
     { value: "1", label: "Visitor's grove" },
@@ -137,14 +187,27 @@ const AddDonation = ({ open, handleClose, createDonation }) => {
     { value: "7", label: "Conference grove" },
   ];
 
+  const checkDisabled = () => {
+    if (current === 0) {
+      return (nameError || emailError || phoneError || name === '' || email === '' || phone === '')
+    } else if (current === 1) {
+      return (numOfTreeError || No_of_Trees === 0 || Grove === '' || Site_Type === '')
+    } else if (current === 4) {
+      return users.length === 0
+    }
+
+    return false
+  }
+
   const handleSubmit = () => {
     const newDonation = {
       name: name,
-      email_address: email,
+      email: email,
+      phone: phone,
       no_of_trees: No_of_Trees,
       no_of_acres: No_of_Acres,
       grove: Grove,
-      site_type: Site_Type,
+      land_type: Site_Type,
       QRCode: QRCode,
       total_payment_based_on_selection: Total_Payment_based_on_selection,
       contribution_dropdown_screenshot: Contribution_dropdown_Screenshot,
@@ -153,15 +216,18 @@ const AddDonation = ({ open, handleClose, createDonation }) => {
       list_of_people_names: List_of_people_names,
       summary: Summary,
       comments: Comments,
+      tag: tag,
+      users: users,
     };
 
     createDonation(newDonation);
     console.log("New Donation Data : ", newDonation);
 
     setName("");
+    setPhone("");
     setEmail("");
-    setNo_of_Trees("");
-    setNo_of_Acres("");
+    setNo_of_Trees(0);
+    setNo_of_Acres(0);
     setGrove("");
     setSite_Type("");
     setQRCode("");
@@ -190,51 +256,75 @@ const AddDonation = ({ open, handleClose, createDonation }) => {
     }
   };
 
-  const handleEmailChange = (e) => {
-    setEmail(e.target.value);
+  const handleEmailChange = (event, value) => {
+    let isSet = false;
+    usersList.forEach((user) => {
+      if (`${user.name} (${user.email})` === value) {
+        isSet = true;
+        setName(user.name);
+        setPhone(user.phone);
+        setEmail(user.email);
+        setEmailError(false);
+        setNameError(false);
+        setPhoneError(false);
+      }
+    });
 
-    const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    if (!isSet && email !== value && value !== ` ()`) {
+      setEmail(value);
+      const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+      setEmailError(!emailPattern.test(value));
 
-    setEmailError(!emailPattern.test(e.target.value));
+      if (value.length >= 3) searchUsers(value);
+    }
+  };
+
+  const handlePhoneChange = (event) => {
+    const { value } = event.target;
+    setPhone(value);
+
+    const phonePattern = /^\d{10}$/;
+    setPhoneError(!phonePattern.test(value))
   };
 
   const handleNumOfTree = (e) => {
     const value = e.target.value;
-    setNo_of_Trees(value);
 
     // Basic validation: check if the value is a valid number
-    if (value !== "" && isNaN(Number(value))) {
+    if (value !== "" && isNaN(parseInt(value))) {
       setNumOfTreeError("Please enter a valid number");
+    } else if (parseInt(value) === 0) {
+      setNumOfTreeError("Please enter a number greater than 0");
     } else {
+      setNo_of_Trees(parseInt(value));
       setNumOfTreeError("");
     }
   };
+
+  useEffect(() => {
+    if (Site_Type !== '') {
+      const multiplier = Site_Type === 'Public' ? 1500 : 3000;
+      setTotal_Payment(No_of_Trees * multiplier);
+    }
+  }, [Site_Type, No_of_Trees]);
+
+  useEffect(() => {
+    let tag = '';
+    GroveType[Site_Type]?.forEach((option) => {
+      if (option.label === Grove) {
+        tag = option.value;
+      }
+    })
+    if (tag === '') setGrove('');
+    else setTag(tag)
+  }, [Site_Type, Grove]);
 
   const handleGroveType = (e) => {
     setGrove(e.target.value);
   };
 
   const handleSiteType = (e) => {
-    const value = e.target.value;
-
     setSite_Type(e.target.value);
-    console.log("site type value", e.target.value);
-    console.log(" type of value", typeof e.target.value);
-
-    let total;
-    if (value == "Public") {
-      total = { No_of_Trees } * 1500;
-      console.log("total value when public: ", total);
-    } else if (value == "Foundation") {
-      total = { No_of_Acres } * 3000;
-      console.log("total value when foundation: ", total);
-    } else {
-      total = 0;
-    }
-    console.log("Total value: ", total);
-
-    setTotal_Payment(total);
-    console.log("Value of Total: ", Total_Payment_based_on_selection);
   };
 
   const handleRadioChange = (e) => {
@@ -270,6 +360,70 @@ const AddDonation = ({ open, handleClose, createDonation }) => {
     setTagValue(remainTags);
     console.log(tags);
   };
+
+  const handleRemoveUser = (email) => {
+    const idx = users.find((user) => user.email === email);
+    if (idx) {
+      setUsers(equallyDistributeTrees(No_of_Trees, users.filter((user) => user.email !== email)));
+    }
+  }
+
+  const columns = [
+    {
+      dataIndex: "name",
+      key: "name",
+      title: "Name",
+      width: 180,
+      align: "center",
+    },
+    {
+      dataIndex: "email",
+      key: "email",
+      title: "Email",
+      width: 180,
+      align: "center",
+    },
+    {
+      dataIndex: "phone",
+      key: "phone",
+      title: "Phone",
+      width: 180,
+      align: "center",
+    },
+    {
+      dataIndex: "gifted_trees",
+      key: "gifted_trees",
+      title: "Gifted Trees",
+      width: 100,
+      align: "center",
+    },
+    {
+      dataIndex: "action",
+      key: "action",
+      title: "Action",
+      width: 150,
+      align: "center",
+      render: (value, record, index) => (
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+          }}>
+          <Button
+            variant="outlined"
+            color="error"
+            style={{ margin: "0 5px" }}
+            onClick={() => {
+              handleRemoveUser(record.email)
+            }}
+          >
+            <DeleteIcon />
+          </Button>
+        </div>
+      ),
+    },
+  ];
 
   return (
     <>
@@ -326,18 +480,42 @@ const AddDonation = ({ open, handleClose, createDonation }) => {
                     onChange={handleNameChange}
                   />
                   <TextField
-                    margin="dense"
                     required
-                    name="email"
-                    label="Email"
+                    margin="dense"
+                    name="phone"
+                    label="Contact No."
                     type="text"
                     fullWidth
-                    value={email}
-                    error={emailError}
+                    value={phone}
+                    error={phoneError}
                     helperText={
-                      emailError ? "Please enter valid email id " : ""
+                      phoneError
+                        ? "Please enter valid phone number"
+                        : ""
                     }
-                    onChange={handleEmailChange}
+                    inputProps={{
+                      pattern: "[0-9]+",
+                    }}
+                    onChange={handlePhoneChange}
+                  />
+                  <Autocomplete
+                    fullWidth
+                    options={usersList.map((user) => `${user.name} (${user.email})`)}
+                    onInputChange={handleEmailChange}
+                    value={email}
+                    renderInput={(params) => (
+                      <TextField
+                        {...params}
+                        label="Email"
+                        variant="outlined"
+                        name="email"
+                        margin="dense"
+                        error={emailError}
+                        helperText={
+                          emailError ? "Please enter valid email id " : ""
+                        }
+                      />
+                    )}
                   />
                 </DialogContent>
               )}
@@ -367,6 +545,7 @@ const AddDonation = ({ open, handleClose, createDonation }) => {
                         <FormControlLabel
                           value="no"
                           control={<Radio />}
+                          disabled
                           label="Acres"
                         />
                       </RadioGroup>
@@ -374,7 +553,6 @@ const AddDonation = ({ open, handleClose, createDonation }) => {
 
                     <Grid item xs={6}>
                       <TextField
-                        autoFocus
                         margin="dense"
                         name="No of Trees"
                         label="No of Trees"
@@ -394,7 +572,6 @@ const AddDonation = ({ open, handleClose, createDonation }) => {
 
                     <Grid item xs={6}>
                       <TextField
-                        autoFocus
                         margin="dense"
                         name="No of Acres"
                         label="No of Acres"
@@ -410,24 +587,6 @@ const AddDonation = ({ open, handleClose, createDonation }) => {
                   </Grid>
                   <TextField
                     select
-                    autoFocus
-                    margin="dense"
-                    name="Grove"
-                    label="Grove Type"
-                    type="text"
-                    fullWidth
-                    value={Grove}
-                    onChange={handleGroveType}
-                  >
-                    {GroveTypeOptions.map((item) => (
-                      <MenuItem key={item.value} value={item.label}>
-                        {item.label}
-                      </MenuItem>
-                    ))}
-                  </TextField>
-                  <TextField
-                    select
-                    autoFocus
                     margin="dense"
                     name="Site Type"
                     label="Site Type"
@@ -437,6 +596,23 @@ const AddDonation = ({ open, handleClose, createDonation }) => {
                     onChange={handleSiteType}
                   >
                     {SiteTypeOptions.map((item) => (
+                      <MenuItem key={item.value} value={item.label}>
+                        {item.label}
+                      </MenuItem>
+                    ))}
+                  </TextField>
+                  <TextField
+                    select
+                    margin="dense"
+                    name="Grove"
+                    label="Grove Type"
+                    type="text"
+                    fullWidth
+                    value={Grove}
+                    disabled={Site_Type === ''}
+                    onChange={handleGroveType}
+                  >
+                    {GroveType[Site_Type]?.map((item) => (
                       <MenuItem key={item.value} value={item.label}>
                         {item.label}
                       </MenuItem>
@@ -479,7 +655,7 @@ const AddDonation = ({ open, handleClose, createDonation }) => {
                     name="Contribution dropdown Screenshot"
                     label="Contribution_dropdown_Screenshot"
                     fullWidth
-                    // onChange={()=>{}}
+                  // onChange={()=>{}}
                   />
                 </DialogContent>
               )}
@@ -545,28 +721,56 @@ const AddDonation = ({ open, handleClose, createDonation }) => {
               )}
 
               {current === 4 && (
-                <div className="tagInput">
-                  {tags.map((item, index) => {
-                    return (
-                      <Button onClick={() => deleteTags(item)} key={index}>
-                        {item}
-                        <span>X</span>
-                      </Button>
-                    );
-                  })}
-                  <input
-                    label="List of name"
-                    type="text"
-                    fullWidth
-                    style={{
-                      marginRight: 8,
-                      display: "flex",
-                      flexWrap: "wrap",
-                    }}
-                    value={tagValue}
-                    onChange={(e) => setTagValue(e.target.value)}
-                  />
-                  <Button onClick={addTags}>Add Name</Button>
+
+                <div
+                  style={{ display: 'flex', flexDirection: 'row' }}
+                >
+                  <Grid
+                    container
+                    style={{ marginRight: '20px', height: 300 }}
+                  >
+                    <Grid item xs={12}>
+                      <RadioGroup
+                        row
+                        aria-label="enable"
+                        name="enable"
+                        value={userAddOption}
+                        onChange={(e) => { setUserAddOption(e.target.value) }}
+                      >
+                        <FormControlLabel
+                          value="single"
+                          control={<Radio />}
+                          label="Manually"
+                        />
+                        <FormControlLabel
+                          value="bulk"
+                          control={<Radio />}
+                          label="CSV Upload"
+                        />
+                      </RadioGroup>
+                    </Grid>
+                    <Grid item xs={12}>
+                      {userAddOption === 'single' && (
+                        <UserForm onSubmit={(user) => { setUsers(prev => equallyDistributeTrees(No_of_Trees, [...prev, user])) }} />
+                      )}
+
+                      {userAddOption === 'bulk' && (
+                        <BulkUserForm onSubmit={users => { setUsers(equallyDistributeTrees(No_of_Trees, users)) }} />
+                      )}
+                    </Grid>
+                  </Grid>
+                  <Grid
+                    container
+                    spacing={2}
+                    style={{ marginLeft: '20px', height: 450 }}
+                  >
+                    <Table
+                      style={{ height: 300 }}
+                      columns={columns}
+                      dataSource={users}
+                      pagination={{ pageSize: 5 }}
+                    />
+                  </Grid>
                 </div>
               )}
 
@@ -726,9 +930,8 @@ const AddDonation = ({ open, handleClose, createDonation }) => {
           >
             {current <= add_donation_steps.length - 1 && (
               <Button
-                variant="contained"
-                type="primary"
-                color="primary"
+                variant="outlined"
+                color="error"
                 style={{ margin: "0 8px 20px 8px" }}
                 onClick={handleCancelButton}
               >
@@ -737,9 +940,8 @@ const AddDonation = ({ open, handleClose, createDonation }) => {
             )}
             {current > 0 && (
               <Button
-                variant="contained"
-                type="primary"
-                color="primary"
+                variant="outlined"
+                color='primary'
                 style={{ margin: "0 8px 20px 8px" }}
                 onClick={() => prevStep()}
               >
@@ -750,10 +952,10 @@ const AddDonation = ({ open, handleClose, createDonation }) => {
             {current < add_donation_steps.length - 1 && (
               <Button
                 variant="contained"
-                type="primary"
-                color="primary"
+                color="success"
                 style={{ margin: "0 8px 20px 8px" }}
                 onClick={() => nextStep()}
+                disabled={checkDisabled()}
               >
                 Next
               </Button>
@@ -762,9 +964,10 @@ const AddDonation = ({ open, handleClose, createDonation }) => {
             {current === add_donation_steps.length - 1 && (
               <Button
                 variant="contained"
+                color="success"
                 type="submit"
-                color="primary"
                 style={{ margin: "0 8px 20px 8px" }}
+                disabled={checkDisabled()}
                 onClick={() => handleSubmit()}
               >
                 Done

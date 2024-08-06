@@ -33,6 +33,7 @@
     "json2csv": "^6.0.0-alpha.2",
     "miragejs": "^0.1.41",
     "moment": "^2.29.1",
+    "papaparse": "^5.4.1",
     "prettier": "^2.6.2",
     "react": "^17.0.2",
     "react-bootstrap": "^2.0.4",
@@ -99,6 +100,7 @@
   },
   "devDependencies": {
     "@types/json2csv": "^5.0.7",
+    "@types/papaparse": "^5.3.14",
     "react-error-overlay": "^6.0.9"
   }
 }
