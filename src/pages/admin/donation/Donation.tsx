@@ -14,6 +14,7 @@ import {
 import { GridFilterItem } from "@mui/x-data-grid";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
+import ForestIcon from "@mui/icons-material/Forest";
 import { TableColumnsType } from "antd";
 import TableComponent from "../../../components/Table";
 import { Donation } from "../../../types/donation";
@@ -32,7 +33,7 @@ export const DonationComponent = () => {
 
 
   const dispatch = useAppDispatch();
-  const { getDonations, createDonation, updateDonation, deleteDonation } = bindActionCreators(
+  const { getDonations, createDonation, updateDonation, deleteDonation, assignTreesToDonationUsers } = bindActionCreators(
     donationActionCreators,
     dispatch
   );
@@ -105,7 +106,7 @@ export const DonationComponent = () => {
       dataIndex: "action",
       key: "action",
       title: "Action",
-      width: 150,
+      width: 220,
       align: "center",
       render: (value, record, index) => (
         <div
@@ -114,6 +115,16 @@ export const DonationComponent = () => {
             justifyContent: "center",
             alignItems: "center",
           }}>
+          <Button
+            variant="outlined"
+            style={{ margin: "0 5px" }}
+            color="success"
+            onClick={() => {
+              assignTreesToDonationUsers(record.id);
+            }}
+          >
+            <ForestIcon />
+          </Button>
           <Button
             variant="outlined"
             style={{ margin: "0 5px" }}

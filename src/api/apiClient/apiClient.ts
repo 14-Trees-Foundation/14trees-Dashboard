@@ -798,6 +798,16 @@ class ApiClient {
         }
     }
 
+    async assignTreesToDonation(donationId: number): Promise<boolean> {
+        try {
+            const response = await this.api.post<void>(`/profile/assignbulk/${donationId}`);
+            return response.status === 200;
+        } catch (error: any) {
+            console.error(error)
+            throw new Error(error?.response?.data?.message || 'Failed to assign trees to donation users');
+        }
+    }
+
     /*
           Model- Event : CRUD Operations/Apis for Event
       */
