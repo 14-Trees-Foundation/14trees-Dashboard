@@ -9,13 +9,17 @@ import {
   DialogContentText,
   DialogTitle,
   Divider,
+  Fade,
+  Menu,
+  MenuItem,
   Typography,
 } from "@mui/material";
 import { GridFilterItem } from "@mui/x-data-grid";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import ForestIcon from "@mui/icons-material/Forest";
-import { TableColumnsType } from "antd";
+import MoreVertIcon from "@mui/icons-material/MoreVert";
+import { Dropdown, TableColumnsType } from "antd";
 import TableComponent from "../../../components/Table";
 import { Donation } from "../../../types/donation";
 import CircularProgress from "@mui/material/CircularProgress";
@@ -31,9 +35,8 @@ import { ToastContainer } from "react-toastify";
 
 export const DonationComponent = () => {
 
-
   const dispatch = useAppDispatch();
-  const { getDonations, createDonation, updateDonation, deleteDonation, assignTreesToDonationUsers } = bindActionCreators(
+  const { getDonations, createDonation, updateDonation, deleteDonation, assignTreesToDonationUsers, createWorkOrderForDonation } = bindActionCreators(
     donationActionCreators,
     dispatch
   );
@@ -47,6 +50,22 @@ export const DonationComponent = () => {
   const [selectedItem, setSelectedItem] = useState<any | null>(null);
   const [selectedEditRow, setSelectedEditRow] = useState<any | null>(null);
   const [editModal, setEditModal] = useState(false);
+
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const dorpDownOpen = Boolean(anchorEl);
+  const handleClick = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleAutoAssignTrees = (donationId: number) => {
+    assignTreesToDonationUsers(donationId);
+    setAnchorEl(null);
+  };
+
+  const handleCreateWorkOder = (donationId: number) => {
+    createWorkOrderForDonation(donationId);
+    setAnchorEl(null);
+  };
 
   const handleSetFilters = (filters: Record<string, GridFilterItem>) => {
     setPage(0);
@@ -118,13 +137,27 @@ export const DonationComponent = () => {
           <Button
             variant="outlined"
             style={{ margin: "0 5px" }}
-            color="success"
-            onClick={() => {
-              assignTreesToDonationUsers(record.id);
-            }}
+            aria-controls={dorpDownOpen ? 'fade-menu' : undefined}
+            aria-haspopup="true"
+            aria-expanded={dorpDownOpen ? 'true' : undefined}
+            onClick={handleClick}
           >
-            <ForestIcon />
+            <MoreVertIcon />
           </Button>
+          <Menu
+            id="fade-menu"
+            MenuListProps={{
+              'aria-labelledby': 'fade-button',
+            }}
+            anchorEl={anchorEl}
+            open={dorpDownOpen}
+            onClose={() => setAnchorEl(null)}
+            TransitionComponent={Fade}
+          >
+            <MenuItem onClick={() => { handleAutoAssignTrees(record.id) }}>Auto Assign Trees</MenuItem>
+            <MenuItem onClick={() => { handleCreateWorkOder(record.id) }}>Create Work Order</MenuItem>
+            <MenuItem >Send Email</MenuItem>
+          </Menu> 
           <Button
             variant="outlined"
             style={{ margin: "0 5px" }}

@@ -21,6 +21,7 @@ import { VisitorNew } from "./pages/Visitor/Visitor2";
 import { OrgEvent } from "./pages/events/OrgEvent";
 import { Corporate } from "./pages/events/Corporate";
 import { Test } from "./pages/test/test";
+import TreeProfile from "./pages/Profiles/TreeProfile";
 
 function App() {
   return (
@@ -40,6 +41,7 @@ function App() {
           <Route path="/visitornew" element={<VisitorNew />}></Route>
           {/* <Route path="/addtree" element={<AddTree />}></Route> */}
           <Route path="/profile/:saplingId" element={<Dashboard />}></Route>
+          <Route path="/tree/:saplingId" element={<TreeProfile />}></Route>
           <Route path="/group/:grptype" element={<OrgEvent />}></Route>
           <Route path="/events/corp/:event_id" element={<Corporate />}></Route>
           <Route path="/login" element={<Login />} />

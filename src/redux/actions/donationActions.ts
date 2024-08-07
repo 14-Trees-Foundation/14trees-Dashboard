@@ -135,3 +135,28 @@ export const assignTreesToDonationUsers = (donationId: number) => {
         )
     };
 }
+
+export const createWorkOrderForDonation = (donationId: number) => {
+    const apiClient = new ApiClient();
+    return (dispatch: any) => {
+        dispatch({
+            type: donationActionTypes.CREATE_WORK_ORDER_REQUESTED,
+        });
+        apiClient.createWorkOrderForDonation(donationId).then(
+            (value: boolean) => {
+                dispatch({
+                    type: donationActionTypes.CREATE_WORK_ORDER_SUCCEEDED,
+                    payload: value,
+                });
+                toast.success('Work order created successfully');
+            },
+            (error: any) => {
+                console.error(error);
+                dispatch({
+                    type: donationActionTypes.CREATE_WORK_ORDER_FAILED,
+                });
+                toast.error(error.message);
+            }
+        )
+    };
+}

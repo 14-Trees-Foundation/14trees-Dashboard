@@ -19,7 +19,7 @@ export type Tree = {
     gifted_to: number,
     assigned_to: number,
     assigned_at: Date,
-    user_tree_images: string[]
+    user_tree_image: string
     memory_images: string[]
     event_id: number,
     created_at: Date,
