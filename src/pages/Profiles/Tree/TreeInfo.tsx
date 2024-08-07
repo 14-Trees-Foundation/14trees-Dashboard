@@ -1,66 +1,28 @@
-import { FC } from "react";
-import { Tree } from "../../../types/tree";
-import React from 'react';
-import { createStyles, makeStyles } from '@mui/styles';
-import { Theme } from '@mui/material/styles';
-
-const useStyles = makeStyles((theme: Theme) =>
-  createStyles({
-    box: {
-      display: 'flex',
-      flexDirection: 'column',
-      border: '1px solid #ccc',
-      borderRadius: '8px',
-      overflow: 'hidden',
-      width: '300px',
-      boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
-    },
-    image: {
-      width: '100%',
-      height: 'auto',
-      aspectRatio: '4 / 3',
-      objectFit: 'cover',
-    },
-    content: {
-      padding: '16px',
-      display: 'flex',
-      flexDirection: 'column',
-      gap: '8px',
-    },
-    title: {
-      margin: 0,
-      fontSize: '1.25em',
-    },
-    description: {
-      margin: 0,
-      color: '#666',
-      flexGrow: 1,
-    },
-    footer: {
-      marginTop: '8px',
-      fontSize: '0.875em',
-      color: '#999',
-    },
-  })
-);
+import React, { FC } from 'react';
+import { Card, CardContent, Typography, Box } from '@mui/material';
+import { Tree } from '../../../types/tree';
+import { getHumanReadableDate } from '../../../helpers/utils';
 
 interface TreeInfoProps {
-    tree: Tree
+  tree: Tree
 }
 
 const TreeInfo: FC<TreeInfoProps> = ({ tree }) => {
-    const classes = useStyles();
-
   return (
-    <div className={classes.box}>
-      <img src={tree.image} alt={tree.sapling_id} className={classes.image} />
-      <div className={classes.content}>
-        <h2 className={classes.title}>{tree.sapling_id}</h2>
-        <p className={classes.description}>{tree.plant_type}</p>
-        <div className={classes.footer}>{tree.plot}</div>
-      </div>
-    </div>
+    <Card sx={{ display: 'flex', margin: '0 auto', padding: 2, borderRadius: 4, boxShadow: 3 }}>
+      <CardContent sx={{ flex: '1 1 auto' }}>
+        <Typography variant="h6" style={{ marginBottom: 10 }}>
+          Tree: {tree.sapling_id}
+        </Typography>
+        <Typography variant="body1" component="p">
+          Planting a tree is more than just adding greenery to our planet—it's a gift to future generations. This <strong>{tree.plant_type}</strong> tree stands as a symbol of hope and sustainability. Planted on <strong>{getHumanReadableDate(tree.created_at as any)}</strong> by <strong>{tree.plant_type}</strong> in <strong>{tree.plot}</strong>, it has been growing strong, providing shade, clean air, and a home for wildlife.
+        </Typography>
+      </CardContent>
+      <Box sx={{ flex: '0 0 auto', padding: 2 }}>
+        <img src={tree.image} alt={`${tree.plant_type} tree`} style={{ width: '210px', height: '280px', borderRadius: 8 }} />
+      </Box>
+    </Card>
   );
-}
+};
 
 export default TreeInfo;
