@@ -13,6 +13,9 @@ const VisitInfo: FC<VisitInfoProps> = ({ visit }) => {
     return (
         <Card sx={{ display: 'flex', margin: '0 auto', padding: 2, borderRadius: 4, boxShadow: 3 }}>
             <CardContent sx={{ flex: '1 1 auto' }}>
+                <Typography variant="h5" style={{margin: 2}}>
+                    <strong>Visit Event:</strong>
+                </Typography>
                 <Typography variant="body1" component="p" style={{ marginBottom: 10 }}>
                     This tree was planted during the {visit.visit_name}, organized by {'Individual'}. The event saw participation from {visit.user_count} individuals who came together to celebrate nature and contribute to a sustainable future. Take a look at some of the wonderful moments captured during the event in the photos below.
                 </Typography>

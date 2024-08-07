@@ -71,17 +71,25 @@ const TreeTimeline: React.FC<TimelineProps> = ({ items }) => {
     return (
         <Container className={classes.timeline}>
             <Box sx={{ width: '100%' }}>
-                {items.length !== 0 && <Timeline position="alternate">
-                    {items.map((item, index) => (
-                        <TimelineItem>
-                            <TimelineSeparator >
-                                <TimelineDot color='success' />
-                                <TimelineConnector sx={{ backgroundColor: 'green' }} />
-                            </TimelineSeparator>
-                            <TimelineContent><TimelineComp key={index} {...item} /></TimelineContent>
-                        </TimelineItem>
-                    ))}
-                </Timeline>}
+                {items.length !== 0 && 
+                    <Timeline position="alternate">
+                        {items.map((item, index) => (
+                            <TimelineItem>
+                                <TimelineSeparator >
+                                    <TimelineDot color='success' />
+                                    <TimelineConnector sx={{ backgroundColor: 'green' }} />
+                                </TimelineSeparator>
+                                <TimelineContent><TimelineComp key={index} {...item} /></TimelineContent>
+                            </TimelineItem>
+                        ))}
+                        <Box style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                            <TimelineDot color='success'/>
+                        </Box>
+                        <Typography variant='body1' style={{ display: 'flex', justifyContent: 'center', marginTop: 10 }}>
+                            The tree is 1 year 3 months old, awaiting new images!
+                        </Typography>
+                    </Timeline>
+                }
                 {items.length === 0 && 
                     <Empty
                         imageStyle={{ height: 60 }}

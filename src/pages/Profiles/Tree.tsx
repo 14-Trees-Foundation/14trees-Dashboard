@@ -5,14 +5,13 @@ import { bindActionCreators } from "@reduxjs/toolkit";
 import { Tree } from "../../types/tree";
 import { RootState } from "../../redux/store/store";
 import { useParams } from "react-router";
-import { Box, Card, CardContent, Grid, Typography } from "@mui/material";
-import VisitCard from "./VisitCard";
-import ImageSlider from "./ImageSlider";
-import { getHumanReadableDate } from "../../helpers/utils";
+import { Box, Divider, Typography } from "@mui/material";
 import TreeInfo from "./Tree/TreeInfo";
 import { Spinner } from "../../components/Spinner";
 import UserTreeInfo from "./Tree/UserTreeInfo";
 import VisitInfo from "./Tree/VisitInfo";
+import TreeTimelineInfo from "./Tree/TreeTimelineInfo";
+import { Map } from "./Tree/Map";
 
 interface TreePageProps {
     // saplingId: string
@@ -58,13 +57,23 @@ const TreePage: FC<TreePageProps> = ({ }) => {
 
     return (
         <Box p={2}>
-            <Box style={{ marginBottom: 10 }}>
+            <Typography variant="h4" style={{ marginBottom: 3 }}>
+                {tree.plant_type}
+            </Typography>
+            <Typography variant="body1" style={{ marginBottom: 10 }}>
+                Tracking ID: {tree.sapling_id}
+            </Typography>
+            <Divider style={{ marginBottom: 10 }}/>
+            <Box style={{ marginBottom: 20 }}>
                 <TreeInfo tree={tree} />
             </Box>
-            <Box style={{ marginBottom: 10 }}>
+            <Box style={{ marginBottom: 20 }}>
                 <UserTreeInfo tree={tree} />
             </Box>
-            <Box style={{ marginBottom: 10 }}>
+            <Box style={{ marginBottom: 20 }}>
+                <Map tree={tree} />
+            </Box>
+            <Box style={{ marginBottom: 20 }}>
                 <VisitInfo visit={{
                     visit_name: "IIT Kanpur Alumni Visit",
                     created_at: new Date("2024-08-08T00:00:00Z"),
@@ -76,6 +85,9 @@ const TreePage: FC<TreePageProps> = ({ }) => {
                     key: 0,
                     updated_at: new Date("2024-08-08T00:00:00Z"),
                 }} />
+            </Box>
+            <Box style={{ marginBottom: 10 }}>
+                <TreeTimelineInfo />
             </Box>
         </Box>
     );
