@@ -17,7 +17,7 @@ const TreeTimelineInfo: FC<{}> = ({ }) => {
                     items={[
                         {
                             image: "https://14treesplants.s3.ap-south-1.amazonaws.com/memories/memory1.jpg",
-                            date: "2024-08-08T00:00:00Z",
+                            date: "2024-08-06T00:00:00Z",
                             status: 'healthy'
                         },
                         {
@@ -27,7 +27,7 @@ const TreeTimelineInfo: FC<{}> = ({ }) => {
                         },
                         {
                             image: "https://14treesplants.s3.ap-south-1.amazonaws.com/memories/memory4.jpg",
-                            date: "2024-08-06T00:00:00Z",
+                            date: "2024-08-08T00:00:00Z",
                             status: 'healthy'
                         },
                     ]}

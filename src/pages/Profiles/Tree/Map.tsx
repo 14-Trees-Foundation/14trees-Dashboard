@@ -10,17 +10,14 @@ import {
 
 import icon from "../../../assets/marker.png";
 
-import { useRecoilValue } from "recoil";
-import { usersData, selUsersData } from "../../../store/atoms";
 import { Tree } from "../../../types/tree";
-import { Plot } from "../../../types/plot";
+import { Card } from "@mui/material";
 
 require("dotenv").config();
 
 const containerStyle = {
     width: "100%",
     height: "100%",
-    borderRadius: "6px",
 };
 
 const options = {
@@ -43,9 +40,9 @@ const selectedOption = {
 const mapOptions = {
     disableDefaultUI: true,
     mapTypeId: "hybrid",
-    zoom: 22,
+    zoom: 26,
     minZoom: 16,
-    maxZoom: 22,
+    maxZoom: 50,
     panControl: true,
     rotateControl: true,
     keyboardShortcuts: false,
@@ -61,44 +58,31 @@ export const Map: FC<TreeMapProps> = ({ tree }) => {
     const classes = useStyles();
 
     let boundaries: [number, number][] = [
-        [
-            18.92883906964203,
-            73.7769217462353
-        ],
-        [
-            18.92705962338517,
-            73.77601906599243
-        ],
-        [
-            18.92691470408016,
-            73.77663242954684
-        ],
-        [
-            18.92764441915284,
-            73.77778245391168
-        ],
-        [
-            18.92883906964203,
-            73.7769217462353
-        ]
+        [18.92751833912228,73.77212379622209], 
+        [18.92752594978088,73.77222208637563], 
+        [18.92755774237601,73.7721940988185], 
+        [18.92756431139442,73.77216744406999],
+        [18.92756216983834,73.77211167923981],
+        [18.92748612876533,73.7720605115741],
+        [18.92751833912228,73.77212379622209]
     ];
 
     const { isLoaded } = useJsApiLoader({
         id: "google-map-script-for-profile",
-        googleMapsApiKey: process.env.REACT_APP_API_MAP_KEY || "" ,
+        googleMapsApiKey: process.env.REACT_APP_API_MAP_KEY ? process.env.REACT_APP_API_MAP_KEY : "",
     });
 
     let position = { lat: boundaries[0][0], lng: boundaries[0][1] };
     if (tree.location?.coordinates && tree.location.coordinates.length === 2) {
-        position = { lat: tree.location.coordinates[0], lng: tree.location.coordinates[1] };
+        position = { lat: 18.92752599978088 || tree.location.coordinates[0], lng: 73.7721940988185 || tree.location.coordinates[1] };
     }
 
     return (
         isLoaded
-        ? (<div className={classes.map}>
+        ? (<Card className={classes.map}>
             <GoogleMap
                 mapContainerStyle={containerStyle}
-                center={{ lat: 0, lng: 0 }}
+                center={position}
                 options={mapOptions}
             >
                 <Fragment>
@@ -146,7 +130,7 @@ export const Map: FC<TreeMapProps> = ({ tree }) => {
                     </>
                 </Fragment>
             </GoogleMap>
-        </div>)
+        </Card>)
         : (<div></div>)
     );
 };
@@ -155,8 +139,8 @@ const useStyles = makeStyles((theme) =>
     createStyles({
         map: {
             width: "100%",
-            height: "100%",
-            marginRight: "20px",
+            height: "50vh",
+            borderRadius: 4,
         },
         treeimg: {
             width: "50px",
