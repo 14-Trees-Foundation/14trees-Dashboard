@@ -31,6 +31,7 @@ export type Site = {
     consent_document_link:  string| null;
     google_earth_link: string|null;
     trees_planted: Number|null;
+    tags: string[]|null;
     account: string|null;
     data_errors: string|null;
     date_planted: Date|null;

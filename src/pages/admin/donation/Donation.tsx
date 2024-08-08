@@ -9,12 +9,17 @@ import {
   DialogContentText,
   DialogTitle,
   Divider,
+  Fade,
+  Menu,
+  MenuItem,
   Typography,
 } from "@mui/material";
 import { GridFilterItem } from "@mui/x-data-grid";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
-import { TableColumnsType } from "antd";
+import ForestIcon from "@mui/icons-material/Forest";
+import MoreVertIcon from "@mui/icons-material/MoreVert";
+import { Dropdown, TableColumnsType } from "antd";
 import TableComponent from "../../../components/Table";
 import { Donation } from "../../../types/donation";
 import CircularProgress from "@mui/material/CircularProgress";
@@ -30,9 +35,8 @@ import { ToastContainer } from "react-toastify";
 
 export const DonationComponent = () => {
 
-
   const dispatch = useAppDispatch();
-  const { getDonations, createDonation, updateDonation, deleteDonation } = bindActionCreators(
+  const { getDonations, createDonation, updateDonation, deleteDonation, assignTreesToDonationUsers, createWorkOrderForDonation } = bindActionCreators(
     donationActionCreators,
     dispatch
   );
@@ -47,6 +51,22 @@ export const DonationComponent = () => {
   const [selectedEditRow, setSelectedEditRow] = useState<any | null>(null);
   const [editModal, setEditModal] = useState(false);
 
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const dorpDownOpen = Boolean(anchorEl);
+  const handleClick = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleAutoAssignTrees = (donationId: number) => {
+    assignTreesToDonationUsers(donationId);
+    setAnchorEl(null);
+  };
+
+  const handleCreateWorkOder = (donationId: number) => {
+    createWorkOrderForDonation(donationId);
+    setAnchorEl(null);
+  };
+
   const handleSetFilters = (filters: Record<string, GridFilterItem>) => {
     setPage(0);
     setFilters(filters);
@@ -59,8 +79,8 @@ export const DonationComponent = () => {
   const getDonationData = async () => {
     let filtersData = Object.values(filters);
     setTimeout(async () => {
-      await getDonations(page * 10, 10, filtersData);
-    }, 1000);
+      getDonations(page * 10, 10, filtersData);
+    }, 10);
   };
 
 
@@ -105,7 +125,7 @@ export const DonationComponent = () => {
       dataIndex: "action",
       key: "action",
       title: "Action",
-      width: 150,
+      width: 220,
       align: "center",
       render: (value, record, index) => (
         <div
@@ -114,6 +134,30 @@ export const DonationComponent = () => {
             justifyContent: "center",
             alignItems: "center",
           }}>
+          <Button
+            variant="outlined"
+            style={{ margin: "0 5px" }}
+            aria-controls={dorpDownOpen ? 'fade-menu' : undefined}
+            aria-haspopup="true"
+            aria-expanded={dorpDownOpen ? 'true' : undefined}
+            onClick={handleClick}
+          >
+            <MoreVertIcon />
+          </Button>
+          <Menu
+            id="fade-menu"
+            MenuListProps={{
+              'aria-labelledby': 'fade-button',
+            }}
+            anchorEl={anchorEl}
+            open={dorpDownOpen}
+            onClose={() => setAnchorEl(null)}
+            TransitionComponent={Fade}
+          >
+            <MenuItem onClick={() => { handleAutoAssignTrees(record.id) }}>Auto Assign Trees</MenuItem>
+            <MenuItem onClick={() => { handleCreateWorkOder(record.id) }}>Create Work Order</MenuItem>
+            <MenuItem >Send Email</MenuItem>
+          </Menu> 
           <Button
             variant="outlined"
             style={{ margin: "0 5px" }}
@@ -144,14 +188,14 @@ export const DonationComponent = () => {
       align: "center",
       ...getColumnSearchProps('name', filters, handleSetFilters)
     },
-    {
-      dataIndex: "donor_type",
-      key: "donor_type",
-      title: "Donor Type",
-      width: 180,
-      align: "center",
-      ...getColumnSearchProps('donor_type', filters, handleSetFilters)
-    },
+    // {
+    //   dataIndex: "donor_type",
+    //   key: "donor_type",
+    //   title: "Donor Type",
+    //   width: 180,
+    //   align: "center",
+    //   ...getColumnSearchProps('donor_type', filters, handleSetFilters)
+    // },
     {
       dataIndex: "phone",
       key: "phone",
@@ -164,17 +208,9 @@ export const DonationComponent = () => {
       dataIndex: "email_address",
       key: "email_address",
       title: "Email",
-      width: 150,
+      width: 250,
       align: "center",
       ...getColumnSearchProps('email_address', filters, handleSetFilters)
-    },
-    {
-      dataIndex: "pan",
-      key: "pan",
-      title: "PAN",
-      width: 150,
-      align: "center",
-      ...getColumnSearchProps('pan', filters, handleSetFilters)
     },
     {
       dataIndex: "pledged",
@@ -186,48 +222,70 @@ export const DonationComponent = () => {
 
     },
     {
+      dataIndex: "assigned_trees",
+      key: "assigned_trees",
+      title: "Assigned Trees",
+      width: 200,
+      align: "center",
+    },
+    {
       dataIndex: "land_type",
       key: "land_type",
       title: "Land_type",
       width: 150,
       align: "center",
       ...getColumnSelectedItemFilter({ dataIndex: 'land_type', filters, handleSetFilters, options: typesList }),
-
     },
     {
-      dataIndex: "zone",
-      key: "zone",
-      title: "Zone",
+      dataIndex: "grove",
+      key: "grove",
+      title: "Grove",
       width: 150,
       align: "center",
-      ...getColumnSearchProps('zone', filters, handleSetFilters)
-
+      ...getColumnSelectedItemFilter({ dataIndex: 'grove', filters, handleSetFilters, options: typesList }),
     },
     {
-      dataIndex: "dashboard_status",
-      key: "dashboard_status",
-      title: "Dashboard Status",
+      dataIndex: "pan",
+      key: "pan",
+      title: "PAN",
       width: 150,
       align: "center",
+      ...getColumnSearchProps('pan', filters, handleSetFilters)
     },
+    // {
+    //   dataIndex: "zone",
+    //   key: "zone",
+    //   title: "Zone",
+    //   width: 150,
+    //   align: "center",
+    //   ...getColumnSearchProps('zone', filters, handleSetFilters)
+
+    // },
+    // {
+    //   dataIndex: "dashboard_status",
+    //   key: "dashboard_status",
+    //   title: "Dashboard Status",
+    //   width: 150,
+    //   align: "center",
+    // },
+    // {
+    //   dataIndex: "assigned_plot",
+    //   key: "assigned_plot",
+    //   title: "Assigned Plot",
+    //   width: 180,
+    //   align: "center",
+    // },
+    // {
+    //   dataIndex: "remarks_for_inventory",
+    //   key: "remarks_for_inventory",
+    //   title: "Remarks for inventory",
+    //   width: 180,
+    //   align: "center",
+    // },
     {
-      dataIndex: "assigned_plot",
-      key: "assigned_plot",
-      title: "Assigned Plot",
-      width: 180,
-      align: "center",
-    },
-    {
-      dataIndex: "tree_planted",
-      key: "tree_planted",
-      title: "Trees Planted",
-      width: 200,
-      align: "center",
-    },
-    {
-      dataIndex: "remarks_for_inventory",
-      key: "remarks_for_inventory",
-      title: "Remarks for inventory",
+      dataIndex: "associated_tag",
+      key: "associated_tag",
+      title: "Associated Tag",
       width: 180,
       align: "center",
     },

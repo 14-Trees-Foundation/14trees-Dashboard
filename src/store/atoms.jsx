@@ -27,7 +27,7 @@ const pondsImages = atom({
 
 const activitiesData = atom({
   key: "activities",
-  default: {},
+  default: [],
 });
 
 const openVideo = atom({

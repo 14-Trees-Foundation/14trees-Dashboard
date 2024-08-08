@@ -71,7 +71,10 @@ export const GiftTrees = () => {
   let { email } = useParams();
 
   const dispatch = useAppDispatch();
-  const { assignTrees, unassignUserTrees } = bindActionCreators(userTreeActions, dispatch);
+  const { assignTrees, unassignUserTrees } = bindActionCreators(
+    userTreeActions,
+    dispatch
+  );
 
   const classes = useStyles();
   const navigate = useNavigate();
@@ -181,7 +184,6 @@ export const GiftTrees = () => {
     setAssignedSelected(false);
   };
 
-
   const fetchTrees = useCallback(async () => {
     try {
       let profileTrees = await Axios.get(`/mapping/${email}`);
@@ -210,7 +212,7 @@ export const GiftTrees = () => {
         };
       });
     } catch (error) {
-      console.error(error)
+      console.error(error);
       if (error.response.status === 404) {
         setValues((values) => {
           return {
@@ -228,7 +230,7 @@ export const GiftTrees = () => {
     (async () => {
       await fetchTrees();
     })();
-    document.title = "14Trees Dashboard - Assign Trees"
+    document.title = "14Trees Dashboard - Assign Trees";
   }, [fetchTrees]);
 
   const handleSaplingClick = () => {
@@ -308,9 +310,12 @@ export const GiftTrees = () => {
     formData.append("sapling_ids", sapling_ids);
     formData.append("sponsored_by_user", values.user?.id);
 
-    if (formValues.gifted_by && formValues.gifted_by !== "undefined") formData.append("gifted_by", formValues.gifted_by);
-    if (formValues.planted_by && formValues.planted_by !== "undefined") formData.append("planted_by", formValues.planted_by);
-    if (formValues.desc && formValues.desc !== "undefined") formData.append("description", formValues.desc);
+    if (formValues.gifted_by && formValues.gifted_by !== "undefined")
+      formData.append("gifted_by", formValues.gifted_by);
+    if (formValues.planted_by && formValues.planted_by !== "undefined")
+      formData.append("planted_by", formValues.planted_by);
+    if (formValues.desc && formValues.desc !== "undefined")
+      formData.append("description", formValues.desc);
     if (formValues.type !== "") formData.append("type", formValues.type);
     if (images.length > 0) formData.append("album_images", images);
     if (img !== null) {
@@ -327,15 +332,20 @@ export const GiftTrees = () => {
         ...values,
         loading: false,
         user: profileTrees.data.user,
-        trees: profileTrees.data.trees?.results?.map((t) => ({ ...t, selected: false })),
-        filteredTrees: profileTrees.data.trees?.results?.map((t) => ({ ...t, selected: false })),
+        trees: profileTrees.data.trees?.results?.map((t) => ({
+          ...t,
+          selected: false,
+        })),
+        filteredTrees: profileTrees.data.trees?.results?.map((t) => ({
+          ...t,
+          selected: false,
+        })),
         selectedTreeSum: 0,
         dlgOpen: false,
         uploaded: true,
       }));
     }
-
-  }
+  };
 
   const handleDeleteAlbum = async (selectedAlbum) => {
     setValues({
@@ -344,14 +354,11 @@ export const GiftTrees = () => {
       backdropOpen: true,
     });
     try {
-      let res = await Axios.delete(
-        `/albums/${selectedAlbum.id}`,
-        {
-          headers: {
-            "Content-type": "multipart/form-data",
-          },
-        }
-      );
+      let res = await Axios.delete(`/albums/${selectedAlbum.id}`, {
+        headers: {
+          "Content-type": "multipart/form-data",
+        },
+      });
       if (res.status === 200) {
         let albums = await Axios.get(`/albums/${email}`);
         if (albums.status === 200) {
@@ -447,8 +454,12 @@ export const GiftTrees = () => {
       .reduce((prev, curr) => prev + curr, 0);
 
     // Update state variables based on whether the selected tree is assigned or unassigned
-    setUnassignedSelected(values.filteredTrees.some(item => item.selected && !item.assigned_to));
-    setAssignedSelected(values.filteredTrees.some(item => item.selected && item.assigned_to));
+    setUnassignedSelected(
+      values.filteredTrees.some((item) => item.selected && !item.assigned_to)
+    );
+    setAssignedSelected(
+      values.filteredTrees.some((item) => item.selected && item.assigned_to)
+    );
 
     setValues({
       ...values,
@@ -463,7 +474,10 @@ export const GiftTrees = () => {
       .filter((t) => t.selected === true)
       .map((a) => a.sapling_id);
 
-    const removedSelected = values.filteredTrees.map((t) => ({ ...t, selected: false }));
+    const removedSelected = values.filteredTrees.map((t) => ({
+      ...t,
+      selected: false,
+    }));
     setValues({
       ...values,
       filteredTrees: removedSelected,
@@ -500,7 +514,11 @@ export const GiftTrees = () => {
     } else {
       return (
         <>
-          <PwdDialog open={values.pwdDlgOpen} onClose={handlePwdDlgClose} passwd={"admin@14trees"} />
+          <PwdDialog
+            open={values.pwdDlgOpen}
+            onClose={handlePwdDlgClose}
+            passwd={"admin@14trees"}
+          />
           <Dialog
             open={values.selectedTreeImgDlg}
             onClose={() =>
@@ -709,7 +727,9 @@ export const GiftTrees = () => {
                           sx={{ ml: "auto", mr: "auto" }}
                           variant="contained"
                           color="primary"
-                          disabled={values.selectedTreeSum <= 0 || unassignedSelected}
+                          disabled={
+                            values.selectedTreeSum <= 0 || unassignedSelected
+                          }
                           onClick={() => setUnAssignModalOpen(true)}
                         >
                           UnAssign
@@ -721,7 +741,9 @@ export const GiftTrees = () => {
                           sx={{ ml: "auto", mr: "auto" }}
                           variant="contained"
                           color="primary"
-                          disabled={values.selectedTreeSum <= 0 || assignedSelected}
+                          disabled={
+                            values.selectedTreeSum <= 0 || assignedSelected
+                          }
                           onClick={handleClickOpen}
                         >
                           Assign
@@ -735,21 +757,36 @@ export const GiftTrees = () => {
                       >
                         {/* <DialogTitle id="alert-dialog-title">{"Unassign Trees"}</DialogTitle> */}
                         <Box p={2}>
-                        <DialogContent>
-                          <DialogContentText id="alert-dialog-description">
-                            Are you sure you want to unAssign the selected trees?
-                          </DialogContentText>
-                        </DialogContent>
-                        <DialogActions>
-                        <Box display="flex" justifyContent="center" width="100%" >
-                          <Button variant="contained" onClick={() => setUnAssignModalOpen(false)} color="primary">
-                            No
-                          </Button>
-                          <Button variant="contained" onClick={(event) => handleUnassignTrees(event)} color="primary" autoFocus sx={{marginLeft:'15px'}}>
-                            Yes
-                          </Button>
-                          </Box>  
-                        </DialogActions>
+                          <DialogContent>
+                            <DialogContentText id="alert-dialog-description">
+                              Are you sure you want to unAssign the selected
+                              trees?
+                            </DialogContentText>
+                          </DialogContent>
+                          <DialogActions>
+                            <Box
+                              display="flex"
+                              justifyContent="center"
+                              width="100%"
+                            >
+                              <Button
+                                variant="contained"
+                                onClick={() => setUnAssignModalOpen(false)}
+                                color="primary"
+                              >
+                                No
+                              </Button>
+                              <Button
+                                variant="contained"
+                                onClick={(event) => handleUnassignTrees(event)}
+                                color="primary"
+                                autoFocus
+                                sx={{ marginLeft: "15px" }}
+                              >
+                                Yes
+                              </Button>
+                            </Box>
+                          </DialogActions>
                         </Box>
                       </Dialog>
                     </TableRow>
@@ -843,7 +880,7 @@ export const GiftTrees = () => {
                                 window.open(
                                   `/profile/${row.sapling_id}`,
                                   "_blank",
-                                  'noopener,noreferrer'
+                                  "noopener,noreferrer"
                                 )
                               }
                             >

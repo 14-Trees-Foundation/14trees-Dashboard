@@ -21,6 +21,7 @@ import { VisitorNew } from "./pages/Visitor/Visitor2";
 import { OrgEvent } from "./pages/events/OrgEvent";
 import { Corporate } from "./pages/events/Corporate";
 import { Test } from "./pages/test/test";
+import TreeProfile from "./pages/Profiles/TreeProfile";
 
 function App() {
   return (
@@ -40,15 +41,16 @@ function App() {
           <Route path="/visitornew" element={<VisitorNew />}></Route>
           {/* <Route path="/addtree" element={<AddTree />}></Route> */}
           <Route path="/profile/:saplingId" element={<Dashboard />}></Route>
+          <Route path="/tree/:saplingId" element={<TreeProfile />}></Route>
           <Route path="/group/:grptype" element={<OrgEvent />}></Route>
           <Route path="/events/corp/:event_id" element={<Corporate />}></Route>
           <Route path="/login" element={<Login />} />
           <Route
             path="/admin"
             element={
-              <RequireAuth>
+              // <RequireAuth>
                 <Admin />
-              </RequireAuth>
+              // </RequireAuth>
             }
           >
             <Route path="forms" element={<Forms />}>
@@ -60,9 +62,9 @@ function App() {
             <Route 
               path=":email" 
               element={ 
-                <RequireAuth>
+                // <RequireAuth>
                   <GiftTrees />
-                </RequireAuth>
+                // </RequireAuth>
               } 
             ></Route>
           </Route>
@@ -73,9 +75,9 @@ function App() {
           <Route 
             path="/test" 
             element={
-              <RequireAuth>
+              // <RequireAuth>
                 <Test />
-              </RequireAuth>
+              // </RequireAuth>
             } 
           />
         </Routes>

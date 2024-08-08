@@ -62,14 +62,14 @@ export const createSite = (record: Site) => {
     };
 };
 
-export const updateSite = (record: Site) => {
+export const updateSite = (record: Site , files?: Blob[]) => {
     const apiClient = new ApiClient();
     return (dispatch: any) => {
 
         dispatch({
             type: siteActionTypes.UPDATE_SITE_REQUESTED,
         });
-         apiClient.updateSite(record).then(
+         apiClient.updateSite(record , files?files:[]).then(
             (value: Site) => {
                 toast.success('Site data Edited successfully')
                 dispatch({

@@ -10,6 +10,8 @@ export const NewsFeed = () => {
   const setOpen = useSetRecoilState(openVideo);
   const setVideoUrl = useSetRecoilState(videoUrl);
 
+  console.log(activities)
+
   const playVideo = (url) => {
     setVideoUrl(url);
     setOpen(true);
@@ -73,7 +75,7 @@ export const NewsFeed = () => {
   };
   return (
     <div className={classes.main}>
-      {activities.map((item, i) => {
+      {activities?.map((item, i) => {
         return <div key={i}>{element(item)}</div>;
       })}
     </div>

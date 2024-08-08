@@ -18,11 +18,10 @@ import {
 import AddOrganization from "./AddOrganization";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
-import GroupAdd from '@mui/icons-material/GroupAdd';
+import GroupIcon from '@mui/icons-material/Group';
 import ErrorIcon from '@mui/icons-material/Error';
 import { Group } from "../../../types/Group";
 import * as groupActionCreators from "../../../redux/actions/groupActions";
-import * as userGroupActionCreators from "../../../redux/actions/userGroupActions";
 import { bindActionCreators } from "redux";
 import { useAppDispatch, useAppSelector } from "../../../redux/store/hooks";
 import { RootState } from "../../../redux/store/store";
@@ -44,9 +43,6 @@ export const OrganizationComponent = () => {
     updateGroup,
     deleteGroup,
   } = bindActionCreators(groupActionCreators, dispatch);
-  const {
-    bulkCreateUserGroupMapping
-  } = bindActionCreators(userGroupActionCreators, dispatch);
 
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
@@ -56,8 +52,6 @@ export const OrganizationComponent = () => {
   const [selectedEditRow, setSelectedEditRow] = useState<Group | null>(null);
   const [failedRecords, setFailedRecords] = useState(false);
   const [editModal, setEditModal] = useState(false);
-  const [bulkCreate, setBulkCreate] = useState(false);
-  const [file, setFile] = useState(null);
   const [page, setPage] = useState(0);
   const [srNoPage, SetSrNoPage] = useState(0);
   const [anchorEl, setAnchorEl] = useState<any>(null);
@@ -97,9 +91,9 @@ export const OrganizationComponent = () => {
 
     setLoading(true);
     setTimeout(async () => {
-      await getGroups(page * 10, 10, dataFilters);
+      getGroups(page * 10, 10, dataFilters);
       setLoading(false);
-    }, 1000);
+    }, 10);
   };
 
   const columns: TableColumnsType<Group> = [
@@ -117,15 +111,6 @@ export const OrganizationComponent = () => {
       title: "Name",
       width: 250,
       align: 'center',
-      render: (value, record, index) => (
-        <Button
-          onClick={() => setSelectedOrg(record)}
-          sx={{ textTransform: 'none', color: 'inherit' }} 
-          fullWidth
-          variant="text"
-        >
-          {value}
-        </Button>),
       ...getColumnSearchProps('name', filters, handleSetFilters)
     },
     {
@@ -162,10 +147,9 @@ export const OrganizationComponent = () => {
             variant="outlined"
             style={{ margin: "0 5px" }}
             onClick={() => {
-              setSelectedItem(record);
-              setBulkCreate(true);
+              setSelectedOrg(record);
             }}>
-            <GroupAdd />
+            <GroupIcon />
           </Button>
           <Button
             variant="outlined"
@@ -222,16 +206,6 @@ export const OrganizationComponent = () => {
   const handleCreateUserData = (formData: Group) => {
     createGroup(formData);
   };
-
-  const handleBulkCreateUserGroupMapping = (e: any) => {
-    e.preventDefault();
-    setBulkCreate(false);
-    if (file && selectedItem) {
-      setTimeout(async () => {
-        await bulkCreateUserGroupMapping(selectedItem.id, file);
-      }, 1000);
-    }
-  }
 
   return (
     <>
@@ -308,7 +282,7 @@ export const OrganizationComponent = () => {
         />
       </Box>
       <Divider style={{ marginBottom: "20px" }} />
-      <OrganizationUsers selectedOrg={selectedOrg}/>
+      {selectedOrg && <OrganizationUsers selectedOrg={selectedOrg}/>}
 
       <Dialog open={openDeleteModal} onClose={() => setOpenDeleteModal(false)}>
         <DialogTitle>Confirm Delete</DialogTitle>
@@ -355,40 +329,6 @@ export const OrganizationComponent = () => {
         />
       )}
 
-
-      <Dialog open={bulkCreate} onClose={() => setBulkCreate(false)}>
-        <DialogTitle>Create user-group Mapping for '{selectedItem?.name}'</DialogTitle>
-        <form onSubmit={handleBulkCreateUserGroupMapping}>
-          <DialogContent>
-            <InputLabel>Download sample file from <a href="https://docs.google.com/spreadsheets/d/1ypVdbR44nQXuaHAEOrwywY3k-lfJdsRZ9iKp0Jpq7Kw/edit?usp=sharing">here</a> and fill the details.</InputLabel>
-            <TextField
-              type="file"
-              inputProps={{ accept: '.csv' }}
-              onChange={(e: any) => {
-                if (e.target.files) {
-                  setFile(e.target.files[0]);
-                }
-              }}
-              fullWidth
-              margin="normal"
-            />
-          </DialogContent>
-          <DialogActions
-            sx={{
-              display: "flex",
-              justifyContent: "center",
-              marginBottom: "15px",
-            }}
-          >
-            <Button onClick={() => setBulkCreate(false)} variant="outlined" color="error">
-              Cancel
-            </Button>
-            <Button type="submit" variant="contained" color="success">
-              Upload
-            </Button>
-          </DialogActions>
-        </form>
-      </Dialog>
     </>
   );
 };

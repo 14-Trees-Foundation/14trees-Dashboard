@@ -35,6 +35,9 @@ import {
   PuneKhedOptions,
   SambhajiNagarOptions,
 } from "../utils/Form_Data";
+import { useDropzone } from "react-dropzone";
+import { makeStyles } from "@mui/styles";
+import TagSelector from "../../../../components/TagSelector";
 
 const StepForm = ({ open, handleClose, useCase, data, submitFunction }) => {
   const [current, setCurrent] = useState(0);
@@ -63,6 +66,10 @@ const StepForm = ({ open, handleClose, useCase, data, submitFunction }) => {
     {
       title: "Location Info",
       content: "Third-content",
+    },
+    {
+      title: "Contour Details",
+      content: "Fourth-content",
     },
     {
       title: "Misc Details",
@@ -98,9 +105,12 @@ const StepForm = ({ open, handleClose, useCase, data, submitFunction }) => {
     data.consent_document_link
   );
   const [google_earth_link, setGoogleEarthLink] = useState(
-    data.google_earth_link
+    data.google_earth_link ? data.google_earth_link : []
   );
   const [account, setAccount] = useState(data.account);
+  const [tags, setTags] = useState(data.tags ? data.tags : []);
+
+  const [files, setFiles] = useState([{}]);
 
   const maintenance_type_options = [
     { value: "1", label: "FULL_MAINTENANCE" },
@@ -153,6 +163,7 @@ const StepForm = ({ open, handleClose, useCase, data, submitFunction }) => {
         consent_document_link: consent_document_link,
         google_earth_link: google_earth_link,
         account: account,
+        tags: tags,
       };
       console.log(
         "maintenace type value on submit : ",
@@ -181,8 +192,9 @@ const StepForm = ({ open, handleClose, useCase, data, submitFunction }) => {
       setSampatiPatra("");
       setMaintenanceType("");
       setConsentDocumentLink("");
-      setGoogleEarthLink("");
+      setGoogleEarthLink([]);
       setAccount("");
+      setTags([]);
 
       handleClose();
       setCurrent(0);
@@ -204,10 +216,10 @@ const StepForm = ({ open, handleClose, useCase, data, submitFunction }) => {
         consent_document_link: consent_document_link,
         google_earth_link: google_earth_link,
         account: account,
+        tags: tags,
       };
       try {
-        const response = submitFunction(updatedSiteData);
-
+        const response = submitFunction(updatedSiteData, files);
         console.log("response from backend: ", response);
       } catch (error) {
         console.log("Error in updating: ", error.message);
@@ -227,14 +239,27 @@ const StepForm = ({ open, handleClose, useCase, data, submitFunction }) => {
       setSampatiPatra("");
       setMaintenanceType("");
       setConsentDocumentLink("");
-      setGoogleEarthLink("");
+      setGoogleEarthLink([]);
       setAccount("");
+      setTags([]);
 
       handleClose();
       setCurrent(0);
     }
   };
 
+  const { getRootProps, getInputProps } = useDropzone({
+    accept: ".kml",
+    maxFiles: 10,
+    onDrop: (acceptedFiles) => {
+      setFiles(acceptedFiles);
+    },
+    onDropRejected: (rejectedFiles) => {
+      // toast.error("Only 10 images allowed!");
+    },
+  });
+
+  const classes = useStyles();
   return (
     <>
       <div>
@@ -288,6 +313,30 @@ const StepForm = ({ open, handleClose, useCase, data, submitFunction }) => {
                       />
                     )}
                   />
+
+                  <TextField
+                    select
+                    margin="dense"
+                    name="maintenance_type"
+                    label="Service Type"
+                    type="text"
+                    fullWidth
+                    value={maintenance_type}
+                    onChange={(e) => {
+                      setMaintenanceType(e.target.value);
+                      console.log("Maintenance type value: ", e.target.value);
+                      console.log(
+                        "Maintenance type varaible: ",
+                        maintenance_type
+                      );
+                    }}
+                  >
+                    {maintenance_type_options.map((item) => (
+                      <MenuItem key={item.value} value={item.label}>
+                        {item.label}
+                      </MenuItem>
+                    ))}
+                  </TextField>
                 </>
               )}
 
@@ -329,29 +378,33 @@ const StepForm = ({ open, handleClose, useCase, data, submitFunction }) => {
                     ))}
                   </TextField>
 
-                  {(land_type != "" && !land_type.includes("Roadside")) && (<TextField
-                    margin="dense"
-                    name="area_acres"
-                    label="Area (Acres)"
-                    type="number"
-                    fullWidth
-                    value={area}
-                    onChange={(e) => {
-                      setArea(e.target.value);
-                    }}
-                  />)}
+                  {land_type != "" && !land_type.includes("Roadside") && (
+                    <TextField
+                      margin="dense"
+                      name="area_acres"
+                      label="Area (Acres)"
+                      type="number"
+                      fullWidth
+                      value={area}
+                      onChange={(e) => {
+                        setArea(e.target.value);
+                      }}
+                    />
+                  )}
 
-                  {(land_type.includes("Roadside")) && (<TextField
-                    margin="dense"
-                    name="length_km"
-                    label="Length (Km)"
-                    type="number"
-                    fullWidth
-                    value={length}
-                    onChange={(e) => {
-                      setLength(e.target.value);
-                    }}
-                  />)}
+                  {land_type.includes("Roadside") && (
+                    <TextField
+                      margin="dense"
+                      name="length_km"
+                      label="Length (Km)"
+                      type="number"
+                      fullWidth
+                      value={length}
+                      onChange={(e) => {
+                        setLength(e.target.value);
+                      }}
+                    />
+                  )}
                 </DialogContent>
               )}
 
@@ -679,7 +732,22 @@ const StepForm = ({ open, handleClose, useCase, data, submitFunction }) => {
                 </DialogContent>
               )}
 
-              {current === 3 && (
+              {current === 3 && useCase === "Edit Site" && (
+                <DialogContent>
+                  <div className={classes.imgdiv}>
+                    <section>
+                      <div {...getRootProps()}>
+                        <input {...getInputProps()} />
+                        <p style={{ cursor: "pointer" }}>
+                          Upload KML files. Click or Drag!
+                        </p>
+                      </div>
+                    </section>
+                  </div>
+                </DialogContent>
+              )}
+
+              {current === 4 && (
                 <DialogContent>
                   <TextField
                     select
@@ -714,42 +782,6 @@ const StepForm = ({ open, handleClose, useCase, data, submitFunction }) => {
                   />
 
                   <TextField
-                    select
-                    margin="dense"
-                    name="maintenance_type"
-                    label="Service Type"
-                    type="text"
-                    fullWidth
-                    value={maintenance_type}
-                    onChange={(e) => {
-                      setMaintenanceType(e.target.value);
-                      console.log("Maintenance type value: ", e.target.value);
-                      console.log(
-                        "Maintenance type varaible: ",
-                        maintenance_type
-                      );
-                    }}
-                  >
-                    {maintenance_type_options.map((item) => (
-                      <MenuItem key={item.value} value={item.label}>
-                        {item.label}
-                      </MenuItem>
-                    ))}
-                  </TextField>
-
-                  <TextField
-                    margin="dense"
-                    name="google_earth_link"
-                    label="Google Earth Link"
-                    type="url"
-                    fullWidth
-                    value={google_earth_link}
-                    onChange={(e) => {
-                      setGoogleEarthLink(e.target.value);
-                    }}
-                  />
-
-                  <TextField
                     margin="dense"
                     name="account"
                     label="Account"
@@ -760,8 +792,14 @@ const StepForm = ({ open, handleClose, useCase, data, submitFunction }) => {
                       setAccount(e.target.value);
                     }}
                   />
+
+                  <TagSelector
+                    value={tags}
+                    handleChange={(tags) => setTags(tags)}
+                  />
                 </DialogContent>
               )}
+
               <DialogActions
                 sx={{
                   display: "flex",
@@ -829,5 +867,25 @@ const StepForm = ({ open, handleClose, useCase, data, submitFunction }) => {
     </>
   );
 };
-
+const useStyles = makeStyles((theme) => ({
+  imgdiv: {
+    padding: "8px",
+    marginTop: "8px",
+    marginBottom: "8px",
+    border: "1px #1f3625 dashed",
+    textAlign: "center",
+  },
+  preview: {
+    width: "100px",
+    height: "100px",
+    objectFit: "cover",
+    margin: "8px",
+  },
+  prevcontainer: {
+    margin: "16px",
+    display: "flex",
+    flexDirection: "row",
+    flexWrap: "wrap",
+  },
+}));
 export default StepForm;

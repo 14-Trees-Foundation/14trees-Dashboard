@@ -32,6 +32,7 @@ function EditSites({ row, openeditModal, closeEditModal, editSubmit }) {
     maintenance_type: formData.maintenance_type,
     consent_document_link: formData.consent_document_link,
     google_earth_link: formData.google_earth_link,
+    tags: formData.tags,
     account: formData.account,
   };
 

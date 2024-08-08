@@ -1,9 +1,16 @@
 import FilterAltRoundedIcon from '@mui/icons-material/FilterAltRounded';
 import { GridFilterItem } from '@mui/x-data-grid';
 
-import { Select, Button as Btn, Input, Space } from 'antd'
+import { Select, Button as Btn, Input, Space, DatePicker } from 'antd'
 import type { TableColumnType, SelectProps } from 'antd';
 import { FilterConfirmProps } from 'antd/es/table/interface';
+import React, { useState } from 'react';
+
+interface FilterItemProps<T> {
+    dataIndex: keyof T
+    filters: Record<string, GridFilterItem>
+    handleSetFilters: (filters: Record<string, GridFilterItem>) => void
+}
 
 export default function getColumnSearchProps<T extends object>(dataIndex: keyof T, filters: Record<string, GridFilterItem>, handleSetFilters: (filters: Record<string, GridFilterItem>) => void): TableColumnType<T> {
 
@@ -178,16 +185,90 @@ export function getColumnSelectedItemFilter<T extends object>({ dataIndex, filte
         filterIcon: (filtered: boolean) => (
             <FilterAltRoundedIcon style={{ color: filtered ? '#1677ff' : undefined }} />
         ),
-        // onFilter: (value, record) =>
-        //     { console.log(filters);
-        //     return record[dataIndex]
-        //     .toString()
-        //     .toLowerCase()
-        //     .includes((value as string).toLowerCase())},
-        // onFilterDropdownOpenChange: (visible) => {
-        //     if (visible) {
-        //         setTimeout(() => searchInput.current?.select(), 100);
-        //     }
-        // },
+
     })
+};
+
+export const getColumnDateFilter = <T extends object>({ dataIndex, filters, handleSetFilters }: FilterItemProps<T>): TableColumnType<T> => {
+    return {
+        filterDropdown: ({ confirm, clearFilters, close }) => (
+            <DateFilterDropdown<T>
+                dataIndex={dataIndex}
+                filters={filters}
+                handleSetFilters={handleSetFilters}
+                confirm={confirm}
+                clearFilters={clearFilters}
+                close={close}
+            />
+        ),
+        filterIcon: (filtered: boolean) => (
+            <FilterAltRoundedIcon style={{ color: filtered ? '#1677ff' : undefined }} />
+        ),
+    };
+};
+
+interface DateFilterDropdownProps<T> extends FilterItemProps<T> {
+    confirm: (param?: FilterConfirmProps) => void;
+    clearFilters?: () => void;
+    close: () => void;
+}
+
+const DateFilterDropdown = <T extends object>({ dataIndex, filters, handleSetFilters, confirm, clearFilters, close }: DateFilterDropdownProps<T>) => {
+    const [lower, setLower] = useState<string>('');
+    const [upper, setUpper] = useState<string>('');
+
+    const handleReset = () => {
+        clearFilters && clearFilters();
+        setLower('');
+        setUpper('');
+        confirm({ closeDropdown: false });
+        let newFilters = { ...filters };
+        Reflect.deleteProperty(newFilters, dataIndex);
+        handleSetFilters(newFilters);
+    };
+
+    const handleApply = () => {
+        confirm({ closeDropdown: false });
+        let filter: GridFilterItem | null = null;
+        if (lower && upper) {
+            filter = { columnField: dataIndex.toString(), operatorValue: 'between', value: [lower, upper] }
+        } else if (lower) {
+            filter = { columnField: dataIndex.toString(), operatorValue: 'greaterThan', value: lower }
+        } else if (upper) {
+            filter = { columnField: dataIndex.toString(), operatorValue: 'lessThan', value: upper }
+        }
+
+        if (filter) {
+            handleSetFilters({ 
+                ...filters,
+                [dataIndex.toString()]: filter,
+            });
+        }
+    };
+
+    return (
+        <div style={{ padding: 8 }} onKeyDown={(e) => e.stopPropagation()}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <div style={{ margin: 2 }}>Visits After:</div>
+                    <DatePicker onChange={(date, stringDate) => setLower(stringDate as string)} style={{ margin: 2, backgroundColor: 'white' }} />
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <div style={{ margin: 2 }}>Visits Before:</div>
+                    <DatePicker onChange={(date, stringDate) => setUpper(stringDate as string)} style={{ margin: 2, backgroundColor: 'white' }} />
+                </div>
+            </div>
+            <Space style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 8 }}>
+                <Btn onClick={handleReset} size="small" style={{ width: 90 }}>
+                    Reset
+                </Btn>
+                <Btn size="small" onClick={handleApply}>
+                    Apply
+                </Btn>
+                <Btn size="small" onClick={() => close()}>
+                    Close
+                </Btn>
+            </Space>
+        </div>
+    );
 };

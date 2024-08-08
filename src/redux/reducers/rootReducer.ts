@@ -13,6 +13,8 @@ import { userGroupsDataReducer } from "./userGroupReducer";
 import { donationsDataReducer } from "./donationReducer";
 import { eventsDataReducer } from "./eventReducer";
 import { visitsDataReducer } from "./visitReducer";
+import { visitUsersDataReducer} from "./visitUserReducer";
+import { treeImagesDataReducer } from "./treeImageReducer";
 
 const rootReducer = combineReducers({
     plantTypesData: plantTypesDataReducer,
@@ -25,6 +27,7 @@ const rootReducer = combineReducers({
     pondsData: pondsDataReducer,
     pondWaterLevelUpdatesData: pondWaterLevelUpdatesDataReducer,
     treesData: treesDataReducer,
+    treeImagesData: treeImagesDataReducer,
     usersData: usersDataReducer,
     userTreesData: userTreesDataReducer,
     userTreeCountData: userTreeCountDataReducer,
@@ -35,7 +38,8 @@ const rootReducer = combineReducers({
     searchGroupsData: searchGroupsDataReducer,
     donationsData: donationsDataReducer,
     eventsData: eventsDataReducer,
-    visitsData:visitsDataReducer
+    visitsData:visitsDataReducer,
+    visitUserData: visitUsersDataReducer
 });
 
 export default rootReducer;

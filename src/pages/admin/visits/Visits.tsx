@@ -1,17 +1,10 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
+import { ToastContainer } from "react-toastify";
 import Box from "@mui/material/Box";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
-import { TableColumnsType } from "antd";
-import getColumnSearchProps from "../../../components/Filter";
-import TableComponent from "../../../components/Table";
-import { useAppDispatch, useAppSelector } from "../../../redux/store/hooks";
-import * as visitActionCreators from "../../../redux/actions/visitActions";
-import { bindActionCreators } from "@reduxjs/toolkit";
-import { RootState } from "../../../redux/store/store";
-import { ToastContainer } from "react-toastify";
-import { Visit } from "../../../types/visits";
-
+import GroupIcon from '@mui/icons-material/Group';
+import Collections from '@mui/icons-material/Collections';
 import {
   Button,
   Dialog,
@@ -26,8 +19,28 @@ import {
 
   GridFilterItem,
 } from "@mui/x-data-grid";
-import AddVisit from "./AddVisit";
-import EditVisit from "./EditVisit";
+import { TableColumnsType } from "antd";
+
+import { useAppDispatch, useAppSelector } from "../../../redux/store/hooks";
+import { bindActionCreators } from "@reduxjs/toolkit";
+
+//import components
+import { VisitUsers } from "./VisitUser";
+import getColumnSearchProps, { getColumnDateFilter, getColumnSelectedItemFilter } from "../../../components/Filter";
+import TableComponent from "../../../components/Table";
+
+//import types
+import { Visit, VisitTypeList } from "../../../types/visits";
+
+//import actions
+import * as visitActionCreators from "../../../redux/actions/visitActions";
+
+//import state
+import { RootState } from "../../../redux/store/store";
+import { getHumanReadableDate } from "../../../helpers/utils";
+import VisitForm from "./EditVisit";
+import ImageGridModal from "../../../components/ImagesGrid";
+
 
 export const VisitsComponent = () => {
   const dispatch = useAppDispatch();
@@ -38,14 +51,16 @@ export const VisitsComponent = () => {
 
   const [open, setOpen] = useState(false);
   const handleModalOpen = () => setOpen(true);
-  const handleModalClose = () => setOpen(false);
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
   const [selectedItem, setSelectedItem] = useState<any | null>(null);
   const [selectedEditRow, setSelectedEditRow] = useState<any | null>(null);
   const [editModal, setEditModal] = useState(false);
   const [page, setPage] = useState(0);
   const [filters, setFilters] = useState<Record<string, GridFilterItem>>({});
-  const [selectedVisit, setSelectedVisit] = useState<Visit | null>(null);
+  const [selectedVisit , setSelectedVisit] = useState<Visit | null>(null);
+  const [selectedVisitForImages , setSelectedVisitForImages] = useState<Visit | null>(null);
+  const [imagesModalOpen, setImagesModalOpen] = useState(false);
+
 
   const handleSetFilters = (filters: Record<string, GridFilterItem>) => {
     setPage(0);
@@ -61,9 +76,10 @@ export const VisitsComponent = () => {
     let filtersData = Object.values(filters);
 
     setTimeout(async () => {
-      await getVisits(page * 10, 10, filtersData);
-    }, 1000);
+      getVisits(page * 10, 10, filtersData);
+    }, 10);
   };
+
 
   let visitsList: Visit[] = [];
   const visitsData = useAppSelector((state: RootState) => state.visitsData);
@@ -97,12 +113,16 @@ export const VisitsComponent = () => {
     createVisit(formData);
   };
 
+  const getVisitType = (type: string) => {
+    return VisitTypeList.find((visitType) => visitType.id === type)?.label || '';
+  }
+
   const columns: TableColumnsType<Visit> = [
     {
       dataIndex: "action",
       key: "action",
       title: "Actions",
-      width: 150,
+      width: 250,
       align: "center",
       render: (value, record, index) => (
         <div
@@ -113,12 +133,20 @@ export const VisitsComponent = () => {
           }}
         >
           <Button
+            color="success"
+            variant="outlined"
+            style={{ margin: "0 5px" }}
+            onClick={() => {
+              setSelectedVisit(record);
+            }}>
+            <GroupIcon />
+          </Button>
+          <Button
             variant="outlined"
             style={{ margin: "0 5px" }}
             onClick={() => {
               setEditModal(true);
               setSelectedEditRow(record);
-
             }}
           >
             <EditIcon />
@@ -141,25 +169,61 @@ export const VisitsComponent = () => {
       title: "Visit Name",
       width: 320,
       align: "center",
-      render: (value, record, index) => (
-        <Button
-          onClick={() => setSelectedVisit(record)}
-          sx={{ textTransform: 'none', color: 'inherit' }}
-          fullWidth
-          variant="text"
-        >
-          {value}
-        </Button>),
       ...getColumnSearchProps("visit_name", filters, handleSetFilters),
     },
-
+    {
+      dataIndex: "visit_type",
+      key: "visit_type",
+      title: "Visit Type",
+      width: 220,
+      align: "center",
+      render: getVisitType,
+      ...getColumnSelectedItemFilter({dataIndex: "visit_type", filters, handleSetFilters, options: VisitTypeList.map(item => item.id)}),
+    },
     {
       dataIndex: "visit_date",
       key: "visit_date",
       title: "Visit Date",
       width: 220,
       align: "center",
-      ...getColumnSearchProps("visit_date", filters, handleSetFilters),
+      render: getHumanReadableDate,
+      ...getColumnDateFilter({dataIndex: "visit_date", filters, handleSetFilters}),
+    },
+    {
+      dataIndex: "user_count",
+      key: "user_count",
+      title: "Users #",
+      width: 100,
+      align: "center",
+      render: (value: string) => (value ? value : "0"),
+    },
+    {
+      dataIndex: "visit_images",
+      key: "visit_images",
+      title: "Images",
+      width: 100,
+      align: "center",
+      render: (value, record, index) => (
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
+          <Button
+            variant="outlined"
+            style={{ margin: "0 5px" }}
+            onClick={() => {
+              setImagesModalOpen(true);
+              setSelectedVisitForImages(record);
+            }}
+            disabled={!(value?.length)}
+          >
+            <Collections /> {value?.length || '0'}
+          </Button>
+        </div>
+      ),
     },
   ]
 
@@ -184,15 +248,18 @@ export const VisitsComponent = () => {
           <Button variant="contained" color="success" onClick={handleModalOpen}>
             Add Visit
           </Button>
-          <AddVisit
+          <VisitForm
+            mode={"add"}
             open={open}
-            handleClose={handleModalClose}
-            createVisit={handleCreateVisitData}
+            handleClose={() => {
+              setOpen(false);
+            }}
+            onSubmit={handleCreateVisitData}
           />
         </div>
       </div>
       <Divider sx={{ backgroundColor: "black", marginBottom: '15px' }} />
-      <Box sx={{ height: 840, width: "100%" }}>
+      <Box sx={{ maxHeight: 840, width: "100%", overflowY: 'auto', marginBottom: '40px' }}>
         <TableComponent
           dataSource={visitsList}
           columns={columns}
@@ -201,6 +268,13 @@ export const VisitsComponent = () => {
           setPage={setPage}
         />
       </Box>
+      {selectedVisit && <VisitUsers selectedVisit={selectedVisit}/>}
+      {selectedVisitForImages && <ImageGridModal 
+        open={imagesModalOpen}
+        onClose={() => setImagesModalOpen(false)}
+        imageUris={selectedVisitForImages.visit_images}
+        title={selectedVisitForImages.visit_name || 'Images'}
+      />}
 
       <Dialog open={openDeleteModal} onClose={() => setOpenDeleteModal(false)}>
         <DialogTitle>Confirm Delete</DialogTitle>
@@ -229,16 +303,18 @@ export const VisitsComponent = () => {
       </Dialog>
 
       {selectedEditRow && (
-        <EditVisit
-          row={selectedEditRow}
-          openeditModal={editModal}
-          closeEditModal={() => {
+        <VisitForm
+          mode={"edit"}
+          visit={selectedEditRow}
+          open={editModal}
+          handleClose={() => {
             setEditModal(false);
             setSelectedEditRow(null);
           }}
-          editSubmit={handleEditSubmit}
+          onSubmit={handleEditSubmit}
         />
       )}
+
     </>
   )
 
