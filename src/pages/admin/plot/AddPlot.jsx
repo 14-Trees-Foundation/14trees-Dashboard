@@ -73,11 +73,11 @@ const AddPlot = ({ open, handleClose, createPlot, tags }) => {
       operatorValue: "contains",
     };
 
+    setSitesLoading(true);
+    getSites(sitePageNo * 10, 10, [siteNameFilter]);
     setTimeout(async () => {
-      setSitesLoading(true);
-      await getSites(sitePageNo * 10, 10, [siteNameFilter]);
       setSitesLoading(false);
-    }, 100);
+    }, 1000);
   };
 
   const handleChange = (event) => {

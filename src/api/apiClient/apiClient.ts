@@ -171,6 +171,18 @@ class ApiClient {
         return response.data;
     }
 
+    async assignPlotsToSite(plotIds: number[], siteId: number): Promise<void> {
+        let url = `/plots/assign-site`
+        try {
+            await this.api.post<void>(url, { plot_ids: plotIds, site_id: siteId });
+        } catch (error: any) {
+            if (error.response?.data?.error) {
+                throw new Error(error.response.data.error);
+            }
+            throw new Error('Failed assign plots to site');
+        }
+    }
+
     /*
         Model- Group: CRUD Operations/Apis for organizations
     */
@@ -622,6 +634,18 @@ class ApiClient {
         } catch (error) {
             console.error(error)
             throw new Error('Failed to create Trees in bulk');
+        }
+    }
+
+    async changeTreesPlot(treeIds: number[], plotId: number): Promise<void> {
+        let url = `/trees/change-plot`
+        try {
+            await this.api.post<void>(url, { tree_ids: treeIds, plot_id: plotId });
+        } catch (error: any) {
+            if (error.response?.data?.error) {
+                throw new Error(error.response.data.error);
+            }
+            throw new Error('Failed change trees plot');
         }
     }
 
