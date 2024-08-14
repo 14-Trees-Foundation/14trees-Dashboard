@@ -130,3 +130,26 @@ export const createBulkTrees = (data: Blob) => {
         )
     };
 };
+
+export const changeTreesPlot = (treeIds: number[], plotId: number) => {
+    const apiClient = new ApiClient()
+    return (dispatch: any) => {
+        dispatch({
+            type: treeActionTypes.CHANGE_TREES_PLOT_REQUESTED,
+        });
+        apiClient.changeTreesPlot(treeIds, plotId).then(
+            () => {
+                dispatch({
+                    type: treeActionTypes.CHANGE_TREES_PLOT_SUCCEEDED,
+                });
+                toast.success('Successfully changed plot!');
+            },
+            (error: any) => {
+                dispatch({
+                    type: treeActionTypes.CHANGE_TREES_PLOT_FAILED,
+                });
+                toast.error(error.message);
+            }
+        )
+    }
+};
