@@ -7,6 +7,7 @@ import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { type Plot } from "../../../types/plot";
 import * as plotActionCreators from "../../../redux/actions/plotActions";
+import * as siteActionCreators from "../../../redux/actions/siteActions";
 import { bindActionCreators } from "redux";
 import { useAppDispatch, useAppSelector } from "../../../redux/store/hooks";
 import { RootState } from "../../../redux/store/store";
@@ -25,14 +26,17 @@ import { TableColumnsType } from "antd";
 import getColumnSearchProps, { getColumnSelectedItemFilter } from "../../../components/Filter";
 import TableComponent from "../../../components/Table";
 import { ToastContainer } from "react-toastify";
+import { AutocompleteWithPagination } from "../../../components/AutoComplete";
+import { Site } from "../../../types/site";
 
 
 export const PlotComponent = () => {
   const dispatch = useAppDispatch();
-  const { getPlots, createPlot, updatePlot, deletePlot, getPlotTags } = bindActionCreators(
+  const { getPlots, createPlot, updatePlot, deletePlot, getPlotTags, assignPlotsToSite } = bindActionCreators(
     plotActionCreators,
     dispatch
   );
+  const { getSites } = bindActionCreators(siteActionCreators, dispatch);
 
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
@@ -44,6 +48,12 @@ export const PlotComponent = () => {
   const [editModal, setEditModal] = useState(false);
   const [page, setPage] = useState(0);
   const [filters, setFilters] = useState<Record<string, GridFilterItem>>({});
+  const [selectedPlotIds, setSelectedPlotIds] = useState<number[]>([]);
+  const [selectSiteModal, setSelectSiteModal] = useState<boolean>(false);
+  const [sitePage, setSitePage] = useState(0);
+  const [sitesLoading, setSitesLoading] = useState(false);
+  const [siteNameInput, setSiteNameInput] = useState("");
+  const [selectedSite, setSelectedSite] = useState<Site | null>(null);
 
   const handleSetFilters = (filters: Record<string, GridFilterItem>) => {
     setPage(0);
@@ -89,9 +99,36 @@ export const PlotComponent = () => {
   const getAllPlotData = async () => {
     setTimeout(async () => {
       let filtersData = Object.values(filters);
-      await getPlots(0, plotsData.totalPlots, filtersData);
+      getPlots(0, plotsData.totalPlots, filtersData);
+    }, 10);
+  };
+
+  useEffect(() => {
+    getSitesData();
+  }, [sitePage, siteNameInput]);
+
+  const getSitesData = async () => {
+    const siteNameFilter = {
+      columnField: "name_english",
+      value: siteNameInput,
+      operatorValue: "contains",
+    };
+
+    setSitesLoading(true);
+    getSites(sitePage * 10, 10, [siteNameFilter]);
+    setTimeout(async () => {
+      setSitesLoading(false);
     }, 1000);
   };
+
+  let sitesList: Site[] = [];
+  const siteData = useAppSelector((state) => state.sitesData);
+  if (siteData) {
+    sitesList = Object.values(siteData.sites);
+    sitesList = sitesList.sort((a, b) => {
+      return b.id - a.id;
+    });
+  }
 
   const columns: TableColumnsType<Plot> = [
     {
@@ -209,6 +246,10 @@ export const PlotComponent = () => {
     },
   ];
 
+  const handleSelectionChanges = (plotIds: number[]) => {
+    setSelectedPlotIds(plotIds);
+  }
+
   const handleDelete = (row: Plot) => {
     setOpenDeleteModal(true);
     setSelectedItem(row);
@@ -220,9 +261,18 @@ export const PlotComponent = () => {
   };
 
   const handleCreatePlotData = (formData: Plot) => {
-    console.log('New Plot data: ',formData);
+    console.log('New Plot data: ', formData);
     createPlot(formData);
   };
+
+  const handleAssignPlots = () => {
+    if (selectedSite === null) return;
+    assignPlotsToSite(selectedPlotIds, selectedSite.id);
+    setSelectedSite(null);
+    setTimeout(() => {
+      getPlotData();
+    }, 1000)
+  }
 
   return (
     <>
@@ -242,6 +292,15 @@ export const PlotComponent = () => {
             marginBottom: "5px",
             marginTop: "5px",
           }}>
+          <Button
+            variant="contained"
+            color="success"
+            onClick={() => setSelectSiteModal(true)}
+            style={{ marginRight: "10px" }}
+            disabled={selectedPlotIds.length === 0}
+          >
+            Assign to Site
+          </Button>
           <Button
             variant="contained"
             color="success"
@@ -265,6 +324,7 @@ export const PlotComponent = () => {
           totalRecords={plotsData.totalPlots}
           fetchAllData={getAllPlotData}
           setPage={setPage}
+          handleSelectionChanges={handleSelectionChanges}
         />
       </Box>
 
@@ -303,6 +363,56 @@ export const PlotComponent = () => {
             variant="outlined"
             autoFocus>
             Yes
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      <Dialog open={selectSiteModal} onClose={() => setSelectSiteModal(false)} >
+        <DialogTitle>Select a Site</DialogTitle>
+        <DialogContent sx={{ width: 500 }}>
+          <DialogContentText>
+            Selected plots will be assigned to this site.
+          </DialogContentText>
+            <div style={{ width: 500, marginTop: 5 }}>
+              <AutocompleteWithPagination
+                label="Select a Site"
+                options={sitesList}
+                getOptionLabel={(option) => option?.name_english || ''}
+                onChange={(event, newValue) => {
+                  setSelectedSite(newValue);
+                }}
+                onInputChange={(event) => {
+                  const { value } = event.target;
+                  setSitePage(0);
+                  setSiteNameInput(value);
+                }}
+                setPage={setSitePage}
+                fullWidth
+                size="medium"
+                loading={sitesLoading}
+                value={(siteNameInput === '' && selectedSite) ? selectedSite : null}
+              />
+            </div>
+        </DialogContent>
+        <DialogActions>
+          <Button 
+            color="error"
+            variant="outlined"
+            onClick={() => setSelectSiteModal(false)}
+          >
+            Cancel
+          </Button>
+          <Button
+            onClick={() => {
+              handleAssignPlots();
+              setSelectSiteModal(false);
+            }}
+            color="success"
+            variant="contained"
+            autoFocus
+            disabled={selectedSite === null}
+          >
+            Assign
           </Button>
         </DialogActions>
       </Dialog>

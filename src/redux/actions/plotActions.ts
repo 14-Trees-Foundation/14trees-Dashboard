@@ -166,3 +166,26 @@ export const getPlotTags = (offset: number, limit: number) => {
         )
     }
 };
+
+export const assignPlotsToSite = (plotIds: number[], siteId: number) => {
+    const apiClient = new ApiClient()
+    return (dispatch: any) => {
+        dispatch({
+            type: plotActionTypes.ASSIGN_PLOTS_REQUESTED,
+        });
+        apiClient.assignPlotsToSite(plotIds, siteId).then(
+            () => {
+                dispatch({
+                    type: plotActionTypes.ASSIGN_PLOTS_SUCCEEDED,
+                });
+                toast.success('Successfully assigned plots to site!');
+            },
+            (error: any) => {
+                dispatch({
+                    type: plotActionTypes.ASSIGN_PLOTS_FAILED,
+                });
+                toast.error(error.message);
+            }
+        )
+    }
+};

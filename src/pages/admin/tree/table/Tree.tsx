@@ -37,7 +37,7 @@ import { AutocompleteWithPagination } from "../../../../components/AutoComplete"
 
 export const TreeNew = () => {
     const dispatch = useAppDispatch();
-    const { getTrees, updateTree, deleteTree }
+    const { getTrees, updateTree, deleteTree, changeTreesPlot }
         = bindActionCreators(treeActionCreators, dispatch);
     const { mapTrees, unMapTrees, assignTrees, unassignUserTrees }
         = bindActionCreators(userTreesActionCreators, dispatch);
@@ -67,6 +67,9 @@ export const TreeNew = () => {
     const [openConfirmation, setOpenConfirmation] = useState(false);
     const [operation, setOperation] = useState('');
     const [filters, setFilters] = useState<Record<string, GridFilterItem>>({});
+    const [selectedTreeIds, setSelectedTreeIds] = useState<number[]>([]);
+    const [selectedPlot, setSelectedPlot] = useState<Plot | null>(null);
+    const [changePlotModal, setChangePlotModal] = useState<boolean>(false);
 
     const handleSetFilters = (filters: Record<string, GridFilterItem>) => {
         setPage(0);
@@ -200,7 +203,11 @@ export const TreeNew = () => {
     const treesData = useAppSelector((state: RootState) => state.treesData);
     if (treesData) {
         treesList = Object.values(treesData.trees);
-        treesList = treesList.sort((a, b) => b.id - a.id)
+        treesList = treesList.sort((a, b) => {
+            if (a.sapling_id > b.sapling_id) return 1;
+            if (a.sapling_id < b.sapling_id) return -1;
+            return 0;
+        })
     }
 
     const getAllTreesData = async () => {
@@ -218,6 +225,7 @@ export const TreeNew = () => {
     const handleSelectionChanges = (treeIds: number[]) => {
         const saplingIds = treeIds.map((treeId) => treesData.trees[treeId].sapling_id);
         setSaplingIds(saplingIds);
+        setSelectedTreeIds(treeIds);
 
         let mapped = 0, unMapped = 0;
         let assigned = 0, unassigned = 0;
@@ -320,6 +328,16 @@ export const TreeNew = () => {
         setSelectedEditRow(null);
     };
 
+    const handleChangePlot = () => {
+        if (selectedPlot === null) return;
+        
+        changeTreesPlot(selectedTreeIds, selectedPlot.id);
+        setSelectedPlot(null);
+        setTimeout(() => {
+            getTreeData();
+        }, 1000)
+    }
+
     return (
         <>
             <div
@@ -367,6 +385,9 @@ export const TreeNew = () => {
                         disabled={disabledMapUnMapButton}
                     >{(isMapTrees) ? "Map Trees" : "UnMap Trees"}</Button>
                     <UserModal open={isUserModalOpen} handleClose={() => { setIsUserModalOpen(false) }} onSubmit={handleMapTrees} searchUser={searchUsers} />
+                    <Button variant="contained" color='success' style={{ marginLeft: '10px' }} onClick={() => setChangePlotModal(true)}
+                        disabled={selectedTreeIds.length === 0}
+                    >Change Plot</Button>
                 </div>
             </div>
             <Divider sx={{ backgroundColor: "black", marginBottom: '15px' }} />
@@ -437,6 +458,56 @@ export const TreeNew = () => {
                         color="primary"
                         autoFocus>
                         Yes
+                    </Button>
+                </DialogActions>
+            </Dialog>
+
+            <Dialog open={changePlotModal} onClose={() => setChangePlotModal(false)} >
+                <DialogTitle>Select a Site</DialogTitle>
+                <DialogContent sx={{ width: 500 }}>
+                    <DialogContentText>
+                        This action will change plot for selected Trees.
+                    </DialogContentText>
+                    <div style={{ width: 500, marginTop: 5 }}>
+                        <AutocompleteWithPagination
+                            label="Select a Plot"
+                            options={plotsList}
+                            getOptionLabel={(option) => option?.name || ''}
+                            onChange={(event, newValue) => {
+                                setSelectedPlot(newValue);
+                            }}
+                            onInputChange={(event) => {
+                                const { value } = event.target;
+                                setPlotPage(0);
+                                setPlotName(value);
+                            }}
+                            setPage={setPlotPage}
+                            fullWidth
+                            size="medium"
+                            loading={plotsLoading}
+                            value={(plotName === '' && selectedPlot) ? selectedPlot : null}
+                        />
+                    </div>
+                </DialogContent>
+                <DialogActions>
+                    <Button
+                        color="error"
+                        variant="outlined"
+                        onClick={() => setChangePlotModal(false)}
+                    >
+                        Cancel
+                    </Button>
+                    <Button
+                        onClick={() => {
+                            handleChangePlot();
+                            setChangePlotModal(false);
+                        }}
+                        color="success"
+                        variant="contained"
+                        autoFocus
+                        disabled={selectedPlot === null}
+                    >
+                        Change Plot
                     </Button>
                 </DialogActions>
             </Dialog>
