@@ -770,6 +770,11 @@ class ApiClient {
         }
     }
 
+    async syncSitesDataFromNotion(): Promise<void> {
+        await this.api.post<void>(`/sites/sync-sites`);
+        return ;
+    }
+
 
     /*
        Model- Donation: CRUD Operations/Apis for Donations

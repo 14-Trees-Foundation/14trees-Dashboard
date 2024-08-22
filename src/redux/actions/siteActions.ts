@@ -117,3 +117,28 @@ export const deleteSite = (record: Site) => {
         )
     };
 };
+
+export const syncSitesDataFromNotion = () => {
+    const apiClient = new ApiClient();
+    return (dispatch: any) => {
+        dispatch({
+            type: siteActionTypes.SYNC_SITES_REQUESTED,
+        });
+        apiClient.syncSitesDataFromNotion().then(
+            () => {
+                toast.success('Successfully synced sites data from notion!')
+                dispatch({
+                    type: siteActionTypes.SYNC_SITES_SUCCEEDED,
+                });
+            },
+            (error: any) => {
+                console.error(error);
+                dispatch({
+                    type: siteActionTypes.SYNC_SITES_FAILED,
+                });
+                if (error?.response?.data?.error) toast.error(error?.response?.data?.error)
+                else toast.error(`Failed to sync sites from notion!`)
+            }
+        )
+    };
+};
