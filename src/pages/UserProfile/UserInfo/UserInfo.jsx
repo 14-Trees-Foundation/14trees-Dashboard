@@ -43,9 +43,13 @@ export const UserInfo = () => {
           <img
             className={imgLoad ? classes.imageWindow : classes.none}
             src={
-              selUserInfo.user_tree_image === ""
+              selUserInfo.user_tree_image && selUserInfo.user_tree_image !== ""
+              ? selUserInfo.user_tree_image
+              : ( selUserInfo.image && selUserInfo.image !== "" )
                 ? selUserInfo.image
-                : selUserInfo.user_tree_image
+                : selUserInfo.plant_type_images && selUserInfo.plant_type_images.length > 0
+                  ? selUserInfo.plant_type_images[0]
+                  : ""
             }
             alt={"A"}
           />
@@ -64,11 +68,13 @@ export const UserInfo = () => {
               alt="Card"
               onLoad={() => setImgLoad(true)}
               src={
-                !selUserInfo.user_tree_image || selUserInfo.user_tree_image === ""
-                  ? selUserInfo.image
+                selUserInfo.user_tree_image && selUserInfo.user_tree_image !== ""
+                  ? selUserInfo.user_tree_image
+                  : ( selUserInfo.image && selUserInfo.image !== "" )
                     ? selUserInfo.image
-                    : selUserInfo.tree_type_images[0]
-                  : selUserInfo.user_tree_image
+                    : selUserInfo.plant_type_images && selUserInfo.plant_type_images.length > 0
+                      ? selUserInfo.plant_type_images[0]
+                      : ""
               }
             />
           </Grid>

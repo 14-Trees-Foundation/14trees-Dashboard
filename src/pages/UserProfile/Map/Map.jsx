@@ -109,11 +109,11 @@ export const Map = () => {
                     <img
                       alt="tree"
                       src={
-                        tree.image
-                          ? tree.image === ""
-                            ? tree.plant_type_image
-                            : tree.image
-                          : tree.tree_type_image
+                        tree.image && tree.image !== ''
+                          ? tree.image
+                          : tree.plant_type_images && tree.plant_type_images.length > 0
+                          ? tree.plant_type_images[0]
+                          : ""
                       }
                       className={classes.treeimg}
                     />
