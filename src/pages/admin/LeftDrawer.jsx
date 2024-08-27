@@ -88,16 +88,16 @@ export const AdminLeftDrawer = () => {
       logo: MapIcon,
       display: true,
     },
-    {
-      displayName: "Events",
-      logo: FestivalIcon,
-      display: true,
-    },
-    {
-      displayName: "Donation",
-      logo: VolunteerActivismIcon,
-      display: true,
-    },
+    // {
+    //   displayName: "Events",
+    //   logo: FestivalIcon,
+    //   display: true,
+    // },
+    // {
+    //   displayName: "Donation",
+    //   logo: VolunteerActivismIcon,
+    //   display: true,
+    // },
     {
       displayName: "Visits",
       logo: TourIcon,
