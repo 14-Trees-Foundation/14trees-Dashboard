@@ -7,8 +7,11 @@ import {
   DialogContent,
   DialogTitle,
   TextField,
+  Grid,
 } from "@mui/material";
 import { plantTypeHabitList } from "./habitList";
+import { useDropzone } from "react-dropzone";
+import { makeStyles } from "@mui/styles";
 
 function EditTreeType({
   row,
@@ -17,6 +20,8 @@ function EditTreeType({
   editSubmit,
 }) {
   const [formData, setFormData] = useState(row);
+
+  const classes = useStyles();
 
   const handleChange = (event) => {
     setFormData({
@@ -30,6 +35,36 @@ function EditTreeType({
     editSubmit(formData);
     handleCloseEditModal(false);
   };
+  const [files, setFiles] = useState([]);
+  const thumbs = files.map((file) => (
+    <div stye={{ display: "inline-flex" }} key={file.name}>
+      <div style={{ display: "flex", minWidth: 0, overflow: "hidden" }}>
+        <img className={classes.preview} src={file.preview} alt="thumb" />
+      </div>
+    </div>
+  ));
+
+  const { getRootProps, getInputProps } = useDropzone({
+    accept: "image/*",
+    maxFiles: 10,
+    onDrop: (acceptedFiles) => {
+      setFiles(
+        acceptedFiles.map((file) =>
+          Object.assign(file, {
+            preview: URL.createObjectURL(file),
+          })
+        )
+      );
+
+      setFormData((prevFormData) => ({
+        ...prevFormData,
+        images: [...(prevFormData.images || []), acceptedFiles],
+      }));
+    },
+    onDropRejected: (rejectedFiles) => {
+      // toast.error("Only 10 images allowed!");
+    },
+  });
 
   return (
     <Dialog open={openeditModal} onClose={() => handleCloseEditModal(false)}>
@@ -109,6 +144,19 @@ function EditTreeType({
             value={formData.tags}
             onChange={handleChange}
           />
+          <Grid item xs={12}>
+            <div className={classes.imgdiv}>
+              <section>
+                <div {...getRootProps()}>
+                  <input {...getInputProps()} />
+                  <p style={{ cursor: "pointer" }}>
+                    Upload Plant Type images. Click or Drag!
+                  </p>
+                </div>
+              </section>
+            </div>
+            <div className={classes.prevcontainer}>{thumbs}</div>
+          </Grid>
           <TextField
             margin="dense"
             name="images"
@@ -177,5 +225,26 @@ function EditTreeType({
     </Dialog>
   );
 }
+const useStyles = makeStyles((theme) => ({
+  imgdiv: {
+    padding: "8px",
+    marginTop: "8px",
+    marginBottom: "8px",
+    border: "1px #1f3625 dashed",
+    textAlign: "center",
+  },
+  preview: {
+    width: "100px",
+    height: "100px",
+    objectFit: "cover",
+    margin: "8px",
+  },
+  prevcontainer: {
+    margin: "16px",
+    display: "flex",
+    flexDirection: "row",
+    flexWrap: "wrap",
+  },
+}));
 
 export default EditTreeType;

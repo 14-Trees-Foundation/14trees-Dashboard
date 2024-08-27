@@ -4,7 +4,6 @@ import {
     GridFilterItem,
 } from "@mui/x-data-grid";
 import {
-    Autocomplete,
     Button,
     Dialog,
     DialogActions,
@@ -12,28 +11,30 @@ import {
     DialogContentText,
     DialogTitle,
     Divider,
-    TextField,
     Typography,
 } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
+import ImageIcon from "@mui/icons-material/Image";
 import { MapTreesUsingSaplingIdsRequest, type Tree } from "../../../../types/tree";
 import * as treeActionCreators from "../../../../redux/actions/treeActions";
 import * as userTreesActionCreators from "../../../../redux/actions/userTreeActions";
 import * as userActionCreators from "../../../../redux/actions/userActions";
 import * as plotActionCreators from "../../../../redux/actions/plotActions";
+import * as treeImageActionCreators from "../../../../redux/actions/treeImageActions";
 import { bindActionCreators } from "redux";
 import { useAppDispatch, useAppSelector } from "../../../../redux/store/hooks";
 import { RootState } from "../../../../redux/store/store";
 import EditTree from "./EditTree";
 import UserModal from "../../../../components/UserModal";
 import AssignTreeModal from "./AssignTreeModal";
-import { AssignTreeRequest } from "../../../../types/userTree";
 import getColumnSearchProps from "../../../../components/Filter";
 import { TableColumnsType } from "antd";
 import { Plot } from "../../../../types/plot";
 import TableComponent from "../../../../components/Table";
 import { AutocompleteWithPagination } from "../../../../components/AutoComplete";
+import Timeline from "./timeline";
+import { TreeImage } from "../../../../types/tree_snapshots";
 
 export const TreeNew = () => {
     const dispatch = useAppDispatch();
@@ -45,6 +46,8 @@ export const TreeNew = () => {
         = bindActionCreators(userActionCreators, dispatch);
     const { getPlots }
         = bindActionCreators(plotActionCreators, dispatch);
+    const { getTreeImages }
+        = bindActionCreators(treeImageActionCreators, dispatch);
 
     const [plotPage, setPlotPage] = useState(0);
     const [plotName, setPlotName] = useState('');
@@ -52,6 +55,7 @@ export const TreeNew = () => {
 
     const [loading, setLoading] = useState(false);
     const [openDeleteModal, setOpenDeleteModal] = useState(false);
+    const [selectedTreeForTimeline, setSelectedTreeForTimeline] = useState<Tree | null>(null);
     const [deleteRow, setDeleteRow] = useState<any>({});
     const [page, setPage] = useState(0);
     const [srNoPage, setSrNoPage] = useState(0);
@@ -93,6 +97,35 @@ export const TreeNew = () => {
         getPlotsData();
     }, [plotPage, plotName]);
 
+    useEffect(() => {
+        if (selectedTreeForTimeline) {
+            getTreeImages(selectedTreeForTimeline.sapling_id, 0, 20);
+        }
+    }, [selectedTreeForTimeline])
+
+    let treeImages: TreeImage[] = [];
+    const treeImagesData = useAppSelector((state) => state.treeImagesData);
+    if (treeImagesData) {
+        treeImages = Object.values(treeImagesData.treeImages);
+        if (selectedTreeForTimeline && selectedTreeForTimeline.image) {
+            treeImages.push({
+                image: selectedTreeForTimeline.image,
+                image_date: selectedTreeForTimeline.created_at,
+                tree_status: selectedTreeForTimeline.tree_status,
+                created_at: selectedTreeForTimeline.created_at,
+                id: 0,
+                key: 0,
+                user_id: 0,
+                sapling_id: selectedTreeForTimeline.sapling_id,
+            })
+        }
+        treeImages = treeImages.sort((a, b) => {
+            if (b.image_date > a.image_date) return 1;
+            if (b.image_date < a.image_date) return -1;
+            return 0;
+        });
+    }
+
     const getPlotsData = async () => {
         const nameFilter = { columnField: "name", value: plotName, operatorValue: "contains" }
         setPlotsLoading(true);
@@ -107,9 +140,6 @@ export const TreeNew = () => {
     if (plotsData) {
         plotsList = Object.values(plotsData.plots);
         plotsList = plotsList.sort((a, b) => {
-            // const at = new Date(a.updated_at);
-            // const bt = new Date(b.updated_at);
-
             return b.id - a.id;
         });
     }
@@ -181,6 +211,14 @@ export const TreeNew = () => {
                         variant="outlined"
                         style={{ margin: "0 5px" }}
                         onClick={() => {
+                            setSelectedTreeForTimeline(record);
+                        }}>
+                        <ImageIcon />
+                    </Button>
+                    <Button
+                        variant="outlined"
+                        style={{ margin: "0 5px" }}
+                        onClick={() => {
                             setSelectedEditRow(record);
                             setEditModal(true);
                         }}>
@@ -213,7 +251,7 @@ export const TreeNew = () => {
     const getAllTreesData = async () => {
         setTimeout(async () => {
             let filtersData = Object.values(filters);
-            await getTrees(0, treesData.totalTrees, filtersData);
+            getTrees(0, treesData.totalTrees, filtersData);
         }, 1000);
     };
 
@@ -403,6 +441,13 @@ export const TreeNew = () => {
                     setSrNoPage={setSrNoPage}
                 />
             </Box>
+
+            <Dialog open={selectedTreeForTimeline !== null} onClose={() => setSelectedTreeForTimeline(null)} PaperProps={{ sx: { width: '80%', maxWidth: '80%', maxHeight: '80%' } }}>
+                <DialogTitle>Timeline For Sapling {selectedTreeForTimeline?.sapling_id}</DialogTitle>
+                <DialogContent>
+                    <Timeline items={treeImages.map(image => ({ date: image.image_date.toString(), status: image.tree_status, image: image.image }))} />
+                </DialogContent>
+            </Dialog>
 
             {selectedEditRow && (
                 <EditTree

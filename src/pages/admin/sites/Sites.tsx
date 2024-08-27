@@ -1,9 +1,6 @@
 import React, { useEffect, useState } from "react";
 import Box from "@mui/material/Box";
 import {
-  DataGrid,
-  GridToolbar,
-  GridColumns,
   GridFilterItem,
 } from "@mui/x-data-grid";
 import {
@@ -18,8 +15,8 @@ import {
 } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
-import CircularProgress from "@mui/material/CircularProgress";
 import EditSites from "./EditSites";
+import SaveIcon from '@mui/icons-material/Save';
 import { TableColumnsType } from "antd";
 import { Site } from "../../../types/site";
 import getColumnSearchProps from "../../../components/Filter";
@@ -29,9 +26,11 @@ import * as siteActionCreators from "../../../redux/actions/siteActions";
 import { bindActionCreators } from "@reduxjs/toolkit";
 import { RootState } from "../../../redux/store/store";
 import AddSite from "./AddSite";
-import { ToastContainer } from "react-toastify";
+import { ToastContainer, toast } from "react-toastify";
 import { SiteMap } from "./components/SiteMap";
 import { getFormattedDate } from "../../../helpers/utils";
+import ApiClient from "../../../api/apiClient/apiClient";
+import { LoadingButton } from "@mui/lab";
 
 
 export const SitesComponent = () => {
@@ -42,6 +41,7 @@ export const SitesComponent = () => {
   );
 
   const [open, setOpen] = useState(false);
+  const [syncInProgress, setSyncInProgress] = useState(false);
   const handleModalOpen = () => setOpen(true);
   const handleModalClose = () => setOpen(false);
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
@@ -61,17 +61,12 @@ export const SitesComponent = () => {
   }, [page, filters]);
 
   const getSiteData = async () => {
-    console.log("Filters Object : ", filters);
     let filtersData = Object.values(filters);
-    console.log("filtered data : ", filtersData);
-    setTimeout(async () => {
-      await getSites(page * 10, 10, filtersData);
-    }, 1000);
+    getSites(page * 10, 10, filtersData);
   };
 
   let sitesList: Site[] = [];
   const sitesData = useAppSelector((state: RootState) => state.sitesData);
-  console.log("Sites Data : ", sitesData);
   if (sitesData) {
     sitesList = Object.values(sitesData.sites);
     sitesList = sitesList.sort((a, b) => b.id - a.id);
@@ -79,10 +74,7 @@ export const SitesComponent = () => {
 
   const getAllSitesData = async () => {
     let filtersData = Object.values(filters);
-    console.log("filtersData from getallsite: ", filtersData);
-    setTimeout(async () => {
-      await getSites(0, sitesData.totalSites, filtersData);
-    }, 1000);
+    getSites(0, sitesData.totalSites, filtersData);
   };
 
   const handleDeleteSites = (row: Site) => {
@@ -90,13 +82,27 @@ export const SitesComponent = () => {
     setSelectedItem(row);
   };
 
-  const handleEditSubmit = (formData: Site) => {
-    updateSite(formData);
+  const handleEditSubmit = (formData: Site, files: Blob[]) => {
+    updateSite(formData, files);
     setSelectedEditRow(null);
   };
 
   const handleCreateSiteData = (formData: Site) => {
     createSite(formData);
+  };
+
+  const handleSyncNotionSites = async () => {
+    setSyncInProgress(true);
+    const apiClient = new ApiClient();
+    try {
+      await apiClient.syncSitesDataFromNotion();
+      toast.success('Successfully synced sites data from notion!')
+    } catch (error: any) {
+      if (error?.response?.data?.error) toast.error(error?.response?.data?.error)
+      else toast.error(`Failed to sync sites from notion!`)
+    }
+    setSyncInProgress(false);
+    getSiteData();
   };
 
   const columns: TableColumnsType<Site> = [
@@ -224,6 +230,13 @@ export const SitesComponent = () => {
       align: "center",
     },
     {
+      dataIndex: "tags",
+      key: "tags",
+      title: "Tags",
+      width: 150,
+      align: "center",
+    },
+    {
       dataIndex: "photo_album",
       key: "photo_album",
       title: "Photo Album",
@@ -310,6 +323,17 @@ export const SitesComponent = () => {
             marginBottom: "5px",
             marginTop: "5px",
           }}>
+          <LoadingButton
+            loading={syncInProgress}
+            loadingPosition="start"
+            variant="contained"
+            color="success"
+            onClick={handleSyncNotionSites}
+            startIcon={<SaveIcon />}
+            style={{ marginRight: "10px" }}
+          >
+            Sync Notion Sites
+          </LoadingButton>
           <Button variant="contained" color="success" onClick={handleModalOpen}>
             Add Site
           </Button>
@@ -325,9 +349,12 @@ export const SitesComponent = () => {
         <TableComponent
           dataSource={sitesList}
           columns={columns}
+
           totalRecords={sitesData.totalSites}
           fetchAllData={getAllSitesData}
           setPage={setPage}
+          isExpandable={true}
+          expandableFunction={(record) => <SiteMap KmlSource={record.google_earth_link[0]} />}
         />
         <SiteMap />
       </Box>

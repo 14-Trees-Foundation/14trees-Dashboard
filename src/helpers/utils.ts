@@ -1,3 +1,5 @@
+import moment from "moment";
+
 export function strEquals(s1: string, s2: string) {
 
     if (s1 == null && s2 !== null) {
@@ -26,4 +28,10 @@ export function getFormattedDate(dateStr: string) {
         const year = date.getFullYear();
         const isValidDate = !isNaN(date.getDate()) && date.getTime() > 0;
         return isValidDate ? `${day}-${month}-${year}` : ''
+}
+
+export function getHumanReadableDate(dateStr: string) { 
+    const date = new Date(dateStr);
+    const isValidDate = !isNaN(date.getDate()) && date.getTime() > 0;
+    return isValidDate ? moment(date).format('MMMM DD, YYYY') : '';
 }

@@ -3,7 +3,7 @@ import { Table, TableColumnsType } from 'antd';
 import { AnyObject } from 'antd/es/_util/type';
 import { TableRowSelection } from 'antd/es/table/interface';
 import { Parser } from 'json2csv';
-import { useEffect, useState } from 'react';
+import { ReactElement, useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 
 interface TableComponentProps {
@@ -15,9 +15,12 @@ interface TableComponentProps {
     setPage: (value: React.SetStateAction<number>) => void
     setSrNoPage?: (value: React.SetStateAction<number>) => void
     handleSelectionChanges?: (ids: number[]) => void
+    isExpandable?: boolean
+    expandableFunction?: (record: any) => 
+        ReactElement
 }
 
-function TableComponent({ loading, dataSource, columns, totalRecords, fetchAllData, setPage, handleSelectionChanges, setSrNoPage }: TableComponentProps) {
+function TableComponent({ loading, dataSource, columns, totalRecords, fetchAllData, setPage, handleSelectionChanges, setSrNoPage, isExpandable, expandableFunction }: TableComponentProps) {
 
     const [download, setDownload] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
@@ -48,6 +51,11 @@ function TableComponent({ loading, dataSource, columns, totalRecords, fetchAllDa
         link.click();
         document.body.removeChild(link);
     };
+
+    const expandable = {
+        expandedRowRender: (record: any)=> expandableFunction?expandableFunction(record):null,
+        rowExpandable: (record: any) => { return isExpandable?isExpandable:false},
+      }
 
     useEffect(() => {
         if (download) {
@@ -80,6 +88,7 @@ function TableComponent({ loading, dataSource, columns, totalRecords, fetchAllDa
             style={{ borderRadius: 20 }}
             dataSource={dataSource}
             columns={columns}
+            expandable={isExpandable ? expandable : undefined}
             pagination={{ 
                 position: ['bottomRight'], 
                 showSizeChanger: false, 

@@ -62,14 +62,14 @@ export const createSite = (record: Site) => {
     };
 };
 
-export const updateSite = (record: Site) => {
+export const updateSite = (record: Site , files?: Blob[]) => {
     const apiClient = new ApiClient();
     return (dispatch: any) => {
 
         dispatch({
             type: siteActionTypes.UPDATE_SITE_REQUESTED,
         });
-         apiClient.updateSite(record).then(
+         apiClient.updateSite(record , files?files:[]).then(
             (value: Site) => {
                 toast.success('Site data Edited successfully')
                 dispatch({
@@ -113,6 +113,31 @@ export const deleteSite = (record: Site) => {
                 dispatch({
                     type: siteActionTypes.DELETE_SITE_FAILED,
                 });
+            }
+        )
+    };
+};
+
+export const syncSitesDataFromNotion = () => {
+    const apiClient = new ApiClient();
+    return (dispatch: any) => {
+        dispatch({
+            type: siteActionTypes.SYNC_SITES_REQUESTED,
+        });
+        apiClient.syncSitesDataFromNotion().then(
+            () => {
+                toast.success('Successfully synced sites data from notion!')
+                dispatch({
+                    type: siteActionTypes.SYNC_SITES_SUCCEEDED,
+                });
+            },
+            (error: any) => {
+                console.error(error);
+                dispatch({
+                    type: siteActionTypes.SYNC_SITES_FAILED,
+                });
+                if (error?.response?.data?.error) toast.error(error?.response?.data?.error)
+                else toast.error(`Failed to sync sites from notion!`)
             }
         )
     };

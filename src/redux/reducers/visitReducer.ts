@@ -1,15 +1,15 @@
-import { Visit, VistsDataState } from "../../types/visits";
+import { Visit, VisitsDataState } from "../../types/visits";
 import { UnknownAction } from "redux";
 
 import visitActionTypes from "../actionTypes/visitActionTypes";
 import { PaginatedResponse } from "../../types/pagination";
 
 
-export const visitsDataReducer = (state = { totalVisits: 0, visits: {} }, action: UnknownAction): VistsDataState => {
+export const visitsDataReducer = (state = { totalVisits: 0, visits: {} }, action: UnknownAction): VisitsDataState => {
     switch (action.type) {
         case visitActionTypes.GET_VISITS_SUCCEEDED:
             if (action.payload) {
-                let visitsDataState: VistsDataState = { totalVisits: state.totalVisits, visits: { ...state.visits } };
+                let visitsDataState: VisitsDataState = { totalVisits: state.totalVisits, visits: { ...state.visits } };
                 let payload = action.payload as PaginatedResponse<Visit>;
                 console.log(payload)
                 if (visitsDataState.totalVisits !== payload.total) {
@@ -25,14 +25,14 @@ export const visitsDataReducer = (state = { totalVisits: 0, visits: {} }, action
                     }
                 }
 
-                const nextState: VistsDataState = visitsDataState;
+                const nextState: VisitsDataState = visitsDataState;
                 return nextState;
             }
             return state;
 
         case visitActionTypes.CREATE_VISIT_SUCCEEDED:
             if (action.payload) {
-                const nextState = { totalVisits: state.totalVisits, visits: { ...state.visits } } as VistsDataState;
+                const nextState = { totalVisits: state.totalVisits, visits: { ...state.visits } } as VisitsDataState;
                 let payload = action.payload as Visit
 
                 nextState.visits[payload.id] = payload;
@@ -42,7 +42,7 @@ export const visitsDataReducer = (state = { totalVisits: 0, visits: {} }, action
             return state;
         case visitActionTypes.UPDATE_VISIT_SUCCEEDED:
             if (action.payload) {
-                const nextState = { totalVisits: state.totalVisits, visits: { ...state.visits } } as VistsDataState;
+                const nextState = { totalVisits: state.totalVisits, visits: { ...state.visits } } as VisitsDataState;
                 let payload = action.payload as Visit
 
                 nextState.visits[payload.id] = payload;
@@ -51,7 +51,7 @@ export const visitsDataReducer = (state = { totalVisits: 0, visits: {} }, action
             return state;
         case visitActionTypes.DELETE_VISIT_SUCCEEDED:
             if (action.payload) {
-                const nextState = { totalVisits: state.totalVisits, visits: { ...state.visits } } as VistsDataState;
+                const nextState = { totalVisits: state.totalVisits, visits: { ...state.visits } } as VisitsDataState;
                 Reflect.deleteProperty(nextState.visits, action.payload as number)
                 nextState.totalVisits -= 1;
                 return nextState;

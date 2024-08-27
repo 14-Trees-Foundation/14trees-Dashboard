@@ -30,15 +30,16 @@ interface OrganizationUsersInputProps {
     selectedOrg: Group | null
 }
 
-export const OrganizationUsers = ( { selectedOrg }: OrganizationUsersInputProps) => {
+export const OrganizationUsers = ({ selectedOrg }: OrganizationUsersInputProps) => {
     const dispatch = useAppDispatch();
     const { getUsers, searchUsers } =
         bindActionCreators(userActionCreators, dispatch);
     const { searchGroups } =
         bindActionCreators(groupActionCreators, dispatch);
-    const { createUserGroupMapping, removeGroupUsers } =
+    const { bulkCreateUserGroupMapping, createUserGroupMapping, removeGroupUsers } =
         bindActionCreators(userGroupActionCreators, dispatch);
 
+    const [loading, setLoading] = useState(false);
     const [searchTerm, setSearchTerm] = useState<string>('');
     const [selectedGroup, setSelectedGroup] = useState<Group | null>(null);
     const [searchGroupPage, setSearchGroupPage] = useState(0);
@@ -47,6 +48,8 @@ export const OrganizationUsers = ( { selectedOrg }: OrganizationUsersInputProps)
     const [selectedUserIds, setSelectedUserIds] = useState<number[]>([]);
     const [page, setPage] = useState(0);
     const [filters, setFilters] = useState<Record<string, GridFilterItem>>({});
+    const [bulkCreate, setBulkCreate] = useState(false);
+    const [file, setFile] = useState(null);
     const targetRef = useRef<any>(null);
 
     const handleSetFilters = (filters: Record<string, GridFilterItem>) => {
@@ -77,9 +80,7 @@ export const OrganizationUsers = ( { selectedOrg }: OrganizationUsersInputProps)
             }
         }
         let filtersData = Object.values(filterWithGroup);
-        setTimeout(async () => {
-            await getUsers(page * 10, 10, filtersData);
-        }, 1000);
+        getUsers(page * 10, 10, filtersData);
     };
 
     const getAllUsersData = async () => {
@@ -93,8 +94,8 @@ export const OrganizationUsers = ( { selectedOrg }: OrganizationUsersInputProps)
                 }
             }
             let filtersData = Object.values(filterWithGroup);
-            await getUsers(0, usersData.totalUsers, filtersData);
-        }, 1000);
+            getUsers(0, usersData.totalUsers, filtersData);
+        }, 10);
     };
 
     // Groups state management
@@ -183,6 +184,16 @@ export const OrganizationUsers = ( { selectedOrg }: OrganizationUsersInputProps)
         usersList = Object.values(usersData.users);
     }
 
+    const handleBulkCreateUserGroupMapping = (e: any) => {
+        e.preventDefault();
+        setBulkCreate(false);
+        if (file && selectedGroup) {
+            setTimeout(async () => {
+                await bulkCreateUserGroupMapping(selectedGroup.id, file);
+            }, 1000);
+        }
+    }
+
 
     return (
         <div ref={targetRef}>
@@ -196,19 +207,19 @@ export const OrganizationUsers = ( { selectedOrg }: OrganizationUsersInputProps)
                     renderInput={(params) => <TextField {...params} label="Select Organization" variant="outlined" />}
                     onInputChange={(event, value) => { setSearchGroupPage(0); setSearchTerm(value); }}
                 />
-                <Button 
+                <Button
                     variant="contained"
                     color="success"
-                    onClick={() => { setAddUserModal(true) }} 
+                    onClick={() => { setAddUserModal(true) }}
                     style={{ marginLeft: 16, width: 150 }}
                     disabled={!selectedGroup}
                 >
                     Add User
                 </Button>
-                <Button 
-                    variant="contained" 
-                    color="error" 
-                    onClick={() => { setOpenDeleteUserGroups(true) }} 
+                <Button
+                    variant="contained"
+                    color="error"
+                    onClick={() => { setOpenDeleteUserGroups(true) }}
                     disabled={!selectedGroup || selectedUserIds.length === 0}
                     style={{ marginLeft: 16, width: 190 }}
                 >
@@ -221,6 +232,7 @@ export const OrganizationUsers = ( { selectedOrg }: OrganizationUsersInputProps)
                 <Box sx={{ height: 540, marginTop: 2, width: "100%", justifyContent: "center", display: "flex" }}>
                     {selectedGroup && (
                         <TableComponent
+                            loading={loading}
                             dataSource={usersList}
                             columns={columns}
                             totalRecords={usersData.totalUsers}
@@ -249,8 +261,8 @@ export const OrganizationUsers = ( { selectedOrg }: OrganizationUsersInputProps)
                     </DialogContentText>
                 </DialogContent>
                 <DialogActions>
-                    <Button 
-                        onClick={() => setOpenDeleteUserGroups(false)} 
+                    <Button
+                        onClick={() => setOpenDeleteUserGroups(false)}
                         color="primary"
                         variant="outlined"
                     >
@@ -265,6 +277,40 @@ export const OrganizationUsers = ( { selectedOrg }: OrganizationUsersInputProps)
                         Yes
                     </Button>
                 </DialogActions>
+            </Dialog>
+
+            <Dialog open={bulkCreate} onClose={() => setBulkCreate(false)}>
+                <DialogTitle>Add Users in group '{selectedGroup?.name}'</DialogTitle>
+                <form onSubmit={handleBulkCreateUserGroupMapping}>
+                    <DialogContent>
+                        <DialogContentText>Download sample file from <a href="https://docs.google.com/spreadsheets/d/1ypVdbR44nQXuaHAEOrwywY3k-lfJdsRZ9iKp0Jpq7Kw/gviz/tq?tqx=out:csv&sheet=Sheet1">here</a> and fill the details.</DialogContentText>
+                        <TextField
+                            type="file"
+                            inputProps={{ accept: '.csv' }}
+                            onChange={(e: any) => {
+                                if (e.target.files) {
+                                    setFile(e.target.files[0]);
+                                }
+                            }}
+                            fullWidth
+                            margin="normal"
+                        />
+                    </DialogContent>
+                    <DialogActions
+                        sx={{
+                            display: "flex",
+                            justifyContent: "center",
+                            marginBottom: "15px",
+                        }}
+                    >
+                        <Button onClick={() => setBulkCreate(false)} variant="outlined" color="error">
+                            Cancel
+                        </Button>
+                        <Button type="submit" variant="contained" color="success">
+                            Upload
+                        </Button>
+                    </DialogActions>
+                </form>
             </Dialog>
         </div>
     );
