@@ -43,6 +43,7 @@ export const DonationComponent = () => {
 
   const [open, setOpen] = useState(false);
   const [page, setPage] = useState(0);
+  const [pageSize, setPageSize] = useState(10);
   const [filters, setFilters] = useState<Record<string, GridFilterItem>>({});
   const handleModalOpen = () => setOpen(true);
   const handleModalClose = () => setOpen(false);
@@ -74,13 +75,11 @@ export const DonationComponent = () => {
 
   useEffect(() => {
     getDonationData();
-  }, [page, filters]);
+  }, [pageSize, page, filters]);
 
   const getDonationData = async () => {
     let filtersData = Object.values(filters);
-    setTimeout(async () => {
-      getDonations(page * 10, 10, filtersData);
-    }, 10);
+    getDonations(page * pageSize, pageSize, filtersData);
   };
 
 
@@ -93,9 +92,7 @@ export const DonationComponent = () => {
 
   const getAllDonationData = async () => {
     let filtersData = Object.values(filters);
-    setTimeout(async () => {
-      await getDonations(0, donationsData.totalDonations, filtersData);
-    }, 1000);
+    getDonations(0, donationsData.totalDonations, filtersData);
   };
 
   const handleCreateDonationData = (formData: Donation) => {
@@ -331,6 +328,7 @@ export const DonationComponent = () => {
           totalRecords={donationsData.totalDonations}
           fetchAllData={getAllDonationData}
           setPage={setPage}
+          setPageSize={setPageSize}
         />
       </Box>
 

@@ -39,7 +39,6 @@ export const OrganizationUsers = ({ selectedOrg }: OrganizationUsersInputProps) 
     const { bulkCreateUserGroupMapping, createUserGroupMapping, removeGroupUsers } =
         bindActionCreators(userGroupActionCreators, dispatch);
 
-    const [loading, setLoading] = useState(false);
     const [searchTerm, setSearchTerm] = useState<string>('');
     const [selectedGroup, setSelectedGroup] = useState<Group | null>(null);
     const [searchGroupPage, setSearchGroupPage] = useState(0);
@@ -47,6 +46,7 @@ export const OrganizationUsers = ({ selectedOrg }: OrganizationUsersInputProps) 
     const [openDeleteUserGroups, setOpenDeleteUserGroups] = useState(false);
     const [selectedUserIds, setSelectedUserIds] = useState<number[]>([]);
     const [page, setPage] = useState(0);
+    const [pageSize, setPageSize] = useState(10);
     const [filters, setFilters] = useState<Record<string, GridFilterItem>>({});
     const [bulkCreate, setBulkCreate] = useState(false);
     const [file, setFile] = useState(null);
@@ -68,7 +68,7 @@ export const OrganizationUsers = ({ selectedOrg }: OrganizationUsersInputProps) 
         if (selectedGroup) {
             getUserData();
         }
-    }, [page, filters, selectedGroup]);
+    }, [pageSize, page, filters, selectedGroup]);
 
     const getUserData = async () => {
         let filterWithGroup = { ...filters }
@@ -80,7 +80,7 @@ export const OrganizationUsers = ({ selectedOrg }: OrganizationUsersInputProps) 
             }
         }
         let filtersData = Object.values(filterWithGroup);
-        getUsers(page * 10, 10, filtersData);
+        getUsers(page * pageSize, pageSize, filtersData);
     };
 
     const getAllUsersData = async () => {
@@ -188,9 +188,7 @@ export const OrganizationUsers = ({ selectedOrg }: OrganizationUsersInputProps) 
         e.preventDefault();
         setBulkCreate(false);
         if (file && selectedGroup) {
-            setTimeout(async () => {
-                await bulkCreateUserGroupMapping(selectedGroup.id, file);
-            }, 1000);
+            bulkCreateUserGroupMapping(selectedGroup.id, file);
         }
     }
 
@@ -232,12 +230,12 @@ export const OrganizationUsers = ({ selectedOrg }: OrganizationUsersInputProps) 
                 <Box sx={{ height: 540, marginTop: 2, width: "100%", justifyContent: "center", display: "flex" }}>
                     {selectedGroup && (
                         <TableComponent
-                            loading={loading}
                             dataSource={usersList}
                             columns={columns}
                             totalRecords={usersData.totalUsers}
                             fetchAllData={getAllUsersData}
                             setPage={setPage}
+                            setPageSize={setPageSize}
                             handleSelectionChanges={handleSelectionChanges}
                         />
                     )}

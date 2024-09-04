@@ -59,6 +59,7 @@ export const PondComponent = ({ setSelectedPond }: PondComponentInputProps) => {
     const [selectedEditRow, setSelectedEditRow] = useState<Pond | null>(null);
     const [editModal, setEditModal] = useState(false);
     const [page, setPage] = useState(0);
+    const [pageSize, setPageSize] = useState(10);
     const [filters, setFilters] = useState<Record<string, GridFilterItem>>({});
 
     const handleSetFilters = (filters: Record<string, GridFilterItem>) => {
@@ -67,9 +68,7 @@ export const PondComponent = ({ setSelectedPond }: PondComponentInputProps) => {
     }
 
     const getPondWaterLevelUpdatesData = async (id: number) => {
-        setTimeout(async () => {
-            await getPondWaterLevelUpdates(id, 0, -1);
-        }, 1000);
+        getPondWaterLevelUpdates(id, 0, -1);
     };
 
     const handlePondWaterLevelFetch = (record: Pond) => {
@@ -193,13 +192,13 @@ export const PondComponent = ({ setSelectedPond }: PondComponentInputProps) => {
 
     useEffect(() => {
         getPondData();
-    }, [page, filters]);
+    }, [pageSize, page, filters]);
 
     const getPondData = async () => {
         let filtersData = Object.values(filters);
         setLoading(true);
-        setTimeout(async () => {
-            await getPonds(page*10, 10, filtersData);
+        getPonds(page*pageSize, pageSize, filtersData);
+        setTimeout(() => {
             setLoading(false);
         }, 1000);
     };
@@ -214,9 +213,7 @@ export const PondComponent = ({ setSelectedPond }: PondComponentInputProps) => {
 
     const getAllPondsData = async () => {
         let filtersData = Object.values(filters);
-        setTimeout(async () => {
-            await getPonds(0, pondsData.totalPonds, filtersData);
-        }, 1000);
+        getPonds(0, pondsData.totalPonds, filtersData);
     };
 
     const handleDelete = (row: Pond) => {
@@ -273,6 +270,7 @@ export const PondComponent = ({ setSelectedPond }: PondComponentInputProps) => {
                     totalRecords={pondsData.totalPonds}
                     fetchAllData={getAllPondsData}
                     setPage={setPage}
+                    setPageSize={setPageSize}
                 />
             </Box>
 

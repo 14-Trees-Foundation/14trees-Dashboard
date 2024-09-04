@@ -42,6 +42,7 @@ export const VisitUsers = ({ selectedVisit }: VisitUsersInputProps) => {
     const [selectedVisitForUser, setSelectedVisitForUser] = useState<Visit | null>(null);
     const [filters, setFilters] = useState<Record<string, GridFilterItem>>({});
     const [page, setPage] = useState(0);
+    const [pageSize, setPageSize] = useState(10);
     const [addUserModal, setAddUserModal] = useState(false);
     const [openDeleteUserGroups, setOpenDeleteUserGroups] = useState(false);
     const [selectedUserIds, setSelectedUserIds] = useState<number[]>([]);
@@ -65,18 +66,14 @@ export const VisitUsers = ({ selectedVisit }: VisitUsersInputProps) => {
 
     useEffect(() => {
         getVisitUsersData();
-    }, [page, filters, selectedVisitForUser]);
+    }, [pageSize, page, filters, selectedVisitForUser]);
 
     const getVisitUsersData = async () => {
-        setTimeout(async () => {
-            selectedVisitForUser && getVisitUsers(selectedVisitForUser.id, page * 10, 10);
-        }, 10);
+        selectedVisitForUser && getVisitUsers(selectedVisitForUser.id, page * pageSize, pageSize);
     };
 
     const getAllUsersData = async () => {
-        setTimeout(async () => {
-            selectedVisitForUser && getVisitUsers(selectedVisitForUser.id, page * 10, 10);
-        }, 1000);
+        selectedVisitForUser && getVisitUsers(selectedVisitForUser.id, page * pageSize, pageSize);
     };
 
     const handleAddUserToVisit = (formData: any) => {
@@ -103,9 +100,7 @@ export const VisitUsers = ({ selectedVisit }: VisitUsersInputProps) => {
         e.preventDefault();
         setBulkCreate(false);
         if (file && selectedVisitForUser) {
-            setTimeout(async () => {
-                createVisitUsersBulk(selectedVisitForUser.id, file);
-            }, 10);
+            createVisitUsersBulk(selectedVisitForUser.id, file);
         }
     }
 
@@ -146,7 +141,6 @@ export const VisitUsers = ({ selectedVisit }: VisitUsersInputProps) => {
     const visitUsersData = useAppSelector((state: RootState) => state.visitUserData);
     if (visitUsersData) {
         usersList = Object.values(visitUsersData.users);
-        console.log("Visit Users list : ", usersList);
     }
 
     return (
@@ -191,6 +185,7 @@ export const VisitUsers = ({ selectedVisit }: VisitUsersInputProps) => {
                             totalRecords={visitUsersData.totalUsers}
                             fetchAllData={getAllUsersData}
                             setPage={setPage}
+                            setPageSize={setPageSize}
                             handleSelectionChanges={handleSelectionChanges}
 
                         />

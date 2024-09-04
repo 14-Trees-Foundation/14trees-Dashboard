@@ -44,6 +44,7 @@ export const User1 = () => {
   const handleBulkModalOpen = () => setBulkModalOpen(true);
   const handleBulkModalClose = () => setBulkModalOpen(false);
   const [page, setPage] = useState(0);
+  const [pageSize, setPageSize] = useState(10);
   const [filters, setFilters] = useState<Record<string, GridFilterItem>>({});
 
   const handleSetFilters = (filters: Record<string, GridFilterItem>) => {
@@ -53,13 +54,13 @@ export const User1 = () => {
 
   useEffect(() => {
     getUserData();
-  }, [page, filters]);
+  }, [pageSize, page, filters]);
 
   const getUserData = async () => {
     let filtersData = Object.values(filters);
     setLoading(true);
-    setTimeout(async () => {
-      await getUsers(page * 10, 10, filtersData);
+    getUsers(page * pageSize, pageSize, filtersData);
+    setTimeout(() => {
       setLoading(false);
     }, 1000);
   };
@@ -160,10 +161,8 @@ export const User1 = () => {
   }
 
   const getAllUsersData = async () => {
-    setTimeout(async () => {
-      let filtersData = Object.values(filters);
-      await getUsers(0, usersData.totalUsers, filtersData);
-    }, 1000);
+    let filtersData = Object.values(filters);
+    getUsers(0, usersData.totalUsers, filtersData);
   };
 
   const handleDelete = (row: User) => {
@@ -237,6 +236,7 @@ export const User1 = () => {
           totalRecords={usersData.totalUsers}
           fetchAllData={getAllUsersData}
           setPage={setPage}
+          setPageSize={setPageSize}
         />
       </Box>
 
