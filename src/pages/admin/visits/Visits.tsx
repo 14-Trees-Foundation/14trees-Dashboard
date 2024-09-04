@@ -56,6 +56,7 @@ export const VisitsComponent = () => {
   const [selectedEditRow, setSelectedEditRow] = useState<any | null>(null);
   const [editModal, setEditModal] = useState(false);
   const [page, setPage] = useState(0);
+  const [pageSize, setPageSize] = useState(10);
   const [filters, setFilters] = useState<Record<string, GridFilterItem>>({});
   const [selectedVisit , setSelectedVisit] = useState<Visit | null>(null);
   const [selectedVisitForImages , setSelectedVisitForImages] = useState<Visit | null>(null);
@@ -69,34 +70,24 @@ export const VisitsComponent = () => {
 
   useEffect(() => {
     getVisitData();
-  }, [page, filters]);
+  }, [pageSize, page, filters]);
 
   const getVisitData = async () => {
-
     let filtersData = Object.values(filters);
-
-    setTimeout(async () => {
-      getVisits(page * 10, 10, filtersData);
-    }, 10);
+    getVisits(page * pageSize, pageSize, filtersData);
   };
-
 
   let visitsList: Visit[] = [];
   const visitsData = useAppSelector((state: RootState) => state.visitsData);
-  console.log("Visit data in state: ", visitsData);
   if (visitsData) {
     visitsList = Object.values(visitsData.visits);
-
     visitsList = visitsList.sort((a, b) => b.id - a.id);
   }
 
 
   const getAllVisitsData = async () => {
     let filtersData = Object.values(filters);
-
-    setTimeout(async () => {
-      await getVisits(0, visitsData.totalVisits, filtersData);
-    }, 1000);
+    getVisits(0, visitsData.totalVisits, filtersData);
   };
 
   const handleDeleteVisit = (row: Visit) => {
@@ -266,6 +257,7 @@ export const VisitsComponent = () => {
           totalRecords={visitsData.totalVisits}
           fetchAllData={getAllVisitsData}
           setPage={setPage}
+          setPageSize={setPageSize}
         />
       </Box>
       {selectedVisit && <VisitUsers selectedVisit={selectedVisit}/>}

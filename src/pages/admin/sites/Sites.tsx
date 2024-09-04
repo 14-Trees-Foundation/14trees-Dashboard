@@ -49,6 +49,7 @@ export const SitesComponent = () => {
   const [selectedEditRow, setSelectedEditRow] = useState<any | null>(null);
   const [editModal, setEditModal] = useState(false);
   const [page, setPage] = useState(0);
+  const [pageSize, setPageSize] = useState(10);
   const [filters, setFilters] = useState<Record<string, GridFilterItem>>({});
 
   const handleSetFilters = (filters: Record<string, GridFilterItem>) => {
@@ -58,11 +59,11 @@ export const SitesComponent = () => {
 
   useEffect(() => {
     getSiteData();
-  }, [page, filters]);
+  }, [pageSize, page, filters]);
 
   const getSiteData = async () => {
     let filtersData = Object.values(filters);
-    getSites(page * 10, 10, filtersData);
+    getSites(page * pageSize, pageSize, filtersData);
   };
 
   let sitesList: Site[] = [];
@@ -349,10 +350,10 @@ export const SitesComponent = () => {
         <TableComponent
           dataSource={sitesList}
           columns={columns}
-
           totalRecords={sitesData.totalSites}
           fetchAllData={getAllSitesData}
           setPage={setPage}
+          setPageSize={setPageSize}
           isExpandable={true}
           expandableFunction={(record) => <SiteMap KmlSource={record.google_earth_link[0]} />}
         />

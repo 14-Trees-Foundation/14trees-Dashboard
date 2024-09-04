@@ -53,6 +53,7 @@ export const OrganizationComponent = () => {
   const [failedRecords, setFailedRecords] = useState(false);
   const [editModal, setEditModal] = useState(false);
   const [page, setPage] = useState(0);
+  const [pageSize, setPageSize] = useState(10);
   const [srNoPage, SetSrNoPage] = useState(0);
   const [anchorEl, setAnchorEl] = useState<any>(null);
   const [groupType, setGroupType] = useState<string>('');
@@ -79,7 +80,7 @@ export const OrganizationComponent = () => {
 
   useEffect(() => {
     getGroupsData();
-  }, [page, filters]);
+  }, [pageSize, page, filters]);
 
   const getGroupsData = async () => {
     const dataFilters = Object.values(filters).map(item => {
@@ -91,7 +92,7 @@ export const OrganizationComponent = () => {
 
     setLoading(true);
     setTimeout(async () => {
-      getGroups(page * 10, 10, dataFilters);
+      getGroups(page * pageSize, pageSize, dataFilters);
       setLoading(false);
     }, 10);
   };
@@ -103,7 +104,7 @@ export const OrganizationComponent = () => {
       title: "Sr. No.",
       width: 100,
       align: 'center',
-      render: (value, record, index) => `${index + 1 + srNoPage * 10}.`,
+      render: (value, record, index) => `${index + 1 + srNoPage * pageSize}.`,
     },
     {
       dataIndex: "name",
@@ -188,9 +189,7 @@ export const OrganizationComponent = () => {
   const filteredUserGroupMapping = Object.fromEntries(data);
 
   const getAllGroupsData = async () => {
-    setTimeout(async () => {
-      await getGroups(0, groupsData.totalGroups);
-    }, 1000);
+    getGroups(0, groupsData.totalGroups);
   };
 
   const handleDelete = (row: Group) => {
@@ -278,6 +277,7 @@ export const OrganizationComponent = () => {
           totalRecords={groupsData.totalGroups}
           fetchAllData={getAllGroupsData}
           setPage={setPage}
+          setPageSize={setPageSize}
           setSrNoPage={SetSrNoPage}
         />
       </Box>
