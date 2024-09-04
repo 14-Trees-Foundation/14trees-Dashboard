@@ -58,6 +58,7 @@ export const TreeNew = () => {
     const [selectedTreeForTimeline, setSelectedTreeForTimeline] = useState<Tree | null>(null);
     const [deleteRow, setDeleteRow] = useState<any>({});
     const [page, setPage] = useState(0);
+    const [pageSize, setPageSize] = useState(10);
     const [srNoPage, setSrNoPage] = useState(0);
     const [disabledMapUnMapButton, setDisabledMapUnMapButton] = useState(true);
     const [isMapTrees, setIsMapTrees] = useState(true);
@@ -82,13 +83,13 @@ export const TreeNew = () => {
 
     useEffect(() => {
         getTreeData();
-    }, [page, filters, editModal]);
+    }, [pageSize, page, filters, editModal]);
 
     const getTreeData = async () => {
         const filtersData = Object.values(filters);
         setLoading(true);
-        setTimeout(async () => {
-            await getTrees(page * 10, 10, filtersData);
+        getTrees(page * pageSize, pageSize, filtersData);
+        setTimeout(() => {
             setLoading(false);
         }, 1000);
     };
@@ -129,8 +130,8 @@ export const TreeNew = () => {
     const getPlotsData = async () => {
         const nameFilter = { columnField: "name", value: plotName, operatorValue: "contains" }
         setPlotsLoading(true);
-        setTimeout(async () => {
-            await getPlots(plotPage * 10, 10, [nameFilter]);
+        getPlots(plotPage * 10, 10, [nameFilter]);
+        setTimeout(() => {
             setPlotsLoading(false);
         }, 1000);
     };
@@ -151,7 +152,7 @@ export const TreeNew = () => {
             title: "Sr. No.",
             width: 150,
             align: 'center',
-            render: (value, record, index) => `${index + 1 + srNoPage * 10}.`,
+            render: (value, record, index) => `${index + 1 + srNoPage * pageSize}.`,
         },
         {
             dataIndex: "sapling_id",
@@ -249,10 +250,8 @@ export const TreeNew = () => {
     }
 
     const getAllTreesData = async () => {
-        setTimeout(async () => {
-            let filtersData = Object.values(filters);
-            getTrees(0, treesData.totalTrees, filtersData);
-        }, 1000);
+        let filtersData = Object.values(filters);
+        getTrees(0, treesData.totalTrees, filtersData);
     };
 
     const handleDelete = (row: Tree) => {
@@ -357,7 +356,6 @@ export const TreeNew = () => {
     }
 
     const handleEditSubmit = (formData: Tree) => {
-        console.log(formData);
         updateTree(formData);
     };
 
@@ -437,6 +435,7 @@ export const TreeNew = () => {
                     totalRecords={treesData.totalTrees}
                     fetchAllData={getAllTreesData}
                     setPage={setPage}
+                    setPageSize={setPageSize}
                     handleSelectionChanges={handleSelectionChanges}
                     setSrNoPage={setSrNoPage}
                 />

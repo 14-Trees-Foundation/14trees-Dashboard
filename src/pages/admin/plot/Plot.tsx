@@ -47,6 +47,7 @@ export const PlotComponent = () => {
   const [selectedEditRow, setSelectedEditRow] = useState<Plot | null>(null);
   const [editModal, setEditModal] = useState(false);
   const [page, setPage] = useState(0);
+  const [pageSize, setPageSize] = useState(10);
   const [filters, setFilters] = useState<Record<string, GridFilterItem>>({});
   const [selectedPlotIds, setSelectedPlotIds] = useState<number[]>([]);
   const [selectSiteModal, setSelectSiteModal] = useState<boolean>(false);
@@ -62,13 +63,13 @@ export const PlotComponent = () => {
 
   useEffect(() => {
     getPlotData();
-  }, [page, filters]);
+  }, [pageSize, page, filters]);
 
   const getPlotData = async () => {
     setLoading(true);
+    let filtersData = Object.values(filters);
+    getPlots(page * pageSize, pageSize, filtersData);
     setTimeout(async () => {
-      let filtersData = Object.values(filters);
-      await getPlots(page * 10, 10, filtersData);
       setLoading(false);
     }, 1000);
   };
@@ -78,9 +79,7 @@ export const PlotComponent = () => {
   }, []);
 
   const getPlotTagsData = async () => {
-    setTimeout(async () => {
-      await getPlotTags(page * 10, 10);
-    }, 1000);
+    getPlotTags(page * pageSize, pageSize);
   };
 
   let plotsList: Plot[] = [];
@@ -97,10 +96,8 @@ export const PlotComponent = () => {
   }
 
   const getAllPlotData = async () => {
-    setTimeout(async () => {
-      let filtersData = Object.values(filters);
-      getPlots(0, plotsData.totalPlots, filtersData);
-    }, 10);
+    let filtersData = Object.values(filters);
+    getPlots(0, plotsData.totalPlots, filtersData);
   };
 
   useEffect(() => {
@@ -324,6 +321,7 @@ export const PlotComponent = () => {
           totalRecords={plotsData.totalPlots}
           fetchAllData={getAllPlotData}
           setPage={setPage}
+          setPageSize={setPageSize}
           handleSelectionChanges={handleSelectionChanges}
         />
       </Box>

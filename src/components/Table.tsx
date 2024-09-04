@@ -12,6 +12,7 @@ interface TableComponentProps {
     columns: TableColumnsType<any> | undefined
     totalRecords: number
     fetchAllData: () => Promise<void>
+    setPageSize: (value: React.SetStateAction<number>) => void
     setPage: (value: React.SetStateAction<number>) => void
     setSrNoPage?: (value: React.SetStateAction<number>) => void
     handleSelectionChanges?: (ids: number[]) => void
@@ -20,7 +21,7 @@ interface TableComponentProps {
         ReactElement
 }
 
-function TableComponent({ loading, dataSource, columns, totalRecords, fetchAllData, setPage, handleSelectionChanges, setSrNoPage, isExpandable, expandableFunction }: TableComponentProps) {
+function TableComponent({ loading, dataSource, columns, totalRecords, fetchAllData, setPageSize, setPage, handleSelectionChanges, setSrNoPage, isExpandable, expandableFunction }: TableComponentProps) {
 
     const [download, setDownload] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
@@ -82,6 +83,18 @@ function TableComponent({ loading, dataSource, columns, totalRecords, fetchAllDa
         if (loading !== undefined) setIsLoading(loading);
     }, [loading]);
 
+    const handlePageChange = (page: number, pageSize: number) => { 
+        if (dataSource && page * pageSize > dataSource.length) {
+            const pageNo = Math.floor(dataSource.length / pageSize);
+            setPage(pageNo);
+            setPageSize(pageSize);
+            setSrNoPage && setSrNoPage(pageNo);
+        } else {
+            setPageSize(pageSize);
+            setSrNoPage && setSrNoPage(page - 1);
+        }
+    }
+
     return (
         <Table
             loading={isLoading}
@@ -91,15 +104,11 @@ function TableComponent({ loading, dataSource, columns, totalRecords, fetchAllDa
             expandable={isExpandable ? expandable : undefined}
             pagination={{ 
                 position: ['bottomRight'], 
-                showSizeChanger: false, 
-                pageSize: 10, 
                 defaultCurrent: 1, 
                 total: totalRecords, 
                 simple: true, 
-                onChange: (page, pageSize) => { 
-                    if (dataSource && page * pageSize > dataSource.length) setPage(page - 1); 
-                    setSrNoPage && setSrNoPage(page-1);
-                } }}
+                onChange: handlePageChange,
+            }}
             rowSelection={rowSelection}
             scroll={{ y: 550 }}
             footer={() => (

@@ -42,6 +42,7 @@ export const PlantTypeComponent = () => {
     const [selectedEditRow, setSelectedEditRow] = useState<PlantType | null>(null);
     const [editModal, setEditModal] = useState(false);
     const [page, setPage] = useState(0);
+    const [pageSize, setPageSize] = useState(10);
     const [srNoPage, setSrNoPage] = useState(0);
     const [filters, setFilters] = useState<Record<string, GridFilterItem>>({});
 
@@ -57,7 +58,7 @@ export const PlantTypeComponent = () => {
             title: "Sr. No.",
             width: 100,
             align: "center",
-            render: (value, record, index) => `${index + 1 + srNoPage * 10}.`
+            render: (value, record, index) => `${index + 1 + srNoPage * pageSize}.`
         },
         {
             dataIndex: "action",
@@ -211,13 +212,13 @@ export const PlantTypeComponent = () => {
 
     useEffect(() => {
         getPlantTypeData();
-    }, [page, filters]);
+    }, [pageSize, page, filters]);
 
     const getPlantTypeData = async () => {
         const filtersData = Object.values(filters);
         setLoading(true);
+        getPlantTypes(page * pageSize, pageSize, filtersData);
         setTimeout(async () => {
-            await getPlantTypes(page * 10, 10, filtersData);
             setLoading(false);
         }, 1000);
     };
@@ -232,14 +233,11 @@ export const PlantTypeComponent = () => {
     }
 
     const getAllPlantTypesData = async () => {
-        setTimeout(async () => {
-            let filtersData = Object.values(filters);
-            await getPlantTypes(0, plantTypesData.totalPlantTypes, filtersData);
-        }, 1000);
+        let filtersData = Object.values(filters);
+        getPlantTypes(0, plantTypesData.totalPlantTypes, filtersData);
     };
 
     const handleCreatePlantTypeData = (formData: PlantType, files: Blob[]) => {
-        console.log(formData);
         createPlantType(formData, files);
     };
 
@@ -293,6 +291,7 @@ export const PlantTypeComponent = () => {
                     columns={columns}
                     totalRecords={plantTypesData.totalPlantTypes}
                     setPage={setPage}
+                    setPageSize={setPageSize}
                     fetchAllData={getAllPlantTypesData}
                     setSrNoPage={setSrNoPage}
                 />

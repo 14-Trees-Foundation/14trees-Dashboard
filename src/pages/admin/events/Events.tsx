@@ -55,6 +55,7 @@ export const EventsComponent = () => {
   const [selectedEditRow, setSelectedEditRow] = useState<Event | null>(null);
   const [editModal, setEditModal] = useState(false);
   const [page, setPage] = useState(0);
+  const [pageSize, setPageSize] = useState(10);
   const [filters, setFilters] = useState<Record<string, GridFilterItem>>({});
 
 
@@ -65,13 +66,11 @@ export const EventsComponent = () => {
 
   useEffect(() => {
     getEventsData();
-  }, [page, filters]);
+  }, [pageSize, page, filters]);
 
   const getEventsData = async () => {
     let filtersData = Object.values(filters);
-    setTimeout(async () => {
-      await getEvents(page * 10, 10, filtersData);
-    }, 1000);
+    getEvents(page * pageSize, pageSize, filtersData);
   };
 
   let eventsList: Event[] = [];
@@ -82,13 +81,8 @@ export const EventsComponent = () => {
 
   const getAllEventsData = async () => {
     let filtersData = Object.values(filters);
-    setTimeout(async () => {
-      await getEvents(0, eventsData.totalEvents, filtersData);
-    }, 1000);
+    getEvents(0, eventsData.totalEvents, filtersData);
   };
-
-
-
 
   const columns: TableColumnsType<Event> = [
     {
@@ -321,6 +315,7 @@ export const EventsComponent = () => {
           totalRecords={eventsData.totalEvents}
           fetchAllData={getAllEventsData}
           setPage={setPage}
+          setPageSize={setPageSize}
         />
       </Box>
 
