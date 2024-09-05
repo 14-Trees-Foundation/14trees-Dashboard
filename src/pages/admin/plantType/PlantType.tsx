@@ -26,6 +26,7 @@ import getColumnSearchProps, { getColumnSelectedItemFilter } from "../../../comp
 import TableComponent from "../../../components/Table";
 import { ToastContainer } from "react-toastify";
 import { plantTypeHabitList } from "./habitList";
+import { PlotPlantTypes } from "./PlotPlantTypes";
 
 
 export const PlantTypeComponent = () => {
@@ -296,6 +297,9 @@ export const PlantTypeComponent = () => {
                     setSrNoPage={setSrNoPage}
                 />
             </Box>
+
+            <Divider style={{ marginBottom: "20px" }} />
+            <PlotPlantTypes />
 
             <Dialog open={openDeleteModal} onClose={() => setOpenDeleteModal(false)}>
                 <DialogTitle>Confirm Delete</DialogTitle>
