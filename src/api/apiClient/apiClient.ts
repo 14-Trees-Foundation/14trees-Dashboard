@@ -105,6 +105,16 @@ class ApiClient {
         }
     }
 
+    async getPlantTypesForPlot(plotId: number): Promise<any[]> {
+        try {
+            const resp = await this.api.get<any[]>(`/plant-types/${plotId}`);
+            return resp.data;
+        } catch (error) {
+            console.error(error)
+            throw new Error('Failed to get plant types for plot!');
+        }
+    }
+
 
     /*
         Model- Plot: CRUD Operations/Apis for plots
