@@ -17,7 +17,7 @@ interface TableComponentProps {
     setSrNoPage?: (value: React.SetStateAction<number>) => void
     handleSelectionChanges?: (ids: number[]) => void
     isExpandable?: boolean
-    expandableFunction?: (record: any) => 
+    expandableFunction?: (record: any) =>
         ReactElement
 }
 
@@ -42,7 +42,7 @@ function TableComponent({ loading, dataSource, columns, totalRecords, fetchAllDa
     const handleDownload = (data: any) => {
         const json2csvParser = new Parser();
         const csv = json2csvParser.parse(data);
-    
+
         // Create a Blob from the CSV string
         const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
         const link = document.createElement('a');
@@ -54,27 +54,31 @@ function TableComponent({ loading, dataSource, columns, totalRecords, fetchAllDa
     };
 
     const expandable = {
-        expandedRowRender: (record: any)=> expandableFunction?expandableFunction(record):null,
-        rowExpandable: (record: any) => { return isExpandable?isExpandable:false},
-      }
+        expandedRowRender: (record: any) => expandableFunction ? expandableFunction(record) : null,
+        rowExpandable: (record: any) => { return isExpandable ? isExpandable : false },
+    }
+
+    const handleDataSourceParse = async () => {
+        const data = dataSource?.map((item) => {
+            const row: any = {}
+            columns?.forEach((column: any) => {
+                if (column.dataIndex === 'srNo' || column.dataIndex === 'action') return;
+                if (column.render) {
+                    const value = column.render(item[column.dataIndex], item, 0);
+                    row[column.title] = value?.props?.children ? value.props.children : value;
+                }
+                else row[column.title] = item[column.dataIndex];
+            })
+            return row
+        })
+        handleDownload(data);
+        setDownload(false);
+        toast.success('File downloaded successfully!');
+    }
 
     useEffect(() => {
         if (download) {
-            const data = dataSource?.map((item) => {
-                const row: any = {}
-                columns?.forEach((column: any) => {
-                    if (column.dataIndex === 'srNo' || column.dataIndex === 'action') return;
-                    if (column.render) {
-                        const value = column.render(item[column.dataIndex], item, 0);
-                        row[column.title] = value?.props?.children ? value.props.children : value;
-                    }
-                    else row[column.title] = item[column.dataIndex];
-                })
-                return row
-            })
-            handleDownload(data);
-            setDownload(false);
-            toast.success('File downloaded successfully!');
+            handleDataSourceParse();
         }
 
     }, [dataSource]);
@@ -83,7 +87,7 @@ function TableComponent({ loading, dataSource, columns, totalRecords, fetchAllDa
         if (loading !== undefined) setIsLoading(loading);
     }, [loading]);
 
-    const handlePageChange = (page: number, pageSize: number) => { 
+    const handlePageChange = (page: number, pageSize: number) => {
         if (dataSource && page * pageSize > dataSource.length) {
             const pageNo = Math.floor(dataSource.length / pageSize);
             setPage(pageNo);
@@ -102,11 +106,11 @@ function TableComponent({ loading, dataSource, columns, totalRecords, fetchAllDa
             dataSource={dataSource}
             columns={columns}
             expandable={isExpandable ? expandable : undefined}
-            pagination={{ 
-                position: ['bottomRight'], 
-                defaultCurrent: 1, 
-                total: totalRecords, 
-                simple: true, 
+            pagination={{
+                position: ['bottomRight'],
+                defaultCurrent: 1,
+                total: totalRecords,
+                simple: true,
                 onChange: handlePageChange,
             }}
             rowSelection={rowSelection}
@@ -114,13 +118,16 @@ function TableComponent({ loading, dataSource, columns, totalRecords, fetchAllDa
             footer={() => (
                 <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
                     <div style={{ marginRight: '10px', display: 'flex', alignItems: 'center' }}><strong>Export table data in a csv file:</strong></div>
-                    <Button 
-                        color="success" 
+                    <Button
+                        color="success"
                         variant='contained'
-                        onClick={() =>{
-                        fetchAllData();
-                        setDownload(true);
-                    }}>Export</Button>
+                        onClick={() => {
+                            if (dataSource?.length === totalRecords) handleDataSourceParse();
+                            else {
+                                fetchAllData();
+                                setDownload(true);
+                            }
+                        }}>Export</Button>
                     <div></div>
                 </div>
             )}
