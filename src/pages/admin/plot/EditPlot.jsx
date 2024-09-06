@@ -87,9 +87,9 @@ function EditPlot({ row, openeditModal, handleCloseModal, editSubmit, tags }) {
           />
           <TextField
             required
-            name="plot_id"
-            label="Plot ID"
-            value={formData.plot_id}
+            name="label"
+            label="Plot Label"
+            value={formData.label}
             onChange={handleChange}
             fullWidth
             margin="dense"

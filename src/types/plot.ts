@@ -5,6 +5,7 @@ export type Plot = {
     id: number,
     name: string,
     plot_id: string,
+    label: string,
     tags: string[],
     gat: string,
     category: number,

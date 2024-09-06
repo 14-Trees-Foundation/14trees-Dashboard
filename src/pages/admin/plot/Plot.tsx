@@ -25,9 +25,11 @@ import EditPlot from "./EditPlot";
 import { TableColumnsType } from "antd";
 import getColumnSearchProps, { getColumnSelectedItemFilter } from "../../../components/Filter";
 import TableComponent from "../../../components/Table";
-import { ToastContainer } from "react-toastify";
+import { ToastContainer, toast } from "react-toastify";
 import { AutocompleteWithPagination } from "../../../components/AutoComplete";
 import { Site } from "../../../types/site";
+import UpdateCoords from "./UpdateCoords";
+import ApiClient from "../../../api/apiClient/apiClient";
 
 
 export const PlotComponent = () => {
@@ -55,6 +57,7 @@ export const PlotComponent = () => {
   const [sitesLoading, setSitesLoading] = useState(false);
   const [siteNameInput, setSiteNameInput] = useState("");
   const [selectedSite, setSelectedSite] = useState<Site | null>(null);
+  const [updateCoords, setUpdateCoords] = useState(false);
 
   const handleSetFilters = (filters: Record<string, GridFilterItem>) => {
     setPage(0);
@@ -170,12 +173,12 @@ export const PlotComponent = () => {
       ...getColumnSearchProps('name', filters, handleSetFilters)
     },
     {
-      dataIndex: "plot_id",
-      key: "plot_id",
-      title: "Plot ID",
+      dataIndex: "label",
+      key: "label",
+      title: "Plot Label",
       align: "center",
       width: 150,
-      ...getColumnSearchProps('plot_id', filters, handleSetFilters)
+      ...getColumnSearchProps('label', filters, handleSetFilters)
     },
     {
       dataIndex: "category",
@@ -258,7 +261,6 @@ export const PlotComponent = () => {
   };
 
   const handleCreatePlotData = (formData: Plot) => {
-    console.log('New Plot data: ', formData);
     createPlot(formData);
   };
 
@@ -269,6 +271,17 @@ export const PlotComponent = () => {
     setTimeout(() => {
       getPlotData();
     }, 1000)
+  }
+
+  const handleUpdatePlotCoords = async (siteId: number, file: File) => {
+    const apiClient = new ApiClient();
+    try {
+      await apiClient.updatePlotCoordsUsingKml(siteId, file);
+      toast.success('Plot coordinates updated successfully');
+    } catch(error) {
+      toast.error('Failed to update plot coordinates');
+    }
+
   }
 
   return (
@@ -289,6 +302,14 @@ export const PlotComponent = () => {
             marginBottom: "5px",
             marginTop: "5px",
           }}>
+          <Button
+            variant="contained"
+            color="success"
+            onClick={() => setUpdateCoords(true)}
+            style={{ marginRight: "10px" }}
+          >
+            Update Coordinates
+          </Button>
           <Button
             variant="contained"
             color="success"
@@ -371,29 +392,29 @@ export const PlotComponent = () => {
           <DialogContentText>
             Selected plots will be assigned to this site.
           </DialogContentText>
-            <div style={{ width: 500, marginTop: 5 }}>
-              <AutocompleteWithPagination
-                label="Select a Site"
-                options={sitesList}
-                getOptionLabel={(option) => option?.name_english || ''}
-                onChange={(event, newValue) => {
-                  setSelectedSite(newValue);
-                }}
-                onInputChange={(event) => {
-                  const { value } = event.target;
-                  setSitePage(0);
-                  setSiteNameInput(value);
-                }}
-                setPage={setSitePage}
-                fullWidth
-                size="medium"
-                loading={sitesLoading}
-                value={(siteNameInput === '' && selectedSite) ? selectedSite : null}
-              />
-            </div>
+          <div style={{ width: 500, marginTop: 5 }}>
+            <AutocompleteWithPagination
+              label="Select a Site"
+              options={sitesList}
+              getOptionLabel={(option) => option?.name_english || ''}
+              onChange={(event, newValue) => {
+                setSelectedSite(newValue);
+              }}
+              onInputChange={(event) => {
+                const { value } = event.target;
+                setSitePage(0);
+                setSiteNameInput(value);
+              }}
+              setPage={setSitePage}
+              fullWidth
+              size="medium"
+              loading={sitesLoading}
+              value={(siteNameInput === '' && selectedSite) ? selectedSite : null}
+            />
+          </div>
         </DialogContent>
         <DialogActions>
-          <Button 
+          <Button
             color="error"
             variant="outlined"
             onClick={() => setSelectSiteModal(false)}
@@ -414,6 +435,12 @@ export const PlotComponent = () => {
           </Button>
         </DialogActions>
       </Dialog>
+
+      <UpdateCoords
+        visible={updateCoords}
+        handleClose={() => setUpdateCoords(false)}
+        updateCoords={handleUpdatePlotCoords}
+      />
 
       {selectedEditRow && (
         <EditPlot

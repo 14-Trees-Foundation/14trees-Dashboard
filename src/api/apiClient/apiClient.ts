@@ -165,6 +165,18 @@ class ApiClient {
         }
     }
 
+    async updatePlotCoordsUsingKml(siteId: number, file: File): Promise<void> {
+        try {
+            const formData = new FormData();
+            formData.append("file", file);
+            formData.append("site_id", String(siteId));
+            const response = await this.api.post<Plot>(`/plots/kml`, formData);
+        } catch (error) {
+            console.error(error)
+            throw new Error('Failed to update coordinates');
+        }
+    }
+
     async deletePlot(data: Plot): Promise<number> {
         try {
             await this.api.delete<any>(`/plots/${data.id}`);

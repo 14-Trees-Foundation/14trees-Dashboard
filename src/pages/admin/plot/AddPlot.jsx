@@ -41,6 +41,7 @@ const AddPlot = ({ open, handleClose, createPlot, tags }) => {
   const [formData, setFormData] = useState({
     name: "",
     plot_id: "",
+    label: "",
     site_id: null,
     category: null,
     district: "",
@@ -162,10 +163,9 @@ const AddPlot = ({ open, handleClose, createPlot, tags }) => {
               </Grid>
               <Grid item xs={12}>
                 <TextField
-                  required
-                  name="plot_id"
-                  label="Plot ID"
-                  value={formData.plot_id}
+                  name="label"
+                  label="Plot Label"
+                  value={formData.label}
                   onChange={handleChange}
                   fullWidth
                 />
