@@ -444,7 +444,7 @@ export const TreeNew = () => {
             <Dialog open={selectedTreeForTimeline !== null} onClose={() => setSelectedTreeForTimeline(null)} PaperProps={{ sx: { width: '80%', maxWidth: '80%', maxHeight: '80%' } }}>
                 <DialogTitle>Timeline For Sapling {selectedTreeForTimeline?.sapling_id}</DialogTitle>
                 <DialogContent>
-                    <Timeline items={treeImages.map(image => ({ date: image.image_date.toString(), status: image.tree_status, image: image.image }))} />
+                    <Timeline created_at={selectedTreeForTimeline?.created_at as any} items={treeImages.map(image => ({ date: image.image_date.toString(), status: image.tree_status, image: image.image }))} />
                 </DialogContent>
             </Dialog>
 
