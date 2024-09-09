@@ -4,7 +4,7 @@ import { Box } from "@mui/material";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import "./slick-custom.css";
-import { ImagesSlider } from "../../components/ImagesSlider";
+import { ImagesSlider } from "../../../components/ImagesSlider";
 
 interface ImageSliderProps {
     images: string[];

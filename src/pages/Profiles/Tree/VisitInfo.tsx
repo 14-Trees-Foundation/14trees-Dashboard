@@ -3,7 +3,7 @@ import { Card, CardContent, Typography, Box } from '@mui/material';
 import { Tree } from '../../../types/tree';
 import { getHumanReadableDate } from '../../../helpers/utils';
 import { Visit } from '../../../types/visits';
-import ImageSlider from '../ImageSlider';
+import ImageSlider from '../components/ImageSlider';
 
 interface VisitInfoProps {
     visit: Visit

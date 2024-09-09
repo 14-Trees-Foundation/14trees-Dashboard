@@ -1,17 +1,17 @@
 import { FC, useEffect, useRef } from "react";
-import * as treeActionCreators from "../../redux/actions/treeActions";
-import { useAppDispatch, useAppSelector } from "../../redux/store/hooks";
+import * as treeActionCreators from "../../../redux/actions/treeActions";
+import { useAppDispatch, useAppSelector } from "../../../redux/store/hooks";
 import { bindActionCreators } from "@reduxjs/toolkit";
-import { Tree } from "../../types/tree";
-import { RootState } from "../../redux/store/store";
+import { Tree } from "../../../types/tree";
+import { RootState } from "../../../redux/store/store";
 import { useParams } from "react-router";
 import { Box, Button, Divider, Typography } from "@mui/material";
-import TreeInfo from "./Tree/TreeInfo";
-import { Spinner } from "../../components/Spinner";
-import UserTreeInfo from "./Tree/UserTreeInfo";
-import VisitInfo from "./Tree/VisitInfo";
-import TreeTimelineInfo from "./Tree/TreeTimelineInfo";
-import { Map } from "./Tree/Map";
+import TreeInfo from "./TreeInfo";
+import { Spinner } from "../../../components/Spinner";
+import UserTreeInfo from "./UserTreeInfo";
+import VisitInfo from "./VisitInfo";
+import TreeTimelineInfo from "./TreeTimelineInfo";
+import { Map } from "./Map";
 
 interface TreePageProps {}
 
