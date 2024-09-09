@@ -1,15 +1,17 @@
-import { FC, useEffect } from "react";
+import { FC, useEffect, useState } from "react";
 import { useAppDispatch, useAppSelector } from "../../../redux/store/hooks";
 import { bindActionCreators } from "@reduxjs/toolkit";
-import * as treeActionCreators from "../../../redux/actions/treeActions";
 import * as userActionCreators from "../../../redux/actions/userActions";
 import { useParams } from "react-router-dom";
 import { User } from "../../../types/user";
 import { RootState } from "../../../redux/store/store";
 import { Spinner } from "../../../components/Spinner";
-import { Box, Button, Divider, Typography } from "@mui/material";
+import { Box, Divider, FormControl, InputAdornment, OutlinedInput, Typography } from "@mui/material";
 import TreeCard from "./TreeCard";
 import VisitCard from "./VisitCard";
+import { Search } from "@mui/icons-material";
+import { Tree } from "../../../types/tree";
+import ApiClient from "../../../api/apiClient/apiClient";
 
 
 interface UserProps { }
@@ -20,9 +22,43 @@ const UserPage: FC<UserProps> = () => {
     const dispatch = useAppDispatch();
     const { getUsers } = bindActionCreators(userActionCreators, dispatch);
 
+    const [searchStr, setSearchStr] = useState<string>('')
+    const [date, setDate] = useState<string>('')
+    const [trees, setTrees] = useState<Tree[]>([])
+    const [filteredTrees, setFilteredTrees] = useState<Tree[]>([])
+
+    useEffect(() => {
+        let result: Tree[] | null = null;
+        if (date) {
+            result = trees.filter(tree => new Date(tree.created_at) >= new Date(date))
+        }
+        
+        if (searchStr) {
+            result = (result ?? trees).filter(tree => {
+                return tree.sapling_id.toLowerCase().includes(searchStr.toLowerCase()) || tree.plant_type?.toLowerCase().includes(searchStr.toLowerCase())
+            })
+        }
+
+        if (result !== null) {
+            setFilteredTrees(result);
+        } else {
+            setFilteredTrees(trees);
+        }
+
+    }, [searchStr, date])
+
 
     useEffect(() => {
         getUsers(0, 1, [{ columnField: "id", value: id, operatorField: "equals" }]);
+
+        const getTrees = async () => {
+            const apiClient = new ApiClient();
+            const trees = await apiClient.getAssignedTrees(Number(id));
+            setTrees(trees);
+            setFilteredTrees(trees);
+        }
+
+        getTrees();
     }, [id]);
 
     let user: User | null = null;
@@ -62,7 +98,7 @@ const UserPage: FC<UserProps> = () => {
                 Thank You for Making a Difference! 🌳
             </Typography>
             <Typography variant='body1' style={{ marginBottom: 3, marginTop: 10 }}>
-                <strong>{user.name.split(' ')[0]}</strong> has planted 14 trees, helping to sustain our environment and create a greener, healthier planet for future generations. Each tree plays a crucial role in absorbing carbon, restoring habitats, and improving air quality. Your commitment is part of a global effort to fight climate change and protect biodiversity.
+                <strong>{user.name.split(' ')[0]}</strong> has planted <strong>{trees.length}</strong> trees, helping to sustain our environment and create a greener, healthier planet for future generations. Each tree plays a crucial role in absorbing carbon, restoring habitats, and improving air quality. Your commitment is part of a global effort to fight climate change and protect biodiversity.
                 <br />
                 <br />
                 Together, we are building a better, more sustainable world—one tree at a time. Keep up the amazing work!
@@ -71,19 +107,44 @@ const UserPage: FC<UserProps> = () => {
             <Typography variant='h6' style={{ marginBottom: 3, marginTop: 10 }}>
                 Here are the trees planted by <strong>{user.name.split(' ')[0]}</strong>
             </Typography>
-            <Box sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', maxHeight: '60vh', overflowY: 'auto', scrollbarWidth: 'none' }}>
-                {
-                    [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14].map((index) => (
-                        <Box key={index} style={{ flexGrow: 1, marginRight: 10, marginBottom: 10 }} onClick={() => handleTreeCardClick("152511")}>
-                            <TreeCard
-                                imageUrl="https://14treesplants.s3.ap-south-1.amazonaws.com/trees/rn_image_picker_lib_temp_e8e1a972-69ba-4b10-bfb0-e5b5cd40d3c8.jpg"
-                                title="152511"
-                                subtitle="Modal (मोदळ)"
-                                date="2024-02-04"
-                            />
-                        </Box>
-                    ))
-                }
+            <Box>
+                <Box sx={{
+                    display: 'flex',
+                    flexDirection: 'row',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    marginBottom: 1,
+                    marginRight: 1
+                }}>
+                    <FormControl style={{ marginRight: 10, width: '70%', color: 'black' }} variant="outlined" >
+                        <OutlinedInput
+                            onChange={(e) => { setSearchStr(e.target.value) }}
+                            startAdornment={<InputAdornment position="start"><Search /></InputAdornment>}
+                            size="small"
+                        />
+                    </FormControl>
+                    <FormControl style={{ width: '30%' }} variant="outlined" >
+                        <OutlinedInput
+                            onChange={(e) => { setDate(e.target.value) }}
+                            size="small"
+                            type="date"
+                        />
+                    </FormControl>
+                </Box>
+                <Box sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', maxHeight: '60vh', overflowY: 'auto', scrollbarWidth: 'none' }}>
+                    {
+                        filteredTrees.map((tree, index) => (
+                            <Box key={index} style={{ flexGrow: 1, marginRight: 10, marginBottom: 10 }} onClick={() => handleTreeCardClick("152511")}>
+                                <TreeCard
+                                    imageUrl={tree.image}
+                                    title={tree.sapling_id}
+                                    subtitle={tree.plant_type || ''}
+                                    date={(tree.created_at as any).split('T')[0]}
+                                />
+                            </Box>
+                        ))
+                    }
+                </Box>
             </Box>
 
             <Typography variant='h6' style={{ marginBottom: 3, marginTop: 20 }}>

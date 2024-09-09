@@ -671,6 +671,17 @@ class ApiClient {
         }
     }
 
+    async getAssignedTrees(userId: number): Promise<Tree[]> {
+        let url = `/trees/assigned/${userId}`;
+        try {
+            let result = await this.api.get<Tree[]>(url);
+            return result.data;
+        } catch (error) {
+            console.error(error)
+            throw new Error('Failed to get assigned trees');
+        }
+    }
+
 
     /*
         Model- UserTree: CRUD Operations/Apis for user_tree_regs
