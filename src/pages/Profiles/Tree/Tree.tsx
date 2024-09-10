@@ -1,4 +1,4 @@
-import { FC, useEffect, useRef } from "react";
+import { FC, useEffect, useRef, useState } from "react";
 import * as treeActionCreators from "../../../redux/actions/treeActions";
 import { useAppDispatch, useAppSelector } from "../../../redux/store/hooks";
 import { bindActionCreators } from "@reduxjs/toolkit";
@@ -12,12 +12,14 @@ import UserTreeInfo from "./UserTreeInfo";
 import VisitInfo from "./VisitInfo";
 import TreeTimelineInfo from "./TreeTimelineInfo";
 import { Map } from "./Map";
+import { ImageViewer } from "../../../components/ImageViewer";
 
-interface TreePageProps {}
+interface TreePageProps { }
 
 const TreePage: FC<TreePageProps> = ({ }) => {
     const dispatch = useAppDispatch();
     const { getTrees } = bindActionCreators(treeActionCreators, dispatch);
+    const [selectedImage, setSelectedImage] = useState<string | null>(null)
 
     const visitRef = useRef<any>(null);
     const timelineRef = useRef<any>(null);
@@ -69,7 +71,7 @@ const TreePage: FC<TreePageProps> = ({ }) => {
                 <Button variant="contained" style={{ marginRight: 10 }} onClick={handleVisitScroll}>Visit Details</Button>
                 <Button variant="contained" onClick={handleTimelineScroll}>Tree Timeline</Button>
             </Box>
-            <Divider style={{ marginBottom: 10 }}/>
+            <Divider style={{ marginBottom: 10 }} />
             <Box style={{ marginBottom: 20 }}>
                 <TreeInfo tree={tree} />
             </Box>
@@ -89,12 +91,15 @@ const TreePage: FC<TreePageProps> = ({ }) => {
                     visit_images: [],
                     visit_date: new Date("2024-08-08T00:00:00Z"),
                     key: 0,
+                    group_id: null,
                     updated_at: new Date("2024-08-08T00:00:00Z"),
                 }} />
             </Box>
             <Box style={{ marginBottom: 10 }} ref={timelineRef}>
                 <TreeTimelineInfo />
             </Box>
+
+            {selectedImage && <ImageViewer image={selectedImage} handleClick={() => { setSelectedImage(null) }}/>}
         </Box>
     );
 }
