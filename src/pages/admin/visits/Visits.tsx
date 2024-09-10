@@ -38,7 +38,7 @@ import * as visitActionCreators from "../../../redux/actions/visitActions";
 //import state
 import { RootState } from "../../../redux/store/store";
 import { getHumanReadableDate } from "../../../helpers/utils";
-import VisitForm from "./EditVisit";
+import VisitForm from "./VisitForm";
 import ImageGridModal from "../../../components/ImagesGrid";
 
 

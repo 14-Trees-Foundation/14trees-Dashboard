@@ -10,9 +10,10 @@ export const VisitTypeList = [
 export type Visit = {
   key: number,
   id: number;
-  visit_name: string | null;
-  visit_date: Date|null;
+  visit_name: string;
+  visit_date: Date;
   visit_type: VisitType;
+  group_id: number | null;
   user_count: number;
   visit_images: string[];
   created_at: Date;
