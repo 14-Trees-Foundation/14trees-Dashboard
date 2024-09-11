@@ -1,39 +1,44 @@
-import { FC, useEffect } from "react";
-import { useAppDispatch, useAppSelector } from "../../../redux/store/hooks";
-import { bindActionCreators } from "@reduxjs/toolkit";
-import * as treeActionCreators from "../../../redux/actions/treeActions";
-import * as userActionCreators from "../../../redux/actions/userActions";
+import { FC, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { User } from "../../../types/user";
-import { RootState } from "../../../redux/store/store";
+import { Visit } from "../../../types/visits";
 import { Spinner } from "../../../components/Spinner";
-import { Box, Button, Divider, Typography } from "@mui/material";
+import { Box, Divider, Typography } from "@mui/material";
 import VisitImages from "./VisitImages";
+import { User } from "../../../types/user";
+import UserList from "../components/UserList";
+import ApiClient from "../../../api/apiClient/apiClient";
 
 
-interface UserProps { }
+interface VisitProps { }
 
-const UserPage: FC<UserProps> = () => {
+const VisitPage: FC<VisitProps> = () => {
     const { id } = useParams();
 
-    const dispatch = useAppDispatch();
-    const { getUsers } = bindActionCreators(userActionCreators, dispatch);
+    const [visit, setVisit] = useState<Visit | null>(null);
+    const [users, setUsers] = useState<User[]>([]);
 
-
-    useEffect(() => {
-        getUsers(0, 1, [{ columnField: "id", value: id, operatorField: "equals" }]);
-    }, [id]);
-
-    let user: User | null = null;
-    const usersData = useAppSelector((state: RootState) => state.usersData);
-    if (usersData) {
-        const users = Object.values(usersData.users);
-        if (users.length > 0) {
-            user = users[0];
+    const getVisit = async (visitId: number) => {
+        const apiClient = new ApiClient();
+        const visit = await apiClient.getVisits(0, 1, [{ columnField: "id", value: visitId, operatorField: "equals" }]);
+        if (visit.results.length === 1) {
+            setVisit(visit.results[0])
         }
     }
 
-    if (!user) {
+    const getVisitUsers = async (visitId: number) => {
+        const apiClient = new ApiClient();
+        const users = await apiClient.getVisitUsers(visitId, 0, 100);
+        setUsers(users.results);
+    }
+
+    useEffect(() => {
+        if (id) {
+            getVisit(parseInt(id));
+            getVisitUsers(parseInt(id));
+        } 
+    }, [id]);
+
+    if (!visit) {
         return (
             <Spinner text={"Loading..."} />
         );
@@ -43,26 +48,32 @@ const UserPage: FC<UserProps> = () => {
         <Box p={2}>
             <Box style={{ display: 'flex', justifyContent: 'start', alignItems: 'center' }}>
                 <Typography variant="h4" style={{ marginBottom: 3 }}>
-                    Sprih Visit
+                    {visit.visit_name}
                 </Typography>
             </Box>
             <Divider style={{ marginBottom: 10 }} />
 
             <Typography variant='body1' style={{ marginBottom: 3, marginTop: 10 }}>
-                On <strong>Aug 12, 2024</strong>, we were thrilled to welcome <strong>20</strong> dedicated individuals who came together for a remarkable cause—to make a lasting impact on the environment. During this special visit, <strong>40</strong> trees were planted, symbolizing our shared commitment to nurturing nature and fostering a greener future. 
+                On <strong>Aug 12, 2024</strong>, we were thrilled to welcome <strong>{visit.user_count}</strong> dedicated individuals who came together for a remarkable cause—to make a lasting impact on the environment. During this special visit, <strong>40</strong> trees were planted, symbolizing our shared commitment to nurturing nature and fostering a greener future. 
                 <br /><br/>
                 Each tree planted represents hope for cleaner air, healthier ecosystems, and a more sustainable planet. We extend our heartfelt gratitude to everyone who participated in this meaningful initiative, leaving a legacy that will benefit generations to come. Together, we are making the world🌍 a better place, one tree at a time.
             </Typography>
             <Divider style={{ marginBottom: 10 }} />
 
             <Typography variant='h6' style={{ marginBottom: 3, marginTop: 10 }}>
+                Here are the wonderful people who helped make this visit possible!
+            </Typography>
+            <UserList list={users} />
+
+            <Divider style={{ marginBottom: 10, marginTop: 10 }} />
+            <Typography variant='h6' style={{ marginBottom: 3, marginTop: 10 }}>
                 Here are some beautiful photos taken during the visit!
             </Typography>
             <Box sx={{ width: '100%', maxHeight: '80vh', overflowY: 'auto', scrollbarWidth: 'none' }}>
-                <VisitImages />
+                <VisitImages images={visit.visit_images}/>
             </Box>
         </Box>
     );
 }
 
-export default UserPage;
+export default VisitPage;

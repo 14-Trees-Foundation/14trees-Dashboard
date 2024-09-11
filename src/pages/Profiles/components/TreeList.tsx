@@ -12,8 +12,8 @@ const TreeList: FC<TreeListProps> = ({ list }) => {
 
     const [searchStr, setSearchStr] = useState<string>('')
     const [date, setDate] = useState<string>('')
-    const [trees, setTrees] = useState<Tree[]>([])
-    const [filteredTrees, setFilteredTrees] = useState<Tree[]>([])
+    const [trees, setTrees] = useState<Tree[]>(list)
+    const [filteredTrees, setFilteredTrees] = useState<Tree[]>(list)
 
     useEffect(() => {
         setTrees(list);

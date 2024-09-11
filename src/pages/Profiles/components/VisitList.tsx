@@ -12,8 +12,8 @@ const VisitList: FC<VisitListProps> = ({ list }) => {
 
     const [searchStr, setSearchStr] = useState<string>('')
     const [date, setDate] = useState<string>('')
-    const [visits, setVisits] = useState<Visit[]>([])
-    const [filteredVisits, setFilteredVisits] = useState<Visit[]>([])
+    const [visits, setVisits] = useState<Visit[]>(list)
+    const [filteredVisits, setFilteredVisits] = useState<Visit[]>(list)
 
     useEffect(() => {
         setVisits(list);

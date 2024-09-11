@@ -11,8 +11,8 @@ interface UserListProps {
 const UserList: FC<UserListProps> = ({ list }) => {
 
     const [searchStr, setSearchStr] = useState<string>('')
-    const [users, setUsers] = useState<User[]>([])
-    const [filteredUsers, setFilteredUsers] = useState<User[]>([])
+    const [users, setUsers] = useState<User[]>(list)
+    const [filteredUsers, setFilteredUsers] = useState<User[]>(list)
 
     useEffect(() => {
         setUsers(list);
