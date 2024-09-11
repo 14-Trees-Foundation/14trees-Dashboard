@@ -30,6 +30,7 @@ import { AutocompleteWithPagination } from "../../../components/AutoComplete";
 import { Site } from "../../../types/site";
 import UpdateCoords from "./UpdateCoords";
 import ApiClient from "../../../api/apiClient/apiClient";
+import PlotManagement from "./PlotManagment";
 
 
 export const PlotComponent = () => {
@@ -278,7 +279,7 @@ export const PlotComponent = () => {
     try {
       await apiClient.updatePlotCoordsUsingKml(siteId, file);
       toast.success('Plot coordinates updated successfully');
-    } catch(error) {
+    } catch (error) {
       toast.error('Failed to update plot coordinates');
     }
 
@@ -347,11 +348,14 @@ export const PlotComponent = () => {
         />
       </Box>
 
+      <PlotManagement />
+
       <div
         style={{
           display: "flex",
           justifyContent: "space-between",
           padding: "4px 12px",
+          marginTop: 30,
         }}
       >
         <Typography variant="h4">Map Trees</Typography>

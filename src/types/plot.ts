@@ -16,6 +16,7 @@ export type Plot = {
     mapped_trees_count?: number,
     assigned_trees_count?: number,
     available_trees_count?: number,
+    acres_area?: number,
     site_id: string,
     site_name: string,
     created_at: Date,
