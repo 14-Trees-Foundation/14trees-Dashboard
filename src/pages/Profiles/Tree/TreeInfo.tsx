@@ -1,8 +1,7 @@
 import { FC, useState } from 'react';
-import { Card, CardContent, Typography, Box, Modal, IconButton } from '@mui/material';
+import { Card, CardContent, Typography, Box, Modal } from '@mui/material';
 import { Tree } from '../../../types/tree';
 import { getHumanReadableDate } from '../../../helpers/utils';
-import { Close } from '@mui/icons-material';
 
 interface TreeInfoProps {
   tree: Tree
@@ -22,11 +21,8 @@ const TreeInfo: FC<TreeInfoProps> = ({ tree }) => {
         <img src={tree.image} alt={`${tree.plant_type} tree`} style={{ width: '240px', height: '320px', borderRadius: 8 }} />
       </Box>
 
-      <Modal open={open} onClose={() => setOpen(false)} sx={{ display: 'flex', padding: 2, alignSelf: 'center', justifySelf: 'center' }} onClick={() => setOpen(true)}>
-        <Box style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-          <IconButton aria-label="close" onClick={() => setOpen(false)} style={{ alignSelf: 'end' }}><Close /></IconButton>
+      <Modal open={open} onClose={() => setOpen(false)} sx={{ display: 'flex', padding: 2, alignSelf: 'center', justifySelf: 'center' }} >
           <img src={tree.image} alt={`${tree.plant_type} tree`} style={{ maxWidth: '90vw', height: '90vh', borderRadius: 8 }} />
-        </Box>
       </Modal>
     </Card>
   );

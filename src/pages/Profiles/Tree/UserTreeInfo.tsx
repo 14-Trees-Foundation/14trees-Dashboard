@@ -24,11 +24,8 @@ const UserTreeInfo: FC<UserTreeInfoProps> = ({ tree }) => {
                 </Typography>
             </CardContent>
 
-            <Modal open={open} onClose={() => setOpen(false)} sx={{ display: 'flex', padding: 2, alignSelf: 'center', justifySelf: 'center' }} onClick={() => setOpen(true)}>
-                <Box style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-                    <IconButton aria-label="close" onClick={() => setOpen(false)} style={{ alignSelf: 'end' }}><Close /></IconButton>
-                    <img src={tree.user_tree_image || tree.image} alt={`${tree.plant_type} tree`} style={{ maxWidth: '90vw', height: '90vh', borderRadius: 8 }} />
-                </Box>
+            <Modal open={open} onClose={() => setOpen(false)} sx={{ display: 'flex', padding: 2, alignSelf: 'center', justifySelf: 'center' }}>
+                <img src={tree.user_tree_image || tree.image} alt={`${tree.plant_type} tree`} style={{ maxWidth: '90vw', height: '90vh', borderRadius: 8 }} />
             </Modal>
         </Card>
     );
