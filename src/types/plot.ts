@@ -6,6 +6,7 @@ export type Plot = {
     name: string,
     plot_id: string,
     label: string,
+    accessibility_status: string | null,
     tags: string[],
     gat: string,
     category: number,

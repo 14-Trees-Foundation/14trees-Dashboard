@@ -130,6 +130,12 @@ export const PlotComponent = () => {
     });
   }
 
+  const accessibilityList = [
+    { value: "accessible", label: "Accessible" },
+    { value: "inaccessible", label: "Inaccessible" },
+    { value: "moderately_accessible", label: "Moderately Accessible" },
+  ];
+
   const columns: TableColumnsType<Plot> = [
     {
       dataIndex: "action",
@@ -179,6 +185,15 @@ export const PlotComponent = () => {
       align: "center",
       width: 150,
       ...getColumnSearchProps('label', filters, handleSetFilters)
+    },
+    {
+      dataIndex: "accessibility_status",
+      key: "accessibility_status",
+      title: "Accessibility",
+      align: "center",
+      width: 200,
+      render: (value) => value ? accessibilityList.find((item) => item.value === value)?.label : "-",
+      ...getColumnSearchProps('accessibility_status', filters, handleSetFilters)
     },
     {
       dataIndex: "category",

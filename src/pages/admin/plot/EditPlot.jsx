@@ -47,14 +47,19 @@ function EditPlot({ row, openeditModal, handleCloseModal, editSubmit, tags }) {
       operatorValue: "contains",
     };
 
+    setSitesLoading(true);
+    getSites(sitePage * 10, 10, [siteNameFilter]);
     setTimeout(async () => {
-      setSitesLoading(true);
-      await getSites(sitePage * 10, 10, [siteNameFilter]);
       setSitesLoading(false);
     }, 1000);
   };
 
   const categoriesList = ["Public", "Foundation"];
+  const accessibilityList = [
+    { value: "accessible", label: "Accessible" },
+    { value: "inaccessible", label: "Inaccessible" },
+    { value: "moderately_accessible", label: "Moderately Accessible" },
+  ];
 
   let sitesList = [];
   let sitesMap = {};
@@ -93,6 +98,20 @@ function EditPlot({ row, openeditModal, handleCloseModal, editSubmit, tags }) {
             onChange={handleChange}
             fullWidth
             margin="dense"
+          />
+          <Autocomplete
+            fullWidth
+            name="accessibility_status"
+            disablePortal
+            options={accessibilityList}
+            getOptionLabel={(option) => option?.label || ''}
+            value={accessibilityList.find((item) => item.value === formData.accessibility_status) ?? null}
+            renderInput={(params) => (
+              <TextField {...params} margin="dense" label="Plot Accessibility Status" />
+            )}
+            onChange={(event, value) => {
+              if (accessibilityList.includes(value)) setFormData((prevState) => ({ ...prevState, accessibility_status: value.value }));
+            }}
           />
           <AutocompleteWithPagination
             name="site"
