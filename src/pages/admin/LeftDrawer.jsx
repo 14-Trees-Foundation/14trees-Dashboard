@@ -23,6 +23,7 @@ import VolunteerActivismIcon from "@mui/icons-material/VolunteerActivism";
 import MapIcon from "@mui/icons-material/Map";
 import FestivalIcon from "@mui/icons-material/Festival";
 import { useNavigate } from "react-router-dom";
+import { Inventory } from "@mui/icons-material";
 
 export const AdminLeftDrawer = () => {
   const theme = useTheme();
@@ -101,6 +102,11 @@ export const AdminLeftDrawer = () => {
     {
       displayName: "Visits",
       logo: TourIcon,
+      display: true,
+    },
+    {
+      displayName: "Inventory",
+      logo: Inventory,
       display: true,
     },
     // {

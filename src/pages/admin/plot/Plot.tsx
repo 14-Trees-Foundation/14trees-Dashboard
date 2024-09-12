@@ -30,7 +30,6 @@ import { AutocompleteWithPagination } from "../../../components/AutoComplete";
 import { Site } from "../../../types/site";
 import UpdateCoords from "./UpdateCoords";
 import ApiClient from "../../../api/apiClient/apiClient";
-import PlotManagement from "./PlotManagment";
 
 
 export const PlotComponent = () => {
@@ -347,8 +346,6 @@ export const PlotComponent = () => {
           handleSelectionChanges={handleSelectionChanges}
         />
       </Box>
-
-      <PlotManagement />
 
       <div
         style={{
