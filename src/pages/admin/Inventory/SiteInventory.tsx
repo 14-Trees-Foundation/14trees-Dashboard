@@ -3,11 +3,13 @@ import { useAppDispatch, useAppSelector } from "../../../redux/store/hooks";
 import { bindActionCreators } from "@reduxjs/toolkit";
 import * as siteActionCreators from "../../../redux/actions/siteActions";
 import { Site } from "../../../types/site";
-import { Box, Checkbox, Divider, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from "@mui/material";
+import { Box, Divider, Typography } from "@mui/material";
 import { AutocompleteWithPagination } from "../../../components/AutoComplete";
 import { Plot } from "../../../types/plot";
 import ApiClient from "../../../api/apiClient/apiClient";
 import MapWithKmlLayer from "./SiteMap";
+import { Table, TableColumnType } from "antd";
+import { TableRowSelection } from "antd/es/table/interface";
 
 const SiteInventory: FC = () => {
 
@@ -33,6 +35,7 @@ const SiteInventory: FC = () => {
         if (selectedSite) {
             const apiClient = new ApiClient();
             const response = await apiClient.getPlots(0, -1, [{ columnField: "site_id", value: selectedSite.id, operatorValue: "equals" }]);
+            response.results.forEach(plot => plot.key = plot.id);
             setPlots(response.results);
             setSelectedPlots([]);
         }
@@ -58,23 +61,7 @@ const SiteInventory: FC = () => {
         });
     }
 
-    const handleCheckBoxClick = (plotId: number) => {
-        if (selectedPlots.includes(plotId)) {
-            setSelectedPlots(selectedPlots.filter(plot => plot !== plotId));
-        } else {
-            setSelectedPlots([...selectedPlots, plotId]);
-        }
-    }
-
-    const handleAllCheckBoxClick = (event: React.ChangeEvent<HTMLInputElement>) => {
-        if (event.target.checked) {
-            setSelectedPlots(plots.map(plot => plot.id));
-        } else {
-            setSelectedPlots([]);
-        }
-    }
-
-    const calculateSum = (nums:( number | string | undefined)[]) => {
+    const calculateSum = (nums: (number | string | undefined)[]) => {
         let sum = 0;
         nums.forEach(num => sum += num ? Number(num) : 0);
         return sum;
@@ -89,10 +76,82 @@ const SiteInventory: FC = () => {
         return ''
     }
 
+    let rowSelection: TableRowSelection<Plot>  = {
+        type: 'checkbox',
+        onChange: (selectedRowKeys) => {
+            setSelectedPlots(selectedRowKeys as number[]);
+        },
+        getCheckboxProps: (record) => {
+            return { name: record.id.toString() }
+        },
+    }
+
+    const columns: TableColumnType<Plot> = [
+        {
+            title: 'Plot Details',
+            children: [
+                {
+                    title: 'Name',
+                    dataIndex: 'name',
+                    key: 'name',
+                    width: 550,
+                },
+                {
+                    title: 'Accessibility',
+                    dataIndex: 'accessibility_status',
+                    key: 'accessibility_status',
+                    width: 150,
+                },
+                {
+                    title: 'Area in acres',
+                    dataIndex: 'acres_area',
+                    key: 'acres_area',
+                    width: 150,
+                },
+                {
+                    title: 'Capacity',
+                    dataIndex: 'capacity',
+                    key: 'capacity',
+                    width: 150,
+                    render: (value: any, plot: Plot, index: number) => plot.acres_area ? Math.floor(plot.acres_area * 300) : 'Unknown'
+                }
+            ]
+        },
+        {
+            title: 'Tree Details',
+            children: [
+                {
+                    title: 'Total',
+                    dataIndex: 'trees_count',
+                    key: 'trees_count',
+                    width: 150,
+                },
+                {
+                    title: 'Booked',
+                    dataIndex: 'mapped_trees_count',
+                    key: 'mapped_trees_count',
+                    width: 150,
+                },
+                {
+                    title: 'Assigned',
+                    dataIndex: 'assigned_trees_count',
+                    key: 'assigned_trees_count',
+                    width: 150,
+                },
+                {
+                    title: 'Available',
+                    dataIndex: 'available_trees_count',
+                    key: 'available_trees_count',
+                    width: 150,
+                }
+            ]
+        },
+    ]
+
     return (
         <Box>
             <Typography variant="h4" sx={{ marginBottom: 1 }}>Inventory Management</Typography>
-            <Divider sx={{ backgroundColor: "black", marginBottom: 3 }}/>
+            <Divider sx={{ backgroundColor: "black", marginBottom: 3 }} />
             <AutocompleteWithPagination
                 label="Select a Site"
                 options={sitesList}
@@ -113,50 +172,26 @@ const SiteInventory: FC = () => {
 
             {(selectedSite && selectedSite.google_earth_link) && <MapWithKmlLayer url={getKmlUrl()} />}
 
-            {selectedSite && <Box>
-                <TableContainer >
-                    <Table sx={{ minWidth: 700 }} aria-label="spanning table">
-                        <TableHead>
-                            <TableRow>
-                                <TableCell colSpan={3} sx={{ fontWeight: 'bold' }}>Plot Details</TableCell>
-                                <TableCell colSpan={5} sx={{ fontWeight: 'bold' }}>Tree Details</TableCell>
-                            </TableRow>
-                            <TableRow>
-                                <TableCell><Checkbox onChange={handleAllCheckBoxClick}/></TableCell>
-                                <TableCell sx={{ fontWeight: 'bold' }}>Plot Name</TableCell>
-                                <TableCell align="right" sx={{ fontWeight: 'bold' }}>Area in Acres</TableCell>
-                                <TableCell align="right" sx={{ fontWeight: 'bold' }}>Capacity</TableCell>
-                                <TableCell align="right" sx={{ fontWeight: 'bold' }}>Total</TableCell>
-                                <TableCell align="right" sx={{ fontWeight: 'bold' }}>Booked</TableCell>
-                                <TableCell align="right" sx={{ fontWeight: 'bold' }}>Assigned</TableCell>
-                                <TableCell align="right" sx={{ fontWeight: 'bold' }}>Available</TableCell>
-                            </TableRow>
-                        </TableHead>
-                        <TableBody>
-                            {plots.map((plot) => (
-                                <TableRow key={plot.id} >
-                                    <TableCell><Checkbox checked={selectedPlots.includes(plot.id)} onChange={() => handleCheckBoxClick(plot.id)}/></TableCell>
-                                    <TableCell>{plot.name}</TableCell>
-                                    <TableCell align="right">{plot.acres_area}</TableCell>
-                                    <TableCell align="right">{plot.acres_area ? Math.floor(plot.acres_area * 300) : 'Unknown'}</TableCell>
-                                    <TableCell align="right">{plot.trees_count}</TableCell>
-                                    <TableCell align="right">{plot.mapped_trees_count}</TableCell>
-                                    <TableCell align="right">{plot.assigned_trees_count}</TableCell>
-                                    <TableCell align="right">{plot.available_trees_count}</TableCell>
-                                </TableRow>
-                            ))}
-                            <TableRow>
-                                <TableCell rowSpan={1} colSpan={3} align="right">Total</TableCell>
-                                <TableCell align="right">{calculateSum(plots.filter((plot) => selectedPlots.includes(plot.id)).map((plot) => plot.acres_area ? Math.floor(plot.acres_area * 300) : 0))}</TableCell>
-                                <TableCell align="right">{calculateSum(plots.filter((plot) => selectedPlots.includes(plot.id)).map((plot) => plot.trees_count))}</TableCell>
-                                <TableCell align="right">{calculateSum(plots.filter((plot) => selectedPlots.includes(plot.id)).map((plot) => plot.mapped_trees_count))}</TableCell>
-                                <TableCell align="right">{calculateSum(plots.filter((plot) => selectedPlots.includes(plot.id)).map((plot) => plot.assigned_trees_count))}</TableCell>
-                                <TableCell align="right">{calculateSum(plots.filter((plot) => selectedPlots.includes(plot.id)).map((plot) => plot.available_trees_count))}</TableCell>
-                            </TableRow>
-                        </TableBody>
-                    </Table>
-                </TableContainer>
-            </Box>}
+            <Table
+                style={{ marginTop: 20 }}
+                columns={columns}
+                dataSource={plots}
+                summary={() => (
+                    <Table.Summary fixed='bottom'>
+                        <Table.Summary.Row>
+                            <Table.Summary.Cell index={3} colSpan={4}>
+                                Total
+                            </Table.Summary.Cell>
+                            <Table.Summary.Cell index={4} colSpan={1}>{calculateSum(plots.filter((plot) => selectedPlots.includes(plot.id)).map((plot) => plot.acres_area ? Math.floor(plot.acres_area * 300) : 0))}</Table.Summary.Cell>
+                            <Table.Summary.Cell index={5} colSpan={1}>{calculateSum(plots.filter((plot) => selectedPlots.includes(plot.id)).map((plot) => plot.trees_count))}</Table.Summary.Cell>
+                            <Table.Summary.Cell index={6} colSpan={1}>{calculateSum(plots.filter((plot) => selectedPlots.includes(plot.id)).map((plot) => plot.mapped_trees_count))}</Table.Summary.Cell>
+                            <Table.Summary.Cell index={7} colSpan={1}>{calculateSum(plots.filter((plot) => selectedPlots.includes(plot.id)).map((plot) => plot.assigned_trees_count))}</Table.Summary.Cell>
+                            <Table.Summary.Cell index={8} colSpan={1}>{calculateSum(plots.filter((plot) => selectedPlots.includes(plot.id)).map((plot) => plot.available_trees_count))}</Table.Summary.Cell>
+                        </Table.Summary.Row>
+                    </Table.Summary>
+                )}
+                rowSelection={rowSelection}
+            />
         </Box>
     )
 }
