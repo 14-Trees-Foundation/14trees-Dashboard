@@ -76,6 +76,19 @@ const SiteInventory: FC = () => {
         return ''
     }
 
+    const getAccessibilityStatus = (status: string) => {
+        switch (status) {
+            case "accessible":
+                return "Accessible";
+            case "inaccessible":
+                return "Inaccessible";
+            case "moderately_accessible":
+                return "Moderately Accessible";
+            default:
+                return "Unknown";
+        }
+    }
+
     let rowSelection: TableRowSelection<Plot>  = {
         type: 'checkbox',
         onChange: (selectedRowKeys) => {
@@ -94,13 +107,14 @@ const SiteInventory: FC = () => {
                     title: 'Name',
                     dataIndex: 'name',
                     key: 'name',
-                    width: 550,
+                    width: 450,
                 },
                 {
                     title: 'Accessibility',
                     dataIndex: 'accessibility_status',
                     key: 'accessibility_status',
-                    width: 150,
+                    width: 250,
+                    render: getAccessibilityStatus,
                 },
                 {
                     title: 'Area in acres',
@@ -113,6 +127,7 @@ const SiteInventory: FC = () => {
                     dataIndex: 'capacity',
                     key: 'capacity',
                     width: 150,
+                    align: 'right',
                     render: (value: any, plot: Plot, index: number) => plot.acres_area ? Math.floor(plot.acres_area * 300) : 'Unknown'
                 }
             ]
@@ -125,24 +140,28 @@ const SiteInventory: FC = () => {
                     dataIndex: 'trees_count',
                     key: 'trees_count',
                     width: 150,
+                    align: 'right',
                 },
                 {
                     title: 'Booked',
                     dataIndex: 'mapped_trees_count',
                     key: 'mapped_trees_count',
                     width: 150,
+                    align: 'right',
                 },
                 {
                     title: 'Assigned',
                     dataIndex: 'assigned_trees_count',
                     key: 'assigned_trees_count',
                     width: 150,
+                    align: 'right',
                 },
                 {
                     title: 'Available',
                     dataIndex: 'available_trees_count',
                     key: 'available_trees_count',
                     width: 150,
+                    align: 'right',
                 }
             ]
         },
@@ -178,15 +197,45 @@ const SiteInventory: FC = () => {
                 dataSource={plots}
                 summary={() => (
                     <Table.Summary fixed='bottom'>
+                        <Table.Summary.Row >
+                            <Table.Summary.Cell align="right" index={3} colSpan={4}>
+                                Accessible
+                            </Table.Summary.Cell>
+                            <Table.Summary.Cell align="right" index={4} colSpan={1}>{calculateSum(plots.filter((plot) => selectedPlots.includes(plot.id) && plot.accessibility_status === "accessible").map((plot) => plot.acres_area ? Math.floor(plot.acres_area * 300) : 0))}</Table.Summary.Cell>
+                            <Table.Summary.Cell align="right" index={5} colSpan={1}>{calculateSum(plots.filter((plot) => selectedPlots.includes(plot.id) && plot.accessibility_status === "accessible").map((plot) => plot.trees_count))}</Table.Summary.Cell>
+                            <Table.Summary.Cell align="right" index={6} colSpan={1}>{calculateSum(plots.filter((plot) => selectedPlots.includes(plot.id) && plot.accessibility_status === "accessible").map((plot) => plot.mapped_trees_count))}</Table.Summary.Cell>
+                            <Table.Summary.Cell align="right" index={7} colSpan={1}>{calculateSum(plots.filter((plot) => selectedPlots.includes(plot.id) && plot.accessibility_status === "accessible").map((plot) => plot.assigned_trees_count))}</Table.Summary.Cell>
+                            <Table.Summary.Cell align="right" index={8} colSpan={1}>{calculateSum(plots.filter((plot) => selectedPlots.includes(plot.id) && plot.accessibility_status === "accessible").map((plot) => plot.available_trees_count))}</Table.Summary.Cell>
+                        </Table.Summary.Row>
                         <Table.Summary.Row>
-                            <Table.Summary.Cell index={3} colSpan={4}>
+                            <Table.Summary.Cell align="right" index={3} colSpan={4}>
+                                Inaccessible
+                            </Table.Summary.Cell>
+                            <Table.Summary.Cell align="right" index={4} colSpan={1}>{calculateSum(plots.filter((plot) => selectedPlots.includes(plot.id) && plot.accessibility_status === "inaccessible").map((plot) => plot.acres_area ? Math.floor(plot.acres_area * 300) : 0))}</Table.Summary.Cell>
+                            <Table.Summary.Cell align="right" index={5} colSpan={1}>{calculateSum(plots.filter((plot) => selectedPlots.includes(plot.id) && plot.accessibility_status === "inaccessible").map((plot) => plot.trees_count))}</Table.Summary.Cell>
+                            <Table.Summary.Cell align="right" index={6} colSpan={1}>{calculateSum(plots.filter((plot) => selectedPlots.includes(plot.id) && plot.accessibility_status === "inaccessible").map((plot) => plot.mapped_trees_count))}</Table.Summary.Cell>
+                            <Table.Summary.Cell align="right" index={7} colSpan={1}>{calculateSum(plots.filter((plot) => selectedPlots.includes(plot.id) && plot.accessibility_status === "inaccessible").map((plot) => plot.assigned_trees_count))}</Table.Summary.Cell>
+                            <Table.Summary.Cell align="right" index={8} colSpan={1}>{calculateSum(plots.filter((plot) => selectedPlots.includes(plot.id) && plot.accessibility_status === "inaccessible").map((plot) => plot.available_trees_count))}</Table.Summary.Cell>
+                        </Table.Summary.Row>
+                        <Table.Summary.Row>
+                            <Table.Summary.Cell align="right" index={3} colSpan={4}>
+                                Moderately Accessible
+                            </Table.Summary.Cell>
+                            <Table.Summary.Cell align="right" index={4} colSpan={1}>{calculateSum(plots.filter((plot) => selectedPlots.includes(plot.id) && plot.accessibility_status === "moderately_accessible").map((plot) => plot.acres_area ? Math.floor(plot.acres_area * 300) : 0))}</Table.Summary.Cell>
+                            <Table.Summary.Cell align="right" index={5} colSpan={1}>{calculateSum(plots.filter((plot) => selectedPlots.includes(plot.id) && plot.accessibility_status === "moderately_accessible").map((plot) => plot.trees_count))}</Table.Summary.Cell>
+                            <Table.Summary.Cell align="right" index={6} colSpan={1}>{calculateSum(plots.filter((plot) => selectedPlots.includes(plot.id) && plot.accessibility_status === "moderately_accessible").map((plot) => plot.mapped_trees_count))}</Table.Summary.Cell>
+                            <Table.Summary.Cell align="right" index={7} colSpan={1}>{calculateSum(plots.filter((plot) => selectedPlots.includes(plot.id) && plot.accessibility_status === "moderately_accessible").map((plot) => plot.assigned_trees_count))}</Table.Summary.Cell>
+                            <Table.Summary.Cell align="right" index={8} colSpan={1}>{calculateSum(plots.filter((plot) => selectedPlots.includes(plot.id) && plot.accessibility_status === "moderately_accessible").map((plot) => plot.available_trees_count))}</Table.Summary.Cell>
+                        </Table.Summary.Row>
+                        <Table.Summary.Row>
+                            <Table.Summary.Cell align="right" index={3} colSpan={4}>
                                 Total
                             </Table.Summary.Cell>
-                            <Table.Summary.Cell index={4} colSpan={1}>{calculateSum(plots.filter((plot) => selectedPlots.includes(plot.id)).map((plot) => plot.acres_area ? Math.floor(plot.acres_area * 300) : 0))}</Table.Summary.Cell>
-                            <Table.Summary.Cell index={5} colSpan={1}>{calculateSum(plots.filter((plot) => selectedPlots.includes(plot.id)).map((plot) => plot.trees_count))}</Table.Summary.Cell>
-                            <Table.Summary.Cell index={6} colSpan={1}>{calculateSum(plots.filter((plot) => selectedPlots.includes(plot.id)).map((plot) => plot.mapped_trees_count))}</Table.Summary.Cell>
-                            <Table.Summary.Cell index={7} colSpan={1}>{calculateSum(plots.filter((plot) => selectedPlots.includes(plot.id)).map((plot) => plot.assigned_trees_count))}</Table.Summary.Cell>
-                            <Table.Summary.Cell index={8} colSpan={1}>{calculateSum(plots.filter((plot) => selectedPlots.includes(plot.id)).map((plot) => plot.available_trees_count))}</Table.Summary.Cell>
+                            <Table.Summary.Cell align="right" index={4} colSpan={1}>{calculateSum(plots.filter((plot) => selectedPlots.includes(plot.id)).map((plot) => plot.acres_area ? Math.floor(plot.acres_area * 300) : 0))}</Table.Summary.Cell>
+                            <Table.Summary.Cell align="right" index={5} colSpan={1}>{calculateSum(plots.filter((plot) => selectedPlots.includes(plot.id)).map((plot) => plot.trees_count))}</Table.Summary.Cell>
+                            <Table.Summary.Cell align="right" index={6} colSpan={1}>{calculateSum(plots.filter((plot) => selectedPlots.includes(plot.id)).map((plot) => plot.mapped_trees_count))}</Table.Summary.Cell>
+                            <Table.Summary.Cell align="right" index={7} colSpan={1}>{calculateSum(plots.filter((plot) => selectedPlots.includes(plot.id)).map((plot) => plot.assigned_trees_count))}</Table.Summary.Cell>
+                            <Table.Summary.Cell align="right" index={8} colSpan={1}>{calculateSum(plots.filter((plot) => selectedPlots.includes(plot.id)).map((plot) => plot.available_trees_count))}</Table.Summary.Cell>
                         </Table.Summary.Row>
                     </Table.Summary>
                 )}

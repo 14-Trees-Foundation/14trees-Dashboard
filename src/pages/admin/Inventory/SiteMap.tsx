@@ -12,13 +12,11 @@ interface KmlLayerProps {
 
 const MapWithKmlLayer: React.FC<KmlLayerProps> = ({ url }) => {
     const googleMapsApiKey = process.env.REACT_APP_API_MAP_KEY ?? '';
-    const center = { lat: 51.5074, lng: -0.1278 };
 
     return (
         <LoadScript googleMapsApiKey={googleMapsApiKey}>
             <GoogleMap
                 mapContainerStyle={containerStyle}
-                center={center}
                 zoom={10}
                 mapTypeId='satellite'
             >
