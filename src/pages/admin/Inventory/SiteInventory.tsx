@@ -107,14 +107,33 @@ const SiteInventory: FC = () => {
                     title: 'Name',
                     dataIndex: 'name',
                     key: 'name',
-                    width: 450,
+                    width: 400,
                 },
                 {
                     title: 'Accessibility',
                     dataIndex: 'accessibility_status',
                     key: 'accessibility_status',
-                    width: 250,
+                    width: 300,
                     render: getAccessibilityStatus,
+                    filters: [
+                        {
+                          text: 'Accessible',
+                          value: 'accessible',
+                        },
+                        {
+                          text: 'Inaccessible',
+                          value: 'inaccessible',
+                        },
+                        {
+                          text: 'Moderately Accessible',
+                          value: 'moderately_accessible',
+                        },
+                        {
+                          text: 'Unknown',
+                          value: 'unknown',
+                        },
+                    ],
+                    onFilter: (value: string, record: Plot) => (record.accessibility_status === value || (record.accessibility_status === null && value === 'unknown')),
                 },
                 {
                     title: 'Area in acres',
@@ -128,7 +147,8 @@ const SiteInventory: FC = () => {
                     key: 'capacity',
                     width: 150,
                     align: 'right',
-                    render: (value: any, plot: Plot, index: number) => plot.acres_area ? Math.floor(plot.acres_area * 300) : 'Unknown'
+                    render: (value: any, plot: Plot, index: number) => plot.acres_area ? Math.floor(plot.acres_area * 300) : 'Unknown',
+                    sorter: (a: Plot, b: Plot) => (a.acres_area || 0) - (b.acres_area || 0),
                 }
             ]
         },
@@ -141,6 +161,7 @@ const SiteInventory: FC = () => {
                     key: 'trees_count',
                     width: 150,
                     align: 'right',
+                    sorter: (a: Plot, b: Plot) => (a.trees_count || 0) - (b.trees_count || 0),
                 },
                 {
                     title: 'Booked',
@@ -148,6 +169,7 @@ const SiteInventory: FC = () => {
                     key: 'mapped_trees_count',
                     width: 150,
                     align: 'right',
+                    sorter: (a: Plot, b: Plot) => (a.mapped_trees_count || 0) - (b.mapped_trees_count || 0),
                 },
                 {
                     title: 'Assigned',
@@ -155,6 +177,7 @@ const SiteInventory: FC = () => {
                     key: 'assigned_trees_count',
                     width: 150,
                     align: 'right',
+                    sorter: (a: Plot, b: Plot) => (a.assigned_trees_count || 0) - (b.assigned_trees_count || 0),
                 },
                 {
                     title: 'Available',
@@ -162,6 +185,7 @@ const SiteInventory: FC = () => {
                     key: 'available_trees_count',
                     width: 150,
                     align: 'right',
+                    sorter: (a: Plot, b: Plot) => (a.available_trees_count || 0) - (b.available_trees_count || 0),
                 }
             ]
         },
