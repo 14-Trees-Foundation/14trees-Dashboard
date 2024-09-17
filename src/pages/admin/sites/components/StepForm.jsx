@@ -110,7 +110,7 @@ const StepForm = ({ open, handleClose, useCase, data, submitFunction }) => {
   const [account, setAccount] = useState(data.account);
   const [tags, setTags] = useState(data.tags ? data.tags : []);
 
-  const [files, setFiles] = useState([{}]);
+  const [file, setFile] = useState(null);
 
   const maintenance_type_options = [
     { value: "1", label: "FULL_MAINTENANCE" },
@@ -219,7 +219,7 @@ const StepForm = ({ open, handleClose, useCase, data, submitFunction }) => {
         tags: tags,
       };
       try {
-        const response = submitFunction(updatedSiteData, files);
+        const response = submitFunction(updatedSiteData, file);
         console.log("response from backend: ", response);
       } catch (error) {
         console.log("Error in updating: ", error.message);
@@ -250,9 +250,9 @@ const StepForm = ({ open, handleClose, useCase, data, submitFunction }) => {
 
   const { getRootProps, getInputProps } = useDropzone({
     accept: ".kml",
-    maxFiles: 10,
+    maxFiles: 1,
     onDrop: (acceptedFiles) => {
-      setFiles(acceptedFiles);
+      setFile(acceptedFiles.length === 1 ? acceptedFiles[0] : null);
     },
     onDropRejected: (rejectedFiles) => {
       // toast.error("Only 10 images allowed!");
@@ -739,11 +739,17 @@ const StepForm = ({ open, handleClose, useCase, data, submitFunction }) => {
                       <div {...getRootProps()}>
                         <input {...getInputProps()} />
                         <p style={{ cursor: "pointer" }}>
-                          Upload KML files. Click or Drag!
+                          Upload KML file. Click or Drag!
                         </p>
                       </div>
                     </section>
                   </div>
+                  {/* Display the selected files */}
+                  {file && (
+                    <div style={{ marginTop: '20px' }}>
+                      <h4>Selected File: {file.name}</h4>
+                    </div>
+                  )}
                 </DialogContent>
               )}
 

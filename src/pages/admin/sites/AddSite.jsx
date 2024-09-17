@@ -8,6 +8,7 @@ const AddSite = ({ open, handleClose, createSite }) => {
     district: null,
     taluka: null,
     village: null,
+    kml_file: null,
     area_acres: 0,
     land_type: "",
     land_strata: "",

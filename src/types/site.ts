@@ -42,6 +42,7 @@ export type Site = {
     created_at: string;
     updated_at: string;
     maintenance_type: maintenance_type | null;
+    kml_file_link: string | null;
 };
 
 export type SitesDataState = {

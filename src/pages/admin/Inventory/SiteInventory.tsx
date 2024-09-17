@@ -67,15 +67,6 @@ const SiteInventory: FC = () => {
         return sum;
     }
 
-    const getKmlUrl = () => {
-        if (selectedSite && selectedSite.google_earth_link) {
-            const fileId = selectedSite.google_earth_link[0].split("/d/")[1].split("/")[0];
-            return `https://drive.google.com/uc?export=view&id=${fileId}`
-        }
-
-        return ''
-    }
-
     const getAccessibilityStatus = (status: string) => {
         switch (status) {
             case "accessible":
@@ -213,7 +204,7 @@ const SiteInventory: FC = () => {
                 value={selectedSite}
             />
 
-            {(selectedSite && selectedSite.google_earth_link) && <MapWithKmlLayer url={getKmlUrl()} />}
+            {(selectedSite && selectedSite.kml_file_link) && <MapWithKmlLayer url={selectedSite.kml_file_link} />}
 
             <Table
                 style={{ marginTop: 20 }}

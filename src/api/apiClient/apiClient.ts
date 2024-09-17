@@ -751,24 +751,12 @@ class ApiClient {
         }
     }
 
-    async createSite(data: Site): Promise<Site> {
-        try {
-            const response = await this.api.post<Site>(`/sites/`, data);
-            return response.data;
-        } catch (error) {
-            console.error(error)
-            throw new Error('Failed to create Site');
-        }
-    }
-
-    async updateSite(data: Site, files: Blob[]): Promise<Site> {
+    async createSite(data: Site, file?: Blob): Promise<Site> {
         try {
 
             const formData = new FormData();
-            if (files) {
-                files.forEach((file) => {
-                    formData.append("files", file);
-                });
+            if (file) {
+                formData.append("file", file);
             }
             Object.entries(data).forEach(([key, value]) => {
                 if (value === null || value === "") return;
@@ -780,7 +768,32 @@ class ApiClient {
                     formData.append(key, JSON.stringify(value));
                 }
             });
-            console.log("Form data in updateSite action : ", formData);
+
+            const response = await this.api.post<Site>(`/sites/`, formData);
+            return response.data;
+        } catch (error) {
+            console.error(error)
+            throw new Error('Failed to create Site');
+        }
+    }
+
+    async updateSite(data: Site, file?: Blob): Promise<Site> {
+        try {
+
+            const formData = new FormData();
+            if (file) {
+                formData.append("file", file);
+            }
+            Object.entries(data).forEach(([key, value]) => {
+                if (value === null || value === "") return;
+                if (key !== 'google_earth_link' && key !== 'tags') {
+                    const strValue = value as string
+                    formData.append(key, strValue);
+                }
+                if (key === 'tags') {
+                    formData.append(key, JSON.stringify(value));
+                }
+            });
 
             const response = await this.api.put<Site>(`/sites/${data.id}`, formData);
             return response.data;

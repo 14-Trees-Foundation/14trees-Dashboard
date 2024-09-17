@@ -83,13 +83,13 @@ export const SitesComponent = () => {
     setSelectedItem(row);
   };
 
-  const handleEditSubmit = (formData: Site, files: Blob[]) => {
-    updateSite(formData, files);
+  const handleEditSubmit = (formData: Site, file: Blob) => {
+    updateSite(formData, file);
     setSelectedEditRow(null);
   };
 
-  const handleCreateSiteData = (formData: Site) => {
-    createSite(formData);
+  const handleCreateSiteData = (formData: Site, file: Blob) => {
+    createSite(formData, file);
   };
 
   const handleSyncNotionSites = async () => {
