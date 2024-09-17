@@ -1,6 +1,6 @@
 import { FC, useEffect, useState } from "react";
 import { User } from "../../../types/user";
-import { Box, FormControl, InputAdornment, OutlinedInput } from "@mui/material";
+import { Box, Card, CardContent, FormControl, Grid, InputAdornment, OutlinedInput, Typography } from "@mui/material";
 import { Search } from "@mui/icons-material";
 import UserCard from "./UserCard";
 
@@ -62,6 +62,27 @@ const UserList: FC<UserListProps> = ({ list }) => {
                     />
                 </FormControl>
             </Box>
+            <Card style={{ backgroundColor: 'rgba(207, 255, 235, 0.3)', borderRadius: 4, width: '100%', marginBottom: 10 }}>
+                <CardContent>
+                    <Grid container spacing={2} alignItems="center">
+                        <Grid item xs={12} md={6} container alignItems="center">
+                            <Typography variant="body1" style={{ marginLeft: 8 }}>
+                                Name
+                            </Typography>
+                        </Grid>
+                        <Grid item xs={12} md={3} container alignItems="center" justifyContent="center">
+                            <Typography variant="body1" style={{ marginLeft: 8 }}>
+                                Mapped Trees
+                            </Typography>
+                        </Grid>
+                        <Grid item xs={12} md={3} container alignItems="center" justifyContent="center">
+                            <Typography variant="body1" style={{ marginLeft: 8 }}>
+                                Assigned Trees
+                            </Typography>
+                        </Grid>
+                    </Grid>
+                </CardContent>
+            </Card>
             <Box sx={{ justifyContent: 'center', alignItems: 'center', maxHeight: '60vh', overflowY: 'auto', scrollbarWidth: 'none' }}>
                 {
                     filteredUsers.map((user, index) => (
