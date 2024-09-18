@@ -54,9 +54,9 @@ function App() {
           <Route
             path="/admin"
             element={
-              // <RequireAuth>
+              <RequireAuth>
                 <Admin />
-              // </RequireAuth>
+              </RequireAuth>
             }
           >
             <Route path="forms" element={<Forms />}>
@@ -68,9 +68,9 @@ function App() {
             <Route 
               path=":email" 
               element={ 
-                // <RequireAuth>
+                <RequireAuth>
                   <GiftTrees />
-                // </RequireAuth>
+                </RequireAuth>
               } 
             ></Route>
           </Route>
@@ -81,9 +81,9 @@ function App() {
           <Route 
             path="/test" 
             element={
-              // <RequireAuth>
+              <RequireAuth>
                 <Test />
-              // </RequireAuth>
+              </RequireAuth>
             } 
           />
         </Routes>
