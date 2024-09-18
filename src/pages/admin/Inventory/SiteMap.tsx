@@ -84,11 +84,10 @@ const SitesMap: React.FC<SitesMapProps> = ({ plots }) => {
                 center={{ lat: 0, lng: 0 }}
             >
                 {plots.map((plot) => (
-                    <Polygon key={plot.id} path={getPlotPolygon(plot)} options={getPolygonOptions(plot)} />
-                ))}
-
-                {plots.map((plot) => (
-                    <Marker key={plot.id} position={calculatePlotCenter(plot)} options={{ label: plot.label }}/>
+                     <React.Fragment key={plot.id}>
+                        <Polygon path={getPlotPolygon(plot)} options={getPolygonOptions(plot)} />
+                        <Marker icon={{ url: 'https://maps.google.com/mapfiles/ms/micons/blue.png' }} position={calculatePlotCenter(plot)} options={{ label: { text: plot.label, color: 'white', fontWeight: 'bold' } }}/>
+                     </React.Fragment>
                 ))}
 
                 {plots.map((plot) => (
@@ -97,7 +96,12 @@ const SitesMap: React.FC<SitesMapProps> = ({ plots }) => {
                     >
                         <div>
                             <h4>{plot.label}</h4>
-                            <p>area: {plot.acres_area}</p>
+                            <p>Name: {plot.name}</p>
+                            <p>Area: {plot.acres_area} acres</p>
+                            <p>Total: {plot.trees_count || 'NA'}</p>
+                            <p>Booked: {plot.mapped_trees_count || 'NA'}</p>
+                            <p>Assigned: {plot.assigned_trees_count || 'NA'}</p>
+                            <p>Available: {plot.available_trees_count || 'NA'}</p>
                         </div>
                     </InfoWindow>
                 ))}
