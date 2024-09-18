@@ -7,7 +7,7 @@ import { Box, Divider, Typography } from "@mui/material";
 import { AutocompleteWithPagination } from "../../../components/AutoComplete";
 import { Plot } from "../../../types/plot";
 import ApiClient from "../../../api/apiClient/apiClient";
-import MapWithKmlLayer from "./SiteMap";
+import SitesMap from "./SiteMap";
 import { Table, TableColumnType } from "antd";
 import { TableRowSelection } from "antd/es/table/interface";
 
@@ -223,7 +223,7 @@ const SiteInventory: FC = () => {
                 value={selectedSite}
             />
 
-            {(selectedSite && selectedSite.kml_file_link) && <MapWithKmlLayer url={selectedSite.kml_file_link} />}
+            {(selectedSite && selectedSite.kml_file_link) && <SitesMap plots={plots} />}
 
             {selectedSite && <Table
                 style={{ marginTop: 20 }}
