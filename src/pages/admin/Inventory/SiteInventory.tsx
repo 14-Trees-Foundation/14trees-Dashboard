@@ -125,6 +125,10 @@ const SiteInventory: FC = () => {
                         },
                     ],
                     onFilter: (value: string, record: Plot) => (record.accessibility_status === value || (record.accessibility_status === null && value === 'unknown')),
+                    sorter: {
+                        compare: (a: Plot, b: Plot) => a.accessibility_status?.localeCompare(b.accessibility_status || ''),
+                        multiple: 2,
+                    }
                 },
                 {
                     title: 'Area in acres',
@@ -139,7 +143,10 @@ const SiteInventory: FC = () => {
                     width: 150,
                     align: 'right',
                     render: (value: any, plot: Plot, index: number) => plot.acres_area ? Math.floor(plot.acres_area * 300) : 'Unknown',
-                    sorter: (a: Plot, b: Plot) => (a.acres_area || 0) - (b.acres_area || 0),
+                    sorter: {
+                        compare: (a: Plot, b: Plot) => (a.acres_area || 0) - (b.acres_area || 0),
+                        multiple: 1
+                    }
                 }
             ]
         },
@@ -152,7 +159,10 @@ const SiteInventory: FC = () => {
                     key: 'trees_count',
                     width: 150,
                     align: 'right',
-                    sorter: (a: Plot, b: Plot) => (a.trees_count || 0) - (b.trees_count || 0),
+                    sorter: {
+                        compare: (a: Plot, b: Plot) => (a.trees_count || 0) - (b.trees_count || 0),
+                        multiple: 1,
+                    }
                 },
                 {
                     title: 'Booked',
@@ -160,7 +170,10 @@ const SiteInventory: FC = () => {
                     key: 'mapped_trees_count',
                     width: 150,
                     align: 'right',
-                    sorter: (a: Plot, b: Plot) => (a.mapped_trees_count || 0) - (b.mapped_trees_count || 0),
+                    sorter: {
+                        compare: (a: Plot, b: Plot) => (a.mapped_trees_count || 0) - (b.mapped_trees_count || 0),
+                        multiple: 1,
+                    }
                 },
                 {
                     title: 'Assigned',
@@ -168,7 +181,10 @@ const SiteInventory: FC = () => {
                     key: 'assigned_trees_count',
                     width: 150,
                     align: 'right',
-                    sorter: (a: Plot, b: Plot) => (a.assigned_trees_count || 0) - (b.assigned_trees_count || 0),
+                    sorter: {
+                        compare:(a: Plot, b: Plot) => (a.assigned_trees_count || 0) - (b.assigned_trees_count || 0),
+                        multiple: 1
+                    },
                 },
                 {
                     title: 'Available',
@@ -176,7 +192,10 @@ const SiteInventory: FC = () => {
                     key: 'available_trees_count',
                     width: 150,
                     align: 'right',
-                    sorter: (a: Plot, b: Plot) => (a.available_trees_count || 0) - (b.available_trees_count || 0),
+                    sorter: {
+                        compare: (a: Plot, b: Plot) => (a.available_trees_count || 0) - (b.available_trees_count || 0),
+                        multiple: 1,
+                    }
                 }
             ]
         },
@@ -206,7 +225,7 @@ const SiteInventory: FC = () => {
 
             {(selectedSite && selectedSite.kml_file_link) && <MapWithKmlLayer url={selectedSite.kml_file_link} />}
 
-            <Table
+            {selectedSite && <Table
                 style={{ marginTop: 20 }}
                 columns={columns}
                 dataSource={plots}
@@ -255,7 +274,7 @@ const SiteInventory: FC = () => {
                     </Table.Summary>
                 )}
                 rowSelection={rowSelection}
-            />
+            />}
         </Box>
     )
 }

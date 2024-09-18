@@ -58,16 +58,16 @@ const VisitPage: FC<VisitProps> = () => {
                 <br /><br/>
                 Each tree planted represents hope for cleaner air, healthier ecosystems, and a more sustainable planet. We extend our heartfelt gratitude to everyone who participated in this meaningful initiative, leaving a legacy that will benefit generations to come. Together, we are making the world🌍 a better place, one tree at a time.
             </Typography>
-            <Divider style={{ marginBottom: 10, marginTop: 30 }} />
-            <Typography variant='h6' fontWeight={600} style={{ marginBottom: 3, marginTop: 10 }}>
+            <Divider style={{ marginTop: 10 }} />
+            <Typography variant='h6' fontWeight={600} style={{ marginBottom: 3, marginTop: 100 }}>
                 Here are some beautiful photos taken during the visit!
             </Typography>
             <Box sx={{ width: '100%', maxHeight: '80vh', overflowY: 'auto', scrollbarWidth: 'none' }}>
                 <VisitImages images={visit.visit_images}/>
             </Box>
 
-            <Divider style={{ marginTop: 30, marginBottom: 10 }} />
-            <Typography variant='h6' fontWeight={600} style={{ marginBottom: 3, marginTop: 10 }}>
+            <Divider style={{ marginTop: 10 }} />
+            <Typography variant='h6' fontWeight={600} style={{ marginBottom: 3, marginTop: 100 }}>
                 Here are the wonderful people who helped make this visit possible!
             </Typography>
             <UserList list={users} />
