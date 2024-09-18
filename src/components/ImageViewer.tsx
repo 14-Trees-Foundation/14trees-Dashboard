@@ -4,7 +4,7 @@ import { Progress } from "./CircularProgress";
 
 interface Props {
   image: string;
-  handleClick: () => {};
+  handleClick: () => void;
 }
 export const ImageViewer = ({ image, handleClick }: Props) => {
   const classes = useStyles();

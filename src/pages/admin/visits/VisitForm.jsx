@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Autocomplete,
   Box,
@@ -9,7 +9,10 @@ import {
   Typography,
 } from "@mui/material";
 import { VisitTypeList } from "../../../types/visits";
-// import StepForm from "../visits/components/StepForm";
+import * as groupActionCreators from "../../../redux/actions/groupActions";
+import { useAppDispatch, useAppSelector } from "../../../redux/store/hooks";
+import { bindActionCreators } from "@reduxjs/toolkit";
+import ApiClient from "../../../api/apiClient/apiClient";
 
 const style = {
   position: "absolute",
@@ -28,13 +31,49 @@ const style = {
   p: 4,
 };
 
-const AddVisit = ({ open, handleClose, createVisit }) => {
+const VisitForm = ({ mode, open, handleClose, onSubmit, visit = null }) => {
+
+  const dispatch = useAppDispatch();
+  const { getGroups } = bindActionCreators(groupActionCreators, dispatch);
+  const [searchStr, setSearchStr] = useState('');
+  const [selectedGroup, setSelectedGroup] = useState(null);
 
   const [formData, setFormData] = useState({
     visit_name: '',
     visit_date: '',
-    visit_type: null
+    visit_type: null,
+    group_id: null
   });
+
+  const getGroup = async (groupId) => {
+    const apiClient = new ApiClient();
+    const response = await apiClient.getGroups(0, 1, [{ columnField: 'id', operatorValue: 'equals', value: groupId }]);
+    if (response.results.length === 1) {
+      setSelectedGroup(response.results[0]);
+    }
+  }
+
+  useEffect(() => {
+    if (visit) {
+      setFormData({
+        visit_name: visit.visit_name,
+        visit_date: visit.visit_date,
+        visit_type: VisitTypeList.find((visitType) => visitType.id === visit.visit_type),
+        group_id: visit.group_id,
+      });
+
+      if (visit.group_id) getGroup(visit.group_id);
+      else setSelectedGroup(null);
+    }
+  }, [visit])
+
+  useEffect(() => {
+    getGroups(0, 20);
+  }, [])
+
+  useEffect(() => {
+    if (searchStr.length > 2) getGroups(0, 20, [{ columnField: 'name', operatorValue: 'contains', value: searchStr }]);
+  }, [searchStr])
 
   const handleChange = (event) => {
     const { name, value } = event.target;
@@ -45,31 +84,37 @@ const AddVisit = ({ open, handleClose, createVisit }) => {
 
   const handleSubmit = (event) => {
     event.preventDefault();
-
-    createVisit({
+    let data = visit ? { ...visit } : {};
+    data = {
+      ...data,
       visit_name: formData.visit_name,
       visit_date: formData.visit_date,
-      visit_type: formData.visit_type.id
-    });
+      visit_type: formData.visit_type.id,
+      group_id: formData.visit_type.id === 'corporate' ? formData.group_id : null,
+    }
+
+    onSubmit(data);
     setFormData({
       visit_name: '',
       visit_date: '',
-      visit_type: null
+      visit_type: null,
+      group_id: null,
     });
 
     handleClose();
   };
 
+  let groupList = [];
+  const groupsData = useAppSelector(
+    (state) => state.groupsData
+  );
+  if (groupsData) {
+    groupList = Object.values(groupsData.groups);
+    const idx = groupList.findIndex(group => group.id === formData.group_id);
+    if (idx < 0 && selectedGroup) groupList.push(selectedGroup);
+  }
+
   return (
-    // <>
-    //   <StepForm
-    //     open={open}
-    //     handleClose={handleClose}
-    //     useCase={"Add Visit"}
-    //     data={initialValues}
-    //     submitFunction={createVisit}
-    //   />
-    // </>
     <div>
       <Modal
         open={open}
@@ -79,7 +124,7 @@ const AddVisit = ({ open, handleClose, createVisit }) => {
       >
         <Box sx={style}>
           <Typography variant="h6" align="center" sx={{ marginBottom: "8px" }}>
-            Add Visit
+            {mode === 'add' ? 'Add Visit' : 'Edit Visit'}
           </Typography>
           <form onSubmit={handleSubmit}>
             <Grid container rowSpacing={2} columnSpacing={1}>
@@ -124,6 +169,28 @@ const AddVisit = ({ open, handleClose, createVisit }) => {
                   onChange={handleChange}
                 />
               </Grid>
+              {(formData.visit_type && formData.visit_type.id === 'corporate') && <Grid item xs={12}>
+                <Autocomplete
+                  fullWidth
+                  name="group_id"
+                  disablePortal
+                  options={groupList}
+                  getOptionLabel={(option) => option.name}
+                  value={selectedGroup}
+                  renderInput={(params) => (
+                    <TextField {...params} label="Select Group" onChange={(e) => setSearchStr(e.target.value)} required />
+                  )}
+                  onChange={(event, value) => {
+                    if (value) {
+                      setFormData((prevState) => ({
+                        ...prevState,
+                        group_id: value.id,
+                      }));
+                      setSelectedGroup(value);
+                    }
+                  }}
+                />
+              </Grid>}
               <Grid
                 item
                 xs={12}
@@ -144,4 +211,4 @@ const AddVisit = ({ open, handleClose, createVisit }) => {
   );
 };
 
-export default AddVisit;
+export default VisitForm;

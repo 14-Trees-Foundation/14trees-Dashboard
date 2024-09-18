@@ -41,6 +41,7 @@ const AddPlot = ({ open, handleClose, createPlot, tags }) => {
   const [formData, setFormData] = useState({
     name: "",
     plot_id: "",
+    label: "",
     site_id: null,
     category: null,
     district: "",
@@ -126,6 +127,11 @@ const AddPlot = ({ open, handleClose, createPlot, tags }) => {
   };
 
   const categoriesList = ["Public", "Foundation"];
+  const accessibilityList = [
+    { value: "accessible", label: "Accessible" },
+    { value: "inaccessible", label: "Inaccessible" },
+    { value: "moderately_accessible", label: "Moderately Accessible" },
+  ];
 
   let sitesList = [];
   const siteData = useAppSelector((state) => state.sitesData);
@@ -162,12 +168,28 @@ const AddPlot = ({ open, handleClose, createPlot, tags }) => {
               </Grid>
               <Grid item xs={12}>
                 <TextField
-                  required
-                  name="plot_id"
-                  label="Plot ID"
-                  value={formData.plot_id}
+                  name="label"
+                  label="Plot Label"
+                  value={formData.label}
                   onChange={handleChange}
                   fullWidth
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <Autocomplete
+                  fullWidth
+                  size="medium"
+                  name="accessibility_status"
+                  disablePortal
+                  options={accessibilityList}
+                  getOptionLabel={(option) => option?.label || ''}
+                  value={accessibilityList.find((item) => item.value === formData.accessibility_status) ?? null}
+                  renderInput={(params) => (
+                    <TextField {...params} margin="dense" label="Plot Accessibility Status" />
+                  )}
+                  onChange={(event, value) => {
+                    if (accessibilityList.includes(value)) setFormData((prevState) => ({ ...prevState, accessibility_status: value.value }));
+                  }}
                 />
               </Grid>
               <Grid item xs={12}>

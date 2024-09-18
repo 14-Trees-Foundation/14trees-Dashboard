@@ -25,6 +25,7 @@ import { DonationComponent } from "./donation/Donation";
 import { SitesComponent } from "./sites/Sites";
 import { EventsComponent } from "./events/Events";
 import { VisitsComponent } from "./visits/Visits";
+import SiteInventory from "./Inventory/SiteInventory";
 
 export const Admin = () => {
   const classes = useStyles();
@@ -106,17 +107,21 @@ export const Admin = () => {
       page: SitesComponent,
       displayName: "Sites",
     },
-    {
-      page: EventsComponent,
-      displayName: "Events",
-    },
-    {
-      page: DonationComponent,
-      displayName: "Donations",
-    },
+    // {
+    //   page: EventsComponent,
+    //   displayName: "Events",
+    // },
+    // {
+    //   page: DonationComponent,
+    //   displayName: "Donations",
+    // },
     {
       page: VisitsComponent,
       displayName: "Visits",
+    },
+    {
+      page: SiteInventory,
+      displayName: "Site Inventory",
     },
     {
       page: Images,

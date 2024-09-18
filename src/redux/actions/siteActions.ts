@@ -33,13 +33,13 @@ export const getSites = (offset: number, limit: number, filters?: any[]) => {
     }
 };
 
-export const createSite = (record: Site) => {
+export const createSite = (record: Site, file?: Blob) => {
     const apiClient = new ApiClient();
     return (dispatch: any) => {
         dispatch({
             type: siteActionTypes.CREATE_SITE_REQUESTED,
         });
-        apiClient.createSite(record).then(
+        apiClient.createSite(record, file).then(
             (value: Site) => {
                 toast.success('New Site Added successfully')
                 dispatch({
@@ -62,14 +62,14 @@ export const createSite = (record: Site) => {
     };
 };
 
-export const updateSite = (record: Site , files?: Blob[]) => {
+export const updateSite = (record: Site , file?: Blob) => {
     const apiClient = new ApiClient();
     return (dispatch: any) => {
 
         dispatch({
             type: siteActionTypes.UPDATE_SITE_REQUESTED,
         });
-         apiClient.updateSite(record , files?files:[]).then(
+         apiClient.updateSite(record , file).then(
             (value: Site) => {
                 toast.success('Site data Edited successfully')
                 dispatch({

@@ -165,6 +165,18 @@ class ApiClient {
         }
     }
 
+    async updatePlotCoordsUsingKml(siteId: number, file: File): Promise<void> {
+        try {
+            const formData = new FormData();
+            formData.append("file", file);
+            formData.append("site_id", String(siteId));
+            const response = await this.api.post<Plot>(`/plots/kml`, formData);
+        } catch (error) {
+            console.error(error)
+            throw new Error('Failed to update coordinates');
+        }
+    }
+
     async deletePlot(data: Plot): Promise<number> {
         try {
             await this.api.delete<any>(`/plots/${data.id}`);
@@ -659,6 +671,17 @@ class ApiClient {
         }
     }
 
+    async getAssignedTrees(userId: number): Promise<Tree[]> {
+        let url = `/trees/assigned/${userId}`;
+        try {
+            let result = await this.api.get<Tree[]>(url);
+            return result.data;
+        } catch (error) {
+            console.error(error)
+            throw new Error('Failed to get assigned trees');
+        }
+    }
+
 
     /*
         Model- UserTree: CRUD Operations/Apis for user_tree_regs
@@ -728,24 +751,12 @@ class ApiClient {
         }
     }
 
-    async createSite(data: Site): Promise<Site> {
-        try {
-            const response = await this.api.post<Site>(`/sites/`, data);
-            return response.data;
-        } catch (error) {
-            console.error(error)
-            throw new Error('Failed to create Site');
-        }
-    }
-
-    async updateSite(data: Site, files: Blob[]): Promise<Site> {
+    async createSite(data: Site, file?: Blob): Promise<Site> {
         try {
 
             const formData = new FormData();
-            if (files) {
-                files.forEach((file) => {
-                    formData.append("files", file);
-                });
+            if (file) {
+                formData.append("file", file);
             }
             Object.entries(data).forEach(([key, value]) => {
                 if (value === null || value === "") return;
@@ -757,7 +768,32 @@ class ApiClient {
                     formData.append(key, JSON.stringify(value));
                 }
             });
-            console.log("Form data in updateSite action : ", formData);
+
+            const response = await this.api.post<Site>(`/sites/`, formData);
+            return response.data;
+        } catch (error) {
+            console.error(error)
+            throw new Error('Failed to create Site');
+        }
+    }
+
+    async updateSite(data: Site, file?: Blob): Promise<Site> {
+        try {
+
+            const formData = new FormData();
+            if (file) {
+                formData.append("file", file);
+            }
+            Object.entries(data).forEach(([key, value]) => {
+                if (value === null || value === "") return;
+                if (key !== 'google_earth_link' && key !== 'tags') {
+                    const strValue = value as string
+                    formData.append(key, strValue);
+                }
+                if (key === 'tags') {
+                    formData.append(key, JSON.stringify(value));
+                }
+            });
 
             const response = await this.api.put<Site>(`/sites/${data.id}`, formData);
             return response.data;
