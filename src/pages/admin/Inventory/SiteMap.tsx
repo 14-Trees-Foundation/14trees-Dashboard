@@ -32,6 +32,10 @@ interface SitesMapProps {
 
 const SitesMap: React.FC<SitesMapProps> = ({ plots }) => {
     const googleMapsApiKey = process.env.REACT_APP_API_MAP_KEY ?? '';
+    const mapRef = React.useRef<google.maps.Map | null>(null);
+
+    const [center, setCenter] = React.useState<google.maps.LatLngLiteral>({ lat: 0, lng: 0 });
+    const [selectedPlots, setSelectedPlots] = React.useState<Plot[]>([]);
 
     const getPlotPolygon = (plot: Plot) => {
         const polygonPath = plot.boundaries?.coordinates[0]?.map(
@@ -39,6 +43,18 @@ const SitesMap: React.FC<SitesMapProps> = ({ plots }) => {
         );
         return polygonPath;
     };
+
+    React.useEffect(() => {
+        let latSum = 0, lngSum = 0;
+        plots.forEach((plot) => {
+            
+            const center = calculatePlotCenter(plot);
+            latSum += center.lat;
+            lngSum += center.lng;
+        })
+        
+        setCenter({ lat: latSum / plots.length, lng: lngSum / plots.length });
+    }, [plots]);
 
     const calculatePlotCenter = (plot: Plot) => {
         let latSum = 0, lngSum = 0;
@@ -75,36 +91,48 @@ const SitesMap: React.FC<SitesMapProps> = ({ plots }) => {
         }
     }
 
+    const handleMarkerClick = (plot: Plot) => {
+        setSelectedPlots(prevSelectedPlots => [...prevSelectedPlots, plot]);
+    };
+
+    const handleInfoWindowClose = (plotId: number) => {
+        setSelectedPlots(prevSelectedPlots => prevSelectedPlots.filter(plot => plot.id !== plotId));
+    }
+
     return (
         <LoadScript googleMapsApiKey={googleMapsApiKey}>
             <GoogleMap
                 mapContainerStyle={containerStyle}
-                zoom={10}
+                zoom={17}
                 mapTypeId='satellite'
-                center={{ lat: 0, lng: 0 }}
+                center={center}
+                onLoad={(map) => { mapRef.current = map }}
             >
                 {plots.map((plot) => (
                      <React.Fragment key={plot.id}>
                         <Polygon path={getPlotPolygon(plot)} options={getPolygonOptions(plot)} />
-                        <Marker icon={{ url: 'https://maps.google.com/mapfiles/ms/micons/blue.png' }} position={calculatePlotCenter(plot)} options={{ label: { text: plot.label, color: 'white', fontWeight: 'bold' } }}/>
+                        <Marker 
+                            icon={{ url: 'https://maps.google.com/mapfiles/ms/micons/blue.png' }} 
+                            position={calculatePlotCenter(plot)} 
+                            options={{ label: { text: plot.label, color: 'white', fontWeight: 'bold' } }}
+                            onClick={() => handleMarkerClick(plot)}
+                        />
                      </React.Fragment>
                 ))}
 
-                {plots.map((plot) => (
+                {selectedPlots.map((plot) => (
                     <InfoWindow
+                        key={plot.id}
                         position={calculatePlotCenter(plot)}
+                        onCloseClick={() => handleInfoWindowClose(plot.id)}
                     >
                         <div>
-                            <h4>{plot.label}</h4>
-                            <p>Name: {plot.name}</p>
-                            <p>Area: {plot.acres_area} acres</p>
-                            <p>Total: {plot.trees_count || 'NA'}</p>
-                            <p>Booked: {plot.mapped_trees_count || 'NA'}</p>
-                            <p>Assigned: {plot.assigned_trees_count || 'NA'}</p>
-                            <p>Available: {plot.available_trees_count || 'NA'}</p>
+                            <strong>{plot.label}</strong>
+                            <p>Available: {plot.available_trees_count}</p>
                         </div>
                     </InfoWindow>
                 ))}
+
             </GoogleMap>
         </LoadScript>
     );
