@@ -1,0 +1,33 @@
+.gm-style-iw {
+    background-color: transparent !important;
+    /* Makes the background transparent */
+    box-shadow: none !important;
+    /* Removes shadow */
+    padding: 0 !important;
+    /* Removes any padding */
+    width: auto !important;
+    /* Prevents any fixed width causing overflow */
+}
+
+.gm-style-iw-t::after {
+    background-color: transparent !important;
+    /* Ensures the tail background is transparent */
+    border: none !important;
+    /* Removes border from the tail */
+}
+
+.gm-style-iw-t {
+    padding: 0 !important;
+    /* Removes tail padding */
+}
+
+.gm-style-iw-d {
+    overflow: hidden !important;
+    /* Ensures no overflow of content */
+}
+
+
+.gm-style-iw + div {
+    display: none !important;
+    /* Hides the close button */
+}
