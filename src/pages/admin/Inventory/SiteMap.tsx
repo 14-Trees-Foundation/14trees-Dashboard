@@ -41,8 +41,10 @@ const SitesMap: React.FC<SitesMapProps> = ({ plots }) => {
         available: true,
         booked: false,
         assigned: false,
-        total: true,
-        capacity: true,
+        total: false,
+        capacity: false,
+        label: true,
+        all: true,
     })
 
     const getPlotPolygon = (plot: Plot) => {
@@ -116,12 +118,12 @@ const SitesMap: React.FC<SitesMapProps> = ({ plots }) => {
                                 icon={{ url: 'https://maps.google.com/mapfiles/ms/micons/blue.png' }}
                                 position={calculatePlotCenter(plot)}
                             />
-                            <InfoWindow
+                            {info.all && <InfoWindow
                                 key={plot.id}
                                 position={calculatePlotCenter(plot)}
                                 options={{
                                     disableAutoPan: true,
-                                    pixelOffset: new window.google.maps.Size(0, -30),
+                                    pixelOffset: new window.google.maps.Size(0, -10),
                                 }}
                             >
                                 <div style={{
@@ -131,15 +133,16 @@ const SitesMap: React.FC<SitesMapProps> = ({ plots }) => {
                                     width: 'auto',
                                     border: 'none',
                                     overflow: 'hidden',
+                                    lineHeight: '0.5'
                                 }}>
+                                    {info.label && <strong style={{ color: '#ff5e6b' }}>{plot.label}</strong>}
                                     {info.available && <p><strong>Available: {plot.available_trees_count}</strong></p>}
                                     {info.booked && <p><strong>Booked: {plot.mapped_trees_count}</strong></p>}
                                     {info.assigned && <p><strong>Assigned: {plot.assigned_trees_count}</strong></p>}
                                     {info.total && <p><strong>Total: {plot.trees_count}</strong></p>}
                                     {info.capacity && <p><strong>Capacity: {Math.floor((plot.acres_area ?? 0) * 300)}</strong></p>}
-                                    <strong>{plot.label}</strong>
                                 </div>
-                            </InfoWindow>
+                            </InfoWindow>}
                         </React.Fragment>
                     ))}
 
@@ -147,33 +150,51 @@ const SitesMap: React.FC<SitesMapProps> = ({ plots }) => {
             </LoadScript>
             <Box style={{ padding: 5, display: 'flex', alignItems: 'center',  }}>
                 <FormControlLabel
+                    label="Show Plot Label"
+                    disabled={!info.all}
+                    control={
+                        <Checkbox checked={info.label} onChange={() => { setInfo(prev => ({ ...prev, label: !prev.label })) }} />
+                    }
+                />
+                <FormControlLabel
                     label="Total"
+                    disabled={!info.all}
                     control={
                         <Checkbox checked={info.total} onChange={() => { setInfo(prev => ({ ...prev, total: !prev.total })) }} />
                     }
                 />
                 <FormControlLabel
                     label="Assigned"
+                    disabled={!info.all}
                     control={
                         <Checkbox checked={info.assigned} onChange={() => { setInfo(prev => ({ ...prev, assigned: !prev.assigned })) }} />
                     }
                 />
                 <FormControlLabel
                     label="Booked"
+                    disabled={!info.all}
                     control={
                         <Checkbox checked={info.booked} onChange={() => { setInfo(prev => ({ ...prev, booked: !prev.booked })) }} />
                     }
                 />
                 <FormControlLabel
                     label="Available"
+                    disabled={!info.all}
                     control={
                         <Checkbox checked={info.available} onChange={() => { setInfo(prev => ({ ...prev, available: !prev.available })) }} />
                     }
                 />
                 <FormControlLabel
                     label="Capacity"
+                    disabled={!info.all}
                     control={
                         <Checkbox checked={info.capacity} onChange={() => { setInfo(prev => ({ ...prev, capacity: !prev.capacity })) }} />
+                    }
+                />
+                <FormControlLabel
+                    label="Show Labels"
+                    control={
+                        <Checkbox checked={info.all} onChange={() => { setInfo(prev => ({ ...prev, all: !prev.all })) }} />
                     }
                 />
             </Box>
