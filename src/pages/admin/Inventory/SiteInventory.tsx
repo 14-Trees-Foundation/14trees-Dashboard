@@ -10,6 +10,7 @@ import ApiClient from "../../../api/apiClient/apiClient";
 import SitesMap from "./SiteMap";
 import { Table, TableColumnType } from "antd";
 import { TableRowSelection } from "antd/es/table/interface";
+import './inventory.css'
 
 const SiteInventory: FC = () => {
 
@@ -128,7 +129,7 @@ const SiteInventory: FC = () => {
                     sorter: {
                         compare: (a: Plot, b: Plot) => a.accessibility_status?.localeCompare(b.accessibility_status || ''),
                         multiple: 2,
-                    }
+                    },
                 },
                 {
                     title: 'Area in acres',
@@ -201,6 +202,19 @@ const SiteInventory: FC = () => {
         },
     ]
 
+    const getRowClassName = (plot: Plot) => {
+        switch (plot.accessibility_status) {
+            case 'accessible':
+                return 'accessible-plot';
+            case 'inaccessible':
+                return 'inaccessible-plot';
+            case 'moderately_accessible':
+                return 'moderately-accessible-plot';
+            default:
+                return '';
+        }
+    }
+
     return (
         <Box>
             <Typography variant="h4" sx={{ marginBottom: 1 }}>Inventory Management</Typography>
@@ -229,11 +243,18 @@ const SiteInventory: FC = () => {
                 style={{ marginTop: 20 }}
                 columns={columns}
                 dataSource={plots}
+                rowClassName={getRowClassName}
                 summary={() => (
                     <Table.Summary fixed='bottom'>
-                        <Table.Summary.Row >
+                        <Table.Summary.Row>
                             <Table.Summary.Cell align="right" index={3} colSpan={4}>
-                                Accessible
+                                <strong>Summary</strong>
+                            </Table.Summary.Cell>
+                            <Table.Summary.Cell index={8} colSpan={5}></Table.Summary.Cell>
+                        </Table.Summary.Row>
+                        <Table.Summary.Row style={{ backgroundColor: 'rgba(172, 252, 172, 0.2)' }}>
+                            <Table.Summary.Cell align="right" index={3} colSpan={4}>
+                                <strong>Accessible</strong>
                             </Table.Summary.Cell>
                             <Table.Summary.Cell align="right" index={4} colSpan={1}>{calculateSum(plots.filter((plot) => selectedPlots.includes(plot.id) && plot.accessibility_status === "accessible").map((plot) => plot.acres_area ? Math.floor(plot.acres_area * 300) : 0))}</Table.Summary.Cell>
                             <Table.Summary.Cell align="right" index={5} colSpan={1}>{calculateSum(plots.filter((plot) => selectedPlots.includes(plot.id) && plot.accessibility_status === "accessible").map((plot) => plot.trees_count))}</Table.Summary.Cell>
@@ -241,9 +262,9 @@ const SiteInventory: FC = () => {
                             <Table.Summary.Cell align="right" index={7} colSpan={1}>{calculateSum(plots.filter((plot) => selectedPlots.includes(plot.id) && plot.accessibility_status === "accessible").map((plot) => plot.assigned_trees_count))}</Table.Summary.Cell>
                             <Table.Summary.Cell align="right" index={8} colSpan={1}>{calculateSum(plots.filter((plot) => selectedPlots.includes(plot.id) && plot.accessibility_status === "accessible").map((plot) => plot.available_trees_count))}</Table.Summary.Cell>
                         </Table.Summary.Row>
-                        <Table.Summary.Row>
+                        <Table.Summary.Row style={{ backgroundColor: 'rgba(255, 156, 156, 0.2)' }}>
                             <Table.Summary.Cell align="right" index={3} colSpan={4}>
-                                Inaccessible
+                                <strong>Inaccessible</strong>
                             </Table.Summary.Cell>
                             <Table.Summary.Cell align="right" index={4} colSpan={1}>{calculateSum(plots.filter((plot) => selectedPlots.includes(plot.id) && plot.accessibility_status === "inaccessible").map((plot) => plot.acres_area ? Math.floor(plot.acres_area * 300) : 0))}</Table.Summary.Cell>
                             <Table.Summary.Cell align="right" index={5} colSpan={1}>{calculateSum(plots.filter((plot) => selectedPlots.includes(plot.id) && plot.accessibility_status === "inaccessible").map((plot) => plot.trees_count))}</Table.Summary.Cell>
@@ -251,9 +272,9 @@ const SiteInventory: FC = () => {
                             <Table.Summary.Cell align="right" index={7} colSpan={1}>{calculateSum(plots.filter((plot) => selectedPlots.includes(plot.id) && plot.accessibility_status === "inaccessible").map((plot) => plot.assigned_trees_count))}</Table.Summary.Cell>
                             <Table.Summary.Cell align="right" index={8} colSpan={1}>{calculateSum(plots.filter((plot) => selectedPlots.includes(plot.id) && plot.accessibility_status === "inaccessible").map((plot) => plot.available_trees_count))}</Table.Summary.Cell>
                         </Table.Summary.Row>
-                        <Table.Summary.Row>
+                        <Table.Summary.Row style={{ backgroundColor: 'rgba(255, 219, 153, 0.2)' }}>
                             <Table.Summary.Cell align="right" index={3} colSpan={4}>
-                                Moderately Accessible
+                                <strong>Moderately Accessible</strong>
                             </Table.Summary.Cell>
                             <Table.Summary.Cell align="right" index={4} colSpan={1}>{calculateSum(plots.filter((plot) => selectedPlots.includes(plot.id) && plot.accessibility_status === "moderately_accessible").map((plot) => plot.acres_area ? Math.floor(plot.acres_area * 300) : 0))}</Table.Summary.Cell>
                             <Table.Summary.Cell align="right" index={5} colSpan={1}>{calculateSum(plots.filter((plot) => selectedPlots.includes(plot.id) && plot.accessibility_status === "moderately_accessible").map((plot) => plot.trees_count))}</Table.Summary.Cell>
@@ -263,7 +284,7 @@ const SiteInventory: FC = () => {
                         </Table.Summary.Row>
                         <Table.Summary.Row>
                             <Table.Summary.Cell align="right" index={3} colSpan={4}>
-                                Total
+                                <strong>Total</strong>
                             </Table.Summary.Cell>
                             <Table.Summary.Cell align="right" index={4} colSpan={1}>{calculateSum(plots.filter((plot) => selectedPlots.includes(plot.id)).map((plot) => plot.acres_area ? Math.floor(plot.acres_area * 300) : 0))}</Table.Summary.Cell>
                             <Table.Summary.Cell align="right" index={5} colSpan={1}>{calculateSum(plots.filter((plot) => selectedPlots.includes(plot.id)).map((plot) => plot.trees_count))}</Table.Summary.Cell>
