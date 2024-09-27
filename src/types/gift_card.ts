@@ -1,0 +1,40 @@
+
+
+export type GiftCard = {
+    key: number;
+    id: number;
+    user_id: number;
+    group_id: number;
+    no_of_cards: number;
+    is_active: boolean;
+    created_at: string;
+    updated_at: string;
+    user_name?: string;
+    group_name?: string;
+    plot_ids?: number[];
+}
+
+export type GiftCardUser = {
+    key: number;
+    id: number;
+    user_id: number;
+    card_id: number;
+    tree_id: number;
+    card_image_url?: string;
+    created_at: string;
+    updated_at: string;
+    sapling_id?: string;
+    user_name?: string;
+    plant_type?: string;
+}
+
+export type GiftCardsDataState = {
+    totalGiftCards: number,
+    giftCards: Record<string, GiftCard>
+}
+
+export type GiftCardUsersDataState = {
+    totalGiftCardUsers: number,
+    giftCardUsers: Record<string, GiftCardUser>
+}
+

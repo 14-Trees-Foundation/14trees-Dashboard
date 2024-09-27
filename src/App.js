@@ -25,6 +25,7 @@ import TreeProfile from "./pages/Profiles/TreeProfile";
 import UserProfile from "./pages/Profiles/UserProfile";
 import VisitProfile from "./pages/Profiles/VisitProfile";
 import OrgProfile from "./pages/Profiles/OrgProfile";
+import RedeemCard from "./pages/admin/gift/RedeemCard";
 
 function App() {
   return (
@@ -47,6 +48,7 @@ function App() {
           <Route path="/tree/:saplingId" element={<TreeProfile />}></Route>
           <Route path="/user/:id" element={<UserProfile />}></Route>
           <Route path="/visit/:id" element={<VisitProfile />}></Route>
+          <Route path="/gifts" element={<RedeemCard />}></Route>
           <Route path="/organization/:id" element={<OrgProfile />}></Route>
           <Route path="/group/:grptype" element={<OrgEvent />}></Route>
           <Route path="/events/corp/:event_id" element={<Corporate />}></Route>

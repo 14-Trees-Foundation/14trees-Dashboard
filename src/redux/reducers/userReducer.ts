@@ -9,7 +9,6 @@ export const usersDataReducer = (state = { totalUsers:0, users: {}}, action: Unk
             if (action.payload) {
                 let usersDataState: UsersDataState = { totalUsers: state.totalUsers, users: { ...state.users }};
                 let payload = action.payload as PaginatedResponse<User>;
-                console.log(payload)
                 if (usersDataState.totalUsers != payload.total) {
                     usersDataState.users = {}
                 }

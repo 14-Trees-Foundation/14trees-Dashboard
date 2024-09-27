@@ -15,6 +15,7 @@ import { eventsDataReducer } from "./eventReducer";
 import { visitsDataReducer } from "./visitReducer";
 import { visitUsersDataReducer} from "./visitUserReducer";
 import { treeImagesDataReducer } from "./treeImageReducer";
+import { giftCardUsersDataReducer, giftCardsDataReducer } from "./giftCardReducer";
 
 const rootReducer = combineReducers({
     plantTypesData: plantTypesDataReducer,
@@ -39,7 +40,9 @@ const rootReducer = combineReducers({
     donationsData: donationsDataReducer,
     eventsData: eventsDataReducer,
     visitsData:visitsDataReducer,
-    visitUserData: visitUsersDataReducer
+    visitUserData: visitUsersDataReducer,
+    giftCardsData: giftCardsDataReducer,
+    giftCardUsersData: giftCardUsersDataReducer,
 });
 
 export default rootReducer;

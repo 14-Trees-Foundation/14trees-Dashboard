@@ -26,6 +26,7 @@ import { SitesComponent } from "./sites/Sites";
 import { EventsComponent } from "./events/Events";
 import { VisitsComponent } from "./visits/Visits";
 import SiteInventory from "./Inventory/SiteInventory";
+import GiftTrees from "./gift/GiftTrees";
 
 export const Admin = () => {
   const classes = useStyles();
@@ -122,6 +123,10 @@ export const Admin = () => {
     {
       page: SiteInventory,
       displayName: "Site Inventory",
+    },
+    {
+      page: GiftTrees,
+      displayName: "Gift Cards",
     },
     {
       page: Images,
