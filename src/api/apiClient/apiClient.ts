@@ -13,6 +13,7 @@ import { PaginatedResponse } from '../../types/pagination';
 import { Event } from '../../types/event';
 import { Visit, BulkVisitUsersMappingResponse } from '../../types/visits';
 import { TreeImage } from '../../types/tree_snapshots';
+import { GiftCard, GiftCardUser } from '../../types/gift_card';
 
 
 class ApiClient {
@@ -1137,6 +1138,121 @@ class ApiClient {
         }
     }
 
+    /*
+        Gift Cards
+    */
+
+    async getGiftCards(offset: number, limit: number, filters?: any[]): Promise<PaginatedResponse<GiftCard>> {
+        const url = `/gift-cards/get?offset=${offset}&limit=${limit}`;
+        try {
+            const response = await this.api.post<PaginatedResponse<GiftCard>>(url, { filters: filters });
+            return response.data;
+        } catch (error: any) {
+            throw new Error(`Failed to fetch gift cards: ${error.message}`);
+        }
+    }
+
+
+    async createGiftCard(no_of_cards: number, user_id: number, group_id?: number, logo?: File): Promise<GiftCard> {
+        try {
+            const formData = new FormData();
+            formData.append('no_of_cards', no_of_cards.toString());
+            formData.append('user_id', user_id.toString());
+            if (group_id) {
+                formData.append('group_id', group_id.toString());
+            }
+            if (logo) {
+                formData.append('file', logo, logo.name);
+            }
+            const response = await this.api.post<GiftCard>(`/gift-cards/`, formData);
+            return response.data;
+        } catch (error: any) {
+            if (error.response) {
+                throw new Error(error.response.data.message);
+            }
+            throw new Error('Failed to create gift card');
+        }
+    }
+
+    async createGiftCardUsers(gift_card_id: number, users: any[]): Promise<void> {
+        try {
+            await this.api.post<any>(`/gift-cards/users`, { gift_card_id, users });
+        } catch (error: any) {
+            if (error.response) {
+                throw new Error(error.response.data.message);
+            }
+            throw new Error('Failed to create gift card');
+        }
+    }
+
+    async createGiftCardPlots(gift_card_id: number, plot_ids: number[]): Promise<void> {
+        try {
+            await this.api.post<any>(`/gift-cards/plots`, { gift_card_id, plot_ids });
+        } catch (error: any) {
+            if (error.response) {
+                throw new Error(error.response.data.message);
+            }
+            throw new Error('Failed to create gift card');
+        }
+    }
+
+    async bookGiftCards(gift_card_id: number): Promise<void> {
+        try {
+            await this.api.post<any>(`/gift-cards/book`, { gift_card_id });
+        } catch (error: any) {
+            if (error.response) {
+                throw new Error(error.response.data.message);
+            }
+            throw new Error('Failed to book gift cards');
+        }
+    }
+
+    async getBookedGiftCards(gift_card_id: number, offset: number = 0, limit: number = 10): Promise<PaginatedResponse<GiftCardUser>> {
+        try {
+            const response = await this.api.get<PaginatedResponse<GiftCardUser>>(`/gift-cards/booked/${gift_card_id}?offset=${offset}&limit=${limit}`);
+            return response.data;
+        } catch (error: any) {
+            if (error.response) {
+                throw new Error(error.response.data.message);
+            }
+            throw new Error('Failed to get gift cards');
+        }
+    }
+
+    async generateCardForUser(gift_card_user_id: number, sapling_id: string, content1: string, content2: string, user?: User): Promise<string> {
+        try {
+            const resp = await this.api.post<any>(`/gift-cards/card`, { gift_card_user_id, sapling_id, content1, content2, user });
+            return resp.data.slide_id;
+        } catch (error: any) {
+            if (error.response) {
+                throw new Error(error.response.data.message);
+            }
+            throw new Error('Failed to generate gift cards');
+        }
+    }
+
+    async updateGiftCardTemplate(gift_card_user_id: number, content1: string, content2: string, user?: User): Promise<void> {
+        try {
+            await this.api.post<any>(`/gift-cards/card/update`, { gift_card_user_id, content1, content2, user });
+        } catch (error: any) {
+            if (error.response) {
+                throw new Error(error.response.data.message);
+            }
+            throw new Error('Failed to generate gift cards');
+        }
+    }
+
+    async redeemGiftCardTemplate(gift_card_user_id: number, sapling_id: string, tree_id: number, user: User): Promise<GiftCardUser> {
+        try {
+            const resp = await this.api.post<GiftCardUser>(`/gift-cards/card/redeem`, { gift_card_user_id, sapling_id, tree_id, user });
+            return resp.data;
+        } catch (error: any) {
+            if (error.response) {
+                throw new Error(error.response.data.message);
+            }
+            throw new Error('Failed to generate gift cards');
+        }
+    }
 }
 
 
