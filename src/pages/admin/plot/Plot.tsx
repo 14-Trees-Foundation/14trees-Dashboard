@@ -13,12 +13,14 @@ import { useAppDispatch, useAppSelector } from "../../../redux/store/hooks";
 import { RootState } from "../../../redux/store/store";
 import {
   Button,
+  Checkbox,
   Dialog,
   DialogActions,
   DialogContent,
   DialogContentText,
   DialogTitle,
   Divider,
+  FormControlLabel,
   Typography,
 } from "@mui/material";
 import EditPlot from "./EditPlot";
@@ -30,6 +32,7 @@ import { AutocompleteWithPagination } from "../../../components/AutoComplete";
 import { Site } from "../../../types/site";
 import UpdateCoords from "./UpdateCoords";
 import ApiClient from "../../../api/apiClient/apiClient";
+import { set } from "date-fns";
 
 
 export const PlotComponent = () => {
@@ -58,6 +61,13 @@ export const PlotComponent = () => {
   const [siteNameInput, setSiteNameInput] = useState("");
   const [selectedSite, setSelectedSite] = useState<Site | null>(null);
   const [updateCoords, setUpdateCoords] = useState(false);
+  const [includeDeadLostTrees, setIncludeDeadLostTrees] = useState(false);
+
+  const defaultTreesFilter = {
+    columnField: "tree_health",
+    value: [null, "healthy", "diseased"],
+    operatorValue: "isAnyOf",
+  };
 
   const handleSetFilters = (filters: Record<string, GridFilterItem>) => {
     setPage(0);
@@ -66,11 +76,16 @@ export const PlotComponent = () => {
 
   useEffect(() => {
     getPlotData();
-  }, [pageSize, page, filters]);
+  }, [pageSize, page, filters, includeDeadLostTrees]);
 
   const getPlotData = async () => {
     setLoading(true);
     let filtersData = Object.values(filters);
+    if (includeDeadLostTrees) {
+      filtersData.push({...defaultTreesFilter, value: [...defaultTreesFilter.value, "dead", "lost"]});
+    } else {
+      filtersData.push(defaultTreesFilter);
+    }
     getPlots(page * pageSize, pageSize, filtersData);
     setTimeout(async () => {
       setLoading(false);
@@ -350,6 +365,18 @@ export const PlotComponent = () => {
       </div>
       <Divider sx={{ backgroundColor: "black", marginBottom: '15px' }} />
       <Box sx={{ height: 840, width: "100%" }}>
+        <div
+          style={{
+            display: "flex",
+            alignItems: 'center',
+            justifyContent: "flex-end",
+          }}
+        >
+          <FormControlLabel
+            control={<Checkbox checked={includeDeadLostTrees} onChange={() => setIncludeDeadLostTrees(!includeDeadLostTrees)} />}
+            label="Include Dead/Lost Trees"
+          />
+        </div>
         <TableComponent
           loading={loading}
           dataSource={plotsList}
