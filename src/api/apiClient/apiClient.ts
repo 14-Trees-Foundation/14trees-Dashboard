@@ -821,6 +821,16 @@ class ApiClient {
         return ;
     }
 
+    async getSitesStats(offset: number = 0, limit: number = -1, filters?: any): Promise<PaginatedResponse<any>> {
+        try {
+            const response = await this.api.post<PaginatedResponse<any>>(`/sites/stats?offset=${offset}&limit=${limit}`, { filters: filters });
+            return response.data;
+        } catch (error) {
+            console.error(error)
+            throw new Error('Failed to fetch Sites stats');
+        }
+    }
+
 
     /*
        Model- Donation: CRUD Operations/Apis for Donations

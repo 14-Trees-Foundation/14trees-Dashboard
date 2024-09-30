@@ -137,10 +137,10 @@ const SitesMap: React.FC<SitesMapProps> = ({ plots }) => {
                                 }}>
                                     {info.label && <strong style={{ color: '#ff5e6b' }}>{plot.label}</strong>}
                                     {info.available && <p><strong>Available: {plot.available_trees_count}</strong></p>}
-                                    {info.booked && <p><strong>Booked: {plot.mapped_trees_count}</strong></p>}
                                     {info.assigned && <p><strong>Assigned: {plot.assigned_trees_count}</strong></p>}
-                                    {info.total && <p><strong>Total: {plot.trees_count}</strong></p>}
+                                    {info.booked && <p><strong>Booked: {plot.mapped_trees_count}</strong></p>}
                                     {info.capacity && <p><strong>Capacity: {Math.floor((plot.acres_area ?? 0) * 300)}</strong></p>}
+                                    {info.total && <p><strong>Total: {plot.trees_count}</strong></p>}
                                 </div>
                             </InfoWindow>}
                         </React.Fragment>
@@ -157,10 +157,10 @@ const SitesMap: React.FC<SitesMapProps> = ({ plots }) => {
                     }
                 />
                 <FormControlLabel
-                    label="Total"
+                    label="Available"
                     disabled={!info.all}
                     control={
-                        <Checkbox checked={info.total} onChange={() => { setInfo(prev => ({ ...prev, total: !prev.total })) }} />
+                        <Checkbox checked={info.available} onChange={() => { setInfo(prev => ({ ...prev, available: !prev.available })) }} />
                     }
                 />
                 <FormControlLabel
@@ -178,17 +178,17 @@ const SitesMap: React.FC<SitesMapProps> = ({ plots }) => {
                     }
                 />
                 <FormControlLabel
-                    label="Available"
-                    disabled={!info.all}
-                    control={
-                        <Checkbox checked={info.available} onChange={() => { setInfo(prev => ({ ...prev, available: !prev.available })) }} />
-                    }
-                />
-                <FormControlLabel
                     label="Capacity"
                     disabled={!info.all}
                     control={
                         <Checkbox checked={info.capacity} onChange={() => { setInfo(prev => ({ ...prev, capacity: !prev.capacity })) }} />
+                    }
+                />
+                <FormControlLabel
+                    label="Total"
+                    disabled={!info.all}
+                    control={
+                        <Checkbox checked={info.total} onChange={() => { setInfo(prev => ({ ...prev, total: !prev.total })) }} />
                     }
                 />
                 <FormControlLabel
