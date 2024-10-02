@@ -6,59 +6,6 @@ import DistrictStats from "./DistrictStats"
 import TalukaStats from "./TalukaStats"
 import VillageStats from "./VillageStats"
 
-const getAggregatedData = (data: any[]) => {
-    const aggStats = {
-        'Public': {
-            category: 'Public',
-            capacity: 0,
-            total: 0,
-            booked: 0,
-            assigned: 0,
-            available: 0
-        },
-        'Foundation': {
-            category: 'Foundation',
-            capacity: 0,
-            total: 0,
-            booked: 0,
-            assigned: 0,
-            available: 0
-        },
-        'Overall': {
-            category: 'Overall',
-            capacity: 0,
-            total: 0,
-            booked: 0,
-            assigned: 0,
-            available: 0
-        }
-
-    }
-    for (const item of data) {
-        if (item.category === 'Foundation') {
-            aggStats.Foundation.capacity += Math.floor(item.acres_area * 300)
-            aggStats.Foundation.total += parseInt(item.trees_count || '0')
-            aggStats.Foundation.booked += parseInt(item.mapped_trees_count || '0')
-            aggStats.Foundation.assigned += parseInt(item.assigned_trees_count || '0')
-            aggStats.Foundation.available += parseInt(item.available_trees_count || '0')
-        } else {
-            aggStats.Public.capacity += Math.floor(item.acres_area * 300)
-            aggStats.Public.total += parseInt(item.trees_count || '0')
-            aggStats.Public.booked += parseInt(item.mapped_trees_count || '0')
-            aggStats.Public.assigned += parseInt(item.assigned_trees_count || '0')
-            aggStats.Public.available += parseInt(item.available_trees_count || '0')
-        }
-
-        aggStats.Overall.capacity += Math.floor(item.acres_area * 300)
-        aggStats.Overall.total += parseInt(item.trees_count || '0')
-        aggStats.Overall.booked += parseInt(item.mapped_trees_count || '0')
-        aggStats.Overall.assigned += parseInt(item.assigned_trees_count || '0')
-        aggStats.Overall.available += parseInt(item.available_trees_count || '0')
-    }
-
-    return [aggStats.Foundation, aggStats.Public, aggStats.Overall]
-}
-
 const SiteStats: FC = () => {
 
     const [data, setData] = useState<any[]>([]);
@@ -77,12 +24,42 @@ const SiteStats: FC = () => {
                 capacity: Math.floor(item.acres_area * 300)
             }
         }));
+    }
 
-        const aggStats = getAggregatedData(stats.results);
-        setAggregatedData(aggStats);
+    const getTreesCountForCategories = async () => {
+        const apiClient = new ApiClient();
+        const stats = await apiClient.getTreesCountForPlotCategories();
+        
+        const overall = {
+            category: 'Overall',
+            total: 0,
+            booked: 0,
+            assigned: 0,
+            available: 0
+        }
+
+        for (const item of stats.results) {
+            overall.total += parseInt(item.total || '0')
+            overall.booked += parseInt(item.booked || '0')
+            overall.assigned += parseInt(item.assigned || '0')
+            overall.available += parseInt(item.available || '0')
+        }
+
+        const finalList: any[] = [];
+        const item = stats.results.find((item: any) => item.category === 'Public');
+        if (item) finalList.push(item)
+
+        const item2 = stats.results.find((item: any) => item.category === 'Foundation');
+        if (item2) finalList.push(item2)
+
+        const item3 = stats.results.find((item: any) => item.category === null);
+        if (item3) finalList.push(item3)
+
+        setAggregatedData([...finalList, overall]);
     }
 
     useEffect(() => {
+        getTreesCountForCategories();
         getSitesData();
     }, [])
 
@@ -91,25 +68,29 @@ const SiteStats: FC = () => {
             title: "Total",
             dataIndex: "total",
             key: "total",
+            align: 'right',
         },
         {
             title: "Booked",
             dataIndex: "booked",
             key: "booked",
+            align: 'right',
         },
         {
             title: "Assigned",
             dataIndex: "assigned",
             key: "assigned",
+            align: 'right',
         },
         {
             title: "Available",
             dataIndex: "available",
             key: "available",
+            align: 'right',
         },
     ]
 
-    const aggregatedDataColumn = [
+    const aggregatedDataColumn: any = [
         {
             title: "Category",
             dataIndex: "category",
@@ -119,7 +100,7 @@ const SiteStats: FC = () => {
         ...commonDataColumn
     ] 
 
-    const dataColumn = [
+    const dataColumn: any = [
         {
             title: "Site Name",
             dataIndex: "site_name",

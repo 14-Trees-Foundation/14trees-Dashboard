@@ -205,6 +205,16 @@ class ApiClient {
         }
     }
 
+    async getTreesCountForPlotCategories(): Promise<PaginatedResponse<any>> {
+        try {
+            const resp = await this.api.get<PaginatedResponse<any>>(`/plots/stats/category`);
+            return resp.data;
+        } catch (error) {
+            console.error(error)
+            throw new Error('Failed to get tree count for plot categories!');
+        }
+    }
+
     /*
         Model- Group: CRUD Operations/Apis for organizations
     */
