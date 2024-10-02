@@ -4,13 +4,13 @@ import { Plot } from "../../types/plot";
 import { PaginatedResponse } from "../../types/pagination";
 import { toast } from "react-toastify";
 
-export const getPlots = (offset: number, limit: number, filters?: any[]) => {
+export const getPlots = (offset: number, limit: number, filters?: any[], orderBy?: { column: string, order: 'ASC' | 'DESC' }[]) => {
     const apiClient = new ApiClient()
     return (dispatch: any) => {
         dispatch({
             type: plotActionTypes.GET_PLOTS_REQUESTED,
         });
-        apiClient.getPlots(offset, limit, filters).then(
+        apiClient.getPlots(offset, limit, filters, orderBy).then(
             (value: PaginatedResponse<Plot>) => {
                 for (let i = 0; i < value.results.length; i++) {
                     if (value.results[i]?.id) {
