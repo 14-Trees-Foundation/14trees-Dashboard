@@ -2,40 +2,9 @@ import { Table } from "antd"
 import { FC, useEffect, useState } from "react"
 import ApiClient from "../../../api/apiClient/apiClient"
 import { Box, Typography } from "@mui/material"
-
-const getData = (data: any[], key: string) => {
-    const dataMap: Record<string, any> = {}
-    const dataList: string[] = []
-
-    data.forEach((item: any) => {
-        if (!item[key]) return;
-
-        if (!dataMap[item[key] + item.category]) {
-            dataMap[item[key] + item.category] = {
-                [key]: item[key],
-                category: item.category,
-                capacity: 0,
-                total: 0,
-                booked: 0,
-                assigned: 0,
-                available: 0
-            }
-
-            dataList.push(item[key])
-        }
-
-        dataMap[item[key] + item.category].total += parseInt(item.trees_count || '0')
-        dataMap[item[key] + item.category].booked += parseInt(item.mapped_trees_count || '0')
-        dataMap[item[key] + item.category].assigned += parseInt(item.assigned_trees_count || '0')
-        dataMap[item[key] + item.category].available += parseInt(item.available_trees_count || '0')
-        dataMap[item[key] + item.category].capacity += Math.floor(item.acres_area * 300)
-    })
-
-    return {
-        dataList,
-        data: Object.values(dataMap)
-    }
-}
+import DistrictStats from "./DistrictStats"
+import TalukaStats from "./TalukaStats"
+import VillageStats from "./VillageStats"
 
 const getAggregatedData = (data: any[]) => {
     const aggStats = {
@@ -92,11 +61,8 @@ const getAggregatedData = (data: any[]) => {
 
 const SiteStats: FC = () => {
 
-    const [data, setData] = useState<any[]>([])
-    const [aggregatedData, setAggregatedData] = useState<any[]>([])
-    const [districtData, setDistrictData] = useState<any[]>([])
-    const [talukaData, setTalukaData] = useState<any[]>([])
-    const [villageData, setVillageData] = useState<any[]>([])
+    const [data, setData] = useState<any[]>([]);
+    const [aggregatedData, setAggregatedData] = useState<any[]>([]);
 
     const getSitesData = async () => {
         const apiClient = new ApiClient();
@@ -114,15 +80,6 @@ const SiteStats: FC = () => {
 
         const aggStats = getAggregatedData(stats.results);
         setAggregatedData(aggStats);
-
-        const districtData = getData(stats.results, 'district');
-        setDistrictData(districtData.data);
-
-        const talukaData = getData(stats.results, 'taluka');
-        setTalukaData(talukaData.data);
-
-        const villageData = getData(stats.results, 'village');
-        setVillageData(villageData.data);
     }
 
     useEffect(() => {
@@ -130,11 +87,6 @@ const SiteStats: FC = () => {
     }, [])
 
     const commonDataColumn = [
-        {
-            title: "Capacity",
-            dataIndex: "capacity",
-            key: "capacity",
-        },
         {
             title: "Total",
             dataIndex: "total",
@@ -162,6 +114,7 @@ const SiteStats: FC = () => {
             title: "Category",
             dataIndex: "category",
             key: "category",
+            render: (value: any) => value ? value : 'Unknown'
         },
         ...commonDataColumn
     ] 
@@ -172,49 +125,13 @@ const SiteStats: FC = () => {
             dataIndex: "site_name",
             key: "site_name",
         },
-        ...commonDataColumn
-    ]
-
-    const districtDataColumn = [
         {
-            title: "District",
-            dataIndex: "district",
-            key: "district",
+            title: "Capacity",
+            dataIndex: "capacity",
+            key: "capacity",
+            render: (value: any) => value ? value : 'Unknown'
         },
-        {
-            title: "Category",
-            dataIndex: "category",
-            key: "category",
-        },
-        ...commonDataColumn
-    ]
-
-    const talukaDataColumn = [
-        {
-            title: "Taluka",
-            dataIndex: "taluka",
-            key: "taluka",
-        },
-        {
-            title: "Category",
-            dataIndex: "category",
-            key: "category",
-        },
-        ...commonDataColumn
-    ]
-
-    const villageDataColumn = [
-        {
-            title: "Village",
-            dataIndex: "village",
-            key: "village",
-        },
-        {
-            title: "Category",
-            dataIndex: "category",
-            key: "category",
-        },
-        ...commonDataColumn
+        ...aggregatedDataColumn
     ]
 
     return (
@@ -226,41 +143,10 @@ const SiteStats: FC = () => {
                     dataSource={aggregatedData}
                 />
             </Box>
-            <Box>
-                <Typography variant="h6">Top 5 Foundation sites based on availability</Typography>
-                <Table 
-                    columns={dataColumn}
-                    dataSource={data.filter((item: any) => item.category === 'Foundation').sort((a: any, b: any) => b.available - a.available).slice(0, 5)}
-                />
-            </Box>
-            <Box>
-                <Typography variant="h6">Top 5 Public sites based on availability</Typography>
-                <Table 
-                    columns={dataColumn}
-                    dataSource={data.filter((item: any) => item.category === 'Public').sort((a: any, b: any) => b.available - a.available).slice(0, 5)}
-                />
-            </Box>
-            <Box>
-                <Typography variant="h6">District level stats</Typography>
-                <Table 
-                    columns={districtDataColumn}
-                    dataSource={districtData}
-                />
-            </Box>
-            <Box>
-                <Typography variant="h6">Taluka level stats</Typography>
-                <Table 
-                    columns={talukaDataColumn}
-                    dataSource={talukaData}
-                />
-            </Box>
-            <Box>
-                <Typography variant="h6">Village level stats</Typography>
-                <Table 
-                    columns={villageDataColumn}
-                    dataSource={villageData}
-                />
-            </Box>
+            <DistrictStats />
+            <TalukaStats />
+            <VillageStats />
+
             <Box>
                 <Typography variant="h6">Site level stats</Typography>
                 <Table 
