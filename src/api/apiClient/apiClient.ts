@@ -831,6 +831,36 @@ class ApiClient {
         }
     }
 
+    async getTreesCountForDistricts(offset: number = 0, limit: number = 10, filters?: any, orderBy?: { column: string, order: 'ASC' | 'DESC' }[]): Promise<PaginatedResponse<any>> {
+        try {
+            const response = await this.api.post<PaginatedResponse<any>>(`/sites/stats/district?offset=${offset}&limit=${limit}`, { filters: filters, order_by: orderBy });
+            return response.data;
+        } catch (error) {
+            console.error(error)
+            throw new Error('Failed to fetch Sites stats');
+        }
+    }
+
+    async getTreesCountForTalukas(offset: number = 0, limit: number = 10, filters?: any, orderBy?: { column: string, order: 'ASC' | 'DESC' }[]): Promise<PaginatedResponse<any>> {
+        try {
+            const response = await this.api.post<PaginatedResponse<any>>(`/sites/stats/taluka?offset=${offset}&limit=${limit}`, { filters: filters, order_by: orderBy });
+            return response.data;
+        } catch (error) {
+            console.error(error)
+            throw new Error('Failed to fetch Sites stats');
+        }
+    }
+
+    async getTreesCountForVillages(offset: number = 0, limit: number = 10, filters?: any, orderBy?: { column: string, order: 'ASC' | 'DESC' }[]): Promise<PaginatedResponse<any>> {
+        try {
+            const response = await this.api.post<PaginatedResponse<any>>(`/sites/stats/village?offset=${offset}&limit=${limit}`, { filters: filters, order_by: orderBy });
+            return response.data;
+        } catch (error) {
+            console.error(error)
+            throw new Error('Failed to fetch Sites stats');
+        }
+    }
+
 
     /*
        Model- Donation: CRUD Operations/Apis for Donations
