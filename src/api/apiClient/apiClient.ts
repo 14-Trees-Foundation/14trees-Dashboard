@@ -120,11 +120,10 @@ class ApiClient {
         Model- Plot: CRUD Operations/Apis for plots
     */
 
-    async getPlots(offset: number, limit: number, filters?: any[]): Promise<PaginatedResponse<Plot>> {
+    async getPlots(offset: number, limit: number, filters?: any[], orderBy?: any[]): Promise<PaginatedResponse<Plot>> {
         const url = `/plots/get?offset=${offset}&limit=${limit}`;
         try {
-            const response = await this.api.post<PaginatedResponse<Plot>>(url, { filters: filters });
-            console.log("plots data: ", response.data);
+            const response = await this.api.post<PaginatedResponse<Plot>>(url, { filters: filters, order_by: orderBy });
             return response.data;
 
         } catch (error: any) {
