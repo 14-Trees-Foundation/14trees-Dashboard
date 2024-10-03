@@ -120,11 +120,10 @@ class ApiClient {
         Model- Plot: CRUD Operations/Apis for plots
     */
 
-    async getPlots(offset: number, limit: number, filters?: any[]): Promise<PaginatedResponse<Plot>> {
+    async getPlots(offset: number, limit: number, filters?: any[], orderBy?: any[]): Promise<PaginatedResponse<Plot>> {
         const url = `/plots/get?offset=${offset}&limit=${limit}`;
         try {
-            const response = await this.api.post<PaginatedResponse<Plot>>(url, { filters: filters });
-            console.log("plots data: ", response.data);
+            const response = await this.api.post<PaginatedResponse<Plot>>(url, { filters: filters, order_by: orderBy });
             return response.data;
 
         } catch (error: any) {
@@ -202,6 +201,16 @@ class ApiClient {
                 throw new Error(error.response.data.error);
             }
             throw new Error('Failed assign plots to site');
+        }
+    }
+
+    async getTreesCountForPlotCategories(): Promise<PaginatedResponse<any>> {
+        try {
+            const resp = await this.api.get<PaginatedResponse<any>>(`/plots/stats/category`);
+            return resp.data;
+        } catch (error) {
+            console.error(error)
+            throw new Error('Failed to get tree count for plot categories!');
         }
     }
 
@@ -819,6 +828,46 @@ class ApiClient {
     async syncSitesDataFromNotion(): Promise<void> {
         await this.api.post<void>(`/sites/sync-sites`);
         return ;
+    }
+
+    async getSitesStats(offset: number = 0, limit: number = -1, filters?: any): Promise<PaginatedResponse<any>> {
+        try {
+            const response = await this.api.post<PaginatedResponse<any>>(`/sites/stats?offset=${offset}&limit=${limit}`, { filters: filters });
+            return response.data;
+        } catch (error) {
+            console.error(error)
+            throw new Error('Failed to fetch Sites stats');
+        }
+    }
+
+    async getTreesCountForDistricts(offset: number = 0, limit: number = 10, filters?: any, orderBy?: { column: string, order: 'ASC' | 'DESC' }[]): Promise<PaginatedResponse<any>> {
+        try {
+            const response = await this.api.post<PaginatedResponse<any>>(`/sites/stats/district?offset=${offset}&limit=${limit}`, { filters: filters, order_by: orderBy });
+            return response.data;
+        } catch (error) {
+            console.error(error)
+            throw new Error('Failed to fetch Sites stats');
+        }
+    }
+
+    async getTreesCountForTalukas(offset: number = 0, limit: number = 10, filters?: any, orderBy?: { column: string, order: 'ASC' | 'DESC' }[]): Promise<PaginatedResponse<any>> {
+        try {
+            const response = await this.api.post<PaginatedResponse<any>>(`/sites/stats/taluka?offset=${offset}&limit=${limit}`, { filters: filters, order_by: orderBy });
+            return response.data;
+        } catch (error) {
+            console.error(error)
+            throw new Error('Failed to fetch Sites stats');
+        }
+    }
+
+    async getTreesCountForVillages(offset: number = 0, limit: number = 10, filters?: any, orderBy?: { column: string, order: 'ASC' | 'DESC' }[]): Promise<PaginatedResponse<any>> {
+        try {
+            const response = await this.api.post<PaginatedResponse<any>>(`/sites/stats/village?offset=${offset}&limit=${limit}`, { filters: filters, order_by: orderBy });
+            return response.data;
+        } catch (error) {
+            console.error(error)
+            throw new Error('Failed to fetch Sites stats');
+        }
     }
 
 

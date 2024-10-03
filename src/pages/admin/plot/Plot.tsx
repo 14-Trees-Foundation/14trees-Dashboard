@@ -13,17 +13,19 @@ import { useAppDispatch, useAppSelector } from "../../../redux/store/hooks";
 import { RootState } from "../../../redux/store/store";
 import {
   Button,
+  Checkbox,
   Dialog,
   DialogActions,
   DialogContent,
   DialogContentText,
   DialogTitle,
   Divider,
+  FormControlLabel,
   Typography,
 } from "@mui/material";
 import EditPlot from "./EditPlot";
 import { TableColumnsType } from "antd";
-import getColumnSearchProps, { getColumnSelectedItemFilter } from "../../../components/Filter";
+import getColumnSearchProps, { getColumnSelectedItemFilter, getSortIcon } from "../../../components/Filter";
 import TableComponent from "../../../components/Table";
 import { ToastContainer, toast } from "react-toastify";
 import { AutocompleteWithPagination } from "../../../components/AutoComplete";
@@ -58,6 +60,15 @@ export const PlotComponent = () => {
   const [siteNameInput, setSiteNameInput] = useState("");
   const [selectedSite, setSelectedSite] = useState<Site | null>(null);
   const [updateCoords, setUpdateCoords] = useState(false);
+  const [includeDeadLostTrees, setIncludeDeadLostTrees] = useState(false);
+
+  const [orderBy, setOrderBy] = useState<{ column: string, order: 'ASC' | 'DESC' }[]>([]);
+
+  const defaultTreesFilter = {
+    columnField: "tree_health",
+    value: [null, "healthy", "diseased"],
+    operatorValue: "isAnyOf",
+  };
 
   const handleSetFilters = (filters: Record<string, GridFilterItem>) => {
     setPage(0);
@@ -66,12 +77,40 @@ export const PlotComponent = () => {
 
   useEffect(() => {
     getPlotData();
-  }, [pageSize, page, filters]);
+  }, [pageSize, page, filters, includeDeadLostTrees, orderBy]);
 
   const getPlotData = async () => {
     setLoading(true);
     let filtersData = Object.values(filters);
-    getPlots(page * pageSize, pageSize, filtersData);
+    if (includeDeadLostTrees) {
+      filtersData.push({ ...defaultTreesFilter, value: [...defaultTreesFilter.value, "dead", "lost"] });
+    } else {
+      filtersData.push(defaultTreesFilter);
+    }
+
+    const categoryIdx = filtersData.findIndex(item => item.columnField === 'category');
+    if (categoryIdx > -1) {
+      filtersData[categoryIdx].value = (filtersData[categoryIdx].value as string[]).filter(item => item !== 'Unknown');
+      filtersData[categoryIdx].value.push(null);
+    }
+
+    const accessibilityIdx = filtersData.findIndex(item => item.columnField === 'accessibility_status');
+    if (accessibilityIdx > -1) {
+      filtersData[accessibilityIdx].value = filtersData[accessibilityIdx].value.map((item: string) => {
+        switch (item) {
+          case "Accessible":
+            return "accessible";
+          case "Inaccessible":
+            return "inaccessible";
+          case "Moderately Accessible":
+            return "moderately_accessible";
+          default:
+            return null;
+        }
+      })
+    }
+
+    getPlots(page * pageSize, pageSize, filtersData, orderBy);
     setTimeout(async () => {
       setLoading(false);
     }, 1000);
@@ -89,7 +128,17 @@ export const PlotComponent = () => {
   const plotsData = useAppSelector((state: RootState) => state.plotsData);
   if (plotsData) {
     plotsList = Object.values(plotsData.plots);
-    plotsList = plotsList.sort((a, b) => b.id - a.id);
+    plotsList = plotsList.sort((a: any, b: any) => {
+      for (let { column, order } of orderBy) {
+        if (a[column] > b[column]) {
+          return order === 'ASC' ? 1 : -1;
+        } else if (a[column] < b[column]) {
+          return order === 'ASC' ? -1 : 1;
+        }
+      }
+      return 0;
+    });
+    
   }
 
   let tags: string[] = [];
@@ -135,6 +184,33 @@ export const PlotComponent = () => {
     { value: "inaccessible", label: "Inaccessible" },
     { value: "moderately_accessible", label: "Moderately Accessible" },
   ];
+
+  const handleSortingChange = (sorter: any) => {
+    let newOrder = [...orderBy];
+    const updateOrder = (item: { column: string, order: 'ASC' | 'DESC' }) => {
+      const index = newOrder.findIndex((item) => item.column === sorter.field);
+      if (index > -1) {
+        if (sorter.order) newOrder[index].order = sorter.order;
+        else newOrder = newOrder.filter((item) => item.column !== sorter.field);
+      } else if (sorter.order) {
+        newOrder.push({ column: sorter.field, order: sorter.order });
+      }
+    }
+
+    if (sorter.field) {
+      setPage(0);
+      updateOrder(sorter);
+      setOrderBy(newOrder);
+    }
+  }
+
+  const getSortableHeader = (header: string, key: string) => {
+    return (
+      <div style={{ display: "flex", alignItems: "center", justifyContent: 'space-between' }}>
+        {header} {getSortIcon(key, orderBy.find((item) => item.column === key)?.order, handleSortingChange)}
+      </div>
+    )
+  }
 
   const columns: TableColumnsType<Plot> = [
     {
@@ -192,8 +268,8 @@ export const PlotComponent = () => {
       title: "Accessibility",
       align: "center",
       width: 200,
-      render: (value) => value ? accessibilityList.find((item) => item.value === value)?.label : "-",
-      ...getColumnSearchProps('accessibility_status', filters, handleSetFilters)
+      render: (value) => value ? accessibilityList.find((item) => item.value === value)?.label : "Unknown",
+      ...getColumnSelectedItemFilter({ dataIndex: 'accessibility_status', filters, handleSetFilters, options: accessibilityList.map((item) => item.label).concat("Unknown") })
     },
     {
       dataIndex: "category",
@@ -201,7 +277,8 @@ export const PlotComponent = () => {
       title: "Category",
       align: "center",
       width: 150,
-      ...getColumnSelectedItemFilter({ dataIndex: 'category', filters, handleSetFilters, options: ["Public", "Foundation"] })
+      render: (value) => value ? value : "Unknown",
+      ...getColumnSelectedItemFilter({ dataIndex: 'category', filters, handleSetFilters, options: ["Public", "Foundation", "Unknown"] })
     },
     {
       dataIndex: "gat",
@@ -222,7 +299,7 @@ export const PlotComponent = () => {
     {
       dataIndex: "trees_count",
       key: "trees_count",
-      title: "Total Trees",
+      title: getSortableHeader("Total Trees", 'trees_count'),
       align: "center",
       width: 150,
       render: (value) => value ?? 0,
@@ -230,7 +307,7 @@ export const PlotComponent = () => {
     {
       dataIndex: "mapped_trees_count",
       key: "mapped_trees_count",
-      title: "Booked Trees",
+      title: getSortableHeader("Booked Trees", 'mapped_trees_count'),
       align: "center",
       width: 150,
       render: (value) => value ?? 0,
@@ -238,7 +315,7 @@ export const PlotComponent = () => {
     {
       dataIndex: "assigned_trees_count",
       key: "assigned_trees_count",
-      title: "Assigned Trees",
+      title: getSortableHeader("Assigned Trees", 'assigned_trees_count'),
       align: "center",
       width: 150,
       render: (value) => value ?? 0,
@@ -246,7 +323,7 @@ export const PlotComponent = () => {
     {
       dataIndex: "available_trees_count",
       key: "available_trees_count",
-      title: "Available Trees",
+      title: getSortableHeader("Available Trees", 'available_trees_count'),
       align: "center",
       width: 150,
       render: (value) => value ?? 0,
@@ -350,6 +427,18 @@ export const PlotComponent = () => {
       </div>
       <Divider sx={{ backgroundColor: "black", marginBottom: '15px' }} />
       <Box sx={{ height: 840, width: "100%" }}>
+        <div
+          style={{
+            display: "flex",
+            alignItems: 'center',
+            justifyContent: "flex-end",
+          }}
+        >
+          <FormControlLabel
+            control={<Checkbox checked={includeDeadLostTrees} onChange={() => setIncludeDeadLostTrees(!includeDeadLostTrees)} />}
+            label="Include Dead/Lost Trees"
+          />
+        </div>
         <TableComponent
           loading={loading}
           dataSource={plotsList}
