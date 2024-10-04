@@ -11,7 +11,7 @@ import SitesMap from "./SiteMap";
 import { Table, TableColumnType } from "antd";
 import { TableRowSelection } from "antd/es/table/interface";
 import './inventory.css'
-import SiteStats from "./SiteStats";
+import InventoryStats from "./InventoryStats";
 
 const SiteInventory: FC = () => {
 
@@ -237,7 +237,7 @@ const SiteInventory: FC = () => {
         <Box>
             <Typography variant="h4" sx={{ marginBottom: 1 }}>Inventory Management</Typography>
             <Divider sx={{ backgroundColor: "black", marginBottom: 3 }} />
-            <SiteStats />
+            <InventoryStats />
             <AutocompleteWithPagination
                 label="Select a Site"
                 options={sitesList}
