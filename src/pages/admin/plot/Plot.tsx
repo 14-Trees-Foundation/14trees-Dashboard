@@ -261,15 +261,6 @@ export const PlotComponent = () => {
       ...getColumnSelectedItemFilter({ dataIndex: 'accessibility_status', filters, handleSetFilters, options: accessibilityList.map((item) => item.label).concat("Unknown") })
     },
     {
-      dataIndex: "category",
-      key: "category",
-      title: "Category",
-      align: "center",
-      width: 150,
-      render: (value) => value ? value : "Unknown",
-      ...getColumnSelectedItemFilter({ dataIndex: 'category', filters, handleSetFilters, options: ["Public", "Foundation", "Unknown"] })
-    },
-    {
       dataIndex: "gat",
       key: "gat",
       title: "Gat No.",

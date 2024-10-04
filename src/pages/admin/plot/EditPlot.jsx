@@ -54,7 +54,6 @@ function EditPlot({ row, openeditModal, handleCloseModal, editSubmit, tags }) {
     }, 1000);
   };
 
-  const categoriesList = ["Public", "Foundation"];
   const accessibilityList = [
     { value: "accessible", label: "Accessible" },
     { value: "inaccessible", label: "Inaccessible" },
@@ -139,20 +138,6 @@ function EditPlot({ row, openeditModal, handleCloseModal, editSubmit, tags }) {
             size="medium"
             loading={sitesLoading}
             value={(siteNameInput === '' && Object.hasOwn(sitesMap, formData.site_id)) ? sitesMap[formData.site_id] : null}
-          />
-          <Autocomplete
-            fullWidth
-            name="category"
-            disablePortal
-            options={categoriesList}
-            value={formData.category}
-            renderInput={(params) => (
-              <TextField {...params} margin="dense" label="Category" required />
-            )}
-            onChange={(event, value) => {
-              if (categoriesList.includes(value))
-                setFormData((prevState) => ({ ...prevState, category: value }));
-            }}
           />
           <TextField
             name="gat"

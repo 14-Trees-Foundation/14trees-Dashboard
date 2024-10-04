@@ -19,7 +19,7 @@ import EditSites from "./EditSites";
 import SaveIcon from '@mui/icons-material/Save';
 import { TableColumnsType } from "antd";
 import { Site } from "../../../types/site";
-import getColumnSearchProps from "../../../components/Filter";
+import getColumnSearchProps, { getColumnSelectedItemFilter } from "../../../components/Filter";
 import TableComponent from "../../../components/Table";
 import { useAppDispatch, useAppSelector } from "../../../redux/store/hooks";
 import * as siteActionCreators from "../../../redux/actions/siteActions";
@@ -52,6 +52,8 @@ export const SitesComponent = () => {
   const [pageSize, setPageSize] = useState(10);
   const [filters, setFilters] = useState<Record<string, GridFilterItem>>({});
 
+  const siteCategories = ['Public', 'Foundation', 'Unknown']
+
   const handleSetFilters = (filters: Record<string, GridFilterItem>) => {
     setPage(0);
     setFilters(filters);
@@ -63,6 +65,13 @@ export const SitesComponent = () => {
 
   const getSiteData = async () => {
     let filtersData = Object.values(filters);
+
+    const categoryIdx = filtersData.findIndex(item => item.columnField === 'category');
+    if (categoryIdx > -1) {
+      filtersData[categoryIdx].value = (filtersData[categoryIdx].value as string[]).filter(item => item !== 'Unknown');
+      filtersData[categoryIdx].value.push(null);
+    }
+
     getSites(page * pageSize, pageSize, filtersData);
   };
 
@@ -75,6 +84,11 @@ export const SitesComponent = () => {
 
   const getAllSitesData = async () => {
     let filtersData = Object.values(filters);
+    const categoryIdx = filtersData.findIndex(item => item.columnField === 'category');
+    if (categoryIdx > -1) {
+      filtersData[categoryIdx].value = (filtersData[categoryIdx].value as string[]).filter(item => item !== 'Unknown');
+      filtersData[categoryIdx].value.push(null);
+    }
     getSites(0, sitesData.totalSites, filtersData);
   };
 
@@ -121,7 +135,7 @@ export const SitesComponent = () => {
             alignItems: "center",
           }}
         >
-          <Button
+          {/* <Button
             variant="outlined"
             style={{ margin: "0 5px" }}
             onClick={() => {
@@ -131,7 +145,7 @@ export const SitesComponent = () => {
             }}
           >
             <EditIcon />
-          </Button>
+          </Button> */}
           <Button
             variant="outlined"
             color="error"
@@ -185,12 +199,12 @@ export const SitesComponent = () => {
       ...getColumnSearchProps("land_type", filters, handleSetFilters),
     },
     {
-      dataIndex: "land_strata",
-      key: "land_strata",
-      title: "Land Strata",
+      dataIndex: "category",
+      key: "category",
+      title: "Site Type",
       width: 150,
       align: "center",
-      ...getColumnSearchProps("land_strata", filters, handleSetFilters),
+      ...getColumnSelectedItemFilter({dataIndex: "category", filters, handleSetFilters, options: siteCategories}),
     },
     {
       dataIndex: "district",
@@ -238,71 +252,11 @@ export const SitesComponent = () => {
       align: "center",
     },
     {
-      dataIndex: "photo_album",
-      key: "photo_album",
-      title: "Photo Album",
-      width: 200,
-      align: "center",
-      render: (value: any) => (
-        <a href={value} target="_blank" rel="noopener noreferrer">
-          View Photos
-        </a>
-      ),
-    },
-    {
-      dataIndex: "consent_letter",
-      key: "consent_letter",
-      title: "Consent Letter",
-      width: 200,
-      align: "center",
-      ...getColumnSearchProps("consent_letter", filters, handleSetFilters),
-    },
-    {
       dataIndex: "grove_type",
       key: "grove_type",
       title: "Grove Type",
       width: 180,
       align: "center",
-    },
-    {
-      dataIndex: "consent_document_link",
-      key: "consent_document_link",
-      title: "Consent Document Link",
-      width: 200,
-      align: "center",
-      ...getColumnSearchProps("consent_document_link", filters, handleSetFilters),
-    },
-    {
-      dataIndex: "google_earth_link",
-      key: "google_earth_link",
-      title: "Google Earth Link",
-      width: 200,
-      align: "center",
-      ...getColumnSearchProps("google_earth_link", filters, handleSetFilters),
-    },
-    {
-      dataIndex: "account",
-      key: "account",
-      title: "Account",
-      width: 200,
-      align: "center",
-      ...getColumnSearchProps("account", filters, handleSetFilters),
-    },
-    {
-      dataIndex: "site_data_check",
-      key: "site_data_check",
-      title: "Site Data Check",
-      width: 200,
-      align: "center",
-      ...getColumnSearchProps("site_data_check", filters, handleSetFilters),
-    },
-    {
-      dataIndex: "updated_at",
-      key: "updated_at",
-      title: "Updated At",
-      width: 200,
-      align: "center",
-      render: getFormattedDate
     },
   ];
 
@@ -335,7 +289,7 @@ export const SitesComponent = () => {
           >
             Sync Notion Sites
           </LoadingButton>
-          <Button variant="contained" color="success" onClick={handleModalOpen}>
+          <Button disabled variant="contained" color="success" onClick={handleModalOpen}>
             Add Site
           </Button>
           <AddSite
@@ -354,10 +308,7 @@ export const SitesComponent = () => {
           fetchAllData={getAllSitesData}
           setPage={setPage}
           setPageSize={setPageSize}
-          isExpandable={true}
-          expandableFunction={(record) => <SiteMap KmlSource={record.google_earth_link[0]} />}
         />
-        <SiteMap />
       </Box>
 
 
