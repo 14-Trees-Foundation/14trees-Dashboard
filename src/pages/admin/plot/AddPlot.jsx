@@ -126,7 +126,6 @@ const AddPlot = ({ open, handleClose, createPlot, tags }) => {
     handleClose();
   };
 
-  const categoriesList = ["Public", "Foundation"];
   const accessibilityList = [
     { value: "accessible", label: "Accessible" },
     { value: "inaccessible", label: "Inaccessible" },
@@ -222,25 +221,6 @@ const AddPlot = ({ open, handleClose, createPlot, tags }) => {
                   loading={sitesLoading}
                   fullWidth
                   size="medium"
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <Autocomplete
-                  fullWidth
-                  name="category"
-                  disablePortal
-                  options={categoriesList}
-                  value={formData.category}
-                  renderInput={(params) => (
-                    <TextField {...params} label="Category" required />
-                  )}
-                  onChange={(event, value) => {
-                    if (categoriesList.includes(value))
-                      setFormData((prevState) => ({
-                        ...prevState,
-                        category: value,
-                      }));
-                  }}
                 />
               </Grid>
               <Grid item xs={12}>
