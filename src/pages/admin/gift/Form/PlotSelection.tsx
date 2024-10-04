@@ -138,25 +138,25 @@ const PlotSelection: FC<PlotSelectionProps> = ({ plots, onPlotsChange }) => {
                 <h2 style={{ marginTop: "0px", paddingRight: "8px" }}>
                     Total:{" "}
                     <span style={{ color: "#C72542", fontStyle: "italic" }}>
-                        {countSum(plots.map(item => item.trees_count))}
+                        {countSum(plots.map(item => item.total))}
                     </span>
                 </h2>
                 <h2 style={{ marginTop: "0px", paddingRight: "8px" }}>
                     Mapped:{" "}
                     <span style={{ color: "#C72542", fontStyle: "italic" }}>
-                        {countSum(plots.map(item => item.mapped_trees_count))}
+                        {countSum(plots.map(item => item.booked))}
                     </span>
                 </h2>
                 <h2 style={{ marginTop: "0px", paddingRight: "8px" }}>
                     Assigned:{" "}
                     <span style={{ color: "#C72542", fontStyle: "italic" }}>
-                        {countSum(plots.map(item => item.assigned_trees_count))}
+                        {countSum(plots.map(item => item.assigned))}
                     </span>
                 </h2>
                 <h2 style={{ marginTop: "0px", paddingRight: "8px" }}>
                     Available:{" "}
                     <span style={{ color: "#C72542", fontStyle: "italic" }}>
-                        {countSum(plots.map(item => item.available_trees_count))}
+                        {countSum(plots.map(item => item.available))}
                     </span>
                 </h2>
             </div>

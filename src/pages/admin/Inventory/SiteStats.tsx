@@ -17,10 +17,10 @@ const SiteStats: FC = () => {
         setData(stats.results.map((item: any) => {
             return {
                 ...item,
-                total: parseInt(item.trees_count || '0'),
-                booked: parseInt(item.mapped_trees_count || '0'),
-                assigned: parseInt(item.assigned_trees_count || '0'),
-                available: parseInt(item.available_trees_count || '0'),
+                total: parseInt(item.total || '0'),
+                booked: parseInt(item.booked || '0'),
+                assigned: parseInt(item.assigned || '0'),
+                available: parseInt(item.available || '0'),
                 capacity: Math.floor(item.acres_area * 300)
             }
         }));

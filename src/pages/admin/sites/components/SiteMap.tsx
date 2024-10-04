@@ -134,16 +134,16 @@ export const SiteMap = (KmlSource: any) => {
       lat: +74.02656389177469,
       lng: +18.8418642283084,
       name: plotsName[0]?.name,
-      trees_count: plotsName[0]?.trees_count,
-      mapped_trees_count: plotsName[0]?.mapped_trees_count,
+      total: plotsName[0]?.total,
+      booked: plotsName[0]?.booked,
     },
 
     {
       lat: +74.02525985697372,
       lng: +18.84296361535512,
       name: plotsName[1]?.name,
-      trees_count: plotsName[1]?.trees_count,
-      mapped_trees_count: plotsName[1]?.mapped_trees_count,
+      total: plotsName[1]?.total,
+      booked: plotsName[1]?.booked,
     },
 
     
@@ -174,8 +174,8 @@ export const SiteMap = (KmlSource: any) => {
               >
                 <div>
                   <h3>Name Plot-1</h3>
-                  {/* <h3>Available tree: {eachMarker.trees_count}</h3>
-                  <h3>Mapped Tree: {eachMarker.mapped_trees_count}</h3> */}
+                  {/* <h3>Available tree: {eachMarker.total}</h3>
+                  <h3>Mapped Tree: {eachMarker.booked}</h3> */}
                 {/* </div>
               </InfoWindow>
             )} */} 

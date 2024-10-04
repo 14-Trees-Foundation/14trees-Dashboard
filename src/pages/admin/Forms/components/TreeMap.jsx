@@ -116,25 +116,25 @@ function TreeMap({ selectedPlot, setSelectedPlot }) {
                             <h2 style={{ marginTop: "0px", paddingRight: "8px" }}>
                                 Total:{" "}
                                 <span style={{ color: "#C72542", fontStyle: "italic" }}>
-                                    {selectedPlot?.trees_count ?? 0}
+                                    {selectedPlot?.total ?? 0}
                                 </span>
                             </h2>
                             <h2 style={{ marginTop: "0px", paddingRight: "8px" }}>
                                 Mapped:{" "}
                                 <span style={{ color: "#C72542", fontStyle: "italic" }}>
-                                    {selectedPlot?.mapped_trees_count ?? 0}
+                                    {selectedPlot?.booked ?? 0}
                                 </span>
                             </h2>
                             <h2 style={{ marginTop: "0px", paddingRight: "8px" }}>
                                 Assigned:{" "}
                                 <span style={{ color: "#C72542", fontStyle: "italic" }}>
-                                    {selectedPlot?.assigned_trees_count ?? 0}
+                                    {selectedPlot?.assigned ?? 0}
                                 </span>
                             </h2>
                             <h2 style={{ marginTop: "0px", paddingRight: "8px" }}>
                                 Available:{" "}
                                 <span style={{ color: "#C72542", fontStyle: "italic" }}>
-                                    {selectedPlot?.available_trees_count ?? 0}
+                                    {selectedPlot?.available ?? 0}
                                 </span>
                             </h2>
                         </div>
