@@ -6,10 +6,42 @@ import DistrictStats from "./DistrictStats"
 import TalukaStats from "./TalukaStats"
 import VillageStats from "./VillageStats"
 import SiteStats from "./SiteStats"
+import MultipleSelect from "../../../components/MultiSelect"
+
+interface SiteLocation {
+    district: string;
+    taluka: string;
+    village: string;
+}
 
 const InventoryStats: FC = () => {
 
     const [aggregatedData, setAggregatedData] = useState<any[]>([]);
+
+    const [districts, setDistricts] = useState<SiteLocation[]>([]);
+    const [selectedDistricts, setSelectedDistricts] = useState<string[]>([]);
+    const [selectedTalukas, setSelectedTalukas] = useState<string[]>([]);
+    const [selectedVillages, setSelectedVillages] = useState<string[]>([]);
+
+    const [filteredTalukas, setFilteredTalukas] = useState<string[]>([]);
+    const [filteredVillages, setFilteredVillages] = useState<string[]>([]);
+
+    useEffect(() => {
+
+        if (selectedDistricts.length === 0) {
+            setFilteredTalukas([]);
+            setFilteredVillages([]);
+        } else if (selectedTalukas.length === 0) {
+            setFilteredVillages([]);
+        } else {
+            if (selectedVillages.length !== 0) setFilteredVillages(selectedVillages);
+            else setFilteredVillages(getVillages(districts, selectedDistricts, selectedTalukas));
+            
+            if (selectedTalukas.length !== 0) setFilteredTalukas(selectedTalukas);
+            else setFilteredTalukas(getTalukas(districts, selectedDistricts));
+        }
+
+    }, [districts, selectedDistricts, selectedTalukas, selectedVillages])
 
     const getTreesCountForCategories = async () => {
         const apiClient = new ApiClient();
@@ -43,8 +75,15 @@ const InventoryStats: FC = () => {
         setAggregatedData([...finalList, overall]);
     }
 
+    const getDistricts = async () => {
+        const apiClient = new ApiClient();
+        const stats = await apiClient.getDistricts();
+        setDistricts(stats);
+    }
+
     useEffect(() => {
         getTreesCountForCategories();
+        getDistricts();
     }, [])
 
     const commonDataColumn = [
@@ -82,7 +121,23 @@ const InventoryStats: FC = () => {
             render: (value: any) => value ? value : 'Unknown'
         },
         ...commonDataColumn
-    ] 
+    ]
+
+    const getTalukas = (districts: SiteLocation[], selectedDistricts: string[]) => {
+        return districts
+            .filter((item) => selectedDistricts.includes(item.district))
+            .map((item) => item.taluka)
+            .filter((value, index, self) => value !== '' && self.indexOf(value) === index)
+    }
+
+    const getVillages = (districts: SiteLocation[], selectedDistricts: string[], selectedTalukas: string[]) => {
+
+        let filteredDistricts = districts.filter((item) => selectedDistricts.includes(item.district))
+        if (selectedTalukas.length !== 0) filteredDistricts = filteredDistricts.filter((item) => selectedTalukas.includes(item.taluka))
+        return filteredDistricts
+            .map((item) => item.village)
+            .filter((value, index, self) => value !== '' && self.indexOf(value) === index)
+    }
 
     return (
         <div>
@@ -93,10 +148,46 @@ const InventoryStats: FC = () => {
                     dataSource={aggregatedData}
                 />
             </Box>
-            <DistrictStats />
-            <TalukaStats />
-            <VillageStats />
-            <SiteStats />
+
+            <Box
+                style={{ display: 'flex', justifyContent: 'space-between', marginTop: '20px', marginBottom: '20px' }}
+            >
+                <Box style={{ width: '32%' }}>
+                    <Typography variant='subtitle2'>District</Typography>
+                    <MultipleSelect
+                        options={districts.map((item) => item.district).filter((value, index, self) => value !== '' && self.indexOf(value) === index)}
+                        onSelectionChange={(value: string[]) => { setSelectedDistricts(value) }}
+                        selected={selectedDistricts}
+                        label="Districts"
+                    />
+                </Box>
+
+                <Box style={{ width: '32%' }}>
+                    <Typography variant='subtitle2'>Taluka</Typography>
+                    <MultipleSelect 
+                        options={getTalukas(districts, selectedDistricts)}
+                        onSelectionChange={(value: string[]) => { setSelectedTalukas(value) }}
+                        selected={getTalukas(districts, selectedDistricts).filter(value => selectedTalukas.includes(value))}
+                        label="Talukas"
+                    />
+                </Box>
+
+                <Box style={{ width: '32%' }}>
+                    <Typography variant='subtitle2'>Village</Typography>
+                    <MultipleSelect 
+                        options={getVillages(districts, selectedDistricts, selectedTalukas)}
+                        onSelectionChange={(value: string[]) => { setSelectedVillages(value) }}
+                        selected={getVillages(districts, selectedDistricts, selectedTalukas).filter(value => selectedVillages.includes(value))}
+                        label="Villages"
+                    />
+                </Box>
+
+            </Box>
+
+            <DistrictStats districts={selectedDistricts}/>
+            <TalukaStats  talukas={filteredTalukas} />
+            <VillageStats villages={filteredVillages}/>
+            <SiteStats villages={filteredVillages} />
         </div>
     )
 }

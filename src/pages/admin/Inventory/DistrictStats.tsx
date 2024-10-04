@@ -7,8 +7,11 @@ import { GridFilterItem } from "@mui/x-data-grid"
 import { PaginatedResponse } from "../../../types/pagination"
 import { ArrowDropDown, ArrowDropUp } from "@mui/icons-material"
 
+interface DistrictStatsProps {
+    districts: string[]
+}
 
-const DistrictStats: FC = () => {
+const DistrictStats: FC<DistrictStatsProps> = ({ districts }) => {
 
     const [districtTreeCountData, setDistrictTreeCountData] = useState<PaginatedResponse<any>>({ total: 0, offset: 0, results: [] });
 
@@ -46,6 +49,10 @@ const DistrictStats: FC = () => {
                 item.value.push(null);
             }
         })
+
+        if (districts.length !== 0) {
+            filtersData.push({ columnField: 'district', operatorValue: 'isAnyOf', value: districts });
+        }
         const stats = await apiClient.getTreesCountForDistricts(0, 10, filtersData, orderBy);
         
         if (stats.offset === 0) {
@@ -55,7 +62,7 @@ const DistrictStats: FC = () => {
 
     useEffect(() => {
         getDistricts();
-    }, [filters, orderBy])
+    }, [filters, orderBy, districts])
 
     const getSortIcon = (field: string, order?: 'ASC' | 'DESC') => {
         return (

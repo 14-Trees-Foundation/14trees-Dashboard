@@ -7,8 +7,11 @@ import { Table } from "antd"
 import { ArrowDropDown, ArrowDropUp } from "@mui/icons-material"
 import getColumnSearchProps, { getColumnSelectedItemFilter } from "../../../components/Filter"
 
+interface SiteStatsProps {
+    villages: string[]
+}
 
-const SiteStats: FC = () => {
+const SiteStats: FC<SiteStatsProps> = ({ villages }) => {
 
     const [siteTreeCountData, setSiteTreeCountData] = useState<PaginatedResponse<any>>({ total: 0, offset: 0, results: [] });
 
@@ -27,6 +30,26 @@ const SiteStats: FC = () => {
                 item.value.push(null);
             }
         })
+
+        const maintenanceIdx = filtersData.findIndex((item) => item.columnField === 'maintenance_type');
+        if (maintenanceIdx > -1) {
+            filtersData[maintenanceIdx].value = filtersData[maintenanceIdx].value.map((item: string) => {
+                switch (item) {
+                    case 'Distribution Only':
+                        return 'DISTRIBUTION_ONLY';
+                    case 'Plantation Only':
+                        return 'PLANTATION_ONLY';
+                    case 'Full Maintenance':
+                        return 'FULL_MAINTENANCE';
+                    default:
+                        return null;
+                }
+            })
+        }
+
+        if (villages.length !== 0) {
+            filtersData.push({ columnField: 'village', operatorValue: 'isAnyOf', value: villages });
+        }
         const stats = await apiClient.getSitesStats(0, 10, filtersData, orderBy);
         
         if (stats.offset === 0) {
@@ -36,7 +59,7 @@ const SiteStats: FC = () => {
 
     useEffect(() => {
         getSites();
-    }, [filters, orderBy])
+    }, [filters, orderBy, villages])
 
     const handleSortingChange = (sorter: any) => {
         let newOrder = [...orderBy];

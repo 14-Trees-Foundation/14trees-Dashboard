@@ -4,8 +4,11 @@ import { GridFilterItem } from "@mui/x-data-grid"
 import { PaginatedResponse } from "../../../types/pagination"
 import GeneralStats from "./GeneralStats"
 
+interface VillageStatsProps {
+    villages: string[]
+}
 
-const VillageStats: FC = () => {
+const VillageStats: FC<VillageStatsProps> = ({ villages }) => {
 
     const [villageTreeCountData, setVillageTreeCountData] = useState<PaginatedResponse<any>>({ total: 0, offset: 0, results: [] });
 
@@ -24,6 +27,10 @@ const VillageStats: FC = () => {
                 item.value.push(null);
             }
         })
+
+        if (villages.length !== 0) {
+            filtersData.push({ columnField: 'village', operatorValue: 'isAnyOf', value: villages });
+        }
         const stats = await apiClient.getTreesCountForVillages(0, 10, filtersData, orderBy);
         
         if (stats.offset === 0) {
@@ -33,7 +40,7 @@ const VillageStats: FC = () => {
 
     useEffect(() => {
         getVillages();
-    }, [filters, orderBy])
+    }, [filters, orderBy, villages])
 
     return (
         <GeneralStats 
