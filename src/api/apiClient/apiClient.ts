@@ -871,6 +871,16 @@ class ApiClient {
         }
     }
 
+    async getDistricts(): Promise<any> {
+        try {
+            const response = await this.api.get<any>(`/sites/districts`);
+            return response.data;
+        } catch (error) {
+            console.error(error)
+            throw new Error('Failed to fetch Sites districts');
+        }
+    }
+
 
     /*
        Model- Donation: CRUD Operations/Apis for Donations
