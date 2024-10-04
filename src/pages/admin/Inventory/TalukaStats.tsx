@@ -4,8 +4,11 @@ import { GridFilterItem } from "@mui/x-data-grid"
 import { PaginatedResponse } from "../../../types/pagination"
 import GeneralStats from "./GeneralStats"
 
+interface TalukaStatsProps {
+    talukas: string[]
+}
 
-const TalukaStats: FC = () => {
+const TalukaStats: FC<TalukaStatsProps> = ({ talukas }) => {
 
     const [talukaTreeCountData, setTalukaTreeCountData] = useState<PaginatedResponse<any>>({ total: 0, offset: 0, results: [] });
 
@@ -24,6 +27,10 @@ const TalukaStats: FC = () => {
                 item.value.push(null);
             }
         })
+
+        if (talukas.length !== 0) {
+            filtersData.push({ columnField: 'taluka', operatorValue: 'isAnyOf', value: talukas });
+        }
         const stats = await apiClient.getTreesCountForTalukas(0, 10, filtersData, orderBy);
         
         if (stats.offset === 0) {
@@ -33,7 +40,7 @@ const TalukaStats: FC = () => {
 
     useEffect(() => {
         getTalukas();
-    }, [filters, orderBy])
+    }, [filters, orderBy, talukas])
 
     return (
         <GeneralStats 
