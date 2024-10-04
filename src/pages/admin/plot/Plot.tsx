@@ -64,12 +64,6 @@ export const PlotComponent = () => {
 
   const [orderBy, setOrderBy] = useState<{ column: string, order: 'ASC' | 'DESC' }[]>([]);
 
-  const defaultTreesFilter = {
-    columnField: "tree_health",
-    value: [null, "healthy", "diseased"],
-    operatorValue: "isAnyOf",
-  };
-
   const handleSetFilters = (filters: Record<string, GridFilterItem>) => {
     setPage(0);
     setFilters(filters);
@@ -77,16 +71,11 @@ export const PlotComponent = () => {
 
   useEffect(() => {
     getPlotData();
-  }, [pageSize, page, filters, includeDeadLostTrees, orderBy]);
+  }, [pageSize, page, filters, orderBy]);
 
   const getPlotData = async () => {
     setLoading(true);
     let filtersData = Object.values(filters);
-    if (includeDeadLostTrees) {
-      filtersData.push({ ...defaultTreesFilter, value: [...defaultTreesFilter.value, "dead", "lost"] });
-    } else {
-      filtersData.push(defaultTreesFilter);
-    }
 
     const categoryIdx = filtersData.findIndex(item => item.columnField === 'category');
     if (categoryIdx > -1) {
@@ -272,15 +261,6 @@ export const PlotComponent = () => {
       ...getColumnSelectedItemFilter({ dataIndex: 'accessibility_status', filters, handleSetFilters, options: accessibilityList.map((item) => item.label).concat("Unknown") })
     },
     {
-      dataIndex: "category",
-      key: "category",
-      title: "Category",
-      align: "center",
-      width: 150,
-      render: (value) => value ? value : "Unknown",
-      ...getColumnSelectedItemFilter({ dataIndex: 'category', filters, handleSetFilters, options: ["Public", "Foundation", "Unknown"] })
-    },
-    {
       dataIndex: "gat",
       key: "gat",
       title: "Gat No.",
@@ -297,36 +277,36 @@ export const PlotComponent = () => {
       ...getColumnSelectedItemFilter({ dataIndex: 'tags', filters, handleSetFilters, options: tags })
     },
     {
-      dataIndex: "trees_count",
-      key: "trees_count",
-      title: getSortableHeader("Total Trees", 'trees_count'),
+      dataIndex: "total",
+      key: "total",
+      title: getSortableHeader("Total Trees", 'total'),
       align: "center",
       width: 150,
-      render: (value) => value ?? 0,
+      render: (value, record) => value ?? 0 - (includeDeadLostTrees && record.void_total ? record.void_total : 0),
     },
     {
-      dataIndex: "mapped_trees_count",
-      key: "mapped_trees_count",
-      title: getSortableHeader("Booked Trees", 'mapped_trees_count'),
+      dataIndex: "booked",
+      key: "booked",
+      title: getSortableHeader("Booked Trees", 'booked'),
       align: "center",
       width: 150,
-      render: (value) => value ?? 0,
+      render: (value, record) => value ?? 0 - (includeDeadLostTrees && record.void_booked ? record.void_booked : 0),
     },
     {
-      dataIndex: "assigned_trees_count",
-      key: "assigned_trees_count",
-      title: getSortableHeader("Assigned Trees", 'assigned_trees_count'),
+      dataIndex: "assigned",
+      key: "assigned",
+      title: getSortableHeader("Assigned Trees", 'assigned'),
       align: "center",
       width: 150,
-      render: (value) => value ?? 0,
+      render: (value, record) => value ?? 0 - (includeDeadLostTrees && record.void_assigned ? record.void_assigned : 0),
     },
     {
-      dataIndex: "available_trees_count",
-      key: "available_trees_count",
-      title: getSortableHeader("Available Trees", 'available_trees_count'),
+      dataIndex: "available",
+      key: "available",
+      title: getSortableHeader("Available Trees", 'available'),
       align: "center",
       width: 150,
-      render: (value) => value ?? 0,
+      render: (value, record) => value ?? 0 - (includeDeadLostTrees && record.void_available ? record.void_available : 0),
     },
     {
       dataIndex: "site_name",
