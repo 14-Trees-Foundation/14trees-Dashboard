@@ -136,11 +136,11 @@ const SitesMap: React.FC<SitesMapProps> = ({ plots }) => {
                                     lineHeight: '0.5'
                                 }}>
                                     {info.label && <strong style={{ color: '#ff5e6b' }}>{plot.label}</strong>}
-                                    {info.available && <p><strong>Available: {plot.available_trees_count}</strong></p>}
-                                    {info.assigned && <p><strong>Assigned: {plot.assigned_trees_count}</strong></p>}
-                                    {info.booked && <p><strong>Booked: {plot.mapped_trees_count}</strong></p>}
+                                    {info.available && <p><strong>Available: {plot.available}</strong></p>}
+                                    {info.assigned && <p><strong>Assigned: {plot.assigned}</strong></p>}
+                                    {info.booked && <p><strong>Booked: {plot.booked}</strong></p>}
                                     {info.capacity && <p><strong>Capacity: {Math.floor((plot.acres_area ?? 0) * 300)}</strong></p>}
-                                    {info.total && <p><strong>Total: {plot.trees_count}</strong></p>}
+                                    {info.total && <p><strong>Total: {plot.total}</strong></p>}
                                 </div>
                             </InfoWindow>}
                         </React.Fragment>
