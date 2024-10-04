@@ -9,7 +9,7 @@ export const plotsDataReducer = (state = { totalPlots:0, plots: {} }, action: Un
             if (action.payload) {
                 let plotsDataState: PlotsDataState = { totalPlots: state.totalPlots, plots: { ...state.plots }};
                 let payload = action.payload as PaginatedResponse<Plot>;
-                if (payload.total !== plotsDataState.totalPlots) {
+                if (payload.offset === 0) {
                     plotsDataState.plots = {}
                 }
                 plotsDataState.totalPlots = payload.total;
