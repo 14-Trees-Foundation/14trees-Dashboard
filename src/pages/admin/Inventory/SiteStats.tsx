@@ -1,7 +1,6 @@
 import { FC, useEffect, useState } from "react"
 import ApiClient from "../../../api/apiClient/apiClient"
 import { GridFilterItem } from "@mui/x-data-grid"
-import { PaginatedResponse } from "../../../types/pagination"
 import { Box, Typography } from "@mui/material"
 import { Table } from "antd"
 import { ArrowDropDown, ArrowDropUp } from "@mui/icons-material"
@@ -9,19 +8,27 @@ import getColumnSearchProps, { getColumnSelectedItemFilter } from "../../../comp
 
 interface SiteStatsProps {
     villages: string[]
+    categories: (string | null)[]
+    serviceTypes: (string | null)[]
 }
 
-const SiteStats: FC<SiteStatsProps> = ({ villages }) => {
+const SiteStats: FC<SiteStatsProps> = ({ villages, categories, serviceTypes }) => {
 
-    const [siteTreeCountData, setSiteTreeCountData] = useState<PaginatedResponse<any>>({ total: 0, offset: 0, results: [] });
+    const [siteTreeCountData, setSiteTreeCountData] = useState<Record<number, any>>({});
+    const [tableRows, setTableRows] = useState<any[]>([]);
+    const [total, setTotal] = useState(0);
+    const [loading, setLoading] = useState(false);
 
     const [filters, setFilters] = useState<Record<string, GridFilterItem>>({});
     const handleSetFilters = (filters: Record<string, GridFilterItem>) => {
         setFilters(filters);
     }
     const [orderBy, setOrderBy] = useState<{column: string, order: 'ASC' | 'DESC'}[]>([])
+    const [page, setPage] = useState(0);
+    const [pageSize, setPageSize] = useState(10);
 
     const getSites = async () => {
+        setLoading(true);
         const apiClient = new ApiClient();
         const filtersData = Object.values(filters);
         filtersData.forEach((item) => {
@@ -47,15 +54,41 @@ const SiteStats: FC<SiteStatsProps> = ({ villages }) => {
             })
         }
 
+        if (categories.length !== 0 && !filters['category']) {
+            filtersData.push({ columnField: 'category', value: categories, operatorValue: 'isAnyOf' })
+        }
+
+        if (serviceTypes.length !== 0 && !filters['maintenance_type']) {
+            filtersData.push({ columnField: 'maintenance_type', value: serviceTypes, operatorValue: 'isAnyOf' })
+        }
         if (villages.length !== 0) {
             filtersData.push({ columnField: 'village', operatorValue: 'isAnyOf', value: villages });
         }
-        const stats = await apiClient.getSitesStats(0, 10, filtersData, orderBy);
+        const stats = await apiClient.getSitesStats(page * pageSize, pageSize, filtersData, orderBy);
         
-        if (stats.offset === 0) {
-            setSiteTreeCountData(stats);
+        setTotal(Number(stats.total));
+        const newData = { ...siteTreeCountData };
+        for (let i = 0; i < stats.results.length; i++) {
+            newData[i + stats.offset] = stats.results[i];
         }
+        setSiteTreeCountData(newData);
+        setLoading(false);
     }
+
+    useEffect(() => {
+        const rows: any[] = []
+        for (let i = 0; i < pageSize; i++) {
+            if (i + page * pageSize >= total) break;
+            const data = siteTreeCountData[i + page * pageSize]
+            if (!data) {
+                getSites();
+                return;
+            }
+            rows.push(data);
+        }
+
+        setTableRows(rows);
+    }, [page, pageSize, total, siteTreeCountData])
 
     useEffect(() => {
         getSites();
@@ -78,6 +111,11 @@ const SiteStats: FC<SiteStatsProps> = ({ villages }) => {
             updateOrder(sorter);
             setOrderBy(newOrder);
         }
+    }
+
+    const handlePageChange = (page: number, pageSize: number) => {
+        setPage(page - 1);
+        setPageSize(pageSize);
     }
 
     const getSortIcon = (field: string, order?: 'ASC' | 'DESC') => {
@@ -126,7 +164,7 @@ const SiteStats: FC<SiteStatsProps> = ({ villages }) => {
             ...getColumnSelectedItemFilter<any>({ dataIndex: 'category', filters, handleSetFilters, options: ['Public', 'Foundation', 'Unknown'] }),
         },
         {
-            title: "Maintenance Type",
+            title: "Service Type",
             dataIndex: "maintenance_type",
             key: "maintenance_type",
             render: getMaintenanceTypesString,
@@ -186,9 +224,15 @@ const SiteStats: FC<SiteStatsProps> = ({ villages }) => {
                 <Typography variant="h6">Site level stats</Typography>
                 <Table
                     columns={columns}
-                    dataSource={siteTreeCountData.results}
+                    loading={loading}
+                    dataSource={tableRows}
                     pagination={{
-                        total: siteTreeCountData.total,
+                        total: total,
+                        pageSize: pageSize,
+                        pageSizeOptions: [10, 20, 50, 100],
+                        onChange(page, pageSize) {
+                            handlePageChange(page, pageSize);
+                        },
                     }}
                 />
             </Box>

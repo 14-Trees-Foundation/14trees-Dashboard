@@ -1,24 +1,31 @@
 import { FC, useEffect, useState } from "react"
 import ApiClient from "../../../api/apiClient/apiClient"
 import { GridFilterItem } from "@mui/x-data-grid"
-import { PaginatedResponse } from "../../../types/pagination"
 import GeneralStats from "./GeneralStats"
 
 interface TalukaStatsProps {
     talukas: string[]
+    categories: (string | null)[]
+    serviceTypes: (string | null)[]
 }
 
-const TalukaStats: FC<TalukaStatsProps> = ({ talukas }) => {
+const TalukaStats: FC<TalukaStatsProps> = ({ talukas, categories, serviceTypes }) => {
 
-    const [talukaTreeCountData, setTalukaTreeCountData] = useState<PaginatedResponse<any>>({ total: 0, offset: 0, results: [] });
+    const [talukaTreeCountData, setTalukaTreeCountData] = useState<Record<number, any>>({});
+    const [tableRows, setTableRows] = useState<any[]>([]);
+    const [total, setTotal] = useState(0);
+    const [loading, setLoading] = useState(false);
 
     const [filters, setFilters] = useState<Record<string, GridFilterItem>>({});
     const handleSetFilters = (filters: Record<string, GridFilterItem>) => {
         setFilters(filters);
     }
-    const [orderBy, setOrderBy] = useState<{column: string, order: 'ASC' | 'DESC'}[]>([])
+    const [orderBy, setOrderBy] = useState<{column: string, order: 'ASC' | 'DESC'}[]>([]);
+    const [page, setPage] = useState(0);
+    const [pageSize, setPageSize] = useState(10);
 
     const getTalukas = async () => {
+        setLoading(true);
         const apiClient = new ApiClient();
         const filtersData = Object.values(filters);
         filtersData.forEach((item) => {
@@ -28,15 +35,45 @@ const TalukaStats: FC<TalukaStatsProps> = ({ talukas }) => {
             }
         })
 
+        if (categories.length !== 0 && !filters['category']) {
+            filtersData.push({ columnField: 'category', value: categories, operatorValue: 'isAnyOf' })
+        }
+        if (serviceTypes.length !== 0) {
+            filtersData.push({ columnField: 'maintenance_type', value: serviceTypes, operatorValue: 'isAnyOf' })
+        }
         if (talukas.length !== 0) {
             filtersData.push({ columnField: 'taluka', operatorValue: 'isAnyOf', value: talukas });
         }
-        const stats = await apiClient.getTreesCountForTalukas(0, 10, filtersData, orderBy);
+        const stats = await apiClient.getTreesCountForTalukas(page * pageSize, pageSize, filtersData, orderBy);
         
-        if (stats.offset === 0) {
-            setTalukaTreeCountData(stats);
+        setTotal(Number(stats.total));
+        const newData = { ...talukaTreeCountData };
+        for (let i = 0; i < stats.results.length; i++) {
+            newData[i + stats.offset] = stats.results[i];
         }
+        setTalukaTreeCountData(newData);
+        setLoading(false);
     }
+
+    const handlePageChange = (page: number, pageSize: number) => {
+        setPage(page - 1);
+        setPageSize(pageSize);
+    }
+
+    useEffect(() => {
+        const rows: any[] = []
+        for (let i = 0; i < pageSize; i++) {
+            if (i + page * pageSize >= total) break;
+            const data = talukaTreeCountData[i + page * pageSize]
+            if (!data) {
+                getTalukas();
+                return;
+            }
+            rows.push(data);
+        }
+
+        setTableRows(rows);
+    }, [page, pageSize, total, talukaTreeCountData])
 
     useEffect(() => {
         getTalukas();
@@ -45,7 +82,11 @@ const TalukaStats: FC<TalukaStatsProps> = ({ talukas }) => {
     return (
         <GeneralStats 
             field="taluka"
-            treesCountData={talukaTreeCountData}
+            loading={loading}
+            total={total}
+            pageSize={pageSize}
+            tableRows={tableRows}
+            onPageChange={handlePageChange}
             orderBy={orderBy}
             onOrderByChange={setOrderBy}
             filters={filters}

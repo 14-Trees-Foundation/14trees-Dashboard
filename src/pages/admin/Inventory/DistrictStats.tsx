@@ -9,9 +9,11 @@ import { ArrowDropDown, ArrowDropUp } from "@mui/icons-material"
 
 interface DistrictStatsProps {
     districts: string[]
+    categories: (string | null)[]
+    serviceTypes: (string | null)[]
 }
 
-const DistrictStats: FC<DistrictStatsProps> = ({ districts }) => {
+const DistrictStats: FC<DistrictStatsProps> = ({ districts, categories, serviceTypes }) => {
 
     const [districtTreeCountData, setDistrictTreeCountData] = useState<PaginatedResponse<any>>({ total: 0, offset: 0, results: [] });
 
@@ -50,6 +52,13 @@ const DistrictStats: FC<DistrictStatsProps> = ({ districts }) => {
             }
         })
 
+        if (categories.length !== 0 && !filters['category']) {
+            filtersData.push({ columnField: 'category', value: categories, operatorValue: 'isAnyOf' })
+        }
+
+        if (serviceTypes.length !== 0) {
+            filtersData.push({ columnField: 'maintenance_type', value: serviceTypes, operatorValue: 'isAnyOf' })
+        }
         if (districts.length !== 0) {
             filtersData.push({ columnField: 'district', operatorValue: 'isAnyOf', value: districts });
         }
