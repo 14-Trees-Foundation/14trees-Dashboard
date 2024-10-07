@@ -8,14 +8,18 @@ import { ArrowDropDown, ArrowDropUp } from "@mui/icons-material"
 
 interface GeneralStatsProps {
     field: string
-    treesCountData: PaginatedResponse<any>
+    loading: boolean,
+    total: number,
+    pageSize: number,
+    tableRows: any[],
+    onPageChange: (page: number, pageSize: number) => void
     orderBy: {column: string, order: 'ASC' | 'DESC'}[]
     onOrderByChange: (orderBy: {column: string, order: 'ASC' | 'DESC'}[]) => void
     filters: Record<string, GridFilterItem>
     onFiltersChange: (filters: Record<string, GridFilterItem>) => void
 }
 
-const GeneralStats: FC<GeneralStatsProps> = ({ field, treesCountData, orderBy, onOrderByChange, filters, onFiltersChange }) => {
+const GeneralStats: FC<GeneralStatsProps> = ({ field, loading, total, pageSize, tableRows, onPageChange, orderBy, onOrderByChange, filters, onFiltersChange }) => {
 
     const handleSortingChange = (sorter: any) => {
         let newOrder = [...orderBy];
@@ -124,9 +128,13 @@ const GeneralStats: FC<GeneralStatsProps> = ({ field, treesCountData, orderBy, o
                 <Typography variant="h6">{field.slice(0, 1).toUpperCase() + field.slice(1)} level stats</Typography>
                 <Table 
                     columns={districtDataColumn}
-                    dataSource={treesCountData.results}
+                    loading={loading}
+                    dataSource={tableRows}
                     pagination={{
-                        total: treesCountData.total,
+                        total: total,
+                        pageSize: pageSize,
+                        pageSizeOptions: [10, 20, 50, 100],
+                        onChange: onPageChange,
                     }}
                 />
             </Box>

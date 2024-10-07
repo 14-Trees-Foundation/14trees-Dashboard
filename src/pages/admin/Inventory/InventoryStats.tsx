@@ -9,11 +9,25 @@ import SiteStats from "./SiteStats"
 import MultipleSelect from "../../../components/MultiSelect"
 import TagStats from "./TagStats"
 import PlotStats from "./PlotStats"
+import { GridFilterItem } from "@mui/x-data-grid"
 
 interface SiteLocation {
     district: string;
     taluka: string;
     village: string;
+}
+
+const getSiteServiceTypeEnum = (serviceType: string): string | null => {
+    switch (serviceType) {
+        case 'Full Maintenance':
+            return 'FULL_MAINTENANCE';
+        case 'Plantation Only':
+            return 'PLANTATION_ONLY';
+        case 'Distribution Only':
+            return 'DISTRIBUTION_ONLY';
+        default:
+            return null;
+    }
 }
 
 const InventoryStats: FC = () => {
@@ -35,8 +49,6 @@ const InventoryStats: FC = () => {
         if (selectedDistricts.length === 0) {
             setFilteredTalukas([]);
             setFilteredVillages([]);
-        } else if (selectedTalukas.length === 0) {
-            setFilteredVillages([]);
         } else {
             if (selectedVillages.length !== 0) setFilteredVillages(selectedVillages);
             else setFilteredVillages(getVillages(districts, selectedDistricts, selectedTalukas));
@@ -49,7 +61,25 @@ const InventoryStats: FC = () => {
 
     const getTreesCountForCategories = async () => {
         const apiClient = new ApiClient();
-        const stats = await apiClient.getTreesCountForPlotCategories();
+
+        const filters: GridFilterItem[] = []
+        if (selectedCategories.length > 0) {
+            const categories: (string | null)[] = []
+            selectedCategories.forEach((item) => {
+                if (item !== 'Unknown') categories.push(item)
+                else categories.push(null)
+            })
+            filters.push({ columnField: 'category', value: categories, operatorValue: 'isAnyOf' })
+        }
+        if (selectedServiceTypes.length > 0) {
+            const serviceTypes: (string | null)[] = selectedServiceTypes.map((item) => getSiteServiceTypeEnum(item))
+            filters.push({ columnField: 'maintenance_type', value: serviceTypes, operatorValue: 'isAnyOf' })
+        }
+        if (selectedVillages.length > 0 || filteredVillages.length > 0) {
+            filters.push({ columnField: 'village', value: selectedVillages.length > 0 ? selectedVillages : filteredVillages, operatorValue: 'isAnyOf' })
+        }
+
+        const stats = await apiClient.getTreesCountForPlotCategories(filters);
         
         const overall = {
             category: 'Overall',
@@ -87,6 +117,9 @@ const InventoryStats: FC = () => {
 
     useEffect(() => {
         getTreesCountForCategories();
+    }, [filteredVillages, selectedVillages, selectedCategories, selectedServiceTypes])
+
+    useEffect(() => {
         getDistricts();
     }, [])
 
@@ -147,7 +180,12 @@ const InventoryStats: FC = () => {
         <div>
 
             <Box
-                style={{ display: 'flex', justifyContent: 'space-between', marginTop: '20px', marginBottom: '20px' }}
+                style={{ 
+                    display: 'flex', 
+                    justifyContent: 'space-between', 
+                    marginTop: '20px', 
+                    marginBottom: '20px',
+                }}
             >
                 <Box style={{ width: '19%' }}>
                     <Typography variant='subtitle2'>District</Typography>
@@ -201,20 +239,49 @@ const InventoryStats: FC = () => {
 
             </Box>
 
-            <Box>
-                <Typography variant="h6">Overall site stats</Typography>
-                <Table 
-                    columns={aggregatedDataColumn}
-                    dataSource={aggregatedData}
-                />
-            </Box>
+            <Box
+                style={{
+                    height: '70vh',
+                    overflowY: 'scroll',
+                    scrollbarWidth: 'none', // For Firefox
+                    '&::-webkit-scrollbar': { display: 'none' } // For Chrome, Safari
+                }}
+            >
+                <Box>
+                    <Typography variant="h6">Overall site stats</Typography>
+                    <Table 
+                        columns={aggregatedDataColumn}
+                        dataSource={aggregatedData}
+                    />
+                </Box>
 
-            <TagStats />
-            <DistrictStats districts={selectedDistricts}/>
-            <TalukaStats  talukas={filteredTalukas} />
-            <VillageStats villages={filteredVillages}/>
-            <SiteStats villages={filteredVillages} />
-            <PlotStats />
+                <TagStats 
+                    villages={filteredVillages} 
+                    categories={selectedCategories.map((item) => item !== 'Unknown' ? item : null)} 
+                    serviceTypes={selectedServiceTypes.map((item) => getSiteServiceTypeEnum(item))}
+                />
+                <DistrictStats 
+                    districts={selectedDistricts}
+                    categories={selectedCategories.map((item) => item !== 'Unknown' ? item : null)} 
+                    serviceTypes={selectedServiceTypes.map((item) => getSiteServiceTypeEnum(item))}
+                />
+                <TalukaStats  
+                    talukas={filteredTalukas} 
+                    categories={selectedCategories.map((item) => item !== 'Unknown' ? item : null)} 
+                    serviceTypes={selectedServiceTypes.map((item) => getSiteServiceTypeEnum(item))}
+                />
+                <VillageStats 
+                    villages={filteredVillages} 
+                    categories={selectedCategories.map((item) => item !== 'Unknown' ? item : null)} 
+                    serviceTypes={selectedServiceTypes.map((item) => getSiteServiceTypeEnum(item))}
+                />
+                <SiteStats 
+                    villages={filteredVillages} 
+                    categories={selectedCategories.map((item) => item !== 'Unknown' ? item : null)} 
+                    serviceTypes={selectedServiceTypes.map((item) => getSiteServiceTypeEnum(item))}
+                />
+                <PlotStats />
+            </Box>
         </div>
     )
 }
