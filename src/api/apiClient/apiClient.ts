@@ -880,6 +880,16 @@ class ApiClient {
         }
     }
 
+    async getTreeCountsForTags(offset: number = 0, limit: number = 10, tags?: string[], orderBy?: { column: string, order: 'ASC' | 'DESC' }[]): Promise<any> {
+        try {
+            const response = await this.api.post<any>(`/sites/tags?offset=${offset}&limit=${limit}`, { tags: tags, order_by: orderBy });
+            return response.data;
+        } catch (error) {
+            console.error(error)
+            throw new Error('Failed to fetch tree counts for tags');
+        }
+    }
+
 
     /*
        Model- Donation: CRUD Operations/Apis for Donations
