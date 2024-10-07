@@ -1,24 +1,32 @@
 import { FC, useEffect, useState } from "react"
 import ApiClient from "../../../api/apiClient/apiClient"
 import { GridFilterItem } from "@mui/x-data-grid"
-import { PaginatedResponse } from "../../../types/pagination"
 import { Box, Typography } from "@mui/material"
 import { Table } from "antd"
 import { getColumnSelectedItemFilter } from "../../../components/Filter"
 import { ArrowDropDown, ArrowDropUp } from "@mui/icons-material"
 
-interface TagStatsProps {}
+interface TagStatsProps {
+    villages: string[]
+    categories: (string | null)[]
+    serviceTypes: (string | null)[]
+}
 
-const TagStats: FC<TagStatsProps> = ({  }) => {
+const TagStats: FC<TagStatsProps> = ({ villages, categories, serviceTypes }) => {
 
-    const [tagTreeCountData, setTagTreeCountData] = useState<PaginatedResponse<any>>({ total: 0, offset: 0, results: [] });
+    const [tagTreeCountData, setTagTreeCountData] = useState<Record<number, any>>({});
+    const [tableRows, setTableRows] = useState<any[]>([]);
+    const [total, setTotal] = useState(0);
+    const [loading, setLoading] = useState(false);
 
     const [tags, setTags] = useState<string[]>([]);
     const [filters, setFilters] = useState<Record<string, GridFilterItem>>({});
     const handleSetFilters = (filters: Record<string, GridFilterItem>) => {
         setFilters(filters);
     }
-    const [orderBy, setOrderBy] = useState<{column: string, order: 'ASC' | 'DESC'}[]>([])
+    const [orderBy, setOrderBy] = useState<{column: string, order: 'ASC' | 'DESC'}[]>([]);
+    const [page, setPage] = useState(0);
+    const [pageSize, setPageSize] = useState(10);
 
     const getTags = async () => {
         const apiClient = new ApiClient();
@@ -27,19 +35,57 @@ const TagStats: FC<TagStatsProps> = ({  }) => {
     }
 
     const getTagStats = async () => {
+        setLoading(true);
         const apiClient = new ApiClient();
-        const tags = filters['tag']?.value ?? [];
-
-        const stats = await apiClient.getTreeCountsForTags(0, 10, tags, orderBy);
-        if (stats.offset === 0) {
-            setTagTreeCountData(stats);
+        const filtersData = Object.values(filters);
+        if (categories.length !== 0 && !filters['category']) {
+            filtersData.push({ columnField: 'category', value: categories, operatorValue: 'isAnyOf' })
         }
+
+        if (villages.length !== 0) {
+            filtersData.push({ columnField: 'village', operatorValue: 'isAnyOf', value: villages });
+        }
+        if (serviceTypes.length !== 0) {
+            filtersData.push({ columnField: 'maintenance_type', value: serviceTypes, operatorValue: 'isAnyOf' })
+        }
+
+        const stats = await apiClient.getTreeCountsForTags(page * pageSize, pageSize, filtersData, orderBy);
+        setTotal(Number(stats.total));
+        const newData = { ...tagTreeCountData };
+        for (let i = 0; i < stats.results.length; i++) {
+            newData[i + stats.offset] = stats.results[i];
+        }
+        setTagTreeCountData(newData);
+        setLoading(false);
+    }
+
+    const handlePageChange = (page: number, pageSize: number) => {
+        setPage(page - 1);
+        setPageSize(pageSize);
     }
 
     useEffect(() => {
+        const rows: any[] = []
+        for (let i = 0; i < pageSize; i++) {
+            if (i + page * pageSize >= total) break;
+            const data = tagTreeCountData[i + page * pageSize]
+            if (!data) {
+                getTagStats();
+                return;
+            }
+            rows.push(data);
+        }
+
+        setTableRows(rows);
+    }, [page, pageSize, total, tagTreeCountData])
+
+    useEffect(() => {
         getTagStats();
+    }, [filters, orderBy, villages, categories, serviceTypes])
+
+    useEffect(() => {
         getTags();
-    }, [filters, orderBy])
+    }, [])
 
     const handleSortingChange = (sorter: any) => {
         let newOrder = [...orderBy];
@@ -133,9 +179,15 @@ const TagStats: FC<TagStatsProps> = ({  }) => {
                 <Typography variant="h6">Tag level stats</Typography>
                 <Table
                     columns={columns}
-                    dataSource={tagTreeCountData.results}
+                    loading={loading}
+                    dataSource={tableRows}
                     pagination={{
-                        total: tagTreeCountData.total,
+                        total: total,
+                        pageSize: pageSize,
+                        pageSizeOptions: [10, 20, 50, 100],
+                        onChange(page, pageSize) {
+                            handlePageChange(page, pageSize);
+                        },
                     }}
                 />
             </Box>

@@ -872,9 +872,9 @@ class ApiClient {
         }
     }
 
-    async getTreesCountForPlotCategories(): Promise<PaginatedResponse<any>> {
+    async getTreesCountForPlotCategories(filters?: any): Promise<PaginatedResponse<any>> {
         try {
-            const response = await this.api.post<PaginatedResponse<any>>(`/sites/stats/category?offset=0&limit=10`, {  });
+            const response = await this.api.post<PaginatedResponse<any>>(`/sites/stats/category?offset=0&limit=10`, { filters });
             return response.data;
         } catch (error) {
             console.error(error)
@@ -892,9 +892,9 @@ class ApiClient {
         }
     }
 
-    async getTreeCountsForTags(offset: number = 0, limit: number = 10, tags?: string[], orderBy?: { column: string, order: 'ASC' | 'DESC' }[]): Promise<any> {
+    async getTreeCountsForTags(offset: number = 0, limit: number = 10, filters?: any[], orderBy?: { column: string, order: 'ASC' | 'DESC' }[]): Promise<any> {
         try {
-            const response = await this.api.post<any>(`/sites/tags?offset=${offset}&limit=${limit}`, { tags: tags, order_by: orderBy });
+            const response = await this.api.post<any>(`/sites/tags?offset=${offset}&limit=${limit}`, { filters, order_by: orderBy });
             return response.data;
         } catch (error) {
             console.error(error)
