@@ -7,6 +7,7 @@ import TalukaStats from "./TalukaStats"
 import VillageStats from "./VillageStats"
 import SiteStats from "./SiteStats"
 import MultipleSelect from "../../../components/MultiSelect"
+import TagStats from "./TagStats"
 
 interface SiteLocation {
     district: string;
@@ -22,6 +23,8 @@ const InventoryStats: FC = () => {
     const [selectedDistricts, setSelectedDistricts] = useState<string[]>([]);
     const [selectedTalukas, setSelectedTalukas] = useState<string[]>([]);
     const [selectedVillages, setSelectedVillages] = useState<string[]>([]);
+    const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+    const [selectedServiceTypes, setSelectedServiceTypes] = useState<string[]>([]);
 
     const [filteredTalukas, setFilteredTalukas] = useState<string[]>([]);
     const [filteredVillages, setFilteredVillages] = useState<string[]>([]);
@@ -141,18 +144,11 @@ const InventoryStats: FC = () => {
 
     return (
         <div>
-            <Box>
-                <Typography variant="h6">Overall site stats</Typography>
-                <Table 
-                    columns={aggregatedDataColumn}
-                    dataSource={aggregatedData}
-                />
-            </Box>
 
             <Box
                 style={{ display: 'flex', justifyContent: 'space-between', marginTop: '20px', marginBottom: '20px' }}
             >
-                <Box style={{ width: '32%' }}>
+                <Box style={{ width: '19%' }}>
                     <Typography variant='subtitle2'>District</Typography>
                     <MultipleSelect
                         options={districts.map((item) => item.district).filter((value, index, self) => value !== '' && self.indexOf(value) === index)}
@@ -162,7 +158,7 @@ const InventoryStats: FC = () => {
                     />
                 </Box>
 
-                <Box style={{ width: '32%' }}>
+                <Box style={{ width: '19%' }}>
                     <Typography variant='subtitle2'>Taluka</Typography>
                     <MultipleSelect 
                         options={getTalukas(districts, selectedDistricts)}
@@ -172,7 +168,7 @@ const InventoryStats: FC = () => {
                     />
                 </Box>
 
-                <Box style={{ width: '32%' }}>
+                <Box style={{ width: '19%' }}>
                     <Typography variant='subtitle2'>Village</Typography>
                     <MultipleSelect 
                         options={getVillages(districts, selectedDistricts, selectedTalukas)}
@@ -182,7 +178,37 @@ const InventoryStats: FC = () => {
                     />
                 </Box>
 
+                <Box style={{ width: '19%' }}>
+                    <Typography variant='subtitle2'>Category</Typography>
+                    <MultipleSelect 
+                        options={['Public', 'Foundation', 'Unknown']}
+                        onSelectionChange={(value: string[]) => { setSelectedCategories(value) }}
+                        selected={selectedCategories}
+                        label="Category"
+                    />
+                </Box>
+
+                <Box style={{ width: '19%' }}>
+                    <Typography variant='subtitle2'>Service Type</Typography>
+                    <MultipleSelect 
+                        options={['Full Maintenance', 'Distribution Only', 'Plantation Only', 'Unknown']}
+                        onSelectionChange={(value: string[]) => { setSelectedServiceTypes(value) }}
+                        selected={selectedServiceTypes}
+                        label="Service Type"
+                    />
+                </Box>
+
             </Box>
+
+            <Box>
+                <Typography variant="h6">Overall site stats</Typography>
+                <Table 
+                    columns={aggregatedDataColumn}
+                    dataSource={aggregatedData}
+                />
+            </Box>
+
+            <TagStats />
 
             <DistrictStats districts={selectedDistricts}/>
             <TalukaStats  talukas={filteredTalukas} />
