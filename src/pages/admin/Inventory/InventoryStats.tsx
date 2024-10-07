@@ -8,6 +8,7 @@ import VillageStats from "./VillageStats"
 import SiteStats from "./SiteStats"
 import MultipleSelect from "../../../components/MultiSelect"
 import TagStats from "./TagStats"
+import PlotStats from "./PlotStats"
 
 interface SiteLocation {
     district: string;
@@ -209,11 +210,11 @@ const InventoryStats: FC = () => {
             </Box>
 
             <TagStats />
-
             <DistrictStats districts={selectedDistricts}/>
             <TalukaStats  talukas={filteredTalukas} />
             <VillageStats villages={filteredVillages}/>
             <SiteStats villages={filteredVillages} />
+            <PlotStats />
         </div>
     )
 }

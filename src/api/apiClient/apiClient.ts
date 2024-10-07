@@ -204,6 +204,18 @@ class ApiClient {
         }
     }
 
+    async getPlotAggregations(offset: number, limit: number, filters?: any[], orderBy?: any[]): Promise<PaginatedResponse<Plot>> {
+        const url = `/plots/stats?offset=${offset}&limit=${limit}`;
+        try {
+            const response = await this.api.post<PaginatedResponse<Plot>>(url, { filters: filters, order_by: orderBy });
+            return response.data;
+        } catch (error: any) {
+            console.error(error)
+            throw new Error(`Failed to fetch plots: ${error.message}`);
+        }
+
+    }
+
     /*
         Model- Group: CRUD Operations/Apis for organizations
     */
