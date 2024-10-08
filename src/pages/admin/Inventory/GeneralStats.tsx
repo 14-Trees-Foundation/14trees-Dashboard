@@ -5,6 +5,7 @@ import getColumnSearchProps, { getColumnSelectedItemFilter } from "../../../comp
 import { GridFilterItem } from "@mui/x-data-grid"
 import { PaginatedResponse } from "../../../types/pagination"
 import { ArrowDropDown, ArrowDropUp } from "@mui/icons-material"
+import { TableRowSelection } from "antd/es/table/interface"
 
 interface GeneralStatsProps {
     field: string

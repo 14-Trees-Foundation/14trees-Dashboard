@@ -903,6 +903,16 @@ class ApiClient {
         }
     }
 
+    async getTreeCountForCorporate(groupId: number, orderBy?: { column: string, order: 'ASC' | 'DESC' }[]): Promise<any> {
+        try {
+            const response = await this.api.get<any>(`/sites/corporate/${groupId}`);
+            return response.data;
+        } catch (error) {
+            console.error(error)
+            throw new Error('Failed to fetch tree counts for corporate');
+        }
+    }
+
 
     /*
        Model- Donation: CRUD Operations/Apis for Donations
