@@ -3,9 +3,8 @@ import { FC } from "react"
 import { Box, Typography } from "@mui/material"
 import getColumnSearchProps, { getColumnSelectedItemFilter } from "../../../components/Filter"
 import { GridFilterItem } from "@mui/x-data-grid"
-import { PaginatedResponse } from "../../../types/pagination"
 import { ArrowDropDown, ArrowDropUp } from "@mui/icons-material"
-import { TableRowSelection } from "antd/es/table/interface"
+import './inventory.css'
 
 interface GeneralStatsProps {
     field: string
@@ -131,6 +130,7 @@ const GeneralStats: FC<GeneralStatsProps> = ({ field, loading, total, pageSize, 
                     columns={districtDataColumn}
                     loading={loading}
                     dataSource={tableRows}
+                    rowClassName={(item) => !item.category || !item[field] ? 'pending-item' : ''}
                     pagination={{
                         total: total,
                         pageSize: pageSize,

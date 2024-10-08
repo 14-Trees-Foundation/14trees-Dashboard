@@ -6,6 +6,7 @@ import getColumnSearchProps, { getColumnSelectedItemFilter } from "../../../comp
 import { GridFilterItem } from "@mui/x-data-grid"
 import { PaginatedResponse } from "../../../types/pagination"
 import { ArrowDropDown, ArrowDropUp } from "@mui/icons-material"
+import './inventory.css'
 
 interface DistrictStatsProps {
     districts: string[]
@@ -162,6 +163,7 @@ const DistrictStats: FC<DistrictStatsProps> = ({ districts, categories, serviceT
                 <Table 
                     columns={districtDataColumn}
                     dataSource={districtTreeCountData.results}
+                    rowClassName={(item) => !item.category || !item.district ? 'pending-item' : ''}
                     pagination={{
                         total: districtTreeCountData.total,
                     }}
