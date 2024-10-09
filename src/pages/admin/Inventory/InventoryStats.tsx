@@ -1,7 +1,7 @@
 import { Table } from "antd"
 import { FC, useEffect, useState } from "react"
 import ApiClient from "../../../api/apiClient/apiClient"
-import { Box, Typography } from "@mui/material"
+import { Box, Button, Typography } from "@mui/material"
 import DistrictStats from "./DistrictStats"
 import TalukaStats from "./TalukaStats"
 import VillageStats from "./VillageStats"
@@ -10,6 +10,8 @@ import MultipleSelect from "../../../components/MultiSelect"
 import TagStats from "./TagStats"
 import PlotStats from "./PlotStats"
 import { GridFilterItem } from "@mui/x-data-grid"
+import './inventory.css'
+import CorporateStats from "./CorporateStats"
 
 interface SiteLocation {
     district: string;
@@ -52,7 +54,7 @@ const InventoryStats: FC = () => {
         } else {
             if (selectedVillages.length !== 0) setFilteredVillages(selectedVillages);
             else setFilteredVillages(getVillages(districts, selectedDistricts, selectedTalukas));
-            
+
             if (selectedTalukas.length !== 0) setFilteredTalukas(selectedTalukas);
             else setFilteredTalukas(getTalukas(districts, selectedDistricts));
         }
@@ -80,7 +82,7 @@ const InventoryStats: FC = () => {
         }
 
         const stats = await apiClient.getTreesCountForPlotCategories(filters);
-        
+
         const overall = {
             category: 'Overall',
             total: 0,
@@ -176,72 +178,93 @@ const InventoryStats: FC = () => {
             .filter((value, index, self) => value !== '' && self.indexOf(value) === index)
     }
 
+    const handleFilterReset = () => {
+        setSelectedDistricts([]);
+        setSelectedTalukas([]);
+        setSelectedVillages([]);
+        setSelectedCategories([]);
+        setSelectedServiceTypes([]);
+    }
+
     return (
         <div>
 
-            <Box
-                style={{ 
-                    display: 'flex', 
-                    justifyContent: 'space-between', 
-                    marginTop: '20px', 
-                    marginBottom: '20px',
-                }}
-            >
-                <Box style={{ width: '19%' }}>
-                    <Typography variant='subtitle2'>District</Typography>
-                    <MultipleSelect
-                        options={districts.map((item) => item.district).filter((value, index, self) => value !== '' && self.indexOf(value) === index)}
-                        onSelectionChange={(value: string[]) => { setSelectedDistricts(value) }}
-                        selected={selectedDistricts}
-                        label="Districts"
-                    />
-                </Box>
+            <Box style={{
+                zIndex: 1,
+                paddingBottom: 10,
+                marginBottom: '10px',
 
-                <Box style={{ width: '19%' }}>
-                    <Typography variant='subtitle2'>Taluka</Typography>
-                    <MultipleSelect 
-                        options={getTalukas(districts, selectedDistricts)}
-                        onSelectionChange={(value: string[]) => { setSelectedTalukas(value) }}
-                        selected={getTalukas(districts, selectedDistricts).filter(value => selectedTalukas.includes(value))}
-                        label="Talukas"
-                    />
-                </Box>
+            }}>
+                <Box
+                    style={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        marginTop: '10px',
+                        marginBottom: '10px',
+                    }}
+                >
+                    <Box style={{ width: '19%' }}>
+                        <Typography variant='subtitle2'>District</Typography>
+                        <MultipleSelect
+                            options={districts.map((item) => item.district).filter((value, index, self) => value !== '' && self.indexOf(value) === index)}
+                            onSelectionChange={(value: string[]) => { setSelectedDistricts(value) }}
+                            selected={selectedDistricts}
+                            label="Districts"
+                        />
+                    </Box>
 
-                <Box style={{ width: '19%' }}>
-                    <Typography variant='subtitle2'>Village</Typography>
-                    <MultipleSelect 
-                        options={getVillages(districts, selectedDistricts, selectedTalukas)}
-                        onSelectionChange={(value: string[]) => { setSelectedVillages(value) }}
-                        selected={getVillages(districts, selectedDistricts, selectedTalukas).filter(value => selectedVillages.includes(value))}
-                        label="Villages"
-                    />
-                </Box>
+                    <Box style={{ width: '19%' }}>
+                        <Typography variant='subtitle2'>Taluka</Typography>
+                        <MultipleSelect
+                            disabled={selectedDistricts.length === 0}
+                            disableLabel={'Please select a district first'}
+                            options={getTalukas(districts, selectedDistricts)}
+                            onSelectionChange={(value: string[]) => { setSelectedTalukas(value) }}
+                            selected={getTalukas(districts, selectedDistricts).filter(value => selectedTalukas.includes(value))}
+                            label="Talukas"
+                        />
+                    </Box>
 
-                <Box style={{ width: '19%' }}>
-                    <Typography variant='subtitle2'>Category</Typography>
-                    <MultipleSelect 
-                        options={['Public', 'Foundation', 'Unknown']}
-                        onSelectionChange={(value: string[]) => { setSelectedCategories(value) }}
-                        selected={selectedCategories}
-                        label="Category"
-                    />
-                </Box>
+                    <Box style={{ width: '19%' }}>
+                        <Typography variant='subtitle2'>Village</Typography>
+                        <MultipleSelect
+                            disabled={selectedDistricts.length === 0}
+                            disableLabel={'Please select a district first'}
+                            options={getVillages(districts, selectedDistricts, selectedTalukas)}
+                            onSelectionChange={(value: string[]) => { setSelectedVillages(value) }}
+                            selected={getVillages(districts, selectedDistricts, selectedTalukas).filter(value => selectedVillages.includes(value))}
+                            label="Villages"
+                        />
+                    </Box>
 
-                <Box style={{ width: '19%' }}>
-                    <Typography variant='subtitle2'>Service Type</Typography>
-                    <MultipleSelect 
-                        options={['Full Maintenance', 'Distribution Only', 'Plantation Only', 'Unknown']}
-                        onSelectionChange={(value: string[]) => { setSelectedServiceTypes(value) }}
-                        selected={selectedServiceTypes}
-                        label="Service Type"
-                    />
-                </Box>
+                    <Box style={{ width: '19%' }}>
+                        <Typography variant='subtitle2'>Category</Typography>
+                        <MultipleSelect
+                            options={['Public', 'Foundation', 'Unknown']}
+                            onSelectionChange={(value: string[]) => { setSelectedCategories(value) }}
+                            selected={selectedCategories}
+                            label="Category"
+                        />
+                    </Box>
 
+                    <Box style={{ width: '19%' }}>
+                        <Typography variant='subtitle2'>Service Type</Typography>
+                        <MultipleSelect
+                            options={['Full Maintenance', 'Distribution Only', 'Plantation Only', 'Unknown']}
+                            onSelectionChange={(value: string[]) => { setSelectedServiceTypes(value) }}
+                            selected={selectedServiceTypes}
+                            label="Service Type"
+                        />
+                    </Box>
+                </Box>
+                <Box style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                    <Button variant="contained" color="primary" size="small" onClick={handleFilterReset}>Reset FIlters</Button>
+                </Box>
             </Box>
 
             <Box
                 style={{
-                    height: '70vh',
+                    height: '65vh',
                     overflowY: 'scroll',
                     scrollbarWidth: 'none', // For Firefox
                     '&::-webkit-scrollbar': { display: 'none' } // For Chrome, Safari
@@ -249,38 +272,40 @@ const InventoryStats: FC = () => {
             >
                 <Box>
                     <Typography variant="h6">Overall site stats</Typography>
-                    <Table 
+                    <Table
+                        rowClassName={(record, index) => !record.category ? 'pending-item' : ''}
                         columns={aggregatedDataColumn}
                         dataSource={aggregatedData}
                     />
                 </Box>
 
-                <TagStats 
-                    villages={filteredVillages} 
-                    categories={selectedCategories.map((item) => item !== 'Unknown' ? item : null)} 
-                    serviceTypes={selectedServiceTypes.map((item) => getSiteServiceTypeEnum(item))}
-                />
-                <DistrictStats 
+                <DistrictStats
                     districts={selectedDistricts}
-                    categories={selectedCategories.map((item) => item !== 'Unknown' ? item : null)} 
+                    categories={selectedCategories.map((item) => item !== 'Unknown' ? item : null)}
                     serviceTypes={selectedServiceTypes.map((item) => getSiteServiceTypeEnum(item))}
                 />
-                <TalukaStats  
-                    talukas={filteredTalukas} 
-                    categories={selectedCategories.map((item) => item !== 'Unknown' ? item : null)} 
+                <TalukaStats
+                    talukas={filteredTalukas}
+                    categories={selectedCategories.map((item) => item !== 'Unknown' ? item : null)}
                     serviceTypes={selectedServiceTypes.map((item) => getSiteServiceTypeEnum(item))}
                 />
-                <VillageStats 
-                    villages={filteredVillages} 
-                    categories={selectedCategories.map((item) => item !== 'Unknown' ? item : null)} 
+                <VillageStats
+                    villages={filteredVillages}
+                    categories={selectedCategories.map((item) => item !== 'Unknown' ? item : null)}
                     serviceTypes={selectedServiceTypes.map((item) => getSiteServiceTypeEnum(item))}
                 />
-                <SiteStats 
-                    villages={filteredVillages} 
-                    categories={selectedCategories.map((item) => item !== 'Unknown' ? item : null)} 
+                <TagStats
+                    villages={filteredVillages}
+                    categories={selectedCategories.map((item) => item !== 'Unknown' ? item : null)}
+                    serviceTypes={selectedServiceTypes.map((item) => getSiteServiceTypeEnum(item))}
+                />
+                <SiteStats
+                    villages={filteredVillages}
+                    categories={selectedCategories.map((item) => item !== 'Unknown' ? item : null)}
                     serviceTypes={selectedServiceTypes.map((item) => getSiteServiceTypeEnum(item))}
                 />
                 <PlotStats />
+                <CorporateStats />
             </Box>
         </div>
     )
