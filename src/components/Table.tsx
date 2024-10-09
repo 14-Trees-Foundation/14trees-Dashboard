@@ -62,12 +62,13 @@ function TableComponent({ loading, dataSource, columns, totalRecords, fetchAllDa
         const data = dataSource?.map((item) => {
             const row: any = {}
             columns?.forEach((column: any) => {
+                const title = typeof column.title === 'string' ? column.title : column.dataIndex;
                 if (column.dataIndex === 'srNo' || column.dataIndex === 'action') return;
                 if (column.render) {
                     const value = column.render(item[column.dataIndex], item, 0);
-                    row[column.title] = value?.props?.children ? value.props.children : value;
+                    row[title] = value?.props?.children ? value.props.children : value;
                 }
-                else row[column.title] = item[column.dataIndex];
+                else row[title] = item[column.dataIndex];
             })
             return row
         })
