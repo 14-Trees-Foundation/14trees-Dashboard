@@ -12,6 +12,7 @@ interface AutoCompleteProps {
   fullWidth?: boolean
   size?: 'small' | 'medium'
   value?: any
+  required?: boolean
 }
 
 const  AutocompleteWithPagination = ({
@@ -25,6 +26,7 @@ const  AutocompleteWithPagination = ({
   fullWidth,
   size,
   value,
+  required,
 }: AutoCompleteProps) => {
   const [position, setPosition] = useState(0);
   const listElem: any = useRef();
@@ -77,6 +79,7 @@ const  AutocompleteWithPagination = ({
           {...params}
           margin={ sx ? undefined : 'dense' }
           label={label}
+          required={required}
           onChange={handleInputChange}
           InputProps={{
             ...params.InputProps,
