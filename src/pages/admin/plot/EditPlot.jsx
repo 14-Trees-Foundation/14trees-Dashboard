@@ -13,6 +13,7 @@ import * as siteActionCreators from "../../../redux/actions/siteActions";
 import { useAppSelector, useAppDispatch } from "../../../redux/store/hooks";
 import { bindActionCreators } from "redux";
 import { AutocompleteWithPagination } from "../../../components/AutoComplete";
+import { toast } from "react-toastify";
 
 function EditPlot({ row, openeditModal, handleCloseModal, editSubmit, tags }) {
   const [sitePage, setSitePage] = useState(0);
@@ -32,6 +33,11 @@ function EditPlot({ row, openeditModal, handleCloseModal, editSubmit, tags }) {
 
   const handleEditSubmit = (event) => {
     event.preventDefault();
+
+    if (!formData.site_id || isNaN(formData.site_id)) {
+      toast.error("Please select a site");
+      return
+    }
     editSubmit(formData);
     handleCloseModal();
   };
@@ -90,7 +96,6 @@ function EditPlot({ row, openeditModal, handleCloseModal, editSubmit, tags }) {
             margin="dense"
           />
           <TextField
-            required
             name="label"
             label="Plot Label"
             value={formData.label}
@@ -113,6 +118,7 @@ function EditPlot({ row, openeditModal, handleCloseModal, editSubmit, tags }) {
             }}
           />
           <AutocompleteWithPagination
+            required
             name="site"
             label="Select a Site"
             options={sitesList}

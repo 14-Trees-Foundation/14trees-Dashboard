@@ -13,6 +13,7 @@ import { AutocompleteWithPagination } from "../../../components/AutoComplete";
 import * as siteActionCreators from "../../../redux/actions/siteActions";
 import { useAppSelector, useAppDispatch } from "../../../redux/store/hooks";
 import { bindActionCreators } from "redux";
+import { toast } from "react-toastify";
 
 const AddPlot = ({ open, handleClose, createPlot, tags }) => {
   const style = {
@@ -98,7 +99,12 @@ const AddPlot = ({ open, handleClose, createPlot, tags }) => {
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    console.log("Plot data in handleSubmit:  ");
+
+    if (!formData.site_id || isNaN(formData.site_id)) {
+      toast.error("Please select a site");
+      return
+    }
+
     createPlot(formData);
     setFormData({
       name: "",
@@ -193,6 +199,7 @@ const AddPlot = ({ open, handleClose, createPlot, tags }) => {
               </Grid>
               <Grid item xs={12}>
                 <AutocompleteWithPagination
+                  required
                   name="site"
                   label="Select a Site"
                   options={sitesList}
