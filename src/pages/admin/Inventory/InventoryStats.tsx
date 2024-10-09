@@ -216,6 +216,8 @@ const InventoryStats: FC = () => {
                     <Box style={{ width: '19%' }}>
                         <Typography variant='subtitle2'>Taluka</Typography>
                         <MultipleSelect
+                            disabled={selectedDistricts.length === 0}
+                            disableLabel={'Please select a district first'}
                             options={getTalukas(districts, selectedDistricts)}
                             onSelectionChange={(value: string[]) => { setSelectedTalukas(value) }}
                             selected={getTalukas(districts, selectedDistricts).filter(value => selectedTalukas.includes(value))}
@@ -226,6 +228,8 @@ const InventoryStats: FC = () => {
                     <Box style={{ width: '19%' }}>
                         <Typography variant='subtitle2'>Village</Typography>
                         <MultipleSelect
+                            disabled={selectedDistricts.length === 0}
+                            disableLabel={'Please select a district first'}
                             options={getVillages(districts, selectedDistricts, selectedTalukas)}
                             onSelectionChange={(value: string[]) => { setSelectedVillages(value) }}
                             selected={getVillages(districts, selectedDistricts, selectedTalukas).filter(value => selectedVillages.includes(value))}

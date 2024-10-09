@@ -28,13 +28,15 @@ function getStyles(name: string, personName: readonly string[], theme: Theme) {
 }
 
 interface MultipleSelectProps {
+    disabled?: boolean;
+    disableLabel?: string;
     label: string;
     selected: string[];
     options: string[];
     onSelectionChange: (selected: string[]) => void;
 }
 
-const MultipleSelect: React.FC<MultipleSelectProps> = ({ label, selected, options, onSelectionChange }) => {
+const MultipleSelect: React.FC<MultipleSelectProps> = ({ disabled, disableLabel, label, selected, options, onSelectionChange }) => {
     const theme = useTheme();
 
     const handleChange = (event: SelectChangeEvent<typeof selected>) => {
@@ -49,8 +51,9 @@ const MultipleSelect: React.FC<MultipleSelectProps> = ({ label, selected, option
     return (
         <div>
             <FormControl sx={{ width: '100%' }}>
-                <InputLabel id="multiple-chip-label">{label}</InputLabel>
+                <InputLabel id="multiple-chip-label">{disabled  && disableLabel ? disableLabel : label}</InputLabel>
                 <Select
+                    disabled={disabled}
                     labelId="multiple-chip-label"
                     multiple
                     value={selected}
