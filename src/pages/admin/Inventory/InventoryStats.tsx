@@ -43,24 +43,6 @@ const InventoryStats: FC = () => {
     const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
     const [selectedServiceTypes, setSelectedServiceTypes] = useState<string[]>([]);
 
-    const [filteredTalukas, setFilteredTalukas] = useState<string[]>([]);
-    const [filteredVillages, setFilteredVillages] = useState<string[]>([]);
-
-    useEffect(() => {
-
-        if (selectedDistricts.length === 0) {
-            setFilteredTalukas([]);
-            setFilteredVillages([]);
-        } else {
-            if (selectedVillages.length !== 0) setFilteredVillages(selectedVillages);
-            else setFilteredVillages(getVillages(districts, selectedDistricts, selectedTalukas));
-
-            if (selectedTalukas.length !== 0) setFilteredTalukas(selectedTalukas);
-            else setFilteredTalukas(getTalukas(districts, selectedDistricts));
-        }
-
-    }, [districts, selectedDistricts, selectedTalukas, selectedVillages])
-
     const getTreesCountForCategories = async () => {
         const apiClient = new ApiClient();
 
@@ -77,9 +59,10 @@ const InventoryStats: FC = () => {
             const serviceTypes: (string | null)[] = selectedServiceTypes.map((item) => getSiteServiceTypeEnum(item))
             filters.push({ columnField: 'maintenance_type', value: serviceTypes, operatorValue: 'isAnyOf' })
         }
-        if (selectedVillages.length > 0 || filteredVillages.length > 0) {
-            filters.push({ columnField: 'village', value: selectedVillages.length > 0 ? selectedVillages : filteredVillages, operatorValue: 'isAnyOf' })
-        }
+        if (selectedTalukas.length !== 0) filters.push({ columnField: 'taluka', operatorValue: 'isAnyOf', value: selectedTalukas });
+        if (selectedDistricts.length !== 0) filters.push({ columnField: 'district', operatorValue: 'isAnyOf', value: selectedDistricts });
+        if (selectedVillages.length !== 0) filters.push({ columnField: 'village', operatorValue: 'isAnyOf', value: selectedVillages });
+
 
         const stats = await apiClient.getTreesCountForPlotCategories(filters);
 
@@ -119,7 +102,7 @@ const InventoryStats: FC = () => {
 
     useEffect(() => {
         getTreesCountForCategories();
-    }, [filteredVillages, selectedVillages, selectedCategories, selectedServiceTypes])
+    }, [selectedDistricts, selectedTalukas, selectedVillages, selectedCategories, selectedServiceTypes])
 
     useEffect(() => {
         getDistricts();
@@ -238,27 +221,27 @@ const InventoryStats: FC = () => {
                     </Box>
 
                     <Box style={{ width: '19%' }}>
-                        <Typography variant='subtitle2'>Category</Typography>
+                        <Typography variant='subtitle2'>Site Category</Typography>
                         <MultipleSelect
                             options={['Public', 'Foundation', 'Unknown']}
                             onSelectionChange={(value: string[]) => { setSelectedCategories(value) }}
                             selected={selectedCategories}
-                            label="Category"
+                            label="Select Category"
                         />
                     </Box>
 
                     <Box style={{ width: '19%' }}>
-                        <Typography variant='subtitle2'>Service Type</Typography>
+                        <Typography variant='subtitle2'>Site Service Type</Typography>
                         <MultipleSelect
                             options={['Full Maintenance', 'Distribution Only', 'Plantation Only', 'Unknown']}
                             onSelectionChange={(value: string[]) => { setSelectedServiceTypes(value) }}
                             selected={selectedServiceTypes}
-                            label="Service Type"
+                            label="Select Service Type"
                         />
                     </Box>
                 </Box>
                 <Box style={{ display: 'flex', justifyContent: 'flex-end' }}>
-                    <Button variant="contained" color="primary" size="small" onClick={handleFilterReset}>Reset FIlters</Button>
+                    <Button variant="contained" color="success" onClick={handleFilterReset}>Reset FIlters</Button>
                 </Box>
             </Box>
 
@@ -280,27 +263,37 @@ const InventoryStats: FC = () => {
                 </Box>
 
                 <DistrictStats
+                    talukas={selectedTalukas}
+                    villages={selectedVillages}
                     districts={selectedDistricts}
                     categories={selectedCategories.map((item) => item !== 'Unknown' ? item : null)}
                     serviceTypes={selectedServiceTypes.map((item) => getSiteServiceTypeEnum(item))}
                 />
                 <TalukaStats
-                    talukas={filteredTalukas}
+                    talukas={selectedTalukas}
+                    villages={selectedVillages}
+                    districts={selectedDistricts}
                     categories={selectedCategories.map((item) => item !== 'Unknown' ? item : null)}
                     serviceTypes={selectedServiceTypes.map((item) => getSiteServiceTypeEnum(item))}
                 />
                 <VillageStats
-                    villages={filteredVillages}
+                    talukas={selectedTalukas}
+                    villages={selectedVillages}
+                    districts={selectedDistricts}
                     categories={selectedCategories.map((item) => item !== 'Unknown' ? item : null)}
                     serviceTypes={selectedServiceTypes.map((item) => getSiteServiceTypeEnum(item))}
                 />
                 <TagStats
-                    villages={filteredVillages}
+                    talukas={selectedTalukas}
+                    villages={selectedVillages}
+                    districts={selectedDistricts}
                     categories={selectedCategories.map((item) => item !== 'Unknown' ? item : null)}
                     serviceTypes={selectedServiceTypes.map((item) => getSiteServiceTypeEnum(item))}
                 />
                 <SiteStats
-                    villages={filteredVillages}
+                    talukas={selectedTalukas}
+                    villages={selectedVillages}
+                    districts={selectedDistricts}
                     categories={selectedCategories.map((item) => item !== 'Unknown' ? item : null)}
                     serviceTypes={selectedServiceTypes.map((item) => getSiteServiceTypeEnum(item))}
                 />

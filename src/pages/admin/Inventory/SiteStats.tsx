@@ -7,12 +7,14 @@ import { ArrowDropDown, ArrowDropUp } from "@mui/icons-material"
 import getColumnSearchProps, { getColumnSelectedItemFilter } from "../../../components/Filter"
 
 interface SiteStatsProps {
+    districts: string[]
+    talukas: string[]
     villages: string[]
     categories: (string | null)[]
     serviceTypes: (string | null)[]
 }
 
-const SiteStats: FC<SiteStatsProps> = ({ villages, categories, serviceTypes }) => {
+const SiteStats: FC<SiteStatsProps> = ({ districts, talukas, villages, categories, serviceTypes }) => {
 
     const [siteTreeCountData, setSiteTreeCountData] = useState<Record<number, any>>({});
     const [tableRows, setTableRows] = useState<any[]>([]);
@@ -27,9 +29,7 @@ const SiteStats: FC<SiteStatsProps> = ({ villages, categories, serviceTypes }) =
     const [page, setPage] = useState(0);
     const [pageSize, setPageSize] = useState(10);
 
-    const getSites = async () => {
-        setLoading(true);
-        const apiClient = new ApiClient();
+    const getFilters = () => {
         const filtersData = Object.values(filters);
         filtersData.forEach((item) => {
             if (item.columnField === 'category' && item.value.includes('Unknown')) {
@@ -59,16 +59,19 @@ const SiteStats: FC<SiteStatsProps> = ({ villages, categories, serviceTypes }) =
             })
         }
 
-        if (categories.length !== 0 && !filters['category']) {
-            filtersData.push({ columnField: 'category', value: categories, operatorValue: 'isAnyOf' })
-        }
+        if (categories.length !== 0 && !filters['category']) filtersData.push({ columnField: 'category', value: categories, operatorValue: 'isAnyOf' })
+        if (serviceTypes.length !== 0) filtersData.push({ columnField: 'maintenance_type', value: serviceTypes, operatorValue: 'isAnyOf' })
+        if (talukas.length !== 0) filtersData.push({ columnField: 'taluka', operatorValue: 'isAnyOf', value: talukas });
+        if (districts.length !== 0) filtersData.push({ columnField: 'district', operatorValue: 'isAnyOf', value: districts });
+        if (villages.length !== 0) filtersData.push({ columnField: 'village', operatorValue: 'isAnyOf', value: villages });
 
-        if (serviceTypes.length !== 0 && !filters['maintenance_type']) {
-            filtersData.push({ columnField: 'maintenance_type', value: serviceTypes, operatorValue: 'isAnyOf' })
-        }
-        if (villages.length !== 0) {
-            filtersData.push({ columnField: 'village', operatorValue: 'isAnyOf', value: villages });
-        }
+        return filtersData;
+    }
+
+    const getSites = async () => {
+        setLoading(true);
+        const apiClient = new ApiClient();
+        const filtersData = getFilters();
         const stats = await apiClient.getSitesStats(page * pageSize, pageSize, filtersData, orderBy);
         
         setTotal(Number(stats.total));
@@ -97,7 +100,7 @@ const SiteStats: FC<SiteStatsProps> = ({ villages, categories, serviceTypes }) =
 
     useEffect(() => {
         getSites();
-    }, [filters, orderBy, villages])
+    }, [filters, orderBy, districts, talukas, villages, categories, serviceTypes])
 
     const handleSortingChange = (sorter: any) => {
         let newOrder = [...orderBy];

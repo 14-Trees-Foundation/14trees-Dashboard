@@ -6,11 +6,13 @@ import GeneralStats from "./GeneralStats"
 
 interface VillageStatsProps {
     villages: string[]
+    talukas: string[]
+    districts: string[]
     categories: (string | null)[]
     serviceTypes: (string | null)[]
 }
 
-const VillageStats: FC<VillageStatsProps> = ({ villages, categories, serviceTypes }) => {
+const VillageStats: FC<VillageStatsProps> = ({ villages, talukas, districts, categories, serviceTypes }) => {
 
     const [villageTreeCountData, setVillageTreeCountData] = useState<Record<number, any>>({});
     const [tableRows, setTableRows] = useState<any[]>([]);
@@ -25,9 +27,7 @@ const VillageStats: FC<VillageStatsProps> = ({ villages, categories, serviceType
     const [page, setPage] = useState(0);
     const [pageSize, setPageSize] = useState(10);
 
-    const getVillages = async () => {
-        setLoading(true);
-        const apiClient = new ApiClient();
+    const getFilters = () => {
         const filtersData = Object.values(filters);
         filtersData.forEach((item) => {
             if (item.columnField === 'category' && item.value.includes('Unknown')) {
@@ -36,16 +36,19 @@ const VillageStats: FC<VillageStatsProps> = ({ villages, categories, serviceType
             }
         })
 
-        if (categories.length !== 0 && !filters['category']) {
-            filtersData.push({ columnField: 'category', value: categories, operatorValue: 'isAnyOf' })
-        }
+        if (categories.length !== 0 && !filters['category']) filtersData.push({ columnField: 'category', value: categories, operatorValue: 'isAnyOf' })
+        if (serviceTypes.length !== 0) filtersData.push({ columnField: 'maintenance_type', value: serviceTypes, operatorValue: 'isAnyOf' })
+        if (talukas.length !== 0) filtersData.push({ columnField: 'taluka', operatorValue: 'isAnyOf', value: talukas });
+        if (districts.length !== 0) filtersData.push({ columnField: 'district', operatorValue: 'isAnyOf', value: districts });
+        if (villages.length !== 0) filtersData.push({ columnField: 'village', operatorValue: 'isAnyOf', value: villages });
 
-        if (villages.length !== 0) {
-            filtersData.push({ columnField: 'village', operatorValue: 'isAnyOf', value: villages });
-        }
-        if (serviceTypes.length !== 0) {
-            filtersData.push({ columnField: 'maintenance_type', value: serviceTypes, operatorValue: 'isAnyOf' })
-        }
+        return filtersData;
+    }
+
+    const getVillages = async () => {
+        setLoading(true);
+        const apiClient = new ApiClient();
+        const filtersData = getFilters();
         const stats = await apiClient.getTreesCountForVillages(page * pageSize, pageSize, filtersData, orderBy);
         
         setTotal(Number(stats.total));
@@ -79,7 +82,7 @@ const VillageStats: FC<VillageStatsProps> = ({ villages, categories, serviceType
 
     useEffect(() => {
         getVillages();
-    }, [filters, orderBy, villages, categories, serviceTypes])
+    }, [filters, orderBy, villages, talukas, districts, categories, serviceTypes])
 
     return (
         <GeneralStats 

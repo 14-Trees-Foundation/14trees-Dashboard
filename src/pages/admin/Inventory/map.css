@@ -27,7 +27,11 @@
 }
 
 
-.gm-style-iw + div {
+.gm-style-iw-chr {
     display: none !important;
     /* Hides the close button */
+}
+
+.gm-style-iw-tc::after {
+    display: none !important;
 }

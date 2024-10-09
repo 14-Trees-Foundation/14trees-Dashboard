@@ -133,7 +133,7 @@ const SitesMap: React.FC<SitesMapProps> = ({ plots }) => {
                                     width: 'auto',
                                     border: 'none',
                                     overflow: 'hidden',
-                                    lineHeight: '0.5'
+                                    lineHeight: '0.5',
                                 }}>
                                     {info.label && <strong style={{ color: '#ff5e6b' }}>{plot.label}</strong>}
                                     {info.available && <p><strong>Available: {plot.available}</strong></p>}
