@@ -36,6 +36,11 @@ const SiteStats: FC<SiteStatsProps> = ({ villages, categories, serviceTypes }) =
                 item.value = (item.value as string[]).filter(item => item !== 'Unknown');
                 item.value.push(null);
             }
+
+            if (item.columnField === 'land_type' && item.value.includes('Unknown')) {
+                item.value = (item.value as string[]).filter(item => item !== 'Unknown');
+                item.value.push(null);
+            }
         })
 
         const maintenanceIdx = filtersData.findIndex((item) => item.columnField === 'maintenance_type');
@@ -169,6 +174,19 @@ const SiteStats: FC<SiteStatsProps> = ({ villages, categories, serviceTypes }) =
             key: "maintenance_type",
             render: getMaintenanceTypesString,
             ...getColumnSelectedItemFilter<any>({ dataIndex: 'maintenance_type', filters, handleSetFilters, options: ['Distribution Only', 'Plantation Only', 'Full Maintenance', 'Unknown'] })
+        },
+        {
+            title: "Land Type",
+            dataIndex: "land_type",
+            key: "land_type",
+            render: (value: string) => value ? value : 'Unknown',
+            ...getColumnSelectedItemFilter<any>({ dataIndex: 'land_type', filters, handleSetFilters, options: ["Foundation", "Cremation", "Farm", "Roadside", "Temple", "Premises", "Gairan", "Forest", "School", 'Unknown'] })
+        },
+        {
+            title: "Kml File",
+            dataIndex: "kml_file_link",
+            key: "kml_file_link",
+            render: (value: string) => value ? 'Yes' : 'No',
         },
         {
             title: "Capacity",
