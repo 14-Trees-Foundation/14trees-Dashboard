@@ -7,12 +7,14 @@ import { getColumnSelectedItemFilter } from "../../../components/Filter"
 import { ArrowDropDown, ArrowDropUp } from "@mui/icons-material"
 
 interface TagStatsProps {
+    districts: string[]
+    talukas: string[]
     villages: string[]
     categories: (string | null)[]
     serviceTypes: (string | null)[]
 }
 
-const TagStats: FC<TagStatsProps> = ({ villages, categories, serviceTypes }) => {
+const TagStats: FC<TagStatsProps> = ({ villages, districts, talukas, categories, serviceTypes }) => {
 
     const [tagTreeCountData, setTagTreeCountData] = useState<Record<number, any>>({});
     const [tableRows, setTableRows] = useState<any[]>([]);
@@ -34,20 +36,28 @@ const TagStats: FC<TagStatsProps> = ({ villages, categories, serviceTypes }) => 
         setTags(resp.results);
     }
 
+    const getFilters = () => {
+        const filtersData = Object.values(filters);
+        filtersData.forEach((item) => {
+            if (item.columnField === 'category' && item.value.includes('Unknown')) {
+                item.value = (item.value as string[]).filter(item => item !== 'Unknown');
+                item.value.push(null);
+            }
+        })
+
+        if (categories.length !== 0 && !filters['category']) filtersData.push({ columnField: 'category', value: categories, operatorValue: 'isAnyOf' })
+        if (serviceTypes.length !== 0) filtersData.push({ columnField: 'maintenance_type', value: serviceTypes, operatorValue: 'isAnyOf' })
+        if (talukas.length !== 0) filtersData.push({ columnField: 'taluka', operatorValue: 'isAnyOf', value: talukas });
+        if (districts.length !== 0) filtersData.push({ columnField: 'district', operatorValue: 'isAnyOf', value: districts });
+        if (villages.length !== 0) filtersData.push({ columnField: 'village', operatorValue: 'isAnyOf', value: villages });
+
+        return filtersData;
+    }
+
     const getTagStats = async () => {
         setLoading(true);
         const apiClient = new ApiClient();
-        const filtersData = Object.values(filters);
-        if (categories.length !== 0 && !filters['category']) {
-            filtersData.push({ columnField: 'category', value: categories, operatorValue: 'isAnyOf' })
-        }
-
-        if (villages.length !== 0) {
-            filtersData.push({ columnField: 'village', operatorValue: 'isAnyOf', value: villages });
-        }
-        if (serviceTypes.length !== 0) {
-            filtersData.push({ columnField: 'maintenance_type', value: serviceTypes, operatorValue: 'isAnyOf' })
-        }
+        const filtersData = getFilters();
 
         const stats = await apiClient.getTreeCountsForTags(page * pageSize, pageSize, filtersData, orderBy);
         setTotal(Number(stats.total));
@@ -81,7 +91,7 @@ const TagStats: FC<TagStatsProps> = ({ villages, categories, serviceTypes }) => 
 
     useEffect(() => {
         getTagStats();
-    }, [filters, orderBy, villages, categories, serviceTypes])
+    }, [filters, orderBy, villages, talukas, districts, categories, serviceTypes])
 
     useEffect(() => {
         getTags();

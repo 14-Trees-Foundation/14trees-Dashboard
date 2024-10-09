@@ -4,12 +4,14 @@ import { GridFilterItem } from "@mui/x-data-grid"
 import GeneralStats from "./GeneralStats"
 
 interface TalukaStatsProps {
+    districts: string[]
     talukas: string[]
+    villages: string[]
     categories: (string | null)[]
     serviceTypes: (string | null)[]
 }
 
-const TalukaStats: FC<TalukaStatsProps> = ({ talukas, categories, serviceTypes }) => {
+const TalukaStats: FC<TalukaStatsProps> = ({ talukas, districts, villages, categories, serviceTypes }) => {
 
     const [talukaTreeCountData, setTalukaTreeCountData] = useState<Record<number, any>>({});
     const [tableRows, setTableRows] = useState<any[]>([]);
@@ -24,9 +26,7 @@ const TalukaStats: FC<TalukaStatsProps> = ({ talukas, categories, serviceTypes }
     const [page, setPage] = useState(0);
     const [pageSize, setPageSize] = useState(10);
 
-    const getTalukas = async () => {
-        setLoading(true);
-        const apiClient = new ApiClient();
+    const getFilters = () => {
         const filtersData = Object.values(filters);
         filtersData.forEach((item) => {
             if (item.columnField === 'category' && item.value.includes('Unknown')) {
@@ -35,15 +35,19 @@ const TalukaStats: FC<TalukaStatsProps> = ({ talukas, categories, serviceTypes }
             }
         })
 
-        if (categories.length !== 0 && !filters['category']) {
-            filtersData.push({ columnField: 'category', value: categories, operatorValue: 'isAnyOf' })
-        }
-        if (serviceTypes.length !== 0) {
-            filtersData.push({ columnField: 'maintenance_type', value: serviceTypes, operatorValue: 'isAnyOf' })
-        }
-        if (talukas.length !== 0) {
-            filtersData.push({ columnField: 'taluka', operatorValue: 'isAnyOf', value: talukas });
-        }
+        if (categories.length !== 0 && !filters['category']) filtersData.push({ columnField: 'category', value: categories, operatorValue: 'isAnyOf' })
+        if (serviceTypes.length !== 0) filtersData.push({ columnField: 'maintenance_type', value: serviceTypes, operatorValue: 'isAnyOf' })
+        if (talukas.length !== 0) filtersData.push({ columnField: 'taluka', operatorValue: 'isAnyOf', value: talukas });
+        if (districts.length !== 0) filtersData.push({ columnField: 'district', operatorValue: 'isAnyOf', value: districts });
+        if (villages.length !== 0) filtersData.push({ columnField: 'village', operatorValue: 'isAnyOf', value: villages });
+
+        return filtersData;
+    }
+
+    const getTalukas = async () => {
+        setLoading(true);
+        const apiClient = new ApiClient();
+        const filtersData = getFilters();
         const stats = await apiClient.getTreesCountForTalukas(page * pageSize, pageSize, filtersData, orderBy);
         
         setTotal(Number(stats.total));
@@ -77,7 +81,7 @@ const TalukaStats: FC<TalukaStatsProps> = ({ talukas, categories, serviceTypes }
 
     useEffect(() => {
         getTalukas();
-    }, [filters, orderBy, talukas])
+    }, [filters, orderBy, villages, talukas, districts, categories, serviceTypes])
 
     return (
         <GeneralStats 

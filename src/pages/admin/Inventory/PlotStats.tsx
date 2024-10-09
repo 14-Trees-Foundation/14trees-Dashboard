@@ -154,8 +154,9 @@ const PlotStats: FC<PlotStatsProps> = ({  }) => {
     return (
         <div>
             <Box>
-                <Typography variant="h6">Plot level stats</Typography>
-                <Box style={{ display: "flex", alignItems: "center", maxWidth: "100%" }}>
+                <Typography variant="h6">Time based stats</Typography>
+                <Typography variant='body1' marginLeft={1}>Select time range to see tree plantation progress at plot level</Typography>
+                <Box style={{ display: "flex", alignItems: "center", maxWidth: "100%", marginTop: 10 }}>
                     <TextField
                         name="start_date" 
                         label="Start Date" 
