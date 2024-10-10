@@ -117,17 +117,21 @@ export const PlotComponent = () => {
   const plotsData = useAppSelector((state: RootState) => state.plotsData);
   if (plotsData) {
     plotsList = Object.values(plotsData.plots);
-    plotsList = plotsList.sort((a: any, b: any) => {
-      for (let { column, order } of orderBy) {
-        if (a[column] > b[column]) {
-          return order === 'ASC' ? 1 : -1;
-        } else if (a[column] < b[column]) {
-          return order === 'ASC' ? -1 : 1;
+
+    if (orderBy.length > 0) {
+      plotsList = plotsList.sort((a: any, b: any) => {
+        for (let { column, order } of orderBy) {
+          if (a[column] > b[column]) {
+            return order === 'ASC' ? 1 : -1;
+          } else if (a[column] < b[column]) {
+            return order === 'ASC' ? -1 : 1;
+          }
         }
-      }
-      return 0;
-    });
-    
+        return 0;
+      });
+    } else {
+      plotsList = plotsList.sort((a: any, b: any) => b.id - a.id);
+    }
   }
 
   let tags: string[] = [];
