@@ -1,26 +1,25 @@
 import { Settings } from '@mui/icons-material';
-import { Box, Button, Divider, IconButton } from '@mui/material';
+import { Button, Divider, IconButton } from '@mui/material';
 import { Checkbox, Dropdown, MenuProps, Table, TableColumnsType } from 'antd';
 import { AnyObject } from 'antd/es/_util/type';
 import { TableRowSelection } from 'antd/es/table/interface';
 import { Parser } from 'json2csv';
-import { ReactElement, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 import { Resizable } from "react-resizable";
+import './GenTable.css'
 
-interface TableComponentProps {
+interface GeneralTableProps {
     loading?: boolean
-    dataSource: any[] | undefined
+    rows: any[] | undefined
     columns: TableColumnsType<any> | undefined
     totalRecords: number
-    fetchAllData: () => Promise<void>
-    setPageSize: (value: React.SetStateAction<number>) => void
-    setPage: (value: React.SetStateAction<number>) => void
-    setSrNoPage?: (value: React.SetStateAction<number>) => void
-    handleSelectionChanges?: (ids: number[]) => void
-    isExpandable?: boolean
-    expandableFunction?: (record: any) =>
-        ReactElement
+    onDownload: () => Promise<any[]>
+    page: number,
+    onPaginationChange: (page: number, pageSize: number) => void
+    onSelectionChanges?: (ids: number[]) => void
+    summary?: (totalColumns: number) => React.ReactNode
+    rowClassName?: (record: any, index: number) => string
 }
 
 const ResizableTitle = (props: any) => {
@@ -40,7 +39,6 @@ const ResizableTitle = (props: any) => {
                         "position": "absolute",
                         "right": "-5px",
                         "bottom": 0,
-                        // "z-index": 1,
                         "width": "10px",
                         "height": "100%",
                         "cursor": "col-resize",
@@ -58,20 +56,18 @@ const ResizableTitle = (props: any) => {
     );
 };
 
-function TableComponent({ loading, dataSource, columns, totalRecords, fetchAllData, setPageSize, setPage, handleSelectionChanges, setSrNoPage, isExpandable, expandableFunction }: TableComponentProps) {
+function GeneralTable({ loading, rows, columns, totalRecords, page, onDownload, onSelectionChanges, onPaginationChange, summary, rowClassName }: GeneralTableProps) {
 
-    const [download, setDownload] = useState(false);
-    const [isLoading, setIsLoading] = useState(false);
     const [checkedList, setCheckedList] = useState(columns?.map((item) => item.key) ?? []);
     const [open, setOpen] = useState(false);
     const [tableCols, setTableCols] = useState<any[]>([]);
 
     let rowSelection: TableRowSelection<AnyObject> | undefined;
-    if (handleSelectionChanges) {
+    if (onSelectionChanges) {
         rowSelection = {
             type: 'checkbox',
             onChange: (selectedRowKeys) => {
-                handleSelectionChanges(selectedRowKeys as number[]);
+                onSelectionChanges(selectedRowKeys as number[]);
             },
             getCheckboxProps: (record) => {
                 return { name: record.id }
@@ -93,13 +89,12 @@ function TableComponent({ loading, dataSource, columns, totalRecords, fetchAllDa
         document.body.removeChild(link);
     };
 
-    const expandable = {
-        expandedRowRender: (record: any) => expandableFunction ? expandableFunction(record) : null,
-        rowExpandable: (record: any) => { return isExpandable ? isExpandable : false },
-    }
-
     const handleDataSourceParse = async () => {
-        const data = dataSource?.map((item) => {
+
+        let dataSource = rows ? rows : [];
+        if (rows?.length !== totalRecords)  dataSource = await onDownload();
+
+        const data = dataSource.map((item) => {
             const row: any = {}
             columns?.forEach((column: any) => {
                 const title = typeof column.title === 'string' ? column.title : column.dataIndex;
@@ -112,21 +107,10 @@ function TableComponent({ loading, dataSource, columns, totalRecords, fetchAllDa
             })
             return row
         })
+
         handleDownload(data);
-        setDownload(false);
         toast.success('File downloaded successfully!');
     }
-
-    useEffect(() => {
-        if (download) {
-            handleDataSourceParse();
-        }
-
-    }, [dataSource]);
-
-    useEffect(() => {
-        if (loading !== undefined) setIsLoading(loading);
-    }, [loading]);
 
     useEffect(() => {
         setTableCols(columns?.map((item: any) => ({
@@ -134,18 +118,6 @@ function TableComponent({ loading, dataSource, columns, totalRecords, fetchAllDa
             hidden: !checkedList.includes(item.key as string),
         })) ?? []);
     }, [columns, checkedList]);
-
-    const handlePageChange = (page: number, pageSize: number) => {
-        if (dataSource && page * pageSize > dataSource.length) {
-            const pageNo = Math.floor(dataSource.length / pageSize);
-            setPage(pageNo);
-            setPageSize(pageSize);
-            setSrNoPage && setSrNoPage(pageNo);
-        } else {
-            setPageSize(pageSize);
-            setSrNoPage && setSrNoPage(page - 1);
-        }
-    }
 
     const handleOpenChange = (flag: boolean, info: { source: 'menu' | 'trigger' }) => {
         if (info.source === 'trigger') setOpen(flag);
@@ -183,9 +155,11 @@ function TableComponent({ loading, dataSource, columns, totalRecords, fetchAllDa
 
     return (
         <Table
-            loading={isLoading}
-            style={{ borderRadius: 20 }}
-            dataSource={dataSource}
+            loading={loading}
+            style={{ 
+                borderRadius: 20,
+            }}
+            dataSource={rows}
             columns={tableCols.map((col, index) => ({
                 ...col,
                 onHeaderCell: (column: any) => ({
@@ -193,15 +167,17 @@ function TableComponent({ loading, dataSource, columns, totalRecords, fetchAllDa
                     onResize: handleResize(index)
                 })
             }))}
-            expandable={isExpandable ? expandable : undefined}
             pagination={{
                 position: ['bottomRight'],
-                defaultCurrent: 1,
+                current: page + 1,
                 total: totalRecords,
+                pageSize: 10,
+                pageSizeOptions: [10, 20, 50, 100],
                 simple: true,
-                onChange: handlePageChange,
+                onChange: onPaginationChange,
             }}
             components={components}
+            rowClassName={rowClassName}
             rowSelection={rowSelection}
             scroll={{ y: 550 }}
             footer={() => (
@@ -220,18 +196,16 @@ function TableComponent({ loading, dataSource, columns, totalRecords, fetchAllDa
                     <Button
                         color="success"
                         variant='contained'
-                        onClick={() => {
-                            if (dataSource?.length === totalRecords) handleDataSourceParse();
-                            else {
-                                fetchAllData();
-                                setDownload(true);
-                            }
-                        }}>Export</Button>
+                        onClick={handleDataSourceParse}>Export</Button>
                     <div></div>
                 </div>
             )}
+            summary={summary ? 
+                () => summary(tableCols.filter((col) => !col.hidden).length)
+                : undefined
+            }
         />
     )
 }
 
-export default TableComponent;
+export default GeneralTable;

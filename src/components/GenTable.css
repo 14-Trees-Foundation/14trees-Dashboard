@@ -1,0 +1,32 @@
+
+.accessible-plot {
+    background-color: rgba(172, 252, 172, 0.2);
+}
+
+.accessible-plot.ant-table-row-selected > .ant-table-cell {
+    background-color: rgba(172, 252, 172, 0.2) !important; /* Keep the same background color on selection */
+}
+
+.inaccessible-plot {
+    background-color: rgba(255, 156, 156, 0.2);
+}
+
+.inaccessible-plot.ant-table-row-selected > .ant-table-cell {
+    background-color: rgba(255, 156, 156, 0.2) !important;
+}
+
+.moderately-accessible-plot {
+    background-color: rgba(255, 219, 153, 0.2);
+}
+
+.moderately-accessible-plot.ant-table-row-selected > .ant-table-cell {
+    background-color: rgba(255, 219, 153, 0.2) !important;
+}
+
+.ant-table-filter-dropdown {
+    background-color: white !important;
+}
+
+.pending-item {
+    background-color: rgba(255, 156, 156, 0.2);
+}
