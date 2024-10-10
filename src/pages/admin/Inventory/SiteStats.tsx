@@ -5,6 +5,7 @@ import { Box, Typography } from "@mui/material"
 import { Table } from "antd"
 import { ArrowDropDown, ArrowDropUp } from "@mui/icons-material"
 import getColumnSearchProps, { getColumnSelectedItemFilter } from "../../../components/Filter"
+import GeneralTable from "../../../components/GenTable"
 
 interface SiteStatsProps {
     districts: string[]
@@ -30,7 +31,7 @@ const SiteStats: FC<SiteStatsProps> = ({ districts, talukas, villages, categorie
     const [pageSize, setPageSize] = useState(10);
 
     const getFilters = () => {
-        const filtersData = Object.values(filters);
+        const filtersData = JSON.parse(JSON.stringify(Object.values(filters))) as GridFilterItem[];
         filtersData.forEach((item) => {
             if (item.columnField === 'category' && item.value.includes('Unknown')) {
                 item.value = (item.value as string[]).filter(item => item !== 'Unknown');
@@ -124,6 +125,13 @@ const SiteStats: FC<SiteStatsProps> = ({ districts, talukas, villages, categorie
     const handlePageChange = (page: number, pageSize: number) => {
         setPage(page - 1);
         setPageSize(pageSize);
+    }
+
+    const handleDownload = async () => {
+        const apiClient = new ApiClient();
+        const filtersList = getFilters();
+        const resp = await apiClient.getSitesStats(0, total, filtersList, orderBy);
+        return resp.results;
     }
 
     const getSortIcon = (field: string, order?: 'ASC' | 'DESC') => {
@@ -243,17 +251,17 @@ const SiteStats: FC<SiteStatsProps> = ({ districts, talukas, villages, categorie
         <div>
             <Box>
                 <Typography variant="h6">Site level stats</Typography>
-                <Table
-                    columns={columns}
+                <GeneralTable 
                     loading={loading}
-                    dataSource={tableRows}
-                    pagination={{
-                        total: total,
-                        pageSize: pageSize,
-                        pageSizeOptions: [10, 20, 50, 100],
-                        onChange(page, pageSize) {
-                            handlePageChange(page, pageSize);
-                        },
+                    columns={columns}
+                    rows={tableRows}
+                    totalRecords={total}
+                    page={page}
+                    onPaginationChange={handlePageChange}
+                    onDownload={handleDownload}
+                    rowClassName={(record: any, index: number) => {
+                        if (!record.category || !record.maintenance_type ) return 'pending-item';
+                        return ''; 
                     }}
                 />
             </Box>

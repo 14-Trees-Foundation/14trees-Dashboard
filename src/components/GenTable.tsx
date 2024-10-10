@@ -7,6 +7,7 @@ import { Parser } from 'json2csv';
 import { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 import { Resizable } from "react-resizable";
+import './GenTable.css'
 
 interface GeneralTableProps {
     loading?: boolean
@@ -18,6 +19,7 @@ interface GeneralTableProps {
     onPaginationChange: (page: number, pageSize: number) => void
     onSelectionChanges?: (ids: number[]) => void
     summary?: (totalColumns: number) => React.ReactNode
+    rowClassName?: (record: any, index: number) => string
 }
 
 const ResizableTitle = (props: any) => {
@@ -54,7 +56,7 @@ const ResizableTitle = (props: any) => {
     );
 };
 
-function GeneralTable({ loading, rows, columns, totalRecords, page, onDownload, onSelectionChanges, onPaginationChange, summary }: GeneralTableProps) {
+function GeneralTable({ loading, rows, columns, totalRecords, page, onDownload, onSelectionChanges, onPaginationChange, summary, rowClassName }: GeneralTableProps) {
 
     const [checkedList, setCheckedList] = useState(columns?.map((item) => item.key) ?? []);
     const [open, setOpen] = useState(false);
@@ -175,6 +177,7 @@ function GeneralTable({ loading, rows, columns, totalRecords, page, onDownload, 
                 onChange: onPaginationChange,
             }}
             components={components}
+            rowClassName={rowClassName}
             rowSelection={rowSelection}
             scroll={{ y: 550 }}
             footer={() => (

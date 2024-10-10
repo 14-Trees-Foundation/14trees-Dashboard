@@ -12,6 +12,7 @@ import PlotStats from "./PlotStats"
 import { GridFilterItem } from "@mui/x-data-grid"
 import './inventory.css'
 import CorporateStats from "./CorporateStats"
+import GeneralTable from "../../../components/GenTable"
 
 interface SiteLocation {
     district: string;
@@ -255,10 +256,15 @@ const InventoryStats: FC = () => {
             >
                 <Box>
                     <Typography variant="h6">Overall site stats</Typography>
-                    <Table
-                        rowClassName={(record, index) => !record.category ? 'pending-item' : ''}
+                    <GeneralTable 
+                        loading={false}
+                        rows={aggregatedData}
                         columns={aggregatedDataColumn}
-                        dataSource={aggregatedData}
+                        page={1}
+                        onPaginationChange={(page, pageSize) => { }}
+                        totalRecords={aggregatedData.length}
+                        onDownload={async () => { return aggregatedData }}
+                        rowClassName={(record, index) => !record.category ? 'pending-item' : ''}
                     />
                 </Box>
 
