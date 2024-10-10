@@ -4,22 +4,23 @@ import { Box, Typography } from "@mui/material"
 import getColumnSearchProps, { getColumnSelectedItemFilter } from "../../../components/Filter"
 import { GridFilterItem } from "@mui/x-data-grid"
 import { ArrowDropDown, ArrowDropUp } from "@mui/icons-material"
-import './inventory.css'
+import GeneralTable from "../../../components/GenTable"
 
 interface GeneralStatsProps {
     field: string
     loading: boolean,
     total: number,
-    pageSize: number,
+    page: number,
     tableRows: any[],
     onPageChange: (page: number, pageSize: number) => void
     orderBy: {column: string, order: 'ASC' | 'DESC'}[]
     onOrderByChange: (orderBy: {column: string, order: 'ASC' | 'DESC'}[]) => void
     filters: Record<string, GridFilterItem>
     onFiltersChange: (filters: Record<string, GridFilterItem>) => void
+    onDownload: () => Promise<any[]>
 }
 
-const GeneralStats: FC<GeneralStatsProps> = ({ field, loading, total, pageSize, tableRows, onPageChange, orderBy, onOrderByChange, filters, onFiltersChange }) => {
+const GeneralStats: FC<GeneralStatsProps> = ({ field, loading, total, page, tableRows, onPageChange, orderBy, onOrderByChange, filters, onFiltersChange, onDownload }) => {
 
     const handleSortingChange = (sorter: any) => {
         let newOrder = [...orderBy];
@@ -126,16 +127,17 @@ const GeneralStats: FC<GeneralStatsProps> = ({ field, loading, total, pageSize, 
         <div>
             <Box>
                 <Typography variant="h6">{field.slice(0, 1).toUpperCase() + field.slice(1)} level stats</Typography>
-                <Table 
-                    columns={districtDataColumn}
+                <GeneralTable 
                     loading={loading}
-                    dataSource={tableRows}
-                    rowClassName={(item) => !item.category || !item[field] ? 'pending-item' : ''}
-                    pagination={{
-                        total: total,
-                        pageSize: pageSize,
-                        pageSizeOptions: [10, 20, 50, 100],
-                        onChange: onPageChange,
+                    page={page}
+                    rows={tableRows}
+                    columns={districtDataColumn}
+                    totalRecords={total}
+                    onPaginationChange={onPageChange}
+                    onDownload={onDownload}
+                    rowClassName={(record, index) => {
+                        if (!record[field] || !record['category']) return 'pending-item';
+                        return '';
                     }}
                 />
             </Box>

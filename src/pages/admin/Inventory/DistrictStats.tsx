@@ -27,7 +27,7 @@ const DistrictStats: FC<DistrictStatsProps> = ({ districts, talukas, villages, c
     const [pageSize, setPageSize] = useState(10);
 
     const getFilters = () => {
-        const filtersData = Object.values(filters);
+        const filtersData = JSON.parse(JSON.stringify(Object.values(filters))) as GridFilterItem[];
         filtersData.forEach((item) => {
             if (item.columnField === 'category' && item.value.includes('Unknown')) {
                 item.value = (item.value as string[]).filter(item => item !== 'Unknown');
@@ -83,18 +83,26 @@ const DistrictStats: FC<DistrictStatsProps> = ({ districts, talukas, villages, c
         getDistricts();
     }, [filters, orderBy, villages, talukas, districts, categories, serviceTypes])
 
+    const handleDownload = async () => {
+        const apiClient = new ApiClient();
+        const filtersList = getFilters();
+        const resp = await apiClient.getTreesCountForDistricts(0, total, filtersList, orderBy);
+        return resp.results;
+    }
+
     return (
         <GeneralStats 
             field="district"
             loading={loading}
             total={total}
-            pageSize={pageSize}
+            page={page}
             tableRows={tableRows}
             onPageChange={handlePageChange}
             orderBy={orderBy}
             onOrderByChange={setOrderBy}
             filters={filters}
             onFiltersChange={handleSetFilters}
+            onDownload={handleDownload}
         />
     )
 }

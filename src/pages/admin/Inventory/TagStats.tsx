@@ -2,9 +2,9 @@ import { FC, useEffect, useState } from "react"
 import ApiClient from "../../../api/apiClient/apiClient"
 import { GridFilterItem } from "@mui/x-data-grid"
 import { Box, Typography } from "@mui/material"
-import { Table } from "antd"
 import { getColumnSelectedItemFilter } from "../../../components/Filter"
 import { ArrowDropDown, ArrowDropUp } from "@mui/icons-material"
+import GeneralTable from "../../../components/GenTable"
 
 interface TagStatsProps {
     districts: string[]
@@ -37,7 +37,7 @@ const TagStats: FC<TagStatsProps> = ({ villages, districts, talukas, categories,
     }
 
     const getFilters = () => {
-        const filtersData = Object.values(filters);
+        const filtersData = JSON.parse(JSON.stringify(Object.values(filters))) as GridFilterItem[];
         filtersData.forEach((item) => {
             if (item.columnField === 'category' && item.value.includes('Unknown')) {
                 item.value = (item.value as string[]).filter(item => item !== 'Unknown');
@@ -116,6 +116,13 @@ const TagStats: FC<TagStatsProps> = ({ villages, districts, talukas, categories,
         }
     }
 
+    const handleDownload = async () => {
+        const apiClient = new ApiClient();
+        const filtersList = getFilters();
+        const resp = await apiClient.getTreeCountsForTags(0, total, filtersList, orderBy);
+        return resp.results;
+    }
+
     const getSortIcon = (field: string, order?: 'ASC' | 'DESC') => {
         return (
             <div 
@@ -187,18 +194,14 @@ const TagStats: FC<TagStatsProps> = ({ villages, districts, talukas, categories,
         <div>
             <Box>
                 <Typography variant="h6">Tag level stats</Typography>
-                <Table
+                <GeneralTable 
                     columns={columns}
                     loading={loading}
-                    dataSource={tableRows}
-                    pagination={{
-                        total: total,
-                        pageSize: pageSize,
-                        pageSizeOptions: [10, 20, 50, 100],
-                        onChange(page, pageSize) {
-                            handlePageChange(page, pageSize);
-                        },
-                    }}
+                    rows={tableRows}
+                    totalRecords={total}
+                    page={page}
+                    onPaginationChange={handlePageChange}
+                    onDownload={handleDownload}
                 />
             </Box>
         </div>
