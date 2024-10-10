@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import Box from "@mui/material/Box";
 import { GridFilterItem } from "@mui/x-data-grid";
 import AddPlot from "./AddPlot";
@@ -24,15 +24,35 @@ import {
   Typography,
 } from "@mui/material";
 import EditPlot from "./EditPlot";
-import { TableColumnsType } from "antd";
+import { Table, TableColumnsType } from "antd";
 import getColumnSearchProps, { getColumnSelectedItemFilter, getSortIcon } from "../../../components/Filter";
-import TableComponent from "../../../components/Table";
 import { ToastContainer, toast } from "react-toastify";
 import { AutocompleteWithPagination } from "../../../components/AutoComplete";
 import { Site } from "../../../types/site";
 import UpdateCoords from "./UpdateCoords";
 import ApiClient from "../../../api/apiClient/apiClient";
+import GeneralTable from "../../../components/GenTable";
 
+const TableSummary = (plots: Plot[], selectedPlotIds: number[], totalColumns: number) => {
+
+  const calculateSum = (data: (number | undefined)[]) => {
+    return data.reduce((a, b) => (a ?? 0) + (b ?? 0), 0);
+  }
+
+  return (
+    <Table.Summary fixed='bottom'>
+      <Table.Summary.Row style={{ backgroundColor: 'rgba(172, 252, 172, 0.2)' }}>
+        <Table.Summary.Cell align="right" index={totalColumns - 4} colSpan={totalColumns - 3}>
+          <strong>Total</strong>
+        </Table.Summary.Cell>
+        <Table.Summary.Cell align="right" index={totalColumns - 3} colSpan={1}>{calculateSum(plots.filter((plot) => selectedPlotIds.includes(plot.id)).map((plot) => plot.total))}</Table.Summary.Cell>
+        <Table.Summary.Cell align="right" index={totalColumns - 3} colSpan={1}>{calculateSum(plots.filter((plot) => selectedPlotIds.includes(plot.id)).map((plot) => plot.booked))}</Table.Summary.Cell>
+        <Table.Summary.Cell align="right" index={totalColumns - 1} colSpan={1}>{calculateSum(plots.filter((plot) => selectedPlotIds.includes(plot.id)).map((plot) => plot.assigned))}</Table.Summary.Cell>
+        <Table.Summary.Cell align="right" index={totalColumns} colSpan={1}>{calculateSum(plots.filter((plot) => selectedPlotIds.includes(plot.id)).map((plot) => plot.available))}</Table.Summary.Cell>
+      </Table.Summary.Row>
+    </Table.Summary>
+  )
+}
 
 export const PlotComponent = () => {
   const dispatch = useAppDispatch();
@@ -47,6 +67,7 @@ export const PlotComponent = () => {
   const handleModalOpen = () => setOpen(true);
   const handleModalClose = () => setOpen(false);
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
+  const [tableRows, setTableRows] = useState<Plot[]>([]);
   const [selectedItem, setSelectedItem] = useState<Plot | null>(null);
   const [selectedEditRow, setSelectedEditRow] = useState<Plot | null>(null);
   const [editModal, setEditModal] = useState(false);
@@ -69,19 +90,34 @@ export const PlotComponent = () => {
     setFilters(filters);
   }
 
+  const plotsData = useAppSelector((state: RootState) => state.plotsData);
+
   useEffect(() => {
     getPlotData();
-  }, [pageSize, page, filters, orderBy]);
+  }, [filters, orderBy]);
+
+  useEffect(() => {
+    const records: Plot[] = [];
+    const maxLength = Math.min((page + 1) * pageSize, plotsData.totalPlots);
+    for (let i = page * pageSize; i < maxLength; i++) {
+      if (Object.hasOwn(plotsData.paginationMapping, i)) {
+        const id = plotsData.paginationMapping[i];
+        const record = plotsData.plots[id];
+        if (record) {
+          records.push(record);
+        }
+      } else {
+        getPlotData();
+        break;
+      }
+    }
+
+    setTableRows(records);
+  }, [pageSize, page, plotsData]);
 
   const getPlotData = async () => {
     setLoading(true);
-    let filtersData = Object.values(filters);
-
-    const categoryIdx = filtersData.findIndex(item => item.columnField === 'category');
-    if (categoryIdx > -1) {
-      filtersData[categoryIdx].value = (filtersData[categoryIdx].value as string[]).filter(item => item !== 'Unknown');
-      filtersData[categoryIdx].value.push(null);
-    }
+    let filtersData = JSON.parse(JSON.stringify(Object.values(filters))) as GridFilterItem[];
 
     const accessibilityIdx = filtersData.findIndex(item => item.columnField === 'accessibility_status');
     if (accessibilityIdx > -1) {
@@ -113,37 +149,11 @@ export const PlotComponent = () => {
     getPlotTags(page * pageSize, pageSize);
   };
 
-  let plotsList: Plot[] = [];
-  const plotsData = useAppSelector((state: RootState) => state.plotsData);
-  if (plotsData) {
-    plotsList = Object.values(plotsData.plots);
-
-    if (orderBy.length > 0) {
-      plotsList = plotsList.sort((a: any, b: any) => {
-        for (let { column, order } of orderBy) {
-          if (a[column] > b[column]) {
-            return order === 'ASC' ? 1 : -1;
-          } else if (a[column] < b[column]) {
-            return order === 'ASC' ? -1 : 1;
-          }
-        }
-        return 0;
-      });
-    } else {
-      plotsList = plotsList.sort((a: any, b: any) => b.id - a.id);
-    }
-  }
-
   let tags: string[] = [];
   const tagsData = useAppSelector((state: RootState) => state.plotTags);
   if (tagsData) {
     tags = Array.from(tagsData);
   }
-
-  const getAllPlotData = async () => {
-    let filtersData = Object.values(filters);
-    getPlots(0, plotsData.totalPlots, filtersData);
-  };
 
   useEffect(() => {
     getSitesData();
@@ -281,10 +291,18 @@ export const PlotComponent = () => {
       ...getColumnSelectedItemFilter({ dataIndex: 'tags', filters, handleSetFilters, options: tags })
     },
     {
+      dataIndex: "site_name",
+      key: "site_name",
+      title: "Site Name",
+      align: "center",
+      width: 300,
+      ...getColumnSearchProps('site_name', filters, handleSetFilters)
+    },
+    {
       dataIndex: "total",
       key: "total",
       title: getSortableHeader("Total Trees", 'total'),
-      align: "center",
+      align: "right",
       width: 150,
       render: (value, record) => value ?? 0 - (includeDeadLostTrees && record.void_total ? record.void_total : 0),
     },
@@ -292,7 +310,7 @@ export const PlotComponent = () => {
       dataIndex: "booked",
       key: "booked",
       title: getSortableHeader("Booked Trees", 'booked'),
-      align: "center",
+      align: "right",
       width: 150,
       render: (value, record) => value ?? 0 - (includeDeadLostTrees && record.void_booked ? record.void_booked : 0),
     },
@@ -300,7 +318,7 @@ export const PlotComponent = () => {
       dataIndex: "assigned",
       key: "assigned",
       title: getSortableHeader("Assigned Trees", 'assigned'),
-      align: "center",
+      align: "right",
       width: 150,
       render: (value, record) => value ?? 0 - (includeDeadLostTrees && record.void_assigned ? record.void_assigned : 0),
     },
@@ -308,17 +326,9 @@ export const PlotComponent = () => {
       dataIndex: "available",
       key: "available",
       title: getSortableHeader("Available Trees", 'available'),
-      align: "center",
+      align: "right",
       width: 150,
       render: (value, record) => value ?? 0 - (includeDeadLostTrees && record.void_available ? record.void_available : 0),
-    },
-    {
-      dataIndex: "site_name",
-      key: "site_name",
-      title: "Site Name",
-      align: "center",
-      width: 300,
-      ...getColumnSearchProps('site_name', filters, handleSetFilters)
     },
   ];
 
@@ -358,6 +368,19 @@ export const PlotComponent = () => {
       toast.error('Failed to update plot coordinates');
     }
 
+  }
+
+  const handlePaginationChange = (page: number, pageSize: number) => {
+    setPage(page - 1);
+    setPageSize(pageSize);
+  }
+
+  const handleDownload = async () => {
+
+    const apiClient = new ApiClient();
+    const filtersList = Object.values(filters);
+    const resp = await apiClient.getPlots(0, plotsData.totalPlots, filtersList, orderBy);
+    return resp.results;
   }
 
   return (
@@ -423,15 +446,19 @@ export const PlotComponent = () => {
             label="Include Dead/Lost Trees"
           />
         </div>
-        <TableComponent
+        <GeneralTable
           loading={loading}
-          dataSource={plotsList}
+          rows={tableRows}
           columns={columns}
           totalRecords={plotsData.totalPlots}
-          fetchAllData={getAllPlotData}
-          setPage={setPage}
-          setPageSize={setPageSize}
-          handleSelectionChanges={handleSelectionChanges}
+          page={page}
+          onSelectionChanges={handleSelectionChanges}
+          onPaginationChange={handlePaginationChange}
+          onDownload={handleDownload}
+          summary={(totalColumns: number) => {
+            if (totalColumns < 5) return undefined;
+            return TableSummary(tableRows, selectedPlotIds, totalColumns)
+          }}
         />
       </Box>
 
