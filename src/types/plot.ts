@@ -31,4 +31,5 @@ export type Plot = {
 export type PlotsDataState = {
     totalPlots: number,
     plots: Record<number, Plot>
+    paginationMapping: Record<number, number> 
 }
