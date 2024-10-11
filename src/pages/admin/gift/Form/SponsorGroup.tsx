@@ -77,7 +77,7 @@ const SponsorGroupForm: FC<SponsorGroupFormProps> = ({ group, onSelect }) => {
                     fullWidth
                     size="medium"
                 />
-                <Typography variant="body1">Couldn't find yourself in the system? <Typography color="primary" onClick={() => setFormOption('new')} variant="body1" component="span">Add sponsor details</Typography>.</Typography>
+                <Typography variant="body1">Couldn't find corporate in the system? <Typography color="primary" onClick={() => setFormOption('new')} variant="body1" component="span">Add corporate details</Typography>.</Typography>
             </Box>}
 
             {formOption === 'new' && <Box>

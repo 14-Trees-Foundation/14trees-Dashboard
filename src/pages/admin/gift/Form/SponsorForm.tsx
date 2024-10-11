@@ -6,18 +6,29 @@ import { User } from "../../../../types/user";
 import { Group } from "../../../../types/Group";
 import SponsorGroupForm from "./SponsorGroup";
 import ImagePicker from "../../../../components/ImagePicker";
+import CardDetails from "./CardDetailsForm";
+
+interface GiftCardMessages {
+    primaryMessage: string
+    secondaryMessage: string
+    eventName: string
+    plantedBy: string
+    logoMessage: string
+}
 
 interface SponsorFormInterface {
+    messages: GiftCardMessages,
+    onMessagesChange: (messages: GiftCardMessages) => void
     user: User | null;
     onUserChange: (user: User | null) => void
     group: Group | null;
     onGroupChange: (group: Group | null) => void
-    onLogoChange: (logo: File | null) => void
+    onLogoChange: (logo: File | null) => void   
 }
 
-const SponsorForm: FC<SponsorFormInterface> = ({ user, group, onUserChange, onGroupChange, onLogoChange }) => {
-    const [formOption, setFormOption] = useState<"0" | "1">("0");
-    const [inputOption, setInputOption] = useState<"user" | "group" | 'logo'>("user");
+const SponsorForm: FC<SponsorFormInterface> = ({ messages, user, group, onUserChange, onGroupChange, onLogoChange, onMessagesChange }) => {
+    const [formOption, setFormOption] = useState<"0" | "1">("1");
+    const [inputOption, setInputOption] = useState<"user" | "group" | 'logo' | 'gift'>("user");
 
     const handleChange = (event: React.MouseEvent<HTMLElement>, newFormOption: "0" | "1") => {
         setFormOption(newFormOption);
@@ -25,7 +36,7 @@ const SponsorForm: FC<SponsorFormInterface> = ({ user, group, onUserChange, onGr
 
     return (
         <div style={{ flex: 1 }}>
-            <ToggleButtonGroup
+            {/* <ToggleButtonGroup
                 color="primary"
                 value={formOption}
                 exclusive
@@ -35,7 +46,7 @@ const SponsorForm: FC<SponsorFormInterface> = ({ user, group, onUserChange, onGr
             >
                 <ToggleButton value="0" color="success" >Individual Sponsor</ToggleButton>
                 <ToggleButton value="1" color="success" >Corporate Sponsor</ToggleButton>
-            </ToggleButtonGroup>
+            </ToggleButtonGroup> */}
 
             <Box
                 style = {{ display: 'flex' }}
@@ -66,12 +77,28 @@ const SponsorForm: FC<SponsorFormInterface> = ({ user, group, onUserChange, onGr
                         endIcon={<ArrowForwardIos sx={{ fontSize: 18 }} />}
                         onClick={() => { setInputOption("group") }}
                     >Corporate Details</Button>}
+                    <Button 
+                        variant='text' 
+                        color='inherit' 
+                        style={{ textTransform: 'none', textAlign: 'left', fontSize: 20, }}
+                        sx={{ marginX: 0 }}
+                        endIcon={<ArrowForwardIos sx={{ fontSize: 18 }} />}
+                        onClick={() => { setInputOption("gift") }}
+                    >Gift Card Details</Button>
                 </Box>
                 <Divider orientation='vertical' flexItem style={{ zIndex: 1, backgroundColor: 'black' }} />
-                <Box style={{ padding: 20, width: '50%' }}>
+                <Box style={{ padding: 50, width: '50%' }}>
                     { inputOption === 'user' && <SponsorUserForm user={user} onSelect={onUserChange}/>}
                     { inputOption === 'group' && <SponsorGroupForm group={group} onSelect={onGroupChange}/>}
-                    { inputOption === 'logo' && <ImagePicker onChange={onLogoChange}/>}
+                    { inputOption === 'logo' && <ImagePicker onChange={onLogoChange} width={300} height={200}/>}
+                    { inputOption === 'gift' && <CardDetails 
+                        primaryMessage={messages.primaryMessage}
+                        secondaryMessage={messages.secondaryMessage}
+                        eventName={messages.eventName}
+                        plantedBy={messages.plantedBy}
+                        logoMessage={messages.logoMessage}
+                        onChange={(primary, secondary, event, planted, logo) => onMessagesChange({ primaryMessage: primary, secondaryMessage: secondary, eventName: event, plantedBy: planted, logoMessage: logo })}
+                    />}
                 </Box>
             </Box>
         </div>

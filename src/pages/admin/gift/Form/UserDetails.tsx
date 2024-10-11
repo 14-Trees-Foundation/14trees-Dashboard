@@ -16,6 +16,7 @@ interface User {
 interface BulkUserFormProps {
   users: User[];
   onUsersChange: (users: User[]) => void;
+  onFileChange: (file: File | null) => void;
 }
 
 const isValidEmail = (email: string) => {
@@ -28,7 +29,7 @@ const isValidPhone = (phone: string) => {
   return phoneRegex.test(phone);
 };
 
-export const BulkUserForm: FC<BulkUserFormProps> = ({ users, onUsersChange }) => {
+export const BulkUserForm: FC<BulkUserFormProps> = ({ users, onUsersChange, onFileChange }) => {
   const [fileError, setFileError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [userAddOption, setUserAddOption] = useState<'bulk' | 'single'>('bulk');
@@ -36,6 +37,7 @@ export const BulkUserForm: FC<BulkUserFormProps> = ({ users, onUsersChange }) =>
   const handleFileChange = (e: any) => {
     if (e.target.files) {
       const file = e.target.files[0];
+      onFileChange(file);
       if (file) {
         Papa.parse(file, {
           header: true,
@@ -132,7 +134,7 @@ export const BulkUserForm: FC<BulkUserFormProps> = ({ users, onUsersChange }) =>
   return (
     <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', margin: '20px' }}>
       <Grid container rowSpacing={2} columnSpacing={1}>
-        <Grid item xs={12}>
+        {/* <Grid item xs={12}>
           <RadioGroup
             row
             aria-label="enable"
@@ -151,7 +153,7 @@ export const BulkUserForm: FC<BulkUserFormProps> = ({ users, onUsersChange }) =>
               label="CSV Upload"
             />
           </RadioGroup>
-        </Grid>
+        </Grid> */}
         <Grid item xs={12}>
           {userAddOption === 'single' && (
             <UserForm onSubmit={(user) => { handleUserAdd(user) }} />
