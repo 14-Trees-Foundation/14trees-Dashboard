@@ -60,11 +60,11 @@ const GiftTrees: FC = () => {
         getGiftCards(0, giftCardsData.totalGiftCards, filtersData);
     };
 
-    const saveNewGiftCardsRequest = async (user: User, group: Group | null, treeCount: number, users: any[], logo?: File) => {
+    const saveNewGiftCardsRequest = async (user: User, group: Group | null, treeCount: number, users: any[], logo?: File, messages?: any, file?: File) => {
         const apiClient = new ApiClient();
         let giftCardId: number;
         try {
-            const response = await apiClient.createGiftCard(treeCount, user.id, group?.id, logo);
+            const response = await apiClient.createGiftCard(treeCount, user.id, group?.id, logo, messages, file);
             giftCardId = response.id;
         } catch (error) {
             toast.error("Failed to create gift card");
@@ -79,10 +79,10 @@ const GiftTrees: FC = () => {
         }   
     }
 
-    const handleSubmit = (user: User, group: Group | null, treeCount: number, users: any[], logo?: File) => {
+    const handleSubmit = (user: User, group: Group | null, treeCount: number, users: any[], logo?: File, messages?: any, file?: File) => {
         handleModalClose();
 
-        saveNewGiftCardsRequest(user, group, treeCount, users, logo);
+        saveNewGiftCardsRequest(user, group, treeCount, users, logo, messages, file);
     }
 
     const handlePlotSelectionSubmit = async () => {

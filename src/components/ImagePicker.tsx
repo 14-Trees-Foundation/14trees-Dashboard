@@ -1,14 +1,22 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useCallback } from 'react';
 import { Button, IconButton } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
+import ReactCrop, { Crop } from 'react-image-crop';
+import 'react-image-crop/dist/ReactCrop.css';
 
 interface ImagePickerProps {
     onChange: (file: File | null) => void;
+    width?: number;
+    height?: number;
 }
 
-const ImagePicker: React.FC<ImagePickerProps> = ({ onChange }) => {
+const ImagePicker: React.FC<ImagePickerProps> = ({ onChange, width, height }) => {
     const [imagePreview, setImagePreview] = useState<string | null>(null);
+    const [crop, setCrop] = useState<Crop>({ unit: '%', width: width || 50, aspect: width && height ? width / height : 1, x: 0, y: 0, height: height || 50 });
+    const [completedCrop, setCompletedCrop] = useState<Crop | null>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
+    const imageRef = useRef<HTMLImageElement | null>(null);
+    const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
     const handleImageUpload = (file: File) => {
         const reader = new FileReader();
@@ -46,24 +54,59 @@ const ImagePicker: React.FC<ImagePickerProps> = ({ onChange }) => {
 
     const handleRemoveImage = () => {
         setImagePreview(null);
+        setCompletedCrop(null);
+    };
+
+    const onCropComplete = (crop: Crop) => {
+        setCompletedCrop(crop);
+    };
+
+    const getCroppedImage = useCallback(() => {
+        if (completedCrop?.width && completedCrop?.height && imageRef.current && canvasRef.current) {
+            const image = imageRef.current;
+            const canvas = canvasRef.current;
+            const ctx = canvas.getContext('2d');
+
+            const scaleX = image.naturalWidth / image.width;
+            const scaleY = image.naturalHeight / image.height;
+
+            canvas.width = width || completedCrop.width;
+            canvas.height = height || completedCrop.height;
+
+            ctx?.drawImage(
+                image,
+                (completedCrop.x ?? 0) * scaleX,
+                (completedCrop.y ?? 0) * scaleY,
+                (completedCrop.width ?? 0) * scaleX,
+                (completedCrop.height ?? 0) * scaleY,
+                0,
+                0,
+                canvas.width,
+                canvas.height
+            );
+        }
+    }, [completedCrop, width, height]);
+
+    const handleCropAndResize = () => {
+        getCroppedImage();
     };
 
     return (
-        <div style={{ 
-            display: 'flex', 
-            flexDirection: 'column', 
-            alignItems: 'center', 
-            justifyContent: 'center', 
-            width: '100%',
-        }}>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', width: '100%' }}>
             {imagePreview ? (
                 <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                     <div style={{ position: 'relative', width: '90%' }}>
-                        <img src={imagePreview} alt="Preview" style={{ width: '100%', maxHeight: '40vh' }} />
+                        <ReactCrop
+                            src={imagePreview}
+                            crop={crop}
+                            onImageLoaded={(img) => (imageRef.current = img)}
+                            onChange={(newCrop) => setCrop(newCrop)}
+                            onComplete={onCropComplete}
+                        />
                         <IconButton
                             aria-label="remove image"
                             onClick={handleRemoveImage}
-                            size='small'
+                            size="small"
                             style={{
                                 position: 'absolute',
                                 top: -5,
@@ -78,7 +121,11 @@ const ImagePicker: React.FC<ImagePickerProps> = ({ onChange }) => {
                         <Button variant="outlined" onClick={handleReuploadClick} style={{ marginTop: '10px' }}>
                             Reupload Image
                         </Button>
+                        <Button variant="contained" onClick={handleCropAndResize} style={{ marginLeft: '10px', marginTop: '10px' }}>
+                            Crop & Resize
+                        </Button>
                     </div>
+                    <canvas ref={canvasRef} style={{ display: 'none' }} />
                 </div>
             ) : (
                 <div

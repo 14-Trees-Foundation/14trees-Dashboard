@@ -8,7 +8,7 @@ import { Site } from '../../types/site';
 import { Donation } from '../../types/donation';
 import { OnsiteStaff } from '../../types/onSiteStaff';
 import { MapTreesUsingPlotIdRequest, MapTreesUsingSaplingIdsRequest, Tree } from '../../types/tree';
-import { AssignTreeRequest, UserTree, UserTreeCountPaginationResponse } from '../../types/userTree';
+import { UserTree, UserTreeCountPaginationResponse } from '../../types/userTree';
 import { PaginatedResponse } from '../../types/pagination';
 import { Event } from '../../types/event';
 import { Visit, BulkVisitUsersMappingResponse } from '../../types/visits';
@@ -1153,18 +1153,23 @@ class ApiClient {
     }
 
 
-    async createGiftCard(no_of_cards: number, user_id: number, group_id?: number, logo?: File): Promise<GiftCard> {
+    async createGiftCard(no_of_cards: number, user_id: number, group_id?: number, logo?: File, messages?: any, file?: File): Promise<GiftCard> {
         try {
             const formData = new FormData();
             formData.append('no_of_cards', no_of_cards.toString());
             formData.append('user_id', user_id.toString());
-            if (group_id) {
-                formData.append('group_id', group_id.toString());
+            if (messages) {
+                formData.append('primary_message', messages.primaryMessage);
+                formData.append('secondary_message', messages.secondaryMessage);
+                formData.append('event_name', messages.eventName);
+                formData.append('planted_by', messages.plantedBy);
+                formData.append('logo_message', messages.logoMessage);
             }
-            if (logo) {
-                formData.append('file', logo, logo.name);
-            }
-            const response = await this.api.post<GiftCard>(`/gift-cards/`, formData);
+            if (group_id) formData.append('group_id', group_id.toString());
+            if (logo) formData.append('logo', logo, logo.name);
+            if (file) formData.append('csv_file', file, file.name);
+
+            const response = await this.api.post<GiftCard>(`/gift-cards/requests`, formData);
             return response.data;
         } catch (error: any) {
             if (error.response) {
