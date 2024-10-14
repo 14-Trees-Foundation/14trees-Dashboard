@@ -30,13 +30,18 @@ const GiftTrees: FC = () => {
     const [filters, setFilters] = useState<Record<string, GridFilterItem>>({});
     const [selectedGiftCard, setSelectedGiftCard] = useState<GiftCard | null>(null);
     const [selectedPlots, setSelectedPlots] = useState<Plot[]>([]);
+    const [requestId, setRequestId] = useState<string | null>(null);
 
     const handleSetFilters = (filters: Record<string, GridFilterItem>) => {
         setPage(0);
         setFilters(filters);
     }
 
-    const handleModalOpen = () => setModalOpen(true);
+    const handleModalOpen = () => {
+        const uniqueRequestId = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+        setRequestId(uniqueRequestId);
+        setModalOpen(true);
+    }
     const handleModalClose = () => setModalOpen(false);
 
     useEffect(() => {
@@ -61,11 +66,16 @@ const GiftTrees: FC = () => {
     };
 
     const saveNewGiftCardsRequest = async (user: User, group: Group | null, treeCount: number, users: any[], logo?: File, messages?: any, file?: File) => {
+        if (!requestId) {
+            toast.error("Something went wrong. Please try again later!");
+            return;
+        }
         const apiClient = new ApiClient();
         let giftCardId: number;
         try {
-            const response = await apiClient.createGiftCard(treeCount, user.id, group?.id, logo, messages, file);
+            const response = await apiClient.createGiftCard(requestId, treeCount, user.id, group?.id, logo, messages, file);
             giftCardId = response.id;
+            setRequestId(null);
         } catch (error) {
             toast.error("Failed to create gift card");
             return;
@@ -225,7 +235,7 @@ const GiftTrees: FC = () => {
                 setPageSize={setPageSize}
             />
 
-            <GiftCardsForm open={modalOpen} handleClose={handleModalClose} onSubmit={handleSubmit} />
+            <GiftCardsForm requestId={requestId} open={modalOpen} handleClose={handleModalClose} onSubmit={handleSubmit} />
 
             <Dialog open={plotModal} onClose={() => setPlotModal(false)} fullWidth maxWidth="lg">
                 <DialogTitle>Select Plots</DialogTitle>

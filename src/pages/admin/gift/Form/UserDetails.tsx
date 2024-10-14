@@ -7,7 +7,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import { UserForm } from "../../donation/components/UserForm";
 import { toast } from "react-toastify";
 import UserImagesForm from "./UserImagesForm";
-import { checkIfObjectKeyExists } from "../../../../helpers/aws";
+import { AWSUtils } from "../../../../helpers/aws";
 
 interface User {
   name: string;
@@ -19,6 +19,7 @@ interface User {
 }
 
 interface BulkUserFormProps {
+  requestId: string | null;
   users: User[];
   onUsersChange: (users: User[]) => void;
   onFileChange: (file: File | null) => void;
@@ -34,12 +35,39 @@ const isValidPhone = (phone: string) => {
   return phoneRegex.test(phone);
 };
 
-export const BulkUserForm: FC<BulkUserFormProps> = ({ users, onUsersChange, onFileChange }) => {
+const dummyData: User[] = [
+  {
+    name: "John Doe",
+    phone: "1234567890",
+    email: "kN3qK@example.com",
+    birth_date: "01/01/2000",
+    image: false,
+    image_name: "John_Doe.png"
+  },
+  {
+    name: "Sam Smith",
+    phone: "1234567890",
+    email: "jI5w3@example.com",
+    birth_date: "01/01/2000",
+    image: true,
+    image_name: "Sam_Smith.png"
+  },
+  {
+    name: "Rita White",
+    phone: "1234567890",
+    email: "jI5x2@example.com",
+    birth_date: "01/01/2000",
+  },
+]
+
+export const BulkUserForm: FC<BulkUserFormProps> = ({ requestId, users, onUsersChange, onFileChange }) => {
   const [fileError, setFileError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [userAddOption, setUserAddOption] = useState<'bulk' | 'single'>('bulk');
 
   const handleFileChange = (e: any) => {
+
+    const awsUtils = new AWSUtils();
     if (e.target.files) {
       const file = e.target.files[0];
       onFileChange(file);
@@ -59,7 +87,7 @@ export const BulkUserForm: FC<BulkUserFormProps> = ({ users, onUsersChange, onFi
                   birth_date: user['Date of Birth (optional)'],
                   image_name: user['Image Name'],
                   image: user['Image Name'] !== '' 
-                    ? await checkIfObjectKeyExists('users/' + user['Image Name']) 
+                    ? await awsUtils.checkIfPublicFileExists( 'gift-card-requests' + "/" + requestId + '/' + user['Image Name']) 
                     : undefined,
                 });
               }
@@ -126,11 +154,11 @@ export const BulkUserForm: FC<BulkUserFormProps> = ({ users, onUsersChange, onFi
       title: "Image",
       width: 180,
       align: "center",
-      render: (value) => value === undefined
+      render: (value, record) => value === undefined
         ? 'NA'
         : value
-          ? 'Yes'
-          : 'Not found'
+          ? record.image_name
+          : record.image_name + '\n(Not Found)'
     },
     {
       dataIndex: "action",
@@ -190,8 +218,8 @@ export const BulkUserForm: FC<BulkUserFormProps> = ({ users, onUsersChange, onFi
 
           {userAddOption === 'bulk' && (
             <Grid item xs={12}>
-              <UserImagesForm />
-              <Typography variant='body1' marginBottom={2}>Upload the CSV file containing user details of the users who will be receiving the gift.</Typography>
+              <UserImagesForm requestId={requestId}/>
+              <Typography variant='body1' marginBottom={1} marginTop={2}>Upload the CSV file containing user details of the users who will be receiving the gift. If you have uploaded user images, make sure to mention exact name of the image in <strong>Image Name</strong> column.</Typography>
               <Typography>Download sample file from <a href="https://docs.google.com/spreadsheets/d/1DDM5nyrvP9YZ09B60cwWICa_AvbgThUx-yeDVzT4Kw4/gviz/tq?tqx=out:csv&sheet=Sheet1">here</a> and fill the details.</Typography>
               <TextField
                 type="file"
@@ -214,12 +242,12 @@ export const BulkUserForm: FC<BulkUserFormProps> = ({ users, onUsersChange, onFi
       >
         <Table
           columns={columns}
-          dataSource={users.sort((a, b) => {
+          dataSource={users.length > 0 ? users.sort((a, b) => {
             if (a.image === false) return 1;
             if (b.image === false) return -1;
 
             return 0;
-          })}
+          }) : dummyData}
           pagination={{ pageSize: 5 }}
         />
       </Grid>

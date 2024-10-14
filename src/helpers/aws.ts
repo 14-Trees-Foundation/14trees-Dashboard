@@ -1,52 +1,50 @@
-import AWS from 'aws-sdk';
+import axios from "axios";
+import ApiClient from "../api/apiClient/apiClient";
 
-AWS.config.update({
-    accessKeyId: process.env.REACT_APP_AWS_ACCESS_KEY,
-    secretAccessKey: process.env.REACT_APP_AWS_SECRET_ACCESS_KEY,
-    region: 'ap-south-1',
-});
 
-const myBucket = new AWS.S3({
-    params: { Bucket: process.env.REACT_APP_S3_BUCKET },
-});
+class AWSUtils {
 
-export const uploadFileToS3 = (file: File, setUploadProgress: any) => {
-    const params = {
-        ACL: 'public-read',
-        Body: file,
-        Bucket: process.env.REACT_APP_S3_BUCKET || '',
-        Key: `users/${file.name}`, // You can structure the S3 folder path as needed
-    };
+    private async getSignedUrl(requestId: string, fileName: string): Promise<string> {
 
-    return new Promise((resolve, reject) => {
-        myBucket.putObject(params)
-            .on('httpUploadProgress', (evt) => {
-                setUploadProgress(Math.round((evt.loaded / evt.total) * 100));
-            })
-            .send((err) => {
-                if (err) {
-                    console.error('Error uploading file:', err);
-                    reject(err);
-                } else {
-                    resolve(true);
+        const apiClient = new ApiClient();
+        const url = await apiClient.getSignedUrlForRequestId(requestId, fileName);
+        return url;
+    }
+
+    async uploadFileToS3(requestId: string, file: File, setUploadProgress: any) {
+        const signedUrl = await this.getSignedUrl(requestId, file.name);
+
+        try {
+            const response = await axios.put(signedUrl, file, {
+                headers: {
+                    'Content-Type': file.type
+                },
+                onUploadProgress: (evt) => {
+                    setUploadProgress(Math.round((evt.loaded / evt.total) * 100));
                 }
-            });
-    });
-};
+            })
+    
+            if (!response.status) {
+                throw new Error(`Failed to upload file. Status: ${response.status}`);
+            }
+        } catch (error) {
+            throw error;
+        }
+    }
 
-export const checkIfObjectKeyExists = (key: string): Promise<boolean> => {
-    return new Promise((resolve, reject) => {
-        myBucket
-            .headObject({ 
-                Key: key,
-                Bucket: process.env.REACT_APP_S3_BUCKET || '',
-            })
-            .promise()
-            .then(() => {
-                resolve(true);
-            })
-            .catch(() => {
-                resolve(false);
-            });
-    });
-};
+    // check if public file exists in s3 or not
+    async checkIfPublicFileExists(key: string): Promise<boolean> {
+        try {
+            const response = await axios.get(`https://14treesplants.s3.amazonaws.com/${key}`, {responseType: 'arraybuffer'});
+            if (!response.status) {
+                throw new Error(`Failed to check if public file exists. Status: ${response.status}`);
+            }
+
+            return true;
+        } catch (error) {
+            return false;
+        }
+    }
+}
+
+export { AWSUtils }

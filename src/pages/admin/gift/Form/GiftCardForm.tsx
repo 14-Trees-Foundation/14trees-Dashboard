@@ -12,12 +12,13 @@ import SponsorGroupForm from "./SponsorGroup";
 import CardDetails from "./CardDetailsForm";
 
 interface GiftCardsFormProps {
+    requestId: string | null
     open: boolean
     handleClose: () => void
     onSubmit: (user: User, group: Group | null, treeCount: number, users: any[], logo?: File, messages?: any, file?: File) => void
 }
 
-const GiftCardsForm: FC<GiftCardsFormProps> = ({ open, handleClose, onSubmit }) => {
+const GiftCardsForm: FC<GiftCardsFormProps> = ({ requestId, open, handleClose, onSubmit }) => {
 
     const [currentStep, setCurrentStep] = useState(0);
     const [user, setUser] = useState<User | null>(null);
@@ -64,7 +65,7 @@ const GiftCardsForm: FC<GiftCardsFormProps> = ({ open, handleClose, onSubmit }) 
         {
             key: 5,
             title: "User Details",
-            content: <BulkUserForm users={users} onUsersChange={users => setUsers(users)} onFileChange={file => setFile(file)} />,
+            content: <BulkUserForm requestId={requestId} users={users} onUsersChange={users => setUsers(users)} onFileChange={file => setFile(file)} />,
         },
     ]
 

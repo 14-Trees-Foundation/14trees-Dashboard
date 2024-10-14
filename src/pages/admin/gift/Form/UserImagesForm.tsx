@@ -1,9 +1,14 @@
 import React, { useState } from 'react';
 import { useDropzone } from 'react-dropzone';
-import { Button } from '@mui/material';
-import { uploadFileToS3 } from '../../../../helpers/aws';
+import { Button, Typography } from '@mui/material';
+import { AWSUtils } from '../../../../helpers/aws';
+import { toast } from 'react-toastify';
 
-const UserImagesForm: React.FC = () => {
+interface UserImagesFormProps {
+    requestId: string | null
+}
+
+const UserImagesForm: React.FC<UserImagesFormProps> = ({ requestId }) => {
     const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
     const [uploading, setUploading] = useState(false);
     const [uploadProgress, setUploadProgress] = useState<number | null>(null);
@@ -16,14 +21,21 @@ const UserImagesForm: React.FC = () => {
     });
 
     const handleUpload = async () => {
+        if (!requestId) {
+            toast.error("Something went wrong. Please try again later!");
+            return;
+        }
+
         if (selectedFiles.length === 0) return;
+        const awsUtils = new AWSUtils();
 
         setUploading(true);
         for (const file of selectedFiles) {
-            await uploadFileToS3(file, setUploadProgress);
+            await awsUtils.uploadFileToS3(requestId, file, setUploadProgress);
         }
         setUploading(false);
         setSelectedFiles([]);
+        toast.success('User images uploaded successfully!');
     };
 
     return (
@@ -32,6 +44,7 @@ const UserImagesForm: React.FC = () => {
             flexDirection: 'column',
             alignItems: 'center',
         }}>
+            <Typography sx={{ mb: 1 }}>Upload images of the user if you wish to create more personalized profile dashboard for user.</Typography>
             <div
                 {...getRootProps()}
                 style={{
@@ -43,7 +56,7 @@ const UserImagesForm: React.FC = () => {
                 }}
             >
                 <input {...getInputProps()} />
-                <p>Drag and drop some files here, or click to select files</p>
+                <p>Drag and drop some user images here, or click to select.</p>
             </div>
 
             {selectedFiles.length > 0 && (
