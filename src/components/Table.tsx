@@ -220,6 +220,7 @@ function TableComponent({ loading, dataSource, columns, totalRecords, fetchAllDa
                     <Button
                         color="success"
                         variant='contained'
+                        disabled={download || Number(totalRecords) === 0}
                         onClick={() => {
                             if (dataSource?.length === totalRecords) handleDataSourceParse();
                             else {
