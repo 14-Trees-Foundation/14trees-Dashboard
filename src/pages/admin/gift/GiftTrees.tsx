@@ -210,7 +210,7 @@ const GiftTrees: FC = () => {
                         marginTop: "5px",
                     }}>
                     <Button variant="contained" color="success" onClick={handleModalOpen}>
-                        Create Gift Cards
+                        Create Gift Request
                     </Button>
                 </div>
             </div>
@@ -227,7 +227,7 @@ const GiftTrees: FC = () => {
 
             <GiftCardsForm open={modalOpen} handleClose={handleModalClose} onSubmit={handleSubmit} />
 
-            <Dialog open={plotModal} onClose={() => setPlotModal(false)} fullWidth maxWidth="md">
+            <Dialog open={plotModal} onClose={() => setPlotModal(false)} fullWidth maxWidth="lg">
                 <DialogTitle>Select Plots</DialogTitle>
                 <DialogContent dividers>
                     <PlotSelection plots={selectedPlots} onPlotsChange={plots => setSelectedPlots(plots)} />

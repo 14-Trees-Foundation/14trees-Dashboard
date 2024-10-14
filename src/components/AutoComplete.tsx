@@ -67,6 +67,7 @@ const  AutocompleteWithPagination = ({
       sx={sx}
       fullWidth={fullWidth}
       freeSolo
+      blurOnSelect
       size={size ? size : 'small'}
       autoHighlight
       value={value ? value : null}

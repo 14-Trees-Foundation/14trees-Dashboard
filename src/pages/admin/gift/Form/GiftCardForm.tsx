@@ -10,7 +10,6 @@ import SponsorUserForm from "./SponsorUser";
 import ImagePicker from "../../../../components/ImagePicker";
 import SponsorGroupForm from "./SponsorGroup";
 import CardDetails from "./CardDetailsForm";
-import UserImagesForm from "./UserImagesForm";
 
 interface GiftCardsFormProps {
     open: boolean
@@ -47,6 +46,11 @@ const GiftCardsForm: FC<GiftCardsFormProps> = ({ open, handleClose, onSubmit }) 
         },
         {
             key: 3,
+            title: "Book Trees",
+            content: <PlotSelection treeCount={treeCount} onTreeCountChange={count => setTreeCount(count)}/>,
+        },
+        {
+            key: 4,
             title: "Gift Card Messages",
             content: <CardDetails
                 primaryMessage={messages.primaryMessage}
@@ -58,17 +62,7 @@ const GiftCardsForm: FC<GiftCardsFormProps> = ({ open, handleClose, onSubmit }) 
             />,
         },
         {
-            key: 4,
-            title: "Book Trees",
-            content: <PlotSelection treeCount={treeCount} onTreeCountChange={count => setTreeCount(count)}/>,
-        },
-        {
             key: 5,
-            title: "User Images",
-            content: <UserImagesForm />,
-        },
-        {
-            key: 6,
             title: "User Details",
             content: <BulkUserForm users={users} onUsersChange={users => setUsers(users)} onFileChange={file => setFile(file)} />,
         },
@@ -101,15 +95,12 @@ const GiftCardsForm: FC<GiftCardsFormProps> = ({ open, handleClose, onSubmit }) 
                 else nextStep = 3;
                 break;
             case 3:
-                if (messages.primaryMessage === "" || messages.secondaryMessage === "") toast.error("Please provide gift card details");
+                if (treeCount === 0) toast.error("Please provide number of trees to gift");
                 else nextStep = 4;
                 break;
             case 4:
-                if (treeCount === 0) toast.error("Please provide number of trees to gift");
+                if (messages.primaryMessage === "" || messages.secondaryMessage === "") toast.error("Please provide gift card details");
                 else nextStep = 5;
-                break;
-            case 5:
-                nextStep = 6;
                 break;
             default:
                 break;

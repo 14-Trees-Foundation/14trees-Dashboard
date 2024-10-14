@@ -1,4 +1,4 @@
-import { Autocomplete, Box, Button, Grid, TextField, ToggleButton, ToggleButtonGroup, Typography } from "@mui/material";
+import { Autocomplete, Box, Button, Grid, TextField, Typography } from "@mui/material";
 import { FC, useEffect, useState } from "react";
 import { AutocompleteWithPagination } from "../../../../components/AutoComplete";
 import { Group } from "../../../../types/Group";
@@ -66,7 +66,7 @@ const SponsorGroupForm: FC<SponsorGroupFormProps> = ({ group, onSelect }) => {
 
 
             {formOption === 'existing' && <Box>
-                <Typography variant='body1'>Let's check whether corporate exist in the system</Typography>
+                <Typography variant='body1'>Do you want to gift on behalf of a corporate/organization?</Typography>
                 <AutocompleteWithPagination
                     label="Enter corporate name to search"
                     value={group}
@@ -77,7 +77,7 @@ const SponsorGroupForm: FC<SponsorGroupFormProps> = ({ group, onSelect }) => {
                     fullWidth
                     size="medium"
                 />
-                <Typography variant="body1">Couldn't find corporate in the system? <Typography color="primary" onClick={() => setFormOption('new')} variant="body1" component="span">Add corporate details</Typography>.</Typography>
+                <Typography variant="body1">Couldn't find corporate in the system? <Typography color="primary" style={{ cursor: 'pointer' }} onClick={() => setFormOption('new')} variant="body1" component="span">Add corporate details</Typography>.</Typography>
             </Box>}
 
             {formOption === 'new' && <Box>
@@ -111,7 +111,7 @@ const SponsorGroupForm: FC<SponsorGroupFormProps> = ({ group, onSelect }) => {
                         </Grid>
                     </Grid>
                 </form>
-                <Typography variant="body1">Sponsor already exists? <Typography onClick={() => setFormOption('existing')} color='primary' variant="body1" component="span">Select Sponsor</Typography>.</Typography>
+                <Typography variant="body1">Sponsor already exists? <Typography onClick={() => setFormOption('existing')} style={{ cursor: 'pointer' }} color='primary' variant="body1" component="span">Select Sponsor</Typography>.</Typography>
             </Box>}
         </Box>
     );
