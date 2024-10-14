@@ -15,6 +15,7 @@ interface User {
   email: string;
   birth_date?: string;
   image?: boolean;
+  image_name?: string;
 }
 
 interface BulkUserFormProps {
@@ -56,6 +57,7 @@ export const BulkUserForm: FC<BulkUserFormProps> = ({ users, onUsersChange, onFi
                   phone: user['Phone'],
                   email: user['Email ID'],
                   birth_date: user['Date of Birth (optional)'],
+                  image_name: user['Image Name'],
                   image: user['Image Name'] !== '' 
                     ? await checkIfObjectKeyExists('users/' + user['Image Name']) 
                     : undefined,
@@ -215,7 +217,7 @@ export const BulkUserForm: FC<BulkUserFormProps> = ({ users, onUsersChange, onFi
           dataSource={users.sort((a, b) => {
             if (a.image === false) return 1;
             if (b.image === false) return -1;
-            
+
             return 0;
           })}
           pagination={{ pageSize: 5 }}
