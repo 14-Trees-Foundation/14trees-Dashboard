@@ -1153,9 +1153,10 @@ class ApiClient {
     }
 
 
-    async createGiftCard(no_of_cards: number, user_id: number, group_id?: number, logo?: File, messages?: any, file?: File): Promise<GiftCard> {
+    async createGiftCard(request_id: string, no_of_cards: number, user_id: number, group_id?: number, logo?: File, messages?: any, file?: File): Promise<GiftCard> {
         try {
             const formData = new FormData();
+            formData.append('request_id', request_id);
             formData.append('no_of_cards', no_of_cards.toString());
             formData.append('user_id', user_id.toString());
             if (messages) {
@@ -1251,6 +1252,19 @@ class ApiClient {
         try {
             const resp = await this.api.post<GiftCardUser>(`/gift-cards/card/redeem`, { gift_card_user_id, sapling_id, tree_id, user });
             return resp.data;
+        } catch (error: any) {
+            if (error.response) {
+                throw new Error(error.response.data.message);
+            }
+            throw new Error('Failed to generate gift cards');
+        }
+    }
+
+    // Utils
+    async getSignedUrlForRequestId(gift_card_request_id: string, filename: string): Promise<string> {
+        try {
+            const response = await this.api.get<{ url: string }>(`/utils/s3/${gift_card_request_id}?filename=${filename}`);
+            return response.data.url;
         } catch (error: any) {
             if (error.response) {
                 throw new Error(error.response.data.message);
