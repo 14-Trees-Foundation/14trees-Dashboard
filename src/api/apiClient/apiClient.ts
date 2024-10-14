@@ -1143,7 +1143,7 @@ class ApiClient {
     */
 
     async getGiftCards(offset: number, limit: number, filters?: any[]): Promise<PaginatedResponse<GiftCard>> {
-        const url = `/gift-cards/get?offset=${offset}&limit=${limit}`;
+        const url = `/gift-cards/requests/get?offset=${offset}&limit=${limit}`;
         try {
             const response = await this.api.post<PaginatedResponse<GiftCard>>(url, { filters: filters });
             return response.data;
@@ -1179,9 +1179,9 @@ class ApiClient {
         }
     }
 
-    async createGiftCardUsers(gift_card_id: number, users: any[]): Promise<void> {
+    async createGiftCardUsers(gift_card_request_id: number, users: any[]): Promise<void> {
         try {
-            await this.api.post<any>(`/gift-cards/users`, { gift_card_id, users });
+            await this.api.post<any>(`/gift-cards`, { gift_card_request_id, users });
         } catch (error: any) {
             if (error.response) {
                 throw new Error(error.response.data.message);
@@ -1190,9 +1190,9 @@ class ApiClient {
         }
     }
 
-    async createGiftCardPlots(gift_card_id: number, plot_ids: number[]): Promise<void> {
+    async createGiftCardPlots(gift_card_request_id: number, plot_ids: number[]): Promise<void> {
         try {
-            await this.api.post<any>(`/gift-cards/plots`, { gift_card_id, plot_ids });
+            await this.api.post<any>(`/gift-cards/plots`, { gift_card_request_id, plot_ids });
         } catch (error: any) {
             if (error.response) {
                 throw new Error(error.response.data.message);
@@ -1201,9 +1201,9 @@ class ApiClient {
         }
     }
 
-    async bookGiftCards(gift_card_id: number): Promise<void> {
+    async bookGiftCards(gift_card_request_id: number): Promise<void> {
         try {
-            await this.api.post<any>(`/gift-cards/book`, { gift_card_id });
+            await this.api.post<any>(`/gift-cards/book`, { gift_card_request_id });
         } catch (error: any) {
             if (error.response) {
                 throw new Error(error.response.data.message);
