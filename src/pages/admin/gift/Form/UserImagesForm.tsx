@@ -1,16 +1,7 @@
 import React, { useState } from 'react';
 import { useDropzone } from 'react-dropzone';
-import AWS from 'aws-sdk';
 import { Button } from '@mui/material';
-
-AWS.config.update({
-    accessKeyId: process.env.REACT_APP_AWS_ACCESS_KEY,
-    secretAccessKey: process.env.REACT_APP_AWS_SECRET_ACCESS_KEY,
-});
-
-const myBucket = new AWS.S3({
-    params: { Bucket: process.env.REACT_APP_S3_BUCKET },
-});
+import { uploadFileToS3 } from '../../../../helpers/aws';
 
 const UserImagesForm: React.FC = () => {
     const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
@@ -29,35 +20,10 @@ const UserImagesForm: React.FC = () => {
 
         setUploading(true);
         for (const file of selectedFiles) {
-            await uploadFileToS3(file);
+            await uploadFileToS3(file, setUploadProgress);
         }
         setUploading(false);
         setSelectedFiles([]);
-    };
-
-    console.log(process.env.REACT_APP_S3_BUCKET);
-    const uploadFileToS3 = (file: File) => {
-        const params = {
-            ACL: 'public-read',
-            Body: file,
-            Bucket: process.env.REACT_APP_S3_BUCKET || '',
-            Key: `users/${file.name}`, // You can structure the S3 folder path as needed
-        };
-
-        return new Promise((resolve, reject) => {
-            myBucket.putObject(params)
-                .on('httpUploadProgress', (evt) => {
-                    setUploadProgress(Math.round((evt.loaded / evt.total) * 100));
-                })
-                .send((err) => {
-                    if (err) {
-                        console.error('Error uploading file:', err);
-                        reject(err);
-                    } else {
-                        resolve(true);
-                    }
-                });
-        });
     };
 
     return (

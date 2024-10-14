@@ -6,11 +6,15 @@ import { ColumnType } from "antd/es/table";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { UserForm } from "../../donation/components/UserForm";
 import { toast } from "react-toastify";
+import UserImagesForm from "./UserImagesForm";
+import { checkIfObjectKeyExists } from "../../../../helpers/aws";
 
 interface User {
   name: string;
   phone: string;
   email: string;
+  birth_date?: string;
+  image?: boolean;
 }
 
 interface BulkUserFormProps {
@@ -41,12 +45,23 @@ export const BulkUserForm: FC<BulkUserFormProps> = ({ users, onUsersChange, onFi
       if (file) {
         Papa.parse(file, {
           header: true,
-          complete: (results: any) => {
-            const parsedUsers: User[] = results.data.map((user: any) => ({
-              name: user['Name'],
-              phone: user['Phone'],
-              email: user['Email ID'],
-            }));
+          complete: async (results: any) => {
+            const parsedUsers: User[] = [];
+            
+            for (let i = 0; i < results.data.length; i++) {
+              const user = results.data[i];
+              if (user['Name'] && user['Phone'] && user['Email ID']) {
+                parsedUsers.push({
+                  name: user['Name'],
+                  phone: user['Phone'],
+                  email: user['Email ID'],
+                  birth_date: user['Date of Birth (optional)'],
+                  image: user['Image Name'] !== '' 
+                    ? await checkIfObjectKeyExists('users/' + user['Image Name']) 
+                    : undefined,
+                });
+              }
+            }
 
             const validUsers = parsedUsers.filter(user => isValidEmail(user.email) && isValidPhone(user.phone));
             if (validUsers.length !== parsedUsers.length) {
@@ -102,6 +117,18 @@ export const BulkUserForm: FC<BulkUserFormProps> = ({ users, onUsersChange, onFi
       title: "Phone",
       width: 180,
       align: "center",
+    },
+    {
+      dataIndex: "image",
+      key: "image",
+      title: "Image",
+      width: 180,
+      align: "center",
+      render: (value) => value === undefined
+        ? 'NA'
+        : value
+          ? 'Yes'
+          : 'Not found'
     },
     {
       dataIndex: "action",
@@ -161,8 +188,9 @@ export const BulkUserForm: FC<BulkUserFormProps> = ({ users, onUsersChange, onFi
 
           {userAddOption === 'bulk' && (
             <Grid item xs={12}>
+              <UserImagesForm />
               <Typography variant='body1' marginBottom={2}>Upload the CSV file containing user details of the users who will be receiving the gift.</Typography>
-              <Typography>Download sample file from <a href="https://docs.google.com/spreadsheets/d/1ypVdbR44nQXuaHAEOrwywY3k-lfJdsRZ9iKp0Jpq7Kw/gviz/tq?tqx=out:csv&sheet=Sheet1">here</a> and fill the details.</Typography>
+              <Typography>Download sample file from <a href="https://docs.google.com/spreadsheets/d/1DDM5nyrvP9YZ09B60cwWICa_AvbgThUx-yeDVzT4Kw4/gviz/tq?tqx=out:csv&sheet=Sheet1">here</a> and fill the details.</Typography>
               <TextField
                 type="file"
                 inputProps={{ accept: '.csv' }}
@@ -184,7 +212,12 @@ export const BulkUserForm: FC<BulkUserFormProps> = ({ users, onUsersChange, onFi
       >
         <Table
           columns={columns}
-          dataSource={users}
+          dataSource={users.sort((a, b) => {
+            if (a.image === false) return 1;
+            if (b.image === false) return -1;
+            
+            return 0;
+          })}
           pagination={{ pageSize: 5 }}
         />
       </Grid>
