@@ -39,6 +39,7 @@ const CardDetails: FC<CardDetailsProps> = ({ primaryMessage, secondaryMessage, e
                     value={primary}
                     onChange={(e) => setPrimary(e.target.value)}
                     size="small"
+                    inputProps={{ maxLength: 270 }}
                 />
                 <Typography variant="body1" sx={{ mt: 2 }}>Secondary Message (3)</Typography>
                 <TextField 
@@ -46,6 +47,7 @@ const CardDetails: FC<CardDetailsProps> = ({ primaryMessage, secondaryMessage, e
                     value={secondary}
                     onChange={(e) => setSecondary(e.target.value)}
                     size="small"
+                    inputProps={{ maxLength: 125 }}
                 />
                 <Typography variant="body1" sx={{ mt: 2 }}>Event Name</Typography>
                 <TextField 
@@ -64,6 +66,7 @@ const CardDetails: FC<CardDetailsProps> = ({ primaryMessage, secondaryMessage, e
                     value={logo}
                     onChange={(e) => setLogo(e.target.value)}
                     size="small"
+                    inputProps={{ maxLength: 50 }}
                 />
             </div>
             <div style={{ display: 'flex', justifyContent: 'center', flexDirection: 'column', maxWidth: '55%' }}>

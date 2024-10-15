@@ -16,6 +16,7 @@ interface User {
   birth_date?: string;
   image?: boolean;
   image_name?: string;
+  error?: boolean;
 }
 
 interface BulkUserFormProps {
@@ -92,6 +93,7 @@ export const BulkUserForm: FC<BulkUserFormProps> = ({ requestId, users, onUsersC
                   image: user['Image Name'] !== '' 
                     ? await awsUtils.checkIfPublicFileExists( 'gift-card-requests' + "/" + requestId + '/' + user['Image Name']) 
                     : undefined,
+                  error: false,
                 });
               }
             }
@@ -118,13 +120,6 @@ export const BulkUserForm: FC<BulkUserFormProps> = ({ requestId, users, onUsersC
       onUsersChange([...users, user]);
     } else {
       toast.warning("User with same email already exists");
-    }
-  }
-
-  const handleRemoveUser = (email: string) => {
-    const idx = users.find((user) => user.email === email);
-    if (idx) {
-      onUsersChange(users.filter((user) => user.email !== email));
     }
   }
 
@@ -157,7 +152,7 @@ export const BulkUserForm: FC<BulkUserFormProps> = ({ requestId, users, onUsersC
       width: 180,
       align: "center",
       render: (value, record) => value === undefined
-        ? 'NA'
+        ? 'Image Not Provided'
         : value
           ? record.image_name
           : record.image_name + '\n(Not Found)'
