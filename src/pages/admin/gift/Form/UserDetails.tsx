@@ -31,6 +31,8 @@ const isValidEmail = (email: string) => {
 };
 
 const isValidPhone = (phone: string) => {
+  if (phone.trim() === '') return true;
+  
   const phoneRegex = /^\+?[1-9]\d{1,14}$/; // International phone number validation
   return phoneRegex.test(phone);
 };
