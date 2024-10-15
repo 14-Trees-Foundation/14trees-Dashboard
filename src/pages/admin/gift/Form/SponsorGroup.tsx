@@ -10,7 +10,7 @@ import { organizationTypes } from "../../organization/organizationType";
 import ImagePicker from "../../../../components/ImagePicker";
 
 interface SponsorGroupFormProps {
-    logo: File | null,
+    logo: File | string | null,
     onLogoChange: (logo: File | null) => void,
     group: Group | null,
     onSelect: (group: Group | null) => void
@@ -118,8 +118,9 @@ const SponsorGroupForm: FC<SponsorGroupFormProps> = ({ logo, onLogoChange, group
             </Box>
             <Divider orientation="vertical" flexItem style={{ backgroundColor: 'black' }}/>
             <Box style={{ width: '48%' }}>
-                <Typography variant="body1" sx={{ pb: 2 }}>Please upload the company logo image to show it on the gift card.</Typography>
+                <Typography variant="body1" sx={{ pb: 2 }}>Please upload the company logo to show on the gift card.</Typography>
                 <ImagePicker 
+                    image={logo}
                     onChange={onLogoChange}
                 />
             </Box>

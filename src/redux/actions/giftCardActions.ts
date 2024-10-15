@@ -32,15 +32,15 @@ export const getGiftCards = (offset: number, limit: number, filters?: any[]) => 
 };
 
 
-export const createGiftCard = (noOfCards: number, userId: number, groupId?: number) => {
+export const createGiftCardRequest = (requestId: string, noOfCards: number, userId: number, groupId?: number, logo?: File, messages?: any, file?: File) => {
     const apiClient = new ApiClient();
     return (dispatch: any) => {
         dispatch({
             type: giftCardActionTypes.CREATE_GIFT_CARD_REQUESTED,
         });
-        apiClient.createGiftCard(noOfCards, userId, groupId).then(
+        apiClient.createGiftCard(requestId, noOfCards, userId, groupId, logo, messages, file).then(
             (value: GiftCard) => {
-                toast.success('New GiftCard Added successfully')
+                toast.success('Gift Cards requested!')
                 dispatch({
                     type: giftCardActionTypes.CREATE_GIFT_CARD_SUCCEEDED,
                     payload: value,
@@ -49,8 +49,36 @@ export const createGiftCard = (noOfCards: number, userId: number, groupId?: numb
                 return (value)
             },
             (error: any) => {
+                toast.error('Gift cards request failed')
                 dispatch({
                     type: giftCardActionTypes.CREATE_GIFT_CARD_FAILED,
+                });
+                return (error)
+            }
+        )
+    };
+};
+
+export const updateGiftCardRequest = (request: GiftCard, noOfCards: number, userId: number, groupId?: number, logo?: File, messages?: any, file?: File) => {
+    const apiClient = new ApiClient();
+    return (dispatch: any) => {
+        dispatch({
+            type: giftCardActionTypes.UPDATE_GIFT_CARD_REQUESTED,
+        });
+        apiClient.updateGiftCard(request, noOfCards, userId, groupId, logo, messages, file).then(
+            (value: GiftCard) => {
+                toast.success('Updated Gift Cards requested!')
+                dispatch({
+                    type: giftCardActionTypes.UPDATE_GIFT_CARD_SUCCEEDED,
+                    payload: value,
+
+                });
+                return (value)
+            },
+            (error: any) => {
+                toast.error('Gift cards request failed')
+                dispatch({
+                    type: giftCardActionTypes.UPDATE_GIFT_CARD_FAILED,
                 });
                 return (error)
             }
