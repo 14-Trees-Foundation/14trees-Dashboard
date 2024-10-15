@@ -14,7 +14,7 @@ import { bindActionCreators } from "@reduxjs/toolkit";
 import { RootState } from "../../../redux/store/store";
 import TableComponent from "../../../components/Table";
 import { TableColumnsType } from "antd";
-import { CardGiftcardOutlined, EditOutlined, LandscapeOutlined } from "@mui/icons-material";
+import { CardGiftcardOutlined, DownloadOutlined, EditOutlined, LandscapeOutlined } from "@mui/icons-material";
 import PlotSelection from "./Form/PlotSelection";
 import { Plot } from "../../../types/plot";
 import giftCardActionTypes from "../../../redux/actionTypes/giftCardActionTypes";
@@ -27,6 +27,7 @@ const GiftTrees: FC = () => {
     const [changeMode, setChangeMode] = useState<'add' | 'edit'>('add');
     const [modalOpen, setModalOpen] = useState(false);
     const [plotModal, setPlotModal] = useState(false);
+    const [autoAssignModal, setAutoAssignModal] = useState(false);
     const [page, setPage] = useState(0);
     const [pageSize, setPageSize] = useState(10);
     const [filters, setFilters] = useState<Record<string, GridFilterItem>>({});
@@ -141,23 +142,51 @@ const GiftTrees: FC = () => {
         if (selectedPlots.length !== 0) {
             try {
                 await apiClient.createGiftCardPlots(selectedGiftCard.id, selectedPlots.map(plot => plot.id));
-                toast.success("Gift card plots created successfully");
+                toast.success("Saved selected plot for gift card request!");
+
+                await apiClient.bookGiftCards(selectedGiftCard.id);
+                toast.success("Gift cards booked successfully");
                 getGiftCardData();
             } catch {
-                toast.error("Failed to create gift card plots");
+                toast.error("Something went wrong!");
             }
         }
     }
 
-    const handleBookGiftCards = async (giftCard: GiftCard) => {
+    const handleAutoAssignTrees = async () => {
+        setAutoAssignModal(false);
+        if (!selectedGiftCard) return;
+
         const apiClient = new ApiClient();
         try {
-            await apiClient.bookGiftCards(giftCard.id);
-            toast.success("Gift cards booked successfully");
-            getGiftCardData();
+            await apiClient.autoAssignTrees(selectedGiftCard.id);
+            toast.success("Successfully assigned trees to users!");
         } catch {
-            toast.error("Failed to book gift cards");
+            toast.error("Something went wrong!");
         }
+    }
+
+    const handleDownloadCards = async (id: number, name: string) => {
+
+        try {
+            const apiClient = new ApiClient();
+            const data = await apiClient.downloadGiftCards(id);
+
+            const blob = new Blob([data], { type: 'application/zip' });
+            const url = window.URL.createObjectURL(blob);
+
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = name;
+            document.body.appendChild(link);
+            link.click();
+
+            link.remove();
+            window.URL.revokeObjectURL(url);
+        } catch (error) {
+            console.error('Error downloading the file:', error);
+        }
+
     }
 
     const getStatus = (card: GiftCard) => {
@@ -225,17 +254,26 @@ const GiftTrees: FC = () => {
                         }}>
                         <LandscapeOutlined />
                     </Button>}
-                    {(record.plot_ids && record.plot_ids.length !== 0) && <Button
+                    {record.is_active && <Button
                         variant="outlined"
                         style={{ margin: "0 5px" }}
-                        disabled={record.is_active}
                         onClick={() => {
-                            handleBookGiftCards(record);
+                            setSelectedGiftCard(record);
+                            setAutoAssignModal(true);
                         }}>
                         <CardGiftcardOutlined />
                     </Button>}
+                    {record.is_active && <Button
+                        variant="outlined"
+                        style={{ margin: "0 5px" }}
+                        onClick={() => {
+                            handleDownloadCards(record.id, (record.user_name ?? '') + "_" + record.no_of_cards)
+                        }}>
+                        <DownloadOutlined />
+                    </Button>}
                     <Button
                         variant="outlined"
+                        disabled={record.is_active}
                         style={{ margin: "0 5px" }}
                         onClick={() => {
                             handleModalOpenEdit(record);
@@ -286,13 +324,28 @@ const GiftTrees: FC = () => {
             <Dialog open={plotModal} onClose={() => setPlotModal(false)} fullWidth maxWidth="lg">
                 <DialogTitle>Select Plots</DialogTitle>
                 <DialogContent dividers>
-                    <PlotSelection plots={selectedPlots} onPlotsChange={plots => setSelectedPlots(plots)} />
+                    <PlotSelection requiredTrees={selectedGiftCard?.no_of_cards ?? 0} plots={selectedPlots} onPlotsChange={plots => setSelectedPlots(plots)} />
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={() => setPlotModal(false)} color="primary">
                         Cancel
                     </Button>
                     <Button onClick={handlePlotSelectionSubmit} color="primary" variant="contained">
+                        Confirm
+                    </Button>
+                </DialogActions>
+            </Dialog>
+
+            <Dialog open={autoAssignModal} onClose={() => setAutoAssignModal(false)} fullWidth maxWidth="lg">
+                <DialogTitle>Auto-assign trees to gift card request users</DialogTitle>
+                <DialogContent dividers>
+                    <Typography variant="subtitle1">Are you sure you want to auto assign trees to users of gift card request generated by {selectedGiftCard?.group_name || selectedGiftCard?.user_name}?</Typography>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={() => setAutoAssignModal(false)} color="primary">
+                        Cancel
+                    </Button>
+                    <Button onClick={handleAutoAssignTrees} color="primary" variant="contained">
                         Confirm
                     </Button>
                 </DialogActions>

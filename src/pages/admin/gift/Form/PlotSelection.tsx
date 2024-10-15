@@ -1,17 +1,18 @@
 
 import { FC, useEffect, useRef, useState } from "react";
-import { Autocomplete, Chip, CircularProgress, TextField } from "@mui/material";
+import { Autocomplete, Box, Chip, CircularProgress, TextField, Typography } from "@mui/material";
 import { Plot } from "../../../../types/plot";
 import { useAppDispatch, useAppSelector } from "../../../../redux/store/hooks";
 import { bindActionCreators } from "@reduxjs/toolkit";
 import * as plotActionCreators from "../../../../redux/actions/plotActions";
 
 interface PlotSelectionProps {
+    requiredTrees: number
     plots: Plot[]
     onPlotsChange: (plots: Plot[]) => void
 }
 
-const PlotSelection: FC<PlotSelectionProps> = ({ plots, onPlotsChange }) => {
+const PlotSelection: FC<PlotSelectionProps> = ({ requiredTrees, plots, onPlotsChange }) => {
     const [position, setPosition] = useState(0);
     const listElem: any = useRef();
     const mounted = useRef<boolean>();
@@ -82,6 +83,33 @@ const PlotSelection: FC<PlotSelectionProps> = ({ plots, onPlotsChange }) => {
 
     return (
         <div>
+
+            <Box style={{ 
+                marginBottom: 30
+            }}>
+                <Typography variant='subtitle1'>Request Trees: <strong>{requiredTrees}</strong></Typography>
+                <Typography variant='subtitle1'>Remaining Trees: <strong>{
+                    Math.max(requiredTrees - plots
+                    .map(pt => pt.available ?? 0)
+                    .reduce((prev, current) => prev + current, 0), 0)
+                }</strong></Typography>
+                <Typography variant='subtitle1'>Tree distribution across the plots:</Typography>
+                {plots.map((plot, idx) => {
+                    const treesAllocated = plots
+                        .slice(0, idx)
+                        .map(pt => pt.available ?? 0)
+                        .reduce((prev, current) => prev + current, 0);
+
+                    const treesForCurrentPlot = Math.min(plot.available ?? 0, requiredTrees - treesAllocated);
+
+                    return (
+                        <Typography variant="body1" key={idx}>
+                            {plot.name} <strong>[ Trees: {treesForCurrentPlot} ]</strong>
+                        </Typography>
+                    );
+                })}
+            </Box>
+
             <Autocomplete
                 multiple
                 loading={loading}
@@ -94,7 +122,7 @@ const PlotSelection: FC<PlotSelectionProps> = ({ plots, onPlotsChange }) => {
                 getOptionLabel={(option) => option.name}
                 renderOption={(props, option) => (
                     <li {...props}>
-                        {option.name}
+                        {option.name} (Available: {option.available ?? 0})
                     </li>
                 )}
                 freeSolo
