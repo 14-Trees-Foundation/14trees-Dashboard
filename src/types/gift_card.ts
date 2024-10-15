@@ -12,6 +12,13 @@ export type GiftCard = {
     user_name?: string;
     group_name?: string;
     plot_ids?: number[];
+    primary_message: string;
+    secondary_message: string;
+    event_name: string;
+    planted_by: string;
+    logo_message: string;
+    request_id: string;
+    logo_url: string | null;
 }
 
 export type GiftCardUser = {

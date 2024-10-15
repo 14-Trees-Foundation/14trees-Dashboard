@@ -1,22 +1,33 @@
-import React, { useState, useRef, useCallback } from 'react';
+import React, { useState, useRef, useCallback, useEffect } from 'react';
 import { Button, IconButton } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import ReactCrop, { Crop } from 'react-image-crop';
 import 'react-image-crop/dist/ReactCrop.css';
 
 interface ImagePickerProps {
+    image: File | string | null;
     onChange: (file: File | null) => void;
     width?: number;
     height?: number;
 }
 
-const ImagePicker: React.FC<ImagePickerProps> = ({ onChange, width, height }) => {
+const ImagePicker: React.FC<ImagePickerProps> = ({ image, onChange, width, height }) => {
     const [imagePreview, setImagePreview] = useState<string | null>(null);
     const [crop, setCrop] = useState<Crop>({ unit: '%', width: width || 50, aspect: width && height ? width / height : 1, x: 0, y: 0, height: height || 50 });
     const [completedCrop, setCompletedCrop] = useState<Crop | null>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
     const imageRef = useRef<HTMLImageElement | null>(null);
     const canvasRef = useRef<HTMLCanvasElement | null>(null);
+
+    useEffect(() => {
+        if (image) {
+            if (typeof image === 'string') {
+                setImagePreview(image);
+            } else {
+                handleImageUpload(image);
+            }
+        }
+    }, [image]);
 
     const handleImageUpload = (file: File) => {
         const reader = new FileReader();
