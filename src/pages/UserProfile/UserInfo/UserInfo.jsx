@@ -92,7 +92,7 @@ export const UserInfo = () => {
                   {selUserInfo.gifted_by_name &&
                     selUserInfo.gifted_by_name !== undefined && !strEquals(selUserInfo.gifted_by_name, selUserInfo.assigned_to) && !strEquals(selUserInfo.gifted_by_name, "ACM India") && !strEquals(selUserInfo.gifted_by_name, "ACM India Council") && selUserInfo.gifted_by && (
                       <>
-                        <div className={classes.label}>Donated By</div>
+                        <div className={classes.label}>Gifted By</div>
                         <div
                           style={{
                             fontSize: "15px",
