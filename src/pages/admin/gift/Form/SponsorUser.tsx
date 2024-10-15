@@ -75,7 +75,7 @@ const SponsorUserForm: FC<SponsorUserFormProps> = ({ user, onSelect }) => {
         if (phone && !phonePattern.test(phone)) {
             setErrors({ ...errors, phone: 'Phone number is not valid' });
             isValid = false;
-        }
+        } else setErrors({ ...errors, phone: '' });
 
         return isValid;
     }
@@ -92,6 +92,8 @@ const SponsorUserForm: FC<SponsorUserFormProps> = ({ user, onSelect }) => {
                 isValid = false;
             }
         }
+
+        if (isValid) setErrors({ ...errors, birth_date: '' });
 
         return isValid;
     }

@@ -20,7 +20,7 @@ const CardCount: FC<CardCountProps> = ({ treeCount, onTreeCountChange }) => {
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <Typography variant='h6'>Please enter the number of gift cards: </Typography>
                 <TextField 
-                    value={treeCount}
+                    value={treeCount === 0 ? '' : treeCount}
                     onChange={handleCountChange}
                     type='number'
                     size="small"

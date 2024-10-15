@@ -31,8 +31,8 @@ const isValidEmail = (email: string) => {
 };
 
 const isValidPhone = (phone: string) => {
-  if (phone.trim() === '') return true;
-  
+  if (!phone || phone.trim() === '') return true;
+
   const phoneRegex = /^\+?[1-9]\d{1,14}$/; // International phone number validation
   return phoneRegex.test(phone);
 };
@@ -81,7 +81,8 @@ export const BulkUserForm: FC<BulkUserFormProps> = ({ requestId, users, onUsersC
             
             for (let i = 0; i < results.data.length; i++) {
               const user = results.data[i];
-              if (user['Name'] && user['Phone'] && user['Email ID']) {
+
+              if (user['Name'] && user['Email ID']) {
                 parsedUsers.push({
                   name: user['Name'],
                   phone: user['Phone'],
