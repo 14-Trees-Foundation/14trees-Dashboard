@@ -7,7 +7,6 @@ import PlotSelection from "./CardCount";
 import { BulkUserForm } from "./UserDetails";
 import { toast } from "react-toastify";
 import SponsorUserForm from "./SponsorUser";
-import ImagePicker from "../../../../components/ImagePicker";
 import SponsorGroupForm from "./SponsorGroup";
 import CardDetails from "./CardDetailsForm";
 
@@ -23,7 +22,7 @@ const GiftCardsForm: FC<GiftCardsFormProps> = ({ requestId, open, handleClose, o
     const [currentStep, setCurrentStep] = useState(0);
     const [user, setUser] = useState<User | null>(null);
     const [group, setGroup] = useState<Group | null>(null);
-    const [treeCount, setTreeCount] = useState<number>(0);
+    const [treeCount, setTreeCount] = useState<number>(100);
     const [file, setFile] = useState<File | null>(null);
     const [users, setUsers] = useState<any[]>([]);
     const [logo, setLogo] = useState<File | null>(null);
@@ -38,32 +37,27 @@ const GiftCardsForm: FC<GiftCardsFormProps> = ({ requestId, open, handleClose, o
         {
             key: 1,
             title: "Corporate Details",
-            content: <SponsorGroupForm group={group} onSelect={group => setGroup(group)}/>,
+            content: <SponsorGroupForm logo={logo} onLogoChange={logo => setLogo(logo)} group={group} onSelect={group => setGroup(group)}/>,
         },
         {
             key: 2,
-            title: "Company Logo",
-            content: <ImagePicker onChange={logo => setLogo(logo)} width={30} height={20}/>,
-        },
-        {
-            key: 3,
             title: "Book Trees",
             content: <PlotSelection treeCount={treeCount} onTreeCountChange={count => setTreeCount(count)}/>,
         },
         {
-            key: 4,
+            key: 3,
             title: "Gift Card Messages",
             content: <CardDetails
                 primaryMessage={messages.primaryMessage}
                 secondaryMessage={messages.secondaryMessage}
                 eventName={messages.eventName}
-                plantedBy={messages.plantedBy}
+                plantedBy={messages.plantedBy || group?.name || ''}
                 logoMessage={messages.logoMessage}
                 onChange={(primary, secondary, event, planted, logo) => setMessages({ primaryMessage: primary, secondaryMessage: secondary, eventName: event, plantedBy: planted, logoMessage: logo })}
             />,
         },
         {
-            key: 5,
+            key: 4,
             title: "User Details",
             content: <BulkUserForm requestId={requestId} users={users} onUsersChange={users => setUsers(users)} onFileChange={file => setFile(file)} />,
         },
@@ -76,8 +70,22 @@ const GiftCardsForm: FC<GiftCardsFormProps> = ({ requestId, open, handleClose, o
             return;
         }
 
-        handleClose();
         onSubmit(user, group, treeCount, users, logo ?? undefined, messages, file ?? undefined);
+
+        handleCloseForm();
+    }
+
+    const handleCloseForm = () => {
+        handleClose();
+
+        setCurrentStep(0);
+        setUser(null);
+        setGroup(null);
+        setTreeCount(100);
+        setFile(null);
+        setUsers([]);
+        setLogo(null);
+        setMessages({ primaryMessage: "", secondaryMessage: "", eventName: "", plantedBy: "", logoMessage: "" });
     }
 
     const handleNext = () => {
@@ -89,19 +97,16 @@ const GiftCardsForm: FC<GiftCardsFormProps> = ({ requestId, open, handleClose, o
                 break;
             case 1:
                 if (!group) toast.error("Please provide corporate details");
+                else if (!logo) toast.error("Please provide company logo to put on gift card");
                 else nextStep = 2;
                 break;
             case 2:
-                if (!logo) toast.error("Please provide company logo to put on gift card");
+                if (treeCount === 0) toast.error("Please provide number of trees to gift");
                 else nextStep = 3;
                 break;
             case 3:
-                if (treeCount === 0) toast.error("Please provide number of trees to gift");
-                else nextStep = 4;
-                break;
-            case 4:
                 if (messages.primaryMessage === "" || messages.secondaryMessage === "") toast.error("Please provide gift card details");
-                else nextStep = 5;
+                else nextStep = 4;
                 break;
             default:
                 break;
@@ -163,6 +168,13 @@ const GiftCardsForm: FC<GiftCardsFormProps> = ({ requestId, open, handleClose, o
                         color="success"
                     >Previous</Button>}
                     <div style={{ display: 'flex', flexGrow: 1 }}></div>
+
+                    <Button
+                        onClick={handleCloseForm}
+                        variant="outlined"
+                        color="error"
+                        style={{ alignSelf: 'right', marginRight: 10 }}
+                    >Cancel</Button>
                     {currentStep < steps.length - 1 && <Button
                         onClick={handleNext}
                         variant="contained"

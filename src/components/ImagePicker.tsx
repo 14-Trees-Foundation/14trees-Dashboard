@@ -96,13 +96,26 @@ const ImagePicker: React.FC<ImagePickerProps> = ({ onChange, width, height }) =>
             {imagePreview ? (
                 <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                     <div style={{ position: 'relative', width: '90%' }}>
-                        <ReactCrop
+                        {/* show image */}
+                        <img
+                            src={imagePreview}
+                            alt="cropped"
+                            ref={imageRef}
+                            style={{
+                                width: '100%',
+                                height: 'auto',
+                                borderRadius: '10px',
+                                objectFit: 'cover',
+                                marginBottom: '10px',
+                            }}
+                        />
+                        {/* <ReactCrop
                             src={imagePreview}
                             crop={crop}
                             onImageLoaded={(img) => (imageRef.current = img)}
                             onChange={(newCrop) => setCrop(newCrop)}
                             onComplete={onCropComplete}
-                        />
+                        /> */}
                         <IconButton
                             aria-label="remove image"
                             onClick={handleRemoveImage}
@@ -121,9 +134,9 @@ const ImagePicker: React.FC<ImagePickerProps> = ({ onChange, width, height }) =>
                         <Button variant="outlined" onClick={handleReuploadClick} style={{ marginTop: '10px' }}>
                             Reupload Image
                         </Button>
-                        <Button variant="contained" onClick={handleCropAndResize} style={{ marginLeft: '10px', marginTop: '10px' }}>
+                        {/* <Button variant="contained" onClick={handleCropAndResize} style={{ marginLeft: '10px', marginTop: '10px' }}>
                             Crop & Resize
-                        </Button>
+                        </Button> */}
                     </div>
                     <canvas ref={canvasRef} style={{ display: 'none' }} />
                 </div>
