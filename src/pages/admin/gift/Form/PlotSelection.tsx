@@ -88,7 +88,7 @@ const PlotSelection: FC<PlotSelectionProps> = ({ requiredTrees, plots, onPlotsCh
                 marginBottom: 30
             }}>
                 <Typography variant='subtitle1'>Request Trees: <strong>{requiredTrees}</strong></Typography>
-                <Typography variant='subtitle1'>Remaining Trees: <strong>{
+                <Typography variant='subtitle1'>Remaining tree count for plot selection: <strong>{
                     Math.max(requiredTrees - plots
                     .map(pt => pt.available ?? 0)
                     .reduce((prev, current) => prev + current, 0), 0)

@@ -16,6 +16,7 @@ interface User {
   birth_date?: string;
   image?: boolean;
   image_name?: string;
+  error?: boolean;
 }
 
 interface BulkUserFormProps {
@@ -92,18 +93,18 @@ export const BulkUserForm: FC<BulkUserFormProps> = ({ requestId, users, onUsersC
                   image: user['Image Name'] !== '' 
                     ? await awsUtils.checkIfPublicFileExists( 'gift-card-requests' + "/" + requestId + '/' + user['Image Name']) 
                     : undefined,
+                  error: false,
                 });
               }
             }
 
-            const validUsers = parsedUsers.filter(user => isValidEmail(user.email) && isValidPhone(user.phone));
-            if (validUsers.length !== parsedUsers.length) {
-              setFileError("Some rows in the CSV file have invalid phone or email values.");
-            } else {
-              setFileError(null);
-            }
-
-            onUsersChange(validUsers);
+            const usersList = parsedUsers.map(user => {
+              return {
+                ...user,
+                error: !isValidEmail(user.email) || !isValidPhone(user.phone)
+              }
+            });
+            onUsersChange(usersList);
           },
           error: () => {
             setFileError("Failed to parse CSV file. Please ensure it is formatted correctly.");
@@ -119,13 +120,6 @@ export const BulkUserForm: FC<BulkUserFormProps> = ({ requestId, users, onUsersC
       onUsersChange([...users, user]);
     } else {
       toast.warning("User with same email already exists");
-    }
-  }
-
-  const handleRemoveUser = (email: string) => {
-    const idx = users.find((user) => user.email === email);
-    if (idx) {
-      onUsersChange(users.filter((user) => user.email !== email));
     }
   }
 
@@ -158,36 +152,18 @@ export const BulkUserForm: FC<BulkUserFormProps> = ({ requestId, users, onUsersC
       width: 180,
       align: "center",
       render: (value, record) => value === undefined
-        ? 'NA'
+        ? 'Image Not Provided'
         : value
           ? record.image_name
           : record.image_name + '\n(Not Found)'
     },
     {
-      dataIndex: "action",
-      key: "action",
-      title: "Action",
-      width: 150,
+      dataIndex: "error",
+      key: "error",
+      title: "Error",
+      width: 180,
       align: "center",
-      render: (value, record, index) => (
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-          }}>
-          <Button
-            variant="outlined"
-            color="error"
-            style={{ margin: "0 5px" }}
-            onClick={() => {
-              handleRemoveUser(record.email)
-            }}
-          >
-            <DeleteIcon />
-          </Button>
-        </div>
-      ),
+      render: (value) => value ? 'Yes' : 'No'
     },
   ];
 
