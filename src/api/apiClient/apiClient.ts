@@ -1180,6 +1180,55 @@ class ApiClient {
         }
     }
 
+    async updateGiftCard(request: GiftCard, no_of_cards: number, user_id: number, group_id?: number, logo?: File, messages?: any, file?: File): Promise<GiftCard> {
+        try {
+            const formData = new FormData();
+            for (const [key, value] of Object.entries(request)) {
+                if (value) formData.append(key, value.toString());
+            }
+
+            if (formData.has('no_of_cards')) formData.set('no_of_cards', no_of_cards.toString());
+            else formData.append('no_of_cards', no_of_cards.toString());
+
+            if (formData.has('user_id')) formData.set('user_id', user_id.toString());
+            else formData.append('user_id', user_id.toString());
+
+            if (group_id && formData.has('group_id')) formData.set('group_id', group_id.toString());
+            else if (group_id) formData.append('group_id', group_id.toString());
+
+            if (logo && formData.has('logo')) formData.set('logo', logo, logo.name);
+            else if (logo) formData.append('logo', logo, logo.name);
+
+            if (file && formData.has('csv_file')) formData.set('csv_file', file, file.name);
+            else if (file) formData.append('csv_file', file, file.name);
+
+            if (messages) {
+                if (formData.has('primary_message')) formData.set('primary_message', messages.primaryMessage);
+                else formData.append('primary_message', messages.primaryMessage);
+
+                if (formData.has('secondary_message')) formData.set('secondary_message', messages.secondaryMessage);
+                else formData.append('secondary_message', messages.secondaryMessage);
+
+                if (messages.eventName && formData.has('event_name')) formData.set('event_name', messages.eventName);
+                else if (messages.eventName) formData.append('event_name', messages.eventName);
+
+                if (formData.has('planted_by')) formData.set('planted_by', messages.plantedBy);
+                else formData.append('planted_by', messages.plantedBy);
+
+                if (formData.has('logo_message')) formData.set('logo_message', messages.logoMessage);
+                else formData.append('logo_message', messages.logoMessage);
+            }
+
+            const response = await this.api.put<GiftCard>(`/gift-cards/requests/${request.id}`, formData);
+            return response.data;
+        } catch (error: any) {
+            if (error.response) {
+                throw new Error(error.response.data.message);
+            }
+            throw new Error('Failed to create gift card');
+        }
+    }
+
     async createGiftCardUsers(gift_card_request_id: number, users: any[]): Promise<void> {
         try {
             await this.api.post<any>(`/gift-cards`, { gift_card_request_id, users });

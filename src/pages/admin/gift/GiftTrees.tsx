@@ -14,15 +14,17 @@ import { bindActionCreators } from "@reduxjs/toolkit";
 import { RootState } from "../../../redux/store/store";
 import TableComponent from "../../../components/Table";
 import { TableColumnsType } from "antd";
-import { CardGiftcardOutlined, LandscapeOutlined } from "@mui/icons-material";
+import { CardGiftcardOutlined, EditOutlined, LandscapeOutlined } from "@mui/icons-material";
 import PlotSelection from "./Form/PlotSelection";
 import { Plot } from "../../../types/plot";
+import giftCardActionTypes from "../../../redux/actionTypes/giftCardActionTypes";
 
 const GiftTrees: FC = () => {
     const dispatch = useAppDispatch();
     const { getGiftCards } =
         bindActionCreators(giftCardActionCreators, dispatch);
 
+    const [changeMode, setChangeMode] = useState<'add' | 'edit'>('add');
     const [modalOpen, setModalOpen] = useState(false);
     const [plotModal, setPlotModal] = useState(false);
     const [page, setPage] = useState(0);
@@ -37,11 +39,20 @@ const GiftTrees: FC = () => {
         setFilters(filters);
     }
 
-    const handleModalOpen = () => {
+    const handleModalOpenAdd = () => {
+        setChangeMode('add');
         const uniqueRequestId = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
         setRequestId(uniqueRequestId);
         setModalOpen(true);
     }
+    const handleModalOpenEdit = (record: GiftCard) => {
+        setChangeMode('edit');
+        setSelectedGiftCard(record);
+        setRequestId(record.request_id);
+        
+        setModalOpen(true);
+    }
+
     const handleModalClose = () => setModalOpen(false);
 
     useEffect(() => {
@@ -75,6 +86,10 @@ const GiftTrees: FC = () => {
         try {
             const response = await apiClient.createGiftCard(requestId, treeCount, user.id, group?.id, logo, messages, file);
             giftCardId = response.id;
+            dispatch({
+                type: giftCardActionTypes.CREATE_GIFT_CARD_SUCCEEDED,
+                payload: response,
+            });
             setRequestId(null);
         } catch (error) {
             toast.error("Failed to create gift card");
@@ -83,16 +98,39 @@ const GiftTrees: FC = () => {
 
         try {
             await apiClient.createGiftCardUsers(giftCardId, users);
+            toast.success("Gift cards requested!");
         } catch (error) {
             toast.error("Failed to create gift card users");
             return;
         }   
     }
 
+    const updateGiftCardRequest = async (user: User, group: Group | null, treeCount: number, users: any[], logo?: File, messages?: any, file?: File) => {
+        if (!selectedGiftCard) return;
+
+        const apiClient = new ApiClient();
+        try {
+            const response = await apiClient.updateGiftCard(selectedGiftCard, treeCount, user.id, group?.id, logo, messages, file);
+            toast.success("Gift card updated successfully");
+            dispatch({
+                type: giftCardActionTypes.UPDATE_GIFT_CARD_SUCCEEDED,
+                payload: response,
+            });
+            setRequestId(null);
+        } catch (error) {
+            toast.error("Failed to create gift card");
+            return;
+        }
+    }
+
     const handleSubmit = (user: User, group: Group | null, treeCount: number, users: any[], logo?: File, messages?: any, file?: File) => {
         handleModalClose();
 
-        saveNewGiftCardsRequest(user, group, treeCount, users, logo, messages, file);
+        if (changeMode === 'add') {
+            saveNewGiftCardsRequest(user, group, treeCount, users, logo, messages, file);
+        } else if (changeMode === 'edit') {
+            updateGiftCardRequest(user, group, treeCount, users, logo, messages, file);
+        }
     }
 
     const handlePlotSelectionSubmit = async () => {
@@ -196,6 +234,14 @@ const GiftTrees: FC = () => {
                         }}>
                         <CardGiftcardOutlined />
                     </Button>}
+                    <Button
+                        variant="outlined"
+                        style={{ margin: "0 5px" }}
+                        onClick={() => {
+                            handleModalOpenEdit(record);
+                        }}>
+                        <EditOutlined />
+                    </Button>
                 </div>
             ),
         },
@@ -219,7 +265,7 @@ const GiftTrees: FC = () => {
                         marginBottom: "5px",
                         marginTop: "5px",
                     }}>
-                    <Button variant="contained" color="success" onClick={handleModalOpen}>
+                    <Button variant="contained" color="success" onClick={handleModalOpenAdd}>
                         Create Gift Request
                     </Button>
                 </div>
@@ -235,7 +281,7 @@ const GiftTrees: FC = () => {
                 setPageSize={setPageSize}
             />
 
-            <GiftCardsForm requestId={requestId} open={modalOpen} handleClose={handleModalClose} onSubmit={handleSubmit} />
+            <GiftCardsForm giftCardRequest={selectedGiftCard ?? undefined} requestId={requestId} open={modalOpen} handleClose={handleModalClose} onSubmit={handleSubmit} />
 
             <Dialog open={plotModal} onClose={() => setPlotModal(false)} fullWidth maxWidth="lg">
                 <DialogTitle>Select Plots</DialogTitle>

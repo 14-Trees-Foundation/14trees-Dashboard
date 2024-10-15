@@ -1,6 +1,6 @@
 import { Button, Dialog, DialogTitle } from "@mui/material";
 import { Steps } from "antd";
-import { FC, useState } from "react";
+import { FC, useEffect, useState } from "react";
 import { User } from "../../../../types/user";
 import { Group } from "../../../../types/Group";
 import PlotSelection from "./CardCount";
@@ -9,15 +9,18 @@ import { toast } from "react-toastify";
 import SponsorUserForm from "./SponsorUser";
 import SponsorGroupForm from "./SponsorGroup";
 import CardDetails from "./CardDetailsForm";
+import { GiftCard } from "../../../../types/gift_card";
+import ApiClient from "../../../../api/apiClient/apiClient";
 
 interface GiftCardsFormProps {
+    giftCardRequest?: GiftCard
     requestId: string | null
     open: boolean
     handleClose: () => void
     onSubmit: (user: User, group: Group | null, treeCount: number, users: any[], logo?: File, messages?: any, file?: File) => void
 }
 
-const GiftCardsForm: FC<GiftCardsFormProps> = ({ requestId, open, handleClose, onSubmit }) => {
+const GiftCardsForm: FC<GiftCardsFormProps> = ({ giftCardRequest, requestId, open, handleClose, onSubmit }) => {
 
     const [currentStep, setCurrentStep] = useState(0);
     const [user, setUser] = useState<User | null>(null);
@@ -28,6 +31,30 @@ const GiftCardsForm: FC<GiftCardsFormProps> = ({ requestId, open, handleClose, o
     const [logo, setLogo] = useState<File | null>(null);
     const [messages, setMessages] = useState({ primaryMessage: "", secondaryMessage: "", eventName: "", plantedBy: "", logoMessage: "" });
 
+    const getGiftCardRequestDetails = async () => {
+        const apiClient = new ApiClient();
+        if (giftCardRequest) {
+            const userResp = await apiClient.getUsers(0, 1, [{ columnField: 'id', operatorValue: 'equals', value: giftCardRequest.user_id }]);
+            if (userResp.results.length === 1) setUser(userResp.results[0]);
+
+            const groupResp = await apiClient.getGroups(0, 1, [{ columnField: 'id', operatorValue: 'equals', value: giftCardRequest.group_id }]);
+            if (groupResp.results.length === 1) setGroup(groupResp.results[0]);
+
+            setTreeCount(giftCardRequest.no_of_cards);
+            setMessages({
+                primaryMessage: giftCardRequest.primary_message,
+                secondaryMessage: giftCardRequest.secondary_message,
+                eventName: giftCardRequest.event_name,
+                plantedBy: giftCardRequest.planted_by,
+                logoMessage: giftCardRequest.logo_message
+            })
+        }
+    }
+
+    useEffect(() => {
+        getGiftCardRequestDetails();
+    }, [giftCardRequest])
+
     const steps = [
         {
             key: 0,
@@ -37,7 +64,7 @@ const GiftCardsForm: FC<GiftCardsFormProps> = ({ requestId, open, handleClose, o
         {
             key: 1,
             title: "Corporate Details",
-            content: <SponsorGroupForm logo={logo} onLogoChange={logo => setLogo(logo)} group={group} onSelect={group => setGroup(group)}/>,
+            content: <SponsorGroupForm logo={logo ?? giftCardRequest?.logo_url ?? null} onLogoChange={logo => setLogo(logo)} group={group} onSelect={group => setGroup(group)}/>,
         },
         {
             key: 2,
@@ -97,7 +124,7 @@ const GiftCardsForm: FC<GiftCardsFormProps> = ({ requestId, open, handleClose, o
                 break;
             case 1:
                 if (!group) toast.error("Please provide corporate details");
-                else if (!logo) toast.error("Please provide company logo to put on gift card");
+                else if (!logo && !giftCardRequest?.logo_url) toast.error("Please provide company logo to put on gift card");
                 else nextStep = 2;
                 break;
             case 2:
