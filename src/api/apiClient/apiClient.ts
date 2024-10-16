@@ -1348,6 +1348,18 @@ class ApiClient {
             throw new Error('Failed to generate gift cards');
         }
     }
+
+    async scrapImagesFromWebPage(request_id: string, url: string): Promise<string[]> {
+        try {
+            const response = await this.api.post<{ urls: string[] }>(`/utils/scrap`, { url, request_id });
+            return response.data.urls;
+        } catch (error: any) {
+            if (error.response) {
+                throw new Error(error.response.data.message);
+            }
+            throw new Error('Failed to get images');
+        }
+    }
 }
 
 
