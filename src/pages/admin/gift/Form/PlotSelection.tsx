@@ -80,21 +80,21 @@ const PlotSelection: FC<PlotSelectionProps> = ({ requiredTrees, plots, onPlotsCh
                 <Typography variant='subtitle1'>Request Trees: <strong>{requiredTrees}</strong></Typography>
                 <Typography variant='subtitle1'>Remaining tree count for plot selection: <strong>{
                     Math.max(requiredTrees - plots
-                    .map(pt => pt.available ?? 0)
+                    .map(pt => pt.card_available ?? 0)
                     .reduce((prev, current) => prev + current, 0), 0)
                 }</strong></Typography>
                 <Typography variant='subtitle1'>Tree distribution across the plots:</Typography>
                 {plots.map((plot, idx) => {
                     const treesAllocated = plots
                         .slice(0, idx)
-                        .map(pt => pt.available ?? 0)
+                        .map(pt => pt.card_available ?? 0)
                         .reduce((prev, current) => prev + current, 0);
 
-                    const treesForCurrentPlot = Math.min(plot.available ?? 0, requiredTrees - treesAllocated);
+                    const treesForCurrentPlot = Math.min(plot.card_available ?? 0, requiredTrees - treesAllocated);
 
                     return (
                         <Typography variant="body1" key={idx}>
-                            {plot.name} <strong>[ Trees: {treesForCurrentPlot} ]</strong>
+                            {plot.name} <strong>[ Trees: {Math.max(treesForCurrentPlot, 0)} ]</strong>
                         </Typography>
                     );
                 })}
@@ -112,7 +112,7 @@ const PlotSelection: FC<PlotSelectionProps> = ({ requiredTrees, plots, onPlotsCh
                 getOptionLabel={(option) => option.name}
                 renderOption={(props, option) => (
                     <li {...props}>
-                        {option.name} (Available: {option.available ?? 0})
+                        {option.name} [Available: {option.available ?? 0}, Cards Available: {option.card_available ?? 0}]
                     </li>
                 )}
                 freeSolo
