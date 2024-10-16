@@ -101,7 +101,7 @@ export const BulkUserForm: FC<BulkUserFormProps> = ({ requestId, users, onUsersC
             const usersList = parsedUsers.map(user => {
               return {
                 ...user,
-                error: !isValidEmail(user.email) || !isValidPhone(user.phone)
+                error: !isValidEmail(user.email) || !isValidPhone(user.phone) || user.image === false
               }
             });
             onUsersChange(usersList);
@@ -155,7 +155,24 @@ export const BulkUserForm: FC<BulkUserFormProps> = ({ requestId, users, onUsersC
         ? 'Image Not Provided'
         : value
           ? record.image_name
-          : record.image_name + '\n(Not Found)'
+          : record.image_name + '\n(Not Found)',
+      // filters: [
+      //   {
+      //     text: 'Image Not Provided',
+      //     value: 'image_not_provided',
+      //   },
+      //   {
+      //     text: 'Not Found',
+      //     value: 'not_found',
+      //   },
+      // ],
+      // onFilter: (value, record) => {
+      //   if (value === 'image_not_provided' && record.image === undefined) return true;
+      //   else if (value === 'not_found' && record.image === false) return true;
+
+      //   return false;
+      // },
+      // filterSearch: true,
     },
     {
       dataIndex: "error",
@@ -163,7 +180,7 @@ export const BulkUserForm: FC<BulkUserFormProps> = ({ requestId, users, onUsersC
       title: "Error",
       width: 180,
       align: "center",
-      render: (value) => value ? 'Yes' : 'No'
+      render: (value) => value ? 'Yes' : 'No',
     },
   ];
 
