@@ -53,18 +53,8 @@ const PlotSelection: FC<PlotSelectionProps> = ({ requiredTrees, plots, onPlotsCh
         plotsList = plotsList.sort((a, b) => b.id - a.id)
     }
 
-    const handlePlotChanges = (event: any, plot: any) => {
-        onPlotsChange(plot);
-    }
-
-    const countSum = (items: (number | string | undefined)[]) => {
-        let sum = 0;
-        items.forEach(item => {
-            if (!item) return;
-            else if (typeof item === 'string') sum += Number(item);
-            else sum += item;
-        });
-        return sum;
+    const handlePlotChanges = (event: any, plot: any[]) => {
+        onPlotsChange(plot.filter(pt => pt.available))
     }
 
     let listboxProps = {
@@ -161,34 +151,6 @@ const PlotSelection: FC<PlotSelectionProps> = ({ requiredTrees, plots, onPlotsCh
                 )}
                 ListboxProps={listboxProps}
             />
-
-            <div style={{ display: 'flex', marginTop: 20 }}>
-                <h2 style={{ marginTop: "0px", paddingRight: "8px" }}>
-                    Total:{" "}
-                    <span style={{ color: "#C72542", fontStyle: "italic" }}>
-                        {countSum(plots.map(item => item.trees_count))}
-                    </span>
-                </h2>
-                <h2 style={{ marginTop: "0px", paddingRight: "8px" }}>
-                    Mapped:{" "}
-                    <span style={{ color: "#C72542", fontStyle: "italic" }}>
-                        {countSum(plots.map(item => item.mapped_trees_count))}
-                    </span>
-                </h2>
-                <h2 style={{ marginTop: "0px", paddingRight: "8px" }}>
-                    Assigned:{" "}
-                    <span style={{ color: "#C72542", fontStyle: "italic" }}>
-                        {countSum(plots.map(item => item.assigned_trees_count))}
-                    </span>
-                </h2>
-                <h2 style={{ marginTop: "0px", paddingRight: "8px" }}>
-                    Available:{" "}
-                    <span style={{ color: "#C72542", fontStyle: "italic" }}>
-                        {countSum(plots.map(item => item.available_trees_count))}
-                    </span>
-                </h2>
-            </div>
-
         </div>
     );
 }

@@ -160,6 +160,7 @@ const GiftTrees: FC = () => {
         const apiClient = new ApiClient();
         try {
             await apiClient.autoAssignTrees(selectedGiftCard.id);
+            getGiftCardData();
             toast.success("Successfully assigned trees to users!");
         } catch {
             toast.error("Something went wrong!");
@@ -190,12 +191,14 @@ const GiftTrees: FC = () => {
     }
 
     const getStatus = (card: GiftCard) => {
-        if (card.is_active) {
-            return 'Active';
-        } else if (card.plot_ids && card.plot_ids.length !== 0) {
-            return 'Pending activation';
-        } else {
+        if (card.status === 'pending_plot_selection') {
             return 'Pending Plot Selection';
+        } else if (card.status === 'pending_assignment') {
+            return 'Pending assignment';
+        } else if (card.status === 'pending_gift_cards') {
+            return 'Pending Gift cards creation';
+        } else {
+            return 'Completed';
         }
     }
 
@@ -245,7 +248,7 @@ const GiftTrees: FC = () => {
                         justifyContent: "center",
                         alignItems: "center",
                     }}>
-                    {!(record.plot_ids && record.plot_ids.length !== 0) && <Button
+                    {record.status === 'pending_plot_selection' && <Button
                         variant="outlined"
                         style={{ margin: "0 5px" }}
                         onClick={() => {
@@ -254,7 +257,7 @@ const GiftTrees: FC = () => {
                         }}>
                         <LandscapeOutlined />
                     </Button>}
-                    {record.is_active && <Button
+                    {record.status === 'pending_assignment' && <Button
                         variant="outlined"
                         style={{ margin: "0 5px" }}
                         onClick={() => {
@@ -263,7 +266,7 @@ const GiftTrees: FC = () => {
                         }}>
                         <CardGiftcardOutlined />
                     </Button>}
-                    {record.is_active && <Button
+                    {(record.status === 'pending_gift_cards' || record.status === 'completed') && <Button
                         variant="outlined"
                         style={{ margin: "0 5px" }}
                         onClick={() => {
@@ -273,7 +276,7 @@ const GiftTrees: FC = () => {
                     </Button>}
                     <Button
                         variant="outlined"
-                        disabled={record.is_active}
+                        disabled={(record.status === 'pending_gift_cards' || record.status === 'completed')}
                         style={{ margin: "0 5px" }}
                         onClick={() => {
                             handleModalOpenEdit(record);
