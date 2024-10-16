@@ -1,4 +1,4 @@
-import { Button, FormControlLabel, Grid, Radio, RadioGroup, TextField, Typography } from "@mui/material";
+import { Box, Button, FormControlLabel, Grid, Radio, RadioGroup, TextField, Typography } from "@mui/material";
 import { FC, useRef, useState } from "react";
 import Papa from 'papaparse';
 import { Table } from "antd";
@@ -8,6 +8,7 @@ import { UserForm } from "../../donation/components/UserForm";
 import { toast } from "react-toastify";
 import UserImagesForm from "./UserImagesForm";
 import { AWSUtils } from "../../../../helpers/aws";
+import ApiClient from "../../../../api/apiClient/apiClient";
 
 interface User {
   name: string;
@@ -64,6 +65,8 @@ const dummyData: User[] = [
 ]
 
 export const BulkUserForm: FC<BulkUserFormProps> = ({ requestId, users, onUsersChange, onFileChange }) => {
+  const [pageUrl, setPageUrl] = useState<string>('');
+  const [imageUrls, setImageUrls] = useState<string[]>([]);
   const [fileError, setFileError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [userAddOption, setUserAddOption] = useState<'bulk' | 'single'>('bulk');
@@ -113,6 +116,18 @@ export const BulkUserForm: FC<BulkUserFormProps> = ({ requestId, users, onUsersC
       }
     }
   };
+
+  const handleCrapWebPage = async () => {
+    if (pageUrl === '' || !requestId) {
+      toast.error('Please provide valid web page link');
+      return;
+    }
+
+    const apiClient = new ApiClient();
+    const imageUrls = await apiClient.scrapImagesFromWebPage(requestId, pageUrl);
+    console.log(imageUrls);
+    setImageUrls(imageUrls);
+  }
 
   const handleUserAdd = (user: User) => {
     const idx = users.findIndex((u) => u.email === user.email);
@@ -197,6 +212,21 @@ export const BulkUserForm: FC<BulkUserFormProps> = ({ requestId, users, onUsersC
 
           {userAddOption === 'bulk' && (
             <Grid item xs={12}>
+              <Typography variant="body1">Enter the link of the web page containing user images (Optional).</Typography>
+              <Box style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 30, marginTop: 5 }}>
+                <TextField
+                  onChange={(event) => { setPageUrl(event.target.value) }}
+                  margin="normal"
+                  size="small"
+                  label="Web page url (Optional)"
+                  style={{ display: 'flex', flexGrow: 1, marginRight: 5, marginTop: 0, marginBottom: 0 }}
+                />
+                <Button
+                  variant="contained"
+                  color="success"
+                  onClick={handleCrapWebPage}
+                >Upload Images</Button>
+              </Box>
               <UserImagesForm requestId={requestId}/>
               <Typography variant='body1' marginBottom={1} marginTop={2}>Upload the CSV file containing user details of the users who will be receiving the gift. If you have uploaded user images, make sure to mention exact name of the image in <strong>Image Name</strong> column.</Typography>
               <Typography>Download sample file from <a href="https://docs.google.com/spreadsheets/d/1DDM5nyrvP9YZ09B60cwWICa_AvbgThUx-yeDVzT4Kw4/gviz/tq?tqx=out:csv&sheet=Sheet1">here</a> and fill the details.</Typography>
