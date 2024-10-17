@@ -1,5 +1,5 @@
 import { Box, Button, FormControlLabel, Grid, Radio, RadioGroup, TextField, Typography } from "@mui/material";
-import { FC, useRef, useState } from "react";
+import { FC, useEffect, useRef, useState } from "react";
 import Papa from 'papaparse';
 import { Table } from "antd";
 import { ColumnType } from "antd/es/table";
@@ -9,6 +9,8 @@ import { toast } from "react-toastify";
 import UserImagesForm from "./UserImagesForm";
 import { AWSUtils } from "../../../../helpers/aws";
 import ApiClient from "../../../../api/apiClient/apiClient";
+import ImageMapping from "./ImageMapping";
+import { ImageOutlined } from "@mui/icons-material";
 
 interface User {
   name: string;
@@ -70,6 +72,58 @@ export const BulkUserForm: FC<BulkUserFormProps> = ({ requestId, users, onUsersC
   const [fileError, setFileError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [userAddOption, setUserAddOption] = useState<'bulk' | 'single'>('bulk');
+  const [openImageSelection, setOpenImageSelection] = useState(false);
+  const [selectedUser, setSelectedUser] = useState<User | null>(null)
+
+  const getFilteredUrls = (images: string[], str: string) => {
+
+    const filteredUrls: string[] = [];
+    for (const image of images) {
+      const parts = str.split(' ')
+      let count = 0;
+      for (const part of parts) {
+        if (image.toLocaleLowerCase().includes(part.toLocaleLowerCase())) count++;
+      }
+
+      if (count / parts.length > 0.5) filteredUrls.push(image)
+    }
+
+    return filteredUrls;
+  }
+
+  useEffect(() => {
+    const newUsers: User[] = []
+    let isNew = false;
+    for (const user of users) {
+      if (!user.image && user.name) {
+        const uris = getFilteredUrls(imageUrls, user.name);
+        console.log(user.name, uris)
+        if (uris.length === 1) {
+          isNew = true;
+          user.image = true;
+          user.image_name = uris[0].split('/').slice(-1)[0];
+        }
+      }
+
+      newUsers.push(user);
+    }
+
+    if (isNew) onUsersChange(newUsers);
+
+  }, [imageUrls, users])
+
+  useEffect(() => {
+    const getUrls = async () => {
+
+      if (!requestId) return;
+
+      const apiClient = new ApiClient();
+      const urls = await apiClient.getImagesForRequestId(requestId);
+      setImageUrls(urls);
+    }
+
+    getUrls();
+  }, [requestId])
 
   const handleFileChange = (e: any) => {
 
@@ -82,7 +136,7 @@ export const BulkUserForm: FC<BulkUserFormProps> = ({ requestId, users, onUsersC
           header: true,
           complete: async (results: any) => {
             const parsedUsers: User[] = [];
-            
+
             for (let i = 0; i < results.data.length; i++) {
               const user = results.data[i];
 
@@ -93,8 +147,8 @@ export const BulkUserForm: FC<BulkUserFormProps> = ({ requestId, users, onUsersC
                   email: user['Email ID'],
                   birth_date: user['Date of Birth (optional)'],
                   image_name: user['Image Name'],
-                  image: user['Image Name'] !== '' 
-                    ? await awsUtils.checkIfPublicFileExists( 'gift-card-requests' + "/" + requestId + '/' + user['Image Name']) 
+                  image: user['Image Name'] !== ''
+                    ? await awsUtils.checkIfPublicFileExists('gift-card-requests' + "/" + requestId + '/' + user['Image Name'])
                     : undefined,
                   error: false,
                 });
@@ -125,8 +179,21 @@ export const BulkUserForm: FC<BulkUserFormProps> = ({ requestId, users, onUsersC
 
     const apiClient = new ApiClient();
     const imageUrls = await apiClient.scrapImagesFromWebPage(requestId, pageUrl);
-    console.log(imageUrls);
     setImageUrls(imageUrls);
+
+    toast.success("Successfully uploaded images!")
+  }
+
+  const handleImageSelection = (imageUrl: string) => {
+    if (!selectedUser) return;
+
+    const newUsers = [...users];
+    const idx = newUsers.findIndex(user => user.email === selectedUser.email && user.name === selectedUser.name)
+    if (idx > -1) {
+      newUsers[idx].image = true;
+      newUsers[idx].image_name = imageUrl.split('/').slice(-1)[0];
+      onUsersChange(newUsers);
+    }
   }
 
   const handleUserAdd = (user: User) => {
@@ -197,6 +264,33 @@ export const BulkUserForm: FC<BulkUserFormProps> = ({ requestId, users, onUsersC
       align: "center",
       render: (value) => value ? 'Yes' : 'No',
     },
+    {
+      dataIndex: "action",
+      key: "action",
+      title: "Actions",
+      width: 150,
+      align: "center",
+      render: (value, record, index) => (
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+          }}>
+          <Button
+            variant="outlined"
+            color="success"
+            style={{ margin: "0 5px" }}
+            onClick={() => {
+              setSelectedUser(record);
+              setOpenImageSelection(true);
+            }}
+          >
+            <ImageOutlined />
+          </Button>
+        </div>
+      ),
+    },
   ];
 
   return (
@@ -244,7 +338,7 @@ export const BulkUserForm: FC<BulkUserFormProps> = ({ requestId, users, onUsersC
                   onClick={handleCrapWebPage}
                 >Upload Images</Button>
               </Box>
-              <UserImagesForm requestId={requestId}/>
+              <UserImagesForm requestId={requestId} />
               <Typography variant='body1' marginBottom={1} marginTop={2}>Upload the CSV file containing user details of the users who will be receiving the gift. If you have uploaded user images, make sure to mention exact name of the image in <strong>Image Name</strong> column.</Typography>
               <Typography>Download sample file from <a href="https://docs.google.com/spreadsheets/d/1DDM5nyrvP9YZ09B60cwWICa_AvbgThUx-yeDVzT4Kw4/gviz/tq?tqx=out:csv&sheet=Sheet1">here</a> and fill the details.</Typography>
               <TextField
@@ -277,6 +371,8 @@ export const BulkUserForm: FC<BulkUserFormProps> = ({ requestId, users, onUsersC
           pagination={{ pageSize: 5 }}
         />
       </Grid>
+
+      <ImageMapping name={setSelectedUser.name} open={openImageSelection} images={imageUrls} onClose={() => { setOpenImageSelection(false) }} onSelect={handleImageSelection} />
     </div>
   );
 };
