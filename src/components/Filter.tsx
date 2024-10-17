@@ -135,7 +135,7 @@ export function getColumnSelectedItemFilter<T extends object>({ dataIndex, filte
 
     return ({
         filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters, close }) => (
-            <div style={{ padding: 8 }} onKeyDown={(e) => e.stopPropagation()}>
+            <div style={{ padding: 8, zIndex: 10 }} onKeyDown={(e) => e.stopPropagation()}>
                 <Select
                     mode="tags"
                     placeholder="Please select"

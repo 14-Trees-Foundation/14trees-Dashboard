@@ -149,7 +149,7 @@ const GiftCardsForm: FC<GiftCardsFormProps> = ({ giftCardRequest, requestId, ope
                 open={open}
                 onClose={handleClose}
                 fullWidth
-                maxWidth='lg'
+                maxWidth='xl'
             >
                 <DialogTitle style={{ textAlign: "center" }}>Gift Cards</DialogTitle>
                 {currentStep < steps.length && (
