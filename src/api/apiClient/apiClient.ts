@@ -1360,6 +1360,18 @@ class ApiClient {
             throw new Error('Failed to get images');
         }
     }
+
+    async getImagesForRequestId(request_id: string): Promise<string[]> {
+        try {
+            const response = await this.api.get<{ urls: string[] }>(`/utils/s3keys/${request_id}`);
+            return response.data.urls;
+        } catch (error: any) {
+            if (error.response) {
+                throw new Error(error.response.data.message);
+            }
+            throw new Error('Failed to get images');
+        }
+    }
 }
 
 
