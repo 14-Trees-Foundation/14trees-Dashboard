@@ -1229,6 +1229,10 @@ class ApiClient {
         }
     }
 
+    async deleteGiftCardRequest(gift_card_request_id: number): Promise<void> {
+        await this.api.delete<void>(`/gift-cards/requests/${gift_card_request_id}`);
+    }
+
     async createGiftCardUsers(gift_card_request_id: number, users: any[]): Promise<void> {
         try {
             await this.api.post<any>(`/gift-cards`, { gift_card_request_id, users });

@@ -19,6 +19,7 @@ export type GiftCard = {
     logo_message: string;
     request_id: string;
     logo_url: string | null;
+    validation_error: string | null;
     status: string;
 }
 
