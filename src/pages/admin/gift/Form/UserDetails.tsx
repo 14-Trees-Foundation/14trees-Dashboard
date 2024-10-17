@@ -1,9 +1,8 @@
-import { Box, Button, FormControlLabel, Grid, Radio, RadioGroup, TextField, Typography } from "@mui/material";
+import { Box, Button, Grid, TextField, Typography } from "@mui/material";
 import { FC, useEffect, useRef, useState } from "react";
 import Papa from 'papaparse';
 import { Table } from "antd";
 import { ColumnType } from "antd/es/table";
-import DeleteIcon from "@mui/icons-material/Delete";
 import { UserForm } from "../../donation/components/UserForm";
 import { toast } from "react-toastify";
 import UserImagesForm from "./UserImagesForm";
@@ -11,6 +10,9 @@ import { AWSUtils } from "../../../../helpers/aws";
 import ApiClient from "../../../../api/apiClient/apiClient";
 import ImageMapping from "./ImageMapping";
 import { ImageOutlined } from "@mui/icons-material";
+import GeneralTable from "../../../../components/GenTable";
+import { getColumnSelectedItemFilter } from "../../../../components/Filter";
+import { GridFilterItem } from "@mui/x-data-grid";
 
 interface User {
   name: string;
@@ -74,6 +76,14 @@ export const BulkUserForm: FC<BulkUserFormProps> = ({ requestId, users, onUsersC
   const [userAddOption, setUserAddOption] = useState<'bulk' | 'single'>('bulk');
   const [openImageSelection, setOpenImageSelection] = useState(false);
   const [selectedUser, setSelectedUser] = useState<User | null>(null)
+  const [page, setPage] = useState(0);
+  const [pageSize, setPageSize] = useState(5)
+  const [filters, setFilters] = useState<Record<string, GridFilterItem>>({})
+
+  const handleSetFilters = (filters: Record<string, GridFilterItem>) => {
+    setPage(0);
+    setFilters(filters)
+  }
 
   const getFilteredUrls = (images: string[], str: string) => {
 
@@ -102,6 +112,7 @@ export const BulkUserForm: FC<BulkUserFormProps> = ({ requestId, users, onUsersC
           isNew = true;
           user.image = true;
           user.image_name = uris[0].split('/').slice(-1)[0];
+          user.error = !isValidEmail(user.email) || !isValidPhone(user.phone)
         }
       }
 
@@ -192,6 +203,7 @@ export const BulkUserForm: FC<BulkUserFormProps> = ({ requestId, users, onUsersC
     if (idx > -1) {
       newUsers[idx].image = true;
       newUsers[idx].image_name = imageUrl.split('/').slice(-1)[0];
+      newUsers[idx].error = !isValidEmail(newUsers[idx].email) || !isValidPhone(newUsers[idx].phone)
       onUsersChange(newUsers);
     }
   }
@@ -203,6 +215,11 @@ export const BulkUserForm: FC<BulkUserFormProps> = ({ requestId, users, onUsersC
     } else {
       toast.warning("User with same email already exists");
     }
+  }
+
+  const handlePaginationChange = (page: number, pageSize: number) => {
+    setPage(page - 1);
+    setPageSize(pageSize);
   }
 
   const columns: ColumnType<User>[] = [
@@ -238,23 +255,7 @@ export const BulkUserForm: FC<BulkUserFormProps> = ({ requestId, users, onUsersC
         : value
           ? record.image_name
           : record.image_name + '\n(Not Found)',
-      // filters: [
-      //   {
-      //     text: 'Image Not Provided',
-      //     value: 'image_not_provided',
-      //   },
-      //   {
-      //     text: 'Not Found',
-      //     value: 'not_found',
-      //   },
-      // ],
-      // onFilter: (value, record) => {
-      //   if (value === 'image_not_provided' && record.image === undefined) return true;
-      //   else if (value === 'not_found' && record.image === false) return true;
-
-      //   return false;
-      // },
-      // filterSearch: true,
+      ...getColumnSelectedItemFilter({ dataIndex: 'image', filters, handleSetFilters, options: ['Image Not Provided', 'Image Not Found'] })
     },
     {
       dataIndex: "error",
@@ -359,16 +360,22 @@ export const BulkUserForm: FC<BulkUserFormProps> = ({ requestId, users, onUsersC
         container
         spacing={2}
         style={{ marginLeft: '20px' }}
+        maxWidth={'60%'}
       >
-        <Table
+        <GeneralTable 
           columns={columns}
-          dataSource={users.length > 0 ? users.sort((a, b) => {
-            if (a.image === false) return 1;
-            if (b.image === false) return -1;
+          page={page}
+          pageSize={pageSize}
+          onPaginationChange={handlePaginationChange}
+          totalRecords={users.length}
+          rows={users.length > 0 ? users.sort((a, b) => {
+            if (a.image === false) return -1;
+            if (b.image === false) return 1;
 
             return 0;
-          }) : dummyData}
-          pagination={{ pageSize: 5 }}
+          }).slice(page * pageSize, page * pageSize + pageSize) : dummyData}
+          onDownload={async () => users}
+          rowClassName={(record, index) => record.error ? 'pending-item' : '' }
         />
       </Grid>
 
