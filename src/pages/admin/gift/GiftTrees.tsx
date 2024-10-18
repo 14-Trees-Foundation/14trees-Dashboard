@@ -1,4 +1,4 @@
-import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Divider, Typography } from "@mui/material";
+import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Divider, Menu, MenuItem, Typography } from "@mui/material";
 import { FC, useEffect, useState } from "react";
 import GiftCardsForm from "./Form/GiftCardForm";
 import { User } from "../../../types/user";
@@ -14,7 +14,7 @@ import { bindActionCreators } from "@reduxjs/toolkit";
 import { RootState } from "../../../redux/store/store";
 import TableComponent from "../../../components/Table";
 import { TableColumnsType } from "antd";
-import { CardGiftcardOutlined, DeleteOutline, DownloadOutlined, EditOutlined, LandscapeOutlined } from "@mui/icons-material";
+import { AssignmentTurnedInOutlined, CardGiftcardOutlined, DeleteOutline, DownloadOutlined, EditOutlined, LandscapeOutlined } from "@mui/icons-material";
 import PlotSelection from "./Form/PlotSelection";
 import { Plot } from "../../../types/plot";
 import giftCardActionTypes from "../../../redux/actionTypes/giftCardActionTypes";
@@ -35,6 +35,15 @@ const GiftTrees: FC = () => {
     const [selectedPlots, setSelectedPlots] = useState<Plot[]>([]);
     const [requestId, setRequestId] = useState<string | null>(null);
     const [deleteModal, setDeleteModal] = useState(false);
+    const [anchorEl, setAnchorEl] = useState<any>(null);
+
+    const handleClick = (event: any) => {
+        setAnchorEl(event.currentTarget);
+    };
+
+    const handleClose = () => {
+        setAnchorEl(null);
+    };
 
     const handleSetFilters = (filters: Record<string, GridFilterItem>) => {
         setPage(0);
@@ -51,7 +60,7 @@ const GiftTrees: FC = () => {
         setChangeMode('edit');
         setSelectedGiftCard(record);
         setRequestId(record.request_id);
-        
+
         setModalOpen(true);
     }
 
@@ -104,7 +113,7 @@ const GiftTrees: FC = () => {
         } catch (error) {
             toast.error("Failed to create gift card users");
             return;
-        }   
+        }
     }
 
     const updateGiftCardRequest = async (user: User, group: Group | null, treeCount: number, users: any[], logo?: File, messages?: any, file?: File) => {
@@ -168,18 +177,24 @@ const GiftTrees: FC = () => {
         }
     }
 
-    const handleDownloadCards = async (id: number, name: string) => {
+    const handleGenerateGiftCards = async (id: number) => {
+        const apiClient = new ApiClient();
+        await apiClient.generateGiftCardTemplates(id);
+        toast.success("Gift card creation ma take upto 10mins. Please come back after some time.")
+    }
 
+    const handleDownloadCards = async (id: number, name: string, type: 'pdf' | 'ppt' | 'zip') => {
+        setAnchorEl(null);
         try {
             const apiClient = new ApiClient();
-            const data = await apiClient.downloadGiftCards(id);
+            const data = await apiClient.downloadGiftCards(id, type);
 
             const blob = new Blob([data], { type: 'application/zip' });
             const url = window.URL.createObjectURL(blob);
 
             const link = document.createElement('a');
             link.href = url;
-            link.download = name;
+            link.download = name + '.' + type;
             document.body.appendChild(link);
             link.click();
 
@@ -192,7 +207,7 @@ const GiftTrees: FC = () => {
     }
 
     const handleGiftCardRequestDelete = () => {
-        if (!selectedGiftCard || selectedGiftCard.status === 'pending_gift_cards'  || selectedGiftCard.status === 'completed') return;
+        if (!selectedGiftCard || selectedGiftCard.status === 'pending_gift_cards' || selectedGiftCard.status === 'completed') return;
 
         deleteGiftCardRequest(selectedGiftCard);
         setDeleteModal(false);
@@ -217,7 +232,7 @@ const GiftTrees: FC = () => {
         } else if (errorValue === 'MISSING_USER_DETAILS') {
             return 'Missing user details for assignment';
         }
-        
+
         return ''
     }
 
@@ -278,7 +293,7 @@ const GiftTrees: FC = () => {
                     {record.status === 'pending_plot_selection' && <Button
                         variant="outlined"
                         style={{ margin: "0 5px" }}
-                        disabled={record.validation_error === 'MISSING_LOGO' }
+                        disabled={record.validation_error === 'MISSING_LOGO'}
                         onClick={() => {
                             setSelectedGiftCard(record);
                             setPlotModal(true);
@@ -288,20 +303,41 @@ const GiftTrees: FC = () => {
                     {record.status === 'pending_assignment' && <Button
                         variant="outlined"
                         style={{ margin: "0 5px" }}
-                        disabled={record.validation_error === 'MISSING_USER_DETAILS' }
+                        disabled={record.validation_error === 'MISSING_USER_DETAILS'}
                         onClick={() => {
                             setSelectedGiftCard(record);
                             setAutoAssignModal(true);
                         }}>
-                        <CardGiftcardOutlined />
+                        <AssignmentTurnedInOutlined />
                     </Button>}
-                    {(record.status === 'pending_gift_cards' || record.status === 'completed') && <Button
+                    {record.status === 'completed' && <div>
+                        <Button
+                            variant="outlined"
+                            style={{ margin: "0 5px" }}
+                            onClick={handleClick}
+                        >
+                            <DownloadOutlined />
+                        </Button>
+                        <Menu
+                            id="simple-menu"
+                            anchorEl={anchorEl}
+                            keepMounted
+                            open={Boolean(anchorEl)}
+                            onClose={handleClose}
+                        >
+                            {['Pdf', 'PPT', 'Zip'].map(option => (
+                                <MenuItem key={option.toLocaleLowerCase()} onClick={() => handleDownloadCards(record.id, (record.user_name ?? '') + "_" + record.no_of_cards, option.toLocaleLowerCase() as any)}>
+                                    {option}
+                                </MenuItem>
+                            ))}
+                        </Menu>
+                    </div>}
+                    {record.status === 'pending_gift_cards' && <Button
                         variant="outlined"
                         style={{ margin: "0 5px" }}
-                        onClick={() => {
-                            handleDownloadCards(record.id, (record.user_name ?? '') + "_" + record.no_of_cards)
-                        }}>
-                        <DownloadOutlined />
+                        onClick={() => { handleGenerateGiftCards(record.id) }}
+                    >
+                        <CardGiftcardOutlined />
                     </Button>}
                     <Button
                         variant="outlined"
