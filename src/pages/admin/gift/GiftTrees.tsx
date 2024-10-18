@@ -1,4 +1,4 @@
-import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Divider, Menu, MenuItem, Typography } from "@mui/material";
+import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Divider, IconButton, Menu, MenuItem, Tooltip, Typography } from "@mui/material";
 import { FC, useEffect, useState } from "react";
 import GiftCardsForm from "./Form/GiftCardForm";
 import { User } from "../../../types/user";
@@ -14,7 +14,7 @@ import { bindActionCreators } from "@reduxjs/toolkit";
 import { RootState } from "../../../redux/store/store";
 import TableComponent from "../../../components/Table";
 import { TableColumnsType } from "antd";
-import { AssignmentTurnedInOutlined, CardGiftcardOutlined, DeleteOutline, DownloadOutlined, EditOutlined, LandscapeOutlined, LinkOutlined } from "@mui/icons-material";
+import { AssignmentTurnedInOutlined, CardGiftcardOutlined, DeleteOutline, DownloadOutlined, EditOutlined, ErrorOutline, LandscapeOutlined, LinkOutlined } from "@mui/icons-material";
 import PlotSelection from "./Form/PlotSelection";
 import { Plot } from "../../../types/plot";
 import giftCardActionTypes from "../../../redux/actionTypes/giftCardActionTypes";
@@ -99,7 +99,13 @@ const GiftTrees: FC = () => {
         }
 
         try {
-            if (users.length > 0) await apiClient.createGiftCardUsers(giftCardId, users);
+            if (users.length > 0) {
+                const response = await apiClient.createGiftCardUsers(giftCardId, users);
+                dispatch({
+                    type: giftCardActionTypes.UPDATE_GIFT_CARD_SUCCEEDED,
+                    payload: response,
+                });
+            }
             toast.success("Gift cards requested!");
         } catch (error) {
             toast.error("Failed to create gift card users");
@@ -216,14 +222,12 @@ const GiftTrees: FC = () => {
         }
     }
 
-    const getValidationError = (errorValue: string) => {
-        if (errorValue === 'MISSING_LOGO') {
-            return 'Missing Company Logo';
-        } else if (errorValue === 'MISSING_USER_DETAILS') {
-            return 'Missing user details for assignment';
-        }
+    const getValidationErrors = (errorValues: string[]) => {
+        let errors = []
+        if (errorValues.includes('MISSING_LOGO')) errors.push('Missing Company Logo');
+        if (errorValues.includes('MISSING_USER_DETAILS')) errors.push('Missing user details for assignment');
 
-        return ''
+        return errors;
     }
 
     const columns: TableColumnsType<GiftCard> = [
@@ -260,12 +264,18 @@ const GiftTrees: FC = () => {
             render: (value, record, index) => getStatus(record),
         },
         {
-            dataIndex: "validation_error",
-            key: "validation_error",
-            title: "Validation Error",
+            dataIndex: "validation_errors",
+            key: "validation_errors",
+            title: "Validation Errors",
             align: "center",
             width: 100,
-            render: getValidationError,
+            render: (value) => value && value.length > 0 ? (
+                <Tooltip title={<div>{getValidationErrors(value).map(item => (<p>{item}</p>) )}</div>}>
+                    <IconButton>
+                        <ErrorOutline color="error"/>
+                    </IconButton>
+                </Tooltip>
+            ) : '',
         },
         {
             dataIndex: "action",
