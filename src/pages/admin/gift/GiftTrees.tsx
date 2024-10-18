@@ -14,7 +14,7 @@ import { bindActionCreators } from "@reduxjs/toolkit";
 import { RootState } from "../../../redux/store/store";
 import TableComponent from "../../../components/Table";
 import { TableColumnsType } from "antd";
-import { AssignmentTurnedInOutlined, CardGiftcardOutlined, DeleteOutline, DownloadOutlined, EditOutlined, LandscapeOutlined } from "@mui/icons-material";
+import { AssignmentTurnedInOutlined, CardGiftcardOutlined, DeleteOutline, DownloadOutlined, EditOutlined, LandscapeOutlined, LinkOutlined } from "@mui/icons-material";
 import PlotSelection from "./Form/PlotSelection";
 import { Plot } from "../../../types/plot";
 import giftCardActionTypes from "../../../redux/actionTypes/giftCardActionTypes";
@@ -35,15 +35,6 @@ const GiftTrees: FC = () => {
     const [selectedPlots, setSelectedPlots] = useState<Plot[]>([]);
     const [requestId, setRequestId] = useState<string | null>(null);
     const [deleteModal, setDeleteModal] = useState(false);
-    const [anchorEl, setAnchorEl] = useState<any>(null);
-
-    const handleClick = (event: any) => {
-        setAnchorEl(event.currentTarget);
-    };
-
-    const handleClose = () => {
-        setAnchorEl(null);
-    };
 
     const handleSetFilters = (filters: Record<string, GridFilterItem>) => {
         setPage(0);
@@ -179,12 +170,11 @@ const GiftTrees: FC = () => {
 
     const handleGenerateGiftCards = async (id: number) => {
         const apiClient = new ApiClient();
-        await apiClient.generateGiftCardTemplates(id);
+        apiClient.generateGiftCardTemplates(id);
         toast.success("Gift card creation ma take upto 10mins. Please come back after some time.")
     }
 
     const handleDownloadCards = async (id: number, name: string, type: 'pdf' | 'ppt' | 'zip') => {
-        setAnchorEl(null);
         try {
             const apiClient = new ApiClient();
             const data = await apiClient.downloadGiftCards(id, type);
@@ -314,23 +304,11 @@ const GiftTrees: FC = () => {
                         <Button
                             variant="outlined"
                             style={{ margin: "0 5px" }}
-                            onClick={handleClick}
+                            disabled={!record.presentation_id}
+                            onClick={() => { window.open('https://docs.google.com/presentation/d/' + record.presentation_id) }}
                         >
-                            <DownloadOutlined />
+                            <LinkOutlined />
                         </Button>
-                        <Menu
-                            id="simple-menu"
-                            anchorEl={anchorEl}
-                            keepMounted
-                            open={Boolean(anchorEl)}
-                            onClose={handleClose}
-                        >
-                            {['Pdf', 'PPT', 'Zip'].map(option => (
-                                <MenuItem key={option.toLocaleLowerCase()} onClick={() => handleDownloadCards(record.id, (record.user_name ?? '') + "_" + record.no_of_cards, option.toLocaleLowerCase() as any)}>
-                                    {option}
-                                </MenuItem>
-                            ))}
-                        </Menu>
                     </div>}
                     {record.status === 'pending_gift_cards' && <Button
                         variant="outlined"
