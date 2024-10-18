@@ -21,6 +21,7 @@ export type GiftCard = {
     logo_url: string | null;
     validation_error: string | null;
     status: string;
+    presentation_id: string | null;
 }
 
 export type GiftCardUser = {
