@@ -77,7 +77,7 @@ const PlotSelection: FC<PlotSelectionProps> = ({ requiredTrees, plots, onPlotsCh
             <Box style={{ 
                 marginBottom: 30
             }}>
-                <Typography variant='subtitle1'>Request Trees: <strong>{requiredTrees}</strong></Typography>
+                <Typography variant='subtitle1'>Total Trees Requested: <strong>{requiredTrees}</strong></Typography>
                 <Typography variant='subtitle1'>Remaining tree count for plot selection: <strong>{
                     Math.max(requiredTrees - plots
                     .map(pt => pt.card_available ?? 0)

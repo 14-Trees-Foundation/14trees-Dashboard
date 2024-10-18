@@ -86,6 +86,31 @@ export const updateGiftCardRequest = (request: GiftCard, noOfCards: number, user
     };
 };
 
+export const deleteGiftCardRequest = (request: GiftCard) => {
+    const apiClient = new ApiClient();
+    return (dispatch: any) => {
+        dispatch({
+            type: giftCardActionTypes.DELETE_GIFT_CARD_REQUESTED,
+        });
+        apiClient.deleteGiftCardRequest(request.id).then(
+            () => {
+                toast.success('Deleted GIft Card request!')
+                dispatch({
+                    type: giftCardActionTypes.DELETE_GIFT_CARD_SUCCEEDED,
+                    payload: request.id
+                });
+                return;
+            },
+            (error: any) => {
+                toast.error('Failed to delete gift card request')
+                dispatch({
+                    type: giftCardActionTypes.DELETE_GIFT_CARD_FAILED,
+                });
+            }
+        )
+    };
+};
+
 export const getBookedGiftCards = (giftCardId: number, offset: number = 0, limit: number = 10) => {
     const apiClient = new ApiClient();
     return (dispatch: any) => {

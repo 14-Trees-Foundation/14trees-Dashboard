@@ -124,7 +124,6 @@ const GiftCardsForm: FC<GiftCardsFormProps> = ({ giftCardRequest, requestId, ope
                 break;
             case 1:
                 if (!group) toast.error("Please provide corporate details");
-                else if (!logo && !giftCardRequest?.logo_url) toast.error("Please provide company logo to put on gift card");
                 else nextStep = 2;
                 break;
             case 2:
@@ -149,7 +148,7 @@ const GiftCardsForm: FC<GiftCardsFormProps> = ({ giftCardRequest, requestId, ope
                 open={open}
                 onClose={handleClose}
                 fullWidth
-                maxWidth='lg'
+                maxWidth='xl'
             >
                 <DialogTitle style={{ textAlign: "center" }}>Gift Cards</DialogTitle>
                 {currentStep < steps.length && (

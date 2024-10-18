@@ -16,10 +16,12 @@ interface GeneralTableProps {
     totalRecords: number
     onDownload: () => Promise<any[]>
     page: number,
+    pageSize?: number,
     onPaginationChange: (page: number, pageSize: number) => void
     onSelectionChanges?: (ids: number[]) => void
     summary?: (totalColumns: number) => React.ReactNode
     rowClassName?: (record: any, index: number) => string
+    footer?: boolean
 }
 
 const ResizableTitle = (props: any) => {
@@ -56,7 +58,7 @@ const ResizableTitle = (props: any) => {
     );
 };
 
-function GeneralTable({ loading, rows, columns, totalRecords, page, onDownload, onSelectionChanges, onPaginationChange, summary, rowClassName }: GeneralTableProps) {
+function GeneralTable({ loading, rows, columns, totalRecords, page, pageSize = 10, footer, onDownload, onSelectionChanges, onPaginationChange, summary, rowClassName }: GeneralTableProps) {
 
     const [checkedList, setCheckedList] = useState(columns?.map((item) => item.key) ?? []);
     const [open, setOpen] = useState(false);
@@ -171,7 +173,7 @@ function GeneralTable({ loading, rows, columns, totalRecords, page, onDownload, 
                 position: ['bottomRight'],
                 current: page + 1,
                 total: totalRecords,
-                pageSize: 10,
+                pageSize: pageSize,
                 pageSizeOptions: [10, 20, 50, 100],
                 simple: true,
                 onChange: onPaginationChange,
@@ -180,7 +182,7 @@ function GeneralTable({ loading, rows, columns, totalRecords, page, onDownload, 
             rowClassName={rowClassName}
             rowSelection={rowSelection}
             scroll={{ y: 550 }}
-            footer={() => (
+            footer={footer ? () => (
                 <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
                     <Dropdown
                         menu={{ items }}
@@ -199,7 +201,7 @@ function GeneralTable({ loading, rows, columns, totalRecords, page, onDownload, 
                         onClick={handleDataSourceParse}>Export</Button>
                     <div></div>
                 </div>
-            )}
+            ) : undefined}
             summary={summary ? 
                 () => summary(tableCols.filter((col) => !col.hidden).length)
                 : undefined

@@ -14,14 +14,14 @@ import { bindActionCreators } from "@reduxjs/toolkit";
 import { RootState } from "../../../redux/store/store";
 import TableComponent from "../../../components/Table";
 import { TableColumnsType } from "antd";
-import { CardGiftcardOutlined, DownloadOutlined, EditOutlined, LandscapeOutlined } from "@mui/icons-material";
+import { CardGiftcardOutlined, DeleteOutline, DownloadOutlined, EditOutlined, LandscapeOutlined } from "@mui/icons-material";
 import PlotSelection from "./Form/PlotSelection";
 import { Plot } from "../../../types/plot";
 import giftCardActionTypes from "../../../redux/actionTypes/giftCardActionTypes";
 
 const GiftTrees: FC = () => {
     const dispatch = useAppDispatch();
-    const { getGiftCards } =
+    const { getGiftCards, deleteGiftCardRequest } =
         bindActionCreators(giftCardActionCreators, dispatch);
 
     const [changeMode, setChangeMode] = useState<'add' | 'edit'>('add');
@@ -34,6 +34,7 @@ const GiftTrees: FC = () => {
     const [selectedGiftCard, setSelectedGiftCard] = useState<GiftCard | null>(null);
     const [selectedPlots, setSelectedPlots] = useState<Plot[]>([]);
     const [requestId, setRequestId] = useState<string | null>(null);
+    const [deleteModal, setDeleteModal] = useState(false);
 
     const handleSetFilters = (filters: Record<string, GridFilterItem>) => {
         setPage(0);
@@ -190,6 +191,14 @@ const GiftTrees: FC = () => {
 
     }
 
+    const handleGiftCardRequestDelete = () => {
+        if (!selectedGiftCard || selectedGiftCard.status === 'pending_gift_cards'  || selectedGiftCard.status === 'completed') return;
+
+        deleteGiftCardRequest(selectedGiftCard);
+        setDeleteModal(false);
+        setSelectedGiftCard(null);
+    }
+
     const getStatus = (card: GiftCard) => {
         if (card.status === 'pending_plot_selection') {
             return 'Pending Plot Selection';
@@ -200,6 +209,16 @@ const GiftTrees: FC = () => {
         } else {
             return 'Completed';
         }
+    }
+
+    const getValidationError = (errorValue: string) => {
+        if (errorValue === 'MISSING_LOGO') {
+            return 'Missing Company Logo';
+        } else if (errorValue === 'MISSING_USER_DETAILS') {
+            return 'Missing user details for assignment';
+        }
+        
+        return ''
     }
 
     const columns: TableColumnsType<GiftCard> = [
@@ -236,6 +255,14 @@ const GiftTrees: FC = () => {
             render: (value, record, index) => getStatus(record),
         },
         {
+            dataIndex: "validation_error",
+            key: "validation_error",
+            title: "Validation Error",
+            align: "center",
+            width: 100,
+            render: getValidationError,
+        },
+        {
             dataIndex: "action",
             key: "action",
             title: "Actions",
@@ -251,6 +278,7 @@ const GiftTrees: FC = () => {
                     {record.status === 'pending_plot_selection' && <Button
                         variant="outlined"
                         style={{ margin: "0 5px" }}
+                        disabled={record.validation_error === 'MISSING_LOGO' }
                         onClick={() => {
                             setSelectedGiftCard(record);
                             setPlotModal(true);
@@ -260,6 +288,7 @@ const GiftTrees: FC = () => {
                     {record.status === 'pending_assignment' && <Button
                         variant="outlined"
                         style={{ margin: "0 5px" }}
+                        disabled={record.validation_error === 'MISSING_USER_DETAILS' }
                         onClick={() => {
                             setSelectedGiftCard(record);
                             setAutoAssignModal(true);
@@ -283,6 +312,16 @@ const GiftTrees: FC = () => {
                         }}>
                         <EditOutlined />
                     </Button>
+                    {(record.status === 'pending_assignment' || record.status === 'pending_plot_selection') && <Button
+                        variant="outlined"
+                        color='error'
+                        style={{ margin: "0 5px" }}
+                        onClick={() => {
+                            setDeleteModal(true);
+                            setSelectedGiftCard(record);
+                        }}>
+                        <DeleteOutline />
+                    </Button>}
                 </div>
             ),
         },
@@ -349,6 +388,21 @@ const GiftTrees: FC = () => {
                         Cancel
                     </Button>
                     <Button onClick={handleAutoAssignTrees} color="primary" variant="contained">
+                        Confirm
+                    </Button>
+                </DialogActions>
+            </Dialog>
+
+            <Dialog open={deleteModal} onClose={() => setDeleteModal(false)} fullWidth maxWidth='md'>
+                <DialogTitle>Auto-assign trees to gift card request users</DialogTitle>
+                <DialogContent dividers>
+                    <Typography variant="subtitle1">Are you sure you want to delete this gift card request? It will delete related plot selection on booked trees.</Typography>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={() => setDeleteModal(false)} color="primary">
+                        Cancel
+                    </Button>
+                    <Button onClick={handleGiftCardRequestDelete} color="success" variant="contained">
                         Confirm
                     </Button>
                 </DialogActions>
