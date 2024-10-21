@@ -11,7 +11,7 @@ import ApiClient from "../../../../api/apiClient/apiClient";
 import ImageMapping from "./ImageMapping";
 import { ImageOutlined } from "@mui/icons-material";
 import GeneralTable from "../../../../components/GenTable";
-import { getColumnSelectedItemFilter } from "../../../../components/Filter";
+import getColumnSearchProps, { getColumnSelectedItemFilter } from "../../../../components/Filter";
 import { GridFilterItem } from "@mui/x-data-grid";
 
 interface User {
@@ -79,6 +79,7 @@ export const BulkUserForm: FC<BulkUserFormProps> = ({ requestId, users, onUsersC
   const [page, setPage] = useState(0);
   const [pageSize, setPageSize] = useState(5)
   const [filters, setFilters] = useState<Record<string, GridFilterItem>>({})
+  const [filteredUsers, setFilteredUsers] = useState<User[]>(users);
 
   const handleSetFilters = (filters: Record<string, GridFilterItem>) => {
     setPage(0);
@@ -135,6 +136,26 @@ export const BulkUserForm: FC<BulkUserFormProps> = ({ requestId, users, onUsersC
 
     getUrls();
   }, [requestId])
+
+  useEffect(() => {
+    const filterList = Object.values(filters);
+    let filteredUsers = users;
+    for (const filter of filterList) {
+      if ((filter.columnField === 'name') && filter.value) filteredUsers = filteredUsers.filter(item => item.name.includes(filter.value));
+      else if ((filter.columnField === 'email') && filter.value) filteredUsers = filteredUsers.filter(item => item.email.includes(filter.value));
+      else if (filter.columnField === 'image' && filter.value && filter.value.length > 0)  {
+        filteredUsers = filteredUsers.filter(item => {
+          if (item.image === undefined && filter.value.includes('Image Not Provided')) return true;
+          else if (item.image === false && filter.value.includes('Image Not Found')) return true;
+          return false
+        });
+      } else if (filter.columnField === 'error' && filter.value && filter.value.length > 0)  {
+        filteredUsers = filteredUsers.filter(item => filter.value.includes(item.error ? 'Yes' : 'No'));
+      }
+    }
+
+    setFilteredUsers(filteredUsers);
+  }, [filters, users])
 
   const handleFileChange = (e: any) => {
 
@@ -229,6 +250,7 @@ export const BulkUserForm: FC<BulkUserFormProps> = ({ requestId, users, onUsersC
       title: "Name",
       width: 180,
       align: "center",
+      ...getColumnSearchProps('name', filters, handleSetFilters),
     },
     {
       dataIndex: "email",
@@ -236,6 +258,7 @@ export const BulkUserForm: FC<BulkUserFormProps> = ({ requestId, users, onUsersC
       title: "Email",
       width: 180,
       align: "center",
+      ...getColumnSearchProps('email', filters, handleSetFilters),
     },
     {
       dataIndex: "phone",
@@ -264,6 +287,7 @@ export const BulkUserForm: FC<BulkUserFormProps> = ({ requestId, users, onUsersC
       width: 180,
       align: "center",
       render: (value) => value ? 'Yes' : 'No',
+      ...getColumnSelectedItemFilter({ dataIndex: 'error', filters, handleSetFilters, options: ['Yes', 'No'] })
     },
     {
       dataIndex: "action",
@@ -367,14 +391,14 @@ export const BulkUserForm: FC<BulkUserFormProps> = ({ requestId, users, onUsersC
           page={page}
           pageSize={pageSize}
           onPaginationChange={handlePaginationChange}
-          totalRecords={users.length}
-          rows={users.length > 0 ? users.sort((a, b) => {
-            if (a.image === false) return -1;
-            if (b.image === false) return 1;
+          totalRecords={filteredUsers.length}
+          rows={users.length > 0 ? filteredUsers.sort((a, b) => {
+            if (a.error) return -1;
+            if (b.error) return 1;
 
             return 0;
           }).slice(page * pageSize, page * pageSize + pageSize) : dummyData}
-          onDownload={async () => users}
+          onDownload={async () => filteredUsers}
           rowClassName={(record, index) => record.error ? 'pending-item' : '' }
         />
       </Grid>
