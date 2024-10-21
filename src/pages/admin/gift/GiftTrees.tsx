@@ -14,10 +14,11 @@ import { bindActionCreators } from "@reduxjs/toolkit";
 import { RootState } from "../../../redux/store/store";
 import TableComponent from "../../../components/Table";
 import { TableColumnsType } from "antd";
-import { AssignmentTurnedInOutlined, CardGiftcardOutlined, DeleteOutline, DownloadOutlined, EditOutlined, ErrorOutline, LandscapeOutlined, LinkOutlined } from "@mui/icons-material";
+import { AssignmentTurnedInOutlined, CardGiftcardOutlined, DeleteOutline, DownloadOutlined, EditOutlined, ErrorOutline, InfoOutlined, LandscapeOutlined, LinkOutlined } from "@mui/icons-material";
 import PlotSelection from "./Form/PlotSelection";
 import { Plot } from "../../../types/plot";
 import giftCardActionTypes from "../../../redux/actionTypes/giftCardActionTypes";
+import GiftCardRequestInfo from "./GiftCardRequestInfo";
 
 const GiftTrees: FC = () => {
     const dispatch = useAppDispatch();
@@ -27,6 +28,7 @@ const GiftTrees: FC = () => {
     const [changeMode, setChangeMode] = useState<'add' | 'edit'>('add');
     const [modalOpen, setModalOpen] = useState(false);
     const [plotModal, setPlotModal] = useState(false);
+    const [infoModal, setInfoModal] = useState(false);
     const [autoAssignModal, setAutoAssignModal] = useState(false);
     const [page, setPage] = useState(0);
     const [pageSize, setPageSize] = useState(10);
@@ -55,7 +57,11 @@ const GiftTrees: FC = () => {
         setModalOpen(true);
     }
 
-    const handleModalClose = () => setModalOpen(false);
+    const handleModalClose = () => {
+        setModalOpen(false);
+        setSelectedGiftCard(null);
+        setRequestId(null);
+    }
 
     useEffect(() => {
         getGiftCardData();
@@ -117,6 +123,7 @@ const GiftTrees: FC = () => {
         if (!selectedGiftCard) return;
 
         const apiClient = new ApiClient();
+        let success = false;
         try {
             const response = await apiClient.updateGiftCard(selectedGiftCard, treeCount, user.id, group?.id, logo, messages, file);
             toast.success("Gift Request updated successfully");
@@ -124,10 +131,28 @@ const GiftTrees: FC = () => {
                 type: giftCardActionTypes.UPDATE_GIFT_CARD_SUCCEEDED,
                 payload: response,
             });
+            success = true;
             setRequestId(null);
+            setSelectedGiftCard(null);
         } catch (error) {
             toast.error("Failed to update gift request");
             return;
+        }
+
+        if (success) {
+            try {
+                if (users.length > 0) {
+                    const response = await apiClient.createGiftCardUsers(selectedGiftCard.id, users);
+                    dispatch({
+                        type: giftCardActionTypes.UPDATE_GIFT_CARD_SUCCEEDED,
+                        payload: response,
+                    });
+                }
+                toast.success("Gift cards requested!");
+            } catch (error) {
+                toast.error("Failed to create gift card users");
+                return;
+            }
         }
     }
 
@@ -236,7 +261,7 @@ const GiftTrees: FC = () => {
             key: "user_name",
             title: "User",
             align: "center",
-            width: 150,
+            width: 200,
             ...getColumnSearchProps('user_name', filters, handleSetFilters)
         },
         {
@@ -260,7 +285,7 @@ const GiftTrees: FC = () => {
             key: "status",
             title: "Status",
             align: "center",
-            width: 100,
+            width: 150,
             render: (value, record, index) => getStatus(record),
         },
         {
@@ -281,7 +306,7 @@ const GiftTrees: FC = () => {
             dataIndex: "action",
             key: "action",
             title: "Actions",
-            width: 150,
+            width: 250,
             align: "center",
             render: (value, record, index) => (
                 <div
@@ -290,6 +315,15 @@ const GiftTrees: FC = () => {
                         justifyContent: "center",
                         alignItems: "center",
                     }}>
+                    <Button
+                        variant="outlined"
+                        style={{ margin: "0 5px" }}
+                        onClick={() => {
+                            setSelectedGiftCard(record);
+                            setInfoModal(true);
+                        }}>
+                        <InfoOutlined />
+                    </Button>
                     {record.status === 'pending_plot_selection' && <Button
                         variant="outlined"
                         style={{ margin: "0 5px" }}
@@ -320,6 +354,16 @@ const GiftTrees: FC = () => {
                             <LinkOutlined />
                         </Button>
                     </div>}
+                    {record.status === 'completed' && <div>
+                        <Button
+                            variant="outlined"
+                            style={{ margin: "0 5px" }}
+                            disabled={!record.presentation_id}
+                            onClick={() => { handleDownloadCards(record.id, record.user_name + '_' + record.no_of_cards, 'zip') }}
+                        >
+                            <DownloadOutlined />
+                        </Button>
+                    </div>}
                     {record.status === 'pending_gift_cards' && <Button
                         variant="outlined"
                         style={{ margin: "0 5px" }}
@@ -329,7 +373,7 @@ const GiftTrees: FC = () => {
                     </Button>}
                     <Button
                         variant="outlined"
-                        disabled={(record.status === 'pending_gift_cards' || record.status === 'completed')}
+                        disabled={record.status !== 'pending_plot_selection'}
                         style={{ margin: "0 5px" }}
                         onClick={() => {
                             handleModalOpenEdit(record);
@@ -431,7 +475,12 @@ const GiftTrees: FC = () => {
                     </Button>
                 </DialogActions>
             </Dialog>
-
+            
+            <GiftCardRequestInfo 
+                open={infoModal}
+                onClose={() => { setInfoModal(false) }}
+                data={selectedGiftCard}
+            />
         </div>
     );
 };
