@@ -30,3 +30,7 @@
 .pending-item {
     background-color: rgba(255, 156, 156, 0.2);
 }
+
+.ant-dropdown {
+    z-index: 10000 !important; /* Set a high z-index value */
+}

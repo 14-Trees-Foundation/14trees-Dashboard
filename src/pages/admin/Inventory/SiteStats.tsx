@@ -54,6 +54,12 @@ const SiteStats: FC<SiteStatsProps> = ({ districts, talukas, villages, categorie
                         return 'PLANTATION_ONLY';
                     case 'Full Maintenance':
                         return 'FULL_MAINTENANCE';
+                    case 'Waiting':
+                        return 'WAITING';
+                    case 'Cancelled':
+                        return 'CANCELLED';
+                    case 'TBD':
+                        return 'TBD';
                     default:
                         return null;
                 }
@@ -159,6 +165,12 @@ const SiteStats: FC<SiteStatsProps> = ({ districts, talukas, villages, categorie
                 return 'Plantation Only';
             case 'FULL_MAINTENANCE':
                 return 'Full Maintenance';
+            case 'WAITING':
+                return 'Waiting';
+            case 'CANCELLED':
+                return 'Cancelled';
+            case 'TBD':
+                return 'TBD';
             default:
                 return 'Unknown';
         }
@@ -184,7 +196,7 @@ const SiteStats: FC<SiteStatsProps> = ({ districts, talukas, villages, categorie
             dataIndex: "maintenance_type",
             key: "maintenance_type",
             render: getMaintenanceTypesString,
-            ...getColumnSelectedItemFilter<any>({ dataIndex: 'maintenance_type', filters, handleSetFilters, options: ['Distribution Only', 'Plantation Only', 'Full Maintenance', 'Unknown'] })
+            ...getColumnSelectedItemFilter<any>({ dataIndex: 'maintenance_type', filters, handleSetFilters, options: ['Distribution Only', 'Plantation Only', 'Full Maintenance', 'Waiting', 'Cancelled', 'TBD', 'Unknown'] })
         },
         {
             title: "Land Type",
