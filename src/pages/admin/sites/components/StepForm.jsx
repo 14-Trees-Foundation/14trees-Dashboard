@@ -116,6 +116,9 @@ const StepForm = ({ open, handleClose, useCase, data, submitFunction }) => {
     { value: "1", label: "FULL_MAINTENANCE" },
     { value: "2", label: "PLANTATION_ONLY" },
     { value: "3", label: "DISTRIBUTION_ONLY" },
+    { value: "4", label: "WAITING" },
+    { value: "5", label: "CANCELLED" },
+    { value: "6", label: "TBD" },
   ];
 
   const handleOwnerChange = (e, value) => {
