@@ -1,11 +1,13 @@
 
 export enum maintenance_type {
- 
-
     FULL_MAINTENANCE= 'FULL_MAINTENANCE',
 	PLANTATION_ONLY='PLANTATION_ONLY',
-	DISTRIBUTION_ONLY='DISTRIBUTION_ONLY'
+	DISTRIBUTION_ONLY='DISTRIBUTION_ONLY',
+	WAITING='WAITING',
+	CANCELLED='CANCELLED',
+	TBD='TBD',
 }
+
 export enum site_data_check_type {
     Yes="Yes",
     No ="No"

@@ -28,6 +28,12 @@ const getSiteServiceTypeEnum = (serviceType: string): string | null => {
             return 'PLANTATION_ONLY';
         case 'Distribution Only':
             return 'DISTRIBUTION_ONLY';
+        case 'Waiting':
+            return 'WAITING';
+        case 'Cancelled':
+            return 'CANCELLED';
+        case 'TBD':
+            return 'TBD';
         default:
             return null;
     }
@@ -234,7 +240,7 @@ const InventoryStats: FC = () => {
                     <Box style={{ width: '19%' }}>
                         <Typography variant='subtitle2'>Site Service Type</Typography>
                         <MultipleSelect
-                            options={['Full Maintenance', 'Distribution Only', 'Plantation Only', 'Unknown']}
+                            options={['Full Maintenance', 'Distribution Only', 'Plantation Only', 'Waiting', 'Cancelled', 'TBD', 'Unknown']}
                             onSelectionChange={(value: string[]) => { setSelectedServiceTypes(value) }}
                             selected={selectedServiceTypes}
                             label="Select Service Type"
