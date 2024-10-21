@@ -48,6 +48,7 @@ export default function getColumnSearchProps<T extends object>(dataIndex: keyof 
                         defaultValue={filterOptionsArray[0]}
                         style={{ marginBottom: 8, marginRight: 6 }}
                         options={filterOptionsArray}
+                        dropdownStyle={{ zIndex: 10001 }}
                         onChange={(value) => { filterOption = value; }}
                     />
                     <Input
@@ -142,6 +143,7 @@ export function getColumnSelectedItemFilter<T extends object>({ dataIndex, filte
                     value={selectedKeys}
                     onChange={(value) => setSelectedKeys(value)}
                     options={selectOptions}
+                    dropdownStyle={{ zIndex: 10001 }}
                     style={{ display: 'block', marginBottom: 8, alignItems: 'center', width: 250}}
                 />
                 <Space style={{ display: 'flex', alignItems: 'center'}}>
