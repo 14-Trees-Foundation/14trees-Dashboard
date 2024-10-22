@@ -2,7 +2,7 @@ import { combineReducers } from "redux";
 import { plantTypesDataReducer, searchPlantTypesDataReducer } from "./plantTypeReducer";
 import { onsiteStaffsDataReducer } from "./onsiteStaffReducer";
 import { groupsDataReducer, searchGroupsDataReducer } from "./groupReducer";
-import { plotsDataReducer, searchPlotsDataReducer, getPlotTagsDataReducer } from "./plotReducer";
+import { plotsDataReducer, searchPlotsDataReducer } from "./plotReducer";
 import { sitesDataReducer } from "./siteReducer";
 import { pondsDataReducer, searchPondsDataReducer } from "./pondReducer";
 import { pondWaterLevelUpdatesDataReducer } from "./pondWaterLevelUpdateReducer";
@@ -16,6 +16,7 @@ import { visitsDataReducer } from "./visitReducer";
 import { visitUsersDataReducer} from "./visitUserReducer";
 import { treeImagesDataReducer } from "./treeImageReducer";
 import { giftCardUsersDataReducer, giftCardsDataReducer } from "./giftCardReducer";
+import { tagsDataReducer } from "./tagReducer";
 
 const rootReducer = combineReducers({
     plantTypesData: plantTypesDataReducer,
@@ -24,7 +25,6 @@ const rootReducer = combineReducers({
     userGroupsData: userGroupsDataReducer,
     sitesData: sitesDataReducer,
     plotsData: plotsDataReducer,
-    plotTags: getPlotTagsDataReducer,
     pondsData: pondsDataReducer,
     pondWaterLevelUpdatesData: pondWaterLevelUpdatesDataReducer,
     treesData: treesDataReducer,
@@ -43,6 +43,7 @@ const rootReducer = combineReducers({
     visitUserData: visitUsersDataReducer,
     giftCardsData: giftCardsDataReducer,
     giftCardUsersData: giftCardUsersDataReducer,
+    tagsData: tagsDataReducer,
 });
 
 export default rootReducer;
