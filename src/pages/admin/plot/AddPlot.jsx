@@ -241,7 +241,8 @@ const AddPlot = ({ open, handleClose, createPlot, tags }) => {
               </Grid>
               <Grid item xs={12}>
                 <TagSelector
-                  tagsList={tags}
+                  userTags={tags.filter(item => item.type === 'USER_DEFINED').map(item => item.tag)}
+                  systemTags={tags.filter(item => item.type === 'SYSTEM_DEFINED').map(item => item.tag)}
                   value={formData.tags}
                   handleChange={(tags) =>
                     setFormData({ ...formData, tags: tags })

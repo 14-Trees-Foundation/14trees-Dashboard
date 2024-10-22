@@ -154,7 +154,8 @@ function EditPlot({ row, openeditModal, handleCloseModal, editSubmit, tags }) {
             margin="dense"
           />
           <TagSelector
-            tagsList={tags}
+            userTags={tags.filter(item => item.type === 'USER_DEFINED').map(item => item.tag)}
+            systemTags={tags.filter(item => item.type === 'SYSTEM_DEFINED').map(item => item.tag)}
             value={formData.tags}
             handleChange={(tags) => setFormData({ ...formData, tags: tags })}
             margin="dense"
