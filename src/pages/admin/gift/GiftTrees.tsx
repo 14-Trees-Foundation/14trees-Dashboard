@@ -14,7 +14,7 @@ import { bindActionCreators } from "@reduxjs/toolkit";
 import { RootState } from "../../../redux/store/store";
 import TableComponent from "../../../components/Table";
 import { TableColumnsType } from "antd";
-import { AssignmentTurnedInOutlined, CardGiftcardOutlined, DeleteOutline, DownloadOutlined, EditOutlined, ErrorOutline, InfoOutlined, LandscapeOutlined, LinkOutlined } from "@mui/icons-material";
+import { AssignmentTurnedInOutlined, CardGiftcardOutlined, DeleteOutline, DownloadOutlined, EditOutlined, EmailOutlined, ErrorOutline, InfoOutlined, LandscapeOutlined, LinkOutlined } from "@mui/icons-material";
 import PlotSelection from "./Form/PlotSelection";
 import { Plot } from "../../../types/plot";
 import giftCardActionTypes from "../../../redux/actionTypes/giftCardActionTypes";
@@ -227,6 +227,18 @@ const GiftTrees: FC = () => {
 
     }
 
+    const handleSendEmail = async (id: number) => {
+        try {
+            const apiClient = new ApiClient();
+            await apiClient.sendEmailToGiftRequestUsers(id);
+
+            toast.success("Emails sent successfully!")
+        } catch (error: any) {
+            toast.error(error.message)
+        }
+
+    }
+
     const handleGiftCardRequestDelete = () => {
         if (!selectedGiftCard || selectedGiftCard.status === 'pending_gift_cards' || selectedGiftCard.status === 'completed') return;
 
@@ -362,6 +374,15 @@ const GiftTrees: FC = () => {
                             onClick={() => { handleDownloadCards(record.id, record.user_name + '_' + record.no_of_cards, 'zip') }}
                         >
                             <DownloadOutlined />
+                        </Button>
+                    </div>}
+                    {record.status === 'completed' && <div>
+                        <Button
+                            variant="outlined"
+                            style={{ margin: "0 5px" }}
+                            onClick={() => { handleSendEmail(record.id) }}
+                        >
+                            <EmailOutlined />
                         </Button>
                     </div>}
                     {record.status === 'pending_gift_cards' && <Button

@@ -1359,6 +1359,17 @@ class ApiClient {
         }
     }
 
+    async sendEmailToGiftRequestUsers(gift_card_request_id: number): Promise<void> {
+        try {
+            const resp = await this.api.post<void>(`/gift-cards/email/${gift_card_request_id}`);
+        } catch (error: any) {
+            if (error.response) {
+                throw new Error(error.response.data.message);
+            }
+            throw new Error('Failed to send emails to users');
+        }
+    }
+
     // Utils
     async getSignedUrlForRequestId(gift_card_request_id: string, filename: string): Promise<string> {
         try {
