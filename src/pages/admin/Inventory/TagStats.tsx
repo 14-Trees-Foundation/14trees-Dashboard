@@ -32,8 +32,8 @@ const TagStats: FC<TagStatsProps> = ({ villages, districts, talukas, categories,
 
     const getTags = async () => {
         const apiClient = new ApiClient();
-        const resp = await apiClient.getPlotTags(0, 50);
-        setTags(resp.results);
+        const resp = await apiClient.getTags(0, 100);
+        setTags(resp.results.map(item => item.tag));
     }
 
     const getFilters = () => {

@@ -14,6 +14,7 @@ import { Event } from '../../types/event';
 import { Visit, BulkVisitUsersMappingResponse } from '../../types/visits';
 import { TreeImage } from '../../types/tree_snapshots';
 import { GiftCard, GiftCardUser } from '../../types/gift_card';
+import { Tag } from '../../types/tag';
 
 
 class ApiClient {
@@ -187,12 +188,6 @@ class ApiClient {
         }
     }
 
-    async getPlotTags(offset: number, limit: number): Promise<PaginatedResponse<string>> {
-        const url = `/plots/tags?offset${offset}&limit=${limit}`
-        const response = await this.api.get<PaginatedResponse<string>>(url);
-        return response.data;
-    }
-
     async assignPlotsToSite(plotIds: number[], siteId: number): Promise<void> {
         let url = `/plots/assign-site`
         try {
@@ -216,6 +211,18 @@ class ApiClient {
         }
 
     }
+
+
+    /*
+        Model- Group: CRUD Operations/Apis for organizations
+    */
+
+    async getTags(offset: number, limit: number): Promise<PaginatedResponse<Tag>> {
+        const url = `/tags?offset${offset}&limit=${limit}`
+        const response = await this.api.get<PaginatedResponse<Tag>>(url);
+        return response.data;
+    }
+    
 
     /*
         Model- Group: CRUD Operations/Apis for organizations

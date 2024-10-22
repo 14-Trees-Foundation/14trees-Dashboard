@@ -8,6 +8,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import { type Plot } from "../../../types/plot";
 import * as plotActionCreators from "../../../redux/actions/plotActions";
 import * as siteActionCreators from "../../../redux/actions/siteActions";
+import * as tagActionCreators from "../../../redux/actions/tagActions";
 import { bindActionCreators } from "redux";
 import { useAppDispatch, useAppSelector } from "../../../redux/store/hooks";
 import { RootState } from "../../../redux/store/store";
@@ -56,10 +57,11 @@ const TableSummary = (plots: Plot[], selectedPlotIds: number[], totalColumns: nu
 
 export const PlotComponent = () => {
   const dispatch = useAppDispatch();
-  const { getPlots, createPlot, updatePlot, deletePlot, getPlotTags, assignPlotsToSite } = bindActionCreators(
+  const { getPlots, createPlot, updatePlot, deletePlot, assignPlotsToSite } = bindActionCreators(
     plotActionCreators,
     dispatch
   );
+  const { getTags } = bindActionCreators(tagActionCreators, dispatch);
   const { getSites } = bindActionCreators(siteActionCreators, dispatch);
 
   const [loading, setLoading] = useState(false);
@@ -142,19 +144,15 @@ export const PlotComponent = () => {
   };
 
   useEffect(() => {
-    getPlotTagsData();
+    getTags(0, 100);
   }, []);
 
-  const getPlotTagsData = async () => {
-    getPlotTags(page * pageSize, pageSize);
-  };
-
   let tags: string[] = [];
-  const tagsData = useAppSelector((state: RootState) => state.plotTags);
+  const tagsData = useAppSelector((state: RootState) => state.tagsData);
   if (tagsData) {
-    tags = Array.from(tagsData);
+    tags = Object.values(tagsData.tags).map(item => item.tag);
   }
-
+  
   useEffect(() => {
     getSitesData();
   }, [sitePage, siteNameInput]);
