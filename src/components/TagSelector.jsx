@@ -7,6 +7,7 @@ import { createFilterOptions } from '@mui/material/Autocomplete';
 const filter = createFilterOptions();
 
 const TagSelector = ({ systemTags, userTags, value, handleChange, margin = "none" }) => {
+    const [options, setOptions] = useState([]);
     const [tags, setTags] = useState([]);
     const [selectedTags, setSelectedTags] = useState(value ?? []);
 
@@ -15,6 +16,12 @@ const TagSelector = ({ systemTags, userTags, value, handleChange, margin = "none
         if (systemTags) tags.push(...systemTags)
         if (userTags) tags.push(...userTags)
         setTags(tags)
+
+        const options = [];
+        if (systemTags) options.push('System Tags', ...systemTags)
+        if (userTags) options.push( 'User Tags',...userTags)
+
+        setOptions(options)
     }, [systemTags, userTags])
 
     useEffect(() => {
@@ -38,10 +45,6 @@ const TagSelector = ({ systemTags, userTags, value, handleChange, margin = "none
             handleChange(newValues);
         }
     };
-
-    const options = [];
-    if (systemTags) options.push('System Tags', ...systemTags)
-    if (userTags) options.push( 'User Tags',...userTags)
 
     return (
         <Autocomplete
