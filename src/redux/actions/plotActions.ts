@@ -3,6 +3,7 @@ import plotActionTypes from "../actionTypes/plotActionTypes";
 import { Plot } from "../../types/plot";
 import { PaginatedResponse } from "../../types/pagination";
 import { toast } from "react-toastify";
+import { Tag } from "../../types/tag";
 
 export const getPlots = (offset: number, limit: number, filters?: any[], orderBy?: { column: string, order: 'ASC' | 'DESC' }[]) => {
     const apiClient = new ApiClient()
@@ -141,30 +142,6 @@ export const deletePlot = (record: Plot) => {
             }
         )
     };
-};
-
-export const getPlotTags = (offset: number, limit: number) => {
-    const apiClient = new ApiClient()
-    return (dispatch: any) => {
-        dispatch({
-            type: plotActionTypes.GET_PLOT_TAGS_REQUESTED,
-        });
-        apiClient.getPlotTags(offset, limit).then(
-            (value: PaginatedResponse<string>) => {
-                dispatch({
-                    type: plotActionTypes.GET_PLOT_TAGS_SUCCEEDED,
-                    payload: value,
-                });
-            },
-            (error: any) => {
-                console.log(error)
-                dispatch({
-                    type: plotActionTypes.GET_PLOT_TAGS_FAILED,
-                    payload: error
-                });
-            }
-        )
-    }
 };
 
 export const assignPlotsToSite = (plotIds: number[], siteId: number) => {
