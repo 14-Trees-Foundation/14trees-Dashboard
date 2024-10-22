@@ -426,7 +426,7 @@ export const PlotComponent = () => {
             open={open}
             handleClose={handleModalClose}
             createPlot={handleCreatePlotData}
-            tags={tags}
+            tags={Object.values(tagsData.tags)}
           />
         </div>
       </div>
@@ -562,7 +562,7 @@ export const PlotComponent = () => {
           openeditModal={editModal}
           handleCloseModal={() => { setSelectedEditRow(null); setEditModal(false); }}
           editSubmit={handleEditSubmit}
-          tags={tags}
+          tags={Object.values(tagsData.tags)}
         />
       )}
     </>

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import TextField from '@mui/material/TextField';
 import Autocomplete from '@mui/material/Autocomplete';
 import Chip from '@mui/material/Chip';
@@ -6,11 +6,23 @@ import { createFilterOptions } from '@mui/material/Autocomplete';
 
 const filter = createFilterOptions();
 
-const TagSelector = ( { tagsList, value, handleChange, margin = "none" } ) => {
-    const [tags, setTags] = useState(tagsList ?? []);
+const TagSelector = ({ systemTags, userTags, value, handleChange, margin = "none" }) => {
+    const [tags, setTags] = useState([]);
     const [selectedTags, setSelectedTags] = useState(value ?? []);
 
+    useEffect(() => {
+        const tags = [];
+        if (systemTags) tags.push(...systemTags)
+        if (userTags) tags.push(...userTags)
+        setTags(tags)
+    }, [systemTags, userTags])
+
+    useEffect(() => {
+        setSelectedTags(value);
+    }, [value])
+
     const handleCreateTag = (event, newValue) => {
+        console.log(newValue)
         if (newValue && newValue.inputValue) {
             const newTag = newValue.inputValue;
             setTags([...tags, newTag]);
@@ -26,6 +38,10 @@ const TagSelector = ( { tagsList, value, handleChange, margin = "none" } ) => {
             handleChange(newValues);
         }
     };
+
+    const options = [];
+    if (systemTags) options.push('System Tags', ...systemTags)
+    if (userTags) options.push( 'User Tags',...userTags)
 
     return (
         <Autocomplete
@@ -48,23 +64,17 @@ const TagSelector = ( { tagsList, value, handleChange, margin = "none" } ) => {
             selectOnFocus
             clearOnBlur
             handleHomeEndKeys
-            options={tags}
+            options={options}
             getOptionLabel={(option) => {
-                // Value selected with enter, right from the input
-                if (typeof option === 'string') {
-                    return option;
-                }
-                // Add "xxx" option created dynamically
-                if (option.inputValue) {
-                    return option.inputValue;
-                }
-                // Regular option
+                if (option === 'System Tags' || option === 'User Tags') return ''; // Skip label from being selectable
+                if (typeof option === 'string') return option; // For selected string tags
+                if (option.inputValue) return option.inputValue; // For newly created tags
                 return option;
             }}
             renderOption={(props, option) => (
-                <li {...props}>
-                    {option.title || option}
-                </li>
+                (option === 'System Tags' || option === 'User Tags')
+                    ? <li {...props}><strong>{option}</strong></li> // Render label sections
+                    : <li {...props}>{option.title || option}</li> // Render tag options
             )}
             freeSolo
             renderTags={(value, getTagProps) =>
