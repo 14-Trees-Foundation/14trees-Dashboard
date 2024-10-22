@@ -457,6 +457,7 @@ export const PlotComponent = () => {
             if (totalColumns < 5) return undefined;
             return TableSummary(tableRows, selectedPlotIds, totalColumns)
           }}
+          footer
         />
       </Box>
 
