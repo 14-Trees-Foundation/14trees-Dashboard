@@ -30,6 +30,7 @@ const GiftTrees: FC = () => {
     const [plotModal, setPlotModal] = useState(false);
     const [infoModal, setInfoModal] = useState(false);
     const [autoAssignModal, setAutoAssignModal] = useState(false);
+    const [emailConfirmationModal, setEmailConfirmationModal] = useState(false);
     const [page, setPage] = useState(0);
     const [pageSize, setPageSize] = useState(10);
     const [filters, setFilters] = useState<Record<string, GridFilterItem>>({});
@@ -197,6 +198,25 @@ const GiftTrees: FC = () => {
         } catch {
             toast.error("Something went wrong!");
         }
+    }
+
+    const handleSendEmails = async () => {
+        const giftCardRequestId = selectedGiftCard?.id
+        handleEmailModalClose();
+        if (!giftCardRequestId) return;
+        const apiClient = new ApiClient();
+        try {
+            await apiClient.sendEmailToGiftRequestUsers(giftCardRequestId);
+            toast.success("Emails sent successfully!")
+        } catch (error: any) {
+            toast.error(error.message)
+        }
+
+    }
+
+    const handleEmailModalClose = () => {
+        setEmailConfirmationModal(false);
+        setSelectedGiftCard(null);
     }
 
     const handleGenerateGiftCards = async (id: number) => {
@@ -380,7 +400,7 @@ const GiftTrees: FC = () => {
                         <Button
                             variant="outlined"
                             style={{ margin: "0 5px" }}
-                            onClick={() => { handleSendEmail(record.id) }}
+                            onClick={() => { setSelectedGiftCard(record); setEmailConfirmationModal(true); }}
                         >
                             <EmailOutlined />
                         </Button>
@@ -477,6 +497,21 @@ const GiftTrees: FC = () => {
                         Cancel
                     </Button>
                     <Button onClick={handleAutoAssignTrees} color="primary" variant="contained">
+                        Confirm
+                    </Button>
+                </DialogActions>
+            </Dialog>
+            
+            <Dialog open={emailConfirmationModal} onClose={handleEmailModalClose} fullWidth maxWidth="lg">
+                <DialogTitle>Send Emails</DialogTitle>
+                <DialogContent dividers>
+                    <Typography variant="subtitle1">Are you sure you want to send emails to users?</Typography>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={handleEmailModalClose} color="error">
+                        Cancel
+                    </Button>
+                    <Button onClick={handleSendEmails} color="success" variant="contained">
                         Confirm
                     </Button>
                 </DialogActions>
