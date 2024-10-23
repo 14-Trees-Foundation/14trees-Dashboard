@@ -160,6 +160,7 @@ function GeneralTable({ loading, rows, columns, totalRecords, page, pageSize = 1
             loading={loading}
             style={{ 
                 borderRadius: 20,
+                width: '100%'
             }}
             dataSource={rows}
             columns={tableCols.map((col, index) => ({
