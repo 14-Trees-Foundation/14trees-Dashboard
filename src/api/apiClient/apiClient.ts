@@ -1160,12 +1160,13 @@ class ApiClient {
     }
 
 
-    async createGiftCard(request_id: string, no_of_cards: number, user_id: number, group_id?: number, logo?: File, messages?: any, file?: File): Promise<GiftCard> {
+    async createGiftCard(request_id: string, no_of_cards: number, user_id: number, presentation_id: string | null, group_id?: number, logo?: File, messages?: any, file?: File): Promise<GiftCard> {
         try {
             const formData = new FormData();
             formData.append('request_id', request_id);
             formData.append('no_of_cards', no_of_cards.toString());
             formData.append('user_id', user_id.toString());
+            if (presentation_id) formData.append('presentation_id', presentation_id);
             if (messages) {
                 formData.append('primary_message', messages.primaryMessage);
                 formData.append('secondary_message', messages.secondaryMessage);
@@ -1286,10 +1287,10 @@ class ApiClient {
         }
     }
 
-    async generateCardForUser(gift_card_user_id: number, sapling_id: string, content1: string, content2: string, user?: User): Promise<string> {
+    async generateCardTemplate(request_id: string, primary_message: string, secondary_message: string, logo_message: string, logo?: string, presentation_id?: string): Promise<{ presentation_id: string, slide_id: string }> {
         try {
-            const resp = await this.api.post<any>(`/gift-cards/card`, { gift_card_user_id, sapling_id, content1, content2, user });
-            return resp.data.slide_id;
+            const resp = await this.api.post<any>(`/gift-cards/generate-template`, { request_id, primary_message, secondary_message, logo_message, logo, presentation_id });
+            return resp.data;
         } catch (error: any) {
             if (error.response) {
                 throw new Error(error.response.data.message);
@@ -1298,9 +1299,9 @@ class ApiClient {
         }
     }
 
-    async updateGiftCardTemplate(gift_card_user_id: number, content1: string, content2: string, user?: User): Promise<void> {
+    async updateGiftCardTemplate(presentation_id: string, slide_id: string, primary_message: string, secondary_message: string, logo_message: string, logo?: string): Promise<void> {
         try {
-            await this.api.post<any>(`/gift-cards/card/update`, { gift_card_user_id, content1, content2, user });
+            await this.api.post<any>(`/gift-cards/update-template`, { presentation_id, slide_id, primary_message, secondary_message, logo_message, logo });
         } catch (error: any) {
             if (error.response) {
                 throw new Error(error.response.data.message);
