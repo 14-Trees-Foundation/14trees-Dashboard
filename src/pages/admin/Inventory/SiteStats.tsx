@@ -8,6 +8,8 @@ import getColumnSearchProps, { getColumnSelectedItemFilter } from "../../../comp
 import GeneralTable from "../../../components/GenTable"
 
 interface SiteStatsProps {
+    habits: string[]
+    landTypes: string[]
     districts: string[]
     talukas: string[]
     villages: string[]
@@ -15,7 +17,7 @@ interface SiteStatsProps {
     serviceTypes: (string | null)[]
 }
 
-const SiteStats: FC<SiteStatsProps> = ({ districts, talukas, villages, categories, serviceTypes }) => {
+const SiteStats: FC<SiteStatsProps> = ({ habits, landTypes, districts, talukas, villages, categories, serviceTypes }) => {
 
     const [siteTreeCountData, setSiteTreeCountData] = useState<Record<number, any>>({});
     const [tableRows, setTableRows] = useState<any[]>([]);
@@ -71,6 +73,8 @@ const SiteStats: FC<SiteStatsProps> = ({ districts, talukas, villages, categorie
         if (talukas.length !== 0) filtersData.push({ columnField: 'taluka', operatorValue: 'isAnyOf', value: talukas });
         if (districts.length !== 0) filtersData.push({ columnField: 'district', operatorValue: 'isAnyOf', value: districts });
         if (villages.length !== 0) filtersData.push({ columnField: 'village', operatorValue: 'isAnyOf', value: villages });
+        if (habits.length !== 0) filtersData.push({ columnField: 'habit', operatorValue: 'isAnyOf', value: habits });
+        if (landTypes.length !== 0) filtersData.push({ columnField: 'land_type', operatorValue: 'isAnyOf', value: landTypes });
 
         return filtersData;
     }

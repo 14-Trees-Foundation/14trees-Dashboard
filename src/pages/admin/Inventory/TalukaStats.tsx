@@ -4,6 +4,8 @@ import { GridFilterItem } from "@mui/x-data-grid"
 import GeneralStats from "./GeneralStats"
 
 interface TalukaStatsProps {
+    habits: string[]
+    landTypes: string[]
     districts: string[]
     talukas: string[]
     villages: string[]
@@ -11,7 +13,7 @@ interface TalukaStatsProps {
     serviceTypes: (string | null)[]
 }
 
-const TalukaStats: FC<TalukaStatsProps> = ({ talukas, districts, villages, categories, serviceTypes }) => {
+const TalukaStats: FC<TalukaStatsProps> = ({ habits, landTypes, talukas, districts, villages, categories, serviceTypes }) => {
 
     const [talukaTreeCountData, setTalukaTreeCountData] = useState<Record<number, any>>({});
     const [tableRows, setTableRows] = useState<any[]>([]);
@@ -40,6 +42,8 @@ const TalukaStats: FC<TalukaStatsProps> = ({ talukas, districts, villages, categ
         if (talukas.length !== 0) filtersData.push({ columnField: 'taluka', operatorValue: 'isAnyOf', value: talukas });
         if (districts.length !== 0) filtersData.push({ columnField: 'district', operatorValue: 'isAnyOf', value: districts });
         if (villages.length !== 0) filtersData.push({ columnField: 'village', operatorValue: 'isAnyOf', value: villages });
+        if (habits.length !== 0) filtersData.push({ columnField: 'habit', operatorValue: 'isAnyOf', value: habits });
+        if (landTypes.length !== 0) filtersData.push({ columnField: 'land_type', operatorValue: 'isAnyOf', value: landTypes });
 
         return filtersData;
     }
