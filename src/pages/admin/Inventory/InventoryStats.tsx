@@ -49,6 +49,8 @@ const InventoryStats: FC = () => {
     const [selectedVillages, setSelectedVillages] = useState<string[]>([]);
     const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
     const [selectedServiceTypes, setSelectedServiceTypes] = useState<string[]>([]);
+    const [selectedHabit, setSelectedHabit] = useState<string[]>([]);
+    const [selectedLandType, setSelectedLandType] = useState<string[]>([]);
 
     const getTreesCountForCategories = async () => {
         const apiClient = new ApiClient();
@@ -69,6 +71,8 @@ const InventoryStats: FC = () => {
         if (selectedTalukas.length !== 0) filters.push({ columnField: 'taluka', operatorValue: 'isAnyOf', value: selectedTalukas });
         if (selectedDistricts.length !== 0) filters.push({ columnField: 'district', operatorValue: 'isAnyOf', value: selectedDistricts });
         if (selectedVillages.length !== 0) filters.push({ columnField: 'village', operatorValue: 'isAnyOf', value: selectedVillages });
+        if (selectedLandType.length !== 0) filters.push({ columnField: 'land_type', operatorValue: 'isAnyOf', value: selectedLandType });
+        if (selectedHabit.length !== 0) filters.push({ columnField: 'habit', operatorValue: 'isAnyOf', value: selectedHabit });
 
 
         const stats = await apiClient.getTreesCountForPlotCategories(filters);
@@ -111,7 +115,7 @@ const InventoryStats: FC = () => {
 
     useEffect(() => {
         getTreesCountForCategories();
-    }, [selectedDistricts, selectedTalukas, selectedVillages, selectedCategories, selectedServiceTypes])
+    }, [selectedDistricts, selectedTalukas, selectedVillages, selectedCategories, selectedServiceTypes, selectedHabit, selectedLandType])
 
     useEffect(() => {
         getDistricts();
@@ -182,6 +186,8 @@ const InventoryStats: FC = () => {
         setSelectedVillages([]);
         setSelectedCategories([]);
         setSelectedServiceTypes([]);
+        setSelectedLandType([]);
+        setSelectedHabit([]);
     }
 
     return (
@@ -201,7 +207,7 @@ const InventoryStats: FC = () => {
                         marginBottom: '10px',
                     }}
                 >
-                    <Box style={{ width: '19%' }}>
+                    <Box style={{ width: '32%' }}>
                         <Typography variant='subtitle2'>District</Typography>
                         <MultipleSelect
                             options={districts.map((item) => item.district).filter((value, index, self) => value !== '' && self.indexOf(value) === index)}
@@ -211,7 +217,7 @@ const InventoryStats: FC = () => {
                         />
                     </Box>
 
-                    <Box style={{ width: '19%' }}>
+                    <Box style={{ width: '32%' }}>
                         <Typography variant='subtitle2'>Taluka</Typography>
                         <MultipleSelect
                             disabled={selectedDistricts.length === 0}
@@ -223,7 +229,7 @@ const InventoryStats: FC = () => {
                         />
                     </Box>
 
-                    <Box style={{ width: '19%' }}>
+                    <Box style={{ width: '32%' }}>
                         <Typography variant='subtitle2'>Village</Typography>
                         <MultipleSelect
                             disabled={selectedDistricts.length === 0}
@@ -234,8 +240,36 @@ const InventoryStats: FC = () => {
                             label="Villages"
                         />
                     </Box>
+                </Box>
+                <Box
+                    style={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        marginTop: '10px',
+                        marginBottom: '10px',
+                    }}
+                >
+                    <Box style={{ width: '24%' }}>
+                        <Typography variant='subtitle2'>Plant Type Habitat</Typography>
+                        <MultipleSelect
+                            options={['Tree', 'Herb', 'Shrub', 'Climber']}
+                            onSelectionChange={(value: string[]) => { setSelectedHabit(value) }}
+                            selected={selectedHabit}
+                            label="Habitats"
+                        />
+                    </Box>
 
-                    <Box style={{ width: '19%' }}>
+                    <Box style={{ width: '24%' }}>
+                        <Typography variant='subtitle2'>Site Land Type</Typography>
+                        <MultipleSelect
+                            options={["Foundation", "Cremation", "Farm", "Roadside", "Temple", "Premises", "Gairan", "Forest", "School"]}
+                            onSelectionChange={(value: string[]) => { setSelectedLandType(value) }}
+                            selected={selectedLandType}
+                            label="Site Land Type"
+                        />
+                    </Box>
+
+                    <Box style={{ width: '24%' }}>
                         <Typography variant='subtitle2'>Site Category</Typography>
                         <MultipleSelect
                             options={['Public', 'Foundation', 'Unknown']}
@@ -245,7 +279,7 @@ const InventoryStats: FC = () => {
                         />
                     </Box>
 
-                    <Box style={{ width: '19%' }}>
+                    <Box style={{ width: '24%' }}>
                         <Typography variant='subtitle2'>Site Service Type</Typography>
                         <MultipleSelect
                             options={['Full Maintenance', 'Distribution Only', 'Plantation Only', 'Waiting', 'Cancelled', 'TBD', 'Unknown']}
@@ -283,6 +317,8 @@ const InventoryStats: FC = () => {
                 </Box>
 
                 <DistrictStats
+                    habits={selectedHabit}
+                    landTypes={selectedLandType}
                     talukas={selectedTalukas}
                     villages={selectedVillages}
                     districts={selectedDistricts}
@@ -290,6 +326,8 @@ const InventoryStats: FC = () => {
                     serviceTypes={selectedServiceTypes.map((item) => getSiteServiceTypeEnum(item))}
                 />
                 <TalukaStats
+                    habits={selectedHabit}
+                    landTypes={selectedLandType}
                     talukas={selectedTalukas}
                     villages={selectedVillages}
                     districts={selectedDistricts}
@@ -297,6 +335,8 @@ const InventoryStats: FC = () => {
                     serviceTypes={selectedServiceTypes.map((item) => getSiteServiceTypeEnum(item))}
                 />
                 <VillageStats
+                    habits={selectedHabit}
+                    landTypes={selectedLandType}
                     talukas={selectedTalukas}
                     villages={selectedVillages}
                     districts={selectedDistricts}
@@ -304,6 +344,8 @@ const InventoryStats: FC = () => {
                     serviceTypes={selectedServiceTypes.map((item) => getSiteServiceTypeEnum(item))}
                 />
                 <TagStats
+                    habits={selectedHabit}
+                    landTypes={selectedLandType}
                     talukas={selectedTalukas}
                     villages={selectedVillages}
                     districts={selectedDistricts}
@@ -311,6 +353,8 @@ const InventoryStats: FC = () => {
                     serviceTypes={selectedServiceTypes.map((item) => getSiteServiceTypeEnum(item))}
                 />
                 <SiteStats
+                    habits={selectedHabit}
+                    landTypes={selectedLandType}
                     talukas={selectedTalukas}
                     villages={selectedVillages}
                     districts={selectedDistricts}

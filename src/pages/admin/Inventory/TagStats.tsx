@@ -7,6 +7,8 @@ import { ArrowDropDown, ArrowDropUp } from "@mui/icons-material"
 import GeneralTable from "../../../components/GenTable"
 
 interface TagStatsProps {
+    habits: string[]
+    landTypes: string[]
     districts: string[]
     talukas: string[]
     villages: string[]
@@ -14,7 +16,7 @@ interface TagStatsProps {
     serviceTypes: (string | null)[]
 }
 
-const TagStats: FC<TagStatsProps> = ({ villages, districts, talukas, categories, serviceTypes }) => {
+const TagStats: FC<TagStatsProps> = ({ habits, landTypes, villages, districts, talukas, categories, serviceTypes }) => {
 
     const [tagTreeCountData, setTagTreeCountData] = useState<Record<number, any>>({});
     const [tableRows, setTableRows] = useState<any[]>([]);
@@ -50,6 +52,8 @@ const TagStats: FC<TagStatsProps> = ({ villages, districts, talukas, categories,
         if (talukas.length !== 0) filtersData.push({ columnField: 'taluka', operatorValue: 'isAnyOf', value: talukas });
         if (districts.length !== 0) filtersData.push({ columnField: 'district', operatorValue: 'isAnyOf', value: districts });
         if (villages.length !== 0) filtersData.push({ columnField: 'village', operatorValue: 'isAnyOf', value: villages });
+        if (habits.length !== 0) filtersData.push({ columnField: 'habit', operatorValue: 'isAnyOf', value: habits });
+        if (landTypes.length !== 0) filtersData.push({ columnField: 'land_type', operatorValue: 'isAnyOf', value: landTypes });
 
         return filtersData;
     }

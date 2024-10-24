@@ -5,6 +5,8 @@ import { PaginatedResponse } from "../../../types/pagination"
 import GeneralStats from "./GeneralStats"
 
 interface VillageStatsProps {
+    habits: string[]
+    landTypes: string[]
     villages: string[]
     talukas: string[]
     districts: string[]
@@ -12,7 +14,7 @@ interface VillageStatsProps {
     serviceTypes: (string | null)[]
 }
 
-const VillageStats: FC<VillageStatsProps> = ({ villages, talukas, districts, categories, serviceTypes }) => {
+const VillageStats: FC<VillageStatsProps> = ({ habits, landTypes, villages, talukas, districts, categories, serviceTypes }) => {
 
     const [villageTreeCountData, setVillageTreeCountData] = useState<Record<number, any>>({});
     const [tableRows, setTableRows] = useState<any[]>([]);
@@ -41,6 +43,8 @@ const VillageStats: FC<VillageStatsProps> = ({ villages, talukas, districts, cat
         if (talukas.length !== 0) filtersData.push({ columnField: 'taluka', operatorValue: 'isAnyOf', value: talukas });
         if (districts.length !== 0) filtersData.push({ columnField: 'district', operatorValue: 'isAnyOf', value: districts });
         if (villages.length !== 0) filtersData.push({ columnField: 'village', operatorValue: 'isAnyOf', value: villages });
+        if (habits.length !== 0) filtersData.push({ columnField: 'habit', operatorValue: 'isAnyOf', value: habits });
+        if (landTypes.length !== 0) filtersData.push({ columnField: 'land_type', operatorValue: 'isAnyOf', value: landTypes });
 
         return filtersData;
     }

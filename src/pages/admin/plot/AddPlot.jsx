@@ -105,7 +105,7 @@ const AddPlot = ({ open, handleClose, createPlot, tags }) => {
       return
     }
 
-    createPlot(formData);
+    createPlot({ ...formData, name: formData.name.trim(), label: formData.label.trim(), gat: formData.gat.trim() });
     setFormData({
       name: "",
       plot_id: "",
