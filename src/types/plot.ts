@@ -22,6 +22,7 @@ export type Plot = {
     void_assigned?: number,
     void_available?: number,
     card_available?: number,
+    unbooked_assigned?: number,
     acres_area?: number,
     site_id: string,
     site_name: string,
