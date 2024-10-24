@@ -78,7 +78,8 @@ const InventoryStats: FC = () => {
             total: 0,
             booked: 0,
             assigned: 0,
-            available: 0
+            available: 0,
+            unbooked_assigned: 0,
         }
 
         for (const item of stats.results) {
@@ -86,6 +87,7 @@ const InventoryStats: FC = () => {
             overall.booked += parseInt(item.booked || '0')
             overall.assigned += parseInt(item.assigned || '0')
             overall.available += parseInt(item.available || '0')
+            overall.unbooked_assigned += parseInt(item.unbooked_assigned || '0')
         }
 
         const finalList: any[] = [];
@@ -135,7 +137,13 @@ const InventoryStats: FC = () => {
             align: 'right',
         },
         {
-            title: "Available",
+            title: "Not Funded Assigned Trees",
+            dataIndex: "unbooked_assigned",
+            key: "unbooked_assigned",
+            align: 'right',
+        },
+        {
+            title: "Not Funded and Not Assigned",
             dataIndex: "available",
             key: "available",
             align: 'right',

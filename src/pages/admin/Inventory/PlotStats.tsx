@@ -2,16 +2,19 @@ import { FC, useEffect, useState } from "react"
 import ApiClient from "../../../api/apiClient/apiClient"
 import { GridFilterItem } from "@mui/x-data-grid"
 import { PaginatedResponse } from "../../../types/pagination"
-import { Box, Button, Input, TextField, Typography } from "@mui/material"
-import { Table } from "antd"
+import { Box, Button, TextField, Typography } from "@mui/material"
 import getColumnSearchProps from "../../../components/Filter"
 import { ArrowDropDown, ArrowDropUp } from "@mui/icons-material"
+import GeneralTable from "../../../components/GenTable"
 
 interface PlotStatsProps {}
 
 const PlotStats: FC<PlotStatsProps> = ({  }) => {
 
-    const [plotTreeCountData, setPlotTreeCountData] = useState<PaginatedResponse<any>>({ total: 0, offset: 0, results: [] });
+    const [plotsTreeCountData, setPlotsTreeCountData] = useState<Record<number, any>>({});
+    const [tableRows, setTableRows] = useState<any[]>([]);
+    const [total, setTotal] = useState(0);
+    const [loading, setLoading] = useState(false);
 
     const [filters, setFilters] = useState<Record<string, GridFilterItem>>({});
     const handleSetFilters = (filters: Record<string, GridFilterItem>) => {
@@ -20,16 +23,40 @@ const PlotStats: FC<PlotStatsProps> = ({  }) => {
     const [orderBy, setOrderBy] = useState<{column: string, order: 'ASC' | 'DESC'}[]>([])
     const [startDate, setStartDate] = useState<Date | null>(null);
     const [endDate, setEndDate] = useState<Date | null>(null);
+    const [page, setPage] = useState(0);
+    const [pageSize, setPageSize] = useState(10);
 
     const getPlotStats = async () => {
+        setLoading(true);
         const apiClient = new ApiClient();
         const filtersData = Object.values(filters);
 
-        const stats = await apiClient.getPlotAggregations(0, 10, filtersData, orderBy);
-        if (stats.offset === 0) {
-            setPlotTreeCountData(stats);
+        const stats = await apiClient.getPlotAggregations(page * pageSize, pageSize, filtersData, orderBy);
+        
+        setTotal(Number(stats.total));
+        const newData = { ...plotsTreeCountData };
+        for (let i = 0; i < stats.results.length; i++) {
+            newData[i + stats.offset] = stats.results[i];
         }
+
+        setPlotsTreeCountData(newData);
+        setLoading(false);
     }
+
+    useEffect(() => {
+        const rows: any[] = []
+        for (let i = 0; i < pageSize; i++) {
+            if (i + page * pageSize >= total) break;
+            const data = plotsTreeCountData[i + page * pageSize]
+            if (!data) {
+                getPlotStats();
+                return;
+            }
+            rows.push(data);
+        }
+
+        setTableRows(rows);
+    }, [page, pageSize, total, plotsTreeCountData])
 
     useEffect(() => {
         getPlotStats();
@@ -54,34 +81,51 @@ const PlotStats: FC<PlotStatsProps> = ({  }) => {
         }
     }
 
-    const handleSearch = async () => {
+    const handlePageChange = (page: number, pageSize: number) => {
+        setPage(page - 1);
+        setPageSize(pageSize);
+    }
+
+    const handleDownload = async () => {
         const apiClient = new ApiClient();
-        const filtersData = Object.values(filters);
+        const filtersList = Object.values(filters)
+        const resp = await apiClient.getPlotAggregations(0, total, filtersList, orderBy);
+        return resp.results;
+    }
+
+    const handleSearch = async () => {
         const start = startDate ? new Date(startDate).toISOString().slice(0, 10) + 'T00:00:00Z' : undefined;
         const end = endDate ? new Date(endDate).toISOString().slice(0, 10) + 'T23:59:59Z' : undefined;
 
-        if (startDate && endDate) {
-            filtersData.push(
-                { columnField: "created_at", operatorValue: "between", value: [start, end] });
-        } else if (startDate) {
-            filtersData.push(
-                { columnField: "created_at", operatorValue: "greaterThan", value: start });
-        } else if (endDate) {
-            filtersData.push(
-                { columnField: "created_at", operatorValue: "lessThan", value: end });
-        }
+        let newFilter: any = null
+        if (startDate && endDate) newFilter = { columnField: "created_at", operatorValue: "between", value: [start, end] }
+        else if (startDate) newFilter = { columnField: "created_at", operatorValue: "greaterThan", value: start }
+        else if (endDate) newFilter  = { columnField: "created_at", operatorValue: "lessThan", value: end }
 
-        const stats = await apiClient.getPlotAggregations(0, 10, filtersData, orderBy);
-        if (stats.offset === 0) {
-            setPlotTreeCountData(stats);
+        if (newFilter) {
+            setFilters(prev => {
+                return {
+                    ...prev,
+                    'created_at': newFilter
+                }
+            })
+        } else {
+            setFilters(prev => {
+                const newFilters = { ...prev }
+                if (newFilters['created_at']) Reflect.deleteProperty(newFilters, 'created_at');
+                return newFilters
+            })
         }
     }
 
     const handleReset = () => {
         setStartDate(null);
         setEndDate(null);
-
-        getPlotStats();
+        setFilters(prev => {
+            const newFilters = { ...prev }
+            if (newFilters['created_at']) Reflect.deleteProperty(newFilters, 'created_at');
+            return newFilters
+        })
     }
 
     const getSortIcon = (field: string, order?: 'ASC' | 'DESC') => {
@@ -142,7 +186,17 @@ const PlotStats: FC<PlotStatsProps> = ({  }) => {
         {
             title: (
                 <div style={{ display: "flex", alignItems: "center", justifyContent: 'space-between' }}>
-                  Available {getSortIcon('available', orderBy.find((item) => item.column === 'available')?.order)}
+                  Not Funded Assigned Trees {getSortIcon('unbooked_assigned', orderBy.find((item) => item.column === 'unbooked_assigned')?.order)}
+                </div>
+            ),
+            dataIndex: "unbooked_assigned",
+            key: "unbooked_assigned",
+            align: 'right',
+        },
+        {
+            title: (
+                <div style={{ display: "flex", alignItems: "center", justifyContent: 'space-between' }}>
+                  Not Funded and Not Assigned {getSortIcon('available', orderBy.find((item) => item.column === 'available')?.order)}
                 </div>
             ),
             dataIndex: "available",
@@ -192,12 +246,14 @@ const PlotStats: FC<PlotStatsProps> = ({  }) => {
                         size="medium"
                     >Reset</Button>
                 </Box>
-                <Table
+                <GeneralTable 
+                    loading={loading}
                     columns={columns}
-                    dataSource={plotTreeCountData.results}
-                    pagination={{
-                        total: plotTreeCountData.total,
-                    }}
+                    rows={tableRows}
+                    totalRecords={total}
+                    page={page}
+                    onPaginationChange={handlePageChange}
+                    onDownload={handleDownload}
                 />
             </Box>
         </div>

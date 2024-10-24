@@ -181,7 +181,17 @@ const TagStats: FC<TagStatsProps> = ({ villages, districts, talukas, categories,
         {
             title: (
                 <div style={{ display: "flex", alignItems: "center", justifyContent: 'space-between' }}>
-                  Available {getSortIcon('available', orderBy.find((item) => item.column === 'available')?.order)}
+                  Not Funded Assigned Trees {getSortIcon('unbooked_assigned', orderBy.find((item) => item.column === 'unbooked_assigned')?.order)}
+                </div>
+            ),
+            dataIndex: "unbooked_assigned",
+            key: "unbooked_assigned",
+            align: 'right',
+        },
+        {
+            title: (
+                <div style={{ display: "flex", alignItems: "center", justifyContent: 'space-between' }}>
+                  Not Funded and Not Assigned {getSortIcon('available', orderBy.find((item) => item.column === 'available')?.order)}
                 </div>
             ),
             dataIndex: "available",

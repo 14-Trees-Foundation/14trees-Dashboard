@@ -43,12 +43,13 @@ const TableSummary = (plots: Plot[], selectedPlotIds: number[], totalColumns: nu
   return (
     <Table.Summary fixed='bottom'>
       <Table.Summary.Row style={{ backgroundColor: 'rgba(172, 252, 172, 0.2)' }}>
-        <Table.Summary.Cell align="right" index={totalColumns - 4} colSpan={totalColumns - 3}>
+        <Table.Summary.Cell align="right" index={totalColumns - 5} colSpan={totalColumns - 4}>
           <strong>Total</strong>
         </Table.Summary.Cell>
-        <Table.Summary.Cell align="right" index={totalColumns - 3} colSpan={1}>{calculateSum(plots.filter((plot) => selectedPlotIds.includes(plot.id)).map((plot) => plot.total))}</Table.Summary.Cell>
+        <Table.Summary.Cell align="right" index={totalColumns - 4} colSpan={1}>{calculateSum(plots.filter((plot) => selectedPlotIds.includes(plot.id)).map((plot) => plot.total))}</Table.Summary.Cell>
         <Table.Summary.Cell align="right" index={totalColumns - 3} colSpan={1}>{calculateSum(plots.filter((plot) => selectedPlotIds.includes(plot.id)).map((plot) => plot.booked))}</Table.Summary.Cell>
-        <Table.Summary.Cell align="right" index={totalColumns - 1} colSpan={1}>{calculateSum(plots.filter((plot) => selectedPlotIds.includes(plot.id)).map((plot) => plot.assigned))}</Table.Summary.Cell>
+        <Table.Summary.Cell align="right" index={totalColumns - 2} colSpan={1}>{calculateSum(plots.filter((plot) => selectedPlotIds.includes(plot.id)).map((plot) => plot.assigned))}</Table.Summary.Cell>
+        <Table.Summary.Cell align="right" index={totalColumns - 1} colSpan={1}>{calculateSum(plots.filter((plot) => selectedPlotIds.includes(plot.id)).map((plot) => plot.unbooked_assigned))}</Table.Summary.Cell>
         <Table.Summary.Cell align="right" index={totalColumns} colSpan={1}>{calculateSum(plots.filter((plot) => selectedPlotIds.includes(plot.id)).map((plot) => plot.available))}</Table.Summary.Cell>
       </Table.Summary.Row>
     </Table.Summary>
@@ -319,6 +320,13 @@ export const PlotComponent = () => {
       align: "right",
       width: 150,
       render: (value, record) => value ?? 0 - (includeDeadLostTrees && record.void_assigned ? record.void_assigned : 0),
+    },
+    {
+      dataIndex: "unbooked_assigned",
+      key: "unbooked_assigned",
+      title: getSortableHeader("Not Funded Assigned Trees", 'unbooked_assigned'),
+      align: "right",
+      width: 150,
     },
     {
       dataIndex: "available",
