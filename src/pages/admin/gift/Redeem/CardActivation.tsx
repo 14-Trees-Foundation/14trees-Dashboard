@@ -55,37 +55,37 @@ const CardActivation: FC<CardActivationProps> = ({ giftCardUser, onUserChange })
         }
     }, [record, selectedUser]);
 
-    const updateSlide = async () => {
-        if (!slideIdRef.current) {
-            return;
-        }
-        const apiClient = new ApiClient();
-        await apiClient.updateGiftCardTemplate(giftCardUser.id, formDataRef.current.content1, formDataRef.current.content2, formDataRef.current.user ?? undefined);
-        setIframeSrc(
-            `https://docs.google.com/presentation/d/1s4aBSIMEgdD_gjs5g1a0a9Wx8zhsXowqYFr_vv1JVhk/embed?rm=minimal&slide=id.${slideIdRef.current}&timestamp=${new Date().getTime()}`
-        );
-    }
+    // const updateSlide = async () => {
+    //     if (!slideIdRef.current) {
+    //         return;
+    //     }
+    //     const apiClient = new ApiClient();
+    //     await apiClient.updateGiftCardTemplate(giftCardUser.id, formDataRef.current.content1, formDataRef.current.content2, formDataRef.current.user ?? undefined);
+    //     setIframeSrc(
+    //         `https://docs.google.com/presentation/d/1s4aBSIMEgdD_gjs5g1a0a9Wx8zhsXowqYFr_vv1JVhk/embed?rm=minimal&slide=id.${slideIdRef.current}&timestamp=${new Date().getTime()}`
+    //     );
+    // }
 
-    useEffect(() => {
-        const interval = setInterval(() => {
-            updateSlide();
-        }, 5000);
+    // useEffect(() => {
+    //     const interval = setInterval(() => {
+    //         updateSlide();
+    //     }, 5000);
 
-        return () => clearInterval(interval);
-    }, [])
+    //     return () => clearInterval(interval);
+    // }, [])
 
-    useEffect(() => {
-        const generateGiftCard = async () => {
-            const apiClient = new ApiClient();
-            const resp = await apiClient.generateCardForUser(giftCardUser.id, giftCardUser.sapling_id || '', record.content1, record.content2, selectedUser ?? undefined);
-            slideIdRef.current = resp;
-            setIframeSrc(
-                `https://docs.google.com/presentation/d/1s4aBSIMEgdD_gjs5g1a0a9Wx8zhsXowqYFr_vv1JVhk/embed?rm=minimal&slide=id.${resp}&timestamp=${new Date().getTime()}`
-            )
-        }
+    // useEffect(() => {
+    //     const generateGiftCard = async () => {
+    //         const apiClient = new ApiClient();
+    //         const resp = await apiClient.generateCardForUser(giftCardUser.id, giftCardUser.sapling_id || '', record.content1, record.content2, selectedUser ?? undefined);
+    //         slideIdRef.current = resp;
+    //         setIframeSrc(
+    //             `https://docs.google.com/presentation/d/1s4aBSIMEgdD_gjs5g1a0a9Wx8zhsXowqYFr_vv1JVhk/embed?rm=minimal&slide=id.${resp}&timestamp=${new Date().getTime()}`
+    //         )
+    //     }
 
-        generateGiftCard();
-    }, [])
+    //     generateGiftCard();
+    // }, [])
 
     useEffect(() => {
         onUserChange(selectedUser);

@@ -17,7 +17,7 @@ interface GiftCardsFormProps {
     requestId: string | null
     open: boolean
     handleClose: () => void
-    onSubmit: (user: User, group: Group | null, treeCount: number, users: any[], logo?: File, messages?: any, file?: File) => void
+    onSubmit: (user: User, group: Group | null, treeCount: number, users: any[], presentationId: string | null, logo?: File, messages?: any, file?: File) => void
 }
 
 const GiftCardsForm: FC<GiftCardsFormProps> = ({ giftCardRequest, requestId, open, handleClose, onSubmit }) => {
@@ -30,6 +30,8 @@ const GiftCardsForm: FC<GiftCardsFormProps> = ({ giftCardRequest, requestId, ope
     const [users, setUsers] = useState<any[]>([]);
     const [logo, setLogo] = useState<File | null>(null);
     const [messages, setMessages] = useState({ primaryMessage: "", secondaryMessage: "", eventName: "", plantedBy: "", logoMessage: "" });
+    const [presentationId, setPresentationId] = useState<string | null>(null)
+    const [slideId, setSlideId] = useState<string | null>(null)
 
     const getGiftCardRequestDetails = async () => {
         const apiClient = new ApiClient();
@@ -48,6 +50,7 @@ const GiftCardsForm: FC<GiftCardsFormProps> = ({ giftCardRequest, requestId, ope
                 plantedBy: giftCardRequest.planted_by,
                 logoMessage: giftCardRequest.logo_message
             })
+            setPresentationId(giftCardRequest.presentation_id);
         }
     }
 
@@ -75,12 +78,16 @@ const GiftCardsForm: FC<GiftCardsFormProps> = ({ giftCardRequest, requestId, ope
             key: 3,
             title: "Gift Card Messages",
             content: <CardDetails
+                request_id={requestId || ''}
+                presentationId={presentationId}
+                slideId={slideId}
                 primaryMessage={messages.primaryMessage}
                 secondaryMessage={messages.secondaryMessage}
                 eventName={messages.eventName}
                 plantedBy={messages.plantedBy || group?.name || ''}
                 logoMessage={messages.logoMessage}
                 onChange={(primary, secondary, event, planted, logo) => setMessages({ primaryMessage: primary, secondaryMessage: secondary, eventName: event, plantedBy: planted, logoMessage: logo })}
+                onPresentationId={(presentationId: string, slideId: string) => { setPresentationId(presentationId); setSlideId(slideId); }}
             />,
         },
         {
@@ -97,7 +104,7 @@ const GiftCardsForm: FC<GiftCardsFormProps> = ({ giftCardRequest, requestId, ope
             return;
         }
 
-        onSubmit(user, group, treeCount, users, logo ?? undefined, messages, file ?? undefined);
+        onSubmit(user, group, treeCount, users, presentationId, logo ?? undefined, messages, file ?? undefined);
 
         handleCloseForm();
     }
@@ -113,6 +120,8 @@ const GiftCardsForm: FC<GiftCardsFormProps> = ({ giftCardRequest, requestId, ope
         setUsers([]);
         setLogo(null);
         setMessages({ primaryMessage: "", secondaryMessage: "", eventName: "", plantedBy: "", logoMessage: "" });
+        setPresentationId('null')
+        setSlideId('null');
     }
 
     const handleNext = () => {

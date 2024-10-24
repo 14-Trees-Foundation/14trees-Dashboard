@@ -21,6 +21,8 @@ interface User {
   birth_date?: string;
   image?: boolean;
   image_name?: string;
+  in_name_of?: string;
+  relation?: string;
   error?: boolean;
 }
 
@@ -179,6 +181,8 @@ export const BulkUserForm: FC<BulkUserFormProps> = ({ requestId, users, onUsersC
                   email: user['Email ID'],
                   birth_date: user['Date of Birth (optional)'],
                   image_name: user['Image Name'],
+                  in_name_of: user['Plant in name of'] ? user['Plant in name of'] : undefined,
+                  relation: user['Relation with person'] ? user['Relation with person'] : undefined,
                   image: user['Image Name'] !== ''
                     ? await awsUtils.checkIfPublicFileExists('gift-card-requests' + "/" + requestId + '/' + user['Image Name'])
                     : undefined,
@@ -261,6 +265,20 @@ export const BulkUserForm: FC<BulkUserFormProps> = ({ requestId, users, onUsersC
       ...getColumnSearchProps('email', filters, handleSetFilters),
     },
     {
+      dataIndex: "in_name_of",
+      key: "in_name_of",
+      title: "Plant in name Of",
+      width: 180,
+      align: "center",
+    },
+    {
+      dataIndex: "relation",
+      key: "relation",
+      title: "Relation with person",
+      width: 180,
+      align: "center",
+    },
+    {
       dataIndex: "phone",
       key: "phone",
       title: "Phone",
@@ -319,7 +337,7 @@ export const BulkUserForm: FC<BulkUserFormProps> = ({ requestId, users, onUsersC
   ];
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', margin: '20px' }}>
+    <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', margin: '20px', width: '100%' }}>
       <Grid container rowSpacing={2} columnSpacing={1}>
         {/* <Grid item xs={12}>
           <RadioGroup
