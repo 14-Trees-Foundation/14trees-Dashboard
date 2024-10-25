@@ -38,7 +38,12 @@ function EditPlot({ row, openeditModal, handleCloseModal, editSubmit, tags }) {
       toast.error("Please select a site");
       return
     }
-    editSubmit({ ...formData, name: formData.name.trim(), label: formData.label.trim(), gat: formData.gat.trim() });
+    editSubmit({ 
+      ...formData,
+      name: formData.name.trim(), 
+      label: formData.label?.trim() ?? null, 
+      gat: formData.gat?.trim() ?? null
+    });
     handleCloseModal();
   };
 

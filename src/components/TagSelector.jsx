@@ -25,7 +25,7 @@ const TagSelector = ({ systemTags, userTags, value, handleChange, margin = "none
     }, [systemTags, userTags])
 
     useEffect(() => {
-        setSelectedTags(value);
+        if (value) setSelectedTags(value);
     }, [value])
 
     const handleCreateTag = (event, newValue) => {
