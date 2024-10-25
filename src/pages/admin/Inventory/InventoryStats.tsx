@@ -84,6 +84,7 @@ const InventoryStats: FC = () => {
             assigned: 0,
             available: 0,
             unbooked_assigned: 0,
+            total_unfunded: 0,
         }
 
         for (const item of stats.results) {
@@ -92,17 +93,18 @@ const InventoryStats: FC = () => {
             overall.assigned += parseInt(item.assigned || '0')
             overall.available += parseInt(item.available || '0')
             overall.unbooked_assigned += parseInt(item.unbooked_assigned || '0')
+            overall.total_unfunded += parseInt(item.available || '0') + parseInt(item.unbooked_assigned || '0')
         }
 
         const finalList: any[] = [];
         const item = stats.results.find((item: any) => item.category === 'Public');
-        if (item) finalList.push(item)
+        if (item) finalList.push({...item, total_unfunded: parseInt(item.available || '0') + parseInt(item.unbooked_assigned || '0')})
 
         const item2 = stats.results.find((item: any) => item.category === 'Foundation');
-        if (item2) finalList.push(item2)
+        if (item2) finalList.push({...item2, total_unfunded: parseInt(item2.available || '0') + parseInt(item2.unbooked_assigned || '0')})
 
         const item3 = stats.results.find((item: any) => item.category === null);
-        if (item3) finalList.push(item3)
+        if (item3) finalList.push({...item3, total_unfunded: parseInt(item3.available || '0') + parseInt(item3.unbooked_assigned || '0')})
 
         setAggregatedData([...finalList, overall]);
     }
@@ -141,15 +143,21 @@ const InventoryStats: FC = () => {
             align: 'right',
         },
         {
-            title: "Not Funded Assigned Trees",
+            title: "Unfunded Inventory (Assigned)",
             dataIndex: "unbooked_assigned",
             key: "unbooked_assigned",
             align: 'right',
         },
         {
-            title: "Not Funded and Not Assigned",
+            title: "Unfunded Inventory (Unassigned)",
             dataIndex: "available",
             key: "available",
+            align: 'right',
+        },
+        {
+            title: "Total Unfunded Inventory",
+            dataIndex: "total_unfunded",
+            key: "total_unfunded",
             align: 'right',
         },
     ]

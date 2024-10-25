@@ -324,14 +324,14 @@ export const PlotComponent = () => {
     {
       dataIndex: "unbooked_assigned",
       key: "unbooked_assigned",
-      title: getSortableHeader("Not Funded Assigned Trees", 'unbooked_assigned'),
+      title: getSortableHeader("Unfunded Inventory (Assigned)", 'unbooked_assigned'),
       align: "right",
       width: 150,
     },
     {
       dataIndex: "available",
       key: "available",
-      title: getSortableHeader("Available Trees", 'available'),
+      title: getSortableHeader("Unfunded Inventory (Unassigned)", 'available'),
       align: "right",
       width: 150,
       render: (value, record) => value ?? 0 - (includeDeadLostTrees && record.void_available ? record.void_available : 0),

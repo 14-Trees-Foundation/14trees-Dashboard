@@ -1,4 +1,4 @@
-import { Box, Dialog, DialogContent, DialogTitle, ImageList, ImageListItem, ImageListItemBar, TextField } from "@mui/material"
+import { Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, ImageList, ImageListItem, ImageListItemBar, TextField } from "@mui/material"
 import { useEffect, useState } from "react"
 
 interface ImageMappingProps {
@@ -57,6 +57,7 @@ const ImageMapping: React.FC<ImageMappingProps> = ({ name, open, images, onClose
         <Dialog
             open={open}
             maxWidth='lg'
+            onClose={onClose}
         >
             <DialogTitle>Select a User Image</DialogTitle>
             <DialogContent dividers>
@@ -68,7 +69,7 @@ const ImageMapping: React.FC<ImageMappingProps> = ({ name, open, images, onClose
                         onChange={(e) => { setSearchStr(e.target.value)}}
                         style={{ marginBottom: 10, backgroundColor: 'rgba(227, 250, 239, 0.4)' }}
                     />
-                    <ImageList cols={4} sx={{ width: 1000, height: 600 }}>
+                    <ImageList cols={4} sx={{ width: 1000, height: 580 }}>
                         {filteredImages.map((url, index) => (
                             <ImageListItem key={index}>
                                 <img
@@ -87,6 +88,11 @@ const ImageMapping: React.FC<ImageMappingProps> = ({ name, open, images, onClose
                     </ImageList>
                 </Box>
             </DialogContent>
+            <DialogActions>
+                <Button onClick={onClose} color="error" sx={{ mr: 3 }} variant="outlined">
+                    Cancel
+                </Button>
+            </DialogActions>
         </Dialog>
     )
 }
