@@ -85,6 +85,7 @@ const InventoryStats: FC = () => {
             available: 0,
             unbooked_assigned: 0,
             total_unfunded: 0,
+            card_available: 0,
         }
 
         for (const item of stats.results) {
@@ -94,6 +95,7 @@ const InventoryStats: FC = () => {
             overall.available += parseInt(item.available || '0')
             overall.unbooked_assigned += parseInt(item.unbooked_assigned || '0')
             overall.total_unfunded += parseInt(item.available || '0') + parseInt(item.unbooked_assigned || '0')
+            overall.card_available += parseInt(item.card_available || '0')
         }
 
         const finalList: any[] = [];
@@ -158,6 +160,12 @@ const InventoryStats: FC = () => {
             title: "Total Unfunded Inventory",
             dataIndex: "total_unfunded",
             key: "total_unfunded",
+            align: 'right',
+        },
+        {
+            title: "Giftable Inventory",
+            dataIndex: "card_available",
+            key: "card_available",
             align: 'right',
         },
     ]
