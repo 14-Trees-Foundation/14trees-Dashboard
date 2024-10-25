@@ -7,6 +7,8 @@ import { ArrowDropDown, ArrowDropUp } from "@mui/icons-material"
 import GeneralTable from "../../../components/GenTable"
 
 interface TagStatsProps {
+    habits: string[]
+    landTypes: string[]
     districts: string[]
     talukas: string[]
     villages: string[]
@@ -14,7 +16,7 @@ interface TagStatsProps {
     serviceTypes: (string | null)[]
 }
 
-const TagStats: FC<TagStatsProps> = ({ villages, districts, talukas, categories, serviceTypes }) => {
+const TagStats: FC<TagStatsProps> = ({ habits, landTypes, villages, districts, talukas, categories, serviceTypes }) => {
 
     const [tagTreeCountData, setTagTreeCountData] = useState<Record<number, any>>({});
     const [tableRows, setTableRows] = useState<any[]>([]);
@@ -50,6 +52,8 @@ const TagStats: FC<TagStatsProps> = ({ villages, districts, talukas, categories,
         if (talukas.length !== 0) filtersData.push({ columnField: 'taluka', operatorValue: 'isAnyOf', value: talukas });
         if (districts.length !== 0) filtersData.push({ columnField: 'district', operatorValue: 'isAnyOf', value: districts });
         if (villages.length !== 0) filtersData.push({ columnField: 'village', operatorValue: 'isAnyOf', value: villages });
+        if (habits.length !== 0) filtersData.push({ columnField: 'habit', operatorValue: 'isAnyOf', value: habits });
+        if (landTypes.length !== 0) filtersData.push({ columnField: 'land_type', operatorValue: 'isAnyOf', value: landTypes });
 
         return filtersData;
     }
@@ -181,7 +185,7 @@ const TagStats: FC<TagStatsProps> = ({ villages, districts, talukas, categories,
         {
             title: (
                 <div style={{ display: "flex", alignItems: "center", justifyContent: 'space-between' }}>
-                  Not Funded Assigned Trees {getSortIcon('unbooked_assigned', orderBy.find((item) => item.column === 'unbooked_assigned')?.order)}
+                  Unfunded Inventory (Assigned) {getSortIcon('unbooked_assigned', orderBy.find((item) => item.column === 'unbooked_assigned')?.order)}
                 </div>
             ),
             dataIndex: "unbooked_assigned",
@@ -191,11 +195,28 @@ const TagStats: FC<TagStatsProps> = ({ villages, districts, talukas, categories,
         {
             title: (
                 <div style={{ display: "flex", alignItems: "center", justifyContent: 'space-between' }}>
-                  Not Funded and Not Assigned {getSortIcon('available', orderBy.find((item) => item.column === 'available')?.order)}
+                  Unfunded Inventory (Unassigned) {getSortIcon('available', orderBy.find((item) => item.column === 'available')?.order)}
                 </div>
             ),
             dataIndex: "available",
             key: "available",
+            align: 'right',
+        },
+        {
+            title: "Total Unfunded Inventory",
+            dataIndex: "total_unfunded",
+            key: "total_unfunded",
+            align: 'right',
+            render: (value: any, record: any) => (Number(record.available) || 0) + (Number(record.unbooked_assigned) || 0),
+        },
+        {
+            title: (
+                <div style={{ display: "flex", alignItems: "center", justifyContent: 'space-between' }}>
+                  Giftable Inventory {getSortIcon('card_available', orderBy.find((item) => item.column === 'card_available')?.order)}
+                </div>
+            ),
+            dataIndex: "card_available",
+            key: "card_available",
             align: 'right',
         },
     ]

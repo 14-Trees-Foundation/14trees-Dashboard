@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Autocomplete, Box, Button, Grid, Modal, TextField, Typography } from '@mui/material';
 import { organizationTypes } from './organizationType';
+import ImagePicker from '../../../components/ImagePicker';
 
 const AddOrganization = ({ open, groupType, handleClose, createOrganization }) => {
     const style = {
@@ -21,6 +22,7 @@ const AddOrganization = ({ open, groupType, handleClose, createOrganization }) =
         type: '',
         description: '',
     });
+    const [logo, setLogo] = useState(null);
 
     useEffect(() => {
         setFormData((prevFormData) => ({
@@ -38,7 +40,7 @@ const AddOrganization = ({ open, groupType, handleClose, createOrganization }) =
 
     const handleSubmit = (event) => {
         event.preventDefault();
-        createOrganization(formData);
+        createOrganization(formData, logo ?? undefined);
         handleClose();
     };
 
@@ -71,6 +73,12 @@ const AddOrganization = ({ open, groupType, handleClose, createOrganization }) =
                             </Grid>
                             <Grid item xs={12}>
                                 <TextField name="description" label="Description" value={formData.description} onChange={handleChange} fullWidth/>
+                            </Grid>
+                            <Grid item xs={12}>
+                                <ImagePicker
+                                    image={logo}
+                                    onChange={file => setLogo(file)}
+                                />
                             </Grid>
                             <Grid item xs={12} sx={{display:'flex', justifyContent:'center', }}>
                                 <Button

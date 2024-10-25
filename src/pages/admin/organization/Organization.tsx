@@ -197,13 +197,13 @@ export const OrganizationComponent = () => {
     setSelectedItem(row);
   };
 
-  const handleEditSubmit = (formData: Group) => {
-    updateGroup(formData);
+  const handleEditSubmit = (formData: Group, logo?: File) => {
+    updateGroup(formData, logo);
     setSelectedEditRow(null);
   };
 
-  const handleCreateUserData = (formData: Group) => {
-    createGroup(formData);
+  const handleCreateUserData = (formData: Group, logo?: File) => {
+    createGroup(formData, logo);
   };
 
   return (

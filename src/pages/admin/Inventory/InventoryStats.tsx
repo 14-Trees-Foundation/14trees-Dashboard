@@ -49,6 +49,8 @@ const InventoryStats: FC = () => {
     const [selectedVillages, setSelectedVillages] = useState<string[]>([]);
     const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
     const [selectedServiceTypes, setSelectedServiceTypes] = useState<string[]>([]);
+    const [selectedHabit, setSelectedHabit] = useState<string[]>([]);
+    const [selectedLandType, setSelectedLandType] = useState<string[]>([]);
 
     const getTreesCountForCategories = async () => {
         const apiClient = new ApiClient();
@@ -69,6 +71,8 @@ const InventoryStats: FC = () => {
         if (selectedTalukas.length !== 0) filters.push({ columnField: 'taluka', operatorValue: 'isAnyOf', value: selectedTalukas });
         if (selectedDistricts.length !== 0) filters.push({ columnField: 'district', operatorValue: 'isAnyOf', value: selectedDistricts });
         if (selectedVillages.length !== 0) filters.push({ columnField: 'village', operatorValue: 'isAnyOf', value: selectedVillages });
+        if (selectedLandType.length !== 0) filters.push({ columnField: 'land_type', operatorValue: 'isAnyOf', value: selectedLandType });
+        if (selectedHabit.length !== 0) filters.push({ columnField: 'habit', operatorValue: 'isAnyOf', value: selectedHabit });
 
 
         const stats = await apiClient.getTreesCountForPlotCategories(filters);
@@ -80,6 +84,8 @@ const InventoryStats: FC = () => {
             assigned: 0,
             available: 0,
             unbooked_assigned: 0,
+            total_unfunded: 0,
+            card_available: 0,
         }
 
         for (const item of stats.results) {
@@ -88,17 +94,19 @@ const InventoryStats: FC = () => {
             overall.assigned += parseInt(item.assigned || '0')
             overall.available += parseInt(item.available || '0')
             overall.unbooked_assigned += parseInt(item.unbooked_assigned || '0')
+            overall.total_unfunded += parseInt(item.available || '0') + parseInt(item.unbooked_assigned || '0')
+            overall.card_available += parseInt(item.card_available || '0')
         }
 
         const finalList: any[] = [];
         const item = stats.results.find((item: any) => item.category === 'Public');
-        if (item) finalList.push(item)
+        if (item) finalList.push({...item, total_unfunded: parseInt(item.available || '0') + parseInt(item.unbooked_assigned || '0')})
 
         const item2 = stats.results.find((item: any) => item.category === 'Foundation');
-        if (item2) finalList.push(item2)
+        if (item2) finalList.push({...item2, total_unfunded: parseInt(item2.available || '0') + parseInt(item2.unbooked_assigned || '0')})
 
         const item3 = stats.results.find((item: any) => item.category === null);
-        if (item3) finalList.push(item3)
+        if (item3) finalList.push({...item3, total_unfunded: parseInt(item3.available || '0') + parseInt(item3.unbooked_assigned || '0')})
 
         setAggregatedData([...finalList, overall]);
     }
@@ -111,7 +119,7 @@ const InventoryStats: FC = () => {
 
     useEffect(() => {
         getTreesCountForCategories();
-    }, [selectedDistricts, selectedTalukas, selectedVillages, selectedCategories, selectedServiceTypes])
+    }, [selectedDistricts, selectedTalukas, selectedVillages, selectedCategories, selectedServiceTypes, selectedHabit, selectedLandType])
 
     useEffect(() => {
         getDistricts();
@@ -137,15 +145,27 @@ const InventoryStats: FC = () => {
             align: 'right',
         },
         {
-            title: "Not Funded Assigned Trees",
+            title: "Unfunded Inventory (Assigned)",
             dataIndex: "unbooked_assigned",
             key: "unbooked_assigned",
             align: 'right',
         },
         {
-            title: "Not Funded and Not Assigned",
+            title: "Unfunded Inventory (Unassigned)",
             dataIndex: "available",
             key: "available",
+            align: 'right',
+        },
+        {
+            title: "Total Unfunded Inventory",
+            dataIndex: "total_unfunded",
+            key: "total_unfunded",
+            align: 'right',
+        },
+        {
+            title: "Giftable Inventory",
+            dataIndex: "card_available",
+            key: "card_available",
             align: 'right',
         },
     ]
@@ -182,6 +202,8 @@ const InventoryStats: FC = () => {
         setSelectedVillages([]);
         setSelectedCategories([]);
         setSelectedServiceTypes([]);
+        setSelectedLandType([]);
+        setSelectedHabit([]);
     }
 
     return (
@@ -201,7 +223,7 @@ const InventoryStats: FC = () => {
                         marginBottom: '10px',
                     }}
                 >
-                    <Box style={{ width: '19%' }}>
+                    <Box style={{ width: '32%' }}>
                         <Typography variant='subtitle2'>District</Typography>
                         <MultipleSelect
                             options={districts.map((item) => item.district).filter((value, index, self) => value !== '' && self.indexOf(value) === index)}
@@ -211,7 +233,7 @@ const InventoryStats: FC = () => {
                         />
                     </Box>
 
-                    <Box style={{ width: '19%' }}>
+                    <Box style={{ width: '32%' }}>
                         <Typography variant='subtitle2'>Taluka</Typography>
                         <MultipleSelect
                             disabled={selectedDistricts.length === 0}
@@ -223,7 +245,7 @@ const InventoryStats: FC = () => {
                         />
                     </Box>
 
-                    <Box style={{ width: '19%' }}>
+                    <Box style={{ width: '32%' }}>
                         <Typography variant='subtitle2'>Village</Typography>
                         <MultipleSelect
                             disabled={selectedDistricts.length === 0}
@@ -234,8 +256,36 @@ const InventoryStats: FC = () => {
                             label="Villages"
                         />
                     </Box>
+                </Box>
+                <Box
+                    style={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        marginTop: '10px',
+                        marginBottom: '10px',
+                    }}
+                >
+                    <Box style={{ width: '24%' }}>
+                        <Typography variant='subtitle2'>Plant Type Habitat</Typography>
+                        <MultipleSelect
+                            options={['Tree', 'Herb', 'Shrub', 'Climber']}
+                            onSelectionChange={(value: string[]) => { setSelectedHabit(value) }}
+                            selected={selectedHabit}
+                            label="Habitats"
+                        />
+                    </Box>
 
-                    <Box style={{ width: '19%' }}>
+                    <Box style={{ width: '24%' }}>
+                        <Typography variant='subtitle2'>Site Land Type</Typography>
+                        <MultipleSelect
+                            options={["Foundation", "Cremation", "Farm", "Roadside", "Temple", "Premises", "Gairan", "Forest", "School"]}
+                            onSelectionChange={(value: string[]) => { setSelectedLandType(value) }}
+                            selected={selectedLandType}
+                            label="Site Land Type"
+                        />
+                    </Box>
+
+                    <Box style={{ width: '24%' }}>
                         <Typography variant='subtitle2'>Site Category</Typography>
                         <MultipleSelect
                             options={['Public', 'Foundation', 'Unknown']}
@@ -245,7 +295,7 @@ const InventoryStats: FC = () => {
                         />
                     </Box>
 
-                    <Box style={{ width: '19%' }}>
+                    <Box style={{ width: '24%' }}>
                         <Typography variant='subtitle2'>Site Service Type</Typography>
                         <MultipleSelect
                             options={['Full Maintenance', 'Distribution Only', 'Plantation Only', 'Waiting', 'Cancelled', 'TBD', 'Unknown']}
@@ -283,6 +333,8 @@ const InventoryStats: FC = () => {
                 </Box>
 
                 <DistrictStats
+                    habits={selectedHabit}
+                    landTypes={selectedLandType}
                     talukas={selectedTalukas}
                     villages={selectedVillages}
                     districts={selectedDistricts}
@@ -290,6 +342,8 @@ const InventoryStats: FC = () => {
                     serviceTypes={selectedServiceTypes.map((item) => getSiteServiceTypeEnum(item))}
                 />
                 <TalukaStats
+                    habits={selectedHabit}
+                    landTypes={selectedLandType}
                     talukas={selectedTalukas}
                     villages={selectedVillages}
                     districts={selectedDistricts}
@@ -297,6 +351,8 @@ const InventoryStats: FC = () => {
                     serviceTypes={selectedServiceTypes.map((item) => getSiteServiceTypeEnum(item))}
                 />
                 <VillageStats
+                    habits={selectedHabit}
+                    landTypes={selectedLandType}
                     talukas={selectedTalukas}
                     villages={selectedVillages}
                     districts={selectedDistricts}
@@ -304,6 +360,8 @@ const InventoryStats: FC = () => {
                     serviceTypes={selectedServiceTypes.map((item) => getSiteServiceTypeEnum(item))}
                 />
                 <TagStats
+                    habits={selectedHabit}
+                    landTypes={selectedLandType}
                     talukas={selectedTalukas}
                     villages={selectedVillages}
                     districts={selectedDistricts}
@@ -311,6 +369,8 @@ const InventoryStats: FC = () => {
                     serviceTypes={selectedServiceTypes.map((item) => getSiteServiceTypeEnum(item))}
                 />
                 <SiteStats
+                    habits={selectedHabit}
+                    landTypes={selectedLandType}
                     talukas={selectedTalukas}
                     villages={selectedVillages}
                     districts={selectedDistricts}

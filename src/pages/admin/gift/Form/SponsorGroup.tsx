@@ -55,7 +55,7 @@ const SponsorGroupForm: FC<SponsorGroupFormProps> = ({ logo, onLogoChange, group
         event.preventDefault()
         const apiClient = new ApiClient();
         const saveGroup = async () => {
-            const group = await apiClient.createGroup(formData as any);
+            const group = await apiClient.createGroup(formData as any, typeof logo !== "string" && logo !== null ? logo : undefined);
             if (group) {
                 onSelect(group);
             }
@@ -102,6 +102,12 @@ const SponsorGroupForm: FC<SponsorGroupFormProps> = ({ logo, onLogoChange, group
                             </Grid>
                             <Grid item xs={12}>
                                 <TextField name="description" label="Description" value={formData.description} onChange={handleInputChange} fullWidth />
+                            </Grid>
+                            <Grid item xs={12}>
+                                <ImagePicker 
+                                    image={logo}
+                                    onChange={onLogoChange}
+                                />
                             </Grid>
                             <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'center', }}>
                                 <Button
