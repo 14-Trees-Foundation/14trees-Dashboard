@@ -130,7 +130,7 @@ export const UserInfo = () => {
                       </div>
                     </div>
                   }
-                  {!selUserInfo.planted_by && (
+                  {(!selUserInfo.planted_by && !selUserInfo.gifted_by_name) && (
                     <Fragment>
                       <div className={classes.growth}>
                         <div style={{ marginTop: "20px" }}>
