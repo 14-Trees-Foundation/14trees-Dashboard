@@ -34,13 +34,13 @@ export const getGroups = (offset: number, limit: number, filters?: any[]) => {
     }
 };
 
-export const createGroup = (record: Group) => {
+export const createGroup = (record: Group, logo?: File) => {
     const apiClient = new ApiClient();
     return (dispatch: any) => {
         dispatch({
             type: groupActionTypes.CREATE_GROUP_REQUESTED,
         });
-        apiClient.createGroup(record).then(
+        apiClient.createGroup(record, logo).then(
             (value: Group) => {
                 dispatch({
                     type: groupActionTypes.CREATE_GROUP_SUCCEEDED,
@@ -59,13 +59,13 @@ export const createGroup = (record: Group) => {
     };
 };
 
-export const updateGroup = (record: Group) => {
+export const updateGroup = (record: Group, logo?: File) => {
     const apiClient = new ApiClient();
     return (dispatch: any) => {
         dispatch({
             type: groupActionTypes.UPDATE_GROUP_REQUESTED,
         });
-        apiClient.updateGroup(record).then(
+        apiClient.updateGroup(record, logo).then(
             (value: Group) => {
                 dispatch({
                     type: groupActionTypes.UPDATE_GROUP_SUCCEEDED,
