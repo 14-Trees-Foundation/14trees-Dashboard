@@ -171,6 +171,7 @@ const useStyles = makeStyles((theme) =>
     map: {
       width: "60%",
       height: "50vh",
+      marginLeft: "20px",
       [theme.breakpoints.down("1500")]: {
         height: "52vh",
       },
