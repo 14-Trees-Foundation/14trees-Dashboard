@@ -116,6 +116,16 @@ const GeneralStats: FC<GeneralStatsProps> = ({ field, loading, total, page, tabl
             align: 'right',
             render: (value: any, record: any) => (Number(record.available) || 0) + (Number(record.unbooked_assigned) || 0),
         },
+        {
+            title: (
+                <div style={{ display: "flex", alignItems: "center", justifyContent: 'space-between' }}>
+                  Giftable Inventory {getSortIcon('card_available', orderBy.find((item) => item.column === 'card_available')?.order)}
+                </div>
+            ),
+            dataIndex: "card_available",
+            key: "card_available",
+            align: 'right',
+        },
     ]
 
     const aggregatedDataColumn = [
