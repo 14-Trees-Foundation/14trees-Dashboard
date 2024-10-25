@@ -206,7 +206,7 @@ const SiteInventory: FC = () => {
                     },
                 },
                 {
-                    title: 'Not Funded Assigned Trees',
+                    title: 'Unfunded Inventory (Assigned)',
                     dataIndex: 'unbooked_assigned',
                     key: 'unbooked_assigned',
                     width: 150,
@@ -217,11 +217,23 @@ const SiteInventory: FC = () => {
                     }
                 },
                 {
-                    title: 'Available',
+                    title: 'Unfunded Inventory (Unassigned)',
                     dataIndex: 'available',
                     key: 'available',
                     width: 150,
                     align: 'right',
+                    sorter: {
+                        compare: (a: Plot, b: Plot) => (a.available || 0) - (b.available || 0),
+                        multiple: 1,
+                    }
+                },
+                {
+                    title: 'Total Unfunded Inventory',
+                    dataIndex: 'available',
+                    key: 'available',
+                    width: 150,
+                    align: 'right',
+                    render: (value: any, record: any) => (Number(record.available) || 0) + (Number(record.unbooked_assigned) || 0),
                     sorter: {
                         compare: (a: Plot, b: Plot) => (a.available || 0) - (b.available || 0),
                         multiple: 1,
@@ -293,6 +305,7 @@ const SiteInventory: FC = () => {
                                 <Table.Summary.Cell align="right" index={8} colSpan={1}>{calculateSum(plots.filter((plot) => selectedPlots.includes(plot.id) && plot.accessibility_status === "accessible").map((plot) => plot.assigned))}</Table.Summary.Cell>
                                 <Table.Summary.Cell align="right" index={9} colSpan={1}>{calculateSum(plots.filter((plot) => selectedPlots.includes(plot.id) && plot.accessibility_status === "accessible").map((plot) => plot.unbooked_assigned))}</Table.Summary.Cell>
                                 <Table.Summary.Cell align="right" index={10} colSpan={1}>{calculateSum(plots.filter((plot) => selectedPlots.includes(plot.id) && plot.accessibility_status === "accessible").map((plot) => plot.available))}</Table.Summary.Cell>
+                                <Table.Summary.Cell align="right" index={11} colSpan={1}>{calculateSum(plots.filter((plot) => selectedPlots.includes(plot.id) && plot.accessibility_status === "accessible").map((plot) => (Number(plot.available) || 0) + (Number(plot.unbooked_assigned) || 0)))}</Table.Summary.Cell>
                             </Table.Summary.Row>
                             <Table.Summary.Row style={{ backgroundColor: 'rgba(255, 156, 156, 0.2)' }}>
                                 <Table.Summary.Cell align="right" index={4} colSpan={5}>
@@ -304,6 +317,7 @@ const SiteInventory: FC = () => {
                                 <Table.Summary.Cell align="right" index={8} colSpan={1}>{calculateSum(plots.filter((plot) => selectedPlots.includes(plot.id) && plot.accessibility_status === "inaccessible").map((plot) => plot.assigned))}</Table.Summary.Cell>
                                 <Table.Summary.Cell align="right" index={9} colSpan={1}>{calculateSum(plots.filter((plot) => selectedPlots.includes(plot.id) && plot.accessibility_status === "inaccessible").map((plot) => plot.unbooked_assigned))}</Table.Summary.Cell>
                                 <Table.Summary.Cell align="right" index={10} colSpan={1}>{calculateSum(plots.filter((plot) => selectedPlots.includes(plot.id) && plot.accessibility_status === "inaccessible").map((plot) => plot.available))}</Table.Summary.Cell>
+                                <Table.Summary.Cell align="right" index={11} colSpan={1}>{calculateSum(plots.filter((plot) => selectedPlots.includes(plot.id) && plot.accessibility_status === "inaccessible").map((plot) => (Number(plot.available) || 0) + (Number(plot.unbooked_assigned) || 0)))}</Table.Summary.Cell>
                             </Table.Summary.Row>
                             <Table.Summary.Row style={{ backgroundColor: 'rgba(255, 219, 153, 0.2)' }}>
                                 <Table.Summary.Cell align="right" index={4} colSpan={5}>
@@ -315,6 +329,7 @@ const SiteInventory: FC = () => {
                                 <Table.Summary.Cell align="right" index={8} colSpan={1}>{calculateSum(plots.filter((plot) => selectedPlots.includes(plot.id) && plot.accessibility_status === "moderately_accessible").map((plot) => plot.assigned))}</Table.Summary.Cell>
                                 <Table.Summary.Cell align="right" index={9} colSpan={1}>{calculateSum(plots.filter((plot) => selectedPlots.includes(plot.id) && plot.accessibility_status === "moderately_accessible").map((plot) => plot.unbooked_assigned))}</Table.Summary.Cell>
                                 <Table.Summary.Cell align="right" index={10} colSpan={1}>{calculateSum(plots.filter((plot) => selectedPlots.includes(plot.id) && plot.accessibility_status === "moderately_accessible").map((plot) => plot.available))}</Table.Summary.Cell>
+                                <Table.Summary.Cell align="right" index={11} colSpan={1}>{calculateSum(plots.filter((plot) => selectedPlots.includes(plot.id) && plot.accessibility_status === "moderately_accessible").map((plot) => (Number(plot.available) || 0) + (Number(plot.unbooked_assigned) || 0)))}</Table.Summary.Cell>
                             </Table.Summary.Row>
                             <Table.Summary.Row>
                                 <Table.Summary.Cell align="right" index={4} colSpan={5}>
@@ -326,6 +341,7 @@ const SiteInventory: FC = () => {
                                 <Table.Summary.Cell align="right" index={8} colSpan={1}>{calculateSum(plots.filter((plot) => selectedPlots.includes(plot.id)).map((plot) => plot.assigned))}</Table.Summary.Cell>
                                 <Table.Summary.Cell align="right" index={9} colSpan={1}>{calculateSum(plots.filter((plot) => selectedPlots.includes(plot.id)).map((plot) => plot.unbooked_assigned))}</Table.Summary.Cell>
                                 <Table.Summary.Cell align="right" index={10} colSpan={1}>{calculateSum(plots.filter((plot) => selectedPlots.includes(plot.id)).map((plot) => plot.available))}</Table.Summary.Cell>
+                                <Table.Summary.Cell align="right" index={11} colSpan={1}>{calculateSum(plots.filter((plot) => selectedPlots.includes(plot.id)).map((plot) => (Number(plot.available) || 0) + (Number(plot.unbooked_assigned) || 0)))}</Table.Summary.Cell>
                             </Table.Summary.Row>
                         </Table.Summary>
                     )}

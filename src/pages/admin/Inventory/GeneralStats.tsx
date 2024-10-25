@@ -92,7 +92,7 @@ const GeneralStats: FC<GeneralStatsProps> = ({ field, loading, total, page, tabl
         {
             title: (
                 <div style={{ display: "flex", alignItems: "center", justifyContent: 'space-between' }}>
-                  Not Funded Assigned Trees {getSortIcon('unbooked_assigned', orderBy.find((item) => item.column === 'unbooked_assigned')?.order)}
+                  Unfunded Inventory (Assigned) {getSortIcon('unbooked_assigned', orderBy.find((item) => item.column === 'unbooked_assigned')?.order)}
                 </div>
             ),
             dataIndex: "unbooked_assigned",
@@ -102,12 +102,19 @@ const GeneralStats: FC<GeneralStatsProps> = ({ field, loading, total, page, tabl
         {
             title: (
                 <div style={{ display: "flex", alignItems: "center", justifyContent: 'space-between' }}>
-                  Not Funded and Not Assigned {getSortIcon('available', orderBy.find((item) => item.column === 'available')?.order)}
+                  Unfunded Inventory (Unassigned) {getSortIcon('available', orderBy.find((item) => item.column === 'available')?.order)}
                 </div>
             ),
             dataIndex: "available",
             key: "available",
             align: 'right',
+        },
+        {
+            title: "Total Unfunded Inventory",
+            dataIndex: "total_unfunded",
+            key: "total_unfunded",
+            align: 'right',
+            render: (value: any, record: any) => (Number(record.available) || 0) + (Number(record.unbooked_assigned) || 0),
         },
     ]
 
