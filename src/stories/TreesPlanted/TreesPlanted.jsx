@@ -31,7 +31,7 @@ export const TreesPlanted = (props) => {
       <div style={{ marginLeft: "15px", marginTop: "10px" }}>
         <div style={{ fontSize: "18px", fontWeight: "700" }}>{props.name}</div>
         <div className={classes.data}>Tree ID : {props.id}</div>
-        <div className={classes.data}>Date : {props.date}</div>
+        <div className={classes.data}>{(props.gifted ? 'Gifted on: ' : 'Date: ') + props.date}</div>
         {/* <div className={classes.data}>Event : {props.event}</div> */}
       </div>
     </div>
