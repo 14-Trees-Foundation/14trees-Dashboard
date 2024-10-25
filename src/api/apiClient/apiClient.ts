@@ -239,9 +239,17 @@ class ApiClient {
         }
     }
 
-    async createGroup(data: Group): Promise<Group> {
+    async createGroup(data: Group, logo?: File): Promise<Group> {
         try {
-            const response = await this.api.post<Group>(`/groups`, data);
+            const formData = new FormData();
+            formData.append("name", data.name);
+            formData.append("type", data.type);
+            formData.append("description", data.description);
+            if (logo) {
+                formData.append("logo", logo);
+            }
+
+            const response = await this.api.post<Group>(`/groups`, formData);
             return response.data;
         } catch (error) {
             console.error(error)
@@ -249,9 +257,22 @@ class ApiClient {
         }
     }
 
-    async updateGroup(data: Group): Promise<Group> {
+    async updateGroup(data: Group, logo?: File): Promise<Group> {
         try {
-            const response = await this.api.put<Group>(`/groups/${data.id}`, data);
+
+            const formData = new FormData();
+            formData.append("id", data.id.toString());
+            formData.append("name", data.name);
+            formData.append("type", data.type);
+            if (data.description) formData.append("description", data.description);
+            formData.append("create_at", data.created_at as any);
+            formData.append("updated_at", data.updated_at as any);
+            if (logo) {
+                formData.append("logo", logo);
+            }
+                
+
+            const response = await this.api.put<Group>(`/groups/${data.id}`, formData);
             return response.data;
         } catch (error) {
             console.error(error)

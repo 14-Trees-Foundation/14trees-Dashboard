@@ -113,8 +113,8 @@ const ImagePicker: React.FC<ImagePickerProps> = ({ image, onChange, width, heigh
                             alt="cropped"
                             ref={imageRef}
                             style={{
-                                width: '100%',
-                                height: 'auto',
+                                maxWidth: 400,
+                                maxHeight: 200,
                                 borderRadius: '10px',
                                 objectFit: 'cover',
                                 marginBottom: '10px',
@@ -142,7 +142,7 @@ const ImagePicker: React.FC<ImagePickerProps> = ({ image, onChange, width, heigh
                         </IconButton>
                     </div>
                     <div style={{ display: 'flex', justifyContent: 'center', marginTop: '10px' }}>
-                        <Button variant="outlined" onClick={handleReuploadClick} style={{ marginTop: '10px' }}>
+                        <Button variant="outlined" onClick={handleReuploadClick}>
                             Reupload Image
                         </Button>
                         {/* <Button variant="contained" onClick={handleCropAndResize} style={{ marginLeft: '10px', marginTop: '10px' }}>

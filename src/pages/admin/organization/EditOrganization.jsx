@@ -9,9 +9,11 @@ import {
   TextField,
 } from "@mui/material";
 import { organizationTypes } from "./organizationType";
+import ImagePicker from '../../../components/ImagePicker';
 
 function EditUser({ row, openeditModal, handleClose, editSubmit }) {
   const [formData, setFormData] = useState(row);
+  const [logo, setLogo] = useState(null);
 
   const handleChange = (event) => {
     setFormData({
@@ -22,7 +24,7 @@ function EditUser({ row, openeditModal, handleClose, editSubmit }) {
 
   const handleEditSubmit = (event) => {
     event.preventDefault();
-    editSubmit(formData);
+    editSubmit(formData, logo ?? undefined);
     handleClose();
   };
 
@@ -56,6 +58,10 @@ function EditUser({ row, openeditModal, handleClose, editSubmit }) {
             onChange={handleChange}
             fullWidth
             margin="dense"
+          />
+          <ImagePicker
+              image={logo ?? formData.logo_url}
+              onChange={file => setLogo(file)}
           />
         </DialogContent>
         <DialogActions
