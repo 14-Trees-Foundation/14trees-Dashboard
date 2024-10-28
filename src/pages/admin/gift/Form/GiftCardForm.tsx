@@ -55,8 +55,8 @@ const GiftCardsForm: FC<GiftCardsFormProps> = ({ giftCardRequest, requestId, ope
     }
 
     useEffect(() => {
-        getGiftCardRequestDetails();
-    }, [giftCardRequest])
+        if (open) getGiftCardRequestDetails();
+    }, [open, giftCardRequest])
 
     const steps = [
         {
@@ -154,7 +154,6 @@ const GiftCardsForm: FC<GiftCardsFormProps> = ({ giftCardRequest, requestId, ope
         <div>
             <Dialog
                 open={open}
-                onClose={handleClose}
                 fullWidth
                 maxWidth='xl'
             >
