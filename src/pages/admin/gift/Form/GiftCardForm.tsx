@@ -66,7 +66,7 @@ const GiftCardsForm: FC<GiftCardsFormProps> = ({ giftCardRequest, requestId, ope
         },
         {
             key: 1,
-            title: "Corporate Details",
+            title: "Corporate Details (Optional)",
             content: <SponsorGroupForm logo={logo ?? giftCardRequest?.logo_url ?? null} onLogoChange={logo => setLogo(logo)} group={group} onSelect={group => setGroup(group)}/>,
         },
         {
@@ -132,8 +132,7 @@ const GiftCardsForm: FC<GiftCardsFormProps> = ({ giftCardRequest, requestId, ope
                 else nextStep = 1;
                 break;
             case 1:
-                if (!group) toast.error("Please provide corporate details");
-                else nextStep = 2;
+                nextStep = 2;
                 break;
             case 2:
                 if (treeCount === 0) toast.error("Please provide number of trees to gift");

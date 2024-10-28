@@ -26,7 +26,6 @@ import UserProfile from "./pages/Profiles/UserProfile";
 import VisitProfile from "./pages/Profiles/VisitProfile";
 import OrgProfile from "./pages/Profiles/OrgProfile";
 import RedeemCard from "./pages/admin/gift/RedeemCard";
-import GiftCardRequest from "./pages/admin/gift/GiftCardRequest";
 
 function App() {
   return (
@@ -50,7 +49,6 @@ function App() {
           <Route path="/user/:id" element={<UserProfile />}></Route>
           <Route path="/visit/:id" element={<VisitProfile />}></Route>
           <Route path="/gifts" element={<RedeemCard />}></Route>
-          <Route path="/gift-trees" element={<GiftCardRequest />}></Route>
           <Route path="/organization/:id" element={<OrgProfile />}></Route>
           <Route path="/group/:grptype" element={<OrgEvent />}></Route>
           <Route path="/events/corp/:event_id" element={<Corporate />}></Route>
