@@ -89,8 +89,7 @@ export const UserInfo = () => {
               <div className={classes.data}>{selUserInfo.assigned_to}</div>
               {(selUserInfo.event_type === "4" || selUserInfo.description) ? (
                 <>
-                  {selUserInfo.gifted_by_name &&
-                    selUserInfo.gifted_by_name !== undefined && !strEquals(selUserInfo.gifted_by_name, selUserInfo.assigned_to) && !strEquals(selUserInfo.gifted_by_name, "ACM India") && !strEquals(selUserInfo.gifted_by_name, "ACM India Council") && selUserInfo.gifted_by && (
+                  {(selUserInfo.gifted_by_name || (selUserInfo.gifted_by_user !== undefined && !strEquals(selUserInfo.gifted_by_user, selUserInfo.assigned_to) && !strEquals(selUserInfo.gifted_by_user, "ACM India") && !strEquals(selUserInfo.gifted_by_user, "ACM India Council") && selUserInfo.gifted_by)) && (
                       <>
                         <div className={classes.label}>Gifted By</div>
                         <div
@@ -100,7 +99,7 @@ export const UserInfo = () => {
                             marginBottom: "8px",
                           }}
                         >
-                          {selUserInfo.gifted_by_name}
+                          {selUserInfo.gifted_by_name || selUserInfo.gifted_by_user}
                         </div>
                       </>
                     )}
@@ -130,7 +129,7 @@ export const UserInfo = () => {
                       </div>
                     </div>
                   }
-                  {(!selUserInfo.planted_by && !selUserInfo.gifted_by_name) && (
+                  {(!selUserInfo.planted_by && !selUserInfo.gifted_by_name && !selUserInfo.gifted_by_user) && (
                     <Fragment>
                       <div className={classes.growth}>
                         <div style={{ marginTop: "20px" }}>
@@ -163,13 +162,13 @@ export const UserInfo = () => {
               ) : (
                 <>
                   {selUserInfo.sponsored_by &&
-                    selUserInfo.sponsored_by !== selUserInfo.assigned_to_id && !strEquals(selUserInfo.gifted_by_name, "ACM India") && !strEquals(selUserInfo.gifted_by_name, "ACM India Council") && !(!selUserInfo.gifted_by && (strEquals(selUserInfo.sponsored_by_name, "ACM India") || strEquals(selUserInfo.sponsored_by_name, "ACM India Council"))) && (
+                    selUserInfo.sponsored_by !== selUserInfo.assigned_to_id && !strEquals(selUserInfo.gifted_by_user, "ACM India") && !strEquals(selUserInfo.gifted_by_user, "ACM India Council") && !(!selUserInfo.gifted_by && (strEquals(selUserInfo.sponsored_by_name, "ACM India") || strEquals(selUserInfo.sponsored_by_name, "ACM India Council"))) && (
                       <>
                         <div className={classes.label}>Donated By</div>
-                        {selUserInfo.gifted_by_name &&
-                          selUserInfo.gifted_by_name !== "undefined" ? (
+                        {selUserInfo.gifted_by_user &&
+                          selUserInfo.gifted_by_user !== "undefined" ? (
                           <div className={classes.data}>
-                            {selUserInfo.gifted_by_name}
+                            {selUserInfo.gifted_by_user}
                           </div>
                         ) : (
                           <div className={classes.data}>
