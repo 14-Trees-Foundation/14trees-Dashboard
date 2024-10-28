@@ -14,11 +14,12 @@ import { bindActionCreators } from "@reduxjs/toolkit";
 import { RootState } from "../../../redux/store/store";
 import TableComponent from "../../../components/Table";
 import { Dropdown, Menu, TableColumnsType } from "antd";
-import { AssignmentTurnedInOutlined, CardGiftcardOutlined, DeleteOutline, DownloadOutlined, EditOutlined, EmailOutlined, ErrorOutline, InfoOutlined, LandscapeOutlined, LinkOutlined, MenuOutlined, MoreVertOutlined, Recommend } from "@mui/icons-material";
+import { ErrorOutline, MenuOutlined, NotesOutlined } from "@mui/icons-material";
 import PlotSelection from "./Form/PlotSelection";
 import { Plot } from "../../../types/plot";
 import giftCardActionTypes from "../../../redux/actionTypes/giftCardActionTypes";
 import GiftCardRequestInfo from "./GiftCardRequestInfo";
+import GiftRequestNotes from "./Form/Notes";
 
 const GiftTrees: FC = () => {
     const dispatch = useAppDispatch();
@@ -38,6 +39,7 @@ const GiftTrees: FC = () => {
     const [selectedPlots, setSelectedPlots] = useState<Plot[]>([]);
     const [requestId, setRequestId] = useState<string | null>(null);
     const [deleteModal, setDeleteModal] = useState(false);
+    const [notesModal, setNotesModal] = useState(false);
 
     const handleSetFilters = (filters: Record<string, GridFilterItem>) => {
         setPage(0);
@@ -46,6 +48,7 @@ const GiftTrees: FC = () => {
 
     const handleModalOpenAdd = () => {
         setChangeMode('add');
+        setSelectedGiftCard(null);
         const uniqueRequestId = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
         setRequestId(uniqueRequestId);
         setModalOpen(true);
@@ -247,6 +250,24 @@ const GiftTrees: FC = () => {
 
     }
 
+    const handleNotesSave = async (text: string) => {
+        setNotesModal(false);
+        if (!selectedGiftCard) return;
+
+        try {
+            const apiClient = new ApiClient();
+            const response = await apiClient.updateGiftCard({ ...selectedGiftCard, notes: text}, selectedGiftCard.no_of_cards, selectedGiftCard.user_id);
+            toast.success("Gift Request updated successfully");
+            dispatch({
+                type: giftCardActionTypes.UPDATE_GIFT_CARD_SUCCEEDED,
+                payload: response,
+            });
+        } catch (error: any) {
+            if (error?.response?.data?.message) toast.error(error.response.data.message);
+            else toast.error("Please try again later!")
+        }
+    }
+
     const handleGiftCardRequestDelete = () => {
         if (!selectedGiftCard || selectedGiftCard.status === 'pending_gift_cards' || selectedGiftCard.status === 'completed') return;
 
@@ -353,6 +374,18 @@ const GiftTrees: FC = () => {
                     </IconButton>
                 </Tooltip>
             ) : '',
+        },
+        {
+            dataIndex: "notes",
+            key: "notes",
+            title: "Notes",
+            align: "center",
+            width: 100,
+            render: (value, record) => (
+                <IconButton onClick={() => { setSelectedGiftCard(record); setNotesModal(true); }}>
+                    <NotesOutlined />
+                </IconButton>
+            ),
         },
         {
             dataIndex: "action",
@@ -565,6 +598,13 @@ const GiftTrees: FC = () => {
                 open={infoModal}
                 onClose={() => { setInfoModal(false) }}
                 data={selectedGiftCard}
+            />
+
+            <GiftRequestNotes 
+                open={notesModal}
+                handleClose={() => { setNotesModal(false) }}
+                onSave={handleNotesSave}
+                initialText={selectedGiftCard?.notes ?? ''}
             />
         </div>
     );
