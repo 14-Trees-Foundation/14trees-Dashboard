@@ -1,18 +1,23 @@
 
 import { FC, useEffect, useRef, useState } from "react";
-import { Autocomplete, Box, Chip, CircularProgress, TextField, Typography } from "@mui/material";
+import { Autocomplete, Box, Checkbox, Chip, CircularProgress, FormControl, FormControlLabel, TextField, Typography } from "@mui/material";
 import { Plot } from "../../../../types/plot";
 import { useAppDispatch, useAppSelector } from "../../../../redux/store/hooks";
 import { bindActionCreators } from "@reduxjs/toolkit";
 import * as plotActionCreators from "../../../../redux/actions/plotActions";
+import UserTreeMappingModal from "./UserTreeMapping";
 
 interface PlotSelectionProps {
     requiredTrees: number
     plots: Plot[]
     onPlotsChange: (plots: Plot[]) => void
+    users: any[]
+    onUsersChange: (users: any[]) => void
+    manualPlotSelection: boolean
+    onPlotSelectionMethodChange: (value: boolean) => void
 }
 
-const PlotSelection: FC<PlotSelectionProps> = ({ requiredTrees, plots, onPlotsChange }) => {
+const PlotSelection: FC<PlotSelectionProps> = ({ requiredTrees, plots, onPlotsChange, users, onUsersChange, manualPlotSelection, onPlotSelectionMethodChange }) => {
     const [position, setPosition] = useState(0);
     const listElem: any = useRef();
     const mounted = useRef<boolean>();
@@ -74,30 +79,32 @@ const PlotSelection: FC<PlotSelectionProps> = ({ requiredTrees, plots, onPlotsCh
     return (
         <div>
 
-            <Box style={{ 
+            <Box style={{
                 marginBottom: 30
             }}>
                 <Typography variant='subtitle1'>Total Trees Requested: <strong>{requiredTrees}</strong></Typography>
-                <Typography variant='subtitle1'>Remaining tree count for plot selection: <strong>{
-                    Math.max(requiredTrees - plots
-                    .map(pt => pt.card_available ?? 0)
-                    .reduce((prev, current) => prev + current, 0), 0)
-                }</strong></Typography>
-                <Typography variant='subtitle1'>Tree distribution across the plots:</Typography>
-                {plots.map((plot, idx) => {
-                    const treesAllocated = plots
-                        .slice(0, idx)
-                        .map(pt => pt.card_available ?? 0)
-                        .reduce((prev, current) => prev + current, 0);
+                {!manualPlotSelection && <Box>
+                    <Typography variant='subtitle1'>Remaining tree count for plot selection: <strong>{
+                        Math.max(requiredTrees - plots
+                            .map(pt => pt.card_available ?? 0)
+                            .reduce((prev, current) => prev + current, 0), 0)
+                    }</strong></Typography>
+                    <Typography variant='subtitle1'>Tree distribution across the plots:</Typography>
+                    {plots.map((plot, idx) => {
+                        const treesAllocated = plots
+                            .slice(0, idx)
+                            .map(pt => pt.card_available ?? 0)
+                            .reduce((prev, current) => prev + current, 0);
 
-                    const treesForCurrentPlot = Math.min(plot.card_available ?? 0, requiredTrees - treesAllocated);
+                        const treesForCurrentPlot = Math.min(plot.card_available ?? 0, requiredTrees - treesAllocated);
 
-                    return (
-                        <Typography variant="body1" key={idx}>
-                            {plot.name} <strong>[ Trees: {Math.max(treesForCurrentPlot, 0)} ]</strong>
-                        </Typography>
-                    );
-                })}
+                        return (
+                            <Typography variant="body1" key={idx}>
+                                {plot.name} <strong>[ Trees: {Math.max(treesForCurrentPlot, 0)} ]</strong>
+                            </Typography>
+                        );
+                    })}
+                </Box>}
             </Box>
 
             <Autocomplete
@@ -151,6 +158,20 @@ const PlotSelection: FC<PlotSelectionProps> = ({ requiredTrees, plots, onPlotsCh
                 )}
                 ListboxProps={listboxProps}
             />
+
+            <FormControl component="fieldset" sx={{ mt: 3 }}>
+                <FormControlLabel
+                    control={
+                        <Checkbox checked={manualPlotSelection} onChange={(e) => { onPlotSelectionMethodChange(e.target.checked) }} name="manual" />
+                    }
+                    label="Do you what to manually select trees for each user?"
+                />
+            </FormControl>
+            {manualPlotSelection && <UserTreeMappingModal
+                plotIds={plots.map(plot => plot.id)}
+                users={users}
+                onUsersChange={onUsersChange}
+            />}
         </div>
     );
 }
