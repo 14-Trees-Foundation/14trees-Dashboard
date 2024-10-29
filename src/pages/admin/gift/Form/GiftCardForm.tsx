@@ -17,7 +17,7 @@ interface GiftCardsFormProps {
     requestId: string | null
     open: boolean
     handleClose: () => void
-    onSubmit: (user: User, group: Group | null, treeCount: number, users: any[], presentationId: string | null, logo?: File, messages?: any, file?: File) => void
+    onSubmit: (user: User, group: Group | null, treeCount: number, users: any[], logo?: File, messages?: any, file?: File) => void
 }
 
 const GiftCardsForm: FC<GiftCardsFormProps> = ({ giftCardRequest, requestId, open, handleClose, onSubmit }) => {
@@ -50,7 +50,6 @@ const GiftCardsForm: FC<GiftCardsFormProps> = ({ giftCardRequest, requestId, ope
                 plantedBy: giftCardRequest.planted_by,
                 logoMessage: giftCardRequest.logo_message
             })
-            setPresentationId(giftCardRequest.presentation_id);
         }
     }
 
@@ -72,7 +71,7 @@ const GiftCardsForm: FC<GiftCardsFormProps> = ({ giftCardRequest, requestId, ope
         {
             key: 2,
             title: "Book Trees",
-            content: <PlotSelection treeCount={treeCount} onTreeCountChange={count => setTreeCount(count)}/>,
+            content: <PlotSelection disabled={giftCardRequest !== undefined && giftCardRequest.status !== 'pending_plot_selection'} treeCount={treeCount} onTreeCountChange={count => setTreeCount(count)}/>,
         },
         {
             key: 3,
@@ -104,7 +103,7 @@ const GiftCardsForm: FC<GiftCardsFormProps> = ({ giftCardRequest, requestId, ope
             return;
         }
 
-        onSubmit(user, group, treeCount, users, presentationId, logo ?? undefined, messages, file ?? undefined);
+        onSubmit(user, group, treeCount, users, logo ?? undefined, messages, file ?? undefined);
 
         handleCloseForm();
     }
@@ -120,8 +119,8 @@ const GiftCardsForm: FC<GiftCardsFormProps> = ({ giftCardRequest, requestId, ope
         setUsers([]);
         setLogo(null);
         setMessages({ primaryMessage: "", secondaryMessage: "", eventName: "", plantedBy: "", logoMessage: "" });
-        setPresentationId('null')
-        setSlideId('null');
+        setPresentationId(null);
+        setSlideId(null);
     }
 
     const handleNext = () => {

@@ -132,7 +132,7 @@ const GiftTrees: FC = () => {
         getGiftCards(0, giftCardsData.totalGiftCards, filtersData);
     };
 
-    const saveNewGiftCardsRequest = async (user: User, group: Group | null, treeCount: number, users: any[], presentationId: string | null, logo?: File, messages?: any, file?: File) => {
+    const saveNewGiftCardsRequest = async (user: User, group: Group | null, treeCount: number, users: any[], logo?: File, messages?: any, file?: File) => {
         if (!requestId) {
             toast.error("Something went wrong. Please try again later!");
             return;
@@ -140,7 +140,7 @@ const GiftTrees: FC = () => {
         const apiClient = new ApiClient();
         let giftCardId: number;
         try {
-            const response = await apiClient.createGiftCard(requestId, treeCount, user.id, presentationId, group?.id, logo, messages, file);
+            const response = await apiClient.createGiftCard(requestId, treeCount, user.id, group?.id, logo, messages, file);
             giftCardId = response.id;
             dispatch({
                 type: giftCardActionTypes.CREATE_GIFT_CARD_SUCCEEDED,
@@ -204,11 +204,11 @@ const GiftTrees: FC = () => {
         }
     }
 
-    const handleSubmit = (user: User, group: Group | null, treeCount: number, users: any[], presentationId: string | null, logo?: File, messages?: any, file?: File) => {
+    const handleSubmit = (user: User, group: Group | null, treeCount: number, users: any[], logo?: File, messages?: any, file?: File) => {
         handleModalClose();
 
         if (changeMode === 'add') {
-            saveNewGiftCardsRequest(user, group, treeCount, users, presentationId, logo, messages, file);
+            saveNewGiftCardsRequest(user, group, treeCount, users, logo, messages, file);
         } else if (changeMode === 'edit') {
             updateGiftCardRequest(user, group, treeCount, users, logo, messages, file);
         }
@@ -359,33 +359,33 @@ const GiftTrees: FC = () => {
     const getActionsMenu = (record: GiftCard) => (
         <Menu>
             <Menu.Item key="0" onClick={() => { setSelectedGiftCard(record); setInfoModal(true); }}>
-                Gift Request Details
+                View Summary
             </Menu.Item>
-            <Menu.Item key="7" onClick={() => { handleAlbumModalOpen(record); }}>
+            <Menu.Item key="1" onClick={() => { handleModalOpenEdit(record); }}>
+                Edit Request
+            </Menu.Item>
+            <Menu.Item key="2" onClick={() => { handleAlbumModalOpen(record); }}>
                 Add Album Images
             </Menu.Item>
-            {record.status === 'pending_plot_selection' && <Menu.Item key="1" onClick={() => { setSelectedGiftCard(record); setPlotModal(true); }}>
+            {record.status === 'pending_plot_selection' && <Menu.Item key="3" onClick={() => { setSelectedGiftCard(record); setPlotModal(true); }}>
                 Select Plots
             </Menu.Item>}
-            {record.status === 'pending_assignment' && <Menu.Item key="2" onClick={() => { setSelectedGiftCard(record); setAutoAssignModal(true); }}>
+            {record.status === 'pending_assignment' && <Menu.Item key="4" onClick={() => { setSelectedGiftCard(record); setAutoAssignModal(true); }}>
                 Assign Trees
             </Menu.Item>}
-            {record.status === 'completed' && <Menu.Item key="3" onClick={() => { handleDownloadCards(record.id, record.user_name + '_' + record.no_of_cards, 'zip') }}>
+            {record.status === 'completed' && <Menu.Item key="5" onClick={() => { handleDownloadCards(record.id, record.user_name + '_' + record.no_of_cards, 'zip') }}>
                 Download Gift Cards
             </Menu.Item>}
-            {record.status === 'completed' && <Menu.Item key="4" onClick={() => { window.open('https://docs.google.com/presentation/d/' + record.presentation_id); }}>
+            {record.status === 'completed' && <Menu.Item key="6" onClick={() => { window.open('https://docs.google.com/presentation/d/' + record.presentation_id); }}>
                 Gift Cards Slide
             </Menu.Item>}
-            {record.status === 'pending_gift_cards' && <Menu.Item key="5" onClick={() => { handleGenerateGiftCards(record.id) }}>
+            {record.status === 'pending_gift_cards' && <Menu.Item key="7" onClick={() => { handleGenerateGiftCards(record.id) }}>
                 Generate Gift Cards
             </Menu.Item>}
-            {(record.status === 'completed' || record.status === 'pending_gift_cards') && <Menu.Item key="6" onClick={() => { setSelectedGiftCard(record); setEmailConfirmationModal(true); }}>
+            {(record.status === 'completed' || record.status === 'pending_gift_cards') && <Menu.Item key="8" onClick={() => { setSelectedGiftCard(record); setEmailConfirmationModal(true); }}>
                 Send Emails
             </Menu.Item>}
-            {(record.status === 'pending_plot_selection') && <Menu.Item key="7" onClick={() => { handleModalOpenEdit(record); }}>
-                Edit Request
-            </Menu.Item>}
-            {(record.status === 'pending_plot_selection' || record.status === 'pending_assignment') && <Menu.Item key="8" danger onClick={() => { setDeleteModal(true); setSelectedGiftCard(record); }}>
+            {(record.status === 'pending_plot_selection' || record.status === 'pending_assignment') && <Menu.Item key="9" danger onClick={() => { setDeleteModal(true); setSelectedGiftCard(record); }}>
                 Delete Request
             </Menu.Item>}
         </Menu>
