@@ -1403,6 +1403,17 @@ class ApiClient {
         }
     }
 
+    async updateAlbumImagesForGiftRequest(gift_card_request_id: number, album_id: number): Promise<void> {
+        try {
+            await this.api.post<void>(`/gift-cards/update-album/`, { gift_card_request_id, album_id});
+        } catch (error: any) {
+            if (error.response) {
+                throw new Error(error.response.data.message);
+            }
+            throw new Error('Failed to update album images for gift request!');
+        }
+    }
+
     // Utils
     async getSignedUrlForRequestId(gift_card_request_id: string, filename: string): Promise<string> {
         try {
@@ -1437,6 +1448,32 @@ class ApiClient {
                 throw new Error(error.response.data.message);
             }
             throw new Error('Failed to get images');
+        }
+    }
+
+    /*
+        Albums
+    */
+
+    async createAlbum(albumName: string, userName: string, email: string, images: File[]) {
+        const formData = new FormData();
+        formData.append("album_name", albumName);
+        formData.append("name", userName);
+        const imagesNames: string[] = [];
+        for (const image of images) {
+            formData.append("images", image);
+            imagesNames.push(image.name);
+        }
+        formData.append("file_names", imagesNames.join(','));
+
+        try {
+            const response = await this.api.post<{ album: any }>(`/albums/${email}`, formData);
+            return response.data.album;
+        } catch (error: any) {
+            if (error.response) {
+                throw new Error(error.response.data.message);
+            }
+            throw new Error('Failed to create album');
         }
     }
 }

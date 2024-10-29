@@ -10,6 +10,7 @@ export type GiftCard = {
     created_at: string;
     updated_at: string;
     user_name?: string;
+    user_email?: string;
     group_name?: string;
     plot_ids?: number[];
     primary_message: string;
