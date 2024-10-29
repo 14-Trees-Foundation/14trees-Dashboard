@@ -40,6 +40,20 @@ const GiftTrees: FC = () => {
     const [requestId, setRequestId] = useState<string | null>(null);
     const [deleteModal, setDeleteModal] = useState(false);
     const [notesModal, setNotesModal] = useState(false);
+    const [users, setUsers] = useState<any[]>([]);
+    const [manualPlotSelection, setManualPlotSelection] = useState(false);
+
+    useEffect(() => {
+        const getUsers = async () => {
+            if (selectedGiftCard) {
+                const apiClient = new ApiClient();
+                const usersResp = await apiClient.getBookedGiftCards(selectedGiftCard?.id, 0, 20);
+                setUsers(usersResp.results);
+            }
+        }
+
+        if (plotModal)  getUsers();
+    }, [plotModal, selectedGiftCard]);
 
     const handleSetFilters = (filters: Record<string, GridFilterItem>) => {
         setPage(0);
@@ -170,7 +184,19 @@ const GiftTrees: FC = () => {
         }
     }
 
+    const handlePlotSelectionCancel = () => {
+        setPlotModal(false);
+        setSelectedPlots([]);
+        setManualPlotSelection(false);
+        setSelectedGiftCard(null);
+    }
+
     const handlePlotSelectionSubmit = async () => {
+        if (manualPlotSelection && users.findIndex(user => !user.tree_id) !== -1) {
+            toast.error("You haven't selected trees for all the users!");
+            return;
+        }
+
         setPlotModal(false);
         if (!selectedGiftCard) return;
 
@@ -180,13 +206,17 @@ const GiftTrees: FC = () => {
                 await apiClient.createGiftCardPlots(selectedGiftCard.id, selectedPlots.map(plot => plot.id));
                 toast.success("Saved selected plot for gift card request!");
 
-                await apiClient.bookGiftCards(selectedGiftCard.id);
+                await apiClient.bookGiftCards(selectedGiftCard.id, manualPlotSelection ? users : undefined);
                 toast.success("Gift cards booked successfully");
                 getGiftCardData();
             } catch {
                 toast.error("Something went wrong!");
             }
         }
+
+        setSelectedGiftCard(null);
+        setSelectedPlots([]);
+        setManualPlotSelection(false);
     }
 
     const handleAutoAssignTrees = async () => {
@@ -537,13 +567,21 @@ const GiftTrees: FC = () => {
             <Dialog open={plotModal} onClose={() => setPlotModal(false)} fullWidth maxWidth="lg">
                 <DialogTitle>Select Plots</DialogTitle>
                 <DialogContent dividers>
-                    <PlotSelection requiredTrees={selectedGiftCard?.no_of_cards ?? 0} plots={selectedPlots} onPlotsChange={plots => setSelectedPlots(plots)} />
+                    <PlotSelection
+                        users={users} 
+                        onUsersChange={(users: any[]) => { setUsers(users)}} 
+                        requiredTrees={selectedGiftCard?.no_of_cards ?? 0} 
+                        plots={selectedPlots} 
+                        onPlotsChange={plots => setSelectedPlots(plots)} 
+                        manualPlotSelection={manualPlotSelection}
+                        onPlotSelectionMethodChange={(value) => { setManualPlotSelection(value) }}
+                    />
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={() => setPlotModal(false)} color="primary">
+                    <Button onClick={handlePlotSelectionCancel} color="error" variant="outlined">
                         Cancel
                     </Button>
-                    <Button onClick={handlePlotSelectionSubmit} color="primary" variant="contained">
+                    <Button onClick={handlePlotSelectionSubmit} color="success" variant="contained">
                         Confirm
                     </Button>
                 </DialogActions>
