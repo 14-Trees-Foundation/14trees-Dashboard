@@ -2,11 +2,12 @@ import { FC, useEffect, useState } from "react";
 import { TextField, Typography } from "@mui/material";
 
 interface CardCountProps {
+    disabled: boolean
     treeCount: number
     onTreeCountChange: (count: number) => void
 }
 
-const CardCount: FC<CardCountProps> = ({ treeCount, onTreeCountChange }) => {
+const CardCount: FC<CardCountProps> = ({ disabled, treeCount, onTreeCountChange }) => {
 
     const handleCountChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const number = parseInt(event.target.value);
@@ -22,6 +23,7 @@ const CardCount: FC<CardCountProps> = ({ treeCount, onTreeCountChange }) => {
                 <TextField 
                     value={treeCount === 0 ? '' : treeCount}
                     onChange={handleCountChange}
+                    disabled={disabled}
                     type='number'
                     size="small"
                 />

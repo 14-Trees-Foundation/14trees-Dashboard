@@ -1,6 +1,5 @@
 import { FC, useEffect, useRef, useState } from "react";
-import { TextField, Typography } from "@mui/material";
-import cardImage from "../../../../assets/gift-card.png";
+import { Box, Button, TextField, Typography } from "@mui/material";
 import ApiClient from "../../../../api/apiClient/apiClient";
 
 const defaultMessages = {
@@ -42,24 +41,16 @@ const CardDetails: FC<CardDetailsProps> = ({ logo_url, request_id, presentationI
         }
 
         const apiClient = new ApiClient();
-        await apiClient.updateGiftCardTemplate(presentationIdIdRef.current, slideIdRef.current, recordRef.current.primary, recordRef.current.secondary, recordRef.current.logo, logo_url);
+        await apiClient.updateGiftCardTemplate(slideIdRef.current, recordRef.current.primary, recordRef.current.secondary, recordRef.current.logo, logo_url);
         setIframeSrc(
             `https://docs.google.com/presentation/d/${presentationIdIdRef.current}/embed?rm=minimal&slide=id.${slideIdRef.current}&timestamp=${new Date().getTime()}`
         );
     }
 
     useEffect(() => {
-        const interval = setInterval(() => {
-            updateSlide();
-        }, 10000);
-
-        return () => clearInterval(interval);
-    }, [])
-
-    useEffect(() => {
         const generateGiftCard = async () => {
             const apiClient = new ApiClient();
-            const resp = await apiClient.generateCardTemplate(request_id, primary, secondary, logo, logo_url, presentationId ?? undefined);
+            const resp = await apiClient.generateCardTemplate(request_id, primary, secondary, logo, logo_url);
             slideIdRef.current = resp.slide_id;
             presentationIdIdRef.current = resp.presentation_id;
 
@@ -111,7 +102,7 @@ const CardDetails: FC<CardDetailsProps> = ({ logo_url, request_id, presentationI
                     onChange={(e) => setEvent(e.target.value)}
                     size="small"
                 />
-                <Typography variant="body1" sx={{ mt: 2 }}>Planted By</Typography>
+                <Typography variant="body1" sx={{ mt: 2 }}>Gifted By</Typography>
                 <TextField
                     value={planted}
                     onChange={(e) => setPlanted(e.target.value)}
@@ -124,6 +115,11 @@ const CardDetails: FC<CardDetailsProps> = ({ logo_url, request_id, presentationI
                     size="small"
                     inputProps={{ maxLength: 50 }}
                 />
+                <Box style={{ display: 'flex', justifyContent: 'flex-start', marginTop: 20 }}>
+                    <Button onClick={updateSlide} variant="contained" color="success" disabled={!presentationIdIdRef.current}>
+                        Update
+                    </Button>
+                </Box>
             </div>
             <div style={{ display: 'flex', justifyContent: 'center', flexDirection: 'column', maxWidth: '55%' }}>
                 {/* <img src={cardImage} /> */}
