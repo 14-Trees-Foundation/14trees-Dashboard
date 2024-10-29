@@ -722,6 +722,17 @@ class ApiClient {
         }
     }
 
+    async getGiftAbleTrees(offset: number, limit: number, filters: any[]): Promise<PaginatedResponse<Tree>> {
+        let url = `/trees/get-giftable?offset=${offset}&limit=${limit}`;
+        try {
+            let result = await this.api.post<PaginatedResponse<Tree>>(url, { filters });
+            return result.data;
+        } catch (error: any) {
+            if (error.response?.data?.message) throw new Error(error.response.data.message);
+            throw new Error('Failed to get giftable trees');
+        }
+    }
+
 
     /*
         Model- UserTree: CRUD Operations/Apis for user_tree_regs
@@ -1285,9 +1296,9 @@ class ApiClient {
         }
     }
 
-    async bookGiftCards(gift_card_request_id: number): Promise<void> {
+    async bookGiftCards(gift_card_request_id: number, gift_card_trees?: any[]): Promise<void> {
         try {
-            await this.api.post<any>(`/gift-cards/book`, { gift_card_request_id });
+            await this.api.post<any>(`/gift-cards/book`, { gift_card_request_id, gift_card_trees });
         } catch (error: any) {
             if (error.response) {
                 throw new Error(error.response.data.message);
@@ -1296,9 +1307,9 @@ class ApiClient {
         }
     }
 
-    async getBookedGiftCards(gift_card_id: number, offset: number = 0, limit: number = 10): Promise<PaginatedResponse<GiftCardUser>> {
+    async getBookedGiftCards(gift_card_request_id: number, offset: number = 0, limit: number = 10): Promise<PaginatedResponse<GiftCardUser>> {
         try {
-            const response = await this.api.get<PaginatedResponse<GiftCardUser>>(`/gift-cards/booked/${gift_card_id}?offset=${offset}&limit=${limit}`);
+            const response = await this.api.get<PaginatedResponse<GiftCardUser>>(`/gift-cards/${gift_card_request_id}?offset=${offset}&limit=${limit}`);
             return response.data;
         } catch (error: any) {
             if (error.response) {
