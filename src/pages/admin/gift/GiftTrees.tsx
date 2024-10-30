@@ -381,7 +381,7 @@ const GiftTrees: FC = () => {
             {record.status === 'completed' && <Menu.Item key="6" onClick={() => { window.open('https://docs.google.com/presentation/d/' + record.presentation_id); }}>
                 Gift Cards Slide
             </Menu.Item>}
-            {record.status === 'pending_gift_cards' && <Menu.Item key="7" onClick={() => { handleGenerateGiftCards(record.id) }}>
+            {(record.status === 'completed' || record.status === 'pending_gift_cards') && <Menu.Item key="7" onClick={() => { handleGenerateGiftCards(record.id) }}>
                 Generate Gift Cards
             </Menu.Item>}
             {(record.status === 'completed' || record.status === 'pending_gift_cards') && <Menu.Item key="8" onClick={() => { setSelectedGiftCard(record); setEmailConfirmationModal(true); }}>
