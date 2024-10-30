@@ -21,6 +21,7 @@ import giftCardActionTypes from "../../../redux/actionTypes/giftCardActionTypes"
 import GiftCardRequestInfo from "./GiftCardRequestInfo";
 import GiftRequestNotes from "./Form/Notes";
 import AlbumImageInput from "../../../components/AlbumImageInput";
+import EmailConfirmationModal from "./Form/EmailConfirmationModal";
 
 const GiftTrees: FC = () => {
     const dispatch = useAppDispatch();
@@ -263,13 +264,14 @@ const GiftTrees: FC = () => {
         }
     }
 
-    const handleSendEmails = async () => {
+    const handleSendEmails = async (testMails: string[], ccMails: string[], attachCard: boolean) => {
         const giftCardRequestId = selectedGiftCard?.id
         handleEmailModalClose();
+
         if (!giftCardRequestId) return;
         const apiClient = new ApiClient();
         try {
-            await apiClient.sendEmailToGiftRequestUsers(giftCardRequestId);
+            await apiClient.sendEmailToGiftRequestUsers(giftCardRequestId, attachCard, ccMails.length > 0 ? ccMails : undefined, testMails.length > 0 ? testMails : undefined);
             toast.success("Emails sent successfully!")
         } catch (error: any) {
             toast.error(error.message)
@@ -551,21 +553,6 @@ const GiftTrees: FC = () => {
                 </DialogActions>
             </Dialog>
 
-            <Dialog open={emailConfirmationModal} onClose={handleEmailModalClose} fullWidth maxWidth="lg">
-                <DialogTitle>Send Emails</DialogTitle>
-                <DialogContent dividers>
-                    <Typography variant="subtitle1">Are you sure you want to send emails to users?</Typography>
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={handleEmailModalClose} color="error">
-                        Cancel
-                    </Button>
-                    <Button onClick={handleSendEmails} color="success" variant="contained">
-                        Confirm
-                    </Button>
-                </DialogActions>
-            </Dialog>
-
             <Dialog open={deleteModal} onClose={() => setDeleteModal(false)} fullWidth maxWidth='md'>
                 <DialogTitle>Auto-assign trees to gift card request users</DialogTitle>
                 <DialogContent dividers>
@@ -580,6 +567,13 @@ const GiftTrees: FC = () => {
                     </Button>
                 </DialogActions>
             </Dialog>
+
+            <EmailConfirmationModal 
+                sponsorMail={selectedGiftCard?.user_email}
+                open={emailConfirmationModal}
+                onClose={handleEmailModalClose}
+                onSubmit={handleSendEmails}
+            />
 
             <AlbumImageInput open={albumImagesModal} onClose={handleAlbumModalClose} onSave={handleAlbumSave} />
 
