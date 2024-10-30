@@ -38,12 +38,12 @@ const EmailConfirmationModal: React.FC<EmailConfirmationModalProps> = ({ sponsor
         <Dialog open={open} fullWidth maxWidth="lg">
             <DialogTitle>Send Emails</DialogTitle>
             <DialogContent dividers>
-                <Typography variant="subtitle1" gutterBottom>
-                    Add recipient and CC email addresses.
+                <Typography variant="body1" gutterBottom>
+                    Add CC email addresses.
                 </Typography>
 
                 {/* CC Email Addresses */}
-                <FormControl fullWidth margin="normal">
+                <FormControl fullWidth>
                     <OutlinedInput
                         placeholder="Enter CC email and press Enter"
                         value={ccInput}
@@ -67,11 +67,14 @@ const EmailConfirmationModal: React.FC<EmailConfirmationModalProps> = ({ sponsor
                         }
                     />
                 </FormControl>
-
+                
+                <Typography variant="body1" gutterBottom sx={{ mt: 2 }}>
+                    In case, you want to check emails first, enter your email address below in order to receive test emails.
+                </Typography>
                 {/* Recipient Email Addresses */}
-                <FormControl fullWidth margin="normal">
+                <FormControl fullWidth>
                     <OutlinedInput
-                        placeholder="Enter recipient email and press Enter"
+                        placeholder="Enter test email and press Enter"
                         value={emailInput}
                         onChange={(e) => setEmailInput(e.target.value)}
                         onKeyDown={(e) => {
@@ -94,7 +97,7 @@ const EmailConfirmationModal: React.FC<EmailConfirmationModalProps> = ({ sponsor
                     />
                 </FormControl>
 
-                <FormControl component="fieldset" sx={{ mt: 3 }}>
+                <FormControl component="fieldset" sx={{ mt: 2 }}>
                     <FormControlLabel
                         control={
                             <Checkbox
