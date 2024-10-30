@@ -1040,31 +1040,6 @@ class ApiClient {
         }
     }
 
-    // async updateEvent(data: Event): Promise<Event>{
-    //     try {
-    //         const response = await this.api.put<Event>(`/events/${data.id}`, data);
-    //         return response.data;
-    //     } catch (error: any) {
-    //         console.error(error)
-    //         if (error.response) {
-    //             throw new Error(error.response.data.message);
-    //             }
-    //         throw new Error('Failed to update Site');
-    //     }
-
-    // }
-
-    // async deleteEvent(data: Event): Promise<number>{
-
-    //     try{
-    //        await this.api.delete<any>(  `/events/${data.id}`);
-    //        return data.id;
-    //     }catch(error: any){
-    //         console.error(error)
-    //         throw new Error(`Failed to delete event: ${error.message}`);
-    //     }
-    // }
-
 
     /*
        Model- Visit: CRUD Operations/Apis for visits
@@ -1192,13 +1167,12 @@ class ApiClient {
     }
 
 
-    async createGiftCard(request_id: string, no_of_cards: number, user_id: number, presentation_id: string | null, group_id?: number, logo?: File, messages?: any, file?: File): Promise<GiftCard> {
+    async createGiftCard(request_id: string, no_of_cards: number, user_id: number, group_id?: number, logo?: File, messages?: any, file?: File): Promise<GiftCard> {
         try {
             const formData = new FormData();
             formData.append('request_id', request_id);
             formData.append('no_of_cards', no_of_cards.toString());
             formData.append('user_id', user_id.toString());
-            if (presentation_id) formData.append('presentation_id', presentation_id);
             if (messages) {
                 formData.append('primary_message', messages.primaryMessage);
                 formData.append('secondary_message', messages.secondaryMessage);
@@ -1319,9 +1293,9 @@ class ApiClient {
         }
     }
 
-    async generateCardTemplate(request_id: string, primary_message: string, secondary_message: string, logo_message: string, logo?: string, presentation_id?: string): Promise<{ presentation_id: string, slide_id: string }> {
+    async generateCardTemplate(request_id: string, primary_message: string, secondary_message: string, logo_message: string, logo?: string): Promise<{ presentation_id: string, slide_id: string }> {
         try {
-            const resp = await this.api.post<any>(`/gift-cards/generate-template`, { request_id, primary_message, secondary_message, logo_message, logo, presentation_id });
+            const resp = await this.api.post<any>(`/gift-cards/generate-template`, { request_id, primary_message, secondary_message, logo_message, logo });
             return resp.data;
         } catch (error: any) {
             if (error.response) {
@@ -1331,9 +1305,9 @@ class ApiClient {
         }
     }
 
-    async updateGiftCardTemplate(presentation_id: string, slide_id: string, primary_message: string, secondary_message: string, logo_message: string, logo?: string): Promise<void> {
+    async updateGiftCardTemplate(slide_id: string, primary_message: string, secondary_message: string, logo_message: string, logo?: string): Promise<void> {
         try {
-            await this.api.post<any>(`/gift-cards/update-template`, { presentation_id, slide_id, primary_message, secondary_message, logo_message, logo });
+            await this.api.post<any>(`/gift-cards/update-template`, { slide_id, primary_message, secondary_message, logo_message, logo });
         } catch (error: any) {
             if (error.response) {
                 throw new Error(error.response.data.message);
@@ -1403,6 +1377,17 @@ class ApiClient {
         }
     }
 
+    async updateAlbumImagesForGiftRequest(gift_card_request_id: number, album_id: number): Promise<void> {
+        try {
+            await this.api.post<void>(`/gift-cards/update-album/`, { gift_card_request_id, album_id});
+        } catch (error: any) {
+            if (error.response) {
+                throw new Error(error.response.data.message);
+            }
+            throw new Error('Failed to update album images for gift request!');
+        }
+    }
+
     // Utils
     async getSignedUrlForRequestId(gift_card_request_id: string, filename: string): Promise<string> {
         try {
@@ -1437,6 +1422,32 @@ class ApiClient {
                 throw new Error(error.response.data.message);
             }
             throw new Error('Failed to get images');
+        }
+    }
+
+    /*
+        Albums
+    */
+
+    async createAlbum(albumName: string, userName: string, email: string, images: File[]) {
+        const formData = new FormData();
+        formData.append("album_name", albumName);
+        formData.append("name", userName);
+        const imagesNames: string[] = [];
+        for (const image of images) {
+            formData.append("images", image);
+            imagesNames.push(image.name);
+        }
+        formData.append("file_names", imagesNames.join(','));
+
+        try {
+            const response = await this.api.post<{ album: any }>(`/albums/${email}`, formData);
+            return response.data.album;
+        } catch (error: any) {
+            if (error.response) {
+                throw new Error(error.response.data.message);
+            }
+            throw new Error('Failed to create album');
         }
     }
 }
