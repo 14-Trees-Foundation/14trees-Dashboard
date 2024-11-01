@@ -1,7 +1,6 @@
 import { Box, Button, Grid, TextField, Typography } from "@mui/material";
 import { FC, useEffect, useRef, useState } from "react";
 import Papa from 'papaparse';
-import { Table } from "antd";
 import { ColumnType } from "antd/es/table";
 import { UserForm } from "../../donation/components/UserForm";
 import { toast } from "react-toastify";
@@ -23,6 +22,7 @@ interface User {
   image_name?: string;
   in_name_of?: string;
   relation?: string;
+  count: number;
   error?: boolean;
 }
 
@@ -52,7 +52,8 @@ const dummyData: User[] = [
     email: "kN3qK@example.com",
     birth_date: "01/01/2000",
     image: false,
-    image_name: "John_Doe.png"
+    image_name: "John_Doe.png",
+    count: 1,
   },
   {
     name: "Sam Smith",
@@ -60,13 +61,15 @@ const dummyData: User[] = [
     email: "jI5w3@example.com",
     birth_date: "01/01/2000",
     image: true,
-    image_name: "Sam_Smith.png"
+    image_name: "Sam_Smith.png",
+    count: 2,
   },
   {
     name: "Rita White",
     phone: "1234567890",
     email: "jI5x2@example.com",
     birth_date: "01/01/2000",
+    count: 2
   },
 ]
 
@@ -176,13 +179,14 @@ export const BulkUserForm: FC<BulkUserFormProps> = ({ requestId, users, onUsersC
 
               if (user['Name'] && user['Email ID']) {
                 parsedUsers.push({
-                  name: user['Name'],
-                  phone: user['Phone'],
-                  email: user['Email ID'],
+                  name: (user['Name'] as string).trim(),
+                  phone: (user['Phone'] as string).trim(),
+                  email: (user['Email ID'] as string).trim(),
                   birth_date: user['Date of Birth (optional)'],
-                  image_name: user['Image Name'],
+                  image_name: user['Image Name'] ? user['Image Name'] : undefined,
                   in_name_of: user['Plant in name of'] ? user['Plant in name of'] : undefined,
                   relation: user['Relation with person'] ? user['Relation with person'] : undefined,
+                  count: user['Number of Gifts'] ? user['Number of Gifts'] : 1,
                   image: user['Image Name'] !== ''
                     ? await awsUtils.checkIfPublicFileExists('gift-card-requests' + "/" + requestId + '/' + user['Image Name'])
                     : undefined,
@@ -263,6 +267,13 @@ export const BulkUserForm: FC<BulkUserFormProps> = ({ requestId, users, onUsersC
       width: 180,
       align: "center",
       ...getColumnSearchProps('email', filters, handleSetFilters),
+    },
+    {
+      dataIndex: "count",
+      key: "count",
+      title: "Number of Gifts",
+      width: 180,
+      align: "center",
     },
     {
       dataIndex: "in_name_of",
@@ -361,7 +372,7 @@ export const BulkUserForm: FC<BulkUserFormProps> = ({ requestId, users, onUsersC
         </Grid> */}
         <Grid item xs={12}>
           {userAddOption === 'single' && (
-            <UserForm onSubmit={(user) => { handleUserAdd(user) }} />
+            <UserForm onSubmit={(user) => { handleUserAdd({ ...user, count: 1 }) }} />
           )}
 
           {userAddOption === 'bulk' && (
