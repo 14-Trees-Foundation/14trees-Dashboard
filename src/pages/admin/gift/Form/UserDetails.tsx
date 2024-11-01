@@ -73,6 +73,13 @@ const dummyData: User[] = [
   },
 ]
 
+const nameField = 'Name'
+const emailField = 'Email'
+const countField = 'Number of Trees'
+const phoneField = 'Phone (optional)'
+const imageNameField = 'Image Name (optional)'
+const dobField = 'Date of Birth (optional)'
+
 export const BulkUserForm: FC<BulkUserFormProps> = ({ requestId, users, onUsersChange, onFileChange }) => {
   const [pageUrl, setPageUrl] = useState<string>('');
   const [imageUrls, setImageUrls] = useState<string[]>([]);
@@ -148,13 +155,13 @@ export const BulkUserForm: FC<BulkUserFormProps> = ({ requestId, users, onUsersC
     for (const filter of filterList) {
       if ((filter.columnField === 'name') && filter.value) filteredUsers = filteredUsers.filter(item => item.name.includes(filter.value));
       else if ((filter.columnField === 'email') && filter.value) filteredUsers = filteredUsers.filter(item => item.email.includes(filter.value));
-      else if (filter.columnField === 'image' && filter.value && filter.value.length > 0)  {
+      else if (filter.columnField === 'image' && filter.value && filter.value.length > 0) {
         filteredUsers = filteredUsers.filter(item => {
           if (item.image === undefined && filter.value.includes('Image Not Provided')) return true;
           else if (item.image === false && filter.value.includes('Image Not Found')) return true;
           return false
         });
-      } else if (filter.columnField === 'error' && filter.value && filter.value.length > 0)  {
+      } else if (filter.columnField === 'error' && filter.value && filter.value.length > 0) {
         filteredUsers = filteredUsers.filter(item => filter.value.includes(item.error ? 'Yes' : 'No'));
       }
     }
@@ -177,18 +184,18 @@ export const BulkUserForm: FC<BulkUserFormProps> = ({ requestId, users, onUsersC
             for (let i = 0; i < results.data.length; i++) {
               const user = results.data[i];
 
-              if (user['Name'] && user['Email ID']) {
+              if (user[nameField] && user[emailField]) {
                 parsedUsers.push({
-                  name: (user['Name'] as string).trim(),
-                  phone: (user['Phone'] as string).trim(),
-                  email: (user['Email ID'] as string).trim(),
-                  birth_date: user['Date of Birth (optional)'],
-                  image_name: user['Image Name'] ? user['Image Name'] : undefined,
+                  name: (user[nameField] as string).trim(),
+                  phone: (user[phoneField] as string).trim(),
+                  email: (user[emailField] as string).trim(),
+                  birth_date: user[dobField],
+                  image_name: user[imageNameField] ? user[imageNameField] : undefined,
                   in_name_of: user['Plant in name of'] ? user['Plant in name of'] : undefined,
                   relation: user['Relation with person'] ? user['Relation with person'] : undefined,
-                  count: user['Number of Gifts'] ? user['Number of Gifts'] : 1,
-                  image: user['Image Name'] !== ''
-                    ? await awsUtils.checkIfPublicFileExists('gift-card-requests' + "/" + requestId + '/' + user['Image Name'])
+                  count: user[countField] ? user[countField] : 1,
+                  image: user[imageNameField] !== ''
+                    ? await awsUtils.checkIfPublicFileExists('gift-card-requests' + "/" + requestId + '/' + user[imageNameField])
                     : undefined,
                   error: false,
                 });
@@ -251,6 +258,23 @@ export const BulkUserForm: FC<BulkUserFormProps> = ({ requestId, users, onUsersC
     setPageSize(pageSize);
   }
 
+  const downloadGoogleSheet = () => {
+    const url = "https://docs.google.com/spreadsheets/d/1DDM5nyrvP9YZ09B60cwWICa_AvbgThUx-yeDVzT4Kw4/gviz/tq?tqx=out:csv&sheet=Sheet1";
+    const fileName = "UserDetails.csv";  // Set your desired file name here
+
+    fetch(url)
+      .then(response => response.blob())
+      .then(blob => {
+        const link = document.createElement("a");
+        link.href = URL.createObjectURL(blob);
+        link.download = fileName;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      })
+      .catch(error => console.error("Download failed:", error));
+  }
+
   const columns: ColumnType<User>[] = [
     {
       dataIndex: "name",
@@ -271,7 +295,7 @@ export const BulkUserForm: FC<BulkUserFormProps> = ({ requestId, users, onUsersC
     {
       dataIndex: "count",
       key: "count",
-      title: "Number of Gifts",
+      title: "Number of Trees",
       width: 180,
       align: "center",
     },
@@ -394,7 +418,7 @@ export const BulkUserForm: FC<BulkUserFormProps> = ({ requestId, users, onUsersC
               </Box>
               <UserImagesForm requestId={requestId} />
               <Typography variant='body1' marginBottom={1} marginTop={2}>Upload the CSV file containing user details of the users who will be receiving the gift. If you have uploaded user images, make sure to mention exact name of the image in <strong>Image Name</strong> column.</Typography>
-              <Typography>Download sample file from <a href="https://docs.google.com/spreadsheets/d/1DDM5nyrvP9YZ09B60cwWICa_AvbgThUx-yeDVzT4Kw4/gviz/tq?tqx=out:csv&sheet=Sheet1">here</a> and fill the details.</Typography>
+              <Typography>Download sample file from <a style={{ color: 'blue', textDecoration: 'underline', cursor: 'pointer' }} onClick={downloadGoogleSheet}>here</a> and fill the details.</Typography>
               <TextField
                 type="file"
                 inputProps={{ accept: '.csv' }}
@@ -415,7 +439,7 @@ export const BulkUserForm: FC<BulkUserFormProps> = ({ requestId, users, onUsersC
         style={{ marginLeft: '20px' }}
         maxWidth={'60%'}
       >
-        <GeneralTable 
+        <GeneralTable
           columns={columns}
           page={page}
           pageSize={pageSize}
@@ -428,7 +452,7 @@ export const BulkUserForm: FC<BulkUserFormProps> = ({ requestId, users, onUsersC
             return 0;
           }).slice(page * pageSize, page * pageSize + pageSize) : dummyData}
           onDownload={async () => filteredUsers}
-          rowClassName={(record, index) => record.error ? 'pending-item' : '' }
+          rowClassName={(record, index) => record.error ? 'pending-item' : ''}
         />
       </Grid>
 
