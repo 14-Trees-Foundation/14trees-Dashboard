@@ -20,7 +20,7 @@ export type GiftCard = {
     logo_message: string;
     request_id: string;
     logo_url: string | null;
-    validation_error: string | null;
+    validation_errors: string[] | null;
     status: string;
     presentation_id: string | null;
     notes: string | null;
@@ -30,13 +30,16 @@ export type GiftCardUser = {
     key: number;
     id: number;
     user_id: number;
-    card_id: number;
+    gift_card_request_id: number;
     tree_id: number;
     card_image_url?: string;
+    profile_image_url?: string;
     created_at: string;
     updated_at: string;
     sapling_id?: string;
     user_name?: string;
+    user_email?: string;
+    user_phone?: string;
     plant_type?: string;
 }
 

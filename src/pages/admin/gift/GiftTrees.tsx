@@ -22,6 +22,7 @@ import GiftCardRequestInfo from "./GiftCardRequestInfo";
 import GiftRequestNotes from "./Form/Notes";
 import AlbumImageInput from "../../../components/AlbumImageInput";
 import EmailConfirmationModal from "./Form/EmailConfirmationModal";
+import EditUserDetailsModal from "./Form/EditUserDetailsModal";
 
 const GiftTrees: FC = () => {
     const dispatch = useAppDispatch();
@@ -45,6 +46,7 @@ const GiftTrees: FC = () => {
     const [users, setUsers] = useState<any[]>([]);
     const [manualPlotSelection, setManualPlotSelection] = useState(false);
     const [albumImagesModal, setAlbumImagesModal] = useState(false);
+    const [userDetailsEditModal, setUserDetailsEditModal] = useState(false);
 
     useEffect(() => {
         const getUsers = async () => {
@@ -250,6 +252,26 @@ const GiftTrees: FC = () => {
         setManualPlotSelection(false);
     }
 
+    const handleUserDetailsEditClose = () => {
+        setUserDetailsEditModal(false);
+        setSelectedGiftCard(null);
+    }
+
+    const handleUserDetailsEditSave = async (users: GiftCard[]) => {
+        handleUserDetailsEditClose();
+
+        if (users.length === 0) return; 
+
+        try {
+            const apiClient = new ApiClient();
+            await apiClient.updateGiftRequestUserDetails(users);
+            toast.success("Gift Request users updated!")
+        } catch (error: any) {
+            toast.error(error.message);
+        }
+
+    }
+
     const handleAutoAssignTrees = async () => {
         setAutoAssignModal(false);
         if (!selectedGiftCard) return;
@@ -369,6 +391,9 @@ const GiftTrees: FC = () => {
             <Menu.Item key="2" onClick={() => { handleAlbumModalOpen(record); }}>
                 Add Album Images
             </Menu.Item>
+            {(record.validation_errors === null || !record.validation_errors.includes('MISSING_USER_DETAILS')) && <Menu.Item key="10" onClick={() => { setSelectedGiftCard(record); setUserDetailsEditModal(true); }}>
+                Edit User Details
+            </Menu.Item>}
             {record.status === 'pending_plot_selection' && <Menu.Item key="3" onClick={() => { setSelectedGiftCard(record); setPlotModal(true); }}>
                 Select Plots
             </Menu.Item>}
@@ -573,6 +598,14 @@ const GiftTrees: FC = () => {
                 open={emailConfirmationModal}
                 onClose={handleEmailModalClose}
                 onSubmit={handleSendEmails}
+            />
+            
+            <EditUserDetailsModal
+                giftRequestId={selectedGiftCard?.id}
+                requestId={selectedGiftCard?.request_id}
+                open={userDetailsEditModal}
+                onClose={handleUserDetailsEditClose}
+                onSave={handleUserDetailsEditSave}
             />
 
             <AlbumImageInput open={albumImagesModal} onClose={handleAlbumModalClose} onSave={handleAlbumSave} />
