@@ -59,6 +59,33 @@ export const createGiftCardRequest = (requestId: string, noOfCards: number, user
     };
 };
 
+export const cloneGiftCardRequest = (giftCardRequestId: number, requestId: string) => {
+    const apiClient = new ApiClient();
+    return (dispatch: any) => {
+        dispatch({
+            type: giftCardActionTypes.CREATE_GIFT_CARD_REQUESTED,
+        });
+        apiClient.cloneGiftCardRequest(giftCardRequestId, requestId).then(
+            (value: GiftCard) => {
+                toast.success('Gift Cards requested!')
+                dispatch({
+                    type: giftCardActionTypes.CREATE_GIFT_CARD_SUCCEEDED,
+                    payload: value,
+
+                });
+                return (value)
+            },
+            (error: any) => {
+                toast.error('Gift cards request failed')
+                dispatch({
+                    type: giftCardActionTypes.CREATE_GIFT_CARD_FAILED,
+                });
+                return (error)
+            }
+        )
+    };
+};
+
 export const updateGiftCardRequest = (request: GiftCard, noOfCards: number, userId: number, groupId?: number, logo?: File, messages?: any, file?: File) => {
     const apiClient = new ApiClient();
     return (dispatch: any) => {
