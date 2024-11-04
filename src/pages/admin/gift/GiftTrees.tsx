@@ -420,6 +420,13 @@ const GiftTrees: FC = () => {
 
     const columns: TableColumnsType<GiftCard> = [
         {
+            dataIndex: "id",
+            key: "id",
+            title: "Req. No.",
+            align: "right",
+            width: 50,
+        },
+        {
             dataIndex: "user_name",
             key: "user_name",
             title: "User",
@@ -540,7 +547,7 @@ const GiftTrees: FC = () => {
 
             <GiftCardsForm giftCardRequest={selectedGiftCard ?? undefined} requestId={requestId} open={modalOpen} handleClose={handleModalClose} onSubmit={handleSubmit} />
 
-            <Dialog open={plotModal} onClose={() => setPlotModal(false)} fullWidth maxWidth="lg">
+            <Dialog open={plotModal} onClose={() => setPlotModal(false)} fullWidth maxWidth="xl">
                 <DialogTitle>Select Plots</DialogTitle>
                 <DialogContent dividers>
                     <PlotSelection
