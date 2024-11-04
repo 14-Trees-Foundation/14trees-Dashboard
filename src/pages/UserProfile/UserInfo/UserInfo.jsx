@@ -103,7 +103,7 @@ export const UserInfo = () => {
                         </div>
                       </>
                     )}
-                  {selUserInfo.planted_by &&
+                  {!(selUserInfo.gifted_by_name || selUserInfo.gifted_by_user) && selUserInfo.planted_by &&
                     selUserInfo.planted_by !== undefined && (
                       <>
                         <div className={classes.label}>{strEquals(selUserInfo.planted_by, "ACM India Council") ? "Planted via" : "Planted By"}</div>

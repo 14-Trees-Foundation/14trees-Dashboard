@@ -1,8 +1,7 @@
-import { Box, Button, Grid, TextField, Typography } from "@mui/material";
+import { Box, Button, FormControlLabel, Grid, Radio, RadioGroup, TextField, Typography } from "@mui/material";
 import { FC, useEffect, useRef, useState } from "react";
 import Papa from 'papaparse';
 import { ColumnType } from "antd/es/table";
-import { UserForm } from "../../donation/components/UserForm";
 import { toast } from "react-toastify";
 import UserImagesForm from "./UserImagesForm";
 import { AWSUtils } from "../../../../helpers/aws";
@@ -12,6 +11,7 @@ import { ImageOutlined } from "@mui/icons-material";
 import GeneralTable from "../../../../components/GenTable";
 import getColumnSearchProps, { getColumnSelectedItemFilter } from "../../../../components/Filter";
 import { GridFilterItem } from "@mui/x-data-grid";
+import SingleUserForm from "./SingleUserForm";
 
 interface User {
   name: string;
@@ -120,7 +120,7 @@ export const BulkUserForm: FC<BulkUserFormProps> = ({ requestId, users, onUsersC
     for (const user of users) {
       if (!user.image && user.name) {
         const uris = getFilteredUrls(imageUrls, user.name);
-        console.log(user.name, uris)
+
         if (uris.length === 1) {
           isNew = true;
           user.image = true;
@@ -244,9 +244,26 @@ export const BulkUserForm: FC<BulkUserFormProps> = ({ requestId, users, onUsersC
     }
   }
 
-  const handleUserAdd = (user: User) => {
+  const handleUserAdd = async (user: User) => {
     const idx = users.findIndex((u) => u.email === user.email);
     if (idx === -1) {
+      user.error = !isValidEmail(user.email) || !isValidPhone(user.phone) || user.name.trim() === ''
+      if (user.error) {
+        toast.error("Invalid user email, phone or user name is not provided!")
+        return;
+      }
+
+      const image: File | undefined = (user as any).profileImage
+      if (image && requestId) {
+        const awsUtils = new AWSUtils();
+        await awsUtils.uploadFileToS3(requestId, image, (progress: number) => { });
+        user.image = true;
+        user.image_name = image.name
+      }
+
+      user.name = user.name.trim();
+      user.phone = user.phone.trim();
+      user.email = user.email.trim();
       onUsersChange([...users, user]);
     } else {
       toast.warning("User with same email already exists");
@@ -374,7 +391,7 @@ export const BulkUserForm: FC<BulkUserFormProps> = ({ requestId, users, onUsersC
   return (
     <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', margin: '20px', width: '100%' }}>
       <Grid container rowSpacing={2} columnSpacing={1}>
-        {/* <Grid item xs={12}>
+        <Grid item xs={12}>
           <RadioGroup
             row
             aria-label="enable"
@@ -393,10 +410,10 @@ export const BulkUserForm: FC<BulkUserFormProps> = ({ requestId, users, onUsersC
               label="CSV Upload"
             />
           </RadioGroup>
-        </Grid> */}
+        </Grid>
         <Grid item xs={12}>
           {userAddOption === 'single' && (
-            <UserForm onSubmit={(user) => { handleUserAdd({ ...user, count: 1 }) }} />
+            <SingleUserForm onSubmit={(user) => { handleUserAdd(user) }} />
           )}
 
           {userAddOption === 'bulk' && (
