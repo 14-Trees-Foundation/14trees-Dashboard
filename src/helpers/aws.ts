@@ -27,6 +27,10 @@ class AWSUtils {
             if (!response.status) {
                 throw new Error(`Failed to upload file. Status: ${response.status}`);
             }
+
+            const urlObject = new URL(signedUrl);
+            urlObject.search = '';  // Clear the query parameters
+            return urlObject.toString(); // Object Url
         } catch (error) {
             throw error;
         }

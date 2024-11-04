@@ -1,7 +1,6 @@
 import { Box, Button, Grid, TextField, Typography } from "@mui/material";
 import { FC, useEffect, useRef, useState } from "react";
 import Papa from 'papaparse';
-import { Table } from "antd";
 import { ColumnType } from "antd/es/table";
 import { UserForm } from "../../donation/components/UserForm";
 import { toast } from "react-toastify";
@@ -23,6 +22,7 @@ interface User {
   image_name?: string;
   in_name_of?: string;
   relation?: string;
+  count: number;
   error?: boolean;
 }
 
@@ -52,7 +52,8 @@ const dummyData: User[] = [
     email: "kN3qK@example.com",
     birth_date: "01/01/2000",
     image: false,
-    image_name: "John_Doe.png"
+    image_name: "John_Doe.png",
+    count: 1,
   },
   {
     name: "Sam Smith",
@@ -60,15 +61,24 @@ const dummyData: User[] = [
     email: "jI5w3@example.com",
     birth_date: "01/01/2000",
     image: true,
-    image_name: "Sam_Smith.png"
+    image_name: "Sam_Smith.png",
+    count: 2,
   },
   {
     name: "Rita White",
     phone: "1234567890",
     email: "jI5x2@example.com",
     birth_date: "01/01/2000",
+    count: 2
   },
 ]
+
+const nameField = 'Name'
+const emailField = 'Email'
+const countField = 'Number of Trees'
+const phoneField = 'Phone (optional)'
+const imageNameField = 'Image Name (optional)'
+const dobField = 'Date of Birth (optional)'
 
 export const BulkUserForm: FC<BulkUserFormProps> = ({ requestId, users, onUsersChange, onFileChange }) => {
   const [pageUrl, setPageUrl] = useState<string>('');
@@ -145,13 +155,13 @@ export const BulkUserForm: FC<BulkUserFormProps> = ({ requestId, users, onUsersC
     for (const filter of filterList) {
       if ((filter.columnField === 'name') && filter.value) filteredUsers = filteredUsers.filter(item => item.name.includes(filter.value));
       else if ((filter.columnField === 'email') && filter.value) filteredUsers = filteredUsers.filter(item => item.email.includes(filter.value));
-      else if (filter.columnField === 'image' && filter.value && filter.value.length > 0)  {
+      else if (filter.columnField === 'image' && filter.value && filter.value.length > 0) {
         filteredUsers = filteredUsers.filter(item => {
           if (item.image === undefined && filter.value.includes('Image Not Provided')) return true;
           else if (item.image === false && filter.value.includes('Image Not Found')) return true;
           return false
         });
-      } else if (filter.columnField === 'error' && filter.value && filter.value.length > 0)  {
+      } else if (filter.columnField === 'error' && filter.value && filter.value.length > 0) {
         filteredUsers = filteredUsers.filter(item => filter.value.includes(item.error ? 'Yes' : 'No'));
       }
     }
@@ -174,17 +184,18 @@ export const BulkUserForm: FC<BulkUserFormProps> = ({ requestId, users, onUsersC
             for (let i = 0; i < results.data.length; i++) {
               const user = results.data[i];
 
-              if (user['Name'] && user['Email ID']) {
+              if (user[nameField] && user[emailField]) {
                 parsedUsers.push({
-                  name: user['Name'],
-                  phone: user['Phone'],
-                  email: user['Email ID'],
-                  birth_date: user['Date of Birth (optional)'],
-                  image_name: user['Image Name'],
+                  name: (user[nameField] as string).trim(),
+                  phone: (user[phoneField] as string).trim(),
+                  email: (user[emailField] as string).trim(),
+                  birth_date: user[dobField],
+                  image_name: user[imageNameField] ? user[imageNameField] : undefined,
                   in_name_of: user['Plant in name of'] ? user['Plant in name of'] : undefined,
                   relation: user['Relation with person'] ? user['Relation with person'] : undefined,
-                  image: user['Image Name'] !== ''
-                    ? await awsUtils.checkIfPublicFileExists('gift-card-requests' + "/" + requestId + '/' + user['Image Name'])
+                  count: user[countField] ? user[countField] : 1,
+                  image: user[imageNameField] !== ''
+                    ? await awsUtils.checkIfPublicFileExists('gift-card-requests' + "/" + requestId + '/' + user[imageNameField])
                     : undefined,
                   error: false,
                 });
@@ -247,6 +258,23 @@ export const BulkUserForm: FC<BulkUserFormProps> = ({ requestId, users, onUsersC
     setPageSize(pageSize);
   }
 
+  const downloadGoogleSheet = () => {
+    const url = "https://docs.google.com/spreadsheets/d/1DDM5nyrvP9YZ09B60cwWICa_AvbgThUx-yeDVzT4Kw4/gviz/tq?tqx=out:csv&sheet=Sheet1";
+    const fileName = "UserDetails.csv";  // Set your desired file name here
+
+    fetch(url)
+      .then(response => response.blob())
+      .then(blob => {
+        const link = document.createElement("a");
+        link.href = URL.createObjectURL(blob);
+        link.download = fileName;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      })
+      .catch(error => console.error("Download failed:", error));
+  }
+
   const columns: ColumnType<User>[] = [
     {
       dataIndex: "name",
@@ -263,6 +291,13 @@ export const BulkUserForm: FC<BulkUserFormProps> = ({ requestId, users, onUsersC
       width: 180,
       align: "center",
       ...getColumnSearchProps('email', filters, handleSetFilters),
+    },
+    {
+      dataIndex: "count",
+      key: "count",
+      title: "Number of Trees",
+      width: 180,
+      align: "center",
     },
     {
       dataIndex: "in_name_of",
@@ -361,7 +396,7 @@ export const BulkUserForm: FC<BulkUserFormProps> = ({ requestId, users, onUsersC
         </Grid> */}
         <Grid item xs={12}>
           {userAddOption === 'single' && (
-            <UserForm onSubmit={(user) => { handleUserAdd(user) }} />
+            <UserForm onSubmit={(user) => { handleUserAdd({ ...user, count: 1 }) }} />
           )}
 
           {userAddOption === 'bulk' && (
@@ -383,7 +418,7 @@ export const BulkUserForm: FC<BulkUserFormProps> = ({ requestId, users, onUsersC
               </Box>
               <UserImagesForm requestId={requestId} />
               <Typography variant='body1' marginBottom={1} marginTop={2}>Upload the CSV file containing user details of the users who will be receiving the gift. If you have uploaded user images, make sure to mention exact name of the image in <strong>Image Name</strong> column.</Typography>
-              <Typography>Download sample file from <a href="https://docs.google.com/spreadsheets/d/1DDM5nyrvP9YZ09B60cwWICa_AvbgThUx-yeDVzT4Kw4/gviz/tq?tqx=out:csv&sheet=Sheet1">here</a> and fill the details.</Typography>
+              <Typography>Download sample file from <a style={{ color: 'blue', textDecoration: 'underline', cursor: 'pointer' }} onClick={downloadGoogleSheet}>here</a> and fill the details.</Typography>
               <TextField
                 type="file"
                 inputProps={{ accept: '.csv' }}
@@ -404,7 +439,7 @@ export const BulkUserForm: FC<BulkUserFormProps> = ({ requestId, users, onUsersC
         style={{ marginLeft: '20px' }}
         maxWidth={'60%'}
       >
-        <GeneralTable 
+        <GeneralTable
           columns={columns}
           page={page}
           pageSize={pageSize}
@@ -417,7 +452,7 @@ export const BulkUserForm: FC<BulkUserFormProps> = ({ requestId, users, onUsersC
             return 0;
           }).slice(page * pageSize, page * pageSize + pageSize) : dummyData}
           onDownload={async () => filteredUsers}
-          rowClassName={(record, index) => record.error ? 'pending-item' : '' }
+          rowClassName={(record, index) => record.error ? 'pending-item' : ''}
         />
       </Grid>
 

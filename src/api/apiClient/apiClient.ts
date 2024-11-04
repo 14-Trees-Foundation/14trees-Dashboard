@@ -1388,6 +1388,17 @@ class ApiClient {
         }
     }
 
+    async updateGiftRequestUserDetails(users: GiftCard[]): Promise<void> {
+        try {
+            await this.api.post<void>(`/gift-cards/update-users/`, { users });
+        } catch (error: any) {
+            if (error.response) {
+                throw new Error(error.response.data.message);
+            }
+            throw new Error('Failed to update gift request users!');
+        }
+    }
+
     // Utils
     async getSignedUrlForRequestId(gift_card_request_id: string, filename: string): Promise<string> {
         try {
