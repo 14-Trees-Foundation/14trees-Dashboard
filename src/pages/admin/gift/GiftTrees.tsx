@@ -24,9 +24,13 @@ import AlbumImageInput from "../../../components/AlbumImageInput";
 import EmailConfirmationModal from "./Form/EmailConfirmationModal";
 import EditUserDetailsModal from "./Form/EditUserDetailsModal";
 
+const getUniqueRequestId = () => {
+    return Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+}
+
 const GiftTrees: FC = () => {
     const dispatch = useAppDispatch();
-    const { getGiftCards, deleteGiftCardRequest } =
+    const { getGiftCards, deleteGiftCardRequest, cloneGiftCardRequest } =
         bindActionCreators(giftCardActionCreators, dispatch);
 
     const [changeMode, setChangeMode] = useState<'add' | 'edit'>('add');
@@ -68,7 +72,7 @@ const GiftTrees: FC = () => {
     const handleModalOpenAdd = () => {
         setChangeMode('add');
         setSelectedGiftCard(null);
-        const uniqueRequestId = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+        const uniqueRequestId = getUniqueRequestId();
         setRequestId(uniqueRequestId);
         setModalOpen(true);
     }
@@ -360,6 +364,10 @@ const GiftTrees: FC = () => {
         setSelectedGiftCard(null);
     }
 
+    const handleCloneGiftCardRequest = (request: GiftCard) => {
+        cloneGiftCardRequest(request.id, getUniqueRequestId());
+    }
+
     const getStatus = (card: GiftCard) => {
         if (card.status === 'pending_plot_selection') {
             return 'Pending Plot Selection';
@@ -412,6 +420,9 @@ const GiftTrees: FC = () => {
             {(record.status === 'completed' || record.status === 'pending_gift_cards') && <Menu.Item key="8" onClick={() => { setSelectedGiftCard(record); setEmailConfirmationModal(true); }}>
                 Send Emails
             </Menu.Item>}
+            <Menu.Item key="11" onClick={() => { handleCloneGiftCardRequest(record); }}>
+                Clone Request
+            </Menu.Item>
             {(record.status === 'pending_plot_selection' || record.status === 'pending_assignment') && <Menu.Item key="9" danger onClick={() => { setDeleteModal(true); setSelectedGiftCard(record); }}>
                 Delete Request
             </Menu.Item>}
