@@ -164,7 +164,7 @@ const PlotSelection: FC<PlotSelectionProps> = ({ requiredTrees, plots, onPlotsCh
                     control={
                         <Checkbox checked={manualPlotSelection} onChange={(e) => { onPlotSelectionMethodChange(e.target.checked) }} name="manual" />
                     }
-                    label="Do you what to manually select trees for each user?"
+                    label="Do you want to manually select trees for each user?"
                 />
             </FormControl>
             {manualPlotSelection && <UserTreeMappingModal
