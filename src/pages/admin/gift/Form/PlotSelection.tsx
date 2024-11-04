@@ -1,6 +1,6 @@
 
-import { FC, useEffect, useRef, useState } from "react";
-import { Box, Button, Checkbox, Chip, CircularProgress, Divider, FormControl, FormControlLabel, TextField, Typography } from "@mui/material";
+import { FC, useEffect, useState } from "react";
+import { Box, Checkbox, Chip, FormControl, FormControlLabel, Typography } from "@mui/material";
 import { Plot } from "../../../../types/plot";
 import { useAppDispatch, useAppSelector } from "../../../../redux/store/hooks";
 import { bindActionCreators } from "@reduxjs/toolkit";
@@ -20,17 +20,24 @@ const TableSummary = (plots: Plot[], selectedPlotIds: number[], totalColumns: nu
         return data.reduce((a, b) => (a ?? 0) + (b ?? 0), 0);
     }
 
+    const calculateUnion = (plantTypes: (string[] | undefined)[]) => {
+        const allTypes = plantTypes.flat().filter((type): type is string => type !== undefined);
+        return Array.from(new Set(allTypes)).length;
+    }
+
     return (
         <Table.Summary fixed='bottom'>
             <Table.Summary.Row style={{ backgroundColor: 'rgba(172, 252, 172, 0.2)' }}>
-                <Table.Summary.Cell align="right" index={totalColumns - 5} colSpan={totalColumns - 4}>
+                <Table.Summary.Cell align="right" index={totalColumns - 7} colSpan={totalColumns - 6}>
                     <strong>Total</strong>
                 </Table.Summary.Cell>
-                <Table.Summary.Cell align="right" index={totalColumns - 4} colSpan={1}>{calculateSum(plots.filter((plot) => selectedPlotIds.includes(plot.id)).map((plot) => plot.total))}</Table.Summary.Cell>
-                <Table.Summary.Cell align="right" index={totalColumns - 3} colSpan={1}>{calculateSum(plots.filter((plot) => selectedPlotIds.includes(plot.id)).map((plot) => plot.booked))}</Table.Summary.Cell>
-                <Table.Summary.Cell align="right" index={totalColumns - 2} colSpan={1}>{calculateSum(plots.filter((plot) => selectedPlotIds.includes(plot.id)).map((plot) => plot.assigned))}</Table.Summary.Cell>
-                <Table.Summary.Cell align="right" index={totalColumns - 1} colSpan={1}>{calculateSum(plots.filter((plot) => selectedPlotIds.includes(plot.id)).map((plot) => plot.unbooked_assigned))}</Table.Summary.Cell>
-                <Table.Summary.Cell align="right" index={totalColumns} colSpan={1}>{calculateSum(plots.filter((plot) => selectedPlotIds.includes(plot.id)).map((plot) => plot.available))}</Table.Summary.Cell>
+                <Table.Summary.Cell align="right" index={totalColumns - 6} colSpan={1}>{calculateSum(plots.filter((plot) => selectedPlotIds.includes(plot.id)).map((plot) => plot.total))}</Table.Summary.Cell>
+                <Table.Summary.Cell align="right" index={totalColumns - 5} colSpan={1}>{calculateSum(plots.filter((plot) => selectedPlotIds.includes(plot.id)).map((plot) => plot.booked))}</Table.Summary.Cell>
+                <Table.Summary.Cell align="right" index={totalColumns - 4} colSpan={1}>{calculateSum(plots.filter((plot) => selectedPlotIds.includes(plot.id)).map((plot) => plot.assigned))}</Table.Summary.Cell>
+                <Table.Summary.Cell align="right" index={totalColumns - 3} colSpan={1}>{calculateSum(plots.filter((plot) => selectedPlotIds.includes(plot.id)).map((plot) => plot.unbooked_assigned))}</Table.Summary.Cell>
+                <Table.Summary.Cell align="right" index={totalColumns - 2} colSpan={1}>{calculateSum(plots.filter((plot) => selectedPlotIds.includes(plot.id)).map((plot) => plot.available))}</Table.Summary.Cell>
+                <Table.Summary.Cell align="right" index={totalColumns - 1} colSpan={1}>{calculateSum(plots.filter((plot) => selectedPlotIds.includes(plot.id)).map((plot) => plot.card_available))}</Table.Summary.Cell>
+                <Table.Summary.Cell align="right" index={totalColumns} colSpan={1}>{calculateUnion(plots.filter((plot) => selectedPlotIds.includes(plot.id)).map((plot) => plot.distinct_plants))}</Table.Summary.Cell>
             </Table.Summary.Row>
         </Table.Summary>
     )
@@ -275,6 +282,14 @@ const PlotSelection: FC<PlotSelectionProps> = ({ requiredTrees, plots, onPlotsCh
             title: getSortableHeader("Giftable Inventory", 'card_available'),
             align: "right",
             width: 150,
+        },
+        {
+            dataIndex: "distinct_plants",
+            key: "distinct_plants",
+            title: "Unique Plant Types",
+            align: "right",
+            width: 100,
+            render: (value) => value.length
         },
     ];
 
