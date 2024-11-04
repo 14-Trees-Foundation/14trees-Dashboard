@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import {
     Dialog,
     DialogTitle,
@@ -11,6 +11,10 @@ import {
     Link,
 } from '@mui/material';
 import { format } from 'date-fns';
+import GeneralTable from '../../../components/GenTable';
+import ApiClient from '../../../api/apiClient/apiClient';
+import { GiftCardUser } from '../../../types/gift_card';
+import { LinkOutlined } from '@mui/icons-material';
 
 interface GiftCardRequestInfoProps {
     open: boolean
@@ -19,7 +23,80 @@ interface GiftCardRequestInfoProps {
 }
 
 const GiftCardRequestInfo: React.FC<GiftCardRequestInfoProps> = ({ open, onClose, data }) => {
-    if (!data) return null;
+
+    const [users, setUsers] = useState<GiftCardUser[]>([]);
+    const [page, setPage] = useState(0);
+    const [pageSize, setPageSize] = useState(5);
+
+    useEffect(() => {
+        const getGiftCards = async () => {
+            const apiClient = new ApiClient();
+            const resp = await apiClient.getBookedGiftCards(data.id, 0, -1);
+            setUsers(resp.results.filter((item: any) => item.assigned_to));
+        }
+
+        if (open) getGiftCards();
+    }, [open, data])
+
+    const columns: any[] = [
+        {
+            dataIndex: "sapling_id",
+            key: "sapling_id",
+            title: "Sapling ID",
+            align: "center",
+            width: 100,
+        },
+        {
+            dataIndex: "plant_type",
+            key: "plant_type",
+            title: "Tree Name",
+            align: "center",
+            width: 200,
+        },
+        {
+            dataIndex: "scientific_name",
+            key: "scientific_name",
+            title: "Scientific Name",
+            align: "center",
+            width: 200,
+        },
+        {
+            dataIndex: "user_name",
+            key: "assigned_to",
+            title: "Assigned to",
+            align: "center",
+            width: 200,
+        },
+        {
+            dataIndex: "dashboard_link",
+            key: "dashboard_link",
+            title: "Dashboard Link",
+            align: "center",
+            width: 200,
+            render: (value: any, record: any) => (<div
+                style={{
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                }}>
+                <Button
+                    variant="outlined"
+                    color="success"
+                    style={{ margin: "0 5px" }}
+                    onClick={() => {
+                        const { hostname, host } = window.location;
+                        if (hostname === "localhost" || hostname === "127.0.0.1") {
+                            window.open("http://" + host + "/profile/" + record.sapling_id);
+                        } else {
+                            window.open("https://" + hostname + "/profile/" + record.sapling_id);
+                        }
+                    }}
+                >
+                    <LinkOutlined />
+                </Button>
+            </div>)
+        },
+    ]
 
     const getStatus = (status: string) => {
         if (status === 'pending_plot_selection') {
@@ -33,8 +110,10 @@ const GiftCardRequestInfo: React.FC<GiftCardRequestInfoProps> = ({ open, onClose
         }
     }
 
+    if (!data) return null;
+
     return (
-        <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth>
+        <Dialog open={open} onClose={onClose} maxWidth="lg" fullWidth>
             <DialogTitle>
                 Event Information
             </DialogTitle>
@@ -122,6 +201,23 @@ const GiftCardRequestInfo: React.FC<GiftCardRequestInfoProps> = ({ open, onClose
                 </Box>
 
                 <Divider />
+                
+                {users.length > 0 && <div>
+                    <Box mt={2} mb={2}>
+                        <GeneralTable
+                            loading={false}
+                            columns={columns}
+                            rows={users}
+                            totalRecords={users.length}
+                            page={page}
+                            pageSize={pageSize}
+                            onPaginationChange={(page: number, pageSize: number) => { setPage(page - 1); setPageSize(pageSize); }}
+                            onDownload={async () => users}
+                            footer
+                        />
+                    </Box>
+                    <Divider />
+                </div>}
 
                 {/* Extra */}
                 <Box mt={2} mb={2}>

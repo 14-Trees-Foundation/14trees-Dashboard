@@ -108,8 +108,8 @@ const EditUserDetailsModal: React.FC<EditUserDetailsModalProps> = ({ open, onClo
                 .map(item => ({ ...item, key: item.id  })));
         }
 
-        getUsers();
-    }, [giftRequestId]);
+        if (open) getUsers();
+    }, [open, giftRequestId]);
 
     // Save action to send edited users
     const handleSubmit = () => {
