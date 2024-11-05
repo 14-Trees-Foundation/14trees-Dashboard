@@ -28,16 +28,14 @@ const TableSummary = (plots: Plot[], selectedPlotIds: number[], totalColumns: nu
     return (
         <Table.Summary fixed='bottom'>
             <Table.Summary.Row style={{ backgroundColor: 'rgba(172, 252, 172, 0.2)' }}>
-                <Table.Summary.Cell align="right" index={totalColumns - 7} colSpan={totalColumns - 6}>
+                <Table.Summary.Cell align="right" index={2} colSpan={2}>
                     <strong>Total</strong>
                 </Table.Summary.Cell>
-                <Table.Summary.Cell align="right" index={totalColumns - 6} colSpan={1}>{calculateSum(plots.filter((plot) => selectedPlotIds.includes(plot.id)).map((plot) => plot.total))}</Table.Summary.Cell>
-                <Table.Summary.Cell align="right" index={totalColumns - 5} colSpan={1}>{calculateSum(plots.filter((plot) => selectedPlotIds.includes(plot.id)).map((plot) => plot.booked))}</Table.Summary.Cell>
-                <Table.Summary.Cell align="right" index={totalColumns - 4} colSpan={1}>{calculateSum(plots.filter((plot) => selectedPlotIds.includes(plot.id)).map((plot) => plot.assigned))}</Table.Summary.Cell>
-                <Table.Summary.Cell align="right" index={totalColumns - 3} colSpan={1}>{calculateSum(plots.filter((plot) => selectedPlotIds.includes(plot.id)).map((plot) => plot.unbooked_assigned))}</Table.Summary.Cell>
-                <Table.Summary.Cell align="right" index={totalColumns - 2} colSpan={1}>{calculateSum(plots.filter((plot) => selectedPlotIds.includes(plot.id)).map((plot) => plot.available))}</Table.Summary.Cell>
-                <Table.Summary.Cell align="right" index={totalColumns - 1} colSpan={1}>{calculateSum(plots.filter((plot) => selectedPlotIds.includes(plot.id)).map((plot) => plot.card_available))}</Table.Summary.Cell>
-                <Table.Summary.Cell align="right" index={totalColumns} colSpan={1}>{calculateUnion(plots.filter((plot) => selectedPlotIds.includes(plot.id)).map((plot) => plot.distinct_plants))}</Table.Summary.Cell>
+                <Table.Summary.Cell align="right" index={3} colSpan={1}>{calculateSum(plots.filter((plot) => selectedPlotIds.includes(plot.id)).map((plot) => plot.total))}</Table.Summary.Cell>
+                <Table.Summary.Cell align="right" index={4} colSpan={1}>{calculateSum(plots.filter((plot) => selectedPlotIds.includes(plot.id)).map((plot) => plot.available))}</Table.Summary.Cell>
+                <Table.Summary.Cell align="right" index={5} colSpan={1}>{calculateSum(plots.filter((plot) => selectedPlotIds.includes(plot.id)).map((plot) => plot.card_available))}</Table.Summary.Cell>
+                <Table.Summary.Cell align="right" index={6} colSpan={1}>{calculateUnion(plots.filter((plot) => selectedPlotIds.includes(plot.id)).map((plot) => plot.distinct_plants))}</Table.Summary.Cell>
+                <Table.Summary.Cell align="right" index={7} colSpan={totalColumns - 6}></Table.Summary.Cell>
             </Table.Summary.Row>
         </Table.Summary>
     )
@@ -207,46 +205,6 @@ const PlotSelection: FC<PlotSelectionProps> = ({ requiredTrees, plots, onPlotsCh
             ...getColumnSearchProps('name', filters, handleSetFilters)
         },
         {
-            dataIndex: "label",
-            key: "label",
-            title: "Plot Label",
-            align: "center",
-            width: 150,
-            ...getColumnSearchProps('label', filters, handleSetFilters)
-        },
-        {
-            dataIndex: "accessibility_status",
-            key: "accessibility_status",
-            title: "Accessibility",
-            align: "center",
-            width: 200,
-            render: (value) => value ? accessibilityList.find((item) => item.value === value)?.label : "Unknown",
-            ...getColumnSelectedItemFilter({ dataIndex: 'accessibility_status', filters, handleSetFilters, options: accessibilityList.map((item) => item.label).concat("Unknown") })
-        },
-        {
-            dataIndex: "gat",
-            key: "gat",
-            title: "Gat No.",
-            align: "center",
-            width: 150,
-        },
-        {
-            dataIndex: "tags",
-            key: "tags",
-            title: "Tags",
-            align: "center",
-            width: 150,
-            render: (tags) => tags ? tags.join(", ") : '',
-        },
-        {
-            dataIndex: "site_name",
-            key: "site_name",
-            title: "Site Name",
-            align: "center",
-            width: 300,
-            ...getColumnSearchProps('site_name', filters, handleSetFilters)
-        },
-        {
             dataIndex: "total",
             key: "total",
             title: getSortableHeader("Total Trees", 'total'),
@@ -254,30 +212,9 @@ const PlotSelection: FC<PlotSelectionProps> = ({ requiredTrees, plots, onPlotsCh
             width: 150,
         },
         {
-            dataIndex: "booked",
-            key: "booked",
-            title: getSortableHeader("Booked Trees", 'booked'),
-            align: "right",
-            width: 150,
-        },
-        {
-            dataIndex: "assigned",
-            key: "assigned",
-            title: getSortableHeader("Assigned Trees", 'assigned'),
-            align: "right",
-            width: 150,
-        },
-        {
-            dataIndex: "unbooked_assigned",
-            key: "unbooked_assigned",
-            title: getSortableHeader("Unfunded Inventory (Assigned)", 'unbooked_assigned'),
-            align: "right",
-            width: 150,
-        },
-        {
             dataIndex: "available",
             key: "available",
-            title: getSortableHeader("Unfunded Inventory (Unassigned)", 'available'),
+            title: getSortableHeader("Available (Unfunded Inventory)", 'available'),
             align: "right",
             width: 150,
         },
@@ -295,6 +232,46 @@ const PlotSelection: FC<PlotSelectionProps> = ({ requiredTrees, plots, onPlotsCh
             align: "right",
             width: 100,
             render: (value) => value?.length || 0
+        },
+        {
+            dataIndex: "accessibility_status",
+            key: "accessibility_status",
+            title: "Accessibility",
+            align: "center",
+            width: 200,
+            render: (value) => value ? accessibilityList.find((item) => item.value === value)?.label : "Unknown",
+            ...getColumnSelectedItemFilter({ dataIndex: 'accessibility_status', filters, handleSetFilters, options: accessibilityList.map((item) => item.label).concat("Unknown") })
+        },
+        {
+            dataIndex: "label",
+            key: "label",
+            title: "Plot Label",
+            align: "center",
+            width: 150,
+            ...getColumnSearchProps('label', filters, handleSetFilters)
+        },
+        {
+            dataIndex: "site_name",
+            key: "site_name",
+            title: "Site Name",
+            align: "center",
+            width: 300,
+            ...getColumnSearchProps('site_name', filters, handleSetFilters)
+        },
+        {
+            dataIndex: "tags",
+            key: "tags",
+            title: "Tags",
+            align: "center",
+            width: 150,
+            render: (tags) => tags ? tags.join(", ") : '',
+        },
+        {
+            dataIndex: "gat",
+            key: "gat",
+            title: "Gat No.",
+            align: "center",
+            width: 150,
         },
     ];
 
