@@ -24,6 +24,7 @@ export type Plot = {
     card_available?: number,
     unbooked_assigned?: number,
     acres_area?: number,
+    distinct_plants?: string[],
     site_id: string,
     site_name: string,
     created_at: Date,

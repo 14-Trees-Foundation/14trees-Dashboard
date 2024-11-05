@@ -1247,6 +1247,18 @@ class ApiClient {
         await this.api.delete<void>(`/gift-cards/requests/${gift_card_request_id}`);
     }
 
+    async cloneGiftCardRequest(gift_card_request_id: number, request_id: string): Promise<GiftCard> {
+        try {
+            const response = await this.api.post<GiftCard>(`/gift-cards/requests/clone`, { gift_card_request_id, request_id });
+            return response.data;
+        } catch (error: any) {
+            if (error.response) {
+                throw new Error(error.response.data.message);
+            }
+            throw new Error('Failed to clone gift card request');
+        }
+    }
+
     async createGiftCardUsers(gift_card_request_id: number, users: any[]): Promise<GiftCard> {
         try {
             const response =await this.api.post<GiftCard>(`/gift-cards`, { gift_card_request_id, users });
