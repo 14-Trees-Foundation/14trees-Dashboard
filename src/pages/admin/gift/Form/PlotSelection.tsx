@@ -1,6 +1,6 @@
 
 import { FC, useEffect, useState } from "react";
-import { Box, Checkbox, Chip, FormControl, FormControlLabel, Typography } from "@mui/material";
+import { Box, Button, Checkbox, Chip, FormControl, FormControlLabel, Typography } from "@mui/material";
 import { Plot } from "../../../../types/plot";
 import { useAppDispatch, useAppSelector } from "../../../../redux/store/hooks";
 import { bindActionCreators } from "@reduxjs/toolkit";
@@ -83,7 +83,13 @@ const PlotSelection: FC<PlotSelectionProps> = ({ requiredTrees, plots, onPlotsCh
     let tags: string[] = [];
     const tagsData = useAppSelector((state: RootState) => state.tagsData);
     if (tagsData) {
-        tags = Object.values(tagsData.tags).map(item => item.tag);
+        tags = Object.values(tagsData.tags)
+            .filter(item => item.type === 'SYSTEM_DEFINED')
+            .map(item => item.tag)
+            .sort((a,b) => {
+                if (a > b) return 1;
+                else return - 1;
+            });
     }
 
     useEffect(() => {
@@ -114,6 +120,8 @@ const PlotSelection: FC<PlotSelectionProps> = ({ requiredTrees, plots, onPlotsCh
     }
 
     useEffect(() => {
+        setLoading(true);
+
         const records: Plot[] = [];
         const maxLength = Math.min((page + 1) * pageSize, plotsData.totalPlots);
         for (let i = page * pageSize; i < maxLength; i++) {
@@ -129,11 +137,11 @@ const PlotSelection: FC<PlotSelectionProps> = ({ requiredTrees, plots, onPlotsCh
             }
         }
 
+        setLoading(false);
         setTableRows(records);
     }, [pageSize, page, plotsData]);
 
     const getPlotData = async () => {
-        setLoading(true);
         let filtersData = JSON.parse(JSON.stringify(Object.values(filters))) as GridFilterItem[];
 
         const accessibilityIdx = filtersData.findIndex(item => item.columnField === 'accessibility_status');
@@ -153,9 +161,6 @@ const PlotSelection: FC<PlotSelectionProps> = ({ requiredTrees, plots, onPlotsCh
         }
 
         getPlots(page * pageSize, pageSize, filtersData, orderBy);
-        setTimeout(async () => {
-            setLoading(false);
-        }, 1000);
     };
 
 
@@ -289,7 +294,7 @@ const PlotSelection: FC<PlotSelectionProps> = ({ requiredTrees, plots, onPlotsCh
             title: "Unique Plant Types",
             align: "right",
             width: 100,
-            render: (value) => value.length
+            render: (value) => value?.length || 0
         },
     ];
 
@@ -372,6 +377,10 @@ const PlotSelection: FC<PlotSelectionProps> = ({ requiredTrees, plots, onPlotsCh
                             sx={{ margin: '2px' }}
                         />
                     ))}
+                </Box>
+                <Box sx={{ mt: 1, display: 'flex', alignItems: 'center' }}>
+                    <Button variant="contained" color="success" onClick={() => { setSelectedTags(tags); }}>All</Button>
+                    <Button variant="outlined" color="success" onClick={() => { setSelectedTags([]); }} sx={{ ml: 1 }}>Reset</Button>
                 </Box>
             </Box>
 
