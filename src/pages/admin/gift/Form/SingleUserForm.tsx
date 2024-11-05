@@ -1,5 +1,5 @@
-import { Autocomplete, Button, Grid, TextField } from "@mui/material";
-import { FC, useState, SyntheticEvent, ChangeEvent } from "react";
+import { Autocomplete, Avatar, Button, Grid, TextField } from "@mui/material";
+import { FC, useState, SyntheticEvent, ChangeEvent, useEffect } from "react";
 import { useAppDispatch, useAppSelector } from "../../../../redux/store/hooks";
 import * as userActionCreators from "../../../../redux/actions/userActions";
 import { bindActionCreators } from "@reduxjs/toolkit";
@@ -9,18 +9,30 @@ interface User {
     phone: string;
     email: string;
     count: number;
-    profileImage?: File;
+    profileImage?: File | string;
 }
 
 interface SingleUserFormProps {
+    value: any
     onSubmit: (user: User) => void;
+    onCancel: () => void
 }
 
-const SingleUserForm: FC<SingleUserFormProps> = ({ onSubmit }) => {
+const SingleUserForm: FC<SingleUserFormProps> = ({ value, onSubmit, onCancel }) => {
     const dispatch = useAppDispatch();
     const { searchUsers } = bindActionCreators(userActionCreators, dispatch);
 
     const [user, setUser] = useState<User>({ name: '', phone: '', email: '', count: 1 });
+
+    useEffect(() => {
+        if (value) setUser({
+            name: value.name,
+            email: value.email,
+            phone: value.phone || '',
+            count: value.count,
+            profileImage: value.image_url
+        })
+    }, [value]);
 
     const handleUserChange = (event: ChangeEvent<HTMLInputElement>) => {
         const { name, value } = event.target;
@@ -32,10 +44,13 @@ const SingleUserForm: FC<SingleUserFormProps> = ({ onSubmit }) => {
         setUser({ ...user, count: value });
     };
 
-    const handleProfileImageChange = (event: ChangeEvent<HTMLInputElement>) => {
-        if (event.target.files) {
-            setUser({ ...user, profileImage: event.target.files[0] });
-        }
+    const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const file = event.target.files?.[0] || null;
+        console.log(event.target)
+        setUser(prev => ({
+            ...prev,
+            profileImage: file ?? undefined
+        }));
     };
 
     const usersData = useAppSelector((state) => state.searchUsersData);
@@ -75,6 +90,7 @@ const SingleUserForm: FC<SingleUserFormProps> = ({ onSubmit }) => {
 
     const handleCancel = () => {
         setUser({ name: '', phone: '', email: '', count: 1, profileImage: undefined });
+        onCancel();
     };
 
     return (
@@ -114,14 +130,26 @@ const SingleUserForm: FC<SingleUserFormProps> = ({ onSubmit }) => {
                     />
                 </Grid>
                 <Grid item xs={12}>
-                    <TextField
-                        value={user.profileImage ? undefined : ''}
-                        type="file"
-                        label="Profile Image (Optional)"
-                        inputProps={{ accept: "image/*" }}
-                        onChange={handleProfileImageChange}
-                        fullWidth
-                    />
+                    <div style={{ display: 'flex', alignItems: 'center', marginBottom: 16 }}>
+                        <Avatar
+                            src={(user.profileImage && typeof user.profileImage !== 'string') ? URL.createObjectURL(user.profileImage) : user.profileImage}
+                            alt="User"
+                            sx={{ width: 80, height: 80, marginRight: 2 }}
+                        />
+                        <Button variant="outlined" component="label" color='success' sx={{ marginRight: 2 }}>
+                            Upload Image
+                            <input
+                                value={''}
+                                type="file"
+                                hidden
+                                accept="image/*"
+                                onChange={handleImageChange}
+                            />
+                        </Button>
+                        {user.profileImage && <Button variant="outlined" component="label" color='error' onClick={() => { setUser(prev => ({ ...prev, profileImage: undefined })) }}>
+                            Remove Image
+                        </Button>}
+                    </div>
                 </Grid>
                 <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'center' }}>
                     <Button

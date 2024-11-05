@@ -7,7 +7,7 @@ import UserImagesForm from "./UserImagesForm";
 import { AWSUtils } from "../../../../helpers/aws";
 import ApiClient from "../../../../api/apiClient/apiClient";
 import ImageMapping from "./ImageMapping";
-import { ImageOutlined } from "@mui/icons-material";
+import { DeleteOutline, EditOutlined, ImageOutlined } from "@mui/icons-material";
 import GeneralTable from "../../../../components/GenTable";
 import getColumnSearchProps, { getColumnSelectedItemFilter } from "../../../../components/Filter";
 import { GridFilterItem } from "@mui/x-data-grid";
@@ -20,6 +20,7 @@ interface User {
   birth_date?: string;
   image?: boolean;
   image_name?: string;
+  image_url?: string;
   in_name_of?: string;
   relation?: string;
   count: number;
@@ -245,29 +246,44 @@ export const BulkUserForm: FC<BulkUserFormProps> = ({ requestId, users, onUsersC
   }
 
   const handleUserAdd = async (user: User) => {
+
+    user.error = !isValidEmail(user.email) || !isValidPhone(user.phone) || user.name.trim() === ''
+    if (user.error) {
+      toast.error("Invalid user email, phone or user name is not provided!")
+      return;
+    }
+
+    const image: File | string | undefined = (user as any).profileImage
+    if (image && typeof image !== 'string' && requestId) {
+      const awsUtils = new AWSUtils();
+      const location = await awsUtils.uploadFileToS3(requestId, image, (progress: number) => { });
+      user.image = true;
+      user.image_name = image.name;
+      user.image_url = location;
+    } else {
+      user.image = image ? selectedUser?.image : undefined;
+      user.image_name = image ? selectedUser?.image_name : undefined;
+      user.image_url = image ? selectedUser?.image_url : undefined;
+    }
+
+    user.name = user.name.trim();
+    user.phone = user.phone.trim();
+    user.email = user.email.trim();
+
     const idx = users.findIndex((u) => u.email === user.email);
     if (idx === -1) {
-      user.error = !isValidEmail(user.email) || !isValidPhone(user.phone) || user.name.trim() === ''
-      if (user.error) {
-        toast.error("Invalid user email, phone or user name is not provided!")
-        return;
-      }
-
-      const image: File | undefined = (user as any).profileImage
-      if (image && requestId) {
-        const awsUtils = new AWSUtils();
-        await awsUtils.uploadFileToS3(requestId, image, (progress: number) => { });
-        user.image = true;
-        user.image_name = image.name
-      }
-
-      user.name = user.name.trim();
-      user.phone = user.phone.trim();
-      user.email = user.email.trim();
       onUsersChange([...users, user]);
     } else {
-      toast.warning("User with same email already exists");
+      const newUsers = [...users]
+      newUsers[idx] = user;
+      onUsersChange(newUsers);
     }
+
+    setSelectedUser(null);
+  }
+
+  const handleDeleteUser = (user: User) => {
+    onUsersChange(users.filter(item => item.email !== user.email));
   }
 
   const handlePaginationChange = (page: number, pageSize: number) => {
@@ -316,20 +332,20 @@ export const BulkUserForm: FC<BulkUserFormProps> = ({ requestId, users, onUsersC
       width: 180,
       align: "center",
     },
-    {
-      dataIndex: "in_name_of",
-      key: "in_name_of",
-      title: "Plant in name Of",
-      width: 180,
-      align: "center",
-    },
-    {
-      dataIndex: "relation",
-      key: "relation",
-      title: "Relation with person",
-      width: 180,
-      align: "center",
-    },
+    // {
+    //   dataIndex: "in_name_of",
+    //   key: "in_name_of",
+    //   title: "Plant in name Of",
+    //   width: 180,
+    //   align: "center",
+    // },
+    // {
+    //   dataIndex: "relation",
+    //   key: "relation",
+    //   title: "Relation with person",
+    //   width: 180,
+    //   align: "center",
+    // },
     {
       dataIndex: "phone",
       key: "phone",
@@ -383,6 +399,25 @@ export const BulkUserForm: FC<BulkUserFormProps> = ({ requestId, users, onUsersC
           >
             <ImageOutlined />
           </Button>
+          <Button
+            variant="outlined"
+            style={{ margin: "0 5px" }}
+            onClick={() => {
+              setSelectedUser(record);
+            }}
+          >
+            <EditOutlined />
+          </Button>
+          <Button
+            variant="outlined"
+            color="error"
+            style={{ margin: "0 5px" }}
+            onClick={() => {
+              handleDeleteUser(record);
+            }}
+          >
+            <DeleteOutline />
+          </Button>
         </div>
       ),
     },
@@ -413,7 +448,7 @@ export const BulkUserForm: FC<BulkUserFormProps> = ({ requestId, users, onUsersC
         </Grid>
         <Grid item xs={12}>
           {userAddOption === 'single' && (
-            <SingleUserForm onSubmit={(user) => { handleUserAdd(user) }} />
+            <SingleUserForm value={selectedUser} onSubmit={(user) => { handleUserAdd(user) }} onCancel={() => { setSelectedUser(null) }} />
           )}
 
           {userAddOption === 'bulk' && (
