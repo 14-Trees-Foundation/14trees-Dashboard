@@ -9,7 +9,7 @@ import { toast } from "react-toastify";
 import SponsorUserForm from "./SponsorUser";
 import SponsorGroupForm from "./SponsorGroup";
 import CardDetails from "./CardDetailsForm";
-import { GiftCard } from "../../../../types/gift_card";
+import { GiftCard, GiftCardUser } from "../../../../types/gift_card";
 import ApiClient from "../../../../api/apiClient/apiClient";
 
 interface GiftCardsFormProps {
@@ -41,6 +41,28 @@ const GiftCardsForm: FC<GiftCardsFormProps> = ({ giftCardRequest, requestId, ope
 
             const groupResp = await apiClient.getGroups(0, 1, [{ columnField: 'id', operatorValue: 'equals', value: giftCardRequest.group_id }]);
             if (groupResp.results.length === 1) setGroup(groupResp.results[0]);
+
+            const giftCards = await apiClient.getBookedGiftCards(giftCardRequest.id, 0, -1);
+            const usersMap: Record<number, any> = {}
+            for (const giftCard of giftCards.results) {
+                if (giftCard.user_id) {
+                    if (usersMap[giftCard.user_id]) {
+                        usersMap[giftCard.user_id].count++;
+                    } else {
+                        usersMap[giftCard.user_id] = {
+                            name: giftCard.user_name,
+                            email: giftCard.user_email,
+                            phone: giftCard.user_phone,
+                            count: 1,
+                            image: giftCard.profile_image_url ? true : undefined,
+                            image_name: giftCard.profile_image_url ? giftCard.profile_image_url.split("/").slice(-1)[0] : undefined,
+                            image_url: giftCard.profile_image_url,
+                        }
+                    }
+                }
+            }
+
+            setUsers(Object.values(usersMap));
 
             setTreeCount(giftCardRequest.no_of_cards);
             setMessages({

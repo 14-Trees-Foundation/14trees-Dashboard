@@ -408,13 +408,13 @@ const GiftTrees: FC = () => {
             {record.status === 'pending_assignment' && <Menu.Item key="4" onClick={() => { setSelectedGiftCard(record); setAutoAssignModal(true); }}>
                 Assign Trees
             </Menu.Item>}
-            {record.status === 'completed' && <Menu.Item key="5" onClick={() => { handleDownloadCards(record.id, record.user_name + '_' + record.no_of_cards, 'zip') }}>
+            {record.presentation_id && <Menu.Item key="5" onClick={() => { handleDownloadCards(record.id, record.user_name + '_' + record.no_of_cards, 'zip') }}>
                 Download Gift Cards
             </Menu.Item>}
-            {record.status === 'completed' && <Menu.Item key="6" onClick={() => { window.open('https://docs.google.com/presentation/d/' + record.presentation_id); }}>
+            {record.presentation_id && <Menu.Item key="6" onClick={() => { window.open('https://docs.google.com/presentation/d/' + record.presentation_id); }}>
                 Gift Cards Slide
             </Menu.Item>}
-            {(record.status === 'completed' || record.status === 'pending_gift_cards') && <Menu.Item key="7" onClick={() => { handleGenerateGiftCards(record.id) }}>
+            {record.status !== 'pending_plot_selection' && <Menu.Item key="7" onClick={() => { handleGenerateGiftCards(record.id) }}>
                 Generate Gift Cards
             </Menu.Item>}
             {(record.status === 'completed' || record.status === 'pending_gift_cards') && <Menu.Item key="8" onClick={() => { setSelectedGiftCard(record); setEmailConfirmationModal(true); }}>
