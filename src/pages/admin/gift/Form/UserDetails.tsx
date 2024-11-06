@@ -247,12 +247,6 @@ export const BulkUserForm: FC<BulkUserFormProps> = ({ requestId, users, onUsersC
 
   const handleUserAdd = async (user: User) => {
 
-    user.error = !isValidEmail(user.email) || !isValidPhone(user.phone) || user.name.trim() === ''
-    if (user.error) {
-      toast.error("Invalid user email, phone or user name is not provided!")
-      return;
-    }
-
     const image: File | string | undefined = (user as any).profileImage
     if (image && typeof image !== 'string' && requestId) {
       const awsUtils = new AWSUtils();
@@ -269,6 +263,7 @@ export const BulkUserForm: FC<BulkUserFormProps> = ({ requestId, users, onUsersC
     user.name = user.name.trim();
     user.phone = user.phone.trim();
     user.email = user.email.trim();
+    user.error = !isValidEmail(user.email) || !isValidPhone(user.phone) || user.name === ''
 
     const idx = users.findIndex((u) => u.email === user.email);
     if (idx === -1) {
