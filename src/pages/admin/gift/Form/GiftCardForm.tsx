@@ -43,20 +43,27 @@ const GiftCardsForm: FC<GiftCardsFormProps> = ({ giftCardRequest, requestId, ope
             if (groupResp.results.length === 1) setGroup(groupResp.results[0]);
 
             const giftCards = await apiClient.getBookedGiftCards(giftCardRequest.id, 0, -1);
-            const usersMap: Record<number, any> = {}
+            const usersMap: Record<string, any> = {}
             for (const giftCard of giftCards.results) {
-                if (giftCard.user_id) {
-                    if (usersMap[giftCard.user_id]) {
-                        usersMap[giftCard.user_id].count++;
+                if (giftCard.gifted_to && giftCard.assigned_to) {
+                    const key = giftCard.gifted_to.toString() + "_" + giftCard.assigned_to.toString();
+                    if (usersMap[key]) {
+                        usersMap[key].count++;
                     } else {
-                        usersMap[giftCard.user_id] = {
-                            name: giftCard.user_name,
-                            email: giftCard.user_email,
-                            phone: giftCard.user_phone,
+                        usersMap[key] = {
+                            key: key,
+                            gifted_to_name: giftCard.gifted_to_name,
+                            gifted_to_email: giftCard.gifted_to_email,
+                            gifted_to_phone: giftCard.gifted_to_phone,
+                            assigned_to_name: giftCard.assigned_to_name,
+                            assigned_to_email: giftCard.assigned_to_email,
+                            assigned_to_phone: giftCard.assigned_to_phone,
+                            relation: giftCard.relation,
                             count: 1,
                             image: giftCard.profile_image_url ? true : undefined,
                             image_name: giftCard.profile_image_url ? giftCard.profile_image_url.split("/").slice(-1)[0] : undefined,
                             image_url: giftCard.profile_image_url,
+                            editable: giftCard.tree_id ? false : true,
                         }
                     }
                 }

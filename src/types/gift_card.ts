@@ -29,7 +29,8 @@ export type GiftCard = {
 export type GiftCardUser = {
     key: number;
     id: number;
-    user_id: number;
+    gifted_to: number;
+    assigned_to: number;
     gift_card_request_id: number;
     tree_id: number;
     card_image_url?: string;
@@ -37,9 +38,13 @@ export type GiftCardUser = {
     created_at: string;
     updated_at: string;
     sapling_id?: string;
-    user_name?: string;
-    user_email?: string;
-    user_phone?: string;
+    gifted_to_name?: string;
+    gifted_to_email?: string;
+    gifted_to_phone?: string;
+    assigned_to_name?: string;
+    assigned_to_email?: string;
+    assigned_to_phone?: string;
+    relation?: string;
     plant_type?: string;
 }
 

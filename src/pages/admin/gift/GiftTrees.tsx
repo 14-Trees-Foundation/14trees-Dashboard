@@ -1,4 +1,4 @@
-import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Divider, IconButton, Tooltip, Typography } from "@mui/material";
+import { Badge, Button, Dialog, DialogActions, DialogContent, DialogTitle, Divider, IconButton, Tooltip, Typography } from "@mui/material";
 import { FC, useEffect, useState } from "react";
 import GiftCardsForm from "./Form/GiftCardForm";
 import { User } from "../../../types/user";
@@ -23,10 +23,7 @@ import GiftRequestNotes from "./Form/Notes";
 import AlbumImageInput from "../../../components/AlbumImageInput";
 import EmailConfirmationModal from "./Form/EmailConfirmationModal";
 import EditUserDetailsModal from "./Form/EditUserDetailsModal";
-
-const getUniqueRequestId = () => {
-    return Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
-}
+import { getUniqueRequestId } from "../../../helpers/utils";
 
 const GiftTrees: FC = () => {
     const dispatch = useAppDispatch();
@@ -264,7 +261,7 @@ const GiftTrees: FC = () => {
     const handleUserDetailsEditSave = async (users: GiftCard[]) => {
         handleUserDetailsEditClose();
 
-        if (users.length === 0) return; 
+        if (users.length === 0) return;
 
         try {
             const apiClient = new ApiClient();
@@ -491,7 +488,9 @@ const GiftTrees: FC = () => {
             width: 100,
             render: (value, record) => (
                 <IconButton onClick={() => { setSelectedGiftCard(record); setNotesModal(true); }}>
-                    <NotesOutlined />
+                    <Badge variant="dot" color="success" invisible={(!value || value.trim() === '') ? true : false}>
+                        <NotesOutlined />
+                    </Badge>
                 </IconButton>
             ),
         },
@@ -611,13 +610,13 @@ const GiftTrees: FC = () => {
                 </DialogActions>
             </Dialog>
 
-            <EmailConfirmationModal 
+            <EmailConfirmationModal
                 sponsorMail={selectedGiftCard?.user_email}
                 open={emailConfirmationModal}
                 onClose={handleEmailModalClose}
                 onSubmit={handleSendEmails}
             />
-            
+
             <EditUserDetailsModal
                 giftRequestId={selectedGiftCard?.id}
                 requestId={selectedGiftCard?.request_id}
