@@ -35,3 +35,7 @@ export function getHumanReadableDate(dateStr: string) {
     const isValidDate = !isNaN(date.getDate()) && date.getTime() > 0;
     return isValidDate ? moment(date).format('MMMM DD, YYYY') : '';
 }
+
+export const getUniqueRequestId = () => {
+    return Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+}
