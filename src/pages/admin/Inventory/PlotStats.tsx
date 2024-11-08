@@ -261,6 +261,8 @@ const PlotStats: FC<PlotStatsProps> = ({  }) => {
                     page={page}
                     onPaginationChange={handlePageChange}
                     onDownload={handleDownload}
+                    tableName="Plots Inventory"
+                    footer
                 />
             </Box>
         </div>

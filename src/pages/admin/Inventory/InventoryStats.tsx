@@ -329,6 +329,8 @@ const InventoryStats: FC = () => {
                         totalRecords={aggregatedData.length}
                         onDownload={async () => { return aggregatedData }}
                         rowClassName={(record, index) => !record.category ? 'pending-item' : ''}
+                        tableName="Category Inventory"
+                        footer
                     />
                 </Box>
 

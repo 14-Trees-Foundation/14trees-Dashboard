@@ -233,6 +233,8 @@ const TagStats: FC<TagStatsProps> = ({ habits, landTypes, villages, districts, t
                     page={page}
                     onPaginationChange={handlePageChange}
                     onDownload={handleDownload}
+                    tableName="Tags Inventory"
+                    footer
                 />
             </Box>
         </div>

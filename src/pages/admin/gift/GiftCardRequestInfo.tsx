@@ -214,6 +214,7 @@ const GiftCardRequestInfo: React.FC<GiftCardRequestInfoProps> = ({ open, onClose
                             onPaginationChange={(page: number, pageSize: number) => { setPage(page - 1); setPageSize(pageSize); }}
                             onDownload={async () => users}
                             footer
+                            tableName='Gift Request Users'
                         />
                     </Box>
                     <Divider />

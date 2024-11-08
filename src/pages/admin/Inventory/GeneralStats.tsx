@@ -166,6 +166,8 @@ const GeneralStats: FC<GeneralStatsProps> = ({ field, loading, total, page, tabl
                         if (!record[field] || !record['category']) return 'pending-item';
                         return '';
                     }}
+                    tableName={field[0].toUpperCase() + field.slice(1) + " Inventory"}
+                    footer
                 />
             </Box>
         </div>
