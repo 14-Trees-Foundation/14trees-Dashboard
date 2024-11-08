@@ -39,3 +39,23 @@ export function getHumanReadableDate(dateStr: string) {
 export const getUniqueRequestId = () => {
     return Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
 }
+
+export const convertFileToBase64 = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+
+        reader.onload = () => {
+            if (reader.result) {
+                resolve(reader.result.toString());
+            } else {
+                reject(new Error("File could not be read"));
+            }
+        };
+
+        reader.onerror = () => {
+            reject(new Error("Error reading file"));
+        };
+
+        reader.readAsDataURL(file);
+    });
+};

@@ -24,7 +24,7 @@ const TalukaStats: FC<TalukaStatsProps> = ({ habits, landTypes, talukas, distric
     const handleSetFilters = (filters: Record<string, GridFilterItem>) => {
         setFilters(filters);
     }
-    const [orderBy, setOrderBy] = useState<{column: string, order: 'ASC' | 'DESC'}[]>([]);
+    const [orderBy, setOrderBy] = useState<{ column: string, order: 'ASC' | 'DESC' }[]>([]);
     const [page, setPage] = useState(0);
     const [pageSize, setPageSize] = useState(10);
 
@@ -53,11 +53,14 @@ const TalukaStats: FC<TalukaStatsProps> = ({ habits, landTypes, talukas, distric
         const apiClient = new ApiClient();
         const filtersData = getFilters();
         const stats = await apiClient.getTreesCountForTalukas(page * pageSize, pageSize, filtersData, orderBy);
-        
+
         setTotal(Number(stats.total));
         const newData = { ...talukaTreeCountData };
         for (let i = 0; i < stats.results.length; i++) {
-            newData[i + stats.offset] = stats.results[i];
+            newData[i + stats.offset] = {
+                ...stats.results[i],
+                key: `${stats.results[i].taluka}_${stats.results[i].category}`
+            }
         }
         setTalukaTreeCountData(newData);
         setLoading(false);
@@ -69,22 +72,35 @@ const TalukaStats: FC<TalukaStatsProps> = ({ habits, landTypes, talukas, distric
     }
 
     useEffect(() => {
-        const rows: any[] = []
-        for (let i = 0; i < pageSize; i++) {
-            if (i + page * pageSize >= total) break;
-            const data = talukaTreeCountData[i + page * pageSize]
-            if (!data) {
-                getTalukas();
-                return;
+        const handler = setTimeout(() => {
+            const rows: any[] = []
+            for (let i = 0; i < pageSize; i++) {
+                if (i + page * pageSize >= total) break;
+                const data = talukaTreeCountData[i + page * pageSize]
+                if (!data) {
+                    getTalukas();
+                    return;
+                }
+                rows.push(data);
             }
-            rows.push(data);
-        }
 
-        setTableRows(rows);
+            setTableRows(rows);
+        }, 300);
+
+        return () => {
+            clearTimeout(handler);
+        };
+
     }, [page, pageSize, total, talukaTreeCountData])
 
     useEffect(() => {
-        getTalukas();
+        const handler = setTimeout(() => {
+            getTalukas();
+        }, 300);
+
+        return () => {
+            clearTimeout(handler);
+        };
     }, [filters, orderBy, villages, talukas, districts, categories, serviceTypes])
 
     const handleDownload = async () => {
@@ -95,7 +111,7 @@ const TalukaStats: FC<TalukaStatsProps> = ({ habits, landTypes, talukas, distric
     }
 
     return (
-        <GeneralStats 
+        <GeneralStats
             field="taluka"
             loading={loading}
             total={total}
