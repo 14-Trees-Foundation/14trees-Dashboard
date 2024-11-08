@@ -912,6 +912,16 @@ class ApiClient {
         }
     }
 
+    async getTreesCountForLandTypes(offset: number = 0, limit: number = 10, filters?: any, orderBy?: { column: string, order: 'ASC' | 'DESC' }[]): Promise<PaginatedResponse<any>> {
+        try {
+            const response = await this.api.post<PaginatedResponse<any>>(`/sites/stats/land_type?offset=${offset}&limit=${limit}`, { filters: filters, order_by: orderBy });
+            return response.data;
+        } catch (error) {
+            console.error(error)
+            throw new Error('Failed to fetch Sites stats');
+        }
+    }
+
     async getTreesCountForPlotCategories(filters?: any): Promise<PaginatedResponse<any>> {
         try {
             const response = await this.api.post<PaginatedResponse<any>>(`/sites/stats/category?offset=0&limit=10`, { filters });

@@ -13,6 +13,7 @@ import { GridFilterItem } from "@mui/x-data-grid"
 import './inventory.css'
 import CorporateStats from "./CorporateStats"
 import GeneralTable from "../../../components/GenTable"
+import LandTypeStats from "./LandTypeStats"
 
 interface SiteLocation {
     district: string;
@@ -334,6 +335,15 @@ const InventoryStats: FC = () => {
                     />
                 </Box>
 
+                <LandTypeStats
+                    habits={selectedHabit}
+                    landTypes={selectedLandType}
+                    talukas={selectedTalukas}
+                    villages={selectedVillages}
+                    districts={selectedDistricts}
+                    categories={selectedCategories.map((item) => item !== 'Unknown' ? item : null)}
+                    serviceTypes={selectedServiceTypes.map((item) => getSiteServiceTypeEnum(item))}
+                />
                 <DistrictStats
                     habits={selectedHabit}
                     landTypes={selectedLandType}
