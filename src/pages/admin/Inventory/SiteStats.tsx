@@ -306,6 +306,8 @@ const SiteStats: FC<SiteStatsProps> = ({ habits, landTypes, districts, talukas, 
                         if (!record.category || !record.maintenance_type ) return 'pending-item';
                         return ''; 
                     }}
+                    tableName="Sites Inventory"
+                    footer
                 />
             </Box>
         </div>

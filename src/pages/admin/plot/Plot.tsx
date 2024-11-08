@@ -466,6 +466,7 @@ export const PlotComponent = () => {
             return TableSummary(tableRows, selectedPlotIds, totalColumns)
           }}
           footer
+          tableName="Plots"
         />
       </Box>
 

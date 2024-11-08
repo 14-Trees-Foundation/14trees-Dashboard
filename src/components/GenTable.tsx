@@ -22,6 +22,7 @@ interface GeneralTableProps {
     summary?: (totalColumns: number) => React.ReactNode
     rowClassName?: (record: any, index: number) => string
     footer?: boolean
+    tableName?: string
 }
 
 const ResizableTitle = (props: any) => {
@@ -58,7 +59,7 @@ const ResizableTitle = (props: any) => {
     );
 };
 
-function GeneralTable({ loading, rows, columns, totalRecords, page, pageSize = 10, footer, onDownload, onSelectionChanges, onPaginationChange, summary, rowClassName }: GeneralTableProps) {
+function GeneralTable({ loading, rows, columns, totalRecords, page, pageSize = 10, footer, tableName, onDownload, onSelectionChanges, onPaginationChange, summary, rowClassName }: GeneralTableProps) {
 
     const [checkedList, setCheckedList] = useState(columns?.map((item) => item.key) ?? []);
     const [open, setOpen] = useState(false);
@@ -81,11 +82,14 @@ function GeneralTable({ loading, rows, columns, totalRecords, page, pageSize = 1
         const json2csvParser = new Parser();
         const csv = json2csvParser.parse(data);
 
+        let fileName = tableName ? tableName : "data";
+        fileName += " - " + new Date().toDateString() + '.csv'
+
         // Create a Blob from the CSV string
         const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
         const link = document.createElement('a');
         link.href = URL.createObjectURL(blob);
-        link.setAttribute('download', `${new Date().getTime()}.csv`);
+        link.setAttribute('download', fileName);
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);

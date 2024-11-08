@@ -375,6 +375,7 @@ const PlotSelection: FC<PlotSelectionProps> = ({ requiredTrees, plots, onPlotsCh
                     return TableSummary(tableRows, selectedPlotIds, totalColumns)
                 }}
                 footer
+                tableName="Plots selection"
             />
 
             <FormControl component="fieldset" sx={{ mt: 3 }}>
