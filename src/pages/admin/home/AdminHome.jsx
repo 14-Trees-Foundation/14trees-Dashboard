@@ -9,7 +9,7 @@ import { useRecoilValue } from "recoil";
 
 import { summary } from "../../../store/adminAtoms";
 import { TreeLogCumulative } from "./TreeLogCumulative";
-import { OpacityTwoTone } from "@mui/icons-material";
+import { Apartment, Flag, HolidayVillage, HowToReg, LocationCity, OpacityTwoTone } from "@mui/icons-material";
 
 export const AdminHome = () => {
   const adminSummary = useRecoilValue(summary);
@@ -51,6 +51,22 @@ export const AdminHome = () => {
         <Grid item xs={4} md={3} xl={2}>
           <div className={classes.card}>
             <Box sx={{ paddingTop: "10px" }}>
+              <HowToReg
+                fontSize="large"
+                style={{ color: "#6166B8" }}
+              />
+              <Typography variant="h3" color="#fff" sx={{ pt: 1, pb: 1 }}>
+                {adminSummary.bookedTreeCount}
+              </Typography>
+              <Typography variant="subtitle2" color="#1f3625">
+                Booked Trees
+              </Typography>
+            </Box>
+          </div>
+        </Grid>
+        <Grid item xs={4} md={3} xl={2}>
+          <div className={classes.card}>
+            <Box sx={{ paddingTop: "10px" }}>
               <AssignmentIndTwoToneIcon
                 fontSize="large"
                 style={{ color: "#6166B8" }}
@@ -83,6 +99,71 @@ export const AdminHome = () => {
         <Grid item xs={4} md={3} xl={2}>
           <div className={classes.card}>
             <Box sx={{ paddingTop: "10px" }}>
+              <OpacityTwoTone fontSize="large" style={{ color: "#3C79BC" }} />
+              <Typography variant="h3" color="#fff" sx={{ pt: 1, pb: 1 }}>
+                {adminSummary.pondCount}
+              </Typography>
+              <Typography variant="subtitle2" color="#1f3625">
+                Total Ponds
+              </Typography>
+            </Box>
+          </div>
+        </Grid>
+        <Grid item xs={4} md={3} xl={2}>
+          <div className={classes.card}>
+            <Box sx={{ paddingTop: "10px" }}>
+              <Flag fontSize="large" style={{ color: "#53ad7a" }} />
+              <Typography variant="h3" color="#fff" sx={{ pt: 1, pb: 1 }}>
+                {adminSummary.sitesCount}
+              </Typography>
+              <Typography variant="subtitle2" color="#1f3625">
+                Sites
+              </Typography>
+            </Box>
+          </div>
+        </Grid>
+        <Grid item xs={4} md={3} xl={2}>
+          <div className={classes.card}>
+            <Box sx={{ paddingTop: "10px" }}>
+              <LocationCity fontSize="large" style={{ color: "#078085" }} />
+              <Typography variant="h3" color="#fff" sx={{ pt: 1, pb: 1 }}>
+                {adminSummary.districtsCount}
+              </Typography>
+              <Typography variant="subtitle2" color="#1f3625">
+                Districts
+              </Typography>
+            </Box>
+          </div>
+        </Grid>
+        <Grid item xs={4} md={3} xl={2}>
+          <div className={classes.card}>
+            <Box sx={{ paddingTop: "10px" }}>
+              <Apartment fontSize="large" style={{ color: "#078085" }} />
+              <Typography variant="h3" color="#fff" sx={{ pt: 1, pb: 1 }}>
+                {adminSummary.talukasCount}
+              </Typography>
+              <Typography variant="subtitle2" color="#1f3625">
+                Talukas
+              </Typography>
+            </Box>
+          </div>
+        </Grid>
+        <Grid item xs={4} md={3} xl={2}>
+          <div className={classes.card}>
+            <Box sx={{ paddingTop: "10px" }}>
+              <HolidayVillage fontSize="large" style={{ color: "#078085" }} />
+              <Typography variant="h3" color="#fff" sx={{ pt: 1, pb: 1 }}>
+                {adminSummary.villagesCount}
+              </Typography>
+              <Typography variant="subtitle2" color="#1f3625">
+                Villages
+              </Typography>
+            </Box>
+          </div>
+        </Grid>
+        <Grid item xs={4} md={3} xl={2}>
+          <div className={classes.card}>
+            <Box sx={{ paddingTop: "10px" }}>
               <TerrainTwoToneIcon
                 fontSize="large"
                 style={{ color: "#573D1C" }}
@@ -96,19 +177,21 @@ export const AdminHome = () => {
             </Box>
           </div>
         </Grid>
-        <Grid item xs={4} md={3} xl={2}>
+        {adminSummary?.landTypeCounts && Object.entries(adminSummary.landTypeCounts).map(([key, value]) => (
+          <Grid key={key} item xs={4} md={3} xl={2}>
           <div className={classes.card}>
             <Box sx={{ paddingTop: "10px" }}>
-              <OpacityTwoTone fontSize="large" style={{ color: "#3C79BC" }} />
+              <ParkTwoToneIcon fontSize="large" style={{ color: "#1F3625" }} />
               <Typography variant="h3" color="#fff" sx={{ pt: 1, pb: 1 }}>
-                {adminSummary.pondCount}
+                {value}
               </Typography>
               <Typography variant="subtitle2" color="#1f3625">
-                Total Ponds
+                {key}
               </Typography>
             </Box>
           </div>
-        </Grid>
+          </Grid>)
+        )}
         <Grid item xs={12}>
           <Box
             sx={{

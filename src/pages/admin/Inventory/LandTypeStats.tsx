@@ -1,22 +1,21 @@
 import { FC, useEffect, useState } from "react"
 import ApiClient from "../../../api/apiClient/apiClient"
 import { GridFilterItem } from "@mui/x-data-grid"
-import { PaginatedResponse } from "../../../types/pagination"
 import GeneralStats from "./GeneralStats"
 
-interface VillageStatsProps {
+interface LandTypeStatsProps {
     habits: string[]
     landTypes: string[]
-    villages: string[]
-    talukas: string[]
     districts: string[]
+    talukas: string[]
+    villages: string[]
     categories: (string | null)[]
     serviceTypes: (string | null)[]
 }
 
-const VillageStats: FC<VillageStatsProps> = ({ habits, landTypes, villages, talukas, districts, categories, serviceTypes }) => {
+const LandTypeStats: FC<LandTypeStatsProps> = ({ habits, landTypes, districts, talukas, villages, categories, serviceTypes }) => {
 
-    const [villageTreeCountData, setVillageTreeCountData] = useState<Record<number, any>>({});
+    const [landTypeTreeCountData, setLandTypeTreeCountData] = useState<Record<number, any>>({});
     const [tableRows, setTableRows] = useState<any[]>([]);
     const [total, setTotal] = useState(0);
     const [loading, setLoading] = useState(false);
@@ -25,7 +24,7 @@ const VillageStats: FC<VillageStatsProps> = ({ habits, landTypes, villages, talu
     const handleSetFilters = (filters: Record<string, GridFilterItem>) => {
         setFilters(filters);
     }
-    const [orderBy, setOrderBy] = useState<{ column: string, order: 'ASC' | 'DESC' }[]>([]);
+    const [orderBy, setOrderBy] = useState<{column: string, order: 'ASC' | 'DESC'}[]>([]);
     const [page, setPage] = useState(0);
     const [pageSize, setPageSize] = useState(10);
 
@@ -49,21 +48,21 @@ const VillageStats: FC<VillageStatsProps> = ({ habits, landTypes, villages, talu
         return filtersData;
     }
 
-    const getVillages = async () => {
+    const getLandTypes = async () => {
         setLoading(true);
         const apiClient = new ApiClient();
         const filtersData = getFilters();
-        const stats = await apiClient.getTreesCountForVillages(page * pageSize, pageSize, filtersData, orderBy);
-
+        const stats = await apiClient.getTreesCountForLandTypes(page * pageSize, pageSize, filtersData, orderBy);
+        
         setTotal(Number(stats.total));
-        const newData = { ...villageTreeCountData };
+        const newData = { ...landTypeTreeCountData };
         for (let i = 0; i < stats.results.length; i++) {
             newData[i + stats.offset] = newData[i + stats.offset] = {
                 ...stats.results[i],
-                key: `${stats.results[i].village}_${stats.results[i].category}`
+                key: `${stats.results[i].land_type}_${stats.results[i].category}`
             }
         }
-        setVillageTreeCountData(newData);
+        setLandTypeTreeCountData(newData);
         setLoading(false);
     }
 
@@ -73,47 +72,34 @@ const VillageStats: FC<VillageStatsProps> = ({ habits, landTypes, villages, talu
     }
 
     useEffect(() => {
-        const handler = setTimeout(() => {
-            const rows: any[] = []
-            for (let i = 0; i < pageSize; i++) {
-                if (i + page * pageSize >= total) break;
-                const data = villageTreeCountData[i + page * pageSize]
-                if (!data) {
-                    getVillages();
-                    return;
-                }
-                rows.push(data);
+        const rows: any[] = []
+        for (let i = 0; i < pageSize; i++) {
+            if (i + page * pageSize >= total) break;
+            const data = landTypeTreeCountData[i + page * pageSize]
+            if (!data) {
+                getLandTypes();
+                return;
             }
+            rows.push(data);
+        }
 
-            setTableRows(rows);
-        }, 300);
-
-        return () => {
-            clearTimeout(handler);
-        };
-
-    }, [page, pageSize, total, villageTreeCountData])
+        setTableRows(rows);
+    }, [page, pageSize, total, landTypeTreeCountData])
 
     useEffect(() => {
-        const handler = setTimeout(() => {
-            getVillages();
-        }, 300);
-
-        return () => {
-            clearTimeout(handler);
-        };
+        getLandTypes();
     }, [filters, orderBy, villages, talukas, districts, categories, serviceTypes])
 
     const handleDownload = async () => {
         const apiClient = new ApiClient();
         const filtersList = getFilters();
-        const resp = await apiClient.getTreesCountForVillages(0, total, filtersList, orderBy);
+        const resp = await apiClient.getTreesCountForLandTypes(0, total, filtersList, orderBy);
         return resp.results;
     }
 
     return (
-        <GeneralStats
-            field="village"
+        <GeneralStats 
+            field="land_type"
             loading={loading}
             total={total}
             page={page}
@@ -128,4 +114,4 @@ const VillageStats: FC<VillageStatsProps> = ({ habits, landTypes, villages, talu
     )
 }
 
-export default VillageStats;
+export default LandTypeStats;

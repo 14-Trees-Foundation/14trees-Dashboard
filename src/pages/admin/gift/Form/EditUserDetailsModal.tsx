@@ -16,8 +16,8 @@ interface EditUserDialogProps {
 }
 
 const EditUserDialog: React.FC<EditUserDialogProps> = ({ open, onClose, user, onSave }) => {
-    const [name, setName] = useState(user.user_name || '');
-    const [phone, setPhone] = useState(user.user_phone || '');
+    const [name, setName] = useState(user.assigned_to_name || '');
+    const [phone, setPhone] = useState(user.assigned_to_phone || '');
     const [imageFile, setImageFile] = useState<File | null>(null);
 
     const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -28,7 +28,7 @@ const EditUserDialog: React.FC<EditUserDialogProps> = ({ open, onClose, user, on
     };
 
     const handleSave = () => {
-        onSave({ ...user, user_name: name, user_phone: phone}, imageFile ?? undefined);
+        onSave({ ...user, assigned_to_name: name, assigned_to_phone: phone}, imageFile ?? undefined);
         onClose();
     };
 
@@ -61,8 +61,9 @@ const EditUserDialog: React.FC<EditUserDialogProps> = ({ open, onClose, user, on
                 />
                 <TextField
                     label="Email"
-                    value={user.user_email}
+                    value={user.assigned_to_email}
                     InputProps={{ readOnly: true }}
+                    disabled
                     fullWidth
                     margin="normal"
                 />
@@ -103,8 +104,8 @@ const EditUserDetailsModal: React.FC<EditUserDetailsModalProps> = ({ open, onClo
             const apiClient = new ApiClient();
             const users = await apiClient.getBookedGiftCards(giftRequestId, 0, -1);
             setUserList(users.results
-                .filter(item => item.user_id)
-                .filter((item, idx, self) => self.findIndex(card => card.user_id === item.user_id) === idx)
+                .filter(item => item.assigned_to)
+                .filter((item, idx, self) => self.findIndex(card => card.assigned_to === item.assigned_to) === idx)
                 .map(item => ({ ...item, key: item.id  })));
         }
 
@@ -120,18 +121,18 @@ const EditUserDetailsModal: React.FC<EditUserDetailsModalProps> = ({ open, onClo
     const defaultColumns: TableColumnType<GiftCardUser>[] = [
         {
             title: 'User Name',
-            dataIndex: 'user_name',
+            dataIndex: 'assigned_to_name',
             width: '30%',
         },
         {
             title: 'Phone',
-            dataIndex: 'user_phone',
+            dataIndex: 'assigned_to_phone',
             width: '20%',
             render: value => value ? value : ''
         },
         {
             title: 'Email',
-            dataIndex: 'user_email',
+            dataIndex: 'assigned_to_email',
             width: '30%',
         },
         {

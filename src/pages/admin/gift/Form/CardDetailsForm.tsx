@@ -9,7 +9,7 @@ const defaultMessages = {
 }
 
 interface CardDetailsProps {
-    logo_url?: string,
+    logo_url?: string | null,
     request_id: string,
     presentationId: string | null,
     slideId: string | null,

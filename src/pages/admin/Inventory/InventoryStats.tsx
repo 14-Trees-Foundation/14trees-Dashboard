@@ -13,6 +13,7 @@ import { GridFilterItem } from "@mui/x-data-grid"
 import './inventory.css'
 import CorporateStats from "./CorporateStats"
 import GeneralTable from "../../../components/GenTable"
+import LandTypeStats from "./LandTypeStats"
 
 interface SiteLocation {
     district: string;
@@ -329,9 +330,20 @@ const InventoryStats: FC = () => {
                         totalRecords={aggregatedData.length}
                         onDownload={async () => { return aggregatedData }}
                         rowClassName={(record, index) => !record.category ? 'pending-item' : ''}
+                        tableName="Category Inventory"
+                        footer
                     />
                 </Box>
 
+                <LandTypeStats
+                    habits={selectedHabit}
+                    landTypes={selectedLandType}
+                    talukas={selectedTalukas}
+                    villages={selectedVillages}
+                    districts={selectedDistricts}
+                    categories={selectedCategories.map((item) => item !== 'Unknown' ? item : null)}
+                    serviceTypes={selectedServiceTypes.map((item) => getSiteServiceTypeEnum(item))}
+                />
                 <DistrictStats
                     habits={selectedHabit}
                     landTypes={selectedLandType}

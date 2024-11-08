@@ -28,7 +28,7 @@ const SiteStats: FC<SiteStatsProps> = ({ habits, landTypes, districts, talukas, 
     const handleSetFilters = (filters: Record<string, GridFilterItem>) => {
         setFilters(filters);
     }
-    const [orderBy, setOrderBy] = useState<{column: string, order: 'ASC' | 'DESC'}[]>([])
+    const [orderBy, setOrderBy] = useState<{ column: string, order: 'ASC' | 'DESC' }[]>([])
     const [page, setPage] = useState(0);
     const [pageSize, setPageSize] = useState(10);
 
@@ -84,7 +84,7 @@ const SiteStats: FC<SiteStatsProps> = ({ habits, landTypes, districts, talukas, 
         const apiClient = new ApiClient();
         const filtersData = getFilters();
         const stats = await apiClient.getSitesStats(page * pageSize, pageSize, filtersData, orderBy);
-        
+
         setTotal(Number(stats.total));
         const newData = { ...siteTreeCountData };
         for (let i = 0; i < stats.results.length; i++) {
@@ -95,22 +95,34 @@ const SiteStats: FC<SiteStatsProps> = ({ habits, landTypes, districts, talukas, 
     }
 
     useEffect(() => {
-        const rows: any[] = []
-        for (let i = 0; i < pageSize; i++) {
-            if (i + page * pageSize >= total) break;
-            const data = siteTreeCountData[i + page * pageSize]
-            if (!data) {
-                getSites();
-                return;
+        const handler = setTimeout(() => {
+            const rows: any[] = []
+            for (let i = 0; i < pageSize; i++) {
+                if (i + page * pageSize >= total) break;
+                const data = siteTreeCountData[i + page * pageSize]
+                if (!data) {
+                    getSites();
+                    return;
+                }
+                rows.push(data);
             }
-            rows.push(data);
-        }
 
-        setTableRows(rows);
+            setTableRows(rows);
+        }, 300);
+
+        return () => {
+            clearTimeout(handler);
+        };
     }, [page, pageSize, total, siteTreeCountData])
 
     useEffect(() => {
-        getSites();
+        const handler = setTimeout(() => {
+            getSites();
+        }, 300);
+
+        return () => {
+            clearTimeout(handler);
+        };
     }, [filters, orderBy, districts, talukas, villages, categories, serviceTypes])
 
     const handleSortingChange = (sorter: any) => {
@@ -146,7 +158,7 @@ const SiteStats: FC<SiteStatsProps> = ({ habits, landTypes, districts, talukas, 
 
     const getSortIcon = (field: string, order?: 'ASC' | 'DESC') => {
         return (
-            <div 
+            <div
                 style={{ alignItems: "center", display: "flex", flexDirection: "column" }}
                 onClick={() => {
                     let newOrder: 'ASC' | 'DESC' | undefined = 'ASC';
@@ -155,8 +167,8 @@ const SiteStats: FC<SiteStatsProps> = ({ habits, landTypes, districts, talukas, 
                     handleSortingChange({ field, order: newOrder });
                 }}
             >
-                <ArrowDropUp style={{ margin: "-8px 0" }} htmlColor={ order === 'ASC' ? '#00b96b' : "grey"}/>
-                <ArrowDropDown style={{ margin: "-8px 0" }} htmlColor={ order === 'DESC' ? '#00b96b' : "grey"}/>
+                <ArrowDropUp style={{ margin: "-8px 0" }} htmlColor={order === 'ASC' ? '#00b96b' : "grey"} />
+                <ArrowDropDown style={{ margin: "-8px 0" }} htmlColor={order === 'DESC' ? '#00b96b' : "grey"} />
             </div>
         )
     }
@@ -224,7 +236,7 @@ const SiteStats: FC<SiteStatsProps> = ({ habits, landTypes, districts, talukas, 
         {
             title: (
                 <div style={{ display: "flex", alignItems: "center", justifyContent: 'space-between' }}>
-                  Total {getSortIcon('total', orderBy.find((item) => item.column === 'total')?.order)}
+                    Total {getSortIcon('total', orderBy.find((item) => item.column === 'total')?.order)}
                 </div>
             ),
             dataIndex: "total",
@@ -234,7 +246,7 @@ const SiteStats: FC<SiteStatsProps> = ({ habits, landTypes, districts, talukas, 
         {
             title: (
                 <div style={{ display: "flex", alignItems: "center", justifyContent: 'space-between' }}>
-                  Booked {getSortIcon('booked', orderBy.find((item) => item.column === 'booked')?.order)}
+                    Booked {getSortIcon('booked', orderBy.find((item) => item.column === 'booked')?.order)}
                 </div>
             ),
             dataIndex: "booked",
@@ -244,7 +256,7 @@ const SiteStats: FC<SiteStatsProps> = ({ habits, landTypes, districts, talukas, 
         {
             title: (
                 <div style={{ display: "flex", alignItems: "center", justifyContent: 'space-between' }}>
-                  Assigned {getSortIcon('assigned', orderBy.find((item) => item.column === 'assigned')?.order)}
+                    Assigned {getSortIcon('assigned', orderBy.find((item) => item.column === 'assigned')?.order)}
                 </div>
             ),
             dataIndex: "assigned",
@@ -254,7 +266,7 @@ const SiteStats: FC<SiteStatsProps> = ({ habits, landTypes, districts, talukas, 
         {
             title: (
                 <div style={{ display: "flex", alignItems: "center", justifyContent: 'space-between' }}>
-                  Unfunded Inventory (Assigned) {getSortIcon('unbooked_assigned', orderBy.find((item) => item.column === 'unbooked_assigned')?.order)}
+                    Unfunded Inventory (Assigned) {getSortIcon('unbooked_assigned', orderBy.find((item) => item.column === 'unbooked_assigned')?.order)}
                 </div>
             ),
             dataIndex: "unbooked_assigned",
@@ -264,7 +276,7 @@ const SiteStats: FC<SiteStatsProps> = ({ habits, landTypes, districts, talukas, 
         {
             title: (
                 <div style={{ display: "flex", alignItems: "center", justifyContent: 'space-between' }}>
-                  Unfunded Inventory (Unassigned) {getSortIcon('available', orderBy.find((item) => item.column === 'available')?.order)}
+                    Unfunded Inventory (Unassigned) {getSortIcon('available', orderBy.find((item) => item.column === 'available')?.order)}
                 </div>
             ),
             dataIndex: "available",
@@ -281,7 +293,7 @@ const SiteStats: FC<SiteStatsProps> = ({ habits, landTypes, districts, talukas, 
         {
             title: (
                 <div style={{ display: "flex", alignItems: "center", justifyContent: 'space-between' }}>
-                  Giftable Inventory {getSortIcon('card_available', orderBy.find((item) => item.column === 'card_available')?.order)}
+                    Giftable Inventory {getSortIcon('card_available', orderBy.find((item) => item.column === 'card_available')?.order)}
                 </div>
             ),
             dataIndex: "card_available",
@@ -294,7 +306,7 @@ const SiteStats: FC<SiteStatsProps> = ({ habits, landTypes, districts, talukas, 
         <div>
             <Box>
                 <Typography variant="h6">Site level stats</Typography>
-                <GeneralTable 
+                <GeneralTable
                     loading={loading}
                     columns={columns}
                     rows={tableRows}
@@ -303,9 +315,11 @@ const SiteStats: FC<SiteStatsProps> = ({ habits, landTypes, districts, talukas, 
                     onPaginationChange={handlePageChange}
                     onDownload={handleDownload}
                     rowClassName={(record: any, index: number) => {
-                        if (!record.category || !record.maintenance_type ) return 'pending-item';
-                        return ''; 
+                        if (!record.category || !record.maintenance_type) return 'pending-item';
+                        return '';
                     }}
+                    tableName="Sites Inventory"
+                    footer
                 />
             </Box>
         </div>

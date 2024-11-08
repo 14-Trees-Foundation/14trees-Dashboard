@@ -11,6 +11,7 @@ import SponsorGroupForm from "./SponsorGroup";
 import CardDetails from "./CardDetailsForm";
 import { GiftCard } from "../../../../types/gift_card";
 import ApiClient from "../../../../api/apiClient/apiClient";
+import { convertFileToBase64 } from "../../../../helpers/utils";
 
 interface GiftCardsFormProps {
     giftCardRequest?: GiftCard
@@ -27,6 +28,7 @@ const GiftCardsForm: FC<GiftCardsFormProps> = ({ giftCardRequest, requestId, ope
     const [group, setGroup] = useState<Group | null>(null);
     const [treeCount, setTreeCount] = useState<number>(100);
     const [file, setFile] = useState<File | null>(null);
+    const [fileString, setFileString] = useState<string | null>(null);
     const [users, setUsers] = useState<any[]>([]);
     const [logo, setLogo] = useState<File | null>(null);
     const [messages, setMessages] = useState({ primaryMessage: "", secondaryMessage: "", eventName: "", plantedBy: "", logoMessage: "" });
@@ -41,6 +43,35 @@ const GiftCardsForm: FC<GiftCardsFormProps> = ({ giftCardRequest, requestId, ope
 
             const groupResp = await apiClient.getGroups(0, 1, [{ columnField: 'id', operatorValue: 'equals', value: giftCardRequest.group_id }]);
             if (groupResp.results.length === 1) setGroup(groupResp.results[0]);
+
+            const giftCards = await apiClient.getBookedGiftCards(giftCardRequest.id, 0, -1);
+            const usersMap: Record<string, any> = {}
+            for (const giftCard of giftCards.results) {
+                if (giftCard.gifted_to && giftCard.assigned_to) {
+                    const key = giftCard.gifted_to.toString() + "_" + giftCard.assigned_to.toString();
+                    if (usersMap[key]) {
+                        usersMap[key].count++;
+                    } else {
+                        usersMap[key] = {
+                            key: key,
+                            gifted_to_name: giftCard.gifted_to_name,
+                            gifted_to_email: giftCard.gifted_to_email,
+                            gifted_to_phone: giftCard.gifted_to_phone,
+                            assigned_to_name: giftCard.assigned_to_name,
+                            assigned_to_email: giftCard.assigned_to_email,
+                            assigned_to_phone: giftCard.assigned_to_phone,
+                            relation: giftCard.relation,
+                            count: 1,
+                            image: giftCard.profile_image_url ? true : undefined,
+                            image_name: giftCard.profile_image_url ? giftCard.profile_image_url.split("/").slice(-1)[0] : undefined,
+                            image_url: giftCard.profile_image_url,
+                            editable: giftCard.tree_id ? false : true,
+                        }
+                    }
+                }
+            }
+
+            setUsers(Object.values(usersMap));
 
             setTreeCount(giftCardRequest.no_of_cards);
             setMessages({
@@ -57,21 +88,34 @@ const GiftCardsForm: FC<GiftCardsFormProps> = ({ giftCardRequest, requestId, ope
         if (open) getGiftCardRequestDetails();
     }, [open, giftCardRequest])
 
+    useEffect(() => {
+        const convertFile = async () => {
+            if (file) {
+                const resp = await convertFileToBase64(file);
+                setFileString(resp);
+            } else {
+                setFileString(null);
+            }
+        }
+
+        convertFile();
+    }, [file])
+
     const steps = [
         {
             key: 0,
             title: "Sponsor Details",
-            content: <SponsorUserForm user={user} onSelect={user => setUser(user)}/>,
+            content: <SponsorUserForm user={user} onSelect={user => setUser(user)} />,
         },
         {
             key: 1,
             title: "Corporate Details (Optional)",
-            content: <SponsorGroupForm logo={logo ?? giftCardRequest?.logo_url ?? null} onLogoChange={logo => setLogo(logo)} group={group} onSelect={group => setGroup(group)}/>,
+            content: <SponsorGroupForm logo={logo ?? giftCardRequest?.logo_url ?? null} onLogoChange={logo => setLogo(logo)} group={group} onSelect={group => setGroup(group)} />,
         },
         {
             key: 2,
             title: "Book Trees",
-            content: <PlotSelection disabled={giftCardRequest !== undefined && giftCardRequest.status !== 'pending_plot_selection'} treeCount={treeCount} onTreeCountChange={count => setTreeCount(count)}/>,
+            content: <PlotSelection disabled={giftCardRequest !== undefined && giftCardRequest.status !== 'pending_plot_selection'} treeCount={treeCount} onTreeCountChange={count => setTreeCount(count)} />,
         },
         {
             key: 3,
@@ -80,6 +124,7 @@ const GiftCardsForm: FC<GiftCardsFormProps> = ({ giftCardRequest, requestId, ope
                 request_id={requestId || ''}
                 presentationId={presentationId}
                 slideId={slideId}
+                logo_url={fileString ? fileString : giftCardRequest?.logo_url}
                 primaryMessage={messages.primaryMessage}
                 secondaryMessage={messages.secondaryMessage}
                 eventName={messages.eventName}
@@ -185,16 +230,16 @@ const GiftCardsForm: FC<GiftCardsFormProps> = ({ giftCardRequest, requestId, ope
                         justifyContent: "center",
                     }}
                 >
-                    { steps[currentStep].content }
+                    {steps[currentStep].content}
                 </div>
-                <div style={{ 
+                <div style={{
                     padding: "10px 40px",
                     margin: 10,
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "space-between",
                 }}>
-                    {currentStep > 0 && <Button 
+                    {currentStep > 0 && <Button
                         onClick={() => setCurrentStep(currentStep - 1)}
                         variant="outlined"
                         color="success"

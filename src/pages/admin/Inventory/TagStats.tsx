@@ -5,6 +5,31 @@ import { Box, Typography } from "@mui/material"
 import { getColumnSelectedItemFilter } from "../../../components/Filter"
 import { ArrowDropDown, ArrowDropUp } from "@mui/icons-material"
 import GeneralTable from "../../../components/GenTable"
+import { Table } from "antd"
+
+const TableSummary = (data: any[], selectedKeys: any[], totalColumns: number) => {
+
+    const calculateSum = (data: (number | undefined)[]) => {
+        return data.reduce((a, b) => (a ?? 0) + (b ?? 0), 0);
+    }
+
+    return (
+        <Table.Summary fixed='bottom'>
+            <Table.Summary.Row style={{ backgroundColor: 'rgba(172, 252, 172, 0.2)' }}>
+                <Table.Summary.Cell align="right" index={totalColumns - 7} colSpan={2}>
+                    <strong>Total</strong>
+                </Table.Summary.Cell>
+                <Table.Summary.Cell align="right" index={totalColumns - 6} colSpan={1}>{calculateSum(data.filter((item) => selectedKeys.includes(item.key)).map((item) => item.total))}</Table.Summary.Cell>
+                <Table.Summary.Cell align="right" index={totalColumns - 5} colSpan={1}>{calculateSum(data.filter((item) => selectedKeys.includes(item.key)).map((item) => item.booked))}</Table.Summary.Cell>
+                <Table.Summary.Cell align="right" index={totalColumns - 4} colSpan={1}>{calculateSum(data.filter((item) => selectedKeys.includes(item.key)).map((item) => item.assigned))}</Table.Summary.Cell>
+                <Table.Summary.Cell align="right" index={totalColumns - 3} colSpan={1}>{calculateSum(data.filter((item) => selectedKeys.includes(item.key)).map((item) => item.unbooked_assigned))}</Table.Summary.Cell>
+                <Table.Summary.Cell align="right" index={totalColumns - 2} colSpan={1}>{calculateSum(data.filter((item) => selectedKeys.includes(item.key)).map((item) => item.available))}</Table.Summary.Cell>
+                <Table.Summary.Cell align="right" index={totalColumns - 1} colSpan={1}>{calculateSum(data.filter((item) => selectedKeys.includes(item.key)).map((item) => (Number(item.available) || 0) + (Number(item.unbooked_assigned) || 0)))}</Table.Summary.Cell>
+                <Table.Summary.Cell align="right" index={totalColumns} colSpan={1}>{calculateSum(data.filter((item) => selectedKeys.includes(item.key)).map((item) => item.card_available))}</Table.Summary.Cell>
+            </Table.Summary.Row>
+        </Table.Summary>
+    )
+}
 
 interface TagStatsProps {
     habits: string[]
@@ -28,9 +53,15 @@ const TagStats: FC<TagStatsProps> = ({ habits, landTypes, villages, districts, t
     const handleSetFilters = (filters: Record<string, GridFilterItem>) => {
         setFilters(filters);
     }
-    const [orderBy, setOrderBy] = useState<{column: string, order: 'ASC' | 'DESC'}[]>([]);
+    const [orderBy, setOrderBy] = useState<{ column: string, order: 'ASC' | 'DESC' }[]>([]);
     const [page, setPage] = useState(0);
     const [pageSize, setPageSize] = useState(10);
+
+    const [selectedRows, setSelectedRows] = useState<any[]>([]);
+
+    const handleSelectionChanges = (keys: any[]) => {
+        setSelectedRows(keys);
+    }
 
     const getTags = async () => {
         const apiClient = new ApiClient();
@@ -67,7 +98,10 @@ const TagStats: FC<TagStatsProps> = ({ habits, landTypes, villages, districts, t
         setTotal(Number(stats.total));
         const newData = { ...tagTreeCountData };
         for (let i = 0; i < stats.results.length; i++) {
-            newData[i + stats.offset] = stats.results[i];
+            newData[i + stats.offset] = {
+                ...stats.results[i],
+                key: stats.results[i].tag
+            }
         }
         setTagTreeCountData(newData);
         setLoading(false);
@@ -79,22 +113,34 @@ const TagStats: FC<TagStatsProps> = ({ habits, landTypes, villages, districts, t
     }
 
     useEffect(() => {
-        const rows: any[] = []
-        for (let i = 0; i < pageSize; i++) {
-            if (i + page * pageSize >= total) break;
-            const data = tagTreeCountData[i + page * pageSize]
-            if (!data) {
-                getTagStats();
-                return;
+        const handler = setTimeout(() => {
+            const rows: any[] = []
+            for (let i = 0; i < pageSize; i++) {
+                if (i + page * pageSize >= total) break;
+                const data = tagTreeCountData[i + page * pageSize]
+                if (!data) {
+                    getTagStats();
+                    return;
+                }
+                rows.push(data);
             }
-            rows.push(data);
-        }
 
-        setTableRows(rows);
+            setTableRows(rows);
+        }, 300);
+
+        return () => {
+            clearTimeout(handler);
+        };
     }, [page, pageSize, total, tagTreeCountData])
 
     useEffect(() => {
-        getTagStats();
+        const handler = setTimeout(() => {
+            getTagStats();
+        }, 300);
+
+        return () => {
+            clearTimeout(handler);
+        };
     }, [filters, orderBy, villages, talukas, districts, categories, serviceTypes])
 
     useEffect(() => {
@@ -129,7 +175,7 @@ const TagStats: FC<TagStatsProps> = ({ habits, landTypes, villages, districts, t
 
     const getSortIcon = (field: string, order?: 'ASC' | 'DESC') => {
         return (
-            <div 
+            <div
                 style={{ alignItems: "center", display: "flex", flexDirection: "column" }}
                 onClick={() => {
                     let newOrder: 'ASC' | 'DESC' | undefined = 'ASC';
@@ -138,8 +184,8 @@ const TagStats: FC<TagStatsProps> = ({ habits, landTypes, villages, districts, t
                     handleSortingChange({ field, order: newOrder });
                 }}
             >
-                <ArrowDropUp style={{ margin: "-8px 0" }} htmlColor={ order === 'ASC' ? '#00b96b' : "grey"}/>
-                <ArrowDropDown style={{ margin: "-8px 0" }} htmlColor={ order === 'DESC' ? '#00b96b' : "grey"}/>
+                <ArrowDropUp style={{ margin: "-8px 0" }} htmlColor={order === 'ASC' ? '#00b96b' : "grey"} />
+                <ArrowDropDown style={{ margin: "-8px 0" }} htmlColor={order === 'DESC' ? '#00b96b' : "grey"} />
             </div>
         )
     }
@@ -150,12 +196,12 @@ const TagStats: FC<TagStatsProps> = ({ habits, landTypes, villages, districts, t
             dataIndex: 'tag',
             key: 'tag',
             render: (value: any) => value ? value : 'Unknown',
-            ...getColumnSelectedItemFilter({dataIndex: 'tag', filters, handleSetFilters, options: tags}),
+            ...getColumnSelectedItemFilter({ dataIndex: 'tag', filters, handleSetFilters, options: tags }),
         },
         {
             title: (
                 <div style={{ display: "flex", alignItems: "center", justifyContent: 'space-between' }}>
-                  Total {getSortIcon('total', orderBy.find((item) => item.column === 'total')?.order)}
+                    Total {getSortIcon('total', orderBy.find((item) => item.column === 'total')?.order)}
                 </div>
             ),
             dataIndex: "total",
@@ -165,7 +211,7 @@ const TagStats: FC<TagStatsProps> = ({ habits, landTypes, villages, districts, t
         {
             title: (
                 <div style={{ display: "flex", alignItems: "center", justifyContent: 'space-between' }}>
-                  Booked {getSortIcon('booked', orderBy.find((item) => item.column === 'booked')?.order)}
+                    Booked {getSortIcon('booked', orderBy.find((item) => item.column === 'booked')?.order)}
                 </div>
             ),
             dataIndex: "booked",
@@ -175,7 +221,7 @@ const TagStats: FC<TagStatsProps> = ({ habits, landTypes, villages, districts, t
         {
             title: (
                 <div style={{ display: "flex", alignItems: "center", justifyContent: 'space-between' }}>
-                  Assigned {getSortIcon('assigned', orderBy.find((item) => item.column === 'assigned')?.order)}
+                    Assigned {getSortIcon('assigned', orderBy.find((item) => item.column === 'assigned')?.order)}
                 </div>
             ),
             dataIndex: "assigned",
@@ -185,7 +231,7 @@ const TagStats: FC<TagStatsProps> = ({ habits, landTypes, villages, districts, t
         {
             title: (
                 <div style={{ display: "flex", alignItems: "center", justifyContent: 'space-between' }}>
-                  Unfunded Inventory (Assigned) {getSortIcon('unbooked_assigned', orderBy.find((item) => item.column === 'unbooked_assigned')?.order)}
+                    Unfunded Inventory (Assigned) {getSortIcon('unbooked_assigned', orderBy.find((item) => item.column === 'unbooked_assigned')?.order)}
                 </div>
             ),
             dataIndex: "unbooked_assigned",
@@ -195,7 +241,7 @@ const TagStats: FC<TagStatsProps> = ({ habits, landTypes, villages, districts, t
         {
             title: (
                 <div style={{ display: "flex", alignItems: "center", justifyContent: 'space-between' }}>
-                  Unfunded Inventory (Unassigned) {getSortIcon('available', orderBy.find((item) => item.column === 'available')?.order)}
+                    Unfunded Inventory (Unassigned) {getSortIcon('available', orderBy.find((item) => item.column === 'available')?.order)}
                 </div>
             ),
             dataIndex: "available",
@@ -212,7 +258,7 @@ const TagStats: FC<TagStatsProps> = ({ habits, landTypes, villages, districts, t
         {
             title: (
                 <div style={{ display: "flex", alignItems: "center", justifyContent: 'space-between' }}>
-                  Giftable Inventory {getSortIcon('card_available', orderBy.find((item) => item.column === 'card_available')?.order)}
+                    Giftable Inventory {getSortIcon('card_available', orderBy.find((item) => item.column === 'card_available')?.order)}
                 </div>
             ),
             dataIndex: "card_available",
@@ -225,7 +271,7 @@ const TagStats: FC<TagStatsProps> = ({ habits, landTypes, villages, districts, t
         <div>
             <Box>
                 <Typography variant="h6">Tag level stats</Typography>
-                <GeneralTable 
+                <GeneralTable
                     columns={columns}
                     loading={loading}
                     rows={tableRows}
@@ -233,6 +279,13 @@ const TagStats: FC<TagStatsProps> = ({ habits, landTypes, villages, districts, t
                     page={page}
                     onPaginationChange={handlePageChange}
                     onDownload={handleDownload}
+                    onSelectionChanges={handleSelectionChanges}
+                    tableName="Tags Inventory"
+                    footer
+                    summary={(totalColumns: number) => {
+                        if (totalColumns < 5) return undefined;
+                        return TableSummary(tableRows, selectedRows, totalColumns)
+                    }}
                 />
             </Box>
         </div>

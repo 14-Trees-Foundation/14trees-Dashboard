@@ -32,7 +32,7 @@ const GiftCardRequestInfo: React.FC<GiftCardRequestInfoProps> = ({ open, onClose
         const getGiftCards = async () => {
             const apiClient = new ApiClient();
             const resp = await apiClient.getBookedGiftCards(data.id, 0, -1);
-            setUsers(resp.results.filter((item: any) => item.assigned_to));
+            setUsers(resp.results.filter((item: any) => item.assigned));
         }
 
         if (open) getGiftCards();
@@ -61,7 +61,7 @@ const GiftCardRequestInfo: React.FC<GiftCardRequestInfoProps> = ({ open, onClose
             width: 200,
         },
         {
-            dataIndex: "user_name",
+            dataIndex: "assigned_to_name",
             key: "assigned_to",
             title: "Assigned to",
             align: "center",
@@ -214,6 +214,7 @@ const GiftCardRequestInfo: React.FC<GiftCardRequestInfoProps> = ({ open, onClose
                             onPaginationChange={(page: number, pageSize: number) => { setPage(page - 1); setPageSize(pageSize); }}
                             onDownload={async () => users}
                             footer
+                            tableName='Gift Request Users'
                         />
                     </Box>
                     <Divider />

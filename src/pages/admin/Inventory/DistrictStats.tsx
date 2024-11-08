@@ -24,7 +24,7 @@ const DistrictStats: FC<DistrictStatsProps> = ({ habits, landTypes, districts, t
     const handleSetFilters = (filters: Record<string, GridFilterItem>) => {
         setFilters(filters);
     }
-    const [orderBy, setOrderBy] = useState<{column: string, order: 'ASC' | 'DESC'}[]>([]);
+    const [orderBy, setOrderBy] = useState<{ column: string, order: 'ASC' | 'DESC' }[]>([]);
     const [page, setPage] = useState(0);
     const [pageSize, setPageSize] = useState(10);
 
@@ -53,11 +53,14 @@ const DistrictStats: FC<DistrictStatsProps> = ({ habits, landTypes, districts, t
         const apiClient = new ApiClient();
         const filtersData = getFilters();
         const stats = await apiClient.getTreesCountForDistricts(page * pageSize, pageSize, filtersData, orderBy);
-        
+
         setTotal(Number(stats.total));
         const newData = { ...districtTreeCountData };
         for (let i = 0; i < stats.results.length; i++) {
-            newData[i + stats.offset] = stats.results[i];
+            newData[i + stats.offset] = newData[i + stats.offset] = {
+                ...stats.results[i],
+                key: `${stats.results[i].district}_${stats.results[i].category}`
+            }
         }
         setDistrictTreeCountData(newData);
         setLoading(false);
@@ -69,22 +72,34 @@ const DistrictStats: FC<DistrictStatsProps> = ({ habits, landTypes, districts, t
     }
 
     useEffect(() => {
-        const rows: any[] = []
-        for (let i = 0; i < pageSize; i++) {
-            if (i + page * pageSize >= total) break;
-            const data = districtTreeCountData[i + page * pageSize]
-            if (!data) {
-                getDistricts();
-                return;
+        const handler = setTimeout(() => {
+            const rows: any[] = []
+            for (let i = 0; i < pageSize; i++) {
+                if (i + page * pageSize >= total) break;
+                const data = districtTreeCountData[i + page * pageSize]
+                if (!data) {
+                    getDistricts();
+                    return;
+                }
+                rows.push(data);
             }
-            rows.push(data);
-        }
 
-        setTableRows(rows);
+            setTableRows(rows);
+        }, 300);
+
+        return () => {
+            clearTimeout(handler);
+        };
     }, [page, pageSize, total, districtTreeCountData])
 
     useEffect(() => {
-        getDistricts();
+        const handler = setTimeout(() => {
+            getDistricts();
+        }, 300);
+
+        return () => {
+            clearTimeout(handler);
+        };
     }, [filters, orderBy, villages, talukas, districts, categories, serviceTypes])
 
     const handleDownload = async () => {
@@ -95,7 +110,7 @@ const DistrictStats: FC<DistrictStatsProps> = ({ habits, landTypes, districts, t
     }
 
     return (
-        <GeneralStats 
+        <GeneralStats
             field="district"
             loading={loading}
             total={total}
