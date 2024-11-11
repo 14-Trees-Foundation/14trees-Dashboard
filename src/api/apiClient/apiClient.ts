@@ -1187,6 +1187,7 @@ class ApiClient {
                 formData.append('primary_message', messages.primaryMessage);
                 formData.append('secondary_message', messages.secondaryMessage);
                 formData.append('event_name', messages.eventName);
+                formData.append('event_type', messages.eventType);
                 formData.append('planted_by', messages.plantedBy);
                 formData.append('logo_message', messages.logoMessage);
             }
@@ -1233,8 +1234,11 @@ class ApiClient {
                 if (formData.has('secondary_message')) formData.set('secondary_message', messages.secondaryMessage);
                 else formData.append('secondary_message', messages.secondaryMessage);
 
-                if (messages.eventName && formData.has('event_name')) formData.set('event_name', messages.eventName);
-                else if (messages.eventName) formData.append('event_name', messages.eventName);
+                if (messages.eventName && formData.has('event_type')) formData.set('event_type', messages.eventName);
+                else if (messages.eventName) formData.append('event_type', messages.eventName);
+
+                if (messages.eventType && formData.has('event_type')) formData.set('event_type', messages.eventType);
+                else if (messages.eventType) formData.append('event_type', messages.eventType);
 
                 if (formData.has('planted_by')) formData.set('planted_by', messages.plantedBy);
                 else formData.append('planted_by', messages.plantedBy);
@@ -1315,7 +1319,7 @@ class ApiClient {
         }
     }
 
-    async generateCardTemplate(request_id: string, primary_message: string, secondary_message: string, logo_message: string, logo?: string): Promise<{ presentation_id: string, slide_id: string }> {
+    async generateCardTemplate(request_id: string, primary_message: string, secondary_message: string, logo_message: string, logo?: string | null): Promise<{ presentation_id: string, slide_id: string }> {
         try {
             const resp = await this.api.post<any>(`/gift-cards/generate-template`, { request_id, primary_message, secondary_message, logo_message, logo });
             return resp.data;
@@ -1327,7 +1331,7 @@ class ApiClient {
         }
     }
 
-    async updateGiftCardTemplate(slide_id: string, primary_message: string, secondary_message: string, logo_message: string, logo?: string): Promise<void> {
+    async updateGiftCardTemplate(slide_id: string, primary_message: string, secondary_message: string, logo_message: string, logo?: string | null): Promise<void> {
         try {
             await this.api.post<any>(`/gift-cards/update-template`, { slide_id, primary_message, secondary_message, logo_message, logo });
         } catch (error: any) {

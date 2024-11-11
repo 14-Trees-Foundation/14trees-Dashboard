@@ -31,7 +31,7 @@ const GiftCardsForm: FC<GiftCardsFormProps> = ({ giftCardRequest, requestId, ope
     const [fileString, setFileString] = useState<string | null>(null);
     const [users, setUsers] = useState<any[]>([]);
     const [logo, setLogo] = useState<File | null>(null);
-    const [messages, setMessages] = useState({ primaryMessage: "", secondaryMessage: "", eventName: "", plantedBy: "", logoMessage: "" });
+    const [messages, setMessages] = useState({ primaryMessage: "", secondaryMessage: "", eventName: "", eventType: undefined as string | undefined, plantedBy: "", logoMessage: "" });
     const [presentationId, setPresentationId] = useState<string | null>(null)
     const [slideId, setSlideId] = useState<string | null>(null)
 
@@ -79,7 +79,8 @@ const GiftCardsForm: FC<GiftCardsFormProps> = ({ giftCardRequest, requestId, ope
                 secondaryMessage: giftCardRequest.secondary_message,
                 eventName: giftCardRequest.event_name,
                 plantedBy: giftCardRequest.planted_by,
-                logoMessage: giftCardRequest.logo_message
+                logoMessage: giftCardRequest.logo_message,
+                eventType: giftCardRequest.event_type || undefined
             })
         }
     }
@@ -128,9 +129,10 @@ const GiftCardsForm: FC<GiftCardsFormProps> = ({ giftCardRequest, requestId, ope
                 primaryMessage={messages.primaryMessage}
                 secondaryMessage={messages.secondaryMessage}
                 eventName={messages.eventName}
+                eventType={messages.eventType}
                 plantedBy={messages.plantedBy || group?.name || ''}
                 logoMessage={messages.logoMessage}
-                onChange={(primary, secondary, event, planted, logo) => setMessages({ primaryMessage: primary, secondaryMessage: secondary, eventName: event, plantedBy: planted, logoMessage: logo })}
+                onChange={(primary, secondary, event, planted, logo, event_type) => setMessages({ primaryMessage: primary, secondaryMessage: secondary, eventName: event, plantedBy: planted, logoMessage: logo, eventType: event_type })}
                 onPresentationId={(presentationId: string, slideId: string) => { setPresentationId(presentationId); setSlideId(slideId); }}
             />,
         },
@@ -163,7 +165,7 @@ const GiftCardsForm: FC<GiftCardsFormProps> = ({ giftCardRequest, requestId, ope
         setFile(null);
         setUsers([]);
         setLogo(null);
-        setMessages({ primaryMessage: "", secondaryMessage: "", eventName: "", plantedBy: "", logoMessage: "" });
+        setMessages({ primaryMessage: "", secondaryMessage: "", eventName: "", plantedBy: "", logoMessage: "", eventType: undefined });
         setPresentationId(null);
         setSlideId(null);
     }
