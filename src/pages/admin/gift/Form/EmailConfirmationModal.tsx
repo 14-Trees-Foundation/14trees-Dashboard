@@ -1,11 +1,22 @@
 import React, { useEffect, useState } from 'react';
-import { Dialog, DialogTitle, DialogContent, DialogActions, Chip, Typography, Button, FormControl, FormControlLabel, Checkbox, OutlinedInput } from '@mui/material';
+import { Dialog, DialogTitle, DialogContent, DialogActions, Chip, Typography, Button, FormControl, FormControlLabel, Checkbox, OutlinedInput, Autocomplete, TextField, FormGroup, Box } from '@mui/material';
+
+const EmailTemplates = [
+    {
+        value: 'default',
+        label: 'Default'
+    },
+    {
+        value: 'christmas',
+        label: 'Christmas'
+    },
+]
 
 interface EmailConfirmationModalProps {
     sponsorMail?: string;
     open: boolean;
     onClose: () => void;
-    onSubmit: (testMails: string[], ccMails: string[], attachCard: boolean) => void;
+    onSubmit: (emailSponsor: boolean, emailReceiver: boolean, testMails: string[], ccMails: string[], templateType: string, attachCard: boolean) => void;
 }
 
 const EmailConfirmationModal: React.FC<EmailConfirmationModalProps> = ({ sponsorMail, open, onClose, onSubmit }) => {
@@ -14,6 +25,9 @@ const EmailConfirmationModal: React.FC<EmailConfirmationModalProps> = ({ sponsor
     const [emailInput, setEmailInput] = useState('');
     const [ccInput, setCcInput] = useState('');
     const [attachCards, setAttachCards] = useState(false);
+    const [emailSponsor, setEmailSponsor] = useState(false);
+    const [emailReceiver, setEmailReceiver] = useState(false);
+    const [selectedTemplate, setSelectedTemplate] = useState<{ value: string, label: string }>(EmailTemplates[0]);
 
     useEffect(() => {
         if (sponsorMail) setCcEmails([sponsorMail]);
@@ -31,7 +45,7 @@ const EmailConfirmationModal: React.FC<EmailConfirmationModalProps> = ({ sponsor
     };
 
     const handleSendMails = () => {
-        onSubmit(toEmails, ccEmails, attachCards);
+        onSubmit(emailSponsor, emailReceiver, toEmails, ccEmails, selectedTemplate.value, attachCards);
     };
 
     return (
@@ -67,7 +81,7 @@ const EmailConfirmationModal: React.FC<EmailConfirmationModalProps> = ({ sponsor
                         }
                     />
                 </FormControl>
-                
+
                 <Typography variant="body1" gutterBottom sx={{ mt: 2 }}>
                     In case, you want to check emails first, enter your email address below in order to receive test emails.
                 </Typography>
@@ -97,24 +111,62 @@ const EmailConfirmationModal: React.FC<EmailConfirmationModalProps> = ({ sponsor
                     />
                 </FormControl>
 
-                <FormControl component="fieldset" sx={{ mt: 2 }}>
-                    <FormControlLabel
-                        control={
-                            <Checkbox
-                                checked={attachCards}
-                                onChange={(e) => setAttachCards(e.target.checked)}
-                                name="manual"
+                <Box sx={{ mt: 2 }}>
+                    <Typography >To whom do you what to send emails?</Typography>
+                    <FormControl component="fieldset">
+                        <FormGroup aria-label="position" row>
+                            <FormControlLabel
+                                value="receiver"
+                                control={<Checkbox checked={emailReceiver} onChange={(e) => { setEmailReceiver(e.target.checked) }} />}
+                                label="Receivers"
+                                labelPlacement="end"
                             />
-                        }
-                        label="Do you want to send gift card image as an attachment in emails?"
-                    />
-                </FormControl>
+                            <FormControlLabel
+                                value="sponsor"
+                                control={<Checkbox checked={emailSponsor} onChange={(e) => { setEmailSponsor(e.target.checked) }} />}
+                                label="Sponsor"
+                                labelPlacement="end"
+                            />
+                        </FormGroup>
+                    </FormControl>
+                </Box>
 
-                <Typography variant="subtitle1" style={{ marginTop: '16px' }}>
-                    Are you sure you want to send emails to these users?
-                </Typography>
+                <Box sx={{ mt: 2 }}>
+                    <Typography >Do you want to send gift card image as an attachment in emails?</Typography>
+                    <FormControl component="fieldset">
+                        <FormControlLabel
+                            control={
+                                <Checkbox
+                                    checked={attachCards}
+                                    onChange={(e) => setAttachCards(e.target.checked)}
+                                    name="manual"
+                                />
+                            }
+                            label="Yes"
+                        />
+                    </FormControl>
+                </Box>
+
+                <Box sx={{ mt: 2 }}>
+                    <Typography >You can select different type of email template below.</Typography>
+                    <Autocomplete
+                        value={selectedTemplate}
+                        options={EmailTemplates}
+                        getOptionLabel={option => option.label}
+                        onChange={(e, value) => { value && setSelectedTemplate(value) }}
+                        renderInput={(params) => (
+                            <TextField
+                                {...params}
+                                margin='dense'
+                                label='Email Template'
+                                required
+                            />
+                        )}
+                    />
+                </Box>
+
             </DialogContent>
-            
+
             <DialogActions>
                 <Button onClick={onClose} color="error">
                     Cancel
