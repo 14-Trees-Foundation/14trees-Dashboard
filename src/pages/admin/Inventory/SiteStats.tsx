@@ -7,6 +7,30 @@ import { ArrowDropDown, ArrowDropUp } from "@mui/icons-material"
 import getColumnSearchProps, { getColumnSelectedItemFilter } from "../../../components/Filter"
 import GeneralTable from "../../../components/GenTable"
 
+const TableSummary = (data: any[], selectedKeys: any[], totalColumns: number) => {
+
+    const calculateSum = (data: (number | undefined)[]) => {
+        return data.reduce((a, b) => (a ?? 0) + (b ?? 0), 0);
+    }
+
+    return (
+        <Table.Summary fixed='bottom'>
+            <Table.Summary.Row style={{ backgroundColor: 'rgba(172, 252, 172, 0.2)' }}>
+                <Table.Summary.Cell align="right" index={totalColumns - 7} colSpan={7}>
+                    <strong>Total</strong>
+                </Table.Summary.Cell>
+                <Table.Summary.Cell align="right" index={totalColumns - 6} colSpan={1}>{calculateSum(data.filter((item) => selectedKeys.includes(item.key)).map((item) => item.total))}</Table.Summary.Cell>
+                <Table.Summary.Cell align="right" index={totalColumns - 5} colSpan={1}>{calculateSum(data.filter((item) => selectedKeys.includes(item.key)).map((item) => item.booked))}</Table.Summary.Cell>
+                <Table.Summary.Cell align="right" index={totalColumns - 4} colSpan={1}>{calculateSum(data.filter((item) => selectedKeys.includes(item.key)).map((item) => item.assigned))}</Table.Summary.Cell>
+                <Table.Summary.Cell align="right" index={totalColumns - 3} colSpan={1}>{calculateSum(data.filter((item) => selectedKeys.includes(item.key)).map((item) => item.unbooked_assigned))}</Table.Summary.Cell>
+                <Table.Summary.Cell align="right" index={totalColumns - 2} colSpan={1}>{calculateSum(data.filter((item) => selectedKeys.includes(item.key)).map((item) => item.available))}</Table.Summary.Cell>
+                <Table.Summary.Cell align="right" index={totalColumns - 1} colSpan={1}>{calculateSum(data.filter((item) => selectedKeys.includes(item.key)).map((item) => (Number(item.available) || 0) + (Number(item.unbooked_assigned) || 0)))}</Table.Summary.Cell>
+                <Table.Summary.Cell align="right" index={totalColumns} colSpan={1}>{calculateSum(data.filter((item) => selectedKeys.includes(item.key)).map((item) => item.card_available))}</Table.Summary.Cell>
+            </Table.Summary.Row>
+        </Table.Summary>
+    )
+}
+
 interface SiteStatsProps {
     habits: string[]
     landTypes: string[]
@@ -31,6 +55,11 @@ const SiteStats: FC<SiteStatsProps> = ({ habits, landTypes, districts, talukas, 
     const [orderBy, setOrderBy] = useState<{ column: string, order: 'ASC' | 'DESC' }[]>([])
     const [page, setPage] = useState(0);
     const [pageSize, setPageSize] = useState(10);
+
+    const [selectedRows, setSelectedRows] = useState<any[]>([]);
+    const handleSelectionChanges = (keys: any[]) => {
+        setSelectedRows(keys);
+    }
 
     const getFilters = () => {
         const filtersData = JSON.parse(JSON.stringify(Object.values(filters))) as GridFilterItem[];
@@ -88,7 +117,10 @@ const SiteStats: FC<SiteStatsProps> = ({ habits, landTypes, districts, talukas, 
         setTotal(Number(stats.total));
         const newData = { ...siteTreeCountData };
         for (let i = 0; i < stats.results.length; i++) {
-            newData[i + stats.offset] = stats.results[i];
+            newData[i + stats.offset] = {
+                ...stats.results[i],
+                key: stats.results[i].id
+            };
         }
         setSiteTreeCountData(newData);
         setLoading(false);
@@ -320,6 +352,11 @@ const SiteStats: FC<SiteStatsProps> = ({ habits, landTypes, districts, talukas, 
                     }}
                     tableName="Sites Inventory"
                     footer
+                    onSelectionChanges={handleSelectionChanges}
+                    summary={(totalColumns: number) => {
+                        if (totalColumns < 5) return undefined;
+                        return TableSummary(tableRows, selectedRows, totalColumns)
+                    }}
                 />
             </Box>
         </div>
