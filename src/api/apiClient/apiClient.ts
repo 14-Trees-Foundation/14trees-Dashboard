@@ -1388,9 +1388,9 @@ class ApiClient {
         }
     }
 
-    async sendEmailToGiftRequestUsers(gift_card_request_id: number, attach_card: boolean, cc_mails?: string[], test_mails?: string[]): Promise<void> {
+    async sendEmailToGiftRequestUsers(gift_card_request_id: number, template_type: string, attach_card: boolean, cc_mails?: string[], test_mails?: string[]): Promise<void> {
         try {
-            const resp = await this.api.post<void>(`/gift-cards/email`, { attach_card, cc_mails, test_mails, gift_card_request_id });
+            const resp = await this.api.post<void>(`/gift-cards/email`, { attach_card, template_type, cc_mails, test_mails, gift_card_request_id });
         } catch (error: any) {
             if (error.response) {
                 throw new Error(error.response.data.message);

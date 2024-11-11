@@ -1,11 +1,22 @@
 import React, { useEffect, useState } from 'react';
-import { Dialog, DialogTitle, DialogContent, DialogActions, Chip, Typography, Button, FormControl, FormControlLabel, Checkbox, OutlinedInput } from '@mui/material';
+import { Dialog, DialogTitle, DialogContent, DialogActions, Chip, Typography, Button, FormControl, FormControlLabel, Checkbox, OutlinedInput, Autocomplete, TextField } from '@mui/material';
+
+const EmailTemplates = [
+    {
+        value: 'default',
+        label: 'Default'
+    },
+    {
+        value: 'christmas',
+        label: 'Christmas'
+    },
+]
 
 interface EmailConfirmationModalProps {
     sponsorMail?: string;
     open: boolean;
     onClose: () => void;
-    onSubmit: (testMails: string[], ccMails: string[], attachCard: boolean) => void;
+    onSubmit: (testMails: string[], ccMails: string[], templateType: string, attachCard: boolean) => void;
 }
 
 const EmailConfirmationModal: React.FC<EmailConfirmationModalProps> = ({ sponsorMail, open, onClose, onSubmit }) => {
@@ -14,6 +25,7 @@ const EmailConfirmationModal: React.FC<EmailConfirmationModalProps> = ({ sponsor
     const [emailInput, setEmailInput] = useState('');
     const [ccInput, setCcInput] = useState('');
     const [attachCards, setAttachCards] = useState(false);
+    const [selectedTemplate, setSelectedTemplate] = useState<{ value: string, label: string }>(EmailTemplates[0]);
 
     useEffect(() => {
         if (sponsorMail) setCcEmails([sponsorMail]);
@@ -31,7 +43,7 @@ const EmailConfirmationModal: React.FC<EmailConfirmationModalProps> = ({ sponsor
     };
 
     const handleSendMails = () => {
-        onSubmit(toEmails, ccEmails, attachCards);
+        onSubmit(toEmails, ccEmails, selectedTemplate.value, attachCards);
     };
 
     return (
@@ -109,6 +121,21 @@ const EmailConfirmationModal: React.FC<EmailConfirmationModalProps> = ({ sponsor
                         label="Do you want to send gift card image as an attachment in emails?"
                     />
                 </FormControl>
+
+                <Autocomplete 
+                    value={selectedTemplate}
+                    options={EmailTemplates}
+                    getOptionLabel={option => option.label}
+                    onChange={(e, value) => { value && setSelectedTemplate(value)}}
+                    renderInput={(params) => (
+                        <TextField
+                          {...params}
+                          margin='dense'
+                          label='Email Template'
+                          required
+                        />
+                      )}
+                />
 
                 <Typography variant="subtitle1" style={{ marginTop: '16px' }}>
                     Are you sure you want to send emails to these users?
