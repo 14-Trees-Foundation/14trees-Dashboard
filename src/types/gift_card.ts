@@ -16,6 +16,7 @@ export type GiftCard = {
     primary_message: string;
     secondary_message: string;
     event_name: string;
+    event_type: string;
     planted_by: string;
     logo_message: string;
     request_id: string;

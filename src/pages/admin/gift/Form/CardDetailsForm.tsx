@@ -1,6 +1,21 @@
 import { FC, useEffect, useRef, useState } from "react";
-import { Box, Button, TextField, Typography } from "@mui/material";
+import { Autocomplete, Box, Button, TextField, Typography } from "@mui/material";
 import ApiClient from "../../../../api/apiClient/apiClient";
+
+const EventTypes = [
+    {
+        value: '1',
+        label: 'Birthday'
+    },
+    {
+        value: '2',
+        label: 'Memorial'
+    },
+    {
+        value: '3',
+        label: 'General gift'
+    },
+]
 
 const defaultMessages = {
     primary: 'We are immensely delighted to share that a tree has been planted in your name at the 14 Trees Foundation, Pune. This tree will be nurtured in your honour, rejuvenating ecosystems, supporting biodiversity, and helping offset the harmful effects of climate change.',
@@ -16,19 +31,21 @@ interface CardDetailsProps {
     primaryMessage: string,
     secondaryMessage: string,
     eventName: string,
+    eventType?: string,
     plantedBy: string,
     logoMessage: string
-    onChange: (primaryMessage: string, secondaryMessage: string, eventName: string, plantedBy: string, logoMessage: string) => void
+    onChange: (primaryMessage: string, secondaryMessage: string, eventName: string, plantedBy: string, logoMessage: string, eventType?: string) => void
     onPresentationId: (presentationId: string, slideId: string) => void
 }
 
-const CardDetails: FC<CardDetailsProps> = ({ logo_url, request_id, presentationId, slideId, primaryMessage, secondaryMessage, eventName, plantedBy, logoMessage, onChange, onPresentationId }) => {
+const CardDetails: FC<CardDetailsProps> = ({ logo_url, request_id, presentationId, slideId, primaryMessage, secondaryMessage, eventName, eventType, plantedBy, logoMessage, onChange, onPresentationId }) => {
 
     const [primary, setPrimary] = useState(primaryMessage || defaultMessages.primary);
     const [secondary, setSecondary] = useState(secondaryMessage || defaultMessages.secondary);
     const [event, setEvent] = useState(eventName);
     const [planted, setPlanted] = useState(plantedBy);
     const [logo, setLogo] = useState(logoMessage || defaultMessages.logo);
+    const [selectedEventType, setSelectedEventType] = useState<{ value: string, label: string } | null>(EventTypes.find(item => item.value === eventType) ?? null);
 
     const slideIdRef = useRef('');
     const presentationIdIdRef = useRef('');
@@ -72,9 +89,9 @@ const CardDetails: FC<CardDetailsProps> = ({ logo_url, request_id, presentationI
     }, [presentationId, slideId])
 
     useEffect(() => {
-        onChange(primary, secondary, event, planted, logo);
-        recordRef.current = { primary: primary, secondary: secondary, logo: logo }
-    }, [primary, secondary, event, planted, logo])
+        onChange(primary, secondary, event, planted, logo, selectedEventType?.value);
+        recordRef.current = { primary: primary, secondary: secondary, logo: logo,  }
+    }, [primary, secondary, event, planted, logo, selectedEventType])
 
     return (
         <div style={{ display: 'flex', padding: '10px 10px', width: '100%', justifyContent: 'space-between' }}>
@@ -96,6 +113,21 @@ const CardDetails: FC<CardDetailsProps> = ({ logo_url, request_id, presentationI
                     size="small"
                     inputProps={{ maxLength: 125 }}
                 />
+                <Typography variant="body1" sx={{ mt: 2 }}>Event Type</Typography>
+                <Autocomplete
+                        size="small"
+                        value={selectedEventType}
+                        options={EventTypes}
+                        getOptionLabel={option => option.label}
+                        onChange={(e, value) => { setSelectedEventType(value) }}
+                        renderInput={(params) => (
+                            <TextField
+                                {...params}
+                                margin='dense'
+                                label='Event Type'
+                            />
+                        )}
+                    />
                 <Typography variant="body1" sx={{ mt: 2 }}>Event Name</Typography>
                 <TextField
                     value={event}
