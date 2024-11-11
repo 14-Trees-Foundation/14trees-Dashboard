@@ -171,7 +171,7 @@ const GeneralStats: FC<GeneralStatsProps> = ({ field, loading, total, page, tabl
 
     const districtDataColumn: any[] = [
         {
-            title: field.split("_").join(" ").slice(0, 1).toUpperCase() + field.slice(1),
+            title: field.slice(0, 1).toUpperCase() + field.split("_").join(" ").slice(1),
             dataIndex: field,
             key: field,
             render: (value: any) => value ? value : 'Unknown',
@@ -183,7 +183,7 @@ const GeneralStats: FC<GeneralStatsProps> = ({ field, loading, total, page, tabl
     return (
         <div>
             <Box>
-                <Typography variant="h6">{field.slice(0, 1).toUpperCase() + field.slice(1)} level stats</Typography>
+                <Typography variant="h6">{field.slice(0, 1).toUpperCase() + field.split("_").join(" ").slice(1)} level stats</Typography>
                 <GeneralTable
                     loading={loading}
                     page={page}
@@ -197,7 +197,7 @@ const GeneralStats: FC<GeneralStatsProps> = ({ field, loading, total, page, tabl
                         if (!record[field] || !record['category']) return 'pending-item';
                         return '';
                     }}
-                    tableName={field[0].toUpperCase() + field.slice(1) + " Inventory"}
+                    tableName={field.slice(0, 1).toUpperCase() + field.split("_").join(" ").slice(1) + " Inventory"}
                     footer
                     summary={(totalColumns: number) => {
                         if (totalColumns < 5) return undefined;
