@@ -271,6 +271,7 @@ export const PondComponent = ({ setSelectedPond }: PondComponentInputProps) => {
                     fetchAllData={getAllPondsData}
                     setPage={setPage}
                     setPageSize={setPageSize}
+                    tableName="Ponds"
                 />
             </Box>
 

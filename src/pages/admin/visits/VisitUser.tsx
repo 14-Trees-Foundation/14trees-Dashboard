@@ -187,7 +187,7 @@ export const VisitUsers = ({ selectedVisit }: VisitUsersInputProps) => {
                             setPage={setPage}
                             setPageSize={setPageSize}
                             handleSelectionChanges={handleSelectionChanges}
-
+                            tableName="Visit Users"
                         />
                     )}
                 </Box>

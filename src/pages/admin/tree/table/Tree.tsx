@@ -438,6 +438,7 @@ export const TreeNew = () => {
                     setPageSize={setPageSize}
                     handleSelectionChanges={handleSelectionChanges}
                     setSrNoPage={setSrNoPage}
+                    tableName="Trees"
                 />
             </Box>
 

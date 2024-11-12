@@ -237,6 +237,7 @@ export const User1 = () => {
           fetchAllData={getAllUsersData}
           setPage={setPage}
           setPageSize={setPageSize}
+          tableName="Users"
         />
       </Box>
 

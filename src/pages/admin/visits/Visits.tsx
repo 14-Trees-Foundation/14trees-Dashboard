@@ -258,6 +258,7 @@ export const VisitsComponent = () => {
           fetchAllData={getAllVisitsData}
           setPage={setPage}
           setPageSize={setPageSize}
+          tableName="Visits"
         />
       </Box>
       {selectedVisit && <VisitUsers selectedVisit={selectedVisit}/>}

@@ -237,6 +237,7 @@ export const OrganizationUsers = ({ selectedOrg }: OrganizationUsersInputProps) 
                             setPage={setPage}
                             setPageSize={setPageSize}
                             handleSelectionChanges={handleSelectionChanges}
+                            tableName="Group Users"
                         />
                     )}
                 </Box>

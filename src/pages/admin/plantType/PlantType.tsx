@@ -295,6 +295,7 @@ export const PlantTypeComponent = () => {
                     setPageSize={setPageSize}
                     fetchAllData={getAllPlantTypesData}
                     setSrNoPage={setSrNoPage}
+                    tableName="Plant Types"
                 />
             </Box>
 
