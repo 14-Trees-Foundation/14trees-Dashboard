@@ -15,6 +15,7 @@ import { Visit, BulkVisitUsersMappingResponse } from '../../types/visits';
 import { TreeImage } from '../../types/tree_snapshots';
 import { GiftCard, GiftCardUser } from '../../types/gift_card';
 import { Tag } from '../../types/tag';
+import { EmailTemplate } from '../../types/email_template';
 
 
 class ApiClient {
@@ -1392,9 +1393,9 @@ class ApiClient {
         }
     }
 
-    async sendEmailToGiftRequestUsers(gift_card_request_id: number, email_sponsor: boolean, email_receiver: boolean, template_type: string, attach_card: boolean, cc_mails?: string[], test_mails?: string[]): Promise<void> {
+    async sendEmailToGiftRequestUsers(gift_card_request_id: number, email_sponsor: boolean, email_receiver: boolean, event_type: string, attach_card: boolean, cc_mails?: string[], test_mails?: string[]): Promise<void> {
         try {
-            const resp = await this.api.post<void>(`/gift-cards/email`, { attach_card, email_sponsor, email_receiver, template_type, cc_mails, test_mails, gift_card_request_id });
+            const resp = await this.api.post<void>(`/gift-cards/email`, { attach_card, email_sponsor, email_receiver, event_type, cc_mails, test_mails, gift_card_request_id });
         } catch (error: any) {
             if (error.response) {
                 throw new Error(error.response.data.message);
@@ -1485,6 +1486,22 @@ class ApiClient {
                 throw new Error(error.response.data.message);
             }
             throw new Error('Failed to create album');
+        }
+    }
+
+    /*
+        Email Templates
+    */
+
+    async getEmailTemplates(): Promise<EmailTemplate[]> {
+        try {
+            const response = await this.api.get<EmailTemplate[]>(`/email-templates/`);
+            return response.data;
+        } catch (error: any) {
+            if (error.response) {
+                throw new Error(error.response.data.message);
+            }
+            throw new Error('Failed to get email template');
         }
     }
 }
