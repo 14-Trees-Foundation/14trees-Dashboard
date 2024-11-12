@@ -287,14 +287,14 @@ const GiftTrees: FC = () => {
         }
     }
 
-    const handleSendEmails = async (emailSponsor: boolean, emailReceiver: boolean, testMails: string[], ccMails: string[], templateType: string, attachCard: boolean) => {
+    const handleSendEmails = async (emailSponsor: boolean, emailReceiver: boolean, testMails: string[], ccMails: string[], eventType: string, attachCard: boolean) => {
         const giftCardRequestId = selectedGiftCard?.id
         handleEmailModalClose();
 
         if (!giftCardRequestId) return;
         const apiClient = new ApiClient();
         try {
-            await apiClient.sendEmailToGiftRequestUsers(giftCardRequestId, emailSponsor, emailReceiver, templateType, attachCard, ccMails.length > 0 ? ccMails : undefined, testMails.length > 0 ? testMails : undefined);
+            await apiClient.sendEmailToGiftRequestUsers(giftCardRequestId, emailSponsor, emailReceiver, eventType, attachCard, ccMails.length > 0 ? ccMails : undefined, testMails.length > 0 ? testMails : undefined);
             toast.success("Emails sent successfully!")
         } catch (error: any) {
             toast.error(error.message)
