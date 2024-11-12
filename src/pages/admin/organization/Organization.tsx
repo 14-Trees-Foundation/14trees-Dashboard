@@ -279,6 +279,7 @@ export const OrganizationComponent = () => {
           setPage={setPage}
           setPageSize={setPageSize}
           setSrNoPage={SetSrNoPage}
+          tableName="Groups"
         />
       </Box>
       <Divider style={{ marginBottom: "20px" }} />
