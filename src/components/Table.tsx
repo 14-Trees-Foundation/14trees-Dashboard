@@ -18,6 +18,7 @@ interface TableComponentProps {
     setPage: (value: React.SetStateAction<number>) => void
     setSrNoPage?: (value: React.SetStateAction<number>) => void
     handleSelectionChanges?: (ids: number[]) => void
+    tableName?: string,
     isExpandable?: boolean
     expandableFunction?: (record: any) =>
         ReactElement
@@ -58,7 +59,7 @@ const ResizableTitle = (props: any) => {
     );
 };
 
-function TableComponent({ loading, dataSource, columns, totalRecords, fetchAllData, setPageSize, setPage, handleSelectionChanges, setSrNoPage, isExpandable, expandableFunction }: TableComponentProps) {
+function TableComponent({ loading, dataSource, columns, totalRecords, tableName, fetchAllData, setPageSize, setPage, handleSelectionChanges, setSrNoPage, isExpandable, expandableFunction }: TableComponentProps) {
 
     const [download, setDownload] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
@@ -83,11 +84,14 @@ function TableComponent({ loading, dataSource, columns, totalRecords, fetchAllDa
         const json2csvParser = new Parser();
         const csv = json2csvParser.parse(data);
 
+        let fileName = tableName ? tableName : "data";
+        fileName += " - " + new Date().toDateString() + '.csv'
+
         // Create a Blob from the CSV string
         const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
         const link = document.createElement('a');
         link.href = URL.createObjectURL(blob);
-        link.setAttribute('download', `${new Date().getTime()}.csv`);
+        link.setAttribute('download', fileName);
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);

@@ -308,6 +308,7 @@ export const SitesComponent = () => {
           fetchAllData={getAllSitesData}
           setPage={setPage}
           setPageSize={setPageSize}
+          tableName="Sites"
         />
       </Box>
 

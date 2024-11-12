@@ -316,6 +316,7 @@ export const EventsComponent = () => {
           fetchAllData={getAllEventsData}
           setPage={setPage}
           setPageSize={setPageSize}
+          tableName="Events"
         />
       </Box>
 

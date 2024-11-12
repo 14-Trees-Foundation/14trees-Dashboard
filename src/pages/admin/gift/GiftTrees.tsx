@@ -553,6 +553,7 @@ const GiftTrees: FC = () => {
                 fetchAllData={getAllGiftCardsData}
                 setPage={setPage}
                 setPageSize={setPageSize}
+                tableName="Gift Trees"
             />
 
             <GiftCardsForm giftCardRequest={selectedGiftCard ?? undefined} requestId={requestId} open={modalOpen} handleClose={handleModalClose} onSubmit={handleSubmit} />

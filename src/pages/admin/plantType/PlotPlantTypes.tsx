@@ -123,6 +123,7 @@ export const PlotPlantTypes = ({ }) => {
                             fetchAllData={getAllPlotPlantTypes}
                             setPage={setPage}
                             setPageSize={setPageSize}
+                            tableName="Plot Plant Types"
                         />
                     )}
                 </Box>
