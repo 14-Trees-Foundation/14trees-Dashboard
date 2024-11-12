@@ -8,7 +8,7 @@ interface EmailConfirmationModalProps {
     sponsorMail?: string;
     open: boolean;
     onClose: () => void;
-    onSubmit: (emailSponsor: boolean, emailReceiver: boolean, testMails: string[], ccMails: string[], templateType: string, attachCard: boolean) => void;
+    onSubmit: (emailSponsor: boolean, emailReceiver: boolean, emailAssignee: boolean, testMails: string[], ccMails: string[], templateType: string, attachCard: boolean) => void;
 }
 
 const EmailConfirmationModal: React.FC<EmailConfirmationModalProps> = ({ sponsorMail, open, onClose, onSubmit }) => {
@@ -19,6 +19,7 @@ const EmailConfirmationModal: React.FC<EmailConfirmationModalProps> = ({ sponsor
     const [attachCards, setAttachCards] = useState(false);
     const [emailSponsor, setEmailSponsor] = useState(false);
     const [emailReceiver, setEmailReceiver] = useState(false);
+    const [emailAssignee, setEmailAssignee] = useState(false);
     const [emailTemplates, setEmailTemplates] = useState<EmailTemplate[]>([]);
     const [selectedTemplate, setSelectedTemplate] = useState<EmailTemplate | null>(null);
 
@@ -58,7 +59,7 @@ const EmailConfirmationModal: React.FC<EmailConfirmationModalProps> = ({ sponsor
             return;
         }
 
-        onSubmit(emailSponsor, emailReceiver, toEmails, ccEmails, selectedTemplate.event_type, attachCards);
+        onSubmit(emailSponsor, emailReceiver, emailAssignee, toEmails, ccEmails, selectedTemplate.event_type, attachCards);
     };
 
     return (
@@ -138,6 +139,12 @@ const EmailConfirmationModal: React.FC<EmailConfirmationModalProps> = ({ sponsor
                                 value="sponsor"
                                 control={<Checkbox checked={emailSponsor} onChange={(e) => { setEmailSponsor(e.target.checked) }} />}
                                 label="Sponsor"
+                                labelPlacement="end"
+                            />
+                            <FormControlLabel
+                                value="assignee"
+                                control={<Checkbox checked={emailAssignee} onChange={(e) => { setEmailAssignee(e.target.checked) }} />}
+                                label="Assignees"
                                 labelPlacement="end"
                             />
                         </FormGroup>
