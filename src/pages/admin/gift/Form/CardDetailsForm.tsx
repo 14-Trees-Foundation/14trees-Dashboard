@@ -50,6 +50,7 @@ const CardDetails: FC<CardDetailsProps> = ({ logo_url, request_id, presentationI
     const slideIdRef = useRef('');
     const presentationIdIdRef = useRef('');
     const recordRef = useRef({ primary: '', secondary: '', logo: '' })
+    const logoRef = useRef({ logoUrl: undefined as string | null | undefined })
     const [iframeSrc, setIframeSrc] = useState<string | null>(null);
 
     const updateSlide = async () => {
@@ -98,6 +99,11 @@ const CardDetails: FC<CardDetailsProps> = ({ logo_url, request_id, presentationI
         onChange(primary, secondary, event, planted, logo, selectedEventType?.value);
         recordRef.current = { primary: primary, secondary: secondary, logo: logo, }
     }, [primary, secondary, event, planted, logo, selectedEventType])
+
+    useEffect(() => {
+        setPlanted(plantedBy)
+        logoRef.current.logoUrl = logo_url
+    }, [logo_url, plantedBy])
 
     return (
         <div style={{ display: 'flex', padding: '10px 10px', width: '100%', justifyContent: 'space-between' }}>
