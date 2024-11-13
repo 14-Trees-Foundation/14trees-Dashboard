@@ -50,6 +50,7 @@ const CardDetails: FC<CardDetailsProps> = ({ logo_url, request_id, presentationI
     const slideIdRef = useRef('');
     const presentationIdIdRef = useRef('');
     const recordRef = useRef({ primary: '', secondary: '', logo: '' })
+    const logoRef = useRef({ logoUrl: undefined as string | null | undefined })
     const [iframeSrc, setIframeSrc] = useState<string | null>(null);
 
     const updateSlide = async () => {
@@ -77,21 +78,32 @@ const CardDetails: FC<CardDetailsProps> = ({ logo_url, request_id, presentationI
             )
         }
 
-        if (!presentationId || !slideId) generateGiftCard();
-        else {
-            presentationIdIdRef.current = presentationId;
-            slideIdRef.current = slideId
+        const handler = setTimeout(() => {
+            if (!presentationId || !slideId) generateGiftCard();
+            else {
+                presentationIdIdRef.current = presentationId;
+                slideIdRef.current = slideId
 
-            setIframeSrc(
-                `https://docs.google.com/presentation/d/${presentationId}/embed?rm=minimal&slide=id.${slideId}&timestamp=${new Date().getTime()}`
-            )
-        }
+                setIframeSrc(
+                    `https://docs.google.com/presentation/d/${presentationId}/embed?rm=minimal&slide=id.${slideId}&timestamp=${new Date().getTime()}`
+                )
+            }
+        }, 300);
+
+        return () => {
+            clearTimeout(handler);
+        };
     }, [presentationId, slideId])
 
     useEffect(() => {
         onChange(primary, secondary, event, planted, logo, selectedEventType?.value);
-        recordRef.current = { primary: primary, secondary: secondary, logo: logo,  }
+        recordRef.current = { primary: primary, secondary: secondary, logo: logo, }
     }, [primary, secondary, event, planted, logo, selectedEventType])
+
+    useEffect(() => {
+        setPlanted(plantedBy)
+        logoRef.current.logoUrl = logo_url
+    }, [logo_url, plantedBy])
 
     return (
         <div style={{ display: 'flex', padding: '10px 10px', width: '100%', justifyContent: 'space-between' }}>
@@ -115,19 +127,19 @@ const CardDetails: FC<CardDetailsProps> = ({ logo_url, request_id, presentationI
                 />
                 <Typography variant="body1" sx={{ mt: 2 }}>Event Type</Typography>
                 <Autocomplete
-                        size="small"
-                        value={selectedEventType}
-                        options={EventTypes}
-                        getOptionLabel={option => option.label}
-                        onChange={(e, value) => { setSelectedEventType(value) }}
-                        renderInput={(params) => (
-                            <TextField
-                                {...params}
-                                margin='dense'
-                                label='Event Type'
-                            />
-                        )}
-                    />
+                    size="small"
+                    value={selectedEventType}
+                    options={EventTypes}
+                    getOptionLabel={option => option.label}
+                    onChange={(e, value) => { setSelectedEventType(value) }}
+                    renderInput={(params) => (
+                        <TextField
+                            {...params}
+                            margin='dense'
+                            label='Event Type'
+                        />
+                    )}
+                />
                 <Typography variant="body1" sx={{ mt: 2 }}>Event Name</Typography>
                 <TextField
                     value={event}

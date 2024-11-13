@@ -12,6 +12,7 @@ import CardDetails from "./CardDetailsForm";
 import { GiftCard } from "../../../../types/gift_card";
 import ApiClient from "../../../../api/apiClient/apiClient";
 import { convertFileToBase64 } from "../../../../helpers/utils";
+import { AWSUtils } from "../../../../helpers/aws";
 
 interface GiftCardsFormProps {
     giftCardRequest?: GiftCard
@@ -28,9 +29,9 @@ const GiftCardsForm: FC<GiftCardsFormProps> = ({ giftCardRequest, requestId, ope
     const [group, setGroup] = useState<Group | null>(null);
     const [treeCount, setTreeCount] = useState<number>(100);
     const [file, setFile] = useState<File | null>(null);
-    const [fileString, setFileString] = useState<string | null>(null);
     const [users, setUsers] = useState<any[]>([]);
     const [logo, setLogo] = useState<File | null>(null);
+    const [logoString, setLogoString] = useState<string | null>(null);
     const [messages, setMessages] = useState({ primaryMessage: "", secondaryMessage: "", eventName: "", eventType: undefined as string | undefined, plantedBy: "", logoMessage: "" });
     const [presentationId, setPresentationId] = useState<string | null>(null)
     const [slideId, setSlideId] = useState<string | null>(null)
@@ -90,17 +91,18 @@ const GiftCardsForm: FC<GiftCardsFormProps> = ({ giftCardRequest, requestId, ope
     }, [open, giftCardRequest])
 
     useEffect(() => {
-        const convertFile = async () => {
-            if (file) {
-                const resp = await convertFileToBase64(file);
-                setFileString(resp);
+        const uploadFile = async () => {
+            if (logo && requestId) {
+                const awsUtils = new AWSUtils();
+                const location = await awsUtils.uploadFileToS3(requestId, logo, (progress: number) => { });
+                setLogoString(location);
             } else {
-                setFileString(null);
+                setLogoString(null);
             }
         }
 
-        convertFile();
-    }, [file])
+        uploadFile();
+    }, [logo, requestId])
 
     const steps = [
         {
@@ -111,7 +113,7 @@ const GiftCardsForm: FC<GiftCardsFormProps> = ({ giftCardRequest, requestId, ope
         {
             key: 1,
             title: "Corporate Details (Optional)",
-            content: <SponsorGroupForm logo={logo ?? giftCardRequest?.logo_url ?? null} onLogoChange={logo => setLogo(logo)} group={group} onSelect={group => setGroup(group)} />,
+            content: <SponsorGroupForm logo={logo ?? giftCardRequest?.logo_url ?? null} onLogoChange={logo => setLogo(logo)} group={group} onSelect={group => { setGroup(group);  setMessages(prev => ({ ...prev, plantedBy: group ? group.name : "" }))}} />,
         },
         {
             key: 2,
@@ -125,7 +127,7 @@ const GiftCardsForm: FC<GiftCardsFormProps> = ({ giftCardRequest, requestId, ope
                 request_id={requestId || ''}
                 presentationId={presentationId}
                 slideId={slideId}
-                logo_url={fileString ? fileString : giftCardRequest?.logo_url}
+                logo_url={logoString ? logoString : giftCardRequest?.logo_url}
                 primaryMessage={messages.primaryMessage}
                 secondaryMessage={messages.secondaryMessage}
                 eventName={messages.eventName}
@@ -223,17 +225,22 @@ const GiftCardsForm: FC<GiftCardsFormProps> = ({ giftCardRequest, requestId, ope
                     </>
                 )}
 
-                <div
-                    style={{
-                        padding: 10,
-                        margin: 10,
-                        marginTop: 40,
-                        display: "flex",
-                        justifyContent: "center",
-                    }}
-                >
-                    {steps[currentStep].content}
-                </div>
+                {steps.map((step, index) => (
+                    <div hidden={currentStep !== index}>
+                        <div
+                            style={{
+                                padding: 10,
+                                margin: 10,
+                                marginTop: 40,
+                                display: "flex",
+                                justifyContent: "center",
+                            }}
+                        >
+                            {step.content}
+                        </div>
+                    </div>
+                ))}
+
                 <div style={{
                     padding: "10px 40px",
                     margin: 10,

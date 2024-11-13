@@ -1,22 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { Dialog, DialogTitle, DialogContent, DialogActions, Chip, Typography, Button, FormControl, FormControlLabel, Checkbox, OutlinedInput, Autocomplete, TextField, FormGroup, Box } from '@mui/material';
-
-const EmailTemplates = [
-    {
-        value: 'default',
-        label: 'Default'
-    },
-    {
-        value: 'christmas',
-        label: 'Christmas'
-    },
-]
+import { EmailTemplate } from '../../../../types/email_template';
+import ApiClient from '../../../../api/apiClient/apiClient';
+import { toast } from 'react-toastify';
 
 interface EmailConfirmationModalProps {
     sponsorMail?: string;
     open: boolean;
     onClose: () => void;
-    onSubmit: (emailSponsor: boolean, emailReceiver: boolean, testMails: string[], ccMails: string[], templateType: string, attachCard: boolean) => void;
+    onSubmit: (emailSponsor: boolean, emailReceiver: boolean, emailAssignee: boolean, testMails: string[], ccMails: string[], templateType: string, attachCard: boolean) => void;
 }
 
 const EmailConfirmationModal: React.FC<EmailConfirmationModalProps> = ({ sponsorMail, open, onClose, onSubmit }) => {
@@ -27,7 +19,24 @@ const EmailConfirmationModal: React.FC<EmailConfirmationModalProps> = ({ sponsor
     const [attachCards, setAttachCards] = useState(false);
     const [emailSponsor, setEmailSponsor] = useState(false);
     const [emailReceiver, setEmailReceiver] = useState(false);
-    const [selectedTemplate, setSelectedTemplate] = useState<{ value: string, label: string }>(EmailTemplates[0]);
+    const [emailAssignee, setEmailAssignee] = useState(false);
+    const [emailTemplates, setEmailTemplates] = useState<EmailTemplate[]>([]);
+    const [selectedTemplate, setSelectedTemplate] = useState<EmailTemplate | null>(null);
+
+    useEffect(() => {
+        const getEmailTemplates = async () => {
+            const apiClient = new ApiClient();
+            const templates = await apiClient.getEmailTemplates();
+            const uniqueTemplates: EmailTemplate[] 
+                = templates
+                    .filter((template, index, self) => self.findIndex(item => item.event_type === template.event_type) === index);
+
+            setEmailTemplates(uniqueTemplates);
+            setSelectedTemplate(uniqueTemplates.find(template => template.event_type === 'default') ?? null);
+        }
+
+        getEmailTemplates();
+    }, [])
 
     useEffect(() => {
         if (sponsorMail) setCcEmails([sponsorMail]);
@@ -45,7 +54,12 @@ const EmailConfirmationModal: React.FC<EmailConfirmationModalProps> = ({ sponsor
     };
 
     const handleSendMails = () => {
-        onSubmit(emailSponsor, emailReceiver, toEmails, ccEmails, selectedTemplate.value, attachCards);
+        if (!selectedTemplate) {
+            toast.error("Please select email template to send!");
+            return;
+        }
+
+        onSubmit(emailSponsor, emailReceiver, emailAssignee, toEmails, ccEmails, selectedTemplate.event_type, attachCards);
     };
 
     return (
@@ -127,6 +141,12 @@ const EmailConfirmationModal: React.FC<EmailConfirmationModalProps> = ({ sponsor
                                 label="Sponsor"
                                 labelPlacement="end"
                             />
+                            <FormControlLabel
+                                value="assignee"
+                                control={<Checkbox checked={emailAssignee} onChange={(e) => { setEmailAssignee(e.target.checked) }} />}
+                                label="Assignees"
+                                labelPlacement="end"
+                            />
                         </FormGroup>
                     </FormControl>
                 </Box>
@@ -151,9 +171,9 @@ const EmailConfirmationModal: React.FC<EmailConfirmationModalProps> = ({ sponsor
                     <Typography >You can select different type of email template below.</Typography>
                     <Autocomplete
                         value={selectedTemplate}
-                        options={EmailTemplates}
-                        getOptionLabel={option => option.label}
-                        onChange={(e, value) => { value && setSelectedTemplate(value) }}
+                        options={emailTemplates}
+                        getOptionLabel={option => option.event_name}
+                        onChange={(e, value) => { setSelectedTemplate(value) }}
                         renderInput={(params) => (
                             <TextField
                                 {...params}
