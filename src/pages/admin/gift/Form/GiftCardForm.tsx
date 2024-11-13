@@ -111,7 +111,7 @@ const GiftCardsForm: FC<GiftCardsFormProps> = ({ giftCardRequest, requestId, ope
         {
             key: 1,
             title: "Corporate Details (Optional)",
-            content: <SponsorGroupForm logo={logo ?? giftCardRequest?.logo_url ?? null} onLogoChange={logo => setLogo(logo)} group={group} onSelect={group => setGroup(group)} />,
+            content: <SponsorGroupForm logo={logo ?? giftCardRequest?.logo_url ?? null} onLogoChange={logo => setLogo(logo)} group={group} onSelect={group => { setGroup(group);  setMessages(prev => ({ ...prev, plantedBy: group ? group.name : "" }))}} />,
         },
         {
             key: 2,
@@ -223,17 +223,22 @@ const GiftCardsForm: FC<GiftCardsFormProps> = ({ giftCardRequest, requestId, ope
                     </>
                 )}
 
-                <div
-                    style={{
-                        padding: 10,
-                        margin: 10,
-                        marginTop: 40,
-                        display: "flex",
-                        justifyContent: "center",
-                    }}
-                >
-                    {steps[currentStep].content}
-                </div>
+                {steps.map((step, index) => (
+                    <div hidden={currentStep !== index}>
+                        <div
+                            style={{
+                                padding: 10,
+                                margin: 10,
+                                marginTop: 40,
+                                display: "flex",
+                                justifyContent: "center",
+                            }}
+                        >
+                            {step.content}
+                        </div>
+                    </div>
+                ))}
+
                 <div style={{
                     padding: "10px 40px",
                     margin: 10,

@@ -21,7 +21,6 @@ const SponsorGroupForm: FC<SponsorGroupFormProps> = ({ logo, onLogoChange, group
     const dispatch = useAppDispatch();
     const { getGroups } = bindActionCreators(groupActionCreators, dispatch);
 
-    const [isCorporate, setIsCorporate] = useState(false);
     const [formOption, setFormOption] = useState<"existing" | "new">("existing");
     const [groupSearchQuery, setGroupSearchQuery] = useState('');
 
