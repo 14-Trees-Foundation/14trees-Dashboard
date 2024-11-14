@@ -1,5 +1,6 @@
 import { Box, FormControl, FormControlLabel, InputAdornment, InputLabel, MenuItem, OutlinedInput, Radio, RadioGroup, Select, TextField, Typography } from "@mui/material";
 import { FC } from "react";
+import FileInputComponent from "../../../../components/FileInputComponent";
 
 interface PaymentFormProps {
     donorType: string

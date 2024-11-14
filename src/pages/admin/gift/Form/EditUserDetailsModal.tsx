@@ -175,7 +175,7 @@ const EditUserDetailsModal: React.FC<EditUserDetailsModalProps> = ({ open, onClo
         const saveImage = async () => {
             if (image && requestId) {
                 const awsUtils = new AWSUtils();
-                const location = await awsUtils.uploadFileToS3(requestId, image, (num: number) => {  })
+                const location = await awsUtils.uploadFileToS3(requestId, image, 'gift-request')
                 row.profile_image_url = location;
             }
 

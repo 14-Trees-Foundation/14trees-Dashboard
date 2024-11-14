@@ -11,15 +11,16 @@ import SponsorGroupForm from "./SponsorGroup";
 import CardDetails from "./CardDetailsForm";
 import { GiftCard } from "../../../../types/gift_card";
 import ApiClient from "../../../../api/apiClient/apiClient";
-import { convertFileToBase64 } from "../../../../helpers/utils";
 import { AWSUtils } from "../../../../helpers/aws";
+import PaymentForm from "../../../../components/payment/PaymentForm";
+import { Payment } from "../../../../types/payment";
 
 interface GiftCardsFormProps {
     giftCardRequest?: GiftCard
     requestId: string | null
     open: boolean
     handleClose: () => void
-    onSubmit: (user: User, group: Group | null, treeCount: number, users: any[], logo?: File, messages?: any, file?: File) => void
+    onSubmit: (user: User, group: Group | null, treeCount: number, users: any[], paymentId?: number, logo?: File, messages?: any, file?: File) => void
 }
 
 const GiftCardsForm: FC<GiftCardsFormProps> = ({ giftCardRequest, requestId, open, handleClose, onSubmit }) => {
@@ -35,6 +36,14 @@ const GiftCardsForm: FC<GiftCardsFormProps> = ({ giftCardRequest, requestId, ope
     const [messages, setMessages] = useState({ primaryMessage: "", secondaryMessage: "", eventName: "", eventType: undefined as string | undefined, plantedBy: "", logoMessage: "" });
     const [presentationId, setPresentationId] = useState<string | null>(null)
     const [slideId, setSlideId] = useState<string | null>(null)
+
+    // payment details
+    const [payment, setPayment] = useState<Payment | null>(null);
+    const [donorType, setDonorType] = useState<string>("Indian Citizen");
+    const [paymentMethod, setPaymentMethod] = useState<string>("UPI");
+    const [panNumber, setPanNumber] = useState<string | null>(null);
+    const [paymentProof, setPaymentProof] = useState<File | null>(null);
+    const [amount, setAmount] = useState<number>(0);
 
     const getGiftCardRequestDetails = async () => {
         const apiClient = new ApiClient();
@@ -83,6 +92,14 @@ const GiftCardsForm: FC<GiftCardsFormProps> = ({ giftCardRequest, requestId, ope
                 logoMessage: giftCardRequest.logo_message,
                 eventType: giftCardRequest.event_type || undefined
             })
+
+            if (giftCardRequest.payment_id) {
+                const payment = await apiClient.getPayment(giftCardRequest.payment_id);
+                setPayment(payment);
+
+                setPanNumber(payment.pan_number);
+                setPaymentMethod(payment.payment_method);
+            }
         }
     }
 
@@ -94,7 +111,7 @@ const GiftCardsForm: FC<GiftCardsFormProps> = ({ giftCardRequest, requestId, ope
         const uploadFile = async () => {
             if (logo && requestId) {
                 const awsUtils = new AWSUtils();
-                const location = await awsUtils.uploadFileToS3(requestId, logo, (progress: number) => { });
+                const location = await awsUtils.uploadFileToS3(requestId, logo, 'gift-request');
                 setLogoString(location);
             } else {
                 setLogoString(null);
@@ -122,6 +139,22 @@ const GiftCardsForm: FC<GiftCardsFormProps> = ({ giftCardRequest, requestId, ope
         },
         {
             key: 3,
+            title: "Payment",
+            content: <PaymentForm
+                treeCount={treeCount}
+                donorType={donorType}
+                paymentMethod={paymentMethod}
+                panNumber={panNumber}
+                paymentProof={paymentProof}
+                onAmountChange={amount => { setAmount(amount)}}
+                onDonorTypeChange={donorType => { setDonorType(donorType)}}
+                onPanNumberChange={panNumber => { setPanNumber(panNumber)}}
+                onPaymentMethodChange={paymentMethod => { setPaymentMethod(paymentMethod)}}
+                onPaymentProofChange={paymentProof => { setPaymentProof(paymentProof)}}
+            />,
+        },
+        {
+            key: 4,
             title: "Gift Card Messages",
             content: <CardDetails
                 request_id={requestId || ''}
@@ -139,20 +172,43 @@ const GiftCardsForm: FC<GiftCardsFormProps> = ({ giftCardRequest, requestId, ope
             />,
         },
         {
-            key: 4,
+            key: 5,
             title: "User Details",
             content: <BulkUserForm requestId={requestId} users={users} onUsersChange={users => setUsers(users)} onFileChange={file => setFile(file)} />,
         },
     ]
 
-    const handleSubmit = () => {
+    const handleSubmit = async () => {
         if (!user) {
             toast.error("Please select sponsor");
             setCurrentStep(0);
             return;
         }
 
-        onSubmit(user, group, treeCount, users, logo ?? undefined, messages, file ?? undefined);
+        let paymentProofLink: string | null = null;
+        if (paymentProof) {
+            const awsUtils = new AWSUtils();
+            const location = await awsUtils.uploadFileToS3("payment", paymentProof);
+            if (location) paymentProofLink = location;
+        }
+
+        const apiClient = new ApiClient();
+        let paymentId = payment ? payment.id : undefined
+        if (!payment) {
+            const payment = await apiClient.createPayment(amount, donorType, paymentMethod, panNumber, paymentProofLink);
+            paymentId = payment.id
+        } else {
+            const data = {
+                ...payment,
+                amount: amount,
+                pan_number: panNumber,
+                payment_method: paymentMethod,
+                payment_proof: paymentProofLink,
+            }
+            await apiClient.updatedPayment(data);
+        }
+
+        onSubmit(user, group, treeCount, users, paymentId, logo ?? undefined, messages, file ?? undefined);
 
         handleCloseForm();
     }
@@ -187,8 +243,11 @@ const GiftCardsForm: FC<GiftCardsFormProps> = ({ giftCardRequest, requestId, ope
                 else nextStep = 3;
                 break;
             case 3:
+                nextStep = 4;
+                break;
+            case 4:
                 if (messages.primaryMessage === "" || messages.secondaryMessage === "") toast.error("Please provide gift card details");
-                else nextStep = 4;
+                else nextStep = 5;
                 break;
             default:
                 break;

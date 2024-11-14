@@ -25,6 +25,7 @@ export type GiftCard = {
     status: string;
     presentation_id: string | null;
     notes: string | null;
+    payment_id: number | null;
 }
 
 export type GiftCardUser = {

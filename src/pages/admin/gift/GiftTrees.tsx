@@ -136,7 +136,7 @@ const GiftTrees: FC = () => {
         getGiftCards(0, giftCardsData.totalGiftCards, filtersData);
     };
 
-    const saveNewGiftCardsRequest = async (user: User, group: Group | null, treeCount: number, users: any[], logo?: File, messages?: any, file?: File) => {
+    const saveNewGiftCardsRequest = async (user: User, group: Group | null, treeCount: number, users: any[], paymentId?: number, logo?: File, messages?: any, file?: File) => {
         if (!requestId) {
             toast.error("Something went wrong. Please try again later!");
             return;
@@ -144,7 +144,7 @@ const GiftTrees: FC = () => {
         const apiClient = new ApiClient();
         let giftCardId: number;
         try {
-            const response = await apiClient.createGiftCard(requestId, treeCount, user.id, group?.id, logo, messages, file);
+            const response = await apiClient.createGiftCard(requestId, treeCount, user.id, group?.id, paymentId, logo, messages, file);
             giftCardId = response.id;
             dispatch({
                 type: giftCardActionTypes.CREATE_GIFT_CARD_SUCCEEDED,
@@ -171,13 +171,13 @@ const GiftTrees: FC = () => {
         }
     }
 
-    const updateGiftCardRequest = async (user: User, group: Group | null, treeCount: number, users: any[], logo?: File, messages?: any, file?: File) => {
+    const updateGiftCardRequest = async (user: User, group: Group | null, treeCount: number, users: any[], paymentId?: number, logo?: File, messages?: any, file?: File) => {
         if (!selectedGiftCard) return;
 
         const apiClient = new ApiClient();
         let success = false;
         try {
-            const response = await apiClient.updateGiftCard(selectedGiftCard, treeCount, user.id, group?.id, logo, messages, file);
+            const response = await apiClient.updateGiftCard(selectedGiftCard, treeCount, user.id, group?.id, paymentId, logo, messages, file);
             toast.success("Gift Request updated successfully");
             dispatch({
                 type: giftCardActionTypes.UPDATE_GIFT_CARD_SUCCEEDED,
@@ -208,13 +208,13 @@ const GiftTrees: FC = () => {
         }
     }
 
-    const handleSubmit = (user: User, group: Group | null, treeCount: number, users: any[], logo?: File, messages?: any, file?: File) => {
+    const handleSubmit = (user: User, group: Group | null, treeCount: number, users: any[], paymentId?: number, logo?: File, messages?: any, file?: File) => {
         handleModalClose();
 
         if (changeMode === 'add') {
-            saveNewGiftCardsRequest(user, group, treeCount, users, logo, messages, file);
+            saveNewGiftCardsRequest(user, group, treeCount, users, paymentId, logo, messages, file);
         } else if (changeMode === 'edit') {
-            updateGiftCardRequest(user, group, treeCount, users, logo, messages, file);
+            updateGiftCardRequest(user, group, treeCount, users, paymentId, logo, messages, file);
         }
     }
 
