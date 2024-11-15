@@ -550,7 +550,7 @@ export const BulkUserForm: FC<BulkUserFormProps> = ({ requestId, users, onUsersC
         maxWidth={'96%'}
       >
         <GeneralTable
-          columns={columns.filter(item => !item.key?.toString().startsWith("assigned") && item.key?.toString() !== 'relation' )}
+          columns={showAllCols ? columns : columns.filter(item => !item.key?.toString().startsWith("assigned") && item.key?.toString() !== 'relation' )}
           page={page}
           pageSize={pageSize}
           onPaginationChange={handlePaginationChange}

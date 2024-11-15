@@ -458,6 +458,7 @@ export const PlotComponent = () => {
           columns={columns}
           totalRecords={plotsData.totalPlots}
           page={page}
+          pageSize={pageSize}
           onSelectionChanges={handleSelectionChanges}
           onPaginationChange={handlePaginationChange}
           onDownload={handleDownload}
