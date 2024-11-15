@@ -1,60 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { Modal, Box, Typography, Button, List, ListItem, ListItemText, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@mui/material';
 import ApiClient from '../../../../api/apiClient/apiClient';
-import { ForestOutlined } from '@mui/icons-material';
-
-interface TreeSelectModalProps {
-    trees: any[];
-    hasMore: boolean
-    open: boolean;
-    handleClose: () => void;
-    onSelectTree: (tree: any) => void;
-    onLoadMore: () => void;
-}
-
-const TreeSelectModal: React.FC<TreeSelectModalProps> = ({ trees, hasMore, open, handleClose, onSelectTree, onLoadMore }) => {
-    return (
-        <Modal open={open} onClose={handleClose} aria-labelledby="tree-select-modal-title">
-            <Box
-                sx={{
-                    position: 'absolute',
-                    top: '50%',
-                    left: '50%',
-                    transform: 'translate(-50%, -50%)',
-                    width: '90%', // Responsive width
-                    maxWidth: 600,
-                    maxHeight: '80vh',
-                    bgcolor: 'background.paper',
-                    borderRadius: 2,
-                    boxShadow: 24,
-                    p: 3,
-                    display: 'flex',
-                    flexDirection: 'column',
-                }}
-            >
-                <Typography id="tree-select-modal-title" variant="h6" sx={{ mb: 2 }}>
-                    Select a Tree
-                </Typography>
-                
-                <List sx={{ maxHeight: '60vh', overflowY: 'auto', flexGrow: 1, mb: 2, pr: 1 }}>
-                    {trees.map((tree) => (
-                        <ListItem key={tree.id} button onClick={() => onSelectTree(tree)}>
-                            <ListItemText primary={`${tree.sapling_id} (${tree.plant_type})`} secondary={tree.plot} />
-                        </ListItem>
-                    ))}
-                </List>
-                {!hasMore && <Typography variant="body1" sx={{ mb: 2 }}>
-                    No More trees in selected plot. Please select more or different plots.
-                </Typography>}
-
-                <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
-                    <Button onClick={handleClose} variant="outlined" color='error' sx={{ mr: 1 }}>Cancel</Button>
-                    <Button disabled={!hasMore} onClick={onLoadMore} variant="contained" color='success'>Load More</Button>
-                </Box>
-            </Box>
-        </Modal>
-    );
-};
+import { ForestOutlined, SelectAllRounded } from '@mui/icons-material';
+import GeneralTable from '../../../../components/GenTable';
+import getColumnSearchProps from '../../../../components/Filter';
+import { GridFilterItem } from '@mui/x-data-grid';
 
 
 interface UserTreeMappingModalProps {
@@ -71,33 +21,80 @@ const UserTreeMappingModal: React.FC<UserTreeMappingModalProps> = ({ users, onUs
     const [page, setPage] = useState(0);
     const [pageSize, setPageSize] = useState(10);
 
+    const [loading, setLoading] = useState(false);
+    const [tableRows, setTableRows] = useState<any[]>([]);
+    const [filters, setFilters] = useState<Record<string, GridFilterItem>>({});
+
+    const handleSetFilters = (filters: Record<string, GridFilterItem>) => {
+        setPage(0);
+        setFilters(filters);
+    }
+
     const getTrees = async (plotIds: number[]) => {
         const apiClient = new ApiClient();
-
+        setLoading(true);
         if (plotIds.length > 0) {
-            const filters = [{
+            const filtersData: any[] = [{
                 columnField: 'plot_id',
                 operatorValue: 'isAnyOf',
                 value: plotIds
             }]
-            const treesResp = await apiClient.getGiftAbleTrees(page * pageSize, pageSize, filters);
+
+            filtersData.push(...Object.values(filters));
+            const treesResp = await apiClient.getGiftAbleTrees(page * pageSize, pageSize, filtersData);
             setTotal(Number(treesResp.total));
 
             setTreesData(prev => {
-    
+
                 const newTrees = { ...prev };
                 for (let i = 0; i < treesResp.results.length; i++) {
-                    newTrees[treesResp.offset + i + 1] = treesResp.results[i];
+                    newTrees[treesResp.offset + i] = treesResp.results[i];
                 }
-    
+
                 return newTrees;
             });
         }
+        setLoading(false);
     }
 
     useEffect(() => {
-        getTrees(plotIds);
-    }, [plotIds, page, pageSize])
+        setTreesData({})
+    }, [filters, plotIds]);
+
+    useEffect(() => {
+        const handler = setTimeout(() => {
+            const records: any[] = [];
+            const maxLength = Math.min((page + 1) * pageSize, total);
+            for (let i = page * pageSize; i < maxLength; i++) {
+                if (Object.hasOwn(treesData, i)) {
+                    const record = treesData[i];
+                    if (record) {
+                        records.push(record);
+                    }
+                } else {
+                    getTrees(plotIds);
+                    break;
+                }
+            }
+
+            setTableRows(records);
+        }, 300)
+
+        return () => {
+            clearTimeout(handler);
+        }
+    }, [pageSize, page, treesData, total, plotIds]);
+
+    useEffect(() => {
+        const handler = setTimeout(() => {
+            getTrees(plotIds);
+        }, 300)
+
+        return () => {
+            clearTimeout(handler);
+        }
+        
+    }, [plotIds, filters])
 
     const handleSelectTree = (tree: any) => {
         if (selectedUser) {
@@ -115,6 +112,78 @@ const UserTreeMappingModal: React.FC<UserTreeMappingModalProps> = ({ users, onUs
         setSelectedUser(user);
         setTreeModalOpen(true);
     };
+
+    const handlePaginationChange = (page: number, pageSize: number) => {
+        setPage(page - 1);
+        setPageSize(pageSize);
+    }
+
+    const columns: any[] = [
+        {
+            dataIndex: "sapling_id",
+            key: "sapling_id",
+            title: "Sapling Id",
+            align: "center",
+            width: 100,
+        },
+        {
+            dataIndex: "plant_type",
+            key: "plant_type",
+            title: "Plant Type",
+            align: "center",
+            width: 200,
+            ...getColumnSearchProps('plant_type', filters, handleSetFilters)
+        },
+        {
+            dataIndex: "plot",
+            key: "plot",
+            title: "Plot Name",
+            align: "center",
+            width: 200,
+            ...getColumnSearchProps('plot', filters, handleSetFilters)
+        },
+        {
+            dataIndex: "category",
+            key: "category",
+            title: "Category",
+            align: "center",
+            width: 100,
+            ...getColumnSearchProps('category', filters, handleSetFilters)
+        },
+        {
+            dataIndex: "use",
+            key: "use",
+            title: "Use",
+            align: "center",
+            width: 150,
+            ...getColumnSearchProps('use', filters, handleSetFilters)
+        },
+        {
+            dataIndex: "action",
+            key: "action",
+            title: "Actions",
+            width: 100,
+            align: "center",
+            render: (value: any, record: any, index: number) => (
+                <div
+                    style={{
+                        display: "flex",
+                        justifyContent: "center",
+                        alignItems: "center",
+                    }}>
+                    <Button
+                        variant='outlined'
+                        color='success'
+                        style={{ margin: "0 5px" }}
+                        disabled={users.find(item => item.tree_id === record.id)}
+                        onClick={() => { handleSelectTree(record) }}
+                    >
+                        Select
+                    </Button>
+                </div>
+            ),
+        },
+    ]
 
     return (
         <>
@@ -135,8 +204,8 @@ const UserTreeMappingModal: React.FC<UserTreeMappingModalProps> = ({ users, onUs
                     <TableBody>
                         {users.map((user, index) => (
                             <TableRow key={index}>
-                                <TableCell>{user.user_name}</TableCell>
-                                <TableCell>{user.user_email}</TableCell>
+                                <TableCell>{user.assigned_to_name}</TableCell>
+                                <TableCell>{user.assigned_to_email}</TableCell>
                                 <TableCell>{user.sapling_id || 'N/A'}</TableCell>
                                 <TableCell>{user.plant_type || 'N/A'}</TableCell>
                                 <TableCell>
@@ -150,14 +219,46 @@ const UserTreeMappingModal: React.FC<UserTreeMappingModalProps> = ({ users, onUs
                 </Table>
             </TableContainer>
 
-            <TreeSelectModal
-                trees={Object.values(treesData).filter(tree => users.findIndex(user => user.tree_id === tree.id) == -1).sort((a, b) => b.id - a.id)}
-                hasMore={total > Object.values(treesData).length}
-                open={isTreeModalOpen}
-                handleClose={() => setTreeModalOpen(false)}
-                onSelectTree={handleSelectTree}
-                onLoadMore={() => { setPage(page + 1) }}
-            />
+            <Modal open={isTreeModalOpen} aria-labelledby="tree-select-modal-title">
+                <Box
+                    sx={{
+                        position: 'absolute',
+                        top: '50%',
+                        left: '50%',
+                        transform: 'translate(-50%, -50%)',
+                        width: '90%', // Responsive width
+                        maxWidth: '80vw',
+                        maxHeight: '90vh',
+                        bgcolor: 'background.paper',
+                        borderRadius: 2,
+                        boxShadow: 24,
+                        overflow: 'auto',
+                        p: 3,
+                        display: 'flex',
+                        flexDirection: 'column',
+                    }}
+                >
+                    <Typography id="tree-select-modal-title" variant="h6" sx={{ mb: 2 }}>
+                        Select a Tree
+                    </Typography>
+
+                    <GeneralTable
+                        loading={loading}
+                        rows={tableRows}
+                        columns={columns}
+                        totalRecords={total}
+                        page={page}
+                        pageSize={pageSize}
+                        onPaginationChange={handlePaginationChange}
+                        onDownload={async() => { return Object.values(treesData) }}
+                        tableName="Trees"
+                    />
+
+                    <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
+                        <Button onClick={() => { setTreeModalOpen(false) }} variant="outlined" color='error' sx={{ mr: 1 }}>Cancel</Button>
+                    </Box>
+                </Box>
+            </Modal>
         </>
     );
 };

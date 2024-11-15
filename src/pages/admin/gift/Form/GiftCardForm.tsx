@@ -128,13 +128,8 @@ const GiftCardsForm: FC<GiftCardsFormProps> = ({ giftCardRequest, requestId, ope
                 presentationId={presentationId}
                 slideId={slideId}
                 logo_url={logoString ? logoString : giftCardRequest?.logo_url}
-                primaryMessage={messages.primaryMessage}
-                secondaryMessage={messages.secondaryMessage}
-                eventName={messages.eventName}
-                eventType={messages.eventType}
-                plantedBy={messages.plantedBy || group?.name || ''}
-                logoMessage={messages.logoMessage}
-                onChange={(primary, secondary, event, planted, logo, event_type) => setMessages({ primaryMessage: primary, secondaryMessage: secondary, eventName: event, plantedBy: planted, logoMessage: logo, eventType: event_type })}
+                messages={{...messages, plantedBy: messages.plantedBy || group?.name || ''}}
+                onChange={messages => { setMessages(messages) }}
                 onPresentationId={(presentationId: string, slideId: string) => { setPresentationId(presentationId); setSlideId(slideId); }}
             />,
         },
