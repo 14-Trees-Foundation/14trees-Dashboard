@@ -40,6 +40,8 @@ const GiftCardsForm: FC<GiftCardsFormProps> = ({ giftCardRequest, requestId, ope
     // payment details
     const [payment, setPayment] = useState<Payment | null>(null);
     const [donorType, setDonorType] = useState<string>("Indian Citizen");
+    const [category, setCategory] = useState<string>("Foundation");
+    const [grove, setGrove] = useState<string>("No Preferences");
     const [paymentMethod, setPaymentMethod] = useState<string>("UPI");
     const [panNumber, setPanNumber] = useState<string | null>(null);
     const [paymentProof, setPaymentProof] = useState<File | null>(null);
@@ -134,18 +136,25 @@ const GiftCardsForm: FC<GiftCardsFormProps> = ({ giftCardRequest, requestId, ope
         {
             key: 2,
             title: "Book Trees",
-            content: <PlotSelection disabled={giftCardRequest !== undefined && giftCardRequest.status !== 'pending_plot_selection'} treeCount={treeCount} onTreeCountChange={count => setTreeCount(count)} />,
+            content: <PlotSelection 
+                disabled={giftCardRequest !== undefined && giftCardRequest.status !== 'pending_plot_selection'} 
+                treeCount={treeCount} 
+                onTreeCountChange={count => setTreeCount(count)} 
+                category={category}
+                onCategoryChange={category => { setCategory(category) }}
+                grove={grove}
+                onGroveChange={grove => setGrove(grove)}
+            />,
         },
         {
             key: 3,
             title: "Payment",
             content: <PaymentForm
-                treeCount={treeCount}
+                amount={treeCount * (category === "Foundation" ? 3000 : 1500)}
                 donorType={donorType}
                 paymentMethod={paymentMethod}
                 panNumber={panNumber}
                 paymentProof={paymentProof}
-                onAmountChange={amount => { setAmount(amount)}}
                 onDonorTypeChange={donorType => { setDonorType(donorType)}}
                 onPanNumberChange={panNumber => { setPanNumber(panNumber)}}
                 onPaymentMethodChange={paymentMethod => { setPaymentMethod(paymentMethod)}}

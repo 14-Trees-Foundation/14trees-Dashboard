@@ -4,10 +4,9 @@ import FileInputComponent from "../FileInputComponent";
 import PaymentQR14tree from "../../assets/PaymentQR14tree.jpg";
 
 interface PaymentFormProps {
-    treeCount: number,
-    onAmountChange: (amount: number) => void
-    donorType: string
-    onDonorTypeChange: (donorType: string) => void
+    amount: number,
+    donorType: string,
+    onDonorTypeChange: (donorType: string) => void,
     paymentMethod: string
     onPaymentMethodChange: (paymentMethod: string) => void
     panNumber: string | null
@@ -16,37 +15,18 @@ interface PaymentFormProps {
     onPaymentProofChange: (paymentProof: File | null) => void
 }
 
-const PaymentForm: FC<PaymentFormProps> = ({ treeCount, onAmountChange, donorType, onDonorTypeChange, paymentMethod, onPaymentMethodChange, panNumber, onPanNumberChange, paymentProof, onPaymentProofChange }) => {
-
-    const [category, setCategory] = useState<string>('Foundation');
-
-    useEffect(() => {
-        onAmountChange(treeCount * (category === 'Public' ? 1500 : 3000))
-    }, [category, treeCount])
+const PaymentForm: FC<PaymentFormProps> = ({ amount, donorType, onDonorTypeChange, paymentMethod, onPaymentMethodChange, panNumber, onPanNumberChange, paymentProof, onPaymentProofChange }) => {
 
     return (
         <Box style={{ display: 'flex', padding: '40px', width: '100%', justifyContent: 'space-between' }}>
             <Box width="45%">
-                <Box>
-                    <FormControl fullWidth>
-                        <InputLabel id="land-type-label">Land Type</InputLabel>
-                        <Select
-                            labelId="land-type-label"
-                            value={category}
-                            label="Land Type"
-                            onChange={(e) => { setCategory(e.target.value) }}
-                        >
-                            <MenuItem value={'Foundation'}>Foundation</MenuItem>
-                            <MenuItem value={'Public'}>Public</MenuItem>
-                        </Select>
-                    </FormControl>
-                </Box>
                 <Box sx={{ mt: 2 }}>
                     <FormControl fullWidth>
                         <InputLabel htmlFor="amount">Amount</InputLabel>
                         <OutlinedInput
                             id="amount"
-                            value={new Intl.NumberFormat('en-IN').format(treeCount * (category === 'Public' ? 1500 : 3000))}
+                            disabled
+                            value={new Intl.NumberFormat('en-IN').format(amount)}
                             startAdornment={<InputAdornment position="start">₹</InputAdornment>}
                             label="Amount"
                         />

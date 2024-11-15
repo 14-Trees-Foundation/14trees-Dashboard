@@ -24,6 +24,7 @@ import AlbumImageInput from "../../../components/AlbumImageInput";
 import EmailConfirmationModal from "./Form/EmailConfirmationModal";
 import EditUserDetailsModal from "./Form/EditUserDetailsModal";
 import { getUniqueRequestId } from "../../../helpers/utils";
+import PaymentComponent from "../../../components/payment/PaymentComponent";
 
 const GiftTrees: FC = () => {
     const dispatch = useAppDispatch();
@@ -49,11 +50,15 @@ const GiftTrees: FC = () => {
     const [albumImagesModal, setAlbumImagesModal] = useState(false);
     const [userDetailsEditModal, setUserDetailsEditModal] = useState(false);
 
+    // payment
+    const [paymentModal, setPaymentModal] = useState(false);
+    const [selectedPaymentGR, setSelectedPaymentGR] = useState<GiftCard | null>(null);
+
     useEffect(() => {
         const getUsers = async () => {
             if (selectedGiftCard) {
                 const apiClient = new ApiClient();
-                const usersResp = await apiClient.getBookedGiftCards(selectedGiftCard?.id, 0, 20);
+                const usersResp = await apiClient.getBookedGiftCards(selectedGiftCard?.id, 0, 50);
                 setUsers(usersResp.results);
             }
         }
@@ -365,6 +370,11 @@ const GiftTrees: FC = () => {
         cloneGiftCardRequest(request.id, getUniqueRequestId());
     }
 
+    const handlePaymentModalOpen = (request: GiftCard) => {
+        setSelectedPaymentGR(request);
+        setPaymentModal(true);
+    }
+
     const getStatus = (card: GiftCard) => {
         if (card.status === 'pending_plot_selection') {
             return 'Pending Plot Selection';
@@ -418,6 +428,9 @@ const GiftTrees: FC = () => {
                 Send Emails
             </Menu.Item>}
             <Menu.Item key="11" onClick={() => { handleCloneGiftCardRequest(record); }}>
+                Clone Request
+            </Menu.Item>
+            <Menu.Item key="12" onClick={() => { handlePaymentModalOpen(record); }}>
                 Clone Request
             </Menu.Item>
             {(record.status === 'pending_plot_selection' || record.status === 'pending_assignment') && <Menu.Item key="9" danger onClick={() => { setDeleteModal(true); setSelectedGiftCard(record); }}>
@@ -607,6 +620,22 @@ const GiftTrees: FC = () => {
                     </Button>
                     <Button onClick={handleGiftCardRequestDelete} color="success" variant="contained">
                         Confirm
+                    </Button>
+                </DialogActions>
+            </Dialog>
+
+            <Dialog open={paymentModal} fullWidth maxWidth='md'>
+                <DialogTitle>Payment Details</DialogTitle>
+                <DialogContent dividers>
+                    <PaymentComponent 
+                        initialAmount={(selectedPaymentGR?.no_of_cards || 0) * 3000}
+                        paymentId={selectedGiftCard?.payment_id}
+                        onChange={(paymentId: number) => {  }}
+                    />
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={() => setPaymentModal(false)} color="primary">
+                        Close
                     </Button>
                 </DialogActions>
             </Dialog>
