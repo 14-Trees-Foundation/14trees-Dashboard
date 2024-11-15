@@ -3,7 +3,7 @@ import { Modal, Box, Typography, Button, List, ListItem, ListItemText, Table, Ta
 import ApiClient from '../../../../api/apiClient/apiClient';
 import { ForestOutlined, SelectAllRounded } from '@mui/icons-material';
 import GeneralTable from '../../../../components/GenTable';
-import getColumnSearchProps from '../../../../components/Filter';
+import getColumnSearchProps, { getColumnSelectedItemFilter } from '../../../../components/Filter';
 import { GridFilterItem } from '@mui/x-data-grid';
 import { toast } from 'react-toastify';
 
@@ -26,7 +26,6 @@ const UserTreeMappingModal: React.FC<UserTreeMappingModalProps> = ({ users, onUs
     const [tableRows, setTableRows] = useState<any[]>([]);
     const [filters, setFilters] = useState<Record<string, GridFilterItem>>({});
     const [tags, setTags] = useState<string[]>([])
-    const [selectedTags, setSelectedTags] = useState<string[]>([]);
 
     const handleSetFilters = (filters: Record<string, GridFilterItem>) => {
         setPage(0);
@@ -42,14 +41,6 @@ const UserTreeMappingModal: React.FC<UserTreeMappingModalProps> = ({ users, onUs
                 operatorValue: 'isAnyOf',
                 value: plotIds
             }]
-
-            if (selectedTags.length > 0) {
-                filtersData.push({
-                    columnField: 'tags',
-                    operatorValue: 'isAnyOf',
-                    value: selectedTags
-                })
-            }
 
             filtersData.push(...Object.values(filters));
             const treesResp = await apiClient.getGiftAbleTrees(page * pageSize, pageSize, filtersData);
@@ -71,7 +62,7 @@ const UserTreeMappingModal: React.FC<UserTreeMappingModalProps> = ({ users, onUs
     useEffect(() => {
         setTreesData({});
         setPage(0);
-    }, [filters, plotIds, selectedTags]);
+    }, [filters, plotIds]);
 
     useEffect(() => {
         const handler = setTimeout(() => {
@@ -144,15 +135,6 @@ const UserTreeMappingModal: React.FC<UserTreeMappingModalProps> = ({ users, onUs
         setPageSize(pageSize);
     }
 
-    const handleTagSelect = (tag: string) => {
-        const idx = selectedTags.findIndex(item => item === tag);
-        if (idx === -1) {
-            setSelectedTags(prev => [...prev, tag]);
-        } else {
-            setSelectedTags(prev => prev.filter(item => item !== tag));
-        }
-    }
-
     const columns: any[] = [
         {
             dataIndex: "sapling_id",
@@ -178,20 +160,12 @@ const UserTreeMappingModal: React.FC<UserTreeMappingModalProps> = ({ users, onUs
             ...getColumnSearchProps('plot', filters, handleSetFilters)
         },
         {
-            dataIndex: "category",
-            key: "category",
-            title: "Category",
+            dataIndex: "tags",
+            key: "tags",
+            title: "Plot Name",
             align: "center",
-            width: 100,
-            ...getColumnSearchProps('category', filters, handleSetFilters)
-        },
-        {
-            dataIndex: "use",
-            key: "use",
-            title: "Use",
-            align: "center",
-            width: 150,
-            ...getColumnSearchProps('use', filters, handleSetFilters)
+            width: 200,
+            ...getColumnSelectedItemFilter({ dataIndex: 'tags', filters, handleSetFilters, options: tags})
         },
         {
             dataIndex: "action",
@@ -273,29 +247,7 @@ const UserTreeMappingModal: React.FC<UserTreeMappingModalProps> = ({ users, onUs
                         flexDirection: 'column',
                     }}
                 >
-                    <Box sx={{ marginBottom: '20px' }}>
-                        <Typography>Select tags to filter plots</Typography>
-                        <Box sx={{
-                            display: 'flex',
-                            flexWrap: 'wrap',
-                        }}>
-                            {tags.map((tag, index) => (
-                                <Chip
-                                    key={index}
-                                    label={tag}
-                                    color="success"
-                                    variant={selectedTags.includes(tag) ? 'filled' : "outlined"}
-                                    onClick={() => { handleTagSelect(tag) }}
-                                    sx={{ margin: '2px' }}
-                                />
-                            ))}
-                        </Box>
-                        <Box sx={{ mt: 1, display: 'flex', alignItems: 'center' }}>
-                            <Button variant="contained" color="success" onClick={() => { setSelectedTags(tags); }}>All</Button>
-                            <Button variant="outlined" color="success" onClick={() => { setSelectedTags([]); }} sx={{ ml: 1 }}>Reset</Button>
-                        </Box>
-                    </Box>
-
+                    <Typography mb={2}>Select tree</Typography>
                     <GeneralTable
                         loading={loading}
                         rows={tableRows}
