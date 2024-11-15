@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { Modal, Box, Typography, Button, List, ListItem, ListItemText, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@mui/material';
+import { Modal, Box, Typography, Button, List, ListItem, ListItemText, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Chip } from '@mui/material';
 import ApiClient from '../../../../api/apiClient/apiClient';
 import { ForestOutlined, SelectAllRounded } from '@mui/icons-material';
 import GeneralTable from '../../../../components/GenTable';
 import getColumnSearchProps from '../../../../components/Filter';
 import { GridFilterItem } from '@mui/x-data-grid';
+import { toast } from 'react-toastify';
 
 
 interface UserTreeMappingModalProps {
@@ -24,6 +25,8 @@ const UserTreeMappingModal: React.FC<UserTreeMappingModalProps> = ({ users, onUs
     const [loading, setLoading] = useState(false);
     const [tableRows, setTableRows] = useState<any[]>([]);
     const [filters, setFilters] = useState<Record<string, GridFilterItem>>({});
+    const [tags, setTags] = useState<string[]>([])
+    const [selectedTags, setSelectedTags] = useState<string[]>([]);
 
     const handleSetFilters = (filters: Record<string, GridFilterItem>) => {
         setPage(0);
@@ -39,6 +42,14 @@ const UserTreeMappingModal: React.FC<UserTreeMappingModalProps> = ({ users, onUs
                 operatorValue: 'isAnyOf',
                 value: plotIds
             }]
+
+            if (selectedTags.length > 0) {
+                filtersData.push({
+                    columnField: 'tags',
+                    operatorValue: 'isAnyOf',
+                    value: selectedTags
+                })
+            }
 
             filtersData.push(...Object.values(filters));
             const treesResp = await apiClient.getGiftAbleTrees(page * pageSize, pageSize, filtersData);
@@ -58,8 +69,9 @@ const UserTreeMappingModal: React.FC<UserTreeMappingModalProps> = ({ users, onUs
     }
 
     useEffect(() => {
-        setTreesData({})
-    }, [filters, plotIds]);
+        setTreesData({});
+        setPage(0);
+    }, [filters, plotIds, selectedTags]);
 
     useEffect(() => {
         const handler = setTimeout(() => {
@@ -93,8 +105,22 @@ const UserTreeMappingModal: React.FC<UserTreeMappingModalProps> = ({ users, onUs
         return () => {
             clearTimeout(handler);
         }
-        
+
     }, [plotIds, filters])
+
+    useEffect(() => {
+        const getPTTags = async () => {
+            try {
+                const apiClient = new ApiClient();
+                const tagsResp = await apiClient.getPlantTypeTags();
+                setTags(tagsResp.results)
+            } catch (error: any) {
+                toast.error(error.message);
+            }
+        }
+
+        getPTTags();
+    }, [])
 
     const handleSelectTree = (tree: any) => {
         if (selectedUser) {
@@ -116,6 +142,15 @@ const UserTreeMappingModal: React.FC<UserTreeMappingModalProps> = ({ users, onUs
     const handlePaginationChange = (page: number, pageSize: number) => {
         setPage(page - 1);
         setPageSize(pageSize);
+    }
+
+    const handleTagSelect = (tag: string) => {
+        const idx = selectedTags.findIndex(item => item === tag);
+        if (idx === -1) {
+            setSelectedTags(prev => [...prev, tag]);
+        } else {
+            setSelectedTags(prev => prev.filter(item => item !== tag));
+        }
     }
 
     const columns: any[] = [
@@ -238,9 +273,28 @@ const UserTreeMappingModal: React.FC<UserTreeMappingModalProps> = ({ users, onUs
                         flexDirection: 'column',
                     }}
                 >
-                    <Typography id="tree-select-modal-title" variant="h6" sx={{ mb: 2 }}>
-                        Select a Tree
-                    </Typography>
+                    <Box sx={{ marginBottom: '20px' }}>
+                        <Typography>Select tags to filter plots</Typography>
+                        <Box sx={{
+                            display: 'flex',
+                            flexWrap: 'wrap',
+                        }}>
+                            {tags.map((tag, index) => (
+                                <Chip
+                                    key={index}
+                                    label={tag}
+                                    color="success"
+                                    variant={selectedTags.includes(tag) ? 'filled' : "outlined"}
+                                    onClick={() => { handleTagSelect(tag) }}
+                                    sx={{ margin: '2px' }}
+                                />
+                            ))}
+                        </Box>
+                        <Box sx={{ mt: 1, display: 'flex', alignItems: 'center' }}>
+                            <Button variant="contained" color="success" onClick={() => { setSelectedTags(tags); }}>All</Button>
+                            <Button variant="outlined" color="success" onClick={() => { setSelectedTags([]); }} sx={{ ml: 1 }}>Reset</Button>
+                        </Box>
+                    </Box>
 
                     <GeneralTable
                         loading={loading}
@@ -250,7 +304,7 @@ const UserTreeMappingModal: React.FC<UserTreeMappingModalProps> = ({ users, onUs
                         page={page}
                         pageSize={pageSize}
                         onPaginationChange={handlePaginationChange}
-                        onDownload={async() => { return Object.values(treesData) }}
+                        onDownload={async () => { return Object.values(treesData) }}
                         tableName="Trees"
                     />
 

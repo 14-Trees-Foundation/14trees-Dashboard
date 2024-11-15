@@ -9,7 +9,6 @@ import {
   Typography,
 } from "@mui/material";
 import { plantTypeHabitList } from "./habitList";
-import { CreateAlbumDialog } from "../../ww/CreateAlbumDialog";
 import { makeStyles } from "@mui/styles";
 import { useDropzone } from "react-dropzone";
 import TagSelector from "../../../components/TagSelector";
@@ -20,8 +19,8 @@ const AddTreeType = ({ open, handleClose, createPlantType }) => {
     top: "50%",
     left: "50%",
     transform: "translate(-50%, -50%)",
-    width: 400,
-    height: 450,
+    width: 800,
+    maxHeight: "90vh",
     overflow: "auto",
     scrollbarWidth: "thin",
     bgcolor: "background.paper",
@@ -33,22 +32,16 @@ const AddTreeType = ({ open, handleClose, createPlantType }) => {
 
   const [formData, setFormData] = useState({
     name: "",
-    plant_type_id: "",
-
+    english_name: "",
     scientific_name: "",
+    common_name_in_english: "",
+    common_name_in_marathi: "",
     known_as: "",
     family: "",
     habit: "",
-    english_name: "",
-    common_name_in_english: "",
-    common_name_in_marathi: "",
     category: "",
     tags: [],
     images: [],
-    remarkable_char: "",
-
-    use: "",
-    parts_used: "",
   });
 
   const [files, setFiles] = useState([]);
@@ -107,7 +100,7 @@ const AddTreeType = ({ open, handleClose, createPlantType }) => {
           </Typography>
           <form onSubmit={handleSubmit}>
             <Grid container rowSpacing={2} columnSpacing={1}>
-              <Grid item xs={12}>
+              <Grid item xs={6}>
                 <TextField
                   name="name"
                   label="Name"
@@ -116,7 +109,7 @@ const AddTreeType = ({ open, handleClose, createPlantType }) => {
                   fullWidth
                 />
               </Grid>
-              <Grid item xs={12}>
+              <Grid item xs={6}>
                 <TextField
                   name="english_name"
                   label="Name (English)"
@@ -125,7 +118,7 @@ const AddTreeType = ({ open, handleClose, createPlantType }) => {
                   fullWidth
                 />
               </Grid>
-              <Grid item xs={12}>
+              <Grid item xs={6}>
                 <TextField
                   name="common_name_in_english"
                   label="Common Name in English"
@@ -134,7 +127,7 @@ const AddTreeType = ({ open, handleClose, createPlantType }) => {
                   fullWidth
                 />
               </Grid>
-              <Grid item xs={12}>
+              <Grid item xs={6}>
                 <TextField
                   name="common_name_in_marathi"
                   label="Common Name in Marathi"
@@ -143,18 +136,7 @@ const AddTreeType = ({ open, handleClose, createPlantType }) => {
                   fullWidth
                 />
               </Grid>
-
-              <Grid item xs={12}>
-                <TextField
-                  name="plant_type_id"
-                  label="Plant Type ID"
-                  value={formData.phone}
-                  onChange={handleChange}
-                  fullWidth
-                />
-              </Grid>
-
-              <Grid item xs={12}>
+              <Grid item xs={6}>
                 <TextField
                   name="scientific_name"
                   label="Scientific Name"
@@ -163,7 +145,7 @@ const AddTreeType = ({ open, handleClose, createPlantType }) => {
                   fullWidth
                 />
               </Grid>
-              <Grid item xs={12}>
+              <Grid item xs={6}>
                 <TextField
                   name="known_as"
                   label="Known As"
@@ -172,7 +154,7 @@ const AddTreeType = ({ open, handleClose, createPlantType }) => {
                   fullWidth
                 />
               </Grid>
-              <Grid item xs={12}>
+              <Grid item xs={6}>
                 <TextField
                   name="category"
                   label="Category"
@@ -181,7 +163,7 @@ const AddTreeType = ({ open, handleClose, createPlantType }) => {
                   fullWidth
                 />
               </Grid>
-              <Grid item xs={12}>
+              <Grid item xs={6}>
                 <TagSelector
                   value={formData.tags}
                   handleChange={(tags) =>
@@ -189,20 +171,7 @@ const AddTreeType = ({ open, handleClose, createPlantType }) => {
                   }
                 />
               </Grid>
-              <Grid item xs={12}>
-                <div className={classes.imgdiv}>
-                  <section>
-                    <div {...getRootProps()}>
-                      <input {...getInputProps()} />
-                      <p style={{ cursor: "pointer" }}>
-                        Upload Plant Type images. Click or Drag!
-                      </p>
-                    </div>
-                  </section>
-                </div>
-                <div className={classes.prevcontainer}>{thumbs}</div>
-              </Grid>
-              <Grid item xs={12}>
+              <Grid item xs={6}>
                 <TextField
                   name="use"
                   label="Use"
@@ -211,7 +180,7 @@ const AddTreeType = ({ open, handleClose, createPlantType }) => {
                   fullWidth
                 />
               </Grid>
-              <Grid item xs={12}>
+              <Grid item xs={6}>
                 <TextField
                   name="family"
                   label="Family"
@@ -220,7 +189,6 @@ const AddTreeType = ({ open, handleClose, createPlantType }) => {
                   fullWidth
                 />
               </Grid>
-
               <Grid item xs={12}>
                 <Autocomplete
                   fullWidth
@@ -245,6 +213,19 @@ const AddTreeType = ({ open, handleClose, createPlantType }) => {
                       }));
                   }}
                 />
+              </Grid>
+              <Grid item xs={12}>
+                <div className={classes.imgdiv}>
+                  <section>
+                    <div {...getRootProps()}>
+                      <input {...getInputProps()} />
+                      <p style={{ cursor: "pointer" }}>
+                        Upload Plant Type images. Click or Drag!
+                      </p>
+                    </div>
+                  </section>
+                </div>
+                <div className={classes.prevcontainer}>{thumbs}</div>
               </Grid>
 
               <Grid
