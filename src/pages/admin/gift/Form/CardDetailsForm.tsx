@@ -19,8 +19,18 @@ const EventTypes = [
 
 const defaultMessages = {
     primary: 'We are immensely delighted to share that a tree has been planted in your name at the 14 Trees Foundation, Pune. This tree will be nurtured in your honour, rejuvenating ecosystems, supporting biodiversity, and helping offset the harmful effects of climate change.',
+    memorial: 'A tree has been planted in the memory of <name here> at the 14 Trees Foundation reforestation site. For many years, this tree will help rejuvenate local ecosystems, support local biodiversity and offset the harmful effects of climate change and global warming.',
     secondary: 'We invite you to visit 14 Trees and firsthand experience the growth and contribution of your tree towards a greener future.',
     logo: 'Gifted by 14 Trees in partnership with'
+}
+
+interface Massages {
+    primaryMessage: string,
+    secondaryMessage: string,
+    eventName: string,
+    eventType: string | undefined,
+    plantedBy: string,
+    logoMessage: string,
 }
 
 interface CardDetailsProps {
@@ -28,24 +38,14 @@ interface CardDetailsProps {
     request_id: string,
     presentationId: string | null,
     slideId: string | null,
-    primaryMessage: string,
-    secondaryMessage: string,
-    eventName: string,
-    eventType?: string,
-    plantedBy: string,
-    logoMessage: string
-    onChange: (primaryMessage: string, secondaryMessage: string, eventName: string, plantedBy: string, logoMessage: string, eventType?: string) => void
+    messages: Massages,
+    onChange: (messages: Massages) => void
     onPresentationId: (presentationId: string, slideId: string) => void
 }
 
-const CardDetails: FC<CardDetailsProps> = ({ logo_url, request_id, presentationId, slideId, primaryMessage, secondaryMessage, eventName, eventType, plantedBy, logoMessage, onChange, onPresentationId }) => {
+const CardDetails: FC<CardDetailsProps> = ({ logo_url, request_id, presentationId, slideId, messages, onChange, onPresentationId }) => {
 
-    const [primary, setPrimary] = useState(primaryMessage || defaultMessages.primary);
-    const [secondary, setSecondary] = useState(secondaryMessage || defaultMessages.secondary);
-    const [event, setEvent] = useState(eventName);
-    const [planted, setPlanted] = useState(plantedBy);
-    const [logo, setLogo] = useState(logoMessage || defaultMessages.logo);
-    const [selectedEventType, setSelectedEventType] = useState<{ value: string, label: string } | null>(EventTypes.find(item => item.value === eventType) ?? null);
+    const [selectedEventType, setSelectedEventType] = useState<{ value: string, label: string } | null>(null);
 
     const slideIdRef = useRef('');
     const presentationIdIdRef = useRef('');
@@ -68,7 +68,7 @@ const CardDetails: FC<CardDetailsProps> = ({ logo_url, request_id, presentationI
     useEffect(() => {
         const generateGiftCard = async () => {
             const apiClient = new ApiClient();
-            const resp = await apiClient.generateCardTemplate(request_id, primary, secondary, logo, logo_url);
+            const resp = await apiClient.generateCardTemplate(request_id, defaultMessages.primary, defaultMessages.secondary, defaultMessages.logo, logo_url);
             slideIdRef.current = resp.slide_id;
             presentationIdIdRef.current = resp.presentation_id;
 
@@ -96,14 +96,40 @@ const CardDetails: FC<CardDetailsProps> = ({ logo_url, request_id, presentationI
     }, [presentationId, slideId])
 
     useEffect(() => {
-        onChange(primary, secondary, event, planted, logo, selectedEventType?.value);
-        recordRef.current = { primary: primary, secondary: secondary, logo: logo, }
-    }, [primary, secondary, event, planted, logo, selectedEventType])
+        logoRef.current.logoUrl = logo_url
+    }, [logo_url])
 
     useEffect(() => {
-        setPlanted(plantedBy)
-        logoRef.current.logoUrl = logo_url
-    }, [logo_url, plantedBy])
+        const eventType = EventTypes.find(item => item.value === messages.eventType)
+        setSelectedEventType(eventType ? eventType : null);
+
+        if (messages.primaryMessage === "" || messages.secondaryMessage === "" || messages.logoMessage === "") {
+            onChange({
+                ...messages,
+                primaryMessage: eventType?.value === "2" ? defaultMessages.memorial : defaultMessages.primary,
+                secondaryMessage: defaultMessages.secondary,
+                logoMessage: defaultMessages.logo,
+            })
+        }
+    }, [messages])
+
+
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+        const { name: field, value }= e.target
+
+        onChange({
+            ...messages,
+            [field]: value,
+        })
+    }
+
+    const handleEventTypeSelection = (e: any, item: { value: string, label: string } | null) => {
+        onChange({
+            ...messages,
+            eventType: item ? item.value : undefined,
+            primaryMessage: messages.primaryMessage === defaultMessages.primary && item?.value === "2" ? defaultMessages.memorial : messages.primaryMessage, 
+        })
+    }
 
     return (
         <div style={{ display: 'flex', padding: '10px 10px', width: '100%', justifyContent: 'space-between' }}>
@@ -112,16 +138,18 @@ const CardDetails: FC<CardDetailsProps> = ({ logo_url, request_id, presentationI
                 <Typography variant="body1" sx={{ mt: 2 }}>Primary Message (2)</Typography>
                 <TextField
                     multiline
-                    value={primary}
-                    onChange={(e) => setPrimary(e.target.value)}
+                    name="primaryMessage"
+                    value={messages.primaryMessage}
+                    onChange={handleChange}
                     size="small"
                     inputProps={{ maxLength: 270 }}
                 />
                 <Typography variant="body1" sx={{ mt: 2 }}>Secondary Message (3)</Typography>
                 <TextField
                     multiline
-                    value={secondary}
-                    onChange={(e) => setSecondary(e.target.value)}
+                    name="secondaryMessage"
+                    value={messages.secondaryMessage}
+                    onChange={handleChange}
                     size="small"
                     inputProps={{ maxLength: 125 }}
                 />
@@ -131,10 +159,11 @@ const CardDetails: FC<CardDetailsProps> = ({ logo_url, request_id, presentationI
                     value={selectedEventType}
                     options={EventTypes}
                     getOptionLabel={option => option.label}
-                    onChange={(e, value) => { setSelectedEventType(value) }}
+                    onChange={handleEventTypeSelection}
                     renderInput={(params) => (
                         <TextField
                             {...params}
+                            name="eventType"    
                             margin='dense'
                             label='Event Type'
                         />
@@ -142,20 +171,23 @@ const CardDetails: FC<CardDetailsProps> = ({ logo_url, request_id, presentationI
                 />
                 <Typography variant="body1" sx={{ mt: 2 }}>Event Name</Typography>
                 <TextField
-                    value={event}
-                    onChange={(e) => setEvent(e.target.value)}
+                    name="eventName"
+                    value={messages.eventName}
+                    onChange={handleChange}
                     size="small"
                 />
                 <Typography variant="body1" sx={{ mt: 2 }}>Gifted By</Typography>
                 <TextField
-                    value={planted}
-                    onChange={(e) => setPlanted(e.target.value)}
+                    name="plantedBy"
+                    value={messages.plantedBy}
+                    onChange={handleChange}
                     size="small"
                 />
                 <Typography variant="body1" sx={{ mt: 2 }}>Logo Message (4)</Typography>
                 <TextField
-                    value={logo}
-                    onChange={(e) => setLogo(e.target.value)}
+                    name="logoMessage"
+                    value={messages.logoMessage}
+                    onChange={handleChange}
                     size="small"
                     inputProps={{ maxLength: 50 }}
                 />
