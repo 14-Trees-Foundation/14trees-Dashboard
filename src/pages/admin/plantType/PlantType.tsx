@@ -164,7 +164,8 @@ export const PlantTypeComponent = () => {
             title: "Tags",
             width: 250,
             align: "center",
-            ...getColumnSearchProps('tags', filters, handleSetFilters)
+            render: (tags) => tags ? tags.join(", ") : '',
+            ...getColumnSelectedItemFilter({ dataIndex: 'tags', filters, handleSetFilters, options: [] })
         },
         {
             dataIndex: "use",

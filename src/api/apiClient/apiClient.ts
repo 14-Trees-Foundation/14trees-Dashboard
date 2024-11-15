@@ -119,6 +119,18 @@ class ApiClient {
         }
     }
 
+    async getPlantTypeTags(): Promise<PaginatedResponse<string>> {
+        try {
+            const resp = await this.api.get<PaginatedResponse<string>>(`/plant-types/tags/get`);
+            return resp.data;
+        } catch (error: any) {
+            if (error?.response?.data?.message) {
+                throw new Error(error.response.data.message)
+            }
+            throw new Error('Failed to get plant type tags!');
+        }
+    }
+
 
     /*
         Model- Plot: CRUD Operations/Apis for plots

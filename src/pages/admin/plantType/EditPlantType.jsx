@@ -1,17 +1,17 @@
 import React, { useState } from "react";
 import {
   Autocomplete,
+  Box,
   Button,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogTitle,
-  TextField,
   Grid,
+  Modal,
+  TextField,
+  Typography,
 } from "@mui/material";
 import { plantTypeHabitList } from "./habitList";
 import { useDropzone } from "react-dropzone";
 import { makeStyles } from "@mui/styles";
+import TagSelector from "../../../components/TagSelector";
 
 function EditTreeType({
   row,
@@ -19,6 +19,23 @@ function EditTreeType({
   handleCloseEditModal,
   editSubmit,
 }) {
+
+  const style = {
+    position: "absolute",
+    top: "50%",
+    left: "50%",
+    transform: "translate(-50%, -50%)",
+    width: 800,
+    maxHeight: "90vh",
+    overflow: "auto",
+    scrollbarWidth: "thin",
+    bgcolor: "background.paper",
+    border: "2px solid #000",
+    boxShadow: 24,
+    borderRadius: "10px",
+    p: 4,
+  };
+  
   const [formData, setFormData] = useState(row);
 
   const classes = useStyles();
@@ -67,162 +84,164 @@ function EditTreeType({
   });
 
   return (
-    <Dialog open={openeditModal} onClose={() => handleCloseEditModal(false)}>
-      <DialogTitle align="center">Edit Tree Type</DialogTitle>
-      <form onSubmit={handleEditSubmit}>
-        <DialogContent>
-          <TextField
-            autoFocus
-            margin="dense"
-            name="name"
-            label="Name"
-            type="text"
-            fullWidth
-            value={formData.name}
-            onChange={handleChange}
-          />
-          <TextField
-            margin="dense"
-            name="english_name"
-            label="Name (English)"
-            type="text"
-            fullWidth
-            value={formData.english_name}
-            onChange={handleChange}
-          />
-          <TextField
-            margin="dense"
-            name="common_name_in_english"
-            label="Common Name in English"
-            type="text"
-            fullWidth
-            value={formData.common_name_in_english}
-            onChange={handleChange}
-          />
-          <TextField
-            margin="dense"
-            name="common_name_in_marathi"
-            label="Common Name in Marathi"
-            type="text"
-            fullWidth
-            value={formData.common_name_in_marathi}
-            onChange={handleChange}
-          />
-          <TextField
-            margin="dense"
-            name="scientific_name"
-            label="Scientific Name"
-            type="text"
-            fullWidth
-            value={formData.scientific_name}
-            onChange={handleChange}
-          />
-          <TextField
-            margin="dense"
-            name="known_as"
-            label="Known As"
-            type="text"
-            fullWidth
-            value={formData.known_as}
-            onChange={handleChange}
-          />
-          <TextField
-            margin="dense"
-            name="category"
-            label="Category"
-            type="text"
-            fullWidth
-            value={formData.category}
-            onChange={handleChange}
-          />
-          <TextField
-            margin="dense"
-            name="tags"
-            label="Tags"
-            type="text"
-            fullWidth
-            value={formData.tags}
-            onChange={handleChange}
-          />
-          <Grid item xs={12}>
-            <div className={classes.imgdiv}>
-              <section>
-                <div {...getRootProps()}>
-                  <input {...getInputProps()} />
-                  <p style={{ cursor: "pointer" }}>
-                    Upload Plant Type images. Click or Drag!
-                  </p>
+    <div>
+      <Modal
+        open={openeditModal}
+        onClose={handleCloseEditModal}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
+      >
+        <Box sx={style}>
+          <Typography variant="h6" align="center" sx={{ marginBottom: "8px" }}>
+            Edit Plant Type
+          </Typography>
+          <form onSubmit={handleEditSubmit}>
+            <Grid container rowSpacing={2} columnSpacing={1}>
+              <Grid item xs={6}>
+                <TextField
+                  name="name"
+                  label="Name"
+                  value={formData.name}
+                  onChange={handleChange}
+                  fullWidth
+                />
+              </Grid>
+              <Grid item xs={6}>
+                <TextField
+                  name="english_name"
+                  label="Name (English)"
+                  value={formData.english_name}
+                  onChange={handleChange}
+                  fullWidth
+                />
+              </Grid>
+              <Grid item xs={6}>
+                <TextField
+                  name="common_name_in_english"
+                  label="Common Name in English"
+                  value={formData.common_name_in_english}
+                  onChange={handleChange}
+                  fullWidth
+                />
+              </Grid>
+              <Grid item xs={6}>
+                <TextField
+                  name="common_name_in_marathi"
+                  label="Common Name in Marathi"
+                  value={formData.common_name_in_marathi}
+                  onChange={handleChange}
+                  fullWidth
+                />
+              </Grid>
+              <Grid item xs={6}>
+                <TextField
+                  name="scientific_name"
+                  label="Scientific Name"
+                  value={formData.scientific_name}
+                  onChange={handleChange}
+                  fullWidth
+                />
+              </Grid>
+              <Grid item xs={6}>
+                <TextField
+                  name="known_as"
+                  label="Known As"
+                  value={formData.known_as}
+                  onChange={handleChange}
+                  fullWidth
+                />
+              </Grid>
+              <Grid item xs={6}>
+                <TextField
+                  name="category"
+                  label="Category"
+                  value={formData.category}
+                  onChange={handleChange}
+                  fullWidth
+                />
+              </Grid>
+              <Grid item xs={6}>
+                <TagSelector
+                  value={formData.tags}
+                  handleChange={(tags) =>
+                    setFormData({ ...formData, tags: tags })
+                  }
+                />
+              </Grid>
+              <Grid item xs={6}>
+                <TextField
+                  name="use"
+                  label="Use"
+                  value={formData.use}
+                  onChange={handleChange}
+                  fullWidth
+                />
+              </Grid>
+              <Grid item xs={6}>
+                <TextField
+                  name="family"
+                  label="Family"
+                  value={formData.family}
+                  onChange={handleChange}
+                  fullWidth
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <Autocomplete
+                  fullWidth
+                  name="habit"
+                  disablePortal
+                  options={plantTypeHabitList}
+                  value={
+                    formData.habit
+                      ? plantTypeHabitList.find(
+                          (item) => item === formData.habit
+                        )
+                      : undefined
+                  }
+                  renderInput={(params) => (
+                    <TextField {...params} margin="dense" label="Habit" />
+                  )}
+                  onChange={(event, value) => {
+                    if (value !== null)
+                      setFormData((prevState) => ({
+                        ...prevState,
+                        habit: value,
+                      }));
+                  }}
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <div className={classes.imgdiv}>
+                  <section>
+                    <div {...getRootProps()}>
+                      <input {...getInputProps()} />
+                      <p style={{ cursor: "pointer" }}>
+                        Upload Plant Type images. Click or Drag!
+                      </p>
+                    </div>
+                  </section>
                 </div>
-              </section>
-            </div>
-            <div className={classes.prevcontainer}>{thumbs}</div>
-          </Grid>
-          <TextField
-            margin="dense"
-            name="images"
-            label="Images"
-            type="text"
-            fullWidth
-            value={formData.images}
-            onChange={handleChange}
-          />
-          <TextField
-            margin="dense"
-            name="use"
-            label="Use"
-            type="text"
-            fullWidth
-            value={formData.use}
-            onChange={handleChange}
-          />
-          <Autocomplete
-            fullWidth
-            name="habit"
-            disablePortal
-            options={plantTypeHabitList}
-            value={
-              formData.habit
-                ? plantTypeHabitList.find((item) => item === formData.habit)
-                : undefined
-            }
-            renderInput={(params) => (
-              <TextField {...params} margin="dense" label="Habit" />
-            )}
-            onChange={(event, value) => {
-              if (value !== null)
-                setFormData((prevState) => ({ ...prevState, habit: value }));
-            }}
-          />
-          <TextField
-            margin="dense"
-            name="plant_type_id"
-            label="Plant Type ID"
-            type="text"
-            fullWidth
-            value={formData.plant_type_id}
-            onChange={handleChange}
-          />
-        </DialogContent>
-        <DialogActions
-          sx={{
-            display: "flex",
-            justifyContent: "center",
-            marginBottom: "15px",
-          }}
-        >
-          <Button
-            variant="outlined"
-            onClick={() => handleCloseEditModal(false)}
-            color="error"
-          >
-            Cancel
-          </Button>
-          <Button variant="contained" type="submit" color="success">
-            Save
-          </Button>
-        </DialogActions>
-      </form>
-    </Dialog>
+                <div className={classes.prevcontainer}>{thumbs}</div>
+              </Grid>
+
+              <Grid
+                item
+                xs={12}
+                sx={{ display: "flex", justifyContent: "center" }}
+              >
+                <Button variant="outlined" color="error" onClick={handleCloseEditModal} style={{ marginRight: "8px" }}>
+                  Cancel
+                </Button>
+                <Button variant="contained" type="submit" color="success">
+                  Submit
+                </Button>
+              </Grid>
+            </Grid>
+          </form>
+        </Box>
+      </Modal>
+    </div>
   );
 }
 const useStyles = makeStyles((theme) => ({
