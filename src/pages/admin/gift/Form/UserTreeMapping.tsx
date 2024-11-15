@@ -162,7 +162,7 @@ const UserTreeMappingModal: React.FC<UserTreeMappingModalProps> = ({ users, onUs
         {
             dataIndex: "tags",
             key: "tags",
-            title: "Plot Name",
+            title: "Tags",
             align: "center",
             width: 200,
             ...getColumnSelectedItemFilter({ dataIndex: 'tags', filters, handleSetFilters, options: tags})
