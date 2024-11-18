@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react"
 import { toast } from "react-toastify"
-import { Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, Typography } from "@mui/material"
+import { Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, FormControl, InputAdornment, InputLabel, MenuItem, OutlinedInput, Select, Typography } from "@mui/material"
 import EditIcon from "@mui/icons-material/Edit";
 
 import { Payment, PaymentHistory } from "../../types/payment"
@@ -10,6 +10,10 @@ import PaymentBaseForm from "./PaymentBaseForm";
 import { VisibilityOutlined } from "@mui/icons-material";
 import { getHumanReadableDate } from "../../helpers/utils";
 import PaymentHistoryForm from "./PaymentHistoryForm";
+import FileInputComponent from "../FileInputComponent";
+
+import PaymentQR14tree from "../../assets/PaymentQR14tree.jpg";
+import { AWSUtils } from "../../helpers/aws";
 
 const paymentStatusList = [
     {
@@ -29,7 +33,7 @@ const paymentStatusList = [
 const getReadableStatus = (value: string) => {
     const status = paymentStatusList.find(item => item.value === value)
     return status ? status.label : '';
-} 
+}
 
 interface PaymentProps {
     initialAmount?: number
@@ -41,10 +45,13 @@ const PaymentComponent: React.FC<PaymentProps> = ({ initialAmount, paymentId, on
 
     const [openEdit, setOpenEdit] = useState(false);
     const [amount, setAmount] = useState(initialAmount || 0);
-    const [amountPayed, setAmountPayed] = useState(0);
     const [donorType, setDonorType] = useState('');
     const [panNumber, setPanNumber] = useState('');
     const [payment, setPayment] = useState<Payment | null>(null);
+
+    const [paymentProof, setPaymentProof] = useState<File | null>(null);
+    const [paymentMethod, setPaymentMethod] = useState<string | undefined>();
+    const [payingAmount, setPayingAmount] = useState<number>(0);
 
     const [page, setPage] = useState(0);
     const [pageSize, setPageSize] = useState(10);
@@ -61,6 +68,26 @@ const PaymentComponent: React.FC<PaymentProps> = ({ initialAmount, paymentId, on
         paymentDate: '',
     })
 
+    const [amountData, setAmountData] = useState({
+        totalAmount: 0,
+        paidAmount: 0,
+        verifiedAmount: 0,
+    })
+
+    useEffect(() => {
+        if (payment && payment.payment_history && payment.payment_history.length > 0) {
+            const paid = payment.payment_history.map(item => item.amount).reduce((prev, curr) => prev + curr, 0);
+            const verified = payment.payment_history.filter(item => item.status === 'validated').map(item => item.amount).reduce((prev, curr) => prev + curr, 0);
+
+            setAmountData({
+                totalAmount: amount,
+                paidAmount: paid,
+                verifiedAmount: verified,
+            });
+
+        }
+    }, [payment, amount])
+
     const getPayment = async (paymentId: number) => {
         try {
             const apiClient = new ApiClient();
@@ -70,7 +97,6 @@ const PaymentComponent: React.FC<PaymentProps> = ({ initialAmount, paymentId, on
             setAmount(payment.amount);
             setDonorType(payment.donor_type);
             setPanNumber(payment.pan_number ? payment.pan_number : '');
-            setAmountPayed(payment?.payment_history ? payment.payment_history.map(item => item.amount).reduce((prev, curr) => prev + curr) : 0)
         } catch (error: any) {
             toast.error(error.message)
         }
@@ -95,7 +121,7 @@ const PaymentComponent: React.FC<PaymentProps> = ({ initialAmount, paymentId, on
                 data.donor_type = donorType;
                 data.pan_number = panNumber ? panNumber : null;
                 const resp = await apiClient.updatedPayment(data);
-    
+
                 setPayment({
                     ...payment,
                     donor_type: resp.donor_type,
@@ -106,7 +132,7 @@ const PaymentComponent: React.FC<PaymentProps> = ({ initialAmount, paymentId, on
                 setPayment(resp);
                 onChange && onChange(resp.id);
             }
-        } catch(error: any) {
+        } catch (error: any) {
             toast.error(error.message);
         }
     }
@@ -164,6 +190,33 @@ const PaymentComponent: React.FC<PaymentProps> = ({ initialAmount, paymentId, on
         }
 
         handleCloseHistoryModal();
+    }
+
+    const handleAddPaymentHistory = async () => {
+        if (!payment) return;
+
+        if (paymentMethod) {
+            let paymentProofLink: string | null = null;
+            if (paymentProof) {
+                const awsUtils = new AWSUtils();
+                const location = await awsUtils.uploadFileToS3("payment", paymentProof);
+                if (location) paymentProofLink = location;
+            }
+
+            try {
+                const apiClient = new ApiClient();
+                const resp = await apiClient.createPaymentHistory(payment.id, payingAmount, paymentMethod, paymentProofLink);
+
+                setPayment(prev => {
+                    return prev ? {
+                        ...prev,
+                        payment_history: prev?.payment_history ? [...prev.payment_history, resp] : [resp],
+                    } : null
+                })
+            } catch(error: any) {
+                toast.error("Failed to save payment made!")
+            }
+        }
     }
 
     const columns: any[] = [
@@ -270,21 +323,30 @@ const PaymentComponent: React.FC<PaymentProps> = ({ initialAmount, paymentId, on
                         <Box display="flex" flexDirection="column" gap={1}>
                             <Box display="flex" justifyContent="space-between">
                                 <Typography>Total amount:</Typography>
-                                <Typography ml={10}>{new Intl.NumberFormat('en-IN').format(amount)}</Typography>
+                                <Typography ml={10}>{new Intl.NumberFormat('en-IN').format(amountData.totalAmount)}</Typography>
                             </Box>
                             <Box display="flex" justifyContent="space-between">
-                                <Typography>Amount paid:</Typography>
-                                <Typography ml={10}>{new Intl.NumberFormat('en-IN').format(amountPayed)}</Typography>
+                                <Typography>Paid amount:</Typography>
+                                <Typography ml={10}>{new Intl.NumberFormat('en-IN').format(amountData.paidAmount)}</Typography>
                             </Box>
                             <Box display="flex" justifyContent="space-between">
                                 <Typography>Remaining amount:</Typography>
-                                <Typography ml={10}>{new Intl.NumberFormat('en-IN').format(amount - amountPayed)}</Typography>
+                                <Typography ml={10}>{new Intl.NumberFormat('en-IN').format(amountData.totalAmount - amountData.paidAmount)}</Typography>
+                            </Box>
+                        </Box>
+                        <Box display="flex" flexDirection="column" gap={1} ml={10}>
+                            <Box display="flex" justifyContent="space-between">
+                                <Typography>Verified amount:</Typography>
+                                <Typography ml={10}>{new Intl.NumberFormat('en-IN').format(amountData.verifiedAmount)}</Typography>
+                            </Box>
+                            <Box display="flex" justifyContent="space-between">
+                                <Typography>Unverified amount:</Typography>
+                                <Typography ml={10}>{new Intl.NumberFormat('en-IN').format(amountData.paidAmount - amountData.verifiedAmount)}</Typography>
                             </Box>
                         </Box>
                         <Box style={{ flexGrow: 1 }}></Box>
                     </Box>
                 </Box>
-
                 <Box>
                     <Button
                         variant="outlined"
@@ -297,7 +359,67 @@ const PaymentComponent: React.FC<PaymentProps> = ({ initialAmount, paymentId, on
                 </Box>
             </Box>
 
-            <Box mt={2}>
+            {amountData.paidAmount !== amountData.totalAmount && <Box mt={10}>
+                <Typography variant="h6">Please consider paying remaining amount</Typography>
+                <Box style={{ display: 'flex', justifyContent: 'space-between' }}>
+                    <Box width="45%">
+                        <Box sx={{ mt: 2 }}>
+                            <FormControl fullWidth>
+                                <InputLabel htmlFor="amount">Amount</InputLabel>
+                                <OutlinedInput
+                                    id="amount"
+                                    defaultValue={new Intl.NumberFormat('en-IN').format(amountData.totalAmount - amountData.paidAmount)}
+                                    value={payingAmount ? new Intl.NumberFormat('en-IN').format(payingAmount) : ''}
+                                    startAdornment={<InputAdornment position="start">₹</InputAdornment>}
+                                    label="Amount"
+                                    onChange={(e) => { setPayingAmount(parseInt(e.target.value.replaceAll(',', ''))) }}
+                                />
+                            </FormControl>
+                        </Box>
+                        <Box sx={{ mt: 2 }}>
+                            <FormControl fullWidth>
+                                <InputLabel id="payment-method-label">Payment Method</InputLabel>
+                                <Select
+                                    disabled={donorType !== 'Indian Citizen'}
+                                    labelId="payment-method-label"
+                                    value={paymentMethod || "None"}
+                                    label="Payment Method"
+                                    onChange={(e) => { setPaymentMethod(e.target.value !== "None" ? e.target.value : undefined) }}
+                                >
+                                    <MenuItem value={"None"}>Not Selected</MenuItem>
+                                    <MenuItem value={'UPI'}>UPI</MenuItem>
+                                    <MenuItem value={'Net Banking'}>Net Banking</MenuItem>
+                                    <MenuItem value={'Cheque'}>Cheque</MenuItem>
+                                    <MenuItem value={'Cash'}>Cash</MenuItem>
+                                    <MenuItem value={'Wire Transfer'}>Wire Transfer</MenuItem>
+                                </Select>
+                            </FormControl>
+                        </Box>
+                    </Box>
+                    <Box width="45%">
+                        <div style={{ textAlign: "center" }}>
+                            <img
+                                // eslint-disable-next-line no-octal-escape
+                                src={PaymentQR14tree} // Replace with your QR code image URL
+                                alt="QR Code"
+                                style={{
+                                    maxWidth: "100%",
+                                    maxHeight: "200px",
+                                    marginBottom: "20px",
+                                }}
+                            />
+                        </div>
+                        <Box sx={{ mt: 2 }}>
+                            <FileInputComponent file={paymentProof} onFileChange={(file: File | null) => setPaymentProof(file)} />
+                        </Box>
+                    </Box>
+                </Box>
+                <Button onClick={handleAddPaymentHistory} color="success" variant="contained">
+                    Add Payment Details
+                </Button>
+            </Box>}
+
+            <Box mt={10}>
                 <Typography>Payment History</Typography>
                 <GeneralTable
                     loading={false}
@@ -359,13 +481,13 @@ const PaymentComponent: React.FC<PaymentProps> = ({ initialAmount, paymentId, on
                 <DialogContent dividers>
                     <PaymentHistoryForm
                         amount={historyForm.amount}
-                        onAmountChange={(amount: number) => { setHistoryForm(prev => ({ ...prev, amount  })) }}
+                        onAmountChange={(amount: number) => { setHistoryForm(prev => ({ ...prev, amount })) }}
                         paymentMethod={historyForm.paymentMethod}
-                        onPaymentMethodChange={(paymentMethod: string) => { setHistoryForm(prev => ({ ...prev, paymentMethod  })) }}
+                        onPaymentMethodChange={(paymentMethod: string) => { setHistoryForm(prev => ({ ...prev, paymentMethod })) }}
                         paymentReceivedDate={historyForm.paymentDate}
-                        onPaymentReceivedDateChange={(date: string) => { setHistoryForm(prev => ({ ...prev, paymentDate: date  })) }}
+                        onPaymentReceivedDateChange={(date: string) => { setHistoryForm(prev => ({ ...prev, paymentDate: date })) }}
                         status={historyForm.status}
-                        onStatusChange={(status: string) => { setHistoryForm(prev => ({ ...prev, status  })) }}
+                        onStatusChange={(status: string) => { setHistoryForm(prev => ({ ...prev, status })) }}
                     />
                 </DialogContent>
                 <DialogActions>

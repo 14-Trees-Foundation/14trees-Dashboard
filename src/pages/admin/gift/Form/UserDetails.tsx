@@ -290,7 +290,7 @@ export const BulkUserForm: FC<BulkUserFormProps> = ({ requestId, users, onUsersC
     const image: File | string | undefined = (user as any).profileImage
     if (image && typeof image !== 'string' && requestId) {
       const awsUtils = new AWSUtils();
-      const location = await awsUtils.uploadFileToS3(requestId, image, 'gift-request');
+      const location = await awsUtils.uploadFileToS3('gift-request', image, requestId);
       user.image = true;
       user.image_name = image.name;
       user.image_url = location;

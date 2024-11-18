@@ -14,6 +14,7 @@ import ApiClient from "../../../../api/apiClient/apiClient";
 import { AWSUtils } from "../../../../helpers/aws";
 import PaymentForm from "../../../../components/payment/PaymentForm";
 import { Payment } from "../../../../types/payment";
+import DashboardDetails from "./DashboardDetailsForm";
 
 interface GiftCardsFormProps {
     giftCardRequest?: GiftCard
@@ -116,7 +117,7 @@ const GiftCardsForm: FC<GiftCardsFormProps> = ({ giftCardRequest, requestId, ope
         const uploadFile = async () => {
             if (logo && requestId) {
                 const awsUtils = new AWSUtils();
-                const location = await awsUtils.uploadFileToS3(requestId, logo, 'gift-request');
+                const location = await awsUtils.uploadFileToS3('gift-request', logo, requestId);
                 setLogoString(location);
             } else {
                 setLogoString(null);
@@ -139,6 +140,14 @@ const GiftCardsForm: FC<GiftCardsFormProps> = ({ giftCardRequest, requestId, ope
         },
         {
             key: 2,
+            title: "Dashboard Details",
+            content: <DashboardDetails
+                messages={{...messages, plantedBy: messages.plantedBy || group?.name || ''}}
+                onChange={messages => { setMessages(messages) }}
+            />,
+        },
+        {
+            key: 3,
             title: "Book Trees",
             content: <PlotSelection 
                 disabled={giftCardRequest !== undefined && giftCardRequest.status !== 'pending_plot_selection'} 
@@ -151,9 +160,10 @@ const GiftCardsForm: FC<GiftCardsFormProps> = ({ giftCardRequest, requestId, ope
             />,
         },
         {
-            key: 3,
+            key: 4,
             title: "Payment",
             content: <PaymentForm
+                payment={payment}
                 amount={amount}
                 donorType={donorType}
                 paymentMethod={paymentMethod}
@@ -166,7 +176,7 @@ const GiftCardsForm: FC<GiftCardsFormProps> = ({ giftCardRequest, requestId, ope
             />,
         },
         {
-            key: 4,
+            key: 5,
             title: "Gift Card Messages",
             content: <CardDetails
                 request_id={requestId || ''}
@@ -179,7 +189,7 @@ const GiftCardsForm: FC<GiftCardsFormProps> = ({ giftCardRequest, requestId, ope
             />,
         },
         {
-            key: 5,
+            key: 6,
             title: "User Details",
             content: <BulkUserForm requestId={requestId} users={users} onUsersChange={users => setUsers(users)} onFileChange={file => setFile(file)} />,
         },
@@ -257,15 +267,18 @@ const GiftCardsForm: FC<GiftCardsFormProps> = ({ giftCardRequest, requestId, ope
                 nextStep = 2;
                 break;
             case 2:
-                if (treeCount === 0) toast.error("Please provide number of trees to gift");
-                else nextStep = 3;
+                nextStep = 3;
                 break;
             case 3:
-                nextStep = 4;
+                if (treeCount === 0) toast.error("Please provide number of trees to gift");
+                else nextStep = 4;
                 break;
             case 4:
+                nextStep = 5;
+                break;
+            case 5:
                 if (messages.primaryMessage === "" || messages.secondaryMessage === "") toast.error("Please provide gift card details");
-                else nextStep = 5;
+                else nextStep = 6;
                 break;
             default:
                 break;

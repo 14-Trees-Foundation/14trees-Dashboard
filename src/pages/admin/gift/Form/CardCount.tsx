@@ -1,5 +1,6 @@
 import { FC } from "react";
-import { Box, FormControl, InputLabel, MenuItem, Select, TextField, Typography } from "@mui/material";
+import { Box, Button, FormControl, InputLabel, MenuItem, Select, TextField, Tooltip, Typography } from "@mui/material";
+import { HelpOutline } from "@mui/icons-material";
 
 interface CardCountProps {
     disabled: boolean
@@ -33,7 +34,11 @@ const CardCount: FC<CardCountProps> = ({ disabled, treeCount, onTreeCountChange,
                 />
             </div>
             <Box mt={2}>
-                <Typography mb={1} variant='body1'>Where would you like to plant the trees?</Typography>
+                <Typography mb={1} variant='body1'>Where would you like to plant the trees? 
+                    <Tooltip title={"Foundation sites are 14 Trees Foundation's land preserves and Public sites are government owned lands such as schools, guirans etc."}>
+                        <Button><HelpOutline /></Button>
+                    </Tooltip>
+                </Typography>
                 <FormControl fullWidth>
                     <Select
                         labelId="land-type-label"
@@ -53,7 +58,7 @@ const CardCount: FC<CardCountProps> = ({ disabled, treeCount, onTreeCountChange,
                         value={grove || 'None'}
                         onChange={(e) => { onGroveChange(e.target.value !== "None" ? e.target.value : null) }}
                     >
-                        <MenuItem value = {'None'}>No Preference</MenuItem>
+                        <MenuItem value={'None'}>No Preference</MenuItem>
                         <MenuItem value={'Visitor'}>Visitor Grove</MenuItem>
                         <MenuItem value={'Family'}>Family Grove</MenuItem>
                         <MenuItem value={'Memorial'}>Memorial Grove</MenuItem>

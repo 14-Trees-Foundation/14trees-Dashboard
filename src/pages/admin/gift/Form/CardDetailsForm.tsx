@@ -1,24 +1,10 @@
 import { FC, useEffect, useRef, useState } from "react";
-import { Autocomplete, Box, Button, TextField, Typography } from "@mui/material";
+import { Box, Button, TextField, Typography } from "@mui/material";
 import ApiClient from "../../../../api/apiClient/apiClient";
-
-const EventTypes = [
-    {
-        value: '1',
-        label: 'Birthday'
-    },
-    {
-        value: '2',
-        label: 'Memorial'
-    },
-    {
-        value: '3',
-        label: 'General gift'
-    },
-]
 
 const defaultMessages = {
     primary: 'We are immensely delighted to share that a tree has been planted in your name at the 14 Trees Foundation, Pune. This tree will be nurtured in your honour, rejuvenating ecosystems, supporting biodiversity, and helping offset the harmful effects of climate change.',
+    birthday: 'We are immensely delighted to share that a tree has been planted in your name on occasion of you birthday at the 14 Trees Foundation, Pune. This tree will be nurtured in your honour, rejuvenating ecosystems, supporting biodiversity, and helping offset the harmful effects of climate change.',
     memorial: 'A tree has been planted in the memory of <name here> at the 14 Trees Foundation reforestation site. For many years, this tree will help rejuvenate local ecosystems, support local biodiversity and offset the harmful effects of climate change and global warming.',
     secondary: 'We invite you to visit 14 Trees and firsthand experience the growth and contribution of your tree towards a greener future.',
     logo: 'Gifted by 14 Trees in partnership with'
@@ -44,8 +30,6 @@ interface CardDetailsProps {
 }
 
 const CardDetails: FC<CardDetailsProps> = ({ logo_url, request_id, presentationId, slideId, messages, onChange, onPresentationId }) => {
-
-    const [selectedEventType, setSelectedEventType] = useState<{ value: string, label: string } | null>(null);
 
     const slideIdRef = useRef('');
     const presentationIdIdRef = useRef('');
@@ -100,13 +84,12 @@ const CardDetails: FC<CardDetailsProps> = ({ logo_url, request_id, presentationI
     }, [logo_url])
 
     useEffect(() => {
-        const eventType = EventTypes.find(item => item.value === messages.eventType)
-        setSelectedEventType(eventType ? eventType : null);
-
-        if (messages.primaryMessage === "" || messages.secondaryMessage === "" || messages.logoMessage === "") {
+        const eventMessage = messages.eventType === "2" ? defaultMessages.memorial : messages.eventType === "1" ? defaultMessages.birthday : defaultMessages.primary;
+        if (messages.primaryMessage === "" || messages.secondaryMessage === "" || messages.logoMessage === ""
+            || ((messages.primaryMessage === defaultMessages.primary || messages.primaryMessage === defaultMessages.birthday || messages.primaryMessage === defaultMessages.memorial) && messages.primaryMessage !== eventMessage)) {
             onChange({
                 ...messages,
-                primaryMessage: eventType?.value === "2" ? defaultMessages.memorial : defaultMessages.primary,
+                primaryMessage: eventMessage,
                 secondaryMessage: defaultMessages.secondary,
                 logoMessage: defaultMessages.logo,
             })
@@ -123,19 +106,11 @@ const CardDetails: FC<CardDetailsProps> = ({ logo_url, request_id, presentationI
         })
     }
 
-    const handleEventTypeSelection = (e: any, item: { value: string, label: string } | null) => {
-        onChange({
-            ...messages,
-            eventType: item ? item.value : undefined,
-            primaryMessage: messages.primaryMessage === defaultMessages.primary && item?.value === "2" ? defaultMessages.memorial : messages.primaryMessage, 
-        })
-    }
-
     return (
         <div style={{ display: 'flex', padding: '10px 10px', width: '100%', justifyContent: 'space-between' }}>
             <div style={{ display: 'flex', justifyContent: 'center', flexDirection: 'column', width: '42%' }}>
                 <Typography variant='h6'>Please provide the messages to use on gift card: </Typography>
-                <Typography variant="body1" sx={{ mt: 2 }}>Primary Message (2)</Typography>
+                <Typography variant="body1" sx={{ mt: 2 }}>Primary Message</Typography>
                 <TextField
                     multiline
                     name="primaryMessage"
@@ -144,7 +119,7 @@ const CardDetails: FC<CardDetailsProps> = ({ logo_url, request_id, presentationI
                     size="small"
                     inputProps={{ maxLength: 270 }}
                 />
-                <Typography variant="body1" sx={{ mt: 2 }}>Secondary Message (3)</Typography>
+                <Typography variant="body1" sx={{ mt: 2 }}>Secondary Message</Typography>
                 <TextField
                     multiline
                     name="secondaryMessage"
@@ -153,44 +128,17 @@ const CardDetails: FC<CardDetailsProps> = ({ logo_url, request_id, presentationI
                     size="small"
                     inputProps={{ maxLength: 125 }}
                 />
-                <Typography variant="body1" sx={{ mt: 2 }}>Event Type</Typography>
-                <Autocomplete
-                    size="small"
-                    value={selectedEventType}
-                    options={EventTypes}
-                    getOptionLabel={option => option.label}
-                    onChange={handleEventTypeSelection}
-                    renderInput={(params) => (
-                        <TextField
-                            {...params}
-                            name="eventType"    
-                            margin='dense'
-                            label='Event Type'
-                        />
-                    )}
-                />
-                <Typography variant="body1" sx={{ mt: 2 }}>Event Name</Typography>
-                <TextField
-                    name="eventName"
-                    value={messages.eventName}
-                    onChange={handleChange}
-                    size="small"
-                />
-                <Typography variant="body1" sx={{ mt: 2 }}>Gifted By</Typography>
-                <TextField
-                    name="plantedBy"
-                    value={messages.plantedBy}
-                    onChange={handleChange}
-                    size="small"
-                />
-                <Typography variant="body1" sx={{ mt: 2 }}>Logo Message (4)</Typography>
-                <TextField
-                    name="logoMessage"
-                    value={messages.logoMessage}
-                    onChange={handleChange}
-                    size="small"
-                    inputProps={{ maxLength: 50 }}
-                />
+                {logo_url && <Box>
+                    <Typography variant="body1" sx={{ mt: 2 }}>Logo Message</Typography>
+                    <TextField
+                        name="logoMessage"
+                        value={messages.logoMessage}
+                        onChange={handleChange}
+                        fullWidth
+                        size="small"
+                        inputProps={{ maxLength: 50 }}
+                    />
+                </Box>}
                 <Box style={{ display: 'flex', justifyContent: 'flex-start', marginTop: 20 }}>
                     <Button onClick={updateSlide} variant="contained" color="success" disabled={!presentationIdIdRef.current}>
                         Update
