@@ -16,7 +16,7 @@ import { TreeImage } from '../../types/tree_snapshots';
 import { GiftCard, GiftCardUser } from '../../types/gift_card';
 import { Tag } from '../../types/tag';
 import { EmailTemplate } from '../../types/email_template';
-import { Payment } from '../../types/payment';
+import { Payment, PaymentHistory } from '../../types/payment';
 
 
 class ApiClient {
@@ -1191,12 +1191,13 @@ class ApiClient {
     }
 
 
-    async createGiftCard(request_id: string, no_of_cards: number, user_id: number, group_id?: number, payment_id?: number, logo?: File, messages?: any, file?: File): Promise<GiftCard> {
+    async createGiftCard(request_id: string, no_of_cards: number, user_id: number, category: string, grove: string | null, group_id?: number, payment_id?: number, logo?: File, messages?: any, file?: File): Promise<GiftCard> {
         try {
             const formData = new FormData();
             formData.append('request_id', request_id);
             formData.append('no_of_cards', no_of_cards.toString());
             formData.append('user_id', user_id.toString());
+            formData.append('category', category);
             if (messages) {
                 formData.append('primary_message', messages.primaryMessage);
                 formData.append('secondary_message', messages.secondaryMessage);
@@ -1205,6 +1206,7 @@ class ApiClient {
                 formData.append('planted_by', messages.plantedBy);
                 formData.append('logo_message', messages.logoMessage);
             }
+            if (grove) formData.append('grove', grove);
             if (group_id) formData.append('group_id', group_id.toString());
             if (payment_id) formData.append('payment_id', payment_id.toString());
             if (logo) formData.append('logo', logo, logo.name);
@@ -1220,7 +1222,7 @@ class ApiClient {
         }
     }
 
-    async updateGiftCard(request: GiftCard, no_of_cards: number, user_id: number, group_id?: number, payment_id?: number, logo?: File, messages?: any, file?: File): Promise<GiftCard> {
+    async updateGiftCard(request: GiftCard, no_of_cards: number, user_id: number, category: string, grove: string | null, group_id?: number, payment_id?: number, logo?: File, messages?: any, file?: File): Promise<GiftCard> {
         try {
             const formData = new FormData();
             for (const [key, value] of Object.entries(request)) {
@@ -1232,6 +1234,12 @@ class ApiClient {
 
             if (formData.has('user_id')) formData.set('user_id', user_id.toString());
             else formData.append('user_id', user_id.toString());
+
+            if (formData.has('category')) formData.set('category', category);
+            else formData.append('category', category);
+
+            if (grove && formData.has('grove')) formData.set('grove', grove);
+            else if (grove) formData.append('grove', grove);
 
             if (group_id && formData.has('group_id')) formData.set('group_id', group_id.toString());
             else if (group_id) formData.append('group_id', group_id.toString());
@@ -1496,9 +1504,9 @@ class ApiClient {
         }
     } 
         
-    async createPayment(amount: number, donor_type: string, payment_method: string, pan_number: string | null, payment_proof: string | null) {
+    async createPayment(amount: number, donor_type: string, pan_number: string | null) {
         try {
-            const response = await this.api.post<Payment>(`/payments`, { amount, donor_type, payment_method, pan_number, payment_proof });
+            const response = await this.api.post<Payment>(`/payments`, { amount, donor_type, pan_number });
             return response.data;
         } catch (error: any) {
             if (error.response) {
@@ -1517,6 +1525,30 @@ class ApiClient {
                 throw new Error(error.response.data.message);
             }
             throw new Error('Failed to update payment');
+        }
+    } 
+
+    async createPaymentHistory(payment_id: number, amount: number, payment_method: string, payment_proof: string | null) {
+        try {
+            const response = await this.api.post<PaymentHistory>(`/payments/history`, { payment_id, amount, payment_method, payment_proof });
+            return response.data;
+        } catch (error: any) {
+            if (error.response) {
+                throw new Error(error.response.data.message);
+            }
+            throw new Error('Failed to create payment');
+        }
+    } 
+
+    async updatePaymentHistory(paymentHistory: PaymentHistory) {
+        try {
+            const response = await this.api.put<PaymentHistory>(`/payments/history/${paymentHistory.id}`, paymentHistory);
+            return response.data;
+        } catch (error: any) {
+            if (error.response) {
+                throw new Error(error.response.data.message);
+            }
+            throw new Error('Failed to create payment');
         }
     } 
 

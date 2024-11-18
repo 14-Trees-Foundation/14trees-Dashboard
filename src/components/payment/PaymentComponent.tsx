@@ -3,10 +3,33 @@ import { toast } from "react-toastify"
 import { Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, Typography } from "@mui/material"
 import EditIcon from "@mui/icons-material/Edit";
 
-import { Payment } from "../../types/payment"
+import { Payment, PaymentHistory } from "../../types/payment"
 import ApiClient from "../../api/apiClient/apiClient"
 import GeneralTable from "../GenTable";
 import PaymentBaseForm from "./PaymentBaseForm";
+import { VisibilityOutlined } from "@mui/icons-material";
+import { getHumanReadableDate } from "../../helpers/utils";
+import PaymentHistoryForm from "./PaymentHistoryForm";
+
+const paymentStatusList = [
+    {
+        value: "pending_validation",
+        label: "Pending validation"
+    },
+    {
+        value: "payment_not_received",
+        label: "Payment not received"
+    },
+    {
+        value: "validated",
+        label: "Validated"
+    },
+]
+
+const getReadableStatus = (value: string) => {
+    const status = paymentStatusList.find(item => item.value === value)
+    return status ? status.label : '';
+} 
 
 interface PaymentProps {
     initialAmount?: number
@@ -25,6 +48,18 @@ const PaymentComponent: React.FC<PaymentProps> = ({ initialAmount, paymentId, on
 
     const [page, setPage] = useState(0);
     const [pageSize, setPageSize] = useState(10);
+
+    const [filePreview, setFilePreview] = useState(false);
+    const [selectedHistory, setSelectedHistory] = useState<PaymentHistory | null>(null);
+
+    const [historyModal, setHistoryModal] = useState(false);
+    const [historyForm, setHistoryForm] = useState({
+        amount: 0,
+        paymentMethod: '',
+        paymentProof: '',
+        status: '',
+        paymentDate: '',
+    })
 
     const getPayment = async (paymentId: number) => {
         try {
@@ -51,11 +86,84 @@ const PaymentComponent: React.FC<PaymentProps> = ({ initialAmount, paymentId, on
     }
 
     const handleSavePayment = async () => {
-        if (payment) {
+        setOpenEdit(false);
+        const apiClient = new ApiClient();
 
-        } else {
-            
+        try {
+            if (payment) {
+                const data = { ...payment };
+                data.donor_type = donorType;
+                data.pan_number = panNumber ? panNumber : null;
+                const resp = await apiClient.updatedPayment(data);
+    
+                setPayment({
+                    ...payment,
+                    donor_type: resp.donor_type,
+                    pan_number: resp.pan_number,
+                })
+            } else {
+                const resp = await apiClient.createPayment(amount, donorType, panNumber);
+                setPayment(resp);
+                onChange && onChange(resp.id);
+            }
+        } catch(error: any) {
+            toast.error(error.message);
         }
+    }
+
+    const handleOpenPreview = (record: PaymentHistory) => {
+        setFilePreview(true);
+        setSelectedHistory(record);
+    }
+
+    const handleClosePreview = () => {
+        setFilePreview(false);
+        setSelectedHistory(null);
+    }
+
+    const handleOpenHistoryModal = (record: PaymentHistory) => {
+        setHistoryModal(true);
+        setSelectedHistory(record);
+        setHistoryForm({
+            amount: record.amount,
+            paymentMethod: record.payment_method,
+            paymentProof: record.payment_proof || '',
+            status: record.status,
+            paymentDate: record.payment_received_date,
+        })
+    }
+
+    const handleCloseHistoryModal = () => {
+        setHistoryModal(false);
+        setSelectedHistory(null);
+        setHistoryForm({
+            amount: 0,
+            paymentMethod: '',
+            paymentProof: '',
+            status: '',
+            paymentDate: '',
+        })
+    }
+
+    const handleSavePaymentHistory = async () => {
+        setHistoryModal(false);
+        if (!selectedHistory) return;
+
+        const data = { ...selectedHistory };
+        data.amount = historyForm.amount;
+        data.payment_method = historyForm.paymentMethod;
+        data.payment_received_date = historyForm.paymentDate;
+        data.status = historyForm.status;
+
+        const apiClient = new ApiClient();
+        const resp = await apiClient.updatePaymentHistory(data);
+
+        const idx = payment?.payment_history?.findIndex(item => item.id === resp.id);
+        if (idx !== undefined && idx >= 0 && payment?.payment_history) {
+            payment.payment_history[idx] = resp;
+        }
+
+        handleCloseHistoryModal();
     }
 
     const columns: any[] = [
@@ -78,14 +186,25 @@ const PaymentComponent: React.FC<PaymentProps> = ({ initialAmount, paymentId, on
             key: "payment_proof",
             title: "Payment Proof",
             align: "center",
-            width: 200,
-        },
-        {
-            dataIndex: "payment_received_date",
-            key: "payment_received_date",
-            title: "Received Date",
-            align: "center",
-            width: 100,
+            width: 150,
+            render: (value: any, record: any) => (
+                <div
+                    style={{
+                        display: "flex",
+                        justifyContent: "center",
+                        alignItems: "center",
+                    }}>
+                    <Button
+                        variant='outlined'
+                        color='success'
+                        disabled={!value}
+                        style={{ margin: "0 5px" }}
+                        onClick={() => { handleOpenPreview(record) }}
+                    >
+                        <VisibilityOutlined />
+                    </Button>
+                </div>
+            ),
         },
         {
             dataIndex: "status",
@@ -93,6 +212,15 @@ const PaymentComponent: React.FC<PaymentProps> = ({ initialAmount, paymentId, on
             title: "Status",
             align: "center",
             width: 150,
+            render: getReadableStatus,
+        },
+        {
+            dataIndex: "payment_received_date",
+            key: "payment_received_date",
+            title: "Received Date",
+            align: "center",
+            width: 100,
+            render: getHumanReadableDate,
         },
         {
             dataIndex: "action",
@@ -111,7 +239,7 @@ const PaymentComponent: React.FC<PaymentProps> = ({ initialAmount, paymentId, on
                         variant='outlined'
                         color='success'
                         style={{ margin: "0 5px" }}
-                        onClick={() => {  }}
+                        onClick={() => { handleOpenHistoryModal(record) }}
                     >
                         <EditIcon />
                     </Button>
@@ -168,10 +296,10 @@ const PaymentComponent: React.FC<PaymentProps> = ({ initialAmount, paymentId, on
                     </Button>
                 </Box>
             </Box>
-            
+
             <Box mt={2}>
                 <Typography>Payment History</Typography>
-                <GeneralTable 
+                <GeneralTable
                     loading={false}
                     rows={payment?.payment_history ? payment.payment_history.slice(page * pageSize, page * pageSize + pageSize) : []}
                     columns={columns}
@@ -179,7 +307,7 @@ const PaymentComponent: React.FC<PaymentProps> = ({ initialAmount, paymentId, on
                     page={page}
                     pageSize={pageSize}
                     onPaginationChange={handlePaginationChange}
-                    onDownload={async() => { return payment?.payment_history || [] }}
+                    onDownload={async () => { return payment?.payment_history || [] }}
                     tableName="Payment History"
                 />
             </Box>
@@ -201,6 +329,84 @@ const PaymentComponent: React.FC<PaymentProps> = ({ initialAmount, paymentId, on
                     </Button>
                     <Button onClick={handleSavePayment} color="success" variant="contained">
                         Confirm
+                    </Button>
+                </DialogActions>
+            </Dialog>
+
+            <Dialog open={openEdit} fullWidth maxWidth="md">
+                <DialogTitle>Payment Details</DialogTitle>
+                <DialogContent dividers>
+                    <PaymentBaseForm
+                        amount={amount}
+                        donorType={donorType}
+                        panNumber={panNumber}
+                        onDonorTypeChange={donorType => { setDonorType(donorType) }}
+                        onPanNumberChange={panNumber => { setPanNumber(panNumber) }}
+                    />
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={() => { setOpenEdit(false) }} color="error" variant="outlined">
+                        Cancel
+                    </Button>
+                    <Button onClick={handleSavePayment} color="success" variant="contained">
+                        Confirm
+                    </Button>
+                </DialogActions>
+            </Dialog>
+
+            <Dialog open={historyModal} fullWidth maxWidth="md">
+                <DialogTitle>Validate Payments</DialogTitle>
+                <DialogContent dividers>
+                    <PaymentHistoryForm
+                        amount={historyForm.amount}
+                        onAmountChange={(amount: number) => { setHistoryForm(prev => ({ ...prev, amount  })) }}
+                        paymentMethod={historyForm.paymentMethod}
+                        onPaymentMethodChange={(paymentMethod: string) => { setHistoryForm(prev => ({ ...prev, paymentMethod  })) }}
+                        paymentReceivedDate={historyForm.paymentDate}
+                        onPaymentReceivedDateChange={(date: string) => { setHistoryForm(prev => ({ ...prev, paymentDate: date  })) }}
+                        status={historyForm.status}
+                        onStatusChange={(status: string) => { setHistoryForm(prev => ({ ...prev, status  })) }}
+                    />
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={handleCloseHistoryModal} color="error" variant="outlined">
+                        Cancel
+                    </Button>
+                    <Button onClick={handleSavePaymentHistory} color="success" variant="contained">
+                        Confirm
+                    </Button>
+                </DialogActions>
+            </Dialog>
+
+            <Dialog open={filePreview} fullWidth maxWidth="lg">
+                <DialogTitle>Payment Proof</DialogTitle>
+                <DialogContent dividers>
+                    {selectedHistory && selectedHistory.payment_proof &&
+                        <Box
+                            width="100%"
+                            maxHeight="65vh"
+                            display="flex"
+                            alignItems="center"
+                            p={2}
+                        >
+                            {selectedHistory.payment_proof.endsWith('.pdf') ? (
+                                <iframe
+                                    src={selectedHistory.payment_proof}
+                                    title="PDF Preview"
+                                    style={{ border: 'none', width: '100%', height: '65vh', display: 'block' }}
+                                ></iframe>
+                            ) : (
+                                <img
+                                    src={selectedHistory.payment_proof}
+                                    alt="Preview"
+                                    style={{ maxWidth: '100%', maxHeight: '100%' }}
+                                />
+                            )}
+                        </Box>}
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={handleClosePreview} color="error" variant="outlined">
+                        Cancel
                     </Button>
                 </DialogActions>
             </Dialog>

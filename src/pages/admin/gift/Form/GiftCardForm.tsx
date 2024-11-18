@@ -20,7 +20,7 @@ interface GiftCardsFormProps {
     requestId: string | null
     open: boolean
     handleClose: () => void
-    onSubmit: (user: User, group: Group | null, treeCount: number, users: any[], paymentId?: number, logo?: File, messages?: any, file?: File) => void
+    onSubmit: (user: User, group: Group | null, treeCount: number, category: string, grove: string | null, users: any[], paymentId?: number, logo?: File, messages?: any, file?: File) => void
 }
 
 const GiftCardsForm: FC<GiftCardsFormProps> = ({ giftCardRequest, requestId, open, handleClose, onSubmit }) => {
@@ -36,16 +36,20 @@ const GiftCardsForm: FC<GiftCardsFormProps> = ({ giftCardRequest, requestId, ope
     const [messages, setMessages] = useState({ primaryMessage: "", secondaryMessage: "", eventName: "", eventType: undefined as string | undefined, plantedBy: "", logoMessage: "" });
     const [presentationId, setPresentationId] = useState<string | null>(null)
     const [slideId, setSlideId] = useState<string | null>(null)
+    const [category, setCategory] = useState<string>("Foundation");
+    const [grove, setGrove] = useState<string | null>(null);
 
     // payment details
     const [payment, setPayment] = useState<Payment | null>(null);
+    const [amount, setAmount] = useState<number>(0);
     const [donorType, setDonorType] = useState<string>("Indian Citizen");
-    const [category, setCategory] = useState<string>("Foundation");
-    const [grove, setGrove] = useState<string>("No Preferences");
-    const [paymentMethod, setPaymentMethod] = useState<string>("UPI");
     const [panNumber, setPanNumber] = useState<string | null>(null);
     const [paymentProof, setPaymentProof] = useState<File | null>(null);
-    const [amount, setAmount] = useState<number>(0);
+    const [paymentMethod, setPaymentMethod] = useState<string | undefined>();
+
+    useEffect(() => {
+        setAmount(treeCount * (category === "Foundation" ? 3000 : 1500));
+    }, [category, treeCount])
 
     const getGiftCardRequestDetails = async () => {
         const apiClient = new ApiClient();
@@ -150,7 +154,7 @@ const GiftCardsForm: FC<GiftCardsFormProps> = ({ giftCardRequest, requestId, ope
             key: 3,
             title: "Payment",
             content: <PaymentForm
-                amount={treeCount * (category === "Foundation" ? 3000 : 1500)}
+                amount={amount}
                 donorType={donorType}
                 paymentMethod={paymentMethod}
                 panNumber={panNumber}
@@ -188,30 +192,41 @@ const GiftCardsForm: FC<GiftCardsFormProps> = ({ giftCardRequest, requestId, ope
             return;
         }
 
-        let paymentProofLink: string | null = null;
-        if (paymentProof) {
-            const awsUtils = new AWSUtils();
-            const location = await awsUtils.uploadFileToS3("payment", paymentProof);
-            if (location) paymentProofLink = location;
-        }
-
         const apiClient = new ApiClient();
         let paymentId = payment ? payment.id : undefined
         if (!payment) {
-            const payment = await apiClient.createPayment(amount, donorType, paymentMethod, panNumber, paymentProofLink);
+            const payment = await apiClient.createPayment(amount, donorType, panNumber);
             paymentId = payment.id
         } else {
             const data = {
                 ...payment,
-                amount: amount,
-                pan_number: panNumber,
-                payment_method: paymentMethod,
-                payment_proof: paymentProofLink,
             }
-            await apiClient.updatedPayment(data);
+
+            if (payment.amount !== amount || payment.pan_number !== panNumber || payment.donor_type !== donorType) {
+                if (payment.amount !== amount) data.amount = amount;
+                if (payment.pan_number !== panNumber) data.pan_number = panNumber;
+                if (payment.donor_type !== donorType) data.donor_type = donorType;
+    
+                await apiClient.updatedPayment(data);
+            }
         }
 
-        onSubmit(user, group, treeCount, users, paymentId, logo ?? undefined, messages, file ?? undefined);
+        onSubmit(user, group, treeCount, category, grove, users, paymentId, logo ?? undefined, messages, file ?? undefined);
+
+        if (paymentMethod && paymentId) {
+            let paymentProofLink: string | null = null;
+            if (paymentProof) {
+                const awsUtils = new AWSUtils();
+                const location = await awsUtils.uploadFileToS3("payment", paymentProof);
+                if (location) paymentProofLink = location;
+            }
+
+            try {
+                await apiClient.createPaymentHistory(paymentId, amount, paymentMethod, paymentProofLink);
+            } catch(error: any) {
+                toast.error("Failed to save payment made!")
+            }
+        }
 
         handleCloseForm();
     }

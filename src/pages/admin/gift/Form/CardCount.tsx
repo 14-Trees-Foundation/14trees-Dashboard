@@ -7,8 +7,8 @@ interface CardCountProps {
     onTreeCountChange: (count: number) => void
     category: string
     onCategoryChange: (category: string) => void
-    grove: string
-    onGroveChange: (category: string) => void
+    grove: string | null
+    onGroveChange: (grove: string | null) => void
 }
 
 const CardCount: FC<CardCountProps> = ({ disabled, treeCount, onTreeCountChange, category, onCategoryChange, grove, onGroveChange }) => {
@@ -22,30 +22,38 @@ const CardCount: FC<CardCountProps> = ({ disabled, treeCount, onTreeCountChange,
 
     return (
         <div style={{ padding: '10px 40px', width: '100%' }}>
-            <Box>
+            <div style={{ display: 'flex', alignItems: 'center' }}>
+                <Typography variant='h6' mr={5}>Please enter the number of gift cards: </Typography>
+                <TextField
+                    value={treeCount === 0 ? '' : treeCount}
+                    onChange={handleCountChange}
+                    disabled={disabled}
+                    type='number'
+                    size="small"
+                />
+            </div>
+            <Box mt={2}>
+                <Typography mb={1} variant='body1'>Where would you like to plant the trees?</Typography>
                 <FormControl fullWidth>
-                    <InputLabel id="land-type-label">Land Type</InputLabel>
                     <Select
                         labelId="land-type-label"
                         value={category}
-                        label="Land Type"
                         onChange={(e) => { onCategoryChange(e.target.value) }}
                     >
-                        <MenuItem value={'Foundation'}>Foundation</MenuItem>
-                        <MenuItem value={'Public'}>Public</MenuItem>
+                        <MenuItem value={'Foundation'}>Foundation Sites</MenuItem>
+                        <MenuItem value={'Public'}>Public Sites</MenuItem>
                     </Select>
                 </FormControl>
             </Box>
-            <Box sx={{ mt: 2, mb: 2 }} style={{ display: category === 'Public' ? 'none' : 'block' }}>
+            <Box sx={{ mt: 2 }} style={{ display: category === 'Public' ? 'none' : 'block' }}>
+                <Typography mb={1} variant='body1'>If you want to plant trees in any specific grove, you can select appropriate grove from the dropdown.</Typography>
                 <FormControl fullWidth>
-                    <InputLabel id="grove-label">Grove</InputLabel>
                     <Select
                         labelId="grove-label"
-                        value={grove}
-                        label="Grove"
-                        onChange={(e) => { onGroveChange(e.target.value) }}
+                        value={grove || 'None'}
+                        onChange={(e) => { onGroveChange(e.target.value !== "None" ? e.target.value : null) }}
                     >
-                        <MenuItem value={'No Preference'}>No Preference</MenuItem>
+                        <MenuItem value = {'None'}>No Preference</MenuItem>
                         <MenuItem value={'Visitor'}>Visitor Grove</MenuItem>
                         <MenuItem value={'Family'}>Family Grove</MenuItem>
                         <MenuItem value={'Memorial'}>Memorial Grove</MenuItem>
@@ -56,16 +64,6 @@ const CardCount: FC<CardCountProps> = ({ disabled, treeCount, onTreeCountChange,
                     </Select>
                 </FormControl>
             </Box>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <Typography variant='h6'>Please enter the number of gift cards: </Typography>
-                <TextField
-                    value={treeCount === 0 ? '' : treeCount}
-                    onChange={handleCountChange}
-                    disabled={disabled}
-                    type='number'
-                    size="small"
-                />
-            </div>
         </div>
     )
 }

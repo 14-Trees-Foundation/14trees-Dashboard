@@ -38,7 +38,8 @@ const FileInputComponent: React.FC<FileInputProps> = ({ file, onFileChange }) =>
       <Typography>Upload the Image/Pdf of payment</Typography>
       {!file && (
         <Button
-          variant="outlined"
+          variant="contained"
+          color='success'
           component="label"
           style={{ maxWidth: 200 }}
         >

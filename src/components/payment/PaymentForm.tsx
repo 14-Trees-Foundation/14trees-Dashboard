@@ -7,8 +7,8 @@ interface PaymentFormProps {
     amount: number,
     donorType: string,
     onDonorTypeChange: (donorType: string) => void,
-    paymentMethod: string
-    onPaymentMethodChange: (paymentMethod: string) => void
+    paymentMethod: string | undefined
+    onPaymentMethodChange: (paymentMethod: string | undefined) => void
     panNumber: string | null
     onPanNumberChange: (panNumber: string | null) => void
     paymentProof: File | null
@@ -34,33 +34,15 @@ const PaymentForm: FC<PaymentFormProps> = ({ amount, donorType, onDonorTypeChang
                 </Box>
                 <Box sx={{ mt: 2 }}>
                     <FormControl fullWidth>
-                        <InputLabel id="donor-label">80g / 501 (c)/ FCRA matters</InputLabel>
+                        <InputLabel id="donor-label">Applicable 80g / 501 (c)/ FCRA</InputLabel>
                         <Select
                             labelId="donor-label"
                             value={donorType}
-                            label="80g / 501 (c)/ FCRA matters"
+                            label="Applicable for 80g / 501 (c)/ FCRA"
                             onChange={(e) => { onDonorTypeChange(e.target.value); }}
                         >
                             <MenuItem value={'Indian Citizen'}>Indian Citizen</MenuItem>
                             <MenuItem value={'Foreign Donor'}>Foreign Donor</MenuItem>
-                        </Select>
-                    </FormControl>
-                </Box>
-                <Box sx={{ mt: 2 }}>
-                    <FormControl fullWidth>
-                        <InputLabel id="payment-method-label">Payment Method</InputLabel>
-                        <Select
-                            disabled={donorType !== 'Indian Citizen'}
-                            labelId="payment-method-label"
-                            value={paymentMethod}
-                            label="Payment Method"
-                            onChange={(e) => { onPaymentMethodChange(e.target.value) }}
-                        >
-                            <MenuItem value={'UPI'}>UPI</MenuItem>
-                            <MenuItem value={'Net Banking'}>Net Banking</MenuItem>
-                            <MenuItem value={'Cheque'}>Cheque</MenuItem>
-                            <MenuItem value={'Cash'}>Cash</MenuItem>
-                            <MenuItem value={'Wire Transfer'}>Wire Transfer</MenuItem>
                         </Select>
                     </FormControl>
                 </Box>
@@ -72,6 +54,25 @@ const PaymentForm: FC<PaymentFormProps> = ({ amount, donorType, onDonorTypeChang
                         onChange={(e) => { onPanNumberChange(e.target.value.toUpperCase() || null) }}
                         fullWidth
                     />
+                </Box>
+                <Box sx={{ mt: 2 }}>
+                    <FormControl fullWidth>
+                        <InputLabel id="payment-method-label">Payment Method</InputLabel>
+                        <Select
+                            disabled={donorType !== 'Indian Citizen'}
+                            labelId="payment-method-label"
+                            value={paymentMethod || "None"}
+                            label="Payment Method"
+                            onChange={(e) => { onPaymentMethodChange(e.target.value !== "None" ? e.target.value : undefined) }}
+                        >
+                            <MenuItem value={"None"}>Not Selected</MenuItem>
+                            <MenuItem value={'UPI'}>UPI</MenuItem>
+                            <MenuItem value={'Net Banking'}>Net Banking</MenuItem>
+                            <MenuItem value={'Cheque'}>Cheque</MenuItem>
+                            <MenuItem value={'Cash'}>Cash</MenuItem>
+                            <MenuItem value={'Wire Transfer'}>Wire Transfer</MenuItem>
+                        </Select>
+                    </FormControl>
                 </Box>
             </Box>
             <Box width="45%">

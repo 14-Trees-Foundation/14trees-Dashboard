@@ -26,11 +26,11 @@ const PaymentBaseForm: React.FC<PaymentBaseFormProps> = ({ amount, donorType, pa
             </Box>
             <Box sx={{ mt: 2 }}>
                 <FormControl fullWidth>
-                    <InputLabel id="donor-label">80g / 501 (c)/ FCRA matters</InputLabel>
+                    <InputLabel id="donor-label">Applicable for 80g / 501 (c)/ FCRA</InputLabel>
                     <Select
                         labelId="donor-label"
                         value={donorType}
-                        label="80g / 501 (c)/ FCRA matters"
+                        label="Applicable for80g / 501 (c)/ FCRA"
                         onChange={(e) => { onDonorTypeChange(e.target.value); }}
                     >
                         <MenuItem value={'Indian Citizen'}>Indian Citizen</MenuItem>
