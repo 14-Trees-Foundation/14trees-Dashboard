@@ -21,6 +21,8 @@ import {
   DialogContent,
   DialogContentText,
   DialogActions,
+  InputLabel,
+  OutlinedInput,
 } from "@mui/material";
 import { useRecoilState } from "recoil";
 import { ToastContainer, toast } from "react-toastify";
@@ -86,6 +88,41 @@ export const GiftTrees = () => {
   const [assignedSelected, setAssignedSelected] = useState(false);
   const [unassignedSelected, setUnassignedSelected] = useState(false);
   const [unAssignModalOpen, setUnAssignModalOpen] = useState(false);
+  const [searchStr, setSearchStr] = useState('');
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+
+      setValues(prev => {
+
+        let filteredTrees = 
+          filter === "all"
+          ? values.trees
+          : filter === "assigned"
+            ? values.trees.filter((item) => {
+                return item.assigned_to;
+              })
+            : values.trees.filter((item) => {
+                return !item.assigned_to;
+              });
+        
+        if (searchStr.trim() !== '') {
+            filteredTrees = filteredTrees.filter(item => {
+              return item.sapling_id.includes(searchStr);
+            });
+        }
+
+        return {
+          ...prev,
+          filteredTrees,
+        }
+      })
+    }, 300)
+
+    return () => {
+      clearTimeout(handler);
+    }
+  }, [searchStr, filter])
 
   const handleFilterChange = (event) => {
     setFilter(event.target.value);
@@ -712,6 +749,17 @@ export const GiftTrees = () => {
                   No Trees in your account
                 </Typography>
               )}
+              <Box sx={{ mt: 2 }}>
+                <FormControl fullWidth>
+                  <InputLabel htmlFor="sapling_id">Search sapling ID</InputLabel>
+                  <OutlinedInput
+                    // id="sapling_id"
+                    value={searchStr}
+                    label="Search sapling id"
+                    onChange={(e) => { setSearchStr(e.target.value) }}
+                  />
+                </FormControl>
+              </Box>
               <TableContainer>
                 <Table sx={{ minWidth: 360 }} aria-label="simple table">
                   <TableHead>
