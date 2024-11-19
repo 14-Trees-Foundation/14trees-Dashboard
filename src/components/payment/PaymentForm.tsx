@@ -1,11 +1,12 @@
-import { Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, FormControl, InputAdornment, InputLabel, MenuItem, OutlinedInput, Select, TextField, Typography } from "@mui/material";
+import { Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, FormControl, InputAdornment, InputLabel, MenuItem, OutlinedInput, Select, TextField, Tooltip, Typography } from "@mui/material";
 import { FC, useEffect, useState } from "react";
 import FileInputComponent from "../FileInputComponent";
 import PaymentQR14tree from "../../assets/PaymentQR14tree.jpg";
+import TreeCostChart from "../../assets/tree-cost-chart.png";
 import { Payment, PaymentHistory } from "../../types/payment";
 import GeneralTable from "../GenTable";
 import { getHumanReadableDate } from "../../helpers/utils";
-import { VisibilityOutlined } from "@mui/icons-material";
+import { HelpOutline, VisibilityOutlined } from "@mui/icons-material";
 
 const paymentStatusList = [
     {
@@ -140,11 +141,20 @@ const PaymentForm: FC<PaymentFormProps> = ({ payment, amount, donorType, onDonor
 
     return (
         <Box style={{ padding: '40px', width: '100%' }}>
-            
+
             <Box style={{ display: 'flex', justifyContent: 'space-between' }}>
                 <Box width="45%">
                     <Box sx={{ mt: 2 }}>
                         <FormControl fullWidth>
+                            <Typography>How is the below amount calculated?
+                                <Tooltip title={<img
+                                    src={TreeCostChart}
+                                    alt="Tree Cost"
+                                    style={{ width: 600, height: 'auto' }}
+                                />}>
+                                    <Button color="success"><HelpOutline /></Button>
+                                </Tooltip>
+                            </Typography>
                             <InputLabel htmlFor="amount">Amount</InputLabel>
                             <OutlinedInput
                                 id="amount"

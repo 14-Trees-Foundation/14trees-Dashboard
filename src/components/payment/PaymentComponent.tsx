@@ -1,18 +1,19 @@
 import { useEffect, useState } from "react"
 import { toast } from "react-toastify"
-import { Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, FormControl, InputAdornment, InputLabel, MenuItem, OutlinedInput, Select, Typography } from "@mui/material"
+import { Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, FormControl, InputAdornment, InputLabel, MenuItem, OutlinedInput, Select, Tooltip, Typography } from "@mui/material"
 import EditIcon from "@mui/icons-material/Edit";
 
 import { Payment, PaymentHistory } from "../../types/payment"
 import ApiClient from "../../api/apiClient/apiClient"
 import GeneralTable from "../GenTable";
 import PaymentBaseForm from "./PaymentBaseForm";
-import { VisibilityOutlined } from "@mui/icons-material";
+import { HelpOutline, VisibilityOutlined } from "@mui/icons-material";
 import { getHumanReadableDate } from "../../helpers/utils";
 import PaymentHistoryForm from "./PaymentHistoryForm";
 import FileInputComponent from "../FileInputComponent";
 
 import PaymentQR14tree from "../../assets/PaymentQR14tree.jpg";
+import TreeCostChart from "../../assets/tree-cost-chart.png";
 import { AWSUtils } from "../../helpers/aws";
 
 const paymentStatusList = [
@@ -85,6 +86,7 @@ const PaymentComponent: React.FC<PaymentProps> = ({ initialAmount, paymentId, on
                 verifiedAmount: verified,
             });
 
+            setPayingAmount(amount - paid);
         }
     }, [payment, amount])
 
@@ -213,7 +215,7 @@ const PaymentComponent: React.FC<PaymentProps> = ({ initialAmount, paymentId, on
                         payment_history: prev?.payment_history ? [...prev.payment_history, resp] : [resp],
                     } : null
                 })
-            } catch(error: any) {
+            } catch (error: any) {
                 toast.error("Failed to save payment made!")
             }
         }
@@ -364,11 +366,19 @@ const PaymentComponent: React.FC<PaymentProps> = ({ initialAmount, paymentId, on
                 <Box style={{ display: 'flex', justifyContent: 'space-between' }}>
                     <Box width="45%">
                         <Box sx={{ mt: 2 }}>
+                            <Typography>How is the below amount calculated?
+                                <Tooltip title={<img
+                                    src={TreeCostChart}
+                                    alt="Tree Cost"
+                                    style={{ width: 600, height: 'auto' }}
+                                />}>
+                                    <Button color="success"><HelpOutline /></Button>
+                                </Tooltip>
+                            </Typography>
                             <FormControl fullWidth>
                                 <InputLabel htmlFor="amount">Amount</InputLabel>
                                 <OutlinedInput
                                     id="amount"
-                                    defaultValue={new Intl.NumberFormat('en-IN').format(amountData.totalAmount - amountData.paidAmount)}
                                     value={payingAmount ? new Intl.NumberFormat('en-IN').format(payingAmount) : ''}
                                     startAdornment={<InputAdornment position="start">₹</InputAdornment>}
                                     label="Amount"
@@ -414,7 +424,10 @@ const PaymentComponent: React.FC<PaymentProps> = ({ initialAmount, paymentId, on
                         </Box>
                     </Box>
                 </Box>
-                <Button onClick={handleAddPaymentHistory} color="success" variant="contained">
+                <Button
+                    disabled={!paymentMethod || !paymentProof}
+                    onClick={handleAddPaymentHistory}
+                    color="success" variant="contained">
                     Add Payment Details
                 </Button>
             </Box>}

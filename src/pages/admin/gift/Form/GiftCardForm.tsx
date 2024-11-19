@@ -140,14 +140,6 @@ const GiftCardsForm: FC<GiftCardsFormProps> = ({ giftCardRequest, requestId, ope
         },
         {
             key: 2,
-            title: "Dashboard Details",
-            content: <DashboardDetails
-                messages={{...messages, plantedBy: messages.plantedBy || group?.name || ''}}
-                onChange={messages => { setMessages(messages) }}
-            />,
-        },
-        {
-            key: 3,
             title: "Book Trees",
             content: <PlotSelection 
                 disabled={giftCardRequest !== undefined && giftCardRequest.status !== 'pending_plot_selection'} 
@@ -157,6 +149,14 @@ const GiftCardsForm: FC<GiftCardsFormProps> = ({ giftCardRequest, requestId, ope
                 onCategoryChange={category => { setCategory(category) }}
                 grove={grove}
                 onGroveChange={grove => setGrove(grove)}
+            />,
+        },
+        {
+            key: 3,
+            title: "Dashboard Details",
+            content: <DashboardDetails
+                messages={{...messages, plantedBy: messages.plantedBy || group?.name || ''}}
+                onChange={messages => { setMessages(messages) }}
             />,
         },
         {
@@ -267,11 +267,11 @@ const GiftCardsForm: FC<GiftCardsFormProps> = ({ giftCardRequest, requestId, ope
                 nextStep = 2;
                 break;
             case 2:
-                nextStep = 3;
+                if (treeCount === 0) toast.error("Please provide number of trees to gift");
+                else nextStep = 3;
                 break;
             case 3:
-                if (treeCount === 0) toast.error("Please provide number of trees to gift");
-                else nextStep = 4;
+                nextStep = 4;
                 break;
             case 4:
                 nextStep = 5;
