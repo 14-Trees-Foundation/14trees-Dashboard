@@ -1368,9 +1368,9 @@ class ApiClient {
         }
     }
 
-    async redeemGiftCardTemplate(gift_card_user_id: number, sapling_id: string, tree_id: number, user: User): Promise<GiftCardUser> {
+    async redeemGiftCardTemplate(gift_card_id: number, sapling_id: string, tree_id: number, user: User): Promise<GiftCardUser> {
         try {
-            const resp = await this.api.post<GiftCardUser>(`/gift-cards/card/redeem`, { gift_card_user_id, sapling_id, tree_id, user });
+            const resp = await this.api.post<GiftCardUser>(`/gift-cards/card/redeem`, { gift_card_id, sapling_id, tree_id, user });
             return resp.data;
         } catch (error: any) {
             if (error.response) {
