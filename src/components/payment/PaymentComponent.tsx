@@ -63,10 +63,12 @@ const PaymentComponent: React.FC<PaymentProps> = ({ initialAmount, paymentId, on
     const [historyModal, setHistoryModal] = useState(false);
     const [historyForm, setHistoryForm] = useState({
         amount: 0,
+        amountReceived: 0,
         paymentMethod: '',
         paymentProof: '',
         status: '',
         paymentDate: '',
+        receivedDate: '',
     })
 
     const [amountData, setAmountData] = useState({
@@ -78,7 +80,7 @@ const PaymentComponent: React.FC<PaymentProps> = ({ initialAmount, paymentId, on
     useEffect(() => {
         if (payment && payment.payment_history && payment.payment_history.length > 0) {
             const paid = payment.payment_history.map(item => item.amount).reduce((prev, curr) => prev + curr, 0);
-            const verified = payment.payment_history.filter(item => item.status === 'validated').map(item => item.amount).reduce((prev, curr) => prev + curr, 0);
+            const verified = payment.payment_history.filter(item => item.status === 'validated').map(item => item.amount_received).reduce((prev, curr) => prev + curr, 0);
 
             setAmountData({
                 totalAmount: amount,
@@ -154,10 +156,12 @@ const PaymentComponent: React.FC<PaymentProps> = ({ initialAmount, paymentId, on
         setSelectedHistory(record);
         setHistoryForm({
             amount: record.amount,
+            amountReceived: record.amount_received,
+            receivedDate: record.payment_received_date,
             paymentMethod: record.payment_method,
             paymentProof: record.payment_proof || '',
             status: record.status,
-            paymentDate: record.payment_received_date,
+            paymentDate: record.payment_date,
         })
     }
 
@@ -166,10 +170,12 @@ const PaymentComponent: React.FC<PaymentProps> = ({ initialAmount, paymentId, on
         setSelectedHistory(null);
         setHistoryForm({
             amount: 0,
+            amountReceived: 0,
             paymentMethod: '',
             paymentProof: '',
             status: '',
             paymentDate: '',
+            receivedDate: '',
         })
     }
 
@@ -178,9 +184,9 @@ const PaymentComponent: React.FC<PaymentProps> = ({ initialAmount, paymentId, on
         if (!selectedHistory) return;
 
         const data = { ...selectedHistory };
-        data.amount = historyForm.amount;
+        data.amount_received = historyForm.amountReceived;
         data.payment_method = historyForm.paymentMethod;
-        data.payment_received_date = historyForm.paymentDate;
+        data.payment_received_date = historyForm.receivedDate;
         data.status = historyForm.status;
 
         const apiClient = new ApiClient();
@@ -225,7 +231,7 @@ const PaymentComponent: React.FC<PaymentProps> = ({ initialAmount, paymentId, on
         {
             dataIndex: "amount",
             key: "amount",
-            title: "amount",
+            title: "Amount paid",
             align: "center",
             width: 100,
         },
@@ -262,6 +268,21 @@ const PaymentComponent: React.FC<PaymentProps> = ({ initialAmount, paymentId, on
             ),
         },
         {
+            dataIndex: "payment_date",
+            key: "payment_date",
+            title: "Payment Date",
+            align: "center",
+            width: 150,
+            render: getHumanReadableDate,
+        },
+        {
+            dataIndex: "amount_received",
+            key: "amount_received",
+            title: "Amount received",
+            align: "center",
+            width: 150,
+        },
+        {
             dataIndex: "status",
             key: "status",
             title: "Status",
@@ -274,7 +295,7 @@ const PaymentComponent: React.FC<PaymentProps> = ({ initialAmount, paymentId, on
             key: "payment_received_date",
             title: "Received Date",
             align: "center",
-            width: 100,
+            width: 150,
             render: getHumanReadableDate,
         },
         {
@@ -494,11 +515,12 @@ const PaymentComponent: React.FC<PaymentProps> = ({ initialAmount, paymentId, on
                 <DialogContent dividers>
                     <PaymentHistoryForm
                         amount={historyForm.amount}
-                        onAmountChange={(amount: number) => { setHistoryForm(prev => ({ ...prev, amount })) }}
+                        receivedAmount={historyForm.amountReceived}
+                        onReceivedAmountChange={(amountReceived: number) => { setHistoryForm(prev => ({ ...prev, amountReceived })) }}
                         paymentMethod={historyForm.paymentMethod}
                         onPaymentMethodChange={(paymentMethod: string) => { setHistoryForm(prev => ({ ...prev, paymentMethod })) }}
-                        paymentReceivedDate={historyForm.paymentDate}
-                        onPaymentReceivedDateChange={(date: string) => { setHistoryForm(prev => ({ ...prev, paymentDate: date })) }}
+                        paymentReceivedDate={historyForm.receivedDate}
+                        onPaymentReceivedDateChange={(date: string) => { setHistoryForm(prev => ({ ...prev, receivedDate: date })) }}
                         status={historyForm.status}
                         onStatusChange={(status: string) => { setHistoryForm(prev => ({ ...prev, status })) }}
                     />

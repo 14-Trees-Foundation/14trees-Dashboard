@@ -31,6 +31,8 @@ const getReadableStatus = (value: string) => {
 interface PaymentFormProps {
     payment?: Payment | null
     amount: number,
+    payingAmount: number,
+    onPayingAmountChange: (payingAmount: number) => void,
     donorType: string,
     onDonorTypeChange: (donorType: string) => void,
     paymentMethod: string | undefined
@@ -41,7 +43,7 @@ interface PaymentFormProps {
     onPaymentProofChange: (paymentProof: File | null) => void
 }
 
-const PaymentForm: FC<PaymentFormProps> = ({ payment, amount, donorType, onDonorTypeChange, paymentMethod, onPaymentMethodChange, panNumber, onPanNumberChange, paymentProof, onPaymentProofChange }) => {
+const PaymentForm: FC<PaymentFormProps> = ({ payment, amount, payingAmount, onPayingAmountChange, donorType, onDonorTypeChange, paymentMethod, onPaymentMethodChange, panNumber, onPanNumberChange, paymentProof, onPaymentProofChange }) => {
 
     const [filePreview, setFilePreview] = useState(false);
     const [selectedHistory, setSelectedHistory] = useState<PaymentHistory | null>(null);
@@ -56,7 +58,7 @@ const PaymentForm: FC<PaymentFormProps> = ({ payment, amount, donorType, onDonor
     useEffect(() => {
         if (payment && payment.payment_history && payment.payment_history.length > 0) {
             const paid = payment.payment_history.map(item => item.amount).reduce((prev, curr) => prev + curr, 0);
-            const verified = payment.payment_history.filter(item => item.status === 'validated').map(item => item.amount).reduce((prev, curr) => prev + curr, 0);
+            const verified = payment.payment_history.filter(item => item.status === 'validated').map(item => item.amount_received).reduce((prev, curr) => prev + curr, 0);
 
             setAmountData({
                 totalAmount: amount,
@@ -85,7 +87,7 @@ const PaymentForm: FC<PaymentFormProps> = ({ payment, amount, donorType, onDonor
         {
             dataIndex: "amount",
             key: "amount",
-            title: "amount",
+            title: "Amount paid",
             align: "center",
             width: 100,
         },
@@ -120,6 +122,21 @@ const PaymentForm: FC<PaymentFormProps> = ({ payment, amount, donorType, onDonor
                     </Button>
                 </div>
             ),
+        },
+        {
+            dataIndex: "payment_date",
+            key: "payment_date",
+            title: "Payment Date",
+            align: "center",
+            width: 100,
+            render: getHumanReadableDate,
+        },
+        {
+            dataIndex: "amount_received",
+            key: "amount_received",
+            title: "Amount received",
+            align: "center",
+            width: 150,
         },
         {
             dataIndex: "status",
@@ -187,6 +204,19 @@ const PaymentForm: FC<PaymentFormProps> = ({ payment, amount, donorType, onDonor
                             onChange={(e) => { onPanNumberChange(e.target.value.toUpperCase() || null) }}
                             fullWidth
                         />
+                    </Box>
+                    <Box sx={{ mt: 2 }}>
+                        <Typography mb={1}>How much would you like to pay right now?</Typography>
+                        <FormControl fullWidth>
+                            <InputLabel htmlFor="paying-amount">Paying Amount</InputLabel>
+                            <OutlinedInput
+                                id="paying-amount"
+                                value={payingAmount ? new Intl.NumberFormat('en-IN').format(payingAmount) : ''}
+                                startAdornment={<InputAdornment position="start">₹</InputAdornment>}
+                                label="Paying Amount"
+                                onChange={(e) => { onPayingAmountChange(e.target.value ? parseInt(e.target.value.replaceAll(',', '')) : 0) }}
+                            />
+                        </FormControl>
                     </Box>
                     <Box sx={{ mt: 2 }}>
                         <FormControl fullWidth>

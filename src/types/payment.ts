@@ -6,6 +6,8 @@ export type PaymentHistory = {
     amount: number;
     payment_method: string;
     payment_proof: string | null;
+    payment_date: string;
+    amount_received: number;
     payment_received_date: string;
     status: string;
     created_at: string;

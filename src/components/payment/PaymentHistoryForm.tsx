@@ -2,7 +2,8 @@ import { Box, FormControl, InputAdornment, InputLabel, MenuItem, OutlinedInput, 
 
 interface PaymentHistoryFormProps {
     amount: number,
-    onAmountChange: (amount: number) => void
+    receivedAmount: number,
+    onReceivedAmountChange: (receivedAmount: number) => void
     paymentMethod: string,
     onPaymentMethodChange: (paymentMethod: string) => void
     status: string,
@@ -11,7 +12,7 @@ interface PaymentHistoryFormProps {
     onPaymentReceivedDateChange: (paymentReceivedDate: string) => void
 }
 
-const PaymentHistoryForm: React.FC<PaymentHistoryFormProps> = ({ amount, onAmountChange, paymentMethod, onPaymentMethodChange, status, onStatusChange, paymentReceivedDate, onPaymentReceivedDateChange }) => {
+const PaymentHistoryForm: React.FC<PaymentHistoryFormProps> = ({ amount, receivedAmount, onReceivedAmountChange, paymentMethod, onPaymentMethodChange, status, onStatusChange, paymentReceivedDate, onPaymentReceivedDateChange }) => {
 
     return (
         <Box>
@@ -20,10 +21,10 @@ const PaymentHistoryForm: React.FC<PaymentHistoryFormProps> = ({ amount, onAmoun
                     <InputLabel htmlFor="amount">Amount</InputLabel>
                     <OutlinedInput
                         id="amount"
+                        disabled
                         value={new Intl.NumberFormat('en-IN').format(amount)}
                         startAdornment={<InputAdornment position="start">₹</InputAdornment>}
                         label="Amount"
-                        onChange={(e) => { onAmountChange(e.target.value ? parseInt(e.target.value.replaceAll(',', '')) : 0) }}
                     />
                 </FormControl>
             </Box>
@@ -32,6 +33,7 @@ const PaymentHistoryForm: React.FC<PaymentHistoryFormProps> = ({ amount, onAmoun
                     <InputLabel id="payment-method-label">Payment Method</InputLabel>
                     <Select
                         labelId="payment-method-label"
+                        disabled
                         value={paymentMethod}
                         label="Payment Method"
                         onChange={(e) => { onPaymentMethodChange(e.target.value) }}
@@ -42,6 +44,18 @@ const PaymentHistoryForm: React.FC<PaymentHistoryFormProps> = ({ amount, onAmoun
                         <MenuItem value={'Cash'}>Cash</MenuItem>
                         <MenuItem value={'Wire Transfer'}>Wire Transfer</MenuItem>
                     </Select>
+                </FormControl>
+            </Box>
+            <Box sx={{ mt: 2 }}>
+                <FormControl fullWidth>
+                    <InputLabel htmlFor="received-amount">Received Amount</InputLabel>
+                    <OutlinedInput
+                        id="received-amount"
+                        value={new Intl.NumberFormat('en-IN').format(receivedAmount)}
+                        startAdornment={<InputAdornment position="start">₹</InputAdornment>}
+                        label="Amount"
+                        onChange={(e) => { onReceivedAmountChange(e.target.value ? parseInt(e.target.value.replaceAll(',', '')) : 0) }}
+                    />
                 </FormControl>
             </Box>
             <Box sx={{ mt: 2 }}>

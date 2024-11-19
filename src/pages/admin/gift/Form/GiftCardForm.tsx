@@ -43,6 +43,7 @@ const GiftCardsForm: FC<GiftCardsFormProps> = ({ giftCardRequest, requestId, ope
     // payment details
     const [payment, setPayment] = useState<Payment | null>(null);
     const [amount, setAmount] = useState<number>(0);
+    const [payingAmount, setPayingAmount] = useState<number>(0);
     const [donorType, setDonorType] = useState<string>("Indian Citizen");
     const [panNumber, setPanNumber] = useState<string | null>(null);
     const [paymentProof, setPaymentProof] = useState<File | null>(null);
@@ -51,6 +52,15 @@ const GiftCardsForm: FC<GiftCardsFormProps> = ({ giftCardRequest, requestId, ope
     useEffect(() => {
         setAmount(treeCount * (category === "Foundation" ? 3000 : 1500));
     }, [category, treeCount])
+
+    useEffect(() => {
+        const totalPayed = payment?.payment_history
+            ? payment.payment_history.map(item => item.amount).reduce((prev, curr) => prev + curr, 0)
+            : 0
+        const total = payment ? payment.amount : 0;
+        
+        setPayingAmount(total - totalPayed > 0 ? total - totalPayed : 0);
+    }, [amount, payment])
 
     const getGiftCardRequestDetails = async () => {
         const apiClient = new ApiClient();
@@ -165,6 +175,8 @@ const GiftCardsForm: FC<GiftCardsFormProps> = ({ giftCardRequest, requestId, ope
             content: <PaymentForm
                 payment={payment}
                 amount={amount}
+                payingAmount={payingAmount}
+                onPayingAmountChange={payingAmount => { setPayingAmount(payingAmount) }}
                 donorType={donorType}
                 paymentMethod={paymentMethod}
                 panNumber={panNumber}
@@ -232,7 +244,7 @@ const GiftCardsForm: FC<GiftCardsFormProps> = ({ giftCardRequest, requestId, ope
             }
 
             try {
-                await apiClient.createPaymentHistory(paymentId, amount, paymentMethod, paymentProofLink);
+                await apiClient.createPaymentHistory(paymentId, payingAmount, paymentMethod, paymentProofLink);
             } catch(error: any) {
                 toast.error("Failed to save payment made!")
             }
