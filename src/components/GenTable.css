@@ -34,3 +34,7 @@
 .ant-dropdown {
     z-index: 10000 !important; /* Set a high z-index value */
 }
+
+.orange-column {
+    background-color: rgb(255, 229, 202);
+}

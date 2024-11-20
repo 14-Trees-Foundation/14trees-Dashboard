@@ -1,5 +1,5 @@
 import { FC, useEffect, useRef, useState } from "react";
-import { Box, Button, TextField, Typography } from "@mui/material";
+import { Box, Button, CircularProgress, TextField, Typography } from "@mui/material";
 import ApiClient from "../../../../api/apiClient/apiClient";
 
 const defaultMessages = {
@@ -104,7 +104,7 @@ const CardDetails: FC<CardDetailsProps> = ({ logo_url, request_id, presentationI
 
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-        const { name: field, value }= e.target
+        const { name: field, value } = e.target
 
         onChange({
             ...messages,
@@ -156,15 +156,36 @@ const CardDetails: FC<CardDetailsProps> = ({ logo_url, request_id, presentationI
                     </Button>
                 </Box>
             </div>
-            <div style={{ display: 'flex', justifyContent: 'center', flexDirection: 'column', maxWidth: '55%' }}>
-                {/* <img src={cardImage} /> */}
-                {iframeSrc && <iframe
-                    src={iframeSrc}
-                    width="800"
-                    height="600"
-                    allowFullScreen
-                ></iframe>}
-            </div>
+            <Box
+                display="flex"
+                flexDirection="column"
+                alignItems="center"
+                justifyContent="center"
+                minWidth="800px"
+                margin="auto"
+                border="2px solid #ccc" // Add border
+                height="600px" // Set height to center loading content
+            >
+                {!iframeSrc ? (
+                    <Box textAlign="center">
+                        <CircularProgress />
+                        <Typography variant="h6" marginTop={2}>
+                            Loading preview...
+                        </Typography>
+                        <Typography variant="h6">
+                            This may take a while...
+                        </Typography>
+                    </Box>
+                ) : (
+                    <iframe
+                        src={iframeSrc}
+                        width="800"
+                        height="600"
+                        allowFullScreen
+                        style={{ border: "none" }}
+                    ></iframe>
+                )}
+            </Box>
         </div>
     )
 }

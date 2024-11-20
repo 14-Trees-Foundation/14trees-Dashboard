@@ -33,17 +33,14 @@ const FileInputComponent: React.FC<FileInputProps> = ({ file, onFileChange }) =>
       display="flex"
       flexDirection="column"
       alignItems="center"
-      gap={2}
     >
-      <Typography>Upload the Image/Pdf of payment</Typography>
       {!file && (
         <Button
           variant="contained"
           color='success'
           component="label"
-          style={{ maxWidth: 200 }}
         >
-          Upload File
+          Upload payment Screenshot
           <input
             type="file"
             hidden

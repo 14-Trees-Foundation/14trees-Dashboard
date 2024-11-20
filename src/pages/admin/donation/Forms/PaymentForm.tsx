@@ -49,7 +49,7 @@ const PaymentForm: FC<PaymentFormProps> = ({ donorType, onDonorTypeChange, payme
             </Box>
             <Box sx={{ mt: 2 }} hidden={donorType !== 'Indian Citizen'}>
                 <TextField
-                    label="Pan card Number"
+                    label="PAN Number"
                     name="pan_number"
                     value={panNumber}
                     onChange={(e) => { onPanNumberChange(e.target.value.toUpperCase() || null) }}

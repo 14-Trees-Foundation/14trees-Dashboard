@@ -41,7 +41,7 @@ const PaymentBaseForm: React.FC<PaymentBaseFormProps> = ({ amount, donorType, pa
             </Box>
             <Box sx={{ mt: 2 }} hidden={donorType !== 'Indian Citizen'}>
                 <TextField
-                    label="Pan card Number"
+                    label="PAN Number"
                     name="pan_number"
                     value={panNumber}
                     onChange={(e) => { onPanNumberChange(e.target.value.toUpperCase()) }}
