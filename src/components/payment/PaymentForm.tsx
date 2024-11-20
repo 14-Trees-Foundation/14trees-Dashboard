@@ -1,4 +1,4 @@
-import { Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, FormControl, InputAdornment, InputLabel, MenuItem, OutlinedInput, Select, TextField, Tooltip, Typography } from "@mui/material";
+import { Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, FormControl, FormHelperText, InputAdornment, InputLabel, MenuItem, OutlinedInput, Select, TextField, Tooltip, Typography } from "@mui/material";
 import { FC, useEffect, useState } from "react";
 import FileInputComponent from "../FileInputComponent";
 import PaymentQR14tree from "../../assets/PaymentQR14tree.jpg";
@@ -6,10 +6,11 @@ import TreeCostChart from "../../assets/tree-cost-chart.png";
 import { Payment, PaymentHistory } from "../../types/payment";
 import GeneralTable from "../GenTable";
 import { getHumanReadableDate } from "../../helpers/utils";
-import { HelpOutline, VisibilityOutlined } from "@mui/icons-material";
+import { HelpOutline, PaymentOutlined, VisibilityOutlined } from "@mui/icons-material";
 import { AWSUtils } from "../../helpers/aws";
 import ApiClient from "../../api/apiClient/apiClient";
 import { toast } from "react-toastify";
+import { LoadingButton } from "@mui/lab";
 
 const paymentStatusList = [
     {
@@ -52,6 +53,8 @@ const PaymentForm: FC<PaymentFormProps> = ({ payment, amount, onPaymentChange, o
     const [donorType, setDonorType] = useState('');
     const [panNumber, setPanNumber] = useState('');
 
+    const [loading, setLoading] = useState(false);
+    const [visible, setVisible] = useState(false);
     const [paymentProof, setPaymentProof] = useState<File | null>(null);
     const [paymentMethod, setPaymentMethod] = useState<string | undefined>();
     const [payingAmount, setPayingAmount] = useState<number>(0);
@@ -96,6 +99,7 @@ const PaymentForm: FC<PaymentFormProps> = ({ payment, amount, onPaymentChange, o
     }
 
     const handleAddPaymentHistory = async () => {
+        setLoading(true);
         const apiClient = new ApiClient();
         let pmt = payment;
         if (!pmt) {
@@ -104,6 +108,7 @@ const PaymentForm: FC<PaymentFormProps> = ({ payment, amount, onPaymentChange, o
 
             if (!pmt) {
                 toast.error("Something went wrong please try again");
+                setLoading(false);
                 return;
             }
 
@@ -123,13 +128,17 @@ const PaymentForm: FC<PaymentFormProps> = ({ payment, amount, onPaymentChange, o
                 const resp = await apiClient.createPaymentHistory(pmt.id, payingAmount, paymentMethod, paymentProofLink);
 
                 onPaymentChange({
-                        ...pmt,
-                        payment_history: pmt?.payment_history ? [...pmt.payment_history, resp] : [resp],
-                    })
+                    ...pmt,
+                    payment_history: pmt?.payment_history ? [...pmt.payment_history, resp] : [resp],
+                })
             } catch (error: any) {
                 toast.error("Failed to save payment made!")
             }
         }
+
+        setPaymentMethod(undefined);
+        setPaymentProof(null);
+        setLoading(false);
     }
 
     const columns: any[] = [
@@ -208,18 +217,30 @@ const PaymentForm: FC<PaymentFormProps> = ({ payment, amount, onPaymentChange, o
     return (
         <Box style={{ padding: '40px', width: '100%' }}>
 
-            <Box style={{ display: 'flex', justifyContent: 'center' }}>
+            <Box style={{ display: 'flex', justifyContent: 'space-between' }}>
+                <Box width="45%" display="flex" flexDirection="column" alignItems="center">
+                    <div style={{ textAlign: "center" }}>
+                        <img
+                            // eslint-disable-next-line no-octal-escape
+                            src={PaymentQR14tree} // Replace with your QR code image URL
+                            alt="QR Code"
+                            style={{
+                                maxWidth: "100%",
+                                maxHeight: "200px",
+                                marginBottom: "20px",
+                            }}
+                        />
+                    </div>
+                    <Box mt={1}>
+                        <Button
+                            onClick={() => { setVisible(prev => !prev) }}
+                            color="success" variant="contained">
+                            {visible ? "Hide Payment Details" : "Add Payment Details"}
+                        </Button>
+                    </Box>
+                </Box>
                 <Box width="45%">
                     <Box sx={{ mt: 2 }}>
-                        <Typography>How is the below amount calculated?
-                            <Tooltip title={<img
-                                src={TreeCostChart}
-                                alt="Tree Cost"
-                                style={{ width: 600, height: 'auto' }}
-                            />}>
-                                <Button color="success"><HelpOutline /></Button>
-                            </Tooltip>
-                        </Typography>
                         <FormControl fullWidth>
                             <InputLabel htmlFor="amount">Amount</InputLabel>
                             <OutlinedInput
@@ -229,6 +250,14 @@ const PaymentForm: FC<PaymentFormProps> = ({ payment, amount, onPaymentChange, o
                                 startAdornment={<InputAdornment position="start">₹</InputAdornment>}
                                 label="Amount"
                             />
+                            <FormHelperText>How is the above amount calculated?
+                                <Tooltip title={<img
+                                    src={TreeCostChart}
+                                    alt="Tree Cost"
+                                    style={{ width: 600, height: 'auto' }}
+                                />}>
+                                    <Button color="success" sx={{ ml: -2 }}><HelpOutline fontSize={"small"} /></Button>
+                                </Tooltip></FormHelperText>
                         </FormControl>
                     </Box>
                     <Box sx={{ mt: 2 }}>
@@ -257,75 +286,54 @@ const PaymentForm: FC<PaymentFormProps> = ({ payment, amount, onPaymentChange, o
                     </Box>
                 </Box>
             </Box>
-            <Box mt={10}>
-                <Typography variant="h6">Please consider paying remaining amount</Typography>
-                <Box style={{ display: 'flex', justifyContent: 'space-between' }}>
-                    <Box width="45%">
-                        <Box sx={{ mt: 2 }}>
-                            <Typography>How is the below amount calculated?
-                                <Tooltip title={<img
-                                    src={TreeCostChart}
-                                    alt="Tree Cost"
-                                    style={{ width: 600, height: 'auto' }}
-                                />}>
-                                    <Button color="success"><HelpOutline /></Button>
-                                </Tooltip>
-                            </Typography>
-                            <FormControl fullWidth>
-                                <InputLabel htmlFor="amount">Amount</InputLabel>
-                                <OutlinedInput
-                                    id="amount"
-                                    value={payingAmount ? new Intl.NumberFormat('en-IN').format(payingAmount) : ''}
-                                    startAdornment={<InputAdornment position="start">₹</InputAdornment>}
-                                    label="Amount"
-                                    onChange={(e) => { setPayingAmount(parseInt(e.target.value.replaceAll(',', ''))) }}
-                                />
-                            </FormControl>
-                        </Box>
-                        <Box sx={{ mt: 2 }}>
-                            <FormControl fullWidth>
-                                <InputLabel id="payment-method-label">Payment Method</InputLabel>
-                                <Select
-                                    disabled={donorType !== 'Indian Citizen'}
-                                    labelId="payment-method-label"
-                                    value={paymentMethod || "None"}
-                                    label="Payment Method"
-                                    onChange={(e) => { setPaymentMethod(e.target.value !== "None" ? e.target.value : undefined) }}
-                                >
-                                    <MenuItem value={"None"}>Not Selected</MenuItem>
-                                    <MenuItem value={'UPI'}>UPI</MenuItem>
-                                    <MenuItem value={'Net Banking'}>Net Banking</MenuItem>
-                                    <MenuItem value={'Cheque'}>Cheque</MenuItem>
-                                    <MenuItem value={'Cash'}>Cash</MenuItem>
-                                    <MenuItem value={'Wire Transfer'}>Wire Transfer</MenuItem>
-                                </Select>
-                            </FormControl>
-                        </Box>
-                        <Button
-                            sx={{ mt: 2 }}
-                            disabled={!paymentMethod || !paymentProof}
-                            onClick={handleAddPaymentHistory}
-                            color="success" variant="contained">
-                            Add Payment Details
-                        </Button>
-                    </Box>
-                    <Box width="45%">
-                        <div style={{ textAlign: "center" }}>
-                            <img
-                                // eslint-disable-next-line no-octal-escape
-                                src={PaymentQR14tree} // Replace with your QR code image URL
-                                alt="QR Code"
-                                style={{
-                                    maxWidth: "100%",
-                                    maxHeight: "200px",
-                                    marginBottom: "20px",
-                                }}
+            <Box hidden={!visible} mt={5}>
+                <Typography variant="h6">Add Payment details:</Typography>
+                <Box style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <Box flexGrow={1}>
+                        <FormControl fullWidth>
+                            <InputLabel htmlFor="amount">Amount</InputLabel>
+                            <OutlinedInput
+                                id="amount"
+                                value={payingAmount ? new Intl.NumberFormat('en-IN').format(payingAmount) : ''}
+                                startAdornment={<InputAdornment position="start">₹</InputAdornment>}
+                                label="Amount"
+                                onChange={(e) => { setPayingAmount(parseInt(e.target.value.replaceAll(',', ''))) }}
                             />
-                        </div>
-                        <Box sx={{ mt: 2 }}>
-                            <FileInputComponent file={paymentProof} onFileChange={(file: File | null) => setPaymentProof(file)} />
-                        </Box>
+                        </FormControl>
                     </Box>
+                    <Box ml={2} flexGrow={1}>
+                        <FormControl fullWidth>
+                            <InputLabel id="payment-method-label">Payment Method</InputLabel>
+                            <Select
+                                disabled={donorType !== 'Indian Citizen'}
+                                labelId="payment-method-label"
+                                value={paymentMethod || "None"}
+                                label="Payment Method"
+                                onChange={(e) => { setPaymentMethod(e.target.value !== "None" ? e.target.value : undefined) }}
+                            >
+                                <MenuItem value={"None"}>Not Selected</MenuItem>
+                                <MenuItem value={'UPI'}>UPI</MenuItem>
+                                <MenuItem value={'Net Banking'}>Net Banking</MenuItem>
+                                <MenuItem value={'Cheque'}>Cheque</MenuItem>
+                                <MenuItem value={'Cash'}>Cash</MenuItem>
+                                <MenuItem value={'Wire Transfer'}>Wire Transfer</MenuItem>
+                            </Select>
+                        </FormControl>
+                    </Box>
+                    <Box ml={2} mr={2} flexGrow={1}>
+                        <FileInputComponent file={paymentProof} onFileChange={(file: File | null) => setPaymentProof(file)} />
+                    </Box>
+                    <LoadingButton
+                        loading={loading}
+                        loadingPosition="start"
+                        variant="contained"
+                        color="success"
+                        onClick={handleAddPaymentHistory}
+                        startIcon={<PaymentOutlined />}
+                        disabled={!paymentMethod || !paymentProof}
+                    >
+                        Add Payment
+                    </LoadingButton>
                 </Box>
             </Box>
 

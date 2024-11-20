@@ -115,7 +115,7 @@ const CardDetails: FC<CardDetailsProps> = ({ logo_url, request_id, presentationI
     return (
         <div style={{ display: 'flex', padding: '10px 10px', width: '100%', justifyContent: 'space-between' }}>
             <div style={{ display: 'flex', flexDirection: 'column', width: '42%' }}>
-                <Typography variant='h6'>Change the messaging if you would like to tweak/add some personalised touch: </Typography>
+                <Typography variant='h6'>If you would like to tweak/add some personalised touch, change the messaging below: </Typography>
                 <Typography variant="body1" sx={{ mt: 2 }}>Primary Message</Typography>
                 <TextField
                     multiline
