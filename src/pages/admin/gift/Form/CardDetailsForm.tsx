@@ -36,21 +36,25 @@ const CardDetails: FC<CardDetailsProps> = ({ logo_url, request_id, presentationI
     const recordRef = useRef({ primary: '', secondary: '', logo: '' })
     const logoRef = useRef({ logoUrl: undefined as string | null | undefined })
     const [iframeSrc, setIframeSrc] = useState<string | null>(null);
+    const [loading, setLoading] = useState(false);
 
     const updateSlide = async () => {
         if (!slideIdRef.current || !presentationIdIdRef.current) {
             return;
         }
 
+        setLoading(true);
         const apiClient = new ApiClient();
         await apiClient.updateGiftCardTemplate(slideIdRef.current, recordRef.current.primary, recordRef.current.secondary, recordRef.current.logo, logo_url);
         setIframeSrc(
             `https://docs.google.com/presentation/d/${presentationIdIdRef.current}/embed?rm=minimal&slide=id.${slideIdRef.current}&timestamp=${new Date().getTime()}`
         );
+        setLoading(false);
     }
 
     useEffect(() => {
         const generateGiftCard = async () => {
+            setLoading(true);
             const apiClient = new ApiClient();
             const resp = await apiClient.generateCardTemplate(request_id, defaultMessages.primary, defaultMessages.secondary, defaultMessages.logo, logo_url);
             slideIdRef.current = resp.slide_id;
@@ -60,6 +64,7 @@ const CardDetails: FC<CardDetailsProps> = ({ logo_url, request_id, presentationI
             setIframeSrc(
                 `https://docs.google.com/presentation/d/${resp.presentation_id}/embed?rm=minimal&slide=id.${resp.slide_id}&timestamp=${new Date().getTime()}`
             )
+            setLoading(false);
         }
 
         const handler = setTimeout(() => {
@@ -166,7 +171,7 @@ const CardDetails: FC<CardDetailsProps> = ({ logo_url, request_id, presentationI
                 border="2px solid #ccc" // Add border
                 height="600px" // Set height to center loading content
             >
-                {!iframeSrc ? (
+                {(!iframeSrc || loading) ? (
                     <Box textAlign="center">
                         <CircularProgress />
                         <Typography variant="h6" marginTop={2}>
