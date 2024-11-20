@@ -124,6 +124,8 @@ const CardDetails: FC<CardDetailsProps> = ({ logo_url, request_id, presentationI
                     onChange={handleChange}
                     size="small"
                     inputProps={{ maxLength: 270 }}
+                    FormHelperTextProps={{ style: { textAlign: 'right' } }}
+                    helperText={`${270 - messages.primaryMessage.length} characters remaining`}
                 />
                 <Typography variant="body1" sx={{ mt: 2 }}>Secondary Message</Typography>
                 <TextField
@@ -133,6 +135,8 @@ const CardDetails: FC<CardDetailsProps> = ({ logo_url, request_id, presentationI
                     onChange={handleChange}
                     size="small"
                     inputProps={{ maxLength: 125 }}
+                    FormHelperTextProps={{ style: { textAlign: 'right' } }}
+                    helperText={`${125 - messages.secondaryMessage.length} characters remaining`}
                 />
                 {logo_url && <Box>
                     <Typography variant="body1" sx={{ mt: 2 }}>Logo Message</Typography>
