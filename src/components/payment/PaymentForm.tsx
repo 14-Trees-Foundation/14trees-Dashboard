@@ -7,6 +7,9 @@ import { Payment, PaymentHistory } from "../../types/payment";
 import GeneralTable from "../GenTable";
 import { getHumanReadableDate } from "../../helpers/utils";
 import { HelpOutline, VisibilityOutlined } from "@mui/icons-material";
+import { AWSUtils } from "../../helpers/aws";
+import ApiClient from "../../api/apiClient/apiClient";
+import { toast } from "react-toastify";
 
 const paymentStatusList = [
     {
@@ -29,22 +32,13 @@ const getReadableStatus = (value: string) => {
 }
 
 interface PaymentFormProps {
-    payment?: Payment | null
     amount: number,
-    payingAmount: number,
-    onPayingAmountChange: (payingAmount: number) => void,
-    donorType: string,
-    onDonorTypeChange: (donorType: string) => void,
-    paymentMethod: string | undefined
-    onPaymentMethodChange: (paymentMethod: string | undefined) => void
-    panNumber: string | null
-    onPanNumberChange: (panNumber: string | null) => void
-    paymentProof: File | null
-    onPaymentProofChange: (paymentProof: File | null) => void
+    payment: Payment | null
+    onPaymentChange: (payment: Payment | null) => void
+    onChange: (donorType: string, panNumber: string | null) => void
 }
 
-const PaymentForm: FC<PaymentFormProps> = ({ payment, amount, payingAmount, onPayingAmountChange, donorType, onDonorTypeChange, paymentMethod, onPaymentMethodChange, panNumber, onPanNumberChange, paymentProof, onPaymentProofChange }) => {
-
+const PaymentForm: FC<PaymentFormProps> = ({ payment, amount, onPaymentChange, onChange }) => {
     const [filePreview, setFilePreview] = useState(false);
     const [selectedHistory, setSelectedHistory] = useState<PaymentHistory | null>(null);
     const [page, setPage] = useState(0);
@@ -54,6 +48,13 @@ const PaymentForm: FC<PaymentFormProps> = ({ payment, amount, payingAmount, onPa
         paidAmount: 0,
         verifiedAmount: 0,
     })
+
+    const [donorType, setDonorType] = useState('');
+    const [panNumber, setPanNumber] = useState('');
+
+    const [paymentProof, setPaymentProof] = useState<File | null>(null);
+    const [paymentMethod, setPaymentMethod] = useState<string | undefined>();
+    const [payingAmount, setPayingAmount] = useState<number>(0);
 
     useEffect(() => {
         if (payment && payment.payment_history && payment.payment_history.length > 0) {
@@ -65,8 +66,19 @@ const PaymentForm: FC<PaymentFormProps> = ({ payment, amount, payingAmount, onPa
                 paidAmount: paid,
                 verifiedAmount: verified,
             })
+
+            setPayingAmount(amount - paid > 0 ? amount - paid : 0);
+        } else {
+            setPayingAmount(amount);
         }
+
+        setDonorType(payment ? payment.donor_type : '');
+        setPanNumber(payment?.pan_number ? payment.pan_number : '');
     }, [payment, amount])
+
+    useEffect(() => {
+        onChange(donorType, panNumber);
+    }, [donorType, panNumber])
 
     const handlePaginationChange = (page: number, pageSize: number) => {
         setPage(page - 1);
@@ -81,6 +93,43 @@ const PaymentForm: FC<PaymentFormProps> = ({ payment, amount, payingAmount, onPa
     const handleClosePreview = () => {
         setFilePreview(false);
         setSelectedHistory(null);
+    }
+
+    const handleAddPaymentHistory = async () => {
+        const apiClient = new ApiClient();
+        let pmt = payment;
+        if (!pmt) {
+            if (!donorType) toast.error("Please select citizenship!");
+            else pmt = await apiClient.createPayment(amount, donorType, panNumber);
+
+            if (!pmt) {
+                toast.error("Something went wrong please try again");
+                return;
+            }
+
+            onPaymentChange(pmt);
+        }
+
+
+        if (paymentMethod) {
+            let paymentProofLink: string | null = null;
+            if (paymentProof) {
+                const awsUtils = new AWSUtils();
+                const location = await awsUtils.uploadFileToS3("payment", paymentProof);
+                if (location) paymentProofLink = location;
+            }
+
+            try {
+                const resp = await apiClient.createPaymentHistory(pmt.id, payingAmount, paymentMethod, paymentProofLink);
+
+                onPaymentChange({
+                        ...pmt,
+                        payment_history: pmt?.payment_history ? [...pmt.payment_history, resp] : [resp],
+                    })
+            } catch (error: any) {
+                toast.error("Failed to save payment made!")
+            }
+        }
     }
 
     const columns: any[] = [
@@ -159,7 +208,7 @@ const PaymentForm: FC<PaymentFormProps> = ({ payment, amount, payingAmount, onPa
     return (
         <Box style={{ padding: '40px', width: '100%' }}>
 
-            <Box style={{ display: 'flex', justifyContent: 'space-between' }}>
+            <Box style={{ display: 'flex', justifyContent: 'center' }}>
                 <Box width="45%">
                     <Box sx={{ mt: 2 }}>
                         <Typography>How is the below amount calculated?
@@ -190,7 +239,7 @@ const PaymentForm: FC<PaymentFormProps> = ({ payment, amount, payingAmount, onPa
                                 labelId="donor-label"
                                 value={donorType}
                                 label="Citizenship (Applicable for 80G/501(c)/FCRA)"
-                                onChange={(e) => { onDonorTypeChange(e.target.value); }}
+                                onChange={(e) => { setDonorType(e.target.value); }}
                             >
                                 <MenuItem value={'Indian Citizen'}>Indian Citizen</MenuItem>
                                 <MenuItem value={'Foreign Donor'}>Foreign Donor</MenuItem>
@@ -202,103 +251,128 @@ const PaymentForm: FC<PaymentFormProps> = ({ payment, amount, payingAmount, onPa
                             label="Pan card Number"
                             name="pan_number"
                             value={panNumber}
-                            onChange={(e) => { onPanNumberChange(e.target.value.toUpperCase() || null) }}
+                            onChange={(e) => { setPanNumber(e.target.value.toUpperCase().trim()) }}
                             fullWidth
                         />
                     </Box>
-                    <Box sx={{ mt: 2 }}>
-                        <Typography mb={1}>How much would you like to pay right now?</Typography>
-                        <FormControl fullWidth>
-                            <InputLabel htmlFor="paying-amount">Paying Amount</InputLabel>
-                            <OutlinedInput
-                                id="paying-amount"
-                                value={payingAmount ? new Intl.NumberFormat('en-IN').format(payingAmount) : ''}
-                                startAdornment={<InputAdornment position="start">₹</InputAdornment>}
-                                label="Paying Amount"
-                                onChange={(e) => { onPayingAmountChange(e.target.value ? parseInt(e.target.value.replaceAll(',', '')) : 0) }}
-                            />
-                        </FormControl>
-                    </Box>
-                    <Box sx={{ mt: 2 }}>
-                        <FormControl fullWidth>
-                            <InputLabel id="payment-method-label">Payment Method</InputLabel>
-                            <Select
-                                disabled={donorType !== 'Indian Citizen'}
-                                labelId="payment-method-label"
-                                value={paymentMethod || "None"}
-                                label="Payment Method"
-                                onChange={(e) => { onPaymentMethodChange(e.target.value !== "None" ? e.target.value : undefined) }}
-                            >
-                                <MenuItem value={"None"}>Not Selected</MenuItem>
-                                <MenuItem value={'UPI'}>UPI</MenuItem>
-                                <MenuItem value={'Net Banking'}>Net Banking</MenuItem>
-                                <MenuItem value={'Cheque'}>Cheque</MenuItem>
-                                <MenuItem value={'Cash'}>Cash</MenuItem>
-                                <MenuItem value={'Wire Transfer'}>Wire Transfer</MenuItem>
-                            </Select>
-                        </FormControl>
-                    </Box>
                 </Box>
-                <Box width="45%">
-                    <div style={{ textAlign: "center" }}>
-                        <img
-                            // eslint-disable-next-line no-octal-escape
-                            src={PaymentQR14tree} // Replace with your QR code image URL
-                            alt="QR Code"
-                            style={{
-                                maxWidth: "100%",
-                                maxHeight: "200px",
-                                marginBottom: "20px",
-                            }}
-                        />
-                    </div>
-                    <Box sx={{ mt: 2 }}>
-                        <FileInputComponent file={paymentProof} onFileChange={onPaymentProofChange} />
+            </Box>
+            <Box mt={10}>
+                <Typography variant="h6">Please consider paying remaining amount</Typography>
+                <Box style={{ display: 'flex', justifyContent: 'space-between' }}>
+                    <Box width="45%">
+                        <Box sx={{ mt: 2 }}>
+                            <Typography>How is the below amount calculated?
+                                <Tooltip title={<img
+                                    src={TreeCostChart}
+                                    alt="Tree Cost"
+                                    style={{ width: 600, height: 'auto' }}
+                                />}>
+                                    <Button color="success"><HelpOutline /></Button>
+                                </Tooltip>
+                            </Typography>
+                            <FormControl fullWidth>
+                                <InputLabel htmlFor="amount">Amount</InputLabel>
+                                <OutlinedInput
+                                    id="amount"
+                                    value={payingAmount ? new Intl.NumberFormat('en-IN').format(payingAmount) : ''}
+                                    startAdornment={<InputAdornment position="start">₹</InputAdornment>}
+                                    label="Amount"
+                                    onChange={(e) => { setPayingAmount(parseInt(e.target.value.replaceAll(',', ''))) }}
+                                />
+                            </FormControl>
+                        </Box>
+                        <Box sx={{ mt: 2 }}>
+                            <FormControl fullWidth>
+                                <InputLabel id="payment-method-label">Payment Method</InputLabel>
+                                <Select
+                                    disabled={donorType !== 'Indian Citizen'}
+                                    labelId="payment-method-label"
+                                    value={paymentMethod || "None"}
+                                    label="Payment Method"
+                                    onChange={(e) => { setPaymentMethod(e.target.value !== "None" ? e.target.value : undefined) }}
+                                >
+                                    <MenuItem value={"None"}>Not Selected</MenuItem>
+                                    <MenuItem value={'UPI'}>UPI</MenuItem>
+                                    <MenuItem value={'Net Banking'}>Net Banking</MenuItem>
+                                    <MenuItem value={'Cheque'}>Cheque</MenuItem>
+                                    <MenuItem value={'Cash'}>Cash</MenuItem>
+                                    <MenuItem value={'Wire Transfer'}>Wire Transfer</MenuItem>
+                                </Select>
+                            </FormControl>
+                        </Box>
+                        <Button
+                            sx={{ mt: 2 }}
+                            disabled={!paymentMethod || !paymentProof}
+                            onClick={handleAddPaymentHistory}
+                            color="success" variant="contained">
+                            Add Payment Details
+                        </Button>
+                    </Box>
+                    <Box width="45%">
+                        <div style={{ textAlign: "center" }}>
+                            <img
+                                // eslint-disable-next-line no-octal-escape
+                                src={PaymentQR14tree} // Replace with your QR code image URL
+                                alt="QR Code"
+                                style={{
+                                    maxWidth: "100%",
+                                    maxHeight: "200px",
+                                    marginBottom: "20px",
+                                }}
+                            />
+                        </div>
+                        <Box sx={{ mt: 2 }}>
+                            <FileInputComponent file={paymentProof} onFileChange={(file: File | null) => setPaymentProof(file)} />
+                        </Box>
                     </Box>
                 </Box>
             </Box>
-            {payment && payment.payment_history && payment.payment_history.length > 0 && <Box mt={5}>
-                <Typography variant="h6" mb={1}>Past payment details</Typography>
-                <Box display="flex" mt={1}>
-                    <Box display="flex" flexDirection="column" gap={1}>
-                        <Box display="flex" justifyContent="space-between">
-                            <Typography>Total amount:</Typography>
-                            <Typography ml={10}>{new Intl.NumberFormat('en-IN').format(amountData.totalAmount)}</Typography>
+
+            {
+                payment && payment.payment_history && payment.payment_history.length > 0 && <Box mt={5}>
+                    <Typography variant="h6" mb={1}>Past payment details</Typography>
+                    <Box display="flex" mt={1}>
+                        <Box display="flex" flexDirection="column" gap={1}>
+                            <Box display="flex" justifyContent="space-between">
+                                <Typography>Total amount:</Typography>
+                                <Typography ml={10}>{new Intl.NumberFormat('en-IN').format(amountData.totalAmount)}</Typography>
+                            </Box>
+                            <Box display="flex" justifyContent="space-between">
+                                <Typography>Paid amount:</Typography>
+                                <Typography ml={10}>{new Intl.NumberFormat('en-IN').format(amountData.paidAmount)}</Typography>
+                            </Box>
+                            <Box display="flex" justifyContent="space-between">
+                                <Typography>Remaining amount:</Typography>
+                                <Typography ml={10}>{new Intl.NumberFormat('en-IN').format(amountData.totalAmount - amountData.paidAmount)}</Typography>
+                            </Box>
                         </Box>
-                        <Box display="flex" justifyContent="space-between">
-                            <Typography>Paid amount:</Typography>
-                            <Typography ml={10}>{new Intl.NumberFormat('en-IN').format(amountData.paidAmount)}</Typography>
+                        <Box display="flex" flexDirection="column" gap={1} ml={10}>
+                            <Box display="flex" justifyContent="space-between">
+                                <Typography>Verified amount:</Typography>
+                                <Typography ml={10}>{new Intl.NumberFormat('en-IN').format(amountData.verifiedAmount)}</Typography>
+                            </Box>
+                            <Box display="flex" justifyContent="space-between">
+                                <Typography>Unverified amount:</Typography>
+                                <Typography ml={10}>{new Intl.NumberFormat('en-IN').format(amountData.paidAmount - amountData.verifiedAmount)}</Typography>
+                            </Box>
                         </Box>
-                        <Box display="flex" justifyContent="space-between">
-                            <Typography>Remaining amount:</Typography>
-                            <Typography ml={10}>{new Intl.NumberFormat('en-IN').format(amountData.totalAmount - amountData.paidAmount)}</Typography>
-                        </Box>
+                        <Box style={{ flexGrow: 1 }}></Box>
                     </Box>
-                    <Box display="flex" flexDirection="column" gap={1} ml={10}>
-                        <Box display="flex" justifyContent="space-between">
-                            <Typography>Verified amount:</Typography>
-                            <Typography ml={10}>{new Intl.NumberFormat('en-IN').format(amountData.verifiedAmount)}</Typography>
-                        </Box>
-                        <Box display="flex" justifyContent="space-between">
-                            <Typography>Unverified amount:</Typography>
-                            <Typography ml={10}>{new Intl.NumberFormat('en-IN').format(amountData.paidAmount - amountData.verifiedAmount)}</Typography>
-                        </Box>
-                    </Box>
-                    <Box style={{ flexGrow: 1 }}></Box>
+                    <Typography variant="h6" mb={1}>Payment History</Typography>
+                    <GeneralTable
+                        loading={false}
+                        rows={payment?.payment_history ? payment.payment_history.slice(page * pageSize, page * pageSize + pageSize) : []}
+                        columns={columns}
+                        totalRecords={payment?.payment_history ? payment.payment_history.length : 0}
+                        page={page}
+                        pageSize={pageSize}
+                        onPaginationChange={handlePaginationChange}
+                        onDownload={async () => { return payment?.payment_history || [] }}
+                        tableName="Payment History"
+                    />
                 </Box>
-                <Typography variant="h6" mb={1}>Payment History</Typography>
-                <GeneralTable
-                    loading={false}
-                    rows={payment?.payment_history ? payment.payment_history.slice(page * pageSize, page * pageSize + pageSize) : []}
-                    columns={columns}
-                    totalRecords={payment?.payment_history ? payment.payment_history.length : 0}
-                    page={page}
-                    pageSize={pageSize}
-                    onPaginationChange={handlePaginationChange}
-                    onDownload={async () => { return payment?.payment_history || [] }}
-                    tableName="Payment History"
-                />
-            </Box>}
+            }
             <Dialog open={filePreview} fullWidth maxWidth="lg">
                 <DialogTitle>Payment Proof</DialogTitle>
                 <DialogContent dividers>
@@ -331,7 +405,7 @@ const PaymentForm: FC<PaymentFormProps> = ({ payment, amount, payingAmount, onPa
                     </Button>
                 </DialogActions>
             </Dialog>
-        </Box>
+        </Box >
     );
 }
 

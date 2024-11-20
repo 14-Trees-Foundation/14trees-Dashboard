@@ -78,18 +78,20 @@ const PaymentComponent: React.FC<PaymentProps> = ({ initialAmount, paymentId, on
     })
 
     useEffect(() => {
+        let paid = 0, verified = 0;
         if (payment && payment.payment_history && payment.payment_history.length > 0) {
-            const paid = payment.payment_history.map(item => item.amount).reduce((prev, curr) => prev + curr, 0);
-            const verified = payment.payment_history.filter(item => item.status === 'validated').map(item => item.amount_received).reduce((prev, curr) => prev + curr, 0);
+            paid = payment.payment_history.map(item => item.amount).reduce((prev, curr) => prev + curr, 0);
+            verified = payment.payment_history.filter(item => item.status === 'validated').map(item => item.amount_received).reduce((prev, curr) => prev + curr, 0);
 
-            setAmountData({
-                totalAmount: amount,
-                paidAmount: paid,
-                verifiedAmount: verified,
-            });
-
-            setPayingAmount(amount - paid);
         }
+        
+        setAmountData({
+            totalAmount: amount,
+            paidAmount: paid,
+            verifiedAmount: verified,
+        });
+    
+        setPayingAmount(amount - paid);
     }, [payment, amount])
 
     const getPayment = async (paymentId: number) => {
