@@ -1,4 +1,4 @@
-import { Box, FormControl, InputAdornment, InputLabel, MenuItem, OutlinedInput, Select, TextField } from "@mui/material"
+import { Box, FormControl, InputAdornment, InputLabel, MenuItem, OutlinedInput, Select, TextField, Typography } from "@mui/material"
 
 interface PaymentBaseFormProps {
     amount: number
@@ -25,12 +25,13 @@ const PaymentBaseForm: React.FC<PaymentBaseFormProps> = ({ amount, donorType, pa
                 </FormControl>
             </Box>
             <Box sx={{ mt: 2 }}>
+                <Typography mb={1}>Tax Benefits:</Typography>
                 <FormControl fullWidth>
-                    <InputLabel id="donor-label">Applicable for 80g / 501 (c)/ FCRA</InputLabel>
+                    <InputLabel id="donor-label">Citizenship (Applicable for 80G/501(c)/FCRA)</InputLabel>
                     <Select
                         labelId="donor-label"
                         value={donorType}
-                        label="Applicable for80g / 501 (c)/ FCRA"
+                        label="Citizenship (Applicable for 80G/501(c)/FCRA)"
                         onChange={(e) => { onDonorTypeChange(e.target.value); }}
                     >
                         <MenuItem value={'Indian Citizen'}>Indian Citizen</MenuItem>

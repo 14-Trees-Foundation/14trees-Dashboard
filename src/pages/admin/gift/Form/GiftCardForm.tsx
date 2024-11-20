@@ -165,7 +165,7 @@ const GiftCardsForm: FC<GiftCardsFormProps> = ({ giftCardRequest, requestId, ope
             key: 3,
             title: "Dashboard Details",
             content: <DashboardDetails
-                messages={{...messages, plantedBy: messages.plantedBy || group?.name || ''}}
+                messages={{...messages, plantedBy: messages.plantedBy || group?.name || user?.name || ''}}
                 onChange={messages => { setMessages(messages) }}
             />,
         },
@@ -195,7 +195,7 @@ const GiftCardsForm: FC<GiftCardsFormProps> = ({ giftCardRequest, requestId, ope
                 presentationId={presentationId}
                 slideId={slideId}
                 logo_url={logoString ? logoString : giftCardRequest?.logo_url}
-                messages={{...messages, plantedBy: messages.plantedBy || group?.name || ''}}
+                messages={{...messages, plantedBy: messages.plantedBy || group?.name || user?.name || ''}}
                 onChange={messages => { setMessages(messages) }}
                 onPresentationId={(presentationId: string, slideId: string) => { setPresentationId(presentationId); setSlideId(slideId); }}
             />,

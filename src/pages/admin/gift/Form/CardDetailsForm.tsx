@@ -93,6 +93,12 @@ const CardDetails: FC<CardDetailsProps> = ({ logo_url, request_id, presentationI
                 secondaryMessage: defaultMessages.secondary,
                 logoMessage: defaultMessages.logo,
             })
+
+            recordRef.current.primary = eventMessage;
+            recordRef.current.secondary = defaultMessages.secondary;
+            recordRef.current.logo = defaultMessages.logo;
+
+            updateSlide();
         }
     }, [messages])
 
@@ -108,8 +114,8 @@ const CardDetails: FC<CardDetailsProps> = ({ logo_url, request_id, presentationI
 
     return (
         <div style={{ display: 'flex', padding: '10px 10px', width: '100%', justifyContent: 'space-between' }}>
-            <div style={{ display: 'flex', justifyContent: 'center', flexDirection: 'column', width: '42%' }}>
-                <Typography variant='h6'>Please provide the messages to use on gift card: </Typography>
+            <div style={{ display: 'flex', flexDirection: 'column', width: '42%' }}>
+                <Typography variant='h6'>Change the messaging if you would like to tweak/add some personalised touch: </Typography>
                 <Typography variant="body1" sx={{ mt: 2 }}>Primary Message</Typography>
                 <TextField
                     multiline
@@ -139,9 +145,10 @@ const CardDetails: FC<CardDetailsProps> = ({ logo_url, request_id, presentationI
                         inputProps={{ maxLength: 50 }}
                     />
                 </Box>}
-                <Box style={{ display: 'flex', justifyContent: 'flex-start', marginTop: 20 }}>
-                    <Button onClick={updateSlide} variant="contained" color="success" disabled={!presentationIdIdRef.current}>
-                        Update
+                <Box style={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'center', marginTop: 20 }}>
+                    <Typography mr={1}>Click to refresh the card template on the right:</Typography>
+                    <Button onClick={updateSlide} size='small' variant="contained" color="success" disabled={!presentationIdIdRef.current}>
+                        Preview
                     </Button>
                 </Box>
             </div>

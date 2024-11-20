@@ -35,7 +35,7 @@ const CardCount: FC<CardCountProps> = ({ disabled, treeCount, onTreeCountChange,
             </div>
             <Box mt={2}>
                 <Typography mb={1} variant='body1'>Where would you like to plant the trees? 
-                    <Tooltip title={"Foundation sites are 14 Trees Foundation's land preserves and Public sites are government owned lands such as schools, guirans etc."}>
+                    <Tooltip title={"Foundation sites are 14 Trees Foundation's land reserves and Public sites are government owned lands such as gairans, schools, roadside, etc."}>
                         <Button><HelpOutline /></Button>
                     </Tooltip>
                 </Typography>
@@ -51,7 +51,7 @@ const CardCount: FC<CardCountProps> = ({ disabled, treeCount, onTreeCountChange,
                 </FormControl>
             </Box>
             <Box sx={{ mt: 2 }} style={{ display: category === 'Public' ? 'none' : 'block' }}>
-                <Typography mb={1} variant='body1'>If you want to plant trees in any specific grove, you can select appropriate grove from the dropdown.</Typography>
+                <Typography mb={1} variant='body1'>Select a grove, such as birthday or memorial, based on the gifting occasion, or leave it blank for us to choose the best fit for you.</Typography>
                 <FormControl fullWidth>
                     <Select
                         labelId="grove-label"

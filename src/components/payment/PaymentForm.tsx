@@ -162,16 +162,16 @@ const PaymentForm: FC<PaymentFormProps> = ({ payment, amount, payingAmount, onPa
             <Box style={{ display: 'flex', justifyContent: 'space-between' }}>
                 <Box width="45%">
                     <Box sx={{ mt: 2 }}>
+                        <Typography>How is the below amount calculated?
+                            <Tooltip title={<img
+                                src={TreeCostChart}
+                                alt="Tree Cost"
+                                style={{ width: 600, height: 'auto' }}
+                            />}>
+                                <Button color="success"><HelpOutline /></Button>
+                            </Tooltip>
+                        </Typography>
                         <FormControl fullWidth>
-                            <Typography>How is the below amount calculated?
-                                <Tooltip title={<img
-                                    src={TreeCostChart}
-                                    alt="Tree Cost"
-                                    style={{ width: 600, height: 'auto' }}
-                                />}>
-                                    <Button color="success"><HelpOutline /></Button>
-                                </Tooltip>
-                            </Typography>
                             <InputLabel htmlFor="amount">Amount</InputLabel>
                             <OutlinedInput
                                 id="amount"
@@ -183,12 +183,13 @@ const PaymentForm: FC<PaymentFormProps> = ({ payment, amount, payingAmount, onPa
                         </FormControl>
                     </Box>
                     <Box sx={{ mt: 2 }}>
+                        <Typography mb={1}>Tax Benefits:</Typography>
                         <FormControl fullWidth>
-                            <InputLabel id="donor-label">Applicable 80g / 501 (c)/ FCRA</InputLabel>
+                            <InputLabel id="donor-label">Citizenship (Applicable for 80G/501(c)/FCRA)</InputLabel>
                             <Select
                                 labelId="donor-label"
                                 value={donorType}
-                                label="Applicable for 80g / 501 (c)/ FCRA"
+                                label="Citizenship (Applicable for 80G/501(c)/FCRA)"
                                 onChange={(e) => { onDonorTypeChange(e.target.value); }}
                             >
                                 <MenuItem value={'Indian Citizen'}>Indian Citizen</MenuItem>

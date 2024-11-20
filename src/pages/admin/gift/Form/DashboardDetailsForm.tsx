@@ -60,7 +60,7 @@ const DashboardDetails: FC<DashboardDetailsProps> = ({ messages, onChange }) => 
     return (
         <div style={{ display: 'flex', padding: '10px 10px', width: '100%', justifyContent: 'center' }}>
             <div style={{ display: 'flex', justifyContent: 'center', flexDirection: 'column', width: '42%' }}>
-                <Typography variant='h6'>Please few more details to display on profile dashboard: </Typography>
+                <Typography variant='h6'>A few more details to make a bit more personalised dashboard: </Typography>
                 <Typography variant="body1" sx={{ mt: 2 }}>Event/Occasion</Typography>
                 <Autocomplete
                     size="small"
