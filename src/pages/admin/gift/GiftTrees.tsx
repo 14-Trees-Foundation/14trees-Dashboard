@@ -25,11 +25,15 @@ import EmailConfirmationModal from "./Form/EmailConfirmationModal";
 import EditUserDetailsModal from "./Form/EditUserDetailsModal";
 import { getUniqueRequestId } from "../../../helpers/utils";
 import PaymentComponent from "../../../components/payment/PaymentComponent";
+import { useAuth } from "../auth/auth";
+import { UserRoles } from "../../../types/common";
 
 const GiftTrees: FC = () => {
     const dispatch = useAppDispatch();
     const { getGiftCards, deleteGiftCardRequest, cloneGiftCardRequest } =
         bindActionCreators(giftCardActionCreators, dispatch);
+
+    let auth = useAuth();
 
     const [changeMode, setChangeMode] = useState<'add' | 'edit'>('add');
     const [modalOpen, setModalOpen] = useState(false);
@@ -412,13 +416,17 @@ const GiftTrees: FC = () => {
                 <Menu.Item key="00" onClick={() => { setSelectedGiftCard(record); setInfoModal(true); }} icon={<Wysiwyg />}>
                     View Summary
                 </Menu.Item>
-                <Menu.Item key="01" onClick={() => { handleModalOpenEdit(record); }} icon={<Edit />}>
-                    Edit Request
-                </Menu.Item>
-                <Menu.Item key="02" onClick={() => { handleCloneGiftCardRequest(record); }} icon={<FileCopy />}>
-                    Clone Request
-                </Menu.Item>
-                {(record.status === 'pending_plot_selection' || record.status === 'pending_assignment') &&
+                { !auth.roles.includes(UserRoles.Admin) &&
+                    <Menu.Item key="01" onClick={() => { handleModalOpenEdit(record); }} icon={<Edit />}>
+                        Edit Request
+                    </Menu.Item>
+                }
+                { !auth.roles.includes(UserRoles.Admin) &&
+                    <Menu.Item key="02" onClick={() => { handleCloneGiftCardRequest(record); }} icon={<FileCopy />}>
+                        Clone Request
+                    </Menu.Item>
+                }
+                {(!auth.roles.includes(UserRoles.Admin) && (record.status === 'pending_plot_selection' || record.status === 'pending_assignment')) &&
                     <Menu.Item key="03" danger onClick={() => { setDeleteModal(true); setSelectedGiftCard(record); }} icon={<Delete />}>
                         Delete Request
                     </Menu.Item>
@@ -459,8 +467,8 @@ const GiftTrees: FC = () => {
                     Gift Cards Slide
                 </Menu.Item>
             </Menu.ItemGroup>}
-            <Menu.Divider style={{ backgroundColor: '#ccc' }} />
-            <Menu.ItemGroup>
+            {!auth.roles.includes(UserRoles.Sponsor) && <Menu.Divider style={{ backgroundColor: '#ccc' }} />}
+            {!auth.roles.includes(UserRoles.Sponsor) && <Menu.ItemGroup>
                 {record.status === 'pending_plot_selection' &&
                     <Menu.Item key="40" onClick={() => { setSelectedGiftCard(record); setPlotModal(true); }} icon={<Landscape />}>
                         Select Plots
@@ -474,7 +482,7 @@ const GiftTrees: FC = () => {
                 <Menu.Item key="42" onClick={() => { handlePaymentModalOpen(record); }} icon={<AssuredWorkload />}>
                     Payment Details
                 </Menu.Item>
-            </Menu.ItemGroup>
+            </Menu.ItemGroup>}
         </Menu>
     );
 
