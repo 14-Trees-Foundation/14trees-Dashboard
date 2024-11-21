@@ -94,11 +94,11 @@ export const AdminLeftDrawer = () => {
     //   logo: FestivalIcon,
     //   display: true,
     // },
-    {
-      displayName: "Donation",
-      logo: VolunteerActivismIcon,
-      display: true,
-    },
+    // {
+    //   displayName: "Donation",
+    //   logo: VolunteerActivismIcon,
+    //   display: true,
+    // },
     {
       displayName: "Visits",
       logo: TourIcon,
