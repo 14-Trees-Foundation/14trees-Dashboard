@@ -24,7 +24,11 @@ const CardCount: FC<CardCountProps> = ({ disabled, treeCount, onTreeCountChange,
     return (
         <div style={{ padding: '10px 40px', width: '100%' }}>
             <div style={{ display: 'flex', alignItems: 'center' }}>
-                <Typography variant='h6' mr={5}>Please enter the number of gift cards: </Typography>
+                <Typography variant='body1' mr={5}>Do you know the number of trees that are to be gifted (approximately)?
+                    <Tooltip title={"This will help us assign an appropriate plot for the gift request"}>
+                        <Button sx={{ ml: -2 }} color="success"><HelpOutline fontSize="small"/></Button>
+                    </Tooltip>
+                </Typography>
                 <TextField
                     value={treeCount === 0 ? '' : treeCount}
                     onChange={handleCountChange}
@@ -34,9 +38,9 @@ const CardCount: FC<CardCountProps> = ({ disabled, treeCount, onTreeCountChange,
                 />
             </div>
             <Box mt={2}>
-                <Typography mb={1} variant='body1'>Where would you like to plant the trees? 
+                <Typography mb={1} variant='body1'>Where would you like to plant the trees?
                     <Tooltip title={"Foundation sites are 14 Trees Foundation's land reserves and Public sites are government owned lands such as gairans, schools, roadside, etc."}>
-                        <Button><HelpOutline /></Button>
+                        <Button sx={{ ml: -2 }} color="success"><HelpOutline fontSize="small"/></Button>
                     </Tooltip>
                 </Typography>
                 <FormControl fullWidth>

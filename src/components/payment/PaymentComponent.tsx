@@ -12,7 +12,7 @@ import { getHumanReadableDate } from "../../helpers/utils";
 import PaymentHistoryForm from "./PaymentHistoryForm";
 import FileInputComponent from "../FileInputComponent";
 
-import PaymentQR14tree from "../../assets/PaymentQR14tree.jpg";
+import PaymentQR14tree from "../../assets/PaymentQR14tree_old.jpg";
 import TreeCostChart from "../../assets/tree-cost-chart.png";
 import { AWSUtils } from "../../helpers/aws";
 

@@ -120,8 +120,8 @@ const CardDetails: FC<CardDetailsProps> = ({ logo_url, request_id, presentationI
     return (
         <div style={{ display: 'flex', padding: '10px 10px', width: '100%', justifyContent: 'space-between' }}>
             <div style={{ display: 'flex', flexDirection: 'column', width: '42%' }}>
-                <Typography variant='h6'>If you would like to tweak/add some personalised touch, change the messaging below: </Typography>
-                <Typography variant="body1" sx={{ mt: 2 }}>Primary Message</Typography>
+                <Typography variant='body1'>If you would like to tweak/add some personalised touch, change the messaging below: </Typography>
+                <Typography variant="body1" sx={{ mt: 2 }}><strong>Primary Message</strong></Typography>
                 <TextField
                     multiline
                     name="primaryMessage"
@@ -130,9 +130,9 @@ const CardDetails: FC<CardDetailsProps> = ({ logo_url, request_id, presentationI
                     size="small"
                     inputProps={{ maxLength: 270 }}
                     FormHelperTextProps={{ style: { textAlign: 'right' } }}
-                    helperText={`${270 - messages.primaryMessage.length} characters remaining`}
+                    helperText={`${270 - messages.primaryMessage.length} characters remaining (max: 270)`}
                 />
-                <Typography variant="body1" sx={{ mt: 2 }}>Secondary Message</Typography>
+                <Typography variant="body1" sx={{ mt: 2 }}><strong>Secondary Message</strong></Typography>
                 <TextField
                     multiline
                     name="secondaryMessage"
@@ -141,7 +141,7 @@ const CardDetails: FC<CardDetailsProps> = ({ logo_url, request_id, presentationI
                     size="small"
                     inputProps={{ maxLength: 125 }}
                     FormHelperTextProps={{ style: { textAlign: 'right' } }}
-                    helperText={`${125 - messages.secondaryMessage.length} characters remaining`}
+                    helperText={`${125 - messages.secondaryMessage.length} characters remaining (max: 125)`}
                 />
                 {logo_url && <Box>
                     <Typography variant="body1" sx={{ mt: 2 }}>Logo Message</Typography>
@@ -177,8 +177,8 @@ const CardDetails: FC<CardDetailsProps> = ({ logo_url, request_id, presentationI
                         <Typography variant="h6" marginTop={2}>
                             Loading preview...
                         </Typography>
-                        <Typography variant="h6">
-                            This may take a while...
+                        <Typography variant="subtitle1">
+                            (This may take a while)
                         </Typography>
                     </Box>
                 ) : (

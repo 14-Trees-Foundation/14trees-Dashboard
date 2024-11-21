@@ -16,7 +16,7 @@ import "./Donation";
 import MenuItem from "@mui/material/MenuItem";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { Steps, Table } from "antd";
-import PaymentQR14tree from "../../../assets/PaymentQR14tree.jpg";
+import PaymentQR14tree from "../../../assets/PaymentQR14tree_old.jpg";
 import { UserForm } from "./components/UserForm";
 import { BulkUserForm } from "./components/UserBulkForm";
 import { useAppDispatch, useAppSelector } from "../../../redux/store/hooks";
