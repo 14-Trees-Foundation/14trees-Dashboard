@@ -1,8 +1,9 @@
-import { Autocomplete, Avatar, Button, Checkbox, FormControl, FormControlLabel, Grid, TextField } from "@mui/material";
+import { Autocomplete, Avatar, Button, Checkbox, FormControl, FormControlLabel, Grid, InputLabel, MenuItem, Select, TextField } from "@mui/material";
 import { FC, useState, SyntheticEvent, ChangeEvent, useEffect } from "react";
 import { useAppDispatch, useAppSelector } from "../../../../redux/store/hooks";
 import * as userActionCreators from "../../../../redux/actions/userActions";
 import { bindActionCreators } from "@reduxjs/toolkit";
+import ImageMapping from "./ImageMapping";
 
 interface User {
     key?: string;
@@ -19,12 +20,13 @@ interface User {
 }
 
 interface SingleUserFormProps {
+    imageUrls: string[]
     value: any
     onSubmit: (user: User) => void;
     onCancel: () => void
 }
 
-const SingleUserForm: FC<SingleUserFormProps> = ({ value, onSubmit, onCancel }) => {
+const SingleUserForm: FC<SingleUserFormProps> = ({ imageUrls, value, onSubmit, onCancel }) => {
     const dispatch = useAppDispatch();
     const { searchUsers } = bindActionCreators(userActionCreators, dispatch);
 
@@ -40,6 +42,7 @@ const SingleUserForm: FC<SingleUserFormProps> = ({ value, onSubmit, onCancel }) 
         editable: true,
     });
     const [showAssignedFields, setShowAssignedFields] = useState(false);
+    const [imageSelectionModal, setImageSelectionModal] = useState(false);
 
     useEffect(() => {
         if (value) {
@@ -80,6 +83,13 @@ const SingleUserForm: FC<SingleUserFormProps> = ({ value, onSubmit, onCancel }) 
             profileImage: file ?? undefined
         }));
     };
+
+    const handleImageSelection = (imageUrl: string) => {
+        setUser(prev => ({
+            ...prev,
+            profileImage: imageUrl
+        }));
+    }
 
     const usersData = useAppSelector((state) => state.searchUsersData);
     let usersList: any[] = [];
@@ -160,7 +170,7 @@ const SingleUserForm: FC<SingleUserFormProps> = ({ value, onSubmit, onCancel }) 
                         renderInput={(params) => (
                             <TextField
                                 {...params}
-                                label="Gifted to Email"
+                                label="Recipient Email id"
                                 variant="outlined"
                                 name="gifted_to_email"
                             />
@@ -168,15 +178,15 @@ const SingleUserForm: FC<SingleUserFormProps> = ({ value, onSubmit, onCancel }) 
                     />
                 </Grid>
                 <Grid item xs={12}>
-                    <TextField disabled={!user.editable} name="gifted_to_name" label="Gifted to Name" value={user.gifted_to_name} onChange={handleUserChange} fullWidth />
+                    <TextField disabled={!user.editable} name="gifted_to_name" label="Recipient Name" value={user.gifted_to_name} onChange={handleUserChange} fullWidth />
                 </Grid>
                 <Grid item xs={12}>
-                    <TextField disabled={!user.editable} name="gifted_to_phone" label="Gifted to Phone (Optional)" value={user.gifted_to_phone} onChange={handleUserChange} fullWidth />
+                    <TextField disabled={!user.editable} name="gifted_to_phone" label="Recipient Phone (Optional)" value={user.gifted_to_phone} onChange={handleUserChange} fullWidth />
                 </Grid>
                 <Grid item xs={12}>
                     <TextField
                         type="number"
-                        label="Number Of Trees"
+                        label="Number of trees to assign"
                         name="count"
                         value={user.count}
                         onChange={handleNumberChange}
@@ -190,7 +200,7 @@ const SingleUserForm: FC<SingleUserFormProps> = ({ value, onSubmit, onCancel }) 
                             control={
                                 <Checkbox checked={showAssignedFields} onChange={(e) => { setShowAssignedFields(e.target.checked) }} name="show_all" />
                             }
-                            label="Do you want plant these trees on someone elses name?"
+                            label="Do you want to assign the tree(s) to someone besides the gift recipient?"
                         />
                     </FormControl>
                 </Grid>
@@ -204,7 +214,7 @@ const SingleUserForm: FC<SingleUserFormProps> = ({ value, onSubmit, onCancel }) 
                         renderInput={(params) => (
                             <TextField
                                 {...params}
-                                label="Assigned Email"
+                                label="Assignee Email"
                                 variant="outlined"
                                 name="assigned_to_email"
                             />
@@ -215,7 +225,7 @@ const SingleUserForm: FC<SingleUserFormProps> = ({ value, onSubmit, onCancel }) 
                     <TextField
                         disabled={!user.editable}
                         name="assigned_to_name"
-                        label="Assigned to Name"
+                        label="Assignee Name"
                         value={user.assigned_to_name}
                         onChange={handleUserChange}
                         fullWidth
@@ -225,21 +235,35 @@ const SingleUserForm: FC<SingleUserFormProps> = ({ value, onSubmit, onCancel }) 
                     <TextField
                         disabled={!user.editable}
                         name="assigned_to_phone"
-                        label="Assigned to Phone (Optional)"
+                        label="Assignee Phone (Optional)"
                         value={user.assigned_to_phone}
                         onChange={handleUserChange}
                         fullWidth
                     />
                 </Grid>}
                 {showAssignedFields && <Grid item xs={12}>
-                    <TextField
-                        disabled={!user.editable}
-                        name="relation"
-                        label="Relation with person (Optional)"
-                        value={user.relation}
-                        onChange={handleUserChange}
-                        fullWidth
-                    />
+                    <FormControl fullWidth>
+                        <InputLabel id="relation-label">Relation with recipient</InputLabel>
+                        <Select
+                            disabled={!user.editable}
+                            labelId="relation-label"
+                            value={user.relation}
+                            label="Relation with recipient"
+                            onChange={(e) => { setUser(prev => ({ ...prev, relation: e.target.value })) }}
+                        >
+                            <MenuItem value={"father"}>Father</MenuItem>
+                            <MenuItem value={'mother'}>Mother</MenuItem>
+                            <MenuItem value={'uncle'}>Uncle</MenuItem>
+                            <MenuItem value={'aunt'}>Aunt</MenuItem>
+                            <MenuItem value={'grandfather'}>Grandfather</MenuItem>
+                            <MenuItem value={'grandmother'}>Grandmother</MenuItem>
+                            <MenuItem value={'son'}>Son</MenuItem>
+                            <MenuItem value={'daughter'}>Daughter</MenuItem>
+                            <MenuItem value={'friend'}>Friend</MenuItem>
+                            <MenuItem value={'colleague'}>Colleague</MenuItem>
+                            <MenuItem value={'other'}>Other</MenuItem>
+                        </Select>
+                    </FormControl>
                 </Grid>}
                 <Grid item xs={12}>
                     <div style={{ display: 'flex', alignItems: 'center', marginBottom: 16 }}>
@@ -258,6 +282,9 @@ const SingleUserForm: FC<SingleUserFormProps> = ({ value, onSubmit, onCancel }) 
                                 onChange={handleImageChange}
                             />
                         </Button>
+                        <Button variant="outlined" component="label" color='success' sx={{ marginRight: 2 }} onClick={() => { setImageSelectionModal(true) }}>
+                            Choose from webscraped URL
+                        </Button>
                         {user.profileImage && <Button variant="outlined" component="label" color='error' onClick={() => { setUser(prev => ({ ...prev, profileImage: undefined })) }}>
                             Remove Image
                         </Button>}
@@ -270,7 +297,7 @@ const SingleUserForm: FC<SingleUserFormProps> = ({ value, onSubmit, onCancel }) 
                         onClick={handleCancel}
                         style={{ marginRight: '10px' }}
                     >
-                        Cancel
+                        Reset
                     </Button>
                     <Button
                         variant="contained"
@@ -281,6 +308,8 @@ const SingleUserForm: FC<SingleUserFormProps> = ({ value, onSubmit, onCancel }) 
                     </Button>
                 </Grid>
             </Grid>
+
+            <ImageMapping name={user.assigned_to_name || user.gifted_to_name} open={imageSelectionModal} images={imageUrls} onClose={() => { setImageSelectionModal(false) }} onSelect={handleImageSelection} />
         </div>
     );
 };

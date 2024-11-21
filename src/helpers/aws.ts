@@ -4,15 +4,10 @@ import ApiClient from "../api/apiClient/apiClient";
 
 class AWSUtils {
 
-    private async getSignedUrl(requestId: string, fileName: string): Promise<string> {
-
+    async uploadFileToS3(type: string, file: File, folder?: string, setUploadProgress?: any) {
+        const key = folder ? folder + "/" + file.name : file.name;
         const apiClient = new ApiClient();
-        const url = await apiClient.getSignedUrlForRequestId(requestId, fileName);
-        return url;
-    }
-
-    async uploadFileToS3(requestId: string, file: File, setUploadProgress: any) {
-        const signedUrl = await this.getSignedUrl(requestId, file.name);
+        const signedUrl = await apiClient.getSignedPutUrl(type, key);
 
         try {
             const response = await axios.put(signedUrl, file, {
@@ -20,7 +15,7 @@ class AWSUtils {
                     'Content-Type': file.type
                 },
                 onUploadProgress: (evt) => {
-                    setUploadProgress(Math.round((evt.loaded / evt.total) * 100));
+                    setUploadProgress && setUploadProgress(Math.round((evt.loaded / evt.total) * 100));
                 }
             })
     

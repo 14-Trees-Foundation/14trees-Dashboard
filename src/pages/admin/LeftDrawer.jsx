@@ -112,7 +112,7 @@ export const AdminLeftDrawer = () => {
     {
       displayName: "Gift Cards",
       logo: CardGiftcard,
-      display: true,
+      display: auth.signedin,
     },
     // {
     //   displayName: "Images",

@@ -32,6 +32,7 @@ import { RootState } from "../../../redux/store/store";
 import AddDonation from "./AddDonation";
 import EditDonation from "./EditDonation";
 import { ToastContainer } from "react-toastify";
+import DonationForm from "./Forms/DonationForm";
 
 export const DonationComponent = () => {
 
@@ -312,11 +313,11 @@ export const DonationComponent = () => {
           <Button variant="contained" color="success" onClick={handleModalOpen}>
             Add Donation
           </Button>
-          <AddDonation
+          {/* <AddDonation
             open={open}
             handleClose={handleModalClose}
             createDonation={handleCreateDonationData}
-          />
+          /> */}
         </div>
       </div>
       <Divider sx={{ backgroundColor: "black", marginBottom: '15px' }} />
@@ -365,6 +366,10 @@ export const DonationComponent = () => {
         />
       )}
 
+      <DonationForm 
+        open={open}
+        handleClose={handleModalClose}
+      />
 
     </>
   );

@@ -1,24 +1,10 @@
 import { FC, useEffect, useRef, useState } from "react";
-import { Autocomplete, Box, Button, TextField, Typography } from "@mui/material";
+import { Box, Button, CircularProgress, TextField, Typography } from "@mui/material";
 import ApiClient from "../../../../api/apiClient/apiClient";
-
-const EventTypes = [
-    {
-        value: '1',
-        label: 'Birthday'
-    },
-    {
-        value: '2',
-        label: 'Memorial'
-    },
-    {
-        value: '3',
-        label: 'General gift'
-    },
-]
 
 const defaultMessages = {
     primary: 'We are immensely delighted to share that a tree has been planted in your name at the 14 Trees Foundation, Pune. This tree will be nurtured in your honour, rejuvenating ecosystems, supporting biodiversity, and helping offset the harmful effects of climate change.',
+    birthday: 'We are immensely delighted to share that a tree has been planted in your name on occasion of you birthday at the 14 Trees Foundation, Pune. This tree will be nurtured in your honour, rejuvenating ecosystems, supporting biodiversity, and helping offset the harmful effects of climate change.',
     memorial: 'A tree has been planted in the memory of <name here> at the 14 Trees Foundation reforestation site. For many years, this tree will help rejuvenate local ecosystems, support local biodiversity and offset the harmful effects of climate change and global warming.',
     secondary: 'We invite you to visit 14 Trees and firsthand experience the growth and contribution of your tree towards a greener future.',
     logo: 'Gifted by 14 Trees in partnership with'
@@ -45,28 +31,30 @@ interface CardDetailsProps {
 
 const CardDetails: FC<CardDetailsProps> = ({ logo_url, request_id, presentationId, slideId, messages, onChange, onPresentationId }) => {
 
-    const [selectedEventType, setSelectedEventType] = useState<{ value: string, label: string } | null>(null);
-
     const slideIdRef = useRef('');
     const presentationIdIdRef = useRef('');
     const recordRef = useRef({ primary: '', secondary: '', logo: '' })
     const logoRef = useRef({ logoUrl: undefined as string | null | undefined })
     const [iframeSrc, setIframeSrc] = useState<string | null>(null);
+    const [loading, setLoading] = useState(false);
 
     const updateSlide = async () => {
         if (!slideIdRef.current || !presentationIdIdRef.current) {
             return;
         }
 
+        setLoading(true);
         const apiClient = new ApiClient();
         await apiClient.updateGiftCardTemplate(slideIdRef.current, recordRef.current.primary, recordRef.current.secondary, recordRef.current.logo, logo_url);
         setIframeSrc(
             `https://docs.google.com/presentation/d/${presentationIdIdRef.current}/embed?rm=minimal&slide=id.${slideIdRef.current}&timestamp=${new Date().getTime()}`
         );
+        setLoading(false);
     }
 
     useEffect(() => {
         const generateGiftCard = async () => {
+            setLoading(true);
             const apiClient = new ApiClient();
             const resp = await apiClient.generateCardTemplate(request_id, defaultMessages.primary, defaultMessages.secondary, defaultMessages.logo, logo_url);
             slideIdRef.current = resp.slide_id;
@@ -76,6 +64,7 @@ const CardDetails: FC<CardDetailsProps> = ({ logo_url, request_id, presentationI
             setIframeSrc(
                 `https://docs.google.com/presentation/d/${resp.presentation_id}/embed?rm=minimal&slide=id.${resp.slide_id}&timestamp=${new Date().getTime()}`
             )
+            setLoading(false);
         }
 
         const handler = setTimeout(() => {
@@ -100,22 +89,27 @@ const CardDetails: FC<CardDetailsProps> = ({ logo_url, request_id, presentationI
     }, [logo_url])
 
     useEffect(() => {
-        const eventType = EventTypes.find(item => item.value === messages.eventType)
-        setSelectedEventType(eventType ? eventType : null);
-
-        if (messages.primaryMessage === "" || messages.secondaryMessage === "" || messages.logoMessage === "") {
+        const eventMessage = messages.eventType === "2" ? defaultMessages.memorial : messages.eventType === "1" ? defaultMessages.birthday : defaultMessages.primary;
+        if (messages.primaryMessage === "" || messages.secondaryMessage === "" || messages.logoMessage === ""
+            || ((messages.primaryMessage === defaultMessages.primary || messages.primaryMessage === defaultMessages.birthday || messages.primaryMessage === defaultMessages.memorial) && messages.primaryMessage !== eventMessage)) {
             onChange({
                 ...messages,
-                primaryMessage: eventType?.value === "2" ? defaultMessages.memorial : defaultMessages.primary,
+                primaryMessage: eventMessage,
                 secondaryMessage: defaultMessages.secondary,
                 logoMessage: defaultMessages.logo,
             })
+
+            recordRef.current.primary = eventMessage;
+            recordRef.current.secondary = defaultMessages.secondary;
+            recordRef.current.logo = defaultMessages.logo;
+
+            updateSlide();
         }
     }, [messages])
 
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-        const { name: field, value }= e.target
+        const { name: field, value } = e.target
 
         onChange({
             ...messages,
@@ -123,19 +117,11 @@ const CardDetails: FC<CardDetailsProps> = ({ logo_url, request_id, presentationI
         })
     }
 
-    const handleEventTypeSelection = (e: any, item: { value: string, label: string } | null) => {
-        onChange({
-            ...messages,
-            eventType: item ? item.value : undefined,
-            primaryMessage: messages.primaryMessage === defaultMessages.primary && item?.value === "2" ? defaultMessages.memorial : messages.primaryMessage, 
-        })
-    }
-
     return (
         <div style={{ display: 'flex', padding: '10px 10px', width: '100%', justifyContent: 'space-between' }}>
-            <div style={{ display: 'flex', justifyContent: 'center', flexDirection: 'column', width: '42%' }}>
-                <Typography variant='h6'>Please provide the messages to use on gift card: </Typography>
-                <Typography variant="body1" sx={{ mt: 2 }}>Primary Message (2)</Typography>
+            <div style={{ display: 'flex', flexDirection: 'column', width: '42%' }}>
+                <Typography variant='body1'>If you would like to tweak/add some personalised touch, change the messaging below: </Typography>
+                <Typography variant="body1" sx={{ mt: 2 }}><strong>Primary Message</strong></Typography>
                 <TextField
                     multiline
                     name="primaryMessage"
@@ -143,8 +129,10 @@ const CardDetails: FC<CardDetailsProps> = ({ logo_url, request_id, presentationI
                     onChange={handleChange}
                     size="small"
                     inputProps={{ maxLength: 270 }}
+                    FormHelperTextProps={{ style: { textAlign: 'right' } }}
+                    helperText={`${270 - messages.primaryMessage.length} characters remaining (max: 270)`}
                 />
-                <Typography variant="body1" sx={{ mt: 2 }}>Secondary Message (3)</Typography>
+                <Typography variant="body1" sx={{ mt: 2 }}><strong>Secondary Message</strong></Typography>
                 <TextField
                     multiline
                     name="secondaryMessage"
@@ -152,60 +140,57 @@ const CardDetails: FC<CardDetailsProps> = ({ logo_url, request_id, presentationI
                     onChange={handleChange}
                     size="small"
                     inputProps={{ maxLength: 125 }}
+                    FormHelperTextProps={{ style: { textAlign: 'right' } }}
+                    helperText={`${125 - messages.secondaryMessage.length} characters remaining (max: 125)`}
                 />
-                <Typography variant="body1" sx={{ mt: 2 }}>Event Type</Typography>
-                <Autocomplete
-                    size="small"
-                    value={selectedEventType}
-                    options={EventTypes}
-                    getOptionLabel={option => option.label}
-                    onChange={handleEventTypeSelection}
-                    renderInput={(params) => (
-                        <TextField
-                            {...params}
-                            name="eventType"    
-                            margin='dense'
-                            label='Event Type'
-                        />
-                    )}
-                />
-                <Typography variant="body1" sx={{ mt: 2 }}>Event Name</Typography>
-                <TextField
-                    name="eventName"
-                    value={messages.eventName}
-                    onChange={handleChange}
-                    size="small"
-                />
-                <Typography variant="body1" sx={{ mt: 2 }}>Gifted By</Typography>
-                <TextField
-                    name="plantedBy"
-                    value={messages.plantedBy}
-                    onChange={handleChange}
-                    size="small"
-                />
-                <Typography variant="body1" sx={{ mt: 2 }}>Logo Message (4)</Typography>
-                <TextField
-                    name="logoMessage"
-                    value={messages.logoMessage}
-                    onChange={handleChange}
-                    size="small"
-                    inputProps={{ maxLength: 50 }}
-                />
-                <Box style={{ display: 'flex', justifyContent: 'flex-start', marginTop: 20 }}>
-                    <Button onClick={updateSlide} variant="contained" color="success" disabled={!presentationIdIdRef.current}>
-                        Update
+                {logo_url && <Box>
+                    <Typography variant="body1" sx={{ mt: 2 }}>Logo Message</Typography>
+                    <TextField
+                        name="logoMessage"
+                        value={messages.logoMessage}
+                        onChange={handleChange}
+                        fullWidth
+                        size="small"
+                        inputProps={{ maxLength: 50 }}
+                    />
+                </Box>}
+                <Box style={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'center', marginTop: 20 }}>
+                    <Typography mr={1}>Click to refresh the card template on the right:</Typography>
+                    <Button onClick={updateSlide} size='small' variant="contained" color="success" disabled={!presentationIdIdRef.current}>
+                        Preview
                     </Button>
                 </Box>
             </div>
-            <div style={{ display: 'flex', justifyContent: 'center', flexDirection: 'column', maxWidth: '55%' }}>
-                {/* <img src={cardImage} /> */}
-                {iframeSrc && <iframe
-                    src={iframeSrc}
-                    width="800"
-                    height="600"
-                    allowFullScreen
-                ></iframe>}
-            </div>
+            <Box
+                display="flex"
+                flexDirection="column"
+                alignItems="center"
+                justifyContent="center"
+                minWidth="800px"
+                margin="auto"
+                border="2px solid #ccc" // Add border
+                height="600px" // Set height to center loading content
+            >
+                {(!iframeSrc || loading) ? (
+                    <Box textAlign="center">
+                        <CircularProgress />
+                        <Typography variant="h6" marginTop={2}>
+                            Loading preview...
+                        </Typography>
+                        <Typography variant="subtitle1">
+                            (This may take a while)
+                        </Typography>
+                    </Box>
+                ) : (
+                    <iframe
+                        src={iframeSrc}
+                        width="800"
+                        height="600"
+                        allowFullScreen
+                        style={{ border: "none" }}
+                    ></iframe>
+                )}
+            </Box>
         </div>
     )
 }

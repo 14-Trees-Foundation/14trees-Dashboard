@@ -16,6 +16,7 @@ import { TreeImage } from '../../types/tree_snapshots';
 import { GiftCard, GiftCardUser } from '../../types/gift_card';
 import { Tag } from '../../types/tag';
 import { EmailTemplate } from '../../types/email_template';
+import { Payment, PaymentHistory } from '../../types/payment';
 
 
 class ApiClient {
@@ -1190,12 +1191,13 @@ class ApiClient {
     }
 
 
-    async createGiftCard(request_id: string, no_of_cards: number, user_id: number, group_id?: number, logo?: File, messages?: any, file?: File): Promise<GiftCard> {
+    async createGiftCard(request_id: string, no_of_cards: number, user_id: number, category: string, grove: string | null, group_id?: number, payment_id?: number, logo?: File, messages?: any, file?: File): Promise<GiftCard> {
         try {
             const formData = new FormData();
             formData.append('request_id', request_id);
             formData.append('no_of_cards', no_of_cards.toString());
             formData.append('user_id', user_id.toString());
+            formData.append('category', category);
             if (messages) {
                 formData.append('primary_message', messages.primaryMessage);
                 formData.append('secondary_message', messages.secondaryMessage);
@@ -1204,7 +1206,9 @@ class ApiClient {
                 formData.append('planted_by', messages.plantedBy);
                 formData.append('logo_message', messages.logoMessage);
             }
+            if (grove) formData.append('grove', grove);
             if (group_id) formData.append('group_id', group_id.toString());
+            if (payment_id) formData.append('payment_id', payment_id.toString());
             if (logo) formData.append('logo', logo, logo.name);
             if (file) formData.append('csv_file', file, file.name);
 
@@ -1218,7 +1222,7 @@ class ApiClient {
         }
     }
 
-    async updateGiftCard(request: GiftCard, no_of_cards: number, user_id: number, group_id?: number, logo?: File, messages?: any, file?: File): Promise<GiftCard> {
+    async updateGiftCard(request: GiftCard, no_of_cards: number, user_id: number, category: string, grove: string | null, group_id?: number, payment_id?: number, logo?: File, messages?: any, file?: File): Promise<GiftCard> {
         try {
             const formData = new FormData();
             for (const [key, value] of Object.entries(request)) {
@@ -1231,8 +1235,17 @@ class ApiClient {
             if (formData.has('user_id')) formData.set('user_id', user_id.toString());
             else formData.append('user_id', user_id.toString());
 
+            if (formData.has('category')) formData.set('category', category);
+            else formData.append('category', category);
+
+            if (grove && formData.has('grove')) formData.set('grove', grove);
+            else if (grove) formData.append('grove', grove);
+
             if (group_id && formData.has('group_id')) formData.set('group_id', group_id.toString());
             else if (group_id) formData.append('group_id', group_id.toString());
+
+            if (payment_id && formData.has('payment_id')) formData.set('payment_id', payment_id.toString());
+            else if (payment_id) formData.append('payment_id', payment_id.toString());
 
             if (logo && formData.has('logo')) formData.set('logo', logo, logo.name);
             else if (logo) formData.append('logo', logo, logo.name);
@@ -1355,9 +1368,9 @@ class ApiClient {
         }
     }
 
-    async redeemGiftCardTemplate(gift_card_user_id: number, sapling_id: string, tree_id: number, user: User): Promise<GiftCardUser> {
+    async redeemGiftCardTemplate(gift_card_id: number, sapling_id: string, tree_id: number, user: User): Promise<GiftCardUser> {
         try {
-            const resp = await this.api.post<GiftCardUser>(`/gift-cards/card/redeem`, { gift_card_user_id, sapling_id, tree_id, user });
+            const resp = await this.api.post<GiftCardUser>(`/gift-cards/card/redeem`, { gift_card_id, sapling_id, tree_id, user });
             return resp.data;
         } catch (error: any) {
             if (error.response) {
@@ -1439,9 +1452,9 @@ class ApiClient {
     }
 
     // Utils
-    async getSignedUrlForRequestId(gift_card_request_id: string, filename: string): Promise<string> {
+    async getSignedPutUrl(type: string, key: string): Promise<string> {
         try {
-            const response = await this.api.get<{ url: string }>(`/utils/s3/${gift_card_request_id}?filename=${filename}`);
+            const response = await this.api.get<{ url: string }>(`/utils/signedPutUrl?type=${type}&key=${key}`);
             return response.data.url;
         } catch (error: any) {
             if (error.response) {
@@ -1474,6 +1487,70 @@ class ApiClient {
             throw new Error('Failed to get images');
         }
     }
+
+    /*
+        Payments
+    */
+
+    async getPayment(paymentId: number) {
+        try {
+            const response = await this.api.get<Payment>(`/payments/${paymentId}`);
+            return response.data;
+        } catch (error: any) {
+            if (error.response) {
+                throw new Error(error.response.data.message);
+            }
+            throw new Error('Failed to get payment');
+        }
+    } 
+        
+    async createPayment(amount: number, donor_type: string, pan_number: string | null) {
+        try {
+            const response = await this.api.post<Payment>(`/payments`, { amount, donor_type, pan_number });
+            return response.data;
+        } catch (error: any) {
+            if (error.response) {
+                throw new Error(error.response.data.message);
+            }
+            throw new Error('Failed to create payment');
+        }
+    } 
+
+    async updatedPayment(data: Payment) {
+        try {
+            const response = await this.api.put<Payment>(`/payments/${data.id}`, data);
+            return response.data;
+        } catch (error: any) {
+            if (error.response) {
+                throw new Error(error.response.data.message);
+            }
+            throw new Error('Failed to update payment');
+        }
+    } 
+
+    async createPaymentHistory(payment_id: number, amount: number, payment_method: string, payment_proof: string | null) {
+        try {
+            const response = await this.api.post<PaymentHistory>(`/payments/history`, { payment_id, amount, payment_method, payment_proof });
+            return response.data;
+        } catch (error: any) {
+            if (error.response) {
+                throw new Error(error.response.data.message);
+            }
+            throw new Error('Failed to create payment');
+        }
+    } 
+
+    async updatePaymentHistory(paymentHistory: PaymentHistory) {
+        try {
+            const response = await this.api.put<PaymentHistory>(`/payments/history/${paymentHistory.id}`, paymentHistory);
+            return response.data;
+        } catch (error: any) {
+            if (error.response) {
+                throw new Error(error.response.data.message);
+            }
+            throw new Error('Failed to create payment');
+        }
+    } 
 
     /*
         Albums

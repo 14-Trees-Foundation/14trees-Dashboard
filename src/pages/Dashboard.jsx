@@ -26,6 +26,7 @@ import { Popup } from "../stories/Popup/Popup";
 import { NotFound } from "./notfound/NotFound";
 import { Spinner } from "../components/Spinner";
 import logo from "../assets/logo_white_small.png";
+import RedeemTree from "./UserProfile/Gift/RedeemTree";
 
 export const Dashboard = () => {
   const styles = useStyles();
@@ -44,6 +45,7 @@ export const Dashboard = () => {
   const [loading, setLoading] = useState(true);
   const [found, setFound] = useState(true);
   const [template, setTemplate] = useState("");
+  const [giftedTree, setGiftedTree] = useState(null);
 
   const onToggleVideo = () => {
     setOpen(false);
@@ -56,12 +58,17 @@ export const Dashboard = () => {
         // let data = response.data.usertrees.filter(function (data) {return data.tree.sapling_id === saplingId});
         setUserinfo(response.data);
         setTemplate(response.data?.user_trees[0]?.plot?.includes("G20") ? "G20" : "");
-        console.log(response, template)
-        setSelectedUserinfo(
-          response.data.user_trees.filter(
-            (data) => data.sapling_id === saplingId
-          )[0]
-        );
+        if (response.data?.user_trees?.length > 0) {
+          setSelectedUserinfo(
+            response.data.user_trees.filter(
+              (data) => data.sapling_id === saplingId
+            )[0]
+          );
+        } else if (response.data?.gift_tree) {
+          setGiftedTree(response.data.gift_tree)
+        } else {
+          setFound(false);
+        }
       } else if (response.status === 204) {
         setLoading(false);
         setUserinfo(response.data);
@@ -129,6 +136,11 @@ export const Dashboard = () => {
       logo: logo,
     },
     {
+      page: RedeemTree,
+      displayName: "Redeem Tree",
+      logo: logo,
+    },
+    {
       page: Maps,
       displayName: "Site Map",
       logo: logo,
@@ -140,6 +152,12 @@ export const Dashboard = () => {
     },
   ];
   const MainBox = () => {
+
+    if (giftedTree) {
+      const Page = pages[1].page;
+      return <Page tree={giftedTree} />
+    }
+
     const Page = pages[index].page;
     return <Page saplingId={saplingId} />;
   };
@@ -161,7 +179,7 @@ export const Dashboard = () => {
       <Box sx={{ display: "flex" }}>
         <LeftDrawer saplingId={saplingId} />
         <Box component="main"
-          sx={{ backgroundColor: "#e5e5e5", width: matches ? "100%" : "65%" }}>
+          sx={{ backgroundColor: "white", width: matches ? "100%" : "65%" }}>
           <MainBox/>
         </Box>
         {

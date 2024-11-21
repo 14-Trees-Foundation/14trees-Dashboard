@@ -6,11 +6,13 @@ export const AuthProvider = ({ children }) => {
   let [user, setUser] = React.useState(null);
   let [token, setToken] = React.useState(null);
   let [permissions, setPermissions] = React.useState([]);
+  let [roles, setRoles] = React.useState([]);
   let [signedin, setSignedin] = React.useState(false);
 
-  let signin = (name, perm, token, callback) => {
+  let signin = (name, perm, roles, token, callback) => {
     setUser(name);
     setPermissions(perm);
+    setRoles(roles)
     setToken(token);
     setSignedin(true);
     return callback();
@@ -22,7 +24,7 @@ export const AuthProvider = ({ children }) => {
     return callback();
   };
 
-  let value = { user, signedin, token, permissions, signin, signout };
+  let value = { user, signedin, token, permissions, roles, signin, signout };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
