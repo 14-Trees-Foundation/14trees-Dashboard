@@ -14,7 +14,7 @@ import { bindActionCreators } from "@reduxjs/toolkit";
 import { RootState } from "../../../redux/store/store";
 import TableComponent from "../../../components/Table";
 import { Dropdown, Menu, TableColumnsType } from "antd";
-import { ErrorOutline, MenuOutlined, NotesOutlined } from "@mui/icons-material";
+import { AssignmentInd, AssuredWorkload, CardGiftcard, Collections, Delete, Download, Edit, Email, ErrorOutline, FileCopy, Landscape, ManageAccounts, MenuOutlined, NotesOutlined, Slideshow, Wysiwyg } from "@mui/icons-material";
 import PlotSelection from "./Form/PlotSelection";
 import { Plot } from "../../../types/plot";
 import giftCardActionTypes from "../../../redux/actionTypes/giftCardActionTypes";
@@ -408,45 +408,73 @@ const GiftTrees: FC = () => {
 
     const getActionsMenu = (record: GiftCard) => (
         <Menu>
-            <Menu.Item key="0" onClick={() => { setSelectedGiftCard(record); setInfoModal(true); }}>
-                View Summary
-            </Menu.Item>
-            <Menu.Item key="1" onClick={() => { handleModalOpenEdit(record); }}>
-                Edit Request
-            </Menu.Item>
-            <Menu.Item key="2" onClick={() => { handleAlbumModalOpen(record); }}>
-                Add Album Images
-            </Menu.Item>
-            {(record.validation_errors === null || !record.validation_errors.includes('MISSING_USER_DETAILS')) && <Menu.Item key="10" onClick={() => { setSelectedGiftCard(record); setUserDetailsEditModal(true); }}>
-                Edit User Details
-            </Menu.Item>}
-            {record.status === 'pending_plot_selection' && <Menu.Item key="3" onClick={() => { setSelectedGiftCard(record); setPlotModal(true); }}>
-                Select Plots
-            </Menu.Item>}
-            {record.status === 'pending_assignment' && <Menu.Item key="4" onClick={() => { setSelectedGiftCard(record); setAutoAssignModal(true); }}>
-                Assign Trees
-            </Menu.Item>}
-            {record.presentation_id && <Menu.Item key="5" onClick={() => { handleDownloadCards(record.id, record.user_name + '_' + record.no_of_cards, 'zip') }}>
-                Download Gift Cards
-            </Menu.Item>}
-            {record.presentation_id && <Menu.Item key="6" onClick={() => { window.open('https://docs.google.com/presentation/d/' + record.presentation_id); }}>
-                Gift Cards Slide
-            </Menu.Item>}
-            {record.status !== 'pending_plot_selection' && <Menu.Item key="7" onClick={() => { handleGenerateGiftCards(record.id) }}>
-                Generate Gift Cards
-            </Menu.Item>}
-            {(record.status === 'completed' || record.status === 'pending_gift_cards') && <Menu.Item key="8" onClick={() => { setSelectedGiftCard(record); setEmailConfirmationModal(true); }}>
-                Send Emails
-            </Menu.Item>}
-            <Menu.Item key="11" onClick={() => { handleCloneGiftCardRequest(record); }}>
-                Clone Request
-            </Menu.Item>
-            <Menu.Item key="12" onClick={() => { handlePaymentModalOpen(record); }}>
-                Payment Details
-            </Menu.Item>
-            {(record.status === 'pending_plot_selection' || record.status === 'pending_assignment') && <Menu.Item key="9" danger onClick={() => { setDeleteModal(true); setSelectedGiftCard(record); }}>
-                Delete Request
-            </Menu.Item>}
+            <Menu.ItemGroup>
+                <Menu.Item key="00" onClick={() => { setSelectedGiftCard(record); setInfoModal(true); }} icon={<Wysiwyg />}>
+                    View Summary
+                </Menu.Item>
+                <Menu.Item key="01" onClick={() => { handleModalOpenEdit(record); }} icon={<Edit />}>
+                    Edit Request
+                </Menu.Item>
+                <Menu.Item key="02" onClick={() => { handleCloneGiftCardRequest(record); }} icon={<FileCopy />}>
+                    Clone Request
+                </Menu.Item>
+                {(record.status === 'pending_plot_selection' || record.status === 'pending_assignment') &&
+                    <Menu.Item key="03" danger onClick={() => { setDeleteModal(true); setSelectedGiftCard(record); }} icon={<Delete />}>
+                        Delete Request
+                    </Menu.Item>
+                }
+            </Menu.ItemGroup>
+            <Menu.Divider style={{ backgroundColor: '#ccc' }} />
+            <Menu.ItemGroup>
+                <Menu.Item key="10" onClick={() => { handleAlbumModalOpen(record); }} icon={<Collections />}>
+                    Add Pictures
+                </Menu.Item>
+                {(record.validation_errors === null || !record.validation_errors.includes('MISSING_USER_DETAILS')) &&
+                    <Menu.Item key="11" onClick={() => { setSelectedGiftCard(record); setUserDetailsEditModal(true); }} icon={<ManageAccounts />}>
+                        Edit Recipient Details
+                    </Menu.Item>
+                }
+            </Menu.ItemGroup>
+            {(record.status === 'completed' || record.status === 'pending_gift_cards' || record.status !== 'pending_plot_selection') && <Menu.Divider style={{ backgroundColor: '#ccc' }} />}
+            {(record.status === 'completed' || record.status === 'pending_gift_cards' || record.status !== 'pending_plot_selection') &&
+                <Menu.ItemGroup>
+                    {record.status !== 'pending_plot_selection' &&
+                        <Menu.Item key="20" onClick={() => { handleGenerateGiftCards(record.id) }} icon={<CardGiftcard />}>
+                            Generate Gift Cards
+                        </Menu.Item>
+                    }
+                    {(record.status === 'completed' || record.status === 'pending_gift_cards') &&
+                        <Menu.Item key="21" onClick={() => { setSelectedGiftCard(record); setEmailConfirmationModal(true); }} icon={<Email />}>
+                            Send Emails
+                        </Menu.Item>
+                    }
+                </Menu.ItemGroup>
+            }
+            {record.presentation_id && <Menu.Divider style={{ backgroundColor: '#ccc' }} />}
+            {record.presentation_id && <Menu.ItemGroup>
+                <Menu.Item key="30" onClick={() => { handleDownloadCards(record.id, record.user_name + '_' + record.no_of_cards, 'zip') }} icon={<Download />}>
+                    Download Gift Cards
+                </Menu.Item>
+                <Menu.Item key="31" onClick={() => { window.open('https://docs.google.com/presentation/d/' + record.presentation_id); }} icon={<Slideshow />}>
+                    Gift Cards Slide
+                </Menu.Item>
+            </Menu.ItemGroup>}
+            <Menu.Divider style={{ backgroundColor: '#ccc' }} />
+            <Menu.ItemGroup>
+                {record.status === 'pending_plot_selection' &&
+                    <Menu.Item key="40" onClick={() => { setSelectedGiftCard(record); setPlotModal(true); }} icon={<Landscape />}>
+                        Select Plots
+                    </Menu.Item>
+                }
+                {record.status === 'pending_assignment' &&
+                    <Menu.Item key="41" onClick={() => { setSelectedGiftCard(record); setAutoAssignModal(true); }} icon={<AssignmentInd />}>
+                        Assign Trees
+                    </Menu.Item>
+                }
+                <Menu.Item key="42" onClick={() => { handlePaymentModalOpen(record); }} icon={<AssuredWorkload />}>
+                    Payment Details
+                </Menu.Item>
+            </Menu.ItemGroup>
         </Menu>
     );
 
@@ -638,7 +666,7 @@ const GiftTrees: FC = () => {
             <Dialog open={paymentModal} fullWidth maxWidth='md'>
                 <DialogTitle>Payment Details</DialogTitle>
                 <DialogContent dividers>
-                    <PaymentComponent 
+                    <PaymentComponent
                         initialAmount={(selectedPaymentGR?.no_of_cards || 0) * 3000}
                         paymentId={selectedPaymentGR?.payment_id}
                         onChange={handlePaymentFormSubmit}
