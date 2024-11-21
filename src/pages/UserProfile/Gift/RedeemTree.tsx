@@ -2,8 +2,6 @@ import { Box, Button, Grid, Paper, TextField, Typography, useMediaQuery } from "
 import { GiftCardUser } from "../../../types/gift_card";
 import { createStyles, makeStyles } from "@mui/styles";
 import { useState } from "react";
-import { User } from "../../../types/user";
-import SelectCreateUser from "../../../components/SelectCreateUser";
 import { toast } from "react-toastify";
 import ApiClient from "../../../api/apiClient/apiClient";
 
@@ -97,7 +95,7 @@ const RedeemTree: React.FC<RedeemTreeProps> = ({ tree }) => {
 
         try {
             const apiClient = new ApiClient();
-            await apiClient.redeemGiftCardTemplate(tree.gift_card_request_id, tree.sapling_id, tree.tree_id, formData as any);
+            await apiClient.redeemGiftCardTemplate(tree.id, tree.sapling_id, tree.tree_id, formData as any);
 
             refreshPage();
         } catch (error: any) {

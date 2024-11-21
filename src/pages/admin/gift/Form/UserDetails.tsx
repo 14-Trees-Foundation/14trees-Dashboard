@@ -1,18 +1,18 @@
-import { Box, Button, FormControlLabel, Grid, Radio, RadioGroup, TextField, Typography } from "@mui/material";
-import { FC, useEffect, useRef, useState } from "react";
+import { Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, Grid, TextField, ToggleButton, Typography, colors } from "@mui/material";
+import { FC, useEffect, useState } from "react";
 import Papa from 'papaparse';
 import { ColumnType } from "antd/es/table";
 import { toast } from "react-toastify";
-import UserImagesForm from "./UserImagesForm";
 import { AWSUtils } from "../../../../helpers/aws";
 import ApiClient from "../../../../api/apiClient/apiClient";
 import ImageMapping from "./ImageMapping";
-import { DeleteOutline, EditOutlined, ImageOutlined } from "@mui/icons-material";
+import { CloudSync, DeleteOutline, EditOutlined, ImageOutlined, Web } from "@mui/icons-material";
 import GeneralTable from "../../../../components/GenTable";
 import getColumnSearchProps, { getColumnSelectedItemFilter } from "../../../../components/Filter";
 import { GridFilterItem } from "@mui/x-data-grid";
 import SingleUserForm from "./SingleUserForm";
 import { getUniqueRequestId } from "../../../../helpers/utils";
+import { LoadingButton } from "@mui/lab";
 
 interface User {
   key: string;
@@ -31,13 +31,6 @@ interface User {
   count: number;
   error?: boolean;
   editable?: boolean;
-}
-
-interface BulkUserFormProps {
-  requestId: string | null;
-  users: User[];
-  onUsersChange: (users: User[]) => void;
-  onFileChange: (file: File | null) => void;
 }
 
 const isValidEmail = (email: string) => {
@@ -86,23 +79,78 @@ const dummyData: User[] = [
   },
 ]
 
-const giftNameField = 'Name'
-const giftEmailField = 'Email'
-const giftPhoneField = 'Phone (optional)'
-const giftDobField = 'Date of Birth (optional)'
-const assignNameField = 'Plantation Name'
-const assignEmailField = 'Plantation Email (optional)'
-const assignPhoneField = 'Plantation Phone (optional)'
-const assignDobField = 'Plantation Date of Birth (optional)'
-const countField = 'Number of Trees'
+const giftNameField = 'Recipient Name'
+const giftEmailField = 'Recipient Email'
+const giftPhoneField = 'Recipient Phone (optional)'
+const assignNameField = 'Assignee Name'
+const assignEmailField = 'Assignee Email (optional)'
+const assignPhoneField = 'Assignee Phone (optional)'
+const countField = 'Number of trees to assign'
 const imageNameField = 'Image Name (optional)'
 
-export const BulkUserForm: FC<BulkUserFormProps> = ({ requestId, users, onUsersChange, onFileChange }) => {
+interface CSVUploadProps {
+  onFileChange: (file: File) => void
+}
+
+const CSVUploadForm: FC<CSVUploadProps> = ({ onFileChange }) => {
+
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      onFileChange(file);
+    }
+  };
+
+  const downloadGoogleSheet = () => {
+    const url = "https://docs.google.com/spreadsheets/d/1DDM5nyrvP9YZ09B60cwWICa_AvbgThUx-yeDVzT4Kw4/gviz/tq?tqx=out:csv&sheet=Sheet1";
+    const fileName = "UserDetails.csv";  // Set your desired file name here
+
+    fetch(url)
+      .then(response => response.blob())
+      .then(blob => {
+        const link = document.createElement("a");
+        link.href = URL.createObjectURL(blob);
+        link.download = fileName;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      })
+      .catch(error => console.error("Download failed:", error));
+  }
+
+  return (
+    <Box>
+      <Typography>You can upload recipient details by using a CSV file. To get started, download the sample CSV file from <a style={{ color: 'blue', textDecoration: 'underline', cursor: 'pointer' }} onClick={downloadGoogleSheet}>this</a> link, fill in the required recipient details, and then upload the completed CSV file.</Typography>
+      <Button
+        variant="contained"
+        component="label"
+        color="success"
+        sx={{ mt: 1 }}
+      >
+        Select CSV File
+        <input
+          value=''
+          type="file"
+          accept=".csv"
+          hidden
+          onChange={handleFileChange}
+        />
+      </Button>
+    </Box>
+  )
+}
+
+interface BulkUserFormProps {
+  requestId: string | null;
+  treeCount: number,
+  users: User[];
+  onUsersChange: (users: User[]) => void;
+  onFileChange: (file: File | null) => void;
+}
+
+export const BulkUserForm: FC<BulkUserFormProps> = ({ requestId, treeCount, users, onUsersChange, onFileChange }) => {
   const [pageUrl, setPageUrl] = useState<string>('');
   const [imageUrls, setImageUrls] = useState<string[]>([]);
-  const [fileError, setFileError] = useState<string | null>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
-  const [userAddOption, setUserAddOption] = useState<'bulk' | 'single'>('bulk');
   const [openImageSelection, setOpenImageSelection] = useState(false);
   const [selectedUser, setSelectedUser] = useState<User | null>(null)
   const [page, setPage] = useState(0);
@@ -110,6 +158,10 @@ export const BulkUserForm: FC<BulkUserFormProps> = ({ requestId, users, onUsersC
   const [filters, setFilters] = useState<Record<string, GridFilterItem>>({})
   const [filteredUsers, setFilteredUsers] = useState<User[]>(users);
   const [showAllCols, setShowAllCols] = useState(false);
+  const [csvModal, setCsvModal] = useState(false);
+  const [manualUserModal, setManualUserModal] = useState(false);
+  const [webScrapModal, setWebScrapModal] = useState(false);
+  const [webScraping, setWebScraping] = useState(false);
 
   const handleSetFilters = (filters: Record<string, GridFilterItem>) => {
     setPage(0);
@@ -192,70 +244,70 @@ export const BulkUserForm: FC<BulkUserFormProps> = ({ requestId, users, onUsersC
     setFilteredUsers(filteredUsers);
   }, [filters, users])
 
-  const handleFileChange = (e: any) => {
+  const handleFileChange = (file: File) => {
 
     const awsUtils = new AWSUtils();
-    if (e.target.files) {
-      const file = e.target.files[0];
-      onFileChange(file);
-      if (file) {
-        Papa.parse(file, {
-          header: true,
-          complete: async (results: any) => {
-            const parsedUsers: User[] = [];
 
-            for (let i = 0; i < results.data.length; i++) {
-              const user = results.data[i];
+    onFileChange(file);
+    if (file) {
+      Papa.parse(file, {
+        header: true,
+        complete: async (results: any) => {
+          const parsedUsers: User[] = [];
 
-              if (user[giftNameField] && user[giftEmailField]) {
+          for (let i = 0; i < results.data.length; i++) {
+            const user = results.data[i];
 
-                const parsedUser: User = {
-                  key: getUniqueRequestId(),
-                  gifted_to_name: (user[giftNameField] as string).trim(),
-                  gifted_to_phone: (user[giftPhoneField] as string).trim(),
-                  gifted_to_email: (user[giftEmailField] as string).trim(),
-                  gifted_to_dob: user[giftDobField],
-                  image_name: user[imageNameField] ? user[imageNameField] : undefined,
-                  relation: user['Relation with person'] ? user['Relation with person'] : undefined,
-                  count: user[countField] ? user[countField] : 1,
-                  image: user[imageNameField] !== ''
-                    ? await awsUtils.checkIfPublicFileExists('gift-card-requests' + "/" + requestId + '/' + user[imageNameField])
-                    : undefined,
-                  error: false,
-                  editable: false,
-                };
+            if (user[giftNameField] && user[giftEmailField]) {
 
-                if ((user[assignNameField] as string).trim()) {
-                  parsedUser.assigned_to_name =  (user[assignNameField] as string).trim()
-                  parsedUser.assigned_to_phone =  (user[assignPhoneField] as string).trim()
-                  parsedUser.assigned_to_email =  (user[assignEmailField] as string).trim()
-                  parsedUser.assigned_to_dob =  user[assignDobField]
-                } else {
-                  parsedUser.assigned_to_name =  parsedUser.gifted_to_name
-                  parsedUser.assigned_to_phone =  parsedUser.gifted_to_email
-                  parsedUser.assigned_to_email =  parsedUser.gifted_to_phone
-                  parsedUser.assigned_to_dob =  parsedUser.gifted_to_dob
-                }
+              const parsedUser: User = {
+                key: getUniqueRequestId(),
+                gifted_to_name: (user[giftNameField] as string).trim(),
+                gifted_to_phone: (user[giftPhoneField] as string).trim(),
+                gifted_to_email: (user[giftEmailField] as string).trim(),
+                image_name: user[imageNameField] ? user[imageNameField] : undefined,
+                relation: user['Relation with person'] ? user['Relation with person'] : undefined,
+                count: user[countField] ? user[countField] : 1,
+                image: user[imageNameField] !== ''
+                  ? await awsUtils.checkIfPublicFileExists('gift-card-requests' + "/" + requestId + '/' + user[imageNameField])
+                  : undefined,
+                error: false,
+                editable: false,
+              };
 
-                parsedUsers.push(parsedUser);
-
+              if ((user[assignNameField] as string).trim()) {
+                parsedUser.assigned_to_name = (user[assignNameField] as string).trim()
+                parsedUser.assigned_to_phone = (user[assignPhoneField] as string).trim()
+                parsedUser.assigned_to_email = (user[assignEmailField] as string).trim()
+              } else {
+                parsedUser.assigned_to_name = parsedUser.gifted_to_name
+                parsedUser.assigned_to_phone = parsedUser.gifted_to_email
+                parsedUser.assigned_to_email = parsedUser.gifted_to_phone
               }
+
+              if (!parsedUser.gifted_to_email) parsedUser.gifted_to_email = parsedUser.gifted_to_name.split(" ").join('.') + "@14trees"
+              if (!parsedUser.assigned_to_email) parsedUser.assigned_to_email = parsedUser.assigned_to_name.split(" ").join('.') + "@14trees"
+
+              parsedUsers.push(parsedUser);
+
             }
+          }
 
-            const usersList = parsedUsers.map(user => {
-              return {
-                ...user,
-                error: !isValidEmail(user.gifted_to_email) || !isValidPhone(user.gifted_to_phone) || user.image === false
-              }
-            });
-            onUsersChange(usersList);
-          },
-          error: () => {
-            setFileError("Failed to parse CSV file. Please ensure it is formatted correctly.");
-          },
-        });
-      }
+          const usersList = parsedUsers.map(user => {
+            return {
+              ...user,
+              error: !isValidEmail(user.gifted_to_email) || !isValidPhone(user.gifted_to_phone) || user.image === false
+            }
+          });
+          onUsersChange(usersList);
+        },
+        error: () => {
+          toast.error("Failed to parse CSV file. Please ensure it is formatted correctly.");
+        },
+      });
     }
+
+    setCsvModal(false);
   };
 
   const handleCrapWebPage = async () => {
@@ -264,9 +316,12 @@ export const BulkUserForm: FC<BulkUserFormProps> = ({ requestId, users, onUsersC
       return;
     }
 
+    setWebScraping(true);
     const apiClient = new ApiClient();
     const imageUrls = await apiClient.scrapImagesFromWebPage(requestId, pageUrl);
     setImageUrls(imageUrls);
+    setWebScraping(false);
+    setWebScrapModal(false);
 
     toast.success("Successfully uploaded images!")
   }
@@ -294,10 +349,14 @@ export const BulkUserForm: FC<BulkUserFormProps> = ({ requestId, users, onUsersC
       user.image = true;
       user.image_name = image.name;
       user.image_url = location;
-    } else {
-      user.image = image ? selectedUser?.image : undefined;
-      user.image_name = image ? selectedUser?.image_name : undefined;
-      user.image_url = image ? selectedUser?.image_url : undefined;
+    } else if (image === selectedUser?.image_url) {
+      user.image = selectedUser?.image;
+      user.image_name = selectedUser?.image_name;
+      user.image_url = selectedUser?.image_url;
+    } else if (image && typeof image === 'string') {
+      user.image = true;
+      user.image_name = image.split("/").slice(-1)[0];
+      user.image_url = image;
     }
 
     if (user.editable) {
@@ -333,28 +392,11 @@ export const BulkUserForm: FC<BulkUserFormProps> = ({ requestId, users, onUsersC
     setPageSize(pageSize);
   }
 
-  const downloadGoogleSheet = () => {
-    const url = "https://docs.google.com/spreadsheets/d/1DDM5nyrvP9YZ09B60cwWICa_AvbgThUx-yeDVzT4Kw4/gviz/tq?tqx=out:csv&sheet=Sheet1";
-    const fileName = "UserDetails.csv";  // Set your desired file name here
-
-    fetch(url)
-      .then(response => response.blob())
-      .then(blob => {
-        const link = document.createElement("a");
-        link.href = URL.createObjectURL(blob);
-        link.download = fileName;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-      })
-      .catch(error => console.error("Download failed:", error));
-  }
-
   const columns: ColumnType<User>[] = [
     {
       dataIndex: "gifted_to_name",
       key: "gifted_to_name",
-      title: "Gifted To Name",
+      title: "Recipient Name",
       width: 180,
       align: "center",
       ...getColumnSearchProps('gifted_to_name', filters, handleSetFilters),
@@ -362,29 +404,22 @@ export const BulkUserForm: FC<BulkUserFormProps> = ({ requestId, users, onUsersC
     {
       dataIndex: "gifted_to_email",
       key: "gifted_to_email",
-      title: "Gifted To Email",
+      title: "Recipient Email",
       width: 180,
       align: "center",
       ...getColumnSearchProps('gifted_to_email', filters, handleSetFilters),
     },
     {
-      dataIndex: "count",
-      key: "count",
-      title: "Number of Trees",
-      width: 180,
-      align: "center",
-    },
-    {
       dataIndex: "gifted_to_phone",
       key: "gifted_to_phone",
-      title: "Gifted to Phone",
+      title: "Recipient Phone",
       width: 180,
       align: "center",
     },
     {
       dataIndex: "assigned_to_name",
       key: "assigned_to_name",
-      title: "Assigned To Name",
+      title: "Assignee Name",
       width: 180,
       align: "center",
       ...getColumnSearchProps('assigned_to_name', filters, handleSetFilters),
@@ -392,7 +427,7 @@ export const BulkUserForm: FC<BulkUserFormProps> = ({ requestId, users, onUsersC
     {
       dataIndex: "assigned_to_email",
       key: "assigned_to_email",
-      title: "Assigned To Email",
+      title: "Assignee Email",
       width: 180,
       align: "center",
       ...getColumnSearchProps('assigned_to_email', filters, handleSetFilters),
@@ -400,7 +435,7 @@ export const BulkUserForm: FC<BulkUserFormProps> = ({ requestId, users, onUsersC
     {
       dataIndex: "assigned_to_phone",
       key: "assigned_to_phone",
-      title: "Assigned To Phone",
+      title: "Assignee Phone",
       width: 180,
       align: "center",
     },
@@ -414,7 +449,7 @@ export const BulkUserForm: FC<BulkUserFormProps> = ({ requestId, users, onUsersC
     {
       dataIndex: "image",
       key: "image",
-      title: "Image",
+      title: "Profile Pic",
       width: 180,
       align: "center",
       render: (value, record) => value === undefined
@@ -425,9 +460,16 @@ export const BulkUserForm: FC<BulkUserFormProps> = ({ requestId, users, onUsersC
       ...getColumnSelectedItemFilter({ dataIndex: 'image', filters, handleSetFilters, options: ['Image Not Provided', 'Image Not Found'] })
     },
     {
+      dataIndex: "count",
+      key: "count",
+      title: "Number of Trees to assign",
+      width: 180,
+      align: "center",
+    },
+    {
       dataIndex: "error",
       key: "error",
-      title: "Error",
+      title: "Validation Error",
       width: 180,
       align: "center",
       render: (value) => value ? 'Yes' : 'No',
@@ -461,6 +503,7 @@ export const BulkUserForm: FC<BulkUserFormProps> = ({ requestId, users, onUsersC
             variant="outlined"
             style={{ margin: "0 5px" }}
             onClick={() => {
+              setManualUserModal(true);
               setSelectedUser(record);
             }}
           >
@@ -482,91 +525,118 @@ export const BulkUserForm: FC<BulkUserFormProps> = ({ requestId, users, onUsersC
   ];
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'space-between', margin: '20px', width: '100%' }}>
-      <Grid container rowSpacing={2} columnSpacing={1} maxWidth='80%'>
-        <Grid item xs={12}>
-          <RadioGroup
-            row
-            aria-label="enable"
-            name="enable"
-            value={userAddOption}
-            onChange={(e) => { setUserAddOption(e.target.value as 'single' | 'bulk') }}
-          >
-            <FormControlLabel
-              value="single"
-              control={<Radio />}
-              label="Manually"
-            />
-            <FormControlLabel
-              value="bulk"
-              control={<Radio />}
-              label="CSV Upload"
-            />
-          </RadioGroup>
-        </Grid>
-        <Grid item xs={12}>
-          {userAddOption === 'single' && (
-            <SingleUserForm value={selectedUser} onSubmit={(user: any) => { handleUserAdd(user) }} onCancel={() => { setSelectedUser(null) }} />
-          )}
-
-          {userAddOption === 'bulk' && (
-            <Grid item xs={12}>
-              <Typography variant="body1">Enter the link of the web page containing user images (Optional).</Typography>
-              <Box style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 30, marginTop: 5 }}>
-                <TextField
-                  onChange={(event) => { setPageUrl(event.target.value) }}
-                  margin="normal"
-                  size="small"
-                  label="Web page url (Optional)"
-                  style={{ display: 'flex', flexGrow: 1, marginRight: 5, marginTop: 0, marginBottom: 0 }}
-                />
-                <Button
-                  variant="contained"
-                  color="success"
-                  onClick={handleCrapWebPage}
-                >Upload Images</Button>
-              </Box>
-              <UserImagesForm requestId={requestId} />
-              <Typography variant='body1' marginBottom={1} marginTop={2}>Upload the CSV file containing user details of the users who will be receiving the gift. If you have uploaded user images, make sure to mention exact name of the image in <strong>Image Name</strong> column.</Typography>
-              <Typography>Download sample file from <a style={{ color: 'blue', textDecoration: 'underline', cursor: 'pointer' }} onClick={downloadGoogleSheet}>here</a> and fill the details.</Typography>
-              <TextField
-                type="file"
-                inputProps={{ accept: '.csv' }}
-                onChange={handleFileChange}
-                fullWidth
-                margin="normal"
-                error={!!fileError}
-                helperText={fileError}
-                inputRef={fileInputRef}
-              />
-            </Grid>
-          )}
-        </Grid>
-      </Grid>
+    <div style={{ margin: '20px', width: '100%' }}>
+      <Typography variant="h6" style={{ color: 'red' }}>Number of Trees left to allocate: {treeCount - users.map(user => user.count).reduce((prev, curr) => prev + curr, 0)}</Typography>
       <Grid
         container
-        spacing={2}
-        style={{ marginTop: '20px' }}
-        maxWidth={'96%'}
+        style={{ marginTop: '10px' }}
+        width={'100%'}
       >
         <GeneralTable
-          columns={showAllCols ? columns : columns.filter(item => !item.key?.toString().startsWith("assigned") && item.key?.toString() !== 'relation' )}
+          columns={showAllCols ? columns : columns.filter(item => !item.key?.toString().startsWith("assigned") && item.key?.toString() !== 'relation')}
           page={page}
           pageSize={pageSize}
           onPaginationChange={handlePaginationChange}
           totalRecords={filteredUsers.length}
-          rows={users.length > 0 ? filteredUsers.sort((a, b) => {
+          rows={filteredUsers.sort((a, b) => {
             if (a.error) return -1;
             if (b.error) return 1;
 
             return 0;
-          }).slice(page * pageSize, page * pageSize + pageSize) : dummyData}
+          }).slice(page * pageSize, page * pageSize + pageSize)}
           onDownload={async () => filteredUsers}
           rowClassName={(record, index) => record.error ? 'pending-item' : ''}
         />
       </Grid>
+      <Box mt={2} display="flex" alignItems="center">
+        <Typography>Do you wish to fetch user images from a website? </Typography>
+        <ToggleButton
+          value="check"
+          color="success"
+          selected={webScrapModal}
+          sx={{ ml: 2 }}
+          onChange={() => setWebScrapModal(true)}
+          size="small"
+        >
+          <Web color="success" sx={{ mr: 1 }} /> Yes
+        </ToggleButton>
+      </Box>
+      <Box mt={2} display="flex" alignItems="center">
+        <Typography>Add Recipients: </Typography>
+        <Button
+          variant="contained"
+          color="success"
+          onClick={() => { setManualUserModal(true) }}
+          sx={{ ml: 2 }}
+        >
+          Add a recipient
+        </Button>
+        <Button
+          variant="contained"
+          color="success"
+          onClick={() => { setCsvModal(true) }}
+          sx={{ ml: 2 }}
+        >
+          Bulk add via csv
+        </Button>
+      </Box>
 
       <ImageMapping name={setSelectedUser.name} open={openImageSelection} images={imageUrls} onClose={() => { setOpenImageSelection(false) }} onSelect={handleImageSelection} />
+
+      <Dialog open={csvModal} fullWidth maxWidth="md">
+        <DialogTitle>Bulk upload recipient details using csv file</DialogTitle>
+        <DialogContent dividers>
+          <CSVUploadForm onFileChange={handleFileChange} />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setCsvModal(false)} variant="outlined" color="error">
+            Cancel
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      <Dialog open={webScrapModal} fullWidth maxWidth="md">
+        <DialogTitle>Fetch user images from website</DialogTitle>
+        <DialogContent dividers>
+          <Grid item xs={12}>
+            <Typography variant="body1">Enter the link of the web page containing user images. You can refer these images during user addition.</Typography>
+            <Box style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 30, marginTop: 5 }}>
+              <TextField
+                onChange={(event) => { setPageUrl(event.target.value.trim()) }}
+                margin="normal"
+                size="small"
+                label="Web page url"
+                style={{ display: 'flex', flexGrow: 1, marginRight: 5, marginTop: 0, marginBottom: 0 }}
+              />
+            </Box>
+          </Grid>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setWebScrapModal(false)} variant="outlined" color="error">
+            Cancel
+          </Button>
+          <LoadingButton
+            loading={webScraping}
+            loadingPosition="start"
+            startIcon={<CloudSync />}
+            variant="contained"
+            color="success"
+            onClick={handleCrapWebPage}
+          >Fetch Images</LoadingButton>
+        </DialogActions>
+      </Dialog>
+
+      <Dialog open={manualUserModal} fullWidth maxWidth="md">
+        <DialogTitle>Recipient Details</DialogTitle>
+        <DialogContent dividers>
+          <SingleUserForm imageUrls={imageUrls} value={selectedUser} onSubmit={(user: any) => { handleUserAdd(user) }} onCancel={() => { setSelectedUser(null) }} />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setManualUserModal(false)} variant="outlined" color="error">
+            Close
+          </Button>
+        </DialogActions>
+      </Dialog>
     </div>
   );
 };
