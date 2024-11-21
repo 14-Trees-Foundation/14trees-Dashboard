@@ -1,4 +1,5 @@
 import { Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, ImageList, ImageListItem, ImageListItemBar, TextField } from "@mui/material"
+import { Empty } from "antd"
 import { useEffect, useState } from "react"
 
 interface ImageMappingProps {
@@ -24,7 +25,7 @@ const ImageMapping: React.FC<ImageMappingProps> = ({ name, open, images, onClose
                 if (image.toLocaleLowerCase().includes(part.toLocaleLowerCase())) count++;
             }
 
-            if (count/parts.length > 0.5) filteredUrls.push(image)
+            if (count / parts.length > 0.5) filteredUrls.push(image)
         }
 
         return filteredUrls;
@@ -42,7 +43,7 @@ const ImageMapping: React.FC<ImageMappingProps> = ({ name, open, images, onClose
         if (searchStr === '') setFilteredImages(images);
         else {
             const urls = getFilteredUrls(images, searchStr);
-    
+
             setFilteredImages(urls)
         }
     }, [searchStr, images])
@@ -62,14 +63,18 @@ const ImageMapping: React.FC<ImageMappingProps> = ({ name, open, images, onClose
             <DialogTitle>Select a User Image</DialogTitle>
             <DialogContent dividers>
                 <Box>
-                    <TextField 
+                    <TextField
                         fullWidth
                         label={"Search name"}
                         value={searchStr}
-                        onChange={(e) => { setSearchStr(e.target.value)}}
+                        onChange={(e) => { setSearchStr(e.target.value) }}
                         style={{ marginBottom: 10, backgroundColor: 'rgba(227, 250, 239, 0.4)' }}
                     />
-                    <ImageList cols={4} sx={{ width: 1000, height: 580 }}>
+                    {filteredImages.length === 0 &&
+                        <Box sx={{ width: 1000, height: 580, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                            <Empty />
+                        </Box>}
+                    {filteredImages.length !== 0 && <ImageList cols={4} sx={{ width: 1000, height: 580 }}>
                         {filteredImages.map((url, index) => (
                             <ImageListItem key={index}>
                                 <img
@@ -85,7 +90,7 @@ const ImageMapping: React.FC<ImageMappingProps> = ({ name, open, images, onClose
                                 />
                             </ImageListItem>
                         ))}
-                    </ImageList>
+                    </ImageList>}
                 </Box>
             </DialogContent>
             <DialogActions>

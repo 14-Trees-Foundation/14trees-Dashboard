@@ -6,6 +6,8 @@ export type GiftCard = {
     user_id: number;
     group_id: number;
     no_of_cards: number;
+    category: string;
+    grove: string | null;
     is_active: boolean;
     created_at: string;
     updated_at: string;
@@ -25,6 +27,7 @@ export type GiftCard = {
     status: string;
     presentation_id: string | null;
     notes: string | null;
+    payment_id: number | null;
 }
 
 export type GiftCardUser = {

@@ -54,7 +54,6 @@ export const LeftDrawer = () => {
   const classes = useStyles();
   const [index, setIndex] = useRecoilState(navIndex);
   const selUserInfo = useRecoilValue(selUsersData);
-  const username = selUserInfo.assigned_to.split(" ")[0];
 
   const onClickNav = (value) => {
     setIndex(value);
@@ -111,19 +110,34 @@ export const LeftDrawer = () => {
       <Box>
         <AppBar position="fixed" open={open} className={classes.appbar}>
           <Toolbar style={{ backgroundColor: "#e5e5e5" }}>
-            <div className={classes.header}>
-              <img
-                src={icon}
-                alt={logo}
-                className={classes.img}
-                onClick={handleDrawerOpen}
-              />
-              <div className={classes.username}>
-                {selUserInfo.event_type && selUserInfo.event_type === "2"
-                  ? "Memorial Dashboard"
-                  : `${username}'s Dashboard`}
-              </div>
-            </div>
+            {selUserInfo?.assigned_to
+              ? (<div className={classes.header}>
+                <img
+                  src={icon}
+                  alt={logo}
+                  className={classes.img}
+                  onClick={handleDrawerOpen}
+                />
+                <div className={classes.username}>
+                  {selUserInfo.event_type && selUserInfo.event_type === "2"
+                    ? "Memorial Dashboard"
+                    : `${selUserInfo.assigned_to.split(" ")[0]}'s Dashboard`}
+                </div>
+              </div>)
+              : (
+                <div className={classes.header}>
+                  <img
+                    src={icon}
+                    alt={logo}
+                    className={classes.img}
+                    onClick={handleDrawerOpen}
+                  />
+                  <div className={classes.username}>
+                    Redeem Your Gift Tree
+                  </div>
+                </div>
+              )
+            }
           </Toolbar>
         </AppBar>
         <Drawer

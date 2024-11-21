@@ -31,7 +31,7 @@ const UserImagesForm: React.FC<UserImagesFormProps> = ({ requestId }) => {
 
         setUploading(true);
         for (const file of selectedFiles) {
-            await awsUtils.uploadFileToS3(requestId, file, setUploadProgress);
+            await awsUtils.uploadFileToS3(requestId, file, 'gift-request', setUploadProgress);
         }
         setUploading(false);
         setSelectedFiles([]);

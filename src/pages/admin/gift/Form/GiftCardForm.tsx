@@ -11,15 +11,17 @@ import SponsorGroupForm from "./SponsorGroup";
 import CardDetails from "./CardDetailsForm";
 import { GiftCard } from "../../../../types/gift_card";
 import ApiClient from "../../../../api/apiClient/apiClient";
-import { convertFileToBase64 } from "../../../../helpers/utils";
 import { AWSUtils } from "../../../../helpers/aws";
+import PaymentForm from "../../../../components/payment/PaymentForm";
+import { Payment } from "../../../../types/payment";
+import DashboardDetails from "./DashboardDetailsForm";
 
 interface GiftCardsFormProps {
     giftCardRequest?: GiftCard
     requestId: string | null
     open: boolean
     handleClose: () => void
-    onSubmit: (user: User, group: Group | null, treeCount: number, users: any[], logo?: File, messages?: any, file?: File) => void
+    onSubmit: (user: User, group: Group | null, treeCount: number, category: string, grove: string | null, users: any[], paymentId?: number, logo?: File, messages?: any, file?: File) => void
 }
 
 const GiftCardsForm: FC<GiftCardsFormProps> = ({ giftCardRequest, requestId, open, handleClose, onSubmit }) => {
@@ -35,6 +37,18 @@ const GiftCardsForm: FC<GiftCardsFormProps> = ({ giftCardRequest, requestId, ope
     const [messages, setMessages] = useState({ primaryMessage: "", secondaryMessage: "", eventName: "", eventType: undefined as string | undefined, plantedBy: "", logoMessage: "" });
     const [presentationId, setPresentationId] = useState<string | null>(null)
     const [slideId, setSlideId] = useState<string | null>(null)
+    const [category, setCategory] = useState<string>("Foundation");
+    const [grove, setGrove] = useState<string | null>(null);
+
+    // payment details
+    const [payment, setPayment] = useState<Payment | null>(null);
+    const [amount, setAmount] = useState<number>(0);
+    const [donorType, setDonorType] = useState<string>("Indian Citizen");
+    const [panNumber, setPanNumber] = useState<string | null>(null);
+
+    useEffect(() => {
+        setAmount(treeCount * (category === "Foundation" ? 3000 : 1500));
+    }, [category, treeCount])
 
     const getGiftCardRequestDetails = async () => {
         const apiClient = new ApiClient();
@@ -83,6 +97,13 @@ const GiftCardsForm: FC<GiftCardsFormProps> = ({ giftCardRequest, requestId, ope
                 logoMessage: giftCardRequest.logo_message,
                 eventType: giftCardRequest.event_type || undefined
             })
+
+            if (giftCardRequest.payment_id) {
+                const payment = await apiClient.getPayment(giftCardRequest.payment_id);
+                setPayment(payment);
+
+                setPanNumber(payment.pan_number);
+            }
         }
     }
 
@@ -94,7 +115,7 @@ const GiftCardsForm: FC<GiftCardsFormProps> = ({ giftCardRequest, requestId, ope
         const uploadFile = async () => {
             if (logo && requestId) {
                 const awsUtils = new AWSUtils();
-                const location = await awsUtils.uploadFileToS3(requestId, logo, (progress: number) => { });
+                const location = await awsUtils.uploadFileToS3('gift-request', logo, requestId);
                 setLogoString(location);
             } else {
                 setLogoString(null);
@@ -118,36 +139,81 @@ const GiftCardsForm: FC<GiftCardsFormProps> = ({ giftCardRequest, requestId, ope
         {
             key: 2,
             title: "Book Trees",
-            content: <PlotSelection disabled={giftCardRequest !== undefined && giftCardRequest.status !== 'pending_plot_selection'} treeCount={treeCount} onTreeCountChange={count => setTreeCount(count)} />,
+            content: <PlotSelection 
+                disabled={giftCardRequest !== undefined && giftCardRequest.status !== 'pending_plot_selection'} 
+                treeCount={treeCount} 
+                onTreeCountChange={count => setTreeCount(count)} 
+                category={category}
+                onCategoryChange={category => { setCategory(category) }}
+                grove={grove}
+                onGroveChange={grove => setGrove(grove)}
+            />,
         },
         {
             key: 3,
+            title: "Dashboard Details",
+            content: <DashboardDetails
+                messages={{...messages, plantedBy: messages.plantedBy || group?.name || user?.name || ''}}
+                onChange={messages => { setMessages(messages) }}
+            />,
+        },
+        {
+            key: 4,
+            title: "Payment",
+            content: <PaymentForm
+                payment={payment}
+                amount={amount}
+                onPaymentChange={payment => setPayment(payment)}
+                onChange={(donorType: string, panNumber: string | null) => { setDonorType(donorType); setPanNumber(panNumber); }}
+            />,
+        },
+        {
+            key: 5,
             title: "Gift Card Messages",
             content: <CardDetails
                 request_id={requestId || ''}
                 presentationId={presentationId}
                 slideId={slideId}
                 logo_url={logoString ? logoString : giftCardRequest?.logo_url}
-                messages={{...messages, plantedBy: messages.plantedBy || group?.name || ''}}
+                messages={{...messages, plantedBy: messages.plantedBy || group?.name || user?.name || ''}}
                 onChange={messages => { setMessages(messages) }}
                 onPresentationId={(presentationId: string, slideId: string) => { setPresentationId(presentationId); setSlideId(slideId); }}
             />,
         },
         {
-            key: 4,
+            key: 6,
             title: "User Details",
-            content: <BulkUserForm requestId={requestId} users={users} onUsersChange={users => setUsers(users)} onFileChange={file => setFile(file)} />,
+            content: <BulkUserForm treeCount={treeCount} requestId={requestId} users={users} onUsersChange={users => setUsers(users)} onFileChange={file => setFile(file)} />,
         },
     ]
 
-    const handleSubmit = () => {
+    const handleSubmit = async () => {
         if (!user) {
             toast.error("Please select sponsor");
             setCurrentStep(0);
             return;
         }
 
-        onSubmit(user, group, treeCount, users, logo ?? undefined, messages, file ?? undefined);
+        const apiClient = new ApiClient();
+        let paymentId = payment ? payment.id : undefined
+        if (!payment) {
+            const payment = await apiClient.createPayment(amount, donorType, panNumber);
+            paymentId = payment.id
+        } else {
+            const data = {
+                ...payment,
+            }
+
+            if (payment.amount !== amount || payment.pan_number !== panNumber || payment.donor_type !== donorType) {
+                if (payment.amount !== amount) data.amount = amount;
+                if (payment.pan_number !== panNumber) data.pan_number = panNumber;
+                if (payment.donor_type !== donorType) data.donor_type = donorType;
+    
+                await apiClient.updatedPayment(data);
+            }
+        }
+
+        onSubmit(user, group, treeCount, category, grove, users, paymentId, logo ?? undefined, messages, file ?? undefined);
 
         handleCloseForm();
     }
@@ -165,6 +231,7 @@ const GiftCardsForm: FC<GiftCardsFormProps> = ({ giftCardRequest, requestId, ope
         setMessages({ primaryMessage: "", secondaryMessage: "", eventName: "", plantedBy: "", logoMessage: "", eventType: undefined });
         setPresentationId(null);
         setSlideId(null);
+        setPayment(null);
     }
 
     const handleNext = () => {
@@ -182,8 +249,14 @@ const GiftCardsForm: FC<GiftCardsFormProps> = ({ giftCardRequest, requestId, ope
                 else nextStep = 3;
                 break;
             case 3:
+                nextStep = 4;
+                break;
+            case 4:
+                nextStep = 5;
+                break;
+            case 5:
                 if (messages.primaryMessage === "" || messages.secondaryMessage === "") toast.error("Please provide gift card details");
-                else nextStep = 4;
+                else nextStep = 6;
                 break;
             default:
                 break;

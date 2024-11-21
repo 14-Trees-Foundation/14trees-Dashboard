@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Drawer, Divider, Box, AppBar, Toolbar } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import { createStyles, makeStyles } from "@mui/styles";
@@ -35,6 +35,10 @@ export const AdminLeftDrawer = () => {
   let auth = useAuth();
   const [subIndex, setSubIndex] = useState(null);
   const [expanded, setExpanded] = useState(null);
+
+  useEffect(() => {
+    auth.signin("Dev", ["all"], ["super-admin"], "", () => {  })
+  }, [])
 
   const onClickNav = (value, subValue) => {
     if (subValue !== undefined) {
@@ -94,11 +98,11 @@ export const AdminLeftDrawer = () => {
     //   logo: FestivalIcon,
     //   display: true,
     // },
-    // {
-    //   displayName: "Donation",
-    //   logo: VolunteerActivismIcon,
-    //   display: true,
-    // },
+    {
+      displayName: "Donation",
+      logo: VolunteerActivismIcon,
+      display: true,
+    },
     {
       displayName: "Visits",
       logo: TourIcon,
@@ -112,7 +116,7 @@ export const AdminLeftDrawer = () => {
     {
       displayName: "Gift Cards",
       logo: CardGiftcard,
-      display: true,
+      display: auth.signedin,
     },
     // {
     //   displayName: "Images",
