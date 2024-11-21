@@ -297,7 +297,7 @@ const SingleUserForm: FC<SingleUserFormProps> = ({ imageUrls, value, onSubmit, o
                         onClick={handleCancel}
                         style={{ marginRight: '10px' }}
                     >
-                        Cancel
+                        Reset
                     </Button>
                     <Button
                         variant="contained"
