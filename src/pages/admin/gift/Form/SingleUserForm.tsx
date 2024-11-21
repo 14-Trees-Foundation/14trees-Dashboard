@@ -214,7 +214,7 @@ const SingleUserForm: FC<SingleUserFormProps> = ({ imageUrls, value, onSubmit, o
                         renderInput={(params) => (
                             <TextField
                                 {...params}
-                                label="Assigned Email"
+                                label="Assignee Email"
                                 variant="outlined"
                                 name="assigned_to_email"
                             />
@@ -225,7 +225,7 @@ const SingleUserForm: FC<SingleUserFormProps> = ({ imageUrls, value, onSubmit, o
                     <TextField
                         disabled={!user.editable}
                         name="assigned_to_name"
-                        label="Assigned to Name"
+                        label="Assignee Name"
                         value={user.assigned_to_name}
                         onChange={handleUserChange}
                         fullWidth
@@ -235,7 +235,7 @@ const SingleUserForm: FC<SingleUserFormProps> = ({ imageUrls, value, onSubmit, o
                     <TextField
                         disabled={!user.editable}
                         name="assigned_to_phone"
-                        label="Assigned to Phone (Optional)"
+                        label="Assignee Phone (Optional)"
                         value={user.assigned_to_phone}
                         onChange={handleUserChange}
                         fullWidth

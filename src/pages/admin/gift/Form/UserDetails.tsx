@@ -526,7 +526,7 @@ export const BulkUserForm: FC<BulkUserFormProps> = ({ requestId, treeCount, user
 
   return (
     <div style={{ margin: '20px', width: '100%' }}>
-      <Typography variant="h6" style={{ color: 'red' }}>Number of Trees left to allocate: {treeCount - users.map(user => user.count).reduce((prev, curr) => prev + curr, 0)}</Typography>
+      <Typography variant="h6" style={{ color: 'red' }}>Number of trees left to allocate: {treeCount - users.map(user => user.count).reduce((prev, curr) => prev + curr, 0)}</Typography>
       <Grid
         container
         style={{ marginTop: '10px' }}

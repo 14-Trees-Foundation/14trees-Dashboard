@@ -276,7 +276,7 @@ const PaymentForm: FC<PaymentFormProps> = ({ payment, amount, onPaymentChange, o
                 </Box>
                 {
                     payment && payment.payment_history && payment.payment_history.length > 0 && <Box width="45%">
-                        <Typography variant="h6" mb={1}>Payments done so far:</Typography>
+                        <Typography variant="h6" mb={1}>Payment Summary:</Typography>
                         <TableContainer sx={{ maxWidth: 650 }} component={Paper}>
                             <Table sx={{ maxWidth: 650 }} aria-label="simple table">
                                 <TableHead>
@@ -369,7 +369,7 @@ const PaymentForm: FC<PaymentFormProps> = ({ payment, amount, onPaymentChange, o
             <Dialog open={visible} fullWidth maxWidth='md'>
                 <DialogTitle>Payment Info</DialogTitle>
                 <DialogContent dividers>
-                    <Typography sx={{ mb: 1 }}>
+                    <Typography sx={{ mb: 2 }}>
                         Please use below details for payment (QR Code or wire transfer whichever is convenient for you) We will be integrating with a payment gateway soon.
                     </Typography>
                     <PaymentQRInfo />
