@@ -32,7 +32,7 @@ const GiftCardRequestInfo: React.FC<GiftCardRequestInfoProps> = ({ open, onClose
         const getGiftCards = async () => {
             const apiClient = new ApiClient();
             const resp = await apiClient.getBookedGiftCards(data.id, 0, -1);
-            setUsers(resp.results.filter((item: any) => item.assigned));
+            setUsers(resp.results);
         }
 
         if (open) getGiftCards();

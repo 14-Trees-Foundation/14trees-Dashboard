@@ -117,8 +117,8 @@ const RedeemTree: React.FC<RedeemTreeProps> = ({ tree }) => {
                     maxWidth: matches ? "96%" : '600px',
                 }}
             >
-                <Typography variant="body1" p={1}>The tree with tracker ID: 49852 has been sponsored by {(tree as any).group_name || (tree as any).sponsor_name} and is reserved as a gift. Please provide the recipient's details below to redeem it. (Note: This tree can be redeemed only once, so kindly ensure the information is accurate.)</Typography>
                 <Box mt={1} component={Paper} sx={{ padding: 2 }}>
+                    <Typography variant="body1" mb={1}>The tree with tracker ID: 49852 has been sponsored by {(tree as any).group_name || (tree as any).sponsor_name} and is reserved as a gift. Please provide the recipient's details below to redeem it. (Note: This tree can be redeemed only once, so kindly ensure the information is accurate.)</Typography>
                     <form onSubmit={handleRedeemTree}>
                         <Grid container rowSpacing={2} columnSpacing={1}>
                             <Grid item xs={12}>
@@ -180,6 +180,7 @@ const useStyles = makeStyles((theme) =>
         },
         main: {
             height: "100%",
+            marginTop: "100px",
         },
     })
 );
