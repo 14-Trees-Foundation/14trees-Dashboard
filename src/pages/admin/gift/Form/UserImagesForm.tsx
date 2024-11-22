@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { useDropzone } from 'react-dropzone';
-import { Button, Typography } from '@mui/material';
+import { Box, Button, Tooltip, Typography } from '@mui/material';
 import { AWSUtils } from '../../../../helpers/aws';
 import { toast } from 'react-toastify';
+import { List } from '@mui/icons-material';
 
 interface UserImagesFormProps {
     requestId: string | null
@@ -16,7 +17,7 @@ const UserImagesForm: React.FC<UserImagesFormProps> = ({ requestId }) => {
     const { getRootProps, getInputProps } = useDropzone({
         accept: 'image/*',
         onDrop: (acceptedFiles) => {
-            setSelectedFiles((prevFiles) => [...prevFiles, ...acceptedFiles]);
+            setSelectedFiles(acceptedFiles);
         },
     });
 
@@ -31,7 +32,7 @@ const UserImagesForm: React.FC<UserImagesFormProps> = ({ requestId }) => {
 
         setUploading(true);
         for (const file of selectedFiles) {
-            await awsUtils.uploadFileToS3(requestId, file, 'gift-request', setUploadProgress);
+            await awsUtils.uploadFileToS3('gift-request', file, requestId, setUploadProgress);
         }
         setUploading(false);
         setSelectedFiles([]);
@@ -44,7 +45,6 @@ const UserImagesForm: React.FC<UserImagesFormProps> = ({ requestId }) => {
             flexDirection: 'column',
             alignItems: 'center',
         }}>
-            <Typography sx={{ mb: 1 }}>Upload images of the user if you wish to create more personalized profile dashboard for user.</Typography>
             <div
                 {...getRootProps()}
                 style={{
@@ -59,25 +59,26 @@ const UserImagesForm: React.FC<UserImagesFormProps> = ({ requestId }) => {
                 <p>Drag and drop some user images here, or click to select.</p>
             </div>
 
-            {selectedFiles.length > 0 && (
-                <div>
-                    <h4>Selected Files:</h4>
-                    <ul>
+            <Box display="flex" alignItems="center" justifyContent="space-between">
+                <Typography>Selected Files:
+                    <Tooltip title={<ul>
                         {selectedFiles.map((file, index) => (
                             <li key={index}>{file.name}</li>
                         ))}
-                    </ul>
-                </div>
-            )}
+                    </ul>}>
+                        <Button sx={{ ml: -2 }} color="success"><List fontSize="small" /></Button>
+                    </Tooltip>
+                </Typography>
+                <Button
+                    variant='contained'
+                    color='success'
+                    onClick={handleUpload}
+                    disabled={uploading || selectedFiles.length === 0}
+                >
+                    {uploading ? 'Uploading...' : 'Upload Images'}
+                </Button>
+            </Box>
 
-            <Button
-                variant='contained'
-                color='success'
-                onClick={handleUpload}
-                disabled={uploading || selectedFiles.length === 0}
-            >
-                {uploading ? 'Uploading...' : 'Upload Images'}
-            </Button>
 
             {uploading && uploadProgress !== null && (
                 <div>Upload Progress: {uploadProgress}%</div>

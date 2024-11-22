@@ -182,7 +182,7 @@ const GiftCardsForm: FC<GiftCardsFormProps> = ({ giftCardRequest, requestId, ope
         },
         {
             key: 6,
-            title: "User Details",
+            title: "Recipient Details",
             content: <BulkUserForm treeCount={treeCount} requestId={requestId} users={users} onUsersChange={users => setUsers(users)} onFileChange={file => setFile(file)} />,
         },
     ]
@@ -273,7 +273,7 @@ const GiftCardsForm: FC<GiftCardsFormProps> = ({ giftCardRequest, requestId, ope
                 fullWidth
                 maxWidth='xl'
             >
-                <DialogTitle style={{ textAlign: "center" }}>Gift Cards</DialogTitle>
+                <DialogTitle style={{ textAlign: "center" }}>{giftCardRequest ? "Edit Gift Request" : "New Gift Request"}</DialogTitle>
                 {currentStep < steps.length && (
                     <>
                         <div

@@ -44,6 +44,10 @@ class AWSUtils {
             return false;
         }
     }
+
+    getS3UrlForKey(key: string): string {
+        return `https://14treesplants.s3.amazonaws.com/${key}`
+    }
 }
 
 export { AWSUtils }

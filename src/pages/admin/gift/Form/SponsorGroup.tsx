@@ -124,7 +124,7 @@ const SponsorGroupForm: FC<SponsorGroupFormProps> = ({ logo, onLogoChange, group
             </Box>
             <Divider orientation="vertical" flexItem style={{ backgroundColor: 'black' }}/>
             <Box style={{ width: '48%' }}>
-                <Typography variant="body1" sx={{ pb: 2 }}>Please upload the company logo to show on the gift card.</Typography>
+                <Typography variant="body1" sx={{ pb: 2 }}>Please upload the corporate logo (this will be shown on the gift card)</Typography>
                 <ImagePicker 
                     image={logo}
                     onChange={onLogoChange}

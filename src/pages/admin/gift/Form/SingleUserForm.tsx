@@ -1,4 +1,4 @@
-import { Autocomplete, Avatar, Button, Checkbox, FormControl, FormControlLabel, Grid, InputLabel, MenuItem, Select, TextField } from "@mui/material";
+import { Autocomplete, Avatar, Button, Checkbox, FormControl, FormControlLabel, Grid, InputLabel, MenuItem, Select, TextField, Typography } from "@mui/material";
 import { FC, useState, SyntheticEvent, ChangeEvent, useEffect } from "react";
 import { useAppDispatch, useAppSelector } from "../../../../redux/store/hooks";
 import * as userActionCreators from "../../../../redux/actions/userActions";
@@ -200,7 +200,7 @@ const SingleUserForm: FC<SingleUserFormProps> = ({ imageUrls, value, onSubmit, o
                             control={
                                 <Checkbox checked={showAssignedFields} onChange={(e) => { setShowAssignedFields(e.target.checked) }} name="show_all" />
                             }
-                            label="Do you want to assign the tree(s) to someone besides the gift recipient?"
+                            label="Do you want to assign/name the tree(s) to someone else (related to recipient)?"
                         />
                     </FormControl>
                 </Grid>
@@ -264,6 +264,8 @@ const SingleUserForm: FC<SingleUserFormProps> = ({ imageUrls, value, onSubmit, o
                             <MenuItem value={'other'}>Other</MenuItem>
                         </Select>
                     </FormControl>
+                    {(user.relation && user.relation !== 'other') && <Typography>Tree(s) will be assigned in the name of {user.gifted_to_name}'s {user.relation}, {user.assigned_to_name}</Typography>}
+                    {(user.relation && user.relation === 'other') && <Typography>Tree(s) will be assigned in the name of {user.assigned_to_name}</Typography>}
                 </Grid>}
                 <Grid item xs={12}>
                     <div style={{ display: 'flex', alignItems: 'center', marginBottom: 16 }}>
@@ -272,8 +274,8 @@ const SingleUserForm: FC<SingleUserFormProps> = ({ imageUrls, value, onSubmit, o
                             alt="User"
                             sx={{ width: 80, height: 80, marginRight: 2 }}
                         />
-                        <Button variant="outlined" component="label" color='success' sx={{ marginRight: 2 }}>
-                            Upload Image
+                        <Button variant="outlined" component="label" color='success' sx={{ marginRight: 2, textTransform: 'none' }}>
+                            Upload {showAssignedFields ? "Assignee" : "Recipient"} Image
                             <input
                                 value={''}
                                 type="file"
@@ -282,10 +284,11 @@ const SingleUserForm: FC<SingleUserFormProps> = ({ imageUrls, value, onSubmit, o
                                 onChange={handleImageChange}
                             />
                         </Button>
-                        <Button variant="outlined" component="label" color='success' sx={{ marginRight: 2 }} onClick={() => { setImageSelectionModal(true) }}>
+                        <Typography sx={{ mr: 2 }}>OR</Typography>
+                        <Button variant="outlined" component="label" color='success' sx={{ marginRight: 2, textTransform: 'none' }} onClick={() => { setImageSelectionModal(true) }}>
                             Choose from webscraped URL
                         </Button>
-                        {user.profileImage && <Button variant="outlined" component="label" color='error' onClick={() => { setUser(prev => ({ ...prev, profileImage: undefined })) }}>
+                        {user.profileImage && <Button variant="outlined" component="label" color='error' sx={{ textTransform: 'none' }} onClick={() => { setUser(prev => ({ ...prev, profileImage: undefined })) }}>
                             Remove Image
                         </Button>}
                     </div>
