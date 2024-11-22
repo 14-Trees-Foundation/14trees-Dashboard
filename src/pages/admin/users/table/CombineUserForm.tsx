@@ -53,6 +53,8 @@ const CombineUserForm: React.FC<CombineUserFormProps> = ({ primaryUser, secondar
         <Box
             sx={{
                 padding: 2,
+                display: "flex",
+                flexDirection: 'column',
             }}
         >
             <Box mt={2}>
@@ -81,8 +83,13 @@ const CombineUserForm: React.FC<CombineUserFormProps> = ({ primaryUser, secondar
                     size="medium"
                 />
             </Box>
-            <Box mt={2}>
-                <Typography>Do you want to delete secondary user?</Typography>
+            <Box 
+                mt={2}
+                display="flex"
+                alignItems="center"
+                justifyContent="space-between"
+            >
+                <Typography mr={5}>Do you want to delete secondary user?</Typography>
                 <ToggleButtonGroup
                     color="success"
                     value={deleteSecondary ? "yes" : "no"}

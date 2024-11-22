@@ -124,7 +124,8 @@ const CardDetails: FC<CardDetailsProps> = ({ logo_url, request_id, presentationI
     return (
         <div style={{ display: 'flex', padding: '10px 10px', width: '100%', justifyContent: 'space-between' }}>
             <div style={{ display: 'flex', flexDirection: 'column', width: '42%' }}>
-                <Typography variant='body1'>If you would like to tweak/add some personalised touch, change the messaging below: </Typography>
+                <Typography variant='h6'>{messages.eventType === "1" ? "Birthday" : messages.eventType === "2" ? "Memorial" : "General"} Gift</Typography>
+                <Typography variant='body1' mt={1}>If you would like to tweak/add some personalised touch, change the messaging below: </Typography>
                 <Typography variant="body1" sx={{ mt: 2 }}><strong>Primary Message</strong></Typography>
                 <TextField
                     multiline
