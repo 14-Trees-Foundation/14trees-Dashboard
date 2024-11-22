@@ -505,9 +505,10 @@ const GiftTrees: FC = () => {
         {
             dataIndex: "group_name",
             key: "group_name",
-            title: "Group",
+            title: "Corporate/Personal",
             align: "center",
             width: 200,
+            render: (value: string) => value ? value : 'Personal',
             ...getColumnSearchProps('group_name', filters, handleSetFilters)
         },
         {
