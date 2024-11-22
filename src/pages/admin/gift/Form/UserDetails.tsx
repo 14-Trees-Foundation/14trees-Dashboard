@@ -13,6 +13,7 @@ import { GridFilterItem } from "@mui/x-data-grid";
 import SingleUserForm from "./SingleUserForm";
 import { getUniqueRequestId } from "../../../../helpers/utils";
 import { LoadingButton } from "@mui/lab";
+import UserImagesForm from "./UserImagesForm";
 
 interface User {
   key: string;
@@ -89,10 +90,11 @@ const countField = 'Number of trees to assign'
 const imageNameField = 'Image Name (optional)'
 
 interface CSVUploadProps {
+  requestId: string | null
   onFileChange: (file: File) => void
 }
 
-const CSVUploadForm: FC<CSVUploadProps> = ({ onFileChange }) => {
+const CSVUploadForm: FC<CSVUploadProps> = ({ requestId, onFileChange }) => {
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -121,21 +123,28 @@ const CSVUploadForm: FC<CSVUploadProps> = ({ onFileChange }) => {
   return (
     <Box>
       <Typography>You can upload recipient details by using a CSV file. To get started, download the sample CSV file from <a style={{ color: 'blue', textDecoration: 'underline', cursor: 'pointer' }} onClick={downloadGoogleSheet}>this</a> link, fill in the required recipient details, and then upload the completed CSV file.</Typography>
-      <Button
-        variant="contained"
-        component="label"
-        color="success"
-        sx={{ mt: 1 }}
-      >
-        Select CSV File
-        <input
-          value=''
-          type="file"
-          accept=".csv"
-          hidden
-          onChange={handleFileChange}
-        />
-      </Button>
+      <Typography mt={2}>You can optionally upload recipient or assignee images below to personalize the dashboard. If you upload images, ensure that the exact file name of each image is specified in the 'Image Name' column in the CSV file. If no image is uploaded, leave the 'Image Name' column blank.</Typography>
+      <Box mt={3} display="flex" alignItems="flex-start" justifyContent='space-evenly'>
+        <UserImagesForm requestId={requestId}/>
+        <Box>
+          <Typography>Upload completed csv file below: </Typography>
+          <Button
+            variant="contained"
+            component="label"
+            color="success"
+            sx={{ mt: 1 }}
+          >
+            Select CSV File
+            <input
+              value=''
+              type="file"
+              accept=".csv"
+              hidden
+              onChange={handleFileChange}
+            />
+          </Button>
+        </Box>
+      </Box>
     </Box>
   )
 }
@@ -269,7 +278,7 @@ export const BulkUserForm: FC<BulkUserFormProps> = ({ requestId, treeCount, user
                 relation: user['Relation with person'] ? user['Relation with person'] : undefined,
                 count: user[countField] ? user[countField] : 1,
                 image: user[imageNameField] !== ''
-                  ? await awsUtils.checkIfPublicFileExists('gift-card-requests' + "/" + requestId + '/' + user[imageNameField])
+                  ? await awsUtils.checkIfPublicFileExists('cards' + "/" + requestId + '/' + user[imageNameField])
                   : undefined,
                 error: false,
                 editable: false,
@@ -287,6 +296,7 @@ export const BulkUserForm: FC<BulkUserFormProps> = ({ requestId, treeCount, user
 
               if (!parsedUser.gifted_to_email) parsedUser.gifted_to_email = parsedUser.gifted_to_name.split(" ").join('.') + "@14trees"
               if (!parsedUser.assigned_to_email) parsedUser.assigned_to_email = parsedUser.assigned_to_name.split(" ").join('.') + "@14trees"
+              if (parsedUser.image) parsedUser.image_url = awsUtils.getS3UrlForKey('cards' + "/" + requestId + '/' + user[imageNameField])
 
               parsedUsers.push(parsedUser);
 
@@ -526,7 +536,8 @@ export const BulkUserForm: FC<BulkUserFormProps> = ({ requestId, treeCount, user
 
   return (
     <div style={{ margin: '20px', width: '100%' }}>
-      <Typography variant="h6" style={{ color: 'red' }}>Number of trees left to allocate: {treeCount - users.map(user => user.count).reduce((prev, curr) => prev + curr, 0)}</Typography>
+      { (treeCount - users.map(user => user.count).reduce((prev, curr) => prev + curr, 0)) > 0
+        && <Typography variant="h6" style={{ color: 'red' }}>Number of trees left to allocate: {treeCount - users.map(user => user.count).reduce((prev, curr) => prev + curr, 0)}</Typography>}
       <Grid
         container
         style={{ marginTop: '10px' }}
@@ -549,7 +560,7 @@ export const BulkUserForm: FC<BulkUserFormProps> = ({ requestId, treeCount, user
         />
       </Grid>
       <Box mt={2} display="flex" alignItems="center">
-        <Typography>Do you wish to fetch user images from a website? </Typography>
+        <Typography>Do you wish to fetch recipient profile pic from a website (via webscraping)? </Typography>
         <ToggleButton
           value="check"
           color="success"
@@ -586,7 +597,7 @@ export const BulkUserForm: FC<BulkUserFormProps> = ({ requestId, treeCount, user
       <Dialog open={csvModal} fullWidth maxWidth="md">
         <DialogTitle>Bulk upload recipient details using csv file</DialogTitle>
         <DialogContent dividers>
-          <CSVUploadForm onFileChange={handleFileChange} />
+          <CSVUploadForm onFileChange={handleFileChange} requestId={requestId} />
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setCsvModal(false)} variant="outlined" color="error">

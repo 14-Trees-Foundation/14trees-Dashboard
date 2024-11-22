@@ -187,7 +187,7 @@ const PaymentForm: FC<PaymentFormProps> = ({ payment, amount, onPaymentChange, o
             key: "payment_date",
             title: "Payment Date",
             align: "center",
-            width: 100,
+            width: 150,
             render: getHumanReadableDate,
         },
         {
@@ -197,6 +197,10 @@ const PaymentForm: FC<PaymentFormProps> = ({ payment, amount, onPaymentChange, o
             align: "center",
             width: 150,
             className: "orange-column",
+            render: (value: number, record: PaymentHistory) => {
+                if (record.status !== 'validated') return '';
+                else return value;
+            }
         },
         {
             dataIndex: "status",
@@ -212,9 +216,12 @@ const PaymentForm: FC<PaymentFormProps> = ({ payment, amount, onPaymentChange, o
             key: "payment_received_date",
             title: "Received Date",
             align: "center",
-            width: 100,
+            width: 150,
             className: "orange-column",
-            render: getHumanReadableDate,
+            render: (value: string, record: PaymentHistory) => {
+                if (record.status !== 'validated') return '';
+                else return getHumanReadableDate(value);
+            },
         },
     ]
 
@@ -280,14 +287,14 @@ const PaymentForm: FC<PaymentFormProps> = ({ payment, amount, onPaymentChange, o
                         <TableContainer sx={{ maxWidth: 650 }} component={Paper}>
                             <Table sx={{ maxWidth: 650 }} aria-label="simple table">
                                 <TableHead>
-                                    <TableRow>
-                                        <TableCell colSpan={2} align="center">Sponsor Data</TableCell>
-                                        <TableCell colSpan={2} align="center">Finance Data</TableCell>
+                                    <TableRow sx={{ backgroundColor: "#9ca29021" }}>
+                                        <TableCell colSpan={2} align="center"><strong>User provided details</strong></TableCell>
+                                        <TableCell colSpan={2} align="center"><strong>For backoffice usage only</strong></TableCell>
                                     </TableRow>
                                 </TableHead>
                                 <TableBody>
                                     <TableRow
-                                        sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+                                        sx={{ '&:last-child td, &:last-child th': { border: 0 }, backgroundColor: "#ffeedad4" }}
                                     >
                                         <TableCell align="left">Remaining amount:</TableCell>
                                         <TableCell align="right">{new Intl.NumberFormat('en-IN').format(amountData.totalAmount - amountData.paidAmount)}</TableCell>
@@ -295,7 +302,7 @@ const PaymentForm: FC<PaymentFormProps> = ({ payment, amount, onPaymentChange, o
                                         <TableCell align="right">{new Intl.NumberFormat('en-IN').format(amountData.paidAmount - amountData.verifiedAmount)}</TableCell>
                                     </TableRow>
                                     <TableRow
-                                        sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+                                        sx={{ '&:last-child td, &:last-child th': { border: 0 }, backgroundColor: "#dfffd5d4" }}
                                     >
                                         <TableCell align="left">Paid amount:</TableCell>
                                         <TableCell align="right">{new Intl.NumberFormat('en-IN').format(amountData.paidAmount)}</TableCell>
@@ -303,7 +310,7 @@ const PaymentForm: FC<PaymentFormProps> = ({ payment, amount, onPaymentChange, o
                                         <TableCell align="right">{new Intl.NumberFormat('en-IN').format(amountData.verifiedAmount)}</TableCell>
                                     </TableRow>
                                     <TableRow
-                                        sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+                                        sx={{ '&:last-child td, &:last-child th': { border: 0 }, backgroundColor: "#B9C0AB1C" }}
                                     >
                                         <TableCell align="left">Total amount:</TableCell>
                                         <TableCell align="right">{new Intl.NumberFormat('en-IN').format(amountData.totalAmount)}</TableCell>
