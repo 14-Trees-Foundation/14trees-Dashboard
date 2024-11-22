@@ -310,7 +310,7 @@ export const User1 = () => {
         </DialogActions>
       </Dialog>
 
-      <Dialog open={userCombineModal}>
+      <Dialog open={userCombineModal} maxWidth="md">
         <DialogTitle>Combine users</DialogTitle>
         <DialogContent>
           <DialogContentText>

@@ -14,6 +14,7 @@ import './inventory.css'
 import CorporateStats from "./CorporateStats"
 import GeneralTable from "../../../components/GenTable"
 import LandTypeStats from "./LandTypeStats"
+import PlantTypeStats from "./PlantTypeStats"
 
 interface SiteLocation {
     district: string;
@@ -396,6 +397,15 @@ const InventoryStats: FC = () => {
                     serviceTypes={selectedServiceTypes.map((item) => getSiteServiceTypeEnum(item))}
                 />
                 <PlotStats />
+                <PlantTypeStats 
+                    habits={selectedHabit}
+                    landTypes={selectedLandType}
+                    talukas={selectedTalukas}
+                    villages={selectedVillages}
+                    districts={selectedDistricts}
+                    categories={selectedCategories.map((item) => item !== 'Unknown' ? item : null)}
+                    serviceTypes={selectedServiceTypes.map((item) => getSiteServiceTypeEnum(item))}
+                />
                 <CorporateStats />
             </Box>
         </div>
