@@ -287,7 +287,6 @@ const GiftCardsForm: FC<GiftCardsFormProps> = ({ giftCardRequest, requestId, ope
                             <Steps
                                 current={currentStep}
                                 items={steps}
-                                style={{ display: "flex", alignItems: "center" }}
                             />
                         </div>
                     </>
