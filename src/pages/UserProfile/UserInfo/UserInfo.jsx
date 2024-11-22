@@ -118,7 +118,7 @@ export const UserInfo = () => {
                         </div>
                       </>
                     )}
-                  {
+                  {(selUserInfo.description && selUserInfo.description.trim() !== '') && 
                     <div>
                       <div className={classes.label}>Event</div>
                       <div
