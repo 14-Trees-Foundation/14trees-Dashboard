@@ -70,7 +70,7 @@ const GiftCardRequestInfo: React.FC<GiftCardRequestInfoProps> = ({ open, onClose
         {
             dataIndex: "dashboard_link",
             key: "dashboard_link",
-            title: "Dashboard Link",
+            title: " ",
             align: "center",
             width: 200,
             render: (value: any, record: any) => (<div
@@ -92,7 +92,7 @@ const GiftCardRequestInfo: React.FC<GiftCardRequestInfoProps> = ({ open, onClose
                         }
                     }}
                 >
-                    <LinkOutlined />
+                    {record.assigned_to_name ? "Dashboard" : "Redeem"}
                 </Button>
             </div>)
         },
