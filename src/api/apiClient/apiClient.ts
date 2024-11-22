@@ -541,6 +541,17 @@ class ApiClient {
         }
     }
 
+    async combineUsers(primary_user: number, secondary_user: number, delete_secondary: boolean): Promise<void> {
+        try {
+            await this.api.post<any>(`/users/combine`, { primary_user, secondary_user, delete_secondary });
+        } catch (error: any) {
+            if (error?.response?.data?.message) {
+                throw new Error(error.response.data.message);
+            }
+            throw new Error('Failed to combine users!');
+        }
+    }
+
     /*
         Model- OnsiteStaff: CRUD Operations/Apis for Onsite staff
     */

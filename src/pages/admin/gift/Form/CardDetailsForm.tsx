@@ -104,6 +104,10 @@ const CardDetails: FC<CardDetailsProps> = ({ logo_url, request_id, presentationI
             recordRef.current.logo = defaultMessages.logo;
 
             updateSlide();
+        } else {
+            recordRef.current.primary = messages.primaryMessage;
+            recordRef.current.secondary = messages.secondaryMessage;
+            recordRef.current.logo = messages.logoMessage;
         }
     }, [messages])
 

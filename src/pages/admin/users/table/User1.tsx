@@ -26,6 +26,9 @@ import type { TableColumnsType } from 'antd';
 import getColumnSearchProps from "../../../../components/Filter";
 import { getFormattedDate } from "../../../../helpers/utils";
 import TableComponent from "../../../../components/Table";
+import CombineUserForm from "./CombineUserForm";
+import { toast } from "react-toastify";
+import ApiClient from "../../../../api/apiClient/apiClient";
 
 export const User1 = () => {
   const dispatch = useAppDispatch();
@@ -46,6 +49,11 @@ export const User1 = () => {
   const [page, setPage] = useState(0);
   const [pageSize, setPageSize] = useState(10);
   const [filters, setFilters] = useState<Record<string, GridFilterItem>>({});
+
+  const [userCombineModal, setUserCombineModal] = useState(false);
+  const [primaryUser, setPrimaryUser] = useState<User | null>(null);
+  const [secondaryUser, setSecondaryUser] = useState<User | null>(null);
+  const [deleteSecondary, setDeleteSecondary] = useState(true);
 
   const handleSetFilters = (filters: Record<string, GridFilterItem>) => {
     setPage(0);
@@ -187,6 +195,29 @@ export const User1 = () => {
     createBulkUsers(file);
   };
 
+  const handleCancelCombineUser = () => {
+    setPrimaryUser(null);
+    setSecondaryUser(null);
+    setDeleteSecondary(true);
+    setUserCombineModal(false);
+  }
+
+  const handleCombineUser = async () => {
+    if (!primaryUser || !secondaryUser) {
+      toast.error("Please select both the users in order to combine them!");
+      return;
+    }
+
+    try {
+      const apiClient = new ApiClient();
+      await apiClient.combineUsers(primaryUser.id, secondaryUser.id, deleteSecondary);
+    } catch(error: any) {
+      toast.error(error.message);
+    }
+
+    handleCancelCombineUser();
+  }
+
   return (
     <>
       <div
@@ -204,7 +235,18 @@ export const User1 = () => {
             marginBottom: "5px",
             marginTop: "5px",
           }}>
-          <Button variant="contained" color="success" onClick={handleModalOpen}>
+          <Button
+            variant="contained"
+            color="success"
+            style={{ marginLeft: "10px", textTransform: 'none' }}
+            onClick={() => { setUserCombineModal(true); }}>
+            Combine Users
+          </Button>
+          <Button 
+            variant="contained" 
+            color="success" 
+            style={{ marginLeft: "10px", textTransform: 'none' }}
+            onClick={handleModalOpen}>
             Add User
           </Button>
           <AddUser
@@ -216,7 +258,7 @@ export const User1 = () => {
           <Button
             variant="contained"
             color="success"
-            style={{ marginLeft: "10px" }}
+            style={{ marginLeft: "10px", textTransform: 'none' }}
             onClick={handleBulkModalOpen}>
             Bulk Add
           </Button>
@@ -264,6 +306,34 @@ export const User1 = () => {
             color="success"
             autoFocus>
             Yes
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      <Dialog open={userCombineModal}>
+        <DialogTitle>Combine users</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            <CombineUserForm 
+              primaryUser={primaryUser}
+              secondaryUser={secondaryUser}
+              deleteSecondary={deleteSecondary}
+              onPrimaryUserChange={user => { setPrimaryUser(user); }}
+              onSecondaryUserChange={user => { setSecondaryUser(user); }}
+              onDeleteSecondaryChange={value => { setDeleteSecondary(value); }}
+            />
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button variant="outlined" onClick={handleCancelCombineUser} color="error">
+            Cancel
+          </Button>
+          <Button
+            onClick={handleCombineUser}
+            variant="contained"
+            color="success"
+          >
+            Combine
           </Button>
         </DialogActions>
       </Dialog>
