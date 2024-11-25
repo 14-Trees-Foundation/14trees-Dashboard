@@ -560,7 +560,7 @@ export const BulkUserForm: FC<BulkUserFormProps> = ({ requestId, treeCount, user
         />
       </Grid>
       <Box mt={2} display="flex" alignItems="center">
-        <Typography>Do you wish to fetch recipient profile pic from a website (via webscraping)? </Typography>
+        <Typography>Do you wish to fetch recipient(s) profile pic from a website (via webscraping)? </Typography>
         <ToggleButton
           value="check"
           color="success"

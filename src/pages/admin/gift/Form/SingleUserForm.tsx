@@ -77,7 +77,6 @@ const SingleUserForm: FC<SingleUserFormProps> = ({ imageUrls, value, onSubmit, o
 
     const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0] || null;
-        console.log(event.target)
         setUser(prev => ({
             ...prev,
             profileImage: file ?? undefined
