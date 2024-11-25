@@ -1,9 +1,10 @@
-import { Box, Button, Grid, Paper, TextField, Typography, useMediaQuery } from "@mui/material"
+import { Avatar, Box, Button, Grid, Paper, TextField, Typography, useMediaQuery } from "@mui/material"
 import { GiftCardUser } from "../../../types/gift_card";
 import { createStyles, makeStyles } from "@mui/styles";
 import { useState } from "react";
 import { toast } from "react-toastify";
 import ApiClient from "../../../api/apiClient/apiClient";
+import { AWSUtils } from "../../../helpers/aws";
 
 interface RedeemTreeProps {
     tree: GiftCardUser
@@ -25,6 +26,7 @@ const RedeemTree: React.FC<RedeemTreeProps> = ({ tree }) => {
         email: '',
         birth_date: '',
     });
+    const [profileImage, setProfileImage] = useState<File | null>(null)
 
     const validateTheName = (name: string) => {
         if (name.trim()) setErrors({ ...errors, name: '' });
@@ -85,6 +87,11 @@ const RedeemTree: React.FC<RedeemTreeProps> = ({ tree }) => {
         window.location.reload();
     };
 
+    const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const file = event.target.files?.[0] || null;
+        setProfileImage(file);
+    };
+
     const handleRedeemTree = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
 
@@ -94,8 +101,15 @@ const RedeemTree: React.FC<RedeemTreeProps> = ({ tree }) => {
         }
 
         try {
+
+            let profileImageUrl: string | null = null
+            if (profileImage) {
+                const awsUtils = new AWSUtils();
+                profileImageUrl = await awsUtils.uploadFileToS3("gift-request", profileImage, (tree as any).request_id);
+            }
+
             const apiClient = new ApiClient();
-            await apiClient.redeemGiftCardTemplate(tree.id, tree.sapling_id, tree.tree_id, formData as any);
+            await apiClient.redeemGiftCardTemplate(tree.id, tree.sapling_id, tree.tree_id, formData as any, profileImageUrl);
 
             refreshPage();
         } catch (error: any) {
@@ -155,6 +169,29 @@ const RedeemTree: React.FC<RedeemTreeProps> = ({ tree }) => {
                                     helperText={errors.phone}
                                     fullWidth
                                 />
+                            </Grid>
+                            <Grid item xs={12}>
+                                <div style={{ display: 'flex', alignItems: 'center', marginBottom: 16 }}>
+                                    <Avatar
+                                        src={profileImage ? URL.createObjectURL(profileImage) : undefined}
+                                        alt="User"
+                                        sx={{ width: 80, height: 80, marginRight: 2 }}
+                                    />
+                                    <Button variant="outlined" component="label" color='success' sx={{ marginRight: 2, textTransform: 'none' }}>
+                                        Upload your Image
+                                        <input
+                                            value={''}
+                                            type="file"
+                                            hidden
+                                            accept="image/*"
+                                            onChange={handleImageChange}
+                                        />
+                                    </Button>
+                                    {profileImage && <Button variant="outlined" component="label" color='error' sx={{ textTransform: 'none' }} onClick={() => { setProfileImage(null) }}>
+                                        Remove Image
+                                    </Button>}
+                                </div>
+                                <Typography fontSize={10}>Profile image is will be used to create more personalised dashboard, Bu it is not required to redeem this tree.</Typography>
                             </Grid>
                             <Grid item xs={12} display="flex" justifyContent="center">
                                 <Button
