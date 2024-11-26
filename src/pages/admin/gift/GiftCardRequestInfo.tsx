@@ -14,7 +14,6 @@ import { format } from 'date-fns';
 import GeneralTable from '../../../components/GenTable';
 import ApiClient from '../../../api/apiClient/apiClient';
 import { GiftCardUser } from '../../../types/gift_card';
-import { LinkOutlined } from '@mui/icons-material';
 
 interface GiftCardRequestInfoProps {
     open: boolean
@@ -32,7 +31,7 @@ const GiftCardRequestInfo: React.FC<GiftCardRequestInfoProps> = ({ open, onClose
         const getGiftCards = async () => {
             const apiClient = new ApiClient();
             const resp = await apiClient.getBookedGiftCards(data.id, 0, -1);
-            setUsers(resp.results);
+            setUsers(resp.results.filter(item => item.sapling_id));
         }
 
         if (open) getGiftCards();
@@ -92,7 +91,7 @@ const GiftCardRequestInfo: React.FC<GiftCardRequestInfoProps> = ({ open, onClose
                         }
                     }}
                 >
-                    {record.assigned_to_name ? "Dashboard" : "Redeem"}
+                    {(record.assigned_to_name && record.assigned) ? "Dashboard" : "Redeem"}
                 </Button>
             </div>)
         },
