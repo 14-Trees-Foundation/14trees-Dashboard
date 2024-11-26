@@ -1345,9 +1345,9 @@ class ApiClient {
         }
     }
 
-    async bookGiftCards(gift_card_request_id: number, gift_card_trees?: any[]): Promise<void> {
+    async bookGiftCards(gift_card_request_id: number, gift_card_trees?: any[], book_non_giftable: boolean = false, diversify: boolean = false): Promise<void> {
         try {
-            await this.api.post<any>(`/gift-cards/book`, { gift_card_request_id, gift_card_trees });
+            await this.api.post<any>(`/gift-cards/book`, { gift_card_request_id, gift_card_trees, book_non_giftable, diversify });
         } catch (error: any) {
             if (error.response) {
                 throw new Error(error.response.data.message);

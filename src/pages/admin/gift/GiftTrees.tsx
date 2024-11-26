@@ -46,6 +46,8 @@ const GiftTrees: FC = () => {
     const [filters, setFilters] = useState<Record<string, GridFilterItem>>({});
     const [selectedGiftCard, setSelectedGiftCard] = useState<GiftCard | null>(null);
     const [selectedPlots, setSelectedPlots] = useState<Plot[]>([]);
+    const [bookNonGiftable, setBookNonGiftable] = useState(false);
+    const [diversify, setDiversify] = useState(false);
     const [requestId, setRequestId] = useState<string | null>(null);
     const [deleteModal, setDeleteModal] = useState(false);
     const [notesModal, setNotesModal] = useState(false);
@@ -232,6 +234,8 @@ const GiftTrees: FC = () => {
         setSelectedPlots([]);
         setManualPlotSelection(false);
         setSelectedGiftCard(null);
+        setDiversify(false);
+        setBookNonGiftable(false);
     }
 
     const handlePlotSelectionSubmit = async () => {
@@ -249,7 +253,7 @@ const GiftTrees: FC = () => {
                 await apiClient.createGiftCardPlots(selectedGiftCard.id, selectedPlots.map(plot => plot.id));
                 toast.success("Saved selected plot for gift card request!");
 
-                await apiClient.bookGiftCards(selectedGiftCard.id, manualPlotSelection ? users : undefined);
+                await apiClient.bookGiftCards(selectedGiftCard.id, manualPlotSelection ? users : undefined, bookNonGiftable, diversify);
                 toast.success("Gift cards booked successfully");
                 getGiftCardData();
             } catch {
@@ -257,9 +261,7 @@ const GiftTrees: FC = () => {
             }
         }
 
-        setSelectedGiftCard(null);
-        setSelectedPlots([]);
-        setManualPlotSelection(false);
+        handlePlotSelectionCancel();
     }
 
     const handleUserDetailsEditClose = () => {
@@ -630,6 +632,10 @@ const GiftTrees: FC = () => {
                         onPlotsChange={plots => setSelectedPlots(plots)}
                         manualPlotSelection={manualPlotSelection}
                         onPlotSelectionMethodChange={(value) => { setManualPlotSelection(value) }}
+                        bookNonGiftable={bookNonGiftable}
+                        onBookNonGiftableChange={(value) => { setBookNonGiftable(value) }}
+                        diversify={diversify}
+                        onDiversifyChange={(value) => { setDiversify(value) }}
                     />
                 </DialogContent>
                 <DialogActions>

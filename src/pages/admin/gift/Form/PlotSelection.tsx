@@ -1,6 +1,6 @@
 
 import { FC, useEffect, useState } from "react";
-import { Box, Button, Checkbox, Chip, FormControl, FormControlLabel, Typography } from "@mui/material";
+import { Box, Button, Checkbox, Chip, FormControl, FormControlLabel, ToggleButton, ToggleButtonGroup, Typography } from "@mui/material";
 import { Plot } from "../../../../types/plot";
 import { useAppDispatch, useAppSelector } from "../../../../redux/store/hooks";
 import { bindActionCreators } from "@reduxjs/toolkit";
@@ -49,9 +49,13 @@ interface PlotSelectionProps {
     onUsersChange: (users: any[]) => void
     manualPlotSelection: boolean
     onPlotSelectionMethodChange: (value: boolean) => void
+    bookNonGiftable: boolean
+    onBookNonGiftableChange: (value: boolean) => void
+    diversify: boolean
+    onDiversifyChange: (value: boolean) => void
 }
 
-const PlotSelection: FC<PlotSelectionProps> = ({ requiredTrees, plots, onPlotsChange, users, onUsersChange, manualPlotSelection, onPlotSelectionMethodChange }) => {
+const PlotSelection: FC<PlotSelectionProps> = ({ requiredTrees, plots, onPlotsChange, users, onUsersChange, manualPlotSelection, onPlotSelectionMethodChange, bookNonGiftable, onBookNonGiftableChange, diversify, onDiversifyChange }) => {
 
     const [page, setPage] = useState(0);
     const [loading, setLoading] = useState(false);
@@ -84,7 +88,7 @@ const PlotSelection: FC<PlotSelectionProps> = ({ requiredTrees, plots, onPlotsCh
         tags = Object.values(tagsData.tags)
             .filter(item => item.type === 'SYSTEM_DEFINED')
             .map(item => item.tag)
-            .sort((a,b) => {
+            .sort((a, b) => {
                 if (a > b) return 1;
                 else return - 1;
             });
@@ -378,14 +382,71 @@ const PlotSelection: FC<PlotSelectionProps> = ({ requiredTrees, plots, onPlotsCh
                 tableName="Plots selection"
             />
 
-            <FormControl component="fieldset" sx={{ mt: 3 }}>
-                <FormControlLabel
-                    control={
-                        <Checkbox checked={manualPlotSelection} onChange={(e) => { onPlotSelectionMethodChange(e.target.checked) }} name="manual" />
-                    }
-                    label="Do you want to manually select trees for each user?"
-                />
-            </FormControl>
+            <Box
+                mt={3}
+                display="flex"
+                alignItems="center"
+            >
+                <Box>
+                    <Box
+                        display="flex"
+                        alignItems="center"
+                        justifyContent="space-between"
+                    >
+                        <Typography mr={10}>Do you want to manually select trees for each user?</Typography>
+                        <ToggleButtonGroup
+                            color="success"
+                            value={manualPlotSelection ? "yes" : "no"}
+                            exclusive
+                            onChange={(e, value) => { onPlotSelectionMethodChange(value === "yes" ? true : false); }}
+                            aria-label="Platform"
+                            size="small"
+                        >
+                            <ToggleButton value="yes">Yes</ToggleButton>
+                            <ToggleButton value="no">No</ToggleButton>
+                        </ToggleButtonGroup>
+                    </Box>
+                    {!manualPlotSelection && <Box
+                        mt={2}
+                        display="flex"
+                        alignItems="center"
+                        justifyContent="space-between"
+                    >
+                        <Typography mr={10}>Do you want to book non giftable trees?</Typography>
+                        <ToggleButtonGroup
+                            color="success"
+                            value={bookNonGiftable ? "yes" : "no"}
+                            exclusive
+                            onChange={(e, value) => { onBookNonGiftableChange(value === "yes" ? true : false); }}
+                            aria-label="Platform"
+                            size="small"
+                        >
+                            <ToggleButton value="yes">Yes</ToggleButton>
+                            <ToggleButton value="no">No</ToggleButton>
+                        </ToggleButtonGroup>
+                    </Box>}
+                    {!manualPlotSelection && <Box
+                        mt={2}
+                        display="flex"
+                        alignItems="center"
+                        justifyContent="space-between"
+                    >
+                        <Typography mr={10}>Do you want diversify plant types?</Typography>
+                        <ToggleButtonGroup
+                            color="success"
+                            value={diversify ? "yes" : "no"}
+                            exclusive
+                            onChange={(e, value) => { onDiversifyChange(value === "yes" ? true : false); }}
+                            aria-label="Platform"
+                            size="small"
+                        >
+                            <ToggleButton value="yes">Yes</ToggleButton>
+                            <ToggleButton value="no">No</ToggleButton>
+                        </ToggleButtonGroup>
+                    </Box>}
+                </Box>
+                <Box display="flex" flexGrow={1}></Box>
+            </Box>
             {manualPlotSelection && <UserTreeMappingModal
                 plotIds={plots.map(plot => plot.id)}
                 users={users}
