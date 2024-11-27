@@ -1574,9 +1574,9 @@ class ApiClient {
         }
     } 
 
-    async createPaymentHistory(payment_id: number, amount: number, payment_method: string, payment_proof: string | null) {
+    async createPaymentHistory(payment_id: number, amount: number, payment_method: string, payment_proof: string | null, data: any) {
         try {
-            const response = await this.api.post<PaymentHistory>(`/payments/history`, { payment_id, amount, payment_method, payment_proof });
+            const response = await this.api.post<PaymentHistory>(`/payments/history`, { payment_id, amount, payment_method, payment_proof, ...data });
             return response.data;
         } catch (error: any) {
             if (error.response) {
@@ -1597,6 +1597,29 @@ class ApiClient {
             throw new Error('Failed to create payment');
         }
     } 
+
+    async verifyPayment(order_id: string, razorpay_payment_id: string, razorpay_signature: string) {
+        try {
+            await this.api.post<PaymentHistory>(`/payments/verify`, { order_id, razorpay_payment_id, razorpay_signature });
+        } catch (error: any) {
+            if (error?.response?.data?.message) {
+                throw new Error(error.response.data.message);
+            }
+            throw new Error('Failed to verify payment');
+        }
+    }
+
+    async getPaymentsForOrder(order_id: string) {
+        try {
+            const response = await this.api.get<any[]>(`/payments/order-payments/${order_id}`);
+            return response.data;
+        } catch (error: any) {
+            if (error?.response?.data?.message) {
+                throw new Error(error.response.data.message);
+            }
+            throw new Error('Failed to fetch payments');
+        }
+    }
 
     /*
         Albums

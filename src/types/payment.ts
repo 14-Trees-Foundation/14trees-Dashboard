@@ -21,6 +21,7 @@ export type Payment = {
     donor_type: string;
     pan_number: string | null;
     payment_history?: PaymentHistory[];
+    order_id: string;
     created_at: string;
     updated_at: string;
 }
