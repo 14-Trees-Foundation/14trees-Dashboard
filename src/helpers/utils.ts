@@ -30,7 +30,7 @@ export function getFormattedDate(dateStr: string) {
         return isValidDate ? `${day}-${month}-${year}` : ''
 }
 
-export function getHumanReadableDate(dateStr: string) { 
+export function getHumanReadableDate(dateStr: string | number) { 
     const date = new Date(dateStr);
     const isValidDate = !isNaN(date.getDate()) && date.getTime() > 0;
     return isValidDate ? moment(date).format('MMMM DD, YYYY') : '';

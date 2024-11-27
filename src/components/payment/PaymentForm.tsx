@@ -11,6 +11,7 @@ import ApiClient from "../../api/apiClient/apiClient";
 import { toast } from "react-toastify";
 import { LoadingButton } from "@mui/lab";
 import PaymentQRInfo from "../PaymentQRInfo";
+import RazonpayComponent from "../RazorpayComponent";
 
 const paymentStatusList = [
     {
@@ -58,6 +59,8 @@ const PaymentForm: FC<PaymentFormProps> = ({ payment, amount, onPaymentChange, o
     const [paymentProof, setPaymentProof] = useState<File | null>(null);
     const [paymentMethod, setPaymentMethod] = useState<string | undefined>();
     const [payingAmount, setPayingAmount] = useState<number>(0);
+    const [showRazorpay, setShowRazorpay] = useState(false);
+    const [rpPayments, setRPPayments] = useState<any[]>([]);
 
     useEffect(() => {
         if (payment && payment.payment_history && payment.payment_history.length > 0) {
@@ -83,6 +86,39 @@ const PaymentForm: FC<PaymentFormProps> = ({ payment, amount, onPaymentChange, o
         onChange(donorType, panNumber);
     }, [donorType, panNumber])
 
+    useEffect(() => {
+        const createPayment = async () => {
+            const apiClient = new ApiClient();
+            if (!donorType) {
+                toast.error("Please select citizenship!");
+                return;
+            }
+
+            const pmt = await apiClient.createPayment(amount, donorType, panNumber);
+            if (!pmt) {
+                toast.error("Something went wrong please try again");
+                return;
+            }
+
+            onPaymentChange(pmt);
+        }
+        if (showRazorpay && !payment) {
+            createPayment();
+        }
+    }, [showRazorpay, payment, amount, donorType, panNumber])
+
+    useEffect(() => {
+        const handler = setTimeout(() => {
+            if (payment) {
+                getPaymentsForOrderId(payment.order_id)
+            }
+        }, 300);
+
+        return () => { 
+            clearTimeout(handler);
+        }
+    }, [payment]) 
+
     const handlePaginationChange = (page: number, pageSize: number) => {
         setPage(page - 1);
         setPageSize(pageSize);
@@ -98,7 +134,35 @@ const PaymentForm: FC<PaymentFormProps> = ({ payment, amount, onPaymentChange, o
         setSelectedHistory(null);
     }
 
-    const handleAddPaymentHistory = async () => {
+    const getPaymentsForOrderId = async (orderId: string) => {
+        try {
+            const apiClient = new ApiClient();
+            const data = await apiClient.getPaymentsForOrder(orderId);
+            setRPPayments(data);
+        } catch(error: any) {
+            toast.error(error.message);
+        }
+    }
+
+    const handlePaymentComplete = async (data: any) => {
+        setShowRazorpay(false);
+        if (!payment) return;
+
+        setLoading(true);
+        const apiClient = new ApiClient();
+        try {
+            await apiClient.verifyPayment(payment.order_id, data.razorpay_payment_id, data.razorpay_signature);
+            toast.success("Payment done successfully!");
+        } catch(error: any) {
+            toast.error(error.message);
+        }
+        
+        getPaymentsForOrderId(payment.order_id);
+        setLoading(false);
+    }
+
+    const handleAddPaymentHistory = async (data: any) => {
+        setShowRazorpay(false);
         setLoading(true);
         const apiClient = new ApiClient();
         let pmt = payment;
@@ -125,7 +189,7 @@ const PaymentForm: FC<PaymentFormProps> = ({ payment, amount, onPaymentChange, o
             }
 
             try {
-                const resp = await apiClient.createPaymentHistory(pmt.id, payingAmount, paymentMethod, paymentProofLink);
+                const resp = await apiClient.createPaymentHistory(pmt.id, payingAmount, paymentMethod, paymentProofLink, data);
 
                 onPaymentChange({
                     ...pmt,
@@ -149,92 +213,92 @@ const PaymentForm: FC<PaymentFormProps> = ({ payment, amount, onPaymentChange, o
             title: "Amount paid",
             align: "center",
             width: 100,
+            render: (value: number) => value/100
         },
         {
-            dataIndex: "payment_method",
-            key: "payment_method",
+            dataIndex: "method",
+            key: "method",
             title: "Payment Method",
             align: "center",
             width: 200,
         },
+        // {
+        //     dataIndex: "payment_proof",
+        //     key: "payment_proof",
+        //     title: "Payment Proof",
+        //     align: "center",
+        //     width: 150,
+        //     render: (value: any, record: any) => (
+        //         <div
+        //             style={{
+        //                 display: "flex",
+        //                 justifyContent: "center",
+        //                 alignItems: "center",
+        //             }}>
+        //             <Button
+        //                 variant='outlined'
+        //                 color='success'
+        //                 disabled={!value}
+        //                 style={{ margin: "0 5px" }}
+        //                 onClick={() => { handleOpenPreview(record) }}
+        //             >
+        //                 <VisibilityOutlined />
+        //             </Button>
+        //         </div>
+        //     ),
+        // },
         {
-            dataIndex: "payment_proof",
-            key: "payment_proof",
-            title: "Payment Proof",
-            align: "center",
-            width: 150,
-            render: (value: any, record: any) => (
-                <div
-                    style={{
-                        display: "flex",
-                        justifyContent: "center",
-                        alignItems: "center",
-                    }}>
-                    <Button
-                        variant='outlined'
-                        color='success'
-                        disabled={!value}
-                        style={{ margin: "0 5px" }}
-                        onClick={() => { handleOpenPreview(record) }}
-                    >
-                        <VisibilityOutlined />
-                    </Button>
-                </div>
-            ),
-        },
-        {
-            dataIndex: "payment_date",
-            key: "payment_date",
+            dataIndex: "created_at",
+            key: "created_at",
             title: "Payment Date",
             align: "center",
             width: 150,
-            render: getHumanReadableDate,
+            render: (value: number) => getHumanReadableDate(value * 1000),
         },
-        {
-            dataIndex: "amount_received",
-            key: "amount_received",
-            title: "Amount received",
-            align: "center",
-            width: 150,
-            className: "orange-column",
-            render: (value: number, record: PaymentHistory) => {
-                if (record.status !== 'validated') return '';
-                else return value;
-            }
-        },
+        // {
+        //     dataIndex: "amount_received",
+        //     key: "amount_received",
+        //     title: "Amount received",
+        //     align: "center",
+        //     width: 150,
+        //     className: "orange-column",
+        //     render: (value: number, record: PaymentHistory) => {
+        //         if (record.status !== 'validated') return '';
+        //         else return value;
+        //     }
+        // },
         {
             dataIndex: "status",
             key: "status",
             title: "Status",
             align: "center",
             width: 150,
-            className: "orange-column",
-            render: getReadableStatus,
+            render: (value: string) => value === "captured" ? "Success" : value === "failed" ? "Failed" : "Unknown",
         },
-        {
-            dataIndex: "payment_received_date",
-            key: "payment_received_date",
-            title: "Received Date",
-            align: "center",
-            width: 150,
-            className: "orange-column",
-            render: (value: string, record: PaymentHistory) => {
-                if (record.status !== 'validated') return '';
-                else return getHumanReadableDate(value);
-            },
-        },
+        // {
+        //     dataIndex: "payment_received_date",
+        //     key: "payment_received_date",
+        //     title: "Received Date",
+        //     align: "center",
+        //     width: 150,
+        //     className: "orange-column",
+        //     render: (value: string, record: PaymentHistory) => {
+        //         if (record.status !== 'validated') return '';
+        //         else return getHumanReadableDate(value);
+        //     },
+        // },
     ]
 
     return (
         <Box style={{ padding: '0px 40px', width: '100%' }}>
             <Box mb={1} display="flex" alignItems="center" justifyContent="flex-end">
                 <Button
-                    onClick={() => { setVisible(prev => !prev) }}
+                    onClick={() => { setShowRazorpay(true) }}
                     color="success" variant="contained">
                     Make Payment
                 </Button>
             </Box>
-            <Box style={{ display: 'flex', justifyContent: (payment && payment.payment_history && payment.payment_history.length > 0) ? 'space-between' : 'center'}}>
+            <Box style={{ display: 'flex', justifyContent: (payment && payment.payment_history && payment.payment_history.length > 0) ? 'space-between' : 'center' }}>
                 <Box width="45%">
                     <Box sx={{ mt: 2 }}>
                         <FormControl fullWidth>
@@ -324,18 +388,19 @@ const PaymentForm: FC<PaymentFormProps> = ({ payment, amount, onPaymentChange, o
                 }
             </Box>
             {
-                payment && payment.payment_history && payment.payment_history.length > 0 && <Box>
+                rpPayments.length > 0 && <Box>
                     <Typography sx={{ mt: 5, mb: 1 }} variant="h6">Transaction History:</Typography>
                     <GeneralTable
                         loading={false}
-                        rows={payment?.payment_history ? payment.payment_history.slice(page * pageSize, page * pageSize + pageSize) : []}
+                        rows={rpPayments.slice(page * pageSize, page * pageSize + pageSize)}
                         columns={columns}
-                        totalRecords={payment?.payment_history ? payment.payment_history.length : 0}
+                        totalRecords={rpPayments.length}
                         page={page}
                         pageSize={pageSize}
                         onPaginationChange={handlePaginationChange}
                         onDownload={async () => { return payment?.payment_history || [] }}
                         tableName="Payment History"
+                        rowClassName={(record, index) => record.status === 'failed' ? 'pending-item' : ''}
                     />
                 </Box>
             }
@@ -373,7 +438,7 @@ const PaymentForm: FC<PaymentFormProps> = ({ payment, amount, onPaymentChange, o
                 </DialogActions>
             </Dialog>
 
-            <Dialog open={visible} fullWidth maxWidth='md'>
+            {/* <Dialog open={visible} fullWidth maxWidth='md'>
                 <DialogTitle>Payment Info</DialogTitle>
                 <DialogContent dividers>
                     <Typography sx={{ mb: 2 }}>
@@ -434,8 +499,20 @@ const PaymentForm: FC<PaymentFormProps> = ({ payment, amount, onPaymentChange, o
                     >
                         Add Payment
                     </LoadingButton>
+                    {payment && <RazonpayComponent
+                        amount={amount}
+                        orderId={payment.order_id}
+                        onPaymentDone={(data) => { }}
+                    />}
                 </DialogActions>
-            </Dialog>
+            </Dialog> */}
+
+            {(payment && showRazorpay) && <RazonpayComponent
+                amount={payingAmount}
+                orderId={payment.order_id}
+                onPaymentDone={handlePaymentComplete}
+                onClose={() => { setShowRazorpay(false) }}
+            />}
         </Box >
     );
 }
