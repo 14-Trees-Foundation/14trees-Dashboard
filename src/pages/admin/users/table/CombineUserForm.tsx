@@ -1,10 +1,12 @@
-import { Box, ToggleButton, ToggleButtonGroup, Typography } from "@mui/material"
+import { Box, Chip, ToggleButton, ToggleButtonGroup, Typography } from "@mui/material"
 import { useAppDispatch, useAppSelector } from "../../../../redux/store/hooks";
 import { bindActionCreators } from "@reduxjs/toolkit";
 import { useEffect, useState } from "react";
 import { User } from "../../../../types/user";
 import { AutocompleteWithPagination } from "../../../../components/AutoComplete";
 import * as userActionCreators from "../../../../redux/actions/userActions"
+import ApiClient from "../../../../api/apiClient/apiClient";
+import { toast } from "react-toastify";
 
 interface CombineUserFormProps {
     primaryUser: User | null
@@ -22,6 +24,8 @@ const CombineUserForm: React.FC<CombineUserFormProps> = ({ primaryUser, secondar
 
     const [userSearchQuery, setUserSearchQuery] = useState('');
     const [userSearchQuery2, setUserSearchQuery2] = useState('');
+    const [treesCount1, setTreesCount1] = useState<any>(null)
+    const [treesCount2, setTreesCount2] = useState<any>(null)
 
     let users: User[] = [];
     const usersData = useAppSelector((state) => state.searchUsersData);
@@ -49,6 +53,46 @@ const CombineUserForm: React.FC<CombineUserFormProps> = ({ primaryUser, secondar
         }
     }, [userSearchQuery2]);
 
+    useEffect(() => {
+        const handler = setTimeout(async () => {
+            if (primaryUser) {
+                const data = await getTreeCountForUser(primaryUser.id);
+                setTreesCount1(data);
+            } else {
+                setTreesCount1(null);
+            }
+        }, 300)
+
+        return () => {
+            clearTimeout(handler);
+        }
+    }, [primaryUser]);
+
+    useEffect(() => {
+        const handler = setTimeout(async () => {
+            if (secondaryUser) {
+                const data = await getTreeCountForUser(secondaryUser.id);
+                setTreesCount2(data);
+            } else {
+                setTreesCount2(null);
+            }
+        }, 300)
+
+        return () => {
+            clearTimeout(handler);
+        }
+    }, [secondaryUser]);
+
+    const getTreeCountForUser = async (userId: number) => {
+        try {
+            const apiClient = new ApiClient();
+            const resp = apiClient.getTreesCountForUser(userId);
+            return resp;
+        } catch (error: any) {
+            toast.error(error.message);
+        }
+    }
+
     return (
         <Box
             sx={{
@@ -69,6 +113,16 @@ const CombineUserForm: React.FC<CombineUserFormProps> = ({ primaryUser, secondar
                     fullWidth
                     size="medium"
                 />
+                {treesCount1 && <Box display="flex">
+                    <Chip
+                        label={`Mapped trees: ${treesCount1.mapped_trees}`}
+                        sx={{ margin: 0.5 }}
+                    />
+                    <Chip
+                        label={`Assigned trees: ${treesCount1.assigned_trees}`}
+                        sx={{ margin: 0.5 }}
+                    />
+                </Box>}
             </Box>
             <Box mt={2}>
                 <Typography>Select secondary user</Typography>
@@ -82,8 +136,18 @@ const CombineUserForm: React.FC<CombineUserFormProps> = ({ primaryUser, secondar
                     fullWidth
                     size="medium"
                 />
+                {treesCount2 && <Box display="flex">
+                    <Chip
+                        label={`Mapped trees: ${treesCount2.mapped_trees}`}
+                        sx={{ margin: 0.5 }}
+                    />
+                    <Chip
+                        label={`Assigned trees: ${treesCount2.assigned_trees}`}
+                        sx={{ margin: 0.5 }}
+                    />
+                </Box>}
             </Box>
-            <Box 
+            <Box
                 mt={2}
                 display="flex"
                 alignItems="center"
@@ -96,6 +160,7 @@ const CombineUserForm: React.FC<CombineUserFormProps> = ({ primaryUser, secondar
                     exclusive
                     onChange={(e, value) => { onDeleteSecondaryChange(value === "yes" ? true : false); }}
                     aria-label="Platform"
+                    size="small"
                 >
                     <ToggleButton value="yes">Yes</ToggleButton>
                     <ToggleButton value="no">No</ToggleButton>

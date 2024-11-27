@@ -27,6 +27,7 @@ import TableComponent from "../../../components/Table";
 import { ToastContainer } from "react-toastify";
 import { plantTypeHabitList } from "./habitList";
 import { PlotPlantTypes } from "./PlotPlantTypes";
+import PlantTypeTemplateForm from "./PlantTypeTemplateForm";
 
 
 export const PlantTypeComponent = () => {
@@ -46,6 +47,7 @@ export const PlantTypeComponent = () => {
     const [pageSize, setPageSize] = useState(10);
     const [srNoPage, setSrNoPage] = useState(0);
     const [filters, setFilters] = useState<Record<string, GridFilterItem>>({});
+    const [addTemplate, setAddTemplate] = useState(false);
 
     const handleSetFilters = (filters: Record<string, GridFilterItem>) => {
         setPage(0);
@@ -275,6 +277,14 @@ export const PlantTypeComponent = () => {
                         marginBottom: "5px",
                         marginTop: "5px",
                     }}>
+                    <Button 
+                        variant="contained" 
+                        color="success" 
+                        onClick={() => { setAddTemplate(true); }}
+                        style={{ textTransform: 'none', marginRight: '10px' }}
+                    >
+                        Add Plant Type Card Template
+                    </Button>
                     <Button variant="contained" color="success" onClick={handleModalOpen}>
                         Add Plant type
                     </Button>
@@ -331,6 +341,11 @@ export const PlantTypeComponent = () => {
             </Dialog>
 
             {selectedEditRow && <EditPlantType row={selectedEditRow} openeditModal={editModal} handleCloseEditModal={handleCloseEditModal} editSubmit={handleEditSubmit} />}
+
+            <PlantTypeTemplateForm 
+                open={addTemplate}
+                onClose={() => { setAddTemplate(false) }}
+            />
         </>
     );
 };

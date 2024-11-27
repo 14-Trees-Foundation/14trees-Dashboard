@@ -311,7 +311,7 @@ export const User1 = () => {
       </Dialog>
 
       <Dialog open={userCombineModal} maxWidth="md">
-        <DialogTitle>Combine users</DialogTitle>
+        <DialogTitle>Merge users</DialogTitle>
         <DialogContent>
           <DialogContentText>
             <CombineUserForm 
@@ -333,7 +333,7 @@ export const User1 = () => {
             variant="contained"
             color="success"
           >
-            Combine
+            Merge
           </Button>
         </DialogActions>
       </Dialog>
