@@ -143,6 +143,18 @@ class ApiClient {
         }
     }
 
+    async addPlantTypeTemplate(plant_type: string, template_id: string): Promise<any> {
+        try {
+            const resp = await this.api.post<any>(`/plant-types/templates/`, { plant_type, template_id });
+            return resp.data;
+        } catch (error: any) {
+            if (error?.response?.data?.message) {
+                throw new Error(error.response.data.message)
+            }
+            throw new Error('Failed to add plant type template!');
+        }
+    }
+
 
     /*
         Model- Plot: CRUD Operations/Apis for plots
@@ -767,6 +779,17 @@ class ApiClient {
         } catch (error: any) {
             if (error.response?.data?.message) throw new Error(error.response.data.message);
             throw new Error('Failed to get giftable trees');
+        }
+    }
+
+    async getTreesCountForUser(userId: number) {
+        let url = `/trees/count/user/${userId}`;
+        try {
+            let result = await this.api.get<any>(url);
+            return result.data;
+        } catch (error: any) {
+            if (error.response?.data?.message) throw new Error(error.response.data.message);
+            throw new Error('Failed to get trees count for user');
         }
     }
 
