@@ -133,7 +133,7 @@ class ApiClient {
 
     async getTreeCountsForPlantTypes(offset: number, limit: number, filters?: any[], orderBy?: any[]): Promise<PaginatedResponse<any>> {
         try {
-            const resp = await this.api.post<PaginatedResponse<any>>(`/plant-types/states`, { offset, limit, filters, order_by: orderBy });
+            const resp = await this.api.post<PaginatedResponse<any>>(`/plant-types/states?offset=${offset}&limit=${limit}`, { filters, order_by: orderBy });
             return resp.data;
         } catch (error: any) {
             if (error?.response?.data?.message) {
