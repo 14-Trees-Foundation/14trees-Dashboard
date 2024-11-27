@@ -445,10 +445,10 @@ const GiftTrees: FC = () => {
                     </Menu.Item>
                 }
             </Menu.ItemGroup>
-            {(record.status === 'completed' || record.status === 'pending_gift_cards' || record.status !== 'pending_plot_selection') && <Menu.Divider style={{ backgroundColor: '#ccc' }} />}
-            {(record.status === 'completed' || record.status === 'pending_gift_cards' || record.status !== 'pending_plot_selection') &&
+            {(record.status === 'completed' || record.status === 'pending_gift_cards' || record.booked > 0) && <Menu.Divider style={{ backgroundColor: '#ccc' }} />}
+            {(record.status === 'completed' || record.status === 'pending_gift_cards' || record.booked > 0) &&
                 <Menu.ItemGroup>
-                    {record.status !== 'pending_plot_selection' &&
+                    {record.booked > 0 &&
                         <Menu.Item key="20" onClick={() => { handleGenerateGiftCards(record.id) }} icon={<CardGiftcard />}>
                             Generate Gift Cards
                         </Menu.Item>
@@ -471,16 +471,14 @@ const GiftTrees: FC = () => {
             </Menu.ItemGroup>}
             {!auth.roles.includes(UserRoles.Sponsor) && <Menu.Divider style={{ backgroundColor: '#ccc' }} />}
             {!auth.roles.includes(UserRoles.Sponsor) && <Menu.ItemGroup>
-                {record.status === 'pending_plot_selection' &&
+                {record.booked !== record.no_of_cards &&
                     <Menu.Item key="40" onClick={() => { setSelectedGiftCard(record); setPlotModal(true); }} icon={<Landscape />}>
                         Select Plots
                     </Menu.Item>
                 }
-                {record.status === 'pending_assignment' &&
-                    <Menu.Item key="41" onClick={() => { setSelectedGiftCard(record); setAutoAssignModal(true); }} icon={<AssignmentInd />}>
+                {record.booked > record.assigned && <Menu.Item key="41" onClick={() => { setSelectedGiftCard(record); setAutoAssignModal(true); }} icon={<AssignmentInd />}>
                         Assign Trees
-                    </Menu.Item>
-                }
+                </Menu.Item>}
                 <Menu.Item key="42" onClick={() => { handlePaymentModalOpen(record); }} icon={<AssuredWorkload />}>
                     Payment Details
                 </Menu.Item>
