@@ -56,8 +56,8 @@ export const Login = () => {
         localStorage.setItem("loginInfo", JSON.stringify(response));
         let permissions = [];
         let roles = [];
-        if (res.data.user.roles && res.data.user.roles.includes("admin")) {
-          permissions = ["all"]
+        if (res.data.user.roles) {
+          if (res.data.user.roles.includes("admin") || res.data.user.roles.includes("super-admin")) permissions = ["all"];
           roles = res.data.user.roles;
         }
         localStorage.setItem(
@@ -76,8 +76,9 @@ export const Login = () => {
             navigate(from, { replace: true });
           }
         );
+      } else {
+        toast.error("User not authorized! Contact Admin");
       }
-      toast.error("User not authorized! Contact Admin");
     } catch (error) {
       if (error.response.status === 404) {
         toast.error("User not Found! Contact Admin");

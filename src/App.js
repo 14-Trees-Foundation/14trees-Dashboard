@@ -70,9 +70,7 @@ function App() {
           <Route
             path="/tree-cards"
             element={
-              <RequireAuth>
                 <User />
-              </RequireAuth>
             }
           >
           </Route>
