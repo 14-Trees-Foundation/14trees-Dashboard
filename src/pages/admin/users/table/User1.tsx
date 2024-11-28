@@ -180,6 +180,8 @@ export const User1 = () => {
 
   const handleEditSubmit = (formData: User) => {
     updateUser(formData);
+    setSelectedEditRow(null);
+    setEditModal(false);
   };
 
   const handleCreateUserData = (formData: User) => {
@@ -342,7 +344,10 @@ export const User1 = () => {
         <EditUser
           row={selectedEditRow}
           openeditModal={editModal}
-          setEditModal={setEditModal}
+          onClose={() => {
+            setEditModal(false);
+            setSelectedEditRow(null);
+          }}
           editSubmit={handleEditSubmit}
         />
       )}
