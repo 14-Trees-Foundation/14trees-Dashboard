@@ -1,32 +1,21 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Drawer, Divider, Box, AppBar, Toolbar } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import { createStyles, makeStyles } from "@mui/styles";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import MenuIcon from "@mui/icons-material/Menu";
 import IconButton from "@mui/material/IconButton";
-import LeaderBoardOutlined from "@mui/icons-material/LeaderboardOutlined";
-import ForestOutlined from "@mui/icons-material/ForestOutlined";
-import GrassTwoToneIcon from "@mui/icons-material/GrassTwoTone";
-import OpacityOutlined from "@mui/icons-material/OpacityOutlined";
-import AccountCircleOutlined from "@mui/icons-material/AccountCircleOutlined";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
-import LandscapeIcon from "@mui/icons-material/Landscape";
-import CorporateFareIcon from "@mui/icons-material/CorporateFare";
-import TourIcon from "@mui/icons-material/TourOutlined";
 import logo from "../../assets/logo_white_small.png";
 import { useRecoilState } from "recoil";
 import { adminNavIndex } from "../../store/adminAtoms";
-import { useAuth } from "./auth/auth";
-import VolunteerActivismIcon from "@mui/icons-material/VolunteerActivism";
-import MapIcon from "@mui/icons-material/Map";
-import FestivalIcon from "@mui/icons-material/Festival";
+import { useAuth } from "../admin/auth/auth";
 import { useNavigate } from "react-router-dom";
-import { CardGiftcard, Inventory } from "@mui/icons-material";
+import { CardGiftcard } from "@mui/icons-material";
 import { UserRoles } from "../../types/common";
 
-export const AdminLeftDrawer = () => {
+export const UserLeftDrawer = () => {
   const theme = useTheme();
   const matches = useMediaQuery("(max-width:481px)");
   const [open, setOpen] = useState(false);
@@ -38,12 +27,12 @@ export const AdminLeftDrawer = () => {
   const [expanded, setExpanded] = useState(null);
 
   useEffect(() => {
-    if (auth.roles.includes(UserRoles.User)) {
-      navigate("/tree-cards");
-    }
+      if (auth.roles.includes(UserRoles.SuperAdmin) || auth.roles.includes(UserRoles.Admin)) {
+        navigate("/admin");
+      }
   }, [auth])
 
-  const onClickNav = (value, subValue) => {
+  const onClickNav = (value: any, subValue?: any) => {
     if (subValue !== undefined) {
       setIndex(value);
       setSubIndex(subValue);
@@ -56,77 +45,10 @@ export const AdminLeftDrawer = () => {
 
   const pages = [
     {
-      displayName: "Home",
-      logo: LeaderBoardOutlined,
-      display: true,
-    },
-    {
-      displayName: "Trees",
-      logo: ForestOutlined,
-      display: true,
-    },
-    {
-      displayName: "Plant Types",
-      logo: GrassTwoToneIcon,
-      display: true,
-    },
-    {
-      displayName: "Ponds",
-      logo: OpacityOutlined,
-      display: true,
-    },
-    {
-      displayName: "Plots",
-      logo: LandscapeIcon,
-      display: true,
-    },
-    {
-      displayName: "People",
-      logo: AccountCircleOutlined,
-      // display: auth.permissions.includes("all"),
-      display: true,
-    },
-    {
-      displayName: "People Groups",
-      logo: CorporateFareIcon,
-      display: true,
-    },
-    {
-      displayName: "Sites",
-      logo: MapIcon,
-      display: true,
-    },
-    // {
-    //   displayName: "Events",
-    //   logo: FestivalIcon,
-    //   display: true,
-    // },
-    // {
-    //   displayName: "Donation",
-    //   logo: VolunteerActivismIcon,
-    //   display: true,
-    // },
-    {
-      displayName: "Visits",
-      logo: TourIcon,
-      display: true,
-    },
-    {
-      displayName: "Inventory",
-      logo: Inventory,
-      display: true,
-    },
-    {
       displayName: "Tree Cards",
       logo: CardGiftcard,
-      display: auth.signedin,
+      display: true,
     },
-    // {
-    //   displayName: "Images",
-    //   logo: FaceIcon,
-    //   // display: auth.permissions.includes("all"),
-    //   display: true,
-    // },
   ];
   const menuitem = () => {
     return (
@@ -145,29 +67,6 @@ export const AdminLeftDrawer = () => {
                   <item.logo />
                   <div className={classes.itemtext}>{item.displayName}</div>
                 </div>
-                {i === expanded &&
-                  item.subPages &&
-                  item.subPages.map((subItem, j) => (
-                    <div
-                      className={classes.item}
-                      onClick={() => onClickNav(i, j)}
-                      key={j}
-                      style={{ marginLeft: 20, marginTop: 10 }}
-                    >
-                      <div
-                        className={
-                          index === i && subIndex === j
-                            ? classes.selected
-                            : classes.itembtn
-                        }
-                      >
-                        <subItem.logo />
-                        <div className={classes.itemtext}>
-                          {subItem.displayName}
-                        </div>
-                      </div>
-                    </div>
-                  ))}
               </div>
             );
           } else {
@@ -181,9 +80,9 @@ export const AdminLeftDrawer = () => {
   if (matches) {
     return (
       <Box>
-        <AppBar position="fixed" open={open} className={classes.appbar}>
+        <AppBar position="fixed" className={classes.appbar}>
           <Toolbar style={{ backgroundColor: "#1F3625" }}>
-            <div className={classes.header}>
+            <div>
               <MenuIcon onClick={() => setOpen(true)} />
             </div>
           </Toolbar>
@@ -234,7 +133,7 @@ export const AdminLeftDrawer = () => {
   }
 };
 
-const useStyles = makeStyles((theme) =>
+const useStyles = makeStyles((theme: any) =>
   createStyles({
     appbar: {
       color: "#ffffff",

@@ -68,6 +68,7 @@ export const Login = () => {
         localStorage.setItem("roles", JSON.stringify(roles));
         auth.signin(
           res.data.user.name,
+          res.data.user.id,
           permissions,
           roles,
           response.tokenId,
@@ -88,7 +89,7 @@ export const Login = () => {
     if (type === "name") {
       setUserName(value);
     } else if (type === "email") {
-      setEmail(value);
+      setEmail(value?.trim());
     } else if (type === "phone") {
       setPhone(value);
     }
