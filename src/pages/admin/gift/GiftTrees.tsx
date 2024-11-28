@@ -28,6 +28,7 @@ import PaymentComponent from "../../../components/payment/PaymentComponent";
 import { useAuth } from "../auth/auth";
 import { UserRoles } from "../../../types/common";
 import { useNavigate } from "react-router-dom";
+import { LoginComponent } from "../Login/LoginComponent";
 
 const GiftTrees: FC = () => {
     const dispatch = useAppDispatch();
@@ -437,17 +438,13 @@ const GiftTrees: FC = () => {
                 <Menu.Item key="00" onClick={() => { setSelectedGiftCard(record); setInfoModal(true); }} icon={<Wysiwyg />}>
                     View Summary
                 </Menu.Item>
-                {!auth.roles.includes(UserRoles.Admin) &&
-                    <Menu.Item key="01" onClick={() => { handleModalOpenEdit(record); }} icon={<Edit />}>
-                        Edit Request
-                    </Menu.Item>
-                }
-                {!auth.roles.includes(UserRoles.Admin) &&
-                    <Menu.Item key="02" onClick={() => { handleCloneGiftCardRequest(record); }} icon={<FileCopy />}>
-                        Clone Request
-                    </Menu.Item>
-                }
-                {(!auth.roles.includes(UserRoles.Admin) && (record.status === 'pending_plot_selection' || record.status === 'pending_assignment')) &&
+                <Menu.Item key="01" onClick={() => { handleModalOpenEdit(record); }} icon={<Edit />}>
+                    Edit Request
+                </Menu.Item>
+                <Menu.Item key="02" onClick={() => { handleCloneGiftCardRequest(record); }} icon={<FileCopy />}>
+                    Clone Request
+                </Menu.Item>
+                {((record.status === 'pending_plot_selection' || record.status === 'pending_assignment')) &&
                     <Menu.Item key="03" danger onClick={() => { setDeleteModal(true); setSelectedGiftCard(record); }} icon={<Delete />}>
                         Delete Request
                     </Menu.Item>
@@ -627,14 +624,14 @@ const GiftTrees: FC = () => {
                     >
                         Request Tree Cards
                     </Button>
-                    {!auth.signedin && <Button
+                    {/* {!auth.signedin && <Button
                         variant="contained"
                         color="success"
                         onClick={() => { navigate('/login') }}
                         style={{ textTransform: 'none', fontSize: 16, marginLeft: '15px' }}
                     >
                         Login
-                    </Button>}
+                    </Button>} */}
                 </div>
             </div>
             <Divider sx={{ backgroundColor: "black", marginBottom: '15px' }} />
@@ -649,18 +646,31 @@ const GiftTrees: FC = () => {
                 tableName="Gift Trees"
             />}
 
-            {!auth.signedin && 
-            <Box
-                display="flex"
-                justifyContent="center"
-                alignItems="center"
-                mt={10}
-            >
-                <Typography
-                    fontSize={32}
-                    color={"#51815A"}
-                >Please LogIn in order to see the tree cards you have requested!</Typography>
-            </Box>}
+            {!auth.signedin &&
+                <Box
+                    display="flex"
+                    justifyContent="center"
+                    alignItems="center"
+                    flexDirection="column"
+                    mt={10}
+                >
+                    <Button
+                        variant="contained"
+                        color="success"
+                        onClick={handleModalOpenAdd}
+                        style={{ textTransform: 'none', fontSize: 16 }}
+                    >
+                        Request Tree Cards
+                    </Button>
+                    <Typography
+                        fontSize={18}
+                        color={"#51815A"}
+                        mb={1}
+                        mt={5}
+                    >Login to see your previous tree cards requests!</Typography>
+                    <LoginComponent />
+                </Box>
+            }
 
             <GiftCardsForm giftCardRequest={selectedGiftCard ?? undefined} requestId={requestId} open={modalOpen} handleClose={handleModalClose} onSubmit={handleSubmit} />
 
