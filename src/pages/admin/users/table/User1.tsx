@@ -29,6 +29,7 @@ import TableComponent from "../../../../components/Table";
 import CombineUserForm from "./CombineUserForm";
 import { toast } from "react-toastify";
 import ApiClient from "../../../../api/apiClient/apiClient";
+import { AccountBalance } from "@mui/icons-material";
 
 export const User1 = () => {
   const dispatch = useAppDispatch();
@@ -91,15 +92,6 @@ export const User1 = () => {
       ...getColumnSearchProps('email', filters, handleSetFilters)
     },
     {
-      dataIndex: "birth_date",
-      key: "birth_date",
-      title: "Date of Birth",
-      align: "center",
-      width: 100,
-      render: getFormattedDate,
-      ...getColumnSearchProps('birth_date', filters, handleSetFilters)
-    },
-    {
       dataIndex: "phone",
       key: "phone",
       title: "Phone",
@@ -135,6 +127,21 @@ export const User1 = () => {
                 window.open("http://" + host + "/ww/" + record.email);
               } else {
                 window.open("https://" + hostname + "/ww/" + record.email);
+              }
+            }}
+          >
+            <AccountBalance />
+          </Button>
+          <Button
+            variant="outlined"
+            color="success"
+            style={{ margin: "0 5px" }}
+            onClick={() => {
+              const { hostname, host } = window.location;
+              if (hostname === "localhost" || hostname === "127.0.0.1") {
+                window.open("http://" + host + "/profile/user/" + record.id);
+              } else {
+                window.open("https://" + hostname + "/profile/user/" + record.id);
               }
             }}
           >

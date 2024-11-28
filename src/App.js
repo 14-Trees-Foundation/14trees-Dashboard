@@ -46,6 +46,7 @@ function App() {
           <Route path="/visitornew" element={<VisitorNew />}></Route>
           {/* <Route path="/addtree" element={<AddTree />}></Route> */}
           <Route path="/profile/:saplingId" element={<Dashboard />}></Route>
+          <Route path="/profile/user/:userId" element={<Dashboard />}></Route>
           <Route path="/tree/:saplingId" element={<TreeProfile />}></Route>
           <Route path="/user/:id" element={<UserProfile />}></Route>
           <Route path="/visit/:id" element={<VisitProfile />}></Route>
