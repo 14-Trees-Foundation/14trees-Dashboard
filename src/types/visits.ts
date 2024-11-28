@@ -14,8 +14,11 @@ export type Visit = {
   visit_date: Date;
   visit_type: VisitType;
   group_id: number | null;
+  site_id: number | null;
   user_count: number;
   visit_images: string[];
+  group_name?: string;
+  site_name?: string;
   created_at: Date;
   updated_at: Date;
 };

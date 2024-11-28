@@ -153,7 +153,6 @@ export const VisitsComponent = () => {
         </div>
       ),
     },
-
     {
       dataIndex: "visit_name",
       key: "visit_name",
@@ -179,6 +178,22 @@ export const VisitsComponent = () => {
       align: "center",
       render: getHumanReadableDate,
       ...getColumnDateFilter({dataIndex: "visit_date", filters, handleSetFilters}),
+    },
+    {
+      dataIndex: "site_name",
+      key: "site_name",
+      title: "Site Name",
+      width: 320,
+      align: "center",
+      ...getColumnSearchProps("site_name", filters, handleSetFilters),
+    },
+    {
+      dataIndex: "group_name",
+      key: "group_name",
+      title: "Group Name",
+      width: 320,
+      align: "center",
+      ...getColumnSearchProps("group_name", filters, handleSetFilters),
     },
     {
       dataIndex: "user_count",
