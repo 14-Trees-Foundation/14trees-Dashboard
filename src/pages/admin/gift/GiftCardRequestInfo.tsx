@@ -25,7 +25,7 @@ const GiftCardRequestInfo: React.FC<GiftCardRequestInfoProps> = ({ open, onClose
 
     const [users, setUsers] = useState<GiftCardUser[]>([]);
     const [page, setPage] = useState(0);
-    const [pageSize, setPageSize] = useState(5);
+    const [pageSize, setPageSize] = useState(10);
 
     useEffect(() => {
         const getGiftCards = async () => {
@@ -203,6 +203,7 @@ const GiftCardRequestInfo: React.FC<GiftCardRequestInfoProps> = ({ open, onClose
                 
                 {users.length > 0 && <div>
                     <Box mt={2} mb={2}>
+                        <Typography>Total trees assigned: {data.assigned}</Typography>
                         <GeneralTable
                             loading={false}
                             columns={columns}
