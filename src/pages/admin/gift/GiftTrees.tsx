@@ -1,5 +1,5 @@
-import { Badge, Button, Dialog, DialogActions, DialogContent, DialogTitle, Divider, IconButton, Tooltip, Typography } from "@mui/material";
-import { FC, useEffect, useState } from "react";
+import { Badge, Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, Divider, IconButton, Tooltip, Typography } from "@mui/material";
+import { FC, useEffect, useRef, useState } from "react";
 import GiftCardsForm from "./Form/GiftCardForm";
 import { User } from "../../../types/user";
 import { Group } from "../../../types/Group";
@@ -27,6 +27,7 @@ import { getUniqueRequestId } from "../../../helpers/utils";
 import PaymentComponent from "../../../components/payment/PaymentComponent";
 import { useAuth } from "../auth/auth";
 import { UserRoles } from "../../../types/common";
+import { useNavigate } from "react-router-dom";
 
 const GiftTrees: FC = () => {
     const dispatch = useAppDispatch();
@@ -34,6 +35,8 @@ const GiftTrees: FC = () => {
         bindActionCreators(giftCardActionCreators, dispatch);
 
     let auth = useAuth();
+    const navigate = useNavigate();
+    const authRef = useRef<any>(null);
 
     const [changeMode, setChangeMode] = useState<'add' | 'edit'>('add');
     const [modalOpen, setModalOpen] = useState(false);
@@ -71,6 +74,10 @@ const GiftTrees: FC = () => {
 
         if (plotModal) getUsers();
     }, [plotModal, selectedGiftCard]);
+
+    useEffect(() => {
+        authRef.current = auth;
+    }, [auth])
 
     const handleSetFilters = (filters: Record<string, GridFilterItem>) => {
         setPage(0);
@@ -128,10 +135,22 @@ const GiftTrees: FC = () => {
 
     useEffect(() => {
         getGiftCardData();
-    }, [pageSize, page, filters]);
+    }, [pageSize, page, filters, auth]);
 
     const getGiftCardData = async () => {
+        // check if user logged in
+        if (!authRef.current?.signedin) return;
+
         let filtersData = Object.values(filters);
+        // if normal user the fetch user specific data
+        if (authRef.current?.roles?.includes(UserRoles.User) && authRef.current?.userId) {
+            filtersData.push({
+                columnField: 'user_id',
+                operatorValue: 'equals',
+                value: authRef.current.userId
+            })
+        }
+
         getGiftCards(page * pageSize, pageSize, filtersData);
     };
 
@@ -418,12 +437,12 @@ const GiftTrees: FC = () => {
                 <Menu.Item key="00" onClick={() => { setSelectedGiftCard(record); setInfoModal(true); }} icon={<Wysiwyg />}>
                     View Summary
                 </Menu.Item>
-                { !auth.roles.includes(UserRoles.Admin) &&
+                {!auth.roles.includes(UserRoles.Admin) &&
                     <Menu.Item key="01" onClick={() => { handleModalOpenEdit(record); }} icon={<Edit />}>
                         Edit Request
                     </Menu.Item>
                 }
-                { !auth.roles.includes(UserRoles.Admin) &&
+                {!auth.roles.includes(UserRoles.Admin) &&
                     <Menu.Item key="02" onClick={() => { handleCloneGiftCardRequest(record); }} icon={<FileCopy />}>
                         Clone Request
                     </Menu.Item>
@@ -469,15 +488,15 @@ const GiftTrees: FC = () => {
                     Gift Cards Slide
                 </Menu.Item>
             </Menu.ItemGroup>}
-            {!auth.roles.includes(UserRoles.Sponsor) && <Menu.Divider style={{ backgroundColor: '#ccc' }} />}
-            {!auth.roles.includes(UserRoles.Sponsor) && <Menu.ItemGroup>
+            {!auth.roles.includes(UserRoles.User) && <Menu.Divider style={{ backgroundColor: '#ccc' }} />}
+            {!auth.roles.includes(UserRoles.User) && <Menu.ItemGroup>
                 {record.booked !== record.no_of_cards &&
                     <Menu.Item key="40" onClick={() => { setSelectedGiftCard(record); setPlotModal(true); }} icon={<Landscape />}>
                         Select Plots
                     </Menu.Item>
                 }
                 {record.booked > record.assigned && <Menu.Item key="41" onClick={() => { setSelectedGiftCard(record); setAutoAssignModal(true); }} icon={<AssignmentInd />}>
-                        Assign Trees
+                    Assign Trees
                 </Menu.Item>}
                 <Menu.Item key="42" onClick={() => { handlePaymentModalOpen(record); }} icon={<AssuredWorkload />}>
                     Payment Details
@@ -592,7 +611,7 @@ const GiftTrees: FC = () => {
                     padding: "4px 12px",
                 }}
             >
-                <Typography variant="h4" style={{ marginTop: '5px' }}>Gift Cards</Typography>
+                <Typography variant="h4" style={{ marginTop: '5px' }}>Tree Cards</Typography>
                 <div
                     style={{
                         display: "flex",
@@ -600,14 +619,27 @@ const GiftTrees: FC = () => {
                         marginBottom: "5px",
                         marginTop: "5px",
                     }}>
-                    <Button variant="contained" color="success" onClick={handleModalOpenAdd}>
-                        Create Gift Request
+                    <Button
+                        variant="contained"
+                        color="success"
+                        onClick={handleModalOpenAdd}
+                        style={{ textTransform: 'none', fontSize: 16 }}
+                    >
+                        Request Tree Cards
                     </Button>
+                    {!auth.signedin && <Button
+                        variant="contained"
+                        color="success"
+                        onClick={() => { navigate('/login') }}
+                        style={{ textTransform: 'none', fontSize: 16, marginLeft: '15px' }}
+                    >
+                        Login
+                    </Button>}
                 </div>
             </div>
             <Divider sx={{ backgroundColor: "black", marginBottom: '15px' }} />
 
-            <TableComponent
+            {auth.signedin && <TableComponent
                 dataSource={giftCards}
                 columns={columns}
                 totalRecords={giftCardsData.totalGiftCards}
@@ -615,7 +647,20 @@ const GiftTrees: FC = () => {
                 setPage={setPage}
                 setPageSize={setPageSize}
                 tableName="Gift Trees"
-            />
+            />}
+
+            {!auth.signedin && 
+            <Box
+                display="flex"
+                justifyContent="center"
+                alignItems="center"
+                mt={10}
+            >
+                <Typography
+                    fontSize={32}
+                    color={"#51815A"}
+                >Please LogIn in order to see the tree cards you have requested!</Typography>
+            </Box>}
 
             <GiftCardsForm giftCardRequest={selectedGiftCard ?? undefined} requestId={requestId} open={modalOpen} handleClose={handleModalClose} onSubmit={handleSubmit} />
 

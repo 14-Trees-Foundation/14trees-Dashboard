@@ -26,6 +26,7 @@ import UserProfile from "./pages/Profiles/UserProfile";
 import VisitProfile from "./pages/Profiles/VisitProfile";
 import OrgProfile from "./pages/Profiles/OrgProfile";
 import RedeemCard from "./pages/admin/gift/RedeemCard";
+import { User } from "./pages/user/User";
 
 function App() {
   return (
@@ -65,6 +66,15 @@ function App() {
               <Route path="assigntrees" element={<AssignTree />}></Route>
               <Route path="addorg" element={<AddOrg />}></Route>
             </Route>
+          </Route>
+          <Route
+            path="/tree-cards"
+            element={
+              // <RequireAuth>
+                <User />
+              // </RequireAuth>
+            }
+          >
           </Route>
           <Route path="/ww" element={<WW />}>
             <Route 
