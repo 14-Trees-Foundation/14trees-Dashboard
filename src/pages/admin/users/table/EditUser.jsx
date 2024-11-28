@@ -1,18 +1,19 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Button,
   Dialog,
   DialogActions,
   DialogContent,
-  DialogContentText,
   DialogTitle,
-  Modal,
   TextField,
-  Typography,
 } from "@mui/material";
 
-function EditUser({ row, openeditModal, setEditModal, editSubmit }) {
+function EditUser({ row, openeditModal, onClose, editSubmit }) {
   const [formData, setFormData] = useState(row);
+
+  useEffect(() => {
+    setFormData(row);
+  }, [row]);
 
   const handleChange = (event) => {
         setFormData({
@@ -24,11 +25,10 @@ function EditUser({ row, openeditModal, setEditModal, editSubmit }) {
   const handleEditSubmit = (event) => {
     event.preventDefault();
     editSubmit(formData);
-    setEditModal(false);
   };
 
   return (
-    <Dialog open={openeditModal} onClose={() => setEditModal(false)}>
+    <Dialog open={openeditModal}>
       <DialogTitle align="center">Edit User</DialogTitle>
       <form onSubmit={handleEditSubmit}>
         <DialogContent>
@@ -75,7 +75,7 @@ function EditUser({ row, openeditModal, setEditModal, editSubmit }) {
           }}>
           <Button
             variant="outlined"
-            onClick={() => setEditModal(false)}
+            onClick={onClose}
             color="error">
             Cancel
           </Button>
