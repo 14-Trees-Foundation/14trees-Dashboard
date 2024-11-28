@@ -31,7 +31,7 @@ import RedeemTree from "./UserProfile/Gift/RedeemTree";
 export const Dashboard = () => {
   const styles = useStyles();
   const matches = useMediaQuery("(max-width:601px)");
-  const { saplingId } = useParams();
+  const { saplingId, userId } = useParams();
 
   const setUserinfo = useSetRecoilState(usersData);
   const setSelectedUserinfo = useSetRecoilState(selUsersData);
@@ -46,39 +46,13 @@ export const Dashboard = () => {
   const [found, setFound] = useState(true);
   const [template, setTemplate] = useState("");
   const [giftedTree, setGiftedTree] = useState(null);
+  const [defaultSapling, setDefaultSapling] = useState("0000");
 
   const onToggleVideo = () => {
     setOpen(false);
   };
 
-  const fetchData = useCallback(async () => {
-    try {
-      const response = await Axios.default.get(`/profile?id=${saplingId}`);
-      if (response.status === 200) {
-        // let data = response.data.usertrees.filter(function (data) {return data.tree.sapling_id === saplingId});
-        setUserinfo(response.data);
-        setTemplate(response.data?.user_trees[0]?.plot?.includes("G20") ? "G20" : "");
-        if (response.data?.user_trees?.length > 0) {
-          setSelectedUserinfo(
-            response.data.user_trees.filter(
-              (data) => data.sapling_id === saplingId
-            )[0]
-          );
-        } else if (response.data?.gift_tree) {
-          setGiftedTree(response.data.gift_tree)
-        } else {
-          setFound(false);
-        }
-      } else if (response.status === 204) {
-        setLoading(false);
-        setUserinfo(response.data);
-      } else {
-        setFound(false);
-      }
-    } catch (error) {
-      setFound(false);
-    }
-
+  const fetchOtherData = useCallback(async () => {
     const overallResponse = await Axios.default.get(`/analytics/totaltrees`);
     if (overallResponse.status === 200) {
       setOverallInfo(overallResponse.data);
@@ -113,21 +87,67 @@ export const Dashboard = () => {
           "__v": 0
       }
     ]);
+  }, [
+    setOverallInfo,
+    setPondsImages,
+    setActivities,
+  ])
+
+  const fetchData = useCallback(async () => {
+
+    if (!saplingId && !userId) {
+      setFound(false);
+      return;
+    }
+
+    try {
+      let response;
+      if (saplingId) {
+        response = await Axios.default.get(`/profile?id=${saplingId}`);
+      } else {
+        response = await Axios.default.get(`/profile/user/${userId}`);
+      }
+      if (response.status === 200) {
+        setUserinfo(response.data);
+        setTemplate(response.data?.user_trees[0]?.plot?.includes("G20") ? "G20" : "");
+        if (response.data?.user_trees?.length > 0) {
+          if (saplingId) {
+            setSelectedUserinfo(
+              response.data.user_trees.filter(
+                (data) => data.sapling_id === saplingId
+              )[0]
+            );
+          } else {
+            setSelectedUserinfo(response.data.user_trees[0]);
+            setDefaultSapling(response.data.user_trees[0].sapling_id);
+          }
+        } else if (response.data?.gift_tree) {
+          setGiftedTree(response.data.gift_tree)
+        } else {
+          setFound(false);
+        }
+      } else if (response.status === 204) {
+        setLoading(false);
+        setUserinfo(response.data);
+      } else {
+        setFound(false);
+      }
+    } catch (error) {
+      setFound(false);
+    }
 
     setLoading(false);
   }, [
     template,
     saplingId,
+    userId,
     setUserinfo,
-    setOverallInfo,
-    setPondsImages,
-    setActivities,
     setSelectedUserinfo,
   ]);
 
   useEffect(() => {
     fetchData();
-  }, [fetchData]);
+  }, [fetchData, fetchOtherData]);
 
   const pages = [
     {
@@ -159,7 +179,7 @@ export const Dashboard = () => {
     }
 
     const Page = pages[index].page;
-    return <Page saplingId={saplingId} />;
+    return <Page saplingId={saplingId || defaultSapling} />;
   };
 
   if (loading) {
@@ -177,7 +197,7 @@ export const Dashboard = () => {
   } else {
     return (
       <Box sx={{ display: "flex" }}>
-        <LeftDrawer saplingId={saplingId} />
+        <LeftDrawer saplingId={saplingId || defaultSapling} />
         <Box component="main"
           sx={{ backgroundColor: "white", width: matches ? "100%" : "65%" }}>
           <MainBox/>
