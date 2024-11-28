@@ -191,7 +191,7 @@ const RedeemTree: React.FC<RedeemTreeProps> = ({ tree }) => {
                                         Remove Image
                                     </Button>}
                                 </div>
-                                <Typography fontSize={10}>Profile image is will be used to create more personalised dashboard, Bu it is not required to redeem this tree.</Typography>
+                                <Typography fontSize={10}>Recipient image will be used to create more personalised dashboard, but it is not required to redeem the tree.</Typography>
                             </Grid>
                             <Grid item xs={12} display="flex" justifyContent="center">
                                 <Button
