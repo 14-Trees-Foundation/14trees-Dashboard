@@ -13,6 +13,7 @@ import { GridFilterItem } from "@mui/x-data-grid";
 import GeneralTable from "../../../../components/GenTable";
 import ApiClient from "../../../../api/apiClient/apiClient";
 import { RootState } from "../../../../redux/store/store";
+import TreeSelectionComponent from "./TreeSelectionComponent";
 
 const TableSummary = (plots: Plot[], selectedPlotIds: number[], totalColumns: number) => {
 
@@ -46,16 +47,15 @@ interface PlotSelectionProps {
     plots: Plot[]
     onPlotsChange: (plots: Plot[]) => void
     users: any[]
-    onUsersChange: (users: any[]) => void
-    manualPlotSelection: boolean
-    onPlotSelectionMethodChange: (value: boolean) => void
+    onUserTreeMapping: (cards: any[]) => void
     bookNonGiftable: boolean
     onBookNonGiftableChange: (value: boolean) => void
     diversify: boolean
     onDiversifyChange: (value: boolean) => void
+
 }
 
-const PlotSelection: FC<PlotSelectionProps> = ({ requiredTrees, plots, onPlotsChange, users, onUsersChange, manualPlotSelection, onPlotSelectionMethodChange, bookNonGiftable, onBookNonGiftableChange, diversify, onDiversifyChange }) => {
+const PlotSelection: FC<PlotSelectionProps> = ({ requiredTrees, plots, onPlotsChange, users, onUserTreeMapping, bookNonGiftable, onBookNonGiftableChange, diversify, onDiversifyChange }) => {
 
     const [page, setPage] = useState(0);
     const [loading, setLoading] = useState(false);
@@ -67,6 +67,8 @@ const PlotSelection: FC<PlotSelectionProps> = ({ requiredTrees, plots, onPlotsCh
     const [selectedTags, setSelectedTags] = useState<string[]>([]);
 
     const [orderBy, setOrderBy] = useState<{ column: string, order: 'ASC' | 'DESC' }[]>([]);
+    const [treeSelectionModal, setTreeSelectionModal] = useState(false);
+    const [userTrees, setUserTrees] = useState<any[]>([]);
 
     const handleSetFilters = (filters: Record<string, GridFilterItem>) => {
         setPage(0);
@@ -319,7 +321,7 @@ const PlotSelection: FC<PlotSelectionProps> = ({ requiredTrees, plots, onPlotsCh
                 marginBottom: 20
             }}>
                 <Typography variant='subtitle1'>Total Trees Requested: <strong>{requiredTrees}</strong></Typography>
-                {!manualPlotSelection && <Box>
+                {userTrees.length === 0 && <Box>
                     <Typography variant='subtitle1'>Remaining tree count for plot selection: <strong>{
                         Math.max(requiredTrees - plots
                             .map(pt => pt.card_available ?? 0)
@@ -394,19 +396,13 @@ const PlotSelection: FC<PlotSelectionProps> = ({ requiredTrees, plots, onPlotsCh
                         justifyContent="space-between"
                     >
                         <Typography mr={10}>Do you want to manually select trees for each user?</Typography>
-                        <ToggleButtonGroup
+                        <Button
+                            variant="outlined"
                             color="success"
-                            value={manualPlotSelection ? "yes" : "no"}
-                            exclusive
-                            onChange={(e, value) => { onPlotSelectionMethodChange(value === "yes" ? true : false); }}
-                            aria-label="Platform"
-                            size="small"
-                        >
-                            <ToggleButton value="yes">Yes</ToggleButton>
-                            <ToggleButton value="no">No</ToggleButton>
-                        </ToggleButtonGroup>
+                            onClick={() => { setTreeSelectionModal(true); }}
+                        >Select Manually</Button>
                     </Box>
-                    {!manualPlotSelection && <Box
+                    {userTrees.length === 0 && <Box
                         mt={2}
                         display="flex"
                         alignItems="center"
@@ -425,7 +421,7 @@ const PlotSelection: FC<PlotSelectionProps> = ({ requiredTrees, plots, onPlotsCh
                             <ToggleButton value="no">No</ToggleButton>
                         </ToggleButtonGroup>
                     </Box>}
-                    {!manualPlotSelection && <Box
+                    {userTrees.length === 0 && <Box
                         mt={2}
                         display="flex"
                         alignItems="center"
@@ -447,11 +443,27 @@ const PlotSelection: FC<PlotSelectionProps> = ({ requiredTrees, plots, onPlotsCh
                 </Box>
                 <Box display="flex" flexGrow={1}></Box>
             </Box>
-            {manualPlotSelection && <UserTreeMappingModal
-                plotIds={plots.map(plot => plot.id)}
+            {userTrees.length > 0 && <UserTreeMappingModal
+                trees={userTrees}
+                onTreesChange={(trees: any[]) => { setUserTrees(trees); onUserTreeMapping(trees); }}
                 users={users}
-                onUsersChange={onUsersChange}
             />}
+            <TreeSelectionComponent 
+                open={treeSelectionModal}
+                max={requiredTrees}
+                plotIds={plots.map(plot => plot.id)} 
+                onClose={() => { setTreeSelectionModal(false); }}
+                onSubmit={(trees: any[]) => { 
+                    const data = trees.map(tree => ({
+                        tree_id: tree.id,
+                        sapling_id: tree.sapling_id,
+                        plant_type: tree.plant_type,
+                    }))
+                    onUserTreeMapping(trees); 
+                    setUserTrees(data);
+                    setTreeSelectionModal(false); 
+                }}
+            />
         </div>
     );
 }
