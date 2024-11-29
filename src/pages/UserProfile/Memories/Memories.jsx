@@ -5,7 +5,7 @@ import useMediaQuery from "@mui/material/useMediaQuery";
 
 import { Popup } from "../../../stories/Popup/Popup";
 import { useRecoilValue, useRecoilState } from "recoil";
-import { usersData, openMemoryPopup } from "../../../store/atoms";
+import { usersData, openMemoryPopup, selUsersData } from "../../../store/atoms";
 import { useState } from "react";
 import { ImageViewer } from "../../../components/ImageViewer";
 
@@ -14,13 +14,16 @@ export const Memories = () => {
   const matches = useMediaQuery("(max-width:481px)");
 
   const userinfo = useRecoilValue(usersData);
+  const selUserInfo = useRecoilValue(selUsersData);
   const [open, setOpenPopup] = useRecoilState(openMemoryPopup);
   const [index, setIndex] = useState(0);
 
   let images = [];
-  for (const tree of userinfo.user_trees) {
-    images.push.apply(images, tree["memory_images"]);
-  }
+  // for (const tree of userinfo.user_trees) {
+  //   images.push.apply(images, tree["memory_images"]);
+  // }
+  images.push.apply(images, selUserInfo["memory_images"]);
+  images.push.apply(images, selUserInfo["visit_images"]);
 
   let allImages = [];
   allImages = [
