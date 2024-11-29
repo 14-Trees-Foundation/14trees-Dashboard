@@ -56,7 +56,7 @@ const GiftTrees: FC = () => {
     const [deleteModal, setDeleteModal] = useState(false);
     const [notesModal, setNotesModal] = useState(false);
     const [users, setUsers] = useState<any[]>([]);
-    const [manualPlotSelection, setManualPlotSelection] = useState(false);
+    const [userTrees, setUserTrees] = useState<any[]>([]);
     const [albumImagesModal, setAlbumImagesModal] = useState(false);
     const [userDetailsEditModal, setUserDetailsEditModal] = useState(false);
 
@@ -252,20 +252,19 @@ const GiftTrees: FC = () => {
     const handlePlotSelectionCancel = () => {
         setPlotModal(false);
         setSelectedPlots([]);
-        setManualPlotSelection(false);
         setSelectedGiftCard(null);
         setDiversify(false);
         setBookNonGiftable(false);
     }
 
     const handlePlotSelectionSubmit = async () => {
-        if (manualPlotSelection && users.findIndex(user => !user.tree_id) !== -1) {
-            toast.error("You haven't selected trees for all the users!");
+        if (!selectedGiftCard) return;
+        setPlotModal(false);
+
+        if (userTrees.length > 0 && userTrees.length !== selectedGiftCard.no_of_cards) {
+            toast.error(`You must select all ${selectedGiftCard.no_of_cards} trees!`);
             return;
         }
-
-        setPlotModal(false);
-        if (!selectedGiftCard) return;
 
         const apiClient = new ApiClient();
         if (selectedPlots.length !== 0) {
@@ -273,7 +272,7 @@ const GiftTrees: FC = () => {
                 await apiClient.createGiftCardPlots(selectedGiftCard.id, selectedPlots.map(plot => plot.id));
                 toast.success("Saved selected plot for gift card request!");
 
-                await apiClient.bookGiftCards(selectedGiftCard.id, manualPlotSelection ? users : undefined, bookNonGiftable, diversify);
+                await apiClient.bookGiftCards(selectedGiftCard.id, userTrees.length > 0 ?  userTrees : undefined, bookNonGiftable, diversify);
                 toast.success("Gift cards booked successfully");
                 getGiftCardData();
             } catch {
@@ -679,12 +678,10 @@ const GiftTrees: FC = () => {
                 <DialogContent dividers>
                     <PlotSelection
                         users={users}
-                        onUsersChange={(users: any[]) => { setUsers(users) }}
+                        onUserTreeMapping={(cards: any[]) => { setUserTrees(cards); }}
                         requiredTrees={selectedGiftCard?.no_of_cards ?? 0}
                         plots={selectedPlots}
                         onPlotsChange={plots => setSelectedPlots(plots)}
-                        manualPlotSelection={manualPlotSelection}
-                        onPlotSelectionMethodChange={(value) => { setManualPlotSelection(value) }}
                         bookNonGiftable={bookNonGiftable}
                         onBookNonGiftableChange={(value) => { setBookNonGiftable(value) }}
                         diversify={diversify}
