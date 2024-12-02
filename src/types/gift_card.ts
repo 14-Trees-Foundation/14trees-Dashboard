@@ -28,6 +28,7 @@ export type GiftCard = {
     presentation_id: string | null;
     notes: string | null;
     payment_id: number | null;
+    album_id: number | null;
     booked: number,
     assigned: number,
 }

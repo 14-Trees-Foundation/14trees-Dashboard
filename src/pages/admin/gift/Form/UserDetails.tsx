@@ -519,7 +519,7 @@ export const BulkUserForm: FC<BulkUserFormProps> = ({ requestId, treeCount, user
           >
             <EditOutlined />
           </Button>
-          {record.editable && <Button
+          <Button
             variant="outlined"
             color="error"
             style={{ margin: "0 5px" }}
@@ -528,7 +528,7 @@ export const BulkUserForm: FC<BulkUserFormProps> = ({ requestId, treeCount, user
             }}
           >
             <DeleteOutline />
-          </Button>}
+          </Button>
         </div>
       ),
     },
@@ -640,7 +640,7 @@ export const BulkUserForm: FC<BulkUserFormProps> = ({ requestId, treeCount, user
       <Dialog open={manualUserModal} fullWidth maxWidth="md">
         <DialogTitle>Recipient Details</DialogTitle>
         <DialogContent dividers>
-          <SingleUserForm imageUrls={imageUrls} value={selectedUser} onSubmit={(user: any) => { handleUserAdd(user) }} onCancel={() => { setSelectedUser(null) }} />
+          <SingleUserForm maxTrees={treeCount - users.map(u => u.count).reduce((prev, curr) => prev + curr, 0)}  imageUrls={imageUrls} value={selectedUser} onSubmit={(user: any) => { handleUserAdd(user) }} onCancel={() => { setSelectedUser(null) }} />
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setManualUserModal(false)} variant="outlined" color="error">
