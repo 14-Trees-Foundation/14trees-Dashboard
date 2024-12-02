@@ -147,6 +147,7 @@ export const Dashboard = () => {
 
   useEffect(() => {
     fetchData();
+    fetchOtherData();
   }, [fetchData, fetchOtherData]);
 
   const pages = [
