@@ -228,7 +228,7 @@ const RedeemTree: React.FC<RedeemTreeProps> = ({ tree }) => {
                                             },
                                         }}
                                     >
-                                        Upload your Image
+                                        Upload Image
                                         <input
                                             value={''}
                                             type="file"
