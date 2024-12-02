@@ -1475,7 +1475,7 @@ class ApiClient {
         }
     }
 
-    async updateAlbumImagesForGiftRequest(gift_card_request_id: number, album_id: number): Promise<void> {
+    async updateAlbumImagesForGiftRequest(gift_card_request_id: number, album_id?: number): Promise<void> {
         try {
             await this.api.post<void>(`/gift-cards/update-album/`, { gift_card_request_id, album_id});
         } catch (error: any) {
@@ -1644,6 +1644,54 @@ class ApiClient {
                 throw new Error(error.response.data.message);
             }
             throw new Error('Failed to create album');
+        }
+    }
+
+    async updateAlbum(albumId: number, images: (File | string)[]) {
+        const formData = new FormData();
+        formData.append("album_id", albumId.toString());
+        const files: { file_name?: string, file_url?: string }[] = []
+        for (const image of images) {
+            if (typeof image === 'string') {
+                files.push({ file_url: image })
+            } else {
+                files.push({ file_name: image.name })
+                formData.append("images", image);
+            }
+        }
+        formData.append('files', JSON.stringify(files));
+
+        try {
+            const response = await this.api.put<any>(`/albums/`, formData);
+            return response.data;
+        } catch (error: any) {
+            if (error.response) {
+                throw new Error(error.response.data.message);
+            }
+            throw new Error('Failed to update album');
+        }
+    }
+
+    async getAlbum(albumId: number) {
+        try {
+            const response = await this.api.get<any>(`/albums/id/${albumId}`);
+            return response.data;
+        } catch (error: any) {
+            if (error.response) {
+                throw new Error(error.response.data.message);
+            }
+            throw new Error('Failed to get album');
+        }
+    }
+
+    async deleteAlbum(albumId: number) {
+        try {
+            await this.api.delete<void>(`/albums/${albumId}`);
+        } catch (error: any) {
+            if (error.response?.data?.message) {
+                throw new Error(error.response.data.message);
+            }
+            throw new Error('Failed to delete album');
         }
     }
 

@@ -15,7 +15,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import UploadFileIcon from '@mui/icons-material/UploadFile';
 
 interface ImageItemProps {
-  file: File;
+  file: File | string;
   index: number;
   moveImage: (dragIndex: number, hoverIndex: number) => void;
   removeImage: (index: number) => void;
@@ -44,14 +44,14 @@ const ImageItem: React.FC<ImageItemProps> = ({ file, index, moveImage, removeIma
       sx={{ display: 'flex', alignItems: 'center', p: 1, mb: 1 }}
     >
       <img
-        src={URL.createObjectURL(file)}
+        src={typeof file === 'string' ? file : URL.createObjectURL(file)}
         alt="Preview"
         width={60}
         height={60}
         style={{ marginRight: '10px', borderRadius: 4 }}
       />
       <Typography variant="body2" sx={{ flexGrow: 1 }}>
-        {file.name}
+        {typeof file === 'string' ? file.split("/").slice(-1)[0] :file.name}
       </Typography>
       <IconButton color="error" onClick={() => removeImage(index)}>
         <DeleteIcon />
@@ -61,17 +61,27 @@ const ImageItem: React.FC<ImageItemProps> = ({ file, index, moveImage, removeIma
 };
 
 interface AlbumImageInputProps {
-  onSave: (images: File[]) => void;
+  onSave: (images: (File | string)[]) => void;
   onClose: () => void;
+  onDeleteAlbum?: () => void
   open: boolean;
+  imageUrls?: string[]
 }
 
-const AlbumImageInput: React.FC<AlbumImageInputProps> = ({ onSave, onClose, open }) => {
-  const [images, setImages] = useState<File[]>([]);
+const AlbumImageInput: React.FC<AlbumImageInputProps> = ({ onSave, onClose, open, imageUrls, onDeleteAlbum }) => {
+  const [images, setImages] = useState<(File | string)[]>([]);
 
   useEffect(() => {
     setImages([]);
   }, [])
+
+  useEffect(() => {
+    if (imageUrls) {
+      setImages(imageUrls);
+    } else {
+      setImages([]);
+    }
+  }, [imageUrls])
 
   const onDrop = useCallback(
     (acceptedFiles: File[]) => {
@@ -144,14 +154,19 @@ const AlbumImageInput: React.FC<AlbumImageInputProps> = ({ onSave, onClose, open
           </Box>
         </DndProvider>
         <Grid container spacing={1} justifyContent="flex-end">
-          <Grid item>
-            <Button variant="contained" onClick={handleSave} color="success">
-              Save
-            </Button>
-          </Grid>
+          {onDeleteAlbum && imageUrls && imageUrls.length > 0 && <Grid item>
+            <Button variant="contained" onClick={onDeleteAlbum} color="error">
+              Delete
+          </Button>
+          </Grid>}
           <Grid item>
             <Button variant="outlined" onClick={onClose} color="error">
               Cancel
+            </Button>
+          </Grid>
+          <Grid item>
+            <Button variant="contained" onClick={handleSave} color="success">
+              Save
             </Button>
           </Grid>
         </Grid>
