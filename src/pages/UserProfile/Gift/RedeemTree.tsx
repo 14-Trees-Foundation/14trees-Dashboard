@@ -5,6 +5,7 @@ import { useState } from "react";
 import { toast } from "react-toastify";
 import ApiClient from "../../../api/apiClient/apiClient";
 import { AWSUtils } from "../../../helpers/aws";
+import poster from '../../../assets/ARANYA_poster.jpg'
 
 interface RedeemTreeProps {
     tree: GiftCardUser
@@ -124,50 +125,90 @@ const RedeemTree: React.FC<RedeemTreeProps> = ({ tree }) => {
                 display: 'flex',
                 flexDirection: 'column',
                 alignItems: 'center',
-                paddingTop: "20px",
+                height: '100vh',
+                backgroundImage: `url(${poster})`,
+                backgroundSize: "cover",
+                backgroundPosition: "center",
+                color: 'white'
             }}>
             <Box
                 style={{
                     maxWidth: matches ? "96%" : '600px',
                 }}
             >
-                <Box mt={1} component={Paper} sx={{ padding: 2 }}>
-                    <Typography variant="body1" mb={1}>The tree with tracker ID: 49852 has been sponsored by {(tree as any).group_name || (tree as any).sponsor_name} and is reserved as a gift. Please provide the recipient's details below to redeem it. (Note: This tree can be redeemed only once, so kindly ensure the information is accurate.)</Typography>
+                <Box mt={1} sx={{ padding: 2 }}>
+                    <Typography variant="body1" mb={1}>The tree with tracker ID: {tree.sapling_id} has been sponsored by {(tree as any).group_name || (tree as any).sponsor_name} and is reserved as a gift. Please provide the recipient's details below to redeem it. (Note: This tree can be redeemed only once, so kindly ensure the information is accurate.)</Typography>
                     <form onSubmit={handleRedeemTree}>
                         <Grid container rowSpacing={2} columnSpacing={1}>
                             <Grid item xs={12}>
                                 <TextField
                                     name="name"
-                                    label="Recipient Name"
+                                    placeholder="Recipient Name"
                                     required
                                     value={formData.name}
                                     onChange={handleInputChange}
                                     error={!!errors.name}
                                     helperText={errors.name}
                                     fullWidth
+                                    sx={{
+                                        "& .MuiInputLabel-root": { color: "black" }, // Label color
+                                        "& .MuiOutlinedInput-root": {
+                                            "& fieldset": { borderColor: "black" }, // Default border color
+                                            "&:hover fieldset": { borderColor: "lightblue" }, // Hover border color
+                                            "&.Mui-focused fieldset": { borderColor: "lightblue" }, // Focused border color
+                                        },
+                                        "& .MuiInputBase-input": { color: "black", backgroundColor: "white", borderRadius: '4px' }, // Input text color
+                                        "& .MuiFormHelperText-root": {
+                                            color: "white", // Change helper text color
+                                        }
+                                    }}
                                 />
                             </Grid>
                             <Grid item xs={12}>
                                 <TextField
                                     name="email"
-                                    label="Recipient Email"
+                                    placeholder="Recipient Email"
                                     required
                                     value={formData.email}
                                     onChange={handleInputChange}
                                     error={!!errors.email}
                                     helperText={errors.email || "will be used to send gift notification"}
                                     fullWidth
+                                    sx={{
+                                        "& .MuiInputLabel-root": { color: "black" }, // Label color
+                                        "& .MuiOutlinedInput-root": {
+                                            "& fieldset": { borderColor: "black" }, // Default border color
+                                            "&:hover fieldset": { borderColor: "lightblue" }, // Hover border color
+                                            "&.Mui-focused fieldset": { borderColor: "lightblue" }, // Focused border color
+                                        },
+                                        "& .MuiInputBase-input": { color: "black", backgroundColor: "white", borderRadius: '4px' }, // Input text color
+                                        "& .MuiFormHelperText-root": {
+                                            color: "white", // Change helper text color
+                                        }
+                                    }}
                                 />
                             </Grid>
                             <Grid item xs={12}>
                                 <TextField
                                     name="phone"
-                                    label="Recipient Phone (optional)"
+                                    placeholder="Recipient Phone (optional)"
                                     value={formData.phone}
                                     onChange={handleInputChange}
                                     error={!!errors.phone}
                                     helperText={errors.phone}
                                     fullWidth
+                                    sx={{
+                                        "& .MuiInputLabel-root": { color: "black" }, // Label color
+                                        "& .MuiOutlinedInput-root": {
+                                            "& fieldset": { borderColor: "black" }, // Default border color
+                                            "&:hover fieldset": { borderColor: "lightblue" }, // Hover border color
+                                            "&.Mui-focused fieldset": { borderColor: "lightblue" }, // Focused border color
+                                        },
+                                        "& .MuiInputBase-input": { color: "black", backgroundColor: "white", borderRadius: '4px' }, // Input text color
+                                        "& .MuiFormHelperText-root": {
+                                            color: "white", // Change helper text color
+                                        }
+                                    }}
                                 />
                             </Grid>
                             <Grid item xs={12}>
@@ -177,7 +218,16 @@ const RedeemTree: React.FC<RedeemTreeProps> = ({ tree }) => {
                                         alt="User"
                                         sx={{ width: 80, height: 80, marginRight: 2 }}
                                     />
-                                    <Button variant="outlined" component="label" color='success' sx={{ marginRight: 2, textTransform: 'none' }}>
+                                    <Button variant="outlined" component="label" color='success'
+                                        sx={{
+                                            marginRight: 2,
+                                            textTransform: 'none',
+                                            backgroundColor: "white",
+                                            "&:hover": {
+                                                backgroundColor: "white", // Hover background color
+                                            },
+                                        }}
+                                    >
                                         Upload your Image
                                         <input
                                             value={''}
@@ -187,9 +237,19 @@ const RedeemTree: React.FC<RedeemTreeProps> = ({ tree }) => {
                                             onChange={handleImageChange}
                                         />
                                     </Button>
-                                    {profileImage && <Button variant="outlined" component="label" color='error' sx={{ textTransform: 'none' }} onClick={() => { setProfileImage(null) }}>
-                                        Remove Image
-                                    </Button>}
+                                    {profileImage &&
+                                        <Button variant="outlined" component="label" color='error'
+                                            sx={{
+                                                textTransform: 'none',
+                                                backgroundColor: "white",
+                                                "&:hover": {
+                                                    backgroundColor: "white", // Hover background color
+                                                },
+                                            }}
+                                            onClick={() => { setProfileImage(null) }}
+                                        >
+                                            Remove Image
+                                        </Button>}
                                 </div>
                                 <Typography fontSize={10}>Recipient image will be used to create more personalised dashboard, but it is not required to redeem the tree.</Typography>
                             </Grid>
@@ -213,11 +273,11 @@ const useStyles = makeStyles((theme) =>
     createStyles({
         mbmain: {
             height: "100%",
-            marginTop: "50px",
+            paddingTop: "70px",
         },
         main: {
             height: "100%",
-            marginTop: "100px",
+            paddingTop: "120px",
         },
     })
 );
