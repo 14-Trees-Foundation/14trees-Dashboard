@@ -27,7 +27,6 @@ import { getUniqueRequestId } from "../../../helpers/utils";
 import PaymentComponent from "../../../components/payment/PaymentComponent";
 import { useAuth } from "../auth/auth";
 import { UserRoles } from "../../../types/common";
-import { useNavigate } from "react-router-dom";
 import { LoginComponent } from "../Login/LoginComponent";
 
 const GiftTrees: FC = () => {
@@ -36,7 +35,6 @@ const GiftTrees: FC = () => {
         bindActionCreators(giftCardActionCreators, dispatch);
 
     let auth = useAuth();
-    const navigate = useNavigate();
     const authRef = useRef<any>(null);
 
     const [changeMode, setChangeMode] = useState<'add' | 'edit'>('add');
@@ -58,6 +56,7 @@ const GiftTrees: FC = () => {
     const [users, setUsers] = useState<any[]>([]);
     const [userTrees, setUserTrees] = useState<any[]>([]);
     const [albumImagesModal, setAlbumImagesModal] = useState(false);
+    const [album, setAlbum] = useState<any>(null);
     const [userDetailsEditModal, setUserDetailsEditModal] = useState(false);
 
     // payment
@@ -107,30 +106,67 @@ const GiftTrees: FC = () => {
         setRequestId(null);
     }
 
-    const handleAlbumModalOpen = (record: GiftCard) => {
+    const handleAlbumModalOpen = async (record: GiftCard) => {
         setSelectedGiftCard(record);
+        if (record.album_id) {
+            const apiClient = new ApiClient();
+            const album = await apiClient.getAlbum(record.album_id);
+            setAlbum(album);
+        }
         setAlbumImagesModal(true);
     }
 
     const handleAlbumModalClose = () => {
         setSelectedGiftCard(null);
         setAlbumImagesModal(false);
+        setAlbum(null);
     }
 
-    const handleAlbumSave = async (files: File[]) => {
+    const handleAlbumSave = async (files: (File | string)[]) => {
         if (!selectedGiftCard) return;
         setAlbumImagesModal(false);
 
         const apiClient = new ApiClient();
         try {
-            const album = await apiClient.createAlbum(selectedGiftCard.event_name || selectedGiftCard.request_id, selectedGiftCard.user_name || '', selectedGiftCard.user_email || '', files);
-            await apiClient.updateAlbumImagesForGiftRequest(selectedGiftCard.id, album.id);
+
+            if (album) {
+                await apiClient.updateAlbum(album.id, files);
+                await apiClient.updateAlbumImagesForGiftRequest(selectedGiftCard.id, album.id);
+            } else {
+                const filesList: File[] = [];
+                files.forEach(file => {
+                    if (typeof file !== 'string') filesList.push(file);
+                })
+
+                const album = await apiClient.createAlbum(selectedGiftCard.event_name || selectedGiftCard.request_id, selectedGiftCard.user_name || '', selectedGiftCard.user_email || '', filesList);
+                await apiClient.updateAlbumImagesForGiftRequest(selectedGiftCard.id, album.id);
+            }
 
             toast.success("Gift Request Album images updated!")
         } catch (error: any) {
             toast.error(error.message);
         }
 
+        setAlbum(null);
+        setSelectedGiftCard(null);
+    }
+
+    const handleDeleteAlbum = async () => {
+        if (!selectedGiftCard) return;
+        setAlbumImagesModal(false);
+
+        const apiClient = new ApiClient();
+        try {
+
+            if (album) await apiClient.deleteAlbum(album.id);
+            await apiClient.updateAlbumImagesForGiftRequest(selectedGiftCard.id);
+
+            toast.success("Removed gift request album images!")
+        } catch (error: any) {
+            toast.error(error.message);
+        }
+
+        setAlbum(null);
         setSelectedGiftCard(null);
     }
 
@@ -272,7 +308,7 @@ const GiftTrees: FC = () => {
                 await apiClient.createGiftCardPlots(selectedGiftCard.id, selectedPlots.map(plot => plot.id));
                 toast.success("Saved selected plot for gift card request!");
 
-                await apiClient.bookGiftCards(selectedGiftCard.id, userTrees.length > 0 ?  userTrees : undefined, bookNonGiftable, diversify);
+                await apiClient.bookGiftCards(selectedGiftCard.id, userTrees.length > 0 ? userTrees : undefined, bookNonGiftable, diversify);
                 toast.success("Gift cards booked successfully");
                 getGiftCardData();
             } catch {
@@ -486,12 +522,12 @@ const GiftTrees: FC = () => {
             </Menu.ItemGroup>}
             {!auth.roles.includes(UserRoles.User) && <Menu.Divider style={{ backgroundColor: '#ccc' }} />}
             {!auth.roles.includes(UserRoles.User) && <Menu.ItemGroup>
-                {record.booked !== record.no_of_cards &&
+                {Number(record.booked) !== record.no_of_cards &&
                     <Menu.Item key="40" onClick={() => { setSelectedGiftCard(record); setPlotModal(true); }} icon={<Landscape />}>
                         Select Plots
                     </Menu.Item>
                 }
-                {record.booked > record.assigned && <Menu.Item key="41" onClick={() => { setSelectedGiftCard(record); setAutoAssignModal(true); }} icon={<AssignmentInd />}>
+                {Number(record.booked) > Number(record.assigned) && <Menu.Item key="41" onClick={() => { setSelectedGiftCard(record); setAutoAssignModal(true); }} icon={<AssignmentInd />}>
                     Assign Trees
                 </Menu.Item>}
                 <Menu.Item key="42" onClick={() => { handlePaymentModalOpen(record); }} icon={<AssuredWorkload />}>
@@ -623,14 +659,6 @@ const GiftTrees: FC = () => {
                     >
                         Request Tree Cards
                     </Button>
-                    {/* {!auth.signedin && <Button
-                        variant="contained"
-                        color="success"
-                        onClick={() => { navigate('/login') }}
-                        style={{ textTransform: 'none', fontSize: 16, marginLeft: '15px' }}
-                    >
-                        Login
-                    </Button>} */}
                 </div>
             </div>
             <Divider sx={{ backgroundColor: "black", marginBottom: '15px' }} />
@@ -759,7 +787,13 @@ const GiftTrees: FC = () => {
                 onSave={handleUserDetailsEditSave}
             />
 
-            <AlbumImageInput open={albumImagesModal} onClose={handleAlbumModalClose} onSave={handleAlbumSave} />
+            <AlbumImageInput
+                open={albumImagesModal}
+                onClose={handleAlbumModalClose}
+                onSave={handleAlbumSave}
+                onDeleteAlbum={handleDeleteAlbum}
+                imageUrls={album?.images}
+            />
 
             <GiftCardRequestInfo
                 open={infoModal}

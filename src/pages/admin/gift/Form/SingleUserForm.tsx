@@ -20,13 +20,14 @@ interface User {
 }
 
 interface SingleUserFormProps {
+    maxTrees: number
     imageUrls: string[]
     value: any
     onSubmit: (user: User) => void;
     onCancel: () => void
 }
 
-const SingleUserForm: FC<SingleUserFormProps> = ({ imageUrls, value, onSubmit, onCancel }) => {
+const SingleUserForm: FC<SingleUserFormProps> = ({ maxTrees, imageUrls, value, onSubmit, onCancel }) => {
     const dispatch = useAppDispatch();
     const { searchUsers } = bindActionCreators(userActionCreators, dispatch);
 
@@ -189,7 +190,7 @@ const SingleUserForm: FC<SingleUserFormProps> = ({ imageUrls, value, onSubmit, o
                         name="count"
                         value={user.count}
                         onChange={handleNumberChange}
-                        inputProps={{ min: user.editable ? 1 : value?.count || 1 }}
+                        inputProps={{ min: user.editable ? 1 : value?.count || 1, max: Math.max(value?.count ? value.count : 0, maxTrees) }}
                         fullWidth
                     />
                 </Grid>
@@ -310,6 +311,7 @@ const SingleUserForm: FC<SingleUserFormProps> = ({ imageUrls, value, onSubmit, o
                         variant="contained"
                         color="success"
                         onClick={handleSubmit}
+                        disabled={!value && maxTrees === 0}
                     >
                         Add
                     </Button>
