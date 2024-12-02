@@ -522,12 +522,12 @@ const GiftTrees: FC = () => {
             </Menu.ItemGroup>}
             {!auth.roles.includes(UserRoles.User) && <Menu.Divider style={{ backgroundColor: '#ccc' }} />}
             {!auth.roles.includes(UserRoles.User) && <Menu.ItemGroup>
-                {record.booked !== record.no_of_cards &&
+                {Number(record.booked) !== record.no_of_cards &&
                     <Menu.Item key="40" onClick={() => { setSelectedGiftCard(record); setPlotModal(true); }} icon={<Landscape />}>
                         Select Plots
                     </Menu.Item>
                 }
-                {record.booked > record.assigned && <Menu.Item key="41" onClick={() => { setSelectedGiftCard(record); setAutoAssignModal(true); }} icon={<AssignmentInd />}>
+                {Number(record.booked) > Number(record.assigned) && <Menu.Item key="41" onClick={() => { setSelectedGiftCard(record); setAutoAssignModal(true); }} icon={<AssignmentInd />}>
                     Assign Trees
                 </Menu.Item>}
                 <Menu.Item key="42" onClick={() => { handlePaymentModalOpen(record); }} icon={<AssuredWorkload />}>
