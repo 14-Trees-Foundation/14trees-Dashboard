@@ -290,8 +290,8 @@ export const BulkUserForm: FC<BulkUserFormProps> = ({ requestId, treeCount, user
                 parsedUser.assigned_to_email = (user[assignEmailField] as string).trim()
               } else {
                 parsedUser.assigned_to_name = parsedUser.gifted_to_name
-                parsedUser.assigned_to_phone = parsedUser.gifted_to_email
-                parsedUser.assigned_to_email = parsedUser.gifted_to_phone
+                parsedUser.assigned_to_phone = parsedUser.gifted_to_phone
+                parsedUser.assigned_to_email = parsedUser.gifted_to_email
               }
 
               if (!parsedUser.gifted_to_email) parsedUser.gifted_to_email = parsedUser.gifted_to_name.split(" ").join('.') + "@14trees"
