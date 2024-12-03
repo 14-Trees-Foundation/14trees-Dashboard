@@ -1031,18 +1031,19 @@ class ApiClient {
         const url = `/donations/get?offset=${offset}&limit=${limit}`;
         try {
             const response = await this.api.post<PaginatedResponse<Donation>>(url, { filters: filters });
-            console.log("Response in api client: ", response);
             return response.data;
         } catch (error: any) {
-            console.error(error)
-            throw new Error(`Failed to fetch donations: ${error.message}`);
+            if (error.response?.data?.message) {
+                throw new Error(error.response.data.message)
+            }
+            throw new Error("Failed to fetch donations")
         }
     }
 
 
-    async createDonation(data: Donation): Promise<Donation> {
+    async createDonation(request_id: string, created_by: number, user_id: number, pledged: number | null, pledged_area: number | null, category: string, grove: string | null, users: any[], payment_id?: number, group_id?: number, logo?: string | null): Promise<Donation> {
         try {
-            const response = await this.api.post<Donation>(`/donations`, data);
+            const response = await this.api.post<Donation>(`/donations`, { request_id, created_by, user_id, pledged, pledged_area, category, group_id, logo, grove, payment_id, users });
             return response.data;
         } catch (error) {
             console.error(error)

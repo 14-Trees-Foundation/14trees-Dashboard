@@ -12,11 +12,8 @@ export const getDonations = (offset: number, limit: number, filters?: any[]) => 
         });
         apiClient.getDonations(offset, limit, filters).then(
             (value: PaginatedResponse<Donation>) => {
-                console.log("Response in action: ", value)
                 for (let i = 0; i < value.results.length; i++) {
-                    if (value.results[i]?.id) {
-                        value.results[i].key = value.results[i].id
-                    }
+                    value.results[i].key = value.results[i].id
                 }
                 dispatch({
                     type: donationActionTypes.GET_DONATIONS_SUCCEEDED,
@@ -24,7 +21,7 @@ export const getDonations = (offset: number, limit: number, filters?: any[]) => 
                 });
             },
             (error: any) => {
-                console.log(error)
+                toast.error(error.message);
                 dispatch({
                     type: donationActionTypes.GET_DONATIONS_FAILED,
                     payload: error
@@ -35,13 +32,13 @@ export const getDonations = (offset: number, limit: number, filters?: any[]) => 
 };
 
 
-export const createDonation = (record: Donation) => {
+export const createDonation = (requestId: string, createdBy: number, userId: number, pledged: number | null, pledgedArea: number | null, category: string, grove: string | null, users: any[], paymentId?: number, groupId?: number, logo?: string | null) => {
     const apiClient = new ApiClient();
     return (dispatch: any) => {
         dispatch({
             type: donationActionTypes.CREATE_DONATION_REQUESTED,
         });
-        apiClient.createDonation(record).then(
+        apiClient.createDonation(requestId, createdBy, userId, pledged, pledgedArea, category, grove, users, paymentId, groupId, logo).then(
             (value: Donation) => {
                 toast.success('New Donation Added')
                 dispatch({
@@ -49,11 +46,9 @@ export const createDonation = (record: Donation) => {
                     payload: value,
 
                 });
-                console.log(value)
             },
             (error: any) => {
-                console.error(error);
-                toast.error('Failed to add Donation')
+                toast.error(error.message);
                 dispatch({
                     type: donationActionTypes.CREATE_DONATION_FAILED,
                 });
@@ -77,8 +72,7 @@ export const updateDonation = (record: Donation) => {
                 });
             },
             (error: any) => {
-                toast.error('Failed to update Donation data')
-                console.log(error)
+                toast.error(error.message);
                 dispatch({
                     type: donationActionTypes.UPDATE_DONATION_FAILED,
                 });
@@ -102,7 +96,7 @@ export const deleteDonation = (record: Donation) => {
                 });
             },
             (error: any) => {
-                console.error(error);
+                toast.error(error.message);
                 dispatch({
                     type: donationActionTypes.DELETE_DONATION_FAILED,
                 });

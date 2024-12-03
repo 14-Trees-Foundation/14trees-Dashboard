@@ -3,59 +3,79 @@ import { Donation, DonationDataState } from "../../types/donation";
 import donationActionTypes from "../actionTypes/donationActionTypes";
 import { PaginatedResponse } from "../../types/pagination";
 
-export const donationsDataReducer = (state = { totalDonations:0, donations: {}}, action: UnknownAction ): DonationDataState => {
-  switch (action.type) {
-      case donationActionTypes.GET_DONATIONS_SUCCEEDED:
-          if (action.payload) {
-              let donationDataState: DonationDataState = { totalDonations: state.totalDonations, donations: {...state.donations}};
-              let payload = action.payload as PaginatedResponse<Donation>;
+export const donationsDataReducer = (state = { totalDonations: 0, donations: {}, paginationMapping: {} }, action: UnknownAction): DonationDataState => {
+    switch (action.type) {
+        case donationActionTypes.GET_DONATIONS_SUCCEEDED:
+            if (action.payload) {
+                let donationsDataState: DonationDataState = {
+                    totalDonations: state.totalDonations,
+                    donations: { ...state.donations },
+                    paginationMapping: { ...state.paginationMapping }
+                };
 
-              if (donationDataState.totalDonations != payload.total) {
-                donationDataState.donations = {}
-              }
-              donationDataState.totalDonations = payload.total;
-              let donations = payload.results;
-              for (let i = 0; i < donations.length; i++) {
-                  if (donations[i]?.id) {
+                let payload = action.payload as PaginatedResponse<Donation>;
+                let donations = payload.results;
+                const offset = payload.offset;
+
+                if (payload.offset === 0) {
+                    donationsDataState.donations = {}
+                    donationsDataState.paginationMapping = {}
+                }
+                for (let i = 0; i < donations.length; i++) {
                     donations[i].key = donations[i].id
-                    donationDataState.donations[donations[i].id] = donations[i]
-                  }
-              }
-              const nextState: DonationDataState = donationDataState;
-              return nextState;
-          }
-          return state;
-      
-          case donationActionTypes.CREATE_DONATION_SUCCEEDED:
-          if (action.payload) {
-              const nextState = { totalDonations: state.totalDonations, donations: { ...state.donations }} as DonationDataState;
-              let payload = action.payload as Donation
-              payload.key = payload.id
-              nextState.donations[payload.id] = payload;
-              nextState.totalDonations += 1;
-              return nextState;
-          }
-          return state;
-      case donationActionTypes.UPDATE_DONATION_SUCCEEDED:
-          if (action.payload) {
-              const nextState = { totalDonations: state.totalDonations, donations: { ...state.donations }} as DonationDataState;
-              let payload = action.payload as Donation
-              payload.key = payload.id
-              nextState.donations[payload.id] = payload;
-              return nextState;
-          }
-          return state;
-      case donationActionTypes.DELETE_DONATION_SUCCEEDED:
-          if (action.payload) {
-              const nextState = { totalDonations: state.totalDonations, donations: { ...state.donations }} as DonationDataState;
-              Reflect.deleteProperty(nextState.donations, action.payload as number)
-              nextState.totalDonations -= 1;
-              return nextState;
-          }
-          return state;
-      
-      default:
-          return state;
-  }
+                    donationsDataState.donations[donations[i].id] = donations[i]
+                    donationsDataState.paginationMapping[offset + i] = donations[i].id
+                }
+                return { ...donationsDataState, totalDonations: payload.total };
+            }
+            return state;
+
+
+        case donationActionTypes.CREATE_DONATION_SUCCEEDED:
+            if (action.payload) {
+                const nextState: DonationDataState = { 
+                    totalDonations: state.totalDonations, 
+                    donations: { ...state.donations },
+                    paginationMapping: { ...state.paginationMapping }
+                };
+
+                let payload = action.payload as Donation
+                payload.key = payload.id
+                nextState.donations[payload.id] = payload;
+                nextState.totalDonations += 1;
+                return nextState;
+            }
+            return state;
+        case donationActionTypes.UPDATE_DONATION_SUCCEEDED:
+            if (action.payload) {
+                const nextState: DonationDataState = { 
+                    totalDonations: state.totalDonations, 
+                    donations: { ...state.donations },
+                    paginationMapping: { ...state.paginationMapping }
+                };
+                
+                let payload = action.payload as Donation
+                payload.key = payload.id
+                nextState.donations[payload.id] = payload;
+                return nextState;
+            }
+            return state;
+        case donationActionTypes.DELETE_DONATION_SUCCEEDED:
+            if (action.payload) {
+                const nextState: DonationDataState = { 
+                    totalDonations: state.totalDonations, 
+                    donations: { ...state.donations },
+                    paginationMapping: { ...state.paginationMapping }
+                };
+                
+                Reflect.deleteProperty(nextState.donations, action.payload as number)
+                nextState.totalDonations -= 1;
+                return nextState;
+            }
+            return state;
+
+        default:
+            return state;
+    }
 };
 

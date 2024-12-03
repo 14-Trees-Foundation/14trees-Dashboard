@@ -45,7 +45,7 @@ const DonorUserForm: FC<DonorUserFormProps> = ({ user, onSelect }) => {
 
     useEffect(() => {
         const handler = setTimeout(() => {
-            if (userSearchQuery.length >= 1) searchUsers(userSearchQuery);
+            if (userSearchQuery.length >= 3) searchUsers(userSearchQuery);
         }, 300)
 
         return () => {

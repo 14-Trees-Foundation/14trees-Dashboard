@@ -1,16 +1,13 @@
-import { Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, Divider, FormControl, FormHelperText, InputAdornment, InputLabel, MenuItem, OutlinedInput, Paper, Select, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Tooltip, Typography } from "@mui/material";
+import { Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, FormControl, FormHelperText, InputAdornment, InputLabel, MenuItem, OutlinedInput, Paper, Select, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Tooltip, Typography } from "@mui/material";
 import { FC, useEffect, useState } from "react";
-import FileInputComponent from "../FileInputComponent";
 import TreeCostChart from "../../assets/tree-cost-chart.png";
 import { Payment, PaymentHistory } from "../../types/payment";
 import GeneralTable from "../GenTable";
 import { getHumanReadableDate } from "../../helpers/utils";
-import { HelpOutline, PaymentOutlined, VisibilityOutlined } from "@mui/icons-material";
+import { HelpOutline } from "@mui/icons-material";
 import { AWSUtils } from "../../helpers/aws";
 import ApiClient from "../../api/apiClient/apiClient";
 import { toast } from "react-toastify";
-import { LoadingButton } from "@mui/lab";
-import PaymentQRInfo from "../PaymentQRInfo";
 import RazonpayComponent from "../RazorpayComponent";
 
 const paymentStatusList = [
