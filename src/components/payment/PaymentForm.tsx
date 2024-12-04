@@ -63,24 +63,29 @@ const PaymentForm: FC<PaymentFormProps> = ({ payment, amount, onPaymentChange, o
     const [rpPayments, setRPPayments] = useState<any[]>([]);
 
     useEffect(() => {
+        let paid = 0, verified = 0;
         if (payment && payment.payment_history && payment.payment_history.length > 0) {
-            const paid = payment.payment_history.map(item => item.amount).reduce((prev, curr) => prev + curr, 0);
-            const verified = payment.payment_history.filter(item => item.status === 'validated').map(item => item.amount_received).reduce((prev, curr) => prev + curr, 0);
-
-            setAmountData({
-                totalAmount: amount,
-                paidAmount: paid,
-                verifiedAmount: verified,
-            })
+            paid = payment.payment_history.map(item => item.amount).reduce((prev, curr) => prev + curr, 0);
+            verified = payment.payment_history.filter(item => item.status === 'validated').map(item => item.amount_received).reduce((prev, curr) => prev + curr, 0);
 
             setPayingAmount(amount - paid > 0 ? amount - paid : 0);
         } else {
             setPayingAmount(amount);
         }
+        
+        const rpAmount = rpPayments.filter(pt => pt.status === "captured").map(pt => pt.amount - pt.fee).reduce((prev, curr) => prev + curr, 0)
+        paid += rpAmount/100;
+        verified += rpAmount/100;
+
+        setAmountData({
+            totalAmount: amount,
+            paidAmount: paid,
+            verifiedAmount: verified,
+        })
 
         setDonorType(payment ? payment.donor_type : '');
         setPanNumber(payment?.pan_number ? payment.pan_number : '');
-    }, [payment, amount])
+    }, [payment, amount, rpPayments])
 
     useEffect(() => {
         onChange(donorType, panNumber);
@@ -348,7 +353,7 @@ const PaymentForm: FC<PaymentFormProps> = ({ payment, amount, onPaymentChange, o
                     </Box>
                 </Box>
                 {
-                    payment && payment.payment_history && payment.payment_history.length > 0 && <Box width="45%">
+                    ((payment && payment.payment_history && payment.payment_history.length > 0) || (rpPayments.length > 0)) && <Box width="45%">
                         <Typography variant="h6" mb={1}>Payment Summary:</Typography>
                         <TableContainer sx={{ maxWidth: 650 }} component={Paper}>
                             <Table sx={{ maxWidth: 650 }} aria-label="simple table">
