@@ -8,9 +8,12 @@ export type Donation = {
   grove: string | null;
   pledged: number | null;
   pledged_area: number | null;
-  user_visit: boolean;
+  preference: string;
   payment_id: number | null;
-  feedback: string;
+  feedback: string | null;
+  source_info: string | null;
+  event_name: string | null;
+  alternate_email: string | null;
   notes: string;
   associated_tag: string;
   request_id: string;

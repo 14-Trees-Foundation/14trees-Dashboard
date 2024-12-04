@@ -1041,12 +1041,14 @@ class ApiClient {
     }
 
 
-    async createDonation(request_id: string, created_by: number, user_id: number, pledged: number | null, pledged_area: number | null, category: string, grove: string | null, users: any[], payment_id?: number, group_id?: number, logo?: string | null): Promise<Donation> {
+    async createDonation(request_id: string, created_by: number, user_id: number, pledged: number | null, pledged_area: number | null, category: string, grove: string | null, preference: string, event_name: string, alternate_email: string, users: any[], payment_id?: number, group_id?: number, logo?: string | null): Promise<Donation> {
         try {
-            const response = await this.api.post<Donation>(`/donations`, { request_id, created_by, user_id, pledged, pledged_area, category, group_id, logo, grove, payment_id, users });
+            const response = await this.api.post<Donation>(`/donations`, { request_id, created_by, user_id, pledged, pledged_area, category, group_id, logo, grove, payment_id, users, preference, event_name, alternate_email });
             return response.data;
-        } catch (error) {
-            console.error(error)
+        } catch (error: any) {
+            if (error.response?.data?.message) {
+                throw new Error(error.response.data.message);
+            }
             throw new Error('Failed to create Donation');
         }
     }
@@ -1057,7 +1059,17 @@ class ApiClient {
             const response = await this.api.put<Donation>(`/donations/${data.id}`, data);
             return response.data;
         } catch (error: any) {
-            console.error(error)
+            if (error.response) {
+                throw new Error(error.response.data.message);
+            }
+            throw new Error('Failed to update donation');
+        }
+    }
+
+    async updateDonationFeedback(request_id: string, feedback: string, source_info: string): Promise<void> {
+        try {
+            await this.api.post<void>(`/donations/update-feedback`, { request_id, feedback, source_info });
+        } catch (error: any) {
             if (error.response) {
                 throw new Error(error.response.data.message);
             }

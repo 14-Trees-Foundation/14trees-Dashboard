@@ -17,6 +17,7 @@ import ApiClient from "../../../api/apiClient/apiClient";
 import { getHumanReadableDate, getUniqueRequestId } from "../../../helpers/utils";
 import { User } from "../../../types/user";
 import { Group } from "../../../types/Group";
+import FeedbackForm from "./Forms/FeedbackForm";
 
 export const DonationComponent = () => {
 
@@ -35,6 +36,8 @@ export const DonationComponent = () => {
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [requestId, setRequestId] = useState<string | null>(null);
   const [isDeleteAltOpen, setIsDeleteAltOpen] = useState(false);
+  const [isFeedbackFormOpen, setIsFeedbackFormOpen] = useState(false);
+  const [donationReqId, setDonationReqId] = useState<string | null>(null);
 
   const handleSetFilters = (filters: Record<string, GridFilterItem>) => {
     setPage(0);
@@ -110,16 +113,18 @@ export const DonationComponent = () => {
     setRequestId(null);
   }
 
-  const handleCreateDonation = async (user: User, group: Group | null, pledged: number | null, pledgedArea: number | null, category: string, grove: string | null, users: any[], paymentId?: number, logo?: string | null) => {
+  const handleCreateDonation = async (user: User, group: Group | null, pledged: number | null, pledgedArea: number | null, category: string, grove: string | null, preference: string, eventName: string, alternateEmail: string, users: any[], paymentId?: number, logo?: string | null) => {
     if (!requestId) {
       toast.error("Something went wrong. Please try again later!");
       return;
     }
 
-    createDonation(requestId, user.id, user.id, pledged, pledgedArea, category, grove, users, paymentId, group?.id, logo)
+    createDonation(requestId, user.id, user.id, pledged, pledgedArea, category, grove, preference, eventName, alternateEmail, users, paymentId, group?.id, logo);
+    setIsFeedbackFormOpen(true);
+    setDonationReqId(requestId);
   }
 
-  const handleUpdateDonation = async (user: User, group: Group | null, pledged: number | null, pledgedArea: number | null, category: string, grove: string | null, users: any[], paymentId?: number, logo?: string | null) => {
+  const handleUpdateDonation = async (user: User, group: Group | null, pledged: number | null, pledgedArea: number | null, category: string, grove: string | null, preference: string, eventName: string, alternateEmail: string, users: any[], paymentId?: number, logo?: string | null) => {
     if (!selectedDonation) return;
 
     const data = { ...selectedDonation };
@@ -130,17 +135,37 @@ export const DonationComponent = () => {
     data.category = category as any;
     data.grove = grove;
     data.payment_id = paymentId ? paymentId : null;
+    data.preference = preference;
+    data.event_name = eventName?.trim() ? eventName.trim() : null;
+    data.alternate_email = alternateEmail?.trim() ? alternateEmail.trim() : null;
 
     updateDonation(data);
   }
 
-  const handleSubmit = (user: User, group: Group | null, pledged: number | null, pledgedArea: number | null, category: string, grove: string | null, users: any[], paymentId?: number, logo?: string | null) => {
+  const handleSubmit = (user: User, group: Group | null, pledged: number | null, pledgedArea: number | null, category: string, grove: string | null, preference: string, eventName: string, alternateEmail: string, users: any[], paymentId?: number, logo?: string | null) => {
 
     if (!selectedDonation) {
-      handleCreateDonation(user, group, pledged, pledgedArea, category, grove, users, paymentId, logo);
+      handleCreateDonation(user, group, pledged, pledgedArea, category, grove, preference, eventName, alternateEmail, users, paymentId, logo);
     } else {
-      handleUpdateDonation(user, group, pledged, pledgedArea, category, grove, users, paymentId, logo);
+      handleUpdateDonation(user, group, pledged, pledgedArea, category, grove, preference, eventName, alternateEmail, users, paymentId, logo);
     }
+  }
+
+  const handleFeedbackSubmit = async (feedback: string, sourceInfo: string) => {
+    if (!donationReqId) {
+      toast.error("Something went wrong. Please try again later!");
+      return;
+    }
+
+    try {
+      const apiClient = new ApiClient();
+      await apiClient.updateDonationFeedback(donationReqId, feedback, sourceInfo);
+    } catch (error: any) {
+      toast.error(error.message)
+    }
+
+    setDonationReqId(null);
+    setIsFeedbackFormOpen(false);
   }
 
   const handleDeleteDonation = () => {
@@ -317,6 +342,12 @@ export const DonationComponent = () => {
         handleClose={handleModalClose}
         onSubmit={handleSubmit}
         requestId={requestId}
+      />
+
+      <FeedbackForm 
+        open={isFeedbackFormOpen}
+        onClose={() => { setIsFeedbackFormOpen(true); }}
+        onSubmit={handleFeedbackSubmit}
       />
 
       <Dialog open={isDeleteAltOpen} fullWidth maxWidth='md'>

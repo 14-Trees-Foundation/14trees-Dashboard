@@ -13,13 +13,14 @@ import { BulkUserForm } from "./UserDetails";
 import ApiClient from "../../../../api/apiClient/apiClient";
 import { AWSUtils } from "../../../../helpers/aws";
 import { Donation } from "../../../../types/donation";
+import DonorPreferencesFrom from "./DonorPreferencesForm";
 
 interface DonationFormProps {
     donation: Donation | null,
     open: boolean
     requestId: string | null
     handleClose: () => void
-    onSubmit: (user: User, group: Group | null, pledged: number | null, pledgedArea: number | null, category: string, grove: string | null, users: any[], paymentId?: number, logo?: string | null) => void
+    onSubmit: (user: User, group: Group | null, pledged: number | null, pledgedArea: number | null, category: string, grove: string | null, preference: string, eventName: string, alternateEmail: string, users: any[], paymentId?: number, logo?: string | null) => void
 }
 
 const DonationForm: React.FC<DonationFormProps> = ({ donation, open, requestId, handleClose, onSubmit }) => {
@@ -40,6 +41,9 @@ const DonationForm: React.FC<DonationFormProps> = ({ donation, open, requestId, 
     const [logo, setLogo] = useState<File | null>(null);
     const [logoString, setLogoString] = useState<string | null>(null);
     const [payment, setPayment] = useState<Payment | null>(null);
+    const [preference, setPreference] = useState<string>('');
+    const [eventName, setEventName] = useState<string>('');
+    const [alternateEmail, setAlternateEmail] = useState<string>('');
 
     useEffect(() => {
         const uploadFile = async () => {
@@ -118,6 +122,18 @@ const DonationForm: React.FC<DonationFormProps> = ({ donation, open, requestId, 
         },
         {
             key: 3,
+            title: "Preferences",
+            content: <DonorPreferencesFrom
+                eventName={eventName}
+                alternateEmail={alternateEmail}
+                preference={preference}
+                onPreferenceChange={preference => { setPreference(preference); }}
+                onEventNameChange={eventName => { setEventName(eventName); }}
+                onAlternateEmailChange={email => { setAlternateEmail(email); }}
+            />,
+        },
+        {
+            key: 4,
             title: "Payment Details",
             content: <PaymentForm
                 amount={pledged * (category === "Foundation" ? 3000 : 1500)}
@@ -127,7 +143,7 @@ const DonationForm: React.FC<DonationFormProps> = ({ donation, open, requestId, 
             />,
         },
         {
-            key: 4,
+            key: 5,
             title: "Recipient Details",
             content: <BulkUserForm
                 users={users}
@@ -163,7 +179,7 @@ const DonationForm: React.FC<DonationFormProps> = ({ donation, open, requestId, 
             }
         }
 
-        onSubmit(user, group, pledgedType === "trees" ? pledged : null, pledgedType === "acres" ? pledgedArea : null, category, grove, users, paymentId, logoString);
+        onSubmit(user, group, pledgedType === "trees" ? pledged : null, pledgedType === "acres" ? pledgedArea : null, category, grove, preference, eventName, alternateEmail, users, paymentId, logoString);
 
         handleCloseForm();
     }
@@ -191,6 +207,7 @@ const DonationForm: React.FC<DonationFormProps> = ({ donation, open, requestId, 
             case 1:
             case 2:
             case 3:
+            case 4:
                 nextStep += 1;
                 break;
             default:

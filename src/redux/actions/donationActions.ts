@@ -32,13 +32,13 @@ export const getDonations = (offset: number, limit: number, filters?: any[]) => 
 };
 
 
-export const createDonation = (requestId: string, createdBy: number, userId: number, pledged: number | null, pledgedArea: number | null, category: string, grove: string | null, users: any[], paymentId?: number, groupId?: number, logo?: string | null) => {
+export const createDonation = (requestId: string, createdBy: number, userId: number, pledged: number | null, pledgedArea: number | null, category: string, grove: string | null, preference: string, eventName: string, alternateEmail: string, users: any[], paymentId?: number, groupId?: number, logo?: string | null) => {
     const apiClient = new ApiClient();
     return (dispatch: any) => {
         dispatch({
             type: donationActionTypes.CREATE_DONATION_REQUESTED,
         });
-        apiClient.createDonation(requestId, createdBy, userId, pledged, pledgedArea, category, grove, users, paymentId, groupId, logo).then(
+        apiClient.createDonation(requestId, createdBy, userId, pledged, pledgedArea, category, grove, preference, eventName, alternateEmail, users, paymentId, groupId, logo).then(
             (value: Donation) => {
                 toast.success('New Donation Added')
                 dispatch({
