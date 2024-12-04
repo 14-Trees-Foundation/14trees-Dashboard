@@ -1587,9 +1587,9 @@ class ApiClient {
         }
     } 
 
-    async createPaymentHistory(payment_id: number, amount: number, payment_method: string, payment_proof: string | null, data: any) {
+    async createPaymentHistory(payment_id: number, amount: number, payment_method: string, payment_proof: string | null) {
         try {
-            const response = await this.api.post<PaymentHistory>(`/payments/history`, { payment_id, amount, payment_method, payment_proof, ...data });
+            const response = await this.api.post<PaymentHistory>(`/payments/history`, { payment_id, amount, payment_method, payment_proof });
             return response.data;
         } catch (error: any) {
             if (error.response) {
