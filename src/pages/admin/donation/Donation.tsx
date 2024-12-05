@@ -10,7 +10,7 @@ import { bindActionCreators } from "@reduxjs/toolkit";
 import { RootState } from "../../../redux/store/store";
 import { ToastContainer, toast } from "react-toastify";
 import DonationForm from "./Forms/DonationForm";
-import { Delete, Edit, MenuOutlined, NotesOutlined, Wysiwyg } from "@mui/icons-material";
+import { Delete, Edit, Landscape, MenuOutlined, NotesOutlined, Wysiwyg } from "@mui/icons-material";
 import { Badge, Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, Divider, IconButton, Typography } from "@mui/material";
 import GeneralTable from "../../../components/GenTable";
 import ApiClient from "../../../api/apiClient/apiClient";
@@ -18,6 +18,8 @@ import { getHumanReadableDate, getUniqueRequestId } from "../../../helpers/utils
 import { User } from "../../../types/user";
 import { Group } from "../../../types/Group";
 import FeedbackForm from "./Forms/FeedbackForm";
+import { Plot } from "../../../types/plot";
+import PlotSelection from "./Forms/PlotSelection";
 
 export const DonationComponent = () => {
 
@@ -38,6 +40,55 @@ export const DonationComponent = () => {
   const [isDeleteAltOpen, setIsDeleteAltOpen] = useState(false);
   const [isFeedbackFormOpen, setIsFeedbackFormOpen] = useState(false);
   const [donationReqId, setDonationReqId] = useState<string | null>(null);
+
+  // plot selection
+  const [plotSelectionModalOpen, setPlotSelectionModalOpen] = useState(false);
+  const [selectedPlots, setSelectedPlots] = useState<Plot[]>([]);
+  const [selectedTrees, setSelectedTrees] = useState<any[]>([]);
+  const [users, setUsers] = useState<any[]>([]);
+  const [diversifyTrees, setDiversifyTrees] = useState(false);
+
+  useEffect(() => {
+    const getUsers = async () => {
+      if (selectedDonation) {
+        
+        try {
+          const apiClient = new ApiClient();
+          const users = await apiClient.getDonationUsers(selectedDonation.id);
+          setUsers(users);
+        }  catch(error: any) {
+          toast.error(error.message);
+        }
+      }
+    }
+
+    if (plotSelectionModalOpen) getUsers();
+  }, [plotSelectionModalOpen, selectedDonation]);
+
+  const handlePlotSelectionClose = () => {
+    setSelectedPlots([]);
+    setSelectedTrees([]);
+    setUsers([]);
+    setDiversifyTrees(false);
+    setPlotSelectionModalOpen(false);
+  }
+
+  const handlePlotSelectionSubmit = async () => {
+    if (!selectedDonation || (selectedPlots.length === 0 && selectedTrees.length === 0)) {
+      toast.error("Invalid input!");
+      return;
+    } 
+
+    try {
+      const apiClient = new ApiClient();
+      await apiClient.bookTreesForDonation(selectedDonation.id, selectedPlots.map(plot => plot.id), selectedTrees, diversifyTrees);
+      toast.success(`Successfully booked trees for donation id: ${selectedDonation.id}!`);
+    } catch(error: any) {
+      toast.error(error.message);
+    }
+
+    handlePlotSelectionClose();
+  }
 
   const handleSetFilters = (filters: Record<string, GridFilterItem>) => {
     setPage(0);
@@ -203,6 +254,11 @@ export const DonationComponent = () => {
         </Menu.Item>
       </Menu.ItemGroup>
       <Menu.Divider style={{ backgroundColor: '#ccc' }} />
+      {(Number(record.booked) < (record.pledged || 0)) && <Menu.ItemGroup>
+        <Menu.Item key="20" onClick={() => { setSelectedDonation(record); setPlotSelectionModalOpen(true); }} icon={<Landscape />}>
+          Select Plots
+        </Menu.Item>
+      </Menu.ItemGroup>}
     </Menu>
   );
 
@@ -344,11 +400,35 @@ export const DonationComponent = () => {
         requestId={requestId}
       />
 
-      <FeedbackForm 
+      <FeedbackForm
         open={isFeedbackFormOpen}
         onClose={() => { setIsFeedbackFormOpen(false); }}
         onSubmit={handleFeedbackSubmit}
       />
+
+      <Dialog open={plotSelectionModalOpen} onClose={() => setPlotSelectionModalOpen(false)} fullWidth maxWidth="xl">
+        <DialogTitle>Select Plots</DialogTitle>
+        <DialogContent dividers>
+          <PlotSelection
+            users={users}
+            onUserTreeMapping={(trees: any[]) => { setSelectedTrees(trees); }}
+            requiredTrees={selectedDonation?.pledged ?? 0}
+            requiredArea={selectedDonation?.pledged_area ?? 0}
+            plots={selectedPlots}
+            onPlotsChange={plots => setSelectedPlots(plots)}
+            diversify={diversifyTrees}
+            onDiversifyChange={(value) => { setDiversifyTrees(value) }}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handlePlotSelectionClose} color="error" variant="outlined">
+            Cancel
+          </Button>
+          <Button onClick={handlePlotSelectionSubmit} color="success" variant="contained">
+            Confirm
+          </Button>
+        </DialogActions>
+      </Dialog>
 
       <Dialog open={isDeleteAltOpen} fullWidth maxWidth='md'>
         <DialogTitle>Delete donation</DialogTitle>

@@ -5,7 +5,7 @@ import { BulkUserGroupMappingResponse, Group } from '../../types/Group';
 import { Pond, PondWaterLevelUpdate } from '../../types/pond';
 import { User } from '../../types/user';
 import { Site } from '../../types/site';
-import { Donation } from '../../types/donation';
+import { Donation, DonationUser } from '../../types/donation';
 import { OnsiteStaff } from '../../types/onSiteStaff';
 import { MapTreesUsingPlotIdRequest, MapTreesUsingSaplingIdsRequest, Tree } from '../../types/tree';
 import { UserTree, UserTreeCountPaginationResponse } from '../../types/userTree';
@@ -1108,6 +1108,29 @@ class ApiClient {
         } catch (error: any) {
             console.error(error)
             throw new Error(error?.response?.data?.message || 'Failed to assign trees to donation users');
+        }
+    }
+
+    async getDonationUsers(donation_id: number) {
+        try {
+            const response = await this.api.get<DonationUser[]>(`/donations/users/${donation_id}`);
+            return response.data;
+        } catch (error: any) {
+            if (error.response?.data?.message) {
+                throw new Error(error.response.data.message);
+            }
+            throw new Error('Failed to recipient users for donation!');
+        }
+    }
+
+    async bookTreesForDonation(donation_id: number, plot_ids: number[], trees: any[], diversify: boolean) {
+        try {
+            await this.api.post<void>(`/donations/book-trees`, { donation_id, plot_ids, trees, diversify });
+        } catch (error: any) {
+            if (error.response?.data?.message) {
+                throw new Error(error.response.data.message);
+            }
+            throw new Error('Failed to book trees for donation!');
         }
     }
 

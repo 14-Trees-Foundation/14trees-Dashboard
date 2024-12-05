@@ -7,9 +7,9 @@ import ImageMapping from "./ImageMapping";
 
 interface User {
     key?: string;
-    gifted_to_name: string;
-    gifted_to_phone: string;
-    gifted_to_email: string;
+    recipient_name: string;
+    recipient_phone: string;
+    recipient_email: string;
     assigned_to_name: string;
     assigned_to_phone: string;
     assigned_to_email: string;
@@ -32,9 +32,9 @@ const SingleUserForm: FC<SingleUserFormProps> = ({ maxTrees, imageUrls, value, o
     const { searchUsers } = bindActionCreators(userActionCreators, dispatch);
 
     const [user, setUser] = useState<User>({
-        gifted_to_name: '',
-        gifted_to_email: '',
-        gifted_to_phone: '',
+        recipient_name: '',
+        recipient_email: '',
+        recipient_phone: '',
         assigned_to_email: '',
         assigned_to_name: '',
         assigned_to_phone: '',
@@ -49,9 +49,9 @@ const SingleUserForm: FC<SingleUserFormProps> = ({ maxTrees, imageUrls, value, o
         if (value) {
             setUser({
                 key: value.key,
-                gifted_to_name: value.gifted_to_name,
-                gifted_to_email: value.gifted_to_email,
-                gifted_to_phone: value.gifted_to_phone || '',
+                recipient_name: value.recipient_name,
+                recipient_email: value.recipient_email,
+                recipient_phone: value.recipient_phone || '',
                 assigned_to_name: value.assigned_to_name,
                 assigned_to_email: value.assigned_to_email,
                 assigned_to_phone: value.assigned_to_phone || '',
@@ -61,7 +61,7 @@ const SingleUserForm: FC<SingleUserFormProps> = ({ maxTrees, imageUrls, value, o
                 editable: value.editable,
             })
 
-            if (value.gifted_to_name !== value.assigned_to_name) setShowAssignedFields(true);
+            if (value.recipient_name !== value.assigned_to_name) setShowAssignedFields(true);
         }
 
     }, [value]);
@@ -97,17 +97,17 @@ const SingleUserForm: FC<SingleUserFormProps> = ({ maxTrees, imageUrls, value, o
         usersList = Object.values(usersData.users);
     }
 
-    const handleEmailChange = (event: SyntheticEvent, value: string, field: 'gifted_to_email' | 'assigned_to_email') => {
+    const handleEmailChange = (event: SyntheticEvent, value: string, field: 'recipient_email' | 'assigned_to_email') => {
         let isSet = false;
         usersList.forEach((user) => {
             if (`${user.name} (${user.email})` === value) {
                 isSet = true;
-                if (field === 'gifted_to_email') {
+                if (field === 'recipient_email') {
                     setUser(prev => ({
                         ...prev,
-                        gifted_to_email: user.email,
-                        gifted_to_name: user.name,
-                        gifted_to_phone: user.phone ?? '',
+                        recipient_email: user.email,
+                        recipient_name: user.name,
+                        recipient_phone: user.phone ?? '',
                     }));
                 } else {
                     setUser(prev => ({
@@ -133,9 +133,9 @@ const SingleUserForm: FC<SingleUserFormProps> = ({ maxTrees, imageUrls, value, o
         const data = { ...user };
 
         if (!showAssignedFields || !data.assigned_to_name) {
-            data.assigned_to_email = data.gifted_to_email
-            data.assigned_to_phone = data.gifted_to_phone
-            data.assigned_to_name = data.gifted_to_name
+            data.assigned_to_email = data.recipient_email
+            data.assigned_to_phone = data.recipient_phone
+            data.assigned_to_name = data.recipient_name
         }
 
         onSubmit(data);
@@ -144,9 +144,9 @@ const SingleUserForm: FC<SingleUserFormProps> = ({ maxTrees, imageUrls, value, o
 
     const handleCancel = () => {
         setUser({
-            gifted_to_name: '',
-            gifted_to_email: '',
-            gifted_to_phone: '',
+            recipient_name: '',
+            recipient_email: '',
+            recipient_phone: '',
             assigned_to_email: '',
             assigned_to_name: '',
             assigned_to_phone: '',
@@ -165,23 +165,23 @@ const SingleUserForm: FC<SingleUserFormProps> = ({ maxTrees, imageUrls, value, o
                         fullWidth
                         disabled={!user.editable}
                         options={usersList.map((user) => `${user.name} (${user.email})`)}
-                        onInputChange={(e, value) => { handleEmailChange(e, value, 'gifted_to_email') }}
-                        value={user.gifted_to_email}
+                        onInputChange={(e, value) => { handleEmailChange(e, value, 'recipient_email') }}
+                        value={user.recipient_email}
                         renderInput={(params) => (
                             <TextField
                                 {...params}
                                 label="Recipient Email id"
                                 variant="outlined"
-                                name="gifted_to_email"
+                                name="recipient_email"
                             />
                         )}
                     />
                 </Grid>
                 <Grid item xs={12}>
-                    <TextField disabled={!user.editable} name="gifted_to_name" label="Recipient Name" value={user.gifted_to_name} onChange={handleUserChange} fullWidth />
+                    <TextField disabled={!user.editable} name="recipient_name" label="Recipient Name" value={user.recipient_name} onChange={handleUserChange} fullWidth />
                 </Grid>
                 <Grid item xs={12}>
-                    <TextField disabled={!user.editable} name="gifted_to_phone" label="Recipient Phone (Optional)" value={user.gifted_to_phone} onChange={handleUserChange} fullWidth />
+                    <TextField disabled={!user.editable} name="recipient_phone" label="Recipient Phone (Optional)" value={user.recipient_phone} onChange={handleUserChange} fullWidth />
                 </Grid>
                 <Grid item xs={12}>
                     <TextField
@@ -194,7 +194,7 @@ const SingleUserForm: FC<SingleUserFormProps> = ({ maxTrees, imageUrls, value, o
                         fullWidth
                     />
                 </Grid>
-                <Grid item xs={12}>
+                {/* <Grid item xs={12}>
                     <FormControl component="fieldset">
                         <FormControlLabel
                             control={
@@ -203,7 +203,7 @@ const SingleUserForm: FC<SingleUserFormProps> = ({ maxTrees, imageUrls, value, o
                             label="Do you want to assign/name the tree(s) to someone else (related to recipient)?"
                         />
                     </FormControl>
-                </Grid>
+                </Grid> */}
                 {showAssignedFields && <Grid item xs={12}>
                     <Autocomplete
                         fullWidth
@@ -269,7 +269,7 @@ const SingleUserForm: FC<SingleUserFormProps> = ({ maxTrees, imageUrls, value, o
                             <MenuItem value={'other'}>Other</MenuItem>
                         </Select>
                     </FormControl>
-                    {(user.relation && user.relation !== 'other') && <Typography>Tree(s) will be assigned in the name of {user.gifted_to_name}'s {user.relation}, {user.assigned_to_name}</Typography>}
+                    {(user.relation && user.relation !== 'other') && <Typography>Tree(s) will be assigned in the name of {user.recipient_name}'s {user.relation}, {user.assigned_to_name}</Typography>}
                     {(user.relation && user.relation === 'other') && <Typography>Tree(s) will be assigned in the name of {user.assigned_to_name}</Typography>}
                 </Grid>}
                 <Grid item xs={12}>
@@ -318,7 +318,7 @@ const SingleUserForm: FC<SingleUserFormProps> = ({ maxTrees, imageUrls, value, o
                 </Grid>
             </Grid>
 
-            <ImageMapping name={user.assigned_to_name || user.gifted_to_name} open={imageSelectionModal} images={imageUrls} onClose={() => { setImageSelectionModal(false) }} onSelect={handleImageSelection} />
+            <ImageMapping name={user.assigned_to_name || user.recipient_name} open={imageSelectionModal} images={imageUrls} onClose={() => { setImageSelectionModal(false) }} onSelect={handleImageSelection} />
         </div>
     );
 };

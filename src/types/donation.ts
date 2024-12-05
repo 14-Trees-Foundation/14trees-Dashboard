@@ -23,7 +23,18 @@ export type Donation = {
   user_name?: string;
   group_name?: string;
   created_by_name?: string;
+  booked: number 
 };
+
+export type DonationUser = {
+  id: number;
+  key: number;
+  user_id: number;
+  gifted_trees: number;
+  donation_id: number;
+  created_at: string;
+  updated_at: string;
+}
 
 export type DonationDataState = {
   totalDonations: number,
