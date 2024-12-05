@@ -14,6 +14,7 @@ import ApiClient from "../../../../api/apiClient/apiClient";
 import { AWSUtils } from "../../../../helpers/aws";
 import { Donation } from "../../../../types/donation";
 import DonorPreferencesFrom from "./DonorPreferencesForm";
+import DonorDetailsForm from "./DonorDetailsForm";
 
 interface DonationFormProps {
     donation: Donation | null,
@@ -30,12 +31,13 @@ const DonationForm: React.FC<DonationFormProps> = ({ donation, open, requestId, 
     const [category, setCategory] = useState<string>('Foundation');
     const [grove, setGrove] = useState<string | null>(null);
     const [pledged, setPledged] = useState<number>(14);
-    const [pledgedArea, setPledgedArea] = useState<number>(1);
-    const [pledgedType, setPledgedType] = useState<"trees" | "acres">("trees");
-    const [userVisit, setUserVisit] = useState(true);
+    const [pledgedArea, setPledgedArea] = useState<number>(5);
+    const [pledgedType, setPledgedType] = useState<"trees" | "acres">("acres");
     const [donorType, setDonorType] = useState<string>("Indian Citizen");
     const [panNumber, setPanNumber] = useState<string | null>(null);
+    const [consent, setConsent] = useState(false);
     const [group, setGroup] = useState<Group | null>(null);
+    const [groupAddress, setGroupAddress] = useState<string>('');
     const [file, setFile] = useState<File | null>(null);
     const [users, setUsers] = useState<any[]>([]);
     const [logo, setLogo] = useState<File | null>(null);
@@ -59,20 +61,27 @@ const DonationForm: React.FC<DonationFormProps> = ({ donation, open, requestId, 
         uploadFile();
     }, [logo, requestId])
 
-    const getGiftCardRequestDetails = async () => {
+    const getDonationDetails = async () => {
         const apiClient = new ApiClient();
         if (donation) {
             const userResp = await apiClient.getUsers(0, 1, [{ columnField: 'id', operatorValue: 'equals', value: donation.user_id }]);
             if (userResp.results.length === 1) setUser(userResp.results[0]);
 
             const groupResp = await apiClient.getGroups(0, 1, [{ columnField: 'id', operatorValue: 'equals', value: donation.group_id }]);
-            if (groupResp.results.length === 1) setGroup(groupResp.results[0]);
+            if (groupResp.results.length === 1) {
+                setGroup(groupResp.results[0]);
+                setGroupAddress(groupResp.results[0].address || '');
+                setLogoString(groupResp.results[0].logo_url);
+            }
 
             setCategory(donation.category);
             setGrove(donation.grove);
             setPledged(donation.pledged || 0);
             setPledgedArea(donation.pledged_area || 0);
             setPledgedType(donation.pledged ? "trees" : "acres")
+            setPreference(donation.preference || '');
+            setEventName(donation.event_name || '');
+            setAlternateEmail(donation.alternate_email || '');
 
             if (donation.payment_id) {
                 const payment = await apiClient.getPayment(donation.payment_id);
@@ -84,27 +93,24 @@ const DonationForm: React.FC<DonationFormProps> = ({ donation, open, requestId, 
     }
 
     useEffect(() => {
-        if (open) getGiftCardRequestDetails();
+        if (open) getDonationDetails();
     }, [open, donation])
 
     const steps = [
         {
             key: 0,
             title: "Donor Details",
-            content: <DonorUserForm user={user} onSelect={user => setUser(user)} />,
-        },
-        {
-            key: 1,
-            title: "Corporate Details",
-            content: <DonorGroupForm
+            content: <DonorDetailsForm 
+                user={user} 
+                onUserSelect={user => setUser(user)} 
                 group={group}
-                onSelect={group => { setGroup(group); }}
+                onGroupSelect={group => { setGroup(group); }}
                 logo={logo ?? logoString}
                 onLogoChange={file => { setLogo(file); }}
             />,
         },
         {
-            key: 2,
+            key: 1,
             title: "Tree Plantation",
             content: <TreePlantationForm
                 category={category}
@@ -121,7 +127,7 @@ const DonationForm: React.FC<DonationFormProps> = ({ donation, open, requestId, 
             />,
         },
         {
-            key: 3,
+            key: 2,
             title: "Preferences",
             content: <DonorPreferencesFrom
                 eventName={eventName}
@@ -133,17 +139,17 @@ const DonationForm: React.FC<DonationFormProps> = ({ donation, open, requestId, 
             />,
         },
         {
-            key: 4,
+            key: 3,
             title: "Payment Details",
             content: <PaymentForm
                 amount={pledged * (category === "Foundation" ? 3000 : 1500)}
-                onChange={(donorType: string, panNumber: string | null) => { setDonorType(donorType); setPanNumber(panNumber); }}
+                onChange={(donorType: string, panNumber: string | null, consent: boolean) => { setDonorType(donorType); setPanNumber(panNumber); setConsent(consent); }}
                 onPaymentChange={payment => { setPayment(payment) }}
                 payment={payment}
             />,
         },
         {
-            key: 5,
+            key: 4,
             title: "Recipient Details",
             content: <BulkUserForm
                 users={users}
@@ -163,7 +169,7 @@ const DonationForm: React.FC<DonationFormProps> = ({ donation, open, requestId, 
         const amount = pledged * (category === "Foundation" ? 3000 : 1500);
         let paymentId = payment ? payment.id : undefined
         if (!payment) {
-            const payment = await apiClient.createPayment(amount, donorType, panNumber);
+            const payment = await apiClient.createPayment(amount, donorType, panNumber, consent);
             paymentId = payment.id
         } else {
             const data = {
@@ -181,6 +187,22 @@ const DonationForm: React.FC<DonationFormProps> = ({ donation, open, requestId, 
 
         onSubmit(user, group, pledgedType === "trees" ? pledged : null, pledgedType === "acres" ? pledgedArea : null, category, grove, preference, eventName, alternateEmail, users, paymentId, logoString);
 
+        if (group) {
+            const data = { ...group };
+            let change = false;
+            if (groupAddress.trim() === '' && group.address !== null) {
+                data.address = null;
+                change = true;
+            }
+            if (logoString !== group.logo_url) {
+                data.logo_url = logoString;
+                change = true;
+            }
+
+            if (change) apiClient.updateGroup(data);
+
+        }
+
         handleCloseForm();
     }
 
@@ -194,6 +216,15 @@ const DonationForm: React.FC<DonationFormProps> = ({ donation, open, requestId, 
         setLogo(null);
         setLogoString(null);
         setUsers([]);
+        setEventName('');
+        setAlternateEmail('');
+        setPreference('');
+        setPayment(null);
+        setGroup(null);
+        setConsent(false);
+        setPledgedType("acres");
+        setPledgedArea(5);
+        setPledged(14);
         handleClose();
     }
 
@@ -207,7 +238,6 @@ const DonationForm: React.FC<DonationFormProps> = ({ donation, open, requestId, 
             case 1:
             case 2:
             case 3:
-            case 4:
                 nextStep += 1;
                 break;
             default:

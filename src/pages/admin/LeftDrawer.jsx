@@ -106,11 +106,6 @@ export const AdminLeftDrawer = () => {
     //   display: true,
     // },
     {
-      displayName: "Donation",
-      logo: VolunteerActivismIcon,
-      display: true,
-    },
-    {
       displayName: "Visits",
       logo: TourIcon,
       display: true,
@@ -124,6 +119,11 @@ export const AdminLeftDrawer = () => {
       displayName: "Tree Cards",
       logo: CardGiftcard,
       display: auth.signedin,
+    },
+    {
+      displayName: "Donations",
+      logo: VolunteerActivismIcon,
+      display: true,
     },
     // {
     //   displayName: "Images",

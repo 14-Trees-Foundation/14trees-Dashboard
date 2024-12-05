@@ -13,10 +13,12 @@ interface DonorGroupFormProps {
     logo: File | string | null,
     onLogoChange: (logo: File | null) => void,
     group: Group | null,
-    onSelect: (group: Group | null) => void
+    onSelect: (group: Group | null) => void,
+    address: string,
+    onAddressChange: (address: string) => void
 }
 
-const DonorGroupForm: FC<DonorGroupFormProps> = ({ logo, onLogoChange, group, onSelect }) => {
+const DonorGroupForm: FC<DonorGroupFormProps> = ({ logo, onLogoChange, group, onSelect, address, onAddressChange }) => {
 
     const dispatch = useAppDispatch();
     const { getGroups } = bindActionCreators(groupActionCreators, dispatch);
@@ -71,7 +73,6 @@ const DonorGroupForm: FC<DonorGroupFormProps> = ({ logo, onLogoChange, group, on
         <Box style={{ display: 'flex', justifyContent: 'space-between' }}>
             <Box style={{ width: '48%' }}>
                 {formOption === 'existing' && <Box>
-                    <Typography variant='body1'>Are making this contribution on behalf of a corporate/organization?</Typography>
                     <AutocompleteWithPagination
                         label="Enter corporate name to search"
                         value={group}
@@ -83,6 +84,23 @@ const DonorGroupForm: FC<DonorGroupFormProps> = ({ logo, onLogoChange, group, on
                         size="medium"
                     />
                     <Typography variant="body1">Couldn't find corporate in the system? <Typography color="primary" style={{ cursor: 'pointer' }} onClick={() => setFormOption('new')} variant="body1" component="span">Add corporate details</Typography>.</Typography>
+
+                    <Box mt={3}>
+                        <Typography variant="body1" sx={{ mb: 1 }}>
+                            Communication address
+                        </Typography>
+                        <TextField
+                            fullWidth
+                            multiline
+                            rows={5}
+                            variant="outlined"
+                            value={address}
+                            type='text'
+                            name="address"
+                            onChange={(e) => { onAddressChange(e.target.value); }}
+                            sx={{ mb: 1 }}
+                        />
+                    </Box>
                 </Box>}
 
                 {formOption === 'new' && <Box>
@@ -107,7 +125,7 @@ const DonorGroupForm: FC<DonorGroupFormProps> = ({ logo, onLogoChange, group, on
                                 <TextField name="description" label="Description" value={formData.description} onChange={handleInputChange} fullWidth />
                             </Grid>
                             <Grid item xs={12}>
-                                <ImagePicker 
+                                <ImagePicker
                                     image={logo}
                                     onChange={onLogoChange}
                                 />
@@ -125,11 +143,11 @@ const DonorGroupForm: FC<DonorGroupFormProps> = ({ logo, onLogoChange, group, on
                     <Typography variant="body1">Sponsor already exists? <Typography onClick={() => setFormOption('existing')} style={{ cursor: 'pointer' }} color='primary' variant="body1" component="span">Select Sponsor</Typography>.</Typography>
                 </Box>}
             </Box>
-            <Divider orientation="vertical" flexItem style={{ backgroundColor: 'black' }}/>
+            <Divider orientation="vertical" flexItem style={{ backgroundColor: 'black' }} />
             <Box style={{ width: '48%' }}>
                 <Typography variant="body1" sx={{ pb: 2 }}>Please upload the corporate logo</Typography>
-                <ImagePicker 
-                    image={logo}
+                <ImagePicker
+                    image={logo || group?.logo_url || null}
                     onChange={onLogoChange}
                 />
             </Box>

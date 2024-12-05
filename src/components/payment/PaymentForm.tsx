@@ -1,4 +1,4 @@
-import { Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, Divider, FormControl, FormHelperText, InputAdornment, InputLabel, MenuItem, OutlinedInput, Paper, Select, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Tooltip, Typography } from "@mui/material";
+import { Box, Button, Checkbox, Dialog, DialogActions, DialogContent, DialogTitle, Divider, FormControl, FormControlLabel, FormGroup, FormHelperText, InputAdornment, InputLabel, MenuItem, OutlinedInput, Paper, Select, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Tooltip, Typography } from "@mui/material";
 import { FC, useEffect, useState } from "react";
 import TreeCostChart from "../../assets/tree-cost-chart.png";
 import { Payment, PaymentHistory } from "../../types/payment";
@@ -37,7 +37,7 @@ interface PaymentFormProps {
     amount: number,
     payment: Payment | null
     onPaymentChange: (payment: Payment | null) => void
-    onChange: (donorType: string, panNumber: string | null) => void
+    onChange: (donorType: string, panNumber: string | null, consent: boolean) => void
 }
 
 const PaymentForm: FC<PaymentFormProps> = ({ payment, amount, onPaymentChange, onChange }) => {
@@ -53,6 +53,7 @@ const PaymentForm: FC<PaymentFormProps> = ({ payment, amount, onPaymentChange, o
 
     const [donorType, setDonorType] = useState('');
     const [panNumber, setPanNumber] = useState('');
+    const [consent, setConsent] = useState(false);
 
     const [loading, setLoading] = useState(false);
     const [visible, setVisible] = useState(false);
@@ -72,10 +73,10 @@ const PaymentForm: FC<PaymentFormProps> = ({ payment, amount, onPaymentChange, o
         } else {
             setPayingAmount(amount);
         }
-        
+
         const rpAmount = rpPayments.filter(pt => pt.status === "captured").map(pt => pt.amount - pt.fee).reduce((prev, curr) => prev + curr, 0)
-        paid += rpAmount/100;
-        verified += rpAmount/100;
+        paid += rpAmount / 100;
+        verified += rpAmount / 100;
 
         setAmountData({
             totalAmount: amount,
@@ -88,13 +89,13 @@ const PaymentForm: FC<PaymentFormProps> = ({ payment, amount, onPaymentChange, o
     }, [payment, amount, rpPayments])
 
     useEffect(() => {
-        onChange(donorType, panNumber);
-    }, [donorType, panNumber])
+        onChange(donorType, panNumber, consent);
+    }, [donorType, panNumber, consent])
 
     useEffect(() => {
         const createPayment = async () => {
             const apiClient = new ApiClient();
-            const pmt = await apiClient.createPayment(amount, donorType, panNumber);
+            const pmt = await apiClient.createPayment(amount, donorType, panNumber, consent);
             if (!pmt) {
                 toast.error("Something went wrong please try again");
                 return;
@@ -105,19 +106,21 @@ const PaymentForm: FC<PaymentFormProps> = ({ payment, amount, onPaymentChange, o
         if (showRazorpay && !payment) {
             createPayment();
         }
-    }, [showRazorpay, payment, amount, donorType, panNumber])
+    }, [showRazorpay, payment, amount, donorType, panNumber, consent])
 
     useEffect(() => {
         const handler = setTimeout(() => {
             if (payment) {
                 getPaymentsForOrderId(payment.order_id)
+            } else {
+                setRPPayments([]);
             }
         }, 300);
 
-        return () => { 
+        return () => {
             clearTimeout(handler);
         }
-    }, [payment]) 
+    }, [payment])
 
     const handlePaginationChange = (page: number, pageSize: number) => {
         setPage(page - 1);
@@ -139,7 +142,7 @@ const PaymentForm: FC<PaymentFormProps> = ({ payment, amount, onPaymentChange, o
             const apiClient = new ApiClient();
             const data = await apiClient.getPaymentsForOrder(orderId);
             setRPPayments(data);
-        } catch(error: any) {
+        } catch (error: any) {
             toast.error(error.message);
         }
     }
@@ -153,10 +156,10 @@ const PaymentForm: FC<PaymentFormProps> = ({ payment, amount, onPaymentChange, o
         try {
             await apiClient.verifyPayment(payment.order_id, data.razorpay_payment_id, data.razorpay_signature);
             toast.success("Payment done successfully!");
-        } catch(error: any) {
+        } catch (error: any) {
             toast.error(error.message);
         }
-        
+
         getPaymentsForOrderId(payment.order_id);
         setLoading(false);
     }
@@ -167,8 +170,7 @@ const PaymentForm: FC<PaymentFormProps> = ({ payment, amount, onPaymentChange, o
         let pmt = payment;
         if (!pmt) {
             if (!donorType) toast.error("Please select citizenship!");
-            else pmt = await apiClient.createPayment(amount, donorType, panNumber);
-
+            else pmt = await apiClient.createPayment(amount, donorType, panNumber, consent);
             if (!pmt) {
                 toast.error("Something went wrong please try again");
                 setLoading(false);
@@ -212,7 +214,7 @@ const PaymentForm: FC<PaymentFormProps> = ({ payment, amount, onPaymentChange, o
             title: "Amount paid",
             align: "center",
             width: 100,
-            render: (value: number, record: any) => record.payment_method? value : value/100
+            render: (value: number, record: any) => record.payment_method ? value : value / 100
         },
         {
             dataIndex: "method",
@@ -253,7 +255,7 @@ const PaymentForm: FC<PaymentFormProps> = ({ payment, amount, onPaymentChange, o
             title: "Payment Date",
             align: "center",
             width: 150,
-            render: (value: number, record: any) => record.payment_date ? getHumanReadableDate(record.payment_date) :  getHumanReadableDate(value * 1000),
+            render: (value: number, record: any) => record.payment_date ? getHumanReadableDate(record.payment_date) : getHumanReadableDate(value * 1000),
         },
         // {
         //     dataIndex: "amount_received",
@@ -291,12 +293,12 @@ const PaymentForm: FC<PaymentFormProps> = ({ payment, amount, onPaymentChange, o
 
     return (
         <Box style={{ padding: '0px 40px', width: '100%' }}>
-            <Box mb={1} display="flex" alignItems="center" justifyContent="flex-end">
+            {((payment && payment.payment_history && payment.payment_history.length > 0) || (rpPayments.length > 0)) && <Box mb={1} display="flex" alignItems="center" justifyContent="flex-end">
                 <Button
                     sx={{ ml: 2, textTransform: 'none' }}
                     onClick={() => { setVisible(true) }}
                     color="success" variant="contained">
-                    Make Payment
+                    Bank Transfer
                 </Button>
                 <Button
                     sx={{ ml: 2, textTransform: 'none' }}
@@ -304,7 +306,7 @@ const PaymentForm: FC<PaymentFormProps> = ({ payment, amount, onPaymentChange, o
                     color="success" variant="contained">
                     Pay using Razorpay
                 </Button>
-            </Box>
+            </Box>}
             <Box style={{ display: 'flex', justifyContent: (payment && payment.payment_history && payment.payment_history.length > 0) ? 'space-between' : 'center' }}>
                 <Box width="45%">
                     <Box sx={{ mt: 2 }}>
@@ -351,6 +353,28 @@ const PaymentForm: FC<PaymentFormProps> = ({ payment, amount, onPaymentChange, o
                             fullWidth
                         />
                     </Box>
+                    <Box sx={{ mt: 2 }} hidden={donorType !== 'Indian Citizen' || panNumber !== ''}>
+                        <FormControlLabel control={<Checkbox checked={consent} onChange={(e, checked) => { setConsent(checked); }} />} label="I'm not provided PAN number and I understand that I will not qualify for 80G benefit" />
+                    </Box>
+                    {!((payment && payment.payment_history && payment.payment_history.length > 0) || (rpPayments.length > 0)) &&
+                        <Box>
+                            <Typography mb={1} mt={3}>For larger amounts, we highly recommend making bank transfer (option 1 below)</Typography>
+                            <Box mb={1} display="flex" alignItems="center" justifyContent="flex-start">
+                                <Button
+                                    sx={{ textTransform: 'none' }}
+                                    onClick={() => { setVisible(true) }}
+                                    color="success" variant="contained">
+                                    Bank Transfer
+                                </Button>
+                                <Button
+                                    sx={{ ml: 2, textTransform: 'none' }}
+                                    onClick={() => { setShowRazorpay(true) }}
+                                    color="success" variant="contained">
+                                    Pay using Razorpay
+                                </Button>
+                            </Box>
+                        </Box>
+                    }
                 </Box>
                 {
                     ((payment && payment.payment_history && payment.payment_history.length > 0) || (rpPayments.length > 0)) && <Box width="45%">
@@ -449,7 +473,7 @@ const PaymentForm: FC<PaymentFormProps> = ({ payment, amount, onPaymentChange, o
                 <DialogTitle>Payment Info</DialogTitle>
                 <DialogContent dividers>
                     <Typography sx={{ mb: 2 }}>
-                        Please use below details for payment (QR Code or wire transfer whichever is convenient for you) We will be integrating with a payment gateway soon.
+                        Please use below details for payment (QR Code or wire transfer whichever is convenient for you).
                     </Typography>
                     <PaymentQRInfo />
                     <Divider />

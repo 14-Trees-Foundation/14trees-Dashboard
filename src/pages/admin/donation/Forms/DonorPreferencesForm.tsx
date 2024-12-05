@@ -34,7 +34,7 @@ const DonorPreferencesFrom: React.FC<DonorPreferencesFromProps> = ({ preference,
     return (
         <Box>
             <Box>
-                <Typography>Is there any occasion/event for which you are making donation?</Typography>
+                <Typography>Is this donation for a specific occasion or event? If not, that's absolutely fine—your thoughtful gesture means a lot to us.</Typography>
                 <TextField
                     placeholder="Occasion/event name"
                     value={eventName}
@@ -44,20 +44,20 @@ const DonorPreferencesFrom: React.FC<DonorPreferencesFromProps> = ({ preference,
             </Box>
             <Box mt={3}>
                 <FormControl>
-                    <Typography>What would you like to do with your donation?</Typography>
+                    <Typography>How would you like your donation to be used?</Typography>
                     <RadioGroup
                         name="preference"
                         value={preference}
                         onChange={handlePreferenceChange}
                     >
-                        <FormControlLabel value="user_visit" control={<Radio />} label="Plant tree during a visit to 14 Trees by yourself" />
-                        <FormControlLabel sx={{ mt: -1 }} value="14trees_plantation" control={<Radio />} label="Trees will be planted by 14 Trees as per plantation schedule under your name" />
-                        <FormControlLabel sx={{ mt: -1 }} value="adopt_trees" control={<Radio />} label="Sponsor/adopt existing trees" />
+                        <FormControlLabel value="user_visit" control={<Radio />} label="Plant a tree yourself during a visit to 14 Trees" />
+                        <FormControlLabel sx={{ mt: -1 }} value="14trees_plantation" control={<Radio />} label="Let 14 Trees team plant trees under your name as per the plantation schedule" />
+                        <FormControlLabel sx={{ mt: -1 }} value="adopt_trees" control={<Radio />} label="Sponsor or adopt existing trees" />
                     </RadioGroup>
                 </FormControl>
             </Box>
             <Box mt={3}>
-                <Typography>You can provided alternate email address for communication</Typography>
+                <Typography>You may provide an alternate email address for communication.</Typography>
                 <TextField
                     placeholder="Alternate email"
                     value={alternateEmail}

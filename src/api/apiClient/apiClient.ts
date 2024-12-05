@@ -283,6 +283,8 @@ class ApiClient {
             formData.append("name", data.name);
             formData.append("type", data.type);
             formData.append("description", data.description);
+            if (data.address) formData.append("address", data.address);
+            if (data.logo_url) formData.append("logo_url", data.logo_url);
             if (logo) {
                 formData.append("logo", logo);
             }
@@ -303,6 +305,8 @@ class ApiClient {
             formData.append("name", data.name);
             formData.append("type", data.type);
             if (data.description) formData.append("description", data.description);
+            if (data.address) formData.append("address", data.address);
+            if (data.logo_url) formData.append("logo_url", data.logo_url);
             formData.append("create_at", data.created_at as any);
             formData.append("updated_at", data.updated_at as any);
             if (logo) {
@@ -1563,9 +1567,9 @@ class ApiClient {
         }
     } 
         
-    async createPayment(amount: number, donor_type: string, pan_number: string | null) {
+    async createPayment(amount: number, donor_type: string, pan_number: string | null, consent: boolean) {
         try {
-            const response = await this.api.post<Payment>(`/payments`, { amount, donor_type, pan_number });
+            const response = await this.api.post<Payment>(`/payments`, { amount, donor_type, pan_number, consent });
             return response.data;
         } catch (error: any) {
             if (error.response) {

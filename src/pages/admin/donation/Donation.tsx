@@ -210,14 +210,14 @@ export const DonationComponent = () => {
     {
       dataIndex: "id",
       key: "id",
-      title: "Req. No.",
+      title: "Donation ID",
       align: "right",
-      width: 50,
+      width: 75,
     },
     {
       dataIndex: "user_name",
       key: "user_name",
-      title: "User",
+      title: "Donor",
       align: "center",
       width: 200,
       ...getColumnSearchProps('user_name', filters, handleSetFilters)
@@ -315,7 +315,7 @@ export const DonationComponent = () => {
             marginTop: "5px",
           }}>
           <Button variant="contained" color="success" onClick={() => { handleModalOpen() }}>
-            Add Donation
+            Donate
           </Button>
         </div>
       </div>
@@ -346,7 +346,7 @@ export const DonationComponent = () => {
 
       <FeedbackForm 
         open={isFeedbackFormOpen}
-        onClose={() => { setIsFeedbackFormOpen(true); }}
+        onClose={() => { setIsFeedbackFormOpen(false); }}
         onSubmit={handleFeedbackSubmit}
       />
 

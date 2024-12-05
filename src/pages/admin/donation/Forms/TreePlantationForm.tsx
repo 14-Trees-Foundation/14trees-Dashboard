@@ -1,5 +1,5 @@
 import { HelpOutline } from "@mui/icons-material";
-import { Box, Button, FormControl, MenuItem, Select, TextField, ToggleButton, ToggleButtonGroup, Tooltip, Typography } from "@mui/material";
+import { Box, Button, FormControl, InputAdornment, MenuItem, OutlinedInput, Select, TextField, ToggleButton, ToggleButtonGroup, Tooltip, Typography } from "@mui/material";
 import { FC } from "react";
 
 interface TreePlantationFormProps {
@@ -40,13 +40,16 @@ const TreePlantationForm: FC<TreePlantationFormProps> = ({ category, grove, pled
                     <ToggleButton value="trees">Trees</ToggleButton>
                     <ToggleButton value="acres">Acres</ToggleButton>
                 </ToggleButtonGroup>
-                <TextField
-                    sx={{ ml: 2 }}
-                    value={pledgedType === 'trees' ? pledged : pledgedArea}
-                    onChange={handleCountChange}
-                    type='number'
-                    size="small"
-                />
+                <FormControl sx={{ m: 1, width: '25ch' }} variant="outlined">
+                    <OutlinedInput
+                        endAdornment={<InputAdornment position="end">{pledgedType === "acres" ? "Acres" : "Trees"}</InputAdornment>}
+                        sx={{ ml: 2 }}
+                        value={pledgedType === 'trees' ? pledged : pledgedArea}
+                        onChange={handleCountChange}
+                        type='number'
+                        size="small"
+                    />
+                </FormControl>
             </div>
             <Box mt={2}>
                 <Typography mb={1} variant='body1'>Where would you like to plant the trees?

@@ -35,9 +35,12 @@ const FeedbackForm: React.FC<FeedbackFormProps> = ({ open, onClose, onSubmit }) 
         <Dialog open={open} fullWidth maxWidth="lg">
             <DialogTitle>Feedback & Comments</DialogTitle>
             <DialogContent dividers>
-                <Box>
+                <Typography variant="body1">
+                    Thank you for your generous donation! We truly appreciate your support. You will shortly receive an acknowledgment from our back-office team.
+                </Typography>
+                <Box mt={3}>
                     <Typography variant="body1" sx={{ mb: 1 }}>
-                        Would you like to provide any comments or feedback?
+                        Do you have any feedback or comments you'd like to share with us?
                     </Typography>
                     <TextField
                         fullWidth
@@ -57,7 +60,7 @@ const FeedbackForm: React.FC<FeedbackFormProps> = ({ open, onClose, onSubmit }) 
                 </Box>
                 <Box mt={3}>
                     <Typography variant="body1" sx={{ mb: 1 }}>
-                        How did you hear about 14 trees?
+                        We'd love to know—how did you hear about 14 Trees?
                     </Typography>
                     <TextField
                         fullWidth

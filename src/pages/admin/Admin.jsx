@@ -113,10 +113,6 @@ export const Admin = () => {
     //   displayName: "Events",
     // },
     {
-      page: DonationComponent,
-      displayName: "Donations",
-    },
-    {
       page: VisitsComponent,
       displayName: "Visits",
     },
@@ -126,7 +122,11 @@ export const Admin = () => {
     },
     {
       page: GiftTrees,
-      displayName: "Gift Cards",
+      displayName: "Tree Cards",
+    },
+    {
+      page: DonationComponent,
+      displayName: "Donations",
     },
     {
       page: Images,
