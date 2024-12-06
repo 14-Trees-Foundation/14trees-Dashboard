@@ -89,6 +89,20 @@ const DonationForm: React.FC<DonationFormProps> = ({ donation, open, requestId, 
 
                 setPanNumber(payment.pan_number);
             }
+
+            const users = await apiClient.getDonationUsers(donation.id);
+            const usersData: any[] = users.map(user => {
+                return {
+                    ...user,
+                    key: user.id,
+                    count: user.gifted_trees,
+                    image: user.profile_image_url ? true : undefined,
+                    image_name: user.profile_image_url ? user.profile_image_url.split("/").slice(-1)[0] : undefined,
+                    image_url: user.profile_image_url,
+                    editable: true,
+                }
+            })
+            setUsers(usersData);
         }
     }
 
@@ -100,9 +114,9 @@ const DonationForm: React.FC<DonationFormProps> = ({ donation, open, requestId, 
         {
             key: 0,
             title: "Donor Details",
-            content: <DonorDetailsForm 
-                user={user} 
-                onUserSelect={user => setUser(user)} 
+            content: <DonorDetailsForm
+                user={user}
+                onUserSelect={user => setUser(user)}
                 group={group}
                 onGroupSelect={group => { setGroup(group); }}
                 logo={logo ?? logoString}

@@ -1058,9 +1058,9 @@ class ApiClient {
     }
 
 
-    async updateDonation(data: Donation): Promise<Donation> {
+    async updateDonation(donation: Donation, users: any): Promise<Donation> {
         try {
-            const response = await this.api.put<Donation>(`/donations/${data.id}`, data);
+            const response = await this.api.put<Donation>(`/donations/${donation.id}`, { donation, users });
             return response.data;
         } catch (error: any) {
             if (error.response) {
@@ -1131,6 +1131,17 @@ class ApiClient {
                 throw new Error(error.response.data.message);
             }
             throw new Error('Failed to book trees for donation!');
+        }
+    }
+
+    async sendAckEmailToDonor(donation_id: number, test_mails: string[], cc_mails: string[]) {
+        try {
+            await this.api.post<void>(`/donations/emails/ack`, { donation_id, test_mails, cc_mails });
+        } catch (error: any) {
+            if (error.response?.data?.message) {
+                throw new Error(error.response.data.message);
+            }
+            throw new Error('Failed to send acknowledgement email!');
         }
     }
 
@@ -1555,7 +1566,7 @@ class ApiClient {
             const response = await this.api.post<{ urls: string[] }>(`/utils/scrap`, { url, request_id });
             return response.data.urls;
         } catch (error: any) {
-            if (error.response) {
+            if (error.response?.data?.message) {
                 throw new Error(error.response.data.message);
             }
             throw new Error('Failed to get images');

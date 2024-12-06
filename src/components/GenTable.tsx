@@ -125,6 +125,10 @@ function GeneralTable({ loading, rows, columns, totalRecords, page, pageSize = 1
         })) ?? []);
     }, [columns, checkedList]);
 
+    useEffect(() => {
+        setCheckedList(columns?.map((item) => item.key) ?? []);
+    }, [columns]);
+
     const handleOpenChange = (flag: boolean, info: { source: 'menu' | 'trigger' }) => {
         if (info.source === 'trigger') setOpen(flag);
     };

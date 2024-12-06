@@ -57,13 +57,13 @@ export const createDonation = (requestId: string, createdBy: number, userId: num
     };
 };
 
-export const updateDonation = (record: Donation) => {
+export const updateDonation = (record: Donation, users: any[]) => {
     const apiClient = new ApiClient();
     return (dispatch: any) => {
         dispatch({
             type: donationActionTypes.UPDATE_DONATION_REQUESTED,
         });
-        apiClient.updateDonation(record).then(
+        apiClient.updateDonation(record, users).then(
             (value: Donation) => {
                 toast.success('Donation data updated')
                 dispatch({

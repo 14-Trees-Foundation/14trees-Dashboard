@@ -10,7 +10,7 @@ import { bindActionCreators } from "@reduxjs/toolkit";
 import { RootState } from "../../../redux/store/store";
 import { ToastContainer, toast } from "react-toastify";
 import DonationForm from "./Forms/DonationForm";
-import { Delete, Edit, Landscape, MenuOutlined, NotesOutlined, Wysiwyg } from "@mui/icons-material";
+import { Delete, Edit, Email, Landscape, MenuOutlined, NotesOutlined, Wysiwyg } from "@mui/icons-material";
 import { Badge, Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, Divider, IconButton, Typography } from "@mui/material";
 import GeneralTable from "../../../components/GenTable";
 import ApiClient from "../../../api/apiClient/apiClient";
@@ -20,6 +20,7 @@ import { Group } from "../../../types/Group";
 import FeedbackForm from "./Forms/FeedbackForm";
 import { Plot } from "../../../types/plot";
 import PlotSelection from "./Forms/PlotSelection";
+import EmailConfirmationModal from "./components/EmailConfirmationModal";
 
 export const DonationComponent = () => {
 
@@ -51,12 +52,12 @@ export const DonationComponent = () => {
   useEffect(() => {
     const getUsers = async () => {
       if (selectedDonation) {
-        
+
         try {
           const apiClient = new ApiClient();
           const users = await apiClient.getDonationUsers(selectedDonation.id);
           setUsers(users);
-        }  catch(error: any) {
+        } catch (error: any) {
           toast.error(error.message);
         }
       }
@@ -77,17 +78,43 @@ export const DonationComponent = () => {
     if (!selectedDonation || (selectedPlots.length === 0 && selectedTrees.length === 0)) {
       toast.error("Invalid input!");
       return;
-    } 
+    }
 
     try {
       const apiClient = new ApiClient();
       await apiClient.bookTreesForDonation(selectedDonation.id, selectedPlots.map(plot => plot.id), selectedTrees, diversifyTrees);
       toast.success(`Successfully booked trees for donation id: ${selectedDonation.id}!`);
-    } catch(error: any) {
+    } catch (error: any) {
       toast.error(error.message);
     }
 
     handlePlotSelectionClose();
+  }
+
+
+  // Send Emails
+  const [emailConfirmationModal, setEmailConfirmationModal] = useState(false);
+
+  const handleEmailModalClose = () => {
+    setEmailConfirmationModal(false);
+    setSelectedDonation(null);
+  }
+
+  const handleSendEmails = async (emailDonor: boolean, emailReceiver: boolean, emailAssignee: boolean, testMails: string[], ccMails: string[], templateType: string) => {
+    if (!selectedDonation) {
+      toast.error("Invalid input!");
+      return;
+    }
+
+    try {
+      const apiClient = new ApiClient();
+      await apiClient.sendAckEmailToDonor(selectedDonation.id, testMails, ccMails);
+      toast.success(`Successfully acknowledgement mail to donor!`);
+    } catch (error: any) {
+      toast.error(error.message);
+    }
+
+    handleEmailModalClose();
   }
 
   const handleSetFilters = (filters: Record<string, GridFilterItem>) => {
@@ -190,7 +217,7 @@ export const DonationComponent = () => {
     data.event_name = eventName?.trim() ? eventName.trim() : null;
     data.alternate_email = alternateEmail?.trim() ? alternateEmail.trim() : null;
 
-    updateDonation(data);
+    updateDonation(data, users);
   }
 
   const handleSubmit = (user: User, group: Group | null, pledged: number | null, pledgedArea: number | null, category: string, grove: string | null, preference: string, eventName: string, alternateEmail: string, users: any[], paymentId?: number, logo?: string | null) => {
@@ -254,11 +281,14 @@ export const DonationComponent = () => {
         </Menu.Item>
       </Menu.ItemGroup>
       <Menu.Divider style={{ backgroundColor: '#ccc' }} />
-      {(Number(record.booked) < (record.pledged || 0)) && <Menu.ItemGroup>
-        <Menu.Item key="20" onClick={() => { setSelectedDonation(record); setPlotSelectionModalOpen(true); }} icon={<Landscape />}>
+      <Menu.ItemGroup>
+        {(Number(record.booked) < (record.pledged || 0)) && <Menu.Item key="20" onClick={() => { setSelectedDonation(record); setPlotSelectionModalOpen(true); }} icon={<Landscape />}>
           Select Plots
+        </Menu.Item>}
+        <Menu.Item key="21" onClick={() => { setSelectedDonation(record); setEmailConfirmationModal(true); }} icon={<Email />}>
+          Send Emails
         </Menu.Item>
-      </Menu.ItemGroup>}
+      </Menu.ItemGroup>
     </Menu>
   );
 
@@ -404,6 +434,12 @@ export const DonationComponent = () => {
         open={isFeedbackFormOpen}
         onClose={() => { setIsFeedbackFormOpen(false); }}
         onSubmit={handleFeedbackSubmit}
+      />
+
+      <EmailConfirmationModal
+        open={emailConfirmationModal}
+        onClose={handleEmailModalClose}
+        onSubmit={handleSendEmails}
       />
 
       <Dialog open={plotSelectionModalOpen} onClose={() => setPlotSelectionModalOpen(false)} fullWidth maxWidth="xl">

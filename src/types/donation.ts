@@ -29,9 +29,20 @@ export type Donation = {
 export type DonationUser = {
   id: number;
   key: number;
-  user_id: number;
+  recipient: number;
+  assignee: number;
   gifted_trees: number;
   donation_id: number;
+  mail_sent: boolean | null;
+  mail_error: string | null;
+  profile_image_url: string | null;
+  recipient_name: string;
+  recipient_email: string;
+  recipient_phone: string;
+  assignee_name: string;
+  assignee_email: string;
+  assignee_phone: string;
+  relation?: string;
   created_at: string;
   updated_at: string;
 }
