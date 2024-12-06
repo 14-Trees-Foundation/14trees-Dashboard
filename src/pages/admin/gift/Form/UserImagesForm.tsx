@@ -56,7 +56,7 @@ const UserImagesForm: React.FC<UserImagesFormProps> = ({ requestId }) => {
                 }}
             >
                 <input {...getInputProps()} />
-                <p>Drag and drop some user images here, or click to select.</p>
+                <p>Drag and drop some recipient images here, or click to select.</p>
             </div>
 
             <Box display="flex" alignItems="center" justifyContent="space-between">

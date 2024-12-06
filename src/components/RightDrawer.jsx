@@ -4,9 +4,13 @@ import Drawer from "@mui/material/Drawer";
 
 import { NewsFeed } from "./NewsFeed";
 import { Impact } from "../stories/Impact/Impact";
+import { overallData } from "../store/atoms";
+import { useRecoilValue } from "recoil";
 
 export const RightDrawer = ({showWhatsNew = true, children = null}) => {
   const classes = useStyles();
+
+  const overAllStates = useRecoilValue(overallData);
   return (
     <Drawer className={classes.rdrawer} variant="permanent" anchor="right">
       <div>
@@ -15,18 +19,18 @@ export const RightDrawer = ({showWhatsNew = true, children = null}) => {
           <Divider style={{ margin: "0 9% 2% 9%" }} />
           <div className={classes.infobox}>
             <Impact
-              count={"120+"}
+              count={"210+"}
               text={"People employed from local community"}
             />
             <Impact
-              count={"70+"}
+              count={"100+"}
               text={"Ponds created to increase water table"}
             />
           </div>
           <div className={classes.infobox}>
             <Impact
               size={"large"}
-              count={"40000+"}
+              count={overAllStates.count}
               text={"Trees planted till date"}
             />
           </div>

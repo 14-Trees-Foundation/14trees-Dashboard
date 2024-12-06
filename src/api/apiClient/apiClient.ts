@@ -1277,6 +1277,16 @@ class ApiClient {
         Gift Cards
     */
 
+    async getGiftRequestTags(): Promise<PaginatedResponse<string>> {
+        const url = `/gift-cards/requests/tags`;
+        try {
+            const response = await this.api.get<PaginatedResponse<string>>(url);
+            return response.data;
+        } catch (error: any) {
+            throw new Error(`Failed to fetch gift cards: ${error.message}`);
+        }
+    }
+
     async getGiftCards(offset: number, limit: number, filters?: any[]): Promise<PaginatedResponse<GiftCard>> {
         const url = `/gift-cards/requests/get?offset=${offset}&limit=${limit}`;
         try {
@@ -1288,11 +1298,12 @@ class ApiClient {
     }
 
 
-    async createGiftCard(request_id: string, no_of_cards: number, user_id: number, category: string, grove: string | null, group_id?: number, payment_id?: number, logo?: File, messages?: any, file?: File): Promise<GiftCard> {
+    async createGiftCard(request_id: string, created_by: number, no_of_cards: number, user_id: number, category: string, grove: string | null, group_id?: number, payment_id?: number, logo?: File, messages?: any, file?: File): Promise<GiftCard> {
         try {
             const formData = new FormData();
             formData.append('request_id', request_id);
             formData.append('no_of_cards', no_of_cards.toString());
+            formData.append('created_by', created_by.toString());
             formData.append('user_id', user_id.toString());
             formData.append('category', category);
             if (messages) {

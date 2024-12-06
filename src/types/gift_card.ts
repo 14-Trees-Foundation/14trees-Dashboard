@@ -4,6 +4,7 @@ export type GiftCard = {
     key: number;
     id: number;
     user_id: number;
+    created_by: number;
     group_id: number;
     no_of_cards: number;
     category: string;
@@ -14,6 +15,7 @@ export type GiftCard = {
     user_name?: string;
     user_email?: string;
     group_name?: string;
+    created_by_name?: string;
     plot_ids?: number[];
     primary_message: string;
     secondary_message: string;
@@ -29,6 +31,7 @@ export type GiftCard = {
     notes: string | null;
     payment_id: number | null;
     album_id: number | null;
+    tags: string[] | null;
     booked: number,
     assigned: number,
 }

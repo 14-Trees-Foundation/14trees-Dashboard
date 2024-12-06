@@ -498,7 +498,6 @@ const PaymentForm: FC<PaymentFormProps> = ({ payment, amount, onPaymentChange, o
                             <FormControl fullWidth>
                                 <InputLabel id="payment-method-label">Transfer Mode</InputLabel>
                                 <Select
-                                    disabled={donorType !== 'Indian Citizen'}
                                     labelId="payment-method-label"
                                     value={paymentMethod || "None"}
                                     label="Transfer Mode"

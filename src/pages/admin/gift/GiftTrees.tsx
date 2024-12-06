@@ -6,7 +6,7 @@ import { Group } from "../../../types/Group";
 import ApiClient from "../../../api/apiClient/apiClient";
 import { ToastContainer, toast } from "react-toastify";
 import { GiftCard } from "../../../types/gift_card";
-import getColumnSearchProps from "../../../components/Filter";
+import getColumnSearchProps, { getColumnSelectedItemFilter } from "../../../components/Filter";
 import { GridFilterItem } from "@mui/x-data-grid";
 import * as giftCardActionCreators from "../../../redux/actions/giftCardActions";
 import { useAppDispatch, useAppSelector } from "../../../redux/store/hooks";
@@ -14,7 +14,7 @@ import { bindActionCreators } from "@reduxjs/toolkit";
 import { RootState } from "../../../redux/store/store";
 import TableComponent from "../../../components/Table";
 import { Dropdown, Menu, TableColumnsType } from "antd";
-import { AssignmentInd, AssuredWorkload, CardGiftcard, Collections, Delete, Download, Edit, Email, ErrorOutline, FileCopy, Landscape, ManageAccounts, MenuOutlined, NotesOutlined, Slideshow, Wysiwyg } from "@mui/icons-material";
+import { AssignmentInd, AssuredWorkload, CardGiftcard, Collections, Delete, Download, Edit, Email, ErrorOutline, FileCopy, Landscape, LocalOffer, ManageAccounts, MenuOutlined, NotesOutlined, Slideshow, Wysiwyg } from "@mui/icons-material";
 import PlotSelection from "./Form/PlotSelection";
 import { Plot } from "../../../types/plot";
 import giftCardActionTypes from "../../../redux/actionTypes/giftCardActionTypes";
@@ -23,11 +23,12 @@ import GiftRequestNotes from "./Form/Notes";
 import AlbumImageInput from "../../../components/AlbumImageInput";
 import EmailConfirmationModal from "./Form/EmailConfirmationModal";
 import EditUserDetailsModal from "./Form/EditUserDetailsModal";
-import { getUniqueRequestId } from "../../../helpers/utils";
+import { getHumanReadableDate, getUniqueRequestId } from "../../../helpers/utils";
 import PaymentComponent from "../../../components/payment/PaymentComponent";
 import { useAuth } from "../auth/auth";
 import { UserRoles } from "../../../types/common";
 import { LoginComponent } from "../Login/LoginComponent";
+import TagComponent from "./Form/TagComponent";
 
 const GiftTrees: FC = () => {
     const dispatch = useAppDispatch();
@@ -58,6 +59,8 @@ const GiftTrees: FC = () => {
     const [albumImagesModal, setAlbumImagesModal] = useState(false);
     const [album, setAlbum] = useState<any>(null);
     const [userDetailsEditModal, setUserDetailsEditModal] = useState(false);
+    const [tagModal, setTagModal] = useState(false);
+    const [tags, setTags] = useState<string[]>([]);
 
     // payment
     const [paymentModal, setPaymentModal] = useState(false);
@@ -74,6 +77,22 @@ const GiftTrees: FC = () => {
 
         if (plotModal) getUsers();
     }, [plotModal, selectedGiftCard]);
+
+    useEffect(() => {
+
+        const getTags = async () => {
+            try {
+                const apiClient = new ApiClient();
+                const tagsResp = await apiClient.getGiftRequestTags();
+                setTags(tagsResp.results);
+            } catch (error: any) {
+                toast.error(error.message);
+            }
+        }
+
+        getTags();
+
+    }, []);
 
     useEffect(() => {
         authRef.current = auth;
@@ -142,7 +161,7 @@ const GiftTrees: FC = () => {
                 await apiClient.updateAlbumImagesForGiftRequest(selectedGiftCard.id, album.id);
             }
 
-            toast.success("Gift Request Album images updated!")
+            toast.success("Tree card request album images updated!")
         } catch (error: any) {
             toast.error(error.message);
         }
@@ -161,7 +180,7 @@ const GiftTrees: FC = () => {
             if (album) await apiClient.deleteAlbum(album.id);
             await apiClient.updateAlbumImagesForGiftRequest(selectedGiftCard.id);
 
-            toast.success("Removed gift request album images!")
+            toast.success("Removed tree card request album images!")
         } catch (error: any) {
             toast.error(error.message);
         }
@@ -211,7 +230,7 @@ const GiftTrees: FC = () => {
         const apiClient = new ApiClient();
         let giftCardId: number;
         try {
-            const response = await apiClient.createGiftCard(requestId, treeCount, user.id, category, grove, group?.id, paymentId, logo, messages, file);
+            const response = await apiClient.createGiftCard(requestId, auth.userId, treeCount, user.id, category, grove, group?.id, paymentId, logo, messages, file);
             giftCardId = response.id;
             dispatch({
                 type: giftCardActionTypes.CREATE_GIFT_CARD_SUCCEEDED,
@@ -231,9 +250,9 @@ const GiftTrees: FC = () => {
                     payload: response,
                 });
             }
-            toast.success("Gift cards requested!");
+            toast.success("Tree cards requested!");
         } catch (error) {
-            toast.error("Failed to create gift card users");
+            toast.error("Failed to create tree card users");
             return;
         }
     }
@@ -245,7 +264,7 @@ const GiftTrees: FC = () => {
         let success = false;
         try {
             const response = await apiClient.updateGiftCard(selectedGiftCard, treeCount, user.id, category, grove, group?.id, paymentId, logo, messages, file);
-            toast.success("Gift Request updated successfully");
+            toast.success("Tree Request updated successfully");
             dispatch({
                 type: giftCardActionTypes.UPDATE_GIFT_CARD_SUCCEEDED,
                 payload: response,
@@ -254,7 +273,7 @@ const GiftTrees: FC = () => {
             setRequestId(null);
             setSelectedGiftCard(null);
         } catch (error) {
-            toast.error("Failed to update gift request");
+            toast.error("Failed to update tree card request");
             return;
         }
 
@@ -267,7 +286,7 @@ const GiftTrees: FC = () => {
                         payload: response,
                     });
                 }
-                toast.success("Gift cards requested!");
+                toast.success("Tree cards requested!");
             } catch (error) {
                 toast.error("Failed to create gift card users");
                 return;
@@ -306,10 +325,10 @@ const GiftTrees: FC = () => {
         if (selectedPlots.length !== 0) {
             try {
                 await apiClient.createGiftCardPlots(selectedGiftCard.id, selectedPlots.map(plot => plot.id));
-                toast.success("Saved selected plot for gift card request!");
+                toast.success("Saved selected plot for tree card request!");
 
                 await apiClient.bookGiftCards(selectedGiftCard.id, userTrees.length > 0 ? userTrees : undefined, bookNonGiftable, diversify);
-                toast.success("Gift cards booked successfully");
+                toast.success("Tree cards booked successfully");
                 getGiftCardData();
             } catch {
                 toast.error("Something went wrong!");
@@ -332,7 +351,7 @@ const GiftTrees: FC = () => {
         try {
             const apiClient = new ApiClient();
             await apiClient.updateGiftRequestUserDetails(users);
-            toast.success("Gift Request users updated!")
+            toast.success("Tree card request users updated!")
         } catch (error: any) {
             toast.error(error.message);
         }
@@ -376,7 +395,7 @@ const GiftTrees: FC = () => {
     const handleGenerateGiftCards = async (id: number) => {
         const apiClient = new ApiClient();
         apiClient.generateGiftCardTemplates(id);
-        toast.success("Gift card creation may take upto 10mins. Please refresh the page after some time.")
+        toast.success("Tree card creation may take upto 10mins. Please refresh the page after some time.")
     }
 
     const handleDownloadCards = async (id: number, name: string, type: 'pdf' | 'ppt' | 'zip') => {
@@ -408,7 +427,7 @@ const GiftTrees: FC = () => {
         try {
             const apiClient = new ApiClient();
             const response = await apiClient.updateGiftCard({ ...selectedGiftCard, notes: text }, selectedGiftCard.no_of_cards, selectedGiftCard.user_id, selectedGiftCard.category, selectedGiftCard.grove);
-            toast.success("Gift Request updated successfully");
+            toast.success("Tree card request updated successfully");
             dispatch({
                 type: giftCardActionTypes.UPDATE_GIFT_CARD_SUCCEEDED,
                 payload: response,
@@ -447,13 +466,46 @@ const GiftTrees: FC = () => {
         }
     }
 
+    // Tag request
+
+    const handleTagModalOpen = (request: GiftCard) => {
+        setSelectedGiftCard(request);
+        setTagModal(true);
+    }
+
+    const handleTagModalClose = () => {
+        setSelectedGiftCard(null);
+        setTagModal(false);
+    }
+
+    const handleTagTreeCardRequestSubmit = async (tags: string[]) => {
+        if (!selectedGiftCard) return;
+
+        setTagModal(false);
+        try {
+            const data = { ...selectedGiftCard };
+            data.tags = tags;
+            const apiClient = new ApiClient();
+            const response = await apiClient.updateGiftCard(data, selectedGiftCard.no_of_cards, selectedGiftCard.user_id, selectedGiftCard.category, selectedGiftCard.grove, selectedGiftCard.group_id);
+            dispatch({
+                type: giftCardActionTypes.UPDATE_GIFT_CARD_SUCCEEDED,
+                payload: response,
+            });
+            toast.success("Updated the tree cards request tags!")
+        } catch (error: any) {
+            toast.error(error.message)
+        }
+
+        handleTagModalClose();
+    }
+
     const getStatus = (card: GiftCard) => {
         if (card.status === 'pending_plot_selection') {
             return 'Pending Plot Selection';
         } else if (card.status === 'pending_assignment') {
             return 'Pending assignment';
         } else if (card.status === 'pending_gift_cards') {
-            return 'Pending Gift cards creation';
+            return 'Pending Tree cards creation';
         } else {
             return 'Completed';
         }
@@ -514,10 +566,10 @@ const GiftTrees: FC = () => {
             {record.presentation_id && <Menu.Divider style={{ backgroundColor: '#ccc' }} />}
             {record.presentation_id && <Menu.ItemGroup>
                 <Menu.Item key="30" onClick={() => { handleDownloadCards(record.id, record.user_name + '_' + record.no_of_cards, 'zip') }} icon={<Download />}>
-                    Download Gift Cards
+                    Download Tree Cards
                 </Menu.Item>
                 <Menu.Item key="31" onClick={() => { window.open('https://docs.google.com/presentation/d/' + record.presentation_id); }} icon={<Slideshow />}>
-                    Gift Cards Slide
+                    Tree Cards Slide
                 </Menu.Item>
             </Menu.ItemGroup>}
             {!auth.roles.includes(UserRoles.User) && <Menu.Divider style={{ backgroundColor: '#ccc' }} />}
@@ -533,6 +585,9 @@ const GiftTrees: FC = () => {
                 <Menu.Item key="42" onClick={() => { handlePaymentModalOpen(record); }} icon={<AssuredWorkload />}>
                     Payment Details
                 </Menu.Item>
+                <Menu.Item key="43" onClick={() => { handleTagModalOpen(record); }} icon={<LocalOffer />}>
+                    Tag Request
+                </Menu.Item>
             </Menu.ItemGroup>}
         </Menu>
     );
@@ -543,12 +598,12 @@ const GiftTrees: FC = () => {
             key: "id",
             title: "Req. No.",
             align: "right",
-            width: 50,
+            width: 100,
         },
         {
             dataIndex: "user_name",
             key: "user_name",
-            title: "User",
+            title: "Sponsor",
             align: "center",
             width: 200,
             ...getColumnSearchProps('user_name', filters, handleSetFilters)
@@ -556,7 +611,7 @@ const GiftTrees: FC = () => {
         {
             dataIndex: "group_name",
             key: "group_name",
-            title: "Corporate/Personal",
+            title: "Sponsorship (Corporate/Personal)",
             align: "center",
             width: 200,
             render: (value: string) => value ? value : 'Personal',
@@ -571,6 +626,23 @@ const GiftTrees: FC = () => {
             ...getColumnSearchProps('no_of_cards', filters, handleSetFilters)
         },
         {
+            dataIndex: "created_by_name",
+            key: "created_by_name",
+            title: "Created by",
+            align: "center",
+            width: 200,
+            ...getColumnSearchProps('created_by_name', filters, handleSetFilters)
+        },
+        {
+            dataIndex: "tags",
+            key: "tags",
+            title: "Tags",
+            align: "center",
+            width: 200,
+            render: value => value?.join(", ") || '',
+            ...getColumnSelectedItemFilter({ dataIndex: 'tags', filters, handleSetFilters, options: tags })
+        },
+        {
             dataIndex: "status",
             key: "status",
             title: "Status",
@@ -583,7 +655,7 @@ const GiftTrees: FC = () => {
             key: "validation_errors",
             title: "Validation Errors",
             align: "center",
-            width: 100,
+            width: 120,
             render: (value) => value && value.length > 0 ? (
                 <Tooltip title={<div>{getValidationErrors(value).map(item => (<p>{item}</p>))}</div>}>
                     <IconButton>
@@ -605,6 +677,14 @@ const GiftTrees: FC = () => {
                     </Badge>
                 </IconButton>
             ),
+        },
+        {
+            dataIndex: "created_at",
+            key: "created_at",
+            title: "Created on",
+            align: "center",
+            width: 200,
+            render: getHumanReadableDate,
         },
         {
             dataIndex: "action",
@@ -663,15 +743,17 @@ const GiftTrees: FC = () => {
             </div>
             <Divider sx={{ backgroundColor: "black", marginBottom: '15px' }} />
 
-            {auth.signedin && <TableComponent
-                dataSource={giftCards}
-                columns={columns}
-                totalRecords={giftCardsData.totalGiftCards}
-                fetchAllData={getAllGiftCardsData}
-                setPage={setPage}
-                setPageSize={setPageSize}
-                tableName="Gift Trees"
-            />}
+            {auth.signedin && <Box sx={{ height: 840, width: "100%" }}>
+                <TableComponent
+                    dataSource={giftCards}
+                    columns={columns}
+                    totalRecords={giftCardsData.totalGiftCards}
+                    fetchAllData={getAllGiftCardsData}
+                    setPage={setPage}
+                    setPageSize={setPageSize}
+                    tableName="Tree Trees"
+                />
+            </Box>}
 
             {!auth.signedin &&
                 <Box
@@ -727,9 +809,9 @@ const GiftTrees: FC = () => {
             </Dialog>
 
             <Dialog open={autoAssignModal} onClose={() => setAutoAssignModal(false)} fullWidth maxWidth="lg">
-                <DialogTitle>Auto-assign trees to gift card request users</DialogTitle>
+                <DialogTitle>Auto-assign trees to tree card request recipients</DialogTitle>
                 <DialogContent dividers>
-                    <Typography variant="subtitle1">Are you sure you want to auto assign trees to users?</Typography>
+                    <Typography variant="subtitle1">Are you sure you want to auto assign trees to recipients?</Typography>
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={() => setAutoAssignModal(false)} color="primary">
@@ -806,6 +888,14 @@ const GiftTrees: FC = () => {
                 handleClose={() => { setNotesModal(false) }}
                 onSave={handleNotesSave}
                 initialText={selectedGiftCard?.notes ?? ''}
+            />
+
+            <TagComponent
+                defaultTags={tags}
+                tags={selectedGiftCard?.tags || []}
+                open={tagModal}
+                onClose={handleTagModalClose}
+                onSubmit={handleTagTreeCardRequestSubmit}
             />
         </div>
     );

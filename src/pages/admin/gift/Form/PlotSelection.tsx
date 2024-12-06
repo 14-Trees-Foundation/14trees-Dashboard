@@ -1,6 +1,6 @@
 
 import { FC, useEffect, useState } from "react";
-import { Box, Button, Checkbox, Chip, FormControl, FormControlLabel, ToggleButton, ToggleButtonGroup, Typography } from "@mui/material";
+import { Box, Button, Checkbox, Chip, Divider, FormControl, FormControlLabel, ToggleButton, ToggleButtonGroup, Typography } from "@mui/material";
 import { Plot } from "../../../../types/plot";
 import { useAppDispatch, useAppSelector } from "../../../../redux/store/hooks";
 import { bindActionCreators } from "@reduxjs/toolkit";
@@ -15,15 +15,15 @@ import ApiClient from "../../../../api/apiClient/apiClient";
 import { RootState } from "../../../../redux/store/store";
 import TreeSelectionComponent from "./TreeSelectionComponent";
 
+const calculateUnion = (plantTypes: (string[] | undefined)[]) => {
+    const allTypes = plantTypes.flat().filter((type): type is string => type !== undefined);
+    return Array.from(new Set(allTypes));
+}
+
 const TableSummary = (plots: Plot[], selectedPlotIds: number[], totalColumns: number) => {
 
     const calculateSum = (data: (number | undefined)[]) => {
         return data.reduce((a, b) => (a ?? 0) + (b ?? 0), 0);
-    }
-
-    const calculateUnion = (plantTypes: (string[] | undefined)[]) => {
-        const allTypes = plantTypes.flat().filter((type): type is string => type !== undefined);
-        return Array.from(new Set(allTypes)).length;
     }
 
     return (
@@ -35,7 +35,7 @@ const TableSummary = (plots: Plot[], selectedPlotIds: number[], totalColumns: nu
                 <Table.Summary.Cell align="right" index={3} colSpan={1}>{calculateSum(plots.filter((plot) => selectedPlotIds.includes(plot.id)).map((plot) => plot.total))}</Table.Summary.Cell>
                 <Table.Summary.Cell align="right" index={4} colSpan={1}>{calculateSum(plots.filter((plot) => selectedPlotIds.includes(plot.id)).map((plot) => plot.available))}</Table.Summary.Cell>
                 <Table.Summary.Cell align="right" index={5} colSpan={1}>{calculateSum(plots.filter((plot) => selectedPlotIds.includes(plot.id)).map((plot) => plot.card_available))}</Table.Summary.Cell>
-                <Table.Summary.Cell align="right" index={6} colSpan={1}>{calculateUnion(plots.filter((plot) => selectedPlotIds.includes(plot.id)).map((plot) => plot.distinct_plants))}</Table.Summary.Cell>
+                <Table.Summary.Cell align="right" index={6} colSpan={1}>{calculateUnion(plots.filter((plot) => selectedPlotIds.includes(plot.id)).map((plot) => plot.distinct_plants)).length}</Table.Summary.Cell>
                 <Table.Summary.Cell align="right" index={7} colSpan={totalColumns - 6}></Table.Summary.Cell>
             </Table.Summary.Row>
         </Table.Summary>
@@ -383,6 +383,12 @@ const PlotSelection: FC<PlotSelectionProps> = ({ requiredTrees, plots, onPlotsCh
                 footer
                 tableName="Plots selection"
             />
+            {plots.length > 0 && <Box sx={{ marginBottom: '20px' }}>
+                <Divider/>
+                <Typography mb={1} mt={2}><strong>List of unique plant types for selected plots:</strong></Typography>
+                <Typography mb={2}>{calculateUnion(plots.map(plot => plot.distinct_plants)).join(", ")}</Typography>
+                <Divider/>
+            </Box>}
 
             <Box
                 mt={3}
@@ -395,7 +401,7 @@ const PlotSelection: FC<PlotSelectionProps> = ({ requiredTrees, plots, onPlotsCh
                         alignItems="center"
                         justifyContent="space-between"
                     >
-                        <Typography mr={10}>Do you want to manually select trees for each user?</Typography>
+                        <Typography mr={10}>Do you want to manually select trees for each recipient?</Typography>
                         <Button
                             variant="outlined"
                             color="success"
