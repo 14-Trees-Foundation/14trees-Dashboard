@@ -1252,7 +1252,7 @@ class ApiClient {
             const formData = new FormData();
             formData.append('request_id', request_id);
             formData.append('no_of_cards', no_of_cards.toString());
-            formData.append('created_by', created_by.toString());
+            formData.append('created_by', created_by ? created_by.toString() : user_id.toString());
             formData.append('user_id', user_id.toString());
             formData.append('category', category);
             if (messages) {
