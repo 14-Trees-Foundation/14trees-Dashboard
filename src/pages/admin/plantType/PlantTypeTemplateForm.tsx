@@ -71,7 +71,7 @@ const PlantTypeTemplateForm: React.FC<PlantTypeTemplateFormProps> = ({ open, onC
         try {
             const apiClient = new ApiClient();
             await apiClient.addPlantTypeTemplate(selectedPlantType.name, templateId);
-            toast.success("Gift Card template added successfully!")
+            toast.success("Tree card template added successfully!")
         } catch (error: any) {
             toast.error(error.message)
         }

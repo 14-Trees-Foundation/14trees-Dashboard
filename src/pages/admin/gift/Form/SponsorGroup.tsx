@@ -68,7 +68,7 @@ const SponsorGroupForm: FC<SponsorGroupFormProps> = ({ logo, onLogoChange, group
         <Box style={{ display: 'flex', justifyContent: 'space-between' }}>
             <Box style={{ width: '48%' }}>
                 {formOption === 'existing' && <Box>
-                    <Typography variant='body1'>Do you want to gift on behalf of a corporate/organization?</Typography>
+                    <Typography variant='body1'>Do you want to sponsor on behalf of a corporate/organization?</Typography>
                     <AutocompleteWithPagination
                         label="Enter corporate name to search"
                         value={group}
@@ -124,7 +124,7 @@ const SponsorGroupForm: FC<SponsorGroupFormProps> = ({ logo, onLogoChange, group
             </Box>
             <Divider orientation="vertical" flexItem style={{ backgroundColor: 'black' }}/>
             <Box style={{ width: '48%' }}>
-                <Typography variant="body1" sx={{ pb: 2 }}>Please upload the corporate logo (this will be shown on the gift card)</Typography>
+                <Typography variant="body1" sx={{ pb: 2 }}>Please upload the corporate logo (this will be shown on the tree card)</Typography>
                 <ImagePicker 
                     image={logo}
                     onChange={onLogoChange}

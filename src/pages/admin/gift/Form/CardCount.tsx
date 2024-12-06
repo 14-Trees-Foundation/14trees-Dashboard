@@ -24,7 +24,7 @@ const CardCount: FC<CardCountProps> = ({ disabled, treeCount, onTreeCountChange,
     return (
         <div style={{ padding: '10px 40px', width: '100%' }}>
             <div style={{ display: 'flex', alignItems: 'center' }}>
-                <Typography variant='body1' mr={5}>Do you know the number of trees that are to be gifted (approximately)?
+                <Typography variant='body1' mr={5}>Do you know the number of trees that are to be sponsored (approximately)?
                     <Tooltip title={"This will help us assign an appropriate plot for the gift request"}>
                         <Button sx={{ ml: -2 }} color="success"><HelpOutline fontSize="small"/></Button>
                     </Tooltip>

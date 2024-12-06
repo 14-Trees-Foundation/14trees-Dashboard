@@ -239,7 +239,7 @@ const GiftCards: FC = () => {
                     padding: "4px 12px",
                 }}
             >
-                <Typography variant="h4" style={{ marginTop: '5px' }}>Gift Cards</Typography>
+                <Typography variant="h4" style={{ marginTop: '5px' }}>Tree Cards</Typography>
             </div>
             <Divider sx={{ backgroundColor: "black", marginBottom: '15px' }} />
 
@@ -284,7 +284,7 @@ const GiftCards: FC = () => {
                     <img
                         src={selectedGiftCardUser?.card_image_url}
                         loading="lazy"
-                        alt="Gift Card"
+                        alt="Tree Card"
                         style={{ width: '800px', height: 'auto' }}
                     />
                 </DialogContent>

@@ -126,7 +126,7 @@ const EmailConfirmationModal: React.FC<EmailConfirmationModalProps> = ({ sponsor
                 </FormControl>
 
                 <Box sx={{ mt: 2 }}>
-                    <Typography >To whom do you what to send emails?</Typography>
+                    <Typography >Who would you like to send the emails to?</Typography>
                     <FormControl component="fieldset">
                         <FormGroup aria-label="position" row>
                             <FormControlLabel

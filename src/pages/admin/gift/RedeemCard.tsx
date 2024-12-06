@@ -8,7 +8,7 @@ const RedeemCard: FC = () => {
     const pages = [
         {
             page: GiftCards,
-            displayName: "Gift Card",
+            displayName: "Tree Card",
             logo: logo,
         },
     ]
