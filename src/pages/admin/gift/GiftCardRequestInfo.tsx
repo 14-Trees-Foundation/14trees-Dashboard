@@ -103,7 +103,7 @@ const GiftCardRequestInfo: React.FC<GiftCardRequestInfoProps> = ({ open, onClose
         } else if (status === 'pending_assignment') {
             return 'Pending assignment';
         } else if (status === 'pending_gift_cards') {
-            return 'Pending Gift cards creation';
+            return 'Pending tree cards creation';
         } else {
             return 'Completed';
         }
@@ -114,12 +114,12 @@ const GiftCardRequestInfo: React.FC<GiftCardRequestInfoProps> = ({ open, onClose
     return (
         <Dialog open={open} onClose={onClose} maxWidth="lg" fullWidth>
             <DialogTitle>
-                Event Information
+                Request summary
             </DialogTitle>
             <DialogContent dividers>
                 {/* User Details */}
                 <Box mb={2}>
-                    <Typography variant="h6" gutterBottom>User Details</Typography>
+                    <Typography variant="h6" gutterBottom>Sponsor Details</Typography>
                     <Typography><strong>Name:</strong> {data.user_name || 'N/A'}</Typography>
                     <Typography><strong>Email:</strong> {data.user_email || 'N/A'}</Typography>
                     <Typography><strong>Phone:</strong> {data.user_phone || 'N/A'}</Typography>
@@ -128,8 +128,8 @@ const GiftCardRequestInfo: React.FC<GiftCardRequestInfoProps> = ({ open, onClose
                 <Divider />
 
                 {/* Group Information */}
-                <Box mt={2} mb={2}>
-                    <Typography variant="h6" gutterBottom>Group Information</Typography>
+                {data.group_name && <Box mt={2} mb={2}>
+                    <Typography variant="h6" gutterBottom>Corporate/Organization Details</Typography>
                     <Typography><strong>Corporate:</strong> {data.group_name || 'N/A'}</Typography>
                     <Box display="flex" >
                         <Typography><strong>Logo:</strong></Typography>
@@ -139,7 +139,7 @@ const GiftCardRequestInfo: React.FC<GiftCardRequestInfoProps> = ({ open, onClose
                             style={{ marginLeft: 10, maxHeight: 50, width: 'auto' }}
                         />
                     </Box>
-                </Box>
+                </Box>}
 
                 <Divider />
 
@@ -178,23 +178,23 @@ const GiftCardRequestInfo: React.FC<GiftCardRequestInfoProps> = ({ open, onClose
                     {data.users_csv_file_url ? (
                         <Typography>
                             <Link href={data.users_csv_file_url} target="_blank" rel="noopener">
-                                Download Users CSV
+                                Download Recipients CSV
                             </Link>
                         </Typography>
                     ) : (
                         <Typography>
-                            <strong>User details:</strong> N/A
+                            <strong>Recipient details:</strong> N/A
                         </Typography>
                     )}
                     {data.presentation_id ? (
                         <Typography>
                             <Link href={'https://docs.google.com/presentation/d/' + data.presentation_id} target="_blank" rel="noopener">
-                                Gift Card Slides
+                                Tree Card Slides
                             </Link>
                         </Typography>
                     ) : (
                         <Typography>
-                            <strong>Gift Card Slides:</strong> N/A
+                            <strong>Tree Card Slides:</strong> N/A
                         </Typography>
                     )}
                 </Box>

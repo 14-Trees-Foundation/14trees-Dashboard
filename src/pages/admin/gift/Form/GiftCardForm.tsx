@@ -39,6 +39,7 @@ const GiftCardsForm: FC<GiftCardsFormProps> = ({ giftCardRequest, requestId, ope
     const [slideId, setSlideId] = useState<string | null>(null)
     const [category, setCategory] = useState<string>("Foundation");
     const [grove, setGrove] = useState<string | null>(null);
+    const [consent, setConsent] = useState(false);
 
     // payment details
     const [payment, setPayment] = useState<Payment | null>(null);
@@ -164,12 +165,12 @@ const GiftCardsForm: FC<GiftCardsFormProps> = ({ giftCardRequest, requestId, ope
                 payment={payment}
                 amount={amount}
                 onPaymentChange={payment => setPayment(payment)}
-                onChange={(donorType: string, panNumber: string | null) => { setDonorType(donorType); setPanNumber(panNumber); }}
+                onChange={(donorType: string, panNumber: string | null, consent: boolean) => { setDonorType(donorType); setPanNumber(panNumber); setConsent(consent)}}
             />,
         },
         {
             key: 5,
-            title: "Gift Card Messages",
+            title: "Tree Card Messages",
             content: <CardDetails
                 request_id={requestId || ''}
                 presentationId={presentationId}
@@ -197,7 +198,7 @@ const GiftCardsForm: FC<GiftCardsFormProps> = ({ giftCardRequest, requestId, ope
         const apiClient = new ApiClient();
         let paymentId = payment ? payment.id : undefined
         if (!payment) {
-            const payment = await apiClient.createPayment(amount, donorType, panNumber);
+            const payment = await apiClient.createPayment(amount, donorType, panNumber, consent);
             paymentId = payment.id
         } else {
             const data = {
@@ -273,7 +274,7 @@ const GiftCardsForm: FC<GiftCardsFormProps> = ({ giftCardRequest, requestId, ope
                 fullWidth
                 maxWidth='xl'
             >
-                <DialogTitle style={{ textAlign: "center" }}>{giftCardRequest ? "Edit Gift Request" : "New Gift Request"}</DialogTitle>
+                <DialogTitle style={{ textAlign: "center" }}>{giftCardRequest ? "Edit Request" : "New Request"}</DialogTitle>
                 {currentStep < steps.length && (
                     <>
                         <div

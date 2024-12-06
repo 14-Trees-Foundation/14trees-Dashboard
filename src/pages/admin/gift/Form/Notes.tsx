@@ -46,7 +46,7 @@ const GiftRequestNotes: React.FC<GiftRequestNotesProps> = ({ open, handleClose, 
         }}
       >
         <Typography id="edit-modal-title" variant="h6" component="h2" sx={{ mb: 2 }}>
-            Gift Request Notes
+            Tree card request notes
         </Typography>
         <TextField
           fullWidth
