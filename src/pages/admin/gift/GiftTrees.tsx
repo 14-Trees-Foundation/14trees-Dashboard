@@ -328,6 +328,10 @@ const GiftTrees: FC = () => {
                 toast.success("Saved selected plot for tree card request!");
 
                 await apiClient.bookGiftCards(selectedGiftCard.id, userTrees.length > 0 ? userTrees : undefined, bookNonGiftable, diversify);
+                if (userTrees.length > 0) {
+                    await apiClient.autoAssignTrees(selectedGiftCard.id);
+                }
+                
                 toast.success("Tree cards booked successfully");
                 getGiftCardData();
             } catch {
