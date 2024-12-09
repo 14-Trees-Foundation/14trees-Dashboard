@@ -60,35 +60,20 @@ const GiftCardsForm: FC<GiftCardsFormProps> = ({ giftCardRequest, requestId, ope
             const groupResp = await apiClient.getGroups(0, 1, [{ columnField: 'id', operatorValue: 'equals', value: giftCardRequest.group_id }]);
             if (groupResp.results.length === 1) setGroup(groupResp.results[0]);
 
-            const giftCards = await apiClient.getBookedGiftCards(giftCardRequest.id, 0, -1);
-            const usersMap: Record<string, any> = {}
-            for (const giftCard of giftCards.results) {
-                if (giftCard.gifted_to && giftCard.assigned_to) {
-                    const key = giftCard.gifted_to.toString() + "_" + giftCard.assigned_to.toString();
-                    if (usersMap[key]) {
-                        usersMap[key].count++;
-                    } else {
-                        usersMap[key] = {
-                            key: key,
-                            gifted_to_name: giftCard.gifted_to_name,
-                            gifted_to_email: giftCard.gifted_to_email,
-                            gifted_to_phone: giftCard.gifted_to_phone,
-                            assigned_to_name: giftCard.assigned_to_name,
-                            assigned_to_email: giftCard.assigned_to_email,
-                            assigned_to_phone: giftCard.assigned_to_phone,
-                            relation: giftCard.relation,
-                            count: 1,
-                            image: giftCard.profile_image_url ? true : undefined,
-                            image_name: giftCard.profile_image_url ? giftCard.profile_image_url.split("/").slice(-1)[0] : undefined,
-                            image_url: giftCard.profile_image_url,
-                            editable: giftCard.tree_id ? false : true,
-                        }
-                    }
-                }
+            const users = await apiClient.getGiftRequestUsers(giftCardRequest.id);
+            const usersData: any[] = []
+            for (const user of users) {
+                usersData.push({
+                    ...user,
+                    key: user.id,
+                    image: user.profile_image_url ? true : undefined,
+                    image_name: user.profile_image_url ? user.profile_image_url.split("/").slice(-1)[0] : undefined,
+                    image_url: user.profile_image_url,
+                    editable: true,
+                })
             }
 
-            setUsers(Object.values(usersMap));
-
+            setUsers(usersData);
             setTreeCount(giftCardRequest.no_of_cards);
             setMessages({
                 primaryMessage: giftCardRequest.primary_message,
@@ -135,15 +120,15 @@ const GiftCardsForm: FC<GiftCardsFormProps> = ({ giftCardRequest, requestId, ope
         {
             key: 1,
             title: "Corporate Details (Optional)",
-            content: <SponsorGroupForm logo={logo ?? giftCardRequest?.logo_url ?? null} onLogoChange={logo => setLogo(logo)} group={group} onSelect={group => { setGroup(group);  setMessages(prev => ({ ...prev, plantedBy: group ? group.name : "" }))}} />,
+            content: <SponsorGroupForm logo={logo ?? giftCardRequest?.logo_url ?? null} onLogoChange={logo => setLogo(logo)} group={group} onSelect={group => { setGroup(group); setMessages(prev => ({ ...prev, plantedBy: group ? group.name : "" })) }} />,
         },
         {
             key: 2,
             title: "Book Trees",
-            content: <PlotSelection 
-                disabled={giftCardRequest !== undefined && giftCardRequest.status !== 'pending_plot_selection'} 
-                treeCount={treeCount} 
-                onTreeCountChange={count => setTreeCount(count)} 
+            content: <PlotSelection
+                disabled={giftCardRequest !== undefined && giftCardRequest.status !== 'pending_plot_selection'}
+                treeCount={treeCount}
+                onTreeCountChange={count => setTreeCount(count)}
                 category={category}
                 onCategoryChange={category => { setCategory(category) }}
                 grove={grove}
@@ -154,7 +139,7 @@ const GiftCardsForm: FC<GiftCardsFormProps> = ({ giftCardRequest, requestId, ope
             key: 3,
             title: "Dashboard Details",
             content: <DashboardDetails
-                messages={{...messages, plantedBy: messages.plantedBy || group?.name || user?.name || ''}}
+                messages={{ ...messages, plantedBy: messages.plantedBy || group?.name || user?.name || '' }}
                 onChange={messages => { setMessages(messages) }}
             />,
         },
@@ -165,7 +150,7 @@ const GiftCardsForm: FC<GiftCardsFormProps> = ({ giftCardRequest, requestId, ope
                 payment={payment}
                 amount={amount}
                 onPaymentChange={payment => setPayment(payment)}
-                onChange={(donorType: string, panNumber: string | null, consent: boolean) => { setDonorType(donorType); setPanNumber(panNumber); setConsent(consent)}}
+                onChange={(donorType: string, panNumber: string | null, consent: boolean) => { setDonorType(donorType); setPanNumber(panNumber); setConsent(consent) }}
             />,
         },
         {
@@ -176,7 +161,7 @@ const GiftCardsForm: FC<GiftCardsFormProps> = ({ giftCardRequest, requestId, ope
                 presentationId={presentationId}
                 slideId={slideId}
                 logo_url={logoString ? logoString : giftCardRequest?.logo_url}
-                messages={{...messages, plantedBy: messages.plantedBy || group?.name || user?.name || ''}}
+                messages={{ ...messages, plantedBy: messages.plantedBy || group?.name || user?.name || '' }}
                 onChange={messages => { setMessages(messages) }}
                 onPresentationId={(presentationId: string, slideId: string) => { setPresentationId(presentationId); setSlideId(slideId); }}
             />,
@@ -209,7 +194,7 @@ const GiftCardsForm: FC<GiftCardsFormProps> = ({ giftCardRequest, requestId, ope
                 if (payment.amount !== amount) data.amount = amount;
                 if (payment.pan_number !== panNumber) data.pan_number = panNumber;
                 if (payment.donor_type !== donorType) data.donor_type = donorType;
-    
+
                 await apiClient.updatedPayment(data);
             }
         }

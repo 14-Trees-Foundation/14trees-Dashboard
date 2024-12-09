@@ -17,19 +17,17 @@ import UserImagesForm from "./UserImagesForm";
 
 interface User {
   key: string;
-  gifted_to_name: string;
-  gifted_to_phone: string;
-  gifted_to_email: string;
-  gifted_to_dob?: string;
-  assigned_to_name?: string;
-  assigned_to_phone?: string;
-  assigned_to_email?: string;
-  assigned_to_dob?: string;
+  recipient_name: string;
+  recipient_phone: string;
+  recipient_email: string;
+  assignee_name: string;
+  assignee_phone: string;
+  assignee_email: string;
   image?: boolean;
   image_name?: string;
   image_url?: string;
   relation?: string;
-  count: number;
+  gifted_trees: number;
   error?: boolean;
   editable?: boolean;
 }
@@ -46,12 +44,12 @@ const isValidPhone = (phone: string) => {
   return phoneRegex.test(phone);
 };
 
-const giftNameField = 'Recipient Name'
-const giftEmailField = 'Recipient Email'
-const giftPhoneField = 'Recipient Phone (optional)'
-const assignNameField = 'Assignee Name'
-const assignEmailField = 'Assignee Email (optional)'
-const assignPhoneField = 'Assignee Phone (optional)'
+const recipientNameField = 'Recipient Name'
+const recipientEmailField = 'Recipient Email'
+const recipientPhoneField = 'Recipient Phone (optional)'
+const assigneeNameField = 'Assignee Name'
+const assigneeEmailField = 'Assignee Email (optional)'
+const assigneePhoneField = 'Assignee Phone (optional)'
 const countField = 'Number of trees to assign'
 const imageNameField = 'Image Name (optional)'
 
@@ -165,16 +163,16 @@ export const BulkUserForm: FC<BulkUserFormProps> = ({ requestId, treeCount, user
     let showAllCols = false;
     for (const user of users) {
 
-      if (user.assigned_to_name !== user.gifted_to_name) showAllCols = true;
-      if (!user.image && user.gifted_to_name) {
-        const uris = getFilteredUrls(imageUrls, user.gifted_to_name);
+      if (user.assignee_name !== user.recipient_name) showAllCols = true;
+      if (!user.image && user.recipient_name) {
+        const uris = getFilteredUrls(imageUrls, user.recipient_name);
 
         if (uris.length === 1) {
           isNew = true;
           user.image = true;
           user.image_name = uris[0].split('/').slice(-1)[0];
           user.image_url = uris[0];
-          user.error = !isValidEmail(user.gifted_to_email) || !isValidPhone(user.gifted_to_phone)
+          user.error = !isValidEmail(user.recipient_email) || !isValidPhone(user.recipient_phone)
         }
       }
 
@@ -203,8 +201,10 @@ export const BulkUserForm: FC<BulkUserFormProps> = ({ requestId, treeCount, user
     const filterList = Object.values(filters);
     let filteredUsers = users;
     for (const filter of filterList) {
-      if ((filter.columnField === 'gifted_to_name') && filter.value) filteredUsers = filteredUsers.filter(item => item.gifted_to_name.includes(filter.value));
-      else if ((filter.columnField === 'gifted_to_email') && filter.value) filteredUsers = filteredUsers.filter(item => item.gifted_to_email.includes(filter.value));
+      if ((filter.columnField === 'recipient_name') && filter.value) filteredUsers = filteredUsers.filter(item => item.recipient_name.includes(filter.value));
+      else if ((filter.columnField === 'recipient_email') && filter.value) filteredUsers = filteredUsers.filter(item => item.recipient_email.includes(filter.value));
+      if ((filter.columnField === 'assignee_name') && filter.value) filteredUsers = filteredUsers.filter(item => item.assignee_name.includes(filter.value));
+      else if ((filter.columnField === 'assignee_email') && filter.value) filteredUsers = filteredUsers.filter(item => item.assignee_email.includes(filter.value));
       else if (filter.columnField === 'image' && filter.value && filter.value.length > 0) {
         filteredUsers = filteredUsers.filter(item => {
           if (item.image === undefined && filter.value.includes('Image Not Provided')) return true;
@@ -233,16 +233,19 @@ export const BulkUserForm: FC<BulkUserFormProps> = ({ requestId, treeCount, user
           for (let i = 0; i < results.data.length; i++) {
             const user = results.data[i];
 
-            if (user[giftNameField] && user[giftEmailField]) {
+            if (user[recipientNameField] && user[recipientEmailField]) {
 
               const parsedUser: User = {
                 key: getUniqueRequestId(),
-                gifted_to_name: (user[giftNameField] as string).trim(),
-                gifted_to_phone: (user[giftPhoneField] as string).trim(),
-                gifted_to_email: (user[giftEmailField] as string).trim(),
+                recipient_name: (user[recipientNameField] as string).trim(),
+                recipient_phone: (user[recipientPhoneField] as string).trim(),
+                recipient_email: (user[recipientEmailField] as string).trim(),
+                assignee_name: (user[assigneeNameField] as string).trim(),
+                assignee_phone: (user[assigneePhoneField] as string).trim(),
+                assignee_email: (user[assigneeEmailField] as string).trim(),
                 image_name: user[imageNameField] ? user[imageNameField] : undefined,
                 relation: user['Relation with person'] ? user['Relation with person'] : undefined,
-                count: user[countField] ? user[countField] : 1,
+                gifted_trees: user[countField] ? user[countField] : 1,
                 image: user[imageNameField] !== ''
                   ? await awsUtils.checkIfPublicFileExists('cards' + "/" + requestId + '/' + user[imageNameField])
                   : undefined,
@@ -250,18 +253,14 @@ export const BulkUserForm: FC<BulkUserFormProps> = ({ requestId, treeCount, user
                 editable: false,
               };
 
-              if ((user[assignNameField] as string).trim()) {
-                parsedUser.assigned_to_name = (user[assignNameField] as string).trim()
-                parsedUser.assigned_to_phone = (user[assignPhoneField] as string).trim()
-                parsedUser.assigned_to_email = (user[assignEmailField] as string).trim()
-              } else {
-                parsedUser.assigned_to_name = parsedUser.gifted_to_name
-                parsedUser.assigned_to_phone = parsedUser.gifted_to_email
-                parsedUser.assigned_to_email = parsedUser.gifted_to_phone
+              if (!(user[assigneeNameField] as string).trim()) {
+                parsedUser.assignee_name = parsedUser.recipient_name
+                parsedUser.assignee_phone = parsedUser.recipient_email
+                parsedUser.assignee_email = parsedUser.recipient_phone
               }
 
-              if (!parsedUser.gifted_to_email) parsedUser.gifted_to_email = parsedUser.gifted_to_name.split(" ").join('.') + "@14trees"
-              if (!parsedUser.assigned_to_email) parsedUser.assigned_to_email = parsedUser.assigned_to_name.split(" ").join('.') + "@14trees"
+              if (!parsedUser.recipient_email) parsedUser.recipient_email = parsedUser.recipient_name.split(" ").join('.') + "@14trees"
+              if (!parsedUser.assignee_email) parsedUser.assignee_email = parsedUser.assignee_name.split(" ").join('.') + "@14trees"
               if (parsedUser.image) parsedUser.image_url = awsUtils.getS3UrlForKey('cards' + "/" + requestId + '/' + user[imageNameField])
 
               parsedUsers.push(parsedUser);
@@ -272,7 +271,7 @@ export const BulkUserForm: FC<BulkUserFormProps> = ({ requestId, treeCount, user
           const usersList = parsedUsers.map(user => {
             return {
               ...user,
-              error: !isValidEmail(user.gifted_to_email) || !isValidPhone(user.gifted_to_phone) || user.image === false
+              error: !isValidEmail(user.recipient_email) || !isValidPhone(user.recipient_phone) || user.image === false
             }
           });
           onUsersChange(usersList);
@@ -306,12 +305,12 @@ export const BulkUserForm: FC<BulkUserFormProps> = ({ requestId, treeCount, user
     if (!selectedUser) return;
 
     const newUsers = [...users];
-    const idx = newUsers.findIndex(user => user.gifted_to_email === selectedUser.gifted_to_email && user.assigned_to_name === selectedUser.assigned_to_name)
+    const idx = newUsers.findIndex(user => user.key = selectedUser.key);
     if (idx > -1) {
       newUsers[idx].image = true;
       newUsers[idx].image_name = imageUrl.split('/').slice(-1)[0];
       newUsers[idx].image_url = imageUrl;
-      newUsers[idx].error = !isValidEmail(newUsers[idx].gifted_to_email) || !isValidPhone(newUsers[idx].gifted_to_phone)
+      newUsers[idx].error = !isValidEmail(newUsers[idx].recipient_email) || !isValidPhone(newUsers[idx].recipient_phone)
       onUsersChange(newUsers);
     }
   }
@@ -336,14 +335,14 @@ export const BulkUserForm: FC<BulkUserFormProps> = ({ requestId, treeCount, user
     }
 
     if (user.editable) {
-      user.gifted_to_name = user.gifted_to_name.trim();
-      user.gifted_to_phone = user.gifted_to_phone.trim();
-      user.gifted_to_email = user.gifted_to_email.trim();
+      user.recipient_name = user.recipient_name.trim();
+      user.recipient_phone = user.recipient_phone.trim();
+      user.recipient_email = user.recipient_email.trim();
       user.relation = user.relation?.trim();
-      user.assigned_to_name = user.assigned_to_name?.trim();
-      user.assigned_to_phone = user.assigned_to_phone?.trim();
-      user.assigned_to_email = user.assigned_to_email?.trim();
-      user.error = !isValidEmail(user.gifted_to_email) || !isValidPhone(user.gifted_to_phone) || user.gifted_to_name === ''
+      user.assignee_name = user.assignee_name?.trim();
+      user.assignee_phone = user.assignee_phone?.trim();
+      user.assignee_email = user.assignee_email?.trim();
+      user.error = !isValidEmail(user.recipient_email) || !isValidPhone(user.recipient_phone) || user.recipient_name === ''
     }
 
     const idx = users.findIndex((u) => (u.key === user.key));
@@ -360,7 +359,7 @@ export const BulkUserForm: FC<BulkUserFormProps> = ({ requestId, treeCount, user
   }
 
   const handleDeleteUser = (user: User) => {
-    onUsersChange(users.filter(item => item.gifted_to_email !== user.gifted_to_email));
+    onUsersChange(users.filter(item => item.recipient_email !== user.recipient_email));
   }
 
   const handlePaginationChange = (page: number, pageSize: number) => {
@@ -370,47 +369,47 @@ export const BulkUserForm: FC<BulkUserFormProps> = ({ requestId, treeCount, user
 
   const columns: ColumnType<User>[] = [
     {
-      dataIndex: "gifted_to_name",
-      key: "gifted_to_name",
+      dataIndex: "recipient_name",
+      key: "recipient_name",
       title: "Recipient Name",
       width: 180,
       align: "center",
-      ...getColumnSearchProps('gifted_to_name', filters, handleSetFilters),
+      ...getColumnSearchProps('recipient_name', filters, handleSetFilters),
     },
     {
-      dataIndex: "gifted_to_email",
-      key: "gifted_to_email",
+      dataIndex: "recipient_email",
+      key: "recipient_email",
       title: "Recipient Email",
       width: 180,
       align: "center",
-      ...getColumnSearchProps('gifted_to_email', filters, handleSetFilters),
+      ...getColumnSearchProps('recipient_email', filters, handleSetFilters),
     },
     {
-      dataIndex: "gifted_to_phone",
-      key: "gifted_to_phone",
+      dataIndex: "recipient_phone",
+      key: "recipient_phone",
       title: "Recipient Phone",
       width: 180,
       align: "center",
     },
     {
-      dataIndex: "assigned_to_name",
-      key: "assigned_to_name",
+      dataIndex: "assignee_name",
+      key: "assignee_name",
       title: "Assignee Name",
       width: 180,
       align: "center",
-      ...getColumnSearchProps('assigned_to_name', filters, handleSetFilters),
+      ...getColumnSearchProps('assignee_name', filters, handleSetFilters),
     },
     {
-      dataIndex: "assigned_to_email",
-      key: "assigned_to_email",
+      dataIndex: "assignee_email",
+      key: "assignee_email",
       title: "Assignee Email",
       width: 180,
       align: "center",
-      ...getColumnSearchProps('assigned_to_email', filters, handleSetFilters),
+      ...getColumnSearchProps('assignee_email', filters, handleSetFilters),
     },
     {
-      dataIndex: "assigned_to_phone",
-      key: "assigned_to_phone",
+      dataIndex: "assignee_phone",
+      key: "assignee_phone",
       title: "Assignee Phone",
       width: 180,
       align: "center",
@@ -436,8 +435,8 @@ export const BulkUserForm: FC<BulkUserFormProps> = ({ requestId, treeCount, user
       ...getColumnSelectedItemFilter({ dataIndex: 'image', filters, handleSetFilters, options: ['Image Not Provided', 'Image Not Found'] })
     },
     {
-      dataIndex: "count",
-      key: "count",
+      dataIndex: "gifted_trees",
+      key: "gifted_trees",
       title: "Number of Trees to assign",
       width: 180,
       align: "center",
@@ -502,8 +501,8 @@ export const BulkUserForm: FC<BulkUserFormProps> = ({ requestId, treeCount, user
 
   return (
     <div style={{ margin: '20px', width: '100%' }}>
-      { (treeCount - users.map(user => user.count).reduce((prev, curr) => prev + curr, 0)) > 0
-        && <Typography variant="h6" style={{ color: 'red' }}>Number of trees left to allocate: {treeCount - users.map(user => user.count).reduce((prev, curr) => prev + curr, 0)}</Typography>}
+      { (treeCount - users.map(user => user.gifted_trees).reduce((prev, curr) => prev + curr, 0)) > 0
+        && <Typography variant="h6" style={{ color: 'red' }}>Number of trees left to allocate: {treeCount - users.map(user => user.gifted_trees).reduce((prev, curr) => prev + curr, 0)}</Typography>}
       <Grid
         container
         style={{ marginTop: '10px' }}
@@ -606,7 +605,7 @@ export const BulkUserForm: FC<BulkUserFormProps> = ({ requestId, treeCount, user
       <Dialog open={manualUserModal} fullWidth maxWidth="md">
         <DialogTitle>Recipient Details</DialogTitle>
         <DialogContent dividers>
-          <SingleUserForm maxTrees={treeCount - users.map(u => u.count).reduce((prev, curr) => prev + curr, 0)}  imageUrls={imageUrls} value={selectedUser} onSubmit={(user: any) => { handleUserAdd(user) }} onCancel={() => { setSelectedUser(null) }} />
+          <SingleUserForm maxTrees={treeCount - users.map(u => u.gifted_trees).reduce((prev, curr) => prev + curr, 0)}  imageUrls={imageUrls} value={selectedUser} onSubmit={(user: any) => { handleUserAdd(user) }} onCancel={() => { setSelectedUser(null) }} />
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setManualUserModal(false)} variant="outlined" color="error">
