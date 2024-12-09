@@ -7,14 +7,14 @@ import ImageMapping from "./ImageMapping";
 
 interface User {
     key?: string;
-    gifted_to_name: string;
-    gifted_to_phone: string;
-    gifted_to_email: string;
-    assigned_to_name: string;
-    assigned_to_phone: string;
-    assigned_to_email: string;
+    recipient_name: string;
+    recipient_phone: string;
+    recipient_email: string;
+    assignee_name: string;
+    assignee_phone: string;
+    assignee_email: string;
     relation: string;
-    count: number;
+    gifted_trees: number;
     editable?: boolean,
     profileImage?: File | string;
 }
@@ -32,14 +32,14 @@ const SingleUserForm: FC<SingleUserFormProps> = ({ maxTrees, imageUrls, value, o
     const { searchUsers } = bindActionCreators(userActionCreators, dispatch);
 
     const [user, setUser] = useState<User>({
-        gifted_to_name: '',
-        gifted_to_email: '',
-        gifted_to_phone: '',
-        assigned_to_email: '',
-        assigned_to_name: '',
-        assigned_to_phone: '',
+        recipient_name: '',
+        recipient_email: '',
+        recipient_phone: '',
+        assignee_email: '',
+        assignee_name: '',
+        assignee_phone: '',
         relation: '',
-        count: 1,
+        gifted_trees: 1,
         editable: true,
     });
     const [showAssignedFields, setShowAssignedFields] = useState(false);
@@ -49,19 +49,19 @@ const SingleUserForm: FC<SingleUserFormProps> = ({ maxTrees, imageUrls, value, o
         if (value) {
             setUser({
                 key: value.key,
-                gifted_to_name: value.gifted_to_name,
-                gifted_to_email: value.gifted_to_email,
-                gifted_to_phone: value.gifted_to_phone || '',
-                assigned_to_name: value.assigned_to_name,
-                assigned_to_email: value.assigned_to_email,
-                assigned_to_phone: value.assigned_to_phone || '',
+                recipient_name: value.recipient_name,
+                recipient_email: value.recipient_email,
+                recipient_phone: value.recipient_phone || '',
+                assignee_name: value.assignee_name,
+                assignee_email: value.assignee_email,
+                assignee_phone: value.assignee_phone || '',
                 relation: value.relation || '',
-                count: value.count,
+                gifted_trees: value.gifted_trees,
                 profileImage: value.image_url,
                 editable: value.editable,
             })
 
-            if (value.gifted_to_name !== value.assigned_to_name) setShowAssignedFields(true);
+            if (value.recipient_name !== value.assignee_name) setShowAssignedFields(true);
         }
 
     }, [value]);
@@ -73,7 +73,7 @@ const SingleUserForm: FC<SingleUserFormProps> = ({ maxTrees, imageUrls, value, o
 
     const handleNumberChange = (event: ChangeEvent<HTMLInputElement>) => {
         const value = Math.max(1, parseInt(event.target.value, 10));
-        setUser({ ...user, count: value });
+        setUser({ ...user, gifted_trees: value });
     };
 
     const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -97,24 +97,24 @@ const SingleUserForm: FC<SingleUserFormProps> = ({ maxTrees, imageUrls, value, o
         usersList = Object.values(usersData.users);
     }
 
-    const handleEmailChange = (event: SyntheticEvent, value: string, field: 'gifted_to_email' | 'assigned_to_email') => {
+    const handleEmailChange = (event: SyntheticEvent, value: string, field: 'recipient_email' | 'assignee_email') => {
         let isSet = false;
         usersList.forEach((user) => {
             if (`${user.name} (${user.email})` === value) {
                 isSet = true;
-                if (field === 'gifted_to_email') {
+                if (field === 'recipient_email') {
                     setUser(prev => ({
                         ...prev,
-                        gifted_to_email: user.email,
-                        gifted_to_name: user.name,
-                        gifted_to_phone: user.phone ?? '',
+                        recipient_email: user.email,
+                        recipient_name: user.name,
+                        recipient_phone: user.phone ?? '',
                     }));
                 } else {
                     setUser(prev => ({
                         ...prev,
-                        assigned_to_email: user.email,
-                        assigned_to_name: user.name,
-                        assigned_to_phone: user.phone ?? '',
+                        assignee_email: user.email,
+                        assignee_name: user.name,
+                        assignee_phone: user.phone ?? '',
                     }));
                 }
             }
@@ -132,10 +132,10 @@ const SingleUserForm: FC<SingleUserFormProps> = ({ maxTrees, imageUrls, value, o
     const handleSubmit = () => {
         const data = { ...user };
 
-        if (!showAssignedFields || !data.assigned_to_name) {
-            data.assigned_to_email = data.gifted_to_email
-            data.assigned_to_phone = data.gifted_to_phone
-            data.assigned_to_name = data.gifted_to_name
+        if (!showAssignedFields || !data.assignee_name) {
+            data.assignee_email = data.recipient_email
+            data.assignee_phone = data.recipient_phone
+            data.assignee_name = data.recipient_name
         }
 
         onSubmit(data);
@@ -144,14 +144,14 @@ const SingleUserForm: FC<SingleUserFormProps> = ({ maxTrees, imageUrls, value, o
 
     const handleCancel = () => {
         setUser({
-            gifted_to_name: '',
-            gifted_to_email: '',
-            gifted_to_phone: '',
-            assigned_to_email: '',
-            assigned_to_name: '',
-            assigned_to_phone: '',
+            recipient_name: '',
+            recipient_email: '',
+            recipient_phone: '',
+            assignee_email: '',
+            assignee_name: '',
+            assignee_phone: '',
             relation: '',
-            count: 1,
+            gifted_trees: 1,
             editable: true,
         });
         onCancel();
@@ -165,32 +165,32 @@ const SingleUserForm: FC<SingleUserFormProps> = ({ maxTrees, imageUrls, value, o
                         fullWidth
                         disabled={!user.editable}
                         options={usersList.map((user) => `${user.name} (${user.email})`)}
-                        onInputChange={(e, value) => { handleEmailChange(e, value, 'gifted_to_email') }}
-                        value={user.gifted_to_email}
+                        onInputChange={(e, value) => { handleEmailChange(e, value, 'recipient_email') }}
+                        value={user.recipient_email}
                         renderInput={(params) => (
                             <TextField
                                 {...params}
                                 label="Recipient Email id"
                                 variant="outlined"
-                                name="gifted_to_email"
+                                name="recipient_email"
                             />
                         )}
                     />
                 </Grid>
                 <Grid item xs={12}>
-                    <TextField disabled={!user.editable} name="gifted_to_name" label="Recipient Name" value={user.gifted_to_name} onChange={handleUserChange} fullWidth />
+                    <TextField disabled={!user.editable} name="recipient_name" label="Recipient Name" value={user.recipient_name} onChange={handleUserChange} fullWidth />
                 </Grid>
                 <Grid item xs={12}>
-                    <TextField disabled={!user.editable} name="gifted_to_phone" label="Recipient Phone (Optional)" value={user.gifted_to_phone} onChange={handleUserChange} fullWidth />
+                    <TextField disabled={!user.editable} name="recipient_phone" label="Recipient Phone (Optional)" value={user.recipient_phone} onChange={handleUserChange} fullWidth />
                 </Grid>
                 <Grid item xs={12}>
                     <TextField
                         type="number"
                         label="Number of trees to assign"
-                        name="count"
-                        value={user.count}
+                        name="gifted_trees"
+                        value={user.gifted_trees}
                         onChange={handleNumberChange}
-                        inputProps={{ min: user.editable ? 1 : value?.count || 1, max: Math.max(value?.count ? value.count : 0, maxTrees) }}
+                        inputProps={{ min: user.editable ? 1 : value?.gifted_trees || 1, max: Math.max(value?.gifted_trees ? value.gifted_trees : 0, maxTrees) }}
                         fullWidth
                     />
                 </Grid>
@@ -209,14 +209,14 @@ const SingleUserForm: FC<SingleUserFormProps> = ({ maxTrees, imageUrls, value, o
                         fullWidth
                         disabled={!user.editable}
                         options={usersList.map((user) => `${user.name} (${user.email})`)}
-                        onInputChange={(e, value) => { handleEmailChange(e, value, 'assigned_to_email') }}
-                        value={user.assigned_to_email}
+                        onInputChange={(e, value) => { handleEmailChange(e, value, 'assignee_email') }}
+                        value={user.assignee_email}
                         renderInput={(params) => (
                             <TextField
                                 {...params}
                                 label="Assignee Email"
                                 variant="outlined"
-                                name="assigned_to_email"
+                                name="assignee_email"
                             />
                         )}
                     />
@@ -224,9 +224,9 @@ const SingleUserForm: FC<SingleUserFormProps> = ({ maxTrees, imageUrls, value, o
                 {showAssignedFields && <Grid item xs={12}>
                     <TextField
                         disabled={!user.editable}
-                        name="assigned_to_name"
+                        name="assignee_name"
                         label="Assignee Name"
-                        value={user.assigned_to_name}
+                        value={user.assignee_name}
                         onChange={handleUserChange}
                         fullWidth
                     />
@@ -234,9 +234,9 @@ const SingleUserForm: FC<SingleUserFormProps> = ({ maxTrees, imageUrls, value, o
                 {showAssignedFields && <Grid item xs={12}>
                     <TextField
                         disabled={!user.editable}
-                        name="assigned_to_phone"
+                        name="assignee_phone"
                         label="Assignee Phone (Optional)"
-                        value={user.assigned_to_phone}
+                        value={user.assignee_phone}
                         onChange={handleUserChange}
                         fullWidth
                     />
@@ -271,8 +271,8 @@ const SingleUserForm: FC<SingleUserFormProps> = ({ maxTrees, imageUrls, value, o
                             <MenuItem value={'other'}>Other</MenuItem>
                         </Select>
                     </FormControl>
-                    {(user.relation && user.relation !== 'other') && <Typography>Tree(s) will be assigned in the name of {user.gifted_to_name}'s {user.relation}, {user.assigned_to_name}</Typography>}
-                    {(user.relation && user.relation === 'other') && <Typography>Tree(s) will be assigned in the name of {user.assigned_to_name}</Typography>}
+                    {(user.relation && user.relation !== 'other') && <Typography>Tree(s) will be assigned in the name of {user.recipient_name}'s {user.relation}, {user.assignee_name}</Typography>}
+                    {(user.relation && user.relation === 'other') && <Typography>Tree(s) will be assigned in the name of {user.assignee_name}</Typography>}
                 </Grid>}
                 <Grid item xs={12}>
                     <div style={{ display: 'flex', alignItems: 'center', marginBottom: 16 }}>
@@ -320,7 +320,7 @@ const SingleUserForm: FC<SingleUserFormProps> = ({ maxTrees, imageUrls, value, o
                 </Grid>
             </Grid>
 
-            <ImageMapping name={user.assigned_to_name || user.gifted_to_name} open={imageSelectionModal} images={imageUrls} onClose={() => { setImageSelectionModal(false) }} onSelect={handleImageSelection} />
+            <ImageMapping name={user.assignee_name || user.recipient_name} open={imageSelectionModal} images={imageUrls} onClose={() => { setImageSelectionModal(false) }} onSelect={handleImageSelection} />
         </div>
     );
 };

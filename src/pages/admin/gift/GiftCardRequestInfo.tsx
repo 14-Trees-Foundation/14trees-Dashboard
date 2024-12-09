@@ -30,7 +30,7 @@ const GiftCardRequestInfo: React.FC<GiftCardRequestInfoProps> = ({ open, onClose
     useEffect(() => {
         const getGiftCards = async () => {
             const apiClient = new ApiClient();
-            const resp = await apiClient.getBookedGiftCards(data.id, 0, -1);
+            const resp = await apiClient.getBookedGiftTrees(data.id, 0, -1);
             setUsers(resp.results.filter(item => item.sapling_id));
         }
 
@@ -60,8 +60,8 @@ const GiftCardRequestInfo: React.FC<GiftCardRequestInfoProps> = ({ open, onClose
             width: 200,
         },
         {
-            dataIndex: "assigned_to_name",
-            key: "assigned_to",
+            dataIndex: "recipient_name",
+            key: "recipient",
             title: "Assigned to",
             align: "center",
             width: 200,
@@ -91,7 +91,7 @@ const GiftCardRequestInfo: React.FC<GiftCardRequestInfoProps> = ({ open, onClose
                         }
                     }}
                 >
-                    {(record.assigned_to_name && record.assigned) ? "Dashboard" : "Redeem"}
+                    {(record.recipient_name && record.assigned) ? "Dashboard" : "Redeem"}
                 </Button>
             </div>)
         },

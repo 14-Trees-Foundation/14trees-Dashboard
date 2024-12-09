@@ -26,7 +26,7 @@ const TagComponent: React.FC<TagComponentProps> = ({ defaultTags, tags, open, on
             <DialogTitle>Tag tree cards request</DialogTitle>
             <DialogContent dividers>
                 <Box mt={2}>
-                    <Typography mb={1}>You can tag tree card request by selection the existing tag(s) from below on entering new tag(s).</Typography>
+                    <Typography mb={1}>You can tag the tree card request by selecting existing tags from the list below or adding new ones.</Typography>
                     <TagSelector
                         showLabels={false}
                         userTags={defaultTags}

@@ -102,7 +102,7 @@ const EditUserDetailsModal: React.FC<EditUserDetailsModalProps> = ({ open, onClo
             if (!giftRequestId) return;
 
             const apiClient = new ApiClient();
-            const users = await apiClient.getBookedGiftCards(giftRequestId, 0, -1);
+            const users = await apiClient.getBookedGiftTrees(giftRequestId, 0, -1);
             setUserList(users.results
                 .filter(item => item.assigned_to)
                 .filter((item, idx, self) => self.findIndex(card => card.assigned_to === item.assigned_to) === idx)

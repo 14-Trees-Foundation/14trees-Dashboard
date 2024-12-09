@@ -13,7 +13,7 @@ import { PaginatedResponse } from '../../types/pagination';
 import { Event } from '../../types/event';
 import { Visit, BulkVisitUsersMappingResponse } from '../../types/visits';
 import { TreeImage } from '../../types/tree_snapshots';
-import { GiftCard, GiftCardUser } from '../../types/gift_card';
+import { GiftCard, GiftCardUser, GiftRequestUser } from '../../types/gift_card';
 import { Tag } from '../../types/tag';
 import { EmailTemplate } from '../../types/email_template';
 import { Payment, PaymentHistory } from '../../types/payment';
@@ -1356,15 +1356,27 @@ class ApiClient {
         }
     }
 
-    async createGiftCardUsers(gift_card_request_id: number, users: any[]): Promise<GiftCard> {
+    async getGiftRequestUsers(gift_card_request_id: number): Promise<GiftRequestUser[]> {
         try {
-            const response =await this.api.post<GiftCard>(`/gift-cards`, { gift_card_request_id, users });
+            const response =await this.api.get<GiftRequestUser[]>(`/gift-cards/users/${gift_card_request_id}`);
             return response.data;
         } catch (error: any) {
-            if (error.response) {
+            if (error.response?.data?.message) {
                 throw new Error(error.response.data.message);
             }
-            throw new Error('Failed to create gift card');
+            throw new Error('Failed to fetch recipient details!');
+        }
+    }
+
+    async upsertGiftCardUsers(gift_card_request_id: number, users: any[]): Promise<GiftCard> {
+        try {
+            const response =await this.api.post<GiftCard>(`/gift-cards/users`, { gift_card_request_id, users });
+            return response.data;
+        } catch (error: any) {
+            if (error.response?.data?.message) {
+                throw new Error(error.response.data.message);
+            }
+            throw new Error('Failed to register recipient details!');
         }
     }
 
@@ -1390,15 +1402,26 @@ class ApiClient {
         }
     }
 
-    async getBookedGiftCards(gift_card_request_id: number, offset: number = 0, limit: number = 10): Promise<PaginatedResponse<GiftCardUser>> {
+    async getBookedGiftTrees(gift_card_request_id: number, offset: number = 0, limit: number = 10): Promise<PaginatedResponse<GiftCardUser>> {
         try {
-            const response = await this.api.get<PaginatedResponse<GiftCardUser>>(`/gift-cards/${gift_card_request_id}?offset=${offset}&limit=${limit}`);
+            const response = await this.api.get<PaginatedResponse<GiftCardUser>>(`/gift-cards/trees/${gift_card_request_id}?offset=${offset}&limit=${limit}`);
             return response.data;
         } catch (error: any) {
             if (error.response) {
                 throw new Error(error.response.data.message);
             }
             throw new Error('Failed to get gift cards');
+        }
+    }
+
+    async unBookGiftTrees(gift_card_request_id: number, tree_ids: number[], unmap_all: boolean = false): Promise<void> {
+        try {
+            const response = await this.api.post<void>(`/gift-cards/unbook`, { gift_card_request_id, tree_ids, unmap_all });
+        } catch (error: any) {
+            if (error.response) {
+                throw new Error(error.response.data.message);
+            }
+            throw new Error('Failed to unmap trees!');
         }
     }
 
@@ -1437,12 +1460,11 @@ class ApiClient {
         }
     }
 
-    async autoAssignTrees(gift_card_request_id: number): Promise<void> {
+    async assignTrees(gift_card_request_id: number, trees: GiftCardUser[], auto_assign: boolean): Promise<void> {
         try {
-            const resp = await this.api.post<void>(`/gift-cards/auto-assign`, { gift_card_request_id });
-            return resp.data;
+            await this.api.post<void>(`/gift-cards/assign`, { gift_card_request_id, trees, auto_assign });
         } catch (error: any) {
-            if (error.response) {
+            if (error.response?.data?.message) {
                 throw new Error(error.response.data.message);
             }
             throw new Error('Failed to generate gift cards');
