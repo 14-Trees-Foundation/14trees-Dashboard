@@ -150,7 +150,7 @@ export const TreeNew = () => {
             dataIndex: "srNo",
             key: "srNo",
             title: "Sr. No.",
-            width: 150,
+            width: 100,
             align: 'center',
             render: (value, record, index) => `${index + 1 + srNoPage * pageSize}.`,
         },
@@ -182,10 +182,34 @@ export const TreeNew = () => {
         {
             dataIndex: "mapped_user_name",
             key: "mapped_user_name",
-            title: "Mapped To",
+            title: "Reserved for (Individual)",
             width: 250,
             align: 'center',
             ...getColumnSearchProps('mapped_user_name', filters, handleSetFilters)
+        },
+        {
+            dataIndex: "mapped_group_name",
+            key: "mapped_group_name",
+            title: "Reserved for (Group)",
+            width: 250,
+            align: 'center',
+            ...getColumnSearchProps('mapped_group_name', filters, handleSetFilters)
+        },
+        {
+            dataIndex: "sponsor_user_name",
+            key: "sponsor_user_name",
+            title: "Sponsored By (Individual)",
+            width: 250,
+            align: 'center',
+            ...getColumnSearchProps('sponsor_user_name', filters, handleSetFilters)
+        },
+        {
+            dataIndex: "sponsor_group_name",
+            key: "sponsor_group_name",
+            title: "Sponsored By (Group)",
+            width: 250,
+            align: 'center',
+            ...getColumnSearchProps('sponsor_group_name', filters, handleSetFilters)
         },
         {
             dataIndex: "assigned_to_name",
@@ -199,7 +223,7 @@ export const TreeNew = () => {
             dataIndex: "action",
             key: "action",
             title: "Actions",
-            width: 170,
+            width: 300,
             align: "center",
             render: (value, record, index) => (
                 <div
@@ -218,6 +242,7 @@ export const TreeNew = () => {
                     </Button>
                     <Button
                         variant="outlined"
+                        color='success'
                         style={{ margin: "0 5px" }}
                         onClick={() => {
                             setSelectedEditRow(record);
@@ -413,9 +438,9 @@ export const TreeNew = () => {
 
                         />
                     </div>
-                    <Button variant="contained" color={isAssignTrees ? 'success' : 'error'} style={{ marginLeft: '10px' }} onClick={handleAssignUnAssign}
+                    {/* <Button variant="contained" color={isAssignTrees ? 'success' : 'error'} style={{ marginLeft: '10px' }} onClick={handleAssignUnAssign}
                         disabled={disabledAUButton}
-                    >{(isAssignTrees) ? "Assign Trees" : "Unassign Trees"}</Button>
+                        >{(isAssignTrees) ? "Assign Trees" : "Unassign Trees"}</Button> */}
                     <AssignTreeModal open={isAssignTreeModalOpen} handleClose={() => { setIsAssignTreeModalOpen(false) }} onSubmit={handleAssignTrees} searchUsers={searchUsers} />
                     <Button variant="contained" color={isMapTrees ? 'success' : 'error'} style={{ marginLeft: '10px' }} onClick={handleMapUnMap}
                         disabled={disabledMapUnMapButton}

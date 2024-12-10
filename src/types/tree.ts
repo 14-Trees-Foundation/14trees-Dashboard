@@ -29,6 +29,9 @@ export type Tree = {
     plant_type?: string,
     plot?: string,
     mapped_user_name?: string,
+    mapped_group_name?: string,
+    sponsor_user_name?: string,
+    sponsor_group_name?: string,
     assigned_to_name?: string,
 };
 

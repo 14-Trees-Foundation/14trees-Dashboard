@@ -10,16 +10,23 @@ import {
   Select,
   Checkbox,
   FormControlLabel,
+  Grid,
+  Box,
 } from "@mui/material";
 import { Field, Form } from "react-final-form";
 import { makeStyles } from "@mui/styles";
 import Dropzone from "react-dropzone";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import "react-image-crop/dist/ReactCrop.css";
 import ReactCrop from "react-image-crop";
 import { useRecoilValue } from "recoil";
 
 import { albums } from "../../store/adminAtoms";
+import { useAppDispatch, useAppSelector } from "../../redux/store/hooks";
+import { bindActionCreators } from "@reduxjs/toolkit";
+import * as userActionCreators from '../../redux/actions/userActions'
+import * as groupActionCreators from '../../redux/actions/groupActions'
+import { AutocompleteWithPagination } from "../../components/AutoComplete";
 
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
@@ -121,12 +128,6 @@ export const GiftDialog = (props) => {
     onClose();
   };
 
-  const formSubmit = (formValues) => {
-    onClose();
-    formValues["type"] = template;
-    formData(formValues, croppedImg, selAlbum, selfAssign);
-  };
-
   const handleAlbumChange = (e) => {
     setSelAlbumName(e.target.value);
   };
@@ -138,6 +139,86 @@ export const GiftDialog = (props) => {
   const handleProfilePic = (image) => {
     setImgsrc(image ? URL.createObjectURL(image[0]) : null);
   };
+
+  ///*** Sponsor user ***/
+  const [suPage, setSUPage] = useState(0);
+  const [suLoading, setSULoading] = useState(false);
+  const [sponsorSearch, setSponsorSearch] = useState('');
+  const [selectedSponsorUser, setSelectedSponsorUser] = useState(null);
+
+  const dispatch = useAppDispatch();
+  const { getUsers } = bindActionCreators(userActionCreators, dispatch);
+
+  useEffect(() => {
+    getUsersData(suPage, sponsorSearch);
+  }, [suPage, sponsorSearch]);
+
+  const getUsersData = async (page, search) => {
+    const userNameFilter = {
+      columnField: "name",
+      value: search,
+      operatorValue: "contains",
+    };
+
+    setSULoading(true);
+    getUsers(page * 10, 10, [userNameFilter]);
+    setTimeout(async () => {
+      setSULoading(false);
+    }, 1000);
+  };
+  
+  let usersList = [];
+  const usersData = useAppSelector((state) => state.usersData);
+  if (usersData) {
+    usersList = Object.values(usersData.users);
+    usersList = usersList.sort((a, b) => {
+      return b.id - a.id;
+    });
+  }
+
+  ///*** Sponsor Group ***/
+  const [sgPage, setSGPage] = useState(0);
+  const [sgLoading, setSGLoading] = useState(false);
+  const [sponsorGroupSearch, setSponsorGroupSearch] = useState('');
+  const [selectedSponsorGroup, setSelectedSponsorGroup] = useState(null);
+
+  const { getGroups } = bindActionCreators(groupActionCreators, dispatch);
+
+  useEffect(() => {
+    getGroupsData(sgPage, sponsorGroupSearch);
+  }, [sgPage, sponsorGroupSearch]);
+
+  const getGroupsData = async (page, search) => {
+    const groupNameFilter = {
+      columnField: "name",
+      value: search,
+      operatorValue: "contains",
+    };
+
+    setSGLoading(true);
+    getGroups(page * 10, 10, [groupNameFilter]);
+    setTimeout(async () => {
+      setSGLoading(false);
+    }, 1000);
+  };
+  
+  let groupsList = [];
+  const groupsData = useAppSelector((state) => state.groupsData);
+  if (groupsData) {
+    groupsList = Object.values(groupsData.groups);
+    groupsList = groupsList.sort((a, b) => {
+      return b.id - a.id;
+    });
+  }
+
+
+  ///*** FORM SUBMIT ***/
+  const formSubmit = (formValues) => {
+    onClose();
+    formValues["type"] = template;
+    formData(formValues, croppedImg, selAlbum, selfAssign, selectedSponsorUser, selectedSponsorGroup);
+  };
+
   return (
     <Dialog
       onClose={handleClose}
@@ -232,24 +313,54 @@ export const GiftDialog = (props) => {
                       />
                     )}
                   </Field>
-                  <Field name="gifted_by">
-                    {({ input, meta }) => (
-                      <TextField
-                        variant="outlined"
-                        label="Donated By"
-                        name="gifted_by"
-                        fullWidth
-                        error={meta.error && meta.touched ? true : false}
-                        {...input}
-                        sx={{ mb: 2 }}
-                        helperText={
-                          meta.error && meta.touched ? meta.error : ""
-                        }
-                      />
-                    )}
-                  </Field>
                 </>
               )}
+              <Box mb={1}>
+                <AutocompleteWithPagination
+                  name="sponsor_url"
+                  label="Select a sponsor user"
+                  options={usersList}
+                  getOptionLabel={(option) => `${option.name} (${option.email})`}
+                  isOptionEqualToValue={(option, value) => {
+                    return option.id === value.id;
+                  }}
+                  onChange={(event, newValue) => {
+                    setSelectedSponsorUser(newValue);
+                  }}
+                  onInputChange={(event) => {
+                    const { value } = event.target;
+                    setSUPage(0);
+                    setSponsorSearch(value);
+                  }}
+                  setPage={setSUPage}
+                  loading={suLoading}
+                  fullWidth
+                  size="medium"
+                />
+              </Box>
+              <Box mb={2}>
+                <AutocompleteWithPagination
+                  name="sponsor_group"
+                  label="Select a sponsor group"
+                  options={groupsList}
+                  getOptionLabel={(option) => option.name}
+                  isOptionEqualToValue={(option, value) => {
+                    return option.id === value.id;
+                  }}
+                  onChange={(event, newValue) => {
+                    setSelectedSponsorGroup(newValue);
+                  }}
+                  onInputChange={(event) => {
+                    const { value } = event.target;
+                    setSGPage(0);
+                    setSponsorGroupSearch(value);
+                  }}
+                  setPage={setSGPage}
+                  loading={sgLoading}
+                  fullWidth
+                  size="medium"
+                />
+              </Box>
               <Field name="planted_by">
                 {({ input, meta }) => (
                   <TextField
@@ -291,7 +402,7 @@ export const GiftDialog = (props) => {
                 })}
               </Select>
               <Select
-                sx={{ mt: 1 }}
+                sx={{ mt: 2 }}
                 fullWidth
                 onChange={handleTemplateChange}
                 defaultValue="none"

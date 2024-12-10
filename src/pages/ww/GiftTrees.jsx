@@ -208,7 +208,9 @@ export const GiftTrees = () => {
     formData,
     img,
     albumName,
-    selfAssign = false
+    selfAssign = false,
+    sponsorUser,
+    sponsorGroup
   ) => {
     let images = [];
     if (albumName !== "none") {
@@ -216,7 +218,7 @@ export const GiftTrees = () => {
         return album.album_name === albumName;
       })[0].images;
     }
-    await assignTrees2(formData, img, images, selfAssign);
+    await assignTrees2(formData, img, images, selfAssign, sponsorUser, sponsorGroup);
     setUnassignedSelected(false);
     setAssignedSelected(false);
   };
@@ -321,7 +323,7 @@ export const GiftTrees = () => {
     }
   };
 
-  const assignTrees2 = async (formValues, img, images, selfAssign) => {
+  const assignTrees2 = async (formValues, img, images, selfAssign, sponsorUser, sponsorGroup) => {
     setValues({
       ...values,
       loading: true,
@@ -345,7 +347,8 @@ export const GiftTrees = () => {
 
     formData.append("birth_date", date);
     formData.append("sapling_ids", sapling_ids);
-    formData.append("sponsored_by_user", values.user?.id);
+    if (sponsorUser && sponsorUser.id) formData.append("sponsored_by_user", sponsorUser.id);
+    if (sponsorGroup && sponsorGroup.id) formData.append("sponsored_by_group", sponsorGroup.id);
 
     if (formValues.gifted_by && formValues.gifted_by !== "undefined")
       formData.append("gifted_by", formValues.gifted_by);
@@ -361,7 +364,7 @@ export const GiftTrees = () => {
       formData.append("user_image", img.name);
     }
 
-    await assignTrees(formData);
+    assignTrees(formData);
 
     let profileTrees = await Axios.get(`/mapping/${email}`);
     if (profileTrees.status === 200 || profileTrees.status === 304) {
