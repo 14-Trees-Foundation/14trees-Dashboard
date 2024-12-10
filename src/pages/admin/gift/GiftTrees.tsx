@@ -62,6 +62,7 @@ const GiftTrees: FC = () => {
     const [userDetailsEditModal, setUserDetailsEditModal] = useState(false);
     const [tagModal, setTagModal] = useState(false);
     const [tags, setTags] = useState<string[]>([]);
+    const [testingMail, setTestingMail] = useState(false);
 
     // payment
     const [paymentModal, setPaymentModal] = useState(false);
@@ -354,18 +355,21 @@ const GiftTrees: FC = () => {
 
     }
 
-    const handleSendEmails = async (emailSponsor: boolean, emailReceiver: boolean, emailAssignee: boolean, testMails: string[], ccMails: string[], eventType: string, attachCard: boolean) => {
+    const handleSendEmails = async (emailSponsor: boolean, emailReceiver: boolean, emailAssignee: boolean, testMails: string[], sponsorCC: string[], receiverCC: string[], eventType: string, attachCard: boolean) => {
         const giftCardRequestId = selectedGiftCard?.id
-        handleEmailModalClose();
+        if (testMails.length === 0) handleEmailModalClose();
+        else setTestingMail(true);
 
         if (!giftCardRequestId) return;
         const apiClient = new ApiClient();
         try {
-            await apiClient.sendEmailToGiftRequestUsers(giftCardRequestId, emailSponsor, emailReceiver, emailAssignee, eventType, attachCard, ccMails.length > 0 ? ccMails : undefined, testMails.length > 0 ? testMails : undefined);
+            await apiClient.sendEmailToGiftRequestUsers(giftCardRequestId, emailSponsor, emailReceiver, emailAssignee, eventType, attachCard, sponsorCC, receiverCC, testMails);
             toast.success("Emails sent successfully!")
         } catch (error: any) {
             toast.error(error.message)
         }
+
+        setTestingMail(false);
     }
 
     const handleEmailModalClose = () => {
@@ -644,6 +648,21 @@ const GiftTrees: FC = () => {
             ) : '',
         },
         {
+            dataIndex: "amount",
+            key: "amount",
+            title: "Total Amount",
+            align: "center",
+            width: 150,
+            render: (value, record, index) => record.no_of_cards * (record.category === "Foundation" ? 3000 : 1500)
+        },
+        {
+            dataIndex: "payment_status",
+            key: "payment_status",
+            title: "Payment Status",
+            align: "center",
+            width: 150,
+        },
+        {
             dataIndex: "notes",
             key: "notes",
             title: "Notes",
@@ -826,6 +845,7 @@ const GiftTrees: FC = () => {
             />}
 
             <EmailConfirmationModal
+                loading={testingMail}
                 sponsorMail={selectedGiftCard?.user_email}
                 open={emailConfirmationModal}
                 onClose={handleEmailModalClose}
