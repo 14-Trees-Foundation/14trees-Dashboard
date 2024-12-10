@@ -120,7 +120,7 @@ function TreeMap({ selectedPlot, setSelectedPlot }) {
                                 </span>
                             </h2>
                             <h2 style={{ marginTop: "0px", paddingRight: "8px" }}>
-                                Mapped:{" "}
+                                Reserved:{" "}
                                 <span style={{ color: "#C72542", fontStyle: "italic" }}>
                                     {selectedPlot?.booked ?? 0}
                                 </span>

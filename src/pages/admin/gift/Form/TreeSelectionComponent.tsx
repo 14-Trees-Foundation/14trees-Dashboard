@@ -12,9 +12,11 @@ interface TreeSelectionComponentProps {
     open: boolean
     onClose: () => void
     onSubmit: (trees: any[]) => void
+    selectedTrees: any[]
+    onSelectedTreesChange: (trees: any[]) => void
 }
 
-const TreeSelectionComponent: React.FC<TreeSelectionComponentProps> = ({ plotIds, max, open, onClose, onSubmit }) => {
+const TreeSelectionComponent: React.FC<TreeSelectionComponentProps> = ({ plotIds, max, open, onClose, onSubmit, selectedTrees, onSelectedTreesChange }) => {
 
     const [treesData, setTreesData] = useState<Record<number, any>>({})
     const [total, setTotal] = useState(0)
@@ -27,7 +29,6 @@ const TreeSelectionComponent: React.FC<TreeSelectionComponentProps> = ({ plotIds
     const [tableRows, setTableRows] = useState<any[]>([]);
     const [filters, setFilters] = useState<Record<string, GridFilterItem>>({});
     const [tags, setTags] = useState<string[]>([]);
-    const [selectedTrees, setSelectedTrees] = useState<any[]>([])
 
     const handleSetFilters = (filters: Record<string, GridFilterItem>) => {
         setPage(0);
@@ -185,14 +186,14 @@ const TreeSelectionComponent: React.FC<TreeSelectionComponentProps> = ({ plotIds
                         color='success'
                         style={{ margin: "0 5px" }}
                         disabled={selectedTrees.findIndex(item => item.id === record.id) !== -1}
-                        onClick={() => { setSelectedTrees(prev => {
-                            if (prev.length === max) {
+                        onClick={() => {
+                            if (selectedTrees.length === max) {
                                 toast.error("Maxing number of trees selected!");
-                                return prev;
+                                return;
                             }
 
-                            return [...prev, record];
-                        })}}
+                            onSelectedTreesChange([...selectedTrees, record])
+                        }}
                     >
                         Select
                     </Button>
@@ -220,7 +221,7 @@ const TreeSelectionComponent: React.FC<TreeSelectionComponentProps> = ({ plotIds
                         variant='outlined'
                         color='error'
                         style={{ margin: "0 5px" }}
-                        onClick={() => { setSelectedTrees(prev => prev.filter(item => item.id !== record.id)) }}
+                        onClick={() => { onSelectedTreesChange(selectedTrees.filter(item => item.id !== record.id)) }}
                     >
                         Remove
                     </Button>

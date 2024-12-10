@@ -29,6 +29,9 @@ export type Tree = {
     plant_type?: string,
     plot?: string,
     mapped_user_name?: string,
+    mapped_group_name?: string,
+    sponsor_user_name?: string,
+    sponsor_group_name?: string,
     assigned_to_name?: string,
 };
 
@@ -55,6 +58,14 @@ type MapTreesBaseRequest = {
     name?: string,
     email?: string,
     phone?: string,
+    type?: string,
+    description?: string,
+    sponsor_id?: number,
+    sponsor_name?: string,
+    sponsor_email?: string,
+    sponsor_phone?: string,
+    sponsor_type?: string,
+    sponsor_description?: string,
 }
 
 export type MapTreesUsingSaplingIdsRequest = MapTreesBaseRequest & {

@@ -35,6 +35,7 @@ import TableComponent from "../../../../components/Table";
 import { AutocompleteWithPagination } from "../../../../components/AutoComplete";
 import Timeline from "./timeline";
 import { TreeImage } from "../../../../types/tree_snapshots";
+import MapTreesModal from "./MapTreesModal";
 
 export const TreeNew = () => {
     const dispatch = useAppDispatch();
@@ -150,7 +151,7 @@ export const TreeNew = () => {
             dataIndex: "srNo",
             key: "srNo",
             title: "Sr. No.",
-            width: 150,
+            width: 100,
             align: 'center',
             render: (value, record, index) => `${index + 1 + srNoPage * pageSize}.`,
         },
@@ -182,10 +183,34 @@ export const TreeNew = () => {
         {
             dataIndex: "mapped_user_name",
             key: "mapped_user_name",
-            title: "Mapped To",
+            title: "Reserved for (Individual)",
             width: 250,
             align: 'center',
             ...getColumnSearchProps('mapped_user_name', filters, handleSetFilters)
+        },
+        {
+            dataIndex: "mapped_group_name",
+            key: "mapped_group_name",
+            title: "Reserved for (Group)",
+            width: 250,
+            align: 'center',
+            ...getColumnSearchProps('mapped_group_name', filters, handleSetFilters)
+        },
+        {
+            dataIndex: "sponsor_user_name",
+            key: "sponsor_user_name",
+            title: "Sponsored By (Individual)",
+            width: 250,
+            align: 'center',
+            ...getColumnSearchProps('sponsor_user_name', filters, handleSetFilters)
+        },
+        {
+            dataIndex: "sponsor_group_name",
+            key: "sponsor_group_name",
+            title: "Sponsored By (Group)",
+            width: 250,
+            align: 'center',
+            ...getColumnSearchProps('sponsor_group_name', filters, handleSetFilters)
         },
         {
             dataIndex: "assigned_to_name",
@@ -199,7 +224,7 @@ export const TreeNew = () => {
             dataIndex: "action",
             key: "action",
             title: "Actions",
-            width: 170,
+            width: 300,
             align: "center",
             render: (value, record, index) => (
                 <div
@@ -218,6 +243,7 @@ export const TreeNew = () => {
                     </Button>
                     <Button
                         variant="outlined"
+                        color='success'
                         style={{ margin: "0 5px" }}
                         onClick={() => {
                             setSelectedEditRow(record);
@@ -308,15 +334,15 @@ export const TreeNew = () => {
     }
 
     const handleMapTrees = (formData: any) => {
-        const req: MapTreesUsingSaplingIdsRequest = {
-            mapped_to: 'user',
-            id: formData.id,
-            sapling_ids: saplingIds,
-            name: formData.name,
-            email: formData.email,
-            phone: formData.phone
-        }
-        mapTrees(req);
+        // const req: MapTreesUsingSaplingIdsRequest = {
+        //     mapped_to: 'user',
+        //     id: formData.id,
+        //     sapling_ids: saplingIds,
+        //     name: formData.name,
+        //     email: formData.email,
+        //     phone: formData.phone
+        // }
+        mapTrees({ ...formData, sapling_ids: saplingIds });
         setSaplingIds([]);
         setDisabledMapUnMapButton(true);
         setDisabledAUButton(true);
@@ -413,14 +439,14 @@ export const TreeNew = () => {
 
                         />
                     </div>
-                    <Button variant="contained" color={isAssignTrees ? 'success' : 'error'} style={{ marginLeft: '10px' }} onClick={handleAssignUnAssign}
+                    {/* <Button variant="contained" color={isAssignTrees ? 'success' : 'error'} style={{ marginLeft: '10px' }} onClick={handleAssignUnAssign}
                         disabled={disabledAUButton}
-                    >{(isAssignTrees) ? "Assign Trees" : "Unassign Trees"}</Button>
+                        >{(isAssignTrees) ? "Assign Trees" : "Unassign Trees"}</Button> */}
                     <AssignTreeModal open={isAssignTreeModalOpen} handleClose={() => { setIsAssignTreeModalOpen(false) }} onSubmit={handleAssignTrees} searchUsers={searchUsers} />
                     <Button variant="contained" color={isMapTrees ? 'success' : 'error'} style={{ marginLeft: '10px' }} onClick={handleMapUnMap}
                         disabled={disabledMapUnMapButton}
-                    >{(isMapTrees) ? "Map Trees" : "UnMap Trees"}</Button>
-                    <UserModal open={isUserModalOpen} handleClose={() => { setIsUserModalOpen(false) }} onSubmit={handleMapTrees} searchUser={searchUsers} />
+                    >{(isMapTrees) ? "Reserve Trees" : "Unreserve Trees"}</Button>
+                    {/* <UserModal open={isUserModalOpen} handleClose={() => { setIsUserModalOpen(false) }} onSubmit={handleMapTrees} searchUser={searchUsers} /> */}
                     <Button variant="contained" color='success' style={{ marginLeft: '10px' }} onClick={() => setChangePlotModal(true)}
                         disabled={selectedTreeIds.length === 0}
                     >Change Plot</Button>
@@ -457,6 +483,12 @@ export const TreeNew = () => {
                     editSubmit={handleEditSubmit}
                 />
             )}
+
+            <MapTreesModal 
+                open={isUserModalOpen}
+                onClose={() => { setIsUserModalOpen(false) }}
+                onSubmit={handleMapTrees}
+            />
 
             <Dialog open={openConfirmation} onClose={() => setOpenConfirmation(false)}>
                 <DialogTitle>Confirm {operation}</DialogTitle>

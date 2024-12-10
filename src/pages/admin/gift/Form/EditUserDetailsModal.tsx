@@ -1,7 +1,7 @@
 import React, { useContext, useRef, useEffect, useState } from 'react';
 import { Dialog, DialogTitle, DialogContent, DialogActions, Button, Avatar, TextField } from '@mui/material';
 
-import { GiftCardUser } from '../../../../types/gift_card';
+import { GiftCardUser, GiftRequestUser } from '../../../../types/gift_card';
 import ApiClient from '../../../../api/apiClient/apiClient';
 import { TableColumnType } from 'antd';
 import GeneralTable from '../../../../components/GenTable';
@@ -11,13 +11,13 @@ import { AWSUtils } from '../../../../helpers/aws';
 interface EditUserDialogProps {
     open: boolean;
     onClose: () => void;
-    user: GiftCardUser;
-    onSave: (updatedUser: GiftCardUser, image?: File) => void;
+    user: GiftRequestUser;
+    onSave: (updatedUser: GiftRequestUser, image?: File) => void;
 }
 
 const EditUserDialog: React.FC<EditUserDialogProps> = ({ open, onClose, user, onSave }) => {
-    const [name, setName] = useState(user.assigned_to_name || '');
-    const [phone, setPhone] = useState(user.assigned_to_phone || '');
+    const [name, setName] = useState(user.assignee_name || '');
+    const [phone, setPhone] = useState(user.assignee_phone || '');
     const [imageFile, setImageFile] = useState<File | null>(null);
 
     const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -28,7 +28,7 @@ const EditUserDialog: React.FC<EditUserDialogProps> = ({ open, onClose, user, on
     };
 
     const handleSave = () => {
-        onSave({ ...user, assigned_to_name: name, assigned_to_phone: phone}, imageFile ?? undefined);
+        onSave({ ...user, assignee_name: name, assignee_phone: phone}, imageFile ?? undefined);
         onClose();
     };
 
@@ -61,7 +61,7 @@ const EditUserDialog: React.FC<EditUserDialogProps> = ({ open, onClose, user, on
                 />
                 <TextField
                     label="Email"
-                    value={user.assigned_to_email}
+                    value={user.assignee_email}
                     InputProps={{ readOnly: true }}
                     disabled
                     fullWidth
@@ -92,9 +92,9 @@ interface EditUserDetailsModalProps {
 }
 
 const EditUserDetailsModal: React.FC<EditUserDetailsModalProps> = ({ open, onClose, giftRequestId, requestId, onSave }) => {
-    const [userList, setUserList] = useState<GiftCardUser[]>([]);
-    const [editedRows, setEditedRows] = useState<Record<number, GiftCardUser>>({});
-    const [selectedUser, setSelectedUser] = useState<GiftCardUser | null>(null);
+    const [userList, setUserList] = useState<GiftRequestUser[]>([]);
+    const [editedRows, setEditedRows] = useState<Record<number, GiftRequestUser>>({});
+    const [selectedUser, setSelectedUser] = useState<GiftRequestUser | null>(null);
     const [editModal, setEditModal] = useState(false);
 
     useEffect(() => {
@@ -102,10 +102,10 @@ const EditUserDetailsModal: React.FC<EditUserDetailsModalProps> = ({ open, onClo
             if (!giftRequestId) return;
 
             const apiClient = new ApiClient();
-            const users = await apiClient.getBookedGiftCards(giftRequestId, 0, -1);
-            setUserList(users.results
-                .filter(item => item.assigned_to)
-                .filter((item, idx, self) => self.findIndex(card => card.assigned_to === item.assigned_to) === idx)
+            const users = await apiClient.getGiftRequestUsers(giftRequestId);
+            setUserList(users
+                .filter(item => item.assignee)
+                .filter((item, idx, self) => self.findIndex(card => card.assignee === item.assignee) === idx)
                 .map(item => ({ ...item, key: item.id  })));
         }
 
@@ -118,21 +118,21 @@ const EditUserDetailsModal: React.FC<EditUserDetailsModalProps> = ({ open, onClo
         onClose();
     };
 
-    const defaultColumns: TableColumnType<GiftCardUser>[] = [
+    const defaultColumns: TableColumnType<GiftRequestUser>[] = [
         {
             title: 'User Name',
-            dataIndex: 'assigned_to_name',
+            dataIndex: 'assignee_name',
             width: '30%',
         },
         {
             title: 'Phone',
-            dataIndex: 'assigned_to_phone',
+            dataIndex: 'assignee_phone',
             width: '20%',
             render: value => value ? value : ''
         },
         {
             title: 'Email',
-            dataIndex: 'assigned_to_email',
+            dataIndex: 'assignee_email',
             width: '30%',
         },
         {
@@ -171,7 +171,7 @@ const EditUserDetailsModal: React.FC<EditUserDetailsModalProps> = ({ open, onClo
         setEditModal(false);
     }
 
-    const handleUserEdit = (row: GiftCardUser, image?: File) => {
+    const handleUserEdit = (row: GiftRequestUser, image?: File) => {
         const saveImage = async () => {
             if (image && requestId) {
                 const awsUtils = new AWSUtils();

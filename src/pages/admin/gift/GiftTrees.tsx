@@ -29,6 +29,7 @@ import { useAuth } from "../auth/auth";
 import { UserRoles } from "../../../types/common";
 import { LoginComponent } from "../Login/LoginComponent";
 import TagComponent from "./Form/TagComponent";
+import AssignTrees from "./Form/AssignTrees";
 
 const GiftTrees: FC = () => {
     const dispatch = useAppDispatch();
@@ -55,12 +56,13 @@ const GiftTrees: FC = () => {
     const [deleteModal, setDeleteModal] = useState(false);
     const [notesModal, setNotesModal] = useState(false);
     const [users, setUsers] = useState<any[]>([]);
-    const [userTrees, setUserTrees] = useState<any[]>([]);
+    const [selectedTrees, setSelectedTrees] = useState<any[]>([]);
     const [albumImagesModal, setAlbumImagesModal] = useState(false);
     const [album, setAlbum] = useState<any>(null);
     const [userDetailsEditModal, setUserDetailsEditModal] = useState(false);
     const [tagModal, setTagModal] = useState(false);
     const [tags, setTags] = useState<string[]>([]);
+    const [testingMail, setTestingMail] = useState(false);
 
     // payment
     const [paymentModal, setPaymentModal] = useState(false);
@@ -70,7 +72,7 @@ const GiftTrees: FC = () => {
         const getUsers = async () => {
             if (selectedGiftCard) {
                 const apiClient = new ApiClient();
-                const usersResp = await apiClient.getBookedGiftCards(selectedGiftCard?.id, 0, 50);
+                const usersResp = await apiClient.getBookedGiftTrees(selectedGiftCard?.id, 0, 50);
                 setUsers(usersResp.results);
             }
         }
@@ -244,7 +246,7 @@ const GiftTrees: FC = () => {
 
         try {
             if (users.length > 0) {
-                const response = await apiClient.createGiftCardUsers(giftCardId, users);
+                const response = await apiClient.upsertGiftCardUsers(giftCardId, users);
                 dispatch({
                     type: giftCardActionTypes.UPDATE_GIFT_CARD_SUCCEEDED,
                     payload: response,
@@ -280,7 +282,7 @@ const GiftTrees: FC = () => {
         if (success) {
             try {
                 if (users.length > 0) {
-                    const response = await apiClient.createGiftCardUsers(selectedGiftCard.id, users);
+                    const response = await apiClient.upsertGiftCardUsers(selectedGiftCard.id, users);
                     dispatch({
                         type: giftCardActionTypes.UPDATE_GIFT_CARD_SUCCEEDED,
                         payload: response,
@@ -316,22 +318,13 @@ const GiftTrees: FC = () => {
         if (!selectedGiftCard) return;
         setPlotModal(false);
 
-        if (userTrees.length > 0 && userTrees.length !== selectedGiftCard.no_of_cards) {
-            toast.error(`You must select all ${selectedGiftCard.no_of_cards} trees!`);
-            return;
-        }
-
         const apiClient = new ApiClient();
         if (selectedPlots.length !== 0) {
             try {
                 await apiClient.createGiftCardPlots(selectedGiftCard.id, selectedPlots.map(plot => plot.id));
                 toast.success("Saved selected plot for tree card request!");
 
-                await apiClient.bookGiftCards(selectedGiftCard.id, userTrees.length > 0 ? userTrees : undefined, bookNonGiftable, diversify);
-                if (userTrees.length > 0) {
-                    await apiClient.autoAssignTrees(selectedGiftCard.id);
-                }
-                
+                await apiClient.bookGiftCards(selectedGiftCard.id, selectedTrees.length > 0 ? selectedTrees : undefined, bookNonGiftable, diversify);                
                 toast.success("Tree cards booked successfully");
                 getGiftCardData();
             } catch {
@@ -362,33 +355,21 @@ const GiftTrees: FC = () => {
 
     }
 
-    const handleAutoAssignTrees = async () => {
-        setAutoAssignModal(false);
-        if (!selectedGiftCard) return;
-
-        const apiClient = new ApiClient();
-        try {
-            await apiClient.autoAssignTrees(selectedGiftCard.id);
-            getGiftCardData();
-            toast.success("Successfully assigned trees to users!");
-        } catch {
-            toast.error("Something went wrong!");
-        }
-    }
-
-    const handleSendEmails = async (emailSponsor: boolean, emailReceiver: boolean, emailAssignee: boolean, testMails: string[], ccMails: string[], eventType: string, attachCard: boolean) => {
+    const handleSendEmails = async (emailSponsor: boolean, emailReceiver: boolean, emailAssignee: boolean, testMails: string[], sponsorCC: string[], receiverCC: string[], eventType: string, attachCard: boolean) => {
         const giftCardRequestId = selectedGiftCard?.id
-        handleEmailModalClose();
+        if (testMails.length === 0) handleEmailModalClose();
+        else setTestingMail(true);
 
         if (!giftCardRequestId) return;
         const apiClient = new ApiClient();
         try {
-            await apiClient.sendEmailToGiftRequestUsers(giftCardRequestId, emailSponsor, emailReceiver, emailAssignee, eventType, attachCard, ccMails.length > 0 ? ccMails : undefined, testMails.length > 0 ? testMails : undefined);
+            await apiClient.sendEmailToGiftRequestUsers(giftCardRequestId, emailSponsor, emailReceiver, emailAssignee, eventType, attachCard, sponsorCC, receiverCC, testMails);
             toast.success("Emails sent successfully!")
         } catch (error: any) {
             toast.error(error.message)
         }
 
+        setTestingMail(false);
     }
 
     const handleEmailModalClose = () => {
@@ -578,14 +559,12 @@ const GiftTrees: FC = () => {
             </Menu.ItemGroup>}
             {!auth.roles.includes(UserRoles.User) && <Menu.Divider style={{ backgroundColor: '#ccc' }} />}
             {!auth.roles.includes(UserRoles.User) && <Menu.ItemGroup>
-                {Number(record.booked) !== record.no_of_cards &&
-                    <Menu.Item key="40" onClick={() => { setSelectedGiftCard(record); setPlotModal(true); }} icon={<Landscape />}>
-                        Select Plots
-                    </Menu.Item>
-                }
-                {Number(record.booked) > Number(record.assigned) && <Menu.Item key="41" onClick={() => { setSelectedGiftCard(record); setAutoAssignModal(true); }} icon={<AssignmentInd />}>
+                <Menu.Item key="40" onClick={() => { setSelectedGiftCard(record); setPlotModal(true); }} icon={<Landscape />}>
+                    Book Trees
+                </Menu.Item>
+                <Menu.Item key="41" onClick={() => { setSelectedGiftCard(record); setAutoAssignModal(true); }} icon={<AssignmentInd />}>
                     Assign Trees
-                </Menu.Item>}
+                </Menu.Item>
                 <Menu.Item key="42" onClick={() => { handlePaymentModalOpen(record); }} icon={<AssuredWorkload />}>
                     Payment Details
                 </Menu.Item>
@@ -667,6 +646,21 @@ const GiftTrees: FC = () => {
                     </IconButton>
                 </Tooltip>
             ) : '',
+        },
+        {
+            dataIndex: "amount",
+            key: "amount",
+            title: "Total Amount",
+            align: "center",
+            width: 150,
+            render: (value, record, index) => record.no_of_cards * (record.category === "Foundation" ? 3000 : 1500)
+        },
+        {
+            dataIndex: "payment_status",
+            key: "payment_status",
+            title: "Payment Status",
+            align: "center",
+            width: 150,
         },
         {
             dataIndex: "notes",
@@ -788,40 +782,25 @@ const GiftTrees: FC = () => {
             <GiftCardsForm giftCardRequest={selectedGiftCard ?? undefined} requestId={requestId} open={modalOpen} handleClose={handleModalClose} onSubmit={handleSubmit} />
 
             <Dialog open={plotModal} onClose={() => setPlotModal(false)} fullWidth maxWidth="xl">
-                <DialogTitle>Select Plots</DialogTitle>
+                <DialogTitle>Book Trees</DialogTitle>
                 <DialogContent dividers>
-                    <PlotSelection
-                        users={users}
-                        onUserTreeMapping={(cards: any[]) => { setUserTrees(cards); }}
-                        requiredTrees={selectedGiftCard?.no_of_cards ?? 0}
+                    {selectedGiftCard && <PlotSelection
+                        giftCardRequestId={selectedGiftCard.id}
+                        onTreeSelection={(trees: any[]) => { setSelectedTrees(trees); }}
+                        requiredTrees={selectedGiftCard.no_of_cards - Number(selectedGiftCard.booked)}
                         plots={selectedPlots}
                         onPlotsChange={plots => setSelectedPlots(plots)}
                         bookNonGiftable={bookNonGiftable}
                         onBookNonGiftableChange={(value) => { setBookNonGiftable(value) }}
                         diversify={diversify}
                         onDiversifyChange={(value) => { setDiversify(value) }}
-                    />
+                    />}
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={handlePlotSelectionCancel} color="error" variant="outlined">
                         Cancel
                     </Button>
                     <Button onClick={handlePlotSelectionSubmit} color="success" variant="contained">
-                        Confirm
-                    </Button>
-                </DialogActions>
-            </Dialog>
-
-            <Dialog open={autoAssignModal} onClose={() => setAutoAssignModal(false)} fullWidth maxWidth="lg">
-                <DialogTitle>Auto-assign trees to tree card request recipients</DialogTitle>
-                <DialogContent dividers>
-                    <Typography variant="subtitle1">Are you sure you want to auto assign trees to recipients?</Typography>
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={() => setAutoAssignModal(false)} color="primary">
-                        Cancel
-                    </Button>
-                    <Button onClick={handleAutoAssignTrees} color="primary" variant="contained">
                         Confirm
                     </Button>
                 </DialogActions>
@@ -858,7 +837,15 @@ const GiftTrees: FC = () => {
                 </DialogActions>
             </Dialog>
 
+            {selectedGiftCard && <AssignTrees 
+                open={autoAssignModal}
+                onClose={() => { setAutoAssignModal(false) }}
+                giftCardRequestId={selectedGiftCard.id}
+                onSubmit={() => { getGiftCardData(); }}
+            />}
+
             <EmailConfirmationModal
+                loading={testingMail}
                 sponsorMail={selectedGiftCard?.user_email}
                 open={emailConfirmationModal}
                 onClose={handleEmailModalClose}

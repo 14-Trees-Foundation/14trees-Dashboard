@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Box, Typography, Grid, TextField, Button, Autocomplete } from "@mui/material";
+import { Box, Typography, Grid, TextField, Button, Autocomplete, ToggleButtonGroup, ToggleButton, Select, MenuItem } from "@mui/material";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
@@ -8,6 +8,8 @@ import Axios from "../../../../api/local";
 import { useAppDispatch, useAppSelector } from "../../../../redux/store/hooks";
 import { bindActionCreators } from "@reduxjs/toolkit";
 import * as userActionCreators from "../../../../redux/actions/userActions";
+import * as groupActionCreators from "../../../../redux/actions/groupActions";
+import { organizationTypes } from "../../organization/organizationType";
 
 const intitialFValues = {
   name: "",
@@ -23,15 +25,22 @@ export const UserDetails = ({ selectedPlot }) => {
   const dispatch = useAppDispatch();
   const { searchUsers } =
     bindActionCreators(userActionCreators, dispatch);
+  const { searchGroups } =
+    bindActionCreators(groupActionCreators, dispatch);
 
   const [values, setValues] = useState(intitialFValues);
   const [treeCount, setTreeCount] = useState(0);
+  const [mapTo, setMapTo] = useState('user');
 
   const [formData, setFormData] = useState({
-    'id': 0,
-    'name': '',
-    'email': '',
-    'contact': '',
+    'user_id': 0,
+    'user_name': '',
+    'user_email': '',
+    'user_contact': '',
+    'group_id': 0,
+    'group_name': '',
+    'group_type': 'corporate',
+    'group_description': '',
   });
 
   const handleChange = (event) => {
@@ -47,16 +56,22 @@ export const UserDetails = ({ selectedPlot }) => {
     usersList = Object.values(usersData.users);
   }
 
+  let groupsList = [];
+  const groupsData = useAppSelector((state) => state.searchGroupsData);
+  if (groupsData) {
+    groupsList = Object.values(groupsData.groups);
+  }
+
   const handleEmailChange = (event, value) => {
     let isSet = false;
     usersList.forEach((user) => {
       if (`${user.name} (${user.email})` === value) {
         isSet = true;
         setFormData({
-          'id': user.id,
-          'email': user.email,
-          'name': user.name,
-          'contact': user.phone ?? '',
+          'user_id': user.id,
+          'user_email': user.email,
+          'user_name': user.name,
+          'user_contact': user.phone ?? '',
         })
       }
     })
@@ -64,10 +79,42 @@ export const UserDetails = ({ selectedPlot }) => {
     if (!isSet) {
       setFormData({
         ...formData,
-        'email': value,
+        'user_email': value,
       })
       if (value.length >= 3) searchUsers(value);
     }
+  }
+
+  const handleGroupNameChange = (event, value) => {
+    let isSet = false;
+    groupsList.forEach((group) => {
+      if (group.name === value) {
+        isSet = true;
+        setFormData({
+          'group_id': group.id,
+          'group_name': group.name,
+          'group_type': group.type,
+          'group_description': group.description ?? '',
+        })
+      }
+    })
+
+    if (!isSet) {
+      setFormData({
+        ...formData,
+        'user_name': value,
+      })
+      if (value.length >= 3) searchGroups(0, 10, value);
+    }
+  }
+
+  const handleGroupTypeChange = (e) => {
+    setFormData(prev => {
+      return {
+        ...prev,
+        group_type: e.target.value,
+      }
+    })
   }
 
   const formSubmit = async () => {
@@ -77,11 +124,13 @@ export const UserDetails = ({ selectedPlot }) => {
       backdropOpen: true,
     });
     const params = JSON.stringify({
-      mapped_to: 'user',
-      id: formData.id,
-      name: formData.name,
-      email: formData.email,
-      phone: formData.contact,
+      mapped_to: mapTo,
+      id: mapTo === 'user' ? formData.user_id : formData.group_id,
+      name: mapTo === 'user' ? formData.user_name : formData.group_name,
+      email: formData.user_email,
+      phone: formData.user_contact,
+      type: formData.group_type,
+      description: formData.group_description,
       plot_id: selectedPlot.id,
       count: treeCount,
     });
@@ -160,6 +209,12 @@ export const UserDetails = ({ selectedPlot }) => {
               boxShadow:
                 "inset 12px 12px 20px #96a29a,inset -12px -12px 20px #ccdcd0",
             },
+            "& .MuiInputBase-root": {
+              borderRadius: "20px",
+              background: "#b1bfb5",
+              boxShadow:
+                "inset 12px 12px 20px #96a29a,inset -12px -12px 20px #ccdcd0",
+            },
             "& .MuiOutlinedInput-notchedOutline": {
               border: "none",
             },
@@ -171,101 +226,205 @@ export const UserDetails = ({ selectedPlot }) => {
           <Typography variant="h5" gutterBottom sx={{ pb: 2 }}>
             Enter User details
           </Typography>
+          <Box
+            display="flex"
+            alignItems="center"
+            sx={{ ml: 3, mr: 2 }}
+          >
+            <Typography mr={10}>Reserve trees for:</Typography>
+            <ToggleButtonGroup
+              color="success"
+              value={mapTo}
+              exclusive
+              onChange={(e, value) => { setMapTo(value); }}
+              aria-label="Platform"
+              size="small"
+            >
+              <ToggleButton value="user">User</ToggleButton>
+              <ToggleButton value="group">Group</ToggleButton>
+            </ToggleButtonGroup>
+          </Box>
           <form
             onSubmit={(e) => { e.preventDefault(); formSubmit(); }}
           >
-            <Grid container sx={{ p: 2, pl: 0 }}>
-              <Grid sx={{ m: 2 }} item xs={12}>
-                <TextField
-                  sx={{
-                    "& label.Mui-focused": {
-                      display: "none",
-                    },
-                    "& legend": {
-                      display: "none",
-                    },
-                  }}
-                  fullWidth
-                  required
-                  value={formData.name}
-                  onChange={handleChange}
-                  label="Full Name"
-                  name="name"
-                />
-              </Grid>
-              <Grid item sx={{ m: 2 }} xs={12}>
-                <Autocomplete
-                  fullWidth
-                  options={usersList}
-                  name='email'
-                  noOptionsText="No Users"
-                  value={formData.email}
-                  onInputChange={handleEmailChange}
-                  getOptionLabel={(option) => option.email ? `${option.name} (${option.email})` : option}
-                  isOptionEqualToValue={(option, value) => true}
-                  renderInput={(params) => (
+            {mapTo === 'user' ?
+              (
+                <Grid container sx={{ p: 2, pl: 0 }}>
+                  <Grid item sx={{ m: 2 }} xs={12}>
+                    <Autocomplete
+                      fullWidth
+                      options={usersList}
+                      name='user_email'
+                      noOptionsText="No Users"
+                      value={formData.email}
+                      onInputChange={handleEmailChange}
+                      getOptionLabel={(option) => option.email ? `${option.name} (${option.email})` : option}
+                      isOptionEqualToValue={(option, value) => true}
+                      renderInput={(params) => (
+                        <TextField
+                          {...params}
+                          label="Enter email to search"
+                          variant="outlined"
+                        />
+                      )}>
+                    </Autocomplete>
+                  </Grid>
+                  <Grid sx={{ m: 2 }} item xs={12}>
                     <TextField
-                      {...params}
-                      label="Email"
-                      variant="outlined"
+                      sx={{
+                        "& label.Mui-focused": {
+                          display: "none",
+                        },
+                        "& legend": {
+                          display: "none",
+                        },
+                      }}
+                      fullWidth
+                      required
+                      value={formData.name}
+                      onChange={handleChange}
+                      label="Full Name"
+                      name="user_name"
                     />
-                  )}>
-                </Autocomplete>
-              </Grid>
-              <Grid item sx={{ m: 2 }} xs={12}>
-                <TextField
-                  sx={{
-                    "& label.Mui-focused": {
-                      display: "none",
-                    },
-                    "& legend": {
-                      display: "none",
-                    },
-                  }}
-                  required
-                  fullWidth
-                  value={formData.contact}
-                  onChange={handleChange}
-                  variant="outlined"
-                  label="Contact"
-                  name="contact"
-                />
-              </Grid>
-              <Grid item sx={{ m: 2 }} xs={12}>
-                <TextField
-                  sx={{
-                    "& label.Mui-focused": {
-                      display: "none",
-                    },
-                    "& legend": {
-                      display: "none",
-                    },
-                  }}
-                  required
-                  type="number"
-                  onChange={(e) => { e.target.value > 0 ? setTreeCount(e.target.value) : setTreeCount(0) }}
-                  value={treeCount}
-                  fullWidth
-                  label="Sapling Count"
-                  name="saplingid"
-                />
-              </Grid>
-              {
-                <Button
-                  sx={{ m: 2 }}
-                  size="large"
-                  variant="contained"
-                  color="primary"
-                  disabled={treeCount === 0 || selectedPlot === null}
-                  type="submit"
-                >
-                  Submit
-                </Button>
-              }
-            </Grid>
+                  </Grid>
+                  <Grid item sx={{ m: 2 }} xs={12}>
+                    <TextField
+                      sx={{
+                        "& label.Mui-focused": {
+                          display: "none",
+                        },
+                        "& legend": {
+                          display: "none",
+                        },
+                      }}
+                      fullWidth
+                      value={formData.contact}
+                      onChange={handleChange}
+                      variant="outlined"
+                      label="Contact"
+                      name="user_contact"
+                    />
+                  </Grid>
+                  <Grid item sx={{ m: 2 }} xs={12}>
+                    <TextField
+                      sx={{
+                        "& label.Mui-focused": {
+                          display: "none",
+                        },
+                        "& legend": {
+                          display: "none",
+                        },
+                      }}
+                      required
+                      type="number"
+                      onChange={(e) => { e.target.value > 0 ? setTreeCount(e.target.value) : setTreeCount(0) }}
+                      value={treeCount}
+                      fullWidth
+                      label="Sapling Count"
+                      name="saplingid"
+                    />
+                  </Grid>
+                </Grid>
+              ) : (
+                <Grid container sx={{ p: 2, pl: 0 }}>
+                  <Grid item sx={{ m: 2 }} xs={12}>
+                    <Autocomplete
+                      fullWidth
+                      options={groupsList}
+                      name='group_name'
+                      noOptionsText="No Users"
+                      value={formData.group_name}
+                      onInputChange={handleGroupNameChange}
+                      getOptionLabel={(option) => option.name ? option.name : option}
+                      isOptionEqualToValue={(option, value) => true}
+                      renderInput={(params) => (
+                        <TextField
+                          {...params}
+                          label="Enter group name to search"
+                          variant="outlined"
+                          name='group_name'
+                        />
+                      )}>
+                    </Autocomplete>
+                  </Grid>
+                  <Grid sx={{ m: 2 }} item xs={12}>
+                    <Select
+                      fullWidth
+                      required
+                      onChange={handleGroupTypeChange}
+                      defaultValue="corporate"
+                      value={formData.group_type}
+                      sx={{
+                        "& label.Mui-focused": {
+                          display: "none",
+                        },
+                        "& legend": {
+                          display: "none",
+                        },
+                      }}
+                    >
+                      {organizationTypes.map((option) => {
+                        return (
+                          <MenuItem key={option.id} value={option.id}>
+                            {option.label}
+                          </MenuItem>
+                        );
+                      })}
+                    </Select>
+                  </Grid>
+                  <Grid item sx={{ m: 2 }} xs={12}>
+                    <TextField
+                      sx={{
+                        "& label.Mui-focused": {
+                          display: "none",
+                        },
+                        "& legend": {
+                          display: "none",
+                        },
+                      }}
+                      fullWidth
+                      value={formData.group_description}
+                      onChange={handleChange}
+                      label="Description"
+                      name="group_description"
+                    />
+                  </Grid>
+                  <Grid item sx={{ m: 2 }} xs={12}>
+                    <TextField
+                      sx={{
+                        "& label.Mui-focused": {
+                          display: "none",
+                        },
+                        "& legend": {
+                          display: "none",
+                        },
+                      }}
+                      required
+                      type="number"
+                      onChange={(e) => { e.target.value > 0 ? setTreeCount(e.target.value) : setTreeCount(0) }}
+                      value={treeCount}
+                      fullWidth
+                      label="Sapling Count"
+                      name="saplingid"
+                    />
+                  </Grid>
+                </Grid>
+              )}
+            {
+              <Button
+                sx={{ ml: 2 }}
+                size="large"
+                variant="contained"
+                color="primary"
+                disabled={treeCount === 0 || selectedPlot === null}
+                type="submit"
+              >
+                Submit
+              </Button>
+            }
           </form>
         </Box>
-      </Box>
+      </Box >
     );
   }
 };

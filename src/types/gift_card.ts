@@ -36,11 +36,31 @@ export type GiftCard = {
     assigned: number,
 }
 
+export type GiftRequestUser = {
+    key: number;
+    id: number;
+    recipient: number;
+    assignee: number;
+    gift_request_id: number;
+    gifted_trees: number;
+    profile_image_url?: string;
+    recipient_name?: string;
+    recipient_email?: string;
+    recipient_phone?: string;
+    assignee_name?: string;
+    assignee_email?: string;
+    assignee_phone?: string;
+    relation?: string;
+    created_at: string;
+    updated_at: string;
+}
+
 export type GiftCardUser = {
     key: number;
     id: number;
     gifted_to: number;
     assigned_to: number;
+    gift_request_user_id: number | null;
     gift_card_request_id: number;
     tree_id: number;
     card_image_url?: string;
@@ -48,12 +68,12 @@ export type GiftCardUser = {
     created_at: string;
     updated_at: string;
     sapling_id?: string;
-    gifted_to_name?: string;
-    gifted_to_email?: string;
-    gifted_to_phone?: string;
-    assigned_to_name?: string;
-    assigned_to_email?: string;
-    assigned_to_phone?: string;
+    recipient_name?: string;
+    recipient_email?: string;
+    recipient_phone?: string;
+    assignee_name?: string;
+    assignee_email?: string;
+    assignee_phone?: string;
     relation?: string;
     plant_type?: string;
 }

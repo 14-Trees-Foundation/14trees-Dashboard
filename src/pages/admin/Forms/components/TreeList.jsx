@@ -150,7 +150,7 @@ export const TreeList = ({ onTreeSelect }) => {
           >
             <div style={{ display: "flex", justifyContent: "space-between" }}>
               <h4 style={{ marginTop: "0px", paddingLeft: "8px" }}>
-                Mapped Trees
+                Reserve Trees
               </h4>
               <div style={{display:'flex'}}>
                 <h4 style={{ marginTop: "0px", paddingRight: "8px" }}>
@@ -212,7 +212,7 @@ export const TreeList = ({ onTreeSelect }) => {
           >
             <div style={{ display: "flex", justifyContent: "space-between" }}>
               <h4 style={{ marginTop: "0px", paddingLeft: "8px" }}>
-                UnMapped Trees
+                Unreserved Trees
               </h4>
               <div style={{display:'flex'}}>
               <h4 style={{ marginTop: "0px", paddingRight: "8px" }}>

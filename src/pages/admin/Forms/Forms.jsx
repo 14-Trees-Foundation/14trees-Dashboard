@@ -93,7 +93,7 @@ export const Forms = () => {
             aria-controls="panel1a-content"
             id="panel1a-header"
           >
-            <Typography variant="h6" style={{ fontWeight: 'inherit', color:'#1F3625' }}>Map using sapling count</Typography>
+            <Typography variant="h6" style={{ fontWeight: 'inherit', color:'#1F3625' }}>Reserve using sapling count</Typography>
           </AccordionSummary>
           <AccordionDetails>
             <Grid container spacing={2}>
@@ -116,7 +116,7 @@ export const Forms = () => {
             aria-controls="panel2a-content"
             id="panel2a-header"
           >
-            <Typography variant="h6" style={{ fontWeight: "inherit", color:'#1F3625' }} >Map using sapling ids</Typography>
+            <Typography variant="h6" style={{ fontWeight: "inherit", color:'#1F3625' }} >Reserve using sapling ids</Typography>
           </AccordionSummary>
           <AccordionDetails>
             <Grid container spacing={2}>

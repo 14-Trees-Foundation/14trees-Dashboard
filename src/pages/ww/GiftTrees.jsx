@@ -70,7 +70,7 @@ const intitialFValues = {
 };
 
 export const GiftTrees = () => {
-  let { email } = useParams();
+  let { email, group_id } = useParams();
 
   const dispatch = useAppDispatch();
   const { assignTrees, unassignUserTrees } = bindActionCreators(
@@ -208,7 +208,9 @@ export const GiftTrees = () => {
     formData,
     img,
     albumName,
-    selfAssign = false
+    selfAssign = false,
+    sponsorUser,
+    sponsorGroup
   ) => {
     let images = [];
     if (albumName !== "none") {
@@ -216,14 +218,16 @@ export const GiftTrees = () => {
         return album.album_name === albumName;
       })[0].images;
     }
-    await assignTrees2(formData, img, images, selfAssign);
+    await assignTrees2(formData, img, images, selfAssign, sponsorUser, sponsorGroup);
     setUnassignedSelected(false);
     setAssignedSelected(false);
   };
 
   const fetchTrees = useCallback(async () => {
     try {
-      let profileTrees = await Axios.get(`/mapping/${email}`);
+      let profileTrees;
+      if (email) profileTrees = await Axios.get(`/mapping/${email}`);
+      else profileTrees = await Axios.get(`/mapping/group/${group_id}`);
       if (profileTrees.status === 200) {
         let data = profileTrees.data.trees.results;
         data = data.map((tree) => ({ ...tree, selected: false }));
@@ -237,9 +241,11 @@ export const GiftTrees = () => {
         });
       }
 
-      let albums = await Axios.get(`/albums/${email}`);
-      if (albums.status === 200) {
-        setAlbums(albums.data.albums);
+      if (email) {
+        let albums = await Axios.get(`/albums/${email}`);
+        if (albums.status === 200) {
+          setAlbums(albums.data.albums);
+        }
       }
 
       setValues((values) => {
@@ -250,7 +256,7 @@ export const GiftTrees = () => {
       });
     } catch (error) {
       console.error(error);
-      if (error.response.status === 404) {
+      if (error.response?.status === 404) {
         setValues((values) => {
           return {
             ...values,
@@ -258,7 +264,7 @@ export const GiftTrees = () => {
             backdropOpen: false,
           };
         });
-        toast.error(error.response.data.message);
+        toast.error(error.response?.data?.message);
       }
     }
   }, [email, setAlbums]);
@@ -321,7 +327,7 @@ export const GiftTrees = () => {
     }
   };
 
-  const assignTrees2 = async (formValues, img, images, selfAssign) => {
+  const assignTrees2 = async (formValues, img, images, selfAssign, sponsorUser, sponsorGroup) => {
     setValues({
       ...values,
       loading: true,
@@ -345,7 +351,8 @@ export const GiftTrees = () => {
 
     formData.append("birth_date", date);
     formData.append("sapling_ids", sapling_ids);
-    formData.append("sponsored_by_user", values.user?.id);
+    if (sponsorUser && sponsorUser.id) formData.append("sponsored_by_user", sponsorUser.id);
+    if (sponsorGroup && sponsorGroup.id) formData.append("sponsored_by_group", sponsorGroup.id);
 
     if (formValues.gifted_by && formValues.gifted_by !== "undefined")
       formData.append("gifted_by", formValues.gifted_by);
@@ -361,7 +368,7 @@ export const GiftTrees = () => {
       formData.append("user_image", img.name);
     }
 
-    await assignTrees(formData);
+    assignTrees(formData);
 
     let profileTrees = await Axios.get(`/mapping/${email}`);
     if (profileTrees.status === 200 || profileTrees.status === 304) {
@@ -538,7 +545,7 @@ export const GiftTrees = () => {
   if (values.loading) {
     return <Spinner />;
   } else {
-    if (Object.keys(values.user).length === 0 && !values.loading) {
+    if ((!group_id && (!values.user || Object.keys(values.user).length === 0)) && !values.loading) {
       return (
         <Typography
           variant="h2"

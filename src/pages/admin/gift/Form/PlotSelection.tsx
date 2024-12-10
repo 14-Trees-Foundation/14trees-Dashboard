@@ -1,12 +1,11 @@
 
 import { FC, useEffect, useState } from "react";
-import { Box, Button, Checkbox, Chip, Divider, FormControl, FormControlLabel, ToggleButton, ToggleButtonGroup, Typography } from "@mui/material";
+import { Box, Button, Chip, Divider, ToggleButton, ToggleButtonGroup, Typography } from "@mui/material";
 import { Plot } from "../../../../types/plot";
 import { useAppDispatch, useAppSelector } from "../../../../redux/store/hooks";
 import { bindActionCreators } from "@reduxjs/toolkit";
 import * as plotActionCreators from "../../../../redux/actions/plotActions";
 import * as tagActionCreators from "../../../../redux/actions/tagActions";
-import UserTreeMappingModal from "./UserTreeMapping";
 import { Table, TableColumnsType } from "antd";
 import getColumnSearchProps, { getColumnSelectedItemFilter, getSortIcon } from "../../../../components/Filter";
 import { GridFilterItem } from "@mui/x-data-grid";
@@ -14,6 +13,7 @@ import GeneralTable from "../../../../components/GenTable";
 import ApiClient from "../../../../api/apiClient/apiClient";
 import { RootState } from "../../../../redux/store/store";
 import TreeSelectionComponent from "./TreeSelectionComponent";
+import BookedTrees from "../Components/BookedTrees";
 
 const calculateUnion = (plantTypes: (string[] | undefined)[]) => {
     const allTypes = plantTypes.flat().filter((type): type is string => type !== undefined);
@@ -43,11 +43,11 @@ const TableSummary = (plots: Plot[], selectedPlotIds: number[], totalColumns: nu
 }
 
 interface PlotSelectionProps {
+    giftCardRequestId: number
     requiredTrees: number
     plots: Plot[]
     onPlotsChange: (plots: Plot[]) => void
-    users: any[]
-    onUserTreeMapping: (cards: any[]) => void
+    onTreeSelection: (trees: any[]) => void
     bookNonGiftable: boolean
     onBookNonGiftableChange: (value: boolean) => void
     diversify: boolean
@@ -55,7 +55,7 @@ interface PlotSelectionProps {
 
 }
 
-const PlotSelection: FC<PlotSelectionProps> = ({ requiredTrees, plots, onPlotsChange, users, onUserTreeMapping, bookNonGiftable, onBookNonGiftableChange, diversify, onDiversifyChange }) => {
+const PlotSelection: FC<PlotSelectionProps> = ({ giftCardRequestId, requiredTrees, plots, onPlotsChange, onTreeSelection, bookNonGiftable, onBookNonGiftableChange, diversify, onDiversifyChange }) => {
 
     const [page, setPage] = useState(0);
     const [loading, setLoading] = useState(false);
@@ -65,10 +65,10 @@ const PlotSelection: FC<PlotSelectionProps> = ({ requiredTrees, plots, onPlotsCh
     const [filters, setFilters] = useState<Record<string, GridFilterItem>>({});
     const [selectedPlotIds, setSelectedPlotIds] = useState<number[]>([]);
     const [selectedTags, setSelectedTags] = useState<string[]>([]);
+    const [treesCount, setTreesCount] = useState<number>(requiredTrees);
 
     const [orderBy, setOrderBy] = useState<{ column: string, order: 'ASC' | 'DESC' }[]>([]);
     const [treeSelectionModal, setTreeSelectionModal] = useState(false);
-    const [userTrees, setUserTrees] = useState<any[]>([]);
 
     const handleSetFilters = (filters: Record<string, GridFilterItem>) => {
         setPage(0);
@@ -313,6 +313,39 @@ const PlotSelection: FC<PlotSelectionProps> = ({ requiredTrees, plots, onPlotsCh
         }
     }
 
+    ///*** tree selection for booking ***/
+    const [page2, setPage2] = useState(0);
+    const [pageSize2, setPageSize2] = useState(10);
+    const [selectedTrees, setSelectedTrees] = useState<any[]>([]);
+
+    const handlePaginationChange2 = (page: number, pageSize: number) => {
+        setPage2(page - 1);
+        setPageSize2(pageSize);
+    }
+
+    const treeColumns: TableColumnsType<any> = [
+        {
+            dataIndex: "sapling_id",
+            key: "sapling_id",
+            title: "Sapling ID",
+            align: "center",
+            width: 120,
+        },
+        {
+            dataIndex: "plant_type",
+            key: "plant_type",
+            title: "Plant Type",
+            align: "center",
+            width: 200,
+        },
+        {
+            dataIndex: "scientific_name",
+            key: "scientific_name",
+            title: "Scientific Name",
+            align: "center",
+            width: 200,
+        },
+    ];
 
     return (
         <div>
@@ -320,10 +353,10 @@ const PlotSelection: FC<PlotSelectionProps> = ({ requiredTrees, plots, onPlotsCh
             <Box style={{
                 marginBottom: 20
             }}>
-                <Typography variant='subtitle1'>Total Trees Requested: <strong>{requiredTrees}</strong></Typography>
-                {userTrees.length === 0 && <Box>
+                <Typography variant='subtitle1'>Total Trees Requested: <strong>{treesCount}</strong></Typography>
+                {selectedTrees.length === 0 && <Box>
                     <Typography variant='subtitle1'>Remaining tree count for plot selection: <strong>{
-                        Math.max(requiredTrees - plots
+                        Math.max(treesCount - plots
                             .map(pt => pt.card_available ?? 0)
                             .reduce((prev, current) => prev + current, 0), 0)
                     }</strong></Typography>
@@ -334,7 +367,7 @@ const PlotSelection: FC<PlotSelectionProps> = ({ requiredTrees, plots, onPlotsCh
                             .map(pt => pt.card_available ?? 0)
                             .reduce((prev, current) => prev + current, 0);
 
-                        const treesForCurrentPlot = Math.min(plot.card_available ?? 0, requiredTrees - treesAllocated);
+                        const treesForCurrentPlot = Math.min(plot.card_available ?? 0, treesCount - treesAllocated);
 
                         return (
                             <Typography variant="body1" key={idx}>
@@ -384,10 +417,10 @@ const PlotSelection: FC<PlotSelectionProps> = ({ requiredTrees, plots, onPlotsCh
                 tableName="Plots selection"
             />
             {plots.length > 0 && <Box sx={{ marginBottom: '20px' }}>
-                <Divider/>
+                <Divider />
                 <Typography mb={1} mt={2}><strong>List of unique plant types for selected plots:</strong></Typography>
                 <Typography mb={2}>{calculateUnion(plots.map(plot => plot.distinct_plants)).join(", ")}</Typography>
-                <Divider/>
+                <Divider />
             </Box>}
 
             <Box
@@ -408,7 +441,7 @@ const PlotSelection: FC<PlotSelectionProps> = ({ requiredTrees, plots, onPlotsCh
                             onClick={() => { setTreeSelectionModal(true); }}
                         >Select Manually</Button>
                     </Box>
-                    {userTrees.length === 0 && <Box
+                    {selectedTrees.length === 0 && <Box
                         mt={2}
                         display="flex"
                         alignItems="center"
@@ -427,7 +460,7 @@ const PlotSelection: FC<PlotSelectionProps> = ({ requiredTrees, plots, onPlotsCh
                             <ToggleButton value="no">No</ToggleButton>
                         </ToggleButtonGroup>
                     </Box>}
-                    {userTrees.length === 0 && <Box
+                    {selectedTrees.length === 0 && <Box
                         mt={2}
                         display="flex"
                         alignItems="center"
@@ -449,25 +482,44 @@ const PlotSelection: FC<PlotSelectionProps> = ({ requiredTrees, plots, onPlotsCh
                 </Box>
                 <Box display="flex" flexGrow={1}></Box>
             </Box>
-            {userTrees.length > 0 && <UserTreeMappingModal
-                trees={userTrees}
-                onTreesChange={(trees: any[]) => { setUserTrees(trees); onUserTreeMapping(trees); }}
-                users={users}
-            />}
-            <TreeSelectionComponent 
+
+            {!treeSelectionModal && selectedTrees.length > 0 && <Box mt={5}>
+                <Typography variant="h6" mb={1}>Below trees will be reserved for gift request after submission:</Typography>
+                <GeneralTable
+                    rows={selectedTrees.slice(page2*pageSize, (page2 + 1)*pageSize2)}
+                    columns={treeColumns}
+                    totalRecords={selectedTrees.length}
+                    page={page2}
+                    pageSize={pageSize2}
+                    onPaginationChange={handlePaginationChange2}
+                    onDownload={async () => { return selectedTrees; }}
+                    tableName="Tree selection"
+                />
+            </Box>}
+
+            <Box mt={5}>
+                <BookedTrees
+                    giftCardRequestId={giftCardRequestId}
+                    visible={false}
+                    onUnMap={count => { setTreesCount(prev => prev + count); }}
+                />
+            </Box>
+
+            <TreeSelectionComponent
                 open={treeSelectionModal}
-                max={requiredTrees}
-                plotIds={plots.map(plot => plot.id)} 
+                max={treesCount}
+                plotIds={plots.map(plot => plot.id)}
                 onClose={() => { setTreeSelectionModal(false); }}
-                onSubmit={(trees: any[]) => { 
+                selectedTrees={selectedTrees}
+                onSelectedTreesChange={(trees: any) => { setSelectedTrees(trees) }}
+                onSubmit={(trees: any[]) => {
                     const data = trees.map(tree => ({
                         tree_id: tree.id,
                         sapling_id: tree.sapling_id,
                         plant_type: tree.plant_type,
                     }))
-                    onUserTreeMapping(trees); 
-                    setUserTrees(data);
-                    setTreeSelectionModal(false); 
+                    onTreeSelection(data);
+                    setTreeSelectionModal(false);
                 }}
             />
         </div>
