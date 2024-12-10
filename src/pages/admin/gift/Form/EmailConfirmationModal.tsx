@@ -3,21 +3,25 @@ import { Dialog, DialogTitle, DialogContent, DialogActions, Chip, Typography, Bu
 import { EmailTemplate } from '../../../../types/email_template';
 import ApiClient from '../../../../api/apiClient/apiClient';
 import { toast } from 'react-toastify';
+import { EmailOutlined } from '@mui/icons-material';
+import { LoadingButton } from '@mui/lab';
 
 interface EmailConfirmationModalProps {
+    loading: boolean
     sponsorMail?: string;
     open: boolean;
     onClose: () => void;
-    onSubmit: (emailSponsor: boolean, emailReceiver: boolean, emailAssignee: boolean, testMails: string[], ccMails: string[], templateType: string, attachCard: boolean) => void;
+    onSubmit: (emailSponsor: boolean, emailReceiver: boolean, emailAssignee: boolean, testMails: string[], sponsorCC: string[], receiverCC: string[], templateType: string, attachCard: boolean) => void;
 }
 
-const EmailConfirmationModal: React.FC<EmailConfirmationModalProps> = ({ sponsorMail, open, onClose, onSubmit }) => {
+const EmailConfirmationModal: React.FC<EmailConfirmationModalProps> = ({ loading, sponsorMail, open, onClose, onSubmit }) => {
     const [toEmails, setToEmails] = useState<string[]>([]);
-    const [ccEmails, setCcEmails] = useState<string[]>(sponsorMail ? [sponsorMail] : []);
+    const [sponsorCC, setSponsorCC] = useState<string[]>([]);
+    const [receiverCC, setReceiverCC] = useState<string[]>(sponsorMail ? [sponsorMail] : []);
     const [emailInput, setEmailInput] = useState('');
     const [ccInput, setCcInput] = useState('');
     const [attachCards, setAttachCards] = useState(false);
-    const [emailSponsor, setEmailSponsor] = useState(false);
+    const [emailSponsor, setEmailSponsor] = useState(true);
     const [emailReceiver, setEmailReceiver] = useState(false);
     const [emailAssignee, setEmailAssignee] = useState(false);
     const [emailTemplates, setEmailTemplates] = useState<EmailTemplate[]>([]);
@@ -27,7 +31,7 @@ const EmailConfirmationModal: React.FC<EmailConfirmationModalProps> = ({ sponsor
         const getEmailTemplates = async () => {
             const apiClient = new ApiClient();
             const templates = await apiClient.getEmailTemplates();
-            const uniqueTemplates: EmailTemplate[] 
+            const uniqueTemplates: EmailTemplate[]
                 = templates
                     .filter((template, index, self) => self.findIndex(item => item.event_type === template.event_type) === index);
 
@@ -39,7 +43,7 @@ const EmailConfirmationModal: React.FC<EmailConfirmationModalProps> = ({ sponsor
     }, [])
 
     useEffect(() => {
-        if (sponsorMail) setCcEmails([sponsorMail]);
+        if (sponsorMail) setReceiverCC([sponsorMail]);
     }, [sponsorMail]);
 
     const handleAddEmail = (input: string, setEmails: React.Dispatch<React.SetStateAction<string[]>>, setInput: React.Dispatch<React.SetStateAction<string>>) => {
@@ -59,86 +63,37 @@ const EmailConfirmationModal: React.FC<EmailConfirmationModalProps> = ({ sponsor
             return;
         }
 
-        onSubmit(emailSponsor, emailReceiver, emailAssignee, toEmails, ccEmails, selectedTemplate.event_type, attachCards);
+        onSubmit(emailSponsor, emailReceiver, emailAssignee, [], sponsorCC, receiverCC, selectedTemplate.event_type, attachCards);
+    };
+
+    const handleTestMails = () => {
+        if (!selectedTemplate) {
+            toast.error("Please select email template to send!");
+            return;
+        }
+
+        onSubmit(emailSponsor, emailReceiver, emailAssignee, toEmails, sponsorCC, receiverCC, selectedTemplate.event_type, attachCards);
     };
 
     return (
         <Dialog open={open} fullWidth maxWidth="lg">
             <DialogTitle>Send Emails</DialogTitle>
             <DialogContent dividers>
-                <Typography variant="body1" gutterBottom>
-                    Add CC email addresses.
-                </Typography>
 
-                {/* CC Email Addresses */}
-                <FormControl fullWidth>
-                    <OutlinedInput
-                        placeholder="Enter CC email and press Enter"
-                        value={ccInput}
-                        onChange={(e) => setCcInput(e.target.value)}
-                        onKeyDown={(e) => {
-                            if (e.key === 'Enter') {
-                                e.preventDefault();
-                                handleAddEmail(ccInput, setCcEmails, setCcInput);
-                            }
-                        }}
-                        startAdornment={
-                            ccEmails.map((email, index) => (
-                                <Chip
-                                    key={index}
-                                    label={email}
-                                    onDelete={() => handleDeleteEmail(email, setCcEmails)}
-                                    color="secondary"
-                                    sx={{ marginRight: 0.5 }}
-                                />
-                            ))
-                        }
-                    />
-                </FormControl>
-
-                <Typography variant="body1" gutterBottom sx={{ mt: 2 }}>
-                    In case, you want to check emails first, enter your email address below in order to receive test emails.
-                </Typography>
-                {/* Recipient Email Addresses */}
-                <FormControl fullWidth>
-                    <OutlinedInput
-                        placeholder="Enter test email and press Enter"
-                        value={emailInput}
-                        onChange={(e) => setEmailInput(e.target.value)}
-                        onKeyDown={(e) => {
-                            if (e.key === 'Enter') {
-                                e.preventDefault();
-                                handleAddEmail(emailInput, setToEmails, setEmailInput);
-                            }
-                        }}
-                        startAdornment={
-                            toEmails.map((email, index) => (
-                                <Chip
-                                    key={index}
-                                    label={email}
-                                    onDelete={() => handleDeleteEmail(email, setToEmails)}
-                                    color="primary"
-                                    sx={{ marginRight: 0.5 }}
-                                />
-                            ))
-                        }
-                    />
-                </FormControl>
-
-                <Box sx={{ mt: 2 }}>
+                <Box sx={{ mt: 1 }}>
                     <Typography >Who would you like to send the emails to?</Typography>
                     <FormControl component="fieldset">
                         <FormGroup aria-label="position" row>
                             <FormControlLabel
-                                value="receiver"
-                                control={<Checkbox checked={emailReceiver} onChange={(e) => { setEmailReceiver(e.target.checked) }} />}
-                                label="Receivers"
-                                labelPlacement="end"
-                            />
-                            <FormControlLabel
                                 value="sponsor"
                                 control={<Checkbox checked={emailSponsor} onChange={(e) => { setEmailSponsor(e.target.checked) }} />}
                                 label="Sponsor"
+                                labelPlacement="end"
+                            />
+                            <FormControlLabel
+                                value="receiver"
+                                control={<Checkbox checked={emailReceiver} onChange={(e) => { setEmailReceiver(e.target.checked) }} />}
+                                label="Receivers"
                                 labelPlacement="end"
                             />
                             <FormControlLabel
@@ -151,18 +106,63 @@ const EmailConfirmationModal: React.FC<EmailConfirmationModalProps> = ({ sponsor
                     </FormControl>
                 </Box>
 
-                <Box sx={{ mt: 2 }}>
-                    <Typography >Do you want to send gift card image as an attachment in emails?</Typography>
-                    <FormControl component="fieldset">
-                        <FormControlLabel
-                            control={
-                                <Checkbox
-                                    checked={attachCards}
-                                    onChange={(e) => setAttachCards(e.target.checked)}
-                                    name="manual"
-                                />
+                {/* CC Email Addresses */}
+                <Box mt={3} hidden={!emailSponsor}>
+                    <Typography variant="body1" gutterBottom>
+                        Sponsor CC email addresses
+                    </Typography>
+                    <FormControl fullWidth>
+                        <OutlinedInput
+                            placeholder="Enter CC email and press Enter"
+                            value={ccInput}
+                            onChange={(e) => setCcInput(e.target.value)}
+                            onKeyDown={(e) => {
+                                if (e.key === 'Enter') {
+                                    e.preventDefault();
+                                    handleAddEmail(ccInput, setSponsorCC, setCcInput);
+                                }
+                            }}
+                            startAdornment={
+                                sponsorCC.map((email, index) => (
+                                    <Chip
+                                        key={index}
+                                        label={email}
+                                        onDelete={() => handleDeleteEmail(email, setSponsorCC)}
+                                        color="secondary"
+                                        sx={{ marginRight: 0.5 }}
+                                    />
+                                ))
                             }
-                            label="Yes"
+                        />
+                    </FormControl>
+                </Box>
+
+                <Box mt={3} hidden={!(emailReceiver || emailAssignee)}>
+                    <Typography variant="body1" gutterBottom>
+                        Receiver CC email addresses
+                    </Typography>
+                    <FormControl fullWidth>
+                        <OutlinedInput
+                            placeholder="Enter CC email and press Enter"
+                            value={ccInput}
+                            onChange={(e) => setCcInput(e.target.value)}
+                            onKeyDown={(e) => {
+                                if (e.key === 'Enter') {
+                                    e.preventDefault();
+                                    handleAddEmail(ccInput, setReceiverCC, setCcInput);
+                                }
+                            }}
+                            startAdornment={
+                                receiverCC.map((email, index) => (
+                                    <Chip
+                                        key={index}
+                                        label={email}
+                                        onDelete={() => handleDeleteEmail(email, setReceiverCC)}
+                                        color="secondary"
+                                        sx={{ marginRight: 0.5 }}
+                                    />
+                                ))
+                            }
                         />
                     </FormControl>
                 </Box>
@@ -183,6 +183,59 @@ const EmailConfirmationModal: React.FC<EmailConfirmationModalProps> = ({ sponsor
                             />
                         )}
                     />
+                </Box>
+
+                <FormControlLabel
+                    sx={{ mt: 2 }}
+                    control={<Checkbox checked={attachCards} onChange={() => setAttachCards(!attachCards)} />}
+                    label="Attach tree card images as attachment in emails"
+                />
+
+                <Typography variant="body1" gutterBottom sx={{ mt: 2 }}>
+                    In case, you want to check emails first, enter your email address below in order to receive test emails.
+                </Typography>
+                {/* Recipient Email Addresses */}
+                <Box
+                    display="flex"
+                    alignItems="center"
+                    justifyContent="space-between"
+                >
+                    <FormControl fullWidth>
+                        <OutlinedInput
+                            placeholder="Enter test email and press Enter"
+                            value={emailInput}
+                            onChange={(e) => setEmailInput(e.target.value)}
+                            onKeyDown={(e) => {
+                                if (e.key === 'Enter') {
+                                    e.preventDefault();
+                                    handleAddEmail(emailInput, setToEmails, setEmailInput);
+                                }
+                            }}
+                            startAdornment={
+                                toEmails.map((email, index) => (
+                                    <Chip
+                                        key={index}
+                                        label={email}
+                                        onDelete={() => handleDeleteEmail(email, setToEmails)}
+                                        color="primary"
+                                        sx={{ marginRight: 0.5 }}
+                                    />
+                                ))
+                            }
+                        />
+                    </FormControl>
+                    <LoadingButton
+                        loading={loading}
+                        loadingPosition="start"
+                        variant="contained"
+                        color="success"
+                        onClick={handleTestMails}
+                        startIcon={<EmailOutlined />}
+                        disabled={toEmails.length === 0}
+                        sx={{ ml: 2 }}
+                    >
+                        Test
+                    </LoadingButton>
                 </Box>
 
             </DialogContent>
