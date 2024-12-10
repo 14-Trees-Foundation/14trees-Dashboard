@@ -9,10 +9,8 @@ import {
   DialogContentText,
   DialogTitle,
   Divider,
-  InputLabel,
   Menu,
   MenuItem,
-  TextField,
   Typography,
 } from "@mui/material";
 import AddOrganization from "./AddOrganization";
@@ -34,6 +32,7 @@ import { organizationTypes } from "./organizationType";
 import { GridFilterItem } from "@mui/x-data-grid";
 import getColumnSearchProps, { getColumnSelectedItemFilter } from "../../../components/Filter";
 import { ToastContainer } from "react-toastify";
+import { AccountBalance } from "@mui/icons-material";
 
 export const OrganizationComponent = () => {
   const dispatch = useAppDispatch();
@@ -60,8 +59,8 @@ export const OrganizationComponent = () => {
   const [filters, setFilters] = useState<Record<string, GridFilterItem>>({});
 
   const handleSetFilters = (filters: Record<string, GridFilterItem>) => {
-      setPage(0);
-      setFilters(filters);
+    setPage(0);
+    setFilters(filters);
   }
 
   const handleClick = (event: any) => {
@@ -121,7 +120,7 @@ export const OrganizationComponent = () => {
       width: 150,
       align: 'center',
       render: (value) => value ? value.toString().toUpperCase() : '',
-      ...getColumnSelectedItemFilter({dataIndex: 'type', filters, handleSetFilters, options: organizationTypes.map(item => item.label.toUpperCase())})
+      ...getColumnSelectedItemFilter({ dataIndex: 'type', filters, handleSetFilters, options: organizationTypes.map(item => item.label.toUpperCase()) })
     },
     {
       dataIndex: "description",
@@ -134,7 +133,7 @@ export const OrganizationComponent = () => {
       dataIndex: "action",
       key: "action",
       title: "Action",
-      width: 200,
+      width: 300,
       align: "center",
       render: (value, record, index) => (
         <div
@@ -143,6 +142,22 @@ export const OrganizationComponent = () => {
             justifyContent: "center",
             alignItems: "center",
           }}>
+
+          <Button
+            variant="outlined"
+            color="success"
+            style={{ margin: "0 5px" }}
+            onClick={() => {
+              const { hostname, host } = window.location;
+              if (hostname === "localhost" || hostname === "127.0.0.1") {
+                window.open("http://" + host + "/ww/group/" + record.id);
+              } else {
+                window.open("https://" + hostname + "/ww/group/" + record.id);
+              }
+            }}
+          >
+            <AccountBalance />
+          </Button>
           <Button
             color="success"
             variant="outlined"
@@ -283,7 +298,7 @@ export const OrganizationComponent = () => {
         />
       </Box>
       <Divider style={{ marginBottom: "20px" }} />
-      {selectedOrg && <OrganizationUsers selectedOrg={selectedOrg}/>}
+      {selectedOrg && <OrganizationUsers selectedOrg={selectedOrg} />}
 
       <Dialog open={openDeleteModal} onClose={() => setOpenDeleteModal(false)}>
         <DialogTitle>Confirm Delete</DialogTitle>

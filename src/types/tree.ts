@@ -58,6 +58,14 @@ type MapTreesBaseRequest = {
     name?: string,
     email?: string,
     phone?: string,
+    type?: string,
+    description?: string,
+    sponsor_id?: number,
+    sponsor_name?: string,
+    sponsor_email?: string,
+    sponsor_phone?: string,
+    sponsor_type?: string,
+    sponsor_description?: string,
 }
 
 export type MapTreesUsingSaplingIdsRequest = MapTreesBaseRequest & {
