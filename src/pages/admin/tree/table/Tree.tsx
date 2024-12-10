@@ -35,6 +35,7 @@ import TableComponent from "../../../../components/Table";
 import { AutocompleteWithPagination } from "../../../../components/AutoComplete";
 import Timeline from "./timeline";
 import { TreeImage } from "../../../../types/tree_snapshots";
+import MapTreesModal from "./MapTreesModal";
 
 export const TreeNew = () => {
     const dispatch = useAppDispatch();
@@ -333,15 +334,15 @@ export const TreeNew = () => {
     }
 
     const handleMapTrees = (formData: any) => {
-        const req: MapTreesUsingSaplingIdsRequest = {
-            mapped_to: 'user',
-            id: formData.id,
-            sapling_ids: saplingIds,
-            name: formData.name,
-            email: formData.email,
-            phone: formData.phone
-        }
-        mapTrees(req);
+        // const req: MapTreesUsingSaplingIdsRequest = {
+        //     mapped_to: 'user',
+        //     id: formData.id,
+        //     sapling_ids: saplingIds,
+        //     name: formData.name,
+        //     email: formData.email,
+        //     phone: formData.phone
+        // }
+        mapTrees({ ...formData, sapling_ids: saplingIds });
         setSaplingIds([]);
         setDisabledMapUnMapButton(true);
         setDisabledAUButton(true);
@@ -445,7 +446,7 @@ export const TreeNew = () => {
                     <Button variant="contained" color={isMapTrees ? 'success' : 'error'} style={{ marginLeft: '10px' }} onClick={handleMapUnMap}
                         disabled={disabledMapUnMapButton}
                     >{(isMapTrees) ? "Map Trees" : "UnMap Trees"}</Button>
-                    <UserModal open={isUserModalOpen} handleClose={() => { setIsUserModalOpen(false) }} onSubmit={handleMapTrees} searchUser={searchUsers} />
+                    {/* <UserModal open={isUserModalOpen} handleClose={() => { setIsUserModalOpen(false) }} onSubmit={handleMapTrees} searchUser={searchUsers} /> */}
                     <Button variant="contained" color='success' style={{ marginLeft: '10px' }} onClick={() => setChangePlotModal(true)}
                         disabled={selectedTreeIds.length === 0}
                     >Change Plot</Button>
@@ -482,6 +483,12 @@ export const TreeNew = () => {
                     editSubmit={handleEditSubmit}
                 />
             )}
+
+            <MapTreesModal 
+                open={isUserModalOpen}
+                onClose={() => { setIsUserModalOpen(false) }}
+                onSubmit={handleMapTrees}
+            />
 
             <Dialog open={openConfirmation} onClose={() => setOpenConfirmation(false)}>
                 <DialogTitle>Confirm {operation}</DialogTitle>

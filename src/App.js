@@ -85,6 +85,16 @@ function App() {
               } 
             ></Route>
           </Route>
+          <Route path="/ww/group" element={<WW />}>
+            <Route 
+              path=":group_id" 
+              element={ 
+                // <RequireAuth>
+                  <GiftTrees />
+                // </RequireAuth>
+              } 
+            ></Route>
+          </Route>
           <Route path="/events" element={<Events />}>
             <Route path="birthday/:id" element={<Birthday />}></Route>
           </Route>
