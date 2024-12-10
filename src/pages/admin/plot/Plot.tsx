@@ -479,7 +479,7 @@ export const PlotComponent = () => {
           marginTop: 30,
         }}
       >
-        <Typography variant="h4">Map Trees</Typography>
+        <Typography variant="h4">Unreserve Trees</Typography>
       </div>
       <Divider sx={{ backgroundColor: "black", marginBottom: '15px' }} />
       <Forms />

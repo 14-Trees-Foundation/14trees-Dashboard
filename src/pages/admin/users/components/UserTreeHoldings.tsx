@@ -121,7 +121,7 @@ export const UserTreeHoldings = () => {
       >
         <div style={{ display: "flex", padding: "16px 0" }}>
           <Chip
-            label={`Total Mapped Trees - ${allTrees}`}
+            label={`Total Reserved Trees - ${allTrees}`}
             size={"large"}
             mode={"secondary"}
             backgroundColor={"#C72542"}

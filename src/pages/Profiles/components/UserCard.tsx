@@ -21,7 +21,7 @@ const UserCard: React.FC<UserCardProps> = ({ name, mapped_trees, assigned_trees 
                         </Typography>
                     </Grid>
                     <Grid item xs={12} md={3} container alignItems="center" justifyContent="center">
-                        <Tooltip title="Mapped Trees" arrow>
+                        <Tooltip title="Reserved Trees" arrow>
                             <Grid container alignItems="center" justifyContent="center">
                                 <Forest />
                                 <Typography variant="body1" style={{ marginLeft: 8 }}>

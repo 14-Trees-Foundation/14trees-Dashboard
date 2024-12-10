@@ -130,14 +130,14 @@ const BookedTrees: React.FC<BookedTreesProps> = ({ giftCardRequestId, visible, o
                     variant="contained"
                     color="success"
                     onClick={() => { setUnMapAllConfirmation(true); }}
-                >Unmap All Trees</Button>
+                >Unreserve All Trees</Button>
                 <Button
                     variant="contained"
                     color="success"
                     disabled={selectedIds.length === 0}
                     onClick={() => { setUnMapConfirmation(true); }}
                     sx={{ ml: 2 }}
-                >Unmap Trees</Button>
+                >Unreserve Trees</Button>
             </Box>
             <GeneralTable
                 loading={loading}
@@ -153,9 +153,9 @@ const BookedTrees: React.FC<BookedTreesProps> = ({ giftCardRequestId, visible, o
             />
 
             <Dialog open={unMapConfirmation} maxWidth="md">
-                <DialogTitle>Unmap Trees</DialogTitle>
+                <DialogTitle>Unreserve Trees</DialogTitle>
                 <DialogContent dividers>
-                    <Typography>Are you sure you want to unmap selected trees? This action will also unassign trees if they are assigned to some users.</Typography>
+                    <Typography>Are you sure you want to unreserve selected trees? This action will also unassign trees if they are assigned to some users.</Typography>
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={() => { setUnMapConfirmation(false); }} color="error" variant="outlined">

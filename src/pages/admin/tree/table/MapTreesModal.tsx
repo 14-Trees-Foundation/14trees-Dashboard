@@ -275,7 +275,7 @@ const MapTreesModal: React.FC<MapTreesModalProps> = ({ open, onClose, onSubmit }
                         display="flex"
                         alignItems="center"
                     >
-                        <Typography mr={10}>Map trees to:</Typography>
+                        <Typography mr={10}>Reserve trees for:</Typography>
                         <ToggleButtonGroup
                             color="success"
                             value={reserveFor}
