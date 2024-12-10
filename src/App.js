@@ -89,9 +89,9 @@ function App() {
             <Route 
               path=":group_id" 
               element={ 
-                // <RequireAuth>
+                <RequireAuth>
                   <GiftTrees />
-                // </RequireAuth>
+                </RequireAuth>
               } 
             ></Route>
           </Route>
