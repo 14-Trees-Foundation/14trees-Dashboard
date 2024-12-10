@@ -115,7 +115,7 @@ const CombineUserForm: React.FC<CombineUserFormProps> = ({ primaryUser, secondar
                 />
                 {treesCount1 && <Box display="flex">
                     <Chip
-                        label={`Mapped trees: ${treesCount1.mapped_trees}`}
+                        label={`Reserved trees: ${treesCount1.mapped_trees}`}
                         sx={{ margin: 0.5 }}
                     />
                     <Chip
@@ -138,7 +138,7 @@ const CombineUserForm: React.FC<CombineUserFormProps> = ({ primaryUser, secondar
                 />
                 {treesCount2 && <Box display="flex">
                     <Chip
-                        label={`Mapped trees: ${treesCount2.mapped_trees}`}
+                        label={`Reserved trees: ${treesCount2.mapped_trees}`}
                         sx={{ margin: 0.5 }}
                     />
                     <Chip

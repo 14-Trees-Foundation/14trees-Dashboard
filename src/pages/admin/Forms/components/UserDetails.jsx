@@ -231,7 +231,7 @@ export const UserDetails = ({ selectedPlot }) => {
             alignItems="center"
             sx={{ ml: 3, mr: 2 }}
           >
-            <Typography mr={10}>Map trees to:</Typography>
+            <Typography mr={10}>Reserve trees for:</Typography>
             <ToggleButtonGroup
               color="success"
               value={mapTo}

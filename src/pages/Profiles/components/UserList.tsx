@@ -72,7 +72,7 @@ const UserList: FC<UserListProps> = ({ list }) => {
                         </Grid>
                         <Grid item xs={12} md={3} container alignItems="center" justifyContent="center">
                             <Typography variant="body1" style={{ marginLeft: 8 }}>
-                                Mapped Trees
+                                Reserved Trees
                             </Typography>
                         </Grid>
                         <Grid item xs={12} md={3} container alignItems="center" justifyContent="center">

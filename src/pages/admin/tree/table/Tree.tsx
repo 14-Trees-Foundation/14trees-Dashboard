@@ -445,7 +445,7 @@ export const TreeNew = () => {
                     <AssignTreeModal open={isAssignTreeModalOpen} handleClose={() => { setIsAssignTreeModalOpen(false) }} onSubmit={handleAssignTrees} searchUsers={searchUsers} />
                     <Button variant="contained" color={isMapTrees ? 'success' : 'error'} style={{ marginLeft: '10px' }} onClick={handleMapUnMap}
                         disabled={disabledMapUnMapButton}
-                    >{(isMapTrees) ? "Map Trees" : "UnMap Trees"}</Button>
+                    >{(isMapTrees) ? "Reserve Trees" : "Unreserve Trees"}</Button>
                     {/* <UserModal open={isUserModalOpen} handleClose={() => { setIsUserModalOpen(false) }} onSubmit={handleMapTrees} searchUser={searchUsers} /> */}
                     <Button variant="contained" color='success' style={{ marginLeft: '10px' }} onClick={() => setChangePlotModal(true)}
                         disabled={selectedTreeIds.length === 0}
