@@ -1,12 +1,14 @@
 import React, { useState } from "react";
 import {
   Autocomplete,
+  Box,
   Button,
   Dialog,
   DialogActions,
   DialogContent,
   DialogTitle,
   TextField,
+  Typography,
 } from "@mui/material";
 import { organizationTypes } from "./organizationType";
 import ImagePicker from '../../../components/ImagePicker';
@@ -29,7 +31,7 @@ function EditUser({ row, openeditModal, handleClose, editSubmit }) {
   };
 
   return (
-    <Dialog open={openeditModal} onClose={handleClose}>
+    <Dialog open={openeditModal} onClose={handleClose} fullWidth maxWidth='md'>
       <DialogTitle align="center">Edit Organization</DialogTitle>
       <form onSubmit={handleEditSubmit}>
         <DialogContent>
@@ -46,8 +48,8 @@ function EditUser({ row, openeditModal, handleClose, editSubmit }) {
             name="type"
             disablePortal
             options={organizationTypes}
-            value={formData.type ? organizationTypes.find((option) => option.id === formData.type): undefined}
-            onChange={(event, value) => { if (value !== null) setFormData(prevState => ({ ...prevState, 'type': value.id }))}}
+            value={formData.type ? organizationTypes.find((option) => option.id === formData.type) : undefined}
+            onChange={(event, value) => { if (value !== null) setFormData(prevState => ({ ...prevState, 'type': value.id })) }}
             getOptionLabel={(option) => (option.label.toUpperCase())}
             renderInput={(params) => <TextField {...params} margin="dense" label="Type" />}
           />
@@ -59,10 +61,24 @@ function EditUser({ row, openeditModal, handleClose, editSubmit }) {
             fullWidth
             margin="dense"
           />
-          <ImagePicker
+          <TextField
+            fullWidth
+            multiline
+            rows={7}
+            name="address"
+            placeholder='Address...'
+            value={formData.address}
+            type='text'
+            onChange={handleChange}
+            sx={{ mb: 1 }}
+          />
+          <Box>
+            <Typography>Group logo image</Typography>
+            <ImagePicker
               image={logo ?? formData.logo_url}
               onChange={file => setLogo(file)}
-          />
+            />
+          </Box>
         </DialogContent>
         <DialogActions
           sx={{
@@ -76,11 +92,11 @@ function EditUser({ row, openeditModal, handleClose, editSubmit }) {
             color="error">
             Cancel
           </Button>
-          <Button 
-            variant="contained" 
-            type="submit" 
+          <Button
+            variant="contained"
+            type="submit"
             color="success"
-            sx={{marginLeft:'10px'}}
+            sx={{ marginLeft: '10px' }}
           >
             Save
           </Button>
