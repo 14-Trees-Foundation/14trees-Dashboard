@@ -1,79 +1,239 @@
-import React, { useContext, useRef, useEffect, useState } from 'react';
-import { Dialog, DialogTitle, DialogContent, DialogActions, Button, Avatar, TextField } from '@mui/material';
-
-import { GiftCardUser, GiftRequestUser } from '../../../../types/gift_card';
+import React, { useEffect, useState } from 'react';
+import { Autocomplete, Avatar, Button, Checkbox, Dialog, DialogActions, DialogContent, DialogTitle, FormControl, FormControlLabel, Grid, InputLabel, MenuItem, Select, TextField, Typography } from "@mui/material";
+import { GiftRequestUser } from '../../../../types/gift_card';
 import ApiClient from '../../../../api/apiClient/apiClient';
 import { TableColumnType } from 'antd';
 import GeneralTable from '../../../../components/GenTable';
 import { EditOutlined } from '@mui/icons-material';
 import { AWSUtils } from '../../../../helpers/aws';
+import ImageMapping from './ImageMapping';
+import { useAppDispatch, useAppSelector } from '../../../../redux/store/hooks';
+import { bindActionCreators } from '@reduxjs/toolkit';
+import * as userActionCreators from '../../../../redux/actions/userActions';
 
 interface EditUserDialogProps {
     open: boolean;
+    imageUrls: string[]
     onClose: () => void;
     user: GiftRequestUser;
     onSave: (updatedUser: GiftRequestUser, image?: File) => void;
 }
 
-const EditUserDialog: React.FC<EditUserDialogProps> = ({ open, onClose, user, onSave }) => {
-    const [name, setName] = useState(user.assignee_name || '');
-    const [phone, setPhone] = useState(user.assignee_phone || '');
-    const [imageFile, setImageFile] = useState<File | null>(null);
+const EditUserDialog: React.FC<EditUserDialogProps> = ({ open, imageUrls, onClose, user, onSave }) => {
+    const dispatch = useAppDispatch();
+    const { searchUsers } = bindActionCreators(userActionCreators, dispatch);
+
+    const [formData, setFormData] = useState<GiftRequestUser>(user);
+    const [showAssignedFields, setShowAssignedFields] = useState(false);
+    const [imageSelectionModal, setImageSelectionModal] = useState(false);
+    const [profileImage, setProfileImage] = useState<File | null>(null);
+
+    useEffect(() => {
+        setFormData(user);
+        setShowAssignedFields(user.assignee !== user.recipient);
+    }, [user]);
+
+    const handleUserChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const { name, value } = event.target;
+        setFormData({ ...formData, [name]: value });
+    };
+
+    const handleImageSelection = (imageUrl: string) => {
+        setFormData(prev => ({
+            ...prev,
+            profile_image_url: imageUrl
+        }));
+    }
+
+    const usersData = useAppSelector((state) => state.searchUsersData);
+    let usersList: any[] = [];
+    if (usersData) {
+        usersList = Object.values(usersData.users);
+    }
+
+    const handleEmailChange = (event: React.SyntheticEvent, value: string, field: 'recipient_email' | 'assignee_email') => {
+        let isSet = false;
+        usersList.forEach((user) => {
+            if (`${user.name} (${user.email})` === value) {
+                isSet = true;
+                if (field === 'recipient_email') {
+                    setFormData(prev => ({
+                        ...prev,
+                        recipient: user.id,
+                        recipient_email: user.email,
+                        recipient_name: user.name,
+                        recipient_phone: user.phone ?? '',
+                    }));
+                } else {
+                    setFormData(prev => ({
+                        ...prev,
+                        assignee: user.id,
+                        assignee_email: user.email,
+                        assignee_name: user.name,
+                        assignee_phone: user.phone ?? '',
+                    }));
+                }
+            }
+        });
+
+        if (!isSet && user[field] !== value && value !== ` ()`) {
+            setFormData({
+                ...user,
+                [field]: value,
+            });
+            if (value.length >= 3) searchUsers(value);
+        }
+    };
 
     const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0] || null;
         if (file) {
-            setImageFile(file);
+            setProfileImage(file);
         }
     };
 
     const handleSave = () => {
-        onSave({ ...user, assignee_name: name, assignee_phone: phone}, imageFile ?? undefined);
+        onSave(formData, profileImage ?? undefined);
         onClose();
     };
 
     return (
-        <Dialog open={open} fullWidth maxWidth="sm">
+        <Dialog open={open} fullWidth maxWidth="md">
             <DialogTitle>Edit User</DialogTitle>
-            <DialogContent>
-                <div style={{ display: 'flex', alignItems: 'center', marginBottom: 16 }}>
-                    <Avatar
-                        src={imageFile ? URL.createObjectURL(imageFile) : user.profile_image_url}
-                        alt="User"
-                        sx={{ width: 80, height: 80, marginRight: 2 }}
-                    />
-                    <Button variant="outlined" component="label" color='success'>
-                        Upload Image
-                        <input
-                            type="file"
-                            hidden
-                            accept="image/*"
-                            onChange={handleImageChange}
+            <DialogContent dividers>
+                <Grid container rowSpacing={2} columnSpacing={1}>
+                    <Grid item xs={12}>
+                        <Autocomplete
+                            fullWidth
+
+                            options={usersList.map((user) => `${user.name} (${user.email})`)}
+                            onInputChange={(e, value) => { handleEmailChange(e, value, 'recipient_email') }}
+                            value={formData.recipient_email}
+                            renderInput={(params) => (
+                                <TextField
+                                    {...params}
+                                    label="Recipient Email id"
+                                    variant="outlined"
+                                    name="recipient_email"
+                                />
+                            )}
                         />
-                    </Button>
-                </div>
-                <TextField
-                    label="Name"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    fullWidth
-                    margin="normal"
-                />
-                <TextField
-                    label="Email"
-                    value={user.assignee_email}
-                    InputProps={{ readOnly: true }}
-                    disabled
-                    fullWidth
-                    margin="normal"
-                />
-                <TextField
-                    label="Phone"
-                    value={phone}
-                    onChange={(e) => setPhone(e.target.value)}
-                    fullWidth
-                    margin="normal"
-                />
+                    </Grid>
+                    <Grid item xs={12}>
+                        <TextField name="recipient_name" label="Recipient Name" value={formData.recipient_name} onChange={handleUserChange} fullWidth />
+                    </Grid>
+                    <Grid item xs={12}>
+                        <TextField name="recipient_phone" label="Recipient Phone (Optional)" value={formData.recipient_phone} onChange={handleUserChange} fullWidth />
+                    </Grid>
+                    <Grid item xs={12}>
+                        <FormControl component="fieldset">
+                            <FormControlLabel
+                                control={
+                                    <Checkbox checked={showAssignedFields} onChange={(e) => { setShowAssignedFields(e.target.checked) }} name="show_all" />
+                                }
+                                label="Do you want to assign/name the tree(s) to someone else (related to recipient)?"
+                            />
+                        </FormControl>
+                    </Grid>
+                    {showAssignedFields && <Grid item xs={12}>
+                        <Autocomplete
+                            fullWidth
+
+                            options={usersList.map((user) => `${user.name} (${user.email})`)}
+                            onInputChange={(e, value) => { handleEmailChange(e, value, 'assignee_email') }}
+                            value={formData.assignee_email}
+                            renderInput={(params) => (
+                                <TextField
+                                    {...params}
+                                    label="Assignee Email"
+                                    variant="outlined"
+                                    name="assignee_email"
+                                />
+                            )}
+                        />
+                    </Grid>}
+                    {showAssignedFields && <Grid item xs={12}>
+                        <TextField
+
+                            name="assignee_name"
+                            label="Assignee Name"
+                            value={formData.assignee_name}
+                            onChange={handleUserChange}
+                            fullWidth
+                        />
+                    </Grid>}
+                    {showAssignedFields && <Grid item xs={12}>
+                        <TextField
+
+                            name="assignee_phone"
+                            label="Assignee Phone (Optional)"
+                            value={formData.assignee_phone}
+                            onChange={handleUserChange}
+                            fullWidth
+                        />
+                    </Grid>}
+                    {showAssignedFields && <Grid item xs={12}>
+                        <FormControl fullWidth>
+                            <InputLabel id="relation-label">Relation with recipient</InputLabel>
+                            <Select
+
+                                labelId="relation-label"
+                                value={formData.relation}
+                                label="Relation with recipient"
+                                onChange={(e) => { setFormData(prev => ({ ...prev, relation: e.target.value })) }}
+                            >
+                                <MenuItem value={"father"}>Father</MenuItem>
+                                <MenuItem value={'mother'}>Mother</MenuItem>
+                                <MenuItem value={'uncle'}>Uncle</MenuItem>
+                                <MenuItem value={'aunt'}>Aunt</MenuItem>
+                                <MenuItem value={'grandfather'}>Grandfather</MenuItem>
+                                <MenuItem value={'grandmother'}>Grandmother</MenuItem>
+                                <MenuItem value={'son'}>Son</MenuItem>
+                                <MenuItem value={'daughter'}>Daughter</MenuItem>
+                                <MenuItem value={'wife'}>Wife</MenuItem>
+                                <MenuItem value={'husband'}>Husband</MenuItem>
+                                <MenuItem value={'grandson'}>Grandson</MenuItem>
+                                <MenuItem value={'granddaughter'}>Granddaughter</MenuItem>
+                                <MenuItem value={'brother'}>Brother</MenuItem>
+                                <MenuItem value={'sister'}>Sister</MenuItem>
+                                <MenuItem value={'cousin'}>Cousin</MenuItem>
+                                <MenuItem value={'friend'}>Friend</MenuItem>
+                                <MenuItem value={'colleague'}>Colleague</MenuItem>
+                                <MenuItem value={'other'}>Other</MenuItem>
+                            </Select>
+                        </FormControl>
+                        {(formData.relation && formData.relation !== 'other') && <Typography>Tree(s) will be assigned in the name of {formData.recipient_name}'s {formData.relation}, {formData.assignee_name}</Typography>}
+                        {(formData.relation && formData.relation === 'other') && <Typography>Tree(s) will be assigned in the name of {formData.assignee_name}</Typography>}
+                    </Grid>}
+                    <Grid item xs={12}>
+                        <div style={{ display: 'flex', alignItems: 'center', marginBottom: 16 }}>
+                            <Avatar
+                                src={profileImage ? URL.createObjectURL(profileImage) : formData.profile_image_url}
+                                alt="User"
+                                sx={{ width: 80, height: 80, marginRight: 2 }}
+                            />
+                            <Button variant="outlined" component="label" color='success' sx={{ marginRight: 2, textTransform: 'none' }}>
+                                Upload {showAssignedFields ? "Assignee" : "Recipient"} Image
+                                <input
+                                    value={''}
+                                    type="file"
+                                    hidden
+                                    accept="image/*"
+                                    onChange={handleImageChange}
+                                />
+                            </Button>
+                            <Typography sx={{ mr: 2 }}>OR</Typography>
+                            {imageUrls.length > 0 && <Button variant="outlined" component="label" color='success' sx={{ marginRight: 2, textTransform: 'none' }} onClick={() => { setImageSelectionModal(true) }}>
+                                Choose from webscraped URL
+                            </Button>}
+                            {(formData.profile_image_url || profileImage) && <Button variant="outlined" component="label" color='error' sx={{ textTransform: 'none' }} onClick={() => { setProfileImage(null); setFormData(prev => ({ ...prev, profile_image_url: undefined })) }}>
+                                Remove Image
+                            </Button>}
+                        </div>
+                    </Grid>
+                </Grid>
+
+                <ImageMapping name={user.assignee_name || user.recipient_name} open={imageSelectionModal} images={imageUrls} onClose={() => { setImageSelectionModal(false) }} onSelect={handleImageSelection} />
             </DialogContent>
             <DialogActions>
                 <Button onClick={onClose} variant='outlined' color='error'>Cancel</Button>
@@ -96,6 +256,7 @@ const EditUserDetailsModal: React.FC<EditUserDetailsModalProps> = ({ open, onClo
     const [editedRows, setEditedRows] = useState<Record<number, GiftRequestUser>>({});
     const [selectedUser, setSelectedUser] = useState<GiftRequestUser | null>(null);
     const [editModal, setEditModal] = useState(false);
+    const [imageUrls, setImageUrls] = useState<string[]>([]);
 
     useEffect(() => {
         const getUsers = async () => {
@@ -106,11 +267,15 @@ const EditUserDetailsModal: React.FC<EditUserDetailsModalProps> = ({ open, onClo
             setUserList(users
                 .filter(item => item.assignee)
                 .filter((item, idx, self) => self.findIndex(card => card.assignee === item.assignee) === idx)
-                .map(item => ({ ...item, key: item.id  })));
+                .map(item => ({ ...item, key: item.id })));
+
+            if (!requestId) return;
+            const urls = await apiClient.getImagesForRequestId(requestId);
+            setImageUrls(urls);
         }
 
         if (open) getUsers();
-    }, [open, giftRequestId]);
+    }, [open, giftRequestId, requestId]);
 
     // Save action to send edited users
     const handleSubmit = () => {
@@ -120,20 +285,36 @@ const EditUserDetailsModal: React.FC<EditUserDetailsModalProps> = ({ open, onClo
 
     const defaultColumns: TableColumnType<GiftRequestUser>[] = [
         {
-            title: 'User Name',
-            dataIndex: 'assignee_name',
-            width: '30%',
+            title: 'Recipient Name',
+            dataIndex: 'recipient_name',
+            width: '250',
         },
         {
-            title: 'Phone',
-            dataIndex: 'assignee_phone',
-            width: '20%',
+            title: 'Recipient Email',
+            dataIndex: 'recipient_email',
+            width: '250',
+        },
+        {
+            title: 'Recipient Phone',
+            dataIndex: 'recipient_phone',
+            width: '200',
             render: value => value ? value : ''
         },
         {
-            title: 'Email',
+            title: 'Assignee Name',
+            dataIndex: 'assignee_name',
+            width: '250',
+        },
+        {
+            title: 'Assignee Email',
             dataIndex: 'assignee_email',
-            width: '30%',
+            width: '250',
+        },
+        {
+            title: 'Assignee Phone',
+            dataIndex: 'assignee_phone',
+            width: '200',
+            render: value => value ? value : ''
         },
         {
             title: 'Image',
@@ -187,7 +368,7 @@ const EditUserDetailsModal: React.FC<EditUserDetailsModalProps> = ({ open, onClo
                 ...row,
             });
             setUserList(newData);
-    
+
             setEditedRows(prev => ({ ...prev, [row.key]: row }))
 
             handleEditUserClose();
@@ -208,11 +389,12 @@ const EditUserDetailsModal: React.FC<EditUserDetailsModalProps> = ({ open, onClo
                     page={0}
                     pageSize={10}
                     onDownload={async () => userList}
-                    onPaginationChange={(page: number, pageSize: number) => {  }}
+                    onPaginationChange={(page: number, pageSize: number) => { }}
                 />
 
-                {selectedUser && <EditUserDialog 
+                {selectedUser && <EditUserDialog
                     open={editModal}
+                    imageUrls={imageUrls}
                     onClose={handleEditUserClose}
                     user={selectedUser}
                     onSave={handleUserEdit}

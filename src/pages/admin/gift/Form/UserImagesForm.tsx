@@ -15,7 +15,9 @@ const UserImagesForm: React.FC<UserImagesFormProps> = ({ requestId }) => {
     const [uploadProgress, setUploadProgress] = useState<number | null>(null);
 
     const { getRootProps, getInputProps } = useDropzone({
-        accept: 'image/*',
+        accept: {
+            "image/*": [".png", ".webp", ".jpeg", ".jpg"],
+        },
         onDrop: (acceptedFiles) => {
             setSelectedFiles(acceptedFiles);
         },

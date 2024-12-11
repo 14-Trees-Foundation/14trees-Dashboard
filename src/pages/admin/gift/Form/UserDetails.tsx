@@ -233,7 +233,7 @@ export const BulkUserForm: FC<BulkUserFormProps> = ({ requestId, treeCount, user
           for (let i = 0; i < results.data.length; i++) {
             const user = results.data[i];
 
-            if (user[recipientNameField] && user[recipientEmailField]) {
+            if (user[recipientNameField]) {
 
               const parsedUser: User = {
                 key: getUniqueRequestId(),
@@ -351,7 +351,7 @@ export const BulkUserForm: FC<BulkUserFormProps> = ({ requestId, treeCount, user
       onUsersChange([...users, user]);
     } else {
       const newUsers = [...users]
-      newUsers[idx] = user;
+      newUsers[idx] = { ...newUsers[idx], ...user};
       onUsersChange(newUsers);
     }
 
@@ -382,6 +382,7 @@ export const BulkUserForm: FC<BulkUserFormProps> = ({ requestId, treeCount, user
       title: "Recipient Email",
       width: 180,
       align: "center",
+      render: (value: string) => value.endsWith("@14trees") ? 'Not Provided' : value,
       ...getColumnSearchProps('recipient_email', filters, handleSetFilters),
     },
     {
@@ -405,6 +406,7 @@ export const BulkUserForm: FC<BulkUserFormProps> = ({ requestId, treeCount, user
       title: "Assignee Email",
       width: 180,
       align: "center",
+      render: (value: string) => value.endsWith("@14trees") ? 'Not Provided' : value,
       ...getColumnSearchProps('assignee_email', filters, handleSetFilters),
     },
     {

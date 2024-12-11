@@ -79,6 +79,7 @@ export type GiftCardUser = {
 }
 
 export type GiftCardsDataState = {
+    loading: boolean,
     totalGiftCards: number,
     giftCards: Record<string, GiftCard>
 }
