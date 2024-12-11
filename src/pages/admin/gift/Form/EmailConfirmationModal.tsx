@@ -19,7 +19,8 @@ const EmailConfirmationModal: React.FC<EmailConfirmationModalProps> = ({ loading
     const [sponsorCC, setSponsorCC] = useState<string[]>([]);
     const [receiverCC, setReceiverCC] = useState<string[]>(sponsorMail ? [sponsorMail] : []);
     const [emailInput, setEmailInput] = useState('');
-    const [ccInput, setCcInput] = useState('');
+    const [sponsorCCInput, setSponsorCcInput] = useState('');
+    const [receiverCcInput, setReceiverCcInput] = useState('');
     const [attachCards, setAttachCards] = useState(false);
     const [emailSponsor, setEmailSponsor] = useState(false);
     const [emailReceiver, setEmailReceiver] = useState(true);
@@ -114,12 +115,12 @@ const EmailConfirmationModal: React.FC<EmailConfirmationModalProps> = ({ loading
                     <FormControl fullWidth>
                         <OutlinedInput
                             placeholder="Enter CC email and press Enter"
-                            value={ccInput}
-                            onChange={(e) => setCcInput(e.target.value)}
+                            value={sponsorCCInput}
+                            onChange={(e) => setSponsorCcInput(e.target.value)}
                             onKeyDown={(e) => {
                                 if (e.key === 'Enter') {
                                     e.preventDefault();
-                                    handleAddEmail(ccInput, setSponsorCC, setCcInput);
+                                    handleAddEmail(sponsorCCInput, setSponsorCC, setSponsorCcInput);
                                 }
                             }}
                             startAdornment={
@@ -144,12 +145,12 @@ const EmailConfirmationModal: React.FC<EmailConfirmationModalProps> = ({ loading
                     <FormControl fullWidth>
                         <OutlinedInput
                             placeholder="Enter CC email and press Enter"
-                            value={ccInput}
-                            onChange={(e) => setCcInput(e.target.value)}
+                            value={receiverCcInput}
+                            onChange={(e) => setReceiverCcInput(e.target.value)}
                             onKeyDown={(e) => {
                                 if (e.key === 'Enter') {
                                     e.preventDefault();
-                                    handleAddEmail(ccInput, setReceiverCC, setCcInput);
+                                    handleAddEmail(receiverCcInput, setReceiverCC, setReceiverCcInput);
                                 }
                             }}
                             startAdornment={

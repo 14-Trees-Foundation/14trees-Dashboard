@@ -48,6 +48,7 @@ const PaymentComponent: React.FC<PaymentProps> = ({ initialAmount, paymentId, on
     const [amount, setAmount] = useState(initialAmount || 0);
     const [donorType, setDonorType] = useState('');
     const [panNumber, setPanNumber] = useState('');
+    const [consent, setConsent] = useState(false);
     const [payment, setPayment] = useState<Payment | null>(null);
 
     const [paymentProof, setPaymentProof] = useState<File | null>(null);
@@ -103,6 +104,7 @@ const PaymentComponent: React.FC<PaymentProps> = ({ initialAmount, paymentId, on
             setAmount(payment.amount);
             setDonorType(payment.donor_type);
             setPanNumber(payment.pan_number ? payment.pan_number : '');
+            setConsent(payment.consent ? payment.consent : false);
         } catch (error: any) {
             toast.error(error.message)
         }
@@ -132,9 +134,10 @@ const PaymentComponent: React.FC<PaymentProps> = ({ initialAmount, paymentId, on
                     ...payment,
                     donor_type: resp.donor_type,
                     pan_number: resp.pan_number,
+                    consent: resp.consent ? resp.consent : false,
                 })
             } else {
-                const resp = await apiClient.createPayment(amount, donorType, panNumber);
+                const resp = await apiClient.createPayment(amount, donorType, panNumber, consent);
                 setPayment(resp);
                 onChange && onChange(resp.id);
             }
@@ -477,29 +480,10 @@ const PaymentComponent: React.FC<PaymentProps> = ({ initialAmount, paymentId, on
                         amount={amount}
                         donorType={donorType}
                         panNumber={panNumber}
+                        consent={consent}
                         onDonorTypeChange={donorType => { setDonorType(donorType) }}
                         onPanNumberChange={panNumber => { setPanNumber(panNumber) }}
-                    />
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={() => { setOpenEdit(false) }} color="error" variant="outlined">
-                        Cancel
-                    </Button>
-                    <Button onClick={handleSavePayment} color="success" variant="contained">
-                        Confirm
-                    </Button>
-                </DialogActions>
-            </Dialog>
-
-            <Dialog open={openEdit} fullWidth maxWidth="md">
-                <DialogTitle>Payment Details</DialogTitle>
-                <DialogContent dividers>
-                    <PaymentBaseForm
-                        amount={amount}
-                        donorType={donorType}
-                        panNumber={panNumber}
-                        onDonorTypeChange={donorType => { setDonorType(donorType) }}
-                        onPanNumberChange={panNumber => { setPanNumber(panNumber) }}
+                        onConsentChange={consent => { setConsent(consent) }}
                     />
                 </DialogContent>
                 <DialogActions>

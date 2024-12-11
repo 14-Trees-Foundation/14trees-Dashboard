@@ -20,6 +20,7 @@ export type Payment = {
     amount: number;
     donor_type: string;
     pan_number: string | null;
+    consent: boolean;
     payment_history?: PaymentHistory[];
     order_id: string;
     created_at: string;

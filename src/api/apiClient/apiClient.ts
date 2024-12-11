@@ -1536,7 +1536,7 @@ class ApiClient {
             const response = await this.api.get<{ url: string }>(`/utils/signedPutUrl?type=${type}&key=${key}`);
             return response.data.url;
         } catch (error: any) {
-            if (error.response) {
+            if (error.response?.data?.message) {
                 throw new Error(error.response.data.message);
             }
             throw new Error('Failed to generate gift cards');
@@ -1548,7 +1548,7 @@ class ApiClient {
             const response = await this.api.post<{ urls: string[] }>(`/utils/scrap`, { url, request_id });
             return response.data.urls;
         } catch (error: any) {
-            if (error.response) {
+            if (error.response?.data?.message) {
                 throw new Error(error.response.data.message);
             }
             throw new Error('Failed to get images');
@@ -1560,7 +1560,7 @@ class ApiClient {
             const response = await this.api.get<{ urls: string[] }>(`/utils/s3keys/${request_id}`);
             return response.data.urls;
         } catch (error: any) {
-            if (error.response) {
+            if (error.response?.data?.message) {
                 throw new Error(error.response.data.message);
             }
             throw new Error('Failed to get images');
@@ -1583,9 +1583,9 @@ class ApiClient {
         }
     } 
         
-    async createPayment(amount: number, donor_type: string, pan_number: string | null) {
+    async createPayment(amount: number, donor_type: string, pan_number: string | null, consent: boolean) {
         try {
-            const response = await this.api.post<Payment>(`/payments`, { amount, donor_type, pan_number });
+            const response = await this.api.post<Payment>(`/payments`, { amount, donor_type, pan_number, consent });
             return response.data;
         } catch (error: any) {
             if (error.response) {
@@ -1607,9 +1607,9 @@ class ApiClient {
         }
     } 
 
-    async createPaymentHistory(payment_id: number, amount: number, payment_method: string, payment_proof: string | null, data: any) {
+    async createPaymentHistory(payment_id: number, amount: number, payment_method: string, payment_proof: string | null) {
         try {
-            const response = await this.api.post<PaymentHistory>(`/payments/history`, { payment_id, amount, payment_method, payment_proof, ...data });
+            const response = await this.api.post<PaymentHistory>(`/payments/history`, { payment_id, amount, payment_method, payment_proof});
             return response.data;
         } catch (error: any) {
             if (error.response) {

@@ -35,12 +35,13 @@ const getReadableStatus = (value: string) => {
 
 interface PaymentFormProps {
     amount: number,
-    payment: Payment | null
-    onPaymentChange: (payment: Payment | null) => void
-    onChange: (donorType: string, panNumber: string | null) => void
+    payment: Payment | null,
+    onPaymentChange: (payment: Payment | null) => void,
+    onChange: (donorType: string, panNumber: string | null, consent: boolean) => void,
+    indianDonor?: boolean,
 }
 
-const PaymentForm: FC<PaymentFormProps> = ({ payment, amount, onPaymentChange, onChange }) => {
+const PaymentForm: FC<PaymentFormProps> = ({ payment, amount, onPaymentChange, onChange, indianDonor }) => {
     const [filePreview, setFilePreview] = useState(false);
     const [selectedHistory, setSelectedHistory] = useState<PaymentHistory | null>(null);
     const [page, setPage] = useState(0);
@@ -85,18 +86,22 @@ const PaymentForm: FC<PaymentFormProps> = ({ payment, amount, onPaymentChange, o
             verifiedAmount: verified,
         })
 
-        setDonorType(payment ? payment.donor_type : '');
+        if (!indianDonor) setDonorType(payment ? payment.donor_type : '');
         setPanNumber(payment?.pan_number ? payment.pan_number : '');
-    }, [payment, amount, rpPayments])
+    }, [payment, amount, rpPayments, indianDonor])
 
     useEffect(() => {
-        onChange(donorType, panNumber);
-    }, [donorType, panNumber])
+        if (indianDonor) setDonorType('Indian Citizen');
+    }, [indianDonor])
+
+    useEffect(() => {
+        onChange(donorType, panNumber, consent);
+    }, [donorType, panNumber, consent])
 
     useEffect(() => {
         const createPayment = async () => {
             const apiClient = new ApiClient();
-            const pmt = await apiClient.createPayment(amount, donorType, panNumber);
+            const pmt = await apiClient.createPayment(amount, donorType, panNumber, consent);
             if (!pmt) {
                 toast.error("Something went wrong please try again");
                 return;
@@ -165,13 +170,13 @@ const PaymentForm: FC<PaymentFormProps> = ({ payment, amount, onPaymentChange, o
         setLoading(false);
     }
 
-    const handleAddPaymentHistory = async (data: any) => {
+    const handleAddPaymentHistory = async () => {
         setLoading(true);
         const apiClient = new ApiClient();
         let pmt = payment;
         if (!pmt) {
             if (!donorType) toast.error("Please select citizenship!");
-            else pmt = await apiClient.createPayment(amount, donorType, panNumber);
+            else pmt = await apiClient.createPayment(amount, donorType, panNumber, consent);
             if (!pmt) {
                 toast.error("Something went wrong please try again");
                 setLoading(false);
@@ -191,7 +196,7 @@ const PaymentForm: FC<PaymentFormProps> = ({ payment, amount, onPaymentChange, o
             }
 
             try {
-                const resp = await apiClient.createPaymentHistory(pmt.id, payingAmount, paymentMethod, paymentProofLink, data);
+                const resp = await apiClient.createPaymentHistory(pmt.id, payingAmount, paymentMethod, paymentProofLink);
 
                 onPaymentChange({
                     ...pmt,
@@ -251,6 +256,23 @@ const PaymentForm: FC<PaymentFormProps> = ({ payment, amount, onPaymentChange, o
             ),
         },
         {
+            dataIndex: "reference_number",
+            key: "reference_number",
+            title: "Transaction Id",
+            align: "center",
+            width: 150,
+            render: (value: number, record: any) => {
+                if (record.acquirer_data) {
+                    const keys = Object.keys(record.acquirer_data);
+                    for (const key of keys) {
+                        if (key.endsWith("transaction_id")) return record.acquirer_data[key];
+                    }
+                }
+
+                return '';
+            }
+        },
+        {
             dataIndex: "created_at",
             key: "created_at",
             title: "Payment Date",
@@ -302,7 +324,7 @@ const PaymentForm: FC<PaymentFormProps> = ({ payment, amount, onPaymentChange, o
                     Make Payment
                 </Button>
             </Box>}
-            <Box style={{ display: 'flex', justifyContent: (payment && payment.payment_history && payment.payment_history.length > 0) ? 'space-between' : 'center' }}>
+            <Box style={{ display: 'flex', justifyContent: ((payment && payment.payment_history && payment.payment_history.length > 0) || rpPayments.length > 0) ? 'space-between' : 'center' }}>
                 <Box width="45%">
                     <Box sx={{ mt: 2 }}>
                         <FormControl fullWidth>
@@ -326,18 +348,20 @@ const PaymentForm: FC<PaymentFormProps> = ({ payment, amount, onPaymentChange, o
                     </Box>
                     <Box sx={{ mt: 2 }}>
                         <Typography mb={1}>Details to avail tax benefits:</Typography>
-                        <FormControl fullWidth>
-                            <InputLabel id="donor-label">Citizenship (Applicable for 80G/501(c)/FCRA)</InputLabel>
-                            <Select
-                                labelId="donor-label"
-                                value={donorType}
-                                label="Citizenship (Applicable for 80G/501(c)/FCRA)"
-                                onChange={(e) => { setDonorType(e.target.value); }}
-                            >
-                                <MenuItem value={'Indian Citizen'}>Indian Citizen</MenuItem>
-                                <MenuItem value={'Foreign Donor'}>Foreign Donor</MenuItem>
-                            </Select>
-                        </FormControl>
+                        <Box hidden={indianDonor}>
+                            <FormControl fullWidth>
+                                <InputLabel id="donor-label">Citizenship (Applicable for 80G/501(c)/FCRA)</InputLabel>
+                                <Select
+                                    labelId="donor-label"
+                                    value={donorType}
+                                    label="Citizenship (Applicable for 80G/501(c)/FCRA)"
+                                    onChange={(e) => { setDonorType(e.target.value); }}
+                                >
+                                    <MenuItem value={'Indian Citizen'}>Indian Citizen</MenuItem>
+                                    <MenuItem value={'Foreign Donor'}>Foreign Donor</MenuItem>
+                                </Select>
+                            </FormControl>
+                        </Box>
                     </Box>
                     <Box sx={{ mt: 2 }} hidden={donorType !== 'Indian Citizen'}>
                         <TextField
