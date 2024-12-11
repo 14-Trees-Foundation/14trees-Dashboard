@@ -1,4 +1,4 @@
-import { Box, FormControl, InputAdornment, InputLabel, MenuItem, OutlinedInput, Select, TextField, Typography } from "@mui/material"
+import { Box, Checkbox, FormControl, FormControlLabel, InputAdornment, InputLabel, MenuItem, OutlinedInput, Select, TextField, Typography } from "@mui/material"
 
 interface PaymentBaseFormProps {
     amount: number
@@ -6,9 +6,11 @@ interface PaymentBaseFormProps {
     onDonorTypeChange: (donorType: string) => void
     panNumber: string
     onPanNumberChange: (panNumber: string) => void
+    consent: boolean
+    onConsentChange: (consent: boolean) => void
 }
 
-const PaymentBaseForm: React.FC<PaymentBaseFormProps> = ({ amount, donorType, panNumber, onDonorTypeChange, onPanNumberChange }) => {
+const PaymentBaseForm: React.FC<PaymentBaseFormProps> = ({ amount, donorType, panNumber, consent, onDonorTypeChange, onPanNumberChange, onConsentChange }) => {
 
 
     return (
@@ -47,6 +49,9 @@ const PaymentBaseForm: React.FC<PaymentBaseFormProps> = ({ amount, donorType, pa
                     onChange={(e) => { onPanNumberChange(e.target.value.toUpperCase()) }}
                     fullWidth
                 />
+            </Box>
+            <Box sx={{ mt: 2 }} hidden={donorType !== 'Indian Citizen' || panNumber !== ''}>
+                <FormControlLabel control={<Checkbox checked={consent} onChange={(e, checked) => { onConsentChange(checked); }} />} label="I'm not provided PAN number and I understand that I will not qualify for 80G benefit" />
             </Box>
         </Box>
     )

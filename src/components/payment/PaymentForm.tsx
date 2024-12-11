@@ -37,7 +37,7 @@ interface PaymentFormProps {
     amount: number,
     payment: Payment | null
     onPaymentChange: (payment: Payment | null) => void
-    onChange: (donorType: string, panNumber: string | null) => void
+    onChange: (donorType: string, panNumber: string | null, consent: boolean) => void
 }
 
 const PaymentForm: FC<PaymentFormProps> = ({ payment, amount, onPaymentChange, onChange }) => {
@@ -90,13 +90,13 @@ const PaymentForm: FC<PaymentFormProps> = ({ payment, amount, onPaymentChange, o
     }, [payment, amount, rpPayments])
 
     useEffect(() => {
-        onChange(donorType, panNumber);
-    }, [donorType, panNumber])
+        onChange(donorType, panNumber, consent);
+    }, [donorType, panNumber, consent])
 
     useEffect(() => {
         const createPayment = async () => {
             const apiClient = new ApiClient();
-            const pmt = await apiClient.createPayment(amount, donorType, panNumber);
+            const pmt = await apiClient.createPayment(amount, donorType, panNumber, consent);
             if (!pmt) {
                 toast.error("Something went wrong please try again");
                 return;
@@ -165,13 +165,13 @@ const PaymentForm: FC<PaymentFormProps> = ({ payment, amount, onPaymentChange, o
         setLoading(false);
     }
 
-    const handleAddPaymentHistory = async (data: any) => {
+    const handleAddPaymentHistory = async () => {
         setLoading(true);
         const apiClient = new ApiClient();
         let pmt = payment;
         if (!pmt) {
             if (!donorType) toast.error("Please select citizenship!");
-            else pmt = await apiClient.createPayment(amount, donorType, panNumber);
+            else pmt = await apiClient.createPayment(amount, donorType, panNumber, consent);
             if (!pmt) {
                 toast.error("Something went wrong please try again");
                 setLoading(false);
@@ -191,7 +191,7 @@ const PaymentForm: FC<PaymentFormProps> = ({ payment, amount, onPaymentChange, o
             }
 
             try {
-                const resp = await apiClient.createPaymentHistory(pmt.id, payingAmount, paymentMethod, paymentProofLink, data);
+                const resp = await apiClient.createPaymentHistory(pmt.id, payingAmount, paymentMethod, paymentProofLink);
 
                 onPaymentChange({
                     ...pmt,

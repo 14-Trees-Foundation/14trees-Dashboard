@@ -808,7 +808,7 @@ const GiftTrees: FC = () => {
             </Dialog>
 
             <Dialog open={deleteModal} onClose={() => setDeleteModal(false)} fullWidth maxWidth='md'>
-                <DialogTitle>Auto-assign trees to gift card request users</DialogTitle>
+                <DialogTitle>Delete tree cards request</DialogTitle>
                 <DialogContent dividers>
                     <Typography variant="subtitle1">Are you sure you want to delete this gift card request? It will delete related plot selection on booked trees.</Typography>
                 </DialogContent>
