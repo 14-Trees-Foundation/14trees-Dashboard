@@ -44,12 +44,12 @@ const isValidPhone = (phone: string) => {
   return phoneRegex.test(phone);
 };
 
-const giftNameField = 'Recipient Name'
-const giftEmailField = 'Recipient Email'
-const giftPhoneField = 'Recipient Phone (optional)'
-const assignNameField = 'Assignee Name'
-const assignEmailField = 'Assignee Email (optional)'
-const assignPhoneField = 'Assignee Phone (optional)'
+const recipientNameField = 'Recipient Name'
+const recipientEmailField = 'Recipient Email'
+const recipientPhoneField = 'Recipient Phone (optional)'
+const assigneeNameField = 'Assignee Name'
+const assigneeEmailField = 'Assignee Email (optional)'
+const assigneePhoneField = 'Assignee Phone (optional)'
 const countField = 'Number of trees to assign'
 const imageNameField = 'Image Name (optional)'
 
