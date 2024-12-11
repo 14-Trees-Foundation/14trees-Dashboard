@@ -21,6 +21,7 @@ const AddOrganization = ({ open, groupType, handleClose, createOrganization }) =
         name: '',
         type: '',
         description: '',
+        address: '',
     });
     const [logo, setLogo] = useState(null);
 
@@ -78,6 +79,18 @@ const AddOrganization = ({ open, groupType, handleClose, createOrganization }) =
                                 <ImagePicker
                                     image={logo}
                                     onChange={file => setLogo(file)}
+                                />
+                            </Grid>
+                            <Grid item xs={12}>
+                                <TextField
+                                    fullWidth
+                                    multiline
+                                    rows={7}
+                                    variant="outlined"
+                                    placeholder='Address...'
+                                    value={formData.address}
+                                    type='text'
+                                    onChange={handleChange}
                                 />
                             </Grid>
                             <Grid item xs={12} sx={{display:'flex', justifyContent:'center', }}>

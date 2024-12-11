@@ -147,6 +147,7 @@ const GiftCardsForm: FC<GiftCardsFormProps> = ({ giftCardRequest, requestId, ope
             key: 4,
             title: "Payment",
             content: <PaymentForm
+                indianDonor={true}
                 payment={payment}
                 amount={amount}
                 onPaymentChange={payment => setPayment(payment)}

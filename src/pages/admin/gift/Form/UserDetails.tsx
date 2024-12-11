@@ -292,13 +292,18 @@ export const BulkUserForm: FC<BulkUserFormProps> = ({ requestId, treeCount, user
     }
 
     setWebScraping(true);
-    const apiClient = new ApiClient();
-    const imageUrls = await apiClient.scrapImagesFromWebPage(requestId, pageUrl);
-    setImageUrls(imageUrls);
+    try {
+      const apiClient = new ApiClient();
+      const imageUrls = await apiClient.scrapImagesFromWebPage(requestId, pageUrl);
+      setImageUrls(imageUrls);
+      toast.success("Successfully uploaded images!")
+    } catch (error: any) {
+      toast.error(error.message);
+    }
+
     setWebScraping(false);
     setWebScrapModal(false);
 
-    toast.success("Successfully uploaded images!")
   }
 
   const handleImageSelection = (imageUrl: string) => {

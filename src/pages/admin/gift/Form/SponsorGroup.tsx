@@ -34,6 +34,7 @@ const SponsorGroupForm: FC<SponsorGroupFormProps> = ({ logo, onLogoChange, group
         name: '',
         type: '',
         description: '',
+        address: '',
     });
 
     useEffect(() => {
@@ -104,9 +105,21 @@ const SponsorGroupForm: FC<SponsorGroupFormProps> = ({ logo, onLogoChange, group
                                 <TextField name="description" label="Description" value={formData.description} onChange={handleInputChange} fullWidth />
                             </Grid>
                             <Grid item xs={12}>
-                                <ImagePicker 
+                                <ImagePicker
                                     image={logo}
                                     onChange={onLogoChange}
+                                />
+                            </Grid>
+                            <Grid item xs={12}>
+                                <TextField
+                                    fullWidth
+                                    multiline
+                                    rows={7}
+                                    variant="outlined"
+                                    placeholder='Address...'
+                                    value={formData.address}
+                                    type='text'
+                                    onChange={handleInputChange}
                                 />
                             </Grid>
                             <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'center', }}>
@@ -122,10 +135,10 @@ const SponsorGroupForm: FC<SponsorGroupFormProps> = ({ logo, onLogoChange, group
                     <Typography variant="body1">Sponsor already exists? <Typography onClick={() => setFormOption('existing')} style={{ cursor: 'pointer' }} color='primary' variant="body1" component="span">Select Sponsor</Typography>.</Typography>
                 </Box>}
             </Box>
-            <Divider orientation="vertical" flexItem style={{ backgroundColor: 'black' }}/>
+            <Divider orientation="vertical" flexItem style={{ backgroundColor: 'black' }} />
             <Box style={{ width: '48%' }}>
                 <Typography variant="body1" sx={{ pb: 2 }}>Please upload the corporate logo (this will be shown on the tree card)</Typography>
-                <ImagePicker 
+                <ImagePicker
                     image={logo}
                     onChange={onLogoChange}
                 />
