@@ -130,7 +130,13 @@ const SingleUserForm: FC<SingleUserFormProps> = ({ maxTrees, imageUrls, value, o
     };
 
     const handleSubmit = () => {
+        if (!user.recipient_name.trim()) return;
+        if (showAssignedFields && !user.assignee_name.trim()) return;
+        
         const data = { ...user };
+        if (data.recipient_email.trim() === '') {
+            data.recipient_email = data.recipient_name.toLocaleLowerCase().split(" ").join('.') + "@14trees"
+        }
 
         if (!showAssignedFields || !data.assignee_name) {
             data.assignee_email = data.recipient_email

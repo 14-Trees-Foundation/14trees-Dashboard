@@ -5,16 +5,17 @@ import giftCardActionTypes from "../actionTypes/giftCardActionTypes";
 import { PaginatedResponse } from "../../types/pagination";
 
 
-export const giftCardsDataReducer = (state = { totalGiftCards: 0, giftCards: {} }, action: UnknownAction): GiftCardsDataState => {
+export const giftCardsDataReducer = (state = { totalGiftCards: 0, giftCards: {}, loading: false }, action: UnknownAction): GiftCardsDataState => {
     switch (action.type) {
         case giftCardActionTypes.GET_GIFT_CARDS_SUCCEEDED:
             if (action.payload) {
-                let giftCardsDataState: GiftCardsDataState = { totalGiftCards: state.totalGiftCards, giftCards: { ...state.giftCards } };
+                let giftCardsDataState: GiftCardsDataState = { totalGiftCards: state.totalGiftCards, giftCards: { ...state.giftCards }, loading: state.loading };
                 let payload = action.payload as PaginatedResponse<GiftCard>;
                 if (giftCardsDataState.totalGiftCards !== payload.total) {
                     giftCardsDataState.giftCards = {}
                 }
                 giftCardsDataState.totalGiftCards = payload.total;
+                giftCardsDataState.loading = false;
                 let giftCards = payload.results;
 
                 for (let i = 0; i < giftCards.length; i++) {
@@ -28,6 +29,12 @@ export const giftCardsDataReducer = (state = { totalGiftCards: 0, giftCards: {} 
                 return nextState;
             }
             return state;
+
+        case giftCardActionTypes.GET_GIFT_CARDS_REQUESTED:
+            return { totalGiftCards: state.totalGiftCards, giftCards: { ...state.giftCards }, loading: true };
+
+        case giftCardActionTypes.GET_GIFT_CARDS_FAILED:
+            return { totalGiftCards: state.totalGiftCards, giftCards: { ...state.giftCards }, loading: false };
 
         case giftCardActionTypes.CREATE_GIFT_CARD_SUCCEEDED:
             if (action.payload) {

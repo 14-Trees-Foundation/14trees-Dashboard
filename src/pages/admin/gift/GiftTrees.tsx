@@ -5,7 +5,7 @@ import { User } from "../../../types/user";
 import { Group } from "../../../types/Group";
 import ApiClient from "../../../api/apiClient/apiClient";
 import { ToastContainer, toast } from "react-toastify";
-import { GiftCard } from "../../../types/gift_card";
+import { GiftCard, GiftRequestUser } from "../../../types/gift_card";
 import getColumnSearchProps, { getColumnSelectedItemFilter } from "../../../components/Filter";
 import { GridFilterItem } from "@mui/x-data-grid";
 import * as giftCardActionCreators from "../../../redux/actions/giftCardActions";
@@ -340,7 +340,7 @@ const GiftTrees: FC = () => {
         setSelectedGiftCard(null);
     }
 
-    const handleUserDetailsEditSave = async (users: GiftCard[]) => {
+    const handleUserDetailsEditSave = async (users: GiftRequestUser[]) => {
         handleUserDetailsEditClose();
 
         if (users.length === 0) return;
@@ -743,6 +743,7 @@ const GiftTrees: FC = () => {
 
             {auth.signedin && <Box sx={{ height: 840, width: "100%" }}>
                 <TableComponent
+                    loading={giftCardsData.loading}
                     dataSource={giftCards}
                     columns={columns}
                     totalRecords={giftCardsData.totalGiftCards}

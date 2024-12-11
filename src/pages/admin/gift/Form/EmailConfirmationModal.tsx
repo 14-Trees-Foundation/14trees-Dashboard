@@ -21,8 +21,8 @@ const EmailConfirmationModal: React.FC<EmailConfirmationModalProps> = ({ loading
     const [emailInput, setEmailInput] = useState('');
     const [ccInput, setCcInput] = useState('');
     const [attachCards, setAttachCards] = useState(false);
-    const [emailSponsor, setEmailSponsor] = useState(true);
-    const [emailReceiver, setEmailReceiver] = useState(false);
+    const [emailSponsor, setEmailSponsor] = useState(false);
+    const [emailReceiver, setEmailReceiver] = useState(true);
     const [emailAssignee, setEmailAssignee] = useState(false);
     const [emailTemplates, setEmailTemplates] = useState<EmailTemplate[]>([]);
     const [selectedTemplate, setSelectedTemplate] = useState<EmailTemplate | null>(null);
@@ -72,7 +72,7 @@ const EmailConfirmationModal: React.FC<EmailConfirmationModalProps> = ({ loading
             return;
         }
 
-        onSubmit(emailSponsor, emailReceiver, emailAssignee, toEmails, sponsorCC, receiverCC, selectedTemplate.event_type, attachCards);
+        onSubmit(emailSponsor, emailReceiver, emailAssignee, toEmails, [], [], selectedTemplate.event_type, attachCards);
     };
 
     return (
@@ -85,15 +85,15 @@ const EmailConfirmationModal: React.FC<EmailConfirmationModalProps> = ({ loading
                     <FormControl component="fieldset">
                         <FormGroup aria-label="position" row>
                             <FormControlLabel
-                                value="sponsor"
-                                control={<Checkbox checked={emailSponsor} onChange={(e) => { setEmailSponsor(e.target.checked) }} />}
-                                label="Sponsor"
-                                labelPlacement="end"
-                            />
-                            <FormControlLabel
                                 value="receiver"
                                 control={<Checkbox checked={emailReceiver} onChange={(e) => { setEmailReceiver(e.target.checked) }} />}
                                 label="Receivers"
+                                labelPlacement="end"
+                            />
+                            <FormControlLabel
+                                value="sponsor"
+                                control={<Checkbox checked={emailSponsor} onChange={(e) => { setEmailSponsor(e.target.checked) }} />}
+                                label="Sponsor"
                                 labelPlacement="end"
                             />
                             <FormControlLabel
@@ -107,7 +107,7 @@ const EmailConfirmationModal: React.FC<EmailConfirmationModalProps> = ({ loading
                 </Box>
 
                 {/* CC Email Addresses */}
-                <Box mt={3} hidden={!emailSponsor}>
+                <Box mt={3}>
                     <Typography variant="body1" gutterBottom>
                         Sponsor CC email addresses
                     </Typography>
@@ -137,7 +137,7 @@ const EmailConfirmationModal: React.FC<EmailConfirmationModalProps> = ({ loading
                     </FormControl>
                 </Box>
 
-                <Box mt={3} hidden={!(emailReceiver || emailAssignee)}>
+                <Box mt={3}>
                     <Typography variant="body1" gutterBottom>
                         Receiver CC email addresses
                     </Typography>

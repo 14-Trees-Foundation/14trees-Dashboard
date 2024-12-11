@@ -60,6 +60,7 @@ const PaymentForm: FC<PaymentFormProps> = ({ payment, amount, onPaymentChange, o
     const [paymentMethod, setPaymentMethod] = useState<string | undefined>();
     const [payingAmount, setPayingAmount] = useState<number>(0);
     const [showRazorpay, setShowRazorpay] = useState(false);
+    const [payUsingRazorpay, setPayUsingRazorpay] = useState(false);
     const [rpPayments, setRPPayments] = useState<any[]>([]);
 
     useEffect(() => {
@@ -291,9 +292,10 @@ const PaymentForm: FC<PaymentFormProps> = ({ payment, amount, onPaymentChange, o
 
     return (
         <Box style={{ padding: '0px 40px', width: '100%' }}>
-            <Box mb={1} display="flex" alignItems="center" justifyContent="flex-end">
+            {((payment && payment.payment_history && payment.payment_history.length > 0) || (rpPayments.length > 0)) && <Box mb={1} display="flex" alignItems="center" justifyContent="flex-end">
                 <Button
-                    onClick={() => { setShowRazorpay(true) }}
+                    sx={{ ml: 2, textTransform: 'none' }}
+                    onClick={() => { amount >= 100000 ? setVisible(true) : setShowRazorpay(true); }}
                     color="success" variant="contained">
                     Make Payment
                 </Button>
@@ -344,6 +346,22 @@ const PaymentForm: FC<PaymentFormProps> = ({ payment, amount, onPaymentChange, o
                             fullWidth
                         />
                     </Box>
+                    <Box sx={{ mt: 2 }} hidden={donorType !== 'Indian Citizen' || panNumber !== ''}>
+                        <FormControlLabel control={<Checkbox checked={consent} onChange={(e, checked) => { setConsent(checked); }} />} label="I'm not provided PAN number and I understand that I will not qualify for 80G benefit" />
+                    </Box>
+                    {!((payment && payment.payment_history && payment.payment_history.length > 0) || (rpPayments.length > 0)) &&
+                        <Box>
+                            <Typography mb={1} mt={3}>For larger amounts, we highly recommend making bank transfer.</Typography>
+                            <Box mb={1} display="flex" alignItems="center" justifyContent="flex-start">
+                                <Button
+                                    sx={{ textTransform: 'none' }}
+                                    onClick={() => { amount >= 100000 ? setVisible(true) : setShowRazorpay(true); }}
+                                    color="success" variant="contained">
+                                    Make Payment
+                                </Button>
+                            </Box>
+                        </Box>
+                    }
                 </Box>
                 {
                     payment && payment.payment_history && payment.payment_history.length > 0 && <Box width="45%">
@@ -482,8 +500,26 @@ const PaymentForm: FC<PaymentFormProps> = ({ payment, amount, onPaymentChange, o
                             </FormControl>
                         </Box>
                     </Box>
+                    <Divider sx={{ mt: 2 }}/>
+                    <Box mt={1}>
+                        <Typography mb={2} textAlign='center'>OR</Typography>
+                        <FormControlLabel
+                            control={
+                                <Checkbox checked={payUsingRazorpay} onChange={(e) => { setPayUsingRazorpay(e.target.checked) }} name="show_all" />
+                            }
+                            label="I want to make payment using razorpay payment gateway. I understand that additional charged may apply for razorpay payments."
+                        />
+                    </Box>
                 </DialogContent>
                 <DialogActions>
+                    <Button 
+                        disabled={!payUsingRazorpay} 
+                        onClick={() => { setVisible(false); setShowRazorpay(true); }} 
+                        color="success" 
+                        variant="contained"
+                    >
+                        Pay using Razorpay
+                    </Button>
                     <Button onClick={() => { setVisible(false) }} color="error" variant="outlined">
                         Cancel
                     </Button>

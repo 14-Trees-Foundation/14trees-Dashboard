@@ -1519,7 +1519,7 @@ class ApiClient {
         }
     }
 
-    async updateGiftRequestUserDetails(users: GiftCard[]): Promise<void> {
+    async updateGiftRequestUserDetails(users: GiftRequestUser[]): Promise<void> {
         try {
             await this.api.post<void>(`/gift-cards/update-users/`, { users });
         } catch (error: any) {
