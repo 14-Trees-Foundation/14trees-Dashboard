@@ -6,13 +6,12 @@ import { Group } from "../../../types/Group";
 import ApiClient from "../../../api/apiClient/apiClient";
 import { ToastContainer, toast } from "react-toastify";
 import { GiftCard, GiftRequestUser } from "../../../types/gift_card";
-import getColumnSearchProps, { getColumnDateFilter, getColumnSelectedItemFilter } from "../../../components/Filter";
+import getColumnSearchProps, { getColumnDateFilter, getColumnSelectedItemFilter, getSortIcon } from "../../../components/Filter";
 import { GridFilterItem } from "@mui/x-data-grid";
 import * as giftCardActionCreators from "../../../redux/actions/giftCardActions";
 import { useAppDispatch, useAppSelector } from "../../../redux/store/hooks";
 import { bindActionCreators } from "@reduxjs/toolkit";
 import { RootState } from "../../../redux/store/store";
-import TableComponent from "../../../components/Table";
 import { Dropdown, Menu, TableColumnsType } from "antd";
 import { AssignmentInd, AssuredWorkload, CardGiftcard, Collections, Delete, Download, Edit, Email, ErrorOutline, FileCopy, Landscape, LocalOffer, ManageAccounts, MenuOutlined, NotesOutlined, Slideshow, Wysiwyg } from "@mui/icons-material";
 import PlotSelection from "./Form/PlotSelection";
@@ -26,11 +25,12 @@ import EditUserDetailsModal from "./Form/EditUserDetailsModal";
 import { getHumanReadableDate, getUniqueRequestId } from "../../../helpers/utils";
 import PaymentComponent from "../../../components/payment/PaymentComponent";
 import { useAuth } from "../auth/auth";
-import { UserRoles } from "../../../types/common";
+import { Order, UserRoles } from "../../../types/common";
 import { LoginComponent } from "../Login/LoginComponent";
 import TagComponent from "./Form/TagComponent";
 import AssignTrees from "./Form/AssignTrees";
 import GiftCardCreationModal from "./Components/GiftCardCreationModal";
+import GeneralTable from "../../../components/GenTable";
 
 const pendingPlotSelection = 'Pending Plot & Tree(s) Reservation';
 
@@ -51,7 +51,8 @@ const GiftTrees: FC = () => {
     const [page, setPage] = useState(0);
     const [pageSize, setPageSize] = useState(10);
     const [filters, setFilters] = useState<Record<string, GridFilterItem>>({});
-    const [orderBy, setOrderBy] = useState<{ column: string, order: 'ASC' | 'DESC' }[]>([]);
+    const [orderBy, setOrderBy] = useState<Order[]>([]);
+    const [tableRows, setTableRows] = useState<GiftCard[]>([]);
     const [selectedGiftCard, setSelectedGiftCard] = useState<GiftCard | null>(null);
     const [selectedPlots, setSelectedPlots] = useState<Plot[]>([]);
     const [bookNonGiftable, setBookNonGiftable] = useState(false);
@@ -72,8 +73,14 @@ const GiftTrees: FC = () => {
     const [paymentModal, setPaymentModal] = useState(false);
     const [selectedPaymentGR, setSelectedPaymentGR] = useState<GiftCard | null>(null);
 
-    useEffect(() => {
+    let giftCards: GiftCard[] = [];
+    const giftCardsData = useAppSelector((state: RootState) => state.giftCardsData);
+    if (giftCardsData) {
+        giftCards = Object.values(giftCardsData.giftCards);
+        giftCards = giftCards.sort((a, b) => b.id - a.id);
+    }
 
+    useEffect(() => {
         const getTags = async () => {
             try {
                 const apiClient = new ApiClient();
@@ -85,12 +92,90 @@ const GiftTrees: FC = () => {
         }
 
         getTags();
-
     }, []);
 
     useEffect(() => {
         authRef.current = auth;
     }, [auth])
+
+    useEffect(() => {
+        const handler = setTimeout(() => {
+            getGiftCardData();
+        }, 300)
+
+        return () => { clearTimeout(handler) };
+    }, [filters, orderBy, auth]);
+
+    useEffect(() => {
+
+        const handler = setTimeout(() => {
+            const records: GiftCard[] = [];
+            const maxLength = Math.min((page + 1) * pageSize, giftCardsData.totalGiftCards);
+            for (let i = page * pageSize; i < maxLength; i++) {
+                if (Object.hasOwn(giftCardsData.paginationMapping, i)) {
+                    const id = giftCardsData.paginationMapping[i];
+                    const record = giftCardsData.giftCards[id];
+                    if (record) {
+                        records.push(record);
+                    }
+                } else {
+                    getGiftCardData();
+                    break;
+                }
+            }
+
+            setTableRows(records);
+        }, 300)
+
+        return () => { clearTimeout(handler) };
+    }, [pageSize, page, giftCardsData]);
+
+    const getFilters = (filters: any) => {
+        const filtersData = JSON.parse(JSON.stringify(Object.values(filters))) as GridFilterItem[];
+        filtersData.forEach((item) => {
+            if (item.columnField === 'status') {
+                item.value = (item.value as string[]).map(value => {
+                    if (value === pendingPlotSelection) return 'pending_plot_selection';
+                    else if (value === 'Pending assignment') return 'pending_assignment';
+                    else return 'completed'
+                })
+            } else if (item.columnField === 'validation_errors' || item.columnField === 'notes') {
+                if ((item.value as string[]).includes('Yes')) {
+                    item.operatorValue = 'isNotEmpty';
+                } else {
+                    item.operatorValue = 'isEmpty'
+                }
+            }
+        })
+
+        // if normal user the fetch user specific data
+        if (authRef.current?.roles?.includes(UserRoles.User) && authRef.current?.userId) {
+            filtersData.push({
+                columnField: 'user_id',
+                operatorValue: 'equals',
+                value: authRef.current.userId
+            })
+        }
+
+        return filtersData;
+    }
+
+    const getGiftCardData = async () => {
+        // check if user logged in
+        if (!authRef.current?.signedin) return;
+
+        const filtersData = getFilters(filters);
+
+        getGiftCards(page * pageSize, pageSize, filtersData, orderBy);
+    };
+
+    const getAllGiftCardsData = async () => {
+        let filtersData = getFilters(filters);
+        const apiClient = new ApiClient();
+        const resp = await apiClient.getGiftCards(0, -1, filtersData, orderBy);
+        return resp.results;
+    };
+
 
     const handleSetFilters = (filters: Record<string, GridFilterItem>) => {
         setPage(0);
@@ -182,55 +267,6 @@ const GiftTrees: FC = () => {
         setAlbum(null);
         setSelectedGiftCard(null);
     }
-
-    useEffect(() => {
-        getGiftCardData();
-    }, [pageSize, page, filters, auth]);
-
-    const getGiftCardData = async () => {
-        // check if user logged in
-        if (!authRef.current?.signedin) return;
-
-        const filtersData = JSON.parse(JSON.stringify(Object.values(filters))) as GridFilterItem[];
-        filtersData.forEach((item) => {
-            if (item.columnField === 'status') {
-                item.value = (item.value as string[]).map(value => {
-                    if (value === pendingPlotSelection) return 'pending_plot_selection';
-                    else if (value === 'Pending assignment') return 'pending_assignment';
-                    else return 'completed'
-                })
-            } else if (item.columnField === 'validation_errors' || item.columnField === 'notes') {
-                if ((item.value as string[]).includes('Yes')) {
-                    item.operatorValue = 'isNotEmpty';
-                } else {
-                    item.operatorValue = 'isEmpty'
-                }
-            }
-        })
-        
-        // if normal user the fetch user specific data
-        if (authRef.current?.roles?.includes(UserRoles.User) && authRef.current?.userId) {
-            filtersData.push({
-                columnField: 'user_id',
-                operatorValue: 'equals',
-                value: authRef.current.userId
-            })
-        }
-
-        getGiftCards(page * pageSize, pageSize, filtersData);
-    };
-
-    let giftCards: GiftCard[] = [];
-    const giftCardsData = useAppSelector((state: RootState) => state.giftCardsData);
-    if (giftCardsData) {
-        giftCards = Object.values(giftCardsData.giftCards);
-        giftCards = giftCards.sort((a, b) => b.id - a.id);
-    }
-
-    const getAllGiftCardsData = async () => {
-        let filtersData = Object.values(filters);
-        getGiftCards(0, giftCardsData.totalGiftCards, filtersData);
-    };
 
     const saveNewGiftCardsRequest = async (user: User, group: Group | null, treeCount: number, category: string, grove: string | null, users: any[], giftedOn: string, paymentId?: number, logo?: string, messages?: any, file?: File) => {
         if (!requestId) {
@@ -331,7 +367,7 @@ const GiftTrees: FC = () => {
             try {
                 await apiClient.createGiftCardPlots(selectedGiftCard.id, selectedPlots.map(plot => plot.id));
 
-                await apiClient.bookGiftCards(selectedGiftCard.id, selectedTrees.length > 0 ? selectedTrees : undefined, bookNonGiftable, diversify);                
+                await apiClient.bookGiftCards(selectedGiftCard.id, selectedTrees.length > 0 ? selectedTrees : undefined, bookNonGiftable, diversify);
                 toast.success("Successfully reserved trees for tree card request!");
                 getGiftCardData();
             } catch {
@@ -511,6 +547,33 @@ const GiftTrees: FC = () => {
         return errors;
     }
 
+    const handleSortingChange = (sorter: any) => {
+        let newOrder = [...orderBy];
+        const updateOrder = () => {
+            const index = newOrder.findIndex((item) => item.column === sorter.field);
+            if (index > -1) {
+                if (sorter.order) newOrder[index].order = sorter.order;
+                else newOrder = newOrder.filter((item) => item.column !== sorter.field);
+            } else if (sorter.order) {
+                newOrder.push({ column: sorter.field, order: sorter.order });
+            }
+        }
+
+        if (sorter.field) {
+            setPage(0);
+            updateOrder();
+            setOrderBy(newOrder);
+        }
+    }
+
+    const getSortableHeader = (header: string, key: string) => {
+        return (
+            <div style={{ display: "flex", alignItems: "center", justifyContent: 'space-between' }}>
+                {header} {getSortIcon(key, orderBy.find((item) => item.column === key)?.order, handleSortingChange)}
+            </div>
+        )
+    }
+
     const getActionsMenu = (record: GiftCard) => (
         <Menu>
             <Menu.ItemGroup>
@@ -610,7 +673,7 @@ const GiftTrees: FC = () => {
         {
             dataIndex: "no_of_cards",
             key: "no_of_cards",
-            title: "# Cards",
+            title: getSortableHeader("# Cards", 'no_of_cards'),
             align: "center",
             width: 100,
         },
@@ -656,12 +719,11 @@ const GiftTrees: FC = () => {
             ...getColumnSelectedItemFilter({ dataIndex: 'validation_errors', filters, handleSetFilters, options: ['Yes', 'No'] }),
         },
         {
-            dataIndex: "amount",
-            key: "amount",
-            title: "Total Amount",
+            dataIndex: "total_amount",
+            key: "total_amount",
+            title: getSortableHeader("Total Amount", 'total_amount'),
             align: "center",
             width: 150,
-            render: (value, record, index) => record.no_of_cards * (record.category === "Foundation" ? 3000 : 1500)
         },
         {
             dataIndex: "payment_status",
@@ -752,15 +814,17 @@ const GiftTrees: FC = () => {
             <Divider sx={{ backgroundColor: "black", marginBottom: '15px' }} />
 
             {auth.signedin && <Box sx={{ height: 840, width: "100%" }}>
-                <TableComponent
+                <GeneralTable
                     loading={giftCardsData.loading}
-                    dataSource={giftCards}
+                    rows={tableRows}
                     columns={columns}
                     totalRecords={giftCardsData.totalGiftCards}
-                    fetchAllData={getAllGiftCardsData}
-                    setPage={setPage}
-                    setPageSize={setPageSize}
-                    tableName="Tree Trees"
+                    page={page}
+                    pageSize={pageSize}
+                    onPaginationChange={(page: number, pageSize: number) => { setPage(page - 1); setPageSize(pageSize); }}
+                    onDownload={getAllGiftCardsData}
+                    footer
+                    tableName="Tree Cards"
                 />
             </Box>}
 
@@ -848,7 +912,7 @@ const GiftTrees: FC = () => {
                 </DialogActions>
             </Dialog>
 
-            {selectedGiftCard && <AssignTrees 
+            {selectedGiftCard && <AssignTrees
                 open={autoAssignModal}
                 onClose={() => { setAutoAssignModal(false) }}
                 giftCardRequestId={selectedGiftCard.id}

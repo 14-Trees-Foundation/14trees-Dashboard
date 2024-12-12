@@ -98,7 +98,14 @@ function GeneralTable({ loading, rows, columns, totalRecords, page, pageSize = 1
     const handleDataSourceParse = async () => {
 
         let dataSource = rows ? rows : [];
-        if (rows?.length !== totalRecords)  dataSource = await onDownload();
+        if (rows?.length !== totalRecords) {
+            try {
+                dataSource = await onDownload();
+            } catch (error: any) {
+                toast.error(error.message);
+                return; 
+            }
+        }
 
         const data = dataSource.map((item) => {
             const row: any = {}
