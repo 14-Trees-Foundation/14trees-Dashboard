@@ -83,6 +83,7 @@ export type GiftCardsDataState = {
     loading: boolean,
     totalGiftCards: number,
     giftCards: Record<string, GiftCard>
+    paginationMapping: Record<number, number> 
 }
 
 export type GiftCardUsersDataState = {

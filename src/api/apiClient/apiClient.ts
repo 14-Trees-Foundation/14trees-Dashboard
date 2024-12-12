@@ -17,6 +17,7 @@ import { GiftCard, GiftCardUser, GiftRequestUser } from '../../types/gift_card';
 import { Tag } from '../../types/tag';
 import { EmailTemplate } from '../../types/email_template';
 import { Payment, PaymentHistory } from '../../types/payment';
+import { Order } from '../../types/common';
 
 
 class ApiClient {
@@ -1236,10 +1237,10 @@ class ApiClient {
         }
     }
 
-    async getGiftCards(offset: number, limit: number, filters?: any[]): Promise<PaginatedResponse<GiftCard>> {
+    async getGiftCards(offset: number, limit: number, filters?: any[], order_by?: Order[]): Promise<PaginatedResponse<GiftCard>> {
         const url = `/gift-cards/requests/get?offset=${offset}&limit=${limit}`;
         try {
-            const response = await this.api.post<PaginatedResponse<GiftCard>>(url, { filters: filters });
+            const response = await this.api.post<PaginatedResponse<GiftCard>>(url, { filters, order_by });
             return response.data;
         } catch (error: any) {
             throw new Error(`Failed to fetch gift cards: ${error.message}`);

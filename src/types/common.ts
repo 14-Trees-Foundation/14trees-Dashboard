@@ -17,3 +17,8 @@ export const UserRoles = {
     TreeLogger: 'treelogging' as UserRole,
     User: 'user' as UserRole,
 }
+
+export type Order = { 
+    column: string, 
+    order: 'ASC' | 'DESC' 
+}
