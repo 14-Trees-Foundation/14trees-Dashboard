@@ -188,7 +188,7 @@ const TreeSelectionComponent: React.FC<TreeSelectionComponentProps> = ({ plotIds
                         disabled={selectedTrees.findIndex(item => item.id === record.id) !== -1}
                         onClick={() => {
                             if (selectedTrees.length === max) {
-                                toast.error("Maxing number of trees selected!");
+                                toast.error("You have already selected maximum number of trees in the request!");
                                 return;
                             }
 

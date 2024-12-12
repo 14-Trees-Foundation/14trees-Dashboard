@@ -437,7 +437,7 @@ export const BulkUserForm: FC<BulkUserFormProps> = ({ requestId, treeCount, user
       render: (value, record) => value === undefined
         ? 'Image Not Provided'
         : value
-          ? record.image_name
+          ? <img src={record.image_url} alt={record.image_name} style={{ width: 50, height: 50 }} />
           : record.image_name + '\n(Not Found)',
       ...getColumnSelectedItemFilter({ dataIndex: 'image', filters, handleSetFilters, options: ['Image Not Provided', 'Image Not Found'] })
     },
@@ -582,7 +582,7 @@ export const BulkUserForm: FC<BulkUserFormProps> = ({ requestId, treeCount, user
         <DialogTitle>Fetch user images from website</DialogTitle>
         <DialogContent dividers>
           <Grid item xs={12}>
-            <Typography variant="body1">Enter the link of the web page containing user images. You can refer these images during user addition.</Typography>
+            <Typography variant="body1">Enter the link of the web page containing user images. You can refer these images during user addition. Webpage URL must start with 'https://' prefix and it should be publicly accessible.</Typography>
             <Box style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 30, marginTop: 5 }}>
               <TextField
                 onChange={(event) => { setPageUrl(event.target.value.trim()) }}
