@@ -62,6 +62,13 @@ const GiftCardRequestInfo: React.FC<GiftCardRequestInfoProps> = ({ open, onClose
         {
             dataIndex: "recipient_name",
             key: "recipient",
+            title: "Recipient",
+            align: "center",
+            width: 200,
+        },
+        {
+            dataIndex: "assignee_name",
+            key: "assignee",
             title: "Assigned to",
             align: "center",
             width: 200,

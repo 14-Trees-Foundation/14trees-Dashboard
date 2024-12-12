@@ -88,6 +88,7 @@ const PaymentForm: FC<PaymentFormProps> = ({ payment, amount, onPaymentChange, o
 
         if (!indianDonor) setDonorType(payment ? payment.donor_type : '');
         setPanNumber(payment?.pan_number ? payment.pan_number : '');
+        setConsent(payment?.consent ?? false);
     }, [payment, amount, rpPayments, indianDonor])
 
     useEffect(() => {
@@ -368,6 +369,7 @@ const PaymentForm: FC<PaymentFormProps> = ({ payment, amount, onPaymentChange, o
                             label="PAN Number"
                             name="pan_number"
                             value={panNumber}
+                            disabled={consent}
                             onChange={(e) => { setPanNumber(e.target.value.toUpperCase().trim()) }}
                             fullWidth
                         />
@@ -376,16 +378,13 @@ const PaymentForm: FC<PaymentFormProps> = ({ payment, amount, onPaymentChange, o
                         <FormControlLabel control={<Checkbox checked={consent} onChange={(e, checked) => { setConsent(checked); }} />} label="I'm not provided PAN number and I understand that I will not qualify for 80G benefit" />
                     </Box>
                     {!((payment && payment.payment_history && payment.payment_history.length > 0) || (rpPayments.length > 0)) &&
-                        <Box>
-                            <Typography mb={1} mt={3}>For larger amounts, we highly recommend making bank transfer.</Typography>
-                            <Box mb={1} display="flex" alignItems="center" justifyContent="flex-start">
-                                <Button
-                                    sx={{ textTransform: 'none' }}
-                                    onClick={() => { amount >= 100000 ? setVisible(true) : setShowRazorpay(true); }}
-                                    color="success" variant="contained">
-                                    Make Payment
-                                </Button>
-                            </Box>
+                        <Box mt={3}>
+                            <Button
+                                sx={{ textTransform: 'none' }}
+                                onClick={() => { amount >= 100000 ? setVisible(true) : setShowRazorpay(true); }}
+                                color="success" variant="contained">
+                                Make Payment
+                            </Button>
                         </Box>
                     }
                 </Box>
@@ -526,7 +525,7 @@ const PaymentForm: FC<PaymentFormProps> = ({ payment, amount, onPaymentChange, o
                             </FormControl>
                         </Box>
                     </Box>
-                    <Divider sx={{ mt: 2 }}/>
+                    <Divider sx={{ mt: 2 }} />
                     <Box mt={1}>
                         <Typography mb={2} textAlign='center'>OR</Typography>
                         <FormControlLabel
@@ -538,10 +537,10 @@ const PaymentForm: FC<PaymentFormProps> = ({ payment, amount, onPaymentChange, o
                     </Box>
                 </DialogContent>
                 <DialogActions>
-                    <Button 
-                        disabled={!payUsingRazorpay} 
-                        onClick={() => { setVisible(false); setShowRazorpay(true); }} 
-                        color="success" 
+                    <Button
+                        disabled={!payUsingRazorpay}
+                        onClick={() => { setVisible(false); setShowRazorpay(true); }}
+                        color="success"
                         variant="contained"
                     >
                         Pay using Razorpay

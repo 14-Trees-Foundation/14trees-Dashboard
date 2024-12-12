@@ -1247,7 +1247,7 @@ class ApiClient {
     }
 
 
-    async createGiftCard(request_id: string, created_by: number, no_of_cards: number, user_id: number, category: string, grove: string | null, group_id?: number, payment_id?: number, logo?: File, messages?: any, file?: File): Promise<GiftCard> {
+    async createGiftCard(request_id: string, created_by: number, no_of_cards: number, user_id: number, category: string, grove: string | null, giftedOn: string, group_id?: number, payment_id?: number, logo?: string, messages?: any, file?: File): Promise<GiftCard> {
         try {
             const formData = new FormData();
             formData.append('request_id', request_id);
@@ -1255,6 +1255,7 @@ class ApiClient {
             formData.append('created_by', created_by ? created_by.toString() : user_id.toString());
             formData.append('user_id', user_id.toString());
             formData.append('category', category);
+            formData.append('gifted_on', giftedOn);
             if (messages) {
                 formData.append('primary_message', messages.primaryMessage);
                 formData.append('secondary_message', messages.secondaryMessage);
@@ -1266,7 +1267,7 @@ class ApiClient {
             if (grove) formData.append('grove', grove);
             if (group_id) formData.append('group_id', group_id.toString());
             if (payment_id) formData.append('payment_id', payment_id.toString());
-            if (logo) formData.append('logo', logo, logo.name);
+            if (logo) formData.append('logo_url', logo);
             if (file) formData.append('csv_file', file, file.name);
 
             const response = await this.api.post<GiftCard>(`/gift-cards/requests`, formData);
@@ -1279,7 +1280,7 @@ class ApiClient {
         }
     }
 
-    async updateGiftCard(request: GiftCard, no_of_cards: number, user_id: number, category: string, grove: string | null, group_id?: number, payment_id?: number, logo?: File, messages?: any, file?: File): Promise<GiftCard> {
+    async updateGiftCard(request: GiftCard, no_of_cards: number, user_id: number, category: string, grove: string | null, giftedOn: string, group_id?: number, payment_id?: number, logo?: string, messages?: any, file?: File): Promise<GiftCard> {
         try {
             const formData = new FormData();
             for (const [key, value] of Object.entries(request)) {
@@ -1298,14 +1299,17 @@ class ApiClient {
             if (grove && formData.has('grove')) formData.set('grove', grove);
             else if (grove) formData.append('grove', grove);
 
+            if (giftedOn && formData.has('gifted_on')) formData.set('gifted_on', giftedOn);
+            else if (giftedOn) formData.append('gifted_on', giftedOn);
+
             if (group_id && formData.has('group_id')) formData.set('group_id', group_id.toString());
             else if (group_id) formData.append('group_id', group_id.toString());
 
             if (payment_id && formData.has('payment_id')) formData.set('payment_id', payment_id.toString());
             else if (payment_id) formData.append('payment_id', payment_id.toString());
 
-            if (logo && formData.has('logo')) formData.set('logo', logo, logo.name);
-            else if (logo) formData.append('logo', logo, logo.name);
+            if (logo && formData.has('logo')) formData.set('logo_url', logo);
+            else if (logo) formData.append('logo_url', logo);
 
             if (file && formData.has('csv_file')) formData.set('csv_file', file, file.name);
             else if (file) formData.append('csv_file', file, file.name);

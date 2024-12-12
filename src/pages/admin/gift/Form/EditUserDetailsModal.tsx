@@ -99,7 +99,7 @@ const EditUserDialog: React.FC<EditUserDialogProps> = ({ open, imageUrls, onClos
 
     return (
         <Dialog open={open} fullWidth maxWidth="md">
-            <DialogTitle>Edit User</DialogTitle>
+            <DialogTitle>Edit Recipient details</DialogTitle>
             <DialogContent dividers>
                 <Grid container rowSpacing={2} columnSpacing={1}>
                     <Grid item xs={12}>
@@ -257,6 +257,8 @@ const EditUserDetailsModal: React.FC<EditUserDetailsModalProps> = ({ open, onClo
     const [selectedUser, setSelectedUser] = useState<GiftRequestUser | null>(null);
     const [editModal, setEditModal] = useState(false);
     const [imageUrls, setImageUrls] = useState<string[]>([]);
+    const [page, setPage] = useState(0);
+    const [pageSize, setPageSize] = useState(10);
 
     useEffect(() => {
         const getUsers = async () => {
@@ -293,6 +295,7 @@ const EditUserDetailsModal: React.FC<EditUserDetailsModalProps> = ({ open, onClo
             title: 'Recipient Email',
             dataIndex: 'recipient_email',
             width: '250',
+            render: (value: string) => value?.endsWith("@14trees") ? "Not Provided" : value,
         },
         {
             title: 'Recipient Phone',
@@ -309,6 +312,7 @@ const EditUserDetailsModal: React.FC<EditUserDetailsModalProps> = ({ open, onClo
             title: 'Assignee Email',
             dataIndex: 'assignee_email',
             width: '250',
+            render: (value: string) => value?.endsWith("@14trees") ? "Not Provided" : value,
         },
         {
             title: 'Assignee Phone',
@@ -379,17 +383,17 @@ const EditUserDetailsModal: React.FC<EditUserDetailsModalProps> = ({ open, onClo
 
     return (
         <Dialog open={open} fullWidth maxWidth="lg">
-            <DialogTitle>User List</DialogTitle>
+            <DialogTitle>Recipients List</DialogTitle>
             <DialogContent>
                 <GeneralTable
                     loading={false}
-                    rows={userList}
+                    rows={userList.slice(page * pageSize, (page + 1)*pageSize)}
                     columns={defaultColumns}
                     totalRecords={userList.length}
-                    page={0}
-                    pageSize={10}
+                    page={page}
+                    pageSize={pageSize}
                     onDownload={async () => userList}
-                    onPaginationChange={(page: number, pageSize: number) => { }}
+                    onPaginationChange={(page: number, pageSize: number) => { setPage(page - 1); setPageSize(pageSize) }}
                 />
 
                 {selectedUser && <EditUserDialog

@@ -118,7 +118,7 @@ const AlbumImageInput: React.FC<AlbumImageInputProps> = ({ onSave, onClose, open
     <Modal open={open}>
       <Box sx={{ p: 3, maxWidth: 600, m: 'auto', mt: '5vh', mb: '5vh', bgcolor: 'background.paper', borderRadius: 2 }}>
         <Typography variant="h6" gutterBottom>
-          Upload Images
+          Add/Edit Event/Occasion Pictures
         </Typography>
         <DndProvider backend={HTML5Backend}>
           <Box
@@ -156,7 +156,7 @@ const AlbumImageInput: React.FC<AlbumImageInputProps> = ({ onSave, onClose, open
         <Grid container spacing={1} justifyContent="flex-end">
           {onDeleteAlbum && imageUrls && imageUrls.length > 0 && <Grid item>
             <Button variant="contained" onClick={onDeleteAlbum} color="error">
-              Delete
+              Delete All
           </Button>
           </Grid>}
           <Grid item>

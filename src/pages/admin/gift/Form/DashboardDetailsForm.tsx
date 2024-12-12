@@ -28,10 +28,12 @@ interface Massages {
 
 interface DashboardDetailsProps {
     messages: Massages,
-    onChange: (messages: Massages) => void
+    onChange: (messages: Massages) => void,
+    giftedOn: string,
+    onGiftedOnChange: (date: string) => void,
 }
 
-const DashboardDetails: FC<DashboardDetailsProps> = ({ messages, onChange }) => {
+const DashboardDetails: FC<DashboardDetailsProps> = ({ messages, onChange, giftedOn, onGiftedOnChange }) => {
 
     const [selectedEventType, setSelectedEventType] = useState<{ value: string, label: string } | null>(null);
 
@@ -90,6 +92,14 @@ const DashboardDetails: FC<DashboardDetailsProps> = ({ messages, onChange }) => 
                     value={messages.plantedBy}
                     onChange={handleChange}
                     size="small"
+                />
+                <Typography variant="body1" sx={{ mt: 2 }}>Gifted On</Typography>
+                <TextField
+                    name="giftedOn"
+                    value={giftedOn}
+                    onChange={(e) => { onGiftedOnChange(e.target.value) }}
+                    size="small"
+                    type="date"
                 />
             </div>
         </div>

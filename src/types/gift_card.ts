@@ -34,6 +34,7 @@ export type GiftCard = {
     tags: string[] | null;
     booked: number,
     assigned: number,
+    gifted_on: string;
 }
 
 export type GiftRequestUser = {

@@ -177,7 +177,7 @@ export const VisitsComponent = () => {
       width: 220,
       align: "center",
       render: getHumanReadableDate,
-      ...getColumnDateFilter({dataIndex: "visit_date", filters, handleSetFilters}),
+      ...getColumnDateFilter({dataIndex: "visit_date", filters, handleSetFilters, label: 'Visits' }),
     },
     {
       dataIndex: "site_name",

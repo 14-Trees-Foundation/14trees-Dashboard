@@ -105,12 +105,6 @@ const SponsorGroupForm: FC<SponsorGroupFormProps> = ({ logo, onLogoChange, group
                                 <TextField name="description" label="Description" value={formData.description} onChange={handleInputChange} fullWidth />
                             </Grid>
                             <Grid item xs={12}>
-                                <ImagePicker
-                                    image={logo}
-                                    onChange={onLogoChange}
-                                />
-                            </Grid>
-                            <Grid item xs={12}>
                                 <TextField
                                     fullWidth
                                     multiline
@@ -120,6 +114,12 @@ const SponsorGroupForm: FC<SponsorGroupFormProps> = ({ logo, onLogoChange, group
                                     value={formData.address}
                                     type='text'
                                     onChange={handleInputChange}
+                                />
+                            </Grid>
+                            <Grid item xs={12}>
+                                <ImagePicker
+                                    image={logo}
+                                    onChange={onLogoChange}
                                 />
                             </Grid>
                             <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'center', }}>
