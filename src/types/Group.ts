@@ -5,6 +5,8 @@ export type Group = {
     name: string,
     type: string,
     description: string,
+    logo_url: string | null,
+    address: string | null,
     created_at: Date,
     updated_at: Date,
 }

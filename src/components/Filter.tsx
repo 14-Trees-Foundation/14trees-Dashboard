@@ -192,7 +192,7 @@ export function getColumnSelectedItemFilter<T extends object>({ dataIndex, filte
     })
 };
 
-export const getColumnDateFilter = <T extends object>({ dataIndex, filters, handleSetFilters }: FilterItemProps<T>): TableColumnType<T> => {
+export const getColumnDateFilter = <T extends object>({ dataIndex, filters, handleSetFilters, label }: FilterItemProps<T> & { label: string }): TableColumnType<T> => {
     return {
         filterDropdown: ({ confirm, clearFilters, close }) => (
             <DateFilterDropdown<T>
@@ -202,6 +202,7 @@ export const getColumnDateFilter = <T extends object>({ dataIndex, filters, hand
                 confirm={confirm}
                 clearFilters={clearFilters}
                 close={close}
+                label={label}
             />
         ),
         filterIcon: (filtered: boolean) => (
@@ -214,9 +215,10 @@ interface DateFilterDropdownProps<T> extends FilterItemProps<T> {
     confirm: (param?: FilterConfirmProps) => void;
     clearFilters?: () => void;
     close: () => void;
+    label: string;
 }
 
-const DateFilterDropdown = <T extends object>({ dataIndex, filters, handleSetFilters, confirm, clearFilters, close }: DateFilterDropdownProps<T>) => {
+const DateFilterDropdown = <T extends object>({ dataIndex, filters, label, handleSetFilters, confirm, clearFilters, close }: DateFilterDropdownProps<T>) => {
     const [lower, setLower] = useState<string>('');
     const [upper, setUpper] = useState<string>('');
 
@@ -253,12 +255,12 @@ const DateFilterDropdown = <T extends object>({ dataIndex, filters, handleSetFil
         <div style={{ padding: 8 }} onKeyDown={(e) => e.stopPropagation()}>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <div style={{ margin: 2 }}>Visits After:</div>
-                    <DatePicker onChange={(date, stringDate) => setLower(stringDate as string)} style={{ margin: 2, backgroundColor: 'white' }} />
+                    <div style={{ margin: 2 }}>{label} After:</div>
+                    <DatePicker onChange={(date, stringDate) => setLower(stringDate as string)} style={{ margin: 2, backgroundColor: 'white' }} popupStyle={{ zIndex: 100001 }}/>
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <div style={{ margin: 2 }}>Visits Before:</div>
-                    <DatePicker onChange={(date, stringDate) => setUpper(stringDate as string)} style={{ margin: 2, backgroundColor: 'white' }} />
+                    <div style={{ margin: 2 }}>{label} Before:</div>
+                    <DatePicker onChange={(date, stringDate) => setUpper(stringDate as string)} style={{ margin: 2, backgroundColor: 'white' }} popupStyle={{ zIndex: 100001 }}/>
                 </div>
             </div>
             <Space style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 8 }}>

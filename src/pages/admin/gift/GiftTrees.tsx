@@ -6,13 +6,12 @@ import { Group } from "../../../types/Group";
 import ApiClient from "../../../api/apiClient/apiClient";
 import { ToastContainer, toast } from "react-toastify";
 import { GiftCard, GiftRequestUser } from "../../../types/gift_card";
-import getColumnSearchProps, { getColumnSelectedItemFilter } from "../../../components/Filter";
+import getColumnSearchProps, { getColumnDateFilter, getColumnSelectedItemFilter, getSortIcon } from "../../../components/Filter";
 import { GridFilterItem } from "@mui/x-data-grid";
 import * as giftCardActionCreators from "../../../redux/actions/giftCardActions";
 import { useAppDispatch, useAppSelector } from "../../../redux/store/hooks";
 import { bindActionCreators } from "@reduxjs/toolkit";
 import { RootState } from "../../../redux/store/store";
-import TableComponent from "../../../components/Table";
 import { Dropdown, Menu, TableColumnsType } from "antd";
 import { AssignmentInd, AssuredWorkload, CardGiftcard, Collections, Delete, Download, Edit, Email, ErrorOutline, FileCopy, Landscape, LocalOffer, ManageAccounts, MenuOutlined, NotesOutlined, Slideshow, Wysiwyg } from "@mui/icons-material";
 import PlotSelection from "./Form/PlotSelection";
@@ -26,10 +25,14 @@ import EditUserDetailsModal from "./Form/EditUserDetailsModal";
 import { getHumanReadableDate, getUniqueRequestId } from "../../../helpers/utils";
 import PaymentComponent from "../../../components/payment/PaymentComponent";
 import { useAuth } from "../auth/auth";
-import { UserRoles } from "../../../types/common";
+import { Order, UserRoles } from "../../../types/common";
 import { LoginComponent } from "../Login/LoginComponent";
 import TagComponent from "./Form/TagComponent";
 import AssignTrees from "./Form/AssignTrees";
+import GiftCardCreationModal from "./Components/GiftCardCreationModal";
+import GeneralTable from "../../../components/GenTable";
+
+const pendingPlotSelection = 'Pending Plot & Tree(s) Reservation';
 
 const GiftTrees: FC = () => {
     const dispatch = useAppDispatch();
@@ -48,6 +51,8 @@ const GiftTrees: FC = () => {
     const [page, setPage] = useState(0);
     const [pageSize, setPageSize] = useState(10);
     const [filters, setFilters] = useState<Record<string, GridFilterItem>>({});
+    const [orderBy, setOrderBy] = useState<Order[]>([]);
+    const [tableRows, setTableRows] = useState<GiftCard[]>([]);
     const [selectedGiftCard, setSelectedGiftCard] = useState<GiftCard | null>(null);
     const [selectedPlots, setSelectedPlots] = useState<Plot[]>([]);
     const [bookNonGiftable, setBookNonGiftable] = useState(false);
@@ -55,7 +60,6 @@ const GiftTrees: FC = () => {
     const [requestId, setRequestId] = useState<string | null>(null);
     const [deleteModal, setDeleteModal] = useState(false);
     const [notesModal, setNotesModal] = useState(false);
-    const [users, setUsers] = useState<any[]>([]);
     const [selectedTrees, setSelectedTrees] = useState<any[]>([]);
     const [albumImagesModal, setAlbumImagesModal] = useState(false);
     const [album, setAlbum] = useState<any>(null);
@@ -63,25 +67,20 @@ const GiftTrees: FC = () => {
     const [tagModal, setTagModal] = useState(false);
     const [tags, setTags] = useState<string[]>([]);
     const [testingMail, setTestingMail] = useState(false);
+    const [giftCardNotification, setGiftCardNotification] = useState(false);
 
     // payment
     const [paymentModal, setPaymentModal] = useState(false);
     const [selectedPaymentGR, setSelectedPaymentGR] = useState<GiftCard | null>(null);
 
-    useEffect(() => {
-        const getUsers = async () => {
-            if (selectedGiftCard) {
-                const apiClient = new ApiClient();
-                const usersResp = await apiClient.getBookedGiftTrees(selectedGiftCard?.id, 0, 50);
-                setUsers(usersResp.results);
-            }
-        }
-
-        if (plotModal) getUsers();
-    }, [plotModal, selectedGiftCard]);
+    let giftCards: GiftCard[] = [];
+    const giftCardsData = useAppSelector((state: RootState) => state.giftCardsData);
+    if (giftCardsData) {
+        giftCards = Object.values(giftCardsData.giftCards);
+        giftCards = giftCards.sort((a, b) => b.id - a.id);
+    }
 
     useEffect(() => {
-
         const getTags = async () => {
             try {
                 const apiClient = new ApiClient();
@@ -93,12 +92,90 @@ const GiftTrees: FC = () => {
         }
 
         getTags();
-
     }, []);
 
     useEffect(() => {
         authRef.current = auth;
     }, [auth])
+
+    useEffect(() => {
+        const handler = setTimeout(() => {
+            getGiftCardData();
+        }, 300)
+
+        return () => { clearTimeout(handler) };
+    }, [filters, orderBy, auth]);
+
+    useEffect(() => {
+
+        const handler = setTimeout(() => {
+            const records: GiftCard[] = [];
+            const maxLength = Math.min((page + 1) * pageSize, giftCardsData.totalGiftCards);
+            for (let i = page * pageSize; i < maxLength; i++) {
+                if (Object.hasOwn(giftCardsData.paginationMapping, i)) {
+                    const id = giftCardsData.paginationMapping[i];
+                    const record = giftCardsData.giftCards[id];
+                    if (record) {
+                        records.push(record);
+                    }
+                } else {
+                    getGiftCardData();
+                    break;
+                }
+            }
+
+            setTableRows(records);
+        }, 300)
+
+        return () => { clearTimeout(handler) };
+    }, [pageSize, page, giftCardsData]);
+
+    const getFilters = (filters: any) => {
+        const filtersData = JSON.parse(JSON.stringify(Object.values(filters))) as GridFilterItem[];
+        filtersData.forEach((item) => {
+            if (item.columnField === 'status') {
+                item.value = (item.value as string[]).map(value => {
+                    if (value === pendingPlotSelection) return 'pending_plot_selection';
+                    else if (value === 'Pending assignment') return 'pending_assignment';
+                    else return 'completed'
+                })
+            } else if (item.columnField === 'validation_errors' || item.columnField === 'notes') {
+                if ((item.value as string[]).includes('Yes')) {
+                    item.operatorValue = 'isNotEmpty';
+                } else {
+                    item.operatorValue = 'isEmpty'
+                }
+            }
+        })
+
+        // if normal user the fetch user specific data
+        if (authRef.current?.roles?.includes(UserRoles.User) && authRef.current?.userId) {
+            filtersData.push({
+                columnField: 'user_id',
+                operatorValue: 'equals',
+                value: authRef.current.userId
+            })
+        }
+
+        return filtersData;
+    }
+
+    const getGiftCardData = async () => {
+        // check if user logged in
+        if (!authRef.current?.signedin) return;
+
+        const filtersData = getFilters(filters);
+
+        getGiftCards(page * pageSize, pageSize, filtersData, orderBy);
+    };
+
+    const getAllGiftCardsData = async () => {
+        let filtersData = getFilters(filters);
+        const apiClient = new ApiClient();
+        const resp = await apiClient.getGiftCards(0, -1, filtersData, orderBy);
+        return resp.results;
+    };
+
 
     const handleSetFilters = (filters: Record<string, GridFilterItem>) => {
         setPage(0);
@@ -191,40 +268,7 @@ const GiftTrees: FC = () => {
         setSelectedGiftCard(null);
     }
 
-    useEffect(() => {
-        getGiftCardData();
-    }, [pageSize, page, filters, auth]);
-
-    const getGiftCardData = async () => {
-        // check if user logged in
-        if (!authRef.current?.signedin) return;
-
-        let filtersData = Object.values(filters);
-        // if normal user the fetch user specific data
-        if (authRef.current?.roles?.includes(UserRoles.User) && authRef.current?.userId) {
-            filtersData.push({
-                columnField: 'user_id',
-                operatorValue: 'equals',
-                value: authRef.current.userId
-            })
-        }
-
-        getGiftCards(page * pageSize, pageSize, filtersData);
-    };
-
-    let giftCards: GiftCard[] = [];
-    const giftCardsData = useAppSelector((state: RootState) => state.giftCardsData);
-    if (giftCardsData) {
-        giftCards = Object.values(giftCardsData.giftCards);
-        giftCards = giftCards.sort((a, b) => b.id - a.id);
-    }
-
-    const getAllGiftCardsData = async () => {
-        let filtersData = Object.values(filters);
-        getGiftCards(0, giftCardsData.totalGiftCards, filtersData);
-    };
-
-    const saveNewGiftCardsRequest = async (user: User, group: Group | null, treeCount: number, category: string, grove: string | null, users: any[], paymentId?: number, logo?: File, messages?: any, file?: File) => {
+    const saveNewGiftCardsRequest = async (user: User, group: Group | null, treeCount: number, category: string, grove: string | null, users: any[], giftedOn: string, paymentId?: number, logo?: string, messages?: any, file?: File) => {
         if (!requestId) {
             toast.error("Something went wrong. Please try again later!");
             return;
@@ -232,7 +276,7 @@ const GiftTrees: FC = () => {
         const apiClient = new ApiClient();
         let giftCardId: number;
         try {
-            const response = await apiClient.createGiftCard(requestId, auth.userId, treeCount, user.id, category, grove, group?.id, paymentId, logo, messages, file);
+            const response = await apiClient.createGiftCard(requestId, auth.userId, treeCount, user.id, category, grove, giftedOn, group?.id, paymentId, logo, messages, file);
             giftCardId = response.id;
             dispatch({
                 type: giftCardActionTypes.CREATE_GIFT_CARD_SUCCEEDED,
@@ -259,13 +303,13 @@ const GiftTrees: FC = () => {
         }
     }
 
-    const updateGiftCardRequest = async (user: User, group: Group | null, treeCount: number, category: string, grove: string | null, users: any[], paymentId?: number, logo?: File, messages?: any, file?: File) => {
+    const updateGiftCardRequest = async (user: User, group: Group | null, treeCount: number, category: string, grove: string | null, users: any[], giftedOn: string, paymentId?: number, logo?: string, messages?: any, file?: File) => {
         if (!selectedGiftCard) return;
 
         const apiClient = new ApiClient();
         let success = false;
         try {
-            const response = await apiClient.updateGiftCard(selectedGiftCard, treeCount, user.id, category, grove, group?.id, paymentId, logo, messages, file);
+            const response = await apiClient.updateGiftCard(selectedGiftCard, treeCount, user.id, category, grove, giftedOn, group?.id, paymentId, logo, messages, file);
             toast.success("Tree Request updated successfully");
             dispatch({
                 type: giftCardActionTypes.UPDATE_GIFT_CARD_SUCCEEDED,
@@ -296,13 +340,13 @@ const GiftTrees: FC = () => {
         }
     }
 
-    const handleSubmit = (user: User, group: Group | null, treeCount: number, category: string, grove: string | null, users: any[], paymentId?: number, logo?: File, messages?: any, file?: File) => {
+    const handleSubmit = (user: User, group: Group | null, treeCount: number, category: string, grove: string | null, users: any[], giftedOn: string, paymentId?: number, logo?: string, messages?: any, file?: File) => {
         handleModalClose();
 
         if (changeMode === 'add') {
-            saveNewGiftCardsRequest(user, group, treeCount, category, grove, users, paymentId, logo, messages, file);
+            saveNewGiftCardsRequest(user, group, treeCount, category, grove, users, giftedOn, paymentId, logo, messages, file);
         } else if (changeMode === 'edit') {
-            updateGiftCardRequest(user, group, treeCount, category, grove, users, paymentId, logo, messages, file);
+            updateGiftCardRequest(user, group, treeCount, category, grove, users, giftedOn, paymentId, logo, messages, file);
         }
     }
 
@@ -322,10 +366,9 @@ const GiftTrees: FC = () => {
         if (selectedPlots.length !== 0) {
             try {
                 await apiClient.createGiftCardPlots(selectedGiftCard.id, selectedPlots.map(plot => plot.id));
-                toast.success("Saved selected plot for tree card request!");
 
-                await apiClient.bookGiftCards(selectedGiftCard.id, selectedTrees.length > 0 ? selectedTrees : undefined, bookNonGiftable, diversify);                
-                toast.success("Tree cards booked successfully");
+                await apiClient.bookGiftCards(selectedGiftCard.id, selectedTrees.length > 0 ? selectedTrees : undefined, bookNonGiftable, diversify);
+                toast.success("Successfully reserved trees for tree card request!");
                 getGiftCardData();
             } catch {
                 toast.error("Something went wrong!");
@@ -380,7 +423,7 @@ const GiftTrees: FC = () => {
     const handleGenerateGiftCards = async (id: number) => {
         const apiClient = new ApiClient();
         apiClient.generateGiftCardTemplates(id);
-        toast.success("Tree card creation may take upto 10mins. Please refresh the page after some time.")
+        setGiftCardNotification(true);
     }
 
     const handleDownloadCards = async (id: number, name: string, type: 'pdf' | 'ppt' | 'zip') => {
@@ -411,7 +454,7 @@ const GiftTrees: FC = () => {
 
         try {
             const apiClient = new ApiClient();
-            const response = await apiClient.updateGiftCard({ ...selectedGiftCard, notes: text }, selectedGiftCard.no_of_cards, selectedGiftCard.user_id, selectedGiftCard.category, selectedGiftCard.grove);
+            const response = await apiClient.updateGiftCard({ ...selectedGiftCard, notes: text }, selectedGiftCard.no_of_cards, selectedGiftCard.user_id, selectedGiftCard.category, selectedGiftCard.grove, selectedGiftCard.gifted_on);
             toast.success("Tree card request updated successfully");
             dispatch({
                 type: giftCardActionTypes.UPDATE_GIFT_CARD_SUCCEEDED,
@@ -445,7 +488,7 @@ const GiftTrees: FC = () => {
 
         try {
             const apiClient = new ApiClient();
-            const response = await apiClient.updateGiftCard(selectedPaymentGR, selectedPaymentGR.no_of_cards, selectedPaymentGR.user_id, selectedPaymentGR.category, selectedPaymentGR.grove, selectedPaymentGR.group_id, paymentId);
+            const response = await apiClient.updateGiftCard(selectedPaymentGR, selectedPaymentGR.no_of_cards, selectedPaymentGR.user_id, selectedPaymentGR.category, selectedPaymentGR.grove, selectedPaymentGR.gifted_on, selectedPaymentGR.group_id, paymentId);
         } catch (error: any) {
             toast.error(error.message)
         }
@@ -471,7 +514,7 @@ const GiftTrees: FC = () => {
             const data = { ...selectedGiftCard };
             data.tags = tags;
             const apiClient = new ApiClient();
-            const response = await apiClient.updateGiftCard(data, selectedGiftCard.no_of_cards, selectedGiftCard.user_id, selectedGiftCard.category, selectedGiftCard.grove, selectedGiftCard.group_id);
+            const response = await apiClient.updateGiftCard(data, selectedGiftCard.no_of_cards, selectedGiftCard.user_id, selectedGiftCard.category, selectedGiftCard.grove, selectedGiftCard.gifted_on, selectedGiftCard.group_id);
             dispatch({
                 type: giftCardActionTypes.UPDATE_GIFT_CARD_SUCCEEDED,
                 payload: response,
@@ -486,7 +529,7 @@ const GiftTrees: FC = () => {
 
     const getStatus = (card: GiftCard) => {
         if (card.status === 'pending_plot_selection') {
-            return 'Pending Plot Selection';
+            return pendingPlotSelection;
         } else if (card.status === 'pending_assignment') {
             return 'Pending assignment';
         } else if (card.status === 'pending_gift_cards') {
@@ -504,6 +547,33 @@ const GiftTrees: FC = () => {
         return errors;
     }
 
+    const handleSortingChange = (sorter: any) => {
+        let newOrder = [...orderBy];
+        const updateOrder = () => {
+            const index = newOrder.findIndex((item) => item.column === sorter.field);
+            if (index > -1) {
+                if (sorter.order) newOrder[index].order = sorter.order;
+                else newOrder = newOrder.filter((item) => item.column !== sorter.field);
+            } else if (sorter.order) {
+                newOrder.push({ column: sorter.field, order: sorter.order });
+            }
+        }
+
+        if (sorter.field) {
+            setPage(0);
+            updateOrder();
+            setOrderBy(newOrder);
+        }
+    }
+
+    const getSortableHeader = (header: string, key: string) => {
+        return (
+            <div style={{ display: "flex", alignItems: "center", justifyContent: 'space-between' }}>
+                {header} {getSortIcon(key, orderBy.find((item) => item.column === key)?.order, handleSortingChange)}
+            </div>
+        )
+    }
+
     const getActionsMenu = (record: GiftCard) => (
         <Menu>
             <Menu.ItemGroup>
@@ -513,11 +583,14 @@ const GiftTrees: FC = () => {
                 <Menu.Item key="01" onClick={() => { handleModalOpenEdit(record); }} icon={<Edit />}>
                     Edit Request
                 </Menu.Item>
-                <Menu.Item key="02" onClick={() => { handleCloneGiftCardRequest(record); }} icon={<FileCopy />}>
+                <Menu.Item key="02" onClick={() => { handleTagModalOpen(record); }} icon={<LocalOffer />}>
+                    Tag Request
+                </Menu.Item>
+                <Menu.Item key="03" onClick={() => { handleCloneGiftCardRequest(record); }} icon={<FileCopy />}>
                     Clone Request
                 </Menu.Item>
                 {((record.status === 'pending_plot_selection' || record.status === 'pending_assignment')) &&
-                    <Menu.Item key="03" danger onClick={() => { setDeleteModal(true); setSelectedGiftCard(record); }} icon={<Delete />}>
+                    <Menu.Item key="04" danger onClick={() => { setDeleteModal(true); setSelectedGiftCard(record); }} icon={<Delete />}>
                         Delete Request
                     </Menu.Item>
                 }
@@ -560,16 +633,13 @@ const GiftTrees: FC = () => {
             {!auth.roles.includes(UserRoles.User) && <Menu.Divider style={{ backgroundColor: '#ccc' }} />}
             {!auth.roles.includes(UserRoles.User) && <Menu.ItemGroup>
                 <Menu.Item key="40" onClick={() => { setSelectedGiftCard(record); setPlotModal(true); }} icon={<Landscape />}>
-                    Book Trees
+                    Reserve Trees
                 </Menu.Item>
                 <Menu.Item key="41" onClick={() => { setSelectedGiftCard(record); setAutoAssignModal(true); }} icon={<AssignmentInd />}>
                     Assign Trees
                 </Menu.Item>
                 <Menu.Item key="42" onClick={() => { handlePaymentModalOpen(record); }} icon={<AssuredWorkload />}>
                     Payment Details
-                </Menu.Item>
-                <Menu.Item key="43" onClick={() => { handleTagModalOpen(record); }} icon={<LocalOffer />}>
-                    Tag Request
                 </Menu.Item>
             </Menu.ItemGroup>}
         </Menu>
@@ -603,10 +673,9 @@ const GiftTrees: FC = () => {
         {
             dataIndex: "no_of_cards",
             key: "no_of_cards",
-            title: "# Cards",
+            title: getSortableHeader("# Cards", 'no_of_cards'),
             align: "center",
             width: 100,
-            ...getColumnSearchProps('no_of_cards', filters, handleSetFilters)
         },
         {
             dataIndex: "created_by_name",
@@ -632,6 +701,7 @@ const GiftTrees: FC = () => {
             align: "center",
             width: 150,
             render: (value, record, index) => getStatus(record),
+            ...getColumnSelectedItemFilter({ dataIndex: 'status', filters, handleSetFilters, options: [pendingPlotSelection, 'Pending assignment', 'Completed'] })
         },
         {
             dataIndex: "validation_errors",
@@ -646,14 +716,14 @@ const GiftTrees: FC = () => {
                     </IconButton>
                 </Tooltip>
             ) : '',
+            ...getColumnSelectedItemFilter({ dataIndex: 'validation_errors', filters, handleSetFilters, options: ['Yes', 'No'] }),
         },
         {
-            dataIndex: "amount",
-            key: "amount",
-            title: "Total Amount",
+            dataIndex: "total_amount",
+            key: "total_amount",
+            title: getSortableHeader("Total Amount", 'total_amount'),
             align: "center",
             width: 150,
-            render: (value, record, index) => record.no_of_cards * (record.category === "Foundation" ? 3000 : 1500)
         },
         {
             dataIndex: "payment_status",
@@ -675,6 +745,7 @@ const GiftTrees: FC = () => {
                     </Badge>
                 </IconButton>
             ),
+            ...getColumnSelectedItemFilter({ dataIndex: 'notes', filters, handleSetFilters, options: ['Yes', 'No'] })
         },
         {
             dataIndex: "created_at",
@@ -683,6 +754,7 @@ const GiftTrees: FC = () => {
             align: "center",
             width: 200,
             render: getHumanReadableDate,
+            ...getColumnDateFilter({ dataIndex: 'created_at', filters, handleSetFilters, label: 'Created' })
         },
         {
             dataIndex: "action",
@@ -742,15 +814,17 @@ const GiftTrees: FC = () => {
             <Divider sx={{ backgroundColor: "black", marginBottom: '15px' }} />
 
             {auth.signedin && <Box sx={{ height: 840, width: "100%" }}>
-                <TableComponent
+                <GeneralTable
                     loading={giftCardsData.loading}
-                    dataSource={giftCards}
+                    rows={tableRows}
                     columns={columns}
                     totalRecords={giftCardsData.totalGiftCards}
-                    fetchAllData={getAllGiftCardsData}
-                    setPage={setPage}
-                    setPageSize={setPageSize}
-                    tableName="Tree Trees"
+                    page={page}
+                    pageSize={pageSize}
+                    onPaginationChange={(page: number, pageSize: number) => { setPage(page - 1); setPageSize(pageSize); }}
+                    onDownload={getAllGiftCardsData}
+                    footer
+                    tableName="Tree Cards"
                 />
             </Box>}
 
@@ -783,7 +857,7 @@ const GiftTrees: FC = () => {
             <GiftCardsForm giftCardRequest={selectedGiftCard ?? undefined} requestId={requestId} open={modalOpen} handleClose={handleModalClose} onSubmit={handleSubmit} />
 
             <Dialog open={plotModal} onClose={() => setPlotModal(false)} fullWidth maxWidth="xl">
-                <DialogTitle>Book Trees</DialogTitle>
+                <DialogTitle>Reserve Trees</DialogTitle>
                 <DialogContent dividers>
                     {selectedGiftCard && <PlotSelection
                         giftCardRequestId={selectedGiftCard.id}
@@ -810,7 +884,7 @@ const GiftTrees: FC = () => {
             <Dialog open={deleteModal} onClose={() => setDeleteModal(false)} fullWidth maxWidth='md'>
                 <DialogTitle>Delete tree cards request</DialogTitle>
                 <DialogContent dividers>
-                    <Typography variant="subtitle1">Are you sure you want to delete this gift card request? It will delete related plot selection on booked trees.</Typography>
+                    <Typography variant="subtitle1">Are you sure you want to delete this tree card request? This will unreserve the trees booked under your name.</Typography>
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={() => setDeleteModal(false)} color="primary">
@@ -838,7 +912,7 @@ const GiftTrees: FC = () => {
                 </DialogActions>
             </Dialog>
 
-            {selectedGiftCard && <AssignTrees 
+            {selectedGiftCard && <AssignTrees
                 open={autoAssignModal}
                 onClose={() => { setAutoAssignModal(false) }}
                 giftCardRequestId={selectedGiftCard.id}
@@ -889,6 +963,8 @@ const GiftTrees: FC = () => {
                 onClose={handleTagModalClose}
                 onSubmit={handleTagTreeCardRequestSubmit}
             />
+
+            <GiftCardCreationModal open={giftCardNotification} onClose={() => { setGiftCardNotification(false) }} />
         </div>
     );
 };

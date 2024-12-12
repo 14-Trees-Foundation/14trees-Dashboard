@@ -34,6 +34,7 @@ export type GiftCard = {
     tags: string[] | null;
     booked: number,
     assigned: number,
+    gifted_on: string;
 }
 
 export type GiftRequestUser = {
@@ -82,6 +83,7 @@ export type GiftCardsDataState = {
     loading: boolean,
     totalGiftCards: number,
     giftCards: Record<string, GiftCard>
+    paginationMapping: Record<number, number> 
 }
 
 export type GiftCardUsersDataState = {

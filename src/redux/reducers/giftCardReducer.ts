@@ -5,42 +5,55 @@ import giftCardActionTypes from "../actionTypes/giftCardActionTypes";
 import { PaginatedResponse } from "../../types/pagination";
 
 
-export const giftCardsDataReducer = (state = { totalGiftCards: 0, giftCards: {}, loading: false }, action: UnknownAction): GiftCardsDataState => {
+export const giftCardsDataReducer = (state = { totalGiftCards: 0, giftCards: {}, loading: false, paginationMapping: {} }, action: UnknownAction): GiftCardsDataState => {
     switch (action.type) {
         case giftCardActionTypes.GET_GIFT_CARDS_SUCCEEDED:
             if (action.payload) {
-                let giftCardsDataState: GiftCardsDataState = { totalGiftCards: state.totalGiftCards, giftCards: { ...state.giftCards }, loading: state.loading };
-                let payload = action.payload as PaginatedResponse<GiftCard>;
-                if (giftCardsDataState.totalGiftCards !== payload.total) {
-                    giftCardsDataState.giftCards = {}
-                }
-                giftCardsDataState.totalGiftCards = payload.total;
-                giftCardsDataState.loading = false;
-                let giftCards = payload.results;
 
+                let giftCardsDataState: GiftCardsDataState = { 
+                    loading: state.loading,
+                    totalGiftCards: state.totalGiftCards, 
+                    giftCards: { ...state.giftCards }, 
+                    paginationMapping: { ...state.paginationMapping }
+                };
+                let payload = action.payload as PaginatedResponse<GiftCard>;
+                const offset = payload.offset;
+
+                if (payload.offset === 0){ 
+                    giftCardsDataState.giftCards = {}
+                    giftCardsDataState.paginationMapping = {}
+                }
+
+                let giftCards = payload.results;
                 for (let i = 0; i < giftCards.length; i++) {
                     if (giftCards[i]?.id) {
                         giftCards[i].key = giftCards[i].id
                         giftCardsDataState.giftCards[giftCards[i].id] = giftCards[i]
+                        giftCardsDataState.paginationMapping[offset + i] = giftCards[i].id
                     }
                 }
 
-                const nextState: GiftCardsDataState = giftCardsDataState;
-                return nextState;
+                return { ...giftCardsDataState, loading: false, totalGiftCards: payload.total };
             }
             return state;
 
         case giftCardActionTypes.GET_GIFT_CARDS_REQUESTED:
-            return { totalGiftCards: state.totalGiftCards, giftCards: { ...state.giftCards }, loading: true };
+            return { totalGiftCards: state.totalGiftCards, giftCards: { ...state.giftCards }, paginationMapping: { ...state.paginationMapping }, loading: true };
 
         case giftCardActionTypes.GET_GIFT_CARDS_FAILED:
-            return { totalGiftCards: state.totalGiftCards, giftCards: { ...state.giftCards }, loading: false };
+            return { totalGiftCards: state.totalGiftCards, giftCards: { ...state.giftCards }, paginationMapping: { ...state.paginationMapping }, loading: false };
 
         case giftCardActionTypes.CREATE_GIFT_CARD_SUCCEEDED:
             if (action.payload) {
-                const nextState = { totalGiftCards: state.totalGiftCards, giftCards: { ...state.giftCards } } as GiftCardsDataState;
-                let payload = action.payload as GiftCard
+                let nextState: GiftCardsDataState = { 
+                    loading: state.loading,
+                    totalGiftCards: state.totalGiftCards, 
+                    giftCards: { ...state.giftCards }, 
+                    paginationMapping: { ...state.paginationMapping }
+                };
 
+                let payload = action.payload as GiftCard
+                payload.key = payload.id
                 nextState.giftCards[payload.id] = payload;
                 nextState.totalGiftCards += 1;
                 return nextState;
@@ -48,16 +61,28 @@ export const giftCardsDataReducer = (state = { totalGiftCards: 0, giftCards: {},
             return state;
         case giftCardActionTypes.UPDATE_GIFT_CARD_SUCCEEDED:
             if (action.payload) {
-                const nextState = { totalGiftCards: state.totalGiftCards, giftCards: { ...state.giftCards } } as GiftCardsDataState;
-                let payload = action.payload as GiftCard
+                let nextState: GiftCardsDataState = { 
+                    loading: state.loading,
+                    totalGiftCards: state.totalGiftCards, 
+                    giftCards: { ...state.giftCards }, 
+                    paginationMapping: { ...state.paginationMapping }
+                };
 
+                let payload = action.payload as GiftCard
+                payload.key = payload.id
                 nextState.giftCards[payload.id] = payload;
                 return nextState;
             }
             return state;
         case giftCardActionTypes.DELETE_GIFT_CARD_SUCCEEDED:
             if (action.payload) {
-                const nextState = { totalGiftCards: state.totalGiftCards, giftCards: { ...state.giftCards } } as GiftCardsDataState;
+                let nextState: GiftCardsDataState = { 
+                    loading: state.loading,
+                    totalGiftCards: state.totalGiftCards, 
+                    giftCards: { ...state.giftCards }, 
+                    paginationMapping: { ...state.paginationMapping }
+                };
+
                 Reflect.deleteProperty(nextState.giftCards, action.payload as number)
                 nextState.totalGiftCards -= 1;
                 return nextState;
