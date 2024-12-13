@@ -110,7 +110,7 @@ function GeneralTable({ loading, rows, columns, totalRecords, page, pageSize = 1
         const data = dataSource.map((item) => {
             const row: any = {}
             columns?.forEach((column: any) => {
-                const title = typeof column.title === 'string' ? column.title : column.dataIndex;
+                const title = typeof column.title === 'string' ? column.title : column.key;
                 if (column.dataIndex === 'srNo' || column.dataIndex === 'action') return;
                 if (column.render) {
                     const value = column.render(item[column.dataIndex], item, 0);
@@ -146,7 +146,7 @@ function GeneralTable({ loading, rows, columns, totalRecords, page, pageSize = 1
     }
 
     const items: MenuProps['items'] = columns?.map((column: any) => {
-        const title = typeof column.title === 'string' ? column.title : column.dataIndex;
+        const title = typeof column.title === 'string' ? column.title : column.key;
         return {
             key: column.dataIndex,
             label: <Checkbox checked={checkedList.includes(column.key)} onChange={() => handleColumnsSelection(column.key)}>{title}</Checkbox>

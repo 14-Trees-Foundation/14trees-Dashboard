@@ -43,10 +43,13 @@ const TableSummary = (plots: Plot[], selectedPlotIds: number[], totalColumns: nu
   return (
     <Table.Summary fixed='bottom'>
       <Table.Summary.Row style={{ backgroundColor: 'rgba(172, 252, 172, 0.2)' }}>
-        <Table.Summary.Cell align="right" index={totalColumns - 5} colSpan={totalColumns - 4}>
+        <Table.Summary.Cell align="right" index={totalColumns - 8} colSpan={totalColumns - 7}>
           <strong>Total</strong>
         </Table.Summary.Cell>
-        <Table.Summary.Cell align="right" index={totalColumns - 4} colSpan={1}>{calculateSum(plots.filter((plot) => selectedPlotIds.includes(plot.id)).map((plot) => plot.total))}</Table.Summary.Cell>
+        <Table.Summary.Cell align="right" index={totalColumns - 7} colSpan={1}>{calculateSum(plots.filter((plot) => selectedPlotIds.includes(plot.id)).map((plot) => plot.total))}</Table.Summary.Cell>
+        <Table.Summary.Cell align="right" index={totalColumns - 6} colSpan={1}>{calculateSum(plots.filter((plot) => selectedPlotIds.includes(plot.id)).map((plot) => plot.tree_count))}</Table.Summary.Cell>
+        <Table.Summary.Cell align="right" index={totalColumns - 5} colSpan={1}>{calculateSum(plots.filter((plot) => selectedPlotIds.includes(plot.id)).map((plot) => plot.shrub_count))}</Table.Summary.Cell>
+        <Table.Summary.Cell align="right" index={totalColumns - 4} colSpan={1}>{calculateSum(plots.filter((plot) => selectedPlotIds.includes(plot.id)).map((plot) => plot.herb_count))}</Table.Summary.Cell>
         <Table.Summary.Cell align="right" index={totalColumns - 3} colSpan={1}>{calculateSum(plots.filter((plot) => selectedPlotIds.includes(plot.id)).map((plot) => plot.booked))}</Table.Summary.Cell>
         <Table.Summary.Cell align="right" index={totalColumns - 2} colSpan={1}>{calculateSum(plots.filter((plot) => selectedPlotIds.includes(plot.id)).map((plot) => plot.assigned))}</Table.Summary.Cell>
         <Table.Summary.Cell align="right" index={totalColumns - 1} colSpan={1}>{calculateSum(plots.filter((plot) => selectedPlotIds.includes(plot.id)).map((plot) => plot.unbooked_assigned))}</Table.Summary.Cell>
@@ -299,15 +302,36 @@ export const PlotComponent = () => {
     },
     {
       dataIndex: "total",
-      key: "total",
+      key: "Total Trees",
       title: getSortableHeader("Total Trees", 'total'),
       align: "right",
       width: 150,
       render: (value, record) => value ?? 0 - (includeDeadLostTrees && record.void_total ? record.void_total : 0),
     },
     {
+      dataIndex: "tree_count",
+      key: "Trees",
+      title: getSortableHeader("Trees", 'tree_count'),
+      align: "right",
+      width: 150,
+    },
+    {
+      dataIndex: "shrub_count",
+      key: "Shrubs",
+      title: getSortableHeader("Shrubs", 'shrub_count'),
+      align: "right",
+      width: 150,
+    },
+    {
+      dataIndex: "herb_count",
+      key: "Herbs",
+      title: getSortableHeader("Herbs", 'herb_count'),
+      align: "right",
+      width: 150,
+    },
+    {
       dataIndex: "booked",
-      key: "booked",
+      key: "Booked Trees",
       title: getSortableHeader("Booked Trees", 'booked'),
       align: "right",
       width: 150,
@@ -315,7 +339,7 @@ export const PlotComponent = () => {
     },
     {
       dataIndex: "assigned",
-      key: "assigned",
+      key: "Assigned Trees",
       title: getSortableHeader("Assigned Trees", 'assigned'),
       align: "right",
       width: 150,
@@ -323,14 +347,14 @@ export const PlotComponent = () => {
     },
     {
       dataIndex: "unbooked_assigned",
-      key: "unbooked_assigned",
+      key: "Unfunded Inventory (Assigned)",
       title: getSortableHeader("Unfunded Inventory (Assigned)", 'unbooked_assigned'),
       align: "right",
       width: 150,
     },
     {
       dataIndex: "available",
-      key: "available",
+      key: "Unfunded Inventory (Unassigned)",
       title: getSortableHeader("Unfunded Inventory (Unassigned)", 'available'),
       align: "right",
       width: 150,
