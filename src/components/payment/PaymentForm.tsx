@@ -370,12 +370,17 @@ const PaymentForm: FC<PaymentFormProps> = ({ payment, amount, onPaymentChange, o
                             name="pan_number"
                             value={panNumber}
                             disabled={consent}
+                            sx={{
+                                "& .Mui-disabled": {
+                                    backgroundColor: "#f0f0f0",
+                                },
+                            }}
                             onChange={(e) => { setPanNumber(e.target.value.toUpperCase().trim()) }}
                             fullWidth
                         />
                     </Box>
                     <Box sx={{ mt: 2 }} hidden={donorType !== 'Indian Citizen' || panNumber !== ''}>
-                        <FormControlLabel control={<Checkbox checked={consent} onChange={(e, checked) => { setConsent(checked); }} />} label="I'm not provided PAN number and I understand that I will not qualify for 80G benefit" />
+                        <FormControlLabel control={<Checkbox checked={consent} onChange={(e, checked) => { setConsent(checked); }} />} label="I have not provided PAN number and I understand that I will not qualify for 80G benefit" />
                     </Box>
                     {!((payment && payment.payment_history && payment.payment_history.length > 0) || (rpPayments.length > 0)) &&
                         <Box mt={3}>

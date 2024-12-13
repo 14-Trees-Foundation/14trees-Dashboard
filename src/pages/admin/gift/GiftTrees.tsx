@@ -598,7 +598,7 @@ const GiftTrees: FC = () => {
             <Menu.Divider style={{ backgroundColor: '#ccc' }} />
             <Menu.ItemGroup>
                 <Menu.Item key="10" onClick={() => { handleAlbumModalOpen(record); }} icon={<Collections />}>
-                    Add Pictures
+                    Update memories
                 </Menu.Item>
                 {(record.validation_errors === null || !record.validation_errors.includes('MISSING_USER_DETAILS')) &&
                     <Menu.Item key="11" onClick={() => { setSelectedGiftCard(record); setUserDetailsEditModal(true); }} icon={<ManageAccounts />}>

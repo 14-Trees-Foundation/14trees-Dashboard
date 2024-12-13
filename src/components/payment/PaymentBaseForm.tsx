@@ -51,7 +51,7 @@ const PaymentBaseForm: React.FC<PaymentBaseFormProps> = ({ amount, donorType, pa
                 />
             </Box>
             <Box sx={{ mt: 2 }} hidden={donorType !== 'Indian Citizen' || panNumber !== ''}>
-                <FormControlLabel control={<Checkbox checked={consent} onChange={(e, checked) => { onConsentChange(checked); }} />} label="I'm not provided PAN number and I understand that I will not qualify for 80G benefit" />
+                <FormControlLabel control={<Checkbox checked={consent} onChange={(e, checked) => { onConsentChange(checked); }} />} label="I have not provided PAN number and I understand that I will not qualify for 80G benefit" />
             </Box>
         </Box>
     )
