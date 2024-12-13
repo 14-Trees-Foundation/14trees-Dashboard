@@ -464,6 +464,8 @@ export const TreeNew = () => {
                     setPageSize={setPageSize}
                     handleSelectionChanges={handleSelectionChanges}
                     setSrNoPage={setSrNoPage}
+                    rowClassName={(record, index) => { return record.habit === 'Tree' ? 'bg-green' : record.habit === 'Shrub' ? 'bg-cyan' : record.habit === 'Herb' ? 'bg-yellow' : 'bg-red' }}
+                    tableRowColoringLabels={[{ className: 'bg-green', label: 'Tree'}, { className: 'bg-cyan', label: 'Shrub'}, { className: 'bg-yellow', label: 'Herb'}, { className: 'bg-red', label: 'Unknown'}]}
                     tableName="Trees"
                 />
             </Box>

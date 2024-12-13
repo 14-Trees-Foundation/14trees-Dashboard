@@ -14,6 +14,7 @@ import SingleUserForm from "./SingleUserForm";
 import { getUniqueRequestId } from "../../../../helpers/utils";
 import { LoadingButton } from "@mui/lab";
 import UserImagesForm from "./UserImagesForm";
+import ImageViewModal from "../../../../components/ImageViewModal";
 
 interface User {
   key: string;
@@ -135,6 +136,7 @@ export const BulkUserForm: FC<BulkUserFormProps> = ({ requestId, treeCount, user
   const [manualUserModal, setManualUserModal] = useState(false);
   const [webScrapModal, setWebScrapModal] = useState(false);
   const [webScraping, setWebScraping] = useState(false);
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
   const handleSetFilters = (filters: Record<string, GridFilterItem>) => {
     setPage(0);
@@ -437,7 +439,7 @@ export const BulkUserForm: FC<BulkUserFormProps> = ({ requestId, treeCount, user
       render: (value, record) => value === undefined
         ? 'Image Not Provided'
         : value
-          ? <img src={record.image_url} alt={record.image_name} style={{ width: 50, height: 50 }} />
+          ? <img src={record.image_url} alt={record.image_name} style={{ width: 50, height: 50 }} onClick={() => { setSelectedImage(record.image_url ?? null) }}/>
           : record.image_name + '\n(Not Found)',
       ...getColumnSelectedItemFilter({ dataIndex: 'image', filters, handleSetFilters, options: ['Image Not Provided', 'Image Not Found'] })
     },
@@ -620,6 +622,12 @@ export const BulkUserForm: FC<BulkUserFormProps> = ({ requestId, treeCount, user
           </Button>
         </DialogActions>
       </Dialog>
+
+      <ImageViewModal 
+        open={selectedImage !== null}
+        onClose={() =>{ setSelectedImage(null) }}
+        imageUrl={selectedImage || ''}
+      />
     </div>
   );
 };
