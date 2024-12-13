@@ -28,7 +28,7 @@ import { RootState } from "../../../../redux/store/store";
 import EditTree from "./EditTree";
 import UserModal from "../../../../components/UserModal";
 import AssignTreeModal from "./AssignTreeModal";
-import getColumnSearchProps from "../../../../components/Filter";
+import getColumnSearchProps, { getColumnSelectedItemFilter } from "../../../../components/Filter";
 import { TableColumnsType } from "antd";
 import { Plot } from "../../../../types/plot";
 import TableComponent from "../../../../components/Table";
@@ -170,6 +170,14 @@ export const TreeNew = () => {
             width: 250,
             align: 'center',
             ...getColumnSearchProps('plant_type', filters, handleSetFilters)
+        },
+        {
+            dataIndex: "habit",
+            key: "habit",
+            title: "habitat",
+            width: 250,
+            align: 'center',
+            ...getColumnSelectedItemFilter({ dataIndex: 'habit', filters, handleSetFilters, options: ['Tree', 'Herb', 'Shrub', 'Climber']})
         },
         {
             dataIndex: "plot",
