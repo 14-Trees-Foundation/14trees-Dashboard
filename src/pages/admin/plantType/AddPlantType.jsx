@@ -8,7 +8,7 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import { plantTypeHabitList } from "./habitList";
+import { plantTypeCategories, plantTypeHabitList } from "./habitList";
 import { makeStyles } from "@mui/styles";
 import { useDropzone } from "react-dropzone";
 import TagSelector from "../../../components/TagSelector";
@@ -155,20 +155,53 @@ const AddTreeType = ({ open, handleClose, createPlantType }) => {
                 />
               </Grid>
               <Grid item xs={6}>
-                <TextField
-                  name="category"
-                  label="Category"
-                  value={formData.category}
-                  onChange={handleChange}
+                <Autocomplete
                   fullWidth
+                  name="category"
+                  disablePortal
+                  options={plantTypeCategories}
+                  value={
+                    formData.category
+                      ? plantTypeCategories.find(
+                        (item) => item === formData.category
+                      )
+                      : undefined
+                  }
+                  renderInput={(params) => (
+                    <TextField {...params} label="Category" />
+                  )}
+                  onChange={(event, value) => {
+                    if (value !== null)
+                      setFormData((prevState) => ({
+                        ...prevState,
+                        category: value,
+                      }));
+                  }}
                 />
               </Grid>
               <Grid item xs={6}>
-                <TagSelector
-                  value={formData.tags}
-                  handleChange={(tags) =>
-                    setFormData({ ...formData, tags: tags })
+                <Autocomplete
+                  fullWidth
+                  name="habit"
+                  disablePortal
+                  options={plantTypeHabitList}
+                  value={
+                    formData.habit
+                      ? plantTypeHabitList.find(
+                        (item) => item === formData.habit
+                      )
+                      : undefined
                   }
+                  renderInput={(params) => (
+                    <TextField {...params} label="Habit" />
+                  )}
+                  onChange={(event, value) => {
+                    if (value !== null)
+                      setFormData((prevState) => ({
+                        ...prevState,
+                        habit: value,
+                      }));
+                  }}
                 />
               </Grid>
               <Grid item xs={6}>
@@ -190,28 +223,11 @@ const AddTreeType = ({ open, handleClose, createPlantType }) => {
                 />
               </Grid>
               <Grid item xs={12}>
-                <Autocomplete
-                  fullWidth
-                  name="habit"
-                  disablePortal
-                  options={plantTypeHabitList}
-                  value={
-                    formData.habit
-                      ? plantTypeHabitList.find(
-                          (item) => item === formData.habit
-                        )
-                      : undefined
+                <TagSelector
+                  value={formData.tags}
+                  handleChange={(tags) =>
+                    setFormData({ ...formData, tags: tags })
                   }
-                  renderInput={(params) => (
-                    <TextField {...params} margin="dense" label="Habit" />
-                  )}
-                  onChange={(event, value) => {
-                    if (value !== null)
-                      setFormData((prevState) => ({
-                        ...prevState,
-                        habit: value,
-                      }));
-                  }}
                 />
               </Grid>
               <Grid item xs={12}>
