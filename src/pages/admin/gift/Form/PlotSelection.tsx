@@ -33,10 +33,13 @@ const TableSummary = (plots: Plot[], selectedPlotIds: number[], totalColumns: nu
                     <strong>Total</strong>
                 </Table.Summary.Cell>
                 <Table.Summary.Cell align="right" index={3} colSpan={1}>{calculateSum(plots.filter((plot) => selectedPlotIds.includes(plot.id)).map((plot) => plot.total))}</Table.Summary.Cell>
-                <Table.Summary.Cell align="right" index={4} colSpan={1}>{calculateSum(plots.filter((plot) => selectedPlotIds.includes(plot.id)).map((plot) => plot.available))}</Table.Summary.Cell>
-                <Table.Summary.Cell align="right" index={5} colSpan={1}>{calculateSum(plots.filter((plot) => selectedPlotIds.includes(plot.id)).map((plot) => plot.card_available))}</Table.Summary.Cell>
-                <Table.Summary.Cell align="right" index={6} colSpan={1}>{calculateUnion(plots.filter((plot) => selectedPlotIds.includes(plot.id)).map((plot) => plot.distinct_plants)).length}</Table.Summary.Cell>
-                <Table.Summary.Cell align="right" index={7} colSpan={totalColumns - 6}></Table.Summary.Cell>
+                <Table.Summary.Cell align="right" index={4} colSpan={1}>{calculateSum(plots.filter((plot) => selectedPlotIds.includes(plot.id)).map((plot) => plot.tree_count))}</Table.Summary.Cell>
+                <Table.Summary.Cell align="right" index={5} colSpan={1}>{calculateSum(plots.filter((plot) => selectedPlotIds.includes(plot.id)).map((plot) => plot.shrub_count))}</Table.Summary.Cell>
+                <Table.Summary.Cell align="right" index={6} colSpan={1}>{calculateSum(plots.filter((plot) => selectedPlotIds.includes(plot.id)).map((plot) => plot.herb_count))}</Table.Summary.Cell>
+                <Table.Summary.Cell align="right" index={7} colSpan={1}>{calculateSum(plots.filter((plot) => selectedPlotIds.includes(plot.id)).map((plot) => plot.available))}</Table.Summary.Cell>
+                <Table.Summary.Cell align="right" index={8} colSpan={1}>{calculateSum(plots.filter((plot) => selectedPlotIds.includes(plot.id)).map((plot) => plot.card_available))}</Table.Summary.Cell>
+                <Table.Summary.Cell align="right" index={9} colSpan={1}>{calculateUnion(plots.filter((plot) => selectedPlotIds.includes(plot.id)).map((plot) => plot.distinct_plants)).length}</Table.Summary.Cell>
+                <Table.Summary.Cell align="right" index={10} colSpan={totalColumns - 9}></Table.Summary.Cell>
             </Table.Summary.Row>
         </Table.Summary>
     )
@@ -212,21 +215,42 @@ const PlotSelection: FC<PlotSelectionProps> = ({ giftCardRequestId, requiredTree
         },
         {
             dataIndex: "total",
-            key: "total",
+            key: "Total Trees",
             title: getSortableHeader("Total Trees", 'total'),
             align: "right",
             width: 150,
         },
         {
+            dataIndex: "tree_count",
+            key: "Trees",
+            title: getSortableHeader("Trees", 'tree_count'),
+            align: "right",
+            width: 150,
+          },
+          {
+            dataIndex: "shrub_count",
+            key: "Shrubs",
+            title: getSortableHeader("Shrubs", 'shrub_count'),
+            align: "right",
+            width: 150,
+          },
+          {
+            dataIndex: "herb_count",
+            key: "Herbs",
+            title: getSortableHeader("Herbs", 'herb_count'),
+            align: "right",
+            width: 150,
+          },
+        {
             dataIndex: "available",
-            key: "available",
+            key: "Available (Unfunded Inventory)",
             title: getSortableHeader("Available (Unfunded Inventory)", 'available'),
             align: "right",
             width: 150,
         },
         {
             dataIndex: "card_available",
-            key: "card_available",
+            key: "Giftable Inventory",
             title: getSortableHeader("Giftable Inventory", 'card_available'),
             align: "right",
             width: 150,

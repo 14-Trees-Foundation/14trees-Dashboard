@@ -5,3 +5,9 @@ export const plantTypeHabitList = [
     "Shrub",
     "Climber",
 ]
+
+export const plantTypeCategories = [
+    "Native",
+    "Non Native",
+    "Cultivated",
+]
