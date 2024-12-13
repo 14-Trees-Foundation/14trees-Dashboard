@@ -27,6 +27,7 @@ export type Tree = {
     tree_status: string,
 
     plant_type?: string,
+    habit?: string,
     plot?: string,
     mapped_user_name?: string,
     mapped_group_name?: string,

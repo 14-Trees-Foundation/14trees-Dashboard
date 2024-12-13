@@ -43,6 +43,7 @@ const GiftTrees: FC = () => {
     const authRef = useRef<any>(null);
 
     const [changeMode, setChangeMode] = useState<'add' | 'edit'>('add');
+    const [step, setStep] = useState(0);
     const [modalOpen, setModalOpen] = useState(false);
     const [plotModal, setPlotModal] = useState(false);
     const [infoModal, setInfoModal] = useState(false);
@@ -190,10 +191,11 @@ const GiftTrees: FC = () => {
         setModalOpen(true);
     }
 
-    const handleModalOpenEdit = (record: GiftCard) => {
+    const handleModalOpenEdit = (record: GiftCard, step: number = 0) => {
         setChangeMode('edit');
         setSelectedGiftCard(record);
         setRequestId(record.request_id);
+        setStep(step);
 
         setModalOpen(true);
     }
@@ -577,6 +579,21 @@ const GiftTrees: FC = () => {
     const getActionsMenu = (record: GiftCard) => (
         <Menu>
             <Menu.ItemGroup>
+                <Menu.Item key="50" onClick={() => { handleModalOpenEdit(record, 2); }} icon={<Wysiwyg />}>
+                    Edit Dashboard Details
+                </Menu.Item>
+                <Menu.Item key="51" onClick={() => { handleModalOpenEdit(record, 4); }} icon={<CardGiftcard />}>
+                    Edit Card Messaging
+                </Menu.Item>
+                <Menu.Item key="52" onClick={() => { handleModalOpenEdit(record, 3); }} icon={<AssuredWorkload />}>
+                    View/Make Payments
+                </Menu.Item>
+                <Menu.Item key="53" onClick={() => { handleModalOpenEdit(record, 5); }} icon={<ManageAccounts />}>
+                    Add/Edit Recipient Details
+                </Menu.Item>
+            </Menu.ItemGroup>
+            <Menu.Divider style={{ backgroundColor: '#ccc' }} />
+            <Menu.ItemGroup>
                 <Menu.Item key="00" onClick={() => { setSelectedGiftCard(record); setInfoModal(true); }} icon={<Wysiwyg />}>
                     View Summary
                 </Menu.Item>
@@ -854,7 +871,7 @@ const GiftTrees: FC = () => {
                 </Box>
             }
 
-            <GiftCardsForm giftCardRequest={selectedGiftCard ?? undefined} requestId={requestId} open={modalOpen} handleClose={handleModalClose} onSubmit={handleSubmit} />
+            <GiftCardsForm step={step} giftCardRequest={selectedGiftCard ?? undefined} requestId={requestId} open={modalOpen} handleClose={handleModalClose} onSubmit={handleSubmit} />
 
             <Dialog open={plotModal} onClose={() => setPlotModal(false)} fullWidth maxWidth="xl">
                 <DialogTitle>Reserve Trees</DialogTitle>
