@@ -17,13 +17,14 @@ import SponsorDetailsForm from "./SponsorDetailsForm";
 
 interface GiftCardsFormProps {
     giftCardRequest?: GiftCard
+    step?: number
     requestId: string | null
     open: boolean
     handleClose: () => void
     onSubmit: (user: User, group: Group | null, treeCount: number, category: string, grove: string | null, users: any[], giftedOn: string, paymentId?: number, logo?: string, messages?: any, file?: File) => void
 }
 
-const GiftCardsForm: FC<GiftCardsFormProps> = ({ giftCardRequest, requestId, open, handleClose, onSubmit }) => {
+const GiftCardsForm: FC<GiftCardsFormProps> = ({ step, giftCardRequest, requestId, open, handleClose, onSubmit }) => {
 
     const [currentStep, setCurrentStep] = useState(0);
     const [user, setUser] = useState<User | null>(null);
@@ -46,6 +47,10 @@ const GiftCardsForm: FC<GiftCardsFormProps> = ({ giftCardRequest, requestId, ope
     const [amount, setAmount] = useState<number>(0);
     const [donorType, setDonorType] = useState<string>("Indian Citizen");
     const [panNumber, setPanNumber] = useState<string | null>(null);
+
+    useEffect(() => {
+        if (giftCardRequest && step) setCurrentStep(step);
+    }, [step, giftCardRequest])
 
     useEffect(() => {
         setAmount(treeCount * (category === "Foundation" ? 3000 : 1500));
