@@ -1,5 +1,5 @@
 import { Settings } from '@mui/icons-material';
-import { Box, Button, Divider, IconButton } from '@mui/material';
+import { Button, Divider, FormControlLabel, IconButton } from '@mui/material';
 import { Checkbox, Dropdown, MenuProps, Table, TableColumnsType } from 'antd';
 import { AnyObject } from 'antd/es/_util/type';
 import { TableRowSelection } from 'antd/es/table/interface';
@@ -7,6 +7,25 @@ import { Parser } from 'json2csv';
 import { ReactElement, useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 import { Resizable } from "react-resizable";
+import './GenTable.css'
+
+interface TableColoringLabels { className: string, label: string }
+
+const TableColoring = ( { labels }: { labels: TableColoringLabels[] }) => {
+
+    return (
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            {
+                labels.map(item => (
+                    <div style={{ display: 'flex', alignItems: 'center', marginRight: '10px' }}>
+                        <div style={{ height: '15px', width: '15px', borderRadius: '2px', marginRight: '5px' }} className={item.className}></div>
+                        <p>{item.label}</p>
+                    </div>
+                ))
+            }
+        </div>
+    )
+}
 
 interface TableComponentProps {
     loading?: boolean
@@ -22,6 +41,8 @@ interface TableComponentProps {
     isExpandable?: boolean
     expandableFunction?: (record: any) =>
         ReactElement
+    tableRowColoringLabels?: TableColoringLabels[]
+    rowClassName?: (record: any, index: number) => string
 }
 
 const ResizableTitle = (props: any) => {
@@ -59,13 +80,14 @@ const ResizableTitle = (props: any) => {
     );
 };
 
-function TableComponent({ loading, dataSource, columns, totalRecords, tableName, fetchAllData, setPageSize, setPage, handleSelectionChanges, setSrNoPage, isExpandable, expandableFunction }: TableComponentProps) {
+function TableComponent({ loading, dataSource, columns, totalRecords, tableName, tableRowColoringLabels, fetchAllData, setPageSize, setPage, handleSelectionChanges, setSrNoPage, isExpandable, expandableFunction, rowClassName }: TableComponentProps) {
 
     const [download, setDownload] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [checkedList, setCheckedList] = useState(columns?.map((item) => item.key) ?? []);
     const [open, setOpen] = useState(false);
     const [tableCols, setTableCols] = useState<any[]>([]);
+    const [showLabels, setShowLabels] = useState(false);
 
     let rowSelection: TableRowSelection<AnyObject> | undefined;
     if (handleSelectionChanges) {
@@ -207,32 +229,51 @@ function TableComponent({ loading, dataSource, columns, totalRecords, tableName,
             }}
             components={components}
             rowSelection={rowSelection}
+            rowClassName={ showLabels && tableRowColoringLabels && tableRowColoringLabels.length > 0 ? rowClassName : undefined}
             scroll={{ y: 550 }}
             footer={() => (
-                <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-                    <Dropdown
-                        menu={{ items }}
-                        placement="bottomLeft"
-                        open={open}
-                        onOpenChange={handleOpenChange}
-                        trigger={['click']}
-                    >
-                        <IconButton sx={{ marginLeft: 'auto' }}><Settings /></IconButton>
-                    </Dropdown>
-                    <Divider orientation="vertical" flexItem sx={{ backgroundColor: "black", marginRight: '10px', }} />
-                    <div style={{ marginRight: '10px', display: 'flex', alignItems: 'center' }}><strong>Export table data in a csv file:</strong></div>
-                    <Button
-                        color="success"
-                        variant='contained'
-                        disabled={download || Number(totalRecords) === 0}
-                        onClick={() => {
-                            if (dataSource?.length === totalRecords) handleDataSourceParse();
-                            else {
-                                fetchAllData();
-                                setDownload(true);
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                    {tableRowColoringLabels && tableRowColoringLabels.length > 0 && <div style={{ display: 'flex', alignSelf: 'flex-start' }}>
+                        <FormControlLabel
+                            control={
+                                <Checkbox
+                                    style={{ marginRight: 10 }}
+                                    checked={showLabels}
+                                    onChange={(e) => {
+                                        setShowLabels(e.target.checked);
+                                    }}
+                                />
                             }
-                        }}>Export</Button>
-                    <div></div>
+                            label="Color code"
+                        />
+                        <Divider orientation="vertical" flexItem sx={{ backgroundColor: "black", marginRight: '10px', }} />
+                        <TableColoring  labels={tableRowColoringLabels} />
+                    </div>}
+                    <div style={{ display: 'flex', alignSelf: 'flex-end', justifyContent: 'flex-end' }}>
+                        <Dropdown
+                            menu={{ items }}
+                            placement="bottomLeft"
+                            open={open}
+                            onOpenChange={handleOpenChange}
+                            trigger={['click']}
+                        >
+                            <IconButton sx={{ marginLeft: 'auto' }}><Settings /></IconButton>
+                        </Dropdown>
+                        <Divider orientation="vertical" flexItem sx={{ backgroundColor: "black", marginRight: '10px', }} />
+                        <div style={{ marginRight: '10px', display: 'flex', alignItems: 'center' }}><strong>Export table data in a csv file:</strong></div>
+                        <Button
+                            color="success"
+                            variant='contained'
+                            disabled={download || Number(totalRecords) === 0}
+                            onClick={() => {
+                                if (dataSource?.length === totalRecords) handleDataSourceParse();
+                                else {
+                                    fetchAllData();
+                                    setDownload(true);
+                                }
+                            }}>Export</Button>
+                        <div></div>
+                    </div>
                 </div>
             )}
         />
