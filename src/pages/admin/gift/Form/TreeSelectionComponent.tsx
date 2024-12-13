@@ -1,4 +1,4 @@
-import { Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, Typography } from "@mui/material"
+import { Box, Button, Chip, Dialog, DialogActions, DialogContent, DialogTitle, Typography } from "@mui/material"
 import getColumnSearchProps, { getColumnSelectedItemFilter } from "../../../../components/Filter"
 import { useEffect, useState } from "react"
 import { GridFilterItem } from "@mui/x-data-grid"
@@ -9,6 +9,7 @@ import GeneralTable from "../../../../components/GenTable"
 interface TreeSelectionComponentProps {
     max: number
     plotIds: number[]
+    plantTypes: string[]
     open: boolean
     onClose: () => void
     onSubmit: (trees: any[]) => void
@@ -16,7 +17,7 @@ interface TreeSelectionComponentProps {
     onSelectedTreesChange: (trees: any[]) => void
 }
 
-const TreeSelectionComponent: React.FC<TreeSelectionComponentProps> = ({ plotIds, max, open, onClose, onSubmit, selectedTrees, onSelectedTreesChange }) => {
+const TreeSelectionComponent: React.FC<TreeSelectionComponentProps> = ({ plotIds, max, open, plantTypes, onClose, onSubmit, selectedTrees, onSelectedTreesChange }) => {
 
     const [treesData, setTreesData] = useState<Record<number, any>>({})
     const [total, setTotal] = useState(0)
@@ -29,6 +30,7 @@ const TreeSelectionComponent: React.FC<TreeSelectionComponentProps> = ({ plotIds
     const [tableRows, setTableRows] = useState<any[]>([]);
     const [filters, setFilters] = useState<Record<string, GridFilterItem>>({});
     const [tags, setTags] = useState<string[]>([]);
+    const [selectedPlantTypes, setSelectedPlantTypes] = useState<string[]>([]);
 
     const handleSetFilters = (filters: Record<string, GridFilterItem>) => {
         setPage(0);
@@ -61,6 +63,27 @@ const TreeSelectionComponent: React.FC<TreeSelectionComponentProps> = ({ plotIds
         }
         setLoading(false);
     }
+
+    useEffect(() => {
+        const handler = setTimeout(() => {
+            let newFilters = { ...filters }
+            if (selectedPlantTypes.length === 0) {
+                Reflect.deleteProperty(newFilters, "plant_type");
+            } else {
+                newFilters["plant_type"] = {
+                    columnField: "plant_type",
+                    operatorValue: 'isAnyOf',
+                    value: selectedPlantTypes,
+                }
+            }
+    
+            handleSetFilters(newFilters);
+        }, 300);
+
+        return () => {
+            clearTimeout(handler);
+        }
+    }, [selectedPlantTypes]);
 
     useEffect(() => {
         setTreesData({});
@@ -129,6 +152,15 @@ const TreeSelectionComponent: React.FC<TreeSelectionComponentProps> = ({ plotIds
 
     const handleSubmit = () => {
         onSubmit(selectedTrees);
+    }
+
+    const handlePlantTypeSelect = (plantType: string) => {
+        const idx = selectedPlantTypes.findIndex(item => item === plantType);
+        if (idx === -1) {
+            setSelectedPlantTypes(prev => [...prev, plantType]);
+        } else {
+            setSelectedPlantTypes(prev => prev.filter(item => item !== plantType));
+        }
     }
 
     const columns: any[] = [
@@ -236,7 +268,27 @@ const TreeSelectionComponent: React.FC<TreeSelectionComponentProps> = ({ plotIds
             <DialogTitle>Tree Selection</DialogTitle>
             <DialogContent dividers>
                 <Box mt={2}>
-                    <Typography variant="h6" mb={1}>You can select trees from below list. Use filters to search for specific tree.</Typography>
+                    <Box sx={{ mb: 3 }}>
+                        <Typography mb={1}>You can select tree(s) from the table below. Select plant type(s) or use filters to search for specific tree(s).</Typography>
+                        <Box sx={{
+                            display: 'flex',
+                            flexWrap: 'wrap',
+                        }}>
+                            {plantTypes.map((plantType, index) => (
+                                <Chip
+                                    key={index}
+                                    label={plantType}
+                                    color="success"
+                                    variant={selectedPlantTypes.includes(plantType) ? 'filled' : "outlined"}
+                                    onClick={() => { handlePlantTypeSelect(plantType) }}
+                                    sx={{ margin: '2px' }}
+                                />
+                            ))}
+                        </Box>
+                        <Box sx={{ mt: 1, display: 'flex', alignItems: 'center' }}>
+                            <Button variant="outlined" color="success" onClick={() => { setSelectedPlantTypes([]); }} sx={{ ml: 1 }}>Reset</Button>
+                        </Box>
+                    </Box>
                     <GeneralTable
                         loading={loading}
                         rows={tableRows}
