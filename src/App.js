@@ -27,6 +27,7 @@ import VisitProfile from "./pages/Profiles/VisitProfile";
 import OrgProfile from "./pages/Profiles/OrgProfile";
 import RedeemCard from "./pages/admin/gift/RedeemCard";
 import { User } from "./pages/user/User";
+import RequestTreeCardsForm from "./pages/admin/gift/Form/TreeCardRequest/RequestTreeCardsForm";
 
 function App() {
   return (
@@ -74,6 +75,13 @@ function App() {
               // <RequireAuth>
                 <User />
               // </RequireAuth>
+            }
+          >
+          </Route>
+          <Route
+            path="/gift-trees"
+            element={
+                <RequestTreeCardsForm />
             }
           >
           </Route>
