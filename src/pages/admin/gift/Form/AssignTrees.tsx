@@ -42,7 +42,7 @@ const AssignTrees: React.FC<AssignTreesProps> = ({ giftCardRequestId, open, onCl
         setLoading(true);
         try {
             const apiClient = new ApiClient();
-            const bookedTreesResp = await apiClient.getBookedGiftTrees(giftRequestId);
+            const bookedTreesResp = await apiClient.getBookedGiftTrees(giftRequestId, 0, -1);
             setTrees(bookedTreesResp.results.map(item => ({ ...item, key: item.id })));
         } catch (error: any) {
             toast.error(error.message);
