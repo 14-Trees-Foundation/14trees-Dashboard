@@ -1,5 +1,4 @@
-import { HelpOutline } from "@mui/icons-material";
-import { Autocomplete, Button, Divider, Grid, TextField, Tooltip, Typography } from "@mui/material";
+import { Autocomplete, Divider, Grid, TextField, Typography } from "@mui/material";
 
 const EventTypes = [
     {

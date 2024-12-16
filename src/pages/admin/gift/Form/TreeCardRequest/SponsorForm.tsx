@@ -1,5 +1,5 @@
 import { Box, Button, TextField, Typography, Grid, FormControlLabel, Switch, Divider } from "@mui/material";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import ImagePicker from "../../../../../components/ImagePicker";
 
 interface SponsorFormProps { }
@@ -14,6 +14,11 @@ const SponsorForm: React.FC<SponsorFormProps> = () => {
     });
     const [logo, setLogo] = useState<File | null>(null);
 
+    useEffect(() => {
+        const value = sessionStorage.getItem('sponsor_details');
+        if (value) setFormData(JSON.parse(value));
+    }, [])
+
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value, type, checked } = e.target;
 
@@ -25,7 +30,7 @@ const SponsorForm: React.FC<SponsorFormProps> = () => {
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        console.log("Form Submitted:", formData);
+        sessionStorage.setItem("sponsor_details", JSON.stringify(formData));
     };
 
     return (

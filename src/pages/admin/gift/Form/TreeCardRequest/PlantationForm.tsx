@@ -1,7 +1,7 @@
 import { Box, Button, Divider, FormControl, InputAdornment, OutlinedInput, TextField, ToggleButton, ToggleButtonGroup, Typography } from "@mui/material";
 
 import imagePoster from '../../../../../assets/ARANYA_poster.jpg'
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { CardGiftcard } from "@mui/icons-material";
 
 const treesCountList = ["5", "10", "14", "50", "100", "Other"]
@@ -15,6 +15,14 @@ const PlantationForm: React.FC<PlantationFormProps> = ({ }) => {
     const [selectedCount, setSelectedCount] = useState<string | null>('14');
     const [customCount, setCustomCount] = useState('14');
 
+    useEffect(() => {
+        const value = sessionStorage.getItem('trees_count');
+        if (value) {
+            setCustomCount(value);
+            setSelectedCount(treesCountList.find(item => item === value) ?? 'Other');
+        }
+    }, [])
+
     const handleToggle = (_: React.MouseEvent<HTMLElement>, newCount: string | null) => {
         if (newCount !== null) {
             setSelectedCount(newCount);
@@ -26,6 +34,18 @@ const PlantationForm: React.FC<PlantationFormProps> = ({ }) => {
         const value = e.target.value;
         setCustomCount(value);
         setSelectedCount(treesCountList.find(item => item === value) ?? 'Other'); // Select "Other" if custom input is provided
+    };
+
+    const handleGiftTreesClick = () => {
+        const count = parseInt(customCount, 10);
+
+        if (isNaN(count) || count <= 0) {
+            alert("Please enter a valid number of trees to be planted.");
+            return;
+        }
+
+        // Save the validated count to sessionStorage
+        sessionStorage.setItem("trees_count", count.toString());
     };
 
     return (
@@ -66,7 +86,7 @@ const PlantationForm: React.FC<PlantationFormProps> = ({ }) => {
                             fullWidth
                             sx={{
                                 mb: 2,
-                              }}
+                            }}
                             size="small"
                         >
                             {treesCountList.map((item) => (
@@ -88,6 +108,7 @@ const PlantationForm: React.FC<PlantationFormProps> = ({ }) => {
                             variant="contained"
                             color="success"
                             startIcon={<CardGiftcard />}
+                            onClick={handleGiftTreesClick}
                             fullWidth
                         >
                             GIFT TREES
