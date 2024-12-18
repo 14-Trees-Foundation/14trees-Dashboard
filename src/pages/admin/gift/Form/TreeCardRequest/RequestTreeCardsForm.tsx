@@ -13,9 +13,8 @@ interface RequestTreeCardsFormProps {
 
 const RequestTreeCardsForm: React.FC<RequestTreeCardsFormProps> = ({ }) => {
 
-    const [messages, setMessages] = useState({ primaryMessage: "", secondaryMessage: "", eventName: "", eventType: undefined as string | undefined, plantedBy: "", logoMessage: "" });
-    const [presentationId, setPresentationId] = useState<string | null>(null)
-    const [slideId, setSlideId] = useState<string | null>(null)
+    const [giftedBy, setGiftedBy] = useState('');
+    const [eventType, setEventType] = useState('');
 
     return (
         <div>
@@ -36,16 +35,9 @@ const RequestTreeCardsForm: React.FC<RequestTreeCardsFormProps> = ({ }) => {
                 }}
             >
                 <PlantationForm />
-                <SponsorForm />
-                <DashboardDetailsForm />
-                <CardDetails 
-                    messages={messages}
-                    request_id="123xyzabc1"
-                    presentationId={presentationId}
-                    slideId={slideId}
-                    onChange={messages => { setMessages(messages) }}
-                    onPresentationId={(presentationId: string, slideId: string) => { setPresentationId(presentationId); setSlideId(slideId); }}
-                />
+                <SponsorForm giftedByChange={value => setGiftedBy(value)} />
+                <DashboardDetailsForm defaultGiftedByName={giftedBy} onEventTypeChange={eventType => { setEventType(eventType) }} />
+                <CardDetails eventType={eventType} />
                 <RecipientForm />
                 <PaymentForm />
             </div>

@@ -1,23 +1,55 @@
 import { Box, Button, TextField, Typography, Grid, FormControlLabel, Switch, Divider } from "@mui/material";
 import { useEffect, useState } from "react";
 import ImagePicker from "../../../../../components/ImagePicker";
+import { AutocompleteWithPagination } from "../../../../../components/AutoComplete";
+import { Group } from "../../../../../types/Group";
+import { useAppDispatch, useAppSelector } from "../../../../../redux/store/hooks";
+import { bindActionCreators } from "@reduxjs/toolkit";
+import * as groupActionCreators from '../../../../../redux/actions/groupActions';
 
-interface SponsorFormProps { }
+interface SponsorFormProps { 
+    giftedByChange: (giftedBy: string) => void
+}
 
-const SponsorForm: React.FC<SponsorFormProps> = () => {
+const SponsorForm: React.FC<SponsorFormProps> = ({ giftedByChange }) => {
+    const dispatch = useAppDispatch();
+    const { getGroups } = bindActionCreators(groupActionCreators, dispatch);
+
     const [formData, setFormData] = useState({
         name: "",
         email: "",
         isCorporate: false,
+        groupOption: "existing",
         corporateName: "",
         address: "",
     });
     const [logo, setLogo] = useState<File | null>(null);
+    const [groupSearchQuery, setGroupSearchQuery] = useState('');
+    const [selectedGroup, setSelectedGroup] = useState<Group | null>(null);
+
+    let groups: Group[] = [];
+    const groupsData = useAppSelector((state) => state.groupsData);
+    if (groupsData) {
+        groups = Object.values(groupsData.groups);
+    }
 
     useEffect(() => {
         const value = sessionStorage.getItem('sponsor_details');
         if (value) setFormData(JSON.parse(value));
+
+        const groupValue = sessionStorage.getItem('group');
+        if (groupValue) setSelectedGroup(JSON.parse(groupValue));
     }, [])
+
+    useEffect(() => {
+        const handler = setTimeout(() => {
+            if (groupSearchQuery.length >= 3) getGroups(0, 20, [{ columnField: 'name', value: groupSearchQuery, operatorValue: 'contains' }]);
+        }, 300)
+
+        return () =>{
+            clearTimeout(handler);
+        }
+    }, [groupSearchQuery])
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value, type, checked } = e.target;
@@ -31,6 +63,13 @@ const SponsorForm: React.FC<SponsorFormProps> = () => {
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         sessionStorage.setItem("sponsor_details", JSON.stringify(formData));
+        if (selectedGroup) sessionStorage.setItem("group", JSON.stringify(selectedGroup));
+
+        giftedByChange(formData.isCorporate
+                        ? formData.groupOption === 'existing'
+                            ? selectedGroup?.name ?? ''
+                            : formData.corporateName
+                        : formData.name)
     };
 
     return (
@@ -39,7 +78,7 @@ const SponsorForm: React.FC<SponsorFormProps> = () => {
             onSubmit={handleSubmit}
             sx={{
                 p: 3,
-                maxWidth: 600,
+                maxWidth: 800,
                 mx: "auto",
                 backgroundColor: "#fff",
             }}
@@ -106,40 +145,53 @@ const SponsorForm: React.FC<SponsorFormProps> = () => {
                         </Grid>
 
                         <Grid item xs={8} container spacing={2}>
-                            {/* Corporate Name */}
-                            <Grid item xs={12}>
-                                <TextField
-                                    label="Corporate Name"
-                                    variant="outlined"
-                                    fullWidth
-                                    name="corporateName"
-                                    value={formData.corporateName}
-                                    onChange={handleChange}
-                                    required
-                                />
-                            </Grid>
 
-                            {/* Address */}
-                            <Grid item xs={12}>
-                                <TextField
-                                    label="Address"
-                                    variant="outlined"
-                                    fullWidth
-                                    multiline
-                                    rows={2}
-                                    name="address"
-                                    value={formData.address}
-                                    onChange={handleChange}
+                            {formData.groupOption === 'existing' && <Grid item xs={12}>
+                                <AutocompleteWithPagination
                                     required
+                                    label="Enter corporate name to search"
+                                    value={selectedGroup}
+                                    options={groups}
+                                    getOptionLabel={group => group.name}
+                                    onChange={(event, value: Group) => setSelectedGroup(value)}
+                                    onInputChange={(event) => { setGroupSearchQuery(event.target.value) }}
+                                    fullWidth
+                                    size="medium"
                                 />
-                            </Grid>
+                                <Typography variant="body1">Couldn't find corporate in the system? <Typography color="primary" style={{ cursor: 'pointer' }} onClick={() => setFormData( prev => ({ ... prev, groupOption: "new"}))} variant="body1" component="span">Add corporate details</Typography>.</Typography>
+                            </Grid>}
 
-                            {/* Logo */}
+                            {formData.groupOption === 'new' && <>
+                                <Grid item xs={12}>
+                                    <Typography variant="body1">Sponsor already exists? <Typography onClick={() => setFormData( prev => ({ ... prev, groupOption: "existing"}))} style={{ cursor: 'pointer' }} color='primary' variant="body1" component="span">Select Sponsor</Typography>.</Typography>
+                                </Grid>
+                                <Grid item xs={12}>
+                                    <TextField
+                                        required
+                                        name="corporateName"
+                                        label="Name"
+                                        value={formData.corporateName}
+                                        onChange={handleChange}
+                                        fullWidth
+                                    />
+                                </Grid>
+                                <Grid item xs={12}>
+                                    <TextField
+                                        fullWidth
+                                        multiline
+                                        rows={4}
+                                        variant="outlined"
+                                        placeholder='Address...'
+                                        value={formData.address}
+                                        type='text'
+                                        onChange={handleChange}
+                                    />
+                                </Grid>
+                            </>}
                             <Grid item xs={12}>
-                                <Typography variant="body1" sx={{ pb: 2 }}>Please upload the corporate logo (this will be shown on the tree card)</Typography>
                                 <ImagePicker
-                                    image={logo}
-                                    onChange={logoFile => { setLogo(logoFile) }}
+                                    image={logo ? logo : selectedGroup?.logo_url ? selectedGroup.logo_url : null}
+                                    onChange={file => { setLogo(file); }}
                                 />
                             </Grid>
                         </Grid>

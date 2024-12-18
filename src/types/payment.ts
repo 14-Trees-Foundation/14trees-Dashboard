@@ -22,7 +22,7 @@ export type Payment = {
     pan_number: string | null;
     consent: boolean;
     payment_history?: PaymentHistory[];
-    order_id: string;
+    order_id: string | null;
     created_at: string;
     updated_at: string;
 }

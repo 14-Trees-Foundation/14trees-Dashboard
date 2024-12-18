@@ -1,5 +1,5 @@
 import { Box, Button, Checkbox, Divider, FormControlLabel, Grid, TextField, Typography } from "@mui/material";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 
 interface PaymentFormProps {
@@ -7,11 +7,32 @@ interface PaymentFormProps {
 }
 
 const PaymentForm: React.FC<PaymentFormProps> = ({ }) => {
-    const [panNumber, setPanNumber] = useState('');
-    const [consent, setConsent] = useState(false);
+    const [formData, setFormData] = useState({
+        panNumber: '',
+        consent: false,
+    })
+
+    useEffect(() => {
+        const value = sessionStorage.getItem("payment_details");
+        if (value) setFormData(JSON.parse(value));
+    }, [])
+
+    const handleSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+        sessionStorage.setItem("payment_details", JSON.stringify(formData));
+    };
 
     return (
-        <div>
+        <Box
+            component="form"
+            onSubmit={handleSubmit}
+            sx={{
+                p: 3,
+                maxWidth: 800,
+                mx: "auto",
+                backgroundColor: "#fff",
+            }}
+        >
             <Typography variant="h4">CHECKOUT</Typography>
             <Typography variant="h6">Something Here</Typography>
             <Divider sx={{ backgroundColor: 'black', mb: 2 }} />
@@ -21,20 +42,20 @@ const PaymentForm: React.FC<PaymentFormProps> = ({ }) => {
                     <Grid item xs={12}>
                         <TextField
                             label="PAN Number"
-                            name="pan_number"
-                            value={panNumber}
-                            disabled={consent}
+                            name="panNumber"
+                            value={formData.panNumber}
+                            disabled={formData.consent}
                             sx={{
                                 "& .Mui-disabled": {
                                     backgroundColor: "#f0f0f0",
                                 },
                             }}
-                            onChange={(e) => { setPanNumber(e.target.value.toUpperCase().trim()) }}
+                            onChange={(e) => { setFormData( prev => ({ ...prev, panNumber: e.target.value.toUpperCase().trim()}))}}
                             fullWidth
                         />
                     </Grid>
                     <Grid item xs={12}>
-                        <FormControlLabel control={<Checkbox checked={consent} onChange={(e, checked) => { setConsent(checked); }} />} label="I have not provided PAN number and I understand that I will not qualify for 80G benefit" />
+                        <FormControlLabel control={<Checkbox checked={formData.consent} onChange={(e, checked) => { setFormData( prev => ({ ...prev, consent: checked}) ) }} />} label="I have not provided PAN number and I understand that I will not qualify for 80G benefit" />
                     </Grid>
                     <Grid item xs={12}>
                         <Button
@@ -57,7 +78,7 @@ const PaymentForm: React.FC<PaymentFormProps> = ({ }) => {
                     </Grid>
                 </Grid>
             </Grid>
-        </div>
+        </Box>
     )
 };
 

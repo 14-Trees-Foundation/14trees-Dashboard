@@ -631,7 +631,7 @@ const GiftTrees: FC = () => {
                             Generate Gift Cards
                         </Menu.Item>
                     }
-                    {(record.status === 'completed' || record.status === 'pending_gift_cards') &&
+                    {Number(record.assigned) > 0 &&
                         <Menu.Item key="21" onClick={() => { setSelectedGiftCard(record); setEmailConfirmationModal(true); }} icon={<Email />}>
                             Send Emails
                         </Menu.Item>

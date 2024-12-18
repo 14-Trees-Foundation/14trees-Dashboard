@@ -10,26 +10,11 @@ const defaultMessages = {
     logo: 'Gifted by 14 Trees in partnership with'
 }
 
-interface Massages {
-    primaryMessage: string,
-    secondaryMessage: string,
-    eventName: string,
-    eventType: string | undefined,
-    plantedBy: string,
-    logoMessage: string,
-}
-
 interface CardDetailsProps {
-    logo_url?: string | null,
-    request_id: string,
-    presentationId: string | null,
-    slideId: string | null,
-    messages: Massages,
-    onChange: (messages: Massages) => void
-    onPresentationId: (presentationId: string, slideId: string) => void
+    eventType: string
 }
 
-const CardDetails: FC<CardDetailsProps> = ({ logo_url, request_id, presentationId, slideId, messages, onChange, onPresentationId }) => {
+const CardDetails: FC<CardDetailsProps> = ({ eventType }) => {
 
     const slideIdRef = useRef('');
     const presentationIdIdRef = useRef('');
@@ -37,6 +22,11 @@ const CardDetails: FC<CardDetailsProps> = ({ logo_url, request_id, presentationI
     const logoRef = useRef({ logoUrl: undefined as string | null | undefined })
     const [iframeSrc, setIframeSrc] = useState<string | null>(null);
     const [loading, setLoading] = useState(false);
+    const [formData, setFormData] = useState({
+        primaryMessage: defaultMessages.primary,
+        secondaryMessage: defaultMessages.secondary,
+        logoMessage: defaultMessages.logo,
+    })
 
     const updateSlide = async () => {
         if (!slideIdRef.current || !presentationIdIdRef.current) {
@@ -45,7 +35,7 @@ const CardDetails: FC<CardDetailsProps> = ({ logo_url, request_id, presentationI
 
         setLoading(true);
         const apiClient = new ApiClient();
-        await apiClient.updateGiftCardTemplate(slideIdRef.current, recordRef.current.primary, recordRef.current.secondary, recordRef.current.logo, logo_url);
+        await apiClient.updateGiftCardTemplate(slideIdRef.current, recordRef.current.primary, recordRef.current.secondary, recordRef.current.logo, logoRef.current.logoUrl);
         setIframeSrc(
             `https://docs.google.com/presentation/d/${presentationIdIdRef.current}/embed?rm=minimal&slide=id.${slideIdRef.current}&timestamp=${new Date().getTime()}`
         );
@@ -53,21 +43,28 @@ const CardDetails: FC<CardDetailsProps> = ({ logo_url, request_id, presentationI
     }
 
     useEffect(() => {
-        const generateGiftCard = async () => {
-            setLoading(true);
-            const apiClient = new ApiClient();
-            const resp = await apiClient.generateCardTemplate(request_id, defaultMessages.primary, defaultMessages.secondary, defaultMessages.logo, logo_url);
-            slideIdRef.current = resp.slide_id;
-            presentationIdIdRef.current = resp.presentation_id;
 
-            onPresentationId(resp.presentation_id, resp.slide_id);
-            setIframeSrc(
-                `https://docs.google.com/presentation/d/${resp.presentation_id}/embed?rm=minimal&slide=id.${resp.slide_id}&timestamp=${new Date().getTime()}`
-            )
-            setLoading(false);
-        }
+        const requestId = sessionStorage.getItem("request_id");
+        const logoUrl = sessionStorage.getItem("logo_url");
+        const presentationId = sessionStorage.getItem("presentation_id");
+        const slideId = sessionStorage.getItem("slide_id");
+        logoRef.current = { logoUrl }
 
-        const handler = setTimeout(() => {
+        if (requestId) {
+
+            const generateGiftCard = async () => {
+                setLoading(true);
+                const apiClient = new ApiClient();
+                const resp = await apiClient.generateCardTemplate(requestId, defaultMessages.primary, defaultMessages.secondary, defaultMessages.logo, logoUrl);
+                slideIdRef.current = resp.slide_id;
+                presentationIdIdRef.current = resp.presentation_id;
+
+                setIframeSrc(
+                    `https://docs.google.com/presentation/d/${resp.presentation_id}/embed?rm=minimal&slide=id.${resp.slide_id}&timestamp=${new Date().getTime()}`
+                )
+                setLoading(false);
+            }
+
             if (!presentationId || !slideId) generateGiftCard();
             else {
                 presentationIdIdRef.current = presentationId;
@@ -77,23 +74,16 @@ const CardDetails: FC<CardDetailsProps> = ({ logo_url, request_id, presentationI
                     `https://docs.google.com/presentation/d/${presentationId}/embed?rm=minimal&slide=id.${slideId}&timestamp=${new Date().getTime()}`
                 )
             }
-        }, 300);
+        }
 
-        return () => {
-            clearTimeout(handler);
-        };
-    }, [presentationId, slideId])
+    }, [])
 
     useEffect(() => {
-        logoRef.current.logoUrl = logo_url
-    }, [logo_url])
-
-    useEffect(() => {
-        const eventMessage = messages.eventType === "2" ? defaultMessages.memorial : messages.eventType === "1" ? defaultMessages.birthday : defaultMessages.primary;
-        if (messages.primaryMessage === "" || messages.secondaryMessage === "" || messages.logoMessage === ""
-            || ((messages.primaryMessage === defaultMessages.primary || messages.primaryMessage === defaultMessages.birthday || messages.primaryMessage === defaultMessages.memorial) && messages.primaryMessage !== eventMessage)) {
-            onChange({
-                ...messages,
+        const eventMessage = eventType === "2" ? defaultMessages.memorial : eventType === "1" ? defaultMessages.birthday : defaultMessages.primary;
+        if (formData.primaryMessage === "" || formData.secondaryMessage === "" || formData.logoMessage === ""
+            || ((formData.primaryMessage === defaultMessages.primary || formData.primaryMessage === defaultMessages.birthday || formData.primaryMessage === defaultMessages.memorial) && formData.primaryMessage !== eventMessage)) {
+            setFormData({
+                ...formData,
                 primaryMessage: eventMessage,
                 secondaryMessage: defaultMessages.secondary,
                 logoMessage: defaultMessages.logo,
@@ -105,20 +95,20 @@ const CardDetails: FC<CardDetailsProps> = ({ logo_url, request_id, presentationI
 
             updateSlide();
         } else {
-            recordRef.current.primary = messages.primaryMessage;
-            recordRef.current.secondary = messages.secondaryMessage;
-            recordRef.current.logo = messages.logoMessage;
+            recordRef.current.primary = formData.primaryMessage;
+            recordRef.current.secondary = formData.secondaryMessage;
+            recordRef.current.logo = formData.logoMessage;
         }
-    }, [messages])
+    }, [eventType, formData])
 
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { name: field, value } = e.target
 
-        onChange({
-            ...messages,
+        setFormData(prev => ({
+            ...prev,
             [field]: value,
-        })
+        }))
     }
 
     return (
@@ -127,35 +117,35 @@ const CardDetails: FC<CardDetailsProps> = ({ logo_url, request_id, presentationI
             <Divider sx={{ backgroundColor: 'black', mb: 2 }} />
             <div style={{ display: 'flex', width: '100%', justifyContent: 'space-between' }}>
                 <div style={{ display: 'flex', flexDirection: 'column', width: '42%' }}>
-                    <Typography variant='h6'>{messages.eventType === "1" ? "Birthday" : messages.eventType === "2" ? "Memorial" : "General"} Gift</Typography>
+                    <Typography variant='h6'>{eventType === "1" ? "Birthday" : eventType === "2" ? "Memorial" : "General"} Gift</Typography>
                     <Typography variant='body1' mt={1}>If you would like to tweak/add some personalised touch, change the messaging below: </Typography>
                     <Typography variant="body1" sx={{ mt: 2 }}><strong>Primary Message</strong></Typography>
                     <TextField
                         multiline
                         name="primaryMessage"
-                        value={messages.primaryMessage}
+                        value={formData.primaryMessage}
                         onChange={handleChange}
                         size="small"
                         inputProps={{ maxLength: 270 }}
                         FormHelperTextProps={{ style: { textAlign: 'right' } }}
-                        helperText={`${270 - messages.primaryMessage.length} characters remaining (max: 270)`}
+                        helperText={`${270 - formData.primaryMessage.length} characters remaining (max: 270)`}
                     />
                     <Typography variant="body1" sx={{ mt: 2 }}><strong>Secondary Message</strong></Typography>
                     <TextField
                         multiline
                         name="secondaryMessage"
-                        value={messages.secondaryMessage}
+                        value={formData.secondaryMessage}
                         onChange={handleChange}
                         size="small"
                         inputProps={{ maxLength: 125 }}
                         FormHelperTextProps={{ style: { textAlign: 'right' } }}
-                        helperText={`${125 - messages.secondaryMessage.length} characters remaining (max: 125)`}
+                        helperText={`${125 - formData.secondaryMessage.length} characters remaining (max: 125)`}
                     />
-                    {logo_url && <Box>
+                    {logoRef.current.logoUrl && <Box>
                         <Typography variant="body1" sx={{ mt: 2 }}>Logo Message</Typography>
                         <TextField
                             name="logoMessage"
-                            value={messages.logoMessage}
+                            value={formData.logoMessage}
                             onChange={handleChange}
                             fullWidth
                             size="small"
