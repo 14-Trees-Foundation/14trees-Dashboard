@@ -1360,7 +1360,7 @@ class ApiClient {
             if (payment_id && formData.has('payment_id')) formData.set('payment_id', payment_id.toString());
             else if (payment_id) formData.append('payment_id', payment_id.toString());
 
-            if (logo && formData.has('logo')) formData.set('logo_url', logo);
+            if (logo && formData.has('logo_url')) formData.set('logo_url', logo);
             else if (logo) formData.append('logo_url', logo);
 
             if (file && formData.has('csv_file')) formData.set('csv_file', file, file.name);
@@ -1373,8 +1373,8 @@ class ApiClient {
                 if (formData.has('secondary_message')) formData.set('secondary_message', messages.secondaryMessage);
                 else formData.append('secondary_message', messages.secondaryMessage);
 
-                if (messages.eventName && formData.has('event_type')) formData.set('event_type', messages.eventName);
-                else if (messages.eventName) formData.append('event_type', messages.eventName);
+                if (messages.eventName && formData.has('event_name')) formData.set('event_name', messages.eventName);
+                else if (messages.eventName) formData.append('event_name', messages.eventName);
 
                 if (messages.eventType && formData.has('event_type')) formData.set('event_type', messages.eventType);
                 else if (messages.eventType) formData.append('event_type', messages.eventType);
