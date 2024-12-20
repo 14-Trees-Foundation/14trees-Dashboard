@@ -22,6 +22,7 @@ const AddUser = ({ open, handleClose, createUser, searchUser }) => {
         name: '',
         phone: '',
         email: '',
+        communication_email: '',
         birth_date: '',
     });
 
@@ -68,6 +69,7 @@ const AddUser = ({ open, handleClose, createUser, searchUser }) => {
             name: '',
             phone: '',
             email: '',
+            communication_email: '',
             birth_date: '',
         });
         handleClose();
@@ -109,6 +111,15 @@ const AddUser = ({ open, handleClose, createUser, searchUser }) => {
                                         />
                                     )}>
                                 </Autocomplete>
+                            </Grid>
+                            <Grid item xs={12}>
+                                <TextField 
+                                    name="communication_email" 
+                                    label="Communication email" 
+                                    value={formData.communication_email} 
+                                    onChange={handleChange} 
+                                    fullWidth
+                                />
                             </Grid>
                             <Grid item xs={12}>
                                 <TextField name="birth_date" label="Date of Birth" type="date" value={formData.birth_date ? formData.birth_date.substring(0, 10): ''} onChange={handleChange} InputLabelProps={{ shrink: true }} fullWidth/>
