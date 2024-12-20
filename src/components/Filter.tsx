@@ -2,7 +2,7 @@ import { ArrowDropDown, ArrowDropUp } from '@mui/icons-material';
 import FilterAltRoundedIcon from '@mui/icons-material/FilterAltRounded';
 import { GridFilterItem } from '@mui/x-data-grid';
 
-import { Select, Button as Btn, Input, Space, DatePicker } from 'antd'
+import { Select, Button as Btn, Input, Space, DatePicker, Segmented } from 'antd'
 import type { TableColumnType, SelectProps } from 'antd';
 import { FilterConfirmProps } from 'antd/es/table/interface';
 import React, { useState } from 'react';
@@ -59,7 +59,7 @@ export default function getColumnSearchProps<T extends object>(dataIndex: keyof 
                         style={{ marginBottom: 8, display: 'block' }}
                     />
                 </div>
-                <Space style={{ display: 'flex', alignItems: 'center'}}>
+                <Space style={{ display: 'flex', alignItems: 'center' }}>
                     <Btn
                         onClick={() => clearFilters && handleReset(clearFilters, confirm, dataIndex)}
                         size="small"
@@ -112,78 +112,26 @@ export default function getColumnSearchProps<T extends object>(dataIndex: keyof 
 
 type FilterSelectItemProp<T> = {
     dataIndex: keyof T,
-    filters: Record<string, GridFilterItem>, 
+    filters: Record<string, GridFilterItem>,
     handleSetFilters: (filters: Record<string, GridFilterItem>) => void,
     options: string[]
 }
 
-export function getColumnSelectedItemFilter<T extends object>({ dataIndex, filters, handleSetFilters, options}: FilterSelectItemProp<T> ): TableColumnType<T> {
-
-    let filterOption = 'isAnyOf'
-
-    const handleReset = (clearFilters: () => void, confirm: (param?: FilterConfirmProps | undefined) => void, dataIndex: keyof T) => {
-        clearFilters();
-        confirm({ closeDropdown: false });
-        let newFilters = { ...filters }
-        Reflect.deleteProperty(newFilters, dataIndex);
-        handleSetFilters(newFilters);
-    };
-
-    let selectOptions: SelectProps['options'] = options.map( item => ({
-        value: item,
-        label: item
-    }))
+export function getColumnSelectedItemFilter<T extends object>({ dataIndex, filters, handleSetFilters, options }: FilterSelectItemProp<T>): TableColumnType<T> {
 
     return ({
         filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters, close }) => (
-            <div style={{ padding: 8, zIndex: 10 }} onKeyDown={(e) => e.stopPropagation()}>
-                <Select
-                    mode="tags"
-                    placeholder="Please select"
-                    value={selectedKeys}
-                    onChange={(value) => setSelectedKeys(value)}
-                    options={selectOptions}
-                    dropdownStyle={{ zIndex: 10001 }}
-                    style={{ display: 'block', marginBottom: 8, alignItems: 'center', width: 250}}
-                />
-                <Space style={{ display: 'flex', alignItems: 'center'}}>
-                    <Btn
-                        onClick={() => clearFilters && handleReset(clearFilters, confirm, dataIndex)}
-                        size="small"
-                        style={{ width: 90 }}
-                    >
-                        Reset
-                    </Btn>
-                    <Btn
-                        size="small"
-                        onClick={() => {
-                            confirm({ closeDropdown: false });
-                            let newFilters = { ...filters }
-                            newFilters[dataIndex.toString()] = {
-                                columnField: dataIndex.toString(),
-                                operatorValue: filterOption,
-                                value: selectedKeys,
-                            }
-                            console.log(newFilters)
-                            if (selectedKeys.length === 0) {
-                                clearFilters && handleReset(clearFilters, confirm, dataIndex);
-                            } else {
-                                handleSetFilters(newFilters);
-                            }
-                        }}
-                    >
-                        Apply
-                    </Btn>
-                    <Btn
-                        size="small"
-                        onClick={() => {
-                            close();
-                        }}
-                    >
-                        close
-                    </Btn>
-                </Space>
-            </div>
+            <SelectItemFilterDropdown 
+                dataIndex={dataIndex}
+                options={options}
+                filters={filters}
+                handleSetFilters={handleSetFilters}
+                selectedKeys={selectedKeys}
+                setSelectedKeys={setSelectedKeys}
+                confirm={confirm}
+                close={close}
+                clearFilters={clearFilters}
+            />
         ),
         filterIcon: (filtered: boolean) => (
             <FilterAltRoundedIcon style={{ color: filtered ? '#1677ff' : undefined }} />
@@ -191,6 +139,93 @@ export function getColumnSelectedItemFilter<T extends object>({ dataIndex, filte
 
     })
 };
+
+interface SelectItemFilterDropdownProps<T> extends FilterSelectItemProp<T> {
+    setSelectedKeys: (selectedKeys: React.Key[]) => void, 
+    selectedKeys: React.Key[],
+    confirm: (param?: FilterConfirmProps) => void;
+    clearFilters?: () => void;
+    close: () => void;
+}
+
+const SelectItemFilterDropdown = <T extends object>({ dataIndex, filters, options, selectedKeys, setSelectedKeys, handleSetFilters, confirm, clearFilters, close }: SelectItemFilterDropdownProps<T>) => {
+
+    const [filterOption, setFilterOption] = useState<'contains' | 'isAnyOf'>('isAnyOf');
+
+    const handleReset = (clearFilters: () => void, confirm: (param?: FilterConfirmProps | undefined) => void, dataIndex: keyof T) => {
+        clearFilters();
+        confirm({ closeDropdown: false });
+        let newFilters = { ...filters }
+        Reflect.deleteProperty(newFilters, dataIndex);
+        handleSetFilters(newFilters);
+        setFilterOption('isAnyOf');
+    };
+
+    let selectOptions: SelectProps['options'] = options.map(item => ({
+        value: item,
+        label: item
+    }))
+
+    return (
+        <div style={{ padding: 8, zIndex: 10 }} onKeyDown={(e) => e.stopPropagation()}>
+            <Select
+                mode="tags"
+                placeholder="Please select"
+                value={selectedKeys}
+                onChange={(value) => setSelectedKeys(value)}
+                options={selectOptions}
+                dropdownStyle={{ zIndex: 10001 }}
+                style={{ display: 'block', marginBottom: 8, alignItems: 'center', width: 250 }}
+            />
+            <Space style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <p>Filter Type: </p>
+                <Segmented<string>
+                    options={['Any', 'All']}
+                    onChange={(value) => {
+                        setFilterOption(value === 'All' ? 'contains' : 'isAnyOf')
+                    }}
+                />
+            </Space>
+            <Space style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center' }}>
+                <Btn
+                    onClick={() => clearFilters && handleReset(clearFilters, confirm, dataIndex)}
+                    size="small"
+                    style={{ width: 90 }}
+                >
+                    Reset
+                </Btn>
+                <Btn
+                    size="small"
+                    onClick={() => {
+                        confirm({ closeDropdown: false });
+                        let newFilters = { ...filters }
+                        newFilters[dataIndex.toString()] = {
+                            columnField: dataIndex.toString(),
+                            operatorValue: filterOption,
+                            value: selectedKeys,
+                        }
+                        
+                        if (selectedKeys.length === 0) {
+                            clearFilters && handleReset(clearFilters, confirm, dataIndex);
+                        } else {
+                            handleSetFilters(newFilters);
+                        }
+                    }}
+                >
+                    Apply
+                </Btn>
+                <Btn
+                    size="small"
+                    onClick={() => {
+                        close();
+                    }}
+                >
+                    close
+                </Btn>
+            </Space>
+        </div>
+    )
+}
 
 export const getColumnDateFilter = <T extends object>({ dataIndex, filters, handleSetFilters, label }: FilterItemProps<T> & { label: string }): TableColumnType<T> => {
     return {
@@ -244,7 +279,7 @@ const DateFilterDropdown = <T extends object>({ dataIndex, filters, label, handl
         }
 
         if (filter) {
-            handleSetFilters({ 
+            handleSetFilters({
                 ...filters,
                 [dataIndex.toString()]: filter,
             });
@@ -256,11 +291,11 @@ const DateFilterDropdown = <T extends object>({ dataIndex, filters, label, handl
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <div style={{ margin: 2 }}>{label} After:</div>
-                    <DatePicker onChange={(date, stringDate) => setLower(stringDate as string)} style={{ margin: 2, backgroundColor: 'white' }} popupStyle={{ zIndex: 100001 }}/>
+                    <DatePicker onChange={(date, stringDate) => setLower(stringDate as string)} style={{ margin: 2, backgroundColor: 'white' }} popupStyle={{ zIndex: 100001 }} />
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <div style={{ margin: 2 }}>{label} Before:</div>
-                    <DatePicker onChange={(date, stringDate) => setUpper(stringDate as string)} style={{ margin: 2, backgroundColor: 'white' }} popupStyle={{ zIndex: 100001 }}/>
+                    <DatePicker onChange={(date, stringDate) => setUpper(stringDate as string)} style={{ margin: 2, backgroundColor: 'white' }} popupStyle={{ zIndex: 100001 }} />
                 </div>
             </div>
             <Space style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 8 }}>
@@ -280,7 +315,7 @@ const DateFilterDropdown = <T extends object>({ dataIndex, filters, label, handl
 
 export const getSortIcon = (field: string, order: 'ASC' | 'DESC' | undefined, handleSortingChange: (param: { field: string, order?: 'ASC' | 'DESC' }) => void) => {
     return (
-        <div 
+        <div
             style={{ alignItems: "center", display: "flex", flexDirection: "column" }}
             onClick={() => {
                 let newOrder: 'ASC' | 'DESC' | undefined = 'ASC';
@@ -289,8 +324,8 @@ export const getSortIcon = (field: string, order: 'ASC' | 'DESC' | undefined, ha
                 handleSortingChange({ field, order: newOrder });
             }}
         >
-            <ArrowDropUp style={{ margin: "-8px 0" }} htmlColor={ order === 'ASC' ? '#00b96b' : "grey"}/>
-            <ArrowDropDown style={{ margin: "-8px 0" }} htmlColor={ order === 'DESC' ? '#00b96b' : "grey"}/>
+            <ArrowDropUp style={{ margin: "-8px 0" }} htmlColor={order === 'ASC' ? '#00b96b' : "grey"} />
+            <ArrowDropDown style={{ margin: "-8px 0" }} htmlColor={order === 'DESC' ? '#00b96b' : "grey"} />
         </div>
     )
 }
