@@ -182,6 +182,7 @@ const PlotStats: FC<PlotStatsProps> = ({  }) => {
             title: "Plot Name",
             dataIndex: 'name',
             key: 'name',
+            width: 300,
             render: (value: any) => value ? value : 'Unknown',
             ...getColumnSearchProps('name', filters, handleSetFilters),
         },
@@ -194,6 +195,7 @@ const PlotStats: FC<PlotStatsProps> = ({  }) => {
             dataIndex: "total",
             key: "total",
             align: 'right',
+            width: 120,
         },
         {
             title: (
@@ -204,6 +206,7 @@ const PlotStats: FC<PlotStatsProps> = ({  }) => {
             dataIndex: "booked",
             key: "booked",
             align: 'right',
+            width: 120,
         },
         {
             title: (
@@ -214,6 +217,7 @@ const PlotStats: FC<PlotStatsProps> = ({  }) => {
             dataIndex: "assigned",
             key: "assigned",
             align: 'right',
+            width: 120,
         },
         {
             title: (
@@ -224,6 +228,7 @@ const PlotStats: FC<PlotStatsProps> = ({  }) => {
             dataIndex: "unbooked_assigned",
             key: "unbooked_assigned",
             align: 'right',
+            width: 150,
         },
         {
             title: (
@@ -240,6 +245,7 @@ const PlotStats: FC<PlotStatsProps> = ({  }) => {
             dataIndex: "total_unfunded",
             key: "total_unfunded",
             align: 'right',
+            width: 150,
             render: (value: any, record: any) => (Number(record.available) || 0) + (Number(record.unbooked_assigned) || 0),
         },
     ]

@@ -16,10 +16,13 @@ const TableSummary = (data: any[], selectedKeys: any[], totalColumns: number) =>
     return (
         <Table.Summary fixed='bottom'>
             <Table.Summary.Row style={{ backgroundColor: 'rgba(172, 252, 172, 0.2)' }}>
-                <Table.Summary.Cell align="right" index={totalColumns - 7} colSpan={7}>
+                <Table.Summary.Cell align="right" index={totalColumns - 10} colSpan={7}>
                     <strong>Total</strong>
                 </Table.Summary.Cell>
-                <Table.Summary.Cell align="right" index={totalColumns - 6} colSpan={1}>{calculateSum(data.filter((item) => selectedKeys.includes(item.key)).map((item) => item.total))}</Table.Summary.Cell>
+                <Table.Summary.Cell align="right" index={totalColumns - 9} colSpan={1}>{calculateSum(data.filter((item) => selectedKeys.includes(item.key)).map((item) => item.total))}</Table.Summary.Cell>
+                <Table.Summary.Cell align="right" index={totalColumns - 8} colSpan={1}>{calculateSum(data.filter((item) => selectedKeys.includes(item.key)).map((item) => item.tree_count))}</Table.Summary.Cell>
+                <Table.Summary.Cell align="right" index={totalColumns - 7} colSpan={1}>{calculateSum(data.filter((item) => selectedKeys.includes(item.key)).map((item) => item.shrub_count))}</Table.Summary.Cell>
+                <Table.Summary.Cell align="right" index={totalColumns - 6} colSpan={1}>{calculateSum(data.filter((item) => selectedKeys.includes(item.key)).map((item) => item.herb_count))}</Table.Summary.Cell>
                 <Table.Summary.Cell align="right" index={totalColumns - 5} colSpan={1}>{calculateSum(data.filter((item) => selectedKeys.includes(item.key)).map((item) => item.booked))}</Table.Summary.Cell>
                 <Table.Summary.Cell align="right" index={totalColumns - 4} colSpan={1}>{calculateSum(data.filter((item) => selectedKeys.includes(item.key)).map((item) => item.assigned))}</Table.Summary.Cell>
                 <Table.Summary.Cell align="right" index={totalColumns - 3} colSpan={1}>{calculateSum(data.filter((item) => selectedKeys.includes(item.key)).map((item) => item.unbooked_assigned))}</Table.Summary.Cell>
@@ -229,6 +232,7 @@ const SiteStats: FC<SiteStatsProps> = ({ habits, landTypes, districts, talukas, 
             title: 'Site Name',
             dataIndex: 'site_name',
             key: 'site_name',
+            width: 300,
             render: (value: any) => value ? value : 'Unknown',
             ...getColumnSearchProps('site_name', filters, handleSetFilters),
         },
@@ -236,6 +240,7 @@ const SiteStats: FC<SiteStatsProps> = ({ habits, landTypes, districts, talukas, 
             title: "Category",
             dataIndex: "category",
             key: "category",
+            width: 200,
             render: (value: any) => value ? value : 'Unknown',
             ...getColumnSelectedItemFilter<any>({ dataIndex: 'category', filters, handleSetFilters, options: ['Public', 'Foundation', 'Unknown'] }),
         },
@@ -243,6 +248,7 @@ const SiteStats: FC<SiteStatsProps> = ({ habits, landTypes, districts, talukas, 
             title: "Service Type",
             dataIndex: "maintenance_type",
             key: "maintenance_type",
+            width: 250,
             render: getMaintenanceTypesString,
             ...getColumnSelectedItemFilter<any>({ dataIndex: 'maintenance_type', filters, handleSetFilters, options: ['Distribution Only', 'Plantation Only', 'Full Maintenance', 'Waiting', 'Cancelled', 'TBD', 'Unknown'] })
         },
@@ -250,6 +256,7 @@ const SiteStats: FC<SiteStatsProps> = ({ habits, landTypes, districts, talukas, 
             title: "Land Type",
             dataIndex: "land_type",
             key: "land_type",
+            width: 200,
             render: (value: string) => value ? value : 'Unknown',
             ...getColumnSelectedItemFilter<any>({ dataIndex: 'land_type', filters, handleSetFilters, options: ["Foundation", "Cremation", "Farm", "Roadside", "Temple", "Premises", "Gairan", "Forest", "School", 'Unknown'] })
         },
@@ -257,12 +264,14 @@ const SiteStats: FC<SiteStatsProps> = ({ habits, landTypes, districts, talukas, 
             title: "Kml File",
             dataIndex: "kml_file_link",
             key: "kml_file_link",
+            width: 100,
             render: (value: string) => value ? 'Yes' : 'No',
         },
         {
             title: "Capacity",
             dataIndex: "capacity",
             key: "capacity",
+            width: 100,
             render: (value: any) => value ? Math.floor(value * 300) : 'Unknown'
         },
         {
@@ -274,6 +283,40 @@ const SiteStats: FC<SiteStatsProps> = ({ habits, landTypes, districts, talukas, 
             dataIndex: "total",
             key: "total",
             align: 'right',
+            width: 120,
+        },
+        {
+            title: (
+                <div style={{ display: "flex", alignItems: "center", justifyContent: 'space-between' }}>
+                    Trees {getSortIcon('tree_count', orderBy.find((item) => item.column === 'tree_count')?.order)}
+                </div>
+            ),
+            dataIndex: "tree_count",
+            key: "Trees",
+            align: 'right',
+            width: 120,
+        },
+        {
+            title: (
+                <div style={{ display: "flex", alignItems: "center", justifyContent: 'space-between' }}>
+                    Shrubs {getSortIcon('shrub_count', orderBy.find((item) => item.column === 'shrub_count')?.order)}
+                </div>
+            ),
+            dataIndex: "shrub_count",
+            key: "Shrubs",
+            align: 'right',
+            width: 120,
+        },
+        {
+            title: (
+                <div style={{ display: "flex", alignItems: "center", justifyContent: 'space-between' }}>
+                    Herbs {getSortIcon('herb_count', orderBy.find((item) => item.column === 'herb_count')?.order)}
+                </div>
+            ),
+            dataIndex: "herb_count",
+            key: "Herbs",
+            align: 'right',
+            width: 120,
         },
         {
             title: (
@@ -284,6 +327,7 @@ const SiteStats: FC<SiteStatsProps> = ({ habits, landTypes, districts, talukas, 
             dataIndex: "booked",
             key: "booked",
             align: 'right',
+            width: 120,
         },
         {
             title: (
@@ -294,6 +338,7 @@ const SiteStats: FC<SiteStatsProps> = ({ habits, landTypes, districts, talukas, 
             dataIndex: "assigned",
             key: "assigned",
             align: 'right',
+            width: 120,
         },
         {
             title: (
@@ -304,6 +349,7 @@ const SiteStats: FC<SiteStatsProps> = ({ habits, landTypes, districts, talukas, 
             dataIndex: "unbooked_assigned",
             key: "unbooked_assigned",
             align: 'right',
+            width: 150,
         },
         {
             title: (
@@ -314,12 +360,14 @@ const SiteStats: FC<SiteStatsProps> = ({ habits, landTypes, districts, talukas, 
             dataIndex: "available",
             key: "available",
             align: 'right',
+            width: 150,
         },
         {
             title: "Total Unfunded Inventory",
             dataIndex: "total_unfunded",
             key: "total_unfunded",
             align: 'right',
+            width: 150,
             render: (value: any, record: any) => (Number(record.available) || 0) + (Number(record.unbooked_assigned) || 0),
         },
         {
@@ -331,35 +379,34 @@ const SiteStats: FC<SiteStatsProps> = ({ habits, landTypes, districts, talukas, 
             dataIndex: "card_available",
             key: "card_available",
             align: 'right',
+            width: 150,
         },
     ]
 
     return (
-        <div>
-            <Box>
-                <Typography variant="h6">Site level stats</Typography>
-                <GeneralTable
-                    loading={loading}
-                    columns={columns}
-                    rows={tableRows}
-                    totalRecords={total}
-                    page={page}
-                    onPaginationChange={handlePageChange}
-                    onDownload={handleDownload}
-                    rowClassName={(record: any, index: number) => {
-                        if (!record.category || !record.maintenance_type) return 'pending-item';
-                        return '';
-                    }}
-                    tableName="Sites Inventory"
-                    footer
-                    onSelectionChanges={handleSelectionChanges}
-                    summary={(totalColumns: number) => {
-                        if (totalColumns < 5) return undefined;
-                        return TableSummary(tableRows, selectedRows, totalColumns)
-                    }}
-                />
-            </Box>
-        </div>
+        <Box sx={{ width: "100%" }}>
+            <Typography variant="h6">Site level stats</Typography>
+            <GeneralTable
+                loading={loading}
+                columns={columns}
+                rows={tableRows}
+                totalRecords={total}
+                page={page}
+                onPaginationChange={handlePageChange}
+                onDownload={handleDownload}
+                rowClassName={(record: any, index: number) => {
+                    if (!record.category || !record.maintenance_type) return 'pending-item';
+                    return '';
+                }}
+                tableName="Sites Inventory"
+                footer
+                onSelectionChanges={handleSelectionChanges}
+                summary={(totalColumns: number) => {
+                    if (totalColumns < 5) return undefined;
+                    return TableSummary(tableRows, selectedRows, totalColumns)
+                }}
+            />
+        </Box>
     )
 }
 

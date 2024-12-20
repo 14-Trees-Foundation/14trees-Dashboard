@@ -192,6 +192,7 @@ function GeneralTable({ loading, rows, columns, totalRecords, page, pageSize = 1
                 pageSize: pageSize,
                 pageSizeOptions: [5, 10, 20, 50, 100],
                 simple: true,
+                showSizeChanger: true,
                 onChange: onPaginationChange,
             }}
             components={components}
