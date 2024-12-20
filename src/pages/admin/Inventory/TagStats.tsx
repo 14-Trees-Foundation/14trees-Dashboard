@@ -16,10 +16,13 @@ const TableSummary = (data: any[], selectedKeys: any[], totalColumns: number) =>
     return (
         <Table.Summary fixed='bottom'>
             <Table.Summary.Row style={{ backgroundColor: 'rgba(172, 252, 172, 0.2)' }}>
-                <Table.Summary.Cell align="right" index={totalColumns - 7} colSpan={2}>
+                <Table.Summary.Cell align="right" index={totalColumns - 10} colSpan={2}>
                     <strong>Total</strong>
                 </Table.Summary.Cell>
-                <Table.Summary.Cell align="right" index={totalColumns - 6} colSpan={1}>{calculateSum(data.filter((item) => selectedKeys.includes(item.key)).map((item) => item.total))}</Table.Summary.Cell>
+                <Table.Summary.Cell align="right" index={totalColumns - 9} colSpan={1}>{calculateSum(data.filter((item) => selectedKeys.includes(item.key)).map((item) => item.total))}</Table.Summary.Cell>
+                <Table.Summary.Cell align="right" index={totalColumns - 8} colSpan={1}>{calculateSum(data.filter((item) => selectedKeys.includes(item.key)).map((item) => item.tree_count))}</Table.Summary.Cell>
+                <Table.Summary.Cell align="right" index={totalColumns - 7} colSpan={1}>{calculateSum(data.filter((item) => selectedKeys.includes(item.key)).map((item) => item.shrub_count))}</Table.Summary.Cell>
+                <Table.Summary.Cell align="right" index={totalColumns - 6} colSpan={1}>{calculateSum(data.filter((item) => selectedKeys.includes(item.key)).map((item) => item.herb_count))}</Table.Summary.Cell>
                 <Table.Summary.Cell align="right" index={totalColumns - 5} colSpan={1}>{calculateSum(data.filter((item) => selectedKeys.includes(item.key)).map((item) => item.booked))}</Table.Summary.Cell>
                 <Table.Summary.Cell align="right" index={totalColumns - 4} colSpan={1}>{calculateSum(data.filter((item) => selectedKeys.includes(item.key)).map((item) => item.assigned))}</Table.Summary.Cell>
                 <Table.Summary.Cell align="right" index={totalColumns - 3} colSpan={1}>{calculateSum(data.filter((item) => selectedKeys.includes(item.key)).map((item) => item.unbooked_assigned))}</Table.Summary.Cell>
@@ -195,6 +198,7 @@ const TagStats: FC<TagStatsProps> = ({ habits, landTypes, villages, districts, t
             title: "Tag",
             dataIndex: 'tag',
             key: 'tag',
+            width: 250,
             render: (value: any) => value ? value : 'Unknown',
             ...getColumnSelectedItemFilter({ dataIndex: 'tag', filters, handleSetFilters, options: tags }),
         },
@@ -207,6 +211,40 @@ const TagStats: FC<TagStatsProps> = ({ habits, landTypes, villages, districts, t
             dataIndex: "total",
             key: "total",
             align: 'right',
+            width: 120,
+        },
+        {
+            title: (
+                <div style={{ display: "flex", alignItems: "center", justifyContent: 'space-between' }}>
+                    Trees {getSortIcon('tree_count', orderBy.find((item) => item.column === 'tree_count')?.order)}
+                </div>
+            ),
+            dataIndex: "tree_count",
+            key: "Trees",
+            align: 'right',
+            width: 120,
+        },
+        {
+            title: (
+                <div style={{ display: "flex", alignItems: "center", justifyContent: 'space-between' }}>
+                    Shrubs {getSortIcon('shrub_count', orderBy.find((item) => item.column === 'shrub_count')?.order)}
+                </div>
+            ),
+            dataIndex: "shrub_count",
+            key: "Shrubs",
+            align: 'right',
+            width: 120,
+        },
+        {
+            title: (
+                <div style={{ display: "flex", alignItems: "center", justifyContent: 'space-between' }}>
+                    Herbs {getSortIcon('herb_count', orderBy.find((item) => item.column === 'herb_count')?.order)}
+                </div>
+            ),
+            dataIndex: "herb_count",
+            key: "Herbs",
+            align: 'right',
+            width: 120,
         },
         {
             title: (
@@ -217,6 +255,7 @@ const TagStats: FC<TagStatsProps> = ({ habits, landTypes, villages, districts, t
             dataIndex: "booked",
             key: "booked",
             align: 'right',
+            width: 120,
         },
         {
             title: (
@@ -227,6 +266,7 @@ const TagStats: FC<TagStatsProps> = ({ habits, landTypes, villages, districts, t
             dataIndex: "assigned",
             key: "assigned",
             align: 'right',
+            width: 120,
         },
         {
             title: (
@@ -237,6 +277,7 @@ const TagStats: FC<TagStatsProps> = ({ habits, landTypes, villages, districts, t
             dataIndex: "unbooked_assigned",
             key: "unbooked_assigned",
             align: 'right',
+            width: 150,
         },
         {
             title: (
@@ -247,12 +288,14 @@ const TagStats: FC<TagStatsProps> = ({ habits, landTypes, villages, districts, t
             dataIndex: "available",
             key: "available",
             align: 'right',
+            width: 150,
         },
         {
             title: "Total Unfunded Inventory",
             dataIndex: "total_unfunded",
             key: "total_unfunded",
             align: 'right',
+            width: 150,
             render: (value: any, record: any) => (Number(record.available) || 0) + (Number(record.unbooked_assigned) || 0),
         },
         {
@@ -264,6 +307,7 @@ const TagStats: FC<TagStatsProps> = ({ habits, landTypes, villages, districts, t
             dataIndex: "card_available",
             key: "card_available",
             align: 'right',
+            width: 150,
         },
     ]
 

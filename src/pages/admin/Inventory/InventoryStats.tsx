@@ -88,6 +88,9 @@ const InventoryStats: FC = () => {
             unbooked_assigned: 0,
             total_unfunded: 0,
             card_available: 0,
+            tree_count: 0,
+            shrub_count: 0,
+            herb_count: 0,
         }
 
         for (const item of stats.results) {
@@ -98,6 +101,9 @@ const InventoryStats: FC = () => {
             overall.unbooked_assigned += parseInt(item.unbooked_assigned || '0')
             overall.total_unfunded += parseInt(item.available || '0') + parseInt(item.unbooked_assigned || '0')
             overall.card_available += parseInt(item.card_available || '0')
+            overall.tree_count += parseInt(item.tree_count || '0')
+            overall.shrub_count += parseInt(item.shrub_count || '0')
+            overall.herb_count += parseInt(item.herb_count || '0')
         }
 
         const finalList: any[] = [];
@@ -132,6 +138,24 @@ const InventoryStats: FC = () => {
             title: "Total",
             dataIndex: "total",
             key: "total",
+            align: 'right',
+        },
+        {
+            title: "Trees",
+            dataIndex: "tree_count",
+            key: "tree_count",
+            align: 'right',
+        },
+        {
+            title: "Shrubs",
+            dataIndex: "shrub_count",
+            key: "shrub_count",
+            align: 'right',
+        },
+        {
+            title: "Herbs",
+            dataIndex: "herb_count",
+            key: "herb_count",
             align: 'right',
         },
         {
@@ -225,7 +249,6 @@ const InventoryStats: FC = () => {
                 zIndex: 1,
                 paddingBottom: 10,
                 marginBottom: '10px',
-
             }}>
                 <Box
                     style={{
