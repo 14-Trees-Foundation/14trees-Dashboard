@@ -92,6 +92,14 @@ export const User1 = () => {
       ...getColumnSearchProps('email', filters, handleSetFilters)
     },
     {
+      dataIndex: "communication_email",
+      key: "communication_email",
+      title: "Communication Email",
+      align: "center",
+      width: 200,
+      ...getColumnSearchProps('communication_email', filters, handleSetFilters)
+    },
+    {
       dataIndex: "phone",
       key: "phone",
       title: "Phone",

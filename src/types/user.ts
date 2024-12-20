@@ -6,6 +6,7 @@ export type User = {
     user_id: string,
     phone: string,
     email: string,
+    communication_email: string | null,
     birth_date: Date,
     created_at: Date,
     updated_at: Date,

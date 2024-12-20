@@ -24,7 +24,7 @@ function EditUser({ row, openeditModal, onClose, editSubmit }) {
 
   const handleEditSubmit = (event) => {
     event.preventDefault();
-    editSubmit(formData);
+    editSubmit({ ...formData, communication_email: formData?.communication_email?.trim() ? formData?.communication_email?.trim() : null });
   };
 
   return (
@@ -44,6 +44,14 @@ function EditUser({ row, openeditModal, onClose, editSubmit }) {
             name="email"
             label="Email"
             value={formData.email}
+            onChange={handleChange}
+            fullWidth
+            margin="dense"
+          />
+          <TextField
+            name="communication_email"
+            label="Communication email"
+            value={formData.communication_email}
             onChange={handleChange}
             fullWidth
             margin="dense"
