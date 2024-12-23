@@ -1,9 +1,10 @@
-import { Box, Button, Checkbox, Divider, FormControl, FormControlLabel, FormGroup, Typography } from "@mui/material";
+import { Box, Button, Checkbox, Divider, FormControl, FormControlLabel, FormGroup, IconButton, InputBase, Paper, Typography } from "@mui/material";
 import CardGrid from "./CardGrid";
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import ApiClient from "../../../api/apiClient/apiClient";
 import { useParams } from "react-router-dom";
+import { Search } from "@mui/icons-material";
 
 interface MappedTreesProps {
 }
@@ -11,6 +12,7 @@ interface MappedTreesProps {
 const MappedTrees: React.FC<MappedTreesProps> = ({ }) => {
     const { userId } = useParams();
 
+    const [searchStr, setSearchStr] = useState('');
     const [filteredTrees, setFilteredTrees] = useState<any[]>([]);
     const [filter, setFilter] = useState<'default' | 'memorial' | 'all'>('default');
     const [loading, setLoading] = useState(false);
@@ -22,7 +24,7 @@ const MappedTrees: React.FC<MappedTreesProps> = ({ }) => {
         try {
             setLoading(true);
             const apiClient = new ApiClient();
-            const response = await apiClient.getMappedTreesForTheUser(Number(userId), offset, 150);
+            const response = await apiClient.getMappedTreesForTheUser(Number(userId), offset, 200);
             setTotal(Number(response.total));
             setTrees(prev => [...prev, ...response.results]);
 
@@ -36,10 +38,24 @@ const MappedTrees: React.FC<MappedTreesProps> = ({ }) => {
     }
 
     useEffect(() => {
-        if (filter === 'all') setFilteredTrees(trees);
-        else if (filter === 'memorial') setFilteredTrees(trees.filter(tree => tree.event_type === '2'));
-        else setFilteredTrees(trees.filter(tree => tree.event_type !== '2'));;
-    }, [filter, trees])
+
+        const handler = setTimeout(() => {
+            let filteredData: any[] = [];
+            if (filter === 'all') filteredData = trees;
+            else if (filter === 'memorial') filteredData = trees.filter(tree => tree.event_type === '2');
+            else filteredData = trees.filter(tree => tree.event_type !== '2');
+    
+            if (searchStr.trim() !== '') {
+                filteredData = filteredData.filter(item => item.assigned_to_name?.toLowerCase()?.includes(searchStr.toLocaleLowerCase()));
+            }
+    
+            setFilteredTrees(filteredData)
+        }, 300);
+
+        return () => {
+            clearTimeout(handler);
+        }
+    }, [searchStr, filter, trees])
 
     useEffect(() => {
         if (userId) getTrees(userId);
@@ -67,12 +83,15 @@ const MappedTrees: React.FC<MappedTreesProps> = ({ }) => {
             </Box>
             <Box
                 mt={8}
+                display="flex"
+                alignItems="center"
+                justifyContent="space-between"
             >
                 <FormControl component="fieldset">
                     <FormGroup aria-label="position" row>
                         <FormControlLabel
                             value="default"
-                            control={<Checkbox checked={filter === 'default' || filter === 'all'} onChange={() => { setFilter('default')}} />}
+                            control={<Checkbox checked={filter === 'default' || filter === 'all'} onChange={() => { setFilter('default') }} />}
                             label="F&F Trees"
                             labelPlacement="end"
                         />
@@ -90,6 +109,21 @@ const MappedTrees: React.FC<MappedTreesProps> = ({ }) => {
                         />
                     </FormGroup>
                 </FormControl>
+                <Paper
+                    component="div"
+                    sx={{ p: '2px 4px', display: 'flex', alignItems: 'center', width: 400, backgroundColor: '#e3e3e3bf' }}
+                >
+                    <IconButton sx={{ p: '10px' }} aria-label="search">
+                        <Search />
+                    </IconButton>
+                    <InputBase
+                        value={searchStr}
+                        onChange={(e) =>{  setSearchStr(e.target.value) }}
+                        sx={{ ml: 1, flex: 1 }}
+                        placeholder="Search"
+                        inputProps={{ 'aria-label': 'search friends & family members' }}
+                    />
+                </Paper>
             </Box>
             <Box
                 mt={1}
@@ -123,14 +157,20 @@ const MappedTrees: React.FC<MappedTreesProps> = ({ }) => {
                         }
                     })}
                 />
-                {userId && total > trees.length && <Button
-                    variant="text"
-                    color="success"
-                    disabled={loading}
-                    onClick={() => { getTrees(userId, trees.length) }}
+                {userId && total > trees.length && <Box
+                    display="flex"
+                    alignItems="center"
+                    justifyContent="center"
                 >
-                    Load More
-                </Button>}
+                    <Button
+                        variant="contained"
+                        color="success"
+                        disabled={loading}
+                        onClick={() => { getTrees(userId, trees.length) }}
+                    >
+                        Load More
+                    </Button>
+                </Box>}
             </Box>
         </Box>
     );
