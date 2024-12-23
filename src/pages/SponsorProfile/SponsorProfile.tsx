@@ -86,7 +86,7 @@ const SponsorProfile: FC<SponsorProfileProps> = ({ }) => {
     setActivities(activities);
 
     return (
-        <Box style={{ display: "flex" }} >
+        <Box style={{ display: "flex", backgroundColor: 'rgb(114 143 121 / 48%)' }} >
             <Drawer
                 className={classes.mdrawer}
                 variant="persistent"
