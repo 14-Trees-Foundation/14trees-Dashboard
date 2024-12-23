@@ -33,6 +33,10 @@ const EditUserDialog: React.FC<EditUserDialogProps> = ({ open, imageUrls, onClos
         setShowAssignedFields(user.assignee !== user.recipient);
     }, [user]);
 
+    useEffect(() => {
+        console.log(formData);
+    }, [formData])
+
     const handleUserChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = event.target;
         setFormData({ ...formData, [name]: value });
@@ -77,10 +81,10 @@ const EditUserDialog: React.FC<EditUserDialogProps> = ({ open, imageUrls, onClos
         });
 
         if (!isSet && user[field] !== value && value !== ` ()`) {
-            setFormData({
-                ...user,
+            setFormData(prev => ({
+                ...prev,
                 [field]: value,
-            });
+            }));
             if (value.length >= 3) searchUsers(value);
         }
     };
