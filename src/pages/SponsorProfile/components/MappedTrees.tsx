@@ -1,4 +1,4 @@
-import { Box, Button, Divider, Typography } from "@mui/material";
+import { Box, Button, Checkbox, Divider, FormControl, FormControlLabel, FormGroup, Typography } from "@mui/material";
 import CardGrid from "./CardGrid";
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
@@ -11,6 +11,8 @@ interface MappedTreesProps {
 const MappedTrees: React.FC<MappedTreesProps> = ({ }) => {
     const { userId } = useParams();
 
+    const [filteredTrees, setFilteredTrees] = useState<any[]>([]);
+    const [filter, setFilter] = useState<'default' | 'memorial' | 'all'>('default');
     const [loading, setLoading] = useState(false);
     const [trees, setTrees] = useState<any[]>([]);
     const [total, setTotal] = useState(0);
@@ -20,18 +22,24 @@ const MappedTrees: React.FC<MappedTreesProps> = ({ }) => {
         try {
             setLoading(true);
             const apiClient = new ApiClient();
-            const response = await apiClient.getMappedTreesForTheUser(Number(userId), offset, 15);
+            const response = await apiClient.getMappedTreesForTheUser(Number(userId), offset, 150);
             setTotal(Number(response.total));
-            setTrees( prev => [...prev, ...response.results]);
+            setTrees(prev => [...prev, ...response.results]);
 
             if (response.results.length > 0 && response.results[0].mapped_user_name) {
                 setUserName(response.results[0].mapped_user_name)
             }
         } catch (error: any) {
-            toast.error(error.message);                                                                                                                                                                                                                                         
+            toast.error(error.message);
         }
         setLoading(false);
     }
+
+    useEffect(() => {
+        if (filter === 'all') setFilteredTrees(trees);
+        else if (filter === 'memorial') setFilteredTrees(trees.filter(tree => tree.event_type === '2'));
+        else setFilteredTrees(trees.filter(tree => tree.event_type !== '2'));;
+    }, [filter, trees])
 
     useEffect(() => {
         if (userId) getTrees(userId);
@@ -58,10 +66,36 @@ const MappedTrees: React.FC<MappedTreesProps> = ({ }) => {
                 </Box>
             </Box>
             <Box
-                mt={6}
+                mt={8}
+            >
+                <FormControl component="fieldset">
+                    <FormGroup aria-label="position" row>
+                        <FormControlLabel
+                            value="default"
+                            control={<Checkbox checked={filter === 'default' || filter === 'all'} onChange={() => { setFilter('default')}} />}
+                            label="F&F Trees"
+                            labelPlacement="end"
+                        />
+                        <FormControlLabel
+                            value="memorial"
+                            control={<Checkbox checked={filter === 'memorial' || filter === 'all'} onChange={() => { setFilter('memorial') }} />}
+                            label="Memorial Trees"
+                            labelPlacement="end"
+                        />
+                        <FormControlLabel
+                            value="all"
+                            control={<Checkbox checked={filter === 'all'} onChange={() => { setFilter(prev => prev === 'all' ? 'default' : 'all') }} />}
+                            label="Show All"
+                            labelPlacement="end"
+                        />
+                    </FormGroup>
+                </FormControl>
+            </Box>
+            <Box
+                mt={1}
                 padding="0 50px"
                 style={{
-                    height: '90vh',
+                    height: '83vh',
                     overflowY: 'scroll',
                     scrollbarWidth: 'none', // For Firefox
                     '&::-webkit-scrollbar': { display: 'none' } // For Chrome, Safari
@@ -69,7 +103,7 @@ const MappedTrees: React.FC<MappedTreesProps> = ({ }) => {
             >
                 <CardGrid
                     loading={loading}
-                    cards={trees.map(tree => {
+                    cards={filteredTrees.map(tree => {
                         let location: string = ''
                         const { hostname, host } = window.location;
                         if (hostname === "localhost" || hostname === "127.0.0.1") {
@@ -84,12 +118,12 @@ const MappedTrees: React.FC<MappedTreesProps> = ({ }) => {
                             type: tree.plant_type,
                             dashboardLink: location,
                             image: tree.illustration_s3_path
-                                    ?  tree.illustration_s3_path
-                                    : tree.image,
+                                ? tree.illustration_s3_path
+                                : tree.image,
                         }
                     })}
                 />
-                {userId && total > trees.length && <Button 
+                {userId && total > trees.length && <Button
                     variant="text"
                     color="success"
                     disabled={loading}

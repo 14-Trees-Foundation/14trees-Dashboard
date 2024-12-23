@@ -6,6 +6,7 @@ import {
 } from "@mui/material";
 import { OpenInNew } from "@mui/icons-material";
 import { Card, Empty } from "antd";
+import './CardGrid.css'
 
 type CardData = {
     id: number;
@@ -29,10 +30,17 @@ const CardGrid: React.FC<CardGridProps> = ({ cards, loading }) => {
     ) : (
         <Grid container spacing={3} padding={3}>
             {cards.map((card) => (
-                <Grid item xs={12} sm={6} md={4} key={card.id}>
+                <Grid item xs={12} sm={6} md={3} key={card.id}>
                     <Card
                         hoverable
-                        style={{ backgroundColor: '#b7edc47a', border: 'none', overflow: 'hidden', borderRadius: '20px' }}
+                        className="custom-card" 
+                        style={{ 
+                            backgroundColor: '#b7edc47a', 
+                            border: 'none', 
+                            overflow: 'hidden', 
+                            borderRadius: '20px',
+                            transition: 'background-color 0.3s',
+                        }}
                         cover={<img height={240} alt={card.type} src={card.image} style={{ backgroundColor: 'white', width: '100%', objectFit: 'cover' }} />}
                     >
                         <div style={{ width: "100%", zIndex: 10 }}>
