@@ -14,7 +14,7 @@ const AddUser = ({ open, handleClose, createUser, searchUser }) => {
         bgcolor: 'background.paper',
         border: '2px solid #000',
         boxShadow: 24,
-        borderRadius:'10px',
+        borderRadius: '10px',
         p: 4,
     };
 
@@ -42,7 +42,7 @@ const AddUser = ({ open, handleClose, createUser, searchUser }) => {
     const handleEmailChange = (event, value) => {
         let isSet = false;
         usersList.forEach((user) => {
-            if(`${user.name} (${user.email})` === value) {
+            if (`${user.name} (${user.email})` === value) {
                 isSet = true;
                 setFormData({
                     'email': user.email,
@@ -58,13 +58,13 @@ const AddUser = ({ open, handleClose, createUser, searchUser }) => {
                 ...formData,
                 'email': value,
             })
-            if(value.length >= 3)  searchUser(value);
+            if (value.length >= 3) searchUser(value);
         }
     }
 
     const handleSubmit = (event) => {
         event.preventDefault();
-        createUser(formData);
+        createUser({ ...formData, email: formData.email.trim() === '' ? formData.name.toLocaleLowerCase().replaceAll(" ", '.') + "@14trees" : formData.email });
         setFormData({
             name: '',
             phone: '',
@@ -88,45 +88,45 @@ const AddUser = ({ open, handleClose, createUser, searchUser }) => {
                     <form onSubmit={handleSubmit}>
                         <Grid container rowSpacing={2} columnSpacing={1} >
                             <Grid item xs={12}>
-                                <TextField name="name" label="Name" value={formData.name} onChange={handleChange} fullWidth/>
+                                <TextField name="name" label="Name" value={formData.name} onChange={handleChange} fullWidth />
                             </Grid>
                             <Grid item xs={12}>
-                                <TextField name="phone" label="Phone" value={formData.phone} onChange={handleChange} fullWidth/>
+                                <TextField name="phone" label="Phone" value={formData.phone} onChange={handleChange} fullWidth />
                             </Grid>
                             <Grid item xs={12}>
-                                <Autocomplete 
-                                    fullWidth 
-                                    options={usersList} 
-                                    name='email' 
-                                    noOptionsText="No Users" 
-                                    value={formData.email} 
-                                    onInputChange={handleEmailChange} 
-                                    getOptionLabel={(option)=> option.email ? `${option.name} (${option.email})`: option}
+                                <Autocomplete
+                                    fullWidth
+                                    options={usersList}
+                                    name='email'
+                                    noOptionsText="No Users"
+                                    value={formData.email}
+                                    onInputChange={handleEmailChange}
+                                    getOptionLabel={(option) => option.email ? `${option.name} (${option.email})` : option}
                                     isOptionEqualToValue={(option, value) => true}
                                     renderInput={(params) => (
                                         <TextField
-                                        {...params}
-                                        label="Email"
-                                        variant="outlined"
+                                            {...params}
+                                            label="Email"
+                                            variant="outlined"
                                         />
                                     )}>
                                 </Autocomplete>
                             </Grid>
                             <Grid item xs={12}>
-                                <TextField 
-                                    name="communication_email" 
-                                    label="Communication email" 
-                                    value={formData.communication_email} 
-                                    onChange={handleChange} 
+                                <TextField
+                                    name="communication_email"
+                                    label="Communication email"
+                                    value={formData.communication_email}
+                                    onChange={handleChange}
                                     fullWidth
                                 />
                             </Grid>
                             <Grid item xs={12}>
-                                <TextField name="birth_date" label="Date of Birth" type="date" value={formData.birth_date ? formData.birth_date.substring(0, 10): ''} onChange={handleChange} InputLabelProps={{ shrink: true }} fullWidth/>
+                                <TextField name="birth_date" label="Date of Birth" type="date" value={formData.birth_date ? formData.birth_date.substring(0, 10) : ''} onChange={handleChange} InputLabelProps={{ shrink: true }} fullWidth />
                             </Grid>
-                            <Grid item xs={12} sx={{display:'flex', justifyContent:'center', }}>
+                            <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'center', }}>
                                 <Button variant='outlined' color='error' onClick={handleClose}>Cancel</Button>
-                                <Button variant='contained' color='success' type="submit" sx={{marginLeft:'10px'}}>Submit</Button>
+                                <Button variant='contained' color='success' type="submit" sx={{ marginLeft: '10px' }}>Submit</Button>
                             </Grid>
                         </Grid>
                     </form>
