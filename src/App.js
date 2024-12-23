@@ -27,6 +27,7 @@ import VisitProfile from "./pages/Profiles/VisitProfile";
 import OrgProfile from "./pages/Profiles/OrgProfile";
 import RedeemCard from "./pages/admin/gift/RedeemCard";
 import { User } from "./pages/user/User";
+import SponsorProfile from "./pages/SponsorProfile/SponsorProfile";
 
 function App() {
   return (
@@ -47,6 +48,7 @@ function App() {
           {/* <Route path="/addtree" element={<AddTree />}></Route> */}
           <Route path="/profile/:saplingId" element={<Dashboard />}></Route>
           <Route path="/profile/user/:userId" element={<Dashboard />}></Route>
+          <Route path="/dashboard/:userId" element={<SponsorProfile />}></Route>
           <Route path="/tree/:saplingId" element={<TreeProfile />}></Route>
           <Route path="/user/:id" element={<UserProfile />}></Route>
           <Route path="/visit/:id" element={<VisitProfile />}></Route>
