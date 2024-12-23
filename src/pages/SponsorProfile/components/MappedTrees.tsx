@@ -72,7 +72,7 @@ const MappedTrees: React.FC<MappedTreesProps> = ({ }) => {
                     <FormGroup aria-label="position" row>
                         <FormControlLabel
                             value="default"
-                            control={<Checkbox checked={filter === 'default' || filter === 'all'} onChange={() => { setFilter('default')}} />}
+                            control={<Checkbox checked={filter === 'default' || filter === 'all'} onChange={() => { setFilter('default') }} />}
                             label="F&F Trees"
                             labelPlacement="end"
                         />
@@ -123,14 +123,20 @@ const MappedTrees: React.FC<MappedTreesProps> = ({ }) => {
                         }
                     })}
                 />
-                {userId && total > trees.length && <Button
-                    variant="text"
-                    color="success"
-                    disabled={loading}
-                    onClick={() => { getTrees(userId, trees.length) }}
+                {userId && total > trees.length && <Box
+                    display="flex"
+                    alignItems="center"
+                    justifyContent="center"
                 >
-                    Load More
-                </Button>}
+                    <Button
+                        variant="contained"
+                        color="success"
+                        disabled={loading}
+                        onClick={() => { getTrees(userId, trees.length) }}
+                    >
+                        Load More
+                    </Button>
+                </Box>}
             </Box>
         </Box>
     );
