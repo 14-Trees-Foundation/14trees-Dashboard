@@ -339,6 +339,10 @@ export const BulkUserForm: FC<BulkUserFormProps> = ({ requestId, treeCount, user
       user.image = true;
       user.image_name = image.split("/").slice(-1)[0];
       user.image_url = image;
+    } else {
+      user.image = undefined;
+      user.image_name = undefined;
+      user.image_url = undefined;
     }
 
     if (user.editable) {
@@ -358,7 +362,13 @@ export const BulkUserForm: FC<BulkUserFormProps> = ({ requestId, treeCount, user
       onUsersChange([...users, user]);
     } else {
       const newUsers = [...users]
-      newUsers[idx] = { ...newUsers[idx], ...user};
+      newUsers[idx] = { 
+        ...newUsers[idx], 
+        ...user,
+        image: user.image, 
+        image_name: user.image_name, 
+        image_url: user.image_url, 
+      };
       onUsersChange(newUsers);
     }
 
