@@ -24,7 +24,11 @@ function EditUser({ row, openeditModal, onClose, editSubmit }) {
 
   const handleEditSubmit = (event) => {
     event.preventDefault();
-    editSubmit({ ...formData, communication_email: formData?.communication_email?.trim() ? formData?.communication_email?.trim() : null });
+    editSubmit({ 
+      ...formData, 
+      email: formData.email.trim() === '' ? formData.name.toLocaleLowerCase().replaceAll(" ", '.') + "@14trees" : formData.email,
+      communication_email: formData?.communication_email?.trim() ? formData?.communication_email?.trim() : null 
+    });
   };
 
   return (
