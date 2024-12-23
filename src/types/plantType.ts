@@ -13,6 +13,7 @@ export type PlantType = {
     tags: string[] | null,
     habit: string | null,
     family: string | null,
+    illustration_s3_path: string | null,
     
     category: string | null,
     med_use: string | null,

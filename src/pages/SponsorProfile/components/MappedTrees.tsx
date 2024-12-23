@@ -1,14 +1,9 @@
-import { Box, Divider, Typography } from "@mui/material";
+import { Box, Button, Divider, Typography } from "@mui/material";
 import CardGrid from "./CardGrid";
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import ApiClient from "../../../api/apiClient/apiClient";
 import { useParams } from "react-router-dom";
-
-const extractFileId = (url: string) => {
-    const match = url.match(/\/d\/(.+?)\/view/);
-    return match ? match[1] : null;
-};
 
 interface MappedTreesProps {
 }
@@ -16,23 +11,26 @@ interface MappedTreesProps {
 const MappedTrees: React.FC<MappedTreesProps> = ({ }) => {
     const { userId } = useParams();
 
+    const [loading, setLoading] = useState(false);
     const [trees, setTrees] = useState<any[]>([]);
     const [total, setTotal] = useState(0);
     const [userName, setUserName] = useState('User');
 
     const getTrees = async (userId: string, offset: number = 0) => {
         try {
+            setLoading(true);
             const apiClient = new ApiClient();
-            const response = await apiClient.getMappedTreesForTheUser(Number(userId), offset, 20);
+            const response = await apiClient.getMappedTreesForTheUser(Number(userId), offset, 15);
             setTotal(Number(response.total));
-            setTrees(response.results);
+            setTrees( prev => [...prev, ...response.results]);
 
             if (response.results.length > 0 && response.results[0].mapped_user_name) {
                 setUserName(response.results[0].mapped_user_name)
             }
         } catch (error: any) {
-            toast.error(error.message);
+            toast.error(error.message);                                                                                                                                                                                                                                         
         }
+        setLoading(false);
     }
 
     useEffect(() => {
@@ -55,8 +53,8 @@ const MappedTrees: React.FC<MappedTreesProps> = ({ }) => {
                         margin: '0 auto',
                     }}
                 >
-                    <Typography variant="h4">{userName}'s Dashboard</Typography>
-                    <Divider sx={{ backgroundColor: 'black' }} />
+                    <Typography mb={1} variant="h4" color={"#323232"}                                                                                                                                                                                                                                                                                                                                                       >{userName}'s Dashboard</Typography>
+                    <Divider />
                 </Box>
             </Box>
             <Box
@@ -70,6 +68,7 @@ const MappedTrees: React.FC<MappedTreesProps> = ({ }) => {
                 }}
             >
                 <CardGrid
+                    loading={loading}
                     cards={trees.map(tree => {
                         let location: string = ''
                         const { hostname, host } = window.location;
@@ -84,13 +83,20 @@ const MappedTrees: React.FC<MappedTreesProps> = ({ }) => {
                             name: tree.assigned_to_name,
                             type: tree.plant_type,
                             dashboardLink: location,
-                            // image: tree.image,
-                            image: (tree.illustration_link && extractFileId(tree.illustration_link))
-                                    ?  `https://drive.google.com/uc?export=view&id=${extractFileId(tree.illustration_link)}`
+                            image: tree.illustration_s3_path
+                                    ?  tree.illustration_s3_path
                                     : tree.image,
                         }
                     })}
                 />
+                {userId && total > trees.length && <Button 
+                    variant="text"
+                    color="success"
+                    disabled={loading}
+                    onClick={() => { getTrees(userId, trees.length) }}
+                >
+                    Load More
+                </Button>}
             </Box>
         </Box>
     );
