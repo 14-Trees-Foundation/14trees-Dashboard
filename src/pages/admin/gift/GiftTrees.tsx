@@ -636,12 +636,12 @@ const GiftTrees: FC = () => {
                     }
                 </Menu.ItemGroup>
             }
-            {record.presentation_id && <Menu.Divider style={{ backgroundColor: '#ccc' }} />}
-            {record.presentation_id && <Menu.ItemGroup>
-                <Menu.Item key="30" onClick={() => { handleDownloadCards(record.id, record.user_name + '_' + record.no_of_cards, 'zip') }} icon={<Download />}>
+            {(record.presentation_id || record.presentation_ids.length > 0) && <Menu.Divider style={{ backgroundColor: '#ccc' }} />}
+            {(record.presentation_id || record.presentation_ids.length > 0) && <Menu.ItemGroup>
+                {record.presentation_id && <Menu.Item key="30" onClick={() => { handleDownloadCards(record.id, record.user_name + '_' + record.no_of_cards, 'zip') }} icon={<Download />}>
                     Download Tree Cards
-                </Menu.Item>
-                <Menu.Item key="31" onClick={() => { window.open('https://docs.google.com/presentation/d/' + record.presentation_id); }} icon={<Slideshow />}>
+                </Menu.Item>}
+                <Menu.Item key="31" onClick={() => { window.open('https://docs.google.com/presentation/d/' + (record.presentation_id ? record.presentation_id : record.presentation_ids[0])); }} icon={<Slideshow />}>
                     Tree Cards Slide
                 </Menu.Item>
             </Menu.ItemGroup>}
