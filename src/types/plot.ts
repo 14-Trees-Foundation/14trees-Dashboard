@@ -13,6 +13,7 @@ export type Plot = {
     desc: string,
     boundaries: Boundaries,
     center: Location,
+    pit_count: number | null,
     total?: number,
     tree_count?: number,
     shrub_count?: number,

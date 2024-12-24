@@ -62,6 +62,7 @@ const AddPlot = ({ open, handleClose, createPlot, tags }) => {
     },
     __v: 0,
     tags: [],
+    pit_count: 0,
   });
 
   useEffect(() => {
@@ -134,6 +135,7 @@ const AddPlot = ({ open, handleClose, createPlot, tags }) => {
       },
       __v: 0,
       tags: [],
+      pit_count: 0,
     });
     handleClose();
   };
@@ -242,6 +244,17 @@ const AddPlot = ({ open, handleClose, createPlot, tags }) => {
                   label="Gat"
                   value={formData.gat}
                   onChange={handleChange}
+                  fullWidth
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <TextField
+                  name="pit_count"
+                  label="Pit count"
+                  value={formData.pit_count}
+                  onChange={handleChange}
+                  type="number"
+                  inputProps={{ min: 0 }}
                   fullWidth
                 />
               </Grid>
