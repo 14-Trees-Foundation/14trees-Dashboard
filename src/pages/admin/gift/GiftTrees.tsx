@@ -280,10 +280,8 @@ const GiftTrees: FC = () => {
         try {
             const response = await apiClient.createGiftCard(requestId, auth.userId, treeCount, user.id, category, grove, giftedOn, group?.id, paymentId, logo, messages, file);
             giftCardId = response.id;
-            dispatch({
-                type: giftCardActionTypes.CREATE_GIFT_CARD_SUCCEEDED,
-                payload: response,
-            });
+            
+            getGiftCardData();
             setRequestId(null);
         } catch (error) {
             toast.error("Failed to create gift card");

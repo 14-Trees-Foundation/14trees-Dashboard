@@ -50,6 +50,11 @@ ReactDOM.render(
           algorithm: true,
           borderRadius: 3
         },
+        Segmented: {
+          itemActiveBg: '#e3e3e3bf',
+          itemSelectedBg: '#8fcf9f7a',
+          itemHoverBg: '#b7edc47a',
+        },
       }
     }}
     >
