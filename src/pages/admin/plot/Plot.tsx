@@ -306,6 +306,14 @@ export const PlotComponent = () => {
       ...getColumnSearchProps('site_name', filters, handleSetFilters)
     },
     {
+      dataIndex: "acres_area",
+      key: "Area (acres)",
+      title: getSortableHeader("Area (acres)", 'acres_area'),
+      align: "right",
+      width: 150,
+      render: (value: number) => value ? value.toFixed(3) : 'Unknown', 
+    },
+    {
       dataIndex: "total",
       key: "Total Trees",
       title: getSortableHeader("Total Trees", 'total'),
