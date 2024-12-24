@@ -18,6 +18,7 @@ import { Tag } from '../../types/tag';
 import { EmailTemplate } from '../../types/email_template';
 import { Payment, PaymentHistory } from '../../types/payment';
 import { Order } from '../../types/common';
+import { isTypedArray } from 'util/types';
 
 
 class ApiClient {
@@ -656,6 +657,9 @@ class ApiClient {
                 formData.append('lng', data.location.coordinates[1].toString());
             }
             formData.append('mapped_to', data.mapped_to_user.toString());
+            if (data.tags && data.tags.length > 0) {
+                data.tags.forEach(tag => { formData.append("tags", tag) });
+            }
             const response = await this.api.post<Tree>(`/trees/`, formData);
             return response.data;
         } catch (error) {
@@ -672,7 +676,9 @@ class ApiClient {
                 formData.append("files", file);
             }
             Object.entries(data).forEach(([key, value]) => {
-                if (key != 'image' && value != null) {
+                if (key === "tags" && value) {
+                    (value as any)?.forEach((tag: string) => { formData.append("tags", tag) });
+                } else if (key != 'image' && value != null) {
                     const strValue = value as string
                     formData.append(key, strValue);
                 }
@@ -703,6 +709,19 @@ class ApiClient {
         } catch (error) {
             console.error(error)
             throw new Error('Failed to create Trees in bulk');
+        }
+    }
+
+    async getTreeTags(): Promise<PaginatedResponse<string>> {
+        try {
+            const resp = await this.api.get<PaginatedResponse<string>>(`/trees/tags`,);
+            return resp.data;
+        } catch (error: any) {
+            if (error.response?.data?.message) {
+                throw new Error(error.response.data.message);
+            }
+
+            throw new Error('Failed to fetch tree tags');
         }
     }
 

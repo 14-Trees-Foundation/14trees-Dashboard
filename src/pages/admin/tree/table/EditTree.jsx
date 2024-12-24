@@ -13,6 +13,7 @@ import * as plantTypeActionCreators from "../../../../redux/actions/plantTypeAct
 import * as plotActionCreators from "../../../../redux/actions/plotActions";
 import { useAppDispatch, useAppSelector } from '../../../../redux/store/hooks';
 import { bindActionCreators } from '@reduxjs/toolkit';
+import TagSelector from '../../../../components/TagSelector';
 
 function EditTree({ row, openeditModal, handleCloseEditModal, editSubmit }) {
 
@@ -49,7 +50,7 @@ function EditTree({ row, openeditModal, handleCloseEditModal, editSubmit }) {
         let nameFilter;
         if (plantTypeName !== "") nameFilter = [{ columnField: "name", value: plantTypeName, operatorValue: "contains" }]
         setTimeout(async () => {
-            await getPlantTypes(page*10, 10, nameFilter);
+            await getPlantTypes(page * 10, 10, nameFilter);
         }, 1000);
     };
 
@@ -63,7 +64,7 @@ function EditTree({ row, openeditModal, handleCloseEditModal, editSubmit }) {
     if (plantTypesData) {
         plantTypesMap = { ...plantTypesData.plantTypes }
         if (!Object.hasOwn(plantTypesMap, formData.plant_type_id)) {
-            plantTypesMap[formData.plant_type_id] = { id: formData.plant_type_id, name: formData.plant_type}
+            plantTypesMap[formData.plant_type_id] = { id: formData.plant_type_id, name: formData.plant_type }
         }
         plantTypesList = Object.values(plantTypesMap);
     }
@@ -71,7 +72,7 @@ function EditTree({ row, openeditModal, handleCloseEditModal, editSubmit }) {
     const getPlotData = async () => {
         const nameFilter = { columnField: "name", value: plotName, operatorValue: "contains" }
         setTimeout(async () => {
-            await getPlots(page*10, 10, [nameFilter]);
+            await getPlots(page * 10, 10, [nameFilter]);
         }, 1000);
     };
 
@@ -85,7 +86,7 @@ function EditTree({ row, openeditModal, handleCloseEditModal, editSubmit }) {
     if (plotsData) {
         plotsMap = { ...plotsData.plots }
         if (!Object.hasOwn(plotsMap, formData.plot_id)) {
-            plotsMap[formData.plot_id] = { id: formData.plot_id, name: formData.plot}
+            plotsMap[formData.plot_id] = { id: formData.plot_id, name: formData.plot }
         }
         plotsList = Object.values(plotsMap);
     }
@@ -106,7 +107,7 @@ function EditTree({ row, openeditModal, handleCloseEditModal, editSubmit }) {
                         value={formData.sapling_id}
                         onChange={handleChange}
                     />
-                    <Autocomplete 
+                    <Autocomplete
                         fullWidth
                         name="plant_type_id"
                         disablePortal
@@ -115,28 +116,35 @@ function EditTree({ row, openeditModal, handleCloseEditModal, editSubmit }) {
                             const { value } = event.target;
                             setPlantTypeName(value);
                         }} margin="dense" label="Plant Type" />}
-                        onChange={(event, value) => { if (value !== null) setFormData(prevState => ({ ...prevState, 'plant_type_id': value.id }))}}
-                        value={ (plantTypeName === '' && Object.hasOwn(plantTypesMap, formData.plant_type_id)) ? plantTypesMap[formData.plant_type_id] : null}
+                        onChange={(event, value) => { if (value !== null) setFormData(prevState => ({ ...prevState, 'plant_type_id': value.id })) }}
+                        value={(plantTypeName === '' && Object.hasOwn(plantTypesMap, formData.plant_type_id)) ? plantTypesMap[formData.plant_type_id] : null}
                         getOptionLabel={(option) => (option.name)}
                     />
-                    <Autocomplete 
+                    <Autocomplete
                         fullWidth
                         name="plot_id"
                         disablePortal
                         options={plotsList}
                         renderInput={(params) => (
-                            <TextField {...params} 
+                            <TextField {...params}
                                 onChange={(event) => {
                                     const { value } = event.target;
                                     setPlotName(value);
-                                }} 
-                                margin="dense" 
-                                label="Plot" 
+                                }}
+                                margin="dense"
+                                label="Plot"
                             />
                         )}
-                        onChange={(event, value) => { if (value !== null) setFormData(prevState => ({ ...prevState, 'plot_id': value.id }))}}
-                        value={ (plotName === '' && Object.hasOwn(plotsMap, formData.plot_id)) ? plotsMap[formData.plot_id] : null }
+                        onChange={(event, value) => { if (value !== null) setFormData(prevState => ({ ...prevState, 'plot_id': value.id })) }}
+                        value={(plotName === '' && Object.hasOwn(plotsMap, formData.plot_id)) ? plotsMap[formData.plot_id] : null}
                         getOptionLabel={(option) => (option.name)}
+                    />
+                    <TagSelector
+                        value={formData.tags}
+                        handleChange={(tags) =>
+                            setFormData({ ...formData, tags: tags })
+                        }
+                        margin='dense'
                     />
                     {/* <TextField
                         autoFocus

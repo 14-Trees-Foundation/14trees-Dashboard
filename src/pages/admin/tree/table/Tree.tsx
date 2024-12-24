@@ -16,7 +16,7 @@ import {
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import ImageIcon from "@mui/icons-material/Image";
-import { MapTreesUsingSaplingIdsRequest, type Tree } from "../../../../types/tree";
+import { type Tree } from "../../../../types/tree";
 import * as treeActionCreators from "../../../../redux/actions/treeActions";
 import * as userTreesActionCreators from "../../../../redux/actions/userTreeActions";
 import * as userActionCreators from "../../../../redux/actions/userActions";
@@ -26,7 +26,6 @@ import { bindActionCreators } from "redux";
 import { useAppDispatch, useAppSelector } from "../../../../redux/store/hooks";
 import { RootState } from "../../../../redux/store/store";
 import EditTree from "./EditTree";
-import UserModal from "../../../../components/UserModal";
 import AssignTreeModal from "./AssignTreeModal";
 import getColumnSearchProps, { getColumnSelectedItemFilter } from "../../../../components/Filter";
 import { TableColumnsType } from "antd";
@@ -36,6 +35,8 @@ import { AutocompleteWithPagination } from "../../../../components/AutoComplete"
 import Timeline from "./timeline";
 import { TreeImage } from "../../../../types/tree_snapshots";
 import MapTreesModal from "./MapTreesModal";
+import { toast } from "react-toastify";
+import ApiClient from "../../../../api/apiClient/apiClient";
 
 export const TreeNew = () => {
     const dispatch = useAppDispatch();
@@ -76,11 +77,26 @@ export const TreeNew = () => {
     const [selectedTreeIds, setSelectedTreeIds] = useState<number[]>([]);
     const [selectedPlot, setSelectedPlot] = useState<Plot | null>(null);
     const [changePlotModal, setChangePlotModal] = useState<boolean>(false);
+    const [tags, setTags] = useState<string[]>([]);
 
     const handleSetFilters = (filters: Record<string, GridFilterItem>) => {
         setPage(0);
         setFilters(filters);
     }
+
+    useEffect(() => {
+        const getTags = async () => {
+            try {
+                const apiClient = new ApiClient();
+                const resp = await apiClient.getTreeTags();
+                setTags(resp.results)
+            } catch (error: any){
+                toast.error(error.message);
+            }
+        };
+
+        getTags();
+    }, [])
 
     useEffect(() => {
         getTreeData();
@@ -187,6 +203,15 @@ export const TreeNew = () => {
             align: 'center',
             render: (value, record, index) => record?.plot,
             ...getColumnSearchProps('plot', filters, handleSetFilters)
+        },
+        {
+            dataIndex: "tags",
+            key: "tags",
+            title: "Tags",
+            width: 200,
+            align: 'center',
+            render: value => value ? value?.join(", ") : '',
+            ...getColumnSelectedItemFilter({dataIndex: 'tags', filters, handleSetFilters, options: tags})
         },
         {
             dataIndex: "mapped_user_name",
