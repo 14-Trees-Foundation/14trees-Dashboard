@@ -158,6 +158,16 @@ function EditPlot({ row, openeditModal, handleCloseModal, editSubmit, tags }) {
             fullWidth
             margin="dense"
           />
+          <TextField
+            name="pit_count"
+            label="Pit count"
+            value={formData.pit_count || 0}
+            onChange={handleChange}
+            type="number"
+            inputProps={{ min: 0 }}
+            fullWidth
+            margin="dense"
+          />
           <TagSelector
             userTags={tags.filter(item => item.type === 'USER_DEFINED').map(item => item.tag)}
             systemTags={tags.filter(item => item.type === 'SYSTEM_DEFINED').map(item => item.tag)}
