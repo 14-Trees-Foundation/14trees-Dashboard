@@ -7,7 +7,7 @@ export type Tree = {
     plant_type_id: number,
     plot_id: number,
     image: string,
-    tags: [string],
+    tags: string[] | null,
     location: Location,
     planted_by: string,
     mapped_to_user: number,
