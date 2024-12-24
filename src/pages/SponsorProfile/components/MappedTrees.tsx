@@ -120,7 +120,7 @@ const MappedTrees: React.FC<MappedTreesProps> = ({ }) => {
                         value={searchStr}
                         onChange={(e) =>{  setSearchStr(e.target.value) }}
                         sx={{ ml: 1, flex: 1 }}
-                        placeholder="Search"
+                        placeholder="Search name"
                         inputProps={{ 'aria-label': 'search friends & family members' }}
                     />
                 </Paper>
