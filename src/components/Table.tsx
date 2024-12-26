@@ -84,7 +84,7 @@ function TableComponent({ loading, dataSource, columns, totalRecords, tableName,
 
     const [download, setDownload] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
-    const [checkedList, setCheckedList] = useState(columns?.map((item) => item.key) ?? []);
+    const [checkedList, setCheckedList] = useState(columns?.filter(item => !item.hidden)?.map((item) => item.key) ?? []);
     const [open, setOpen] = useState(false);
     const [tableCols, setTableCols] = useState<any[]>([]);
     const [showLabels, setShowLabels] = useState(false);
@@ -183,9 +183,9 @@ function TableComponent({ loading, dataSource, columns, totalRecords, tableName,
     }
 
     const items: MenuProps['items'] = columns?.map((column: any) => {
-        const title = typeof column.title === 'string' ? column.title : column.dataIndex;
+        const title = typeof column.title === 'string' ? column.title : column.key;
         return {
-            key: column.dataIndex,
+            key: column.key,
             label: <Checkbox checked={checkedList.includes(column.key)} onChange={() => handleColumnsSelection(column.key)}>{title}</Checkbox>
         }
     })
