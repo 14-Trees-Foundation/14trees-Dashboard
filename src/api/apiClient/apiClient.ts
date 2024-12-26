@@ -631,10 +631,10 @@ class ApiClient {
         Model- Tree: CRUD Operations/Apis for trees
     */
 
-    async getTrees(offset: number, limit: number, filters?: any[]): Promise<PaginatedResponse<Tree>> {
+    async getTrees(offset: number, limit: number, filters?: any[], order_by?: Order[]): Promise<PaginatedResponse<Tree>> {
         const url = `/trees/get?offset=${offset}&limit=${limit}`;
         try {
-            const response = await this.api.post<PaginatedResponse<Tree>>(url, { filters: filters });
+            const response = await this.api.post<PaginatedResponse<Tree>>(url, { filters: filters, order_by });
             return response.data;
         } catch (error: any) {
             console.error(error)

@@ -27,7 +27,7 @@ import { useAppDispatch, useAppSelector } from "../../../../redux/store/hooks";
 import { RootState } from "../../../../redux/store/store";
 import EditTree from "./EditTree";
 import AssignTreeModal from "./AssignTreeModal";
-import getColumnSearchProps, { getColumnSelectedItemFilter } from "../../../../components/Filter";
+import getColumnSearchProps, { getColumnSelectedItemFilter, getSortIcon } from "../../../../components/Filter";
 import { TableColumnsType } from "antd";
 import { Plot } from "../../../../types/plot";
 import TableComponent from "../../../../components/Table";
@@ -37,6 +37,8 @@ import { TreeImage } from "../../../../types/tree_snapshots";
 import MapTreesModal from "./MapTreesModal";
 import { toast } from "react-toastify";
 import ApiClient from "../../../../api/apiClient/apiClient";
+import { Order } from "../../../../types/common";
+import { getHumanReadableDate } from "../../../../helpers/utils";
 
 export const TreeNew = () => {
     const dispatch = useAppDispatch();
@@ -74,6 +76,7 @@ export const TreeNew = () => {
     const [openConfirmation, setOpenConfirmation] = useState(false);
     const [operation, setOperation] = useState('');
     const [filters, setFilters] = useState<Record<string, GridFilterItem>>({});
+    const [orderBy, setOrderBy] = useState<Order[]>([]);
     const [selectedTreeIds, setSelectedTreeIds] = useState<number[]>([]);
     const [selectedPlot, setSelectedPlot] = useState<Plot | null>(null);
     const [changePlotModal, setChangePlotModal] = useState<boolean>(false);
@@ -90,7 +93,7 @@ export const TreeNew = () => {
                 const apiClient = new ApiClient();
                 const resp = await apiClient.getTreeTags();
                 setTags(resp.results)
-            } catch (error: any){
+            } catch (error: any) {
                 toast.error(error.message);
             }
         };
@@ -100,12 +103,12 @@ export const TreeNew = () => {
 
     useEffect(() => {
         getTreeData();
-    }, [pageSize, page, filters, editModal]);
+    }, [pageSize, page, filters, editModal, orderBy]);
 
     const getTreeData = async () => {
         const filtersData = Object.values(filters);
         setLoading(true);
-        getTrees(page * pageSize, pageSize, filtersData);
+        getTrees(page * pageSize, pageSize, filtersData, orderBy);
         setTimeout(() => {
             setLoading(false);
         }, 1000);
@@ -162,6 +165,33 @@ export const TreeNew = () => {
         });
     }
 
+    const handleSortingChange = (sorter: any) => {
+        let newOrder = [...orderBy];
+        const updateOrder = (item: { column: string, order: 'ASC' | 'DESC' }) => {
+            const index = newOrder.findIndex((item) => item.column === sorter.field);
+            if (index > -1) {
+                if (sorter.order) newOrder[index].order = sorter.order;
+                else newOrder = newOrder.filter((item) => item.column !== sorter.field);
+            } else if (sorter.order) {
+                newOrder.push({ column: sorter.field, order: sorter.order });
+            }
+        }
+
+        if (sorter.field) {
+            setPage(0);
+            updateOrder(sorter);
+            setOrderBy(newOrder);
+        }
+    }
+
+    const getSortableHeader = (header: string, key: string) => {
+        return (
+          <div style={{ display: "flex", alignItems: "center", justifyContent: 'space-between' }}>
+            {header} {getSortIcon(key, orderBy.find((item) => item.column === key)?.order, handleSortingChange)}
+          </div>
+        )
+    }
+
     const columns: TableColumnsType<Tree> = [
         {
             dataIndex: "srNo",
@@ -193,7 +223,7 @@ export const TreeNew = () => {
             title: "habitat",
             width: 250,
             align: 'center',
-            ...getColumnSelectedItemFilter({ dataIndex: 'habit', filters, handleSetFilters, options: ['Tree', 'Herb', 'Shrub', 'Climber']})
+            ...getColumnSelectedItemFilter({ dataIndex: 'habit', filters, handleSetFilters, options: ['Tree', 'Herb', 'Shrub', 'Climber'] })
         },
         {
             dataIndex: "plot",
@@ -211,7 +241,7 @@ export const TreeNew = () => {
             width: 200,
             align: 'center',
             render: value => value ? value?.join(", ") : '',
-            ...getColumnSelectedItemFilter({dataIndex: 'tags', filters, handleSetFilters, options: tags})
+            ...getColumnSelectedItemFilter({ dataIndex: 'tags', filters, handleSetFilters, options: tags })
         },
         {
             dataIndex: "mapped_user_name",
@@ -252,6 +282,33 @@ export const TreeNew = () => {
             width: 250,
             align: 'center',
             ...getColumnSearchProps('assigned_to_name', filters, handleSetFilters)
+        },
+        {
+            dataIndex: "mapped_at",
+            key: "Booked on",
+            title: getSortableHeader("Booked on", "mapped_at"),
+            width: 250,
+            align: 'center',
+            hidden: true,
+            render: value => value ? getHumanReadableDate(value) : '',
+        },
+        {
+            dataIndex: "assigned_at",
+            key: "Assigned on",
+            title: getSortableHeader("Assigned on", "assigned_at"),
+            width: 250,
+            align: 'center',
+            hidden: true,
+            render: value => value ? getHumanReadableDate(value) : '',
+        },
+        {
+            dataIndex: "created_at",
+            key: "Uploaded on",
+            title: getSortableHeader("Uploaded on", "created_at"),
+            width: 250,
+            align: 'center',
+            hidden: true,
+            render: value => value ? getHumanReadableDate(value) : '',
         },
         {
             dataIndex: "action",
@@ -310,7 +367,7 @@ export const TreeNew = () => {
 
     const getAllTreesData = async () => {
         let filtersData = Object.values(filters);
-        getTrees(0, treesData.totalTrees, filtersData);
+        getTrees(0, treesData.totalTrees, filtersData, orderBy);
     };
 
     const handleDelete = (row: Tree) => {
@@ -425,7 +482,7 @@ export const TreeNew = () => {
 
     const handleChangePlot = () => {
         if (selectedPlot === null) return;
-        
+
         changeTreesPlot(selectedTreeIds, selectedPlot.id);
         setSelectedPlot(null);
         setTimeout(() => {
@@ -498,7 +555,7 @@ export const TreeNew = () => {
                     handleSelectionChanges={handleSelectionChanges}
                     setSrNoPage={setSrNoPage}
                     rowClassName={(record, index) => { return record.habit === 'Tree' ? 'bg-green' : record.habit === 'Shrub' ? 'bg-cyan' : record.habit === 'Herb' ? 'bg-yellow' : 'bg-red' }}
-                    tableRowColoringLabels={[{ className: 'bg-green', label: 'Tree'}, { className: 'bg-cyan', label: 'Shrub'}, { className: 'bg-yellow', label: 'Herb'}, { className: 'bg-red', label: 'Unknown'}]}
+                    tableRowColoringLabels={[{ className: 'bg-green', label: 'Tree' }, { className: 'bg-cyan', label: 'Shrub' }, { className: 'bg-yellow', label: 'Herb' }, { className: 'bg-red', label: 'Unknown' }]}
                     tableName="Trees"
                 />
             </Box>
@@ -519,7 +576,7 @@ export const TreeNew = () => {
                 />
             )}
 
-            <MapTreesModal 
+            <MapTreesModal
                 open={isUserModalOpen}
                 onClose={() => { setIsUserModalOpen(false) }}
                 onSubmit={handleMapTrees}

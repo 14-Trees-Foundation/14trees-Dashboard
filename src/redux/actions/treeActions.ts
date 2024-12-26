@@ -3,14 +3,15 @@ import treeActionTypes from "../actionTypes/treeActionTypes";
 import { Tree } from "../../types/tree";
 import { PaginatedResponse } from "../../types/pagination";
 import { toast } from "react-toastify";
+import { Order } from "../../types/common";
 
-export const getTrees = (offset: number, limit: number, filters?: any) => {
+export const getTrees = (offset: number, limit: number, filters?: any, orderBy?: Order[]) => {
     const apiClient = new ApiClient()
     return (dispatch: any) => {
         dispatch({
             type: treeActionTypes.GET_TREES_REQUESTED,
         });
-        apiClient.getTrees(offset, limit, filters).then(
+        apiClient.getTrees(offset, limit, filters, orderBy).then(
             (value: PaginatedResponse<Tree>) => {
                 for (let i = 0; i < value.results.length; i++) {
                     if (value.results[i]?.id) {
