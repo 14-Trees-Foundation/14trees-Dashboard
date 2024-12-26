@@ -203,7 +203,6 @@ const TagStats: FC<TagStatsProps> = ({ habits, landTypes, villages, districts, t
             key: "total",
             align: 'right',
             width: 120,
-            className: 'bg-orange',
         },
         {
             title: getSortableHeader("Trees", "tree_count"),
@@ -211,7 +210,6 @@ const TagStats: FC<TagStatsProps> = ({ habits, landTypes, villages, districts, t
             key: "Trees",
             align: 'right',
             width: 120,
-            className: 'bg-green',
         },
         {
             title: getSortableHeader("Shrubs", "shrub_count"),
@@ -219,7 +217,6 @@ const TagStats: FC<TagStatsProps> = ({ habits, landTypes, villages, districts, t
             key: "Shrubs",
             align: 'right',
             width: 120,
-            className: 'bg-cyan',
         },
         {
             title: getSortableHeader("Herbs", "herb_count"),
@@ -227,7 +224,6 @@ const TagStats: FC<TagStatsProps> = ({ habits, landTypes, villages, districts, t
             key: "Herbs",
             align: 'right',
             width: 120,
-            className: 'bg-yellow',
         },
         {
             title: getSortableHeader("Booked", "booked"),
@@ -314,11 +310,38 @@ const TagStats: FC<TagStatsProps> = ({ habits, landTypes, villages, districts, t
                         title: getSortableHeader("Unfunded Inventory (Unassigned)", getColumn("available", treeHabit)),
                         className: getColumnClass(),
                     }
+                } else if (column.dataIndex.startsWith("card_available")) {
+                    return {
+                        ...column,
+                        dataIndex: getColumn("card_available", treeHabit),
+                        title: getSortableHeader("Giftable Inventory", getColumn("card_available", treeHabit)),
+                        className: getColumnClass(),
+                    }
                 } else if (column.dataIndex === 'total_unfunded') {
                     return {
                         ...column,
                         render: (value: any, record: any) => (Number(record[getColumn("available", treeHabit)]) || 0) + (Number(record[getColumn("unbooked_assigned", treeHabit)]) || 0),
                         className: getColumnClass(),
+                    }
+                } else if (column.dataIndex === "total") {
+                    return {
+                        ...column,
+                        className: treeHabit === '' ? 'bg-orange' : undefined,
+                    }
+                } else if (column.dataIndex === "tree_count") {
+                    return {
+                        ...column,
+                        className: treeHabit === 'trees' ? 'bg-green' : undefined,
+                    }
+                } else if (column.dataIndex === "shrub_count") {
+                    return {
+                        ...column,
+                        className: treeHabit === 'shrubs' ? 'bg-cyan' : undefined,
+                    }
+                } else if (column.dataIndex === "herb_count") {
+                    return {
+                        ...column,
+                        className: treeHabit === 'herbs' ? 'bg-yellow' : undefined,
                     }
                 }
 
@@ -332,13 +355,21 @@ const TagStats: FC<TagStatsProps> = ({ habits, landTypes, villages, districts, t
     return (
         <div>
             <Box>
-                <Typography variant="h6">Tag level stats</Typography>
-                <Segmented<{ value: 'trees' | 'herbs' | 'shrubs' | '', label: string }>
-                    options={[{ value: 'trees', label: 'Trees' }, { value: 'shrubs', label: 'Shrubs' }, { value: 'herbs', label: 'Herbs' }, { value: '', label: 'Total' }]}
-                    onChange={(item: any) => {
-                        setTreeHabit(item)
-                    }}
-                />
+                <Box
+                    display="flex"
+                    justifyContent="space-between"
+                    alignItems="felx-end"
+                    marginBottom={1}
+                >
+                    <Typography variant="h6">Tag level stats</Typography>
+                    <Segmented<{ value: 'trees' | 'herbs' | 'shrubs' | '', label: string }>
+                        size="large"
+                        options={[{ value: 'trees', label: 'Trees' }, { value: 'shrubs', label: 'Shrubs' }, { value: 'herbs', label: 'Herbs' }, { value: '', label: 'Total' }]}
+                        onChange={(item: any) => {
+                            setTreeHabit(item)
+                        }}
+                    />
+                </Box>
                 <GeneralTable
                     columns={columns}
                     loading={loading}

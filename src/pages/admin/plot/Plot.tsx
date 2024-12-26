@@ -319,7 +319,6 @@ export const PlotComponent = () => {
       title: getSortableHeader("Total Trees", 'total'),
       align: "right",
       width: 150,
-      className: 'bg-orange',
       render: (value, record) => value ?? 0 - (includeDeadLostTrees && record.void_total ? record.void_total : 0),
     },
     {
@@ -327,7 +326,6 @@ export const PlotComponent = () => {
       key: "Trees",
       title: getSortableHeader("Trees", 'tree_count'),
       align: "right",
-      className: 'bg-green',
       width: 150,
     },
     {
@@ -335,7 +333,6 @@ export const PlotComponent = () => {
       key: "Shrubs",
       title: getSortableHeader("Shrubs", 'shrub_count'),
       align: "right",
-      className: 'bg-cyan',
       width: 150,
     },
     {
@@ -343,7 +340,6 @@ export const PlotComponent = () => {
       key: "Herbs",
       title: getSortableHeader("Herbs", 'herb_count'),
       align: "right",
-      className: 'bg-yellow',
       width: 150,
     },
     {
@@ -418,6 +414,26 @@ export const PlotComponent = () => {
             dataIndex: getColumn("available", treeHabit),
             title: getSortableHeader("Unfunded Inventory (Unassigned)", getColumn("available", treeHabit)),
             className: getColumnClass(),
+          }
+        } else if (column.dataIndex === "total") {
+          return {
+            ...column,
+            className: treeHabit === '' ? 'bg-orange' : undefined,
+          }
+        } else if (column.dataIndex === "tree_count") {
+          return {
+            ...column,
+            className: treeHabit === 'trees' ? 'bg-green' : undefined,
+          }
+        } else if (column.dataIndex === "shrub_count") {
+          return {
+            ...column,
+            className: treeHabit === 'shrubs' ? 'bg-cyan' : undefined,
+          }
+        } else if (column.dataIndex === "herb_count") {
+          return {
+            ...column,
+            className: treeHabit === 'herbs' ? 'bg-yellow' : undefined,
           }
         }
 
@@ -533,16 +549,18 @@ export const PlotComponent = () => {
           style={{
             display: "flex",
             alignItems: 'center',
-            justifyContent: "space-between",
+            justifyContent: "flex-end",
           }}
         >
           <Segmented<{ value: 'trees' | 'herbs' | 'shrubs' | '', label: string }>
+            size="large"
             options={[{ value: 'trees', label: 'Trees' }, { value: 'shrubs', label: 'Shrubs' }, { value: 'herbs', label: 'Herbs' }, { value: '', label: 'Total' }]}
             onChange={(item: any) => {
               setTreeHabit(item)
             }}
           />
           <FormControlLabel
+            sx={{ ml: 2 }}
             control={<Checkbox checked={includeDeadLostTrees} onChange={() => setIncludeDeadLostTrees(!includeDeadLostTrees)} />}
             label="Include Dead/Lost Trees"
           />

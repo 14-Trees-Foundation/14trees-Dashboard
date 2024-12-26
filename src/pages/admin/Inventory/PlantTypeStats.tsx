@@ -16,7 +16,7 @@ const TableSummary = (data: any[], selectedKeys: any[], totalColumns: number) =>
     return (
         <Table.Summary fixed='bottom'>
             <Table.Summary.Row style={{ backgroundColor: 'rgba(172, 252, 172, 0.2)' }}>
-                <Table.Summary.Cell align="right" index={totalColumns - 7} colSpan={3}>
+                <Table.Summary.Cell align="right" index={totalColumns - 7} colSpan={4}>
                     <strong>Total</strong>
                 </Table.Summary.Cell>
                 <Table.Summary.Cell align="right" index={totalColumns - 6} colSpan={1}>{calculateSum(data.filter((item) => selectedKeys.includes(item.key)).map((item) => item.total))}</Table.Summary.Cell>
@@ -250,6 +250,13 @@ const PlantTypeStats: FC<PlantTypeStatsProps> = ({ habits, landTypes, districts,
             key: 'plant_type',
             render: (value: any) => value ? value : 'Unknown',
             ...getColumnSearchProps('plant_type', filters, handleSetFilters),
+        },
+        {
+            title: "Habitat",
+            dataIndex: 'habit',
+            key: 'habit',
+            render: (value: any) => value ? value : 'Unknown',
+            ...getColumnSelectedItemFilter({dataIndex: 'habit', filters, handleSetFilters, options: ["Tree", "Herb", "Shrub"]}),
         },
         {
             title: "Illustrations",
