@@ -242,9 +242,9 @@ const PlotSelection: FC<PlotSelectionProps> = ({ giftCardRequestId, requiredTree
             width: 150,
           },
         {
-            dataIndex: "available",
+            dataIndex: "available_trees",
             key: "Available (Unfunded Inventory)",
-            title: getSortableHeader("Available (Unfunded Inventory)", 'available'),
+            title: getSortableHeader("Available (Unfunded Inventory)", 'available_trees'),
             align: "right",
             width: 150,
         },

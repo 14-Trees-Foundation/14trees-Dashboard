@@ -25,7 +25,7 @@ import {
   Typography,
 } from "@mui/material";
 import EditPlot from "./EditPlot";
-import { Table, TableColumnsType } from "antd";
+import { Segmented, Table, TableColumnsType } from "antd";
 import getColumnSearchProps, { getColumnSelectedItemFilter, getSortIcon } from "../../../components/Filter";
 import { ToastContainer, toast } from "react-toastify";
 import { AutocompleteWithPagination } from "../../../components/AutoComplete";
@@ -34,7 +34,11 @@ import UpdateCoords from "./UpdateCoords";
 import ApiClient from "../../../api/apiClient/apiClient";
 import GeneralTable from "../../../components/GenTable";
 
-const TableSummary = (plots: Plot[], selectedPlotIds: number[], totalColumns: number) => {
+function getColumn(field: string, treeHabitat: string) {
+  return field + (treeHabitat ? "_" + treeHabitat : '')
+}
+
+const TableSummary = (plots: Plot[], selectedPlotIds: number[], totalColumns: number, treeHabitat: string) => {
 
   const calculateSum = (data: (number | undefined)[]) => {
     return data.reduce((a, b) => (a ?? 0) + (b ?? 0), 0);
@@ -50,10 +54,10 @@ const TableSummary = (plots: Plot[], selectedPlotIds: number[], totalColumns: nu
         <Table.Summary.Cell align="right" index={totalColumns - 6} colSpan={1}>{calculateSum(plots.filter((plot) => selectedPlotIds.includes(plot.id)).map((plot) => plot.tree_count))}</Table.Summary.Cell>
         <Table.Summary.Cell align="right" index={totalColumns - 5} colSpan={1}>{calculateSum(plots.filter((plot) => selectedPlotIds.includes(plot.id)).map((plot) => plot.shrub_count))}</Table.Summary.Cell>
         <Table.Summary.Cell align="right" index={totalColumns - 4} colSpan={1}>{calculateSum(plots.filter((plot) => selectedPlotIds.includes(plot.id)).map((plot) => plot.herb_count))}</Table.Summary.Cell>
-        <Table.Summary.Cell align="right" index={totalColumns - 3} colSpan={1}>{calculateSum(plots.filter((plot) => selectedPlotIds.includes(plot.id)).map((plot) => plot.booked))}</Table.Summary.Cell>
-        <Table.Summary.Cell align="right" index={totalColumns - 2} colSpan={1}>{calculateSum(plots.filter((plot) => selectedPlotIds.includes(plot.id)).map((plot) => plot.assigned))}</Table.Summary.Cell>
-        <Table.Summary.Cell align="right" index={totalColumns - 1} colSpan={1}>{calculateSum(plots.filter((plot) => selectedPlotIds.includes(plot.id)).map((plot) => plot.unbooked_assigned))}</Table.Summary.Cell>
-        <Table.Summary.Cell align="right" index={totalColumns} colSpan={1}>{calculateSum(plots.filter((plot) => selectedPlotIds.includes(plot.id)).map((plot) => plot.available))}</Table.Summary.Cell>
+        <Table.Summary.Cell align="right" index={totalColumns - 3} colSpan={1}>{calculateSum(plots.filter((plot) => selectedPlotIds.includes(plot.id)).map((plot: any) => plot[getColumn("booked", treeHabitat)]))}</Table.Summary.Cell>
+        <Table.Summary.Cell align="right" index={totalColumns - 2} colSpan={1}>{calculateSum(plots.filter((plot) => selectedPlotIds.includes(plot.id)).map((plot: any) => plot[getColumn("assigned", treeHabitat)]))}</Table.Summary.Cell>
+        <Table.Summary.Cell align="right" index={totalColumns - 1} colSpan={1}>{calculateSum(plots.filter((plot) => selectedPlotIds.includes(plot.id)).map((plot: any) => plot[getColumn("unbooked_assigned", treeHabitat)]))}</Table.Summary.Cell>
+        <Table.Summary.Cell align="right" index={totalColumns} colSpan={1}>{calculateSum(plots.filter((plot) => selectedPlotIds.includes(plot.id)).map((plot: any) => plot[getColumn("available", treeHabitat)]))}</Table.Summary.Cell>
       </Table.Summary.Row>
     </Table.Summary>
   )
@@ -88,6 +92,7 @@ export const PlotComponent = () => {
   const [selectedSite, setSelectedSite] = useState<Site | null>(null);
   const [updateCoords, setUpdateCoords] = useState(false);
   const [includeDeadLostTrees, setIncludeDeadLostTrees] = useState(false);
+  const [treeHabit, setTreeHabit] = useState<'trees' | 'shrubs' | 'herbs' | ''>('trees');
 
   const [orderBy, setOrderBy] = useState<{ column: string, order: 'ASC' | 'DESC' }[]>([]);
 
@@ -156,7 +161,7 @@ export const PlotComponent = () => {
   if (tagsData) {
     tags = Object.values(tagsData.tags).map(item => item.tag);
   }
-  
+
   useEffect(() => {
     getSitesData();
   }, [sitePage, siteNameInput]);
@@ -217,7 +222,7 @@ export const PlotComponent = () => {
     )
   }
 
-  const columns: TableColumnsType<Plot> = [
+  const [columns, setColumns] = useState<TableColumnsType<Plot>>([
     {
       dataIndex: "action",
       key: "action",
@@ -301,6 +306,14 @@ export const PlotComponent = () => {
       ...getColumnSearchProps('site_name', filters, handleSetFilters)
     },
     {
+      dataIndex: "acres_area",
+      key: "Area (acres)",
+      title: getSortableHeader("Area (acres)", 'acres_area'),
+      align: "right",
+      width: 150,
+      render: (value: number) => value ? value.toFixed(3) : 'Unknown', 
+    },
+    {
       dataIndex: "total",
       key: "Total Trees",
       title: getSortableHeader("Total Trees", 'total'),
@@ -332,7 +345,7 @@ export const PlotComponent = () => {
     {
       dataIndex: "booked",
       key: "Booked Trees",
-      title: getSortableHeader("Booked Trees", 'booked'),
+      title: getSortableHeader("Booked Trees", "booked"),
       align: "right",
       width: 150,
       render: (value, record) => value ?? 0 - (includeDeadLostTrees && record.void_booked ? record.void_booked : 0),
@@ -340,7 +353,7 @@ export const PlotComponent = () => {
     {
       dataIndex: "assigned",
       key: "Assigned Trees",
-      title: getSortableHeader("Assigned Trees", 'assigned'),
+      title: getSortableHeader("Assigned Trees", "assigned"),
       align: "right",
       width: 150,
       render: (value, record) => value ?? 0 - (includeDeadLostTrees && record.void_assigned ? record.void_assigned : 0),
@@ -348,19 +361,87 @@ export const PlotComponent = () => {
     {
       dataIndex: "unbooked_assigned",
       key: "Unfunded Inventory (Assigned)",
-      title: getSortableHeader("Unfunded Inventory (Assigned)", 'unbooked_assigned'),
+      title: getSortableHeader("Unfunded Inventory (Assigned)", "unbooked_assigned"),
       align: "right",
       width: 150,
     },
     {
       dataIndex: "available",
       key: "Unfunded Inventory (Unassigned)",
-      title: getSortableHeader("Unfunded Inventory (Unassigned)", 'available'),
+      title: getSortableHeader("Unfunded Inventory (Unassigned)", "available"),
       align: "right",
       width: 150,
       render: (value, record) => value ?? 0 - (includeDeadLostTrees && record.void_available ? record.void_available : 0),
     },
-  ];
+  ]);
+
+  useEffect(() => {
+
+    const getColumnClass = () => {
+      if (treeHabit === 'trees') return 'bg-green';
+      if (treeHabit === 'shrubs') return 'bg-cyan';
+      if (treeHabit === 'herbs') return 'bg-yellow';
+
+      return 'bg-orange'
+    }
+
+    setColumns(prev => {
+      return prev.map((column: any) => {
+        if (column.dataIndex.startsWith("booked")) {
+          return {
+            ...column,
+            dataIndex: getColumn("booked", treeHabit),
+            title: getSortableHeader("Booked Trees", getColumn("booked", treeHabit)),
+            className: getColumnClass(),
+          }
+        } else if (column.dataIndex.startsWith("assigned")) {
+          return {
+            ...column,
+            dataIndex: getColumn("assigned", treeHabit),
+            title: getSortableHeader("Assigned Trees", getColumn("assigned", treeHabit)),
+            className: getColumnClass(),
+          }
+        } else if (column.dataIndex.startsWith("unbooked_assigned")) {
+          return {
+            ...column,
+            dataIndex: getColumn("unbooked_assigned", treeHabit),
+            title: getSortableHeader("Unfunded Inventory (Assigned)", getColumn("unbooked_assigned", treeHabit)),
+            className: getColumnClass(),
+          }
+        } else if (column.dataIndex.startsWith("available")) {
+          return {
+            ...column,
+            dataIndex: getColumn("available", treeHabit),
+            title: getSortableHeader("Unfunded Inventory (Unassigned)", getColumn("available", treeHabit)),
+            className: getColumnClass(),
+          }
+        } else if (column.dataIndex === "total") {
+          return {
+            ...column,
+            className: treeHabit === '' ? 'bg-orange' : undefined,
+          }
+        } else if (column.dataIndex === "tree_count") {
+          return {
+            ...column,
+            className: treeHabit === 'trees' ? 'bg-green' : undefined,
+          }
+        } else if (column.dataIndex === "shrub_count") {
+          return {
+            ...column,
+            className: treeHabit === 'shrubs' ? 'bg-cyan' : undefined,
+          }
+        } else if (column.dataIndex === "herb_count") {
+          return {
+            ...column,
+            className: treeHabit === 'herbs' ? 'bg-yellow' : undefined,
+          }
+        }
+
+        return column;
+      })
+    })
+
+  }, [treeHabit])
 
   const handleSelectionChanges = (plotIds: number[]) => {
     setSelectedPlotIds(plotIds);
@@ -471,7 +552,15 @@ export const PlotComponent = () => {
             justifyContent: "flex-end",
           }}
         >
+          <Segmented<{ value: 'trees' | 'herbs' | 'shrubs' | '', label: string }>
+            size="large"
+            options={[{ value: 'trees', label: 'Trees' }, { value: 'shrubs', label: 'Shrubs' }, { value: 'herbs', label: 'Herbs' }, { value: '', label: 'Total' }]}
+            onChange={(item: any) => {
+              setTreeHabit(item)
+            }}
+          />
           <FormControlLabel
+            sx={{ ml: 2 }}
             control={<Checkbox checked={includeDeadLostTrees} onChange={() => setIncludeDeadLostTrees(!includeDeadLostTrees)} />}
             label="Include Dead/Lost Trees"
           />
@@ -488,7 +577,7 @@ export const PlotComponent = () => {
           onDownload={handleDownload}
           summary={(totalColumns: number) => {
             if (totalColumns < 5) return undefined;
-            return TableSummary(tableRows, selectedPlotIds, totalColumns)
+            return TableSummary(tableRows, selectedPlotIds, totalColumns, treeHabit)
           }}
           footer
           tableName="Plots"
