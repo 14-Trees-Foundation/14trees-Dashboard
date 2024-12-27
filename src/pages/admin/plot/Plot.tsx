@@ -47,17 +47,18 @@ const TableSummary = (plots: Plot[], selectedPlotIds: number[], totalColumns: nu
   return (
     <Table.Summary fixed='bottom'>
       <Table.Summary.Row style={{ backgroundColor: 'rgba(172, 252, 172, 0.2)' }}>
-        <Table.Summary.Cell align="right" index={totalColumns - 8} colSpan={totalColumns - 7}>
+        <Table.Summary.Cell align="right" index={totalColumns - 9} colSpan={totalColumns - 8}>
           <strong>Total</strong>
         </Table.Summary.Cell>
-        <Table.Summary.Cell align="right" index={totalColumns - 7} colSpan={1}>{calculateSum(plots.filter((plot) => selectedPlotIds.includes(plot.id)).map((plot) => plot.total))}</Table.Summary.Cell>
-        <Table.Summary.Cell align="right" index={totalColumns - 6} colSpan={1}>{calculateSum(plots.filter((plot) => selectedPlotIds.includes(plot.id)).map((plot) => plot.tree_count))}</Table.Summary.Cell>
-        <Table.Summary.Cell align="right" index={totalColumns - 5} colSpan={1}>{calculateSum(plots.filter((plot) => selectedPlotIds.includes(plot.id)).map((plot) => plot.shrub_count))}</Table.Summary.Cell>
-        <Table.Summary.Cell align="right" index={totalColumns - 4} colSpan={1}>{calculateSum(plots.filter((plot) => selectedPlotIds.includes(plot.id)).map((plot) => plot.herb_count))}</Table.Summary.Cell>
-        <Table.Summary.Cell align="right" index={totalColumns - 3} colSpan={1}>{calculateSum(plots.filter((plot) => selectedPlotIds.includes(plot.id)).map((plot: any) => plot[getColumn("booked", treeHabitat)]))}</Table.Summary.Cell>
-        <Table.Summary.Cell align="right" index={totalColumns - 2} colSpan={1}>{calculateSum(plots.filter((plot) => selectedPlotIds.includes(plot.id)).map((plot: any) => plot[getColumn("assigned", treeHabitat)]))}</Table.Summary.Cell>
-        <Table.Summary.Cell align="right" index={totalColumns - 1} colSpan={1}>{calculateSum(plots.filter((plot) => selectedPlotIds.includes(plot.id)).map((plot: any) => plot[getColumn("unbooked_assigned", treeHabitat)]))}</Table.Summary.Cell>
-        <Table.Summary.Cell align="right" index={totalColumns} colSpan={1}>{calculateSum(plots.filter((plot) => selectedPlotIds.includes(plot.id)).map((plot: any) => plot[getColumn("available", treeHabitat)]))}</Table.Summary.Cell>
+        <Table.Summary.Cell align="right" index={totalColumns - 8} colSpan={1}>{calculateSum(plots.filter((plot) => selectedPlotIds.includes(plot.id)).map((plot) => plot.total))}</Table.Summary.Cell>
+        <Table.Summary.Cell align="right" index={totalColumns - 7} colSpan={1}>{calculateSum(plots.filter((plot) => selectedPlotIds.includes(plot.id)).map((plot) => plot.tree_count))}</Table.Summary.Cell>
+        <Table.Summary.Cell align="right" index={totalColumns - 6} colSpan={1}>{calculateSum(plots.filter((plot) => selectedPlotIds.includes(plot.id)).map((plot) => plot.shrub_count))}</Table.Summary.Cell>
+        <Table.Summary.Cell align="right" index={totalColumns - 5} colSpan={1}>{calculateSum(plots.filter((plot) => selectedPlotIds.includes(plot.id)).map((plot) => plot.herb_count))}</Table.Summary.Cell>
+        <Table.Summary.Cell align="right" index={totalColumns - 4} colSpan={1}>{calculateSum(plots.filter((plot) => selectedPlotIds.includes(plot.id)).map((plot: any) => plot[getColumn("booked", treeHabitat)]))}</Table.Summary.Cell>
+        <Table.Summary.Cell align="right" index={totalColumns - 3} colSpan={1}>{calculateSum(plots.filter((plot) => selectedPlotIds.includes(plot.id)).map((plot: any) => plot[getColumn("assigned", treeHabitat)]))}</Table.Summary.Cell>
+        <Table.Summary.Cell align="right" index={totalColumns - 2} colSpan={1}>{calculateSum(plots.filter((plot) => selectedPlotIds.includes(plot.id)).map((plot: any) => plot[getColumn("unbooked_assigned", treeHabitat)]))}</Table.Summary.Cell>
+        <Table.Summary.Cell align="right" index={totalColumns - 1} colSpan={1}>{calculateSum(plots.filter((plot) => selectedPlotIds.includes(plot.id)).map((plot: any) => plot[getColumn("available", treeHabitat)]))}</Table.Summary.Cell>
+        <Table.Summary.Cell align="right" index={totalColumns - 0} colSpan={1}>{calculateSum(plots.filter((plot) => selectedPlotIds.includes(plot.id)).map((plot: any) => plot[getColumn("card_available", treeHabitat)]))}</Table.Summary.Cell>
       </Table.Summary.Row>
     </Table.Summary>
   )
@@ -373,6 +374,13 @@ export const PlotComponent = () => {
       width: 150,
       render: (value, record) => value ?? 0 - (includeDeadLostTrees && record.void_available ? record.void_available : 0),
     },
+    {
+      dataIndex: "card_available",
+      key: "Giftable Inventory",
+      title: getSortableHeader("Giftable Inventory", "card_available"),
+      align: "right",
+      width: 150,
+    },
   ]);
 
   useEffect(() => {
@@ -415,6 +423,13 @@ export const PlotComponent = () => {
             title: getSortableHeader("Unfunded Inventory (Unassigned)", getColumn("available", treeHabit)),
             className: getColumnClass(),
           }
+        } else if (column.dataIndex.startsWith("card_available")) {
+          return {
+            ...column,
+            dataIndex: getColumn("card_available", treeHabit),
+            title: getSortableHeader("Giftable Inventory", getColumn("card_available", treeHabit)),
+            className: getColumnClass(),
+          }
         } else if (column.dataIndex === "total") {
           return {
             ...column,
@@ -441,7 +456,7 @@ export const PlotComponent = () => {
       })
     })
 
-  }, [treeHabit])
+  }, [treeHabit, orderBy])
 
   const handleSelectionChanges = (plotIds: number[]) => {
     setSelectedPlotIds(plotIds);

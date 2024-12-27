@@ -18,7 +18,6 @@ import { Tag } from '../../types/tag';
 import { EmailTemplate } from '../../types/email_template';
 import { Payment, PaymentHistory } from '../../types/payment';
 import { Order } from '../../types/common';
-import { isTypedArray } from 'util/types';
 
 
 class ApiClient {
