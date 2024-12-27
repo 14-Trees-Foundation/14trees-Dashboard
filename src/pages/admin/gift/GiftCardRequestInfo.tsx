@@ -98,7 +98,7 @@ const GiftCardRequestInfo: React.FC<GiftCardRequestInfoProps> = ({ open, onClose
                         }
                     }}
                 >
-                    {(record.recipient_name && record.assigned) ? "Dashboard" : "Redeem"}
+                    {record.assigned ? "Dashboard" : "Redeem"}
                 </Button>
             </div>)
         },
