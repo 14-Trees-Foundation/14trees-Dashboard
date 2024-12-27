@@ -1,10 +1,11 @@
-import { FC, useEffect, useState } from "react"
+import { FC, useEffect, useRef, useState } from "react"
 import ApiClient from "../../../api/apiClient/apiClient"
 import { GridFilterItem } from "@mui/x-data-grid"
 import { Box, Typography } from "@mui/material"
 import { getColumnSelectedItemFilter, getSortIcon } from "../../../components/Filter"
 import GeneralTable from "../../../components/GenTable"
 import { Segmented, Table, TableColumnsType } from "antd"
+import { Order } from "../../../types/common"
 
 function getColumn(field: string, treeHabitat: string) {
     return field + (treeHabitat ? "_" + treeHabitat : '')
@@ -59,7 +60,7 @@ const TagStats: FC<TagStatsProps> = ({ habits, landTypes, villages, districts, t
     const handleSetFilters = (filters: Record<string, GridFilterItem>) => {
         setFilters(filters);
     }
-    const [orderBy, setOrderBy] = useState<{ column: string, order: 'ASC' | 'DESC' }[]>([]);
+    const [orderBy, setOrderBy] = useState<Order[]>([]);
     const [page, setPage] = useState(0);
     const [pageSize, setPageSize] = useState(10);
 
@@ -349,7 +350,7 @@ const TagStats: FC<TagStatsProps> = ({ habits, landTypes, villages, districts, t
             })
         })
 
-    }, [treeHabit])
+    }, [treeHabit, orderBy])
 
 
     return (
