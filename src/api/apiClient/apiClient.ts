@@ -757,9 +757,11 @@ class ApiClient {
     async removeTreeMappings(saplingIds: string[]): Promise<void> {
         try {
             await this.api.post<any>(`/mapping/unmap`, { sapling_ids: saplingIds });
-        } catch (error) {
-            console.error(error)
-            throw new Error('Failed to create Trees in bulk');
+        } catch (error: any) {
+            if (error.response?.data?.message) {
+                throw new Error(error.response.data.message);
+            }
+            throw new Error('Failed to unmap trees');
         }
     }
 
