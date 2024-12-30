@@ -112,7 +112,12 @@ export const AdminLeftDrawer = () => {
       display: true,
     },
     {
-      displayName: "Inventory",
+      displayName: "Site Inventory",
+      logo: Inventory,
+      display: true,
+    },
+    {
+      displayName: "GC Inventory",
       logo: Inventory,
       display: true,
     },

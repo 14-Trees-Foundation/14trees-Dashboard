@@ -377,6 +377,7 @@ const TagStats: FC<TagStatsProps> = ({ habits, landTypes, villages, districts, t
                     rows={tableRows}
                     totalRecords={total}
                     page={page}
+                    pageSize={pageSize}
                     onPaginationChange={handlePageChange}
                     onDownload={handleDownload}
                     onSelectionChanges={handleSelectionChanges}

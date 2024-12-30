@@ -392,6 +392,7 @@ const SiteStats: FC<SiteStatsProps> = ({ habits, landTypes, districts, talukas, 
                 rows={tableRows}
                 totalRecords={total}
                 page={page}
+                pageSize={pageSize}
                 onPaginationChange={handlePageChange}
                 onDownload={handleDownload}
                 rowClassName={(record: any, index: number) => {
