@@ -16,7 +16,7 @@ const TableSummary = (data: any[], selectedKeys: any[], totalColumns: number) =>
     return (
         <Table.Summary fixed='bottom'>
             <Table.Summary.Row style={{ backgroundColor: 'rgba(172, 252, 172, 0.2)' }}>
-                <Table.Summary.Cell align="right" index={totalColumns - 7} colSpan={4}>
+                <Table.Summary.Cell align="right" index={totalColumns - 7} colSpan={5}>
                     <strong>Total</strong>
                 </Table.Summary.Cell>
                 <Table.Summary.Cell align="right" index={totalColumns - 6} colSpan={1}>{calculateSum(data.filter((item) => selectedKeys.includes(item.key)).map((item) => item.total))}</Table.Summary.Cell>
@@ -65,6 +65,14 @@ const PlantTypeStats: FC<PlantTypeStatsProps> = ({ habits, landTypes, districts,
                     item.value = '';
                 } else {
                     item.value = (item.value as string[]).filter(item => item !== 'Not Available');
+                    item.value.push(null);
+                }
+            } else if (item.columnField === 'template_id') {
+                if (item.value.includes('Yes')) {
+                    item.operatorValue = 'isNotEmpty';
+                    item.value = '';
+                } else {
+                    item.value = (item.value as string[]).filter(item => item !== 'No');
                     item.value.push(null);
                 }
             }
@@ -183,6 +191,7 @@ const PlantTypeStats: FC<PlantTypeStatsProps> = ({ habits, landTypes, districts,
             dataIndex: "total",
             key: "total",
             align: 'right',
+            width: 150,
         },
         {
             title: (
@@ -193,6 +202,7 @@ const PlantTypeStats: FC<PlantTypeStatsProps> = ({ habits, landTypes, districts,
             dataIndex: "booked",
             key: "booked",
             align: 'right',
+            width: 150,
         },
         {
             title: (
@@ -203,6 +213,7 @@ const PlantTypeStats: FC<PlantTypeStatsProps> = ({ habits, landTypes, districts,
             dataIndex: "assigned",
             key: "assigned",
             align: 'right',
+            width: 150,
         },
         {
             title: (
@@ -213,6 +224,7 @@ const PlantTypeStats: FC<PlantTypeStatsProps> = ({ habits, landTypes, districts,
             dataIndex: "unbooked_assigned",
             key: "unbooked_assigned",
             align: 'right',
+            width: 200,
         },
         {
             title: (
@@ -223,12 +235,14 @@ const PlantTypeStats: FC<PlantTypeStatsProps> = ({ habits, landTypes, districts,
             dataIndex: "available",
             key: "available",
             align: 'right',
+            width: 200,
         },
         {
             title: "Total Unfunded Inventory",
             dataIndex: "total_unfunded",
             key: "total_unfunded",
             align: 'right',
+            width: 200,
             render: (value: any, record: any) => (Number(record.available) || 0) + (Number(record.unbooked_assigned) || 0),
         },
         {
@@ -240,6 +254,7 @@ const PlantTypeStats: FC<PlantTypeStatsProps> = ({ habits, landTypes, districts,
             dataIndex: "card_available",
             key: "card_available",
             align: 'right',
+            width: 200,
         },
     ]
 
@@ -248,6 +263,7 @@ const PlantTypeStats: FC<PlantTypeStatsProps> = ({ habits, landTypes, districts,
             title: "Plant Type",
             dataIndex: 'plant_type',
             key: 'plant_type',
+            width: 250,
             render: (value: any) => value ? value : 'Unknown',
             ...getColumnSearchProps('plant_type', filters, handleSetFilters),
         },
@@ -255,6 +271,7 @@ const PlantTypeStats: FC<PlantTypeStatsProps> = ({ habits, landTypes, districts,
             title: "Habitat",
             dataIndex: 'habit',
             key: 'habit',
+            width: 150,
             render: (value: any) => value ? value : 'Unknown',
             ...getColumnSelectedItemFilter({dataIndex: 'habit', filters, handleSetFilters, options: ["Tree", "Herb", "Shrub"]}),
         },
@@ -262,8 +279,17 @@ const PlantTypeStats: FC<PlantTypeStatsProps> = ({ habits, landTypes, districts,
             title: "Illustrations",
             dataIndex: 'illustration_link',
             key: 'illustration_link',
+            width: 200,
             render: (value: any) => value ? "Available" : 'Not Available',
             ...getColumnSelectedItemFilter({dataIndex: 'illustration_link', filters, handleSetFilters, options: ['Available', 'Not Available']}),
+        },
+        {
+            title: "Card Template",
+            dataIndex: 'template_id',
+            key: 'Card Template',
+            width: 150,
+            render: (value: any) => value ? "Yes" : 'No',
+            ...getColumnSelectedItemFilter({dataIndex: 'template_id', filters, handleSetFilters, options: ["Yes", "No"]}),
         },
         ...commonDataColumn
     ]

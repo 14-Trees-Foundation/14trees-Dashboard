@@ -82,6 +82,14 @@ export const Admin = () => {
       displayName: "Admin Home",
     },
     {
+      page: SitesComponent,
+      displayName: "Sites",
+    },
+    {
+      page: PlotComponent,
+      displayName: "Plots",
+    },
+    {
       page: Trees,
       displayName: "Trees",
     },
@@ -94,20 +102,12 @@ export const Admin = () => {
       displayName: "Ponds",
     },
     {
-      page: PlotComponent,
-      displayName: "Plots",
-    },
-    {
       page: Users,
       displayName: "Users",
     },
     {
       page: OrganizationComponent,
       displayName: "Organizations",
-    },
-    {
-      page: SitesComponent,
-      displayName: "Sites",
     },
     // {
     //   page: EventsComponent,
