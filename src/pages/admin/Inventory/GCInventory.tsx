@@ -8,6 +8,7 @@ import TagStats from "./TagStats"
 import './inventory.css'
 import PlantTypeStats from "./PlantTypeStats"
 import PlantTypePlotStats from "./PlantTypePlotStats";
+import { toast } from "react-toastify";
 
 interface SiteLocation {
     district: string;
@@ -96,7 +97,7 @@ const GCInventory: FC = () => {
             <Typography variant="h4" sx={{ marginBottom: 1 }}>Gifting Inventory</Typography>
             <Divider sx={{ backgroundColor: "black", marginBottom: 3 }} />
 
-            <Box style={{
+            {/* <Box style={{
                 zIndex: 1,
                 paddingBottom: 10,
                 marginBottom: '10px',
@@ -190,11 +191,11 @@ const GCInventory: FC = () => {
                 <Box style={{ display: 'flex', justifyContent: 'flex-end' }}>
                     <Button variant="contained" color="success" onClick={handleFilterReset}>Reset FIlters</Button>
                 </Box>
-            </Box>
+            </Box> */}
 
             <Box
                 style={{
-                    height: '65vh',
+                    height: '85vh',
                     overflowY: 'scroll',
                     scrollbarWidth: 'none', // For Firefox
                     '&::-webkit-scrollbar': { display: 'none' } // For Chrome, Safari

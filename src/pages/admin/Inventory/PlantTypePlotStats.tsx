@@ -17,7 +17,7 @@ const TableSummary = (data: any[], selectedKeys: any[], totalColumns: number) =>
     return (
         <Table.Summary fixed='bottom'>
             <Table.Summary.Row style={{ backgroundColor: 'rgba(172, 252, 172, 0.2)' }}>
-                <Table.Summary.Cell align="right" index={totalColumns - 7} colSpan={4}>
+                <Table.Summary.Cell align="right" index={totalColumns - 7} colSpan={7}>
                     <strong>Total</strong>
                 </Table.Summary.Cell>
                 <Table.Summary.Cell align="right" index={totalColumns - 6} colSpan={1}>{calculateSum(data.filter((item) => selectedKeys.includes(item.key)).map((item) => item.total))}</Table.Summary.Cell>
@@ -56,6 +56,21 @@ const PlantTypePlotStats: FC<PlantTypePlotStatsProps> = ({ habits, landTypes, di
     const [orderBy, setOrderBy] = useState<{column: string, order: 'ASC' | 'DESC'}[]>([]);
     const [page, setPage] = useState(0);
     const [pageSize, setPageSize] = useState(10);
+    const [tags, setTags] = useState<string[]>([]);
+
+    const getTags = async () => {
+        try {
+            const apiClient = new ApiClient();
+            const resp = await apiClient.getTags(0, 100);
+            setTags(resp.results.map(item => item.tag));
+        } catch (error: any) {
+            toast.error(error.message);
+        }
+    }
+
+    useEffect(() => {
+        getTags();
+    }, [])
 
     const getFilters = () => {
         const filtersData = JSON.parse(JSON.stringify(Object.values(filters))) as GridFilterItem[];
@@ -66,6 +81,14 @@ const PlantTypePlotStats: FC<PlantTypePlotStatsProps> = ({ habits, landTypes, di
                     item.value = '';
                 } else {
                     item.value = (item.value as string[]).filter(item => item !== 'Not Available');
+                    item.value.push(null);
+                }
+            } else if (item.columnField === 'template_id') {
+                if (item.value.includes('Yes')) {
+                    item.operatorValue = 'isNotEmpty';
+                    item.value = '';
+                } else {
+                    item.value = (item.value as string[]).filter(item => item !== 'No');
                     item.value.push(null);
                 }
             }
@@ -101,7 +124,7 @@ const PlantTypePlotStats: FC<PlantTypePlotStatsProps> = ({ habits, landTypes, di
         } catch (error: any) {
             toast.error(error.message)
         }
-        
+
         setLoading(false);
     }
 
@@ -274,11 +297,27 @@ const PlantTypePlotStats: FC<PlantTypePlotStatsProps> = ({ habits, landTypes, di
             ...getColumnSelectedItemFilter({dataIndex: 'habit', filters, handleSetFilters, options: ["Tree", "Herb", "Shrub"]}),
         },
         {
+            title: "Card Template",
+            dataIndex: 'template_id',
+            key: 'Card Template',
+            width: 150,
+            render: (value: any) => value ? "Yes" : 'No',
+            ...getColumnSelectedItemFilter({dataIndex: 'template_id', filters, handleSetFilters, options: ["Yes", "No"]}),
+        },
+        {
             title: "Plot",
             dataIndex: 'plot_name',
             key: 'Plot',
             width: 350,
             ...getColumnSearchProps('plot_name', filters, handleSetFilters),
+        },
+        {
+            title: "Plot Tags",
+            dataIndex: 'plot_tags',
+            key: 'Plot Tags',
+            width: 250,
+            render: (value: any) => value ? value?.join(', ') : '',
+            ...getColumnSelectedItemFilter({dataIndex: 'plot_tags', filters, handleSetFilters, options: tags}),
         },
         {
             title: "Site",
