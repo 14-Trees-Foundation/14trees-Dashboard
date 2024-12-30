@@ -533,6 +533,7 @@ const PlotSelection: FC<PlotSelectionProps> = ({ giftCardRequestId, requiredTree
             <TreeSelectionComponent
                 open={treeSelectionModal}
                 max={treesCount}
+                includeNonGiftable={bookNonGiftable}
                 plotIds={plots.map(plot => plot.id)}
                 plantTypes={calculateUnion(plots.map(plot => plot.distinct_plants))}
                 onClose={() => { setTreeSelectionModal(false); }}

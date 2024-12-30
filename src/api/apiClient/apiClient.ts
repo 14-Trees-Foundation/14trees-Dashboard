@@ -807,10 +807,10 @@ class ApiClient {
         }
     }
 
-    async getGiftAbleTrees(offset: number, limit: number, filters: any[]): Promise<PaginatedResponse<Tree>> {
+    async getGiftAbleTrees(offset: number, limit: number, filters: any[], include_no_giftable: boolean = false): Promise<PaginatedResponse<Tree>> {
         let url = `/trees/get-giftable?offset=${offset}&limit=${limit}`;
         try {
-            let result = await this.api.post<PaginatedResponse<Tree>>(url, { filters });
+            let result = await this.api.post<PaginatedResponse<Tree>>(url, { filters, include_no_giftable });
             return result.data;
         } catch (error: any) {
             if (error.response?.data?.message) throw new Error(error.response.data.message);
