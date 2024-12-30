@@ -142,8 +142,7 @@ export const unMapTrees = (saplingIds: string[]) => {
                 });
             },
             (error: any) => {
-                console.error(error);
-                toast.error("Failed to unmap trees!");
+                toast.error(error.message);
                 dispatch({
                     type: userTreeActionTypes.UN_MAP_TREES_FAILED,
                     value: error
