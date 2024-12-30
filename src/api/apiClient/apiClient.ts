@@ -144,6 +144,18 @@ class ApiClient {
         }
     }
 
+    async getPlantTypeStateForPlots(offset: number, limit: number, filters?: any[], orderBy?: any[]): Promise<PaginatedResponse<any>> {
+        try {
+            const resp = await this.api.post<PaginatedResponse<any>>(`/plant-types/plot-states`, { offset, limit, filters, order_by: orderBy });
+            return resp.data;
+        } catch (error: any) {
+            if (error?.response?.data?.message) {
+                throw new Error(error.response.data.message)
+            }
+            throw new Error('Failed to get plant type states!');
+        }
+    }
+
     async addPlantTypeTemplate(plant_type: string, template_id: string): Promise<any> {
         try {
             const resp = await this.api.post<any>(`/plant-types/templates/`, { plant_type, template_id });

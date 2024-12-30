@@ -278,6 +278,7 @@ const PlantTypeStats: FC<PlantTypeStatsProps> = ({ habits, landTypes, districts,
                     rows={tableRows}
                     columns={districtDataColumn}
                     totalRecords={total}
+                    pageSize={pageSize}
                     onPaginationChange={handlePageChange}
                     onDownload={handleDownload}
                     onSelectionChanges={handleSelectionChanges}

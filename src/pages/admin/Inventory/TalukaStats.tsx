@@ -116,6 +116,7 @@ const TalukaStats: FC<TalukaStatsProps> = ({ habits, landTypes, talukas, distric
             loading={loading}
             total={total}
             page={page}
+            pageSize={pageSize}
             tableRows={tableRows}
             onPageChange={handlePageChange}
             orderBy={orderBy}

@@ -117,6 +117,7 @@ const VillageStats: FC<VillageStatsProps> = ({ habits, landTypes, villages, talu
             loading={loading}
             total={total}
             page={page}
+            pageSize={pageSize}
             tableRows={tableRows}
             onPageChange={handlePageChange}
             orderBy={orderBy}
