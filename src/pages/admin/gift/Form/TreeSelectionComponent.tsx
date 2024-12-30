@@ -8,6 +8,7 @@ import GeneralTable from "../../../../components/GenTable"
 
 interface TreeSelectionComponentProps {
     max: number
+    includeNonGiftable: boolean
     plotIds: number[]
     plantTypes: string[]
     open: boolean
@@ -17,7 +18,7 @@ interface TreeSelectionComponentProps {
     onSelectedTreesChange: (trees: any[]) => void
 }
 
-const TreeSelectionComponent: React.FC<TreeSelectionComponentProps> = ({ plotIds, max, open, plantTypes, onClose, onSubmit, selectedTrees, onSelectedTreesChange }) => {
+const TreeSelectionComponent: React.FC<TreeSelectionComponentProps> = ({ plotIds, includeNonGiftable, max, open, plantTypes, onClose, onSubmit, selectedTrees, onSelectedTreesChange }) => {
 
     const [treesData, setTreesData] = useState<Record<number, any>>({})
     const [total, setTotal] = useState(0)
@@ -37,7 +38,7 @@ const TreeSelectionComponent: React.FC<TreeSelectionComponentProps> = ({ plotIds
         setFilters(filters);
     }
 
-    const getTrees = async (plotIds: number[]) => {
+    const getTrees = async (plotIds: number[], includeNonGiftable: boolean) => {
         const apiClient = new ApiClient();
         setLoading(true);
         if (plotIds.length > 0) {
@@ -48,7 +49,7 @@ const TreeSelectionComponent: React.FC<TreeSelectionComponentProps> = ({ plotIds
             }]
 
             filtersData.push(...Object.values(filters));
-            const treesResp = await apiClient.getGiftAbleTrees(page * pageSize, pageSize, filtersData);
+            const treesResp = await apiClient.getGiftAbleTrees(page * pageSize, pageSize, filtersData, includeNonGiftable);
             setTotal(Number(treesResp.total));
 
             setTreesData(prev => {
@@ -88,7 +89,7 @@ const TreeSelectionComponent: React.FC<TreeSelectionComponentProps> = ({ plotIds
     useEffect(() => {
         setTreesData({});
         setPage(0);
-    }, [filters, plotIds]);
+    }, [filters, plotIds, includeNonGiftable]);
 
     useEffect(() => {
         const handler = setTimeout(() => {
@@ -101,7 +102,7 @@ const TreeSelectionComponent: React.FC<TreeSelectionComponentProps> = ({ plotIds
                         records.push(record);
                     }
                 } else {
-                    getTrees(plotIds);
+                    getTrees(plotIds, includeNonGiftable);
                     break;
                 }
             }
@@ -112,18 +113,18 @@ const TreeSelectionComponent: React.FC<TreeSelectionComponentProps> = ({ plotIds
         return () => {
             clearTimeout(handler);
         }
-    }, [pageSize, page, treesData, total, plotIds]);
+    }, [pageSize, page, treesData, total, plotIds, includeNonGiftable]);
 
     useEffect(() => {
         const handler = setTimeout(() => {
-            getTrees(plotIds);
+            getTrees(plotIds, includeNonGiftable);
         }, 300)
 
         return () => {
             clearTimeout(handler);
         }
 
-    }, [plotIds, filters])
+    }, [plotIds, includeNonGiftable, filters])
 
     useEffect(() => {
         const getPTTags = async () => {
