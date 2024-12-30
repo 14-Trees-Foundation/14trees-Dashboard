@@ -59,42 +59,56 @@ export const AdminLeftDrawer = () => {
       displayName: "Home",
       logo: LeaderBoardOutlined,
       display: true,
+      key: 0,
     },
     {
-      displayName: "Trees",
-      logo: ForestOutlined,
+      displayName: "Sites",
+      logo: MapIcon,
       display: true,
-    },
-    {
-      displayName: "Plant Types",
-      logo: GrassTwoToneIcon,
-      display: true,
-    },
-    {
-      displayName: "Ponds",
-      logo: OpacityOutlined,
-      display: true,
+      key: 1,
     },
     {
       displayName: "Plots",
       logo: LandscapeIcon,
       display: true,
+      key: 2,
+    },
+    {
+      displayName: "Trees",
+      logo: ForestOutlined,
+      display: true,
+      key: 3,
+    },
+    {
+      divider: true,
+    },
+    {
+      displayName: "Plant Types",
+      logo: GrassTwoToneIcon,
+      display: true,
+      key: 4,
+    },
+    {
+      displayName: "Ponds",
+      logo: OpacityOutlined,
+      display: true,
+      key: 5,
     },
     {
       displayName: "People",
       logo: AccountCircleOutlined,
       // display: auth.permissions.includes("all"),
       display: true,
+      key: 6,
     },
     {
       displayName: "People Groups",
       logo: CorporateFareIcon,
       display: true,
+      key: 7,
     },
     {
-      displayName: "Sites",
-      logo: MapIcon,
-      display: true,
+      divider: true,
     },
     // {
     //   displayName: "Events",
@@ -110,16 +124,25 @@ export const AdminLeftDrawer = () => {
       displayName: "Visits",
       logo: TourIcon,
       display: true,
+      key: 8,
     },
     {
-      displayName: "Inventory",
+      displayName: "Site Inventory",
       logo: Inventory,
       display: true,
+      key: 9,
+    },
+    {
+      displayName: "GC Inventory",
+      logo: Inventory,
+      display: true,
+      key: 10,
     },
     {
       displayName: "Tree Cards",
       logo: CardGiftcard,
       display: auth.signedin,
+      key: 11,
     },
     // {
     //   displayName: "Images",
@@ -132,15 +155,17 @@ export const AdminLeftDrawer = () => {
     return (
       <div className={classes.itemlist}>
         {pages.map((item, i) => {
-          if (item.display) {
+          if (item.divider) {
+            return <Divider sx={{ width: "calc(100% - 20px)", margin: "0 0 20px 20px", backgroundColor: 'white' }} key={i} />;
+          } else if (item.display) {
             return (
               <div
                 className={classes.item}
-                onClick={() => onClickNav(i)}
+                onClick={() => onClickNav(item.key)}
                 key={i}
               >
                 <div
-                  className={index === i ? classes.selected : classes.itembtn}
+                  className={index === item.key ? classes.selected : classes.itembtn}
                 >
                   <item.logo />
                   <div className={classes.itemtext}>{item.displayName}</div>

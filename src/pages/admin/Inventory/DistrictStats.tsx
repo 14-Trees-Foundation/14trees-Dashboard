@@ -115,6 +115,7 @@ const DistrictStats: FC<DistrictStatsProps> = ({ habits, landTypes, districts, t
             loading={loading}
             total={total}
             page={page}
+            pageSize={pageSize}
             tableRows={tableRows}
             onPageChange={handlePageChange}
             orderBy={orderBy}

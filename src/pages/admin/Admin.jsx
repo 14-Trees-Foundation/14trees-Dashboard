@@ -27,6 +27,7 @@ import { EventsComponent } from "./events/Events";
 import { VisitsComponent } from "./visits/Visits";
 import SiteInventory from "./Inventory/SiteInventory";
 import GiftTrees from "./gift/GiftTrees";
+import GCInventory from "./Inventory/GCInventory";
 
 export const Admin = () => {
   const classes = useStyles();
@@ -81,6 +82,14 @@ export const Admin = () => {
       displayName: "Admin Home",
     },
     {
+      page: SitesComponent,
+      displayName: "Sites",
+    },
+    {
+      page: PlotComponent,
+      displayName: "Plots",
+    },
+    {
       page: Trees,
       displayName: "Trees",
     },
@@ -93,20 +102,12 @@ export const Admin = () => {
       displayName: "Ponds",
     },
     {
-      page: PlotComponent,
-      displayName: "Plots",
-    },
-    {
       page: Users,
       displayName: "Users",
     },
     {
       page: OrganizationComponent,
       displayName: "Organizations",
-    },
-    {
-      page: SitesComponent,
-      displayName: "Sites",
     },
     // {
     //   page: EventsComponent,
@@ -123,6 +124,10 @@ export const Admin = () => {
     {
       page: SiteInventory,
       displayName: "Site Inventory",
+    },
+    {
+      page: GCInventory,
+      displayName: "GC Inventory",
     },
     {
       page: GiftTrees,

@@ -6,6 +6,7 @@ import getColumnSearchProps, { getColumnSelectedItemFilter } from "../../../comp
 import { Box, Typography } from "@mui/material"
 import GeneralTable from "../../../components/GenTable"
 import { Table } from "antd"
+import { toast } from "react-toastify"
 
 const TableSummary = (data: any[], selectedKeys: any[], totalColumns: number) => {
 
@@ -16,7 +17,7 @@ const TableSummary = (data: any[], selectedKeys: any[], totalColumns: number) =>
     return (
         <Table.Summary fixed='bottom'>
             <Table.Summary.Row style={{ backgroundColor: 'rgba(172, 252, 172, 0.2)' }}>
-                <Table.Summary.Cell align="right" index={totalColumns - 7} colSpan={5}>
+                <Table.Summary.Cell align="right" index={totalColumns - 7} colSpan={7}>
                     <strong>Total</strong>
                 </Table.Summary.Cell>
                 <Table.Summary.Cell align="right" index={totalColumns - 6} colSpan={1}>{calculateSum(data.filter((item) => selectedKeys.includes(item.key)).map((item) => item.total))}</Table.Summary.Cell>
@@ -31,7 +32,7 @@ const TableSummary = (data: any[], selectedKeys: any[], totalColumns: number) =>
     )
 }
 
-interface PlantTypeStatsProps {
+interface PlantTypePlotStatsProps {
     habits: string[]
     landTypes: string[]
     districts: string[]
@@ -41,7 +42,7 @@ interface PlantTypeStatsProps {
     serviceTypes: (string | null)[]
 }
 
-const PlantTypeStats: FC<PlantTypeStatsProps> = ({ habits, landTypes, districts, talukas, villages, categories, serviceTypes }) => {
+const PlantTypePlotStats: FC<PlantTypePlotStatsProps> = ({ habits, landTypes, districts, talukas, villages, categories, serviceTypes }) => {
 
     const [plantTypeTreeCountData, setPlantTypeTreeCountData] = useState<Record<number, any>>({});
     const [tableRows, setTableRows] = useState<any[]>([]);
@@ -55,6 +56,21 @@ const PlantTypeStats: FC<PlantTypeStatsProps> = ({ habits, landTypes, districts,
     const [orderBy, setOrderBy] = useState<{column: string, order: 'ASC' | 'DESC'}[]>([]);
     const [page, setPage] = useState(0);
     const [pageSize, setPageSize] = useState(10);
+    const [tags, setTags] = useState<string[]>([]);
+
+    const getTags = async () => {
+        try {
+            const apiClient = new ApiClient();
+            const resp = await apiClient.getTags(0, 100);
+            setTags(resp.results.map(item => item.tag));
+        } catch (error: any) {
+            toast.error(error.message);
+        }
+    }
+
+    useEffect(() => {
+        getTags();
+    }, [])
 
     const getFilters = () => {
         const filtersData = JSON.parse(JSON.stringify(Object.values(filters))) as GridFilterItem[];
@@ -91,19 +107,24 @@ const PlantTypeStats: FC<PlantTypeStatsProps> = ({ habits, landTypes, districts,
 
     const getPlantTypes = async () => {
         setLoading(true);
-        const apiClient = new ApiClient();
-        const filtersData = getFilters();
-        const stats = await apiClient.getTreeCountsForPlantTypes(page * pageSize, pageSize, filtersData, orderBy);
-        
-        setTotal(Number(stats.total));
-        const newData = { ...plantTypeTreeCountData };
-        for (let i = 0; i < stats.results.length; i++) {
-            newData[i + stats.offset] = newData[i + stats.offset] = {
-                ...stats.results[i],
-                key: stats.results[i].plant_type
+        try {
+            const apiClient = new ApiClient();
+            const filtersData = getFilters();
+            const stats = await apiClient.getPlantTypeStateForPlots(page * pageSize, pageSize, filtersData, orderBy);
+            
+            setTotal(Number(stats.total));
+            const newData = { ...plantTypeTreeCountData };
+            for (let i = 0; i < stats.results.length; i++) {
+                newData[i + stats.offset] = newData[i + stats.offset] = {
+                    ...stats.results[i],
+                    key: stats.results[i].plant_type
+                }
             }
+            setPlantTypeTreeCountData(newData);
+        } catch (error: any) {
+            toast.error(error.message)
         }
-        setPlantTypeTreeCountData(newData);
+
         setLoading(false);
     }
 
@@ -258,12 +279,12 @@ const PlantTypeStats: FC<PlantTypeStatsProps> = ({ habits, landTypes, districts,
         },
     ]
 
-    const districtDataColumn: any[] = [
+    const columns: any[] = [
         {
             title: "Plant Type",
             dataIndex: 'plant_type',
             key: 'plant_type',
-            width: 250,
+            width: 200,
             render: (value: any) => value ? value : 'Unknown',
             ...getColumnSearchProps('plant_type', filters, handleSetFilters),
         },
@@ -276,14 +297,6 @@ const PlantTypeStats: FC<PlantTypeStatsProps> = ({ habits, landTypes, districts,
             ...getColumnSelectedItemFilter({dataIndex: 'habit', filters, handleSetFilters, options: ["Tree", "Herb", "Shrub"]}),
         },
         {
-            title: "Illustrations",
-            dataIndex: 'illustration_link',
-            key: 'illustration_link',
-            width: 200,
-            render: (value: any) => value ? "Available" : 'Not Available',
-            ...getColumnSelectedItemFilter({dataIndex: 'illustration_link', filters, handleSetFilters, options: ['Available', 'Not Available']}),
-        },
-        {
             title: "Card Template",
             dataIndex: 'template_id',
             key: 'Card Template',
@@ -291,27 +304,45 @@ const PlantTypeStats: FC<PlantTypeStatsProps> = ({ habits, landTypes, districts,
             render: (value: any) => value ? "Yes" : 'No',
             ...getColumnSelectedItemFilter({dataIndex: 'template_id', filters, handleSetFilters, options: ["Yes", "No"]}),
         },
+        {
+            title: "Plot",
+            dataIndex: 'plot_name',
+            key: 'Plot',
+            width: 350,
+            ...getColumnSearchProps('plot_name', filters, handleSetFilters),
+        },
+        {
+            title: "Plot Tags",
+            dataIndex: 'plot_tags',
+            key: 'Plot Tags',
+            width: 250,
+            render: (value: any) => value ? value?.join(', ') : '',
+            ...getColumnSelectedItemFilter({dataIndex: 'plot_tags', filters, handleSetFilters, options: tags}),
+        },
+        {
+            title: "Site",
+            dataIndex: 'site_name',
+            key: 'Site',
+            width: 350,
+            ...getColumnSearchProps('site_name', filters, handleSetFilters),
+        },
         ...commonDataColumn
     ]
 
     return (
         <div>
             <Box>
-                <Typography variant="h6">Plant type level stats</Typography>
+                <Typography variant="h6">Plant types inventory</Typography>
                 <GeneralTable
                     loading={loading}
                     page={page}
                     rows={tableRows}
-                    columns={districtDataColumn}
+                    columns={columns}
                     totalRecords={total}
                     pageSize={pageSize}
                     onPaginationChange={handlePageChange}
                     onDownload={handleDownload}
                     onSelectionChanges={handleSelectionChanges}
-                    // rowClassName={(record, index) => {
-                    //     if (!record[field] || !record['category']) return 'pending-item';
-                    //     return '';
-                    // }}
                     tableName={"Plant type Inventory"}
                     footer
                     summary={(totalColumns: number) => {
@@ -324,4 +355,4 @@ const PlantTypeStats: FC<PlantTypeStatsProps> = ({ habits, landTypes, districts,
     )
 }
 
-export default PlantTypeStats;
+export default PlantTypePlotStats;

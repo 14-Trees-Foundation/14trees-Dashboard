@@ -297,6 +297,7 @@ const PlotStats: FC<PlotStatsProps> = ({  }) => {
                     rows={tableRows}
                     totalRecords={total}
                     page={page}
+                    pageSize={pageSize}
                     onPaginationChange={handlePageChange}
                     onDownload={handleDownload}
                     tableName="Plots Inventory"

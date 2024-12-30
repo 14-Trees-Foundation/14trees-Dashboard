@@ -38,6 +38,7 @@ interface GeneralStatsProps {
     loading: boolean,
     total: number,
     page: number,
+    pageSize: number,
     tableRows: any[],
     onPageChange: (page: number, pageSize: number) => void
     orderBy: { column: string, order: 'ASC' | 'DESC' }[]
@@ -47,7 +48,7 @@ interface GeneralStatsProps {
     onDownload: () => Promise<any[]>
 }
 
-const GeneralStats: FC<GeneralStatsProps> = ({ field, loading, total, page, tableRows, onPageChange, orderBy, onOrderByChange, filters, onFiltersChange, onDownload }) => {
+const GeneralStats: FC<GeneralStatsProps> = ({ field, loading, total, page, pageSize, tableRows, onPageChange, orderBy, onOrderByChange, filters, onFiltersChange, onDownload }) => {
 
     const [selectedRows, setSelectedRows] = useState<any[]>([]);
 
@@ -235,6 +236,7 @@ const GeneralStats: FC<GeneralStatsProps> = ({ field, loading, total, page, tabl
                     rows={tableRows}
                     columns={districtDataColumn}
                     totalRecords={total}
+                    pageSize={pageSize}
                     onPaginationChange={onPageChange}
                     onDownload={onDownload}
                     onSelectionChanges={handleSelectionChanges}

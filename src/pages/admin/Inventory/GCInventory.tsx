@@ -1,16 +1,14 @@
 import { FC, useEffect, useState } from "react"
-import ApiClient from "../../../api/apiClient/apiClient"
-import { Box, Button, Typography } from "@mui/material"
-import DistrictStats from "./DistrictStats"
-import TalukaStats from "./TalukaStats"
-import VillageStats from "./VillageStats"
-import MultipleSelect from "../../../components/MultiSelect"
-import PlotStats from "./PlotStats"
-import { GridFilterItem } from "@mui/x-data-grid"
+import { Box, Button, Divider, Typography } from "@mui/material";
 import './inventory.css'
-import CorporateStats from "./CorporateStats"
-import GeneralTable from "../../../components/GenTable"
-import LandTypeStats from "./LandTypeStats"
+import ApiClient from "../../../api/apiClient/apiClient"
+import SiteStats from "./SiteStats"
+import MultipleSelect from "../../../components/MultiSelect"
+import TagStats from "./TagStats"
+import './inventory.css'
+import PlantTypeStats from "./PlantTypeStats"
+import PlantTypePlotStats from "./PlantTypePlotStats";
+import { toast } from "react-toastify";
 
 interface SiteLocation {
     district: string;
@@ -37,9 +35,7 @@ const getSiteServiceTypeEnum = (serviceType: string): string | null => {
     }
 }
 
-const InventoryStats: FC = () => {
-
-    const [aggregatedData, setAggregatedData] = useState<any[]>([]);
+const GCInventory: FC = () => {
 
     const [districts, setDistricts] = useState<SiteLocation[]>([]);
     const [selectedDistricts, setSelectedDistricts] = useState<string[]>([]);
@@ -50,71 +46,6 @@ const InventoryStats: FC = () => {
     const [selectedHabit, setSelectedHabit] = useState<string[]>([]);
     const [selectedLandType, setSelectedLandType] = useState<string[]>([]);
 
-    const getTreesCountForCategories = async () => {
-        const apiClient = new ApiClient();
-
-        const filters: GridFilterItem[] = []
-        if (selectedCategories.length > 0) {
-            const categories: (string | null)[] = []
-            selectedCategories.forEach((item) => {
-                if (item !== 'Unknown') categories.push(item)
-                else categories.push(null)
-            })
-            filters.push({ columnField: 'category', value: categories, operatorValue: 'isAnyOf' })
-        }
-        if (selectedServiceTypes.length > 0) {
-            const serviceTypes: (string | null)[] = selectedServiceTypes.map((item) => getSiteServiceTypeEnum(item))
-            filters.push({ columnField: 'maintenance_type', value: serviceTypes, operatorValue: 'isAnyOf' })
-        }
-        if (selectedTalukas.length !== 0) filters.push({ columnField: 'taluka', operatorValue: 'isAnyOf', value: selectedTalukas });
-        if (selectedDistricts.length !== 0) filters.push({ columnField: 'district', operatorValue: 'isAnyOf', value: selectedDistricts });
-        if (selectedVillages.length !== 0) filters.push({ columnField: 'village', operatorValue: 'isAnyOf', value: selectedVillages });
-        if (selectedLandType.length !== 0) filters.push({ columnField: 'land_type', operatorValue: 'isAnyOf', value: selectedLandType });
-        if (selectedHabit.length !== 0) filters.push({ columnField: 'habit', operatorValue: 'isAnyOf', value: selectedHabit });
-
-
-        const stats = await apiClient.getTreesCountForPlotCategories(filters);
-
-        const overall = {
-            category: 'Overall',
-            total: 0,
-            booked: 0,
-            assigned: 0,
-            available: 0,
-            unbooked_assigned: 0,
-            total_unfunded: 0,
-            card_available: 0,
-            tree_count: 0,
-            shrub_count: 0,
-            herb_count: 0,
-        }
-
-        for (const item of stats.results) {
-            overall.total += parseInt(item.total || '0')
-            overall.booked += parseInt(item.booked || '0')
-            overall.assigned += parseInt(item.assigned || '0')
-            overall.available += parseInt(item.available || '0')
-            overall.unbooked_assigned += parseInt(item.unbooked_assigned || '0')
-            overall.total_unfunded += parseInt(item.available || '0') + parseInt(item.unbooked_assigned || '0')
-            overall.card_available += parseInt(item.card_available || '0')
-            overall.tree_count += parseInt(item.tree_count || '0')
-            overall.shrub_count += parseInt(item.shrub_count || '0')
-            overall.herb_count += parseInt(item.herb_count || '0')
-        }
-
-        const finalList: any[] = [];
-        const item = stats.results.find((item: any) => item.category === 'Public');
-        if (item) finalList.push({...item, total_unfunded: parseInt(item.available || '0') + parseInt(item.unbooked_assigned || '0')})
-
-        const item2 = stats.results.find((item: any) => item.category === 'Foundation');
-        if (item2) finalList.push({...item2, total_unfunded: parseInt(item2.available || '0') + parseInt(item2.unbooked_assigned || '0')})
-
-        const item3 = stats.results.find((item: any) => item.category === null);
-        if (item3) finalList.push({...item3, total_unfunded: parseInt(item3.available || '0') + parseInt(item3.unbooked_assigned || '0')})
-
-        setAggregatedData([...finalList, overall]);
-    }
-
     const getDistricts = async () => {
         const apiClient = new ApiClient();
         const stats = await apiClient.getDistricts();
@@ -122,85 +53,8 @@ const InventoryStats: FC = () => {
     }
 
     useEffect(() => {
-        getTreesCountForCategories();
-    }, [selectedDistricts, selectedTalukas, selectedVillages, selectedCategories, selectedServiceTypes, selectedHabit, selectedLandType])
-
-    useEffect(() => {
         getDistricts();
     }, [])
-
-    const commonDataColumn = [
-        {
-            title: "Total",
-            dataIndex: "total",
-            key: "total",
-            align: 'right',
-        },
-        {
-            title: "Trees",
-            dataIndex: "tree_count",
-            key: "tree_count",
-            align: 'right',
-        },
-        {
-            title: "Shrubs",
-            dataIndex: "shrub_count",
-            key: "shrub_count",
-            align: 'right',
-        },
-        {
-            title: "Herbs",
-            dataIndex: "herb_count",
-            key: "herb_count",
-            align: 'right',
-        },
-        {
-            title: "Booked",
-            dataIndex: "booked",
-            key: "booked",
-            align: 'right',
-        },
-        {
-            title: "Assigned",
-            dataIndex: "assigned",
-            key: "assigned",
-            align: 'right',
-        },
-        {
-            title: "Unfunded Inventory (Assigned)",
-            dataIndex: "unbooked_assigned",
-            key: "unbooked_assigned",
-            align: 'right',
-        },
-        {
-            title: "Unfunded Inventory (Unassigned)",
-            dataIndex: "available",
-            key: "available",
-            align: 'right',
-        },
-        {
-            title: "Total Unfunded Inventory",
-            dataIndex: "total_unfunded",
-            key: "total_unfunded",
-            align: 'right',
-        },
-        {
-            title: "Giftable Inventory",
-            dataIndex: "card_available",
-            key: "card_available",
-            align: 'right',
-        },
-    ]
-
-    const aggregatedDataColumn: any = [
-        {
-            title: "Category",
-            dataIndex: "category",
-            key: "category",
-            render: (value: any) => value ? value : 'Unknown'
-        },
-        ...commonDataColumn
-    ]
 
     const getTalukas = (districts: SiteLocation[], selectedDistricts: string[]) => {
         let filteredDistricts = districts;
@@ -239,9 +93,11 @@ const InventoryStats: FC = () => {
     }
 
     return (
-        <div>
+        <Box>
+            <Typography variant="h4" sx={{ marginBottom: 1 }}>Gifting Inventory</Typography>
+            <Divider sx={{ backgroundColor: "black", marginBottom: 3 }} />
 
-            <Box style={{
+            {/* <Box style={{
                 zIndex: 1,
                 paddingBottom: 10,
                 marginBottom: '10px',
@@ -335,33 +191,17 @@ const InventoryStats: FC = () => {
                 <Box style={{ display: 'flex', justifyContent: 'flex-end' }}>
                     <Button variant="contained" color="success" onClick={handleFilterReset}>Reset FIlters</Button>
                 </Box>
-            </Box>
+            </Box> */}
 
             <Box
                 style={{
-                    height: '65vh',
+                    height: '85vh',
                     overflowY: 'scroll',
                     scrollbarWidth: 'none', // For Firefox
                     '&::-webkit-scrollbar': { display: 'none' } // For Chrome, Safari
                 }}
             >
-                <Box>
-                    <Typography variant="h6">Overall site stats</Typography>
-                    <GeneralTable 
-                        loading={false}
-                        rows={aggregatedData}
-                        columns={aggregatedDataColumn}
-                        page={1}
-                        onPaginationChange={(page, pageSize) => { }}
-                        totalRecords={aggregatedData.length}
-                        onDownload={async () => { return aggregatedData }}
-                        rowClassName={(record, index) => !record.category ? 'pending-item' : ''}
-                        tableName="Category Inventory"
-                        footer
-                    />
-                </Box>
-
-                <LandTypeStats
+                <TagStats
                     habits={selectedHabit}
                     landTypes={selectedLandType}
                     talukas={selectedTalukas}
@@ -370,7 +210,7 @@ const InventoryStats: FC = () => {
                     categories={selectedCategories.map((item) => item !== 'Unknown' ? item : null)}
                     serviceTypes={selectedServiceTypes.map((item) => getSiteServiceTypeEnum(item))}
                 />
-                <DistrictStats
+                <SiteStats
                     habits={selectedHabit}
                     landTypes={selectedLandType}
                     talukas={selectedTalukas}
@@ -379,7 +219,7 @@ const InventoryStats: FC = () => {
                     categories={selectedCategories.map((item) => item !== 'Unknown' ? item : null)}
                     serviceTypes={selectedServiceTypes.map((item) => getSiteServiceTypeEnum(item))}
                 />
-                <TalukaStats
+                <PlantTypePlotStats 
                     habits={selectedHabit}
                     landTypes={selectedLandType}
                     talukas={selectedTalukas}
@@ -388,7 +228,7 @@ const InventoryStats: FC = () => {
                     categories={selectedCategories.map((item) => item !== 'Unknown' ? item : null)}
                     serviceTypes={selectedServiceTypes.map((item) => getSiteServiceTypeEnum(item))}
                 />
-                <VillageStats
+                <PlantTypeStats 
                     habits={selectedHabit}
                     landTypes={selectedLandType}
                     talukas={selectedTalukas}
@@ -397,11 +237,9 @@ const InventoryStats: FC = () => {
                     categories={selectedCategories.map((item) => item !== 'Unknown' ? item : null)}
                     serviceTypes={selectedServiceTypes.map((item) => getSiteServiceTypeEnum(item))}
                 />
-                <PlotStats />
-                <CorporateStats />
             </Box>
-        </div>
+        </Box>
     )
 }
 
-export default InventoryStats;
+export default GCInventory;
