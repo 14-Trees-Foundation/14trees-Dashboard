@@ -110,14 +110,14 @@ const PaymentForm: FC<PaymentFormProps> = ({ payment, amount, onPaymentChange, o
 
             onPaymentChange(pmt);
         }
-        if (showRazorpay && !payment) {
+        if ((showRazorpay || visible) && !payment) {
             createPayment();
         }
-    }, [showRazorpay, payment, amount, donorType, panNumber, consent])
+    }, [showRazorpay, visible, payment, amount, donorType, panNumber, consent])
 
     useEffect(() => {
         const handler = setTimeout(() => {
-            if (payment) {
+            if (payment && payment.order_id) {
                 getPaymentsForOrderId(payment.order_id)
             } else {
                 setRPPayments([]);
@@ -156,7 +156,7 @@ const PaymentForm: FC<PaymentFormProps> = ({ payment, amount, onPaymentChange, o
 
     const handlePaymentComplete = async (data: any) => {
         setShowRazorpay(false);
-        if (!payment) return;
+        if (!payment || !payment.order_id) return;
 
         setLoading(true);
         const apiClient = new ApiClient();
@@ -530,26 +530,28 @@ const PaymentForm: FC<PaymentFormProps> = ({ payment, amount, onPaymentChange, o
                             </FormControl>
                         </Box>
                     </Box>
-                    <Divider sx={{ mt: 2 }} />
-                    <Box mt={1}>
-                        <Typography mb={2} textAlign='center'>OR</Typography>
-                        <FormControlLabel
-                            control={
-                                <Checkbox checked={payUsingRazorpay} onChange={(e) => { setPayUsingRazorpay(e.target.checked) }} name="show_all" />
-                            }
-                            label="I want to make payment using razorpay payment gateway. I understand that additional charged may apply for razorpay payments."
-                        />
-                    </Box>
+                    {payment && payment.order_id && <>
+                        <Divider sx={{ mt: 2 }} />
+                        <Box mt={1}>
+                            <Typography mb={2} textAlign='center'>OR</Typography>
+                            <FormControlLabel
+                                control={
+                                    <Checkbox checked={payUsingRazorpay} onChange={(e) => { setPayUsingRazorpay(e.target.checked) }} name="show_all" />
+                                }
+                                label="I want to make payment using razorpay payment gateway. I understand that additional charged may apply for razorpay payments."
+                            />
+                        </Box>
+                    </>}
                 </DialogContent>
                 <DialogActions>
-                    <Button
+                    {payment && payment.order_id && <Button
                         disabled={!payUsingRazorpay}
                         onClick={() => { setVisible(false); setShowRazorpay(true); }}
                         color="success"
                         variant="contained"
                     >
                         Pay using Razorpay
-                    </Button>
+                    </Button>}
                     <Button onClick={() => { setVisible(false) }} color="error" variant="outlined">
                         Cancel
                     </Button>
@@ -567,7 +569,7 @@ const PaymentForm: FC<PaymentFormProps> = ({ payment, amount, onPaymentChange, o
                 </DialogActions>
             </Dialog>
 
-            {(payment && showRazorpay) && <RazonpayComponent
+            {(payment && payment.order_id && showRazorpay) && <RazonpayComponent
                 amount={payingAmount}
                 orderId={payment.order_id}
                 onPaymentDone={handlePaymentComplete}
