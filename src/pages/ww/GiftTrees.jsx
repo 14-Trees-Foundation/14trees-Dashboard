@@ -210,7 +210,8 @@ export const GiftTrees = () => {
     albumName,
     selfAssign = false,
     sponsorUser,
-    sponsorGroup
+    sponsorGroup,
+    visit,
   ) => {
     let images = [];
     if (albumName !== "none") {
@@ -218,7 +219,7 @@ export const GiftTrees = () => {
         return album.album_name === albumName;
       })[0].images;
     }
-    await assignTrees2(formData, img, images, selfAssign, sponsorUser, sponsorGroup);
+    await assignTrees2(formData, img, images, selfAssign, sponsorUser, sponsorGroup, visit);
     setUnassignedSelected(false);
     setAssignedSelected(false);
   };
@@ -327,7 +328,7 @@ export const GiftTrees = () => {
     }
   };
 
-  const assignTrees2 = async (formValues, img, images, selfAssign, sponsorUser, sponsorGroup) => {
+  const assignTrees2 = async (formValues, img, images, selfAssign, sponsorUser, sponsorGroup, visit) => {
     setValues({
       ...values,
       loading: true,
@@ -353,6 +354,7 @@ export const GiftTrees = () => {
     formData.append("sapling_ids", sapling_ids);
     if (sponsorUser && sponsorUser.id) formData.append("sponsored_by_user", sponsorUser.id);
     if (sponsorGroup && sponsorGroup.id) formData.append("sponsored_by_group", sponsorGroup.id);
+    if (visit && visit.id) formData.append("visit_id", visit.id);
 
     if (formValues.gifted_by && formValues.gifted_by !== "undefined")
       formData.append("gifted_by", formValues.gifted_by);
