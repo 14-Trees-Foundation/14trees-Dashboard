@@ -178,44 +178,45 @@ export const GiftDialog = (props) => {
   }
 
   ///*** Visits ***/
-  const [visitsPage, setVisitsPage] = useState(0);
-  const [visitsLoading, setVisitsLoading] = useState(false);
-  const [visitSearch, setVisitSearch] = useState('');
-  const [selectedVisit, setSelectedVisit] = useState(null);
-  const { getVisits } = bindActionCreators(visitActionCreators, dispatch);
+  const [visited, setVisited] = useState(false);
+  // const [visitsPage, setVisitsPage] = useState(0);
+  // const [visitsLoading, setVisitsLoading] = useState(false);
+  // const [visitSearch, setVisitSearch] = useState('');
+  // const [selectedVisit, setSelectedVisit] = useState(null);
+  // const { getVisits } = bindActionCreators(visitActionCreators, dispatch);
 
-  useEffect(() => {
-    const handler = setTimeout(() => {
-      getVisitsData(visitsPage, visitSearch);
-    }, 300);
+  // useEffect(() => {
+  //   const handler = setTimeout(() => {
+  //     getVisitsData(visitsPage, visitSearch);
+  //   }, 300);
 
-    return () => {
-      clearTimeout(handler);
-    }
-  }, [visitsPage, visitSearch]);
+  //   return () => {
+  //     clearTimeout(handler);
+  //   }
+  // }, [visitsPage, visitSearch]);
 
-  const getVisitsData = async (page, search) => {
-    const groupNameFilter = {
-      columnField: "visit_name",
-      value: search,
-      operatorValue: "contains",
-    };
+  // const getVisitsData = async (page, search) => {
+  //   const groupNameFilter = {
+  //     columnField: "visit_name",
+  //     value: search,
+  //     operatorValue: "contains",
+  //   };
 
-    setVisitsLoading(true);
-    getVisits(page * 10, 10, [groupNameFilter]);
-    setTimeout(async () => {
-      setVisitsLoading(false);
-    }, 1000);
-  };
+  //   setVisitsLoading(true);
+  //   getVisits(page * 10, 10, [groupNameFilter]);
+  //   setTimeout(async () => {
+  //     setVisitsLoading(false);
+  //   }, 1000);
+  // };
 
-  let visitsList = [];
-  const visitsData = useAppSelector((state) => state.visitsData);
-  if (visitsData) {
-    visitsList = Object.values(visitsData.visits);
-    visitsList = visitsList.sort((a, b) => {
-      return b.id - a.id;
-    });
-  }
+  // let visitsList = [];
+  // const visitsData = useAppSelector((state) => state.visitsData);
+  // if (visitsData) {
+  //   visitsList = Object.values(visitsData.visits);
+  //   visitsList = visitsList.sort((a, b) => {
+  //     return b.id - a.id;
+  //   });
+  // }
 
 
   ///*** Sponsor Group ***/
@@ -264,7 +265,7 @@ export const GiftDialog = (props) => {
   const formSubmit = (formValues) => {
     onClose();
     formValues["type"] = template;
-    formData(formValues, croppedImg, selAlbum, selfAssign, selectedSponsorUser, selectedSponsorGroup, selectedVisit);
+    formData(formValues, croppedImg, selAlbum, selfAssign, selectedSponsorUser, selectedSponsorGroup, visited);
   };
 
   return (
@@ -467,7 +468,7 @@ export const GiftDialog = (props) => {
                 })}
               </Select>
               <Box mb={2} mt={1}>
-                <AutocompleteWithPagination
+                {/* <AutocompleteWithPagination
                   name="visit"
                   label="Select a visit"
                   options={visitsList}
@@ -487,6 +488,17 @@ export const GiftDialog = (props) => {
                   loading={visitsLoading}
                   fullWidth
                   size="medium"
+                /> */}
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      checked={visited}
+                      onChange={(e) => {
+                        setVisited(e.target.checked);
+                      }}
+                    />
+                  }
+                  label="User is a part of a visit"
                 />
               </Box>
               <Field name="profile">
