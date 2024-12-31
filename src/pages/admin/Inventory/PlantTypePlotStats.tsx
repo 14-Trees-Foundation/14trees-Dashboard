@@ -117,7 +117,7 @@ const PlantTypePlotStats: FC<PlantTypePlotStatsProps> = ({ habits, landTypes, di
             for (let i = 0; i < stats.results.length; i++) {
                 newData[i + stats.offset] = newData[i + stats.offset] = {
                     ...stats.results[i],
-                    key: stats.results[i].plant_type
+                    key: `${stats.results[i].id}_${stats.results[i].plot_id}`
                 }
             }
             setPlantTypeTreeCountData(newData);
