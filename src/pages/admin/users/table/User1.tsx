@@ -29,7 +29,7 @@ import TableComponent from "../../../../components/Table";
 import CombineUserForm from "./CombineUserForm";
 import { toast } from "react-toastify";
 import ApiClient from "../../../../api/apiClient/apiClient";
-import { AccountBalance } from "@mui/icons-material";
+import { AccountBalance, Forest } from "@mui/icons-material";
 
 export const User1 = () => {
   const dispatch = useAppDispatch();
@@ -116,7 +116,7 @@ export const User1 = () => {
       dataIndex: "action",
       key: "action",
       title: "Actions",
-      width: 150,
+      width: 300,
       align: "center",
       render: (value, record, index) => (
         <div
@@ -125,6 +125,21 @@ export const User1 = () => {
             justifyContent: "center",
             alignItems: "center",
           }}>
+          <Button
+            variant="outlined"
+            color="success"
+            style={{ margin: "0 5px" }}
+            onClick={() => {
+              const { hostname, host } = window.location;
+              if (hostname === "localhost" || hostname === "127.0.0.1") {
+                window.open("http://" + host + "/dashboard/" + record.id);
+              } else {
+                window.open("https://" + hostname + "/dashboard/" + record.id);
+              }
+            }}
+          >
+            <Forest />
+          </Button>
           <Button
             variant="outlined"
             color="success"
