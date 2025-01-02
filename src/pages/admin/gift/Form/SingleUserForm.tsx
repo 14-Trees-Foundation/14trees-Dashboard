@@ -1,4 +1,4 @@
-import { Autocomplete, Avatar, Button, Checkbox, FormControl, FormControlLabel, Grid, InputLabel, MenuItem, Select, TextField, Typography } from "@mui/material";
+import { Autocomplete, Avatar, Box, Button, Checkbox, FormControl, FormControlLabel, Grid, InputLabel, MenuItem, Select, TextField, Typography } from "@mui/material";
 import { FC, useState, SyntheticEvent, ChangeEvent, useEffect } from "react";
 import { useAppDispatch, useAppSelector } from "../../../../redux/store/hooks";
 import * as userActionCreators from "../../../../redux/actions/userActions";
@@ -140,7 +140,7 @@ const SingleUserForm: FC<SingleUserFormProps> = ({ maxTrees, imageUrls, value, o
     const handleSubmit = () => {
         if (!user.recipient_name.trim()) return;
         if (showAssignedFields && !user.assignee_name.trim()) return;
-        
+
         const data = { ...user };
         if (data.recipient_email.trim() === '') {
             data.recipient_email = data.recipient_name.toLocaleLowerCase().split(" ").join('.') + "@14trees"
@@ -180,10 +180,29 @@ const SingleUserForm: FC<SingleUserFormProps> = ({ maxTrees, imageUrls, value, o
                 <Grid item xs={12}>
                     <Autocomplete
                         fullWidth
+                        options={usersList}
                         disabled={!user.editable}
-                        options={usersList.map((user) => `${user.name} (${user.email})`)}
-                        onInputChange={(e, value) => { handleEmailChange(e, value, 'recipient_email') }}
                         value={user.recipient_email}
+                        onInputChange={(e, value) => { handleEmailChange(e, value, 'recipient_email') }}
+                        getOptionLabel={(option: any) => option.email ? `${option.name} (${option.email})` : option}
+                        isOptionEqualToValue={(option, value) => option.email ? option.email === value.email : option === value}
+                        renderOption={(props: any, option) => {
+                            return (
+                                <Box
+                                    {...props}
+                                >
+                                    {option.email ? (
+                                        <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
+                                            <Typography variant='body1'>{option.name}</Typography>
+                                            <Typography variant='body2' color={'#494b4b'}>Email: {option.email}</Typography>
+                                            {option.communication_email && <Typography variant='subtitle2' color={'GrayText'}>Comm. Email: {option.communication_email}</Typography>}
+                                        </Box>
+                                    ) : (
+                                        <Typography>{option}</Typography>
+                                    )}
+                                </Box>
+                            );
+                        }}
                         renderInput={(params) => (
                             <TextField
                                 {...params}
@@ -191,8 +210,8 @@ const SingleUserForm: FC<SingleUserFormProps> = ({ maxTrees, imageUrls, value, o
                                 variant="outlined"
                                 name="recipient_email"
                             />
-                        )}
-                    />
+                        )}>
+                    </Autocomplete>
                 </Grid>
                 <Grid item xs={12}>
                     <TextField disabled={!user.editable} name="recipient_name" label="Recipient Name" value={user.recipient_name} onChange={handleUserChange} fullWidth />
@@ -227,10 +246,29 @@ const SingleUserForm: FC<SingleUserFormProps> = ({ maxTrees, imageUrls, value, o
                 {showAssignedFields && <Grid item xs={12}>
                     <Autocomplete
                         fullWidth
+                        options={usersList}
                         disabled={!user.editable}
-                        options={usersList.map((user) => `${user.name} (${user.email})`)}
-                        onInputChange={(e, value) => { handleEmailChange(e, value, 'assignee_email') }}
                         value={user.assignee_email}
+                        onInputChange={(e, value) => { handleEmailChange(e, value, 'assignee_email') }}
+                        getOptionLabel={(option: any) => option.email ? `${option.name} (${option.email})` : option}
+                        isOptionEqualToValue={(option, value) => option.email ? option.email === value.email : option === value}
+                        renderOption={(props: any, option) => {
+                            return (
+                                <Box
+                                    {...props}
+                                >
+                                    {option.email ? (
+                                        <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
+                                            <Typography variant='body1'>{option.name}</Typography>
+                                            <Typography variant='body2' color={'#494b4b'}>Email: {option.email}</Typography>
+                                            {option.communication_email && <Typography variant='subtitle2' color={'GrayText'}>Comm. Email: {option.communication_email}</Typography>}
+                                        </Box>
+                                    ) : (
+                                        <Typography>{option}</Typography>
+                                    )}
+                                </Box>
+                            );
+                        }}
                         renderInput={(params) => (
                             <TextField
                                 {...params}
@@ -238,8 +276,8 @@ const SingleUserForm: FC<SingleUserFormProps> = ({ maxTrees, imageUrls, value, o
                                 variant="outlined"
                                 name="assignee_email"
                             />
-                        )}
-                    />
+                        )}>
+                    </Autocomplete>
                 </Grid>}
                 {showAssignedFields && <Grid item xs={12}>
                     <TextField
