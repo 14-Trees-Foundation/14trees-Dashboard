@@ -21,9 +21,11 @@ interface User {
   recipient_name: string;
   recipient_phone: string;
   recipient_email: string;
+  recipient_communication_email: string;
   assignee_name: string;
   assignee_phone: string;
   assignee_email: string;
+  assignee_communication_email: string;
   image?: boolean;
   image_name?: string;
   image_url?: string;
@@ -47,9 +49,11 @@ const isValidPhone = (phone: string) => {
 
 const recipientNameField = 'Recipient Name'
 const recipientEmailField = 'Recipient Email'
+const recipientCommEmailField = 'Recipient Communication Email (optional)'
 const recipientPhoneField = 'Recipient Phone (optional)'
 const assigneeNameField = 'Assignee Name'
 const assigneeEmailField = 'Assignee Email (optional)'
+const assigneeCommEmailField = 'Assignee Communication Email (optional)'
 const assigneePhoneField = 'Assignee Phone (optional)'
 const countField = 'Number of trees to assign'
 const imageNameField = 'Image Name (optional)'
@@ -242,9 +246,11 @@ export const BulkUserForm: FC<BulkUserFormProps> = ({ requestId, treeCount, user
                 recipient_name: (user[recipientNameField] as string).trim(),
                 recipient_phone: (user[recipientPhoneField] as string).trim(),
                 recipient_email: (user[recipientEmailField] as string).trim(),
+                recipient_communication_email: (user[recipientCommEmailField] as string).trim(),
                 assignee_name: (user[assigneeNameField] as string).trim(),
                 assignee_phone: (user[assigneePhoneField] as string).trim(),
                 assignee_email: (user[assigneeEmailField] as string).trim(),
+                assignee_communication_email: (user[assigneeCommEmailField] as string).trim(),
                 image_name: user[imageNameField] ? user[imageNameField] : undefined,
                 relation: user['Relation with person'] ? user['Relation with person'] : undefined,
                 gifted_trees: user[countField] ? user[countField] : 1,
@@ -259,6 +265,7 @@ export const BulkUserForm: FC<BulkUserFormProps> = ({ requestId, treeCount, user
                 parsedUser.assignee_name = parsedUser.recipient_name
                 parsedUser.assignee_phone = parsedUser.recipient_phone
                 parsedUser.assignee_email = parsedUser.recipient_email
+                parsedUser.assignee_communication_email = parsedUser.recipient_communication_email
               }
 
               if (!parsedUser.recipient_email) parsedUser.recipient_email = parsedUser.recipient_name.split(" ").join('.') + "@14trees"
@@ -349,10 +356,12 @@ export const BulkUserForm: FC<BulkUserFormProps> = ({ requestId, treeCount, user
       user.recipient_name = user.recipient_name.trim();
       user.recipient_phone = user.recipient_phone.trim();
       user.recipient_email = user.recipient_email.trim();
+      user.recipient_communication_email = user.recipient_communication_email.trim();
       user.relation = user.relation?.trim();
       user.assignee_name = user.assignee_name?.trim();
       user.assignee_phone = user.assignee_phone?.trim();
       user.assignee_email = user.assignee_email?.trim();
+      user.assignee_communication_email = user.assignee_communication_email?.trim();
       user.error = !isValidEmail(user.recipient_email) || !isValidPhone(user.recipient_phone) || user.recipient_name === ''
     }
 
@@ -403,6 +412,15 @@ export const BulkUserForm: FC<BulkUserFormProps> = ({ requestId, treeCount, user
       ...getColumnSearchProps('recipient_email', filters, handleSetFilters),
     },
     {
+      dataIndex: "recipient_communication_email",
+      key: "recipient_communication_email",
+      title: "Recipient Communication Email",
+      width: 180,
+      align: "center",
+      render: (value: string) => value ? value : 'Not Provided',
+      ...getColumnSearchProps('recipient_communication_email', filters, handleSetFilters),
+    },
+    {
       dataIndex: "recipient_phone",
       key: "recipient_phone",
       title: "Recipient Phone",
@@ -425,6 +443,15 @@ export const BulkUserForm: FC<BulkUserFormProps> = ({ requestId, treeCount, user
       align: "center",
       render: (value: string) => value.endsWith("@14trees") ? 'Not Provided' : value,
       ...getColumnSearchProps('assignee_email', filters, handleSetFilters),
+    },
+    {
+      dataIndex: "assignee_communication_email",
+      key: "assignee_communication_email",
+      title: "Assignee Communication Email",
+      width: 180,
+      align: "center",
+      render: (value: string) => value ? value : 'Not Provided',
+      ...getColumnSearchProps('assignee_communication_email', filters, handleSetFilters),
     },
     {
       dataIndex: "assignee_phone",

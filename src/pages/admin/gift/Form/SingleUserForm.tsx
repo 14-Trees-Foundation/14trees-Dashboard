@@ -10,9 +10,11 @@ interface User {
     recipient_name: string;
     recipient_phone: string;
     recipient_email: string;
+    recipient_communication_email: string;
     assignee_name: string;
     assignee_phone: string;
     assignee_email: string;
+    assignee_communication_email: string;
     relation: string;
     gifted_trees: number;
     editable?: boolean,
@@ -34,8 +36,10 @@ const SingleUserForm: FC<SingleUserFormProps> = ({ maxTrees, imageUrls, value, o
     const [user, setUser] = useState<User>({
         recipient_name: '',
         recipient_email: '',
+        recipient_communication_email: '',
         recipient_phone: '',
         assignee_email: '',
+        assignee_communication_email: '',
         assignee_name: '',
         assignee_phone: '',
         relation: '',
@@ -51,9 +55,11 @@ const SingleUserForm: FC<SingleUserFormProps> = ({ maxTrees, imageUrls, value, o
                 key: value.key,
                 recipient_name: value.recipient_name,
                 recipient_email: value.recipient_email,
+                recipient_communication_email: value.recipient_communication_email,
                 recipient_phone: value.recipient_phone || '',
                 assignee_name: value.assignee_name,
                 assignee_email: value.assignee_email,
+                assignee_communication_email: value.assignee_communication_email,
                 assignee_phone: value.assignee_phone || '',
                 relation: value.relation || '',
                 gifted_trees: value.gifted_trees,
@@ -108,6 +114,7 @@ const SingleUserForm: FC<SingleUserFormProps> = ({ maxTrees, imageUrls, value, o
                         recipient_email: user.email,
                         recipient_name: user.name,
                         recipient_phone: user.phone ?? '',
+                        recipient_communication_email: user.communication_email ?? '',
                     }));
                 } else {
                     setUser(prev => ({
@@ -115,6 +122,7 @@ const SingleUserForm: FC<SingleUserFormProps> = ({ maxTrees, imageUrls, value, o
                         assignee_email: user.email,
                         assignee_name: user.name,
                         assignee_phone: user.phone ?? '',
+                        assignee_communication_email: user.communication_email ?? '',
                     }));
                 }
             }
@@ -142,6 +150,7 @@ const SingleUserForm: FC<SingleUserFormProps> = ({ maxTrees, imageUrls, value, o
             data.assignee_email = data.recipient_email
             data.assignee_phone = data.recipient_phone
             data.assignee_name = data.recipient_name
+            data.assignee_communication_email = data.recipient_communication_email
         }
 
         onSubmit(data);
@@ -152,8 +161,10 @@ const SingleUserForm: FC<SingleUserFormProps> = ({ maxTrees, imageUrls, value, o
         setUser({
             recipient_name: '',
             recipient_email: '',
+            recipient_communication_email: '',
             recipient_phone: '',
             assignee_email: '',
+            assignee_communication_email: '',
             assignee_name: '',
             assignee_phone: '',
             relation: '',
@@ -188,6 +199,9 @@ const SingleUserForm: FC<SingleUserFormProps> = ({ maxTrees, imageUrls, value, o
                 </Grid>
                 <Grid item xs={12}>
                     <TextField disabled={!user.editable} name="recipient_phone" label="Recipient Phone (Optional)" value={user.recipient_phone} onChange={handleUserChange} fullWidth />
+                </Grid>
+                <Grid item xs={12}>
+                    <TextField disabled={!user.editable} name="recipient_communication_email" label="Recipient's Communication Email (Optional)" value={user.recipient_communication_email} onChange={handleUserChange} fullWidth />
                 </Grid>
                 <Grid item xs={12}>
                     <TextField
@@ -225,6 +239,16 @@ const SingleUserForm: FC<SingleUserFormProps> = ({ maxTrees, imageUrls, value, o
                                 name="assignee_email"
                             />
                         )}
+                    />
+                </Grid>}
+                {showAssignedFields && <Grid item xs={12}>
+                    <TextField
+                        disabled={!user.editable}
+                        name="assignee_communication_email"
+                        label="Assignee's Communication Email (Optional)"
+                        value={user.assignee_communication_email}
+                        onChange={handleUserChange}
+                        fullWidth
                     />
                 </Grid>}
                 {showAssignedFields && <Grid item xs={12}>
