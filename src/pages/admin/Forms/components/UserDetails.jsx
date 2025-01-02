@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Box, Typography, Grid, TextField, Button, Autocomplete, ToggleButtonGroup, ToggleButton, Select, MenuItem } from "@mui/material";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -11,6 +11,7 @@ import * as userActionCreators from "../../../../redux/actions/userActions";
 import * as groupActionCreators from "../../../../redux/actions/groupActions";
 import { organizationTypes } from "../../organization/organizationType";
 
+const defaultHanlperText = 'Email already exists in the system for a different user. You can use the same email in new user as communication address.';
 const intitialFValues = {
   name: "",
   email: "",
@@ -32,6 +33,7 @@ export const UserDetails = ({ selectedPlot }) => {
   const [treeCount, setTreeCount] = useState(0);
   const [mapTo, setMapTo] = useState('user');
 
+  const [helpersText, setHelpersText] = useState(undefined);
   const [formData, setFormData] = useState({
     'user_id': 0,
     'user_name': '',
@@ -62,10 +64,25 @@ export const UserDetails = ({ selectedPlot }) => {
     groupsList = Object.values(groupsData.groups);
   }
 
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      const item = usersList.find((user) => user.email === formData.email);
+      if (item && item.name !== formData.name) {
+        setHelpersText(defaultHanlperText);
+      } else {
+        setHelpersText(undefined);
+      }
+    }, 300);
+
+    return () => {
+      clearTimeout(handler);
+    }
+  }, [usersList, formData]);
+
   const handleEmailChange = (event, value) => {
     let isSet = false;
     usersList.forEach((user) => {
-      if (`${user.name} (${user.email})` === value) {
+      if (user.email === value.trim()) {
         isSet = true;
         setFormData({
           'user_id': user.id,
@@ -258,13 +275,31 @@ export const UserDetails = ({ selectedPlot }) => {
                       noOptionsText="No Users"
                       value={formData.email}
                       onInputChange={handleEmailChange}
-                      getOptionLabel={(option) => option.email ? `${option.name} (${option.email})` : option}
-                      isOptionEqualToValue={(option, value) => true}
+                      getOptionLabel={option => option.email ? option.email : option}
+                      isOptionEqualToValue={(option, value) => option.email ? option.email === value.email : option === value}
+                      renderOption={(props, option) => {
+                        return (
+                          <Box
+                            {...props}
+                          >
+                            {option.email ? (
+                              <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
+                                <Typography variant='body1'>{option.name}</Typography>
+                                <Typography variant='body2' color={'#494b4b'}>Email: {option.email}</Typography>
+                                {option.communication_email && <Typography variant='subtitle2' color={'GrayText'}>Comm. Email: {option.communication_email}</Typography>}
+                              </Box>
+                            ) : (
+                              <Typography>{option}</Typography>
+                            )}
+                          </Box>
+                        );
+                      }}
                       renderInput={(params) => (
                         <TextField
                           {...params}
-                          label="Enter email to search"
+                          label="Email"
                           variant="outlined"
+                          helperText={helpersText}
                         />
                       )}>
                     </Autocomplete>
@@ -281,7 +316,7 @@ export const UserDetails = ({ selectedPlot }) => {
                       }}
                       fullWidth
                       required
-                      value={formData.name}
+                      value={formData.user_name}
                       onChange={handleChange}
                       label="Full Name"
                       name="user_name"
@@ -298,7 +333,7 @@ export const UserDetails = ({ selectedPlot }) => {
                         },
                       }}
                       fullWidth
-                      value={formData.contact}
+                      value={formData.user_contact}
                       onChange={handleChange}
                       variant="outlined"
                       label="Contact"
