@@ -1,8 +1,8 @@
 import { useState } from 'react';
-import { Autocomplete, Box, Button, Grid, Modal, TextField } from '@mui/material';
+import { Autocomplete, Box, Button, Grid, Modal, TextField, Typography } from '@mui/material';
 import { useAppSelector } from '../../../../redux/store/hooks';
 
-
+// @deprecated
 const AddUser = ({ open, handleClose, createUser, searchUser }) => {
 
     const style = {
@@ -47,6 +47,7 @@ const AddUser = ({ open, handleClose, createUser, searchUser }) => {
                 setFormData({
                     'email': user.email,
                     'name': user.name,
+                    'communication_email': user.communication_email ?? '',
                     'phone': user.phone ?? '',
                     'birth_date': user.birth_date ?? '',
                 })
@@ -102,7 +103,26 @@ const AddUser = ({ open, handleClose, createUser, searchUser }) => {
                                     value={formData.email}
                                     onInputChange={handleEmailChange}
                                     getOptionLabel={(option) => option.email ? `${option.name} (${option.email})` : option}
-                                    isOptionEqualToValue={(option, value) => true}
+                                    isOptionEqualToValue={(option, value) => option.email ? option.email === value.email : option === value}
+                                    renderOption={(props, option) => {
+                                        const { key, ...optionProps } = props;
+                                        return (
+                                            <Box
+                                                key={key}
+                                                {...optionProps}
+                                            >
+                                                {option.email ? (
+                                                    <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
+                                                        <Typography variant='body1'>{option.name}</Typography>
+                                                        <Typography variant='body2' color={'#494b4b'}>Email: {option.email}</Typography>
+                                                        {option.communication_email && <Typography variant='subtitle2' color={'GrayText'}>Comm. Email: {option.communication_email}</Typography>}
+                                                    </Box>
+                                                ) : (
+                                                    <Typography>{option}</Typography>
+                                                )}
+                                            </Box>
+                                        );
+                                    }}
                                     renderInput={(params) => (
                                         <TextField
                                             {...params}

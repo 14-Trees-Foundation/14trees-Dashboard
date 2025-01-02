@@ -30,6 +30,7 @@ import CombineUserForm from "./CombineUserForm";
 import { toast } from "react-toastify";
 import ApiClient from "../../../../api/apiClient/apiClient";
 import { AccountBalance, Forest } from "@mui/icons-material";
+import UserForm from "./UserForm";
 
 export const User1 = () => {
   const dispatch = useAppDispatch();
@@ -175,7 +176,7 @@ export const User1 = () => {
             style={{ margin: "0 5px" }}
             onClick={() => {
               setSelectedEditRow(record);
-              setEditModal(true);
+              setOpen(true);
             }}>
             <EditIcon />
           </Button>
@@ -281,12 +282,12 @@ export const User1 = () => {
             onClick={handleModalOpen}>
             Add User
           </Button>
-          <AddUser
+          {/* <AddUser
             open={open}
             handleClose={handleModalClose}
             createUser={handleCreateUserData}
             searchUser={searchUsers}
-          />
+          /> */}
           <Button
             variant="contained"
             color="success"
@@ -381,6 +382,15 @@ export const User1 = () => {
           editSubmit={handleEditSubmit}
         />
       )}
+
+      <UserForm 
+        user={selectedEditRow}
+        open={open}
+        onClose={() => {
+          setSelectedEditRow(null);
+          setOpen(false);
+        }}
+      />
     </>
   );
 };
