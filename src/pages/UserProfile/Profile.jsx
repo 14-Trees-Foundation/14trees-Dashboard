@@ -20,6 +20,7 @@ export const Profile = ({ saplingId }) => {
   const selUserInfo = useRecoilValue(selUsersData);
 
   const username = selUserInfo.assigned_to.split(" ")[0];
+  const userId = selUserInfo.assigned_to_id;
 
   useEffect(() => {
     document.title = "14Trees Dashboard - Profile: " + username;
@@ -39,6 +40,21 @@ export const Profile = ({ saplingId }) => {
             ""
           ) : (
             <div style={{ justifyContent: "flex-end" }}>
+              <Button
+                variant="contained"
+                color="primary"
+                style={{ margin: "0 5px" }}
+                onClick={() => {
+                  const { hostname, host } = window.location;
+                  if (hostname === "localhost" || hostname === "127.0.0.1") {
+                    window.open("http://" + host + "/dashboard/" + userId);
+                  } else {
+                    window.open("https://" + hostname + "/dashboard/" + userId);
+                  }
+                }}
+              >
+                View Sponsored Trees
+              </Button>
               <Button
                 color="primary"
                 variant="contained"
