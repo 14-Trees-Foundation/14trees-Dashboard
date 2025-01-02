@@ -498,7 +498,7 @@ export const GiftDialog = (props) => {
                       }}
                     />
                   }
-                  label="User is a part of a visit"
+                  label="Tree(s) Planted during a visit"
                 />
               </Box>
               <Field name="profile">
