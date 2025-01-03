@@ -1,4 +1,4 @@
-import { Autocomplete, Avatar, Button, Checkbox, FormControl, FormControlLabel, Grid, InputLabel, MenuItem, Select, TextField, Typography } from "@mui/material";
+import { Autocomplete, Avatar, Box, Button, Checkbox, FormControl, FormControlLabel, Grid, InputLabel, MenuItem, Select, TextField, Typography } from "@mui/material";
 import { FC, useState, SyntheticEvent, ChangeEvent, useEffect } from "react";
 import { useAppDispatch, useAppSelector } from "../../../../redux/store/hooks";
 import * as userActionCreators from "../../../../redux/actions/userActions";
@@ -10,9 +10,11 @@ interface User {
     recipient_name: string;
     recipient_phone: string;
     recipient_email: string;
+    recipient_communication_email: string;
     assignee_name: string;
     assignee_phone: string;
     assignee_email: string;
+    assignee_communication_email: string;
     relation: string;
     gifted_trees: number;
     editable?: boolean,
@@ -34,8 +36,10 @@ const SingleUserForm: FC<SingleUserFormProps> = ({ maxTrees, imageUrls, value, o
     const [user, setUser] = useState<User>({
         recipient_name: '',
         recipient_email: '',
+        recipient_communication_email: '',
         recipient_phone: '',
         assignee_email: '',
+        assignee_communication_email: '',
         assignee_name: '',
         assignee_phone: '',
         relation: '',
@@ -51,9 +55,11 @@ const SingleUserForm: FC<SingleUserFormProps> = ({ maxTrees, imageUrls, value, o
                 key: value.key,
                 recipient_name: value.recipient_name,
                 recipient_email: value.recipient_email,
+                recipient_communication_email: value.recipient_communication_email,
                 recipient_phone: value.recipient_phone || '',
                 assignee_name: value.assignee_name,
                 assignee_email: value.assignee_email,
+                assignee_communication_email: value.assignee_communication_email,
                 assignee_phone: value.assignee_phone || '',
                 relation: value.relation || '',
                 gifted_trees: value.gifted_trees,
@@ -108,6 +114,7 @@ const SingleUserForm: FC<SingleUserFormProps> = ({ maxTrees, imageUrls, value, o
                         recipient_email: user.email,
                         recipient_name: user.name,
                         recipient_phone: user.phone ?? '',
+                        recipient_communication_email: user.communication_email ?? '',
                     }));
                 } else {
                     setUser(prev => ({
@@ -115,6 +122,7 @@ const SingleUserForm: FC<SingleUserFormProps> = ({ maxTrees, imageUrls, value, o
                         assignee_email: user.email,
                         assignee_name: user.name,
                         assignee_phone: user.phone ?? '',
+                        assignee_communication_email: user.communication_email ?? '',
                     }));
                 }
             }
@@ -132,7 +140,7 @@ const SingleUserForm: FC<SingleUserFormProps> = ({ maxTrees, imageUrls, value, o
     const handleSubmit = () => {
         if (!user.recipient_name.trim()) return;
         if (showAssignedFields && !user.assignee_name.trim()) return;
-        
+
         const data = { ...user };
         if (data.recipient_email.trim() === '') {
             data.recipient_email = data.recipient_name.toLocaleLowerCase().split(" ").join('.') + "@14trees"
@@ -142,6 +150,7 @@ const SingleUserForm: FC<SingleUserFormProps> = ({ maxTrees, imageUrls, value, o
             data.assignee_email = data.recipient_email
             data.assignee_phone = data.recipient_phone
             data.assignee_name = data.recipient_name
+            data.assignee_communication_email = data.recipient_communication_email
         }
 
         onSubmit(data);
@@ -152,8 +161,10 @@ const SingleUserForm: FC<SingleUserFormProps> = ({ maxTrees, imageUrls, value, o
         setUser({
             recipient_name: '',
             recipient_email: '',
+            recipient_communication_email: '',
             recipient_phone: '',
             assignee_email: '',
+            assignee_communication_email: '',
             assignee_name: '',
             assignee_phone: '',
             relation: '',
@@ -169,10 +180,29 @@ const SingleUserForm: FC<SingleUserFormProps> = ({ maxTrees, imageUrls, value, o
                 <Grid item xs={12}>
                     <Autocomplete
                         fullWidth
+                        options={usersList}
                         disabled={!user.editable}
-                        options={usersList.map((user) => `${user.name} (${user.email})`)}
-                        onInputChange={(e, value) => { handleEmailChange(e, value, 'recipient_email') }}
                         value={user.recipient_email}
+                        onInputChange={(e, value) => { handleEmailChange(e, value, 'recipient_email') }}
+                        getOptionLabel={(option: any) => option.email ? `${option.name} (${option.email})` : option}
+                        isOptionEqualToValue={(option, value) => option.email ? option.email === value.email : option === value}
+                        renderOption={(props: any, option) => {
+                            return (
+                                <Box
+                                    {...props}
+                                >
+                                    {option.email ? (
+                                        <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
+                                            <Typography variant='body1'>{option.name}</Typography>
+                                            <Typography variant='body2' color={'#494b4b'}>Email: {option.email}</Typography>
+                                            {option.communication_email && <Typography variant='subtitle2' color={'GrayText'}>Comm. Email: {option.communication_email}</Typography>}
+                                        </Box>
+                                    ) : (
+                                        <Typography>{option}</Typography>
+                                    )}
+                                </Box>
+                            );
+                        }}
                         renderInput={(params) => (
                             <TextField
                                 {...params}
@@ -180,14 +210,17 @@ const SingleUserForm: FC<SingleUserFormProps> = ({ maxTrees, imageUrls, value, o
                                 variant="outlined"
                                 name="recipient_email"
                             />
-                        )}
-                    />
+                        )}>
+                    </Autocomplete>
                 </Grid>
                 <Grid item xs={12}>
                     <TextField disabled={!user.editable} name="recipient_name" label="Recipient Name" value={user.recipient_name} onChange={handleUserChange} fullWidth />
                 </Grid>
                 <Grid item xs={12}>
                     <TextField disabled={!user.editable} name="recipient_phone" label="Recipient Phone (Optional)" value={user.recipient_phone} onChange={handleUserChange} fullWidth />
+                </Grid>
+                <Grid item xs={12}>
+                    <TextField disabled={!user.editable} name="recipient_communication_email" label="Recipient's Communication Email (Optional)" value={user.recipient_communication_email} onChange={handleUserChange} fullWidth />
                 </Grid>
                 <Grid item xs={12}>
                     <TextField
@@ -213,10 +246,29 @@ const SingleUserForm: FC<SingleUserFormProps> = ({ maxTrees, imageUrls, value, o
                 {showAssignedFields && <Grid item xs={12}>
                     <Autocomplete
                         fullWidth
+                        options={usersList}
                         disabled={!user.editable}
-                        options={usersList.map((user) => `${user.name} (${user.email})`)}
-                        onInputChange={(e, value) => { handleEmailChange(e, value, 'assignee_email') }}
                         value={user.assignee_email}
+                        onInputChange={(e, value) => { handleEmailChange(e, value, 'assignee_email') }}
+                        getOptionLabel={(option: any) => option.email ? `${option.name} (${option.email})` : option}
+                        isOptionEqualToValue={(option, value) => option.email ? option.email === value.email : option === value}
+                        renderOption={(props: any, option) => {
+                            return (
+                                <Box
+                                    {...props}
+                                >
+                                    {option.email ? (
+                                        <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
+                                            <Typography variant='body1'>{option.name}</Typography>
+                                            <Typography variant='body2' color={'#494b4b'}>Email: {option.email}</Typography>
+                                            {option.communication_email && <Typography variant='subtitle2' color={'GrayText'}>Comm. Email: {option.communication_email}</Typography>}
+                                        </Box>
+                                    ) : (
+                                        <Typography>{option}</Typography>
+                                    )}
+                                </Box>
+                            );
+                        }}
                         renderInput={(params) => (
                             <TextField
                                 {...params}
@@ -224,7 +276,17 @@ const SingleUserForm: FC<SingleUserFormProps> = ({ maxTrees, imageUrls, value, o
                                 variant="outlined"
                                 name="assignee_email"
                             />
-                        )}
+                        )}>
+                    </Autocomplete>
+                </Grid>}
+                {showAssignedFields && <Grid item xs={12}>
+                    <TextField
+                        disabled={!user.editable}
+                        name="assignee_communication_email"
+                        label="Assignee's Communication Email (Optional)"
+                        value={user.assignee_communication_email}
+                        onChange={handleUserChange}
+                        fullWidth
                     />
                 </Grid>}
                 {showAssignedFields && <Grid item xs={12}>

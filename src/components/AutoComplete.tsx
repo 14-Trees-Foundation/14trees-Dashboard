@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { Autocomplete, TextField, CircularProgress } from '@mui/material';
+import { ArrowDropDown } from '@mui/icons-material';
 
 interface AutoCompleteProps {
   loading?: boolean,
@@ -86,7 +87,7 @@ const  AutocompleteWithPagination = ({
             ...params.InputProps,
             endAdornment: (
               <>
-                {loading ? <CircularProgress color="inherit" size={20} /> : null}
+                {loading ? <CircularProgress color="inherit" size={20} /> : <ArrowDropDown htmlColor='rgba(0, 0, 0, 0.54)'/>}
                 {params.InputProps.endAdornment}
               </>
             ),

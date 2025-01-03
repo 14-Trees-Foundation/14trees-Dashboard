@@ -6,6 +6,7 @@ import { Table } from "antd"
 import { ArrowDropDown, ArrowDropUp } from "@mui/icons-material"
 import getColumnSearchProps, { getColumnSelectedItemFilter } from "../../../components/Filter"
 import GeneralTable from "../../../components/GenTable"
+import { toast } from "react-toastify"
 
 const TableSummary = (data: any[], selectedKeys: any[], totalColumns: number) => {
 
@@ -16,7 +17,7 @@ const TableSummary = (data: any[], selectedKeys: any[], totalColumns: number) =>
     return (
         <Table.Summary fixed='bottom'>
             <Table.Summary.Row style={{ backgroundColor: 'rgba(172, 252, 172, 0.2)' }}>
-                <Table.Summary.Cell align="right" index={totalColumns - 10} colSpan={7}>
+                <Table.Summary.Cell align="right" index={totalColumns - 10} colSpan={8}>
                     <strong>Total</strong>
                 </Table.Summary.Cell>
                 <Table.Summary.Cell align="right" index={totalColumns - 9} colSpan={1}>{calculateSum(data.filter((item) => selectedKeys.includes(item.key)).map((item) => item.total))}</Table.Summary.Cell>
@@ -58,6 +59,21 @@ const SiteStats: FC<SiteStatsProps> = ({ habits, landTypes, districts, talukas, 
     const [orderBy, setOrderBy] = useState<{ column: string, order: 'ASC' | 'DESC' }[]>([])
     const [page, setPage] = useState(0);
     const [pageSize, setPageSize] = useState(10);
+    const [tags, setTags] = useState<string[]>([]);
+
+    const getTags = async () => {
+        try {
+            const apiClient = new ApiClient();
+            const resp = await apiClient.getTags(0, 100);
+            setTags(resp.results.map(item => item.tag));
+        } catch (error: any) {
+            toast.error(error.message);
+        }
+    }
+
+    useEffect(() => {
+        getTags();
+    }, [])
 
     const [selectedRows, setSelectedRows] = useState<any[]>([]);
     const handleSelectionChanges = (keys: any[]) => {
@@ -243,6 +259,14 @@ const SiteStats: FC<SiteStatsProps> = ({ habits, landTypes, districts, talukas, 
             width: 200,
             render: (value: any) => value ? value : 'Unknown',
             ...getColumnSelectedItemFilter<any>({ dataIndex: 'category', filters, handleSetFilters, options: ['Public', 'Foundation', 'Unknown'] }),
+        },
+        {
+            title: "Tags",
+            dataIndex: 'tags',
+            key: 'Tags',
+            width: 250,
+            render: (value: any) => value ? value?.join(', ') : '',
+            ...getColumnSelectedItemFilter({dataIndex: 'tags', filters, handleSetFilters, options: tags}),
         },
         {
             title: "Service Type",

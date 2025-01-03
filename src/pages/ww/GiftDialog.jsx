@@ -26,6 +26,7 @@ import { useAppDispatch, useAppSelector } from "../../redux/store/hooks";
 import { bindActionCreators } from "@reduxjs/toolkit";
 import * as userActionCreators from '../../redux/actions/userActions'
 import * as groupActionCreators from '../../redux/actions/groupActions'
+import * as visitActionCreators from '../../redux/actions/visitActions'
 import { AutocompleteWithPagination } from "../../components/AutoComplete";
 
 const Transition = React.forwardRef(function Transition(props, ref) {
@@ -166,7 +167,7 @@ export const GiftDialog = (props) => {
       setSULoading(false);
     }, 1000);
   };
-  
+
   let usersList = [];
   const usersData = useAppSelector((state) => state.usersData);
   if (usersData) {
@@ -175,6 +176,48 @@ export const GiftDialog = (props) => {
       return b.id - a.id;
     });
   }
+
+  ///*** Visits ***/
+  const [visited, setVisited] = useState(false);
+  // const [visitsPage, setVisitsPage] = useState(0);
+  // const [visitsLoading, setVisitsLoading] = useState(false);
+  // const [visitSearch, setVisitSearch] = useState('');
+  // const [selectedVisit, setSelectedVisit] = useState(null);
+  // const { getVisits } = bindActionCreators(visitActionCreators, dispatch);
+
+  // useEffect(() => {
+  //   const handler = setTimeout(() => {
+  //     getVisitsData(visitsPage, visitSearch);
+  //   }, 300);
+
+  //   return () => {
+  //     clearTimeout(handler);
+  //   }
+  // }, [visitsPage, visitSearch]);
+
+  // const getVisitsData = async (page, search) => {
+  //   const groupNameFilter = {
+  //     columnField: "visit_name",
+  //     value: search,
+  //     operatorValue: "contains",
+  //   };
+
+  //   setVisitsLoading(true);
+  //   getVisits(page * 10, 10, [groupNameFilter]);
+  //   setTimeout(async () => {
+  //     setVisitsLoading(false);
+  //   }, 1000);
+  // };
+
+  // let visitsList = [];
+  // const visitsData = useAppSelector((state) => state.visitsData);
+  // if (visitsData) {
+  //   visitsList = Object.values(visitsData.visits);
+  //   visitsList = visitsList.sort((a, b) => {
+  //     return b.id - a.id;
+  //   });
+  // }
+
 
   ///*** Sponsor Group ***/
   const [sgPage, setSGPage] = useState(0);
@@ -185,7 +228,13 @@ export const GiftDialog = (props) => {
   const { getGroups } = bindActionCreators(groupActionCreators, dispatch);
 
   useEffect(() => {
-    getGroupsData(sgPage, sponsorGroupSearch);
+    const handler = setTimeout(() => {
+      getGroupsData(sgPage, sponsorGroupSearch);
+    }, 300);
+
+    return () => {
+      clearTimeout(handler);
+    }
   }, [sgPage, sponsorGroupSearch]);
 
   const getGroupsData = async (page, search) => {
@@ -201,7 +250,7 @@ export const GiftDialog = (props) => {
       setSGLoading(false);
     }, 1000);
   };
-  
+
   let groupsList = [];
   const groupsData = useAppSelector((state) => state.groupsData);
   if (groupsData) {
@@ -216,7 +265,7 @@ export const GiftDialog = (props) => {
   const formSubmit = (formValues) => {
     onClose();
     formValues["type"] = template;
-    formData(formValues, croppedImg, selAlbum, selfAssign, selectedSponsorUser, selectedSponsorGroup);
+    formData(formValues, croppedImg, selAlbum, selfAssign, selectedSponsorUser, selectedSponsorGroup, visited);
   };
 
   return (
@@ -418,6 +467,40 @@ export const GiftDialog = (props) => {
                   );
                 })}
               </Select>
+              <Box mb={2} mt={1}>
+                {/* <AutocompleteWithPagination
+                  name="visit"
+                  label="Select a visit"
+                  options={visitsList}
+                  getOptionLabel={(option) => option.visit_name}
+                  isOptionEqualToValue={(option, value) => {
+                    return option.id === value.id;
+                  }}
+                  onChange={(event, newValue) => {
+                    setSelectedVisit(newValue);
+                  }}
+                  onInputChange={(event) => {
+                    const { value } = event.target;
+                    setVisitsPage(0);
+                    setVisitSearch(value);
+                  }}
+                  setPage={setVisitsPage}
+                  loading={visitsLoading}
+                  fullWidth
+                  size="medium"
+                /> */}
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      checked={visited}
+                      onChange={(e) => {
+                        setVisited(e.target.checked);
+                      }}
+                    />
+                  }
+                  label="Tree(s) Planted during a visit"
+                />
+              </Box>
               <Field name="profile">
                 {({ input, meta }) => (
                   <div className={classes.imgdiv}>
