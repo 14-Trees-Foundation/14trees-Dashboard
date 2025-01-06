@@ -29,6 +29,7 @@ export type Tree = {
     plant_type?: string,
     habit?: string,
     plot?: string,
+    site_name?: string,
     mapped_user_name?: string,
     mapped_group_name?: string,
     sponsor_user_name?: string,

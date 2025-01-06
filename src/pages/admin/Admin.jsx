@@ -28,6 +28,7 @@ import { VisitsComponent } from "./visits/Visits";
 import SiteInventory from "./Inventory/SiteInventory";
 import GiftTrees from "./gift/GiftTrees";
 import GCInventory from "./Inventory/GCInventory";
+import CSRInventory from "./csr/CSRInventory";
 
 export const Admin = () => {
   const classes = useStyles();
@@ -132,6 +133,10 @@ export const Admin = () => {
     {
       page: GiftTrees,
       displayName: "Gift Cards",
+    },
+    {
+      page: CSRInventory,
+      displayName: "CSR Analytics",
     },
     {
       page: Images,

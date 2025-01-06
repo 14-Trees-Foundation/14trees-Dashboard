@@ -263,6 +263,20 @@ class ApiClient {
 
     }
 
+    async getPlotStatsForCorporate(offset: number, limit: number, group_id: number, filters?: any[], orderBy?: any[]): Promise<PaginatedResponse<any>> {
+        const url = `/plots/corporate-stats?offset=${offset}&limit=${limit}`;
+        try {
+            const response = await this.api.post<PaginatedResponse<any>>(url, { group_id, filters: filters, order_by: orderBy });
+            return response.data;
+        } catch (error: any) {
+            if (error.response?.data?.message) {
+                throw new Error(error.response.data.message);
+            }
+            throw new Error(`Failed to fetch CSR plot analytics: ${error.message}`);
+        }
+
+    }
+
 
     /*
         Model- Group: CRUD Operations/Apis for organizations
