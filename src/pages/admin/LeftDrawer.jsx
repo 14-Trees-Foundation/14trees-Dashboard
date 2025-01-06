@@ -23,7 +23,7 @@ import VolunteerActivismIcon from "@mui/icons-material/VolunteerActivism";
 import MapIcon from "@mui/icons-material/Map";
 import FestivalIcon from "@mui/icons-material/Festival";
 import { useNavigate } from "react-router-dom";
-import { CardGiftcard, Inventory } from "@mui/icons-material";
+import { Analytics, CardGiftcard, Inventory } from "@mui/icons-material";
 import { UserRoles } from "../../types/common";
 
 export const AdminLeftDrawer = () => {
@@ -148,6 +148,12 @@ export const AdminLeftDrawer = () => {
       logo: VolunteerActivismIcon,
       display: true,
       key: 12,
+    },
+    {
+      displayName: "CSR Analytics",
+      logo: Analytics,
+      display: true,
+      key: 13,
     },
     // {
     //   displayName: "Images",
@@ -309,7 +315,7 @@ const useStyles = makeStyles((theme) =>
       height: "40px",
       display: "flex",
       alignItems: "center",
-      justifyContent: "space-evenly",
+      justifyContent: "flex-start",
       backgroundColor: "#1f3625",
       "&:hover": {
         backgroundColor: "#383838",
@@ -322,7 +328,7 @@ const useStyles = makeStyles((theme) =>
       height: "40px",
       display: "flex",
       alignItems: "center",
-      justifyContent: "space-evenly",
+      justifyContent: "flex-start",
       boxShadow: "7px 7px 11px #0d1710,-7px -7px 11px #31553a",
       background: "linear-gradient(145deg, #1c3121, #213a28)",
     },
