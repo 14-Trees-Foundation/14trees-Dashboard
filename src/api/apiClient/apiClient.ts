@@ -277,6 +277,20 @@ class ApiClient {
 
     }
 
+    async getCSRAnalytics(): Promise<any> {
+        const url = `/plots/corporate-analytics`;
+        try {
+            const response = await this.api.get<any>(url);
+            return response.data;
+        } catch (error: any) {
+            if (error.response?.data?.message) {
+                throw new Error(error.response.data.message);
+            }
+            throw new Error(`Failed to fetch CSR analytics: ${error.message}`);
+        }
+
+    }
+
 
     /*
         Model- Group: CRUD Operations/Apis for organizations
