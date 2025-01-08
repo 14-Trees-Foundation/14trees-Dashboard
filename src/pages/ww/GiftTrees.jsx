@@ -512,6 +512,31 @@ export const GiftTrees = () => {
       selectedTreeSum: sum,
     });
   };
+
+  const handleSelectAlltree = (event) => {
+    values.filteredTrees.forEach((item, index) => {
+        item.selected = event.target.checked;
+    });
+
+    // Calculate the sum of selected trees
+    const sum = values.filteredTrees
+      .map((item) => item.selected)
+      .reduce((prev, curr) => prev + curr, 0);
+
+    // Update state variables based on whether the selected tree is assigned or unassigned
+    setUnassignedSelected(
+      values.filteredTrees.some((item) => item.selected && !item.assigned_to)
+    );
+    setAssignedSelected(
+      values.filteredTrees.some((item) => item.selected && item.assigned_to)
+    );
+
+    setValues({
+      ...values,
+      selectedTreeSum: sum,
+    });
+  };
+
   const handleUnassignTrees = async (event) => {
     event.preventDefault();
     setUnAssignModalOpen(false);
@@ -773,8 +798,8 @@ export const GiftTrees = () => {
                 <Table sx={{ minWidth: 360 }} aria-label="simple table">
                   <TableHead>
                     <TableRow sx={{ fontSize: "16px" }}>
-                      <TableCell align="right"></TableCell>
-                      {/* <TableCell align="left"><Checkbox onClick={(e) => handleSelectAlltree(e)} /></TableCell> */}
+                      {/* <TableCell align="right"></TableCell> */}
+                      <TableCell align="left"><Checkbox checked={values.filteredTrees.every(item => item.selected)} onClick={(e) => handleSelectAlltree(e)} /></TableCell>
                       <TableCell align="right"></TableCell>
                       <TableCell>Tree Name</TableCell>
                       <TableCell align="center">Sapling ID</TableCell>

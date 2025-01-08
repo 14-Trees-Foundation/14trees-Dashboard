@@ -158,7 +158,6 @@ const UserForm: React.FC<UserFormProps> = ({ open, user, onClose }) => {
                     </Grid>
                     <Grid item xs={12}>
                         <TextField 
-                            required 
                             name="phone" 
                             label="Phone" 
                             value={formData.phone} 
@@ -170,7 +169,6 @@ const UserForm: React.FC<UserFormProps> = ({ open, user, onClose }) => {
                         <Autocomplete
                             fullWidth
                             options={usersList}
-                            name='email'
                             noOptionsText="No Users"
                             value={formData.email}
                             onInputChange={handleEmailChange}
@@ -196,6 +194,7 @@ const UserForm: React.FC<UserFormProps> = ({ open, user, onClose }) => {
                             renderInput={(params) => (
                                 <TextField
                                     {...params}
+                                    name='email'
                                     label="Email"
                                     variant="outlined"
                                     helperText={helpersText}
