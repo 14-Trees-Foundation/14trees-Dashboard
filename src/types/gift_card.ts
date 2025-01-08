@@ -1,4 +1,10 @@
 
+export type GiftRequestType = 'Cards Request' | 'Normal Assignment' | 'Promotion' | 'Test'
+
+export const GiftRequestType_CARDS_REQUEST: GiftRequestType = 'Cards Request'
+export const GiftRequestType_NORAML_ASSIGNMENT: GiftRequestType = 'Normal Assignment'
+export const GiftRequestType_PROMOTION: GiftRequestType = 'Promotion'
+export const GiftRequestType_TEST: GiftRequestType = 'Test'
 
 export type GiftCard = {
     key: number;

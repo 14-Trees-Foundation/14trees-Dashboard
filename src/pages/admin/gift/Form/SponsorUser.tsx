@@ -10,9 +10,11 @@ import ApiClient from "../../../../api/apiClient/apiClient";
 interface SponsorUserFormProps {
     user: User | null;
     onSelect: (user: User | null) => void;
+    createdBy: User | null;
+    onCreatedBySelect: (user: User | null) => void;
 }
 
-const SponsorUserForm: FC<SponsorUserFormProps> = ({ user, onSelect }) => {
+const SponsorUserForm: FC<SponsorUserFormProps> = ({ user, onSelect, createdBy, onCreatedBySelect }) => {
 
     const dispatch = useAppDispatch();
     const { searchUsers } = bindActionCreators(userActionCreators, dispatch);
@@ -219,6 +221,20 @@ const SponsorUserForm: FC<SponsorUserFormProps> = ({ user, onSelect }) => {
                 </form>
                 <Typography variant="body1">Sponsor already exists? <Typography onClick={() => setFormOption('existing')} style={{ cursor: 'pointer' }} color='primary' variant="body1" component="span">Select Sponsor</Typography>.</Typography>
             </Box>}
+
+            <Box mt={3}>
+                <Typography variant='body1'>Request created by:</Typography>
+                <AutocompleteWithPagination
+                    label="Enter your name or email to search"
+                    value={createdBy}
+                    options={users}
+                    getOptionLabel={(user) => `${user.name} (${user.email})`}
+                    onChange={(event, value: User) => onCreatedBySelect(value)}
+                    onInputChange={(event) => { setUserSearchQuery(event.target.value); }}
+                    fullWidth
+                    size="medium"
+                />
+            </Box>
         </Box>
     );
 }
