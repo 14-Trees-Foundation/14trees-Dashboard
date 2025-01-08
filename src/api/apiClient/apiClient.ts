@@ -263,6 +263,34 @@ class ApiClient {
 
     }
 
+    async getPlotStatsForCorporate(offset: number, limit: number, group_id: number, filters?: any[], orderBy?: any[]): Promise<PaginatedResponse<any>> {
+        const url = `/plots/corporate-stats?offset=${offset}&limit=${limit}`;
+        try {
+            const response = await this.api.post<PaginatedResponse<any>>(url, { group_id, filters: filters, order_by: orderBy });
+            return response.data;
+        } catch (error: any) {
+            if (error.response?.data?.message) {
+                throw new Error(error.response.data.message);
+            }
+            throw new Error(`Failed to fetch CSR plot analytics: ${error.message}`);
+        }
+
+    }
+
+    async getCSRAnalytics(): Promise<any> {
+        const url = `/plots/corporate-analytics`;
+        try {
+            const response = await this.api.get<any>(url);
+            return response.data;
+        } catch (error: any) {
+            if (error.response?.data?.message) {
+                throw new Error(error.response.data.message);
+            }
+            throw new Error(`Failed to fetch CSR analytics: ${error.message}`);
+        }
+
+    }
+
 
     /*
         Model- Group: CRUD Operations/Apis for organizations
@@ -1297,7 +1325,7 @@ class ApiClient {
     }
 
 
-    async createGiftCard(request_id: string, created_by: number, no_of_cards: number, user_id: number, category: string, grove: string | null, giftedOn: string, group_id?: number, payment_id?: number, logo?: string, messages?: any, file?: File): Promise<GiftCard> {
+    async createGiftCard(request_id: string, created_by: number, no_of_cards: number, user_id: number, category: string, grove: string | null, requestType: string, giftedOn: string, group_id?: number, payment_id?: number, logo?: string, messages?: any, file?: File): Promise<GiftCard> {
         try {
             const formData = new FormData();
             formData.append('request_id', request_id);
@@ -1306,6 +1334,7 @@ class ApiClient {
             formData.append('user_id', user_id.toString());
             formData.append('category', category);
             formData.append('gifted_on', giftedOn);
+            formData.append('request_type', requestType);
             if (messages) {
                 formData.append('primary_message', messages.primaryMessage);
                 formData.append('secondary_message', messages.secondaryMessage);
@@ -1330,7 +1359,7 @@ class ApiClient {
         }
     }
 
-    async updateGiftCard(request: GiftCard, no_of_cards: number, user_id: number, category: string, grove: string | null, giftedOn: string, group_id?: number, payment_id?: number, logo?: string, messages?: any, file?: File): Promise<GiftCard> {
+    async updateGiftCard(request: GiftCard, no_of_cards: number, user_id: number, category: string, grove: string | null, requestType: string, giftedOn: string, group_id?: number, payment_id?: number, logo?: string, messages?: any, file?: File): Promise<GiftCard> {
         try {
             const formData = new FormData();
             for (const [key, value] of Object.entries(request)) {
@@ -1351,6 +1380,9 @@ class ApiClient {
 
             if (giftedOn && formData.has('gifted_on')) formData.set('gifted_on', giftedOn);
             else if (giftedOn) formData.append('gifted_on', giftedOn);
+
+            if (requestType && formData.has('request_type')) formData.set('request_type', requestType);
+            else if (requestType) formData.append('request_type', requestType);
 
             if (group_id && formData.has('group_id')) formData.set('group_id', group_id.toString());
             else if (group_id) formData.append('group_id', group_id.toString());

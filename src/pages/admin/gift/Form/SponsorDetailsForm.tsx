@@ -9,13 +9,15 @@ import SponsorGroupForm from "./SponsorGroup";
 interface SponsorDetailsFormProps {
     user: User | null;
     onUserSelect: (user: User | null) => void;
+    createdBy: User | null;
+    onCreatedByUserSelect: (createdBy: User | null) => void;
     logo: File | string | null,
     onLogoChange: (logo: File | null) => void,
     group: Group | null,
     onGroupSelect: (group: Group | null) => void
 }
 
-const SponsorDetailsForm: React.FC<SponsorDetailsFormProps> = ({ user, logo, group, onUserSelect, onGroupSelect, onLogoChange }) => {
+const SponsorDetailsForm: React.FC<SponsorDetailsFormProps> = ({ user, createdBy, logo, group, onUserSelect, onCreatedByUserSelect, onGroupSelect, onLogoChange }) => {
 
     const [donorType, setSponsorType] = useState<"corporate" | "individual">("individual");
     useEffect(() => {
@@ -29,6 +31,8 @@ const SponsorDetailsForm: React.FC<SponsorDetailsFormProps> = ({ user, logo, gro
             <SponsorUserForm
                 user={user}
                 onSelect={onUserSelect}
+                createdBy={createdBy}
+                onCreatedBySelect={onCreatedByUserSelect}
             />
             <div style={{ display: 'flex', alignItems: 'center', marginTop: '30px', marginBottom: '30px' }}>
                 <Typography variant='body1' mr={5}>

@@ -19,15 +19,17 @@ interface GiftCardsFormProps {
     giftCardRequest?: GiftCard
     step?: number
     requestId: string | null
+    loggedinUserId?: number
     open: boolean
     handleClose: () => void
-    onSubmit: (user: User, group: Group | null, treeCount: number, category: string, grove: string | null, users: any[], giftedOn: string, paymentId?: number, logo?: string, messages?: any, file?: File) => void
+    onSubmit: (user: User, createdByUser: User, group: Group | null, treeCount: number, category: string, grove: string | null, requestType: string, users: any[], giftedOn: string, paymentId?: number, logo?: string, messages?: any, file?: File) => void
 }
 
-const GiftCardsForm: FC<GiftCardsFormProps> = ({ step, giftCardRequest, requestId, open, handleClose, onSubmit }) => {
+const GiftCardsForm: FC<GiftCardsFormProps> = ({ step, loggedinUserId, giftCardRequest, requestId, open, handleClose, onSubmit }) => {
 
     const [currentStep, setCurrentStep] = useState(0);
     const [user, setUser] = useState<User | null>(null);
+    const [createdBy, setCreatedBy] = useState<User | null>(null);
     const [group, setGroup] = useState<Group | null>(null);
     const [treeCount, setTreeCount] = useState<number>(100);
     const [file, setFile] = useState<File | null>(null);
@@ -39,6 +41,7 @@ const GiftCardsForm: FC<GiftCardsFormProps> = ({ step, giftCardRequest, requestI
     const [presentationId, setPresentationId] = useState<string | null>(null)
     const [slideId, setSlideId] = useState<string | null>(null)
     const [category, setCategory] = useState<string>("Foundation");
+    const [giftRequestType, setGiftRequestType] = useState<string>("Cards Request");
     const [grove, setGrove] = useState<string | null>(null);
     const [consent, setConsent] = useState(false);
 
@@ -53,11 +56,17 @@ const GiftCardsForm: FC<GiftCardsFormProps> = ({ step, giftCardRequest, requestI
     }, [step, giftCardRequest])
 
     useEffect(() => {
-        setAmount(treeCount * (category === "Foundation" ? 3000 : 1500));
+        setAmount(treeCount * 2000);
     }, [category, treeCount])
 
     const getGiftCardRequestDetails = async () => {
         const apiClient = new ApiClient();
+
+        if (loggedinUserId) {
+            const createdByResp = await apiClient.getUsers(0, 1, [{ columnField: 'id', operatorValue: 'equals', value: giftCardRequest?.created_by ? giftCardRequest.created_by : loggedinUserId }]);
+            if (createdByResp.results.length === 1) setCreatedBy(createdByResp.results[0]);
+        }
+
         if (giftCardRequest) {
             const userResp = await apiClient.getUsers(0, 1, [{ columnField: 'id', operatorValue: 'equals', value: giftCardRequest.user_id }]);
             if (userResp.results.length === 1) setUser(userResp.results[0]);
@@ -126,7 +135,7 @@ const GiftCardsForm: FC<GiftCardsFormProps> = ({ step, giftCardRequest, requestI
         {
             key: 0,
             title: "Sponsor Details",
-            content: <SponsorDetailsForm user={user} onUserSelect={user => setUser(user)} logo={logoString} onLogoChange={logo => setLogo(logo)} group={group} onGroupSelect={group => { setGroup(group); setMessages(prev => ({ ...prev, plantedBy: group ? group.name : "" }))}}/>,
+            content: <SponsorDetailsForm user={user} onUserSelect={user => setUser(user)} createdBy={createdBy} onCreatedByUserSelect={user => setCreatedBy(user)} logo={logoString} onLogoChange={logo => setLogo(logo)} group={group} onGroupSelect={group => { setGroup(group); setMessages(prev => ({ ...prev, plantedBy: group ? group.name : "" }))}}/>,
             onClick: () => setCurrentStep(0),
             style: { cursor: 'pointer' },
         },
@@ -155,6 +164,8 @@ const GiftCardsForm: FC<GiftCardsFormProps> = ({ step, giftCardRequest, requestI
                 onChange={messages => { setMessages(messages) }}
                 giftedOn={giftedOn}
                 onGiftedOnChange={(date) => { setGiftedOn(date) }}
+                requestType={giftRequestType}
+                onRequestTypeChange={requestType => { setGiftRequestType(requestType); }}
             />,
         },
         {
@@ -221,7 +232,7 @@ const GiftCardsForm: FC<GiftCardsFormProps> = ({ step, giftCardRequest, requestI
             }
         }
 
-        onSubmit(user, group, treeCount, category, grove, users, giftedOn, paymentId, logoString ?? undefined, messages, file ?? undefined);
+        onSubmit(user, createdBy ?? user, group, treeCount, category, grove, giftRequestType, users, giftedOn, paymentId, logoString ?? undefined, messages, file ?? undefined);
 
         handleCloseForm();
     }

@@ -5,7 +5,7 @@ import { User } from "../../../types/user";
 import { Group } from "../../../types/Group";
 import ApiClient from "../../../api/apiClient/apiClient";
 import { ToastContainer, toast } from "react-toastify";
-import { GiftCard, GiftRequestUser } from "../../../types/gift_card";
+import { GiftCard, GiftRequestType_CARDS_REQUEST, GiftRequestType_NORAML_ASSIGNMENT, GiftRequestUser } from "../../../types/gift_card";
 import getColumnSearchProps, { getColumnDateFilter, getColumnSelectedItemFilter, getSortIcon } from "../../../components/Filter";
 import { GridFilterItem } from "@mui/x-data-grid";
 import * as giftCardActionCreators from "../../../redux/actions/giftCardActions";
@@ -270,7 +270,7 @@ const GiftTrees: FC = () => {
         setSelectedGiftCard(null);
     }
 
-    const saveNewGiftCardsRequest = async (user: User, group: Group | null, treeCount: number, category: string, grove: string | null, users: any[], giftedOn: string, paymentId?: number, logo?: string, messages?: any, file?: File) => {
+    const saveNewGiftCardsRequest = async (user: User, createdBy: User, group: Group | null, treeCount: number, category: string, grove: string | null, requestType: string, users: any[], giftedOn: string, paymentId?: number, logo?: string, messages?: any, file?: File) => {
         if (!requestId) {
             toast.error("Something went wrong. Please try again later!");
             return;
@@ -278,7 +278,7 @@ const GiftTrees: FC = () => {
         const apiClient = new ApiClient();
         let giftCardId: number;
         try {
-            const response = await apiClient.createGiftCard(requestId, auth.userId, treeCount, user.id, category, grove, giftedOn, group?.id, paymentId, logo, messages, file);
+            const response = await apiClient.createGiftCard(requestId, createdBy.id, treeCount, user.id, category, grove, requestType, giftedOn, group?.id, paymentId, logo, messages, file);
             giftCardId = response.id;
             
             getGiftCardData();
@@ -303,13 +303,13 @@ const GiftTrees: FC = () => {
         }
     }
 
-    const updateGiftCardRequest = async (user: User, group: Group | null, treeCount: number, category: string, grove: string | null, users: any[], giftedOn: string, paymentId?: number, logo?: string, messages?: any, file?: File) => {
+    const updateGiftCardRequest = async (user: User, group: Group | null, treeCount: number, category: string, grove: string | null, requestType: string, users: any[], giftedOn: string, paymentId?: number, logo?: string, messages?: any, file?: File) => {
         if (!selectedGiftCard) return;
 
         const apiClient = new ApiClient();
         let success = false;
         try {
-            const response = await apiClient.updateGiftCard(selectedGiftCard, treeCount, user.id, category, grove, giftedOn, group?.id, paymentId, logo, messages, file);
+            const response = await apiClient.updateGiftCard(selectedGiftCard, treeCount, user.id, category, grove, requestType, giftedOn, group?.id, paymentId, logo, messages, file);
             toast.success("Tree Request updated successfully");
             dispatch({
                 type: giftCardActionTypes.UPDATE_GIFT_CARD_SUCCEEDED,
@@ -340,13 +340,13 @@ const GiftTrees: FC = () => {
         }
     }
 
-    const handleSubmit = (user: User, group: Group | null, treeCount: number, category: string, grove: string | null, users: any[], giftedOn: string, paymentId?: number, logo?: string, messages?: any, file?: File) => {
+    const handleSubmit = (user: User, createdBy: User, group: Group | null, treeCount: number, category: string, grove: string | null, requestType: string, users: any[], giftedOn: string, paymentId?: number, logo?: string, messages?: any, file?: File) => {
         handleModalClose();
 
         if (changeMode === 'add') {
-            saveNewGiftCardsRequest(user, group, treeCount, category, grove, users, giftedOn, paymentId, logo, messages, file);
+            saveNewGiftCardsRequest(user, createdBy, group, treeCount, category, grove, requestType, users, giftedOn, paymentId, logo, messages, file);
         } else if (changeMode === 'edit') {
-            updateGiftCardRequest(user, group, treeCount, category, grove, users, giftedOn, paymentId, logo, messages, file);
+            updateGiftCardRequest(user, group, treeCount, category, grove, requestType, users, giftedOn, paymentId, logo, messages, file);
         }
     }
 
@@ -454,7 +454,7 @@ const GiftTrees: FC = () => {
 
         try {
             const apiClient = new ApiClient();
-            const response = await apiClient.updateGiftCard({ ...selectedGiftCard, notes: text }, selectedGiftCard.no_of_cards, selectedGiftCard.user_id, selectedGiftCard.category, selectedGiftCard.grove, selectedGiftCard.gifted_on);
+            const response = await apiClient.updateGiftCard({ ...selectedGiftCard, notes: text }, selectedGiftCard.no_of_cards, selectedGiftCard.user_id, selectedGiftCard.category, selectedGiftCard.grove, selectedGiftCard.request_type ?? GiftRequestType_CARDS_REQUEST, selectedGiftCard.gifted_on);
             toast.success("Tree card request updated successfully");
             dispatch({
                 type: giftCardActionTypes.UPDATE_GIFT_CARD_SUCCEEDED,
@@ -488,7 +488,7 @@ const GiftTrees: FC = () => {
 
         try {
             const apiClient = new ApiClient();
-            const response = await apiClient.updateGiftCard(selectedPaymentGR, selectedPaymentGR.no_of_cards, selectedPaymentGR.user_id, selectedPaymentGR.category, selectedPaymentGR.grove, selectedPaymentGR.gifted_on, selectedPaymentGR.group_id, paymentId);
+            const response = await apiClient.updateGiftCard(selectedPaymentGR, selectedPaymentGR.no_of_cards, selectedPaymentGR.user_id, selectedPaymentGR.category, selectedPaymentGR.grove, selectedPaymentGR.request_type ?? GiftRequestType_CARDS_REQUEST, selectedPaymentGR.gifted_on, selectedPaymentGR.group_id, paymentId);
         } catch (error: any) {
             toast.error(error.message)
         }
@@ -514,7 +514,7 @@ const GiftTrees: FC = () => {
             const data = { ...selectedGiftCard };
             data.tags = tags;
             const apiClient = new ApiClient();
-            const response = await apiClient.updateGiftCard(data, selectedGiftCard.no_of_cards, selectedGiftCard.user_id, selectedGiftCard.category, selectedGiftCard.grove, selectedGiftCard.gifted_on, selectedGiftCard.group_id);
+            const response = await apiClient.updateGiftCard(data, selectedGiftCard.no_of_cards, selectedGiftCard.user_id, selectedGiftCard.category, selectedGiftCard.grove, selectedGiftCard.request_type ?? GiftRequestType_CARDS_REQUEST, selectedGiftCard.gifted_on, selectedGiftCard.group_id);
             dispatch({
                 type: giftCardActionTypes.UPDATE_GIFT_CARD_SUCCEEDED,
                 payload: response,
@@ -636,18 +636,18 @@ const GiftTrees: FC = () => {
                     }
                 </Menu.ItemGroup>
             }
-            {record.presentation_id && <Menu.Divider style={{ backgroundColor: '#ccc' }} />}
-            {record.presentation_id && <Menu.ItemGroup>
-                <Menu.Item key="30" onClick={() => { handleDownloadCards(record.id, record.user_name + '_' + record.no_of_cards, 'zip') }} icon={<Download />}>
+            {(record.presentation_id || record.presentation_ids.length > 0) && <Menu.Divider style={{ backgroundColor: '#ccc' }} />}
+            {(record.presentation_id || record.presentation_ids.length > 0) && <Menu.ItemGroup>
+                {record.presentation_id && <Menu.Item key="30" onClick={() => { handleDownloadCards(record.id, record.user_name + '_' + record.no_of_cards, 'zip') }} icon={<Download />}>
                     Download Tree Cards
-                </Menu.Item>
-                <Menu.Item key="31" onClick={() => { window.open('https://docs.google.com/presentation/d/' + record.presentation_id); }} icon={<Slideshow />}>
+                </Menu.Item>}
+                <Menu.Item key="31" onClick={() => { window.open('https://docs.google.com/presentation/d/' + (record.presentation_id ? record.presentation_id : record.presentation_ids[0])); }} icon={<Slideshow />}>
                     Tree Cards Slide
                 </Menu.Item>
             </Menu.ItemGroup>}
             {!auth.roles.includes(UserRoles.User) && <Menu.Divider style={{ backgroundColor: '#ccc' }} />}
             {!auth.roles.includes(UserRoles.User) && <Menu.ItemGroup>
-                <Menu.Item key="40" onClick={() => { setSelectedGiftCard(record); setPlotModal(true); }} icon={<Landscape />}>
+                <Menu.Item key="40" onClick={() => { setBookNonGiftable(record.request_type === GiftRequestType_NORAML_ASSIGNMENT ? true : false); setSelectedGiftCard(record); setPlotModal(true); }} icon={<Landscape />}>
                     Reserve Trees
                 </Menu.Item>
                 <Menu.Item key="41" onClick={() => { setSelectedGiftCard(record); setAutoAssignModal(true); }} icon={<AssignmentInd />}>
@@ -915,7 +915,7 @@ const GiftTrees: FC = () => {
                 <DialogTitle>Payment Details</DialogTitle>
                 <DialogContent dividers>
                     <PaymentComponent
-                        initialAmount={(selectedPaymentGR?.no_of_cards || 0) * 3000}
+                        initialAmount={(selectedPaymentGR?.no_of_cards || 0) * 2000}
                         paymentId={selectedPaymentGR?.payment_id}
                         onChange={handlePaymentFormSubmit}
                     />

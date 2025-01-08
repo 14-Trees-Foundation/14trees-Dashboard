@@ -1,4 +1,10 @@
 
+export type GiftRequestType = 'Cards Request' | 'Normal Assignment' | 'Promotion' | 'Test'
+
+export const GiftRequestType_CARDS_REQUEST: GiftRequestType = 'Cards Request'
+export const GiftRequestType_NORAML_ASSIGNMENT: GiftRequestType = 'Normal Assignment'
+export const GiftRequestType_PROMOTION: GiftRequestType = 'Promotion'
+export const GiftRequestType_TEST: GiftRequestType = 'Test'
 
 export type GiftCard = {
     key: number;
@@ -28,6 +34,7 @@ export type GiftCard = {
     validation_errors: string[] | null;
     status: string;
     presentation_id: string | null;
+    presentation_ids: string[];
     notes: string | null;
     payment_id: number | null;
     album_id: number | null;
@@ -35,6 +42,7 @@ export type GiftCard = {
     booked: number,
     assigned: number,
     gifted_on: string;
+    request_type: string | null;
 }
 
 export type GiftRequestUser = {

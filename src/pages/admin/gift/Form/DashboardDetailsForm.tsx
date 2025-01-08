@@ -1,6 +1,5 @@
-import { FC, useEffect, useRef, useState } from "react";
-import { Autocomplete, Box, Button, TextField, Typography } from "@mui/material";
-import ApiClient from "../../../../api/apiClient/apiClient";
+import { FC, useEffect, useState } from "react";
+import { Autocomplete, Box, FormControl, InputLabel, MenuItem, Select, TextField, Typography } from "@mui/material";
 
 const EventTypes = [
     {
@@ -17,6 +16,8 @@ const EventTypes = [
     },
 ]
 
+const GiftRequestTypes = ['Cards Request', 'Normal Assignment', 'Promotion', 'Test']
+
 interface Massages {
     primaryMessage: string,
     secondaryMessage: string,
@@ -31,9 +32,11 @@ interface DashboardDetailsProps {
     onChange: (messages: Massages) => void,
     giftedOn: string,
     onGiftedOnChange: (date: string) => void,
+    requestType: string,
+    onRequestTypeChange: (requestType: string) => void,
 }
 
-const DashboardDetails: FC<DashboardDetailsProps> = ({ messages, onChange, giftedOn, onGiftedOnChange }) => {
+const DashboardDetails: FC<DashboardDetailsProps> = ({ messages, onChange, giftedOn, onGiftedOnChange, requestType, onRequestTypeChange }) => {
 
     const [selectedEventType, setSelectedEventType] = useState<{ value: string, label: string } | null>(null);
 
@@ -44,7 +47,7 @@ const DashboardDetails: FC<DashboardDetailsProps> = ({ messages, onChange, gifte
 
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-        const { name: field, value }= e.target
+        const { name: field, value } = e.target
 
         onChange({
             ...messages,
@@ -55,7 +58,7 @@ const DashboardDetails: FC<DashboardDetailsProps> = ({ messages, onChange, gifte
     const handleEventTypeSelection = (e: any, item: { value: string, label: string } | null) => {
         onChange({
             ...messages,
-            eventType: item ? item.value : undefined, 
+            eventType: item ? item.value : undefined,
         })
     }
 
@@ -86,21 +89,37 @@ const DashboardDetails: FC<DashboardDetailsProps> = ({ messages, onChange, gifte
                     onChange={handleChange}
                     size="small"
                 />
-                <Typography variant="body1" sx={{ mt: 2 }}>Gifted By</Typography>
-                <TextField
-                    name="plantedBy"
-                    value={messages.plantedBy}
-                    onChange={handleChange}
-                    size="small"
-                />
-                <Typography variant="body1" sx={{ mt: 2 }}>Gifted On</Typography>
-                <TextField
-                    name="giftedOn"
-                    value={giftedOn}
-                    onChange={(e) => { onGiftedOnChange(e.target.value) }}
-                    size="small"
-                    type="date"
-                />
+                <Box sx={{ mt: 2 }}>
+                    <FormControl fullWidth>
+                        <InputLabel id="request-type">Request Type</InputLabel>
+                        <Select
+                            labelId="request-type"
+                            value={requestType}
+                            label="Request Type"
+                            size="small"
+                            onChange={(e) => { onRequestTypeChange(e.target.value); }}
+                        >
+                            {GiftRequestTypes.map(item => <MenuItem key={item} value={item}>{item}</MenuItem>)}
+                        </Select>
+                    </FormControl>
+                </Box>
+                {requestType !== 'Normal Assignment' && <>
+                    <Typography variant="body1" sx={{ mt: 2 }}>Gifted By</Typography>
+                    <TextField
+                        name="plantedBy"
+                        value={messages.plantedBy}
+                        onChange={handleChange}
+                        size="small"
+                    />
+                    <Typography variant="body1" sx={{ mt: 2 }}>Gifted On</Typography>
+                    <TextField
+                        name="giftedOn"
+                        value={giftedOn}
+                        onChange={(e) => { onGiftedOnChange(e.target.value) }}
+                        size="small"
+                        type="date"
+                    />
+                </>}
             </div>
         </div>
     )
