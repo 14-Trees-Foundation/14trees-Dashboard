@@ -915,7 +915,7 @@ const GiftTrees: FC = () => {
                 <DialogTitle>Payment Details</DialogTitle>
                 <DialogContent dividers>
                     <PaymentComponent
-                        initialAmount={(selectedPaymentGR?.no_of_cards || 0) * 3000}
+                        initialAmount={(selectedPaymentGR?.no_of_cards || 0) * 2000}
                         paymentId={selectedPaymentGR?.payment_id}
                         onChange={handlePaymentFormSubmit}
                     />

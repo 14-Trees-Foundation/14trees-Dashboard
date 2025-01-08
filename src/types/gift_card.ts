@@ -36,6 +36,7 @@ export type GiftCard = {
     booked: number,
     assigned: number,
     gifted_on: string;
+    request_type: string | null;
 }
 
 export type GiftRequestUser = {

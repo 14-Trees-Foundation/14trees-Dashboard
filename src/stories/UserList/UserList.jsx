@@ -2,6 +2,7 @@ import { createStyles, makeStyles } from "@mui/styles";
 import Avatar from "@mui/material/Avatar";
 import { useRecoilValue } from "recoil";
 import { searchResults } from "../../store/atoms";
+import { Button } from "@mui/material";
 
 export const UserList = ({ handleClick }) => {
   const searchResult = useRecoilValue(searchResults);
@@ -48,6 +49,23 @@ export const UserList = ({ handleClick }) => {
               <div className={classes.itemshort}>{i.assigned_trees.length}</div>
               <div className={classes.itemshort}>
                 {lastVisit[i.id].slice(0, 10)}
+              </div>
+              <div className={classes.itemshort}>
+                {i.sponsored_trees > 0 && <Button
+                  variant="outlined"
+                  color="success"
+                  style={{ margin: "0 5px", textTransform: 'none' }}
+                  onClick={() => {
+                    const { hostname, host } = window.location;
+                    if (hostname === "localhost" || hostname === "127.0.0.1") {
+                      window.open("http://" + host + "/dashboard/" + i.id);
+                    } else {
+                      window.open("https://" + hostname + "/dashboard/" + i.id);
+                    }
+                  }}
+                >
+                  View Sponsored Trees
+                </Button>}
               </div>
             </div>
           );
