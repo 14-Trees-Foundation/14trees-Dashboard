@@ -39,6 +39,7 @@ const GiftCardsForm: FC<GiftCardsFormProps> = ({ step, giftCardRequest, requestI
     const [presentationId, setPresentationId] = useState<string | null>(null)
     const [slideId, setSlideId] = useState<string | null>(null)
     const [category, setCategory] = useState<string>("Foundation");
+    const [giftRequestType, setGiftRequestType] = useState<string>("Cards Request");
     const [grove, setGrove] = useState<string | null>(null);
     const [consent, setConsent] = useState(false);
 
@@ -53,7 +54,7 @@ const GiftCardsForm: FC<GiftCardsFormProps> = ({ step, giftCardRequest, requestI
     }, [step, giftCardRequest])
 
     useEffect(() => {
-        setAmount(treeCount * (category === "Foundation" ? 3000 : 1500));
+        setAmount(treeCount * 2000);
     }, [category, treeCount])
 
     const getGiftCardRequestDetails = async () => {
@@ -155,6 +156,8 @@ const GiftCardsForm: FC<GiftCardsFormProps> = ({ step, giftCardRequest, requestI
                 onChange={messages => { setMessages(messages) }}
                 giftedOn={giftedOn}
                 onGiftedOnChange={(date) => { setGiftedOn(date) }}
+                requestType={giftRequestType}
+                onRequestTypeChange={requestType => { setGiftRequestType(requestType); }}
             />,
         },
         {

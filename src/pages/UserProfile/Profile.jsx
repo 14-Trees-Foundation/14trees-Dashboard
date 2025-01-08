@@ -8,7 +8,7 @@ import { Trees } from "./Trees/Trees";
 import { Map } from "./Map/Map";
 
 import { useRecoilValue } from "recoil";
-import { selUsersData } from "../../store/atoms";
+import { selUsersData, usersData } from "../../store/atoms";
 
 import logo from "../../assets/icon_round.png";
 import { Button } from "@mui/material";
@@ -18,6 +18,7 @@ export const Profile = ({ saplingId }) => {
   const matches = useMediaQuery("(max-width:481px)");
   const classes = useStyles();
   const selUserInfo = useRecoilValue(selUsersData);
+  const usersInfo = useRecoilValue(usersData);
 
   const username = selUserInfo.assigned_to.split(" ")[0];
   const userId = selUserInfo.assigned_to_id;
@@ -40,7 +41,7 @@ export const Profile = ({ saplingId }) => {
             ""
           ) : (
             <div style={{ justifyContent: "flex-end" }}>
-              <Button
+              {usersInfo.sponsored_trees > 0 && <Button
                 variant="contained"
                 color="primary"
                 style={{ margin: "0 5px" }}
@@ -54,7 +55,7 @@ export const Profile = ({ saplingId }) => {
                 }}
               >
                 View Sponsored Trees
-              </Button>
+              </Button>}
               <Button
                 color="primary"
                 variant="contained"
