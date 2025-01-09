@@ -869,7 +869,7 @@ const GiftTrees: FC = () => {
                 </Box>
             }
 
-            <GiftCardsForm step={step} giftCardRequest={selectedGiftCard ?? undefined} requestId={requestId} open={modalOpen} handleClose={handleModalClose} onSubmit={handleSubmit} />
+            <GiftCardsForm loggedinUserId={auth.userId} step={step} giftCardRequest={selectedGiftCard ?? undefined} requestId={requestId} open={modalOpen} handleClose={handleModalClose} onSubmit={handleSubmit} />
 
             <Dialog open={plotModal} onClose={() => setPlotModal(false)} fullWidth maxWidth="xl">
                 <DialogTitle>Reserve Trees</DialogTitle>
@@ -911,8 +911,8 @@ const GiftTrees: FC = () => {
                 </DialogActions>
             </Dialog>
 
-            <Dialog open={paymentModal} fullWidth maxWidth='md'>
-                <DialogTitle>Payment Details</DialogTitle>
+            <Dialog open={paymentModal} fullWidth maxWidth='xl'>
+                <DialogTitle>Sponsorship/Payment Details</DialogTitle>
                 <DialogContent dividers>
                     <PaymentComponent
                         initialAmount={(selectedPaymentGR?.no_of_cards || 0) * 2000}
@@ -921,7 +921,12 @@ const GiftTrees: FC = () => {
                     />
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={() => setPaymentModal(false)} color="error">
+                    <Button 
+                        onClick={() => setPaymentModal(false)} 
+                        color="error"
+                        variant="outlined"
+                        sx={{ mr: 2 }}
+                    >
                         Close
                     </Button>
                 </DialogActions>
