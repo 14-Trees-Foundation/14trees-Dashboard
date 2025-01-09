@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react"
 import { toast } from "react-toastify"
-import { Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, FormControl, InputAdornment, InputLabel, MenuItem, OutlinedInput, Select, Tooltip, Typography } from "@mui/material"
+import { Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, Divider, FormControl, Grid, InputAdornment, InputLabel, MenuItem, OutlinedInput, Paper, Select, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Tooltip, Typography } from "@mui/material"
 import EditIcon from "@mui/icons-material/Edit";
 
 import { Payment, PaymentHistory } from "../../types/payment"
@@ -30,6 +30,8 @@ const paymentStatusList = [
         label: "Validated"
     },
 ]
+
+const SponosrshipTypes = ['Unverified', 'Pledged', 'Promotional', 'Unsponsored Visit', 'Donation Received']
 
 const getReadableStatus = (value: string) => {
     const status = paymentStatusList.find(item => item.value === value)
@@ -85,13 +87,13 @@ const PaymentComponent: React.FC<PaymentProps> = ({ initialAmount, paymentId, on
             verified = payment.payment_history.filter(item => item.status === 'validated').map(item => item.amount_received).reduce((prev, curr) => prev + curr, 0);
 
         }
-        
+
         setAmountData({
             totalAmount: amount,
             paidAmount: paid,
             verifiedAmount: verified,
         });
-    
+
         setPayingAmount(amount - paid);
     }, [payment, amount])
 
@@ -330,64 +332,116 @@ const PaymentComponent: React.FC<PaymentProps> = ({ initialAmount, paymentId, on
     ]
 
     return (
-        <Box>
+        <Box p={2}>
             <Box
                 style={{
                     display: 'flex',
                     justifyContent: 'space-between',
-                    alignItems: 'center'
+                    alignItems: 'flex-start'
                 }}
             >
-                <Box style={{ flexGrow: 1 }}>
-                    <Box
-                        display="flex"
-                        alignItems="center"
-                        gap={2}
-                    >
-                        <Typography>Donor Type: {donorType || "N/A"}</Typography>
-                        <Typography ml={2}>Pan number: {panNumber || "N/A"}</Typography>
-                    </Box>
-                    <Box display="flex" mt={1}>
-                        <Box display="flex" flexDirection="column" gap={1}>
-                            <Box display="flex" justifyContent="space-between">
-                                <Typography>Total amount:</Typography>
-                                <Typography ml={10}>{new Intl.NumberFormat('en-IN').format(amountData.totalAmount)}</Typography>
-                            </Box>
-                            <Box display="flex" justifyContent="space-between">
-                                <Typography>Paid amount:</Typography>
-                                <Typography ml={10}>{new Intl.NumberFormat('en-IN').format(amountData.paidAmount)}</Typography>
-                            </Box>
-                            <Box display="flex" justifyContent="space-between">
-                                <Typography>Remaining amount:</Typography>
-                                <Typography ml={10}>{new Intl.NumberFormat('en-IN').format(amountData.totalAmount - amountData.paidAmount)}</Typography>
-                            </Box>
-                        </Box>
-                        <Box display="flex" flexDirection="column" gap={1} ml={10}>
-                            <Box display="flex" justifyContent="space-between">
-                                <Typography>Verified amount:</Typography>
-                                <Typography ml={10}>{new Intl.NumberFormat('en-IN').format(amountData.verifiedAmount)}</Typography>
-                            </Box>
-                            <Box display="flex" justifyContent="space-between">
-                                <Typography>Unverified amount:</Typography>
-                                <Typography ml={10}>{new Intl.NumberFormat('en-IN').format(amountData.paidAmount - amountData.verifiedAmount)}</Typography>
-                            </Box>
-                        </Box>
-                        <Box style={{ flexGrow: 1 }}></Box>
-                    </Box>
+                <Box width="45%">
+                    <Typography variant="h6" mb={1}>Payment Summary:</Typography>
+                    <TableContainer sx={{ maxWidth: 650 }} component={Paper}>
+                        <Table sx={{ maxWidth: 650 }} aria-label="simple table">
+                            <TableHead>
+                                <TableRow sx={{ backgroundColor: "#9ca29021" }}>
+                                    <TableCell colSpan={2} align="center"><strong>User provided details</strong></TableCell>
+                                    <TableCell colSpan={2} align="center"><strong>For backoffice usage only</strong></TableCell>
+                                </TableRow>
+                            </TableHead>
+                            <TableBody>
+                                <TableRow
+                                    sx={{ '&:last-child td, &:last-child th': { border: 0 }, backgroundColor: "#ffeedad4" }}
+                                >
+                                    <TableCell align="left">Remaining amount:</TableCell>
+                                    <TableCell align="right">{new Intl.NumberFormat('en-IN').format(amountData.totalAmount - amountData.paidAmount)}</TableCell>
+                                    <TableCell align="left">Unverified amount:</TableCell>
+                                    <TableCell align="right">{new Intl.NumberFormat('en-IN').format(amountData.paidAmount - amountData.verifiedAmount)}</TableCell>
+                                </TableRow>
+                                <TableRow
+                                    sx={{ '&:last-child td, &:last-child th': { border: 0 }, backgroundColor: "#dfffd5d4" }}
+                                >
+                                    <TableCell align="left">Paid amount:</TableCell>
+                                    <TableCell align="right">{new Intl.NumberFormat('en-IN').format(amountData.paidAmount)}</TableCell>
+                                    <TableCell align="left">Verified amount:</TableCell>
+                                    <TableCell align="right">{new Intl.NumberFormat('en-IN').format(amountData.verifiedAmount)}</TableCell>
+                                </TableRow>
+                                <TableRow
+                                    sx={{ '&:last-child td, &:last-child th': { border: 0 }, backgroundColor: "#B9C0AB1C" }}
+                                >
+                                    <TableCell align="left">Total amount:</TableCell>
+                                    <TableCell align="right">{new Intl.NumberFormat('en-IN').format(amountData.totalAmount)}</TableCell>
+                                    <TableCell align="left"></TableCell>
+                                    <TableCell align="right"></TableCell>
+                                </TableRow>
+                            </TableBody>
+                        </Table>
+                    </TableContainer>
                 </Box>
-                <Box>
-                    <Button
-                        variant="outlined"
-                        style={{ margin: "0 5px" }}
-                        onClick={() => {
-                            setOpenEdit(true);
-                        }}>
-                        <EditIcon />
-                    </Button>
+                <Box width="45%">
+                    <Typography variant="h6">Sponsorship Details:</Typography>
+                    <Divider sx={{ mb: 2 }} />
+                    <Grid container spacing={2}>
+                        <Grid item container xs={12}>
+                            <Grid item xs={5}><Typography>PAN Number:</Typography></Grid>
+                            <Grid item xs={7}><Typography>{panNumber ? panNumber : 'Nor Provided'}</Typography></Grid>
+                        </Grid>
+                        <Grid item container xs={12}>
+                            <Grid item xs={5}><Typography>Sponsorship type:</Typography></Grid>
+                            <Grid item xs={7}>
+                                <FormControl fullWidth>
+                                    <InputLabel id="sponsorship-type">Sponsorship type</InputLabel>
+                                    <Select
+                                        labelId="sponsorship-type"
+                                        // value={requestType}
+                                        label="Sponsorship type"
+                                        size="small"
+                                        // onChange={(e) => { onRequestTypeChange(e.target.value); }}
+                                    >
+                                        {SponosrshipTypes.map(item => <MenuItem key={item} value={item}>{item}</MenuItem>)}
+                                    </Select>
+                                </FormControl>
+                            </Grid>
+                        </Grid>
+                        <Grid item container xs={12}>
+                            <Grid item xs={5}><Typography>Donation receipt number:</Typography></Grid>
+                            <Grid item xs={7}>
+                                <TextField
+                                    fullWidth
+                                    name="donation_receipt_number"
+                                    size="small"
+                                    label="Donation receipt number"
+                                />
+                            </Grid>
+                        </Grid>
+                        <Grid item container xs={12}>
+                            <Grid item xs={5}><Typography>Amount received:</Typography></Grid>
+                            <Grid item xs={7}>
+                                <TextField
+                                    fullWidth
+                                    name="amount_received"
+                                    size="small"
+                                    label="Amount received"
+                                    type="number"
+                                />
+                            </Grid>
+                        </Grid>
+                        <Grid item container xs={12}>
+                            <Grid item xs={3}></Grid>
+                            <Grid item xs={5}>
+                                <Button
+                                    variant="contained"
+                                    color="success"
+                                >Save details</Button>
+                            </Grid>
+                            <Grid item xs={4}></Grid>
+                        </Grid>
+                    </Grid>
                 </Box>
             </Box>
 
-            {amountData.paidAmount !== amountData.totalAmount && <Box mt={10}>
+            {/* {amountData.paidAmount !== amountData.totalAmount && <Box mt={10}>
                 <Typography variant="h6">Please consider paying remaining amount</Typography>
                 <Box style={{ display: 'flex', justifyContent: 'space-between' }}>
                     <Box width="45%">
@@ -456,10 +510,10 @@ const PaymentComponent: React.FC<PaymentProps> = ({ initialAmount, paymentId, on
                     color="success" variant="contained">
                     Add Payment Details
                 </Button>
-            </Box>}
+            </Box>} */}
 
             <Box mt={10}>
-                <Typography>Payment History</Typography>
+                <Typography variant="h6" mb={1}>Payment History</Typography>
                 <GeneralTable
                     loading={false}
                     rows={payment?.payment_history ? payment.payment_history.slice(page * pageSize, page * pageSize + pageSize) : []}
