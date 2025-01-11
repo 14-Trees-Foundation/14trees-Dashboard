@@ -29,19 +29,26 @@ export const Search = () => {
   let selectedChips = "All";
 
   const fetchData = async (searchKey) => {
+    if (searchKey.length === 0) return;
     let params = {
       key: searchKey,
     };
     setLoading(true);
-    const res = await api.get("/search/", {
-      params: params,
-    });
 
-    if (res.status === 200) {
-      setSearchResult(res.data);
-    } else {
-      toast.error(res.data?.message ?? "Something went wrong");
+    try {
+      const res = await api.get("/search/", {
+        params: params,
+      });
+
+      if (res.status === 200) {
+        setSearchResult(res.data);
+      } else {
+        toast.error(res.data?.message ?? "Something went wrong");
+      }
+    } catch (e) {
+      toast.error("Something went wrong. Please try again later!");
     }
+
     setLoading(false);
   };
 
@@ -116,7 +123,7 @@ export const Search = () => {
               )}
               {(selectedChips === "Individual" || selectedChips === "All") && (
                 <div>
-                  <UserList handleClick={onUserClick} />
+                  <UserList />
                 </div>
               )}
             </div>
