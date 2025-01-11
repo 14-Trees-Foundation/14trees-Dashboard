@@ -26,6 +26,7 @@ const RedeemTree: React.FC<RedeemTreeProps> = ({ tree }) => {
         phone: '',
         email: '',
         birth_date: '',
+        gifted_by: '',
     });
     const [profileImage, setProfileImage] = useState<File | null>(null)
 
@@ -196,6 +197,27 @@ const RedeemTree: React.FC<RedeemTreeProps> = ({ tree }) => {
                                     onChange={handleInputChange}
                                     error={!!errors.phone}
                                     helperText={errors.phone}
+                                    fullWidth
+                                    sx={{
+                                        "& .MuiInputLabel-root": { color: "black" }, // Label color
+                                        "& .MuiOutlinedInput-root": {
+                                            "& fieldset": { borderColor: "black" }, // Default border color
+                                            "&:hover fieldset": { borderColor: "lightblue" }, // Hover border color
+                                            "&.Mui-focused fieldset": { borderColor: "lightblue" }, // Focused border color
+                                        },
+                                        "& .MuiInputBase-input": { color: "black", backgroundColor: "white", borderRadius: '4px' }, // Input text color
+                                        "& .MuiFormHelperText-root": {
+                                            color: "white", // Change helper text color
+                                        }
+                                    }}
+                                />
+                            </Grid>
+                            <Grid item xs={12}>
+                                <TextField
+                                    name="gifted_by"
+                                    placeholder="Gifted by"
+                                    value={formData.gifted_by}
+                                    onChange={handleInputChange}
                                     fullWidth
                                     sx={{
                                         "& .MuiInputLabel-root": { color: "black" }, // Label color
