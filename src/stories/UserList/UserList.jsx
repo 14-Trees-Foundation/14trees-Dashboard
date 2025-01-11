@@ -4,19 +4,23 @@ import { useRecoilValue } from "recoil";
 import { searchResults } from "../../store/atoms";
 import { Button } from "@mui/material";
 
-export const UserList = ({ handleClick }) => {
+export const UserList = () => {
   const searchResult = useRecoilValue(searchResults);
 
   let lastVisit = {}
+  let profileImages = {}
   searchResult.users.map((i) => {
     let last = i.assigned_trees[0]?.assigned_at;
+    let profile = i.assigned_trees[0]?.profile_image;
     i.assigned_trees.map((j) => {
+      if (j.profile_image) profile = j.profile_image;
       if (j.assigned_at > last) {
         last = j.assigned_at
       }
     })
 
     lastVisit[i.id] = last
+    profileImages[i.id] = profile
   })
 
 
@@ -25,31 +29,27 @@ export const UserList = ({ handleClick }) => {
     return (
       <div>
         <div className={classes.header}>
-          <div className={classes.itemlong}></div>
           <div className={classes.itemlong}>Name</div>
-          <div className={classes.itemshort}>No. Of Plants</div>
-          <div className={classes.itemshort}>Last Vsit</div>
+          <div className={classes.itemshort}>Trees Assigned</div>
+          <div className={classes.itemshort}>Trees Sponsored</div>
+          <div className={classes.itemshort}></div>
+          <div className={classes.itemshort}></div>
         </div>
         {searchResult.users.map((i) => {
           return (
             <div
               className={classes.box}
-              key={i._id}
-              onClick={() => {
-                handleClick(i.assigned_trees[0]);
-              }}
+              key={i.id}
             >
               <Avatar
                 className={classes.profile}
                 alt="Profile"
-                src={i.assigned_trees[0]?.profile_image ? i.assigned_trees[0].profile_image : ""}
+                src={profileImages[i.id] ? profileImages[i.id] : undefined}
                 sx={{ width: 40, height: 40 }}
               />
               <div className={classes.itemlong}>{i.name}</div>
               <div className={classes.itemshort}>{i.assigned_trees.length}</div>
-              <div className={classes.itemshort}>
-                {lastVisit[i.id].slice(0, 10)}
-              </div>
+              <div className={classes.itemshort}>{i.sponsored_trees}</div>
               <div className={classes.itemshort}>
                 {i.sponsored_trees > 0 && <Button
                   variant="outlined"
@@ -64,7 +64,24 @@ export const UserList = ({ handleClick }) => {
                     }
                   }}
                 >
-                  View Sponsored Trees
+                  Sponsored View
+                </Button>}
+              </div>
+              <div className={classes.itemshort}>
+                {i.assigned_trees.length > 0 && <Button
+                  variant="outlined"
+                  color="success"
+                  style={{ margin: "0 5px", textTransform: 'none' }}
+                  onClick={() => {
+                    const { hostname, host } = window.location;
+                    if (hostname === "localhost" || hostname === "127.0.0.1") {
+                      window.open("http://" + host + "/profile/user/" + i.id);
+                    } else {
+                      window.open("https://" + hostname + "/profile/user/" + i.id);
+                    }
+                  }}
+                >
+                  Dashboard View
                 </Button>}
               </div>
             </div>
