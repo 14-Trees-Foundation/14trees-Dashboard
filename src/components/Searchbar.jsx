@@ -9,9 +9,17 @@ export const SearchBar = ({ searchSubmit }) => {
   const handleChange = (prop) => (event) => {
     setSearch(event.target.value);
   };
+
   const onSubmit = () => {
     searchSubmit(search);
   };
+
+  const handleKeyDown = (event) => {
+    if (event.key === 'Enter') {
+      onSubmit();
+    }
+  };
+
   return (
     <div className={classes.box}>
       <FormControl sx={{ width: "100%" }} variant="outlined">
@@ -19,6 +27,7 @@ export const SearchBar = ({ searchSubmit }) => {
           fullWidth
           value={search}
           onChange={handleChange("key")}
+          onKeyDown={handleKeyDown}
           inputProps={{
             "aria-label": "key",
           }}

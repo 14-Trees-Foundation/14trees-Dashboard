@@ -41,6 +41,17 @@ export const Profile = ({ saplingId }) => {
             ""
           ) : (
             <div style={{ justifyContent: "flex-end" }}>
+              <Button
+                color="primary"
+                variant="contained"
+                onClick={() => {
+                  window.open(
+                    "https://docs.google.com/forms/d/e/1FAIpQLSfumyti7x9f26BPvUb0FDYzI2nnuEl5HA63EO8svO3DG2plXg/viewform"
+                  );
+                }}
+              >
+                Gift a Tree
+              </Button>
               {usersInfo.sponsored_trees > 0 && <Button
                 variant="contained"
                 color="primary"
@@ -54,19 +65,8 @@ export const Profile = ({ saplingId }) => {
                   }
                 }}
               >
-                View Sponsored Trees
+                Your Sponsored View
               </Button>}
-              <Button
-                color="primary"
-                variant="contained"
-                onClick={() => {
-                  window.open(
-                    "https://docs.google.com/forms/d/e/1FAIpQLSfumyti7x9f26BPvUb0FDYzI2nnuEl5HA63EO8svO3DG2plXg/viewform"
-                  );
-                }}
-              >
-                Gift a Tree
-              </Button>
             </div>
           )}
         </div>

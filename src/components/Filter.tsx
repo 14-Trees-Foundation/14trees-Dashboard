@@ -75,7 +75,7 @@ export default function getColumnSearchProps<T extends object>(dataIndex: keyof 
                             newFilters[dataIndex.toString()] = {
                                 columnField: dataIndex.toString(),
                                 operatorValue: filterOption,
-                                value: (selectedKeys as string[])[0],
+                                value: (selectedKeys as string[])[0]?.trim(),
                             }
                             handleSetFilters(newFilters);
                         }}
