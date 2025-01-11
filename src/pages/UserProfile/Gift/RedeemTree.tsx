@@ -138,7 +138,7 @@ const RedeemTree: React.FC<RedeemTreeProps> = ({ tree }) => {
                 }}
             >
                 <Box mt={1} sx={{ padding: 2 }}>
-                    <Typography variant="body1" mb={1}>The tree with tracker ID: {tree.sapling_id} has been sponsored by {(tree as any).group_name || (tree as any).sponsor_name} and is reserved as a gift. Please provide the recipient's details below to redeem it. (Note: This tree can be redeemed only once, so kindly ensure the information is accurate.)</Typography>
+                    <Typography variant="body1" mb={1}>The tree with tracker ID: {tree.sapling_id} is reserved as a gift. Please provide the recipient's details below to gift the tree. (Note: It can be redeemed only once, so kindly ensure the information is accurate.)</Typography>
                     <form onSubmit={handleRedeemTree}>
                         <Grid container rowSpacing={2} columnSpacing={1}>
                             <Grid item xs={12}>
@@ -213,27 +213,6 @@ const RedeemTree: React.FC<RedeemTreeProps> = ({ tree }) => {
                                 />
                             </Grid>
                             <Grid item xs={12}>
-                                <TextField
-                                    name="gifted_by"
-                                    placeholder="Gifted by"
-                                    value={formData.gifted_by}
-                                    onChange={handleInputChange}
-                                    fullWidth
-                                    sx={{
-                                        "& .MuiInputLabel-root": { color: "black" }, // Label color
-                                        "& .MuiOutlinedInput-root": {
-                                            "& fieldset": { borderColor: "black" }, // Default border color
-                                            "&:hover fieldset": { borderColor: "lightblue" }, // Hover border color
-                                            "&.Mui-focused fieldset": { borderColor: "lightblue" }, // Focused border color
-                                        },
-                                        "& .MuiInputBase-input": { color: "black", backgroundColor: "white", borderRadius: '4px' }, // Input text color
-                                        "& .MuiFormHelperText-root": {
-                                            color: "white", // Change helper text color
-                                        }
-                                    }}
-                                />
-                            </Grid>
-                            <Grid item xs={12}>
                                 <div style={{ display: 'flex', alignItems: 'center', marginBottom: 16 }}>
                                     <Avatar
                                         src={profileImage ? URL.createObjectURL(profileImage) : undefined}
@@ -250,7 +229,7 @@ const RedeemTree: React.FC<RedeemTreeProps> = ({ tree }) => {
                                             },
                                         }}
                                     >
-                                        Upload Image
+                                        Add Recipient Pic
                                         <input
                                             value={''}
                                             type="file"
@@ -274,6 +253,27 @@ const RedeemTree: React.FC<RedeemTreeProps> = ({ tree }) => {
                                         </Button>}
                                 </div>
                                 <Typography fontSize={10}>Recipient image will be used to create more personalised dashboard, but it is not required to redeem the tree.</Typography>
+                            </Grid>
+                            <Grid item xs={12}>
+                                <TextField
+                                    name="gifted_by"
+                                    placeholder="Gifted by"
+                                    value={formData.gifted_by}
+                                    onChange={handleInputChange}
+                                    fullWidth
+                                    sx={{
+                                        "& .MuiInputLabel-root": { color: "black" }, // Label color
+                                        "& .MuiOutlinedInput-root": {
+                                            "& fieldset": { borderColor: "black" }, // Default border color
+                                            "&:hover fieldset": { borderColor: "lightblue" }, // Hover border color
+                                            "&.Mui-focused fieldset": { borderColor: "lightblue" }, // Focused border color
+                                        },
+                                        "& .MuiInputBase-input": { color: "black", backgroundColor: "white", borderRadius: '4px' }, // Input text color
+                                        "& .MuiFormHelperText-root": {
+                                            color: "white", // Change helper text color
+                                        }
+                                    }}
+                                />
                             </Grid>
                             <Grid item xs={12} display="flex" justifyContent="center">
                                 <Button
