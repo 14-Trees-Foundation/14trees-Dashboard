@@ -26,6 +26,7 @@ export const SearchBar = ({ searchSubmit }) => {
         <OutlinedInput
           fullWidth
           value={search}
+          placeholder="Enter you name"
           onChange={handleChange("key")}
           onKeyDown={handleKeyDown}
           inputProps={{
