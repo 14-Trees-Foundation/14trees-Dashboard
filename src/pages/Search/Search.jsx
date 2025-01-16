@@ -13,6 +13,16 @@ import { searchResults } from "../../store/atoms";
 import { SearchBar } from "../../components/Searchbar";
 import { useSetRecoilState } from "recoil";
 import api from "../../api/local";
+import { Card } from "antd";
+import Meta from "antd/es/card/Meta";
+
+import image1 from '../../assets/home/land-1.jpg'
+import image2 from '../../assets/home/land-2.jpg'
+import image3 from '../../assets/home/land-3.jpg'
+import image4 from '../../assets/home/land-4.jpg'
+import image5 from '../../assets/home/land-5.jpg'
+import image6 from '../../assets/home/land-6.jpg'
+import image7 from '../../assets/home/land-7.jpg'
 
 export const Search = () => {
   const classes = UseStyle();
@@ -68,7 +78,7 @@ export const Search = () => {
             className={classes.bg}
             style={{ height: "100vh" }}
           />
-          <div className={classes.overlay} style={{ height: "100vh" }}>
+          <div className={classes.overlay} style={{ height: "auto" }}>
             <AppBar />
             <div className={classes.main}>
               <div className={classes.header}>
@@ -80,6 +90,123 @@ export const Search = () => {
               <div>
                 <div className={classes.inputBox}>
                   <SearchBar searchSubmit={handleSearch} />
+                </div>
+                <div className={classes.cardContainer}>
+                  <Card
+                    hoverable
+                    className={classes.primaryCard}
+                    onClick={() => { window.open("https://docs.google.com/forms/d/e/1FAIpQLSfumyti7x9f26BPvUb0FDYzI2nnuEl5HA63EO8svO3DG2plXg/viewform"); }}
+                    cover={
+                      <img
+                        alt="example"
+                        src={image1}
+                        height={"160px"}
+                      />
+                    }
+                  >
+                    <Meta
+                      title="Corporate Gifts"
+                      description="You can do corporate gifting"
+                    />
+                  </Card>
+                  <Card
+                    hoverable
+                    className={classes.primaryCard}
+                    onClick={() => { window.open("https://docs.google.com/forms/d/e/1FAIpQLSfumyti7x9f26BPvUb0FDYzI2nnuEl5HA63EO8svO3DG2plXg/viewform"); }}
+                    cover={
+                      <img
+                        alt="example"
+                        src={image2}
+                        height={"160px"}
+                      />
+                    }
+                  >
+                    <Meta
+                      title="Personal Gifts"
+                      description="You can do personal gifting"
+                    />
+                  </Card>
+                  <Card
+                    hoverable
+                    className={classes.primaryCard}
+                    onClick={() => { window.open("https://docs.google.com/forms/d/e/1FAIpQLSfumyti7x9f26BPvUb0FDYzI2nnuEl5HA63EO8svO3DG2plXg/viewform"); }}
+                    cover={
+                      <img
+                        alt="example"
+                        src={image3}
+                        height={"160px"}
+                      />
+                    }
+                  >
+                    <Meta
+                      title="Social Groves"
+                      description="You can do social gifting"
+                    />
+                  </Card>
+                  <Card
+                    hoverable
+                    className={classes.primaryCard}
+                    onClick={() => { window.open("https://docs.google.com/forms/d/e/1FAIpQLSfumyti7x9f26BPvUb0FDYzI2nnuEl5HA63EO8svO3DG2plXg/viewform"); }}
+                    cover={
+                      <img
+                        alt="example"
+                        src={image4}
+                        height={"160px"}
+                      />
+                    }
+                  >
+                    <Meta
+                      title="Personal Groves"
+                      description="You can do personal gifting"
+                    />
+                  </Card>
+                </div>
+                <div className={classes.cardContainer}>
+                  <Card
+                    hoverable
+                    className={classes.secondaryCard}
+                    cover={
+                      <img
+                        alt="example"
+                        src={image5}
+                      />
+                    }
+                  >
+                    <Meta
+                      title="Corporate Gifts"
+                      description="You can do corporate gifting"
+                    />
+                  </Card>
+                  <Card
+                    hoverable
+                    className={classes.secondaryCard}
+                    cover={
+                      <img
+                        alt="example"
+                        src={image6}
+                      />
+                    }
+                  >
+                    <Meta
+                      title="Personal Gifts"
+                      description="You can do personal gifting"
+                    />
+                  </Card>
+                  <Card
+                    hoverable
+                    className={classes.secondaryCard}
+                    cover={
+                      <img
+                        alt="example"
+                        src={image7}
+                      />
+                    }
+                  >
+                    <Meta
+                      title="Social Groves"
+                      description="You can do social gifting"
+                    />
+                  </Card>
                 </div>
               </div>
             </div>
@@ -140,7 +267,6 @@ const UseStyle = makeStyles((theme) =>
       width: "100%",
       position: "relative",
       backgroundColor: "#e5e5e5",
-      overflow: "auto",
       minHeight: "100vh",
     },
     bg: {
@@ -250,5 +376,38 @@ const UseStyle = makeStyles((theme) =>
         marginLeft: "5vw",
       },
     },
+    cardContainer: {
+      display: "flex",
+      justifyContent: "center",
+      marginTop: "50px",
+    },
+    primaryCard: {
+      margin: '10px',
+      width: '300px',
+      border: 'none', 
+      overflow: 'hidden', 
+      borderRadius: '20px',
+      backgroundColor: 'rgb(190 210 195)',
+      transition: 'background-color 0.3s',
+      '&:hover': {
+        boxShadow: '0 4px 8px rgba(255, 255, 255, 0.8)',
+        backgroundColor: "rgb(202, 225, 209)",
+        transition: "background-color 0.3s ease",
+      },
+    },
+    secondaryCard: {
+      margin: '10px',
+      width: '200px',
+      border: 'none', 
+      overflow: 'hidden', 
+      borderRadius: '20px',
+      backgroundColor: 'rgb(190 210 195)',
+      transition: 'background-color 0.3s',
+      '&:hover': {
+        boxShadow: '0 4px 8px rgba(255, 255, 255, 0.8)',
+        backgroundColor: "rgb(202, 225, 209)",
+        transition: "background-color 0.3s ease",
+      },
+    }
   })
 );
