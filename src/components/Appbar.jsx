@@ -13,7 +13,7 @@ export const AppBar = () => {
       <div className={classes.appbar}>
         <nav className={classes.content}>
           <div className={classes.logo}>
-            <img style={{ width: "40px" }} src={logo} alt="logo banner" />
+            <img style={{ width: "80px" }} src={logo} alt="logo banner" />
           </div>
           <div className={classes.right}>
             {/* <h2 className={classes.links}>Home</h2>
