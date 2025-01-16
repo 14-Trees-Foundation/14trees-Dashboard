@@ -41,7 +41,7 @@ export const SearchBar = ({ searchSubmit }) => {
           className={classes.btn}
           onClick={onSubmit}
         >
-          Search
+          Find My Tree
         </Button>
       </div>
     </div>

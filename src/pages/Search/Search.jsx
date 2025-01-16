@@ -92,106 +92,81 @@ export const Search = () => {
               </div>
             </div>
             <div className={classes.bottomContainer}>
-              <div>
-                <h1 className={classes.cardheader} style={{ marginLeft: '10px', marginBottom: '20px', alignSelf: 'flex-start' }}>Brighten someone's day</h1>
-                <div className={classes.cardContainer}>
-                  <Card
-                    hoverable
-                    className={classes.primaryCard}
-                    onClick={() => { window.open("https://docs.google.com/forms/d/e/1FAIpQLSfumyti7x9f26BPvUb0FDYzI2nnuEl5HA63EO8svO3DG2plXg/viewform"); }}
-                    cover={
-                      <img
-                        alt="example"
-                        style={{ padding: '10px' }}
-                        src={image1}
-                      />
-                    }
-                    title="Corporate Gifting"
-                  >
-                    <ul>
-                      <li>Conference Gift</li>
-                      <li>Annual day Celebration</li>
-                      <li>Customer Engagement</li>
-                      <li>Retirement Gift</li>
-                      <li>Birthday Gift</li>
-                      <li>Festive Gifting</li>
-                    </ul>
-                  </Card>
-                  <Card
-                    hoverable
-                    className={classes.primaryCard}
-                    onClick={() => { window.open("https://docs.google.com/forms/d/e/1FAIpQLSfumyti7x9f26BPvUb0FDYzI2nnuEl5HA63EO8svO3DG2plXg/viewform"); }}
-                    cover={
-                      <img
-                        alt="example"
-                        src={image2}
-                        style={{ padding: '10px' }}
-                      />
-                    }
-                    title="Personal Gifts"
-                  >
-                    <ul>
-                      <li>Birthday Gift</li>
-                      <li>Wedding Gift</li>
-                      <li>Memorial</li>
-                      <li>Anniversary Gift</li>
-                      <li>Return Gifts</li>
-                      <li>Festive Greeting</li>
-                    </ul>
-                  </Card>
-                  <Card
-                    hoverable
-                    className={classes.primaryCard}
-                    onClick={() => { window.open("https://docs.google.com/forms/d/e/1FAIpQLSfumyti7x9f26BPvUb0FDYzI2nnuEl5HA63EO8svO3DG2plXg/viewform"); }}
-                    cover={
-                      <img
-                        alt="example"
-                        src={image3}
-                        style={{ padding: '10px' }}
-                      />
-                    }
-                    title="Social Groves"
-                  >
-                    <ul>
-                      <li>Alumni/College Grove</li>
-                      <li>School Grove</li>
-                      <li>Corporate Grove</li>
-                      <li>Club Grove</li>
-                    </ul>
-                  </Card>
-                  <Card
-                    hoverable
-                    className={classes.primaryCard}
-                    onClick={() => { window.open("https://docs.google.com/forms/d/e/1FAIpQLSfumyti7x9f26BPvUb0FDYzI2nnuEl5HA63EO8svO3DG2plXg/viewform"); }}
-                    cover={
-                      <img
-                        alt="example"
-                        src={image4}
-                        style={{ padding: '10px' }}
-                      />
-                    }
-                    title="Personal Groves"
-                  >
-                    <ul>
-                      <li>My 14 Trees</li>
-                      <li>Family Grove</li>
-                      <li>Memorial Grove</li>
-                      <li>Visitor Grove</li>
-                    </ul>
-                  </Card>
-                </div>
+              <h1 className={classes.cardheader} style={{ marginBottom: '20px', alignSelf: 'center' }}>Brighten someone's day</h1>
+              <div className={classes.cardContainer}>
+                <Card
+                  hoverable
+                  className={classes.primaryCard}
+                  onClick={() => { window.open("https://docs.google.com/forms/d/e/1FAIpQLSfumyti7x9f26BPvUb0FDYzI2nnuEl5HA63EO8svO3DG2plXg/viewform"); }}
+                  cover={
+                    <img
+                      alt="example"
+                      src={image1}
+                      style={{ padding: '10px', width: 'calc(100% - 20px)' }}
+                    />
+                  }
+                  title="Corporate Gifting"
+                >
+                  <ul>
+                    <li>Conference Gift</li>
+                    <li>Annual day Celebration</li>
+                    <li>Customer Engagement</li>
+                    <li>Retirement Gift</li>
+                    <li>Birthday Gift</li>
+                    <li>Festive Gifting</li>
+                  </ul>
+                </Card>
+                <Card
+                  hoverable
+                  className={classes.primaryCard}
+                  onClick={() => { window.open("https://docs.google.com/forms/d/e/1FAIpQLSfumyti7x9f26BPvUb0FDYzI2nnuEl5HA63EO8svO3DG2plXg/viewform"); }}
+                  cover={
+                    <img
+                      alt="example"
+                      src={image2}
+                      style={{ padding: '10px', width: 'calc(100% - 20px)' }}
+                    />
+                  }
+                  title="Personal Gifts"
+                >
+                  <ul>
+                    <li>Birthday Gift</li>
+                    <li>Wedding Gift</li>
+                    <li>Memorial</li>
+                    <li>Anniversary Gift</li>
+                    <li>Return Gifts</li>
+                    <li>Festive Greeting</li>
+                  </ul>
+                </Card>
+                <Card
+                  hoverable
+                  className={classes.primaryCard}
+                  onClick={() => { window.open("https://docs.google.com/forms/d/e/1FAIpQLSfumyti7x9f26BPvUb0FDYzI2nnuEl5HA63EO8svO3DG2plXg/viewform"); }}
+                  cover={
+                    <img
+                      alt="example"
+                      src={image3}
+                      style={{ padding: '10px', width: 'calc(100% - 20px)' }}
+                    />
+                  }
+                  title="Social Groves"
+                >
+                  <ul>
+                    <li>Alumni/College Grove</li>
+                    <li>School Grove</li>
+                    <li>Corporate Grove</li>
+                    <li>Club Grove</li>
+                    <li>My 14 Trees</li>
+                    <li>Family Grove</li>
+                    <li>Memorial Grove</li>
+                  </ul>
+                </Card>
               </div>
               <h1 className={classes.cardheader} style={{ marginTop: '100px', marginBottom: '20px' }}>Other ways to support us</h1>
               <div className={classes.cardContainer}>
                 <Card
                   hoverable
                   className={classes.secondaryCard}
-                // cover={
-                //   <img
-                //     alt="example"
-                //     src={image5}
-                //   />
-                // }
                 >
                   <Meta
                     title="Volunteer My Time"
@@ -201,12 +176,6 @@ export const Search = () => {
                 <Card
                   hoverable
                   className={classes.secondaryCard}
-                // cover={
-                //   <img
-                //     alt="example"
-                //     src={image6}
-                //   />
-                // }
                 >
                   <Meta
                     title="Spread the 14Trees Message"
@@ -422,11 +391,18 @@ const UseStyle = makeStyles((theme) =>
         wordWrap: 'break-word',
         textAlign: 'center',
       },
+      '& .ant-card-body': {
+        padding: '10px'
+      },
     },
     secondaryCard: {
       margin: '10px',
       width: '250px',
       border: 'none',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      textAlign: 'center',
       overflow: 'hidden',
       borderRadius: '20px',
       backgroundColor: 'rgb(190 210 195)',
@@ -438,11 +414,19 @@ const UseStyle = makeStyles((theme) =>
       },
     },
     meta: {
+      alignItems: 'center',
       '& .ant-card-meta-title': {
         whiteSpace: 'normal',
         wordWrap: 'break-word',
         textAlign: 'center',
       },
+    },
+    cardimage: {
+      padding: '10px',
+      width: 'calc(100% - 20px) !important',
+      height: 'auto',
+      objectFit: 'cover',
+      margin: '10px',
     },
     cardheader: {
       fontSize: "42px",
