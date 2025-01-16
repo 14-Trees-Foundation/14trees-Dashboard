@@ -16,14 +16,14 @@ import api from "../../api/local";
 import { Card } from "antd";
 import Meta from "antd/es/card/Meta";
 
-import image1 from '../../assets/home/land-1.jpg'
-import image2 from '../../assets/home/land-2.jpg'
-import image3 from '../../assets/home/land-3.jpg'
-import image4 from '../../assets/home/land-4.jpg'
+import image1 from '../../assets/home/Sisav-2.jpg'
+import image2 from '../../assets/home/Arjun-2.jpg'
+import image3 from '../../assets/home/social.png'
+import image4 from '../../assets/home/Durangi-2.jpg'
 import image5 from '../../assets/home/land-5.jpg'
 import image6 from '../../assets/home/land-6.jpg'
 import image7 from '../../assets/home/land-7.jpg'
-import { Divider } from "@mui/material";
+import { Button } from "@mui/material";
 
 export const Search = () => {
   const classes = UseStyle();
@@ -95,101 +95,101 @@ export const Search = () => {
               </div>
             </div>
             <div className={classes.bottomContainer}>
-              <div className={classes.cardContainer}>
-                <Card
-                  hoverable
-                  className={classes.primaryCard}
-                  onClick={() => { window.open("https://docs.google.com/forms/d/e/1FAIpQLSfumyti7x9f26BPvUb0FDYzI2nnuEl5HA63EO8svO3DG2plXg/viewform"); }}
-                  cover={
-                    <img
-                      alt="example"
-                      src={image1}
-                      height={"160px"}
-                    />
-                  }
-                >
-                  <Meta
+              <div>
+                <h1 className={classes.infoheader} style={{ marginBottom: '20px', alignSelf: 'flex-start' }}>Brighten someone's day!</h1>
+                <div className={classes.cardContainer}>
+                  <Card
+                    hoverable
+                    className={classes.primaryCard}
+                    onClick={() => { window.open("https://docs.google.com/forms/d/e/1FAIpQLSfumyti7x9f26BPvUb0FDYzI2nnuEl5HA63EO8svO3DG2plXg/viewform"); }}
+                    cover={
+                      <img
+                        alt="example"
+                        src={image1}
+                      />
+                    }
                     title="Corporate Gifting"
-                  />
-                  <ul>
-                    <li>Conference Gift</li>
-                    <li>Annual day Celebration</li>
-                    <li>Customer Engagement</li>
-                    <li>Retirement Gift</li>
-                    <li>Birthday Gift</li>
-                    <li>Festive Gifting</li>
-                  </ul>
-                </Card>
-                <Card
-                  hoverable
-                  className={classes.primaryCard}
-                  onClick={() => { window.open("https://docs.google.com/forms/d/e/1FAIpQLSfumyti7x9f26BPvUb0FDYzI2nnuEl5HA63EO8svO3DG2plXg/viewform"); }}
-                  cover={
-                    <img
-                      alt="example"
-                      src={image2}
-                      height={"160px"}
+                  >
+                    {/* <Meta
+                      title="Corporate Gifting"
+                    /> */}
+                    <ul>
+                      <li>Conference Gift</li>
+                      <li>Annual day Celebration</li>
+                      <li>Customer Engagement</li>
+                      <li>Retirement Gift</li>
+                      <li>Birthday Gift</li>
+                      <li>Festive Gifting</li>
+                    </ul>
+                  </Card>
+                  <Card
+                    hoverable
+                    className={classes.primaryCard}
+                    onClick={() => { window.open("https://docs.google.com/forms/d/e/1FAIpQLSfumyti7x9f26BPvUb0FDYzI2nnuEl5HA63EO8svO3DG2plXg/viewform"); }}
+                    cover={
+                      <img
+                        alt="example"
+                        src={image2}
+                      />
+                    }
+                  >
+                    <Meta
+                      title="Personal Gifts"
                     />
-                  }
-                >
-                  <Meta
-                    title="Personal Gifts"
-                  />
-                  <ul>
-                    <li>Birthday Gift</li>
-                    <li>Wedding Gift</li>
-                    <li>Memorial</li>
-                    <li>Anniversary Gift</li>
-                    <li>Return Gifts</li>
-                    <li>Festive Greeting</li>
-                  </ul>
-                </Card>
-                <Card
-                  hoverable
-                  className={classes.primaryCard}
-                  onClick={() => { window.open("https://docs.google.com/forms/d/e/1FAIpQLSfumyti7x9f26BPvUb0FDYzI2nnuEl5HA63EO8svO3DG2plXg/viewform"); }}
-                  cover={
-                    <img
-                      alt="example"
-                      src={image3}
-                      height={"160px"}
+                    <ul>
+                      <li>Birthday Gift</li>
+                      <li>Wedding Gift</li>
+                      <li>Memorial</li>
+                      <li>Anniversary Gift</li>
+                      <li>Return Gifts</li>
+                      <li>Festive Greeting</li>
+                    </ul>
+                  </Card>
+                  <Card
+                    hoverable
+                    className={classes.primaryCard}
+                    onClick={() => { window.open("https://docs.google.com/forms/d/e/1FAIpQLSfumyti7x9f26BPvUb0FDYzI2nnuEl5HA63EO8svO3DG2plXg/viewform"); }}
+                    cover={
+                      <img
+                        alt="example"
+                        src={image3}
+                      />
+                    }
+                  >
+                    <Meta
+                      title="Social Groves"
                     />
-                  }
-                >
-                  <Meta
-                    title="Social Groves"
-                  />
-                  <ul>
-                    <li>Alumni/College Grove</li>
-                    <li>School Grove</li>
-                    <li>Corporate Grove</li>
-                    <li>Club Grove</li>
-                  </ul>
-                </Card>
-                <Card
-                  hoverable
-                  className={classes.primaryCard}
-                  onClick={() => { window.open("https://docs.google.com/forms/d/e/1FAIpQLSfumyti7x9f26BPvUb0FDYzI2nnuEl5HA63EO8svO3DG2plXg/viewform"); }}
-                  cover={
-                    <img
-                      alt="example"
-                      src={image4}
-                      height={"160px"}
+                    <ul>
+                      <li>Alumni/College Grove</li>
+                      <li>School Grove</li>
+                      <li>Corporate Grove</li>
+                      <li>Club Grove</li>
+                    </ul>
+                  </Card>
+                  <Card
+                    hoverable
+                    className={classes.primaryCard}
+                    onClick={() => { window.open("https://docs.google.com/forms/d/e/1FAIpQLSfumyti7x9f26BPvUb0FDYzI2nnuEl5HA63EO8svO3DG2plXg/viewform"); }}
+                    cover={
+                      <img
+                        alt="example"
+                        src={image4}
+                      />
+                    }
+                  >
+                    <Meta
+                      title="Personal Groves"
                     />
-                  }
-                >
-                  <Meta
-                    title="Personal Groves"
-                  />
-                  <ul>
-                    <li>My 14 Trees</li>
-                    <li>Family Grove</li>
-                    <li>Memorial Grove</li>
-                    <li>Visitor Grove</li>
-                  </ul>
-                </Card>
+                    <ul>
+                      <li>My 14 Trees</li>
+                      <li>Family Grove</li>
+                      <li>Memorial Grove</li>
+                      <li>Visitor Grove</li>
+                    </ul>
+                  </Card>
+                </div>
               </div>
-              <Divider sx={{ backgroundColor: 'white', width: '80%', marginTop: '20px' }} />
+              <h1 className={classes.infoheader} style={{ marginTop: '100px', marginBottom: '20px' }}>Other ways to support our work!</h1>
               <div className={classes.cardContainer}>
                 <Card
                   hoverable
@@ -236,6 +236,13 @@ export const Search = () => {
                     className={classes.meta}
                   />
                 </Card>
+              </div>
+              <div className={classes.cardContainer} style={{ marginTop: '30px', marginBottom: '20px' }}>
+                <Button
+                  variant="contained"
+                >
+                  Contact Us
+                </Button>
               </div>
             </div>
           </div>
@@ -408,11 +415,11 @@ const UseStyle = makeStyles((theme) =>
       display: "flex",
       flexDirection: 'column',
       alignItems: "center",
+      marginTop: "50px",
     },
     cardContainer: {
       display: "flex",
       justifyContent: "center",
-      marginTop: "50px",
       flexWrap: 'wrap',
     },
     primaryCard: {
@@ -428,6 +435,11 @@ const UseStyle = makeStyles((theme) =>
         backgroundColor: "rgb(202, 225, 209)",
         transition: "background-color 0.3s ease",
       },
+      '& .ant-card-head-title': {
+        whiteSpace: 'normal',
+        wordWrap: 'break-word',
+        textAlign: 'center',
+      },
     },
     secondaryCard: {
       margin: '10px',
@@ -442,12 +454,13 @@ const UseStyle = makeStyles((theme) =>
         backgroundColor: "rgb(202, 225, 209)",
         transition: "background-color 0.3s ease",
       },
-      meta: {
-        '& .ant-card-meta-title': {
-          whiteSpace: 'normal',
-          wordWrap: 'break-word',
-        },
+    },
+    meta: {
+      '& .ant-card-meta-title': {
+        whiteSpace: 'normal',
+        wordWrap: 'break-word',
+        textAlign: 'center',
       },
-    }
+    },
   })
 );
