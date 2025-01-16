@@ -24,6 +24,7 @@ import image5 from '../../assets/home/land-5.jpg'
 import image6 from '../../assets/home/land-6.jpg'
 import image7 from '../../assets/home/land-7.jpg'
 import { Button } from "@mui/material";
+import ContactUs from "./ContactUs";
 
 export const Search = () => {
   const classes = UseStyle();
@@ -238,11 +239,7 @@ export const Search = () => {
                 </Card>
               </div>
               <div className={classes.cardContainer} style={{ marginTop: '30px', marginBottom: '20px' }}>
-                <Button
-                  variant="contained"
-                >
-                  Contact Us
-                </Button>
+                <ContactUs />
               </div>
             </div>
           </div>
