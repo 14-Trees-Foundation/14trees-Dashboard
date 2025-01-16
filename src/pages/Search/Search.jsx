@@ -19,8 +19,7 @@ import Meta from "antd/es/card/Meta";
 import image1 from '../../assets/home/Sisav-2.jpg'
 import image2 from '../../assets/home/Arjun-2.jpg'
 import image3 from '../../assets/home/social.webp'
-import image4 from '../../assets/home/Durangi-2.jpg'
-import ContactUs from "./ContactUs";
+import { Button } from "@mui/material";
 
 export const Search = () => {
   const classes = UseStyle();
@@ -164,9 +163,20 @@ export const Search = () => {
               </div>
               <h1 className={classes.cardheader} style={{ marginTop: '100px', marginBottom: '20px' }}>Other ways to support us</h1>
               <div className={classes.cardContainer}>
+              <Card
+                  hoverable
+                  className={classes.secondaryCard}
+                  onClick={() => { window.open("https://docs.google.com/forms/d/e/1FAIpQLSfbbEpyfo7fgX_j4xOb1fqtqEbWuWobYHvfKSpF1_b4bPjV5g/viewform"); }}
+                >
+                  <Meta
+                    title="Request a Site Visit"
+                    className={classes.meta}
+                  />
+                </Card>
                 <Card
                   hoverable
                   className={classes.secondaryCard}
+                  onClick={() => { window.open("https://docs.google.com/forms/d/e/1FAIpQLSfbbEpyfo7fgX_j4xOb1fqtqEbWuWobYHvfKSpF1_b4bPjV5g/viewform"); }}
                 >
                   <Meta
                     title="Volunteer My Time"
@@ -182,18 +192,11 @@ export const Search = () => {
                     className={classes.meta}
                   />
                 </Card>
-                <Card
-                  hoverable
-                  className={classes.secondaryCard}
-                >
-                  <Meta
-                    title="Request a Site Visit"
-                    className={classes.meta}
-                  />
-                </Card>
               </div>
               <div className={classes.cardContainer} style={{ marginTop: '30px', marginBottom: '20px' }}>
-                <ContactUs />
+                <Button variant="contained" onClick={() => { window.open("https://docs.google.com/forms/d/e/1FAIpQLSfbbEpyfo7fgX_j4xOb1fqtqEbWuWobYHvfKSpF1_b4bPjV5g/viewform"); }}>
+                  Contact Us
+                </Button>
               </div>
             </div>
           </div>
@@ -275,7 +278,7 @@ const UseStyle = makeStyles((theme) =>
       [theme.breakpoints.down("748")]: {
         width: "80vw",
         paddingLeft: "9vw",
-        marginTop: "20%",
+        marginTop: "30%",
       },
     },
     header: {
