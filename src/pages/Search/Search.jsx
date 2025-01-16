@@ -18,7 +18,7 @@ import Meta from "antd/es/card/Meta";
 
 import image1 from '../../assets/home/Sisav-2.jpg'
 import image2 from '../../assets/home/Arjun-2.jpg'
-import image3 from '../../assets/home/social.png'
+import image3 from '../../assets/home/social.webp'
 import image4 from '../../assets/home/Durangi-2.jpg'
 import ContactUs from "./ContactUs";
 
@@ -93,7 +93,7 @@ export const Search = () => {
             </div>
             <div className={classes.bottomContainer}>
               <div>
-                <h1 className={classes.cardheader} style={{ marginBottom: '20px', alignSelf: 'flex-start' }}>Brighten someone's day!</h1>
+                <h1 className={classes.cardheader} style={{ marginLeft: '10px', marginBottom: '20px', alignSelf: 'flex-start' }}>Brighten someone's day</h1>
                 <div className={classes.cardContainer}>
                   <Card
                     hoverable
@@ -102,14 +102,12 @@ export const Search = () => {
                     cover={
                       <img
                         alt="example"
+                        style={{ padding: '10px' }}
                         src={image1}
                       />
                     }
                     title="Corporate Gifting"
                   >
-                    {/* <Meta
-                      title="Corporate Gifting"
-                    /> */}
                     <ul>
                       <li>Conference Gift</li>
                       <li>Annual day Celebration</li>
@@ -127,12 +125,11 @@ export const Search = () => {
                       <img
                         alt="example"
                         src={image2}
+                        style={{ padding: '10px' }}
                       />
                     }
+                    title="Personal Gifts"
                   >
-                    <Meta
-                      title="Personal Gifts"
-                    />
                     <ul>
                       <li>Birthday Gift</li>
                       <li>Wedding Gift</li>
@@ -150,12 +147,11 @@ export const Search = () => {
                       <img
                         alt="example"
                         src={image3}
+                        style={{ padding: '10px' }}
                       />
                     }
+                    title="Social Groves"
                   >
-                    <Meta
-                      title="Social Groves"
-                    />
                     <ul>
                       <li>Alumni/College Grove</li>
                       <li>School Grove</li>
@@ -171,12 +167,11 @@ export const Search = () => {
                       <img
                         alt="example"
                         src={image4}
+                        style={{ padding: '10px' }}
                       />
                     }
+                    title="Personal Groves"
                   >
-                    <Meta
-                      title="Personal Groves"
-                    />
                     <ul>
                       <li>My 14 Trees</li>
                       <li>Family Grove</li>
@@ -186,7 +181,7 @@ export const Search = () => {
                   </Card>
                 </div>
               </div>
-              <h1 className={classes.cardheader} style={{ marginTop: '100px', marginBottom: '20px' }}>Other ways to support our work!</h1>
+              <h1 className={classes.cardheader} style={{ marginTop: '100px', marginBottom: '20px' }}>Other ways to support us</h1>
               <div className={classes.cardContainer}>
                 <Card
                   hoverable
@@ -214,19 +209,13 @@ export const Search = () => {
                 // }
                 >
                   <Meta
-                    title="Spread 14Trees Message"
+                    title="Spread the 14Trees Message"
                     className={classes.meta}
                   />
                 </Card>
                 <Card
                   hoverable
                   className={classes.secondaryCard}
-                // cover={
-                //   <img
-                //     alt="example"
-                //     src={image7}
-                //   />
-                // }
                 >
                   <Meta
                     title="Request a Site Visit"
@@ -420,7 +409,7 @@ const UseStyle = makeStyles((theme) =>
       width: '300px',
       border: 'none',
       overflow: 'hidden',
-      borderRadius: '20px',
+      // borderRadius: '20px',
       backgroundColor: 'rgb(190 210 195)',
       transition: 'background-color 0.3s',
       '&:hover': {
@@ -458,7 +447,7 @@ const UseStyle = makeStyles((theme) =>
     cardheader: {
       fontSize: "42px",
       color: "#9BC53D",
-      fontWeight: "550",
+      fontWeight: "bold",
       [theme.breakpoints.down("md")]: {
         fontSize: "32px",
       },
