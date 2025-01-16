@@ -20,10 +20,6 @@ import image1 from '../../assets/home/Sisav-2.jpg'
 import image2 from '../../assets/home/Arjun-2.jpg'
 import image3 from '../../assets/home/social.png'
 import image4 from '../../assets/home/Durangi-2.jpg'
-import image5 from '../../assets/home/land-5.jpg'
-import image6 from '../../assets/home/land-6.jpg'
-import image7 from '../../assets/home/land-7.jpg'
-import { Button } from "@mui/material";
 import ContactUs from "./ContactUs";
 
 export const Search = () => {
@@ -97,7 +93,7 @@ export const Search = () => {
             </div>
             <div className={classes.bottomContainer}>
               <div>
-                <h1 className={classes.infoheader} style={{ marginBottom: '20px', alignSelf: 'flex-start' }}>Brighten someone's day!</h1>
+                <h1 className={classes.cardheader} style={{ marginBottom: '20px', alignSelf: 'flex-start' }}>Brighten someone's day!</h1>
                 <div className={classes.cardContainer}>
                   <Card
                     hoverable
@@ -190,7 +186,7 @@ export const Search = () => {
                   </Card>
                 </div>
               </div>
-              <h1 className={classes.infoheader} style={{ marginTop: '100px', marginBottom: '20px' }}>Other ways to support our work!</h1>
+              <h1 className={classes.cardheader} style={{ marginTop: '100px', marginBottom: '20px' }}>Other ways to support our work!</h1>
               <div className={classes.cardContainer}>
                 <Card
                   hoverable
@@ -457,6 +453,14 @@ const UseStyle = makeStyles((theme) =>
         whiteSpace: 'normal',
         wordWrap: 'break-word',
         textAlign: 'center',
+      },
+    },
+    cardheader: {
+      fontSize: "42px",
+      color: "#9BC53D",
+      fontWeight: "550",
+      [theme.breakpoints.down("md")]: {
+        fontSize: "32px",
       },
     },
   })
