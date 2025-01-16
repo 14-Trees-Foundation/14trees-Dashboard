@@ -4,9 +4,10 @@ import { FormControl, OutlinedInput } from "@mui/material";
 import Button from "@mui/material/Button";
 
 export const SearchBar = ({ searchSubmit }) => {
-  const classes = usestyle();
+  const classes = useStyles();
   const [search, setSearch] = React.useState("");
-  const handleChange = (prop) => (event) => {
+
+  const handleChange = (event) => {
     setSearch(event.target.value);
   };
 
@@ -15,57 +16,51 @@ export const SearchBar = ({ searchSubmit }) => {
   };
 
   const handleKeyDown = (event) => {
-    if (event.key === 'Enter') {
+    if (event.key === "Enter") {
       onSubmit();
     }
   };
 
   return (
-    <div className={classes.box}>
-      <FormControl sx={{ width: "100%" }} variant="outlined">
+    <div className={classes.container}>
+      <FormControl fullWidth variant="outlined">
         <OutlinedInput
           fullWidth
           value={search}
-          placeholder="Enter you name"
-          onChange={handleChange("key")}
+          placeholder="Type your name"
+          onChange={handleChange}
           onKeyDown={handleKeyDown}
-          inputProps={{
-            "aria-label": "key",
-          }}
+          inputProps={{ "aria-label": "search-input" }}
         />
       </FormControl>
-      <div className={classes.btndiv}>
-        <Button
-          variant="contained"
-          color="primary"
-          className={classes.btn}
-          onClick={onSubmit}
-        >
-          Submit
-        </Button>
-      </div>
+      <Button
+        variant="contained"
+        color="primary"
+        className={classes.button}
+        onClick={onSubmit}
+      >
+        Find My Tree
+      </Button>
     </div>
   );
 };
 
-const usestyle = makeStyles((theme) => ({
-  box: {
-    marginLeft: "2.5%",
-    marginRight: "2.5%",
+const useStyles = makeStyles((theme) => ({
+  container: {
     display: "flex",
-  },
-  btndiv: {
-    marginLeft: "-180px",
-    display: "flex",
-    marginTop: "-1px",
-    [theme.breakpoints.down("480")]: {
-      marginLeft: "-100px",
+    alignItems: "center",
+    gap: "10px",
+    width: "95%",
+    margin: "auto",
+    [theme.breakpoints.down("sm")]: {
+      flexDirection: "column",
+      alignItems: "stretch",
     },
   },
-  btn: {
-    width: "190px",
-    [theme.breakpoints.down("480")]: {
-      width: "100px",
+  button: {
+    minWidth: "150px",
+    [theme.breakpoints.down("sm")]: {
+      minWidth: "100%",
     },
   },
 }));
