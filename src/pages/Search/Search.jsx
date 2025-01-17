@@ -96,7 +96,7 @@ export const Search = () => {
                 <Card
                   hoverable
                   className={classes.primaryCard}
-                  onClick={() => { window.open("https://docs.google.com/forms/d/e/1FAIpQLSfumyti7x9f26BPvUb0FDYzI2nnuEl5HA63EO8svO3DG2plXg/viewform"); }}
+                  onClick={() => { window.open("https://docs.google.com/forms/d/1Y1HrJiidcUXYrkjaYPvznQTs7AWROAFcrCb4heQlJg4/viewform"); }}
                   cover={
                     <img
                       alt="example"
@@ -118,7 +118,7 @@ export const Search = () => {
                 <Card
                   hoverable
                   className={classes.primaryCard}
-                  onClick={() => { window.open("https://docs.google.com/forms/d/e/1FAIpQLSfumyti7x9f26BPvUb0FDYzI2nnuEl5HA63EO8svO3DG2plXg/viewform"); }}
+                  onClick={() => { window.open("https://docs.google.com/forms/d/1Y1HrJiidcUXYrkjaYPvznQTs7AWROAFcrCb4heQlJg4/viewform"); }}
                   cover={
                     <img
                       alt="example"
@@ -140,7 +140,7 @@ export const Search = () => {
                 <Card
                   hoverable
                   className={classes.primaryCard}
-                  onClick={() => { window.open("https://docs.google.com/forms/d/e/1FAIpQLSfumyti7x9f26BPvUb0FDYzI2nnuEl5HA63EO8svO3DG2plXg/viewform"); }}
+                  onClick={() => { window.open("https://docs.google.com/forms/d/1Y1HrJiidcUXYrkjaYPvznQTs7AWROAFcrCb4heQlJg4/viewform"); }}
                   cover={
                     <img
                       alt="example"
