@@ -183,7 +183,7 @@ export const Search = () => {
               <Card
                   hoverable
                   className={classes.secondaryCard}
-                  onClick={() => { window.open("https://tinyurl.com/14T-visit-feedback"); }}
+                  onClick={() => { window.open("https://tinyurl.com/14T-volunteers-poll"); }}
                 >
                   <Meta
                     title="Volunteer your time"
@@ -203,7 +203,6 @@ export const Search = () => {
                 <Card
                   hoverable
                   className={classes.secondaryCard}
-                  onClick={() => { window.open("https://docs.google.com/forms/d/e/1FAIpQLSfbbEpyfo7fgX_j4xOb1fqtqEbWuWobYHvfKSpF1_b4bPjV5g/viewform"); }}
                 >
                   <Meta
                     title="Host 14 Trees outreach event in your professional and/or social group"
