@@ -181,15 +181,25 @@ export const Search = () => {
                   </ul>
                 </Card>
               </div>
-              <h1 className={classes.cardheader} style={{ marginTop: '100px', marginBottom: '20px' }}>Other ways to support us</h1>
+              <h1 className={classes.cardheader} style={{ marginTop: '100px', marginBottom: '20px' }}>Other ways to take climate action</h1>
               <div className={classes.cardContainer}>
               <Card
                   hoverable
                   className={classes.secondaryCard}
-                  onClick={() => { window.open("https://docs.google.com/forms/d/e/1FAIpQLSfbbEpyfo7fgX_j4xOb1fqtqEbWuWobYHvfKSpF1_b4bPjV5g/viewform"); }}
+                  onClick={() => { window.open("https://tinyurl.com/14T-visit-feedback"); }}
                 >
                   <Meta
-                    title="Request a Site Visit"
+                    title="Volunteer your time"
+                    className={classes.meta}
+                  />
+                </Card>
+                <Card
+                  hoverable
+                  className={classes.secondaryCard}
+                  onClick={() => { window.open("https://tinyurl.com/14Trees-req-visit"); }}
+                >
+                  <Meta
+                    title="Invite potential contributors for a site visit"
                     className={classes.meta}
                   />
                 </Card>
@@ -199,23 +209,14 @@ export const Search = () => {
                   onClick={() => { window.open("https://docs.google.com/forms/d/e/1FAIpQLSfbbEpyfo7fgX_j4xOb1fqtqEbWuWobYHvfKSpF1_b4bPjV5g/viewform"); }}
                 >
                   <Meta
-                    title="Volunteer My Time"
-                    className={classes.meta}
-                  />
-                </Card>
-                <Card
-                  hoverable
-                  className={classes.secondaryCard}
-                >
-                  <Meta
-                    title="Spread the 14Trees Message"
+                    title="Host 14 Trees outreach event in your professional and/or social group"
                     className={classes.meta}
                   />
                 </Card>
               </div>
               <div className={classes.cardContainer} style={{ marginTop: '30px', marginBottom: '20px' }}>
-                <Button variant="contained" onClick={() => { window.open("https://docs.google.com/forms/d/e/1FAIpQLSfbbEpyfo7fgX_j4xOb1fqtqEbWuWobYHvfKSpF1_b4bPjV5g/viewform"); }}>
-                  Contact Us
+                <Button variant="contained" onClick={() => { window.open("https://tinyurl.com/14T-visit-feedback"); }}>
+                  Share your site visit testimonial, feedback, actionable ideas
                 </Button>
               </div>
             </div>
