@@ -16,9 +16,9 @@ import api from "../../api/local";
 import { Card } from "antd";
 import Meta from "antd/es/card/Meta";
 
-import image1 from '../../assets/home/Sisav-2.jpg'
-import image2 from '../../assets/home/Arjun-2.jpg'
-import image3 from '../../assets/home/social.webp'
+import image1 from '../../assets/home/corporate-gifts.jpeg'
+import image2 from '../../assets/home/personal-gifts.jpeg'
+import image3 from '../../assets/home/grove-gifts.jpeg'
 import { Button } from "@mui/material";
 
 export const Search = () => {
@@ -94,9 +94,7 @@ export const Search = () => {
               <h1 className={classes.cardheader} style={{ marginBottom: '20px', alignSelf: 'center' }}>Brighten someone's day</h1>
               <div className={classes.cardContainer}>
                 <Card
-                  hoverable
                   className={classes.primaryCard}
-                  onClick={() => { window.open("https://docs.google.com/forms/d/1Y1HrJiidcUXYrkjaYPvznQTs7AWROAFcrCb4heQlJg4/viewform"); }}
                   cover={
                     <img
                       alt="example"
@@ -104,9 +102,17 @@ export const Search = () => {
                       style={{ padding: '10px', width: 'calc(100% - 20px)' }}
                     />
                   }
+                  actions={[
+                    <Button 
+                      variant="contained" color="success" style={{ textTransform: 'none' }}
+                      onClick={() => { window.open("https://docs.google.com/forms/d/1Y1HrJiidcUXYrkjaYPvznQTs7AWROAFcrCb4heQlJg4/viewform"); }}
+                    >
+                      Gift Trees
+                    </Button>
+                  ]}
                   title="Corporate Gifting"
                 >
-                  <ul>
+                  <ul style={{ flexGrow: 1 }}>
                     <li>Conference Gift</li>
                     <li>Annual day Celebration</li>
                     <li>Customer Engagement</li>
@@ -116,16 +122,22 @@ export const Search = () => {
                   </ul>
                 </Card>
                 <Card
-                  hoverable
                   className={classes.primaryCard}
-                  onClick={() => { window.open("https://docs.google.com/forms/d/1Y1HrJiidcUXYrkjaYPvznQTs7AWROAFcrCb4heQlJg4/viewform"); }}
                   cover={
                     <img
                       alt="example"
                       src={image2}
-                      style={{ padding: '10px', width: 'calc(100% - 20px)' }}
+                      style={{ padding: '10px', height: '197px', width: 'calc(100% - 20px)' }}
                     />
                   }
+                  actions={[
+                    <Button 
+                      variant="contained" color="success" style={{ textTransform: 'none' }}
+                      onClick={() => { window.open("https://docs.google.com/forms/d/1Y1HrJiidcUXYrkjaYPvznQTs7AWROAFcrCb4heQlJg4/viewform"); }}
+                    >
+                      Gift Trees
+                    </Button>
+                  ]}
                   title="Personal Gifts"
                 >
                   <ul>
@@ -138,16 +150,22 @@ export const Search = () => {
                   </ul>
                 </Card>
                 <Card
-                  hoverable
                   className={classes.primaryCard}
-                  onClick={() => { window.open("https://docs.google.com/forms/d/1Y1HrJiidcUXYrkjaYPvznQTs7AWROAFcrCb4heQlJg4/viewform"); }}
                   cover={
                     <img
                       alt="example"
                       src={image3}
-                      style={{ padding: '10px', width: 'calc(100% - 20px)' }}
+                      style={{ padding: '10px', height: '197px', width: 'calc(100% - 20px)' }}
                     />
                   }
+                  actions={[
+                    <Button 
+                      variant="contained" color="success" style={{ textTransform: 'none' }}
+                      onClick={() => { window.open("https://docs.google.com/forms/d/1Y1HrJiidcUXYrkjaYPvznQTs7AWROAFcrCb4heQlJg4/viewform"); }}
+                    >
+                      Create Forest
+                    </Button>
+                  ]}
                   title="Social Groves"
                 >
                   <ul>
@@ -155,7 +173,6 @@ export const Search = () => {
                     <li>School Grove</li>
                     <li>Corporate Grove</li>
                     <li>Club Grove</li>
-                    <li>My 14 Trees</li>
                     <li>Family Grove</li>
                     <li>Memorial Grove</li>
                   </ul>
