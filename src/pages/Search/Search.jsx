@@ -94,7 +94,6 @@ export const Search = () => {
               <h1 className={classes.cardheader} style={{ marginBottom: '20px', alignSelf: 'center' }}>Brighten someone's day</h1>
               <div className={classes.cardContainer}>
                 <Card
-                  hoverable
                   className={classes.primaryCard}
                   cover={
                     <img
@@ -123,7 +122,6 @@ export const Search = () => {
                   </ul>
                 </Card>
                 <Card
-                  hoverable
                   className={classes.primaryCard}
                   cover={
                     <img
@@ -152,7 +150,6 @@ export const Search = () => {
                   </ul>
                 </Card>
                 <Card
-                  hoverable
                   className={classes.primaryCard}
                   cover={
                     <img
