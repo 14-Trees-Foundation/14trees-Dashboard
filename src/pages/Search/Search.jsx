@@ -178,7 +178,7 @@ export const Search = () => {
                   </ul>
                 </Card>
               </div>
-              <h1 className={classes.cardheader} style={{ marginTop: '100px', marginBottom: '20px' }}>Other ways to take climate action</h1>
+              <h1 className={classes.cardheader} style={{ marginTop: '100px', marginBottom: '20px', textAlign: 'center' }}>Other ways to take climate action</h1>
               <div className={classes.cardContainer}>
               <Card
                   hoverable
@@ -210,7 +210,7 @@ export const Search = () => {
                   />
                 </Card>
               </div>
-              <div className={classes.cardContainer} style={{ marginTop: '30px', marginBottom: '20px' }}>
+              <div className={classes.cardContainer} style={{ margin: '20px', marginTop: '30px', }}>
                 <Button variant="contained" onClick={() => { window.open("https://tinyurl.com/14T-visit-feedback"); }}>
                   Share your site visit testimonial, feedback, actionable ideas
                 </Button>
