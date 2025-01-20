@@ -18,7 +18,7 @@ const TableSummary = (data: any[], selectedKeys: any[], totalColumns: number) =>
     return (
         <Table.Summary fixed='bottom'>
             <Table.Summary.Row style={{ backgroundColor: 'rgba(172, 252, 172, 0.2)' }}>
-                <Table.Summary.Cell align="right" index={totalColumns - 4} colSpan={3}>
+                <Table.Summary.Cell align="right" index={totalColumns - 4} colSpan={2}>
                     <strong>Total</strong>
                 </Table.Summary.Cell>
                 <Table.Summary.Cell align="right" index={totalColumns - 3} colSpan={1}>{calculateSum(data.filter((item) => selectedKeys.includes(item.key)).map((item) => item.total))}</Table.Summary.Cell>
@@ -30,15 +30,15 @@ const TableSummary = (data: any[], selectedKeys: any[], totalColumns: number) =>
     )
 }
 
-interface CSRPlotStatesProps {
+interface CSRSiteStatesProps {
     groupId?: number
 }
 
-const CSRPlotStates: React.FC<CSRPlotStatesProps> = ({ groupId }) => {
+const CSRSiteStates: React.FC<CSRSiteStatesProps> = ({ groupId }) => {
 
     const [loading, setLoading] = useState(false);
     const [tableRows, setTableRows] = useState<any[]>([]);
-    const [plots, setPlots] = useState<Record<number, any>>({});
+    const [sites, setSites] = useState<Record<number, any>>({});
     const [totalRecords, setTotalRecords] = useState(10);
     const [page, setPage] = useState(0);
     const [pageSize, setPageSize] = useState(10);
@@ -49,7 +49,7 @@ const CSRPlotStates: React.FC<CSRPlotStatesProps> = ({ groupId }) => {
     const handleSetFilters = (filters: Record<string, GridFilterItem>) => {
         setPage(0);
         setFilters(filters);
-        setPlots({});
+        setSites({});
         setTotalRecords(10);
     }
 
@@ -64,25 +64,25 @@ const CSRPlotStates: React.FC<CSRPlotStatesProps> = ({ groupId }) => {
 
     useEffect(() => {
         setPage(0);
-        setPlots({});
+        setSites({});
         setTotalRecords(10);
     }, [groupId])
 
-    const getCSRPlotStats = async (offset: number, limit: number, filters: any[], orderBy: Order[], group_id?: number) => {
+    const getCSRSiteStats = async (offset: number, limit: number, filters: any[], orderBy: Order[], group_id?: number) => {
         setLoading(true);
         try {
             const apiClient = new ApiClient();
-            const plotsResp = await apiClient.getPlotStatsForCorporate(offset, limit, group_id, filters, orderBy);
+            const sitesResp = await apiClient.getSiteStatsForCorporate(offset, limit, group_id, filters, orderBy);
 
-            setPlots(prev => {
-                const plotsData = { ...prev };
-                for (let i = 0; i < plotsResp.results.length; i++) {
-                    plotsData[plotsResp.offset + i] = {...plotsResp.results[i], key: plotsResp.results[i].id }
+            setSites(prev => {
+                const sitesData = { ...prev };
+                for (let i = 0; i < sitesResp.results.length; i++) {
+                    sitesData[sitesResp.offset + i] = {...sitesResp.results[i], key: sitesResp.results[i].id }
                 }
 
-                return plotsData;
+                return sitesData;
             })
-            setTotalRecords(Number(plotsResp.total));
+            setTotalRecords(Number(sitesResp.total));
 
         } catch (error: any) {
             toast.error(error.message);
@@ -100,37 +100,38 @@ const CSRPlotStates: React.FC<CSRPlotStatesProps> = ({ groupId }) => {
             const filtersData = getFiltersData(filters);
             const currentPageTrees: Tree[] = [];
             for (let i = page * pageSize; i < Math.min((page + 1) * pageSize, totalRecords); i++) {
-                if (!plots[i]) {
-                    getCSRPlotStats(page * pageSize, pageSize, filtersData, orderBy, groupId);
+                if (!sites[i]) {
+                    getCSRSiteStats(page * pageSize, pageSize, filtersData, orderBy, groupId);
                     return;
                 }
 
-                currentPageTrees.push(plots[i]);
+                currentPageTrees.push(sites[i]);
             }
             setTableRows(currentPageTrees);
         }, 300);
 
         return () => { clearTimeout(handler); }
-    }, [groupId, plots, page, pageSize, filters, totalRecords])
+    }, [groupId, sites, page, pageSize, filters, totalRecords])
 
     const handleDownload = async () => {
+        if (!groupId) return [];
         setLoading(true);
         const filtersData = getFiltersData(filters);
         try {
             const apiClient = new ApiClient();
-            const plotsResp = await apiClient.getPlotStatsForCorporate(0, totalRecords, groupId, filtersData, orderBy);
+            const sitesResp = await apiClient.getSiteStatsForCorporate(0, totalRecords, groupId, filtersData, orderBy);
 
-            setPlots(prev => {
-                const plotsData = { ...prev };
-                for (let i = 0; i < plotsResp.results.length; i++) {
-                    plotsData[plotsResp.offset + i] = {...plotsResp.results[i], key: plotsResp.results[i].id }
+            setSites(prev => {
+                const sitesData = { ...prev };
+                for (let i = 0; i < sitesResp.results.length; i++) {
+                    sitesData[sitesResp.offset + i] = {...sitesResp.results[i], key: sitesResp.results[i].id }
                 }
 
-                return plotsData;
+                return sitesData;
             })
-            setTotalRecords(Number(plotsResp.total));
+            setTotalRecords(Number(sitesResp.total));
             setLoading(false);
-            return plotsResp.results;
+            return sitesResp.results;
         } catch (error: any) {
             toast.error(error.message);
             setLoading(false);
@@ -168,20 +169,12 @@ const CSRPlotStates: React.FC<CSRPlotStatesProps> = ({ groupId }) => {
 
     const columns: TableColumnsType<any> = [
         {
-            dataIndex: "name",
-            key: "Plot name",
-            title: "Plot name",
-            width: 350,
-            align: 'center',
-            ...getColumnSearchProps('name', filters, handleSetFilters)
-        },
-        {
-            dataIndex: "site_name",
+            dataIndex: "name_english",
             key: "Site name",
             title: "Site name",
             width: 350,
             align: 'center',
-            ...getColumnSearchProps('site_name', filters, handleSetFilters)
+            ...getColumnSearchProps('name_english', filters, handleSetFilters)
         },
         {
             dataIndex: "total",
@@ -215,7 +208,7 @@ const CSRPlotStates: React.FC<CSRPlotStatesProps> = ({ groupId }) => {
 
     return (
         <Box mt={2}>
-            <Typography variant="h5" ml={1}>CSR Plots</Typography>
+            <Typography variant="h5" ml={1}>CSR Sites</Typography>
             <GeneralTable
                 loading={loading}
                 columns={columns}
@@ -225,7 +218,7 @@ const CSRPlotStates: React.FC<CSRPlotStatesProps> = ({ groupId }) => {
                 pageSize={pageSize}
                 onPaginationChange={handlePaginationChange}
                 onDownload={handleDownload}
-                tableName="CSR Plots"
+                tableName="CSR Sites"
                 onSelectionChanges={handleSelectionChanges}
                     summary={(totalColumns: number) => {
                         if (totalColumns < 5) return undefined;
@@ -237,4 +230,4 @@ const CSRPlotStates: React.FC<CSRPlotStatesProps> = ({ groupId }) => {
     );
 }
 
-export default CSRPlotStates;
+export default CSRSiteStates;
