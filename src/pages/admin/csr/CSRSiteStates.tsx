@@ -5,7 +5,7 @@ import { Order } from "../../../types/common";
 import { Box, Typography } from "@mui/material";
 import GeneralTable from "../../../components/GenTable";
 import { Table, TableColumnsType } from "antd";
-import getColumnSearchProps, { getSortIcon } from "../../../components/Filter";
+import getColumnSearchProps, { getColumnSelectedItemFilter, getSortIcon } from "../../../components/Filter";
 import { toast } from "react-toastify";
 import ApiClient from "../../../api/apiClient/apiClient";
 
@@ -32,9 +32,10 @@ const TableSummary = (data: any[], selectedKeys: any[], totalColumns: number) =>
 
 interface CSRSiteStatesProps {
     groupId?: number
+    tags: string[]
 }
 
-const CSRSiteStates: React.FC<CSRSiteStatesProps> = ({ groupId }) => {
+const CSRSiteStates: React.FC<CSRSiteStatesProps> = ({ groupId, tags }) => {
 
     const [loading, setLoading] = useState(false);
     const [tableRows, setTableRows] = useState<any[]>([]);
@@ -175,6 +176,15 @@ const CSRSiteStates: React.FC<CSRSiteStatesProps> = ({ groupId }) => {
             width: 350,
             align: 'center',
             ...getColumnSearchProps('name_english', filters, handleSetFilters)
+        },
+        {
+            dataIndex: "tags",
+            key: "tags",
+            title: "Tags",
+            align: "center",
+            width: 150,
+            render: (tags) => tags ? tags.join(", ") : '',
+            ...getColumnSelectedItemFilter({ dataIndex: 'tags', filters, handleSetFilters, options: tags })
         },
         {
             dataIndex: "total",
