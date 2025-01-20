@@ -42,9 +42,13 @@ interface PaymentProps {
     initialAmount?: number
     paymentId?: number | null
     onChange?: (paymentId: number) => void
+    sponsorshipType?: string
+    donationReceipt?: string | null
+    amountReceived?: number
+    onSponsorshipDetailsSave: (sponsorshipType: string, donationReceiptNumber: string | null, amountReceived: number) => void
 }
 
-const PaymentComponent: React.FC<PaymentProps> = ({ initialAmount, paymentId, onChange }) => {
+const PaymentComponent: React.FC<PaymentProps> = ({ initialAmount, paymentId, amountReceived: ar, donationReceipt, sponsorshipType: st, onChange, onSponsorshipDetailsSave }) => {
 
     const [openEdit, setOpenEdit] = useState(false);
     const [amount, setAmount] = useState(initialAmount || 0);
@@ -79,6 +83,20 @@ const PaymentComponent: React.FC<PaymentProps> = ({ initialAmount, paymentId, on
         paidAmount: 0,
         verifiedAmount: 0,
     })
+
+    const [donationReceiptNumber, setDonationReceiptNumber] = useState('');
+    const [sponsorshipType, setSponosrshipType] = useState('');
+    const [amountReceived, setAmountReceived] = useState(0);
+
+    useEffect(() => {
+        const handler = setTimeout(() =>{ 
+            setAmountReceived(ar ? ar : 0);
+            setDonationReceiptNumber(donationReceipt ? donationReceipt : '');
+            setSponosrshipType(st ? st : 'Unverified')
+        }, 300);
+
+        return () =>{ clearTimeout(handler); }
+    }, [donationReceipt, st, ar]) 
 
     useEffect(() => {
         let paid = 0, verified = 0;
@@ -394,10 +412,10 @@ const PaymentComponent: React.FC<PaymentProps> = ({ initialAmount, paymentId, on
                                     <InputLabel id="sponsorship-type">Sponsorship type</InputLabel>
                                     <Select
                                         labelId="sponsorship-type"
-                                        // value={requestType}
+                                        value={sponsorshipType}
                                         label="Sponsorship type"
                                         size="small"
-                                        // onChange={(e) => { onRequestTypeChange(e.target.value); }}
+                                        onChange={(e) => { setSponosrshipType(e.target.value); }}
                                     >
                                         {SponosrshipTypes.map(item => <MenuItem key={item} value={item}>{item}</MenuItem>)}
                                     </Select>
@@ -412,18 +430,25 @@ const PaymentComponent: React.FC<PaymentProps> = ({ initialAmount, paymentId, on
                                     name="donation_receipt_number"
                                     size="small"
                                     label="Donation receipt number"
+                                    value={donationReceiptNumber}
+                                    onChange={(e) => { setDonationReceiptNumber(e.target.value); }}
                                 />
                             </Grid>
                         </Grid>
                         <Grid item container xs={12}>
                             <Grid item xs={5}><Typography>Amount received:</Typography></Grid>
                             <Grid item xs={7}>
-                                <TextField
+                                <TextField  
                                     fullWidth
                                     name="amount_received"
                                     size="small"
                                     label="Amount received"
                                     type="number"
+                                    value={amountReceived ? amountReceived : ''}
+                                    onChange={(e) => { 
+                                        if (e.target.value === '') setAmountReceived(0);
+                                        else if (!isNaN(parseInt(e.target.value))) setAmountReceived(parseInt(e.target.value)); 
+                                    }}
                                 />
                             </Grid>
                         </Grid>
@@ -433,6 +458,7 @@ const PaymentComponent: React.FC<PaymentProps> = ({ initialAmount, paymentId, on
                                 <Button
                                     variant="contained"
                                     color="success"
+                                    onClick={() => { onSponsorshipDetailsSave(sponsorshipType, donationReceiptNumber.trim() ? donationReceiptNumber.trim() : null, amountReceived ) }}
                                 >Save details</Button>
                             </Grid>
                             <Grid item xs={4}></Grid>

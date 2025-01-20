@@ -5,7 +5,7 @@ import { User } from "../../../types/user";
 import { Group } from "../../../types/Group";
 import ApiClient from "../../../api/apiClient/apiClient";
 import { ToastContainer, toast } from "react-toastify";
-import { GiftCard, GiftRequestType_CARDS_REQUEST, GiftRequestType_NORAML_ASSIGNMENT, GiftRequestUser } from "../../../types/gift_card";
+import { GiftCard, GiftRequestType_CARDS_REQUEST, GiftRequestType_NORAML_ASSIGNMENT, GiftRequestUser, SponsorshipType } from "../../../types/gift_card";
 import getColumnSearchProps, { getColumnDateFilter, getColumnSelectedItemFilter, getSortIcon } from "../../../components/Filter";
 import { GridFilterItem } from "@mui/x-data-grid";
 import * as giftCardActionCreators from "../../../redux/actions/giftCardActions";
@@ -494,6 +494,27 @@ const GiftTrees: FC = () => {
         }
     }
 
+    const handleSponsorshipDetailsSubmit = async (sponsorshipType: string, donationReceiptNumber: string | null, amountReceived: number) => {
+        if (!selectedPaymentGR) return;
+
+        const data = { ...selectedPaymentGR };
+        data.sponsorship_type = sponsorshipType as SponsorshipType;
+        data.amount_received = amountReceived;
+        data.donation_receipt_number = donationReceiptNumber;
+
+        try {
+            const apiClient = new ApiClient();
+            const response = await apiClient.updateGiftCard(data, selectedPaymentGR.no_of_cards, selectedPaymentGR.user_id, selectedPaymentGR.category, selectedPaymentGR.grove, selectedPaymentGR.request_type ?? GiftRequestType_CARDS_REQUEST, selectedPaymentGR.gifted_on);
+            dispatch({
+                type: giftCardActionTypes.UPDATE_GIFT_CARD_SUCCEEDED,
+                payload: response,
+            });
+            toast.success("Sponsorship details Updated!")
+        } catch (error: any) {
+            toast.error(error.message)
+        }
+    }
+
     // Tag request
 
     const handleTagModalOpen = (request: GiftCard) => {
@@ -663,14 +684,14 @@ const GiftTrees: FC = () => {
     const columns: TableColumnsType<GiftCard> = [
         {
             dataIndex: "id",
-            key: "id",
+            key: "Req. No.",
             title: "Req. No.",
             align: "right",
             width: 100,
         },
         {
             dataIndex: "user_name",
-            key: "user_name",
+            key: "Sponsor",
             title: "Sponsor",
             align: "center",
             width: 200,
@@ -678,7 +699,7 @@ const GiftTrees: FC = () => {
         },
         {
             dataIndex: "group_name",
-            key: "group_name",
+            key: "Sponsorship (Corporate/Personal)",
             title: "Sponsorship (Corporate/Personal)",
             align: "center",
             width: 200,
@@ -687,14 +708,14 @@ const GiftTrees: FC = () => {
         },
         {
             dataIndex: "no_of_cards",
-            key: "no_of_cards",
+            key: "# Cards",
             title: getSortableHeader("# Cards", 'no_of_cards'),
             align: "center",
             width: 100,
         },
         {
             dataIndex: "created_by_name",
-            key: "created_by_name",
+            key: "Created by",
             title: "Created by",
             align: "center",
             width: 200,
@@ -702,7 +723,7 @@ const GiftTrees: FC = () => {
         },
         {
             dataIndex: "tags",
-            key: "tags",
+            key: "Tags",
             title: "Tags",
             align: "center",
             width: 200,
@@ -711,7 +732,7 @@ const GiftTrees: FC = () => {
         },
         {
             dataIndex: "status",
-            key: "status",
+            key: "Status",
             title: "Status",
             align: "center",
             width: 150,
@@ -720,7 +741,7 @@ const GiftTrees: FC = () => {
         },
         {
             dataIndex: "validation_errors",
-            key: "validation_errors",
+            key: "Validation Errors",
             title: "Validation Errors",
             align: "center",
             width: 120,
@@ -734,22 +755,45 @@ const GiftTrees: FC = () => {
             ...getColumnSelectedItemFilter({ dataIndex: 'validation_errors', filters, handleSetFilters, options: ['Yes', 'No'] }),
         },
         {
+            dataIndex: "sponsorship_type",
+            key: "Sponosorship Type",
+            title: "Sponsorship Type",
+            align: "center",
+            width: 150,
+            ...getColumnSelectedItemFilter({ dataIndex: 'sponsorship_type', filters, handleSetFilters, options: ['Unverified', 'Pledged', 'Promotional', 'Unsponsored Visit', 'Donation Received'] })
+        },
+        {
+            dataIndex: "donation_receipt_number",
+            key: "Donation Receipt No.",
+            title: "Donation Receipt No.",
+            align: "center",
+            width: 200,
+            ...getColumnSearchProps('donation_receipt_number', filters, handleSetFilters)
+        },
+        {
             dataIndex: "total_amount",
-            key: "total_amount",
+            key: "Total Amount",
             title: getSortableHeader("Total Amount", 'total_amount'),
             align: "center",
             width: 150,
         },
         {
+            dataIndex: "amount_received",
+            key: "Amount Received",
+            title: "Amount Received",
+            align: "center",
+            width: 200,
+        },
+        {
             dataIndex: "payment_status",
-            key: "payment_status",
+            key: "Payment Status",
             title: "Payment Status",
             align: "center",
             width: 150,
         },
         {
             dataIndex: "notes",
-            key: "notes",
+            key: "Notes",
             title: "Notes",
             align: "center",
             width: 100,
@@ -764,7 +808,7 @@ const GiftTrees: FC = () => {
         },
         {
             dataIndex: "created_at",
-            key: "created_at",
+            key: "Created on",
             title: "Created on",
             align: "center",
             width: 200,
@@ -918,6 +962,10 @@ const GiftTrees: FC = () => {
                         initialAmount={(selectedPaymentGR?.no_of_cards || 0) * 2000}
                         paymentId={selectedPaymentGR?.payment_id}
                         onChange={handlePaymentFormSubmit}
+                        sponsorshipType={selectedPaymentGR?.sponsorship_type}
+                        donationReceipt={selectedPaymentGR?.donation_receipt_number}
+                        amountReceived={selectedPaymentGR?.amount_received}
+                        onSponsorshipDetailsSave={handleSponsorshipDetailsSubmit}
                     />
                 </DialogContent>
                 <DialogActions>
