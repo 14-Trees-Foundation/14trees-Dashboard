@@ -1,5 +1,6 @@
 
 export type GiftRequestType = 'Cards Request' | 'Normal Assignment' | 'Promotion' | 'Test'
+export type SponsorshipType = 'Unverified' | 'Pledged' | 'Promotional' | 'Unsponsored Visit' | 'Donation Received'
 
 export const GiftRequestType_CARDS_REQUEST: GiftRequestType = 'Cards Request'
 export const GiftRequestType_NORAML_ASSIGNMENT: GiftRequestType = 'Normal Assignment'
@@ -43,6 +44,9 @@ export type GiftCard = {
     assigned: number,
     gifted_on: string;
     request_type: string | null;
+    sponsorship_type: SponsorshipType;
+    donation_receipt_number: string | null;
+    amount_received: number;
 }
 
 export type GiftRequestUser = {
