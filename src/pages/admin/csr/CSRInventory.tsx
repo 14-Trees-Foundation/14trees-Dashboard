@@ -12,6 +12,7 @@ import ApiClient from "../../../api/apiClient/apiClient";
 import { toast } from "react-toastify";
 import { Forest, GrassTwoTone, ModeOfTravel, NaturePeople } from "@mui/icons-material";
 import CSRSiteStates from "./CSRSiteStates";
+import SitesMap from "./SitesMap";
 
 const CSRInventory: React.FC = () => {
 
@@ -174,6 +175,9 @@ const CSRInventory: React.FC = () => {
             </Box>}
 
             <CSRSiteStates groupId={selectedGroup?.id} tags={tags} />
+            <Box style={{ marginBottom: '50px' }}>
+                <SitesMap />
+            </Box>
             <CSRPlotStates groupId={selectedGroup?.id} tags={tags} />
             <CSRTrees groupId={selectedGroup?.id} />
         </Box>
