@@ -11,29 +11,13 @@ import * as groupActionCreators from '../../../redux/actions/groupActions';
 import ApiClient from "../../../api/apiClient/apiClient";
 import { toast } from "react-toastify";
 import { Forest, GrassTwoTone, ModeOfTravel, NaturePeople } from "@mui/icons-material";
+import CSRSiteStates from "./CSRSiteStates";
+import SitesMap from "./SitesMap";
 
 const CSRInventory: React.FC = () => {
 
     const dispatch = useAppDispatch();
     const { getGroups } = bindActionCreators(groupActionCreators, dispatch);
-
-    ///*** CSR Cards ***/
-    const classes = useStyles();
-    const [csrAnalytics, setCsrAnalytics] = useState<any>(null);
-
-    useEffect(() => {
-        const getCSRAnalytics = async () => {
-            try {
-                const apiClient = new ApiClient();
-                const data = await apiClient.getCSRAnalytics();
-                setCsrAnalytics(data);
-            } catch (error) {
-                toast.error("Failed to fetch CSR analytics data");
-            }
-        }
-
-        getCSRAnalytics();
-    }, []);
 
     ///*** GROUP ***/
     const [groupPage, setGroupPage] = useState(0);
@@ -69,6 +53,41 @@ const CSRInventory: React.FC = () => {
             return b.id - a.id;
         });
     }
+
+    ///*** CSR Cards ***/
+    const classes = useStyles();
+    const [csrAnalytics, setCsrAnalytics] = useState<any>(null);
+
+    useEffect(() => {
+        const getCSRAnalytics = async () => {
+            try {
+                const apiClient = new ApiClient();
+                const data = await apiClient.getCSRAnalytics(selectedGroup?.id);
+                setCsrAnalytics(data);
+            } catch (error) {
+                toast.error("Failed to fetch CSR analytics data");
+            }
+        }
+
+        getCSRAnalytics();
+    }, [selectedGroup]);
+
+    ///*** Tags ***/
+    const [tags, setTags] = useState<string[]>([]);
+
+    useEffect(() => {
+        const getTags = async () => {
+            try {
+                const apiClient = new ApiClient();
+                const tagsResp = await apiClient.getTags(0, 100);
+                setTags(tagsResp.results.map(item => item.tag))
+            } catch (error: any) {
+                toast.error(error.message);
+            }
+        }
+
+        getTags();
+    }, []);
 
     return (
         <Box>
@@ -110,7 +129,7 @@ const CSRInventory: React.FC = () => {
                     <Box sx={{ paddingTop: "10px" }}>
                         <Forest fontSize="large" style={{ color: "#53ad7a" }} />
                         <Typography variant="h3" color="#fff" sx={{ pt: 1, pb: 1 }}>
-                            {csrAnalytics.sponsored_trees}
+                            {csrAnalytics.sponsored_trees ? csrAnalytics.sponsored_trees : '0'}
                         </Typography>
                         <Typography variant="subtitle2" color="#1f3625">
                             Sponsored Trees
@@ -124,7 +143,7 @@ const CSRInventory: React.FC = () => {
                             style={{ color: "#573D1C" }}
                         />
                         <Typography variant="h3" color="#fff" sx={{ pt: 1, pb: 1 }}>
-                            {csrAnalytics.assigned_trees}
+                            {csrAnalytics.assigned_trees ? csrAnalytics.assigned_trees : '0'}
                         </Typography>
                         <Typography variant="subtitle2" color="#1f3625">
                             Assigned Trees
@@ -135,7 +154,7 @@ const CSRInventory: React.FC = () => {
                     <Box sx={{ paddingTop: "10px" }}>
                         <GrassTwoTone fontSize="large" style={{ color: "#F94F25" }} />
                         <Typography variant="h3" color="#fff" sx={{ pt: 1, pb: 1 }}>
-                            {csrAnalytics.plant_types}
+                            {csrAnalytics.plant_types ? csrAnalytics.plant_types : '0'}
                         </Typography>
                         <Typography variant="subtitle2" color="#1f3625">
                             Plant Types
@@ -146,7 +165,7 @@ const CSRInventory: React.FC = () => {
                     <Box sx={{ paddingTop: "10px" }}>
                         <ModeOfTravel fontSize="large" style={{ color: "#078085" }} />
                         <Typography variant="h3" color="#fff" sx={{ pt: 1, pb: 1 }}>
-                            {csrAnalytics.area?.toFixed(2)}
+                            {csrAnalytics.area ? csrAnalytics.area?.toFixed(2) : '0'}
                         </Typography>
                         <Typography variant="subtitle2" color="#1f3625">
                             Acres Sponsored
@@ -155,10 +174,12 @@ const CSRInventory: React.FC = () => {
                 </div>
             </Box>}
 
-            <CSRTrees
-                groupId={selectedGroup?.id}
-            />
-            {selectedGroup && <CSRPlotStates groupId={selectedGroup?.id} />}
+            <CSRSiteStates groupId={selectedGroup?.id} tags={tags} />
+            <Box style={{ marginBottom: '50px' }}>
+                <SitesMap />
+            </Box>
+            <CSRPlotStates groupId={selectedGroup?.id} tags={tags} />
+            <CSRTrees groupId={selectedGroup?.id} />
         </Box>
     );
 }
