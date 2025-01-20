@@ -263,7 +263,7 @@ class ApiClient {
 
     }
 
-    async getPlotStatsForCorporate(offset: number, limit: number, group_id: number, filters?: any[], orderBy?: any[]): Promise<PaginatedResponse<any>> {
+    async getPlotStatsForCorporate(offset: number, limit: number, group_id?: number, filters?: any[], orderBy?: any[]): Promise<PaginatedResponse<any>> {
         const url = `/plots/corporate-stats?offset=${offset}&limit=${limit}`;
         try {
             const response = await this.api.post<PaginatedResponse<any>>(url, { group_id, filters: filters, order_by: orderBy });
@@ -277,8 +277,8 @@ class ApiClient {
 
     }
 
-    async getCSRAnalytics(): Promise<any> {
-        const url = `/plots/corporate-analytics`;
+    async getCSRAnalytics(groupId?: number): Promise<any> {
+        const url = `/plots/corporate-analytics?group_id=${groupId}`;
         try {
             const response = await this.api.get<any>(url);
             return response.data;
@@ -1098,6 +1098,20 @@ class ApiClient {
             console.error(error)
             throw new Error('Failed to fetch tree counts for corporate');
         }
+    }
+
+    async getSiteStatsForCorporate(offset: number, limit: number, group_id?: number, filters?: any[], orderBy?: any[]): Promise<PaginatedResponse<any>> {
+        const url = `/sites/corporate-stats?offset=${offset}&limit=${limit}`;
+        try {
+            const response = await this.api.post<PaginatedResponse<any>>(url, { group_id, filters: filters, order_by: orderBy });
+            return response.data;
+        } catch (error: any) {
+            if (error.response?.data?.message) {
+                throw new Error(error.response.data.message);
+            }
+            throw new Error(`Failed to fetch CSR site analytics: ${error.message}`);
+        }
+
     }
 
 
