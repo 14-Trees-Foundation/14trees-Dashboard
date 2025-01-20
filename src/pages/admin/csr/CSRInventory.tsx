@@ -71,6 +71,23 @@ const CSRInventory: React.FC = () => {
         getCSRAnalytics();
     }, [selectedGroup]);
 
+    ///*** Tags ***/
+    const [tags, setTags] = useState<string[]>([]);
+
+    useEffect(() => {
+        const getTags = async () => {
+            try {
+                const apiClient = new ApiClient();
+                const tagsResp = await apiClient.getTags(0, 100);
+                setTags(tagsResp.results.map(item => item.tag))
+            } catch (error: any) {
+                toast.error(error.message);
+            }
+        }
+
+        getTags();
+    }, []);
+
     return (
         <Box>
             <div
@@ -156,8 +173,8 @@ const CSRInventory: React.FC = () => {
                 </div>
             </Box>}
 
-            <CSRSiteStates groupId={selectedGroup?.id} />
-            <CSRPlotStates groupId={selectedGroup?.id} />
+            <CSRSiteStates groupId={selectedGroup?.id} tags={tags} />
+            <CSRPlotStates groupId={selectedGroup?.id} tags={tags} />
             <CSRTrees groupId={selectedGroup?.id} />
         </Box>
     );

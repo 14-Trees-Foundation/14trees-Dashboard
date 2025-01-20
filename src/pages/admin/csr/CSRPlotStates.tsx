@@ -5,9 +5,15 @@ import { Order } from "../../../types/common";
 import { Box, Typography } from "@mui/material";
 import GeneralTable from "../../../components/GenTable";
 import { Table, TableColumnsType } from "antd";
-import getColumnSearchProps, { getSortIcon } from "../../../components/Filter";
+import getColumnSearchProps, { getColumnSelectedItemFilter, getSortIcon } from "../../../components/Filter";
 import { toast } from "react-toastify";
 import ApiClient from "../../../api/apiClient/apiClient";
+
+const accessibilityList = [
+    { value: "accessible", label: "Accessible" },
+    { value: "inaccessible", label: "Inaccessible" },
+    { value: "moderately_accessible", label: "Moderately Accessible" },
+];
 
 const TableSummary = (data: any[], selectedKeys: any[], totalColumns: number) => {
 
@@ -32,9 +38,10 @@ const TableSummary = (data: any[], selectedKeys: any[], totalColumns: number) =>
 
 interface CSRPlotStatesProps {
     groupId?: number
+    tags: string[]
 }
 
-const CSRPlotStates: React.FC<CSRPlotStatesProps> = ({ groupId }) => {
+const CSRPlotStates: React.FC<CSRPlotStatesProps> = ({ groupId, tags }) => {
 
     const [loading, setLoading] = useState(false);
     const [tableRows, setTableRows] = useState<any[]>([]);
@@ -91,7 +98,24 @@ const CSRPlotStates: React.FC<CSRPlotStatesProps> = ({ groupId }) => {
     }
 
     const getFiltersData = (filters: any) => {
-        const filtersData = JSON.parse(JSON.stringify(Object.values(filters)));
+        let filtersData = JSON.parse(JSON.stringify(Object.values(filters))) as GridFilterItem[];
+        
+        const accessibilityIdx = filtersData.findIndex(item => item.columnField === 'accessibility_status');
+        if (accessibilityIdx > -1) {
+            filtersData[accessibilityIdx].value = filtersData[accessibilityIdx].value.map((item: string) => {
+            switch (item) {
+                case "Accessible":
+                return "accessible";
+                case "Inaccessible":
+                return "inaccessible";
+                case "Moderately Accessible":
+                return "moderately_accessible";
+                default:
+                return null;
+            }
+            })
+        }
+
         return filtersData;
     }
 
@@ -165,7 +189,6 @@ const CSRPlotStates: React.FC<CSRPlotStatesProps> = ({ groupId }) => {
         )
     }
 
-
     const columns: TableColumnsType<any> = [
         {
             dataIndex: "name",
@@ -182,6 +205,24 @@ const CSRPlotStates: React.FC<CSRPlotStatesProps> = ({ groupId }) => {
             width: 350,
             align: 'center',
             ...getColumnSearchProps('site_name', filters, handleSetFilters)
+        },
+        {
+            dataIndex: "accessibility_status",
+            key: "accessibility_status",
+            title: "Accessibility",
+            align: "center",
+            width: 200,
+            render: (value) => value ? accessibilityList.find((item) => item.value === value)?.label : "Unknown",
+            ...getColumnSelectedItemFilter({ dataIndex: 'accessibility_status', filters, handleSetFilters, options: accessibilityList.map((item) => item.label).concat("Unknown") })
+        },
+        {
+            dataIndex: "tags",
+            key: "tags",
+            title: "Tags",
+            align: "center",
+            width: 150,
+            render: (tags) => tags ? tags.join(", ") : '',
+            ...getColumnSelectedItemFilter({ dataIndex: 'tags', filters, handleSetFilters, options: tags })
         },
         {
             dataIndex: "total",
