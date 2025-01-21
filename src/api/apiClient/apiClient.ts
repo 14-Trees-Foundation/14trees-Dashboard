@@ -168,6 +168,20 @@ class ApiClient {
         }
     }
 
+    async getPlantTypeStatsForCorporate(offset: number, limit: number, group_id?: number, filters?: any[]): Promise<PaginatedResponse<any>> {
+        const url = `/plant-types/corporate-stats?offset=${offset}&limit=${limit}`;
+        try {
+            const response = await this.api.post<PaginatedResponse<any>>(url, { group_id, filters: filters });
+            return response.data;
+        } catch (error: any) {
+            if (error.response?.data?.message) {
+                throw new Error(error.response.data.message);
+            }
+            throw new Error(`Failed to fetch CSR plant types analytics: ${error.message}`);
+        }
+
+    }
+
 
     /*
         Model- Plot: CRUD Operations/Apis for plots
@@ -869,6 +883,20 @@ class ApiClient {
             if (error.response?.data?.message) throw new Error(error.response.data.message);
             throw new Error('Failed to get trees count for user');
         }
+    }
+
+    async getCSRTreesLoggedByYear(groupId?: number): Promise<any[]> {
+        const url = `/trees/corporate-stats/tree-logged?group_id=${groupId}`;
+        try {
+            const response = await this.api.get<any[]>(url);
+            return response.data;
+        } catch (error: any) {
+            if (error.response?.data?.message) {
+                throw new Error(error.response.data.message);
+            }
+            throw new Error(`Failed to fetch CSR analytics: ${error.message}`);
+        }
+
     }
 
 
