@@ -74,7 +74,7 @@ const SitesMap: React.FC<SitesMapProps> = ({ groupId }) => {
         try {
             const apiClient = new ApiClient();
             const plotsResp = await apiClient.getPlotStatsForCorporate(offset, limit, group_id, filters);
-            setPlots(plotsResp.results.map(item => ({ ...item, key: item.id })));
+            setPlots(plotsResp.results.filter(item => item.boundaries && item.boundaries?.coordinates[0]).map(item => ({ ...item, key: item.id })));
         } catch (error: any) {
             toast.error(error.message);
         }
@@ -120,19 +120,22 @@ const SitesMap: React.FC<SitesMapProps> = ({ groupId }) => {
             lngSum += center.lng;
         })
 
-        setCenter({ lat: latSum / plots.length, lng: lngSum / plots.length });
+        const size = Math.max(plots.length, 1);
+        setCenter({ lat: latSum / size, lng: lngSum /  size});
     }, [plots]);
 
     const calculatePlotCenter = (plot: Plot) => {
         let latSum = 0, lngSum = 0;
-        const path = getPlotPolygon(plot);
+        const path = getPlotPolygon(plot).filter(item => item);
         path.forEach(point => {
             latSum += point.lat;
             lngSum += point.lng;
         });
+
+        const size = Math.max(path.length, 1)
         return {
-            lat: latSum / path.length,
-            lng: lngSum / path.length,
+            lat: latSum / size,
+            lng: lngSum / size,
         };
     };
 
