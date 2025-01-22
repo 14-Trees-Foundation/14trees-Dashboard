@@ -1,4 +1,4 @@
-import { React, useState } from "react";
+import { React, useEffect, useState } from "react";
 import {
   Autocomplete,
   Box,
@@ -12,6 +12,8 @@ import { plantTypeCategories, plantTypeHabitList } from "./habitList";
 import { makeStyles } from "@mui/styles";
 import { useDropzone } from "react-dropzone";
 import TagSelector from "../../../components/TagSelector";
+import ApiClient from "../../../api/apiClient/apiClient";
+import { toast } from "react-toastify";
 
 const AddTreeType = ({ open, handleClose, createPlantType }) => {
   const style = {
@@ -44,7 +46,71 @@ const AddTreeType = ({ open, handleClose, createPlantType }) => {
     images: [],
   });
 
+  const [plantTypes, setPlantTypes] = useState([]);
+  const [enSearchStr, setEnSearchStr] = useState('');
+  const [mrSearchStr, setMrSearchStr] = useState('');
   const [files, setFiles] = useState([]);
+
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      if (enSearchStr.length > 0) getPlantTypes(enSearchStr);
+    }, 300)
+
+    return () => { clearTimeout(timeoutId) };
+  }, [enSearchStr]);
+
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      if (mrSearchStr.length > 0) getPlantTypes(mrSearchStr);
+    }, 300)
+
+    return () => { clearTimeout(timeoutId) };
+  }, [mrSearchStr]);
+
+
+  const getPlantTypes = async (searchStr) => {
+    const apiClinet = new ApiClient();
+    try {
+      const resp = await apiClinet.getPlantTypes(0, 20, [{ columnField: 'combined_name', operatorValue: 'contains', value: searchStr }]);
+      resp.results.forEach(item => { item.key = item.id });
+      setPlantTypes(resp.results);
+    } catch (error) {
+      toast.error(error.message);
+    }
+  };
+
+  const handleEnglishNameChange = (event, value) => {
+    let isSet = false;
+    plantTypes.forEach((pt) => {
+      if (pt.name === value) isSet = true;
+    })
+
+    if (!isSet) {
+      if (value.length >= 1) setEnSearchStr(value);
+    }
+    setFormData(prevState => ({
+      ...prevState,
+      'common_name_in_english': value,
+      name: value.trim() + " (" + (prevState.common_name_in_marathi?.trim() || '') + ")",
+    }))
+  }
+
+  const handleMarathiNameChange = (event, value) => {
+    let isSet = false;
+    plantTypes.forEach((pt) => {
+      if (pt.name === value) isSet = true;
+    })
+
+    if (!isSet) {
+      if (value.length >= 1) setEnSearchStr(value);
+    }
+    setFormData(prevState => ({
+      ...prevState,
+      'common_name_in_marathi': value,
+      name: (prevState.common_name_in_english?.trim() || '') + " (" + value.trim() + ")",
+    }))
+  }
+
   const handleChange = (event) => {
     const { name, value } = event.target;
 
@@ -138,22 +204,98 @@ const AddTreeType = ({ open, handleClose, createPlantType }) => {
                 />
               </Grid>
               <Grid item xs={6}>
-                <TextField
+                {/* <TextField
                   name="common_name_in_english"
                   label="Common Name in English"
                   value={formData.common_name_in_english}
                   onChange={handleChange}
                   fullWidth
-                />
+                /> */}
+                <Autocomplete
+                  fullWidth
+                  options={plantTypes}
+                  name='common_name_in_english'
+                  noOptionsText="No Plant Types Found"
+                  value={formData.common_name_in_english}
+                  onInputChange={handleEnglishNameChange}
+                  getOptionLabel={(option) => option.name ? option.name : option}
+                  isOptionEqualToValue={(option, value) => value.name ? option.name === value.name : option === value}
+                  renderOption={(props, option) => {
+                    const { key, ...optionProps } = props;
+                    return (
+                      <Box
+                        key={key}
+                        {...optionProps}
+                      >
+                        {option.name ? (
+                          <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
+                            <Typography variant='body1'>{option.name}</Typography>
+                            {option.english_name && <Typography variant='body2' color={'#494b4b'}>Eng name: {option.english_name}</Typography>}
+                            {option.scientific_name && <Typography variant='body2' color={'#494b4b'}>Sci name: {option.scientific_name}</Typography>}
+                            {option.known_as && <Typography variant='subtitle2' color={'GrayText'}>Known as: {option.known_as}</Typography>}
+                          </Box>
+                        ) : (
+                          <Typography>{option}</Typography>
+                        )}
+                      </Box>
+                    );
+                  }}
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      name="common_name_in_english"
+                      label="Name (English)"
+                      variant="outlined"
+                    />
+                  )}>
+                </Autocomplete>
               </Grid>
               <Grid item xs={6}>
-                <TextField
+                {/* <TextField
                   name="common_name_in_marathi"
                   label="Common Name in Marathi"
                   value={formData.common_name_in_marathi}
                   onChange={handleChange}
                   fullWidth
-                />
+                /> */}
+                <Autocomplete
+                  fullWidth
+                  options={plantTypes}
+                  name='common_name_in_marathi'
+                  noOptionsText="No Plant Types Found"
+                  value={formData.common_name_in_marathi}
+                  onInputChange={handleMarathiNameChange}
+                  getOptionLabel={(option) => option.name ? option.name : option}
+                  isOptionEqualToValue={(option, value) => value.name ? option.name === value.name : option === value}
+                  renderOption={(props, option) => {
+                    const { key, ...optionProps } = props;
+                    return (
+                      <Box
+                        key={key}
+                        {...optionProps}
+                      >
+                        {option.name ? (
+                          <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
+                            <Typography variant='body1'>{option.name}</Typography>
+                            {option.english_name && <Typography variant='body2' color={'#494b4b'}>Eng name: {option.english_name}</Typography>}
+                            {option.scientific_name && <Typography variant='body2' color={'#494b4b'}>Sci name: {option.scientific_name}</Typography>}
+                            {option.known_as && <Typography variant='subtitle2' color={'GrayText'}>Known as: {option.known_as}</Typography>}
+                          </Box>
+                        ) : (
+                          <Typography>{option}</Typography>
+                        )}
+                      </Box>
+                    );
+                  }}
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      name="common_name_in_marathi"
+                      label="Name (English)"
+                      variant="outlined"
+                    />
+                  )}>
+                </Autocomplete>
               </Grid>
               <Grid item xs={6}>
                 <TextField

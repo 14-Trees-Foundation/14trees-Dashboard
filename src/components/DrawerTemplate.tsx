@@ -60,7 +60,7 @@ const DrawerTemplate: FC<DrawerTemplateProps> = ({ pages }) => {
                 <img className={classes.logo} alt={"logo"} src={logo} />
                 {menuitem()}
             </Drawer>
-            <Box style={{ padding: 10, flexGrow: 1 }}>
+            <Box style={{ padding: 20, flexGrow: 1, overflow: 'hidden' }}>
                 { mainBox() }
             </Box>
         </Box>

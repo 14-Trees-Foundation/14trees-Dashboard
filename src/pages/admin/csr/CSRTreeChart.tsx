@@ -18,12 +18,12 @@ const CSRTreeChart: React.FC<CSRTreeChartProps> = ({ groupId }) => {
 
             let total = 0;
             const data: any[] = [];
-            if (resp.length > 0) data.push({ year: resp[0].year - 1, Trees: 0, "New Trees": 0 });
+            if (resp.length > 0) data.push({ year: resp[0].year - 1, "Total Trees": 0, "Trees Planted in a Year": 0 });
 
             resp.forEach(item => {
                 total += item.tree_count;
 
-                data.push({ ...item, Trees: total, "New Trees": item.tree_count });
+                data.push({ ...item, "Total Trees": total, "Trees Planted in a Year": item.tree_count });
             })
 
             setTreesData(data);
@@ -53,21 +53,21 @@ const CSRTreeChart: React.FC<CSRTreeChartProps> = ({ groupId }) => {
                         <Label value="Year" offset={0} position='insideBottom' />
                     </XAxis>
                     <YAxis>
-                        <Label value="Trees Planted" angle={-90} position='insideLeft' />
+                        <Label value="Trees Sponsored" angle={-90} position='insideLeft' />
                     </YAxis>
                     <Tooltip />
                     <Legend verticalAlign="top" height={36}/>
                     <Area
                         type="linear"
-                        dataKey="Trees"
+                        dataKey="Total Trees"
                         stroke={"green"}
                         fill={"green"}
                     />
                     <Area
                         type="linear"
-                        dataKey="New Trees"
-                        stroke={"rgb(7, 128, 133)"}
-                        fill={"rgb(7, 128, 133)"}
+                        dataKey="Trees Planted in a Year"
+                        stroke={"rgb(18, 94, 123)"}
+                        fill={"rgb(18, 94, 123)"}
                     />
                 </AreaChart>
             </ResponsiveContainer>

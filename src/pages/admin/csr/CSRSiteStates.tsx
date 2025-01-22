@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Tree } from "../../../types/tree";
 import { GridFilterItem } from "@mui/x-data-grid";
 import { Order } from "../../../types/common";
-import { Box, Typography } from "@mui/material";
+import { Box, Button, Typography } from "@mui/material";
 import GeneralTable from "../../../components/GenTable";
 import { Table, TableColumnsType } from "antd";
 import getColumnSearchProps, { getColumnSelectedItemFilter, getSortIcon } from "../../../components/Filter";
@@ -18,13 +18,13 @@ const TableSummary = (data: any[], selectedKeys: any[], totalColumns: number) =>
     return (
         <Table.Summary fixed='bottom'>
             <Table.Summary.Row style={{ backgroundColor: 'rgba(172, 252, 172, 0.2)' }}>
-                <Table.Summary.Cell align="right" index={totalColumns - 4} colSpan={2}>
+                <Table.Summary.Cell align="right" index={totalColumns - 5} colSpan={totalColumns - 3}>
                     <strong>Total</strong>
                 </Table.Summary.Cell>
-                <Table.Summary.Cell align="right" index={totalColumns - 3} colSpan={1}>{calculateSum(data.filter((item) => selectedKeys.includes(item.key)).map((item) => item.total))}</Table.Summary.Cell>
-                <Table.Summary.Cell align="right" index={totalColumns - 2} colSpan={1}>{calculateSum(data.filter((item) => selectedKeys.includes(item.key)).map((item) => item.booked))}</Table.Summary.Cell>
-                <Table.Summary.Cell align="right" index={totalColumns - 1} colSpan={1}>{calculateSum(data.filter((item) => selectedKeys.includes(item.key)).map((item) => item.available))}</Table.Summary.Cell>
-                <Table.Summary.Cell align="right" index={totalColumns} colSpan={1}>{calculateSum(data.filter((item) => selectedKeys.includes(item.key)).map((item) => item.card_available))}</Table.Summary.Cell>
+                <Table.Summary.Cell align="right" index={totalColumns - 4} >{calculateSum(data.filter((item) => selectedKeys.includes(item.key)).map((item) => item.total))}</Table.Summary.Cell>
+                <Table.Summary.Cell align="right" index={totalColumns - 3} >{calculateSum(data.filter((item) => selectedKeys.includes(item.key)).map((item) => item.booked))}</Table.Summary.Cell>
+                <Table.Summary.Cell align="right" index={totalColumns - 2} >{calculateSum(data.filter((item) => selectedKeys.includes(item.key)).map((item) => item.available))}</Table.Summary.Cell>
+                <Table.Summary.Cell align="right" index={totalColumns - 1} >{calculateSum(data.filter((item) => selectedKeys.includes(item.key)).map((item) => item.card_available))}</Table.Summary.Cell>
             </Table.Summary.Row>
         </Table.Summary>
     )
@@ -78,7 +78,7 @@ const CSRSiteStates: React.FC<CSRSiteStatesProps> = ({ groupId, tags }) => {
             setSites(prev => {
                 const sitesData = { ...prev };
                 for (let i = 0; i < sitesResp.results.length; i++) {
-                    sitesData[sitesResp.offset + i] = {...sitesResp.results[i], key: sitesResp.results[i].id }
+                    sitesData[sitesResp.offset + i] = { ...sitesResp.results[i], key: sitesResp.results[i].id }
                 }
 
                 return sitesData;
@@ -125,7 +125,7 @@ const CSRSiteStates: React.FC<CSRSiteStatesProps> = ({ groupId, tags }) => {
             setSites(prev => {
                 const sitesData = { ...prev };
                 for (let i = 0; i < sitesResp.results.length; i++) {
-                    sitesData[sitesResp.offset + i] = {...sitesResp.results[i], key: sitesResp.results[i].id }
+                    sitesData[sitesResp.offset + i] = { ...sitesResp.results[i], key: sitesResp.results[i].id }
                 }
 
                 return sitesData;
@@ -187,6 +187,24 @@ const CSRSiteStates: React.FC<CSRSiteStatesProps> = ({ groupId, tags }) => {
             ...getColumnSelectedItemFilter({ dataIndex: 'tags', filters, handleSetFilters, options: tags })
         },
         {
+            dataIndex: "area_acres",
+            key: "area_acres",
+            title: "Area (Acres)",
+            width: 150,
+            align: "center",
+        },
+        {
+            dataIndex: "kml_file_link",
+            key: "kml_file_link",
+            title: "Kml File",
+            width: 150,
+            align: "center",
+            render: (value, record, index) => {
+                return value ? <Button variant="outlined" color="success"><a href={value} download={record.name_english + '.kml'} style={{ textTransform: 'none', color: 'inherit' }}>Download</a></Button> : 'Not Available'
+            },
+            ...getColumnSearchProps("kml_file_link", filters, handleSetFilters),
+        },
+        {
             dataIndex: "total",
             key: "Total Trees",
             title: getSortableHeader("Total Trees", 'total'),
@@ -230,10 +248,10 @@ const CSRSiteStates: React.FC<CSRSiteStatesProps> = ({ groupId, tags }) => {
                 onDownload={handleDownload}
                 tableName="CSR Sites"
                 onSelectionChanges={handleSelectionChanges}
-                    summary={(totalColumns: number) => {
-                        if (totalColumns < 5) return undefined;
-                        return TableSummary(tableRows, selectedRows, totalColumns)
-                    }}
+                summary={(totalColumns: number) => {
+                    if (totalColumns < 5) return undefined;
+                    return TableSummary(tableRows, selectedRows, totalColumns)
+                }}
                 footer
             />
         </Box>
