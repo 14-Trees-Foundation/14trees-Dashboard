@@ -13,6 +13,8 @@ import { toast } from "react-toastify";
 import { Forest, GrassTwoTone, ModeOfTravel, NaturePeople } from "@mui/icons-material";
 import CSRSiteStates from "./CSRSiteStates";
 import SitesMap from "./SitesMap";
+import CSRPlantTypeStats from "./CSRPlantTypeStates";
+import CSRTreeChart from "./CSRTreeChart";
 
 const CSRInventory: React.FC = () => {
 
@@ -119,60 +121,74 @@ const CSRInventory: React.FC = () => {
             </div>
             <Divider sx={{ backgroundColor: "black", marginBottom: '15px' }} />
 
-            {csrAnalytics && <Box style={{
-                display: 'flex',
-                justifyContent: 'space-evenly',
-                alignItems: 'center'
-            }}
+            <Box
+                style={{
+                    display: 'flex',
+                    justifyContent: 'space-evenly',
+                    alignItems: 'flex-end',
+                    marginBottom: '100px',
+                }}
             >
-                <div className={classes.card}>
-                    <Box sx={{ paddingTop: "10px" }}>
-                        <Forest fontSize="large" style={{ color: "#53ad7a" }} />
-                        <Typography variant="h3" color="#fff" sx={{ pt: 1, pb: 1 }}>
-                            {csrAnalytics.sponsored_trees ? csrAnalytics.sponsored_trees : '0'}
-                        </Typography>
-                        <Typography variant="subtitle2" color="#1f3625">
-                            Sponsored Trees
-                        </Typography>
-                    </Box>
-                </div>
-                <div className={classes.card}>
-                    <Box sx={{ paddingTop: "10px" }}>
-                        <NaturePeople
-                            fontSize="large"
-                            style={{ color: "#573D1C" }}
-                        />
-                        <Typography variant="h3" color="#fff" sx={{ pt: 1, pb: 1 }}>
-                            {csrAnalytics.assigned_trees ? csrAnalytics.assigned_trees : '0'}
-                        </Typography>
-                        <Typography variant="subtitle2" color="#1f3625">
-                            Assigned Trees
-                        </Typography>
-                    </Box>
-                </div>
-                <div className={classes.card}>
-                    <Box sx={{ paddingTop: "10px" }}>
-                        <GrassTwoTone fontSize="large" style={{ color: "#F94F25" }} />
-                        <Typography variant="h3" color="#fff" sx={{ pt: 1, pb: 1 }}>
-                            {csrAnalytics.plant_types ? csrAnalytics.plant_types : '0'}
-                        </Typography>
-                        <Typography variant="subtitle2" color="#1f3625">
-                            Plant Types
-                        </Typography>
-                    </Box>
-                </div>
-                <div className={classes.card}>
-                    <Box sx={{ paddingTop: "10px" }}>
-                        <ModeOfTravel fontSize="large" style={{ color: "#078085" }} />
-                        <Typography variant="h3" color="#fff" sx={{ pt: 1, pb: 1 }}>
-                            {csrAnalytics.area ? csrAnalytics.area?.toFixed(2) : '0'}
-                        </Typography>
-                        <Typography variant="subtitle2" color="#1f3625">
-                            Acres Sponsored
-                        </Typography>
-                    </Box>
-                </div>
-            </Box>}
+                {csrAnalytics && <Box style={{
+                    display: 'flex',
+                    justifyContent: 'space-evenly',
+                    alignItems: 'center',
+                    flexWrap: 'wrap',
+                }}
+                >
+                    <div className={classes.card}>
+                        <Box sx={{ paddingTop: "10px" }}>
+                            <Forest fontSize="large" style={{ color: "#53ad7a" }} />
+                            <Typography variant="h3" color="#fff" sx={{ pt: 1, pb: 1 }}>
+                                {csrAnalytics.sponsored_trees ? csrAnalytics.sponsored_trees : '0'}
+                            </Typography>
+                            <Typography variant="subtitle2" color="#1f3625">
+                                Sponsored Trees
+                            </Typography>
+                        </Box>
+                    </div>
+                    <div className={classes.card}>
+                        <Box sx={{ paddingTop: "10px" }}>
+                            <NaturePeople
+                                fontSize="large"
+                                style={{ color: "#573D1C" }}
+                            />
+                            <Typography variant="h3" color="#fff" sx={{ pt: 1, pb: 1 }}>
+                                {csrAnalytics.assigned_trees ? csrAnalytics.assigned_trees : '0'}
+                            </Typography>
+                            <Typography variant="subtitle2" color="#1f3625">
+                                Assigned Trees
+                            </Typography>
+                        </Box>
+                    </div>
+                    <div className={classes.card}>
+                        <Box sx={{ paddingTop: "10px" }}>
+                            <GrassTwoTone fontSize="large" style={{ color: "#F94F25" }} />
+                            <Typography variant="h3" color="#fff" sx={{ pt: 1, pb: 1 }}>
+                                {csrAnalytics.plant_types ? csrAnalytics.plant_types : '0'}
+                            </Typography>
+                            <Typography variant="subtitle2" color="#1f3625">
+                                Plant Types
+                            </Typography>
+                        </Box>
+                    </div>
+                    <div className={classes.card}>
+                        <Box sx={{ paddingTop: "10px" }}>
+                            <ModeOfTravel fontSize="large" style={{ color: "#078085" }} />
+                            <Typography variant="h3" color="#fff" sx={{ pt: 1, pb: 1 }}>
+                                {csrAnalytics.area ? csrAnalytics.area?.toFixed(2) : '0'}
+                            </Typography>
+                            <Typography variant="subtitle2" color="#1f3625">
+                                Acres Sponsored
+                            </Typography>
+                        </Box>
+                    </div>
+                </Box>}
+
+                <Box sx={{ width: '60%' }}>
+                    <CSRTreeChart groupId={selectedGroup?.id} />
+                </Box>
+            </Box>
 
             <CSRSiteStates groupId={selectedGroup?.id} tags={tags} />
             <Box style={{ marginBottom: '50px' }}>
@@ -180,6 +196,7 @@ const CSRInventory: React.FC = () => {
             </Box>
             <CSRPlotStates groupId={selectedGroup?.id} tags={tags} />
             <CSRTrees groupId={selectedGroup?.id} />
+            <CSRPlantTypeStats groupId={selectedGroup?.id} />
         </Box>
     );
 }
