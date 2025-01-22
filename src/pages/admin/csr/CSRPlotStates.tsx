@@ -20,17 +20,17 @@ const TableSummary = (data: any[], selectedKeys: any[], totalColumns: number) =>
     const calculateSum = (data: (number | undefined)[]) => {
         return data.reduce((a, b) => (a ?? 0) + (b ?? 0), 0);
     }
-
+    
     return (
         <Table.Summary fixed='bottom'>
             <Table.Summary.Row style={{ backgroundColor: 'rgba(172, 252, 172, 0.2)' }}>
-                <Table.Summary.Cell align="right" index={totalColumns - 4} colSpan={3}>
+                <Table.Summary.Cell align="right" index={totalColumns - 5} colSpan={totalColumns - 3}>
                     <strong>Total</strong>
                 </Table.Summary.Cell>
-                <Table.Summary.Cell align="right" index={totalColumns - 3} colSpan={1}>{calculateSum(data.filter((item) => selectedKeys.includes(item.key)).map((item) => item.total))}</Table.Summary.Cell>
-                <Table.Summary.Cell align="right" index={totalColumns - 2} colSpan={1}>{calculateSum(data.filter((item) => selectedKeys.includes(item.key)).map((item) => item.booked))}</Table.Summary.Cell>
-                <Table.Summary.Cell align="right" index={totalColumns - 1} colSpan={1}>{calculateSum(data.filter((item) => selectedKeys.includes(item.key)).map((item) => item.available))}</Table.Summary.Cell>
-                <Table.Summary.Cell align="right" index={totalColumns} colSpan={1}>{calculateSum(data.filter((item) => selectedKeys.includes(item.key)).map((item) => item.card_available))}</Table.Summary.Cell>
+                <Table.Summary.Cell align="right" index={totalColumns - 4} >{calculateSum(data.filter((item) => selectedKeys.includes(item.key)).map((item) => item.total))}</Table.Summary.Cell>
+                <Table.Summary.Cell align="right" index={totalColumns - 3} >{calculateSum(data.filter((item) => selectedKeys.includes(item.key)).map((item) => item.booked))}</Table.Summary.Cell>
+                <Table.Summary.Cell align="right" index={totalColumns - 2} >{calculateSum(data.filter((item) => selectedKeys.includes(item.key)).map((item) => item.available))}</Table.Summary.Cell>
+                <Table.Summary.Cell align="right" index={totalColumns - 1} >{calculateSum(data.filter((item) => selectedKeys.includes(item.key)).map((item) => item.card_available))}</Table.Summary.Cell>
             </Table.Summary.Row>
         </Table.Summary>
     )
@@ -220,7 +220,7 @@ const CSRPlotStates: React.FC<CSRPlotStatesProps> = ({ groupId, tags }) => {
             key: "tags",
             title: "Tags",
             align: "center",
-            width: 150,
+            width: 250,
             render: (tags) => tags ? tags.join(", ") : '',
             ...getColumnSelectedItemFilter({ dataIndex: 'tags', filters, handleSetFilters, options: tags })
         },
@@ -268,10 +268,10 @@ const CSRPlotStates: React.FC<CSRPlotStatesProps> = ({ groupId, tags }) => {
                 onDownload={handleDownload}
                 tableName="CSR Plots"
                 onSelectionChanges={handleSelectionChanges}
-                    summary={(totalColumns: number) => {
-                        if (totalColumns < 5) return undefined;
-                        return TableSummary(tableRows, selectedRows, totalColumns)
-                    }}
+                summary={(totalColumns: number) => {
+                    if (totalColumns < 5) return undefined;
+                    return TableSummary(tableRows, selectedRows, totalColumns)
+                }}
                 footer
             />
         </Box>

@@ -20,6 +20,7 @@ export type PlantType = {
     other_use: string | null,
     use: string|null,
     names_index: string | null,
+    combined_name: string,
     
     created_at: Date,
     updated_at: Date,

@@ -238,6 +238,17 @@ export const SitesComponent = () => {
       align: "center",
     },
     {
+      dataIndex: "kml_file_link",
+      key: "kml_file_link",
+      title: "Kml File",
+      width: 150,
+      align: "center",
+      render: (value, record, index) => {
+        return value ? <Button variant="outlined" color="success"><a href={value} download={record.name_english + '.kml'} style={{ textTransform: 'none', color: 'inherit' }}>Download</a></Button> : 'Not Available'
+      },
+      ...getColumnSearchProps("kml_file_link", filters, handleSetFilters),
+    },
+    {
       dataIndex: "length_km",
       key: "length_km",
       title: "Length (Km)",

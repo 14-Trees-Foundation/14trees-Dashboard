@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Box, Divider, Typography } from "@mui/material";
+import { Box, Button, Divider, Typography } from "@mui/material";
 import { createStyles, makeStyles } from "@mui/styles";
 import CSRTrees from "./CSRTrees";
 import CSRPlotStates from "./CSRPlotStates";
@@ -15,8 +15,12 @@ import CSRSiteStates from "./CSRSiteStates";
 import SitesMap from "./SitesMap";
 import CSRPlantTypeStats from "./CSRPlantTypeStates";
 import CSRTreeChart from "./CSRTreeChart";
+import { useParams } from "react-router-dom";
+import CSRGiftRequests from "./CSRGiftRequests";
 
 const CSRInventory: React.FC = () => {
+
+    const { groupId } = useParams();
 
     const dispatch = useAppDispatch();
     const { getGroups } = bindActionCreators(groupActionCreators, dispatch);
@@ -43,7 +47,16 @@ const CSRInventory: React.FC = () => {
             operatorValue: "contains",
         };
 
-        getGroups(groupPage * 10, 10, [groupNameFilter]);
+        const filters = [groupNameFilter]
+        if (groupId && !isNaN(parseInt(groupId))) {
+            filters.push({
+                columnField: "id",
+                value: groupId,
+                operatorValue: "equals",
+            })
+        }
+
+        getGroups(groupPage * 10, 10, filters);
     };
 
     let groupsList: Group[] = [];
@@ -55,6 +68,14 @@ const CSRInventory: React.FC = () => {
             return b.id - a.id;
         });
     }
+
+    useEffect(() => {
+        if (groupId) {
+            const group = groupsList.find(item => item.id === parseInt(groupId));
+            if (group) setSelectedGroup(group);
+        }
+
+    }, [groupsList, groupId])
 
     ///*** CSR Cards ***/
     const classes = useStyles();
@@ -102,22 +123,47 @@ const CSRInventory: React.FC = () => {
             >
                 <Typography variant="h4" style={{ marginTop: '5px' }}>CSR Analytics</Typography>
 
-                <AutocompleteWithPagination
-                    label="Select a corporate group"
-                    options={groupsList}
-                    getOptionLabel={(option) => option?.name || ''}
-                    onChange={(event, newValue) => {
-                        setSelectedGroup(newValue);
+                {!groupId && <div
+                    style={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        padding: "4px 12px",
                     }}
-                    onInputChange={(event) => {
-                        const { value } = event.target;
-                        setGroupPage(0);
-                        setGroupNameInput(value);
-                    }}
-                    setPage={setGroupPage}
-                    size="small"
-                    value={selectedGroup}
-                />
+                >
+                    <AutocompleteWithPagination
+                        label="Select a corporate group"
+                        options={groupsList}
+                        getOptionLabel={(option) => option?.name || ''}
+                        onChange={(event, newValue) => {
+                            setSelectedGroup(newValue);
+                        }}
+                        onInputChange={(event) => {
+                            const { value } = event.target;
+                            setGroupPage(0);
+                            setGroupNameInput(value);
+                        }}
+                        setPage={setGroupPage}
+                        size="small"
+                        value={selectedGroup}
+                    />
+                    <Button
+                        sx={{ ml: 2 }}
+                        size="small"
+                        disabled={!selectedGroup}
+                        variant="contained"
+                        color="success"
+                        onClick={() => {
+                            const { hostname, host } = window.location;
+                            if (hostname === "localhost" || hostname === "127.0.0.1") {
+                                window.open("http://" + host + "/csr/dashboard/" + selectedGroup?.id);
+                            } else {
+                                window.open("https://" + hostname + "/csr/dashboard/" + selectedGroup?.id);
+                            }
+                        }}
+                    >
+                        CSR View
+                    </Button>
+                </div>}
             </div>
             <Divider sx={{ backgroundColor: "black", marginBottom: '15px' }} />
 
@@ -197,6 +243,8 @@ const CSRInventory: React.FC = () => {
             <CSRPlotStates groupId={selectedGroup?.id} tags={tags} />
             <CSRTrees groupId={selectedGroup?.id} />
             <CSRPlantTypeStats groupId={selectedGroup?.id} />
+
+            {selectedGroup && <CSRGiftRequests groupId={selectedGroup.id} />}
         </Box>
     );
 }

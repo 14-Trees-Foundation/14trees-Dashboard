@@ -28,6 +28,7 @@ import OrgProfile from "./pages/Profiles/OrgProfile";
 import RedeemCard from "./pages/admin/gift/RedeemCard";
 import { User } from "./pages/user/User";
 import SponsorProfile from "./pages/SponsorProfile/SponsorProfile";
+import CSRPage from "./pages/admin/csr/CSRPage";
 
 function App() {
   return (
@@ -106,6 +107,14 @@ function App() {
             element={
               <RequireAuth>
                 <Test />
+              </RequireAuth>
+            } 
+          />
+          <Route 
+            path="/csr/dashboard/:groupId" 
+            element={
+              <RequireAuth>
+                <CSRPage />
               </RequireAuth>
             } 
           />
