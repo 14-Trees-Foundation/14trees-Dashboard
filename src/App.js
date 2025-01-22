@@ -113,9 +113,9 @@ function App() {
           <Route 
             path="/csr/dashboard/:groupId" 
             element={
-              // <RequireAuth>
+              <RequireAuth>
                 <CSRPage />
-              // </RequireAuth>
+              </RequireAuth>
             } 
           />
         </Routes>
