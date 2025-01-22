@@ -46,9 +46,27 @@ const AddTreeType = ({ open, handleClose, createPlantType }) => {
 
   const [files, setFiles] = useState([]);
   const handleChange = (event) => {
-    setFormData({
-      ...formData,
-      [event.target.name]: event.target.value,
+    const { name, value } = event.target;
+
+    setFormData((prevState) => {
+      if (name === 'common_name_in_english') {
+        return {
+          ...prevState,
+          [name]: value,
+          name: value.trim() + " (" + (prevState.common_name_in_marathi?.trim() || '') + ")",
+        };
+      } else if (name === 'common_name_in_marathi') {
+        return {
+          ...prevState,
+          [name]: value,
+          name: (prevState.common_name_in_english?.trim() || '') + " (" + value.trim() + ")",
+        };
+      } else {
+        return {
+          ...prevState,
+          [name]: value,
+        };
+      }
     });
   };
 
@@ -104,6 +122,7 @@ const AddTreeType = ({ open, handleClose, createPlantType }) => {
                 <TextField
                   name="name"
                   label="Name"
+                  disabled
                   value={formData.name}
                   onChange={handleChange}
                   fullWidth
