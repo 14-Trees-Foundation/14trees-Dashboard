@@ -237,9 +237,9 @@ const CSRInventory: React.FC = () => {
             </Box>
 
             <CSRSiteStates groupId={selectedGroup?.id} tags={tags} />
-            <Box style={{ marginBottom: '50px' }}>
+            {/* <Box style={{ marginBottom: '50px' }}>
                 <SitesMap />
-            </Box>
+            </Box> */}
             <CSRPlotStates groupId={selectedGroup?.id} tags={tags} />
             <CSRTrees groupId={selectedGroup?.id} />
             <CSRPlantTypeStats groupId={selectedGroup?.id} />

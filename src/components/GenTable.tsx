@@ -23,6 +23,10 @@ interface GeneralTableProps {
     rowClassName?: (record: any, index: number) => string
     footer?: boolean
     tableName?: string
+    expandable?: {
+        render: (record: any) => React.ReactNode
+        isExpandable: (record: any) => boolean
+    }
 }
 
 const ResizableTitle = (props: any) => {
@@ -59,7 +63,7 @@ const ResizableTitle = (props: any) => {
     );
 };
 
-function GeneralTable({ loading, rows, columns, totalRecords, page, pageSize = 10, footer, tableName, onDownload, onSelectionChanges, onPaginationChange, summary, rowClassName }: GeneralTableProps) {
+function GeneralTable({ loading, rows, columns, totalRecords, page, pageSize = 10, footer, tableName, onDownload, onSelectionChanges, onPaginationChange, summary, rowClassName, expandable }: GeneralTableProps) {
 
     const [checkedList, setCheckedList] = useState(columns?.map((item) => item.key) ?? []);
     const [open, setOpen] = useState(false);
@@ -223,6 +227,7 @@ function GeneralTable({ loading, rows, columns, totalRecords, page, pageSize = 1
                 () => summary(tableCols.filter((col) => !col.hidden).length)
                 : undefined
             }
+            expandable={ expandable ? { expandedRowRender: expandable?.render, rowExpandable: expandable?.isExpandable } : undefined}
         />
     )
 }

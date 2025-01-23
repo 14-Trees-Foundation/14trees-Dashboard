@@ -8,6 +8,7 @@ import { Table, TableColumnsType } from "antd";
 import getColumnSearchProps, { getColumnSelectedItemFilter, getSortIcon } from "../../../components/Filter";
 import { toast } from "react-toastify";
 import ApiClient from "../../../api/apiClient/apiClient";
+import SitesMap from "./SitesMap";
 
 const TableSummary = (data: any[], selectedKeys: any[], totalColumns: number) => {
 
@@ -18,7 +19,7 @@ const TableSummary = (data: any[], selectedKeys: any[], totalColumns: number) =>
     return (
         <Table.Summary fixed='bottom'>
             <Table.Summary.Row style={{ backgroundColor: 'rgba(172, 252, 172, 0.2)' }}>
-                <Table.Summary.Cell align="right" index={totalColumns - 5} colSpan={totalColumns - 3}>
+                <Table.Summary.Cell align="right" index={totalColumns - 5} colSpan={totalColumns - 2}>
                     <strong>Total</strong>
                 </Table.Summary.Cell>
                 <Table.Summary.Cell align="right" index={totalColumns - 4} >{calculateSum(data.filter((item) => selectedKeys.includes(item.key)).map((item) => item.total))}</Table.Summary.Cell>
@@ -253,6 +254,10 @@ const CSRSiteStates: React.FC<CSRSiteStatesProps> = ({ groupId, tags }) => {
                     return TableSummary(tableRows, selectedRows, totalColumns)
                 }}
                 footer
+                expandable={{
+                    render: (record: any) => (<SitesMap groupId={groupId} site={record} />),
+                    isExpandable: (record: any) => record.kml_file_link ? true: false,
+                }}
             />
         </Box>
     );
