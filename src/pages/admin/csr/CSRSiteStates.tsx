@@ -214,8 +214,8 @@ const CSRSiteStates: React.FC<CSRSiteStatesProps> = ({ groupId, tags }) => {
         },
         {
             dataIndex: "booked",
-            key: "Booked Trees",
-            title: getSortableHeader("Booked Trees", "booked"),
+            key: "Sponsored Trees",
+            title: getSortableHeader("Sponsored Trees", "booked"),
             align: "right",
             width: 150,
         },
