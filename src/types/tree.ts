@@ -35,6 +35,7 @@ export type Tree = {
     sponsor_user_name?: string,
     sponsor_group_name?: string,
     assigned_to_name?: string,
+    illustration_s3_path?: string,
 };
 
 export type CreateTreeRequest = {

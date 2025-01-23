@@ -16,6 +16,7 @@ import CSRPlantTypeStats from "./CSRPlantTypeStates";
 import CSRTreeChart from "./CSRTreeChart";
 import { useParams } from "react-router-dom";
 import CSRGiftRequests from "./CSRGiftRequests";
+import CSRGiftTrees from "./CSRGiftTrees";
 
 const CSRInventory: React.FC = () => {
 
@@ -119,7 +120,7 @@ const CSRInventory: React.FC = () => {
                     justifyContent: "space-between",
                 }}
             >
-                <Typography variant="h3" style={{ marginTop: '5px', marginBottom: '5px' }}>Corporate Dashboard</Typography>
+                <Typography variant="h3" style={{ marginTop: '5px', marginBottom: '5px' }}>{selectedGroup ? `${selectedGroup.name}'s` : 'Corporate'} Dashboard</Typography>
                 {!groupId && <div
                     style={{
                         display: "flex",
@@ -241,6 +242,8 @@ const CSRInventory: React.FC = () => {
             <CSRPlotStates groupId={selectedGroup?.id} tags={tags} />
             <CSRPlantTypeStats groupId={selectedGroup?.id} />
             <CSRTrees groupId={selectedGroup?.id} />
+
+            {selectedGroup && <CSRGiftTrees groupId={selectedGroup.id} />}
 
             {selectedGroup && <CSRGiftRequests groupId={selectedGroup.id} />}
         </Box>

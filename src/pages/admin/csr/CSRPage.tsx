@@ -4,7 +4,7 @@ import logo from "../../../assets/logo_white_small.png";
 import { useAuth } from "../auth/auth";
 import { useEffect } from "react";
 import { SinglePageDrawer } from "./SinglePageDrawer";
-import { Dashboard, CardGiftcard, Landscape, Forest, GrassTwoTone, Map } from "@mui/icons-material";
+import { Dashboard, CardGiftcard, Landscape, Forest, GrassTwoTone, Map, NaturePeople } from "@mui/icons-material";
 import { createStyles, makeStyles } from "@mui/styles";
 import { Box } from "@mui/material";
 
@@ -43,7 +43,7 @@ const CSRPage: React.FC = () => {
 
     const items = [
         {
-            displayName: 'Dashboard',
+            displayName: 'Overview',
             logo: Dashboard,
             key: 0,
             display: true,
@@ -71,16 +71,23 @@ const CSRPage: React.FC = () => {
             onClick: () => { handleScroll('biodiversity-supported') }
         },
         {
-            displayName: 'Tree Sponsorship Details',
+            displayName: 'Sponsored Trees',
             logo: Forest,
             key: 4,
             display: true,
             onClick: () => { handleScroll('tree-sponsorship-details') }
         },
         {
+            displayName: 'Gift Trees',
+            logo: NaturePeople,
+            key: 5,
+            display: true,
+            onClick: () => { handleScroll('your-wall-of-gift-trees') }
+        },
+        {
             displayName: 'Green Gift Contributions',
             logo: CardGiftcard,
-            key: 5,
+            key: 6,
             display: true,
             onClick: () => { handleScroll('green-gift-contributions') }
         },
