@@ -239,8 +239,8 @@ const CSRSiteStates: React.FC<CSRSiteStatesProps> = ({ groupId, tags }) => {
     ];
 
     return (
-        <Box mt={5}>
-            <Typography variant="h4" ml={1}>Reforestation Sites</Typography>
+        <Box mt={5} id="reforestation-sites">
+            <Typography variant="h4" ml={1} >Reforestation Sites</Typography>
             <Typography variant="subtitle1" ml={1} mb={1}>Explore the locations where your sponsored trees have been planted. View details of each site, including its geographical impact and sustainability progress.</Typography>
             <GeneralTable
                 loading={loading}
