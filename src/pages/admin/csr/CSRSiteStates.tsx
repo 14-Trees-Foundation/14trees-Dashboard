@@ -184,6 +184,7 @@ const CSRSiteStates: React.FC<CSRSiteStatesProps> = ({ groupId, tags }) => {
             title: "Tags",
             align: "center",
             width: 150,
+            hidden: true,
             render: (tags) => tags ? tags.join(", ") : '',
             ...getColumnSelectedItemFilter({ dataIndex: 'tags', filters, handleSetFilters, options: tags })
         },
@@ -193,6 +194,7 @@ const CSRSiteStates: React.FC<CSRSiteStatesProps> = ({ groupId, tags }) => {
             title: "Area (Acres)",
             width: 150,
             align: "center",
+            hidden: true,
         },
         {
             dataIndex: "kml_file_link",
@@ -200,6 +202,7 @@ const CSRSiteStates: React.FC<CSRSiteStatesProps> = ({ groupId, tags }) => {
             title: "Kml File",
             width: 150,
             align: "center",
+            hidden: true,
             render: (value, record, index) => {
                 return value ? <Button variant="outlined" color="success"><a href={value} download={record.name_english + '.kml'} style={{ textTransform: 'none', color: 'inherit' }}>Download</a></Button> : 'Not Available'
             },
