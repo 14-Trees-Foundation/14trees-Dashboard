@@ -119,7 +119,7 @@ const CSRInventory: React.FC = () => {
                     justifyContent: "space-between",
                 }}
             >
-                <Typography variant="h3" style={{ marginTop: '5px' }}>Corporate Dashboard</Typography>
+                <Typography variant="h3" style={{ marginTop: '5px', marginBottom: '5px' }}>Corporate Dashboard</Typography>
                 {!groupId && <div
                     style={{
                         display: "flex",
@@ -163,7 +163,7 @@ const CSRInventory: React.FC = () => {
             </div>
             <Divider sx={{ backgroundColor: "black", marginBottom: '15px' }} />
             
-            <Typography variant="h4" mt={5} ml={1}>Corporate Impact Overview</Typography>
+            <Typography variant="h4" mt={5} ml={1} id="corporate-impact-overview">Corporate Impact Overview</Typography>
             <Typography variant="subtitle1" mb={1} ml={1}>A comprehensive snapshot of your contributions to reforestation and sustainability efforts, including total trees sponsored, plant types supported, acres rejuvenated, and sponsorship progress over time.</Typography>
             <Box
                 style={{

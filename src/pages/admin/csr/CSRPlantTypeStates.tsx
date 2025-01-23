@@ -205,7 +205,7 @@ const CSRPlantTypeStats: React.FC<CSRPlantTypeStatsProps> = ({ groupId }) => {
     ];
 
     return (
-        <Box mt={5}>
+        <Box mt={5} id="biodiversity-supported">
             <Typography variant="h4" ml={1}>Biodiversity Supported</Typography>
             <Typography variant="subtitle1" ml={1} mb={1}>Discover the variety of plant species supported by your sponsorship.</Typography>
             <GeneralTable

@@ -9,7 +9,6 @@ import getColumnSearchProps, { getColumnSelectedItemFilter } from "../../../comp
 import { toast } from "react-toastify";
 import ApiClient from "../../../api/apiClient/apiClient";
 import CSRTreesCards from "./CSRTreeCards";
-import { GridView, TableView } from "@mui/icons-material";
 
 interface CSRTreesProps {
     groupId?: number
@@ -25,7 +24,7 @@ const CSRTrees: React.FC<CSRTreesProps> = ({ groupId }) => {
     const [pageSize, setPageSize] = useState(10);
     const [filters, setFilters] = useState<Record<string, GridFilterItem>>({});
     const [orderBy, setOrderBy] = useState<Order[]>([]);
-    const [viewType, setViewType] = useState('Table');
+    const [viewType, setViewType] = useState('Grid');
 
     const handleSetFilters = (filters: Record<string, GridFilterItem>) => {
         setPage(0);
@@ -237,7 +236,7 @@ const CSRTrees: React.FC<CSRTreesProps> = ({ groupId }) => {
     ];
 
     return (
-        <Box mt={5}>
+        <Box mt={5} id="tree-sponsorship-details">
             <Box mb={1} style={{ display: 'flex', alignItems: 'center' }}>
                 <Typography variant="h5" ml={1} mr={2}>Tree Sponsorship Details</Typography>
                 <Segmented

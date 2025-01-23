@@ -266,8 +266,8 @@ const CSRPlotStates: React.FC<CSRPlotStatesProps> = ({ groupId, tags }) => {
     ];
 
     return (
-        <Box mt={5}>
-            <Typography variant="h4" ml={1}>Plantation Plots</Typography>
+        <Box mt={5} id="plantation-plots">
+            <Typography variant="h4" ml={1} >Plantation Plots</Typography>
             <Typography variant="subtitle1" ml={1} mb={1}>Dive deeper into the individual plots within each site.</Typography>
             <GeneralTable
                 loading={loading}
