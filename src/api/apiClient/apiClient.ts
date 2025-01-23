@@ -899,6 +899,19 @@ class ApiClient {
 
     }
 
+    async getMappedGiftTrees(offset:number, limit: number, groupId: number): Promise<PaginatedResponse<Tree>> {
+        const url = `/trees/mapped-gift/get?offset=${offset}&limit=${limit}`;
+        try {
+            const response = await this.api.post<PaginatedResponse<Tree>>(url, { group_id: groupId });
+            return response.data;
+        } catch (error: any) {
+            if (error.response?.data?.message) {
+                throw new Error(error.response.data.message);
+            }
+            throw new Error(`Failed to fetch reserved gift trees: ${error.message}`);
+        }
+    }
+
 
     /*
         Model- UserTree: CRUD Operations/Apis for user_tree_regs
