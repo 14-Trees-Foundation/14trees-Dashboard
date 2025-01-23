@@ -18,10 +18,11 @@ const TableSummary = (data: any[], selectedKeys: any[], totalColumns: number) =>
     return (
         <Table.Summary fixed='bottom'>
             <Table.Summary.Row style={{ backgroundColor: 'rgba(172, 252, 172, 0.2)' }}>
-                <Table.Summary.Cell align="right" index={totalColumns - 1} colSpan={6}>
+                <Table.Summary.Cell align="right" index={1} colSpan={2}>
                     <strong>Total</strong>
                 </Table.Summary.Cell>
-                <Table.Summary.Cell align="right" index={totalColumns} colSpan={1}>{calculateSum(data.filter((item) => selectedKeys.includes(item.key)).map((item) => item.booked))}</Table.Summary.Cell>
+                <Table.Summary.Cell align="right" index={2} colSpan={1}>{calculateSum(data.filter((item) => selectedKeys.includes(item.key)).map((item) => item.booked))}</Table.Summary.Cell>
+                <Table.Summary.Cell align="right" index={3} colSpan={totalColumns - 2}></Table.Summary.Cell>
             </Table.Summary.Row>
         </Table.Summary>
     )
@@ -161,6 +162,13 @@ const CSRPlantTypeStats: React.FC<CSRPlantTypeStatsProps> = ({ groupId }) => {
             ...getColumnSearchProps('name', filters, handleSetFilters)
         },
         {
+            dataIndex: "booked",
+            key: "Sponsored Trees Count",
+            title: "Sponsored Trees Count",
+            align: "right",
+            width: 150,
+        },
+        {
             dataIndex: "scientific_name",
             key: "Scientific name",
             title: "Scientific name",
@@ -182,6 +190,7 @@ const CSRPlantTypeStats: React.FC<CSRPlantTypeStatsProps> = ({ groupId }) => {
             title: "Category",
             width: 250,
             align: "center",
+            hidden: true,
             ...getColumnSelectedItemFilter({ dataIndex: 'category', filters, handleSetFilters, options: ['Native', 'Non Native', 'Cultivated'] })
         },
         {
@@ -190,20 +199,15 @@ const CSRPlantTypeStats: React.FC<CSRPlantTypeStatsProps> = ({ groupId }) => {
             title: "Habit",
             width: 200,
             align: "center",
+            hidden: true,
             ...getColumnSelectedItemFilter({ dataIndex: 'habit', filters, handleSetFilters, options: plantTypeHabitList })
-        },
-        {
-            dataIndex: "booked",
-            key: "Sponsored Trees",
-            title: "Sponsored Trees",
-            align: "right",
-            width: 150,
         },
     ];
 
     return (
-        <Box mt={2}>
-            <Typography variant="h5" ml={1}>CSR PlantTypes</Typography>
+        <Box mt={5}>
+            <Typography variant="h4" ml={1}>Biodiversity Supported</Typography>
+            <Typography variant="subtitle1" ml={1} mb={1}>Discover the variety of plant species supported by your sponsorship.</Typography>
             <GeneralTable
                 loading={loading}
                 columns={columns}
@@ -213,10 +217,10 @@ const CSRPlantTypeStats: React.FC<CSRPlantTypeStatsProps> = ({ groupId }) => {
                 pageSize={pageSize}
                 onPaginationChange={handlePaginationChange}
                 onDownload={handleDownload}
-                tableName="CSR PlantTypes"
+                tableName="Biodiversity Supported"
                 onSelectionChanges={handleSelectionChanges}
                     summary={(totalColumns: number) => {
-                        if (totalColumns < 5) return undefined;
+                        if (totalColumns < 2) return undefined;
                         return TableSummary(tableRows, selectedRows, totalColumns)
                     }}
                 footer
