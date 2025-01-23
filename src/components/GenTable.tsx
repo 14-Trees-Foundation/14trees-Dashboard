@@ -65,7 +65,7 @@ const ResizableTitle = (props: any) => {
 
 function GeneralTable({ loading, rows, columns, totalRecords, page, pageSize = 10, footer, tableName, onDownload, onSelectionChanges, onPaginationChange, summary, rowClassName, expandable }: GeneralTableProps) {
 
-    const [checkedList, setCheckedList] = useState(columns?.map((item) => item.key) ?? []);
+    const [checkedList, setCheckedList] = useState(columns?.filter(item => !item.hidden)?.map((item) => item.key) ?? []);
     const [open, setOpen] = useState(false);
     const [tableCols, setTableCols] = useState<any[]>([]);
 
@@ -137,7 +137,7 @@ function GeneralTable({ loading, rows, columns, totalRecords, page, pageSize = 1
     }, [columns, checkedList]);
 
     useEffect(() => {
-        setCheckedList(columns?.map((item) => item.key) ?? []);
+        setCheckedList(columns?.filter(item => !item.hidden)?.map((item) => item.key) ?? []);
     }, [columns]);
 
     const handleOpenChange = (flag: boolean, info: { source: 'menu' | 'trigger' }) => {

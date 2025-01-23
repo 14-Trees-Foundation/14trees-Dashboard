@@ -7,9 +7,10 @@ import { navIndex } from "../store/atoms";
 
 interface DrawerTemplateProps {
     pages: any[]
+    style?: React.CSSProperties
 }
 
-const DrawerTemplate: FC<DrawerTemplateProps> = ({ pages }) => {
+const DrawerTemplate: FC<DrawerTemplateProps> = ({ pages, style }) => {
 
     const [index, setIndex] = useRecoilState(navIndex);
     const classes = useStyles();
@@ -49,7 +50,7 @@ const DrawerTemplate: FC<DrawerTemplateProps> = ({ pages }) => {
     };
 
     return (
-        <Box style={{ display: "flex" }} >
+        <Box style={{ display: "flex", ...style }} >
             <Drawer
                 className={classes.mdrawer}
                 variant="persistent"

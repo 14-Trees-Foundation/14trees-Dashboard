@@ -18,12 +18,12 @@ const CSRTreeChart: React.FC<CSRTreeChartProps> = ({ groupId }) => {
 
             let total = 0;
             const data: any[] = [];
-            if (resp.length > 0) data.push({ year: resp[0].year - 1, "Total Trees": 0, "Trees Planted in a Year": 0 });
+            if (resp.length > 0) data.push({ year: resp[0].year - 1, "Total Sponsored Trees": 0, "Yearly Sponsored Trees": 0 });
 
             resp.forEach(item => {
                 total += item.tree_count;
 
-                data.push({ ...item, "Total Trees": total, "Trees Planted in a Year": item.tree_count });
+                data.push({ ...item, "Total Sponsored Trees": total, "Yearly Sponsored Trees": item.tree_count });
             })
 
             setTreesData(data);
@@ -59,13 +59,13 @@ const CSRTreeChart: React.FC<CSRTreeChartProps> = ({ groupId }) => {
                     <Legend verticalAlign="top" height={36}/>
                     <Area
                         type="linear"
-                        dataKey="Total Trees"
+                        dataKey="Total Sponsored Trees"
                         stroke={"green"}
                         fill={"green"}
                     />
                     <Area
                         type="linear"
-                        dataKey="Trees Planted in a Year"
+                        dataKey="Yearly Sponsored Trees"
                         stroke={"rgb(18, 94, 123)"}
                         fill={"rgb(18, 94, 123)"}
                     />

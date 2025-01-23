@@ -6,7 +6,7 @@ import {
 } from "@mui/material";
 import { OpenInNew } from "@mui/icons-material";
 import { Card, Empty } from "antd";
-import './CardGrid.css'
+import { createStyles, makeStyles } from "@mui/styles";
 
 type CardData = {
     id: number;
@@ -23,6 +23,8 @@ interface CardGridProps {
 
 const CardGrid: React.FC<CardGridProps> = ({ cards, loading }) => {
 
+    const classes = useStyle();
+
     return !loading && cards.length === 0 ? (
         <Box height='60vh' display="flex" alignItems="center" justifyContent="center">
             <Empty description="Trees not found for the user!" />
@@ -33,7 +35,7 @@ const CardGrid: React.FC<CardGridProps> = ({ cards, loading }) => {
                 <Grid item xs={12} sm={6} md={3} key={card.id}>
                     <Card
                         hoverable
-                        className="custom-card" 
+                        className={classes.customCard}
                         style={{ 
                             backgroundColor: '#b7edc47a', 
                             border: 'none', 
@@ -78,5 +80,17 @@ const CardGrid: React.FC<CardGridProps> = ({ cards, loading }) => {
         </Grid>
     );
 };
+
+const useStyle = makeStyles((theme) =>
+  createStyles({
+    customCard: {
+      '&:hover': {
+        backgroundColor: '#8fcf9f7a !important', /* New hover color */
+        cursor: 'pointer',
+        transition: 'background-color 0.3s ease', /* Smooth transition */
+      },
+    },
+  })
+);
 
 export default CardGrid;

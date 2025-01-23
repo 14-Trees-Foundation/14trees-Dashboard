@@ -121,7 +121,7 @@ const CSRInventory: React.FC = () => {
                     padding: "4px 12px",
                 }}
             >
-                <Typography variant="h4" style={{ marginTop: '5px' }}>CSR Analytics</Typography>
+                <Typography variant="h4" style={{ marginTop: '5px' }}>Corporate Dashboard</Typography>
 
                 {!groupId && <div
                     style={{
@@ -241,8 +241,8 @@ const CSRInventory: React.FC = () => {
                 <SitesMap />
             </Box> */}
             <CSRPlotStates groupId={selectedGroup?.id} tags={tags} />
-            <CSRTrees groupId={selectedGroup?.id} />
             <CSRPlantTypeStats groupId={selectedGroup?.id} />
+            <CSRTrees groupId={selectedGroup?.id} />
 
             {selectedGroup && <CSRGiftRequests groupId={selectedGroup.id} />}
         </Box>

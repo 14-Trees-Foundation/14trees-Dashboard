@@ -1,6 +1,0 @@
-
-.custom-card:hover {
-    background-color: #8fcf9f7a !important; /* New hover color */
-    cursor: pointer;
-    transition: background-color 0.3s ease; /* Smooth transition */
-}
