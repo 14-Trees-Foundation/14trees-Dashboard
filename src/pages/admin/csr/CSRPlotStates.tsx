@@ -233,8 +233,8 @@ const CSRPlotStates: React.FC<CSRPlotStatesProps> = ({ groupId, tags }) => {
         },
         {
             dataIndex: "booked",
-            key: "Booked Trees",
-            title: getSortableHeader("Booked Trees", "booked"),
+            key: "Sponsored Trees",
+            title: getSortableHeader("Sponsored Trees", "booked"),
             align: "right",
             width: 150,
         },

@@ -194,8 +194,8 @@ const CSRPlantTypeStats: React.FC<CSRPlantTypeStatsProps> = ({ groupId }) => {
         },
         {
             dataIndex: "booked",
-            key: "Booked Trees",
-            title: "Booked Trees",
+            key: "Sponsored Trees",
+            title: "Sponsored Trees",
             align: "right",
             width: 150,
         },
