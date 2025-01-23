@@ -1,5 +1,5 @@
 import { Box, Button, Checkbox, Divider, FormControl, FormControlLabel, FormGroup, IconButton, InputBase, Paper, Typography } from "@mui/material";
-import CardGrid from "./CardGrid";
+import CardGrid from "../../../components/CardGrid";
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import ApiClient from "../../../api/apiClient/apiClient";

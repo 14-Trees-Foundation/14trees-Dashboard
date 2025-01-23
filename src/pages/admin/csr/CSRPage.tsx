@@ -21,6 +21,9 @@ const CSRPage: React.FC = () => {
 
     return (<DrawerTemplate
         pages={pages}
+        style={{
+            backgroundColor: "#B1BFB5",
+        }}
     />)
 }
 

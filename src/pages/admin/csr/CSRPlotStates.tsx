@@ -212,6 +212,7 @@ const CSRPlotStates: React.FC<CSRPlotStatesProps> = ({ groupId, tags }) => {
             title: "Accessibility",
             align: "center",
             width: 200,
+            hidden: true,
             render: (value) => value ? accessibilityList.find((item) => item.value === value)?.label : "Unknown",
             ...getColumnSelectedItemFilter({ dataIndex: 'accessibility_status', filters, handleSetFilters, options: accessibilityList.map((item) => item.label).concat("Unknown") })
         },
@@ -221,8 +222,17 @@ const CSRPlotStates: React.FC<CSRPlotStatesProps> = ({ groupId, tags }) => {
             title: "Tags",
             align: "center",
             width: 250,
+            hidden: true,
             render: (tags) => tags ? tags.join(", ") : '',
             ...getColumnSelectedItemFilter({ dataIndex: 'tags', filters, handleSetFilters, options: tags })
+        },
+        {
+            dataIndex: "total_booked",
+            key: "Sponsor Ownership",
+            title: "Sponsor Ownership",
+            align: "center",
+            width: 250,
+            render: (value: any, record: any) => record.booked === record.total_booked ? 'Exclusive' : 'Shared',
         },
         {
             dataIndex: "total",
