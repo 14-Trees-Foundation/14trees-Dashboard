@@ -224,8 +224,8 @@ const CSRSiteStates: React.FC<CSRSiteStatesProps> = ({ groupId, tags }) => {
         },
         {
             dataIndex: "available",
-            key: "Unfunded Inventory (Unassigned)",
-            title: getSortableHeader("Unfunded Inventory (Unassigned)", "available"),
+            key: "Unfunded Inventory",
+            title: getSortableHeader("Unfunded Inventory", "available"),
             align: "right",
             width: 200,
         },
@@ -239,8 +239,9 @@ const CSRSiteStates: React.FC<CSRSiteStatesProps> = ({ groupId, tags }) => {
     ];
 
     return (
-        <Box mt={2}>
-            <Typography variant="h5" ml={1}>CSR Sites</Typography>
+        <Box mt={5}>
+            <Typography variant="h4" ml={1}>Reforestation Sites</Typography>
+            <Typography variant="subtitle1" ml={1} mb={1}>Explore the locations where your sponsored trees have been planted. View details of each site, including its geographical impact and sustainability progress.</Typography>
             <GeneralTable
                 loading={loading}
                 columns={columns}
@@ -250,7 +251,7 @@ const CSRSiteStates: React.FC<CSRSiteStatesProps> = ({ groupId, tags }) => {
                 pageSize={pageSize}
                 onPaginationChange={handlePaginationChange}
                 onDownload={handleDownload}
-                tableName="CSR Sites"
+                tableName="Reforestation Sites"
                 onSelectionChanges={handleSelectionChanges}
                 summary={(totalColumns: number) => {
                     if (totalColumns < 5) return undefined;

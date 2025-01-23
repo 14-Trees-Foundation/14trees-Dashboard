@@ -24,13 +24,14 @@ const TableSummary = (data: any[], selectedKeys: any[], totalColumns: number) =>
     return (
         <Table.Summary fixed='bottom'>
             <Table.Summary.Row style={{ backgroundColor: 'rgba(172, 252, 172, 0.2)' }}>
-                <Table.Summary.Cell align="right" index={totalColumns - 5} colSpan={totalColumns - 3}>
+                <Table.Summary.Cell align="right" index={totalColumns - 6} colSpan={totalColumns - 4}>
                     <strong>Total</strong>
                 </Table.Summary.Cell>
-                <Table.Summary.Cell align="right" index={totalColumns - 4} >{calculateSum(data.filter((item) => selectedKeys.includes(item.key)).map((item) => item.total))}</Table.Summary.Cell>
-                <Table.Summary.Cell align="right" index={totalColumns - 3} >{calculateSum(data.filter((item) => selectedKeys.includes(item.key)).map((item) => item.booked))}</Table.Summary.Cell>
-                <Table.Summary.Cell align="right" index={totalColumns - 2} >{calculateSum(data.filter((item) => selectedKeys.includes(item.key)).map((item) => item.available))}</Table.Summary.Cell>
-                <Table.Summary.Cell align="right" index={totalColumns - 1} >{calculateSum(data.filter((item) => selectedKeys.includes(item.key)).map((item) => item.card_available))}</Table.Summary.Cell>
+                <Table.Summary.Cell align="right" index={totalColumns - 5} >{calculateSum(data.filter((item) => selectedKeys.includes(item.key)).map((item) => item.total))}</Table.Summary.Cell>
+                <Table.Summary.Cell align="right" index={totalColumns - 4} >{calculateSum(data.filter((item) => selectedKeys.includes(item.key)).map((item) => item.booked))}</Table.Summary.Cell>
+                <Table.Summary.Cell align="right" index={totalColumns - 3} >{calculateSum(data.filter((item) => selectedKeys.includes(item.key)).map((item) => item.available))}</Table.Summary.Cell>
+                <Table.Summary.Cell align="right" index={totalColumns - 2} >{calculateSum(data.filter((item) => selectedKeys.includes(item.key)).map((item) => item.card_available))}</Table.Summary.Cell>
+                <Table.Summary.Cell align="right" index={totalColumns - 1} ></Table.Summary.Cell>
             </Table.Summary.Row>
         </Table.Summary>
     )
@@ -199,14 +200,6 @@ const CSRPlotStates: React.FC<CSRPlotStatesProps> = ({ groupId, tags }) => {
             ...getColumnSearchProps('name', filters, handleSetFilters)
         },
         {
-            dataIndex: "site_name",
-            key: "Site name",
-            title: "Site name",
-            width: 350,
-            align: 'center',
-            ...getColumnSearchProps('site_name', filters, handleSetFilters)
-        },
-        {
             dataIndex: "accessibility_status",
             key: "accessibility_status",
             title: "Accessibility",
@@ -250,8 +243,8 @@ const CSRPlotStates: React.FC<CSRPlotStatesProps> = ({ groupId, tags }) => {
         },
         {
             dataIndex: "available",
-            key: "Unfunded Inventory (Unassigned)",
-            title: getSortableHeader("Unfunded Inventory (Unassigned)", "available"),
+            key: "Unfunded Inventory",
+            title: getSortableHeader("Unfunded Inventory", "available"),
             align: "right",
             width: 200,
         },
@@ -262,11 +255,20 @@ const CSRPlotStates: React.FC<CSRPlotStatesProps> = ({ groupId, tags }) => {
             align: "right",
             width: 150,
         },
+        {
+            dataIndex: "site_name",
+            key: "Site name",
+            title: "Site name",
+            width: 350,
+            align: 'center',
+            ...getColumnSearchProps('site_name', filters, handleSetFilters)
+        },
     ];
 
     return (
-        <Box mt={2}>
-            <Typography variant="h5" ml={1}>CSR Plots</Typography>
+        <Box mt={5}>
+            <Typography variant="h4" ml={1}>Plantation Plots</Typography>
+            <Typography variant="subtitle1" ml={1} mb={1}>Dive deeper into the individual plots within each site.</Typography>
             <GeneralTable
                 loading={loading}
                 columns={columns}
@@ -276,7 +278,7 @@ const CSRPlotStates: React.FC<CSRPlotStatesProps> = ({ groupId, tags }) => {
                 pageSize={pageSize}
                 onPaginationChange={handlePaginationChange}
                 onDownload={handleDownload}
-                tableName="CSR Plots"
+                tableName="Plantation Plots"
                 onSelectionChanges={handleSelectionChanges}
                 summary={(totalColumns: number) => {
                     if (totalColumns < 5) return undefined;
