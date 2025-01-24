@@ -7,6 +7,7 @@ import { Tree } from "../../../types/tree";
 import ApiClient from "../../../api/apiClient/apiClient";
 import { toast } from "react-toastify";
 import { AccountCircleOutlined, CardGiftcard, OpenInNew, Wysiwyg } from "@mui/icons-material";
+import RedeemGiftTreeDialog from "./RedeemGiftTreeDialog";
 
 interface CSRGiftTreesProps {
     groupId: number
@@ -21,6 +22,8 @@ const CSRGiftTrees: React.FC<CSRGiftTreesProps> = ({ groupId }) => {
     const [pageSize, setPageSize] = useState(20);
     const [trees, setTrees] = useState<Record<number, Tree>>({});
     const [totalRecords, setTotalRecords] = useState(10);
+    const [giftDialogVisible, setGiftDialogVisible] = useState(false);
+    const [selectedGiftTree, setSelectedGiftTree] = useState<Tree | null>(null);
 
     const getTrees = async (offset: number, limit: number, groupId: number) => {
         setLoading(true);
@@ -86,7 +89,7 @@ const CSRGiftTrees: React.FC<CSRGiftTreesProps> = ({ groupId }) => {
                                             ? tree.illustration_s3_path
                                             : tree.image} style={{ backgroundColor: 'white', width: '100%', objectFit: 'cover' }} />}
                         >
-                            <div style={{ width: "100%", zIndex: 10 }}>
+                            <div style={{ width: "100%", zIndex: 10, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                                 <Typography variant="h6" gutterBottom noWrap>
                                     {tree.plant_type}
                                 </Typography>
@@ -113,7 +116,7 @@ const CSRGiftTrees: React.FC<CSRGiftTreesProps> = ({ groupId }) => {
                                 {!tree.assigned_to && <Button
                                     variant="contained"
                                     color="success"
-                                    onClick={() => { }}
+                                    onClick={() => { setSelectedGiftTree(tree); setGiftDialogVisible(true); }}
                                     style={{ textTransform: 'none', margin: '10px 5px 0 0' }}
                                     startIcon={tree.assigned_to ? <Wysiwyg /> : <CardGiftcard />}
                                 >
@@ -138,6 +141,16 @@ const CSRGiftTrees: React.FC<CSRGiftTreesProps> = ({ groupId }) => {
                     Load More Trees
                 </Button>
             </div>}
+
+            {selectedGiftTree && <RedeemGiftTreeDialog 
+                open={giftDialogVisible}
+                onClose={ () => { setGiftDialogVisible(false); setSelectedGiftTree(null); }}
+                tree={{
+                    treeId: selectedGiftTree.id,
+                    saplingId: selectedGiftTree.sapling_id,
+                    giftCardId: (selectedGiftTree as any).gift_card_id,
+                }}
+            />}
         </Box>
     );
 }
