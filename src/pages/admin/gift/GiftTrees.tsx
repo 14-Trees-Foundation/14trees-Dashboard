@@ -13,7 +13,7 @@ import { useAppDispatch, useAppSelector } from "../../../redux/store/hooks";
 import { bindActionCreators } from "@reduxjs/toolkit";
 import { RootState } from "../../../redux/store/store";
 import { Dropdown, Menu, TableColumnsType } from "antd";
-import { AssignmentInd, AssuredWorkload, CardGiftcard, Collections, Delete, Download, Edit, Email, ErrorOutline, FileCopy, Landscape, LocalOffer, ManageAccounts, MenuOutlined, NotesOutlined, Slideshow, Wysiwyg } from "@mui/icons-material";
+import { AssignmentInd, AssuredWorkload, CardGiftcard, Collections, Delete, Description, Download, Edit, Email, ErrorOutline, FileCopy, Landscape, LocalOffer, ManageAccounts, MenuOutlined, NotesOutlined, Slideshow, Wysiwyg } from "@mui/icons-material";
 import PlotSelection from "./Form/PlotSelection";
 import { Plot } from "../../../types/plot";
 import giftCardActionTypes from "../../../redux/actionTypes/giftCardActionTypes";
@@ -548,6 +548,24 @@ const GiftTrees: FC = () => {
         handleTagModalClose();
     }
 
+    const handleDownloadFundRequest = async (id: number) => {
+        try {
+            const apiClient = new ApiClient();
+            const url = await apiClient.generateFundRequest(id);
+
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = url.split('/')?.slice(-1)[0];
+            document.body.appendChild(link);
+            link.click();
+
+            link.remove();
+            window.URL.revokeObjectURL(url);
+        } catch (error: any) {
+            console.error('Error downloading the file:', error.message);
+        }
+    }
+
     const getStatus = (card: GiftCard) => {
         if (card.status === 'pending_plot_selection') {
             return pendingPlotSelection;
@@ -677,6 +695,9 @@ const GiftTrees: FC = () => {
                 <Menu.Item key="42" onClick={() => { handlePaymentModalOpen(record); }} icon={<AssuredWorkload />}>
                     Payment Details
                 </Menu.Item>
+                {record.group_id && <Menu.Item key="43" onClick={() => { handleDownloadFundRequest(record.id); }} icon={<Description />}>
+                    Fund Request
+                </Menu.Item>}
             </Menu.ItemGroup>}
         </Menu>
     );
