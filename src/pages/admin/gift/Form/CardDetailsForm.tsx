@@ -27,9 +27,12 @@ interface CardDetailsProps {
     messages: Massages,
     onChange: (messages: Massages) => void
     onPresentationId: (presentationId: string, slideId: string) => void
+    saplingId?: string | null
+    plantType?: string | null
+    userName?: string | null
 }
 
-const CardDetails: FC<CardDetailsProps> = ({ logo_url, request_id, presentationId, slideId, messages, onChange, onPresentationId }) => {
+const CardDetails: FC<CardDetailsProps> = ({ logo_url, request_id, presentationId, slideId, messages, saplingId, plantType, userName, onChange, onPresentationId }) => {
 
     const slideIdRef = useRef('');
     const presentationIdIdRef = useRef('');
@@ -37,6 +40,7 @@ const CardDetails: FC<CardDetailsProps> = ({ logo_url, request_id, presentationI
     const logoRef = useRef({ logoUrl: undefined as string | null | undefined })
     const [iframeSrc, setIframeSrc] = useState<string | null>(null);
     const [loading, setLoading] = useState(false);
+    const giftRef = useRef({ saplingId: undefined as string | null | undefined, plantType: undefined as string | null | undefined, userName: undefined as string | null | undefined })
 
     const updateSlide = async () => {
         if (!slideIdRef.current || !presentationIdIdRef.current) {
@@ -45,7 +49,7 @@ const CardDetails: FC<CardDetailsProps> = ({ logo_url, request_id, presentationI
 
         setLoading(true);
         const apiClient = new ApiClient();
-        await apiClient.updateGiftCardTemplate(slideIdRef.current, recordRef.current.primary, recordRef.current.secondary, recordRef.current.logo, logo_url);
+        await apiClient.updateGiftCardTemplate(slideIdRef.current, recordRef.current.primary, recordRef.current.secondary, recordRef.current.logo, logo_url, giftRef.current.saplingId, giftRef.current.userName);
         setIframeSrc(
             `https://docs.google.com/presentation/d/${presentationIdIdRef.current}/embed?rm=minimal&slide=id.${slideIdRef.current}&timestamp=${new Date().getTime()}`
         );
@@ -56,7 +60,7 @@ const CardDetails: FC<CardDetailsProps> = ({ logo_url, request_id, presentationI
         const generateGiftCard = async () => {
             setLoading(true);
             const apiClient = new ApiClient();
-            const resp = await apiClient.generateCardTemplate(request_id, defaultMessages.primary, defaultMessages.secondary, defaultMessages.logo, logo_url);
+            const resp = await apiClient.generateCardTemplate(request_id, defaultMessages.primary, defaultMessages.secondary, defaultMessages.logo, logo_url, giftRef.current.saplingId, giftRef.current.userName, giftRef.current.plantType);
             slideIdRef.current = resp.slide_id;
             presentationIdIdRef.current = resp.presentation_id;
 
@@ -87,6 +91,10 @@ const CardDetails: FC<CardDetailsProps> = ({ logo_url, request_id, presentationI
     useEffect(() => {
         logoRef.current.logoUrl = logo_url
     }, [logo_url])
+
+    useEffect(() => {
+        giftRef.current = { userName, saplingId, plantType }
+    }, [userName, saplingId, plantType])
 
     useEffect(() => {
         const eventMessage = messages.eventType === "2" ? defaultMessages.memorial : messages.eventType === "1" ? defaultMessages.birthday : defaultMessages.primary;

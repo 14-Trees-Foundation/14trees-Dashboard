@@ -179,6 +179,7 @@ const CSRPlotStates: React.FC<CSRPlotStatesProps> = ({ groupId, tags }) => {
             setPage(0);
             updateOrder(sorter);
             setOrderBy(newOrder);
+            setPlots({});
         }
     }
 
@@ -218,6 +219,13 @@ const CSRPlotStates: React.FC<CSRPlotStatesProps> = ({ groupId, tags }) => {
             hidden: true,
             render: (tags) => tags ? tags.join(", ") : '',
             ...getColumnSelectedItemFilter({ dataIndex: 'tags', filters, handleSetFilters, options: tags })
+        },
+        {
+            dataIndex: "acres_area",
+            key: "Area (acres)",
+            title: getSortableHeader("Area (acres)", 'acres_area'),
+            align: "right",
+            width: 150,
         },
         {
             dataIndex: "total_booked",
