@@ -157,6 +157,7 @@ const CSRSiteStates: React.FC<CSRSiteStatesProps> = ({ groupId, tags }) => {
             setPage(0);
             updateOrder(sorter);
             setOrderBy(newOrder);
+            setSites({});
         }
     }
 

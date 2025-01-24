@@ -1,9 +1,10 @@
-import { Autocomplete, Avatar, Button, Dialog, DialogActions, DialogContent, DialogTitle, Grid, TextField, Typography } from "@mui/material"
+import { Autocomplete, Avatar, Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, Grid, TextField, Typography } from "@mui/material"
 import { useState } from "react";
 import { toast } from "react-toastify";
 import ApiClient from "../../../api/apiClient/apiClient";
 import { AWSUtils } from "../../../helpers/aws";
 import { CardGiftcard } from "@mui/icons-material";
+import CardDetails from "../gift/Form/CardDetailsForm";
 
 const EventTypes = [
     {
@@ -26,7 +27,9 @@ interface RedeemGiftTreeDialogProps {
     tree: {
         giftCardId: number,
         treeId: number,
-        saplingId: string
+        saplingId: string,
+        plantType: string,
+        requestId: string,
     }
 }
 
@@ -46,9 +49,14 @@ const RedeemGiftTreeDialog: React.FC<RedeemGiftTreeDialogProps> = ({ tree, open,
         gifted_by: '',
         event_name: '',
         event_type: '',
+        gifted_on: new Date().toISOString().slice(0, 10),
     });
     const [profileImage, setProfileImage] = useState<File | null>(null);
     const [selectedEventType, setSelectedEventType] = useState<{ value: string, label: string } | null>(null);
+    const [messages, setMessages] = useState({ primaryMessage: '', secondaryMessage: '', logoMessage: '', eventName: '', eventType: '' as string | undefined, plantedBy: '' });
+    const [presentationId, setPresentationId] = useState<string | null>(null);
+    const [slideId, setSlideId] = useState<string | null>(null);
+    const [step, setStep] = useState(0);
 
     const validateTheName = (name: string) => {
         if (name.trim()) setErrors({ ...errors, name: '' });
@@ -110,7 +118,7 @@ const RedeemGiftTreeDialog: React.FC<RedeemGiftTreeDialogProps> = ({ tree, open,
             let profileImageUrl: string | null = null
             if (profileImage) {
                 const awsUtils = new AWSUtils();
-                profileImageUrl = await awsUtils.uploadFileToS3("gift-request", profileImage, (tree as any).request_id);
+                profileImageUrl = await awsUtils.uploadFileToS3("gift-request", profileImage, tree.requestId);
             }
 
             const apiClient = new ApiClient();
@@ -129,130 +137,184 @@ const RedeemGiftTreeDialog: React.FC<RedeemGiftTreeDialogProps> = ({ tree, open,
             event_type: item ? item.value : '',
         }))
         setSelectedEventType(item ? item : null);
+        setMessages(prev => ({
+            ...prev,
+            eventType: item?.value,
+        }))
     }
 
     return (
-        <Dialog open={open} fullWidth maxWidth='md'>
+        <Dialog open={open} fullWidth maxWidth='xl'>
             <DialogTitle>Gift a Tree</DialogTitle>
             <form onSubmit={handleRedeemGiftTreeDialog}>
                 <DialogContent dividers>
-                    <Grid container rowSpacing={2} columnSpacing={1}>
-                        <Grid item xs={12}>
-                            <TextField
-                                name="name"
-                                placeholder="Recipient Name *"
-                                required
-                                value={formData.name}
-                                onChange={handleInputChange}
-                                error={!!errors.name}
-                                helperText={errors.name}
-                                fullWidth
-                            />
-                        </Grid>
-                        <Grid item xs={12}>
-                            <TextField
-                                name="email"
-                                placeholder="Recipient Email *"
-                                required
-                                value={formData.email}
-                                onChange={handleInputChange}
-                                error={!!errors.email}
-                                helperText={errors.email || "will be used to send gift notification"}
-                                fullWidth
-                            />
-                        </Grid>
-                        <Grid item xs={12}>
-                            <TextField
-                                name="phone"
-                                placeholder="Recipient Phone (optional)"
-                                value={formData.phone}
-                                onChange={handleInputChange}
-                                error={!!errors.phone}
-                                helperText={errors.phone}
-                                fullWidth
-                            />
-                        </Grid>
-                        <Grid item xs={12}>
-                            <div style={{ display: 'flex', alignItems: 'center', marginBottom: 16 }}>
-                                <Avatar
-                                    src={profileImage ? URL.createObjectURL(profileImage) : undefined}
-                                    alt="User"
-                                    sx={{ width: 80, height: 80, marginRight: 2 }}
+                    <Box hidden={step !== 0} sx={{ maxWidth: '100%' }}>
+                        <Grid container rowSpacing={2} columnSpacing={1}>
+                            <Grid item xs={12}>
+                                <TextField
+                                    name="name"
+                                    placeholder="Recipient Name *"
+                                    required
+                                    value={formData.name}
+                                    onChange={handleInputChange}
+                                    error={!!errors.name}
+                                    helperText={errors.name}
+                                    fullWidth
                                 />
-                                <Button variant="outlined" component="label" color='success'
-                                    sx={{
-                                        marginRight: 2,
-                                        textTransform: 'none',
-                                        backgroundColor: "white",
-                                        "&:hover": {
-                                            backgroundColor: "white", // Hover background color
-                                        },
-                                    }}
-                                >
-                                    Add Recipient Pic
-                                    <input
-                                        value={''}
-                                        type="file"
-                                        hidden
-                                        accept="image/*"
-                                        onChange={handleImageChange}
+                            </Grid>
+                            <Grid item xs={12}>
+                                <TextField
+                                    name="email"
+                                    placeholder="Recipient Email *"
+                                    required
+                                    value={formData.email}
+                                    onChange={handleInputChange}
+                                    error={!!errors.email}
+                                    helperText={errors.email || "will be used to send gift notification"}
+                                    fullWidth
+                                />
+                            </Grid>
+                            <Grid item xs={12}>
+                                <TextField
+                                    name="phone"
+                                    placeholder="Recipient Phone (optional)"
+                                    value={formData.phone}
+                                    onChange={handleInputChange}
+                                    error={!!errors.phone}
+                                    helperText={errors.phone}
+                                    fullWidth
+                                />
+                            </Grid>
+                            <Grid item xs={12}>
+                                <div style={{ display: 'flex', alignItems: 'center', marginBottom: 16 }}>
+                                    <Avatar
+                                        src={profileImage ? URL.createObjectURL(profileImage) : undefined}
+                                        alt="User"
+                                        sx={{ width: 80, height: 80, marginRight: 2 }}
                                     />
-                                </Button>
-                                {profileImage &&
-                                    <Button variant="outlined" component="label" color='error'
+                                    <Button variant="outlined" component="label" color='success'
                                         sx={{
+                                            marginRight: 2,
                                             textTransform: 'none',
                                             backgroundColor: "white",
                                             "&:hover": {
                                                 backgroundColor: "white", // Hover background color
                                             },
                                         }}
-                                        onClick={() => { setProfileImage(null) }}
                                     >
-                                        Remove Image
-                                    </Button>}
-                            </div>
-                            <Typography fontSize={10}>Recipient image will be used to create more personalised dashboard, but it is not required to redeem the tree.</Typography>
-                        </Grid>
-                        <Grid item xs={12}>
-                            <Autocomplete
-                                fullWidth
-                                value={selectedEventType}
-                                options={EventTypes}
-                                getOptionLabel={option => option.label}
-                                onChange={handleEventTypeSelection}
-                                renderInput={(params) => (
+                                        Add Recipient Pic
+                                        <input
+                                            value={''}
+                                            type="file"
+                                            hidden
+                                            accept="image/*"
+                                            onChange={handleImageChange}
+                                        />
+                                    </Button>
+                                    {profileImage &&
+                                        <Button variant="outlined" component="label" color='error'
+                                            sx={{
+                                                textTransform: 'none',
+                                                backgroundColor: "white",
+                                                "&:hover": {
+                                                    backgroundColor: "white", // Hover background color
+                                                },
+                                            }}
+                                            onClick={() => { setProfileImage(null) }}
+                                        >
+                                            Remove Image
+                                        </Button>}
+                                </div>
+                                <Typography fontSize={10}>Recipient image will be used to create more personalised dashboard, but it is not required to redeem the tree.</Typography>
+                            </Grid>
+                            <Grid item xs={12}>
+                                <Autocomplete
+                                    fullWidth
+                                    value={selectedEventType}
+                                    options={EventTypes}
+                                    getOptionLabel={option => option.label}
+                                    onChange={handleEventTypeSelection}
+                                    renderInput={(params) => (
+                                        <TextField
+                                            {...params}
+                                            name="event_type"
+                                            margin='dense'
+                                            label='Occasion Type'
+                                        />
+                                    )}
+                                />
+                            </Grid>
+                            <Grid item xs={12}>
+                                <TextField
+                                    fullWidth
+                                    placeholder="Occasion Name"
+                                    name="event_name"
+                                    value={formData.event_name}
+                                    onChange={handleInputChange}
+                                />
+                            </Grid>
+                            <Grid item xs={12}>
+                                <Typography>
+                                    This tree is being gifted by{' '}
                                     <TextField
-                                        {...params}
-                                        name="event_type"
-                                        margin='dense'
-                                        label='Occasion Type'
-                                    />
-                                )}
-                            />
+                                        value={formData.gifted_by}
+                                        onChange={handleInputChange}
+                                        placeholder="Gifted By"
+                                        name="gifted_by"
+                                        variant="standard"
+                                        InputProps={{
+                                            disableUnderline: true,
+                                            style: { width: 'auto', display: 'inline-block' },
+                                        }}
+                                    />{' '}
+                                    on{' '}
+                                    <TextField
+                                        value={formData.gifted_on}
+                                        onChange={handleInputChange}
+                                        placeholder="Gifted on"
+                                        name="gifted_on"
+                                        variant="standard"
+                                        InputProps={{
+                                            disableUnderline: true,
+                                            style: { width: 'auto', display: 'inline-block' },
+                                        }}
+                                    />.
+                                </Typography>
+                            </Grid>
                         </Grid>
-                        <Grid item xs={12}>
-                            <TextField
-                                fullWidth
-                                placeholder="Occasion Name"
-                                name="event_name"
-                                value={formData.event_name}
-                                onChange={handleInputChange}
-                            />
-                        </Grid>
-                    </Grid>
+                    </Box>
+                    <Box hidden={step !== 1} sx={{ maxWidth: '100%' }}>
+                        <CardDetails 
+                            request_id={tree.requestId}
+                            presentationId={presentationId}
+                            slideId={slideId}
+                            messages={messages}
+                            onChange={(messages) => { setMessages(messages) }}
+                            onPresentationId={(presentationId: string, slideId: string) => { setPresentationId(presentationId); setSlideId(slideId); }}
+                            saplingId={tree.saplingId}
+                            plantType={tree.plantType}
+                            userName={formData.name.trim() ? formData.name.trim() : undefined}
+                        />
+                    </Box>
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={onClose} color="error" variant="outlined">
                         Cancel
                     </Button>
-                    <Button
+                    {step === 0 && <Button variant="contained" color="success" onClick={() => { setStep(1); }} style={{ textTransform: 'none' }}>View Gift Card</Button>}
+                    {step === 1 && <Button
+                        variant="contained" color="success" 
+                        onClick={() => { setStep(0); }} style={{ textTransform: 'none' }}
+                    >
+                        Edit Details
+                    </Button>}
+                    {step === 1 && <Button
                         color="success" variant="contained" type="submit"
                         disabled={!!errors.name || !!errors.phone || !!errors.email}
                         startIcon={<CardGiftcard />}
                     >
                         Gift
-                    </Button>
+                    </Button>}
                 </DialogActions>
             </form>
         </Dialog>

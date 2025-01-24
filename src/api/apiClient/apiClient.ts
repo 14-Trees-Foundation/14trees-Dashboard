@@ -1566,9 +1566,9 @@ class ApiClient {
         }
     }
 
-    async generateCardTemplate(request_id: string, primary_message: string, secondary_message: string, logo_message: string, logo?: string | null): Promise<{ presentation_id: string, slide_id: string }> {
+    async generateCardTemplate(request_id: string, primary_message: string, secondary_message: string, logo_message: string, logo?: string | null, sapling_id?: string | null, user_name?: string | null, plant_type?: string | null): Promise<{ presentation_id: string, slide_id: string }> {
         try {
-            const resp = await this.api.post<any>(`/gift-cards/generate-template`, { request_id, primary_message, secondary_message, logo_message, logo });
+            const resp = await this.api.post<any>(`/gift-cards/generate-template`, { request_id, primary_message, secondary_message, logo_message, logo, sapling_id, plant_type, user_name });
             return resp.data;
         } catch (error: any) {
             if (error.response) {
@@ -1578,9 +1578,9 @@ class ApiClient {
         }
     }
 
-    async updateGiftCardTemplate(slide_id: string, primary_message: string, secondary_message: string, logo_message: string, logo?: string | null): Promise<void> {
+    async updateGiftCardTemplate(slide_id: string, primary_message: string, secondary_message: string, logo_message: string, logo?: string | null, sapling_id?: string | null, user_name?: string | null): Promise<void> {
         try {
-            await this.api.post<any>(`/gift-cards/update-template`, { slide_id, primary_message, secondary_message, logo_message, logo });
+            await this.api.post<any>(`/gift-cards/update-template`, { slide_id, primary_message, secondary_message, logo_message, logo, sapling_id, user_name });
         } catch (error: any) {
             if (error.response) {
                 throw new Error(error.response.data.message);
