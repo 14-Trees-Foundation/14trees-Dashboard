@@ -1658,6 +1658,18 @@ class ApiClient {
         }
     }
 
+    async generateFundRequest(giftCardRequestId: number): Promise<string> {
+        try {
+            const resp = await this.api.get<{ url: string }>(`/gift-cards/requests/fund-request/${giftCardRequestId}`);
+            return resp.data.url;
+        } catch (error: any) {
+            if (error.response) {
+                throw new Error(error.response.data.message);
+            }
+            throw new Error('Failed to generate fund request for gift request!');
+        }
+    }
+
     // Utils
     async getSignedPutUrl(type: string, key: string): Promise<string> {
         try {
