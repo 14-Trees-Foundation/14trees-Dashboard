@@ -236,9 +236,9 @@ const CSRTrees: React.FC<CSRTreesProps> = ({ groupId }) => {
     ];
 
     return (
-        <Box mt={5} id="tree-sponsorship-details">
+        <Box mt={10} id="tree-sponsorship-details">
             <Box mb={1} style={{ display: 'flex', alignItems: 'center' }}>
-                <Typography variant="h5" ml={1} mr={2}>Tree Sponsorship Details</Typography>
+                <Typography variant="h5" ml={1} mr={2}>Sponsored Trees Details</Typography>
                 <Segmented
                     value={viewType}
                     onChange={(value) => {

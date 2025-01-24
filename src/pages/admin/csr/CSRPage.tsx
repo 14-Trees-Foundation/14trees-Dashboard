@@ -75,7 +75,7 @@ const CSRPage: React.FC = () => {
             logo: NaturePeople,
             key: 5,
             display: true,
-            onClick: () => { handleScroll('your-wall-of-gift-trees') }
+            onClick: () => { handleScroll('your-wall-of-tree-gifts') }
         },
         {
             displayName: 'Green Gift Contributions',

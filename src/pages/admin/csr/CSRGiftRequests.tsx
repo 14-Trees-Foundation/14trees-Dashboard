@@ -404,7 +404,7 @@ const CSRGiftRequests: React.FC<CSRGiftRequestsProps> = ({ groupId }) => {
     ]
 
     return (
-        <Box sx={{ mt: 5 }} id="green-gift-contributions">
+        <Box mt={10} id="green-gift-contributions">
             <Typography variant="h4" ml={1}>Green Gift Contributions</Typography>
             <Typography variant="subtitle1" ml={1} mb={1}>Track tree gifting activities initiated by your organization and the impact of these eco-friendly gifts.</Typography>
             <Box sx={{ height: 840, width: "100%" }}>

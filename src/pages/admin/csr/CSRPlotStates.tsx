@@ -225,7 +225,7 @@ const CSRPlotStates: React.FC<CSRPlotStatesProps> = ({ groupId, tags }) => {
             title: "Sponsor Ownership",
             align: "center",
             width: 250,
-            render: (value: any, record: any) => record.booked === record.total_booked ? 'Exclusive' : 'Shared',
+            render: (value: any, record: any) => record.booked === Number(record.total_booked) ? 'Exclusive' : 'Shared',
         },
         {
             dataIndex: "total",
@@ -266,7 +266,7 @@ const CSRPlotStates: React.FC<CSRPlotStatesProps> = ({ groupId, tags }) => {
     ];
 
     return (
-        <Box mt={5} id="plantation-plots">
+        <Box mt={10} id="plantation-plots">
             <Typography variant="h4" ml={1} >Plantation Plots</Typography>
             <Typography variant="subtitle1" ml={1} mb={1}>Dive deeper into the individual plots within each site.</Typography>
             <GeneralTable

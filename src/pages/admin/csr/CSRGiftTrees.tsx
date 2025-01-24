@@ -6,7 +6,7 @@ import { createStyles, makeStyles } from "@mui/styles";
 import { Tree } from "../../../types/tree";
 import ApiClient from "../../../api/apiClient/apiClient";
 import { toast } from "react-toastify";
-import { AccountCircleOutlined, CardGiftcard, Wysiwyg } from "@mui/icons-material";
+import { AccountCircleOutlined, CardGiftcard, OpenInNew, Wysiwyg } from "@mui/icons-material";
 
 interface CSRGiftTreesProps {
     groupId: number
@@ -27,9 +27,9 @@ const CSRGiftTrees: React.FC<CSRGiftTreesProps> = ({ groupId }) => {
         try {
             const apiClient = new ApiClient();
             const treesResp = await apiClient.getMappedGiftTrees(offset, limit, groupId);
-            
+
             setTrees(prev => {
-                const treesData = {...prev};
+                const treesData = { ...prev };
                 for (let i = 0; i < treesResp.results.length; i++) {
                     treesData[treesResp.offset + i] = treesResp.results[i];
                 }
@@ -48,7 +48,7 @@ const CSRGiftTrees: React.FC<CSRGiftTreesProps> = ({ groupId }) => {
         const handler = setTimeout(() => {
             for (let i = page * pageSize; i < Math.min((page + 1) * pageSize, totalRecords); i++) {
                 if (!trees[i]) {
-                    getTrees(page*pageSize, pageSize, groupId);
+                    getTrees(page * pageSize, pageSize, groupId);
                     return;
                 }
             }
@@ -57,10 +57,22 @@ const CSRGiftTrees: React.FC<CSRGiftTreesProps> = ({ groupId }) => {
         return () => { clearTimeout(handler); }
     }, [trees, page, pageSize, groupId, totalRecords])
 
+    const getDashboardLink = (tree: Tree) => {
+        let location: string = ''
+        const { hostname, host } = window.location;
+        if (hostname === "localhost" || hostname === "127.0.0.1") {
+            location = "http://" + host + "/profile/" + tree.sapling_id
+        } else {
+            location = "https://" + hostname + "/profile/" + tree.sapling_id
+        }
+
+        return location;
+    }
+
     return (
-        <Box mt={5} id="your-wall-of-gift-trees">
-            <Typography variant="h5" ml={1} mr={2}>Your Wall of Gift Trees</Typography>
-            <Typography variant="subtitle1" ml={1} mb={1}>View your gift trees.</Typography>
+        <Box mt={10} id="your-wall-of-tree-gifts">
+            <Typography variant="h4" ml={1} mr={2}>Green Tribute Wall</Typography>
+            <Typography variant="subtitle1" ml={1} mb={1}>Celebrate your organization's eco-friendly contributions with a dedicated wall showcasing all the trees gifted. Each entry represents a lasting tribute to sustainability, featuring recipient details, heartfelt messages, and the tree's location.</Typography>
             <Grid container spacing={3} padding={3}>
                 {Object.values(trees).map((tree) => (
                     <Grid item xs={12} sm={6} md={3} key={tree.id}>
@@ -73,42 +85,37 @@ const CSRGiftTrees: React.FC<CSRGiftTreesProps> = ({ groupId }) => {
                         >
                             <div style={{ width: "100%", zIndex: 10 }}>
                                 <Typography variant="h6" gutterBottom noWrap>
-                                    {tree.sapling_id}
-                                </Typography>
-                                <Typography variant="body2" color="text.secondary" noWrap>
-                                    Plant Type: {tree.plant_type}
+                                    {tree.plant_type}
                                 </Typography>
                                 {tree.assigned_to_name && <Typography variant="body2" color="text.secondary" noWrap>
                                     Gifted to: {tree.assigned_to_name}
                                 </Typography>}
-                                <Button
+                                {tree.assigned_to && <Typography
+                                    noWrap
+                                    component='a'
+                                    href={getDashboardLink(tree)}
+                                    target="_blank"
+                                    sx={{
+                                        mt: 1,
+                                        color: '#3f5344',
+                                        textTransform: 'none',
+                                        fontSize: '0.875rem', // Smaller button text
+                                        display: 'inline-flex', // Align text and icon
+                                        alignItems: 'center', // Center text and icon vertically
+                                        textDecoration: 'none', // Remove underline
+                                    }}
+                                >
+                                    Go to Dashboard <OpenInNew sx={{ ml: 1 }} fontSize='inherit' />
+                                </Typography>}
+                                {!tree.assigned_to && <Button
                                     variant="contained"
                                     color="success"
-                                    onClick={() => {  }}
+                                    onClick={() => { }}
                                     style={{ textTransform: 'none', margin: '10px 5px 0 0' }}
                                     startIcon={tree.assigned_to ? <Wysiwyg /> : <CardGiftcard />}
                                 >
                                     {tree.assigned_to ? 'View Summary' : 'Gift Tree'}
-                                </Button>
-                                <Button
-                                    variant="contained"
-                                    color="success"
-                                    onClick={() => { 
-                                        let location: string = ''
-                                        const { hostname, host } = window.location;
-                                        if (hostname === "localhost" || hostname === "127.0.0.1") {
-                                            location = "http://" + host + "/profile/" + tree.sapling_id
-                                        } else {
-                                            location = "https://" + hostname + "/profile/" + tree.sapling_id
-                                        }
-
-                                        window.open(location);
-                                    }}
-                                    style={{ textTransform: 'none', margin: '10px 5px 0 0' }}
-                                    startIcon={<AccountCircleOutlined />}
-                                >
-                                    Profile
-                                </Button>
+                                </Button>}
                             </div>
                         </Card>
                     </Grid>
@@ -118,7 +125,7 @@ const CSRGiftTrees: React.FC<CSRGiftTreesProps> = ({ groupId }) => {
                     <Card loading style={{ backgroundColor: '#b7edc47a', border: 'none', overflow: 'hidden', borderRadius: '20px' }}></Card>
                 </Grid>))}
             </Grid>
-            
+
             {Object.values(trees).length < totalRecords && <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
                 <Button
                     variant="contained"
