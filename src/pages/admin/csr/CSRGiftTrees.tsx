@@ -79,9 +79,12 @@ const CSRGiftTrees: React.FC<CSRGiftTreesProps> = ({ groupId }) => {
                         <Card
                             hoverable
                             className={classes.customCard}
-                            cover={<img height={240} alt={tree.plant_type} src={tree.illustration_s3_path
-                                ? tree.illustration_s3_path
-                                : tree.image} style={{ backgroundColor: 'white', width: '100%', objectFit: 'cover' }} />}
+                            cover={<img height='auto' alt={tree.plant_type} 
+                                src={ tree.template_image 
+                                        ? tree.template_image
+                                        : tree.illustration_s3_path
+                                            ? tree.illustration_s3_path
+                                            : tree.image} style={{ backgroundColor: 'white', width: '100%', objectFit: 'cover' }} />}
                         >
                             <div style={{ width: "100%", zIndex: 10 }}>
                                 <Typography variant="h6" gutterBottom noWrap>
