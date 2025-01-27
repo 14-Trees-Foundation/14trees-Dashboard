@@ -764,8 +764,8 @@ const GiftTrees: FC = () => {
         },
         {
             dataIndex: "no_of_cards",
-            key: "# Cards",
-            title: getSortableHeader("# Cards", 'no_of_cards'),
+            key: "# Trees",
+            title: getSortableHeader("# Trees", 'no_of_cards'),
             align: "center",
             width: 100,
         },

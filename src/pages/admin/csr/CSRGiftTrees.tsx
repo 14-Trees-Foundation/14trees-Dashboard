@@ -152,6 +152,7 @@ const CSRGiftTrees: React.FC<CSRGiftTreesProps> = ({ groupId }) => {
                     plantType: selectedGiftTree.plant_type || '',
                     giftCardId: (selectedGiftTree as any).gift_card_id,
                     requestId: (selectedGiftTree as any).request_id,
+                    giftedBy: (selectedGiftTree as any).gifted_by,
                 }}
             />}
         </Box>

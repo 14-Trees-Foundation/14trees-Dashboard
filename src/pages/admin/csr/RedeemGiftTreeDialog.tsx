@@ -1,5 +1,5 @@
 import { Autocomplete, Avatar, Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, Grid, TextField, Typography } from "@mui/material"
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import ApiClient from "../../../api/apiClient/apiClient";
 import { AWSUtils } from "../../../helpers/aws";
@@ -52,6 +52,7 @@ interface RedeemGiftTreeDialogProps {
         saplingId: string,
         plantType: string,
         requestId: string,
+        giftedBy: string,
     }
 }
 
@@ -80,6 +81,12 @@ const RedeemGiftTreeDialog: React.FC<RedeemGiftTreeDialogProps> = ({ tree, open,
     const [presentationId, setPresentationId] = useState<string | null>(null);
     const [slideId, setSlideId] = useState<string | null>(null);
     const [step, setStep] = useState(0);
+
+    useEffect(() => {
+        setFormData(prev => {
+            return {  ...prev, gifted_by: tree.giftedBy }
+        })
+    }, [tree])
 
     const validateTheName = (name: string) => {
         if (name.trim()) setErrors({ ...errors, name: '' });
@@ -194,7 +201,7 @@ const RedeemGiftTreeDialog: React.FC<RedeemGiftTreeDialogProps> = ({ tree, open,
                                     <Grid item xs={12}>
                                         <TextField
                                             name="name"
-                                            placeholder="Recipient Name *"
+                                            label="Recipient Name"
                                             required
                                             value={formData.name}
                                             onChange={handleInputChange}
@@ -206,7 +213,7 @@ const RedeemGiftTreeDialog: React.FC<RedeemGiftTreeDialogProps> = ({ tree, open,
                                     <Grid item xs={12}>
                                         <TextField
                                             name="email"
-                                            placeholder="Recipient Email *"
+                                            label="Recipient Email"
                                             required
                                             value={formData.email}
                                             onChange={handleInputChange}
@@ -218,7 +225,7 @@ const RedeemGiftTreeDialog: React.FC<RedeemGiftTreeDialogProps> = ({ tree, open,
                                     <Grid item xs={12}>
                                         <TextField
                                             name="phone"
-                                            placeholder="Recipient Phone (optional)"
+                                            label="Recipient Phone (optional)"
                                             value={formData.phone}
                                             onChange={handleInputChange}
                                             error={!!errors.phone}
@@ -268,7 +275,7 @@ const RedeemGiftTreeDialog: React.FC<RedeemGiftTreeDialogProps> = ({ tree, open,
                                         </div>
                                         <Typography fontSize={10}>Recipient image will be used to create more personalised dashboard, but it is not required to redeem the tree.</Typography>
                                     </Grid>
-                                    <Grid item xs={12}>
+                                    <Grid item xs={6}>
                                         <Autocomplete
                                             fullWidth
                                             value={selectedEventType}
@@ -279,54 +286,44 @@ const RedeemGiftTreeDialog: React.FC<RedeemGiftTreeDialogProps> = ({ tree, open,
                                                 <TextField
                                                     {...params}
                                                     name="event_type"
-                                                    margin='dense'
                                                     label='Occasion Type'
                                                 />
                                             )}
                                         />
                                     </Grid>
-                                    <Grid item xs={12}>
+                                    <Grid item xs={6}>
                                         <TextField
                                             fullWidth
-                                            placeholder="Occasion Name"
+                                            label="Occasion Name"
                                             name="event_name"
                                             value={formData.event_name}
                                             onChange={handleInputChange}
                                         />
                                     </Grid>
-                                    <Grid item xs={12}>
-                                        <Typography>
-                                            This tree is being gifted by{' '}
-                                            <TextField
-                                                value={formData.gifted_by}
-                                                onChange={handleInputChange}
-                                                placeholder="Gifted By"
-                                                name="gifted_by"
-                                                variant="standard"
-                                                InputProps={{
-                                                    disableUnderline: true,
-                                                    style: { width: 'auto', display: 'inline-block' },
-                                                }}
-                                            />{' '}
-                                            on{' '}
-                                            <TextField
-                                                value={formData.gifted_on}
-                                                onChange={handleInputChange}
-                                                placeholder="Gifted on"
-                                                name="gifted_on"
-                                                variant="standard"
-                                                InputProps={{
-                                                    disableUnderline: true,
-                                                    style: { width: 'auto', display: 'inline-block' },
-                                                }}
-                                            />.
-                                        </Typography>
+                                    <Grid item xs={6}>
+                                        <TextField
+                                            fullWidth
+                                            label="Gifted By"
+                                            name="gifted_by"
+                                            value={formData.gifted_by}
+                                            onChange={handleInputChange}
+                                        />
+                                    </Grid>
+                                    <Grid item xs={6}>
+                                        <TextField
+                                            fullWidth
+                                            label="Gifted on"
+                                            name="gifted_on"
+                                            value={formData.gifted_on}
+                                            type="date"
+                                            onChange={handleInputChange}
+                                        />
                                     </Grid>
                                 </Grid>
                             </Box>
                         </Box>
                     </Box>
-                    <Box hidden={step !== 1} sx={{ maxWidth: '100%' }} >
+                    <Box hidden={step !== 1} sx={{ maxWidth: '100%' }}>
                         <CardDetails 
                             request_id={tree.requestId}
                             presentationId={presentationId}
