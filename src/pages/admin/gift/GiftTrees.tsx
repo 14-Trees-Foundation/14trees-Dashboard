@@ -12,7 +12,7 @@ import * as giftCardActionCreators from "../../../redux/actions/giftCardActions"
 import { useAppDispatch, useAppSelector } from "../../../redux/store/hooks";
 import { bindActionCreators } from "@reduxjs/toolkit";
 import { RootState } from "../../../redux/store/store";
-import { Dropdown, Menu, TableColumnsType } from "antd";
+import { Dropdown, Menu, Table, TableColumnsType } from "antd";
 import { AssignmentInd, AssuredWorkload, CardGiftcard, Collections, Delete, Description, Download, Edit, Email, ErrorOutline, FileCopy, Landscape, LocalOffer, ManageAccounts, MenuOutlined, NotesOutlined, Slideshow, Wysiwyg } from "@mui/icons-material";
 import PlotSelection from "./Form/PlotSelection";
 import { Plot } from "../../../types/plot";
@@ -33,6 +33,33 @@ import GiftCardCreationModal from "./Components/GiftCardCreationModal";
 import GeneralTable from "../../../components/GenTable";
 
 const pendingPlotSelection = 'Pending Plot & Tree(s) Reservation';
+
+const calculateUnion = (plantTypes: (string[] | undefined)[]) => {
+    const allTypes = plantTypes.flat().filter((type): type is string => type !== undefined);
+    return Array.from(new Set(allTypes));
+}
+
+const TableSummary = (giftRequests: GiftCard[], selectedGiftRequestIds: number[], totalColumns: number) => {
+
+    const calculateSum = (data: (number | undefined)[]) => {
+        return data.reduce((a, b) => (a ?? 0) + (b ?? 0), 0);
+    }
+
+    return (
+        <Table.Summary fixed='bottom'>
+            <Table.Summary.Row style={{ backgroundColor: 'rgba(172, 252, 172, 0.2)' }}>
+                <Table.Summary.Cell align="center" index={1} colSpan={4}>
+                    <strong>Total</strong>
+                </Table.Summary.Cell>
+                <Table.Summary.Cell align="center" index={3} colSpan={1}>{calculateSum(giftRequests.filter((giftRequest) => selectedGiftRequestIds.includes(giftRequest.id)).map((giftRequest) => giftRequest.no_of_cards))}</Table.Summary.Cell>
+                <Table.Summary.Cell align="center" index={10} colSpan={7}></Table.Summary.Cell>
+                <Table.Summary.Cell align="center" index={11} colSpan={1}>{calculateSum(giftRequests.filter((giftRequest) => selectedGiftRequestIds.includes(giftRequest.id)).map((giftRequest: any) => giftRequest.total_amount))}</Table.Summary.Cell>
+                <Table.Summary.Cell align="center" index={12} colSpan={1}>{calculateSum(giftRequests.filter((giftRequest) => selectedGiftRequestIds.includes(giftRequest.id)).map((giftRequest) => giftRequest.amount_received))}</Table.Summary.Cell>
+                <Table.Summary.Cell align="center" index={13} colSpan={4}></Table.Summary.Cell>
+            </Table.Summary.Row>
+        </Table.Summary>
+    )
+}
 
 const GiftTrees: FC = () => {
     const dispatch = useAppDispatch();
@@ -70,6 +97,7 @@ const GiftTrees: FC = () => {
     const [tags, setTags] = useState<string[]>([]);
     const [testingMail, setTestingMail] = useState(false);
     const [giftCardNotification, setGiftCardNotification] = useState(false);
+    const [selectedGiftRequestIds, setSelectedGiftRequestIds] = useState<number[]>([]);
 
     // payment
     const [paymentModal, setPaymentModal] = useState(false);
@@ -608,6 +636,10 @@ const GiftTrees: FC = () => {
         }
     }
 
+    const handleSelectionChanges = (giftRequestIds: number[]) => {
+        setSelectedGiftRequestIds(giftRequestIds);
+    }
+
     const getSortableHeader = (header: string, key: string) => {
         return (
             <div style={{ display: "flex", alignItems: "center", justifyContent: 'space-between' }}>
@@ -744,6 +776,14 @@ const GiftTrees: FC = () => {
             align: "center",
             width: 200,
             ...getColumnSearchProps('created_by_name', filters, handleSetFilters)
+        },
+        {
+            dataIndex: "request_type",
+            key: "Request Type",
+            title: "Request Type",
+            align: "center",
+            width: 200,
+            ...getColumnSelectedItemFilter({ dataIndex: 'request_type', filters, handleSetFilters, options: ['Cards Request', 'Normal Assignment', 'Test', 'Promotion'] })
         },
         {
             dataIndex: "tags",
@@ -906,6 +946,11 @@ const GiftTrees: FC = () => {
                     pageSize={pageSize}
                     onPaginationChange={(page: number, pageSize: number) => { setPage(page - 1); setPageSize(pageSize); }}
                     onDownload={getAllGiftCardsData}
+                    onSelectionChanges={handleSelectionChanges}
+                    summary={(totalColumns: number) => {
+                        if (totalColumns < 5) return undefined;
+                        return TableSummary(tableRows, selectedGiftRequestIds, totalColumns)
+                    }}
                     footer
                     tableName="Tree Cards"
                 />

@@ -94,6 +94,7 @@ const GiftCardsForm: FC<GiftCardsFormProps> = ({ step, loggedinUserId, giftCardR
             setTreeCount(giftCardRequest.no_of_cards);
             setLogoString(giftCardRequest.logo_url);
             setGiftedOn(giftCardRequest.gifted_on);
+            if (giftCardRequest.request_type) setGiftRequestType(giftCardRequest.request_type);
             setMessages({
                 primaryMessage: giftCardRequest.primary_message,
                 secondaryMessage: giftCardRequest.secondary_message,
