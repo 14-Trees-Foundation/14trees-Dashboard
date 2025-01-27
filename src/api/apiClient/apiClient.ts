@@ -863,10 +863,10 @@ class ApiClient {
         }
     }
 
-    async getGiftAbleTrees(offset: number, limit: number, filters: any[], include_no_giftable: boolean = false): Promise<PaginatedResponse<Tree>> {
+    async getGiftAbleTrees(offset: number, limit: number, filters: any[], include_no_giftable: boolean = false, include_all_habits: boolean = false): Promise<PaginatedResponse<Tree>> {
         let url = `/trees/get-giftable?offset=${offset}&limit=${limit}`;
         try {
-            let result = await this.api.post<PaginatedResponse<Tree>>(url, { filters, include_no_giftable });
+            let result = await this.api.post<PaginatedResponse<Tree>>(url, { filters, include_no_giftable, include_all_habits });
             return result.data;
         } catch (error: any) {
             if (error.response?.data?.message) throw new Error(error.response.data.message);
@@ -1519,9 +1519,9 @@ class ApiClient {
         }
     }
 
-    async bookGiftCards(gift_card_request_id: number, gift_card_trees?: any[], book_non_giftable: boolean = false, diversify: boolean = false): Promise<void> {
+    async bookGiftCards(gift_card_request_id: number, gift_card_trees?: any[], book_non_giftable: boolean = false, diversify: boolean = false, book_all_habits: boolean = false): Promise<void> {
         try {
-            await this.api.post<any>(`/gift-cards/book`, { gift_card_request_id, gift_card_trees, book_non_giftable, diversify });
+            await this.api.post<any>(`/gift-cards/book`, { gift_card_request_id, gift_card_trees, book_non_giftable, diversify, book_all_habits });
         } catch (error: any) {
             if (error.response) {
                 throw new Error(error.response.data.message);
