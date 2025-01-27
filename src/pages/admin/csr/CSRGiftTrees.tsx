@@ -145,6 +145,7 @@ const CSRGiftTrees: React.FC<CSRGiftTreesProps> = ({ groupId }) => {
             {selectedGiftTree && <RedeemGiftTreeDialog 
                 open={giftDialogVisible}
                 onClose={ () => { setGiftDialogVisible(false); setSelectedGiftTree(null); }}
+                onSubmit={ () => { getTrees(0, Object.values(trees).length, groupId) }}
                 tree={{
                     treeId: selectedGiftTree.id,
                     saplingId: selectedGiftTree.sapling_id,

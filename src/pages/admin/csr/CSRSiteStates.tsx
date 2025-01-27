@@ -259,6 +259,7 @@ const CSRSiteStates: React.FC<CSRSiteStatesProps> = ({ groupId, tags }) => {
                     return TableSummary(tableRows, selectedRows, totalColumns)
                 }}
                 footer
+                fullHeight
                 expandable={{
                     render: (record: any) => (<SitesMap groupId={groupId} site={record} />),
                     isExpandable: (record: any) => record.kml_file_link ? true: false,

@@ -225,7 +225,12 @@ const CSRPlotStates: React.FC<CSRPlotStatesProps> = ({ groupId, tags }) => {
             key: "Area (acres)",
             title: getSortableHeader("Area (acres)", 'acres_area'),
             align: "right",
-            width: 150,
+            width: 180,
+            render: (value: any, record) => value 
+                                                ? value.toFixed(2) 
+                                                : record.kml_file_link
+                                                    ? 'Invalid Plot Label'
+                                                    : 'Missing Kml File',
         },
         {
             dataIndex: "total_booked",
