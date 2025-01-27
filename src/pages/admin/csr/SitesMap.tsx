@@ -197,7 +197,7 @@ const SitesMap: React.FC<SitesMapProps> = ({ groupId, site }) => {
             <Box style={{ display: selectedSite ? 'block' : 'none' }}>
                     {isLoaded && <GoogleMap
                         mapContainerStyle={containerStyle}
-                        zoom={17}
+                        zoom={18}
                         mapTypeId='satellite'
                         center={center}
                         onLoad={(map) => { mapRef.current = map }}
