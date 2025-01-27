@@ -288,6 +288,7 @@ const CSRGiftRequests: React.FC<CSRGiftRequestsProps> = ({ groupId }) => {
             title: "Created by",
             align: "center",
             width: 200,
+            hidden: true,
             ...getColumnSearchProps('created_by_name', filters, handleSetFilters)
         },
         {
@@ -296,6 +297,7 @@ const CSRGiftRequests: React.FC<CSRGiftRequestsProps> = ({ groupId }) => {
             title: "Tags",
             align: "center",
             width: 200,
+            hidden: true,
             render: value => value?.join(", ") || '',
             ...getColumnSelectedItemFilter({ dataIndex: 'tags', filters, handleSetFilters, options: tags })
         },
@@ -314,6 +316,7 @@ const CSRGiftRequests: React.FC<CSRGiftRequestsProps> = ({ groupId }) => {
             title: "Validation Errors",
             align: "center",
             width: 120,
+            hidden: true,
             render: (value) => value && value.length > 0 ? (
                 <Tooltip title={<div>{getValidationErrors(value).map(item => (<p>{item}</p>))}</div>}>
                     <IconButton>
@@ -329,6 +332,7 @@ const CSRGiftRequests: React.FC<CSRGiftRequestsProps> = ({ groupId }) => {
             title: "Sponsorship Type",
             align: "center",
             width: 150,
+            hidden: true,
             ...getColumnSelectedItemFilter({ dataIndex: 'sponsorship_type', filters, handleSetFilters, options: ['Unverified', 'Pledged', 'Promotional', 'Unsponsored Visit', 'Donation Received'] })
         },
         {
@@ -337,6 +341,7 @@ const CSRGiftRequests: React.FC<CSRGiftRequestsProps> = ({ groupId }) => {
             title: "Donation Receipt No.",
             align: "center",
             width: 200,
+            hidden: true,
             ...getColumnSearchProps('donation_receipt_number', filters, handleSetFilters)
         },
         {
@@ -352,6 +357,7 @@ const CSRGiftRequests: React.FC<CSRGiftRequestsProps> = ({ groupId }) => {
             title: "Amount Received",
             align: "center",
             width: 200,
+            hidden: true,
         },
         {
             dataIndex: "payment_status",
@@ -359,6 +365,7 @@ const CSRGiftRequests: React.FC<CSRGiftRequestsProps> = ({ groupId }) => {
             title: "Payment Status",
             align: "center",
             width: 150,
+            hidden: true,
         },
         {
             dataIndex: "created_at",
@@ -397,8 +404,9 @@ const CSRGiftRequests: React.FC<CSRGiftRequestsProps> = ({ groupId }) => {
     ]
 
     return (
-        <Box sx={{ mt: 5 }}>
-            <Typography variant="h6">Your Gift Requests</Typography>
+        <Box mt={10} id="green-gift-contributions">
+            <Typography variant="h4" ml={1}>Green Gift Contributions</Typography>
+            <Typography variant="subtitle1" ml={1} mb={1}>Track tree gifting activities initiated by your organization and the impact of these eco-friendly gifts.</Typography>
             <Box sx={{ height: 840, width: "100%" }}>
                 <GeneralTable
                     loading={giftCardsData.loading}
@@ -410,7 +418,7 @@ const CSRGiftRequests: React.FC<CSRGiftRequestsProps> = ({ groupId }) => {
                     onPaginationChange={(page: number, pageSize: number) => { setPage(page - 1); setPageSize(pageSize); }}
                     onDownload={getAllGiftCardsData}
                     footer
-                    tableName="Tree Cards"
+                    tableName="Green Gift Contributions"
                 />
             </Box>
 

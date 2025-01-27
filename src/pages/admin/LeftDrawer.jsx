@@ -145,7 +145,7 @@ export const AdminLeftDrawer = () => {
       key: 11,
     },
     {
-      displayName: "CSR Analytics",
+      displayName: "Corporate Dashboard",
       logo: Analytics,
       display: true,
       key: 12,

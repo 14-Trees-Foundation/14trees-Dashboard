@@ -899,6 +899,19 @@ class ApiClient {
 
     }
 
+    async getMappedGiftTrees(offset:number, limit: number, groupId: number): Promise<PaginatedResponse<Tree>> {
+        const url = `/trees/mapped-gift/get?offset=${offset}&limit=${limit}`;
+        try {
+            const response = await this.api.post<PaginatedResponse<Tree>>(url, { group_id: groupId });
+            return response.data;
+        } catch (error: any) {
+            if (error.response?.data?.message) {
+                throw new Error(error.response.data.message);
+            }
+            throw new Error(`Failed to fetch reserved gift trees: ${error.message}`);
+        }
+    }
+
 
     /*
         Model- UserTree: CRUD Operations/Apis for user_tree_regs
@@ -1553,9 +1566,9 @@ class ApiClient {
         }
     }
 
-    async generateCardTemplate(request_id: string, primary_message: string, secondary_message: string, logo_message: string, logo?: string | null): Promise<{ presentation_id: string, slide_id: string }> {
+    async generateCardTemplate(request_id: string, primary_message: string, secondary_message: string, logo_message: string, logo?: string | null, sapling_id?: string | null, user_name?: string | null, plant_type?: string | null): Promise<{ presentation_id: string, slide_id: string }> {
         try {
-            const resp = await this.api.post<any>(`/gift-cards/generate-template`, { request_id, primary_message, secondary_message, logo_message, logo });
+            const resp = await this.api.post<any>(`/gift-cards/generate-template`, { request_id, primary_message, secondary_message, logo_message, logo, sapling_id, plant_type, user_name });
             return resp.data;
         } catch (error: any) {
             if (error.response) {
@@ -1565,9 +1578,9 @@ class ApiClient {
         }
     }
 
-    async updateGiftCardTemplate(slide_id: string, primary_message: string, secondary_message: string, logo_message: string, logo?: string | null): Promise<void> {
+    async updateGiftCardTemplate(slide_id: string, primary_message: string, secondary_message: string, logo_message: string, logo?: string | null, sapling_id?: string | null, user_name?: string | null): Promise<void> {
         try {
-            await this.api.post<any>(`/gift-cards/update-template`, { slide_id, primary_message, secondary_message, logo_message, logo });
+            await this.api.post<any>(`/gift-cards/update-template`, { slide_id, primary_message, secondary_message, logo_message, logo, sapling_id, user_name });
         } catch (error: any) {
             if (error.response) {
                 throw new Error(error.response.data.message);
@@ -1578,7 +1591,7 @@ class ApiClient {
 
     async redeemGiftCardTemplate(gift_card_id: number, sapling_id: string, tree_id: number, user: User, profile_image_url?: string | null): Promise<GiftCardUser> {
         try {
-            const resp = await this.api.post<GiftCardUser>(`/gift-cards/card/redeem`, { gift_card_id, sapling_id, tree_id, user, profile_image_url });
+            const resp = await this.api.post<GiftCardUser>(`/gift-cards/card/redeem`, { gift_card_id, sapling_id, tree_id, ...user, user, profile_image_url });
             return resp.data;
         } catch (error: any) {
             if (error.response) {

@@ -9,7 +9,6 @@ import getColumnSearchProps, { getColumnSelectedItemFilter } from "../../../comp
 import { toast } from "react-toastify";
 import ApiClient from "../../../api/apiClient/apiClient";
 import CSRTreesCards from "./CSRTreeCards";
-import { GridView, TableView } from "@mui/icons-material";
 
 interface CSRTreesProps {
     groupId?: number
@@ -25,7 +24,7 @@ const CSRTrees: React.FC<CSRTreesProps> = ({ groupId }) => {
     const [pageSize, setPageSize] = useState(10);
     const [filters, setFilters] = useState<Record<string, GridFilterItem>>({});
     const [orderBy, setOrderBy] = useState<Order[]>([]);
-    const [viewType, setViewType] = useState('Table');
+    const [viewType, setViewType] = useState('Grid');
 
     const handleSetFilters = (filters: Record<string, GridFilterItem>) => {
         setPage(0);
@@ -147,6 +146,7 @@ const CSRTrees: React.FC<CSRTreesProps> = ({ groupId }) => {
             title: "Sr. No.",
             width: 100,
             align: 'center',
+            hidden: true,
             render: (value, record, index) => `${index + 1 + page * pageSize}.`,
         },
         {
@@ -171,6 +171,7 @@ const CSRTrees: React.FC<CSRTreesProps> = ({ groupId }) => {
             title: "habitat",
             width: 250,
             align: 'center',
+            hidden: true,
             ...getColumnSelectedItemFilter({ dataIndex: 'habit', filters, handleSetFilters, options: ['Tree', 'Herb', 'Shrub', 'Climber'] })
         },
         {
@@ -196,6 +197,7 @@ const CSRTrees: React.FC<CSRTreesProps> = ({ groupId }) => {
             title: "Reserved for (Individual)",
             width: 250,
             align: 'center',
+            hidden: true,
             ...getColumnSearchProps('mapped_user_name', filters, handleSetFilters)
         },
         {
@@ -204,6 +206,7 @@ const CSRTrees: React.FC<CSRTreesProps> = ({ groupId }) => {
             title: "Reserved for (Group)",
             width: 250,
             align: 'center',
+            hidden: true,
             ...getColumnSearchProps('mapped_group_name', filters, handleSetFilters)
         },
         {
@@ -233,9 +236,9 @@ const CSRTrees: React.FC<CSRTreesProps> = ({ groupId }) => {
     ];
 
     return (
-        <Box mt={2}>
+        <Box mt={10} id="tree-sponsorship-details">
             <Box mb={1} style={{ display: 'flex', alignItems: 'center' }}>
-                <Typography variant="h5" ml={1} mr={2}>CSR Trees</Typography>
+                <Typography variant="h5" ml={1} mr={2}>Sponsored Trees Details</Typography>
                 <Segmented
                     value={viewType}
                     onChange={(value) => {
@@ -250,6 +253,7 @@ const CSRTrees: React.FC<CSRTreesProps> = ({ groupId }) => {
                     ]}
                 />
             </Box>
+            <Typography variant="subtitle1" ml={1} mb={1}>View a detailed breakdown of the trees you’ve sponsored.</Typography>
             {viewType === 'Table' && <GeneralTable
                 loading={loading}
                 columns={columns}
@@ -259,7 +263,7 @@ const CSRTrees: React.FC<CSRTreesProps> = ({ groupId }) => {
                 pageSize={pageSize}              
                 onPaginationChange={handlePaginationChange}
                 onDownload={handleDownload}
-                tableName="CSR Trees"
+                tableName="Tree Sponsorship Details"
                 footer
             />}
             {viewType === 'Grid' && <CSRTreesCards 

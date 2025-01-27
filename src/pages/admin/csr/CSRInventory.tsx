@@ -12,11 +12,11 @@ import ApiClient from "../../../api/apiClient/apiClient";
 import { toast } from "react-toastify";
 import { Forest, GrassTwoTone, ModeOfTravel, NaturePeople } from "@mui/icons-material";
 import CSRSiteStates from "./CSRSiteStates";
-import SitesMap from "./SitesMap";
 import CSRPlantTypeStats from "./CSRPlantTypeStates";
 import CSRTreeChart from "./CSRTreeChart";
 import { useParams } from "react-router-dom";
 import CSRGiftRequests from "./CSRGiftRequests";
+import CSRGiftTrees from "./CSRGiftTrees";
 
 const CSRInventory: React.FC = () => {
 
@@ -118,16 +118,14 @@ const CSRInventory: React.FC = () => {
                 style={{
                     display: "flex",
                     justifyContent: "space-between",
-                    padding: "4px 12px",
                 }}
             >
-                <Typography variant="h4" style={{ marginTop: '5px' }}>Corporate Dashboard</Typography>
-
+                <Typography variant="h3" style={{ marginTop: '5px', marginBottom: '5px' }}>{selectedGroup ? `${selectedGroup.name}'s` : 'Corporate'} Dashboard</Typography>
                 {!groupId && <div
                     style={{
                         display: "flex",
                         justifyContent: "space-between",
-                        padding: "4px 12px",
+                        alignItems: 'center',
                     }}
                 >
                     <AutocompleteWithPagination
@@ -148,7 +146,6 @@ const CSRInventory: React.FC = () => {
                     />
                     <Button
                         sx={{ ml: 2 }}
-                        size="small"
                         disabled={!selectedGroup}
                         variant="contained"
                         color="success"
@@ -166,7 +163,9 @@ const CSRInventory: React.FC = () => {
                 </div>}
             </div>
             <Divider sx={{ backgroundColor: "black", marginBottom: '15px' }} />
-
+            
+            <Typography variant="h4" mt={5} ml={1} id="corporate-impact-overview">Corporate Impact Overview</Typography>
+            <Typography variant="subtitle1" mb={1} ml={1}>A comprehensive snapshot of your contributions to reforestation and sustainability efforts, including total trees sponsored, plant types supported, acres rejuvenated, and sponsorship progress over time.</Typography>
             <Box
                 style={{
                     display: 'flex',
@@ -243,6 +242,8 @@ const CSRInventory: React.FC = () => {
             <CSRPlotStates groupId={selectedGroup?.id} tags={tags} />
             <CSRPlantTypeStats groupId={selectedGroup?.id} />
             <CSRTrees groupId={selectedGroup?.id} />
+
+            {selectedGroup && <CSRGiftTrees groupId={selectedGroup.id} />}
 
             {selectedGroup && <CSRGiftRequests groupId={selectedGroup.id} />}
         </Box>
