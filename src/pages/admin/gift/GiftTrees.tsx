@@ -58,6 +58,7 @@ const GiftTrees: FC = () => {
     const [selectedPlots, setSelectedPlots] = useState<Plot[]>([]);
     const [bookNonGiftable, setBookNonGiftable] = useState(false);
     const [diversify, setDiversify] = useState(false);
+    const [bookAllHabits, setBookAllHabits] = useState(false);
     const [requestId, setRequestId] = useState<string | null>(null);
     const [deleteModal, setDeleteModal] = useState(false);
     const [notesModal, setNotesModal] = useState(false);
@@ -356,6 +357,8 @@ const GiftTrees: FC = () => {
         setSelectedGiftCard(null);
         setDiversify(false);
         setBookNonGiftable(false);
+        setBookAllHabits(false);
+        setSelectedTrees([]);
     }
 
     const handlePlotSelectionSubmit = async () => {
@@ -367,7 +370,7 @@ const GiftTrees: FC = () => {
             try {
                 await apiClient.createGiftCardPlots(selectedGiftCard.id, selectedPlots.map(plot => plot.id));
 
-                await apiClient.bookGiftCards(selectedGiftCard.id, selectedTrees.length > 0 ? selectedTrees : undefined, bookNonGiftable, diversify);
+                await apiClient.bookGiftCards(selectedGiftCard.id, selectedTrees.length > 0 ? selectedTrees : undefined, bookNonGiftable, diversify, bookAllHabits);
                 toast.success("Successfully reserved trees for tree card request!");
                 getGiftCardData();
             } catch {
@@ -949,6 +952,8 @@ const GiftTrees: FC = () => {
                         onBookNonGiftableChange={(value) => { setBookNonGiftable(value) }}
                         diversify={diversify}
                         onDiversifyChange={(value) => { setDiversify(value) }}
+                        bookAllHabits={bookAllHabits}
+                        onBookAllHabitsChange={(value) => { setBookAllHabits(value) }}
                     />}
                 </DialogContent>
                 <DialogActions>
@@ -1003,9 +1008,9 @@ const GiftTrees: FC = () => {
 
             {selectedGiftCard && <AssignTrees
                 open={autoAssignModal}
-                onClose={() => { setAutoAssignModal(false) }}
+                onClose={() => { setAutoAssignModal(false); setSelectedGiftCard(null); }}
                 giftCardRequestId={selectedGiftCard.id}
-                onSubmit={() => { getGiftCardData(); }}
+                onSubmit={() => { getGiftCardData(); setSelectedGiftCard(null); }}
             />}
 
             <EmailConfirmationModal

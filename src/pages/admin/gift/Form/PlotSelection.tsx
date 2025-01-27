@@ -55,10 +55,12 @@ interface PlotSelectionProps {
     onBookNonGiftableChange: (value: boolean) => void
     diversify: boolean
     onDiversifyChange: (value: boolean) => void
+    bookAllHabits: boolean
+    onBookAllHabitsChange: (value: boolean) => void
 
 }
 
-const PlotSelection: FC<PlotSelectionProps> = ({ giftCardRequestId, requiredTrees, plots, onPlotsChange, onTreeSelection, bookNonGiftable, onBookNonGiftableChange, diversify, onDiversifyChange }) => {
+const PlotSelection: FC<PlotSelectionProps> = ({ giftCardRequestId, requiredTrees, plots, onPlotsChange, onTreeSelection, bookNonGiftable, onBookNonGiftableChange, diversify, onDiversifyChange, bookAllHabits, onBookAllHabitsChange }) => {
 
     const [page, setPage] = useState(0);
     const [loading, setLoading] = useState(false);
@@ -381,17 +383,35 @@ const PlotSelection: FC<PlotSelectionProps> = ({ giftCardRequestId, requiredTree
                 {selectedTrees.length === 0 && <Box>
                     <Typography variant='subtitle1'>Remaining tree count for plot selection: <strong>{
                         Math.max(treesCount - plots
-                            .map(pt => pt.card_available ?? 0)
+                            .map(pt => ( bookAllHabits 
+                                            ? bookNonGiftable
+                                                ? pt.available 
+                                                : pt.card_available
+                                            : bookNonGiftable
+                                                ? pt.available_trees
+                                                : pt.card_available) ?? 0)
                             .reduce((prev, current) => prev + current, 0), 0)
                     }</strong></Typography>
                     <Typography variant='subtitle1'>Tree distribution across the plots:</Typography>
                     {plots.map((plot, idx) => {
                         const treesAllocated = plots
                             .slice(0, idx)
-                            .map(pt => pt.card_available ?? 0)
+                            .map(pt => ( bookAllHabits 
+                                            ? bookNonGiftable
+                                                ? pt.available 
+                                                : pt.card_available
+                                            : bookNonGiftable
+                                                ? pt.available_trees
+                                                : pt.card_available) ?? 0)
                             .reduce((prev, current) => prev + current, 0);
 
-                        const treesForCurrentPlot = Math.min(plot.card_available ?? 0, treesCount - treesAllocated);
+                        const treesForCurrentPlot = Math.min(( bookAllHabits 
+                                                                ? bookNonGiftable
+                                                                    ? plot.available 
+                                                                    : plot.card_available
+                                                                : bookNonGiftable
+                                                                    ? plot.available_trees
+                                                                    : plot.card_available) ?? 0, treesCount - treesAllocated);
 
                         return (
                             <Typography variant="body1" key={idx}>
@@ -483,6 +503,25 @@ const PlotSelection: FC<PlotSelectionProps> = ({ giftCardRequestId, requiredTree
                         >
                             <ToggleButton value="yes">Yes</ToggleButton>
                             <ToggleButton value="no">No</ToggleButton>
+                        </ToggleButtonGroup>
+                    </Box>}
+                    {selectedTrees.length === 0 && <Box
+                        mt={2}
+                        display="flex"
+                        alignItems="center"
+                        justifyContent="space-between"
+                    >
+                        <Typography mr={10}>Do you want to book Trees, Herbs & Shrubs?</Typography>
+                        <ToggleButtonGroup
+                            color="success"
+                            value={bookAllHabits ? "yes" : "no"}
+                            exclusive
+                            onChange={(e, value) => { onBookAllHabitsChange(value === "yes" ? true : false); }}
+                            aria-label="Platform"
+                            size="small"
+                        >
+                            <ToggleButton value="yes">Yes</ToggleButton>
+                            <ToggleButton value="no">Only Trees</ToggleButton>
                         </ToggleButtonGroup>
                     </Box>}
                     {selectedTrees.length === 0 && <Box
