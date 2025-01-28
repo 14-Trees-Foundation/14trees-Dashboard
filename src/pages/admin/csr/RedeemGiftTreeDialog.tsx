@@ -53,6 +53,7 @@ interface RedeemGiftTreeDialogProps {
         plantType: string,
         requestId: string,
         giftedBy: string,
+        logoUrl?: string | null,
     }
 }
 
@@ -86,6 +87,8 @@ const RedeemGiftTreeDialog: React.FC<RedeemGiftTreeDialogProps> = ({ tree, open,
         setFormData(prev => {
             return {  ...prev, gifted_by: tree.giftedBy }
         })
+
+        console.log(tree);
     }, [tree])
 
     const validateTheName = (name: string) => {
@@ -334,6 +337,7 @@ const RedeemGiftTreeDialog: React.FC<RedeemGiftTreeDialogProps> = ({ tree, open,
                             saplingId={tree.saplingId}
                             plantType={tree.plantType}
                             userName={formData.name.trim() ? formData.name.trim() : undefined}
+                            logo_url={tree.logoUrl}
                         />
                     </Box>
                 </DialogContent>

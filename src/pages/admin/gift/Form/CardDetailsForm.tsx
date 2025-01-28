@@ -49,7 +49,7 @@ const CardDetails: FC<CardDetailsProps> = ({ logo_url, request_id, presentationI
 
         setLoading(true);
         const apiClient = new ApiClient();
-        await apiClient.updateGiftCardTemplate(slideIdRef.current, recordRef.current.primary, recordRef.current.secondary, recordRef.current.logo, logo_url, giftRef.current.saplingId, giftRef.current.userName);
+        await apiClient.updateGiftCardTemplate(slideIdRef.current, recordRef.current.primary, recordRef.current.secondary, recordRef.current.logo, logoRef.current.logoUrl, giftRef.current.saplingId, giftRef.current.userName);
         setIframeSrc(
             `https://docs.google.com/presentation/d/${presentationIdIdRef.current}/embed?rm=minimal&slide=id.${slideIdRef.current}&timestamp=${new Date().getTime()}`
         );
@@ -60,7 +60,7 @@ const CardDetails: FC<CardDetailsProps> = ({ logo_url, request_id, presentationI
         const generateGiftCard = async () => {
             setLoading(true);
             const apiClient = new ApiClient();
-            const resp = await apiClient.generateCardTemplate(request_id, defaultMessages.primary, defaultMessages.secondary, defaultMessages.logo, logo_url, giftRef.current.saplingId, giftRef.current.userName, giftRef.current.plantType);
+            const resp = await apiClient.generateCardTemplate(request_id, defaultMessages.primary, defaultMessages.secondary, defaultMessages.logo, logoRef.current.logoUrl, giftRef.current.saplingId, giftRef.current.userName, giftRef.current.plantType);
             slideIdRef.current = resp.slide_id;
             presentationIdIdRef.current = resp.presentation_id;
 
@@ -90,6 +90,7 @@ const CardDetails: FC<CardDetailsProps> = ({ logo_url, request_id, presentationI
 
     useEffect(() => {
         logoRef.current.logoUrl = logo_url
+        console.log(logo_url);
     }, [logo_url])
 
     useEffect(() => {
