@@ -362,8 +362,8 @@ const GiftTrees: FC = () => {
                     });
                 }
                 toast.success("Tree cards requested!");
-            } catch (error) {
-                toast.error("Failed to create gift card users");
+            } catch (error: any) {
+                toast.error(error.message);
                 return;
             }
         }

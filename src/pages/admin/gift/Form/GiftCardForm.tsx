@@ -136,7 +136,7 @@ const GiftCardsForm: FC<GiftCardsFormProps> = ({ step, loggedinUserId, giftCardR
         {
             key: 0,
             title: "Sponsor Details",
-            content: <SponsorDetailsForm user={user} onUserSelect={user => setUser(user)} createdBy={createdBy} onCreatedByUserSelect={user => setCreatedBy(user)} logo={logoString} onLogoChange={logo => setLogo(logo)} group={group} onGroupSelect={group => { setGroup(group); setMessages(prev => ({ ...prev, plantedBy: group ? group.name : "" }))}}/>,
+            content: <SponsorDetailsForm user={user} onUserSelect={user => setUser(user)} createdBy={createdBy} onCreatedByUserSelect={user => setCreatedBy(user)} logo={logoString} onLogoChange={logo => setLogo(logo)} group={group} onGroupSelect={group => { setGroup(group); setLogoString(prev => group?.logo_url && !prev ? group.logo_url : prev); setMessages(prev => ({ ...prev, plantedBy: group ? group.name : "" }))}}/>,
             onClick: () => setCurrentStep(0),
             style: { cursor: 'pointer' },
         },
@@ -214,6 +214,10 @@ const GiftCardsForm: FC<GiftCardsFormProps> = ({ step, loggedinUserId, giftCardR
         }
 
         const apiClient = new ApiClient();
+        if (logoString && group && group.logo_url !== logoString) {
+            await apiClient.updateGroup({ ...group, logo_url: logoString })
+        }
+
         let paymentId = payment ? payment.id : undefined
         if (!payment) {
             const payment = await apiClient.createPayment(amount, donorType, panNumber, consent);
