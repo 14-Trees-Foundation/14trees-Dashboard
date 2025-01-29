@@ -146,7 +146,7 @@ export const UserInfo = () => {
                               style={{ width: `${treeDoneWidth}%` }}
                             ></div>
                             <div className={classes.count}>
-                              {14 - userinfo.user_trees.length}
+                              {Math.max(14 - userinfo.user_trees.length, 0)}
                               <div className={classes.countdesc}>
                                 Trees away from neutralising your carbon
                                 footprint
