@@ -19,7 +19,7 @@ import Meta from "antd/es/card/Meta";
 import image1 from '../../assets/home/corporate-gifts.jpeg'
 import image2 from '../../assets/home/personal-gifts.jpeg'
 import image3 from '../../assets/home/grove-gifts.jpeg'
-import { Button } from "@mui/material";
+import { Button, Typography } from "@mui/material";
 
 export const Search = () => {
   const classes = UseStyle();
@@ -105,7 +105,7 @@ export const Search = () => {
                   actions={[
                     <Button 
                       variant="contained" color="success" style={{ textTransform: 'none' }}
-                      onClick={() => { window.open("https://docs.google.com/forms/d/1Y1HrJiidcUXYrkjaYPvznQTs7AWROAFcrCb4heQlJg4/viewform"); }}
+                      onClick={() => { window.open("https://forms.gle/drNLNzYandSzer1TA"); }}
                     >
                       Gift Trees
                     </Button>
@@ -133,7 +133,7 @@ export const Search = () => {
                   actions={[
                     <Button 
                       variant="contained" color="success" style={{ textTransform: 'none' }}
-                      onClick={() => { window.open("https://docs.google.com/forms/d/1Y1HrJiidcUXYrkjaYPvznQTs7AWROAFcrCb4heQlJg4/viewform"); }}
+                      onClick={() => { window.open("https://forms.gle/fyuHye7yQaDTRGku7"); }}
                     >
                       Gift Trees
                     </Button>
@@ -161,7 +161,7 @@ export const Search = () => {
                   actions={[
                     <Button 
                       variant="contained" color="success" style={{ textTransform: 'none' }}
-                      onClick={() => { window.open("https://docs.google.com/forms/d/1Y1HrJiidcUXYrkjaYPvznQTs7AWROAFcrCb4heQlJg4/viewform"); }}
+                      onClick={() => { window.open("https://forms.gle/drNLNzYandSzer1TA"); }}
                     >
                       Create Forest
                     </Button>
@@ -171,7 +171,7 @@ export const Search = () => {
                   <ul>
                     <li>Alumni/College Grove</li>
                     <li>School Grove</li>
-                    <li>Corporate Grove</li>
+                    <li>Event/Ocassion Grove</li>
                     <li>Club Grove</li>
                     <li>Family Grove</li>
                     <li>Memorial Grove</li>
@@ -210,9 +210,10 @@ export const Search = () => {
                   />
                 </Card>
               </div>
-              <div className={classes.cardContainer} style={{ margin: '20px', marginTop: '30px', }}>
-                <Button variant="contained" onClick={() => { window.open("https://tinyurl.com/14T-visit-feedback"); }}>
-                  Share your site visit testimonial, feedback, actionable ideas
+              <h2 className={classes.cardheader} style={{ marginTop: '50px', alignSelf: 'center', fontSize: "24px", }}>Share your site visit testimonial, feedback, actionable ideas</h2>
+              <div className={classes.cardContainer} style={{ marginBottom: '30px' }}>
+                <Button variant="contained" onClick={() => { window.open("https://forms.gle/sWXxRZb1NKm9wWD18"); }}>
+                  Contact Us
                 </Button>
               </div>
             </div>
