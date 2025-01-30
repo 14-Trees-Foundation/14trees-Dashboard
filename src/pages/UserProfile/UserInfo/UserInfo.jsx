@@ -140,7 +140,7 @@ export const UserInfo = () => {
                               onClick={handleTreeClick}
                             />
                           </div>
-                          <div className={classes.overall}>
+                          {(14 - userinfo.user_trees.length) > 0 && <div className={classes.overall}>
                             <div
                               className={classes.done}
                               style={{ width: `${treeDoneWidth}%` }}
@@ -152,7 +152,7 @@ export const UserInfo = () => {
                                 footprint
                               </div>
                             </div>
-                          </div>
+                          </div>}
                         </div>
                       </div>
                     </Fragment>
