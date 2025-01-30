@@ -359,7 +359,7 @@ const PaymentComponent: React.FC<PaymentProps> = ({ initialAmount, paymentId, am
                 }}
             >
                 <Box width="45%">
-                    <Typography variant="h6" mb={1}>Payment Summary:</Typography>
+                    <Typography variant="h6" mb={1}>Payment Summary: (Razorpay/Bank Transfer)</Typography>
                     <TableContainer sx={{ maxWidth: 650 }} component={Paper}>
                         <Table sx={{ maxWidth: 650 }} aria-label="simple table">
                             <TableHead>
@@ -398,7 +398,7 @@ const PaymentComponent: React.FC<PaymentProps> = ({ initialAmount, paymentId, am
                     </TableContainer>
                 </Box>
                 <Box width="45%">
-                    <Typography variant="h6">Sponsorship Details:</Typography>
+                    <Typography variant="h6">Sponsorship Details: (Finance Team)</Typography>
                     <Divider sx={{ mb: 2 }} />
                     <Grid container spacing={2}>
                         <Grid item container xs={12}>
