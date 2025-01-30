@@ -17,7 +17,7 @@ const GiftRequestNotes: React.FC<GiftRequestNotesProps> = ({ open, handleClose, 
     if (initialText) setText(initialText);
     else setText('');
     
-  }, [initialText])
+  }, [open, initialText])
 
   const handleSave = () => {
     onSave(text);
