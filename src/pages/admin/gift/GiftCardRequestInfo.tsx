@@ -193,17 +193,22 @@ const GiftCardRequestInfo: React.FC<GiftCardRequestInfoProps> = ({ open, onClose
                             <strong>Recipient details:</strong> N/A
                         </Typography>
                     )}
-                    {data.presentation_id ? (
+                    {data.presentation_id &&
                         <Typography>
                             <Link href={'https://docs.google.com/presentation/d/' + data.presentation_id} target="_blank" rel="noopener">
                                 Tree Card Slides
                             </Link>
-                        </Typography>
-                    ) : (
+                        </Typography>}
+                    {data.presentation_ids.length > 0 &&
+                        <Typography>
+                            <Link href={'https://docs.google.com/presentation/d/' + data.presentation_ids[0]} target="_blank" rel="noopener">
+                                Tree Card Slides
+                            </Link>
+                        </Typography>}
+                    {(!data.presentation_id && !data.presentation_ids?.length) &&
                         <Typography>
                             <strong>Tree Card Slides:</strong> N/A
-                        </Typography>
-                    )}
+                        </Typography>}
                 </Box>
 
                 <Divider />
