@@ -332,13 +332,17 @@ const GiftTrees: FC = () => {
         }
     }
 
-    const updateGiftCardRequest = async (user: User, group: Group | null, treeCount: number, category: string, grove: string | null, requestType: string, users: any[], giftedOn: string, paymentId?: number, logo?: string, messages?: any, file?: File) => {
+    const updateGiftCardRequest = async (user: User, createdBy: User, group: Group | null, treeCount: number, category: string, grove: string | null, requestType: string, users: any[], giftedOn: string, paymentId?: number, logo?: string, messages?: any, file?: File) => {
         if (!selectedGiftCard) return;
 
         const apiClient = new ApiClient();
         let success = false;
         try {
-            const response = await apiClient.updateGiftCard(selectedGiftCard, treeCount, user.id, category, grove, requestType, giftedOn, group?.id, paymentId, logo, messages, file);
+
+            const data = { ...selectedGiftCard };
+            data.created_by = createdBy.id;
+            const response = await apiClient.updateGiftCard(data, treeCount, user.id, category, grove, requestType, giftedOn, group?.id, paymentId, logo, messages, file);
+
             toast.success("Tree Request updated successfully");
             dispatch({
                 type: giftCardActionTypes.UPDATE_GIFT_CARD_SUCCEEDED,
@@ -375,7 +379,7 @@ const GiftTrees: FC = () => {
         if (changeMode === 'add') {
             saveNewGiftCardsRequest(user, createdBy, group, treeCount, category, grove, requestType, users, giftedOn, paymentId, logo, messages, file);
         } else if (changeMode === 'edit') {
-            updateGiftCardRequest(user, group, treeCount, category, grove, requestType, users, giftedOn, paymentId, logo, messages, file);
+            updateGiftCardRequest(user, createdBy, group, treeCount, category, grove, requestType, users, giftedOn, paymentId, logo, messages, file);
         }
     }
 
@@ -491,6 +495,7 @@ const GiftTrees: FC = () => {
                 type: giftCardActionTypes.UPDATE_GIFT_CARD_SUCCEEDED,
                 payload: response,
             });
+            setSelectedGiftCard(null);
         } catch (error: any) {
             if (error?.response?.data?.message) toast.error(error.response.data.message);
             else toast.error("Please try again later!")
@@ -982,7 +987,15 @@ const GiftTrees: FC = () => {
                 </Box>
             }
 
-            <GiftCardsForm loggedinUserId={auth.userId} step={step} giftCardRequest={selectedGiftCard ?? undefined} requestId={requestId} open={modalOpen} handleClose={handleModalClose} onSubmit={handleSubmit} />
+            <GiftCardsForm 
+                loggedinUserId={authRef.current?.userId} 
+                step={step} 
+                giftCardRequest={selectedGiftCard ?? undefined} 
+                requestId={requestId} 
+                open={modalOpen} 
+                handleClose={handleModalClose} 
+                onSubmit={handleSubmit} 
+            />
 
             <Dialog open={plotModal} onClose={() => setPlotModal(false)} fullWidth maxWidth="xl">
                 <DialogTitle>Reserve Trees</DialogTitle>
