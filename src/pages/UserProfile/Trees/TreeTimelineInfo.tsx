@@ -11,7 +11,7 @@ const TreeTimelineInfo: FC<{}> = ({ }) => {
     const matches = useMediaQuery("(max-width:481px)");
 
     return (
-        <Card sx={{ display: 'flex', margin: '0 auto', padding: 2, borderRadius: 4, boxShadow: 3 }}>
+        <Card sx={{ display: 'flex', margin: '30px auto', padding: 2, borderRadius: 4, boxShadow: 3 }}>
             <CardContent sx={{ flex: '1 1 auto' }}>
                 <Typography variant="h5" style={{margin: 2}}>
                     <strong>Tree Timeline:</strong>
@@ -20,7 +20,7 @@ const TreeTimelineInfo: FC<{}> = ({ }) => {
                     Explore the journey of this tree through the timeline below, showcasing its growth and transformation over time. Each image tells a story of resilience and beauty as the tree matures and contributes to the ecosystem.
                 </Typography>
                 <TreeTimeline 
-                    items={selUserInfo.tree_audits.map((item: any) => ({ image: item.image, date: item.image_date, status: item.tree_status }))} 
+                    items={[{ image: selUserInfo.image, date: selUserInfo.created_at, status: 'healthy' }, ...selUserInfo.tree_audits.map((item: any) => ({ image: item.image, date: item.image_date, status: item.tree_status }))]} 
                     created_at={selUserInfo.created_at} 
                     position={matches ? 'right' : 'alternate'}
                 />

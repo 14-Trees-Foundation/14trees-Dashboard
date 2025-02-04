@@ -98,7 +98,7 @@ const TimelineComp: React.FC<{ items: TimelineItemProps[] }> = ({ items }) => {
 };
 
 
-const TreeTimeline: React.FC<TimelineProps> = ({ items, created_at, position='alternate' }) => {
+const TreeTimeline: React.FC<TimelineProps> = ({ items, created_at, position = 'alternate' }) => {
     const classes = useStyles();
 
     const imagesMap: Record<string, TimelineItemProps[]> = {};
@@ -124,12 +124,16 @@ const TreeTimeline: React.FC<TimelineProps> = ({ items, created_at, position='al
                                 <TimelineContent><TimelineComp key={index} items={item} /></TimelineContent>
                             </TimelineItem>
                         ))}
-                        <Box style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-                            <TimelineDot color='success' />
-                        </Box>
-                        <Typography variant='body1' style={{ display: 'flex', justifyContent: 'center', marginTop: 10 }}>
-                            The tree is {formatDateDifference(created_at)} old, awaiting new images!
-                        </Typography>
+                        <TimelineItem>
+                            <TimelineSeparator >
+                                <TimelineDot color='success' />
+                            </TimelineSeparator>
+                            <TimelineContent>
+                                <Typography variant='body1'>
+                                    The tree is {formatDateDifference(created_at)} old, awaiting new images!
+                                </Typography>
+                            </TimelineContent>
+                        </TimelineItem>
                     </Timeline>
                 }
                 {items.length === 0 &&
