@@ -11,7 +11,7 @@ const useStyles = makeStyles((theme: any) =>
         card: {
             marginBottom: theme.spacing(4),
             alignItems: 'center',
-            width: 250,
+            width: 300,
         },
         date: {
             marginTop: theme.spacing(2),
@@ -76,6 +76,7 @@ interface TimelineItemProps {
 interface TimelineProps {
     items: TimelineItemProps[];
     created_at: string;
+    position?: 'alternate' | 'left' | 'right'
 }
 
 const TimelineComp: React.FC<{ items: TimelineItemProps[] }> = ({ items }) => {
@@ -97,7 +98,7 @@ const TimelineComp: React.FC<{ items: TimelineItemProps[] }> = ({ items }) => {
 };
 
 
-const TreeTimeline: React.FC<TimelineProps> = ({ items, created_at }) => {
+const TreeTimeline: React.FC<TimelineProps> = ({ items, created_at, position='alternate' }) => {
     const classes = useStyles();
 
     const imagesMap: Record<string, TimelineItemProps[]> = {};
@@ -113,7 +114,7 @@ const TreeTimeline: React.FC<TimelineProps> = ({ items, created_at }) => {
         <Container className={classes.timeline}>
             <Box sx={{ width: '100%' }}>
                 {items.length !== 0 &&
-                    <Timeline position="alternate">
+                    <Timeline position={position}>
                         {Object.values(imagesMap).map((item, index) => (
                             <TimelineItem>
                                 <TimelineSeparator >

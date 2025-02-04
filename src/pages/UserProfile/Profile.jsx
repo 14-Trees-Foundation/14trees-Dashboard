@@ -13,6 +13,7 @@ import { selUsersData, usersData } from "../../store/atoms";
 import logo from "../../assets/icon_round.png";
 import { Button } from "@mui/material";
 import { useEffect } from "react";
+import TreeTimelineInfo from "./Trees/TreeTimelineInfo";
 
 export const Profile = ({ saplingId }) => {
   const matches = useMediaQuery("(max-width:481px)");
@@ -92,6 +93,9 @@ export const Profile = ({ saplingId }) => {
             </div>
           </div>
         </div>
+        {selUserInfo.tree_audits && selUserInfo.tree_audits.length > 1 && <div >
+          <TreeTimelineInfo />
+        </div>}
       </div>
     </div>
   );
