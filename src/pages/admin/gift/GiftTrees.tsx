@@ -1043,7 +1043,7 @@ const GiftTrees: FC = () => {
                 <DialogTitle>Sponsorship/Payment Details</DialogTitle>
                 <DialogContent dividers>
                     <PaymentComponent
-                        initialAmount={(selectedPaymentGR?.no_of_cards || 0) * 2000}
+                        initialAmount={(selectedPaymentGR?.no_of_cards || 0) * (selectedPaymentGR?.request_type === 'Card Request' ? 2000 : selectedPaymentGR?.category === 'Foundation' ? 3000 : 2000)}
                         paymentId={selectedPaymentGR?.payment_id}
                         onChange={handlePaymentFormSubmit}
                         sponsorshipType={selectedPaymentGR?.sponsorship_type}

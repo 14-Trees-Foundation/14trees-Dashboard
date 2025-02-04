@@ -56,8 +56,8 @@ const GiftCardsForm: FC<GiftCardsFormProps> = ({ step, loggedinUserId, giftCardR
     }, [step, giftCardRequest])
 
     useEffect(() => {
-        setAmount(treeCount * 2000);
-    }, [category, treeCount])
+        setAmount(treeCount * (giftRequestType === 'Card Request' ? 2000 : category === 'Foundation' ? 3000 : 200));
+    }, [giftRequestType, category, treeCount])
 
     const getGiftCardRequestDetails = async () => {
         const apiClient = new ApiClient();
