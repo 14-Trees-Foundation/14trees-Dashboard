@@ -1,5 +1,5 @@
 import React from 'react';
-import { Card, CardContent, CardMedia, Typography, Container, Box } from '@mui/material';
+import { Card, CardContent, Typography, Container, Box } from '@mui/material';
 import { makeStyles, createStyles } from '@mui/styles';
 import { Timeline, TimelineConnector, TimelineContent, TimelineDot, TimelineItem, TimelineSeparator } from '@mui/lab';
 import { Empty } from 'antd';
@@ -12,6 +12,12 @@ const useStyles = makeStyles((theme: any) =>
             marginBottom: theme.spacing(4),
             alignItems: 'center',
             width: 300,
+            [theme.breakpoints.down("1500")]: {
+                width: 230
+            },
+            [theme.breakpoints.down("480")]: {
+                width: 230
+            },
         },
         date: {
             marginTop: theme.spacing(2),
@@ -129,7 +135,7 @@ const TreeTimeline: React.FC<TimelineProps> = ({ items, created_at, position = '
                                 <TimelineDot color='success' />
                             </TimelineSeparator>
                             <TimelineContent>
-                                <Typography variant='body1'>
+                                <Typography variant='body1' className={classes.card}>
                                     The tree is {formatDateDifference(created_at)} old, awaiting new images!
                                 </Typography>
                             </TimelineContent>
