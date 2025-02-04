@@ -164,7 +164,7 @@ const useStyles = makeStyles((theme) =>
       height: "50vh",
       marginTop: "20px",
       [theme.breakpoints.down("1500")]: {
-        height: "52vh",
+        height: "105vh",
         marginTop: "5px",
       },
     },
@@ -195,6 +195,7 @@ const useStyles = makeStyles((theme) =>
       marginLeft: "20px",
       [theme.breakpoints.down("1500")]: {
         height: "52vh",
+        marginTop: "30px",
       },
       [theme.breakpoints.down("1025")]: {
         width: "55%",

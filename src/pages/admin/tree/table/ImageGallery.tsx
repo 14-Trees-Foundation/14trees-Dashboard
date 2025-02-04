@@ -15,7 +15,9 @@ const ImageGallery = ({ images }: { images: TimelineItemProps[] }) => {
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
 
-  const displayImages = images.slice(0, 2);
+  const maxDisplay = 1;
+  const displayImages = images.slice(0, maxDisplay);
+  const remainingImages = images.length - maxDisplay;
 
   return (
     <div>
@@ -24,12 +26,12 @@ const ImageGallery = ({ images }: { images: TimelineItemProps[] }) => {
         onClick={handleOpen}
         sx={{
           display: 'grid',
-          gridTemplateColumns: `repeat(${Math.min(displayImages.length, 2)}, 1fr)`,
+          gridTemplateColumns: `repeat(${Math.min(images.length, 2)}, 1fr)`,
           gridTemplateRows: `repeat(1, 1fr)`,
-          gap: 1,
           cursor: 'pointer',
           borderRadius: '4px',
           overflow: 'hidden',
+          position: 'relative'
         }}
       >
         {displayImages.map((image, index) => (
@@ -41,6 +43,26 @@ const ImageGallery = ({ images }: { images: TimelineItemProps[] }) => {
             sx={{ width: '100%', height: '100%', objectFit: 'cover' }}
           />
         ))}
+        {remainingImages > 0 && (
+          <Box
+            sx={{
+              position: 'absolute',
+              top: 0,
+              right: 0,
+              bottom: 0,
+              left: '50%',
+              width: '50%', height: '100%', objectFit: 'cover',
+              backgroundColor: 'rgba(0, 0, 0, 0.5)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: 'white',
+              fontSize: '24px',
+            }}
+          >
+            +{remainingImages}
+          </Box>
+        )}
       </Box>
 
       {/* Modal for Viewing All Images */}
