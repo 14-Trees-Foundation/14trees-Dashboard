@@ -70,6 +70,7 @@ export default function getColumnSearchProps<T extends object>(dataIndex: keyof 
                     <Btn
                         size="small"
                         onClick={() => {
+                            setSelectedKeys([' '])
                             confirm({ closeDropdown: false });
                             let newFilters = { ...filters }
                             newFilters[dataIndex.toString()] = {
