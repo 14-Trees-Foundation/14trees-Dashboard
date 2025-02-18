@@ -47,7 +47,7 @@ const TableSummary = (plots: Plot[], selectedPlotIds: number[], totalColumns: nu
   return (
     <Table.Summary fixed='bottom'>
       <Table.Summary.Row style={{ backgroundColor: 'rgba(172, 252, 172, 0.2)' }}>
-        <Table.Summary.Cell align="right" index={totalColumns - 9} colSpan={totalColumns - 8}>
+        <Table.Summary.Cell align="right" index={totalColumns - 10} colSpan={totalColumns - 8}>
           <strong>Total</strong>
         </Table.Summary.Cell>
         <Table.Summary.Cell align="right" index={totalColumns - 8} colSpan={1}>{calculateSum(plots.filter((plot) => selectedPlotIds.includes(plot.id)).map((plot) => plot.total))}</Table.Summary.Cell>
@@ -313,6 +313,14 @@ export const PlotComponent = () => {
       align: "right",
       width: 150,
       render: (value: number) => value ? value.toFixed(3) : 'Unknown', 
+    },
+    {
+      dataIndex: "pit_count",
+      key: "No. of Pits",
+      title: getSortableHeader("No. of Pits", 'pit_count'),
+      align: "right",
+      width: 150,
+      render: (value: number) => value >= 0 ? value : 'Unknown', 
     },
     {
       dataIndex: "total",
