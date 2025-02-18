@@ -540,13 +540,14 @@ const GiftTrees: FC = () => {
         }
     }
 
-    const handleSponsorshipDetailsSubmit = async (sponsorshipType: string, donationReceiptNumber: string | null, amountReceived: number) => {
+    const handleSponsorshipDetailsSubmit = async (sponsorshipType: string, donationReceiptNumber: string | null, amountReceived: number, donationDate: string | null) => {
         if (!selectedPaymentGR) return;
 
         const data = { ...selectedPaymentGR };
         data.sponsorship_type = sponsorshipType as SponsorshipType;
         data.amount_received = amountReceived;
         data.donation_receipt_number = donationReceiptNumber;
+        data.donation_date = donationDate;
 
         try {
             const apiClient = new ApiClient();
@@ -853,6 +854,14 @@ const GiftTrees: FC = () => {
             ...getColumnSearchProps('donation_receipt_number', filters, handleSetFilters)
         },
         {
+            dataIndex: "donation_date",
+            key: "Donation Date",
+            title: "Donation Date",
+            align: "center",
+            width: 200,
+            ...getColumnDateFilter({dataIndex: 'donation_date', filters, handleSetFilters, label: 'Received'})
+        },
+        {
             dataIndex: "total_amount",
             key: "Total Amount",
             title: getSortableHeader("Total Amount", 'total_amount'),
@@ -1063,6 +1072,7 @@ const GiftTrees: FC = () => {
                         sponsorshipType={selectedPaymentGR?.sponsorship_type}
                         donationReceipt={selectedPaymentGR?.donation_receipt_number}
                         amountReceived={selectedPaymentGR?.amount_received}
+                        donationDate={selectedPaymentGR?.donation_date}
                         onSponsorshipDetailsSave={handleSponsorshipDetailsSubmit}
                     />
                 </DialogContent>

@@ -47,6 +47,7 @@ export type GiftCard = {
     sponsorship_type: SponsorshipType;
     donation_receipt_number: string | null;
     amount_received: number;
+    donation_date: string | null;
 }
 
 export type GiftRequestUser = {
