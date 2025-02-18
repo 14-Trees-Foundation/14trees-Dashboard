@@ -513,7 +513,7 @@ const GiftTrees: FC = () => {
     }
 
     const handleGiftCardRequestDelete = () => {
-        if (!selectedGiftCard || selectedGiftCard.status === 'pending_gift_cards' || selectedGiftCard.status === 'completed') return;
+        if (!selectedGiftCard) return;
 
         deleteGiftCardRequest(selectedGiftCard);
         setDeleteModal(false);
@@ -540,13 +540,14 @@ const GiftTrees: FC = () => {
         }
     }
 
-    const handleSponsorshipDetailsSubmit = async (sponsorshipType: string, donationReceiptNumber: string | null, amountReceived: number) => {
+    const handleSponsorshipDetailsSubmit = async (sponsorshipType: string, donationReceiptNumber: string | null, amountReceived: number, donationDate: string | null) => {
         if (!selectedPaymentGR) return;
 
         const data = { ...selectedPaymentGR };
         data.sponsorship_type = sponsorshipType as SponsorshipType;
         data.amount_received = amountReceived;
         data.donation_receipt_number = donationReceiptNumber;
+        data.donation_date = donationDate;
 
         try {
             const apiClient = new ApiClient();
@@ -693,7 +694,7 @@ const GiftTrees: FC = () => {
                 <Menu.Item key="03" onClick={() => { handleCloneGiftCardRequest(record); }} icon={<FileCopy />}>
                     Clone Request
                 </Menu.Item>
-                {((record.status === 'pending_plot_selection' || record.status === 'pending_assignment')) &&
+                {!auth.roles.includes(UserRoles.User) &&
                     <Menu.Item key="04" danger onClick={() => { setDeleteModal(true); setSelectedGiftCard(record); }} icon={<Delete />}>
                         Delete Request
                     </Menu.Item>
@@ -851,6 +852,14 @@ const GiftTrees: FC = () => {
             align: "center",
             width: 200,
             ...getColumnSearchProps('donation_receipt_number', filters, handleSetFilters)
+        },
+        {
+            dataIndex: "donation_date",
+            key: "Donation Date",
+            title: "Donation Date",
+            align: "center",
+            width: 200,
+            ...getColumnDateFilter({dataIndex: 'donation_date', filters, handleSetFilters, label: 'Received'})
         },
         {
             dataIndex: "total_amount",
@@ -1040,14 +1049,15 @@ const GiftTrees: FC = () => {
             <Dialog open={deleteModal} onClose={() => setDeleteModal(false)} fullWidth maxWidth='md'>
                 <DialogTitle>Delete tree cards request</DialogTitle>
                 <DialogContent dividers>
-                    <Typography variant="subtitle1">Are you sure you want to delete this tree card request? This will unreserve the trees booked under your name.</Typography>
+                    <Typography variant='body1' fontWeight='bold'>Are you sure you want to delete this tree card request?</Typography>
+                    <Typography variant='body1'>This action will unassing and unreserve all the trees from this request. It will also delete any payment/donation details as well.</Typography>
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={() => setDeleteModal(false)} color="primary">
+                    <Button onClick={() => setDeleteModal(false)} color="success" variant="outlined">
                         Cancel
                     </Button>
-                    <Button onClick={handleGiftCardRequestDelete} color="success" variant="contained">
-                        Confirm
+                    <Button onClick={handleGiftCardRequestDelete} color="error" variant="contained">
+                        Delete
                     </Button>
                 </DialogActions>
             </Dialog>
@@ -1062,6 +1072,7 @@ const GiftTrees: FC = () => {
                         sponsorshipType={selectedPaymentGR?.sponsorship_type}
                         donationReceipt={selectedPaymentGR?.donation_receipt_number}
                         amountReceived={selectedPaymentGR?.amount_received}
+                        donationDate={selectedPaymentGR?.donation_date}
                         onSponsorshipDetailsSave={handleSponsorshipDetailsSubmit}
                     />
                 </DialogContent>

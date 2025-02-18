@@ -44,11 +44,12 @@ interface PaymentProps {
     onChange?: (paymentId: number) => void
     sponsorshipType?: string
     donationReceipt?: string | null
+    donationDate?: string | null
     amountReceived?: number
-    onSponsorshipDetailsSave: (sponsorshipType: string, donationReceiptNumber: string | null, amountReceived: number) => void
+    onSponsorshipDetailsSave: (sponsorshipType: string, donationReceiptNumber: string | null, amountReceived: number, donationDate: string | null) => void
 }
 
-const PaymentComponent: React.FC<PaymentProps> = ({ initialAmount, paymentId, amountReceived: ar, donationReceipt, sponsorshipType: st, onChange, onSponsorshipDetailsSave }) => {
+const PaymentComponent: React.FC<PaymentProps> = ({ initialAmount, paymentId, amountReceived: ar, donationReceipt, sponsorshipType: st, donationDate: dt, onChange, onSponsorshipDetailsSave }) => {
 
     const [openEdit, setOpenEdit] = useState(false);
     const [amount, setAmount] = useState(initialAmount || 0);
@@ -87,16 +88,18 @@ const PaymentComponent: React.FC<PaymentProps> = ({ initialAmount, paymentId, am
     const [donationReceiptNumber, setDonationReceiptNumber] = useState('');
     const [sponsorshipType, setSponosrshipType] = useState('');
     const [amountReceived, setAmountReceived] = useState(0);
+    const [donationDate, setDonationDate] = useState('');
 
     useEffect(() => {
         const handler = setTimeout(() =>{ 
             setAmountReceived(ar ? ar : 0);
             setDonationReceiptNumber(donationReceipt ? donationReceipt : '');
+            setDonationDate(dt ? dt : '');
             setSponosrshipType(st ? st : 'Unverified')
         }, 300);
 
         return () =>{ clearTimeout(handler); }
-    }, [donationReceipt, st, ar]) 
+    }, [donationReceipt, st, ar, dt]) 
 
     useEffect(() => {
         let paid = 0, verified = 0;
@@ -453,12 +456,29 @@ const PaymentComponent: React.FC<PaymentProps> = ({ initialAmount, paymentId, am
                             </Grid>
                         </Grid>
                         <Grid item container xs={12}>
+                            <Grid item xs={5}><Typography>Donation received on:</Typography></Grid>
+                            <Grid item xs={7}>
+                                <TextField  
+                                    fullWidth
+                                    name="donation_date"
+                                    size="small"
+                                    label="Donation date"
+                                    type="date"
+                                    InputLabelProps={{ shrink: true }}
+                                    value={donationDate ? donationDate : undefined}
+                                    onChange={(e) => {
+                                        setDonationDate(e.target.value);
+                                    }}
+                                />
+                            </Grid>
+                        </Grid>
+                        <Grid item container xs={12}>
                             <Grid item xs={3}></Grid>
                             <Grid item xs={5}>
                                 <Button
                                     variant="contained"
                                     color="success"
-                                    onClick={() => { onSponsorshipDetailsSave(sponsorshipType, donationReceiptNumber.trim() ? donationReceiptNumber.trim() : null, amountReceived ) }}
+                                    onClick={() => { onSponsorshipDetailsSave(sponsorshipType, donationReceiptNumber.trim() ? donationReceiptNumber.trim() : null, amountReceived, donationDate ? donationDate : null) }}
                                 >Save details</Button>
                             </Grid>
                             <Grid item xs={4}></Grid>
