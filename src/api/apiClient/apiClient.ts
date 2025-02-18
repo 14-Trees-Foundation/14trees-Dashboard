@@ -1670,6 +1670,17 @@ class ApiClient {
         }
     }
 
+    async updateGiftCardImages(gift_card_request_id: number): Promise<void> {
+        try {
+            const resp = await this.api.get<any>(`/gift-cards/update-card-images/${gift_card_request_id}`);
+        } catch (error: any) {
+            if (error.response) {
+                throw new Error(error.response.data.message);
+            }
+            throw new Error('Failed to update gift card images');
+        }
+    }
+
     async downloadGiftCards(gift_card_request_id: number, type: 'pdf' | 'ppt' | 'zip'): Promise<any> {
         try {
             const resp = await this.api.get<any>(`/gift-cards/download/${gift_card_request_id}?downloadType=${type}`, {

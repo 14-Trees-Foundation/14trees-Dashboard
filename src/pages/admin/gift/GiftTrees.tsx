@@ -13,7 +13,7 @@ import { useAppDispatch, useAppSelector } from "../../../redux/store/hooks";
 import { bindActionCreators } from "@reduxjs/toolkit";
 import { RootState } from "../../../redux/store/store";
 import { Dropdown, Menu, Table, TableColumnsType } from "antd";
-import { AssignmentInd, AssuredWorkload, CardGiftcard, Collections, Delete, Description, Download, Edit, Email, ErrorOutline, FileCopy, Landscape, LocalOffer, ManageAccounts, MenuOutlined, NotesOutlined, Slideshow, Wysiwyg } from "@mui/icons-material";
+import { AssignmentInd, AssuredWorkload, CardGiftcard, Collections, Delete, Description, Download, Edit, Email, ErrorOutline, FileCopy, Landscape, LocalOffer, ManageAccounts, MenuOutlined, NotesOutlined, Photo, Slideshow, Wysiwyg } from "@mui/icons-material";
 import PlotSelection from "./Form/PlotSelection";
 import { Plot } from "../../../types/plot";
 import giftCardActionTypes from "../../../redux/actionTypes/giftCardActionTypes";
@@ -461,6 +461,16 @@ const GiftTrees: FC = () => {
         setGiftCardNotification(true);
     }
 
+    const handleUpdateGiftCardImagess = async (id: number) => {
+        try {
+            const apiClient = new ApiClient();
+            await apiClient.updateGiftCardImages(id);
+            setGiftCardNotification(true);
+        } catch (error: any) {
+            toast.error(error.message);
+        }
+    }
+
     const handleDownloadCards = async (id: number, name: string, type: 'pdf' | 'ppt' | 'zip') => {
         try {
             const apiClient = new ApiClient();
@@ -722,6 +732,9 @@ const GiftTrees: FC = () => {
                 </Menu.Item>}
                 <Menu.Item key="31" onClick={() => { window.open('https://docs.google.com/presentation/d/' + (record.presentation_id ? record.presentation_id : record.presentation_ids[0])); }} icon={<Slideshow />}>
                     Tree Cards Slide
+                </Menu.Item>
+                <Menu.Item key="32" onClick={() => { handleUpdateGiftCardImagess(record.id) }} icon={<Photo />}>
+                    Update Cards Images
                 </Menu.Item>
             </Menu.ItemGroup>}
             {!auth.roles.includes(UserRoles.User) && <Menu.Divider style={{ backgroundColor: '#ccc' }} />}
