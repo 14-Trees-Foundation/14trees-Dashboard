@@ -731,8 +731,10 @@ class ApiClient {
             Object.entries(data).forEach(([key, value]) => {
                 if (key === "tags" && value) {
                     (value as any)?.forEach((tag: string) => { formData.append("tags", tag) });
-                } else if (key != 'image' && value != null) {
-                    const strValue = value as string
+                } else if (key === "location") {
+
+                } else if (key != 'image' && key !== "location") {
+                    const strValue = value as any
                     formData.append(key, strValue);
                 }
             });
