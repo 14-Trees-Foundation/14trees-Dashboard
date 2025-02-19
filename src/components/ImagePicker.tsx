@@ -66,6 +66,7 @@ const ImagePicker: React.FC<ImagePickerProps> = ({ image, onChange, width, heigh
     const handleRemoveImage = () => {
         setImagePreview(null);
         setCompletedCrop(null);
+        onChange(null);
     };
 
     const onCropComplete = (crop: Crop) => {
