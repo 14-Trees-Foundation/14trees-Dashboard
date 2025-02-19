@@ -848,6 +848,18 @@ const GiftTrees: FC = () => {
             ...getColumnSelectedItemFilter({ dataIndex: 'status', filters, handleSetFilters, options: [pendingPlotSelection, 'Pending assignment', 'Completed'] })
         },
         {
+            dataIndex: "mailed_count",
+            key: "Email Status",
+            title: "Email Status",
+            align: "center",
+            width: 150,
+            render: (value, record: any, index) => Number(record.mailed_count) > 0
+                                                    ? record.mailed_count >= record.users_count
+                                                        ? 'Sent'
+                                                        : 'Partially Sent'
+                                                    : ''
+        },
+        {
             dataIndex: "validation_errors",
             key: "Validation Errors",
             title: "Validation Errors",
