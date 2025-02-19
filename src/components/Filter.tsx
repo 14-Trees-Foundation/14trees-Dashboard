@@ -11,12 +11,42 @@ interface FilterItemProps<T> {
     dataIndex: keyof T
     filters: Record<string, GridFilterItem>
     handleSetFilters: (filters: Record<string, GridFilterItem>) => void
+    multiSearch?: boolean
 }
 
-export default function getColumnSearchProps<T extends object>(dataIndex: keyof T, filters: Record<string, GridFilterItem>, handleSetFilters: (filters: Record<string, GridFilterItem>) => void): TableColumnType<T> {
+export default function getColumnSearchProps<T extends object>(dataIndex: keyof T, filters: Record<string, GridFilterItem>, handleSetFilters: (filters: Record<string, GridFilterItem>) => void, multiSearch?: boolean): TableColumnType<T> {
 
-    let filterOption = 'contains'
-    // const searchInput = useRef<InputRef>(null);
+    return ({
+        filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters, close }) => (
+            <ColumnSearchDropdown
+                dataIndex={dataIndex}
+                filters={filters}
+                multiSearch={multiSearch}
+                handleSetFilters={handleSetFilters}
+                selectedKeys={selectedKeys}
+                setSelectedKeys={setSelectedKeys}
+                confirm={confirm}
+                close={close}
+                clearFilters={clearFilters}
+            />
+        ),
+        filterIcon: (filtered: boolean) => (
+            <FilterAltRoundedIcon style={{ color: filtered ? '#1677ff' : undefined }} />
+        ),
+    })
+};
+
+interface ColumnSearchDropdownProps<T> extends FilterItemProps<T> {
+    setSelectedKeys: (selectedKeys: React.Key[]) => void,
+    selectedKeys: React.Key[],
+    confirm: (param?: FilterConfirmProps) => void;
+    clearFilters?: () => void;
+    close: () => void;
+}
+
+const ColumnSearchDropdown = <T extends object>({ dataIndex, filters, selectedKeys, multiSearch, setSelectedKeys, handleSetFilters, confirm, clearFilters, close }: ColumnSearchDropdownProps<T>) => {
+
+    const [filterOption, setFilterOption] = useState('contains');
 
     const filterOptions: Record<string, string> = {
         'contains': 'Contains',
@@ -25,6 +55,10 @@ export default function getColumnSearchProps<T extends object>(dataIndex: keyof 
         'endsWith': 'Ends with',
         'isEmpty': 'Is empty',
         'isNotEmpty': 'Is not empty'
+    }
+
+    if (multiSearch) {
+        filterOptions['isAnyOf'] = "Is Any"
     }
 
     const filterOptionsArray: any = []
@@ -40,24 +74,31 @@ export default function getColumnSearchProps<T extends object>(dataIndex: keyof 
         handleSetFilters(newFilters);
     };
 
-    return ({
-        filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters, close }) => (
-            <div style={{ padding: 8 }} onKeyDown={(e) => e.stopPropagation()}>
+    return (
+        <div style={{ padding: 8 }} onKeyDown={(e) => e.stopPropagation()}>
                 <div style={{ display: 'flex', alignItems: 'center' }} >
                     <Select
                         defaultValue={filterOptionsArray[0]}
                         style={{ marginBottom: 8, marginRight: 6 }}
                         options={filterOptionsArray}
                         dropdownStyle={{ zIndex: 10001 }}
-                        onChange={(value) => { filterOption = value; }}
+                        onChange={(value) => { setFilterOption(value) }}
                     />
-                    <Input
-                        // ref={searchInput}
+                    {filterOption !== "isAnyOf" && <Input
                         placeholder={`Search ${dataIndex.toString()}`}
                         value={selectedKeys[0]}
                         onChange={(e) => setSelectedKeys(e.target.value ? [e.target.value] : [])}
                         style={{ marginBottom: 8, display: 'block' }}
-                    />
+                    />}
+                    {filterOption === "isAnyOf" && <Select
+                        mode="tags"
+                        placeholder="Please select"
+                        value={selectedKeys}
+                        onChange={(value) => setSelectedKeys(value)}
+                        tokenSeparators={['\n', ',']}
+                        dropdownStyle={{ zIndex: 10001 }}
+                        style={{ display: 'block', marginBottom: 8, alignItems: 'center', width: 250 }}
+                    />}
                 </div>
                 <Space style={{ display: 'flex', alignItems: 'center' }}>
                     <Btn
@@ -70,13 +111,15 @@ export default function getColumnSearchProps<T extends object>(dataIndex: keyof 
                     <Btn
                         size="small"
                         onClick={() => {
-                            setSelectedKeys([' '])
+                            if (filterOption === 'isEmpty' || filterOption === 'isNotEmpty') setSelectedKeys([' '])
                             confirm({ closeDropdown: false });
                             let newFilters = { ...filters }
                             newFilters[dataIndex.toString()] = {
                                 columnField: dataIndex.toString(),
                                 operatorValue: filterOption,
-                                value: (selectedKeys as string[])[0]?.trim(),
+                                value: filterOption !== "isAnyOf" 
+                                        ? (selectedKeys as string[])[0]?.trim()
+                                        : (selectedKeys as string[]).map(item => item.trim()),
                             }
                             handleSetFilters(newFilters);
                         }}
@@ -93,23 +136,10 @@ export default function getColumnSearchProps<T extends object>(dataIndex: keyof 
                     </Btn>
                 </Space>
             </div>
-        ),
-        filterIcon: (filtered: boolean) => (
-            <FilterAltRoundedIcon style={{ color: filtered ? '#1677ff' : undefined }} />
-        ),
-        // onFilter: (value, record) =>
-        //     { console.log(filters);
-        //     return record[dataIndex]
-        //     .toString()
-        //     .toLowerCase()
-        //     .includes((value as string).toLowerCase())},
-        // onFilterDropdownOpenChange: (visible) => {
-        //     if (visible) {
-        //         setTimeout(() => searchInput.current?.select(), 100);
-        //     }
-        // },
-    })
-};
+    )
+}
+
+
 
 type FilterSelectItemProp<T> = {
     dataIndex: keyof T,
@@ -122,7 +152,7 @@ export function getColumnSelectedItemFilter<T extends object>({ dataIndex, filte
 
     return ({
         filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters, close }) => (
-            <SelectItemFilterDropdown 
+            <SelectItemFilterDropdown
                 dataIndex={dataIndex}
                 options={options}
                 filters={filters}
@@ -142,7 +172,7 @@ export function getColumnSelectedItemFilter<T extends object>({ dataIndex, filte
 };
 
 interface SelectItemFilterDropdownProps<T> extends FilterSelectItemProp<T> {
-    setSelectedKeys: (selectedKeys: React.Key[]) => void, 
+    setSelectedKeys: (selectedKeys: React.Key[]) => void,
     selectedKeys: React.Key[],
     confirm: (param?: FilterConfirmProps) => void;
     clearFilters?: () => void;
@@ -205,7 +235,7 @@ const SelectItemFilterDropdown = <T extends object>({ dataIndex, filters, option
                             operatorValue: filterOption,
                             value: selectedKeys,
                         }
-                        
+
                         if (selectedKeys.length === 0) {
                             clearFilters && handleReset(clearFilters, confirm, dataIndex);
                         } else {
