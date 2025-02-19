@@ -56,8 +56,8 @@ const GiftCardsForm: FC<GiftCardsFormProps> = ({ step, loggedinUserId, giftCardR
     }, [step, giftCardRequest])
 
     useEffect(() => {
-        setAmount(treeCount * 2000);
-    }, [category, treeCount])
+        setAmount(treeCount * (category === 'Foundation' ? 3000 : giftRequestType === 'Normal Assignment' ? 1500 : 2000));
+    }, [giftRequestType, category, treeCount])
 
     const getGiftCardRequestDetails = async () => {
         const apiClient = new ApiClient();
@@ -136,7 +136,22 @@ const GiftCardsForm: FC<GiftCardsFormProps> = ({ step, loggedinUserId, giftCardR
         {
             key: 0,
             title: "Sponsor Details",
-            content: <SponsorDetailsForm user={user} onUserSelect={user => setUser(user)} createdBy={createdBy} onCreatedByUserSelect={user => setCreatedBy(user)} logo={logoString} onLogoChange={logo => setLogo(logo)} group={group} onGroupSelect={group => { setGroup(group); setLogoString(prev => group?.logo_url && !prev ? group.logo_url : prev); setMessages(prev => ({ ...prev, plantedBy: group ? group.name : "" }))}}/>,
+            content: <SponsorDetailsForm 
+                user={user} 
+                onUserSelect={user => setUser(user)} 
+                createdBy={createdBy} 
+                onCreatedByUserSelect={user => setCreatedBy(user)} 
+                logo={logoString} 
+                onLogoChange={logo => {
+                    setLogo(logo)
+                    if (logo === null) setLogoString(null)
+                }}
+                group={group} 
+                onGroupSelect={group => { 
+                    setGroup(group); 
+                    setLogoString(prev => group?.logo_url ? group.logo_url : prev); 
+                    setMessages(prev => ({ ...prev, plantedBy: group ? group.name : "" }))}
+                }/>,
             onClick: () => setCurrentStep(0),
             style: { cursor: 'pointer' },
         },
@@ -237,7 +252,8 @@ const GiftCardsForm: FC<GiftCardsFormProps> = ({ step, loggedinUserId, giftCardR
             }
         }
 
-        onSubmit(user, createdBy ?? user, group, treeCount, category, grove, giftRequestType, users, giftedOn, paymentId, logoString ?? undefined, messages, file ?? undefined);
+        const logoStr = logoString ? logoString : group?.logo_url ?? undefined;
+        onSubmit(user, createdBy ?? user, group, treeCount, category, grove, giftRequestType, users, giftedOn, paymentId, logoStr, messages, file ?? undefined);
 
         handleCloseForm();
     }
