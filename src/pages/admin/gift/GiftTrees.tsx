@@ -48,14 +48,14 @@ const TableSummary = (giftRequests: GiftCard[], selectedGiftRequestIds: number[]
     return (
         <Table.Summary fixed='bottom'>
             <Table.Summary.Row style={{ backgroundColor: 'rgba(172, 252, 172, 0.2)' }}>
-                <Table.Summary.Cell align="center" index={1} colSpan={4}>
+                <Table.Summary.Cell align="center" index={1} colSpan={5}>
                     <strong>Total</strong>
                 </Table.Summary.Cell>
                 <Table.Summary.Cell align="center" index={3} colSpan={1}>{calculateSum(giftRequests.filter((giftRequest) => selectedGiftRequestIds.includes(giftRequest.id)).map((giftRequest) => giftRequest.no_of_cards))}</Table.Summary.Cell>
                 <Table.Summary.Cell align="center" index={10} colSpan={7}></Table.Summary.Cell>
                 <Table.Summary.Cell align="center" index={11} colSpan={1}>{calculateSum(giftRequests.filter((giftRequest) => selectedGiftRequestIds.includes(giftRequest.id)).map((giftRequest: any) => giftRequest.total_amount))}</Table.Summary.Cell>
                 <Table.Summary.Cell align="center" index={12} colSpan={1}>{calculateSum(giftRequests.filter((giftRequest) => selectedGiftRequestIds.includes(giftRequest.id)).map((giftRequest) => giftRequest.amount_received))}</Table.Summary.Cell>
-                <Table.Summary.Cell align="center" index={13} colSpan={4}></Table.Summary.Cell>
+                <Table.Summary.Cell align="center" index={13} colSpan={3}></Table.Summary.Cell>
             </Table.Summary.Row>
         </Table.Summary>
     )
@@ -758,6 +758,31 @@ const GiftTrees: FC = () => {
 
     const columns: TableColumnsType<GiftCard> = [
         {
+            dataIndex: "action",
+            key: "action",
+            title: "Actions",
+            width: 100,
+            align: "center",
+            render: (value, record, index) => (
+                <div
+                    style={{
+                        display: "flex",
+                        justifyContent: "center",
+                        alignItems: "center",
+                    }}>
+                    <Dropdown overlay={getActionsMenu(record)} trigger={['click']}>
+                        <Button
+                            variant='outlined'
+                            color='success'
+                            style={{ margin: "0 5px" }}
+                        >
+                            <MenuOutlined />
+                        </Button>
+                    </Dropdown>
+                </div>
+            ),
+        },
+        {
             dataIndex: "id",
             key: "Req. No.",
             title: "Req. No.",
@@ -821,6 +846,18 @@ const GiftTrees: FC = () => {
             width: 150,
             render: (value, record, index) => getStatus(record),
             ...getColumnSelectedItemFilter({ dataIndex: 'status', filters, handleSetFilters, options: [pendingPlotSelection, 'Pending assignment', 'Completed'] })
+        },
+        {
+            dataIndex: "mailed_count",
+            key: "Email Status",
+            title: "Email Status",
+            align: "center",
+            width: 150,
+            render: (value, record: any, index) => Number(record.mailed_count) > 0
+                                                    ? record.mailed_count >= record.users_count
+                                                        ? 'Sent'
+                                                        : 'Partially Sent'
+                                                    : ''
         },
         {
             dataIndex: "validation_errors",
@@ -905,31 +942,6 @@ const GiftTrees: FC = () => {
             width: 200,
             render: getHumanReadableDate,
             ...getColumnDateFilter({ dataIndex: 'created_at', filters, handleSetFilters, label: 'Created' })
-        },
-        {
-            dataIndex: "action",
-            key: "action",
-            title: "Actions",
-            width: 100,
-            align: "center",
-            render: (value, record, index) => (
-                <div
-                    style={{
-                        display: "flex",
-                        justifyContent: "center",
-                        alignItems: "center",
-                    }}>
-                    <Dropdown overlay={getActionsMenu(record)} trigger={['click']}>
-                        <Button
-                            variant='outlined'
-                            color='success'
-                            style={{ margin: "0 5px" }}
-                        >
-                            <MenuOutlined />
-                        </Button>
-                    </Dropdown>
-                </div>
-            ),
         },
     ]
 
@@ -1066,7 +1078,7 @@ const GiftTrees: FC = () => {
                 <DialogTitle>Payment Details</DialogTitle>
                 <DialogContent dividers>
                     <PaymentComponent
-                        initialAmount={(selectedPaymentGR?.no_of_cards || 0) * 2000}
+                        initialAmount={(selectedPaymentGR?.no_of_cards || 0) * (selectedPaymentGR?.category === 'Foundation' ? 3000 : selectedPaymentGR?.request_type === 'Normal Assignment' ? 1500 : 2000)}
                         paymentId={selectedPaymentGR?.payment_id}
                         onChange={handlePaymentFormSubmit}
                         sponsorshipType={selectedPaymentGR?.sponsorship_type}

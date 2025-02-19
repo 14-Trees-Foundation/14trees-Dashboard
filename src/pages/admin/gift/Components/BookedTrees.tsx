@@ -31,7 +31,7 @@ const BookedTrees: React.FC<BookedTreesProps> = ({ giftCardRequestId, visible, o
         setLoading(true);
         try {
             const apiClient = new ApiClient();
-            const bookedTreesResp = await apiClient.getBookedGiftTrees(giftRequestId);
+            const bookedTreesResp = await apiClient.getBookedGiftTrees(giftRequestId, 0, -1);
             setExistingBookedTrees(bookedTreesResp.results.map(item => ({ ...item, key: item.id })));
         } catch (error: any) {
             toast.error(error.message);
@@ -55,7 +55,7 @@ const BookedTrees: React.FC<BookedTreesProps> = ({ giftCardRequestId, visible, o
             title: "Sapling ID",
             align: "center",
             width: 120,
-            ...getColumnSearchProps('sapling_id', filters, handleSetFilters)
+            // ...getColumnSearchProps('sapling_id', filters, handleSetFilters)
         },
         {
             dataIndex: "plant_type",
@@ -63,7 +63,7 @@ const BookedTrees: React.FC<BookedTreesProps> = ({ giftCardRequestId, visible, o
             title: "Plant Type",
             align: "center",
             width: 200,
-            ...getColumnSearchProps('plant_type', filters, handleSetFilters)
+            // ...getColumnSearchProps('plant_type', filters, handleSetFilters)
         },
         {
             dataIndex: "recipient_name",
@@ -71,7 +71,7 @@ const BookedTrees: React.FC<BookedTreesProps> = ({ giftCardRequestId, visible, o
             title: "Recipient",
             align: "center",
             width: 200,
-            ...getColumnSearchProps('recipient_name', filters, handleSetFilters)
+            // ...getColumnSearchProps('recipient_name', filters, handleSetFilters)
         },
         {
             dataIndex: "assignee_name",
@@ -79,7 +79,7 @@ const BookedTrees: React.FC<BookedTreesProps> = ({ giftCardRequestId, visible, o
             title: "Assignee",
             align: "center",
             width: 200,
-            ...getColumnSearchProps('assignee_name', filters, handleSetFilters)
+            // ...getColumnSearchProps('assignee_name', filters, handleSetFilters)
         },
     ];
 
@@ -145,6 +145,7 @@ const BookedTrees: React.FC<BookedTreesProps> = ({ giftCardRequestId, visible, o
                 columns={columns}
                 totalRecords={existingBookedTrees.length}
                 page={page}
+                pageSize={pageSize}
                 onSelectionChanges={handleSelectionChanges}
                 onPaginationChange={handlePaginationChange}
                 onDownload={handleDownload}
