@@ -207,7 +207,7 @@ export const TreeNew = () => {
             title: "Sapling ID",
             width: 150,
             align: 'center',
-            ...getColumnSearchProps('sapling_id', filters, handleSetFilters)
+            ...getColumnSearchProps('sapling_id', filters, handleSetFilters, true)
         },
         {
             dataIndex: "plant_type",
