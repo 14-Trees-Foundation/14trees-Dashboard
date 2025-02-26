@@ -18,16 +18,20 @@ import { Tag } from '../../types/tag';
 import { EmailTemplate } from '../../types/email_template';
 import { Payment, PaymentHistory } from '../../types/payment';
 import { Order } from '../../types/common';
+import { View } from '../../types/viewPermission';
 
 
 class ApiClient {
     private api: AxiosInstance;
+    private token: string | null;
 
     constructor() {
         const baseURL = process.env.REACT_APP_BASE_URL;
         this.api = axios.create({
             baseURL: baseURL,
         });
+        const token = localStorage.getItem("token")
+        this.token = token ? JSON.parse(token) : null;
     }
 
     /*
@@ -315,7 +319,7 @@ class ApiClient {
         const response = await this.api.get<PaginatedResponse<Tag>>(url);
         return response.data;
     }
-    
+
 
     /*
         Model- Group: CRUD Operations/Apis for organizations
@@ -367,7 +371,7 @@ class ApiClient {
             if (logo) {
                 formData.append("logo", logo);
             }
-                
+
 
             const response = await this.api.put<Group>(`/groups/${data.id}`, formData);
             return response.data;
@@ -901,7 +905,7 @@ class ApiClient {
 
     }
 
-    async getMappedGiftTrees(offset:number, limit: number, groupId: number): Promise<PaginatedResponse<Tree>> {
+    async getMappedGiftTrees(offset: number, limit: number, groupId: number): Promise<PaginatedResponse<Tree>> {
         const url = `/trees/mapped-gift/get?offset=${offset}&limit=${limit}`;
         try {
             const response = await this.api.post<PaginatedResponse<Tree>>(url, { group_id: groupId });
@@ -1050,7 +1054,7 @@ class ApiClient {
 
     async syncSitesDataFromNotion(): Promise<void> {
         await this.api.post<void>(`/sites/sync-sites`);
-        return ;
+        return;
     }
 
     async getSitesStats(offset: number = 0, limit: number = -1, filters?: any, orderBy?: { column: string, order: 'ASC' | 'DESC' }[]): Promise<PaginatedResponse<any>> {
@@ -1548,7 +1552,7 @@ class ApiClient {
 
     async getGiftRequestUsers(gift_card_request_id: number): Promise<GiftRequestUser[]> {
         try {
-            const response =await this.api.get<GiftRequestUser[]>(`/gift-cards/users/${gift_card_request_id}`);
+            const response = await this.api.get<GiftRequestUser[]>(`/gift-cards/users/${gift_card_request_id}`);
             return response.data;
         } catch (error: any) {
             if (error.response?.data?.message) {
@@ -1560,7 +1564,7 @@ class ApiClient {
 
     async upsertGiftCardUsers(gift_card_request_id: number, users: any[]): Promise<GiftCard> {
         try {
-            const response =await this.api.post<GiftCard>(`/gift-cards/users`, { gift_card_request_id, users });
+            const response = await this.api.post<GiftCard>(`/gift-cards/users`, { gift_card_request_id, users });
             return response.data;
         } catch (error: any) {
             if (error.response?.data?.message) {
@@ -1711,7 +1715,7 @@ class ApiClient {
 
     async updateAlbumImagesForGiftRequest(gift_card_request_id: number, album_id?: number): Promise<void> {
         try {
-            await this.api.post<void>(`/gift-cards/update-album/`, { gift_card_request_id, album_id});
+            await this.api.post<void>(`/gift-cards/update-album/`, { gift_card_request_id, album_id });
         } catch (error: any) {
             if (error.response) {
                 throw new Error(error.response.data.message);
@@ -1794,8 +1798,8 @@ class ApiClient {
             }
             throw new Error('Failed to get payment');
         }
-    } 
-        
+    }
+
     async createPayment(amount: number, donor_type: string, pan_number: string | null, consent: boolean) {
         try {
             const response = await this.api.post<Payment>(`/payments`, { amount, donor_type, pan_number, consent });
@@ -1806,7 +1810,7 @@ class ApiClient {
             }
             throw new Error('Failed to create payment');
         }
-    } 
+    }
 
     async updatedPayment(data: Payment) {
         try {
@@ -1818,7 +1822,7 @@ class ApiClient {
             }
             throw new Error('Failed to update payment');
         }
-    } 
+    }
 
     async createPaymentHistory(payment_id: number, amount: number, payment_method: string, payment_proof: string | null) {
         try {
@@ -1830,7 +1834,7 @@ class ApiClient {
             }
             throw new Error('Failed to create payment');
         }
-    } 
+    }
 
     async updatePaymentHistory(paymentHistory: PaymentHistory) {
         try {
@@ -1842,7 +1846,7 @@ class ApiClient {
             }
             throw new Error('Failed to create payment');
         }
-    } 
+    }
 
     async verifyPayment(order_id: string, razorpay_payment_id: string, razorpay_signature: string) {
         try {
@@ -1956,6 +1960,45 @@ class ApiClient {
             throw new Error('Failed to get email template');
         }
     }
+
+
+    /*
+        View Permissions
+    */
+
+    async verifyViewAccess(view_id: string, user_id: number, path: string, metadata?: Record<string, any>): Promise<{ code: number, message: string }> {
+        try {
+            const response = await this.api.post<any>(`/auth/verify-access/`, { view_id, user_id, path, metadata }, {
+                headers: {
+                    "x-access-token": this.token,
+                    "content-type": "application/json",
+                }
+            });
+            return response.data;
+        } catch (error: any) {
+            if (error.response) {
+                throw new Error(error.response.data.message);
+            }
+            throw new Error('Failed to fethc the page');
+        }
+    }
+
+    // async getViewDetails(path: string): Promise<View | null> {
+    //     try {
+    //         const response = await this.api.post<any>(`/auth/verify-access/`, { view_id, user_id, path, metadata }, {
+    //             headers: {
+    //                 "x-access-token": this.token,
+    //                 "content-type": "application/json",
+    //             }
+    //         });
+    //         return response.data;
+    //     } catch (error: any) {
+    //         if (error.response) {
+    //             throw new Error(error.response.data.message);
+    //         }
+    //         throw new Error('Failed to fethc the page');
+    //     }
+    // }
 }
 
 

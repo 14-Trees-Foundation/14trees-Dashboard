@@ -1,20 +1,28 @@
-import DrawerTemplate from "../../../components/DrawerTemplate";
 import CSRInventory from "./CSRInventory";
-import logo from "../../../assets/logo_white_small.png";
 import { useAuth } from "../auth/auth";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { SinglePageDrawer } from "./SinglePageDrawer";
 import { Dashboard, CardGiftcard, Landscape, Forest, GrassTwoTone, Map, NaturePeople } from "@mui/icons-material";
 import { createStyles, makeStyles } from "@mui/styles";
 import { Box } from "@mui/material";
+import { useLocation, useSearchParams } from "react-router-dom";
+import { UserRoles } from "../../../types/common";
+import ApiClient from "../../../api/apiClient/apiClient";
+import { toast } from "react-toastify";
+import { Spinner } from "../../../components/Spinner";
+import { NotFound } from "../../notfound/NotFound";
 
 const CSRPage: React.FC = () => {
 
     const classes = useStyles();
+    const [searchParams] = useSearchParams();
+    const location = useLocation();
+    const [loading, setLoading] = useState(true);
+    const [status, setStatus] = useState<{ code: number, message: string }>({ code: 404, message: '' })
 
     let auth = useAuth();
     useEffect(() => {
-        auth.signin("User", 0, ["all"], ["super-admin"], "", () => { })
+        auth.signin("User", 13124, ["all"], ["user"], "", () => { })
     }, [])
 
     const handleScroll = (id: string) => {
@@ -26,20 +34,31 @@ const CSRPage: React.FC = () => {
         }
     };
 
-    // const pages = [
-    //     {
-    //         page: CSRInventory,
-    //         displayName: "Dashboard",
-    //         logo: logo,
-    //     },
-    // ]
+    useEffect(() => {
+        console.log(auth);
+        if (auth.roles?.includes(UserRoles.Admin) || auth.roles?.includes(UserRoles.SuperAdmin)) {
+            setStatus({ code: 200, message: '' })
+            return;
+        }
 
-    // return (<DrawerTemplate
-    //     pages={pages}
-    //     style={{
-    //         backgroundColor: "#B1BFB5",
-    //     }}
-    // />)
+        const intervalId = setTimeout(async () => {
+            setLoading(true);
+            try {
+                const viewId = searchParams.get('v') || '';
+                const apiClient = new ApiClient();
+                const resp = await apiClient.verifyViewAccess(viewId, auth.userId, location.pathname);
+                setStatus(resp);
+            } catch (error: any) {
+                toast.error(error.message);
+            }
+            setLoading(false);
+        }, 300)
+
+        return () => {
+            clearTimeout(intervalId);
+        }
+
+    }, [auth, location])
 
     const items = [
         {
@@ -94,21 +113,25 @@ const CSRPage: React.FC = () => {
     ]
 
     return (
-        <div className={classes.box}>
-            <Box
-                sx={{
-                    display: "flex",
-                }}
-            >
-                <SinglePageDrawer pages={items} />
-                <Box
-                    component="main"
-                    sx={{ minWidth: "1080px", p: 2, width: "100%" }}
-                >
-                    <CSRInventory />
-                </Box>
-            </Box>
-        </div>
+        loading
+            ? <Spinner text={''} />
+            : status.code !== 200
+                ? <NotFound text={status.message} />
+                : (<div className={classes.box}>
+                    <Box
+                        sx={{
+                            display: "flex",
+                        }}
+                    >
+                        <SinglePageDrawer pages={items} />
+                        <Box
+                            component="main"
+                            sx={{ minWidth: "1080px", p: 2, width: "100%" }}
+                        >
+                            <CSRInventory />
+                        </Box>
+                    </Box>
+                </div>)
     );
 }
 
