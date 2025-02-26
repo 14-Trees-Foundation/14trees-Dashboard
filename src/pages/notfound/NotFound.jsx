@@ -5,7 +5,7 @@ import Button from "@mui/material/Button";
 import { createStyles, makeStyles } from "@mui/styles";
 import notfound from "../../assets/user.png";
 
-export const NotFound = () => {
+export const NotFound = ({ text = '' }) => {
   const classes = useStyles();
   return (
     <Grid container>
@@ -13,7 +13,7 @@ export const NotFound = () => {
         <img src={notfound} alt="Page Not Found" className={classes.img} />
       </Grid>
       <Grid item xs={12} className={classes.text}>
-        The requested page is lost in the Forest!
+        {text ? text : 'The requested page is lost in the Forest!'}
         <br></br>
         Please check if you are on right Trail!
       </Grid>
