@@ -23,7 +23,7 @@ const GiftCards: FC = () => {
     }]
 
     const dispatch = useAppDispatch();
-    const { getGiftCards, getBookedGiftTrees, redeemGiftCard } =
+    const { getGiftCards, getBookedGiftCards, redeemGiftCard } =
         bindActionCreators(giftCardActionCreators, dispatch);
 
     const [page, setPage] = useState(0);
@@ -42,7 +42,7 @@ const GiftCards: FC = () => {
 
     useEffect(() => {
         if (selectedGiftCard) {
-            getBookedGiftTrees(selectedGiftCard.id, bookedCardsPage * bookedCardsPageSize, bookedCardsPageSize);
+            getBookedGiftCards(selectedGiftCard.id, bookedCardsPage * bookedCardsPageSize, bookedCardsPageSize);
         }
     }, [selectedGiftCard, bookedCardsPage, bookedCardsPageSize]);
 
@@ -69,7 +69,7 @@ const GiftCards: FC = () => {
     };
 
     const getAllBookedGiftCardTreesData = async () => {
-        if (selectedGiftCard) getBookedGiftTrees(selectedGiftCard.id, 0, giftCardUsersData.totalGiftCardUsers);
+        if (selectedGiftCard) getBookedGiftCards(selectedGiftCard.id, 0, giftCardUsersData.totalGiftCardUsers);
     };
 
     const getStatus = (card: GiftCard) => {

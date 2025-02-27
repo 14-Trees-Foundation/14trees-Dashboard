@@ -905,10 +905,10 @@ class ApiClient {
 
     }
 
-    async getMappedGiftTrees(offset: number, limit: number, groupId: number): Promise<PaginatedResponse<Tree>> {
+    async getMappedGiftTrees(offset: number, limit: number, groupId: number, filters?: any[]): Promise<PaginatedResponse<Tree>> {
         const url = `/trees/mapped-gift/get?offset=${offset}&limit=${limit}`;
         try {
-            const response = await this.api.post<PaginatedResponse<Tree>>(url, { group_id: groupId });
+            const response = await this.api.post<PaginatedResponse<Tree>>(url, { group_id: groupId, filters });
             return response.data;
         } catch (error: any) {
             if (error.response?.data?.message) {
@@ -1650,7 +1650,18 @@ class ApiClient {
             if (error.response) {
                 throw new Error(error.response.data.message);
             }
-            throw new Error('Failed to generate gift cards');
+            throw new Error('Failed to redeem gift card');
+        }
+    }
+
+    async redeemMultipleGiftCardTemplate(trees_count: number, sponsor_group: number, user: User, profile_image_url?: string | null): Promise<void> {
+        try {
+            await this.api.post<void>(`/gift-cards/card/redeem-multi`, { trees_count, sponsor_group, ...user, user, profile_image_url });
+        } catch (error: any) {
+            if (error.response) {
+                throw new Error(error.response.data.message);
+            }
+            throw new Error('Failed to redeem gift cards');
         }
     }
 

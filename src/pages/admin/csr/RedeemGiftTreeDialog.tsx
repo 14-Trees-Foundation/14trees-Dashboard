@@ -8,6 +8,7 @@ import CardDetails from "../gift/Form/CardDetailsForm";
 import leafsPoster from "../../../assets/leafs.jpg";
 import treePlanting from "../../../assets/planting_illustration.jpg";
 import { makeStyles } from "@mui/styles";
+import { LoadingButton } from "@mui/lab";
 
 const EventTypes = [
     {
@@ -26,26 +27,28 @@ const EventTypes = [
 
 const useStyles = makeStyles((theme) => ({
     backgroundImage: {
-      position: 'relative',
-      '&::before': {
-        content: '""',
-        position: 'absolute',
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        backgroundImage: `url(${leafsPoster})`,
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        opacity: 0.5, // Adjust the opacity as needed
-      },
+        position: 'relative',
+        '&::before': {
+            content: '""',
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundImage: `url(${leafsPoster})`,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            opacity: 0.5, // Adjust the opacity as needed
+        },
     },
-  }));
+}));
 
 interface RedeemGiftTreeDialogProps {
     open: boolean
     onClose: () => void
     onSubmit: () => void
+    giftMultiple?: boolean
+    groupId: number,
     tree: {
         giftCardId: number,
         treeId: number,
@@ -57,7 +60,7 @@ interface RedeemGiftTreeDialogProps {
     }
 }
 
-const RedeemGiftTreeDialog: React.FC<RedeemGiftTreeDialogProps> = ({ tree, open, onSubmit, onClose }) => {
+const RedeemGiftTreeDialog: React.FC<RedeemGiftTreeDialogProps> = ({ tree, open, giftMultiple, groupId, onSubmit, onClose }) => {
 
     const classes = useStyles();
     const [errors, setErrors] = useState({
@@ -82,10 +85,12 @@ const RedeemGiftTreeDialog: React.FC<RedeemGiftTreeDialogProps> = ({ tree, open,
     const [presentationId, setPresentationId] = useState<string | null>(null);
     const [slideId, setSlideId] = useState<string | null>(null);
     const [step, setStep] = useState(0);
+    const [treesCount, setTreesCount] = useState(1);
+    const [loading, setLoading] = useState(false);
 
     useEffect(() => {
         setFormData(prev => {
-            return {  ...prev, gifted_by: tree.giftedBy }
+            return { ...prev, gifted_by: tree.giftedBy }
         })
 
         console.log(tree);
@@ -141,7 +146,7 @@ const RedeemGiftTreeDialog: React.FC<RedeemGiftTreeDialogProps> = ({ tree, open,
     const handleRedeemGiftTreeDialog = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
 
-        if (!tree.saplingId || !tree.treeId) {
+        if (!giftMultiple && (!tree.saplingId || !tree.treeId)) {
             toast.error("Gifted tree not found!");
             return;
         }
@@ -151,7 +156,7 @@ const RedeemGiftTreeDialog: React.FC<RedeemGiftTreeDialogProps> = ({ tree, open,
 
     const handleSubmit = async () => {
         try {
-
+            setLoading(true);
             let profileImageUrl: string | null = null
             if (profileImage) {
                 const awsUtils = new AWSUtils();
@@ -159,11 +164,17 @@ const RedeemGiftTreeDialog: React.FC<RedeemGiftTreeDialogProps> = ({ tree, open,
             }
 
             const apiClient = new ApiClient();
-            await apiClient.redeemGiftCardTemplate(tree.giftCardId, tree.saplingId, tree.treeId, formData as any, profileImageUrl);
+            if (giftMultiple) {
+                await apiClient.redeemMultipleGiftCardTemplate(treesCount, groupId, formData as any, profileImageUrl);
+                toast.success("Succefully gifted trees!");
+            } else {
+                await apiClient.redeemGiftCardTemplate(tree.giftCardId, tree.saplingId, tree.treeId, formData as any, profileImageUrl);
+                toast.success("Succefully gifted a tree!");
+            }
 
+            setLoading(false);
             onClose();
             onSubmit();
-            toast.success("Succefully gifted a tree!");
         } catch (error: any) {
             toast.error(error.message);
         }
@@ -181,15 +192,20 @@ const RedeemGiftTreeDialog: React.FC<RedeemGiftTreeDialogProps> = ({ tree, open,
         }))
     }
 
+    const handleNumberChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const value = Math.max(1, parseInt(event.target.value, 10));
+        setTreesCount(value);
+    };
+
     return (
         <Dialog open={open} fullWidth maxWidth='xl'>
-            <DialogTitle>🌳 Gift a Tree</DialogTitle>
+            <DialogTitle>🌳 Gift {giftMultiple ? 'Trees' : 'a Tree'}</DialogTitle>
             <form onSubmit={handleRedeemGiftTreeDialog}>
                 <DialogContent dividers>
                     <Box
-                        hidden={step !== 0} 
+                        hidden={step !== 0}
                     >
-                        <Box 
+                        <Box
                             sx={{
                                 maxWidth: '100%',
                                 display: 'flex',
@@ -199,7 +215,7 @@ const RedeemGiftTreeDialog: React.FC<RedeemGiftTreeDialogProps> = ({ tree, open,
                             className={classes.backgroundImage}
                         >
                             <Box component={'img'} src={treePlanting} sx={{ maxWidth: '45%', height: 'auto', zIndex: 1, borderRadius: 2, boxShadow: '0.3em 0.3em 1em rgba(12, 123, 115, 0.8)' }}></Box>
-                            <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', margin: 'auto', padding: '0px 0px 10px 30px' }}> 
+                            <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', margin: 'auto', padding: '0px 0px 10px 30px' }}>
                                 <Grid container rowSpacing={2} columnSpacing={1}>
                                     <Grid item xs={12}>
                                         <TextField
@@ -236,7 +252,18 @@ const RedeemGiftTreeDialog: React.FC<RedeemGiftTreeDialogProps> = ({ tree, open,
                                             fullWidth
                                         />
                                     </Grid>
-                                    <Grid item xs={12}>
+                                    {giftMultiple && <Grid item xs={6}>
+                                        <TextField
+                                            name="trees_count"
+                                            label="Number of Trees"
+                                            value={treesCount}
+                                            onChange={handleNumberChange}
+                                            inputProps={{ min: 1 }}
+                                            type="number"
+                                            fullWidth
+                                        />
+                                    </Grid>}
+                                    <Grid item xs={giftMultiple ? 6 : 12}>
                                         <div style={{ display: 'flex', alignItems: 'center', marginBottom: 16 }}>
                                             <Avatar
                                                 src={profileImage ? URL.createObjectURL(profileImage) : undefined}
@@ -327,15 +354,15 @@ const RedeemGiftTreeDialog: React.FC<RedeemGiftTreeDialogProps> = ({ tree, open,
                         </Box>
                     </Box>
                     <Box hidden={step !== 1} sx={{ maxWidth: '100%' }}>
-                        <CardDetails 
+                        <CardDetails
                             request_id={tree.requestId}
                             presentationId={presentationId}
                             slideId={slideId}
                             messages={messages}
                             onChange={(messages) => { setMessages(messages) }}
                             onPresentationId={(presentationId: string, slideId: string) => { setPresentationId(presentationId); setSlideId(slideId); }}
-                            saplingId={tree.saplingId}
-                            plantType={tree.plantType}
+                            saplingId={!giftMultiple ? tree.saplingId : '000000'}
+                            plantType={!giftMultiple ? tree.plantType : undefined}
                             userName={formData.name.trim() ? formData.name.trim() : undefined}
                             logo_url={tree.logoUrl}
                         />
@@ -345,24 +372,25 @@ const RedeemGiftTreeDialog: React.FC<RedeemGiftTreeDialogProps> = ({ tree, open,
                     <Button onClick={onClose} color="error" variant="outlined">
                         Cancel
                     </Button>
-                    {step === 0 && <Button 
+                    {step === 0 && <Button
                         variant="contained" color="success" type="submit"
                         style={{ textTransform: 'none' }}
                     >Preview Gift Card</Button>}
                     {step === 1 && <Button
-                        variant="contained" color="success" 
+                        variant="contained" color="success"
                         onClick={() => { setStep(0); }} style={{ textTransform: 'none' }}
                     >
                         Edit Details
                     </Button>}
-                    {step === 1 && <Button
+                    {step === 1 && <LoadingButton
+                        loading={loading}
                         color="success" variant="contained"
                         disabled={!!errors.name || !!errors.phone || !!errors.email}
                         startIcon={<CardGiftcard />}
                         onClick={handleSubmit}
                     >
                         Gift
-                    </Button>}
+                    </LoadingButton>}
                 </DialogActions>
             </form>
         </Dialog>
