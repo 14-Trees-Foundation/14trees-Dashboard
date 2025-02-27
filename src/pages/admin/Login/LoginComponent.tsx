@@ -65,6 +65,7 @@ export const LoginComponent = () => {
         );
         localStorage.setItem("token", JSON.stringify(res.data.token));
         localStorage.setItem("roles", JSON.stringify(roles));
+        localStorage.setItem("userId", res.data.user.id.toString());
         auth.signin(
           res.data.user.name,
           res.data.user.id,
