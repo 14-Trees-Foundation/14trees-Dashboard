@@ -43,6 +43,7 @@ const CSRGiftTrees: React.FC<CSRGiftTreesProps> = ({ groupId }) => {
         setTrees({});
         setPage(0);
         setTreesList([]);
+        setTotalRecords(20);
     }, [filter, searchUser])
 
     const getTrees = async (offset: number, limit: number, groupId: number, filters: any[]) => {
