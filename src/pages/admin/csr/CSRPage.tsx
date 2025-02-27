@@ -18,9 +18,7 @@ const CSRPage: React.FC = () => {
     const [searchParams] = useSearchParams();
     const location = useLocation();
     const [loading, setLoading] = useState(true);
-    const [status, setStatus] = useState<{ code: number, message: string }>({ code: 404, message: '' })
-
-    let auth = useAuth();
+    const [status, setStatus] = useState<{ code: number, message: string }>({ code: 404, message: '' });
 
     const handleScroll = (id: string) => {
         const element = document.getElementById(id);
@@ -32,8 +30,10 @@ const CSRPage: React.FC = () => {
     };
 
     useEffect(() => {
-        console.log(auth);
-        if (auth.roles?.includes(UserRoles.Admin) || auth.roles?.includes(UserRoles.SuperAdmin)) {
+        const roles: string[] = JSON.parse(localStorage.getItem('roles') || '[]');
+        const userId = localStorage.getItem('userId') ? Number(localStorage.getItem("userId")) : 0;
+
+        if (roles.includes(UserRoles.Admin) || roles.includes(UserRoles.SuperAdmin)) {
             setStatus({ code: 200, message: '' })
             return;
         }
@@ -43,7 +43,7 @@ const CSRPage: React.FC = () => {
             try {
                 const viewId = searchParams.get('v') || '';
                 const apiClient = new ApiClient();
-                const resp = await apiClient.verifyViewAccess(viewId, auth.userId, location.pathname);
+                const resp = await apiClient.verifyViewAccess(viewId, userId, location.pathname);
                 setStatus(resp);
             } catch (error: any) {
                 toast.error(error.message);
@@ -55,7 +55,7 @@ const CSRPage: React.FC = () => {
             clearTimeout(intervalId);
         }
 
-    }, [auth, location])
+    }, [location])
 
     const items = [
         // {
