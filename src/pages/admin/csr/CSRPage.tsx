@@ -22,7 +22,7 @@ const CSRPage: React.FC = () => {
 
     let auth = useAuth();
     useEffect(() => {
-        auth.signin("User", 13124, ["all"], ["user"], "", () => { })
+        auth.signin("User", 0, ["all"], ["super-admin"], "", () => { })
     }, [])
 
     const handleScroll = (id: string) => {
@@ -61,41 +61,41 @@ const CSRPage: React.FC = () => {
     }, [auth, location])
 
     const items = [
-        {
-            displayName: 'Overview',
-            logo: Dashboard,
-            key: 0,
-            display: true,
-            onClick: () => { handleScroll('corporate-impact-overview') }
-        },
-        {
-            displayName: 'Reforestation Sites',
-            logo: Map,
-            key: 1,
-            display: true,
-            onClick: () => { handleScroll('reforestation-sites') }
-        },
-        {
-            displayName: 'Plantation Plots',
-            logo: Landscape,
-            key: 2,
-            display: true,
-            onClick: () => { handleScroll('plantation-plots') }
-        },
-        {
-            displayName: 'Biodiversity Supported',
-            logo: GrassTwoTone,
-            key: 3,
-            display: true,
-            onClick: () => { handleScroll('biodiversity-supported') }
-        },
-        {
-            displayName: 'Sponsored Trees',
-            logo: Forest,
-            key: 4,
-            display: true,
-            onClick: () => { handleScroll('tree-sponsorship-details') }
-        },
+        // {
+        //     displayName: 'Overview',
+        //     logo: Dashboard,
+        //     key: 0,
+        //     display: true,
+        //     onClick: () => { handleScroll('corporate-impact-overview') }
+        // },
+        // {
+        //     displayName: 'Reforestation Sites',
+        //     logo: Map,
+        //     key: 1,
+        //     display: true,
+        //     onClick: () => { handleScroll('reforestation-sites') }
+        // },
+        // {
+        //     displayName: 'Plantation Plots',
+        //     logo: Landscape,
+        //     key: 2,
+        //     display: true,
+        //     onClick: () => { handleScroll('plantation-plots') }
+        // },
+        // {
+        //     displayName: 'Biodiversity Supported',
+        //     logo: GrassTwoTone,
+        //     key: 3,
+        //     display: true,
+        //     onClick: () => { handleScroll('biodiversity-supported') }
+        // },
+        // {
+        //     displayName: 'Sponsored Trees',
+        //     logo: Forest,
+        //     key: 4,
+        //     display: true,
+        //     onClick: () => { handleScroll('tree-sponsorship-details') }
+        // },
         {
             displayName: 'Gift Trees',
             logo: NaturePeople,
@@ -103,13 +103,13 @@ const CSRPage: React.FC = () => {
             display: true,
             onClick: () => { handleScroll('your-wall-of-tree-gifts') }
         },
-        {
-            displayName: 'Green Gift Contributions',
-            logo: CardGiftcard,
-            key: 6,
-            display: true,
-            onClick: () => { handleScroll('green-gift-contributions') }
-        },
+        // {
+        //     displayName: 'Green Gift Contributions',
+        //     logo: CardGiftcard,
+        //     key: 6,
+        //     display: true,
+        //     onClick: () => { handleScroll('green-gift-contributions') }
+        // },
     ]
 
     return (
