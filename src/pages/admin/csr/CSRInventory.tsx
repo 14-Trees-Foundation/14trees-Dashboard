@@ -9,7 +9,7 @@ import { bindActionCreators } from "@reduxjs/toolkit";
 import { Group } from "../../../types/Group";
 import * as groupActionCreators from '../../../redux/actions/groupActions';
 import ApiClient from "../../../api/apiClient/apiClient";
-import { toast } from "react-toastify";
+import { toast, ToastContainer } from "react-toastify";
 import { Forest, GrassTwoTone, ModeOfTravel, NaturePeople } from "@mui/icons-material";
 import CSRSiteStates from "./CSRSiteStates";
 import CSRPlantTypeStats from "./CSRPlantTypeStates";
@@ -17,6 +17,7 @@ import CSRTreeChart from "./CSRTreeChart";
 import { useParams } from "react-router-dom";
 import CSRGiftRequests from "./CSRGiftRequests";
 import CSRGiftTrees from "./CSRGiftTrees";
+import CSRSharePageDialog from "./CSRSharePageDialog";
 
 const CSRInventory: React.FC = () => {
 
@@ -114,6 +115,7 @@ const CSRInventory: React.FC = () => {
 
     return (
         <Box>
+            <ToastContainer />
             <div
                 style={{
                     display: "flex",
@@ -144,7 +146,7 @@ const CSRInventory: React.FC = () => {
                         size="small"
                         value={selectedGroup}
                     />
-                    <Button
+                    {/* <Button
                         sx={{ ml: 2 }}
                         disabled={!selectedGroup}
                         variant="contained"
@@ -159,12 +161,13 @@ const CSRInventory: React.FC = () => {
                         }}
                     >
                         CSR View
-                    </Button>
+                    </Button> */}
+                    <CSRSharePageDialog groupId={selectedGroup?.id} groupName={selectedGroup?.name} style={{ marginLeft: 10 }}/>
                 </div>}
             </div>
             <Divider sx={{ backgroundColor: "black", marginBottom: '15px' }} />
             
-            <Typography variant="h4" mt={5} ml={1} id="corporate-impact-overview">Corporate Impact Overview</Typography>
+            {/* <Typography variant="h4" mt={5} ml={1} id="corporate-impact-overview">Corporate Impact Overview</Typography>
             <Typography variant="subtitle1" mb={1} ml={1}>A comprehensive snapshot of your contributions to reforestation and sustainability efforts, including total trees sponsored, plant types supported, acres rejuvenated, and sponsorship progress over time.</Typography>
             <Box
                 style={{
@@ -235,17 +238,17 @@ const CSRInventory: React.FC = () => {
                 </Box>
             </Box>
 
-            <CSRSiteStates groupId={selectedGroup?.id} tags={tags} />
+            <CSRSiteStates groupId={selectedGroup?.id} tags={tags} /> */}
             {/* <Box style={{ marginBottom: '50px' }}>
                 <SitesMap />
             </Box> */}
-            <CSRPlotStates groupId={selectedGroup?.id} tags={tags} />
+            {/* <CSRPlotStates groupId={selectedGroup?.id} tags={tags} />
             <CSRPlantTypeStats groupId={selectedGroup?.id} />
-            <CSRTrees groupId={selectedGroup?.id} />
+            <CSRTrees groupId={selectedGroup?.id} /> */}
 
             {selectedGroup && <CSRGiftTrees groupId={selectedGroup.id} />}
 
-            {selectedGroup && <CSRGiftRequests groupId={selectedGroup.id} />}
+            {/* {selectedGroup && <CSRGiftRequests groupId={selectedGroup.id} />} */}
         </Box>
     );
 }
