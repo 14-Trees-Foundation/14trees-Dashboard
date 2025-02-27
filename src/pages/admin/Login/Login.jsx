@@ -37,7 +37,7 @@ export const Login = () => {
   const textStyle = { margin: "8px auto" };
   const btnstyle = { margin: "8px 0" };
 
-  let from = location.state?.from?.pathname || "/admin";
+  let from = location.state?.from?.pathname + location.state?.from?.search || "/admin";
 
   const responseGoogle = async (response) => {
     try {
