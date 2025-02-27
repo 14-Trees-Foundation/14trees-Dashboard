@@ -1921,7 +1921,7 @@ class ApiClient {
 
     async verifyViewAccess(view_id: string, user_id: number, path: string, metadata?: Record<string, any>): Promise<{ code: number, message: string }> {
         try {
-            const response = await this.api.post<any>(`/auth/verify-access/`, { view_id, user_id, path, metadata }, {
+            const response = await this.api.post<any>(`/view/verify-access/`, { view_id, user_id, path, metadata }, {
                 headers: {
                     "x-access-token": this.token,
                     "content-type": "application/json",
@@ -1932,26 +1932,77 @@ class ApiClient {
             if (error.response) {
                 throw new Error(error.response.data.message);
             }
-            throw new Error('Failed to fethc the page');
+            throw new Error('Failed to fetch the page');
         }
     }
 
-    // async getViewDetails(path: string): Promise<View | null> {
-    //     try {
-    //         const response = await this.api.post<any>(`/auth/verify-access/`, { view_id, user_id, path, metadata }, {
-    //             headers: {
-    //                 "x-access-token": this.token,
-    //                 "content-type": "application/json",
-    //             }
-    //         });
-    //         return response.data;
-    //     } catch (error: any) {
-    //         if (error.response) {
-    //             throw new Error(error.response.data.message);
-    //         }
-    //         throw new Error('Failed to fethc the page');
-    //     }
-    // }
+    async getViewDetails(path: string): Promise<View | null> {
+        try {
+            const response = await this.api.get<View | null>(`/view?path=${path}`, {
+                headers: {
+                    "x-access-token": this.token,
+                    "content-type": "application/json",
+                }
+            });
+            return response.data;
+        } catch (error: any) {
+            if (error.response) {
+                throw new Error(error.response.data.message);
+            }
+            throw new Error('Failed to fetch view details');
+        }
+    }
+
+    async createNewView(name: string, path: string, users: any[]): Promise<View> {
+        try {
+            const response = await this.api.post<View>(`/view`, { name, path, users }, {
+                headers: {
+                    "x-access-token": this.token,
+                    "content-type": "application/json",
+                }
+            });
+            return response.data;
+        } catch (error: any) {
+            if (error.response) {
+                throw new Error(error.response.data.message);
+            }
+            throw new Error('Failed to create view details');
+        }
+    }
+
+    async updateView(viewData: View): Promise<View> {
+        try {
+            const response = await this.api.put<View>(`/view`, viewData, {
+                headers: {
+                    "x-access-token": this.token,
+                    "content-type": "application/json",
+                }
+            });
+            return response.data;
+        } catch (error: any) {
+            if (error.response) {
+                throw new Error(error.response.data.message);
+            }
+            throw new Error('Failed to update view details');
+        }
+    }
+
+    async updateViewUsers(view_id: number, users: any[]): Promise<View> {
+        try {
+            const response = await this.api.post<View>(`/view/users`, { view_id, users }, {
+                headers: {
+                    "x-access-token": this.token,
+                    "content-type": "application/json",
+                }
+            });
+            return response.data;
+        } catch (error: any) {
+            if (error.response) {
+                throw new Error(error.response.data.message);
+            }
+            throw new Error('Failed to update permission details');
+        }
+    }
 }
 
 
