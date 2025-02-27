@@ -18,7 +18,9 @@ const CSRPage: React.FC = () => {
     const [searchParams] = useSearchParams();
     const location = useLocation();
     const [loading, setLoading] = useState(true);
-    const [status, setStatus] = useState<{ code: number, message: string }>({ code: 404, message: '' });
+    const [status, setStatus] = useState<{ code: number, message: string }>({ code: 404, message: '' })
+
+    let auth = useAuth();
 
     const handleScroll = (id: string) => {
         const element = document.getElementById(id);
@@ -30,7 +32,6 @@ const CSRPage: React.FC = () => {
     };
 
     useEffect(() => {
-        const auth = useAuth();
         console.log(auth);
         if (auth.roles?.includes(UserRoles.Admin) || auth.roles?.includes(UserRoles.SuperAdmin)) {
             setStatus({ code: 200, message: '' })
@@ -54,7 +55,7 @@ const CSRPage: React.FC = () => {
             clearTimeout(intervalId);
         }
 
-    }, [location])
+    }, [auth, location])
 
     const items = [
         // {
