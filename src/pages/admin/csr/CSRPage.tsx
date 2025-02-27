@@ -34,7 +34,8 @@ const CSRPage: React.FC = () => {
         const userId = localStorage.getItem('userId') ? Number(localStorage.getItem("userId")) : 0;
 
         if (roles.includes(UserRoles.Admin) || roles.includes(UserRoles.SuperAdmin)) {
-            setStatus({ code: 200, message: '' })
+            setStatus({ code: 200, message: '' });
+            setLoading(false);
             return;
         }
 
