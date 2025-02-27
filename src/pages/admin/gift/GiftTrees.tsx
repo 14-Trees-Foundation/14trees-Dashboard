@@ -1,6 +1,5 @@
 import { Badge, Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, Divider, IconButton, Tooltip, Typography } from "@mui/material";
 import { FC, useEffect, useRef, useState } from "react";
-import GiftTreesChart from "./GiftTreesChart";
 import GiftCardsForm from "./Form/GiftCardForm";
 import { User } from "../../../types/user";
 import { Group } from "../../../types/Group";
@@ -44,7 +43,22 @@ const TableSummary = (giftRequests: GiftCard[], selectedGiftRequestIds: number[]
 
     const calculateSum = (data: (number | undefined)[]) => {
         return data.reduce((a, b) => (a ?? 0) + (b ?? 0), 0);
-    }    
+    }
+
+    return (
+        <Table.Summary fixed='bottom'>
+            <Table.Summary.Row style={{ backgroundColor: 'rgba(172, 252, 172, 0.2)' }}>
+                <Table.Summary.Cell align="center" index={1} colSpan={5}>
+                    <strong>Total</strong>
+                </Table.Summary.Cell>
+                <Table.Summary.Cell align="center" index={3} colSpan={1}>{calculateSum(giftRequests.filter((giftRequest) => selectedGiftRequestIds.includes(giftRequest.id)).map((giftRequest) => giftRequest.no_of_cards))}</Table.Summary.Cell>
+                <Table.Summary.Cell align="center" index={10} colSpan={7}></Table.Summary.Cell>
+                <Table.Summary.Cell align="center" index={11} colSpan={1}>{calculateSum(giftRequests.filter((giftRequest) => selectedGiftRequestIds.includes(giftRequest.id)).map((giftRequest: any) => giftRequest.total_amount))}</Table.Summary.Cell>
+                <Table.Summary.Cell align="center" index={12} colSpan={1}>{calculateSum(giftRequests.filter((giftRequest) => selectedGiftRequestIds.includes(giftRequest.id)).map((giftRequest) => giftRequest.amount_received))}</Table.Summary.Cell>
+                <Table.Summary.Cell align="center" index={13} colSpan={3}></Table.Summary.Cell>
+            </Table.Summary.Row>
+        </Table.Summary>
+    )
 }
 
 const GiftTrees: FC = () => {
@@ -84,9 +98,6 @@ const GiftTrees: FC = () => {
     const [testingMail, setTestingMail] = useState(false);
     const [giftCardNotification, setGiftCardNotification] = useState(false);
     const [selectedGiftRequestIds, setSelectedGiftRequestIds] = useState<number[]>([]);
-    // Chart
-    const [corporateCount, setCorporateCount] = useState(0);
-    const [personalCount, setPersonalCount] = useState(0);
 
     // payment
     const [paymentModal, setPaymentModal] = useState(false);
@@ -148,16 +159,6 @@ const GiftTrees: FC = () => {
 
         return () => { clearTimeout(handler) };
     }, [pageSize, page, giftCardsData]);
-
-    // Chart Useffect
-    useEffect(() => {
-        const corporate = giftCards.filter(card => card.group_name !== 'Personal').length;
-        const personal = giftCards.filter(card => card.group_name === 'Personal').length;
-        setCorporateCount(corporate);
-        setPersonalCount(personal);
-      }, [giftCards]);
-
-
 
     const getFilters = (filters: any) => {
         const filtersData = JSON.parse(JSON.stringify(Object.values(filters))) as GridFilterItem[];
@@ -1152,11 +1153,6 @@ const GiftTrees: FC = () => {
             />
 
             <GiftCardCreationModal open={giftCardNotification} onClose={() => { setGiftCardNotification(false) }} />
-
-            <div style={{ marginTop: '20px' }}>
-                <h3>Sponsorship Distribution</h3>
-                <GiftTreesChart corporateCount={corporateCount} personalCount={personalCount} />
-            </div>    
         </div>
     );
 };
