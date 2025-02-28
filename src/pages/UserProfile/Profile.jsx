@@ -161,10 +161,10 @@ const useStyles = makeStyles((theme) =>
     },
     treemap: {
       fontSize: "30px",
-      height: "50vh",
+      maxHeight: "50vh",
       marginTop: "20px",
       [theme.breakpoints.down("1500")]: {
-        height: "105vh",
+        maxHeight: "105vh",
         marginTop: "5px",
       },
     },
@@ -191,10 +191,10 @@ const useStyles = makeStyles((theme) =>
     },
     map: {
       width: "60%",
-      height: "50vh",
+      maxHeight: "50vh",
       marginLeft: "20px",
       [theme.breakpoints.down("1500")]: {
-        height: "52vh",
+        maxHeight: "52vh",
         marginTop: "30px",
       },
       [theme.breakpoints.down("1025")]: {
@@ -202,7 +202,7 @@ const useStyles = makeStyles((theme) =>
       },
       [theme.breakpoints.down("480")]: {
         width: "100%",
-        height: "60vh",
+        maxHeight: "60vh",
         marginRight: "0px",
         marginLeft: "0px",
         paddingBottom: "20px",

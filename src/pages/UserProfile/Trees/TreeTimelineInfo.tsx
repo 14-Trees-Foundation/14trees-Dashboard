@@ -8,7 +8,7 @@ import { useRecoilValue } from 'recoil';
 const TreeTimelineInfo: FC<{}> = ({ }) => {
 
     const selUserInfo: any = useRecoilValue(selUsersData);
-    const matches = useMediaQuery("(max-width:1000px)");
+    const matches = useMediaQuery("(max-width:1150px)");
 
     return (
         <Card sx={{ display: 'flex', margin: '30px auto', padding: 2, borderRadius: 4, boxShadow: 3 }}>
