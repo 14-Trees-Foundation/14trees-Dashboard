@@ -1,5 +1,5 @@
 import React from 'react';
-import { Card, CardContent, CardMedia, Typography, Container, Box } from '@mui/material';
+import { Card, CardContent, Typography, Container, Box } from '@mui/material';
 import { makeStyles, createStyles } from '@mui/styles';
 import { Timeline, TimelineConnector, TimelineContent, TimelineDot, TimelineItem, TimelineSeparator } from '@mui/lab';
 import { Empty } from 'antd';
@@ -11,7 +11,13 @@ const useStyles = makeStyles((theme: any) =>
         card: {
             marginBottom: theme.spacing(4),
             alignItems: 'center',
-            width: 250,
+            width: 300,
+            [theme.breakpoints.down("1500")]: {
+                width: 230
+            },
+            [theme.breakpoints.down("480")]: {
+                width: 230
+            },
         },
         date: {
             marginTop: theme.spacing(2),
@@ -76,6 +82,7 @@ interface TimelineItemProps {
 interface TimelineProps {
     items: TimelineItemProps[];
     created_at: string;
+    position?: 'alternate' | 'left' | 'right'
 }
 
 const TimelineComp: React.FC<{ items: TimelineItemProps[] }> = ({ items }) => {
@@ -97,7 +104,7 @@ const TimelineComp: React.FC<{ items: TimelineItemProps[] }> = ({ items }) => {
 };
 
 
-const TreeTimeline: React.FC<TimelineProps> = ({ items, created_at }) => {
+const TreeTimeline: React.FC<TimelineProps> = ({ items, created_at, position = 'alternate' }) => {
     const classes = useStyles();
 
     const imagesMap: Record<string, TimelineItemProps[]> = {};
@@ -113,7 +120,7 @@ const TreeTimeline: React.FC<TimelineProps> = ({ items, created_at }) => {
         <Container className={classes.timeline}>
             <Box sx={{ width: '100%' }}>
                 {items.length !== 0 &&
-                    <Timeline position="alternate">
+                    <Timeline position={position}>
                         {Object.values(imagesMap).map((item, index) => (
                             <TimelineItem>
                                 <TimelineSeparator >
@@ -123,12 +130,16 @@ const TreeTimeline: React.FC<TimelineProps> = ({ items, created_at }) => {
                                 <TimelineContent><TimelineComp key={index} items={item} /></TimelineContent>
                             </TimelineItem>
                         ))}
-                        <Box style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-                            <TimelineDot color='success' />
-                        </Box>
-                        <Typography variant='body1' style={{ display: 'flex', justifyContent: 'center', marginTop: 10 }}>
-                            The tree is {formatDateDifference(created_at)} old, awaiting new images!
-                        </Typography>
+                        <TimelineItem>
+                            <TimelineSeparator >
+                                <TimelineDot color='success' />
+                            </TimelineSeparator>
+                            <TimelineContent>
+                                <Typography variant='body1' className={classes.card}>
+                                    The tree is {formatDateDifference(created_at)} old, awaiting new images!
+                                </Typography>
+                            </TimelineContent>
+                        </TimelineItem>
                     </Timeline>
                 }
                 {items.length === 0 &&
