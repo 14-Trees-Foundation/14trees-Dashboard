@@ -37,7 +37,8 @@ const CSRPage: React.FC = () => {
     useEffect(() => {
         console.log(auth);
         if (auth.roles?.includes(UserRoles.Admin) || auth.roles?.includes(UserRoles.SuperAdmin)) {
-            setStatus({ code: 200, message: '' })
+            setStatus({ code: 200, message: '' });
+            setLoading(false);
             return;
         }
 
@@ -97,7 +98,7 @@ const CSRPage: React.FC = () => {
         //     onClick: () => { handleScroll('tree-sponsorship-details') }
         // },
         {
-            displayName: 'Gift Trees',
+            displayName: 'Green Tribute Wall',
             logo: NaturePeople,
             key: 5,
             display: true,
