@@ -918,6 +918,19 @@ class ApiClient {
         }
     }
 
+    async getMappedGiftTreesAnalytics(groupId: number): Promise<any> {
+        const url = `/trees/mapped-gift/analytics`;
+        try{
+            const response = await this.api.post<any>(url, { group_id: groupId });
+            return response.data;
+        } catch (error: any) {
+            if (error.response?.data?.message) {
+                throw new Error(error.response.data.message);
+            }
+            throw new Error(`Failed to fetch reserved gift trees: ${error.message}`);
+        }
+    }
+
 
     /*
         Model- UserTree: CRUD Operations/Apis for user_tree_regs
