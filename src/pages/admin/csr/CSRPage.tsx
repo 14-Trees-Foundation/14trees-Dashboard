@@ -95,7 +95,7 @@ const CSRPage: React.FC = () => {
         //     onClick: () => { handleScroll('tree-sponsorship-details') }
         // },
         {
-            displayName: 'Gift Trees',
+            displayName: 'Green Tribute Wall',
             logo: NaturePeople,
             key: 5,
             display: true,
