@@ -9,7 +9,7 @@ interface AnalyticsChatsProps {
     style?: React.CSSProperties
 }
 
-const COLORS = ["#0088FE", "#00C49F", "#6DBBFF", "#00DFB5"];
+const COLORS = ["#007BFF", "#28A745", "#FFC107", "#FF5733"];
 
 const AnalyticsChats: FC<AnalyticsChatsProps> = ({ style }) => {
     /*
