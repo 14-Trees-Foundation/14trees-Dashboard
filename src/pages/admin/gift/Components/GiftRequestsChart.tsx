@@ -1,113 +1,152 @@
 import React, { useEffect, useState } from "react";
-import { PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer } from "recharts";
-import ApiClient from "../../../../api/apiClient/apiClient";
+import { LineChart, Line, BarChart, Bar, XAxis, YAxis, Tooltip, Legend, CartesianGrid, LabelList } from "recharts";
+import axios from "axios";
 
-const COLORS = ["#FF0000", "#1C39BB", "#006400"]; // Bright Red, Persian Blue, Dark Green
+// Utility function to get previous months in YYYY-MM-DD format
+const getPreviousMonthDate = (monthsAgo: number) => {
+    const date = new Date();
+    date.setMonth(date.getMonth() - monthsAgo);
+    return date.toISOString().split("T")[0]; // Get YYYY-MM-DD format
+};
 
-const GiftRequestsChart: React.FC<{ card?: boolean }> = ({ card }) => {
-    const [chartData, setChartData] = useState<{ name: string; value: number }>();
-    const [loading, setLoading] = useState(true);
+const GiftRequestsChart: React.FC = () => {
+    const [startDate, setStartDate] = useState<string>(getPreviousMonthDate(3));
+    const [endDate, setEndDate] = useState<string>(getPreviousMonthDate(0));
+    const [chartData, setChartData] = useState<any[]>([]);
+    const [loading, setLoading] = useState<boolean>(false);
+    const [chartType, setChartType] = useState<"line" | "bar">("bar"); // Default to Bar Chart
 
     useEffect(() => {
-        console.log("useEffect triggered!");
+        fetchChartData();
+    }, [startDate, endDate]);
 
-        const fetchData = async () => {
-            console.log("Fetching chart data...");
+    const fetchChartData = async () => {
+        setLoading(true);
+        const baseURL = "http://localhost:8088/api/gift-cards/requests/distribution";
+        const params = `start_date=${startDate}&end_date=${endDate}`;
+        const finalURL = `${baseURL}?${params}`;
+        console.log("Final API URL:", finalURL);
 
-            const apiClientInstance = new ApiClient();
-            console.log("ApiClient Instance:", apiClientInstance);
+        try {
+            const response = await axios.get(finalURL);
+            console.log("RAW API Response:", JSON.stringify(response.data, null, 2));
 
-            try {
-                const response = await apiClientInstance.api.get('/gift-cards/requests/distribution');
-                console.log("API Data:", response.data);
-
-                if (!response.data) {
-                    console.error("API response data is undefined:", response);
-                    return;
-                }
-
-                const data = response.data;
-                console.log("Parsed Values:", data.birthday_requests, data.memorial_requests, data.general_requests);
-
-                const formattedData = [
-                    { name: "Birthday", value: parseInt(data.birthday_requests, 10) || 0 },
-                    { name: "Memorial", value: parseInt(data.memorial_requests, 10) || 0 },
-                    { name: "General", value: parseInt(data.general_requests, 10) || 0 }
-                ];
-
-                console.log("Formatted Chart Data (Before Setting State):", formattedData);
-
-                setTimeout(() => {
-                    setChartData(formattedData);
-                    setLoading(false);
-                }, 500);
-            } catch (error) {
-                console.error("Error fetching gift request distribution:", error);
-                setLoading(false);
+            if (!response.data || response.data.length === 0) {
+                console.warn("No data received from API");
+                setChartData([]);
+                return;
             }
-        };
 
-        fetchData();
-    },);
+            console.log("Formatting Data...");
+            const formattedData = response.data.map((item: any) => ({
+                ...item,
+                birthday_requests: Number(item.birthday_requests) || 0,
+                memorial_requests: Number(item.memorial_requests) || 0,
+                general_requests: Number(item.general_requests) || 0,
+            }));
 
-    useEffect(() => {
-        console.log("Updated Chart Data (After State Update):", chartData);
-    }, [chartData]);
+            console.log("Formatted Data:", formattedData);
+            setChartData(formattedData);
+        } catch (error) {
+            console.error("Error fetching gift requests data:", error);
+        } finally {
+            setLoading(false);
+        }
+    };
 
-    console.log("Final Chart Data:", chartData);
+    // Format X-Axis labels for better readability
+    const formatXAxis = (month: string, index: number) => {
+        if (index === 0) return startDate; // Show start date for first entry
+        if (index === chartData.length - 1) return endDate; // Show end date for last entry
+        return month; // Default to month_start
+    };
 
-    if (loading) {
-        return <p style={{ textAlign: "center", margin: "50px 10px" }}>Loading chart data...</p>;
-    }
+    // Custom Tooltip Formatter
+    const tooltipFormatter = (value: number | string, name: string) => {
+        return [`${value} requests`, name.replace("_", " ")]; // Convert "birthday_requests" to "Birthday Requests"
+    };
 
-    if (chartData.length === 0) {
-        return <p style={{ textAlign: "center", margin: "50px 10px" }}>No data available.</p>;
-    }
-
-    const chartContent = (
-        <div style={{ width: "100%", display: "flex", justifyContent: "center" }}>
-            <div style={{ maxWidth: "500px", width: "100%", textAlign: "center" }}>
-                <h3>Gift Requests Distribution</h3>
-                <ResponsiveContainer width="100%" height={300}>
-                    <PieChart>
-                        <Pie
-                            data={chartData}
-                            cx="50%"
-                            cy="50%"
-                            outerRadius={80}
-                            fill="#8884d8"
-                            dataKey="value"
-                            label={({ name }) => name}
-                        >
-                            {chartData.map((entry, index) => (
-                                <Cell key={`cell-${entry.name}`} fill={COLORS[index % COLORS.length]} />
-                            ))}
-                        </Pie>
-                        <Tooltip />
-                        <Legend />
-                    </PieChart>
-                </ResponsiveContainer>
+    return (
+        <div style={{ width: "950px", height: "650px", border: "1px solid black", padding: "10px", margin: "0 auto", backgroundColor: "#f9f9f9" }}>
+            <div style={{ marginBottom: "10px", textAlign: "center" }}>
+                <label>Start Date: </label>
+                <input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} style={{ marginRight: "10px", padding: "5px" }} />
+                
+                <label>End Date: </label>
+                <input type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} style={{ padding: "5px" }} />
             </div>
+
+            {/* Chart Type Selector */}
+            <div style={{ textAlign: "center", marginBottom: "15px" }}>
+                <label>Select Chart Type: </label>
+                <select value={chartType} onChange={(e) => setChartType(e.target.value as "line" | "bar")} style={{ padding: "5px" }}>
+                    <option value="line">Line Chart</option>
+                    <option value="bar">Bar Chart</option>
+                </select>
+            </div>
+
+            <h2 style={{ textAlign: "center", fontWeight: "bold", marginTop: "10px" }}>Gift Request Trends Over Time</h2>
+
+            {loading ? (
+                <p>Loading...</p>
+            ) : chartData.length > 0 ? (
+                chartType === "line" ? (
+                    <LineChart width={900} height={500} data={chartData}>
+                        <CartesianGrid strokeDasharray="3 3" />
+                        <XAxis 
+                            dataKey="month_start" 
+                            tick={{ fontSize: 14 }} 
+                            interval={0} 
+                            tickFormatter={formatXAxis} 
+                            padding={{ right: 40 }}  
+                            allowDuplicatedCategory={false}
+                        />
+                        <YAxis domain={[0, "dataMax"]} tick={{ fontSize: 14 }} />
+                        <Tooltip formatter={tooltipFormatter} />
+                        <Legend verticalAlign="top" align="center" height={50} />
+                        
+                        <Line type="monotone" dataKey="birthday_requests" stroke="#FF0000" name="Birthday Requests" dot={{ r: 5 }} />
+                        <Line type="monotone" dataKey="memorial_requests" stroke="#00C853" name="Memorial Requests" dot={{ r: 5 }} />
+                        <Line type="monotone" dataKey="general_requests" stroke="#FF9100" name="General Requests" dot={{ r: 5 }} />
+                    </LineChart>
+                ) : (
+                    <BarChart width={900} height={500} data={chartData} barSize={50}>
+                        <CartesianGrid strokeDasharray="3 3" />
+                        <XAxis 
+                            dataKey="month_start" 
+                            tick={{ fontSize: 14 }} 
+                            interval={0} 
+                            tickFormatter={formatXAxis} 
+                            padding={{ right: 40 }}  
+                            allowDuplicatedCategory={false}
+                        />
+                        <YAxis domain={[0, "dataMax"]} tick={{ fontSize: 14 }} />
+                        
+                        {/* Fixed Tooltip Formatting */}
+                        <Tooltip 
+                            formatter={tooltipFormatter} 
+                            labelFormatter={(label) => `Date: ${label}`}
+                        />
+
+                        <Legend verticalAlign="top" align="center" height={50} />
+
+                        {/* Bars with Labels on Top */}
+                        <Bar dataKey="birthday_requests" fill="#FF0000" name="Birthday Requests">
+                            <LabelList dataKey="birthday_requests" position="top" style={{ fontSize: 14, fill: "#FF0000" }} />
+                        </Bar>
+                        <Bar dataKey="memorial_requests" fill="#00C853" name="Memorial Requests">
+                            <LabelList dataKey="memorial_requests" position="top" style={{ fontSize: 14, fill: "#00C853" }} />
+                        </Bar>
+                        <Bar dataKey="general_requests" fill="#FF9100" name="General Requests">
+                            <LabelList dataKey="general_requests" position="top" style={{ fontSize: 14, fill: "#FF9100" }} />
+                        </Bar>
+                    </BarChart>
+                )
+            ) : (
+                <p>No data available</p>
+            )}
         </div>
     );
-
-    // Conditional rendering for the card wrapper
-    if (card) {
-        return (
-            <div style={{
-                border: '1px solid #ddd',
-                borderRadius: '8px',
-                padding: '20px',
-                margin: '10px',
-                boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)'
-            }}>
-                {chartContent} 
-            </div>
-        );
-    }
-
-    return chartContent; 
 };
 
 export default GiftRequestsChart;
-

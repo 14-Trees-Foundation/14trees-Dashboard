@@ -1,4 +1,4 @@
-import { Badge, Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, Divider, IconButton, Tooltip, Typography, Grid } from "@mui/material";
+import { Badge, Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, Divider, IconButton, Tooltip, Typography, Grid, Card, CardContent} from "@mui/material";
 import { FC, useEffect, useRef, useState } from "react";
 import GiftCardsForm from "./Form/GiftCardForm";
 import { User } from "../../../types/user";
@@ -977,44 +977,40 @@ const GiftTrees: FC = () => {
             <Divider sx={{ backgroundColor: "black", marginBottom: '15px' }} />
 
             {auth.signedin && (
-                 <Grid container justifyContent="center" sx={{ width: "100%" }}>
-                    <Grid item xs={12} sx={{ display: "flex", justifyContent: "center" }}>
-                         <GeneralTable
-                          loading={giftCardsData.loading}
-                        rows={tableRows}
-                        columns={columns}
-                        totalRecords={giftCardsData.totalGiftCards}
-                        page={page}
-                        pageSize={pageSize}
-                        onPaginationChange={(page: number, pageSize: number) => { setPage(page - 1); setPageSize(pageSize); }}
-                        onDownload={getAllGiftCardsData}
-                        onSelectionChanges={handleSelectionChanges}
-                        summary={(totalColumns: number) => {
-                            if (totalColumns < 5) return undefined;
-                            return TableSummary(tableRows, selectedGiftRequestIds, totalColumns)
-                        }}
-                         footer
-                         tableName="Tree Cards"
-                         /> 
-                 </Grid>
-            
-            <Box sx={{ width: "100%" }}>
-            <div style={{
-                borderRadius: '8px',       // Slightly less rounded corners
-                padding: '15px',           // Reduce padding
-                margin: '10px auto',       // Center the card horizontally and add margin
-                boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)',
-                textAlign: 'center',       // Center the content
-                maxWidth: '550px'
-            }}>
-                <GiftRequestsChart card={true} style={{ margin: "50px 10px" }} />
-            </div>
-        </Box>
-        
-         <Grid item xs={12} sx={{ display: "flex", justifyContent: "center", width: "100%" }}>
-             <AnalyticsChats style={{ margin: "50px 10px", maxWidth: "600px", width: "100%" }} />
+    <Grid container justifyContent="center" sx={{ width: "100%" }}>
+        <Grid item xs={12} sx={{ display: "flex", justifyContent: "center" }}>
+            <GeneralTable
+                loading={giftCardsData.loading}
+                rows={tableRows}
+                columns={columns}
+                totalRecords={giftCardsData.totalGiftCards}
+                page={page}
+                pageSize={pageSize}
+                onPaginationChange={(page: number, pageSize: number) => { setPage(page - 1); setPageSize(pageSize); }}
+                onDownload={getAllGiftCardsData}
+                onSelectionChanges={handleSelectionChanges}
+                summary={(totalColumns: number) => {
+                    if (totalColumns < 5) return undefined;
+                    return TableSummary(tableRows, selectedGiftRequestIds, totalColumns)
+                }}
+                footer
+                tableName="Tree Cards"
+            />
         </Grid>
- </Grid>
+
+        <Grid item xs={12} display="flex" justifyContent="center">
+            <Card sx={{ width: "1000px", height: "700px", borderRadius: "20px", margin: "0 auto", boxShadow: 3, backgroundColor: "transparent", overflow: "hidden", display: "flex",
+                        justifyContent: "center", alignItems: "center",  padding: 2 }}>
+                <CardContent sx={{ display: "flex", justifyContent: "center", alignItems: "center", width: "100%", height: "100%" }}>
+                    <GiftRequestsChart />
+                </CardContent>
+            </Card>
+        </Grid>
+
+        <Grid item xs={12} sx={{ display: "flex", justifyContent: "center", width: "100%" }}>
+            <AnalyticsChats style={{ margin: "50px 10px", maxWidth: "600px", width: "100%" }} />
+        </Grid>
+    </Grid>
 )}
             {!auth.signedin &&
                 <Box
