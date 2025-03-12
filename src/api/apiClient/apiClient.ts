@@ -402,6 +402,17 @@ class ApiClient {
         }
     }
 
+    async mergeGroups(primary_group: number, secondary_group: number, delete_secondary: boolean): Promise<void> {
+        try {
+            await this.api.post<any>(`/groups/merge`, { primary_group, secondary_group, delete_secondary });
+        } catch (error: any) {
+            if (error?.response?.data?.message) {
+                throw new Error(error.response.data.message);
+            }
+            throw new Error('Failed to merge groups!');
+        }
+    }
+
     /*
         Model- UserGroup: CRUD Operations/Apis for user_groups
     */
