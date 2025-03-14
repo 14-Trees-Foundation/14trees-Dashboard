@@ -34,7 +34,11 @@ const GiftCardRequestInfo: React.FC<GiftCardRequestInfoProps> = ({ open, onClose
             setUsers(resp.results.filter(item => item.sapling_id));
         }
 
-        if (open) getGiftCards();
+        if (open) {
+            console.log("View Summary opened for Request ID:", data.id); // Log the request ID
+            console.log("Presentation IDs from API:", data.presentation_ids); // Log the presentation IDs
+            getGiftCards();
+        }
     }, [open, data])
 
     const columns: any[] = [
@@ -193,22 +197,27 @@ const GiftCardRequestInfo: React.FC<GiftCardRequestInfoProps> = ({ open, onClose
                             <strong>Recipient details:</strong> N/A
                         </Typography>
                     )}
-                    {data.presentation_id &&
+                    {data.presentation_ids.length > 0 ? (
+                        <Box>
+                            {data.presentation_ids.map((id: string, index: number) => (
+                                <Typography key={index}>
+                                    <Link href={`https://docs.google.com/presentation/d/${id}`} target="_blank" rel="noopener">
+                                        Tree Card Slides {index + 1}
+                                    </Link>
+                                </Typography>
+                            ))}
+                        </Box>
+                    ) : data.presentation_id ? (
                         <Typography>
-                            <Link href={'https://docs.google.com/presentation/d/' + data.presentation_id} target="_blank" rel="noopener">
+                            <Link href={`https://docs.google.com/presentation/d/${data.presentation_id}`} target="_blank" rel="noopener">
                                 Tree Card Slides
                             </Link>
-                        </Typography>}
-                    {data.presentation_ids.length > 0 &&
-                        <Typography>
-                            <Link href={'https://docs.google.com/presentation/d/' + data.presentation_ids[0]} target="_blank" rel="noopener">
-                                Tree Card Slides
-                            </Link>
-                        </Typography>}
-                    {(!data.presentation_id && !data.presentation_ids?.length) &&
+                        </Typography>
+                    ) : (
                         <Typography>
                             <strong>Tree Card Slides:</strong> N/A
-                        </Typography>}
+                        </Typography>
+                    )}
                 </Box>
 
                 <Divider />

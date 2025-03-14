@@ -48,6 +48,37 @@ const BookedTrees: React.FC<BookedTreesProps> = ({ giftCardRequestId, visible, o
         setFilters(filters);
     }
 
+    // Add the applyFilters function here
+    const applyFilters = (rows: GiftCardUser[], filters: Record<string, GridFilterItem>) => {
+        return rows.filter(row => {
+            return Object.entries(filters).every(([key, filter]) => {
+                const columnValue = row[key as keyof GiftCardUser];
+                const filterValue = filter.value;
+
+                if (!filterValue) return true; // No filter applied
+
+                switch (filter.operatorValue) {
+                    case 'contains':
+                        return String(columnValue).toLowerCase().includes(String(filterValue).toLowerCase());
+                    case 'equals':
+                        return String(columnValue) === String(filterValue);
+                    case 'startsWith':
+                        return String(columnValue).startsWith(String(filterValue));
+                    case 'endsWith':
+                        return String(columnValue).endsWith(String(filterValue));
+                    case 'isEmpty':
+                        return !columnValue;
+                    case 'isNotEmpty':
+                        return !!columnValue;
+                    case 'isAnyOf':
+                        return Array.isArray(filterValue) && filterValue.includes(String(columnValue));
+                    default:
+                        return true;
+                }
+            });
+        });
+    };
+
     const columns: TableColumnsType<GiftCardUser> = [
         {
             dataIndex: "sapling_id",
@@ -55,7 +86,7 @@ const BookedTrees: React.FC<BookedTreesProps> = ({ giftCardRequestId, visible, o
             title: "Sapling ID",
             align: "center",
             width: 120,
-            // ...getColumnSearchProps('sapling_id', filters, handleSetFilters)
+            ...getColumnSearchProps('sapling_id', filters, handleSetFilters)
         },
         {
             dataIndex: "plant_type",
@@ -63,7 +94,7 @@ const BookedTrees: React.FC<BookedTreesProps> = ({ giftCardRequestId, visible, o
             title: "Plant Type",
             align: "center",
             width: 200,
-            // ...getColumnSearchProps('plant_type', filters, handleSetFilters)
+            ...getColumnSearchProps('plant_type', filters, handleSetFilters)
         },
         {
             dataIndex: "recipient_name",
@@ -71,7 +102,7 @@ const BookedTrees: React.FC<BookedTreesProps> = ({ giftCardRequestId, visible, o
             title: "Recipient",
             align: "center",
             width: 200,
-            // ...getColumnSearchProps('recipient_name', filters, handleSetFilters)
+            ...getColumnSearchProps('recipient_name', filters, handleSetFilters)
         },
         {
             dataIndex: "assignee_name",
@@ -79,7 +110,7 @@ const BookedTrees: React.FC<BookedTreesProps> = ({ giftCardRequestId, visible, o
             title: "Assignee",
             align: "center",
             width: 200,
-            // ...getColumnSearchProps('assignee_name', filters, handleSetFilters)
+            ...getColumnSearchProps('assignee_name', filters, handleSetFilters)
         },
     ];
 
@@ -141,9 +172,9 @@ const BookedTrees: React.FC<BookedTreesProps> = ({ giftCardRequestId, visible, o
             </Box>
             <GeneralTable
                 loading={loading}
-                rows={existingBookedTrees.slice(page * pageSize, (page + 1) * pageSize)}
+                rows={applyFilters(existingBookedTrees, filters).slice(page * pageSize, (page + 1) * pageSize)} // Apply filters here
                 columns={columns}
-                totalRecords={existingBookedTrees.length}
+                totalRecords={applyFilters(existingBookedTrees, filters).length} // Update total records
                 page={page}
                 pageSize={pageSize}
                 onSelectionChanges={handleSelectionChanges}
