@@ -41,24 +41,32 @@ const calculateUnion = (plantTypes: (string[] | undefined)[]) => {
 }
 
 const TableSummary = (giftRequests: GiftCard[], selectedGiftRequestIds: number[], totalColumns: number) => {
-
+ 
     const calculateSum = (data: (number | undefined)[]) => {
         return data.reduce((a, b) => (a ?? 0) + (b ?? 0), 0);
     }    
 
     return (
-        <Table.Summary fixed='bottom'>
-            <Table.Summary.Row style={{ backgroundColor: 'rgba(172, 252, 172, 0.2)' }}>
-                <Table.Summary.Cell align="center" index={1} colSpan={5}>
-                    <strong>Total</strong>
-                </Table.Summary.Cell>
-                <Table.Summary.Cell align="center" index={3} colSpan={1}>{calculateSum(giftRequests.filter((giftRequest) => selectedGiftRequestIds.includes(giftRequest.id)).map((giftRequest) => giftRequest.no_of_cards))}</Table.Summary.Cell>
-                <Table.Summary.Cell align="center" index={10} colSpan={7}></Table.Summary.Cell>
-                <Table.Summary.Cell align="center" index={11} colSpan={1}>{calculateSum(giftRequests.filter((giftRequest) => selectedGiftRequestIds.includes(giftRequest.id)).map((giftRequest: any) => giftRequest.total_amount))}</Table.Summary.Cell>
-                <Table.Summary.Cell align="center" index={12} colSpan={1}>{calculateSum(giftRequests.filter((giftRequest) => selectedGiftRequestIds.includes(giftRequest.id)).map((giftRequest) => giftRequest.amount_received))}</Table.Summary.Cell>
-                <Table.Summary.Cell align="center" index={13} colSpan={3}></Table.Summary.Cell>
-            </Table.Summary.Row>
-        </Table.Summary>
+        <Table.Summary fixed="bottom">
+    <Table.Summary.Row style={{ backgroundColor: "rgba(172, 252, 172, 0.2)" }}>
+        <Table.Summary.Cell align="center" index={1} colSpan={5}>
+            <strong>Total</strong>
+        </Table.Summary.Cell>
+        <Table.Summary.Cell align="center" index={6}>
+            {calculateSum(giftRequests.map((giftRequest) => giftRequest.no_of_cards))}
+        </Table.Summary.Cell>
+
+        <Table.Summary.Cell index={7} colSpan={9}></Table.Summary.Cell>
+        <Table.Summary.Cell align="center" index={11}>
+            {calculateSum(giftRequests.map((giftRequest) => giftRequest.total_amount))}
+        </Table.Summary.Cell>
+        <Table.Summary.Cell align="center" index={12}>
+            {calculateSum(giftRequests.map((giftRequest) => giftRequest.amount_received))}
+        </Table.Summary.Cell>
+        <Table.Summary.Cell index={13} colSpan={4}></Table.Summary.Cell>
+    </Table.Summary.Row>
+</Table.Summary>
+
     )
 }
 
@@ -103,6 +111,9 @@ const GiftTrees: FC = () => {
     const [corporateCount, setCorporateCount] = useState(0);
     const [personalCount, setPersonalCount] = useState(0);
 
+    const [totalReceived, setTotalReceived] = useState(0);
+    const [totalAmount, setTotalAmount] = useState(0);
+
     // payment
     const [paymentModal, setPaymentModal] = useState(false);
     const [selectedPaymentGR, setSelectedPaymentGR] = useState<GiftCard | null>(null);
@@ -136,12 +147,12 @@ const GiftTrees: FC = () => {
         const handler = setTimeout(() => {
             getGiftCardData();
         }, 300)
-
+    
         return () => { clearTimeout(handler) };
     }, [filters, orderBy, auth]);
-
+    
     useEffect(() => {
-
+        
         const handler = setTimeout(() => {
             const records: GiftCard[] = [];
             const maxLength = Math.min((page + 1) * pageSize, giftCardsData.totalGiftCards);
@@ -150,19 +161,19 @@ const GiftTrees: FC = () => {
                     const id = giftCardsData.paginationMapping[i];
                     const record = giftCardsData.giftCards[id];
                     if (record) {
-                        records.push(record);
+                         records.push(record); 
                     }
                 } else {
                     getGiftCardData();
                     break;
                 }
             }
-
-            setTableRows(records);
+    
+             setTableRows(records);
         }, 300)
-
+    
         return () => { clearTimeout(handler) };
-    }, [pageSize, page, giftCardsData]);
+    }, [pageSize, page, giftCardsData]);   
 
     // Chart Useffect
     useEffect(() => {
@@ -179,6 +190,54 @@ const GiftTrees: FC = () => {
     console.log("Corporate Count:", corporateCount);
     console.log("Personal Count:", personalCount);
 
+    useEffect(() => {
+        if (!giftCards || !Array.isArray(giftCards)) return;
+
+        const receivedSum = giftCards.reduce((sum, card) => sum + (card.amount_received || 0), 0);
+        const totalSum = giftCards.reduce((sum, card) => sum + (card.total_amount || 0), 0);
+
+        setTotalReceived(receivedSum);
+        setTotalAmount(totalSum);
+    }, [giftCards]);
+
+    console.log("total recieved", totalReceived);
+    console.log("total amount:", totalAmount);
+
+    useEffect(() => {
+        // Inject CSS for scrollable menu
+        const style = document.createElement("style");
+        style.innerHTML = `
+            .scrollable-menu {
+                max-height: 300px; /* Adjust height as needed */
+                overflow-y: auto;
+            }
+        `;
+        document.head.appendChild(style);
+    
+        // Function to stop scroll propagation
+        const stopPropagation = (e: Event) => {
+            if (e instanceof WheelEvent) {
+                e.stopPropagation();
+            }
+        };
+    
+        // Prevent whole page scrolling when scrolling inside the menu
+        const menuElement = document.querySelector(".scrollable-menu");
+        if (menuElement) {
+            menuElement.addEventListener("wheel", stopPropagation as EventListener, { passive: false });
+    
+            // Cleanup function
+            return () => {
+                document.head.removeChild(style);
+                menuElement.removeEventListener("wheel", stopPropagation as EventListener);
+            };
+        }
+    
+        return () => {
+            document.head.removeChild(style);
+        };
+    }, []);
+    
 
     const getFilters = (filters: any) => {
         const filtersData = JSON.parse(JSON.stringify(Object.values(filters))) as GridFilterItem[];
@@ -210,14 +269,14 @@ const GiftTrees: FC = () => {
         return filtersData;
     }
 
-    const getGiftCardData = async () => {
-        // check if user logged in
-        if (!authRef.current?.signedin) return;
+const getGiftCardData = async () => {
+    // check if user logged in
+    if (!authRef.current?.signedin) return;
 
-        const filtersData = getFilters(filters);
+    const filtersData = getFilters(filters);
 
-        getGiftCards(page * pageSize, pageSize, filtersData, orderBy);
-    };
+    getGiftCards(page * pageSize, pageSize, filtersData, orderBy);
+};
 
     const getAllGiftCardsData = async () => {
         let filtersData = getFilters(filters);
@@ -225,8 +284,6 @@ const GiftTrees: FC = () => {
         const resp = await apiClient.getGiftCards(0, -1, filtersData, orderBy);
         return resp.results;
     };
-
-
     const handleSetFilters = (filters: Record<string, GridFilterItem>) => {
         setPage(0);
         setFilters(filters);
@@ -685,7 +742,7 @@ const GiftTrees: FC = () => {
     }
 
     const getActionsMenu = (record: GiftCard) => (
-        <Menu>
+        <Menu className="scrollable-menu"> {/* Added class for scrollable menu */}
             <Menu.ItemGroup>
                 <Menu.Item key="50" onClick={() => { handleModalOpenEdit(record, 2); }} icon={<Wysiwyg />}>
                     Edit Dashboard Details
@@ -964,7 +1021,9 @@ const GiftTrees: FC = () => {
             ...getColumnDateFilter({ dataIndex: 'created_at', filters, handleSetFilters, label: 'Created' })
         },
     ]
-
+    console.log("GiftTrees rendering - autoAssignModal:", autoAssignModal);  
+    console.log("Selected Gift Card:", selectedGiftCard);
+    
     return (
         <div>
             <ToastContainer />
