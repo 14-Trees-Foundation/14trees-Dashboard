@@ -803,18 +803,32 @@ const getGiftCardData = async () => {
                     }
                 </Menu.ItemGroup>
             }
-            {(record.presentation_id || record.presentation_ids.length > 0) && <Menu.Divider style={{ backgroundColor: '#ccc' }} />}
-            {(record.presentation_id || record.presentation_ids.length > 0) && <Menu.ItemGroup>
-                {record.presentation_id && <Menu.Item key="30" onClick={() => { handleDownloadCards(record.id, record.user_name + '_' + record.no_of_cards, 'zip') }} icon={<Download />}>
-                    Download Tree Cards
-                </Menu.Item>}
-                <Menu.Item key="31" onClick={() => { window.open('https://docs.google.com/presentation/d/' + (record.presentation_id ? record.presentation_id : record.presentation_ids[0])); }} icon={<Slideshow />}>
-                    Tree Cards Slide
-                </Menu.Item>
-                <Menu.Item key="32" onClick={() => { handleUpdateGiftCardImagess(record.id) }} icon={<Photo />}>
-                    Update Cards Images
-                </Menu.Item>
-            </Menu.ItemGroup>}
+            {(record.presentation_id || record.presentation_ids?.length > 0) && (
+    <Menu.ItemGroup>
+        {record.presentation_id && (
+            <Menu.Item key="30" onClick={() => { handleDownloadCards(record.id, record.user_name + '_' + record.no_of_cards, 'zip') }} icon={<Download />}>
+                Download Tree Cards
+            </Menu.Item>
+        )}
+        {/* Submenu for multiple presentation links */}
+        {record.presentation_ids?.length > 1 ? (
+            <Menu.SubMenu key="31" title="Tree Card Slides" icon={<Slideshow />}popupOffset={[20, 5]}popupClassName="custom-submenu">
+                {record.presentation_ids.map((id: string, index: number) => (
+                    <Menu.Item key={`31-${index}`} onClick={() => { window.open(`https://docs.google.com/presentation/d/${id}`); }}>
+                        Presentation {index + 1}
+                    </Menu.Item>
+                ))}
+            </Menu.SubMenu>
+        ) : (
+            <Menu.Item key="31" onClick={() => { window.open('https://docs.google.com/presentation/d/' + (record.presentation_id ? record.presentation_id : record.presentation_ids[0])); }} icon={<Slideshow />}>
+                Tree Cards Slide
+            </Menu.Item>
+        )}
+        <Menu.Item key="32" onClick={() => { handleUpdateGiftCardImagess(record.id) }} icon={<Photo />}>
+            Update Cards Images
+        </Menu.Item>
+    </Menu.ItemGroup>
+)}
             {!auth.roles.includes(UserRoles.User) && <Menu.Divider style={{ backgroundColor: '#ccc' }} />}
             {!auth.roles.includes(UserRoles.User) && <Menu.ItemGroup>
                 <Menu.Item key="40" onClick={() => { setBookNonGiftable(record.request_type === GiftRequestType_NORAML_ASSIGNMENT ? true : false); setSelectedGiftCard(record); setPlotModal(true); }} icon={<Landscape />}>
