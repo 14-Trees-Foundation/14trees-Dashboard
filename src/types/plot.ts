@@ -18,6 +18,7 @@ export type Plot = {
     tree_count?: number,
     shrub_count?: number,
     herb_count?: number,
+    climber_count: number; //new
     booked?: number,
     assigned?: number,
     available?: number,
@@ -45,6 +46,7 @@ export type Plot = {
     site_name: string,
     created_at: Date,
     updated_at: Date,
+    notes?: string;  //New 
 };
 
 export type PlotsDataState = {

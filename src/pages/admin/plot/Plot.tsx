@@ -23,53 +23,127 @@ import {
   Divider,
   FormControlLabel,
   Typography,
+  IconButton,
+  Badge,
 } from "@mui/material";
+import { NotesOutlined } from "@mui/icons-material";
 import EditPlot from "./EditPlot";
 import { Segmented, Table, TableColumnsType } from "antd";
-import getColumnSearchProps, { getColumnSelectedItemFilter, getSortIcon } from "../../../components/Filter";
+import getColumnSearchProps, {
+  getColumnSelectedItemFilter,
+  getSortIcon,
+} from "../../../components/Filter";
 import { ToastContainer, toast } from "react-toastify";
 import { AutocompleteWithPagination } from "../../../components/AutoComplete";
 import { Site } from "../../../types/site";
 import UpdateCoords from "./UpdateCoords";
 import ApiClient from "../../../api/apiClient/apiClient";
 import GeneralTable from "../../../components/GenTable";
+import GiftRequestNotes from "../gift/Form/Notes";
 
 function getColumn(field: string, treeHabitat: string) {
-  return field + (treeHabitat ? "_" + treeHabitat : '')
+  return field + (treeHabitat ? "_" + treeHabitat : "");
 }
 
-const TableSummary = (plots: Plot[], selectedPlotIds: number[], totalColumns: number, treeHabitat: string) => {
-
+const TableSummary = (
+  plots: Plot[],
+  selectedPlotIds: number[],
+  totalColumns: number,
+  treeHabitat: string
+) => {
   const calculateSum = (data: (number | undefined)[]) => {
     return data.reduce((a, b) => (a ?? 0) + (b ?? 0), 0);
-  }
+  };
 
   return (
-    <Table.Summary fixed='bottom'>
-      <Table.Summary.Row style={{ backgroundColor: 'rgba(172, 252, 172, 0.2)' }}>
-        <Table.Summary.Cell align="right" index={totalColumns - 10} colSpan={totalColumns - 8}>
+    <Table.Summary fixed="bottom">
+      <Table.Summary.Row style={{ backgroundColor: "rgba(172, 252, 172, 0.2)" }}>
+        <Table.Summary.Cell
+          align="right"
+          index={totalColumns - 10}
+          colSpan={totalColumns - 8}
+        >
           <strong>Total</strong>
         </Table.Summary.Cell>
-        <Table.Summary.Cell align="right" index={totalColumns - 8} colSpan={1}>{calculateSum(plots.filter((plot) => selectedPlotIds.includes(plot.id)).map((plot) => plot.total))}</Table.Summary.Cell>
-        <Table.Summary.Cell align="right" index={totalColumns - 7} colSpan={1}>{calculateSum(plots.filter((plot) => selectedPlotIds.includes(plot.id)).map((plot) => plot.tree_count))}</Table.Summary.Cell>
-        <Table.Summary.Cell align="right" index={totalColumns - 6} colSpan={1}>{calculateSum(plots.filter((plot) => selectedPlotIds.includes(plot.id)).map((plot) => plot.shrub_count))}</Table.Summary.Cell>
-        <Table.Summary.Cell align="right" index={totalColumns - 5} colSpan={1}>{calculateSum(plots.filter((plot) => selectedPlotIds.includes(plot.id)).map((plot) => plot.herb_count))}</Table.Summary.Cell>
-        <Table.Summary.Cell align="right" index={totalColumns - 4} colSpan={1}>{calculateSum(plots.filter((plot) => selectedPlotIds.includes(plot.id)).map((plot: any) => plot[getColumn("booked", treeHabitat)]))}</Table.Summary.Cell>
-        <Table.Summary.Cell align="right" index={totalColumns - 3} colSpan={1}>{calculateSum(plots.filter((plot) => selectedPlotIds.includes(plot.id)).map((plot: any) => plot[getColumn("assigned", treeHabitat)]))}</Table.Summary.Cell>
-        <Table.Summary.Cell align="right" index={totalColumns - 2} colSpan={1}>{calculateSum(plots.filter((plot) => selectedPlotIds.includes(plot.id)).map((plot: any) => plot[getColumn("unbooked_assigned", treeHabitat)]))}</Table.Summary.Cell>
-        <Table.Summary.Cell align="right" index={totalColumns - 1} colSpan={1}>{calculateSum(plots.filter((plot) => selectedPlotIds.includes(plot.id)).map((plot: any) => plot[getColumn("available", treeHabitat)]))}</Table.Summary.Cell>
-        <Table.Summary.Cell align="right" index={totalColumns - 0} colSpan={1}>{calculateSum(plots.filter((plot) => selectedPlotIds.includes(plot.id)).map((plot: any) => plot[getColumn("card_available", treeHabitat)]))}</Table.Summary.Cell>
+        <Table.Summary.Cell align="right" index={totalColumns - 8} colSpan={1}>
+          {calculateSum(
+            plots
+              .filter((plot) => selectedPlotIds.includes(plot.id))
+              .map((plot) => plot.total)
+          )}
+        </Table.Summary.Cell>
+        <Table.Summary.Cell align="right" index={totalColumns - 7} colSpan={1}>
+          {calculateSum(
+            plots
+              .filter((plot) => selectedPlotIds.includes(plot.id))
+              .map((plot) => plot.tree_count)
+          )}
+        </Table.Summary.Cell>
+        <Table.Summary.Cell align="right" index={totalColumns - 6} colSpan={1}>
+          {calculateSum(
+            plots
+              .filter((plot) => selectedPlotIds.includes(plot.id))
+              .map((plot) => plot.shrub_count)
+          )}
+        </Table.Summary.Cell>
+        <Table.Summary.Cell align="right" index={totalColumns - 5} colSpan={1}>
+          {calculateSum(
+            plots
+              .filter((plot) => selectedPlotIds.includes(plot.id))
+              .map((plot) => plot.herb_count)
+          )}
+        </Table.Summary.Cell>
+        <Table.Summary.Cell align="right" index={totalColumns - 4} colSpan={1}>
+          {calculateSum(
+            plots
+              .filter((plot) => selectedPlotIds.includes(plot.id))
+              .map((plot) => plot.climber_count)
+          )}
+        </Table.Summary.Cell>
+        <Table.Summary.Cell align="right" index={totalColumns - 3} colSpan={1}>
+          {calculateSum(
+            plots
+              .filter((plot) => selectedPlotIds.includes(plot.id))
+              .map((plot: any) => plot[getColumn("booked", treeHabitat)])
+          )}
+        </Table.Summary.Cell>
+        <Table.Summary.Cell align="right" index={totalColumns - 2} colSpan={1}>
+          {calculateSum(
+            plots
+              .filter((plot) => selectedPlotIds.includes(plot.id))
+              .map((plot: any) => plot[getColumn("assigned", treeHabitat)])
+          )}
+        </Table.Summary.Cell>
+        <Table.Summary.Cell align="right" index={totalColumns - 1} colSpan={1}>
+          {calculateSum(
+            plots
+              .filter((plot) => selectedPlotIds.includes(plot.id))
+              .map((plot: any) => plot[getColumn("unbooked_assigned", treeHabitat)])
+          )}
+        </Table.Summary.Cell>
+        <Table.Summary.Cell align="right" index={totalColumns - 0} colSpan={1}>
+          {calculateSum(
+            plots
+              .filter((plot) => selectedPlotIds.includes(plot.id))
+              .map((plot: any) => plot[getColumn("available", treeHabitat)])
+          )}
+        </Table.Summary.Cell>
+        <Table.Summary.Cell align="right" index={totalColumns - 0} colSpan={1}>
+          {calculateSum(
+            plots
+              .filter((plot) => selectedPlotIds.includes(plot.id))
+              .map((plot: any) => plot[getColumn("card_available", treeHabitat)])
+          )}
+        </Table.Summary.Cell>
       </Table.Summary.Row>
     </Table.Summary>
-  )
-}
+  );
+};
 
 export const PlotComponent = () => {
   const dispatch = useAppDispatch();
-  const { getPlots, createPlot, updatePlot, deletePlot, assignPlotsToSite } = bindActionCreators(
-    plotActionCreators,
-    dispatch
-  );
+  const { getPlots, createPlot, updatePlot, deletePlot, assignPlotsToSite } =
+    bindActionCreators(plotActionCreators, dispatch);
   const { getTags } = bindActionCreators(tagActionCreators, dispatch);
   const { getSites } = bindActionCreators(siteActionCreators, dispatch);
 
@@ -93,14 +167,18 @@ export const PlotComponent = () => {
   const [selectedSite, setSelectedSite] = useState<Site | null>(null);
   const [updateCoords, setUpdateCoords] = useState(false);
   const [includeDeadLostTrees, setIncludeDeadLostTrees] = useState(false);
-  const [treeHabit, setTreeHabit] = useState<'trees' | 'shrubs' | 'herbs' | ''>('trees');
+  const [treeHabit, setTreeHabit] = useState<"trees" | "shrubs" | "herbs" | "climbers" | "">(
+    "trees"
+  );
+  const [notesModal, setNotesModal] = useState(false);
+  const [selectedPlot, setSelectedPlot] = useState<Plot | null>(null);
 
-  const [orderBy, setOrderBy] = useState<{ column: string, order: 'ASC' | 'DESC' }[]>([]);
+  const [orderBy, setOrderBy] = useState<{ column: string; order: "ASC" | "DESC" }[]>([]);
 
   const handleSetFilters = (filters: Record<string, GridFilterItem>) => {
     setPage(0);
     setFilters(filters);
-  }
+  };
 
   const plotsData = useAppSelector((state: RootState) => state.plotsData);
 
@@ -123,7 +201,7 @@ export const PlotComponent = () => {
         break;
       }
     }
-
+    console.log("Table Rows Data:", records); // Add this line to log the tableRows data
     setTableRows(records);
   }, [pageSize, page, plotsData]);
 
@@ -131,20 +209,24 @@ export const PlotComponent = () => {
     setLoading(true);
     let filtersData = JSON.parse(JSON.stringify(Object.values(filters))) as GridFilterItem[];
 
-    const accessibilityIdx = filtersData.findIndex(item => item.columnField === 'accessibility_status');
+    const accessibilityIdx = filtersData.findIndex(
+      (item) => item.columnField === "accessibility_status"
+    );
     if (accessibilityIdx > -1) {
-      filtersData[accessibilityIdx].value = filtersData[accessibilityIdx].value.map((item: string) => {
-        switch (item) {
-          case "Accessible":
-            return "accessible";
-          case "Inaccessible":
-            return "inaccessible";
-          case "Moderately Accessible":
-            return "moderately_accessible";
-          default:
-            return null;
+      filtersData[accessibilityIdx].value = filtersData[accessibilityIdx].value.map(
+        (item: string) => {
+          switch (item) {
+            case "Accessible":
+              return "accessible";
+            case "Inaccessible":
+              return "inaccessible";
+            case "Moderately Accessible":
+              return "moderately_accessible";
+            default:
+              return null;
+          }
         }
-      })
+      );
     }
 
     getPlots(page * pageSize, pageSize, filtersData, orderBy);
@@ -215,13 +297,30 @@ export const PlotComponent = () => {
     }
   }
 
+  const handleNotesSave = async (text: string) => {
+    // notes
+    setNotesModal(false);
+    if (!selectedPlot) return;
+
+    try {
+      const apiClient = new ApiClient();
+      const response = await apiClient.updatePlot({ ...selectedPlot, notes: text });
+      toast.success("Plot notes updated successfully");
+      // Update the state or refetch data as needed
+      setSelectedPlot(null);
+    } catch (error: any) {
+      if (error?.response?.data?.message) toast.error(error.response.data.message);
+      else toast.error("Please try again later!");
+    }
+  };
+
   const getSortableHeader = (header: string, key: string) => {
     return (
-      <div style={{ display: "flex", alignItems: "center", justifyContent: 'space-between' }}>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
         {header} {getSortIcon(key, orderBy.find((item) => item.column === key)?.order, handleSortingChange)}
       </div>
-    )
-  }
+    );
+  };
 
   const [columns, setColumns] = useState<TableColumnsType<Plot>>([
     {
@@ -236,7 +335,8 @@ export const PlotComponent = () => {
             display: "flex",
             justifyContent: "center",
             alignItems: "center",
-          }}>
+          }}
+        >
           <Button
             variant="outlined"
             style={{ margin: "0 5px" }}
@@ -244,14 +344,16 @@ export const PlotComponent = () => {
               setSelectedEditRow(record);
               setEditModal(true);
               console.log("Row to edit: ", record);
-            }}>
+            }}
+          >
             <EditIcon />
           </Button>
           <Button
             variant="outlined"
             color="error"
             style={{ margin: "0 5px" }}
-            onClick={() => handleDelete(record)}>
+            onClick={() => handleDelete(record)}
+          >
             <DeleteIcon />
           </Button>
         </div>
@@ -263,7 +365,7 @@ export const PlotComponent = () => {
       title: "Name",
       align: "center",
       width: 300,
-      ...getColumnSearchProps('name', filters, handleSetFilters)
+      ...getColumnSearchProps("name", filters, handleSetFilters),
     },
     {
       dataIndex: "label",
@@ -271,7 +373,7 @@ export const PlotComponent = () => {
       title: "Plot Label",
       align: "center",
       width: 150,
-      ...getColumnSearchProps('label', filters, handleSetFilters)
+      ...getColumnSearchProps("label", filters, handleSetFilters),
     },
     {
       dataIndex: "accessibility_status",
@@ -279,8 +381,14 @@ export const PlotComponent = () => {
       title: "Accessibility",
       align: "center",
       width: 200,
-      render: (value) => value ? accessibilityList.find((item) => item.value === value)?.label : "Unknown",
-      ...getColumnSelectedItemFilter({ dataIndex: 'accessibility_status', filters, handleSetFilters, options: accessibilityList.map((item) => item.label).concat("Unknown") })
+      render: (value) =>
+        value ? accessibilityList.find((item) => item.value === value)?.label : "Unknown",
+      ...getColumnSelectedItemFilter({
+        dataIndex: "accessibility_status",
+        filters,
+        handleSetFilters,
+        options: accessibilityList.map((item) => item.label).concat("Unknown"),
+      }),
     },
     {
       dataIndex: "gat",
@@ -295,8 +403,8 @@ export const PlotComponent = () => {
       title: "Tags",
       align: "center",
       width: 150,
-      render: (tags) => tags ? tags.join(", ") : '',
-      ...getColumnSelectedItemFilter({ dataIndex: 'tags', filters, handleSetFilters, options: tags })
+      render: (tags) => (tags ? tags.join(", ") : ""),
+      ...getColumnSelectedItemFilter({ dataIndex: "tags", filters, handleSetFilters, options: tags }),
     },
     {
       dataIndex: "site_name",
@@ -304,50 +412,58 @@ export const PlotComponent = () => {
       title: "Site Name",
       align: "center",
       width: 300,
-      ...getColumnSearchProps('site_name', filters, handleSetFilters)
+      ...getColumnSearchProps("site_name", filters, handleSetFilters),
     },
     {
       dataIndex: "acres_area",
       key: "Area (acres)",
-      title: getSortableHeader("Area (acres)", 'acres_area'),
+      title: getSortableHeader("Area (acres)", "acres_area"),
       align: "right",
       width: 150,
-      render: (value: number) => value ? value.toFixed(3) : 'Unknown', 
+      render: (value: number) => (value ? value.toFixed(3) : "Unknown"),
     },
     {
       dataIndex: "pit_count",
       key: "No. of Pits",
-      title: getSortableHeader("No. of Pits", 'pit_count'),
+      title: getSortableHeader("No. of Pits", "pit_count"),
       align: "right",
       width: 150,
-      render: (value: number) => value >= 0 ? value : 'Unknown', 
+      render: (value: number) => (value >= 0 ? value : "Unknown"),
     },
     {
       dataIndex: "total",
       key: "Total Trees",
-      title: getSortableHeader("Total Trees", 'total'),
+      title: getSortableHeader("Total Plants", "total"),
       align: "right",
       width: 150,
-      render: (value, record) => value ?? 0 - (includeDeadLostTrees && record.void_total ? record.void_total : 0),
+      render: (value, record) =>
+        value ?? 0 - (includeDeadLostTrees && record.void_total ? record.void_total : 0),
     },
     {
       dataIndex: "tree_count",
       key: "Trees",
-      title: getSortableHeader("Trees", 'tree_count'),
+      title: getSortableHeader("Trees", "tree_count"),
       align: "right",
       width: 150,
     },
     {
       dataIndex: "shrub_count",
       key: "Shrubs",
-      title: getSortableHeader("Shrubs", 'shrub_count'),
+      title: getSortableHeader("Shrubs", "shrub_count"),
       align: "right",
       width: 150,
     },
     {
       dataIndex: "herb_count",
       key: "Herbs",
-      title: getSortableHeader("Herbs", 'herb_count'),
+      title: getSortableHeader("Herbs", "herb_count"),
+      align: "right",
+      width: 150,
+    },
+    {
+      dataIndex: "climber_count",
+      key: "Climbers",
+      title: getSortableHeader("Climbers", "climber_count"),
       align: "right",
       width: 150,
     },
@@ -357,7 +473,8 @@ export const PlotComponent = () => {
       title: getSortableHeader("Booked Trees", "booked"),
       align: "right",
       width: 150,
-      render: (value, record) => value ?? 0 - (includeDeadLostTrees && record.void_booked ? record.void_booked : 0),
+      render: (value, record) =>
+        value ?? 0 - (includeDeadLostTrees && record.void_booked ? record.void_booked : 0),
     },
     {
       dataIndex: "assigned",
@@ -365,7 +482,8 @@ export const PlotComponent = () => {
       title: getSortableHeader("Assigned Trees", "assigned"),
       align: "right",
       width: 150,
-      render: (value, record) => value ?? 0 - (includeDeadLostTrees && record.void_assigned ? record.void_assigned : 0),
+      render: (value, record) =>
+        value ?? 0 - (includeDeadLostTrees && record.void_assigned ? record.void_assigned : 0),
     },
     {
       dataIndex: "unbooked_assigned",
@@ -380,7 +498,8 @@ export const PlotComponent = () => {
       title: getSortableHeader("Unfunded Inventory (Unassigned)", "available"),
       align: "right",
       width: 150,
-      render: (value, record) => value ?? 0 - (includeDeadLostTrees && record.void_available ? record.void_available : 0),
+      render: (value, record) =>
+        value ?? 0 - (includeDeadLostTrees && record.void_available ? record.void_available : 0),
     },
     {
       dataIndex: "card_available",
@@ -389,19 +508,43 @@ export const PlotComponent = () => {
       align: "right",
       width: 150,
     },
+    {
+      dataIndex: "notes",
+      key: "Notes",
+      title: "Notes",
+      align: "center",
+      width: 100,
+      render: (value, record) => (
+        <IconButton
+          onClick={() => {
+            setSelectedPlot(record);
+            setNotesModal(true);
+          }}
+        >
+          <Badge
+            variant="dot"
+            color="success"
+            invisible={!value || value.trim() === "" ? true : false}
+          >
+            <NotesOutlined />
+          </Badge>
+        </IconButton>
+      ),
+      ...getColumnSelectedItemFilter({ dataIndex: "notes", filters, handleSetFilters, options: ["Yes", "No"] }),
+    },
   ]);
 
   useEffect(() => {
-
     const getColumnClass = () => {
-      if (treeHabit === 'trees') return 'bg-green';
-      if (treeHabit === 'shrubs') return 'bg-cyan';
-      if (treeHabit === 'herbs') return 'bg-yellow';
+      if (treeHabit === "trees") return "bg-green";
+      if (treeHabit === "shrubs") return "bg-cyan";
+      if (treeHabit === "herbs") return "bg-yellow";
+      if (treeHabit === "climbers") return "bg-orange"; // climber 
 
-      return 'bg-orange'
-    }
+      return "bg-orange";
+    };
 
-    setColumns(prev => {
+    setColumns((prev) => {
       return prev.map((column: any) => {
         if (column.dataIndex.startsWith("booked")) {
           return {
@@ -409,66 +552,76 @@ export const PlotComponent = () => {
             dataIndex: getColumn("booked", treeHabit),
             title: getSortableHeader("Booked Trees", getColumn("booked", treeHabit)),
             className: getColumnClass(),
-          }
+          };
         } else if (column.dataIndex.startsWith("assigned")) {
           return {
             ...column,
             dataIndex: getColumn("assigned", treeHabit),
             title: getSortableHeader("Assigned Trees", getColumn("assigned", treeHabit)),
             className: getColumnClass(),
-          }
+          };
         } else if (column.dataIndex.startsWith("unbooked_assigned")) {
           return {
             ...column,
             dataIndex: getColumn("unbooked_assigned", treeHabit),
-            title: getSortableHeader("Unfunded Inventory (Assigned)", getColumn("unbooked_assigned", treeHabit)),
+            title: getSortableHeader(
+              "Unfunded Inventory (Assigned)",
+              getColumn("unbooked_assigned", treeHabit)
+            ),
             className: getColumnClass(),
-          }
+          };
         } else if (column.dataIndex.startsWith("available")) {
           return {
             ...column,
             dataIndex: getColumn("available", treeHabit),
-            title: getSortableHeader("Unfunded Inventory (Unassigned)", getColumn("available", treeHabit)),
+            title: getSortableHeader(
+              "Unfunded Inventory (Unassigned)",
+              getColumn("available", treeHabit)
+            ),
             className: getColumnClass(),
-          }
+          };
         } else if (column.dataIndex.startsWith("card_available")) {
           return {
             ...column,
             dataIndex: getColumn("card_available", treeHabit),
             title: getSortableHeader("Giftable Inventory", getColumn("card_available", treeHabit)),
             className: getColumnClass(),
-          }
+          };
         } else if (column.dataIndex === "total") {
           return {
             ...column,
-            className: treeHabit === '' ? 'bg-orange' : undefined,
-          }
+            className: treeHabit === "" ? "bg-orange" : undefined,
+          };
         } else if (column.dataIndex === "tree_count") {
           return {
             ...column,
-            className: treeHabit === 'trees' ? 'bg-green' : undefined,
-          }
+            className: treeHabit === "trees" ? "bg-green" : undefined,
+          };
         } else if (column.dataIndex === "shrub_count") {
           return {
             ...column,
-            className: treeHabit === 'shrubs' ? 'bg-cyan' : undefined,
-          }
+            className: treeHabit === "shrubs" ? "bg-cyan" : undefined,
+          };
         } else if (column.dataIndex === "herb_count") {
           return {
             ...column,
-            className: treeHabit === 'herbs' ? 'bg-yellow' : undefined,
-          }
+            className: treeHabit === "herbs" ? "bg-yellow" : undefined,
+          };
+        } else if (column.dataIndex === "climber_count") {
+          return {
+            ...column,
+            className: treeHabit === "climbers" ? "bg-orange" : undefined, // climber line
+          };
         }
 
         return column;
-      })
-    })
-
-  }, [treeHabit, orderBy])
+      });
+    });
+  }, [treeHabit, orderBy]);
 
   const handleSelectionChanges = (plotIds: number[]) => {
     setSelectedPlotIds(plotIds);
-  }
+  };
 
   const handleDelete = (row: Plot) => {
     setOpenDeleteModal(true);
@@ -490,32 +643,30 @@ export const PlotComponent = () => {
     setSelectedSite(null);
     setTimeout(() => {
       getPlotData();
-    }, 1000)
-  }
+    }, 1000);
+  };
 
   const handleUpdatePlotCoords = async (siteId: number, file: File) => {
     const apiClient = new ApiClient();
     try {
       await apiClient.updatePlotCoordsUsingKml(siteId, file);
-      toast.success('Plot coordinates updated successfully');
+      toast.success("Plot coordinates updated successfully");
     } catch (error) {
-      toast.error('Failed to update plot coordinates');
+      toast.error("Failed to update plot coordinates");
     }
-
-  }
+  };
 
   const handlePaginationChange = (page: number, pageSize: number) => {
     setPage(page - 1);
     setPageSize(pageSize);
-  }
+  };
 
   const handleDownload = async () => {
-
     const apiClient = new ApiClient();
     const filtersList = Object.values(filters);
     const resp = await apiClient.getPlots(0, plotsData.totalPlots, filtersList, orderBy);
     return resp.results;
-  }
+  };
 
   return (
     <>
@@ -527,14 +678,17 @@ export const PlotComponent = () => {
           padding: "4px 12px",
         }}
       >
-        <Typography variant="h4" style={{ marginTop: '5px' }}>Plots</Typography>
+        <Typography variant="h4" style={{ marginTop: "5px" }}>
+          Plots
+        </Typography>
         <div
           style={{
             display: "flex",
             justifyContent: "flex-end",
             marginBottom: "5px",
             marginTop: "5px",
-          }}>
+          }}
+        >
           <Button
             variant="contained"
             color="success"
@@ -552,10 +706,7 @@ export const PlotComponent = () => {
           >
             Assign to Site
           </Button>
-          <Button
-            variant="contained"
-            color="success"
-            onClick={handleModalOpen}>
+          <Button variant="contained" color="success" onClick={handleModalOpen}>
             Add Plot
           </Button>
           <AddPlot
@@ -566,25 +717,38 @@ export const PlotComponent = () => {
           />
         </div>
       </div>
-      <Divider sx={{ backgroundColor: "black", marginBottom: '15px' }} />
+      <Divider sx={{ backgroundColor: "black", marginBottom: "15px" }} />
       <Box sx={{ height: 840, width: "100%" }}>
         <div
           style={{
             display: "flex",
-            alignItems: 'center',
+            alignItems: "center",
             justifyContent: "flex-end",
           }}
         >
-          <Segmented<{ value: 'trees' | 'herbs' | 'shrubs' | '', label: string }>
+          <Segmented<
+            { value: "trees" | "herbs" | "shrubs" | "climbers" | ""; label: string }
+          >
             size="large"
-            options={[{ value: 'trees', label: 'Trees' }, { value: 'shrubs', label: 'Shrubs' }, { value: 'herbs', label: 'Herbs' }, { value: '', label: 'Total' }]}
+            options={[
+              { value: "trees", label: "Trees" },
+              { value: "shrubs", label: "Shrubs" },
+              { value: "herbs", label: "Herbs" },
+              { value: "climbers", label: "Climbers" },
+              { value: "", label: "Total" },
+            ]}
             onChange={(item: any) => {
-              setTreeHabit(item)
+              setTreeHabit(item);
             }}
           />
           <FormControlLabel
             sx={{ ml: 2 }}
-            control={<Checkbox checked={includeDeadLostTrees} onChange={() => setIncludeDeadLostTrees(!includeDeadLostTrees)} />}
+            control={
+              <Checkbox
+                checked={includeDeadLostTrees}
+                onChange={() => setIncludeDeadLostTrees(!includeDeadLostTrees)}
+              />
+            }
             label="Include Dead/Lost Trees"
           />
         </div>
@@ -600,7 +764,7 @@ export const PlotComponent = () => {
           onDownload={handleDownload}
           summary={(totalColumns: number) => {
             if (totalColumns < 5) return undefined;
-            return TableSummary(tableRows, selectedPlotIds, totalColumns, treeHabit)
+            return TableSummary(tableRows, selectedPlotIds, totalColumns, treeHabit);
           }}
           footer
           tableName="Plots"
@@ -617,7 +781,7 @@ export const PlotComponent = () => {
       >
         <Typography variant="h4">Unreserve Trees</Typography>
       </div>
-      <Divider sx={{ backgroundColor: "black", marginBottom: '15px' }} />
+      <Divider sx={{ backgroundColor: "black", marginBottom: "15px" }} />
       <Forms />
 
       <Dialog open={openDeleteModal} onClose={() => setOpenDeleteModal(false)}>
@@ -628,9 +792,7 @@ export const PlotComponent = () => {
           </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setOpenDeleteModal(false)}>
-            Cancel
-          </Button>
+          <Button onClick={() => setOpenDeleteModal(false)}>Cancel</Button>
           <Button
             onClick={() => {
               console.log("Deleting item...");
@@ -641,13 +803,14 @@ export const PlotComponent = () => {
             }}
             color="error"
             variant="outlined"
-            autoFocus>
+            autoFocus
+          >
             Yes
           </Button>
         </DialogActions>
       </Dialog>
 
-      <Dialog open={selectSiteModal} onClose={() => setSelectSiteModal(false)} >
+      <Dialog open={selectSiteModal} onClose={() => setSelectSiteModal(false)}>
         <DialogTitle>Select a Site</DialogTitle>
         <DialogContent sx={{ width: 500 }}>
           <DialogContentText>
@@ -657,7 +820,7 @@ export const PlotComponent = () => {
             <AutocompleteWithPagination
               label="Select a Site"
               options={sitesList}
-              getOptionLabel={(option) => option?.name_english || ''}
+              getOptionLabel={(option) => option?.name_english || ""}
               onChange={(event, newValue) => {
                 setSelectedSite(newValue);
               }}
@@ -670,7 +833,7 @@ export const PlotComponent = () => {
               fullWidth
               size="medium"
               loading={sitesLoading}
-              value={(siteNameInput === '' && selectedSite) ? selectedSite : null}
+              value={siteNameInput === "" && selectedSite ? selectedSite : null}
             />
           </div>
         </DialogContent>
@@ -707,11 +870,24 @@ export const PlotComponent = () => {
         <EditPlot
           row={selectedEditRow}
           openeditModal={editModal}
-          handleCloseModal={() => { setSelectedEditRow(null); setEditModal(false); }}
+          handleCloseModal={() => {
+            setSelectedEditRow(null);
+            setEditModal(false);
+          }}
           editSubmit={handleEditSubmit}
           tags={Object.values(tagsData.tags)}
         />
       )}
+
+      {/* Added the Notes modal component here */}
+      <GiftRequestNotes
+        open={notesModal}
+        handleClose={() => {
+          setNotesModal(false);
+        }}
+        onSave={handleNotesSave}
+        initialText={selectedPlot?.notes ?? ""}
+      />
     </>
   );
 };
