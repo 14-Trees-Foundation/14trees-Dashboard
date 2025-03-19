@@ -198,3 +198,4 @@ const useStyles = makeStyles((theme) =>
     },
   })
 );
+export default Admin; 

@@ -15,20 +15,18 @@ import { Typography } from "@mui/material";
 
 export const TreeLogCumulative = () => {
   const theme = useTheme();
-  let treeByDate = useRecoilValue(treeLoggedByDate);
+  let treeByDate = useRecoilValue(treeLoggedByDate) || []; // Ensure it's an array
+
   let cumTree = 0;
-  treeByDate = [...treeByDate].reverse();
+  treeByDate = Array.isArray(treeByDate) ? [...treeByDate].reverse() : []; // Check if it's an array
+
   const data = treeByDate.map(({ _id, count }) => ({
     date: _id,
-    total_tree: (cumTree += count),
+    total_tree: (cumTree += count || 0), // Ensure count is valid
   }));
+
   return (
-    <div
-      style={{
-        width: "100%",
-        height: "530px",
-      }}
-    >
+    <div style={{ width: "100%", height: "530px" }}>
       <div style={{ display: "flex", justifyContent: "space-between" }}>
         <Typography variant="h6" gutterBottom>
           Cumulative tree count
@@ -60,3 +58,4 @@ export const TreeLogCumulative = () => {
     </div>
   );
 };
+

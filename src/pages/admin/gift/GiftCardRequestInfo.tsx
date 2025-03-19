@@ -11,9 +11,11 @@ import {
     Link,
 } from '@mui/material';
 import { format } from 'date-fns';
+import { GridFilterItem } from '@mui/x-data-grid';
 import GeneralTable from '../../../components/GenTable';
 import ApiClient from '../../../api/apiClient/apiClient';
 import { GiftCardUser } from '../../../types/gift_card';
+import getColumnSearchProps from '../../../components/Filter';
 
 interface GiftCardRequestInfoProps {
     open: boolean
@@ -26,6 +28,7 @@ const GiftCardRequestInfo: React.FC<GiftCardRequestInfoProps> = ({ open, onClose
     const [users, setUsers] = useState<GiftCardUser[]>([]);
     const [page, setPage] = useState(0);
     const [pageSize, setPageSize] = useState(10);
+    const [filters, setFilters] = useState<Record<string, GridFilterItem>>({});
 
     useEffect(() => {
         const getGiftCards = async () => {
@@ -60,18 +63,18 @@ const GiftCardRequestInfo: React.FC<GiftCardRequestInfoProps> = ({ open, onClose
             width: 200,
         },
         {
-            dataIndex: "recipient_name",
-            key: "recipient",
-            title: "Recipient",
-            align: "center",
+            title: 'Recipient',
+            dataIndex: 'recipient_name',
+            key: 'recipient_name',
             width: 200,
+            ...getColumnSearchProps('recipient_name', filters, setFilters),
         },
         {
-            dataIndex: "assignee_name",
-            key: "assignee",
-            title: "Assigned to",
-            align: "center",
+            title: 'Assigned To',
+            dataIndex: 'assignee_name',
+            key: 'assignee_name',
             width: 200,
+            ...getColumnSearchProps('assignee_name', filters, setFilters),
         },
         {
             dataIndex: "dashboard_link",
@@ -115,6 +118,43 @@ const GiftCardRequestInfo: React.FC<GiftCardRequestInfoProps> = ({ open, onClose
             return 'Completed';
         }
     }
+
+    const getFilteredUsers = () => {
+        return users.filter(user => {
+            for (const key in filters) {
+                const filter = filters[key];
+                const value = user[key as keyof GiftCardUser];
+                
+                if (!value) continue;
+
+                switch (filter.operatorValue) {
+                    case 'contains':
+                        if (!value.toString().toLowerCase().includes(filter.value.toLowerCase())) {
+                            return false;
+                        }
+                        break;
+                    case 'equals':
+                        if (value.toString().toLowerCase() !== filter.value.toLowerCase()) {
+                            return false;
+                        }
+                        break;
+                    case 'startsWith':
+                        if (!value.toString().toLowerCase().startsWith(filter.value.toLowerCase())) {
+                            return false;
+                        }
+                        break;
+                    case 'endsWith':
+                        if (!value.toString().toLowerCase().endsWith(filter.value.toLowerCase())) {
+                            return false;
+                        }
+                        break;
+                }
+            }
+            return true;
+        });
+    };
+
+    const filteredUsers = getFilteredUsers();
 
     if (!data) return null;
 
@@ -219,12 +259,12 @@ const GiftCardRequestInfo: React.FC<GiftCardRequestInfoProps> = ({ open, onClose
                         <GeneralTable
                             loading={false}
                             columns={columns}
-                            rows={users}
-                            totalRecords={users.length}
+                            rows={filteredUsers}
+                            totalRecords={filteredUsers.length}
                             page={page}
                             pageSize={pageSize}
                             onPaginationChange={(page: number, pageSize: number) => { setPage(page - 1); setPageSize(pageSize); }}
-                            onDownload={async () => users}
+                            onDownload={async () => filteredUsers}
                             footer
                             tableName='Gift Request Users'
                         />
