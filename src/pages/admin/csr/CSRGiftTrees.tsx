@@ -7,6 +7,7 @@ import ApiClient from "../../../api/apiClient/apiClient";
 import { toast } from "react-toastify";
 import { CardGiftcard, Forest, GrassTwoTone, NaturePeople, OpenInNew, Wysiwyg } from "@mui/icons-material";
 import RedeemGiftTreeDialog from "./RedeemGiftTreeDialog";
+import { GiftRedeemTransaction } from "../../../types/gift_redeem_transaction";
 
 interface CSRGiftTreesProps {
     groupId: number
@@ -29,6 +30,11 @@ const CSRGiftTrees: React.FC<CSRGiftTreesProps> = ({ groupId }) => {
     const [searchUser, setSeachUser] = useState('');
     const [analytics, setAnalytics] = useState<any>(null)
 
+    const [trnList, setTrnList] = useState<GiftRedeemTransaction[]>([]);
+    const [totalTrnRecords, setTotalTrnRecords] = useState(10);
+    const [transactions, setTransactions] = useState<Record<number, GiftRedeemTransaction>>({});
+    const [trnPage, setTrnPage] = useState(0);
+
     useEffect(() => {
         const treesList = Object.values(trees);
 
@@ -39,6 +45,22 @@ const CSRGiftTrees: React.FC<CSRGiftTreesProps> = ({ groupId }) => {
 
         setTreesList(filteredData)
     }, [trees, filter, searchUser])
+
+
+    useEffect(() => {
+        if (filter !== 'gifted') return;
+
+        const handler = setTimeout(() => {
+            for (let i = trnPage * pageSize; i < Math.min((trnPage + 1) * pageSize, totalTrnRecords); i++) {
+                if (!transactions[i]) {
+                    getGiftTransactions(trnPage * pageSize, pageSize, groupId);
+                    return;
+                }
+            }
+        }, 300);
+
+        return () => { clearTimeout(handler); }
+    }, [filter, transactions, trnPage, pageSize, groupId, totalTrnRecords])
 
     useEffect(() => {
         setTrees({});
@@ -74,6 +96,24 @@ const CSRGiftTrees: React.FC<CSRGiftTreesProps> = ({ groupId }) => {
             const apiClient = new ApiClient();
             const treesResp = await apiClient.getMappedGiftTreesAnalytics(groupId);
             setAnalytics(treesResp)
+        } catch (error: any) {
+            toast.error(error.message);
+        }
+    }
+
+    const getGiftTransactions = async (offset: number, limit: number, groupId: number) => {
+        try {
+            const apiClient = new ApiClient();
+            const trns = await apiClient.getGiftTransactions(offset, limit, groupId);
+            setTransactions(prev => {
+                const trnData = { ...prev };
+                for (let i = 0; i < trns.results.length; i++) {
+                    trnData[trns.offset + i] = trns.results[i];
+                }
+
+                return trnData;
+            })
+            setTotalRecords(Number(trns.total));
         } catch (error: any) {
             toast.error(error.message);
         }
@@ -235,17 +275,19 @@ const CSRGiftTrees: React.FC<CSRGiftTreesProps> = ({ groupId }) => {
                 </FormControl>
             </Box>
             <Grid container spacing={3} padding={3}>
-                {treesList.map((tree) => (
+                {filter !== 'gifted' && treesList.map((tree) => (
                     <Grid item xs={12} sm={6} md={3} key={tree.id}>
                         <Card
                             hoverable
                             className={classes.customCard}
                             cover={<img height='auto' alt={tree.plant_type}
-                                src={tree.template_image
-                                    ? tree.template_image
-                                    : tree.illustration_s3_path
-                                        ? tree.illustration_s3_path
-                                        : tree.image} style={{ backgroundColor: 'white', width: '100%', objectFit: 'cover' }} />}
+                                src={(tree as any).card_image_url
+                                    ? (tree as any).card_image_url
+                                    : tree.template_image
+                                        ? tree.template_image
+                                        : tree.illustration_s3_path
+                                            ? tree.illustration_s3_path
+                                            : tree.image } style={{ backgroundColor: 'white', width: '100%', objectFit: 'cover' }} />}
                         >
                             <div style={{ width: "100%", zIndex: 10, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                                 <Typography variant="h6" gutterBottom noWrap>
@@ -280,6 +322,49 @@ const CSRGiftTrees: React.FC<CSRGiftTreesProps> = ({ groupId }) => {
                                 >
                                     {tree.assigned_to ? 'View Summary' : 'Gift Tree'}
                                 </Button>}
+                            </div>
+                        </Card>
+                    </Grid>
+                ))}
+
+
+                {/* Gifted trees transactions */}
+                {filter === 'gifted' && Object.values(transactions).map((trn) => (
+                    <Grid item xs={12} sm={6} md={3} key={trn.id}>
+                        <Card
+                            hoverable
+                            className={classes.customCard}
+                            cover={<img height='auto' alt={trn.plant_type}
+                                src={trn.card_image_url
+                                    ? trn.card_image_url
+                                    : trn.template_image
+                                        ? trn.template_image
+                                        : trn.illustration_s3_path } style={{ backgroundColor: 'white', width: '100%', objectFit: 'cover' }} />}
+                        >
+                            <div style={{ width: "100%", zIndex: 10, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                                <Typography variant="h6" gutterBottom noWrap>
+                                    {trn.plant_type}
+                                </Typography>
+                                {trn.recipient_name && <Typography variant="body2" color="text.secondary" textAlign={'center'}>
+                                    Pack of {trn.trees_count} trees gifted to {trn.recipient_name}
+                                </Typography>}
+                                {trn.recipient && <Typography
+                                    noWrap
+                                    component='a'
+                                    href={getDashboardLink(trn as any)}
+                                    target="_blank"
+                                    sx={{
+                                        mt: 1,
+                                        color: '#3f5344',
+                                        textTransform: 'none',
+                                        fontSize: '0.875rem', // Smaller button text
+                                        display: 'inline-flex', // Align text and icon
+                                        alignItems: 'center', // Center text and icon vertically
+                                        textDecoration: 'none', // Remove underline
+                                    }}
+                                >
+                                    Go to Dashboard <OpenInNew sx={{ ml: 1 }} fontSize='inherit' />
+                                </Typography>}
                             </div>
                         </Card>
                     </Grid>

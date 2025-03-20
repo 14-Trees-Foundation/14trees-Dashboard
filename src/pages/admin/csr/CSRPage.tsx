@@ -22,7 +22,8 @@ const CSRPage: React.FC = () => {
 
     let auth = useAuth();
     useEffect(() => {
-        auth.signin("User", 0, ["all"], ["super-admin"], "", () => { })
+        auth.signin("User", 13124, ["all"], ["super-admin"], "", () => { })
+        localStorage.setItem("userId", "13124");
     }, [])
 
     const handleScroll = (id: string) => {

@@ -36,6 +36,12 @@ export function getHumanReadableDate(dateStr: string | number) {
     return isValidDate ? moment(date).format('MMMM DD, YYYY') : '';
 }
 
+export function getHumanReadableDateTime(dateStr: string | number) { 
+    const date = new Date(dateStr);
+    const isValidDate = !isNaN(date.getDate()) && date.getTime() > 0;
+    return isValidDate ? moment(date).format('MMMM DD, YYYY hh:mm') : '';
+}
+
 export const getUniqueRequestId = () => {
     return Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
 }
