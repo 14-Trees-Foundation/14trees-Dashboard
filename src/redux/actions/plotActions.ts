@@ -3,6 +3,7 @@ import plotActionTypes from "../actionTypes/plotActionTypes";
 import { Plot } from "../../types/plot";
 import { PaginatedResponse } from "../../types/pagination";
 import { toast } from "react-toastify";
+import { createAsyncThunk } from "@reduxjs/toolkit";
 import { Tag } from "../../types/tag";
 
 export const getPlots = (offset: number, limit: number, filters?: any[], orderBy?: { column: string, order: 'ASC' | 'DESC' }[]) => {
@@ -93,32 +94,20 @@ export const createPlot = (record: Plot) => {
     };
 };
 
-export const updatePlot = (record: Plot) => {
-    const apiClient = new ApiClient();
-    return (dispatch: any) => {
-        dispatch({
-            type: plotActionTypes.UPDATE_PLOT_REQUESTED,
-        });
-        apiClient.updatePlot(record).then(
-            (value: Plot) => {
-                dispatch({
-                    type: plotActionTypes.UPDATE_PLOT_SUCCEEDED,
-                    payload: value,
-                });
-                toast.success(`Successfully updated plot!`)
-            },
-            (error: any) => {
-                console.error(error);
-                dispatch({
-                    type: plotActionTypes.UPDATE_PLOT_FAILED,
-                });
-                toast.error(`Failed to update plot!`)
-            }
-        )
-    };
-};
-
-
+export const updatePlot = createAsyncThunk(
+    "plots/updatePlot",
+    async (plotData: Plot, { rejectWithValue }) => {
+        try {
+            const apiClient = new ApiClient();
+            const response = await apiClient.updatePlot(plotData);
+            toast.success("Successfully updated plot!");
+            return response;
+        } catch (error: any) {
+            toast.error(error.response?.data?.message || "Failed to update plot!");
+            return rejectWithValue(error.response?.data || error.message);
+        }
+    }
+);
 export const deletePlot = (record: Plot) => {
     const apiClient = new ApiClient();
     return (dispatch: any) => {
