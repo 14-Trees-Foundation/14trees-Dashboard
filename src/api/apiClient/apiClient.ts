@@ -1432,6 +1432,23 @@ class ApiClient {
         }
     }
 
+    async getTreeAuditDetails(saplingId: string, page: number, pageSize: number): Promise<PaginatedResponse<TreeImage>> {
+        try {
+            const response = await this.api.get<PaginatedResponse<TreeImage>>(
+                `/tree-snapshots/${saplingId}`, 
+                {
+                    params: {
+                        offset: page * pageSize,
+                        limit: pageSize
+                    }
+                }
+            );
+            return response.data;
+        } catch (error: any) {
+            console.error('Error fetching tree audit details:', error);
+            throw error;
+        }
+    }
     /*
         Gift Cards
     */
