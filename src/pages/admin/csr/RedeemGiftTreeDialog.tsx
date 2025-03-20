@@ -162,7 +162,7 @@ const RedeemGiftTreeDialog: React.FC<RedeemGiftTreeDialogProps> = ({ tree, open,
 
             const apiClient = new ApiClient();
             if (giftMultiple) {
-                await apiClient.redeemMultipleGiftCardTemplate(treesCount, groupId, formData as any, profileImageUrl);
+                await apiClient.redeemMultipleGiftCardTemplate(treesCount, groupId, formData as any, profileImageUrl, messages);
                 toast.success("Succefully gifted trees!");
             } else {
                 await apiClient.redeemGiftCardTemplate(tree.giftCardId, tree.saplingId, tree.treeId, formData as any, profileImageUrl);
@@ -361,6 +361,7 @@ const RedeemGiftTreeDialog: React.FC<RedeemGiftTreeDialogProps> = ({ tree, open,
                             saplingId={!giftMultiple ? tree.saplingId : '000000'}
                             plantType={!giftMultiple ? tree.plantType : undefined}
                             userName={formData.name.trim() ? formData.name.trim() : undefined}
+                            treesCount={treesCount}
                         />
                     </Box>
                 </DialogContent>
