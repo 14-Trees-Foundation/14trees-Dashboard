@@ -39,7 +39,7 @@ import { Site } from "../../../types/site";
 import UpdateCoords from "./UpdateCoords";
 import ApiClient from "../../../api/apiClient/apiClient";
 import GeneralTable from "../../../components/GenTable";
-import GiftRequestNotes from "../gift/Form/Notes";
+import Notes from "../../../components/Notes";
 
 function getColumn(field: string, treeHabitat: string) {
   return field + (treeHabitat ? "_" + treeHabitat : "");
@@ -171,6 +171,7 @@ export const PlotComponent = () => {
     "trees"
   );
   const [notesModal, setNotesModal] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
   const [selectedPlot, setSelectedPlot] = useState<Plot | null>(null);
 
   const [orderBy, setOrderBy] = useState<{ column: string; order: "ASC" | "DESC" }[]>([]);
@@ -201,7 +202,6 @@ export const PlotComponent = () => {
         break;
       }
     }
-    console.log("Table Rows Data:", records); // Add this line to log the tableRows data
     setTableRows(records);
   }, [pageSize, page, plotsData]);
 
@@ -298,22 +298,29 @@ export const PlotComponent = () => {
   }
 
   const handleNotesSave = async (text: string) => {
-    // notes
-    setNotesModal(false);
-    if (!selectedPlot) return;
+    if (isSaving || !selectedPlot) return; // Prevent redundant calls
+    setIsSaving(true);
 
     try {
-      const apiClient = new ApiClient();
-      const response = await apiClient.updatePlot({ ...selectedPlot, notes: text });
-      toast.success("Plot notes updated successfully");
-      // Update the state or refetch data as needed
-      setSelectedPlot(null);
+        const updatedPlot = await dispatch(updatePlot({ ...selectedPlot, notes: text })).unwrap();
+        setSelectedPlot(updatedPlot);
+        setNotesModal(false);
+        toast.success("Notes saved successfully");
     } catch (error: any) {
-      if (error?.response?.data?.message) toast.error(error.response.data.message);
-      else toast.error("Please try again later!");
-    }
-  };
+        console.error('Error saving notes:', error);
+        console.log('Error structure:', JSON.stringify(error, null, 2));
 
+        if (error.response) {
+            toast.error(error.response.data.message || "Failed to update plot notes");
+        } else if (error.request) {
+            toast.error("Network error. Please check your connection and try again.");
+        } else {
+            toast.error("Please try again later!");
+        }
+    } finally {
+        setIsSaving(false);
+    }
+};
   const getSortableHeader = (header: string, key: string) => {
     return (
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
@@ -539,7 +546,7 @@ export const PlotComponent = () => {
       if (treeHabit === "trees") return "bg-green";
       if (treeHabit === "shrubs") return "bg-cyan";
       if (treeHabit === "herbs") return "bg-yellow";
-      if (treeHabit === "climbers") return "bg-orange"; // climber 
+      if (treeHabit === "climbers") return "bg-orange"; 
 
       return "bg-orange";
     };
@@ -610,7 +617,7 @@ export const PlotComponent = () => {
         } else if (column.dataIndex === "climber_count") {
           return {
             ...column,
-            className: treeHabit === "climbers" ? "bg-orange" : undefined, // climber line
+            className: treeHabit === "climbers" ? "bg-orange" : undefined, 
           };
         }
 
@@ -880,13 +887,13 @@ export const PlotComponent = () => {
       )}
 
       {/* Added the Notes modal component here */}
-      <GiftRequestNotes
+      <Notes
         open={notesModal}
         handleClose={() => {
           setNotesModal(false);
         }}
-        onSave={handleNotesSave}
-        initialText={selectedPlot?.notes ?? ""}
+       onSave={handleNotesSave}
+       initialText={selectedPlot?.notes ?? ""}
       />
     </>
   );
