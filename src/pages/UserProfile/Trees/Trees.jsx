@@ -109,10 +109,10 @@ const useStyles = makeStyles((theme) =>
       maxHeight: "calc(100% - 50px)",
       overflowX: "hidden",
       overflowY: "auto",
-      "&::-webkit-scrollbar": {
+      "&::WebkitScrollbar": {
         width: "0.2em",
       },
-      "&::-webkit-scrollbar-thumb": {
+      "&::WebkitScrollbar-thumb": {
         backgroundColor: "#1F3625",
         borderRadius: "0.3em",
         height: "10px",

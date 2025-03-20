@@ -7,12 +7,12 @@ import { Dashboard } from "./pages/Dashboard";
 import { Events } from "./pages/events/Events";
 import { NotFound } from "./pages/notfound/NotFound";
 import { AssignTree } from "./pages/admin/Forms/components/AssignTree";
-import { Admin } from "./pages/admin/Admin";
+import Admin from "./pages/admin/Admin"; // Ensure the import matches the default export
 import { Layout } from "./components/Layout";
 import { GiftTrees } from "./pages/ww/GiftTrees";
 import { WW } from "./pages/ww/WW";
 // import { AdminLogin } from "./pages/admin/GoogleLogin";
-import { RequireAuth } from "./pages/admin/auth/RequireAuth";
+//import { RequireAuth } from "./pages/admin/auth/RequireAuth";
 import { AuthProvider } from "./pages/admin/auth/auth";
 import { Login } from "./pages/admin/Login/Login";
 import { Forms } from "./pages/admin/Forms/Forms";
