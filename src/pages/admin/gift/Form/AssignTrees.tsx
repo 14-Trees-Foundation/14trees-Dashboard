@@ -40,8 +40,7 @@ const AssignTrees: React.FC<AssignTreesProps> = ({ giftCardRequestId, open, onCl
         setLoading(true);
         try {
             const apiClient = new ApiClient();
-            const bookedTreesResp = await apiClient.getBookedGiftTrees(giftRequestId, 0, -1);
-            console.log("Booked Trees API Response:", bookedTreesResp); // ✅ Log API Response
+            const bookedTreesResp = await apiClient.getBookedGiftTrees(giftRequestId, page * pageSize, pageSize, filters ? Object.values(filters) : undefined);
             setTrees(bookedTreesResp.results.map(item => ({ ...item, key: item.id })));
         } catch (error: any) {
             toast.error(error.message);
@@ -55,7 +54,6 @@ const AssignTrees: React.FC<AssignTreesProps> = ({ giftCardRequestId, open, onCl
         try {
             const apiClient = new ApiClient();
             const usersResp = await apiClient.getGiftRequestUsers(giftRequestId);
-            console.log("Gift Request Users API Response:", usersResp); // ✅ Log API Response
             setUsers(usersResp.map(user => ({
                 ...user, // Spread the existing user object
                 assignee_name: user.assignee_name ?? "N/A",
@@ -70,6 +68,9 @@ const AssignTrees: React.FC<AssignTreesProps> = ({ giftCardRequestId, open, onCl
     // Fetch data on component mount
     useEffect(() => {
         getBookedTrees(giftCardRequestId);
+    }, [giftCardRequestId, page, pageSize, filters]);
+
+    useEffect(() => {
         getGiftRequestUsers(giftCardRequestId);
     }, [giftCardRequestId]);
 
@@ -77,37 +78,6 @@ const AssignTrees: React.FC<AssignTreesProps> = ({ giftCardRequestId, open, onCl
     const handleSetFilters = (newFilters: Record<string, GridFilterItem>) => {
         setFilters(newFilters);
         setPage(0); // Reset to the first page when filters change
-    };
-
-    // Apply filters to rows
-    const applyFilters = (rows: GiftCardUser[], filters: Record<string, GridFilterItem>) => {
-        return rows.filter(row => {
-            return Object.entries(filters).every(([key, filter]) => {
-                const columnValue = row[key as keyof GiftCardUser];
-                const filterValue = filter.value;
-
-                if (!filterValue) return true; // No filter applied
-
-                switch (filter.operatorValue) {
-                    case 'contains':
-                        return String(columnValue).toLowerCase().includes(String(filterValue).toLowerCase());
-                    case 'equals':
-                        return String(columnValue) === String(filterValue);
-                    case 'startsWith':
-                        return String(columnValue).startsWith(String(filterValue));
-                    case 'endsWith':
-                        return String(columnValue).endsWith(String(filterValue));
-                    case 'isEmpty':
-                        return !columnValue;
-                    case 'isNotEmpty':
-                        return !!columnValue;
-                    case 'isAnyOf':
-                        return Array.isArray(filterValue) && filterValue.includes(String(columnValue));
-                    default:
-                        return true;
-                }
-            });
-        });
     };
 
     // Handle unassigning a tree
@@ -284,9 +254,9 @@ const AssignTrees: React.FC<AssignTreesProps> = ({ giftCardRequestId, open, onCl
                 <Box>
                     <GeneralTable
                         loading={loading}
-                        rows={applyFilters(trees, filters).slice(page * pageSize, (page + 1) * pageSize)} // Apply filters
+                        rows={trees} 
                         columns={columns}
-                        totalRecords={applyFilters(trees, filters).length} // Apply filters
+                        totalRecords={trees.length} 
                         page={page}
                         onPaginationChange={handlePaginationChange}
                         onDownload={handleDownload}

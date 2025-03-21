@@ -32,6 +32,7 @@ import TagComponent from "./Form/TagComponent";
 import AssignTrees from "./Form/AssignTrees";
 import GiftCardCreationModal from "./Components/GiftCardCreationModal";
 import GeneralTable from "../../../components/GenTable";
+import "./GiftTrees.css";
 
 const pendingPlotSelection = 'Pending Plot & Tree(s) Reservation';
 
@@ -204,16 +205,6 @@ const GiftTrees: FC = () => {
     console.log("total amount:", totalAmount);
 
     useEffect(() => {
-        // Inject CSS for scrollable menu
-        const style = document.createElement("style");
-        style.innerHTML = `
-            .scrollable-menu {
-                max-height: 300px; /* Adjust height as needed */
-                overflow-y: auto;
-            }
-        `;
-        document.head.appendChild(style);
-    
         // Function to stop scroll propagation
         const stopPropagation = (e: Event) => {
             if (e instanceof WheelEvent) {
@@ -228,14 +219,9 @@ const GiftTrees: FC = () => {
     
             // Cleanup function
             return () => {
-                document.head.removeChild(style);
                 menuElement.removeEventListener("wheel", stopPropagation as EventListener);
             };
         }
-    
-        return () => {
-            document.head.removeChild(style);
-        };
     }, []);
     
 
@@ -1035,9 +1021,6 @@ const getGiftCardData = async () => {
             ...getColumnDateFilter({ dataIndex: 'created_at', filters, handleSetFilters, label: 'Created' })
         },
     ]
-    console.log("GiftTrees rendering - autoAssignModal:", autoAssignModal);  
-    console.log("Selected Gift Card:", selectedGiftCard);
-    
     return (
         <div>
             <ToastContainer />

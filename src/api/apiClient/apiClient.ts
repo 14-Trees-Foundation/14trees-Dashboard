@@ -1609,9 +1609,12 @@ class ApiClient {
         }
     }
 
-    async getBookedGiftTrees(gift_card_request_id: number, offset: number = 0, limit: number = 10): Promise<PaginatedResponse<GiftCardUser>> {
+    async getBookedGiftTrees(gift_card_request_id: number, offset: number = 0, limit: number = 10, filters?: any[], order_by?: Order[]): Promise<PaginatedResponse<GiftCardUser>> {        
         try {
-            const response = await this.api.get<PaginatedResponse<GiftCardUser>>(`/gift-cards/trees/${gift_card_request_id}?offset=${offset}&limit=${limit}`);
+            const filterQuery = filters && filters.length > 0 
+                ? `&filters=${encodeURIComponent(JSON.stringify(filters))}` 
+                : "";
+            const response = await this.api.get<PaginatedResponse<GiftCardUser>>(`/gift-cards/trees/${gift_card_request_id}?offset=${offset}&limit=${limit}${filterQuery}`);
             return response.data;
         } catch (error: any) {
             if (error.response) {
