@@ -139,19 +139,20 @@ const GiftTrees: FC = () => {
     useEffect(() => {
 
         const handler = setTimeout(() => {
+
+            if (giftCardsData.loading) return;
+
             const records: GiftCard[] = [];
             const maxLength = Math.min((page + 1) * pageSize, giftCardsData.totalGiftCards);
             for (let i = page * pageSize; i < maxLength; i++) {
-                if (Object.hasOwn(giftCardsData.paginationMapping, i)) {
-                    const id = giftCardsData.paginationMapping[i];
-                    const record = giftCardsData.giftCards[id];
-                    if (record) {
-                        records.push(record);
-                    }
-                } else {
+                if (!Object.hasOwn(giftCardsData.paginationMapping, i)) {
                     getGiftCardData();
                     break;
                 }
+
+                const id = giftCardsData.paginationMapping[i];
+                const record = giftCardsData.giftCards[id];
+                if (record) records.push(record);
             }
 
             setTableRows(records);
