@@ -8,6 +8,7 @@ import { toast } from "react-toastify";
 import { CardGiftcard, Forest, GrassTwoTone, NaturePeople, OpenInNew, Wysiwyg } from "@mui/icons-material";
 import RedeemGiftTreeDialog from "./RedeemGiftTreeDialog";
 import { GiftRedeemTransaction } from "../../../types/gift_redeem_transaction";
+import FannedImageStack from "../../../components/FannedImageStack";
 
 interface CSRGiftTreesProps {
     groupId: number
@@ -334,12 +335,18 @@ const CSRGiftTrees: React.FC<CSRGiftTreesProps> = ({ groupId }) => {
                         <Card
                             hoverable
                             className={classes.customCard}
-                            cover={<img height='auto' alt={trn.plant_type}
-                                src={trn.card_image_url
-                                    ? trn.card_image_url
-                                    : trn.template_image
-                                        ? trn.template_image
-                                        : trn.illustration_s3_path } style={{ backgroundColor: 'white', width: '100%', objectFit: 'cover' }} />}
+                            // cover={<img height='auto' alt={trn.plant_type}
+                            //     src={trn.card_image_url
+                            //         ? trn.card_image_url
+                            //         : trn.template_image
+                            //             ? trn.template_image
+                            //             : trn.illustration_s3_path } style={{ backgroundColor: 'white', width: '100%', objectFit: 'cover' }} />}
+                            cover={<FannedImageStack imageUrls={[
+                                trn.card_image_url || '',
+                                trn.card_image_url || '',
+                                trn.card_image_url || '',
+                                trn.card_image_url || '',
+                              ]}/>}
                         >
                             <div style={{ width: "100%", zIndex: 10, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                                 <Typography variant="h6" gutterBottom noWrap>
