@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, Tooltip, Legend, CartesianGrid, LabelList } from "recharts";
 import axios from "axios";
+import { Empty } from "antd"; // Import Empty component from antd
 
 // Utility function to get previous months in YYYY-MM-DD format
 const getPreviousMonthDate = (monthsAgo: number) => {
@@ -22,22 +23,17 @@ const GiftRequestsChart: React.FC = () => {
 
     const fetchChartData = async () => {
         setLoading(true);
-        const baseURL = "http://localhost:8088/api/gift-cards/requests/distribution";
+        const baseURL =  process.env.REACT_APP_BASE_URL;
         const params = `start_date=${startDate}&end_date=${endDate}`;
         const finalURL = `${baseURL}?${params}`;
-        console.log("Final API URL:", finalURL);
 
         try {
             const response = await axios.get(finalURL);
-            console.log("RAW API Response:", JSON.stringify(response.data, null, 2));
-
             if (!response.data || response.data.length === 0) {
                 console.warn("No data received from API");
-                setChartData([]);
+                setChartData([]); // Set chartData to an empty array if no data is returned
                 return;
             }
-
-            console.log("Formatting Data...");
             const formattedData = response.data.map((item: any) => ({
                 ...item,
                 birthday_requests: Number(item.birthday_requests) || 0,
@@ -45,8 +41,7 @@ const GiftRequestsChart: React.FC = () => {
                 general_requests: Number(item.general_requests) || 0,
             }));
 
-            console.log("Formatted Data:", formattedData);
-            setChartData(formattedData);
+            setChartData(formattedData); // Update chartData with formatted data
         } catch (error) {
             console.error("Error fetching gift requests data:", error);
         } finally {
@@ -143,7 +138,10 @@ const GiftRequestsChart: React.FC = () => {
                     </BarChart>
                 )
             ) : (
-                <p>No data available</p>
+                // Display Empty component only when there is no data
+                <div style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100%" }}>
+                    <Empty description="No data available for the selected date range" />
+                </div>
             )}
         </div>
     );
