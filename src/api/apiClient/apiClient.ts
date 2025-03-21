@@ -19,7 +19,7 @@ import { EmailTemplate } from '../../types/email_template';
 import { Payment, PaymentHistory } from '../../types/payment';
 import { Order } from '../../types/common';
 import { View } from '../../types/viewPermission';
-
+import { GridFilterItem } from '@mui/x-data-grid';
 
 class ApiClient {
     private api: AxiosInstance;
@@ -1620,18 +1620,29 @@ class ApiClient {
         }
     }
 
-    async getBookedGiftTrees(gift_card_request_id: number, offset: number = 0, limit: number = 10): Promise<PaginatedResponse<GiftCardUser>> {
+    async getBookedGiftTrees(
+        giftCardId: string,
+        page: number,
+        pageSize: number,
+        filters?: Record<string, GridFilterItem>
+    ): Promise<PaginatedResponse<GiftCardUser>> {
         try {
-            const response = await this.api.get<PaginatedResponse<GiftCardUser>>(`/gift-cards/trees/${gift_card_request_id}?offset=${offset}&limit=${limit}`);
+            const response = await this.api.get<PaginatedResponse<GiftCardUser>>(
+                `/gift-cards/trees/${giftCardId}`,
+                {
+                    params: {
+                        offset: page * pageSize,
+                        limit: pageSize,
+                        filters: JSON.stringify(filters)
+                    }
+                }
+            );
             return response.data;
-        } catch (error: any) {
-            if (error.response) {
-                throw new Error(error.response.data.message);
-            }
-            throw new Error('Failed to get gift cards');
+        } catch (error) {
+            console.error('Error fetching booked gift trees:', error);
+            throw error;
         }
     }
-
     async unBookGiftTrees(gift_card_request_id: number, tree_ids: number[], unmap_all: boolean = false): Promise<void> {
         try {
             const response = await this.api.post<void>(`/gift-cards/unbook`, { gift_card_request_id, tree_ids, unmap_all });

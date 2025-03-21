@@ -7,7 +7,7 @@ import { Dashboard } from "./pages/Dashboard";
 import { Events } from "./pages/events/Events";
 import { NotFound } from "./pages/notfound/NotFound";
 import { AssignTree } from "./pages/admin/Forms/components/AssignTree";
-import Admin from "./pages/admin/Admin"; // Ensure the import matches the default export
+import  Admin  from "./pages/admin/Admin";
 import { Layout } from "./components/Layout";
 import { GiftTrees } from "./pages/ww/GiftTrees";
 import { WW } from "./pages/ww/WW";

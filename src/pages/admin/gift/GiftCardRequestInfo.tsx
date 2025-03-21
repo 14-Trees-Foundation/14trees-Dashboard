@@ -29,16 +29,32 @@ const GiftCardRequestInfo: React.FC<GiftCardRequestInfoProps> = ({ open, onClose
     const [page, setPage] = useState(0);
     const [pageSize, setPageSize] = useState(10);
     const [filters, setFilters] = useState<Record<string, GridFilterItem>>({});
+    const [loading, setLoading] = useState(false);
+    const [totalRecords, setTotalRecords] = useState<number>(0);
 
     useEffect(() => {
-        const getGiftCards = async () => {
-            const apiClient = new ApiClient();
-            const resp = await apiClient.getBookedGiftTrees(data.id, 0, -1);
-            setUsers(resp.results.filter(item => item.sapling_id));
-        }
+        const fetchData = async () => {
+            if (!data?.id) return;
+            setLoading(true);
+            try {
+                const apiClient = new ApiClient();
+                const response = await apiClient.getBookedGiftTrees(
+                    data.id,
+                    page,
+                    pageSize,
+                    filters
+                );
+                setUsers(response.results);
+                setTotalRecords(response.total);
+            } catch (error) {
+                console.error('Error:', error);
+            } finally {
+                setLoading(false);
+            }
+        };
 
-        if (open) getGiftCards();
-    }, [open, data])
+        fetchData();
+    }, [data?.id, page, pageSize, filters]);
 
     const columns: any[] = [
         {
@@ -107,6 +123,7 @@ const GiftCardRequestInfo: React.FC<GiftCardRequestInfoProps> = ({ open, onClose
         },
     ]
 
+
     const getStatus = (status: string) => {
         if (status === 'pending_plot_selection') {
             return 'Pending Plot Selection';
@@ -118,43 +135,6 @@ const GiftCardRequestInfo: React.FC<GiftCardRequestInfoProps> = ({ open, onClose
             return 'Completed';
         }
     }
-
-    const getFilteredUsers = () => {
-        return users.filter(user => {
-            for (const key in filters) {
-                const filter = filters[key];
-                const value = user[key as keyof GiftCardUser];
-                
-                if (!value) continue;
-
-                switch (filter.operatorValue) {
-                    case 'contains':
-                        if (!value.toString().toLowerCase().includes(filter.value.toLowerCase())) {
-                            return false;
-                        }
-                        break;
-                    case 'equals':
-                        if (value.toString().toLowerCase() !== filter.value.toLowerCase()) {
-                            return false;
-                        }
-                        break;
-                    case 'startsWith':
-                        if (!value.toString().toLowerCase().startsWith(filter.value.toLowerCase())) {
-                            return false;
-                        }
-                        break;
-                    case 'endsWith':
-                        if (!value.toString().toLowerCase().endsWith(filter.value.toLowerCase())) {
-                            return false;
-                        }
-                        break;
-                }
-            }
-            return true;
-        });
-    };
-
-    const filteredUsers = getFilteredUsers();
 
     if (!data) return null;
 
@@ -257,14 +237,17 @@ const GiftCardRequestInfo: React.FC<GiftCardRequestInfoProps> = ({ open, onClose
                     <Box mt={2} mb={2}>
                         <Typography>Total trees assigned: {data.assigned}</Typography>
                         <GeneralTable
-                            loading={false}
+                            loading={loading}
                             columns={columns}
-                            rows={filteredUsers}
-                            totalRecords={filteredUsers.length}
+                            rows={users} 
+                            totalRecords={totalRecords}
                             page={page}
                             pageSize={pageSize}
-                            onPaginationChange={(page: number, pageSize: number) => { setPage(page - 1); setPageSize(pageSize); }}
-                            onDownload={async () => filteredUsers}
+                            onPaginationChange={(newPage: number, newPageSize: number) => { 
+                                setPage(newPage - 1); 
+                                setPageSize(newPageSize); 
+                            }}
+                            onDownload={async () => users}
                             footer
                             tableName='Gift Request Users'
                         />

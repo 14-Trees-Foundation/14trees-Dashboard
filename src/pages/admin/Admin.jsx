@@ -39,38 +39,27 @@ export const Admin = () => {
   const index = useRecoilValue(adminNavIndex);
   const token = JSON.parse(localStorage.getItem("token"));
   const navigate = useNavigate();
-
   const fetchData = useCallback(async () => {
     setLoading(true);
     try {
-      let response = await Axios.default.get(`/analytics/summary`, {
-        headers: {
-          "x-access-token": token,
-          "content-type": "application/json",
-        },
-      });
-      if (response.status === 200) {
-        setSummary(response.data);
+      let response = await Axios.default.get(`/trees/loggedbydate`);
+      if (response.status === 200 && Array.isArray(response.data)) {
+        const cleanedData = response.data
+          .filter((element) => element && element._id && element.count >= 0) // Ensure valid data
+          .map((element) => ({
+            _id: element._id.substring(0, 10),
+            count: element.count || 0, // Ensure count is a number
+          }));
+        setTreeLoggedByDate(cleanedData);
+      } else {
+        setTreeLoggedByDate([]); // Prevent undefined issues
       }
-      response = await Axios.default.get(`/trees/loggedbydate`);
-      if (response.status === 200) {
-        response.data.forEach((element, index) => {
-          element["_id"] = element["_id"].substring(0, 10);
-        });
-        setTreeLoggedByDate(response.data);
-      }
-      // let plotRes = await Axios.default.get(`/plots`);
-      // if (plotRes.status === 200) {
-      //   setPlotsList(plotRes.data.result);
-      // }
     } catch (error) {
-      if (error.response.status === 500) {
-        navigate("/login");
-      }
+      console.error("Error fetching tree log data:", error);
+      setTreeLoggedByDate([]); // Handle failure case
     }
-
     setLoading(false);
-  }, [setSummary, navigate, setTreeLoggedByDate, setPlotsList, token]);
+  }, [setTreeLoggedByDate]);
 
   useEffect(() => {
     fetchData();
@@ -198,4 +187,4 @@ const useStyles = makeStyles((theme) =>
     },
   })
 );
-export default Admin; 
+export default Admin;
