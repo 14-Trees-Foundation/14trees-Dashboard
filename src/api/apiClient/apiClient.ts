@@ -1576,6 +1576,18 @@ class ApiClient {
         }
     }
 
+// New
+async getGiftRequestDistribution(): Promise<any> {
+    try {
+        const response = await this.api.get<any>(`/gift-cards/requests/distribution`);
+        return response.data;
+    } catch (error: any) {
+        if (error.response) {
+            throw new Error(error.response.data.message);
+        }
+        throw new Error('Failed to fetch distribution data');
+    }
+}
     async getGiftRequestUsers(gift_card_request_id: number): Promise<GiftRequestUser[]> {
         try {
             const response = await this.api.get<GiftRequestUser[]>(`/gift-cards/users/${gift_card_request_id}`);

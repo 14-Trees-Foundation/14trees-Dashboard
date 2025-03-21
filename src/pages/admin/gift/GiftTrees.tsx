@@ -1,4 +1,4 @@
-import { Badge, Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, Divider, IconButton, Tooltip, Typography } from "@mui/material";
+import { Badge, Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, Divider, IconButton, Tooltip, Typography, Grid, Card, CardContent} from "@mui/material";
 import { FC, useEffect, useRef, useState } from "react";
 import GiftCardsForm from "./Form/GiftCardForm";
 import { User } from "../../../types/user";
@@ -32,6 +32,7 @@ import AssignTrees from "./Form/AssignTrees";
 import GiftCardCreationModal from "./Components/GiftCardCreationModal";
 import GeneralTable from "../../../components/GenTable";
 import AnalyticsChats from "./Components/AnalyticsChats";
+import GiftRequestsChart from "./Components/GiftRequestsChart";
 
 const pendingPlotSelection = 'Pending Plot & Tree(s) Reservation';
 
@@ -207,7 +208,6 @@ const GiftTrees: FC = () => {
         return resp.results;
     };
 
-
     const handleSetFilters = (filters: Record<string, GridFilterItem>) => {
         setPage(0);
         setFilters(filters);
@@ -310,7 +310,7 @@ const GiftTrees: FC = () => {
         try {
             const response = await apiClient.createGiftCard(requestId, createdBy.id, treeCount, user.id, category, grove, requestType, giftedOn, group?.id, paymentId, logo, messages, file);
             giftCardId = response.id;
-            
+
             getGiftCardData();
             setRequestId(null);
         } catch (error) {
@@ -976,28 +976,42 @@ const GiftTrees: FC = () => {
             </div>
             <Divider sx={{ backgroundColor: "black", marginBottom: '15px' }} />
 
-            {auth.signedin && <Box sx={{ width: "100%" }}>
-                <GeneralTable
-                    loading={giftCardsData.loading}
-                    rows={tableRows}
-                    columns={columns}
-                    totalRecords={giftCardsData.totalGiftCards}
-                    page={page}
-                    pageSize={pageSize}
-                    onPaginationChange={(page: number, pageSize: number) => { setPage(page - 1); setPageSize(pageSize); }}
-                    onDownload={getAllGiftCardsData}
-                    onSelectionChanges={handleSelectionChanges}
-                    summary={(totalColumns: number) => {
-                        if (totalColumns < 5) return undefined;
-                        return TableSummary(tableRows, selectedGiftRequestIds, totalColumns)
-                    }}
-                    footer
-                    tableName="Tree Cards"
-                />
+            {auth.signedin && (
+    <Grid container justifyContent="center" sx={{ width: "100%" }}>
+        <Grid item xs={12} sx={{ display: "flex", justifyContent: "center" }}>
+            <GeneralTable
+                loading={giftCardsData.loading}
+                rows={tableRows}
+                columns={columns}
+                totalRecords={giftCardsData.totalGiftCards}
+                page={page}
+                pageSize={pageSize}
+                onPaginationChange={(page: number, pageSize: number) => { setPage(page - 1); setPageSize(pageSize); }}
+                onDownload={getAllGiftCardsData}
+                onSelectionChanges={handleSelectionChanges}
+                summary={(totalColumns: number) => {
+                    if (totalColumns < 5) return undefined;
+                    return TableSummary(tableRows, selectedGiftRequestIds, totalColumns)
+                }}
+                footer
+                tableName="Tree Cards"
+            />
+        </Grid>
 
-                <AnalyticsChats style={{ margin: '50px 10px' }} />
-            </Box>}
+        <Grid item xs={12} display="flex" justifyContent="center">
+            <Card sx={{ width: "1000px", height: "700px", borderRadius: "20px", margin: "0 auto", boxShadow: 3, backgroundColor: "transparent", overflow: "hidden", display: "flex",
+                        justifyContent: "center", alignItems: "center",  padding: 2 }}>
+                <CardContent sx={{ display: "flex", justifyContent: "center", alignItems: "center", width: "100%", height: "100%" }}>
+                    <GiftRequestsChart />
+                </CardContent>
+            </Card>
+        </Grid>
 
+        <Grid item xs={12} sx={{ display: "flex", justifyContent: "center", width: "100%" }}>
+            <AnalyticsChats style={{ margin: "50px 10px", maxWidth: "600px", width: "100%" }} />
+        </Grid>
+    </Grid>
+)}
             {!auth.signedin &&
                 <Box
                     display="flex"
@@ -1024,14 +1038,14 @@ const GiftTrees: FC = () => {
                 </Box>
             }
 
-            <GiftCardsForm 
-                loggedinUserId={authRef.current?.userId} 
-                step={step} 
-                giftCardRequest={selectedGiftCard ?? undefined} 
-                requestId={requestId} 
-                open={modalOpen} 
-                handleClose={handleModalClose} 
-                onSubmit={handleSubmit} 
+            <GiftCardsForm
+                loggedinUserId={authRef.current?.userId}
+                step={step}
+                giftCardRequest={selectedGiftCard ?? undefined}
+                requestId={requestId}
+                open={modalOpen}
+                handleClose={handleModalClose}
+                onSubmit={handleSubmit}
             />
 
             <Dialog open={plotModal} onClose={() => setPlotModal(false)} fullWidth maxWidth="xl">
@@ -1092,8 +1106,8 @@ const GiftTrees: FC = () => {
                     />
                 </DialogContent>
                 <DialogActions>
-                    <Button 
-                        onClick={() => setPaymentModal(false)} 
+                    <Button
+                        onClick={() => setPaymentModal(false)}
                         color="error"
                         variant="outlined"
                         sx={{ mr: 2 }}
