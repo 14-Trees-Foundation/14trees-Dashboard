@@ -31,7 +31,8 @@ const BookedTrees: React.FC<BookedTreesProps> = ({ giftCardRequestId, visible, o
         setLoading(true);
         try {
             const apiClient = new ApiClient();
-            const bookedTreesResp = await apiClient.getBookedGiftTrees(giftRequestId, page * pageSize, pageSize, filters ? Object.values(filters) : undefined);
+            const filtersArray = filters ? Object.values(filters) : undefined;
+            const bookedTreesResp = await apiClient.getBookedGiftTrees(giftRequestId, page * pageSize, pageSize, filtersArray);
             setExistingBookedTrees(bookedTreesResp.results.map(item => ({ ...item, key: item.id })));
         } catch (error: any) {
             toast.error(error.message);
@@ -98,20 +99,12 @@ const BookedTrees: React.FC<BookedTreesProps> = ({ giftCardRequestId, visible, o
     }
 
     const handleUnMapTrees = async (unMapAll: boolean = false) => {
-
         try {
-            const treeIds: number[] = unMapAll
-                ? existingBookedTrees.map(item => item.tree_id) // Unmap all trees
-                : existingBookedTrees.filter(tree => selectedIds.includes(tree.id)).map(item => item.tree_id); // Unmap selected trees
-
             const apiClient = new ApiClient();
-            await apiClient.unBookGiftTrees(giftCardRequestId, treeIds, unMapAll);
-
-            // Notify parent component about unmapped trees
-            onUnMap && onUnMap(treeIds.length);
-
-            // Update local state
-            setExistingBookedTrees(prev => prev.filter(item => !treeIds.includes(item.tree_id)));
+            const idsToUnmap = unMapAll ? [] : selectedIds;   
+            await apiClient.unBookGiftTrees(giftCardRequestId, idsToUnmap, unMapAll);
+            onUnMap && onUnMap(unMapAll ? existingBookedTrees.length : selectedIds.length);
+            getBookedTrees(giftCardRequestId, page, pageSize, filters);
             setSelectedIds([]); // Reset selected IDs
         } catch (error: any) {
             toast.error(error.message);
