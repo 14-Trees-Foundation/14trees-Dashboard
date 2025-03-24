@@ -1620,27 +1620,16 @@ class ApiClient {
         }
     }
 
-    async getBookedGiftTrees(
-        giftCardId: string,
-        page: number,
-        pageSize: number,
-        filters?: Record<string, GridFilterItem>
-    ): Promise<PaginatedResponse<GiftCardUser>> {
+    async getBookedGiftTrees(giftCardId: string,page: number,pageSize: number,filters?: GridFilterItem[]): Promise<PaginatedResponse<GiftCardUser>> {
         try {
-            const response = await this.api.get<PaginatedResponse<GiftCardUser>>(
-                `/gift-cards/trees/${giftCardId}`,
-                {
-                    params: {
-                        offset: page * pageSize,
-                        limit: pageSize,
-                        filters: JSON.stringify(filters)
-                    }
-                }
-            );
+            const url = `/gift-cards/trees/${giftCardId}?offset=${page * pageSize}&limit=${pageSize}&filters=${encodeURIComponent(JSON.stringify(filters || []))}`;
+            const response = await this.api.get<PaginatedResponse<GiftCardUser>>(url);
             return response.data;
-        } catch (error) {
-            console.error('Error fetching booked gift trees:', error);
-            throw error;
+        } catch (error:any) {
+            if (error.response) {
+                throw new Error(error.response.data.message);
+            }
+            throw new Error('Failed to get booked gift trees');
         }
     }
     async unBookGiftTrees(gift_card_request_id: number, tree_ids: number[], unmap_all: boolean = false): Promise<void> {

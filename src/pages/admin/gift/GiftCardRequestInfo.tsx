@@ -16,6 +16,7 @@ import GeneralTable from '../../../components/GenTable';
 import ApiClient from '../../../api/apiClient/apiClient';
 import { GiftCardUser } from '../../../types/gift_card';
 import getColumnSearchProps from '../../../components/Filter';
+import { toast } from 'react-toastify';
 
 interface GiftCardRequestInfoProps {
     open: boolean
@@ -38,21 +39,32 @@ const GiftCardRequestInfo: React.FC<GiftCardRequestInfoProps> = ({ open, onClose
             setLoading(true);
             try {
                 const apiClient = new ApiClient();
+                const filtersArray = Object.entries(filters).map(([key, value]) => ({
+                    columnField: key,
+                    operatorValue: value.operatorValue,
+                    value: value.value
+                }));
+    
                 const response = await apiClient.getBookedGiftTrees(
                     data.id,
                     page,
                     pageSize,
-                    filters
+                    filtersArray 
                 );
                 setUsers(response.results);
                 setTotalRecords(response.total);
-            } catch (error) {
-                console.error('Error:', error);
+            } catch (error: unknown) {
+                // Proper error handling
+                if (error instanceof Error) {
+                    toast.error(error.message);
+                } else {
+                    toast.error('An unknown error occurred');
+                }
             } finally {
                 setLoading(false);
             }
         };
-
+    
         fetchData();
     }, [data?.id, page, pageSize, filters]);
 
