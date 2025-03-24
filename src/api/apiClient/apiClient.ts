@@ -735,8 +735,8 @@ class ApiClient {
             Object.entries(data).forEach(([key, value]) => {
                 if (key === "tags" && value) {
                     (value as any)?.forEach((tag: string) => { formData.append("tags", tag) });
-                } else if (key === "location") {
-
+                } else if (key === "memory_images" && value) {
+                    (value as string[]).forEach((image: string) => { formData.append("memory_images", image) });
                 } else if (key != 'image' && key !== "location") {
                     const strValue = value as any
                     formData.append(key, strValue);
