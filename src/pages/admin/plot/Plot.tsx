@@ -297,29 +297,18 @@ export const PlotComponent = () => {
     }
   }
 
-  const handleNotesSave = async (text: string) => {
-    if (isSaving || !selectedPlot) return; // Prevent redundant calls
+  const handleNotesSave = (text: string) => {
+    if (isSaving || !selectedPlot) return;
     setIsSaving(true);
 
-    try {
-        const updatedPlot = await dispatch(updatePlot({ ...selectedPlot, notes: text })).unwrap();
-        setSelectedPlot(updatedPlot);
+    updatePlot({ ...selectedPlot, notes: text });
+
+    setTimeout(() => {
+        setSelectedPlot(null);
         setNotesModal(false);
         toast.success("Notes saved successfully");
-    } catch (error: any) {
-        console.error('Error saving notes:', error);
-        console.log('Error structure:', JSON.stringify(error, null, 2));
-
-        if (error.response) {
-            toast.error(error.response.data.message || "Failed to update plot notes");
-        } else if (error.request) {
-            toast.error("Network error. Please check your connection and try again.");
-        } else {
-            toast.error("Please try again later!");
-        }
-    } finally {
         setIsSaving(false);
-    }
+    }, 500);
 };
   const getSortableHeader = (header: string, key: string) => {
     return (

@@ -2,12 +2,12 @@ import { UnknownAction } from "redux";
 import { PlotsDataState, Plot } from "../../types/plot";
 import plotActionTypes from "../actionTypes/plotActionTypes";
 import { PaginatedResponse } from "../../types/pagination";
-import { updatePlot } from "../actions/plotActions";
 
 export const plotsDataReducer = (state = { totalPlots:0, plots: {}, paginationMapping: {} }, action: UnknownAction ): PlotsDataState => {
     switch (action.type) {
         case plotActionTypes.GET_PLOTS_SUCCEEDED:
             if (action.payload) {
+
                 let plotsDataState: PlotsDataState = { 
                     totalPlots: state.totalPlots, 
                     plots: { ...state.plots }, 
@@ -47,7 +47,7 @@ export const plotsDataReducer = (state = { totalPlots:0, plots: {}, paginationMa
                 return nextState;
             }
             return state;
-        case updatePlot.fulfilled.type: 
+        case plotActionTypes.UPDATE_PLOT_SUCCEEDED:
             if (action.payload) {
                 const nextState: PlotsDataState = { 
                     totalPlots: state.totalPlots, 
@@ -61,22 +61,15 @@ export const plotsDataReducer = (state = { totalPlots:0, plots: {}, paginationMa
                 return nextState;
             }
             return state;
-
-        case updatePlot.pending.type: 
-            return state;
-        case updatePlot.rejected.type: 
-            console.error("Failed to update plot:", action.payload);
-            return state;
-
         case plotActionTypes.DELETE_PLOT_SUCCEEDED:
             if (action.payload) {
-                const nextState: PlotsDataState = {
-                    totalPlots: state.totalPlots,
+                const nextState: PlotsDataState = { 
+                    totalPlots: state.totalPlots, 
                     plots: { ...state.plots },
-                    paginationMapping: { ...state.paginationMapping },
+                    paginationMapping: { ...state.paginationMapping }
                 };
 
-                Reflect.deleteProperty(nextState.plots, action.payload as number);
+                Reflect.deleteProperty(nextState.plots, action.payload as number)
                 nextState.totalPlots -= 1;
                 return nextState;
             }

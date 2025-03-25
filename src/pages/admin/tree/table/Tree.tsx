@@ -289,8 +289,9 @@ export const TreeNew = () => {
             title: getSortableHeader("Reserved on", "mapped_at"),
             width: 250,
             align: 'center',
+            hidden: true,
             render: value => value ? getHumanReadableDate(value) : '',
-            ...getColumnDateFilter({ dataIndex: 'mapped_at', filters, handleSetFilters, label: 'Reserved On' }), // Add date range filter
+            ...getColumnDateFilter({ dataIndex: 'mapped_at', filters, handleSetFilters, label: 'Reserved' }),
         },
         {
             dataIndex: "assigned_at",
@@ -298,8 +299,9 @@ export const TreeNew = () => {
             title: getSortableHeader("Assigned on", "assigned_at"),
             width: 250,
             align: 'center',
+            hidden: true,
             render: value => value ? getHumanReadableDate(value) : '',
-            ...getColumnDateFilter({ dataIndex: 'assigned_at', filters, handleSetFilters, label: 'Assigned On' }), // Add date range filter
+            ...getColumnDateFilter({ dataIndex: 'assigned_at', filters, handleSetFilters, label: 'Assigned' }),
         },
         {
             dataIndex: "created_at",
