@@ -5,6 +5,9 @@ import GrassTwoToneIcon from "@mui/icons-material/GrassTwoTone";
 import PermIdentityTwoToneIcon from "@mui/icons-material/PermIdentityTwoTone";
 import TerrainTwoToneIcon from "@mui/icons-material/TerrainTwoTone";
 import AssignmentIndTwoToneIcon from "@mui/icons-material/AssignmentIndTwoTone";
+import CardGiftcardIcon from '@mui/icons-material/CardGiftcard';
+import PersonIcon from '@mui/icons-material/Person';
+import BusinessIcon from '@mui/icons-material/Business';
 import { useRecoilValue } from "recoil";
 
 import { summary } from "../../../store/adminAtoms";
@@ -93,6 +96,60 @@ export const AdminHome = () => {
           </Box>
         </div>
       </Box>
+      <Box style={{
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center'
+      }}>
+        <div className={classes.card}>
+          <Box sx={{ paddingTop: "10px" }}>
+            <CardGiftcardIcon fontSize="large" style={{ color: "#E91E63" }} />
+            <Typography variant="h3" color="#fff" sx={{ pt: 1, pb: 1 }}>
+              {adminSummary.personalGiftRequestsCount || "0"}
+            </Typography>
+            <Typography variant="subtitle2" color="#1f3625">
+              Personal Gift Requests
+            </Typography>
+          </Box>
+        </div>
+
+        <div className={classes.card}>
+          <Box sx={{ paddingTop: "10px" }}>
+            <PersonIcon fontSize="large" style={{ color: "#00ACC1" }} />
+            <Typography variant="h3" color="#fff" sx={{ pt: 1, pb: 1 }}>
+              {adminSummary.personalGiftedTreesCount || "0"}
+            </Typography>
+            <Typography variant="subtitle2" color="#1f3625">
+              Personal Gifted Trees
+            </Typography>
+          </Box>
+        </div>
+
+        <div className={classes.card}>
+          <Box sx={{ paddingTop: "10px" }}>
+            <CardGiftcardIcon fontSize="large" style={{ color: "#E91E63" }} />
+            <Typography variant="h3" color="#fff" sx={{ pt: 1, pb: 1 }}>
+              {adminSummary.corporateGiftRequestsCount || "0"}
+            </Typography>
+            <Typography variant="subtitle2" color="#1f3625">
+              Corporate Gift Requests
+            </Typography>
+          </Box>
+        </div>
+
+        <div className={classes.card}>
+          <Box sx={{ paddingTop: "10px" }}>
+            <BusinessIcon fontSize="large" style={{ color: "#00ACC1" }} />
+            <Typography variant="h3" color="#fff" sx={{ pt: 1, pb: 1 }}>
+              {adminSummary.corporateGiftedTreesCount || "0"}
+            </Typography>
+            <Typography variant="subtitle2" color="#1f3625">
+              Corporate Gifted Trees
+            </Typography>
+          </Box>
+        </div>
+      </Box>
+
       <Box style={{
         display: 'flex',
         justifyContent: 'space-evenly',

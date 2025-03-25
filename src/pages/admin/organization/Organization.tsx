@@ -31,8 +31,11 @@ import { OrganizationUsers } from "./OrganizationUsers";
 import { organizationTypes } from "./organizationType";
 import { GridFilterItem } from "@mui/x-data-grid";
 import getColumnSearchProps, { getColumnSelectedItemFilter } from "../../../components/Filter";
-import { ToastContainer } from "react-toastify";
+import { toast, ToastContainer } from "react-toastify";
 import { AccountBalance } from "@mui/icons-material";
+import ApiClient from "../../../api/apiClient/apiClient";
+import CombineGroupForm from "./CombineGroupForm";
+import { LoadingButton } from "@mui/lab";
 
 export const OrganizationComponent = () => {
   const dispatch = useAppDispatch();
@@ -57,6 +60,12 @@ export const OrganizationComponent = () => {
   const [anchorEl, setAnchorEl] = useState<any>(null);
   const [groupType, setGroupType] = useState<string>('');
   const [filters, setFilters] = useState<Record<string, GridFilterItem>>({});
+
+  const [groupCombineModal, setGroupCombineModal] = useState(false);
+  const [primaryGroup, setPrimaryGroup] = useState<Group | null>(null);
+  const [secondaryGroup, setSecondaryGroup] = useState<Group | null>(null);
+  const [deleteSecondary, setDeleteSecondary] = useState(true);
+  const [merging, setMerging] = useState(false);
 
   const handleSetFilters = (filters: Record<string, GridFilterItem>) => {
     setPage(0);
@@ -221,6 +230,31 @@ export const OrganizationComponent = () => {
     createGroup(formData, logo);
   };
 
+  const handleCancelCombineGroup = () => {
+    setPrimaryGroup(null);
+    setSecondaryGroup(null);
+    setDeleteSecondary(true);
+    setGroupCombineModal(false);
+  }
+
+  const handleCombineGroup = async () => {
+    if (!primaryGroup || !secondaryGroup) {
+      toast.error("Please select both the users in order to combine them!");
+      return;
+    }
+
+    setMerging(true);
+    try {
+      const apiClient = new ApiClient();
+      await apiClient.mergeGroups(primaryGroup.id, secondaryGroup.id, deleteSecondary);
+    } catch(error: any) {
+      toast.error(error.message);
+    }
+    setMerging(false);
+
+    handleCancelCombineGroup();
+  }
+
   return (
     <>
       <ToastContainer />
@@ -247,7 +281,7 @@ export const OrganizationComponent = () => {
             marginBottom: "5px",
             marginTop: "5px",
           }}>
-          <Button variant="outlined" color="primary" onClick={() => setFailedRecords(true)} disabled={Object.keys(filteredUserGroupMapping).length === 0}>
+          <Button style={{ marginLeft: "10px" }} variant="outlined" color="primary" onClick={() => setFailedRecords(true)} disabled={Object.keys(filteredUserGroupMapping).length === 0}>
             <Badge badgeContent={Object.keys(filteredUserGroupMapping).length} color="error">
               <ErrorIcon />
             </Badge>
@@ -261,6 +295,13 @@ export const OrganizationComponent = () => {
             onClick={handleClick}
           >
             +ADD
+          </Button>
+          <Button
+            variant="contained"
+            color="success"
+            style={{ marginLeft: "10px", textTransform: 'none' }}
+            onClick={() => { setGroupCombineModal(true); }}>
+            Merge Groups
           </Button>
           <Menu
             id="simple-menu"
@@ -324,6 +365,35 @@ export const OrganizationComponent = () => {
             autoFocus>
             Yes
           </Button>
+        </DialogActions>
+      </Dialog>
+
+      <Dialog open={groupCombineModal} maxWidth="md">
+        <DialogTitle>Merge groups</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            <CombineGroupForm
+              primaryGroup={primaryGroup}
+              secondaryGroup={secondaryGroup}
+              deleteSecondary={deleteSecondary}
+              onPrimaryGroupChange={group => { setPrimaryGroup(group); }}
+              onSecondaryGroupChange={group => { setSecondaryGroup(group); }}
+              onDeleteSecondaryChange={value => { setDeleteSecondary(value); }}
+            />
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button variant="outlined" onClick={handleCancelCombineGroup} color="error">
+            Cancel
+          </Button>
+          <LoadingButton
+            loading={merging}
+            onClick={handleCombineGroup}
+            variant="contained"
+            color="success"
+          >
+            Merge
+          </LoadingButton>
         </DialogActions>
       </Dialog>
 

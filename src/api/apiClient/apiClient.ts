@@ -19,6 +19,7 @@ import { EmailTemplate } from '../../types/email_template';
 import { Payment, PaymentHistory } from '../../types/payment';
 import { Order } from '../../types/common';
 import { View } from '../../types/viewPermission';
+import { GiftRedeemTransaction } from '../../types/gift_redeem_transaction';
 
 
 class ApiClient {
@@ -399,6 +400,17 @@ class ApiClient {
         } catch (error: any) {
             console.error(error)
             throw new Error(`Failed to fetch groups: ${error.message}`);
+        }
+    }
+
+    async mergeGroups(primary_group: number, secondary_group: number, delete_secondary: boolean): Promise<void> {
+        try {
+            await this.api.post<any>(`/groups/merge`, { primary_group, secondary_group, delete_secondary });
+        } catch (error: any) {
+            if (error?.response?.data?.message) {
+                throw new Error(error.response.data.message);
+            }
+            throw new Error('Failed to merge groups!');
         }
     }
 
@@ -1644,9 +1656,9 @@ class ApiClient {
         }
     }
 
-    async updateGiftCardTemplate(slide_id: string, primary_message: string, secondary_message: string, logo_message: string, logo?: string | null, sapling_id?: string | null, user_name?: string | null): Promise<void> {
+    async updateGiftCardTemplate(slide_id: string, primary_message: string, secondary_message: string, logo_message: string, logo?: string | null, sapling_id?: string | null, user_name?: string | null, trees_count?: number): Promise<void> {
         try {
-            await this.api.post<any>(`/gift-cards/update-template`, { slide_id, primary_message, secondary_message, logo_message, logo, sapling_id, user_name });
+            await this.api.post<any>(`/gift-cards/update-template`, { slide_id, primary_message, secondary_message, logo_message, logo, sapling_id, user_name, trees_count });
         } catch (error: any) {
             if (error.response) {
                 throw new Error(error.response.data.message);
@@ -1667,9 +1679,10 @@ class ApiClient {
         }
     }
 
-    async redeemMultipleGiftCardTemplate(trees_count: number, sponsor_group: number, user: User, profile_image_url?: string | null): Promise<void> {
+    async redeemMultipleGiftCardTemplate(trees_count: number, sponsor_group: number, user: User, profile_image_url?: string | null, messages?: Record<string, any>): Promise<void> {
         try {
-            await this.api.post<void>(`/gift-cards/card/redeem-multi`, { trees_count, sponsor_group, ...user, user, profile_image_url });
+            const requesting_user = localStorage.getItem("userId");
+            await this.api.post<void>(`/gift-cards/card/redeem-multi`, { requesting_user, trees_count, sponsor_group, ...user, user, profile_image_url, ...messages });
         } catch (error: any) {
             if (error.response) {
                 throw new Error(error.response.data.message);
@@ -1768,6 +1781,18 @@ class ApiClient {
                 throw new Error(error.response.data.message);
             }
             throw new Error('Failed to generate fund request for gift request!');
+        }
+    }
+
+    async getGiftTransactions(offset: number, limit: number, groupId: number): Promise<PaginatedResponse<GiftRedeemTransaction>> {
+        try {
+            const resp = await this.api.get<PaginatedResponse<GiftRedeemTransaction>>(`/gift-cards/transactions/${groupId}?offset=${offset}&limit=${limit}`);
+            return resp.data;
+        } catch (error: any) {
+            if (error.response) {
+                throw new Error(error.response.data.message);
+            }
+            throw new Error('Failed fetch gifted trees data!');
         }
     }
 
