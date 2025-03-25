@@ -132,7 +132,7 @@ const MappedTrees: React.FC<MappedTreesProps> = ({ }) => {
                     height: '83vh',
                     overflowY: 'scroll',
                     scrollbarWidth: 'none', // For Firefox
-                    '&::WebkitScrollbar': { display: 'none' } // For Chrome, Safari
+                    '&::-webkit-scrollbar': { display: 'none' } // For Chrome, Safari
                 }}
             >
                 <CardGrid

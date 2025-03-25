@@ -719,7 +719,7 @@ const UseStyle = makeStyles((theme) =>
     },
     bg: {
       overflow: "auto",
-      "&::WebkitScrollbar": {
+      "&::-webkit-scrollbar": {
         display: "none",
       },
       width: "100vw",

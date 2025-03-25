@@ -342,7 +342,7 @@ const InventoryStats: FC = () => {
                     height: '65vh',
                     overflowY: 'scroll',
                     scrollbarWidth: 'none', // For Firefox
-                    '&::WebkitScrollbar': { display: 'none' } // For Chrome, Safari
+                    '&::-webkit-scrollbar': { display: 'none' } // For Chrome, Safari
                 }}
             >
                 <Box>

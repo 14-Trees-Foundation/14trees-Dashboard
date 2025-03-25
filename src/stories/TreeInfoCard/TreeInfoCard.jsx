@@ -35,7 +35,7 @@ const UseStyle = makeStyles((theme) =>
       overflowY: "auto",
       borderRadius: "7px",
       minWidth: "93%",
-      "&::WebkitScrollbar": {
+      "&::-webkit-scrollbar": {
         display: "none",
       },
     },
