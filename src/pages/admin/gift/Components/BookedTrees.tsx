@@ -31,17 +31,27 @@ const BookedTrees: React.FC<BookedTreesProps> = ({ giftCardRequestId, visible, o
         setLoading(true);
         try {
             const apiClient = new ApiClient();
-            const bookedTreesResp = await apiClient.getBookedGiftTrees(giftRequestId, 0, -1);
+            const filters = [{
+                columnField: 'gift_card_request_id',
+                operatorValue: 'equals',
+                value: giftRequestId
+            }];
+            
+            const bookedTreesResp = await apiClient.getBookedGiftTrees(
+                0,  // page
+                -1, // pageSize for all records
+                filters
+            );
             setExistingBookedTrees(bookedTreesResp.results.map(item => ({ ...item, key: item.id })));
         } catch (error: any) {
             toast.error(error.message);
         }
         setLoading(false);
     }
-
+    
     useEffect(() => {
         getBookedTrees(giftCardRequestId);
-    }, [giftCardRequestId])
+    }, [giftCardRequestId]);
 
     const handleSetFilters = (filters: Record<string, GridFilterItem>) => {
         setPage(0);

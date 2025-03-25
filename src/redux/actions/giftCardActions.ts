@@ -145,7 +145,14 @@ export const getBookedGiftCards = (giftCardId: number, offset: number = 0, limit
         dispatch({
             type: giftCardActionTypes.GET_BOOKED_GIFT_CARDS_REQUESTED,
         });
-        apiClient.getBookedGiftTrees(giftCardId, offset, limit).then(
+
+        const filters = [{
+            columnField: 'gift_card_request_id',
+            operatorValue: 'equals',
+            value: giftCardId
+        }];
+
+        apiClient.getBookedGiftTrees(offset, limit, filters).then(
             (value: PaginatedResponse<GiftCardUser>) => {
                 dispatch({
                     type: giftCardActionTypes.GET_BOOKED_GIFT_CARDS_SUCCEEDED,
@@ -155,6 +162,7 @@ export const getBookedGiftCards = (giftCardId: number, offset: number = 0, limit
             (error: any) => {
                 dispatch({
                     type: giftCardActionTypes.GET_BOOKED_GIFT_CARDS_FAILED,
+                    payload: error.message
                 });
             }
         )

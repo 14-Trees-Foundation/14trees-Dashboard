@@ -42,14 +42,24 @@ const AssignTrees: React.FC<AssignTreesProps> = ({ giftCardRequestId, open, onCl
         setLoading(true);
         try {
             const apiClient = new ApiClient();
-            const bookedTreesResp = await apiClient.getBookedGiftTrees(giftRequestId, 0, -1);
+            const filters = [{
+                columnField: 'gift_card_request_id',
+                operatorValue: 'equals',
+                value: giftRequestId
+            }];
+            
+            const bookedTreesResp = await apiClient.getBookedGiftTrees(
+                0,      // page
+                -1,     // pageSize (-1 for all records)
+                filters // pass filters array instead of giftRequestId
+            );
             setTrees(bookedTreesResp.results.map(item => ({ ...item, key: item.id })));
         } catch (error: any) {
             toast.error(error.message);
         }
         setLoading(false);
     }
-
+    
     const getGiftRequestUsers = async (giftRequestId: number) => {
         setLoading(true);
         try {

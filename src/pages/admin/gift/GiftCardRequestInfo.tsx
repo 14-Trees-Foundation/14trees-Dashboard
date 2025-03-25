@@ -39,22 +39,27 @@ const GiftCardRequestInfo: React.FC<GiftCardRequestInfoProps> = ({ open, onClose
             setLoading(true);
             try {
                 const apiClient = new ApiClient();
-                const filtersArray = Object.entries(filters).map(([key, value]) => ({
-                    columnField: key,
-                    operatorValue: value.operatorValue,
-                    value: value.value
-                }));
+                const filtersArray = [
+                    {
+                        columnField: 'gift_card_request_id',
+                        operatorValue: 'equals',
+                        value: data.id
+                    },
+                    ...Object.entries(filters).map(([key, value]) => ({
+                        columnField: key,
+                        operatorValue: value.operatorValue,
+                        value: value.value
+                    }))
+                ];
     
                 const response = await apiClient.getBookedGiftTrees(
-                    data.id,
                     page,
                     pageSize,
-                    filtersArray 
+                    filtersArray
                 );
                 setUsers(response.results);
                 setTotalRecords(response.total);
-            } catch (error: unknown) {
-                // Proper error handling
+            } catch (error) {
                 if (error instanceof Error) {
                     toast.error(error.message);
                 } else {
