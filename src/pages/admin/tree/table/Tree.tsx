@@ -311,6 +311,7 @@ export const TreeNew = () => {
             align: 'center',
             hidden: true,
             render: value => value ? getHumanReadableDate(value) : '',
+            ...getColumnDateFilter({dataIndex: 'created_at', filters, handleSetFilters, label: 'Uploaded'})
         },
         {
             dataIndex: "action",
