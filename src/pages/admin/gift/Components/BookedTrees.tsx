@@ -99,17 +99,21 @@ const BookedTrees: React.FC<BookedTreesProps> = ({ giftCardRequestId, visible, o
     }
 
     const handleUnMapTrees = async (unMapAll: boolean = false) => {
+
         try {
+            const treeIds: number[] = existingBookedTrees.filter(tree => selectedIds.some(id => id === tree.id)).map(item => item.tree_id);
             const apiClient = new ApiClient();
-            const idsToUnmap = unMapAll ? [] : selectedIds;   
-            await apiClient.unBookGiftTrees(giftCardRequestId, idsToUnmap, unMapAll);
-            onUnMap && onUnMap(unMapAll ? existingBookedTrees.length : selectedIds.length);
-            getBookedTrees(giftCardRequestId, page, pageSize, filters);
-            setSelectedIds([]); // Reset selected IDs
+            await apiClient.unBookGiftTrees(giftCardRequestId, unMapAll ? [] : treeIds, unMapAll)
+
+            onUnMap && onUnMap(unMapAll ? existingBookedTrees.length : treeIds.length);
+            setExistingBookedTrees(prev => {
+                return prev.filter(item => selectedIds.findIndex(id => id === item.id) === -1);
+            });
+            setSelectedIds([]);
         } catch (error: any) {
             toast.error(error.message);
         }
-    };
+    }
 
     return (
         <Box

@@ -54,15 +54,15 @@ const TableSummary = (giftRequests: GiftCard[], selectedGiftRequestIds: number[]
             <strong>Total</strong>
         </Table.Summary.Cell>
         <Table.Summary.Cell align="center" index={6}>
-            {calculateSum(giftRequests.map((giftRequest) => giftRequest.no_of_cards))}
+        {calculateSum(giftRequests.filter((giftRequest) => selectedGiftRequestIds.includes(giftRequest.id)).map((giftRequest) => giftRequest.no_of_cards))}
         </Table.Summary.Cell>
 
         <Table.Summary.Cell index={7} colSpan={9}></Table.Summary.Cell>
         <Table.Summary.Cell align="center" index={11}>
-            {calculateSum(giftRequests.map((giftRequest) => giftRequest.total_amount))}
+        {calculateSum(giftRequests.filter((giftRequest) => selectedGiftRequestIds.includes(giftRequest.id)).map((giftRequest: any) => giftRequest.total_amount))}
         </Table.Summary.Cell>
         <Table.Summary.Cell align="center" index={12}>
-            {calculateSum(giftRequests.map((giftRequest) => giftRequest.amount_received))}
+        {calculateSum(giftRequests.filter((giftRequest) => selectedGiftRequestIds.includes(giftRequest.id)).map((giftRequest) => giftRequest.amount_received))}
         </Table.Summary.Cell>
         <Table.Summary.Cell index={13} colSpan={4}></Table.Summary.Cell>
     </Table.Summary.Row>
@@ -186,23 +186,7 @@ const GiftTrees: FC = () => {
         setCorporateCount(corporate);
         setPersonalCount(personal);
     }, [giftCards]);
-    
-    console.log("Gift Cards:", giftCards);
-    console.log("Corporate Count:", corporateCount);
-    console.log("Personal Count:", personalCount);
-
-    useEffect(() => {
-        if (!giftCards || !Array.isArray(giftCards)) return;
-
-        const receivedSum = giftCards.reduce((sum, card) => sum + (card.amount_received || 0), 0);
-        const totalSum = giftCards.reduce((sum, card) => sum + (card.total_amount || 0), 0);
-
-        setTotalReceived(receivedSum);
-        setTotalAmount(totalSum);
-    }, [giftCards]);
-
-    console.log("total recieved", totalReceived);
-    console.log("total amount:", totalAmount);
+   
 
     useEffect(() => {
         // Function to stop scroll propagation
