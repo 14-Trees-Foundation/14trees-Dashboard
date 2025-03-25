@@ -25,53 +25,89 @@ interface GiftCardRequestInfoProps {
 }
 
 const GiftCardRequestInfo: React.FC<GiftCardRequestInfoProps> = ({ open, onClose, data }) => {
-
-    const [users, setUsers] = useState<GiftCardUser[]>([]);
+    const [users, setUsers] = useState<Record<number, GiftCardUser>>({});
+    const [usersList, setUsersList] = useState<GiftCardUser[]>([]);
     const [page, setPage] = useState(0);
     const [pageSize, setPageSize] = useState(10);
     const [filters, setFilters] = useState<Record<string, GridFilterItem>>({});
     const [loading, setLoading] = useState(false);
-    const [totalRecords, setTotalRecords] = useState<number>(0);
+    const [totalRecords, setTotalRecords] = useState(0);
 
+    // Reset states when filters change
     useEffect(() => {
-        const fetchData = async () => {
-            if (!data?.id) return;
-            setLoading(true);
-            try {
-                const apiClient = new ApiClient();
-                const filtersArray = [
-                    {
-                        columnField: 'gift_card_request_id',
-                        operatorValue: 'equals',
-                        value: data.id
-                    },
-                    ...Object.entries(filters).map(([key, value]) => ({
-                        columnField: key,
-                        operatorValue: value.operatorValue,
-                        value: value.value
-                    }))
-                ];
-    
-                const response = await apiClient.getBookedGiftTrees(
-                    page,
-                    pageSize,
-                    filtersArray
-                );
-                setUsers(response.results);
-                setTotalRecords(response.total);
-            } catch (error) {
-                if (error instanceof Error) {
-                    toast.error(error.message);
-                } else {
-                    toast.error('An unknown error occurred');
+        setUsers({});
+        setPage(0);
+        setUsersList([]);
+        setTotalRecords(20);
+    }, [filters]);
+
+    // Update usersList when users record changes
+    useEffect(() => {
+        setUsersList(Object.values(users));
+    }, [users]);
+
+    const getBookedTrees = async (offset: number, limit: number, filters: GridFilterItem[]) => {
+        setLoading(true);
+        try {
+            const apiClient = new ApiClient();
+            const response = await apiClient.getBookedGiftTrees(offset, limit, filters);
+
+            setUsers(prev => {
+                const usersData = { ...prev };
+                for (let i = 0; i < response.results.length; i++) {
+                    usersData[response.offset + i] = response.results[i];
                 }
-            } finally {
-                setLoading(false);
+                return usersData;
+            });
+            setTotalRecords(response.total);
+        } catch (error) {
+            if (error instanceof Error) {
+                toast.error(error.message);
+            } else {
+                toast.error('An unknown error occurred');
             }
-        };
-    
-        fetchData();
-    }, [data?.id, page, pageSize, filters]);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    // Debounced effect for fetching data
+    useEffect(() => {
+        const handler = setTimeout(() => {
+            if (!data?.id) return;
+
+            const filtersArray = [
+                {
+                    columnField: 'gift_card_request_id',
+                    operatorValue: 'equals',
+                    value: data.id
+                },
+                ...Object.entries(filters).map(([key, value]) => ({
+                    columnField: key,
+                    operatorValue: value.operatorValue,
+                    value: value.value
+                }))
+            ];
+
+            // Check if we need to fetch more data
+            for (let i = page * pageSize; i < Math.min((page + 1) * pageSize, totalRecords); i++) {
+                if (!users[i]) {
+                    getBookedTrees(page * pageSize, pageSize, filtersArray);
+                    return;
+                }
+            }
+        }, 300);
+
+        return () => clearTimeout(handler);
+    }, [data?.id, page, pageSize, filters, users, totalRecords]);
+
+    // Reset states when data changes
+    useEffect(() => {
+        setUsers({});
+        setTotalRecords(20);
+        setPage(0);
+        setFilters({});
+    }, [data?.id]);
 
     const columns: any[] = [
         {
@@ -250,13 +286,13 @@ const GiftCardRequestInfo: React.FC<GiftCardRequestInfoProps> = ({ open, onClose
 
                 <Divider />
                 
-                {users.length > 0 && <div>
+                {usersList.length > 0 && <div>
                     <Box mt={2} mb={2}>
                         <Typography>Total trees assigned: {data.assigned}</Typography>
                         <GeneralTable
                             loading={loading}
                             columns={columns}
-                            rows={users} 
+                            rows={usersList} 
                             totalRecords={totalRecords}
                             page={page}
                             pageSize={pageSize}
@@ -264,7 +300,7 @@ const GiftCardRequestInfo: React.FC<GiftCardRequestInfoProps> = ({ open, onClose
                                 setPage(newPage - 1); 
                                 setPageSize(newPageSize); 
                             }}
-                            onDownload={async () => users}
+                            onDownload={async () => usersList}
                             footer
                             tableName='Gift Request Users'
                         />

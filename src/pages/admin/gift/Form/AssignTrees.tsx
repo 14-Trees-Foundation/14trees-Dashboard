@@ -17,13 +17,16 @@ interface AssignTreesProps {
 }
 
 const AssignTrees: React.FC<AssignTreesProps> = ({ giftCardRequestId, open, onClose, onSubmit }) => {
-
     const [loading, setLoading] = useState(false);
     const [page, setPage] = useState(0);
     const [pageSize, setPageSize] = useState(10);
-
     const [filters, setFilters] = useState<Record<string, GridFilterItem>>({});
-    const [trees, setTrees] = useState<GiftCardUser[]>([]);
+    
+    // Updated state management
+    const [existingBookedTrees, setExistingBookedTrees] = useState<Record<number, GiftCardUser>>({});
+    const [treesList, setTreesList] = useState<GiftCardUser[]>([]);
+    const [totalRecords, setTotalRecords] = useState(20);
+    
     const [selectedTree, setSelectedTree] = useState<GiftCardUser | null>(null);
     const [autoAssign, setAutoAssign] = useState(false);
 
@@ -33,33 +36,71 @@ const AssignTrees: React.FC<AssignTreesProps> = ({ giftCardRequestId, open, onCl
     const [page2, setPage2] = useState(0);
     const [pageSize2, setPageSize2] = useState(10);
 
-    const handlePaginationChange2 = (page: number, pageSize: number) => {
-        setPage2(page - 1);
-        setPageSize2(pageSize);
-    }
+    // Reset states when filters change
+    useEffect(() => {
+        setExistingBookedTrees({});
+        setPage(0);
+        setTreesList([]);
+        setTotalRecords(20);
+    }, [filters]);
 
-    const getBookedTrees = async (giftRequestId: number) => {
+    // Reset states when giftCardRequestId changes
+    useEffect(() => {
+        setExistingBookedTrees({});
+        setTotalRecords(20);
+        setPage(0);
+        setFilters({});
+    }, [giftCardRequestId]);
+
+    // Update treesList when existingBookedTrees changes
+    useEffect(() => {
+        setTreesList(Object.values(existingBookedTrees));
+    }, [existingBookedTrees]);
+
+    const getBookedTrees = async (offset: number, limit: number, filters: GridFilterItem[]) => {
         setLoading(true);
         try {
             const apiClient = new ApiClient();
-            const filters = [{
-                columnField: 'gift_card_request_id',
-                operatorValue: 'equals',
-                value: giftRequestId
-            }];
-            
-            const bookedTreesResp = await apiClient.getBookedGiftTrees(
-                0,      // page
-                -1,     // pageSize (-1 for all records)
-                filters // pass filters array instead of giftRequestId
+            const response = await apiClient.getBookedGiftTrees(
+                offset,
+                limit,
+                filters
             );
-            setTrees(bookedTreesResp.results.map(item => ({ ...item, key: item.id })));
+
+            setExistingBookedTrees(prev => {
+                const treesData = { ...prev };
+                for (let i = 0; i < response.results.length; i++) {
+                    treesData[response.offset + i] = response.results[i];
+                }
+                return treesData;
+            });
+            setTotalRecords(response.total);
         } catch (error: any) {
             toast.error(error.message);
         }
         setLoading(false);
-    }
-    
+    };
+
+    // Debounced effect for fetching data
+    useEffect(() => {
+        const handler = setTimeout(() => {
+            const filtersArray = [{
+                columnField: 'gift_card_request_id',
+                operatorValue: 'equals',
+                value: giftCardRequestId
+            }];
+
+            for (let i = page * pageSize; i < Math.min((page + 1) * pageSize, totalRecords); i++) {
+                if (!existingBookedTrees[i]) {
+                    getBookedTrees(page * pageSize, pageSize, filtersArray);
+                    return;
+                }
+            }
+        }, 300);
+
+        return () => clearTimeout(handler);
+    }, [giftCardRequestId, page, pageSize, existingBookedTrees, totalRecords]);
+
     const getGiftRequestUsers = async (giftRequestId: number) => {
         setLoading(true);
         try {
@@ -73,7 +114,6 @@ const AssignTrees: React.FC<AssignTreesProps> = ({ giftCardRequestId, open, onCl
     }
 
     useEffect(() => {
-        getBookedTrees(giftCardRequestId);
         getGiftRequestUsers(giftCardRequestId);
     }, [giftCardRequestId]);
 
@@ -82,15 +122,59 @@ const AssignTrees: React.FC<AssignTreesProps> = ({ giftCardRequestId, open, onCl
         setFilters(filters);
     }
 
-    const handleUnAssign = (selectedTree: GiftCardUser) => {
-        const idx = trees.findIndex(tree => selectedTree.id === tree.id);
-        if (idx !== -1) {
-            const newData = [...trees];
-            newData[idx].gift_request_user_id = null
-            newData[idx].assignee_name = undefined
-            newData[idx].recipient_name = undefined
+    const handlePaginationChange = (page: number, pageSize: number) => {
+        setPage(page - 1);
+        setPageSize(pageSize);
+    }
 
-            setTrees(newData);
+    const handlePaginationChange2 = (page: number, pageSize: number) => {
+        setPage2(page - 1);
+        setPageSize2(pageSize);
+    }
+
+    const handleDownload = async () => {
+        return treesList;
+    }
+
+    const handleUnAssign = (selectedTree: GiftCardUser) => {
+        const idx = treesList.findIndex(tree => selectedTree.id === tree.id);
+        if (idx !== -1) {
+            const newData = [...treesList];
+            newData[idx].gift_request_user_id = null;
+            newData[idx].assignee_name = undefined;
+            newData[idx].recipient_name = undefined;
+
+            setTreesList(newData);
+        }
+    }
+
+    const handleUserSelection = (selectedUser: GiftRequestUser) => {
+        if (!selectedTree) return;
+
+        const idx = treesList.findIndex(tree => selectedTree.id === tree.id);
+        if (idx !== -1) {
+            const newData = [...treesList];
+            newData[idx].gift_request_user_id = selectedUser.id;
+            newData[idx].assignee_name = selectedUser.assignee_name;
+            newData[idx].recipient_name = selectedUser.recipient_name;
+
+            setTreesList(newData);
+        }
+
+        setIsUserModalOpen(false);
+    }
+
+    // Assignment
+    const handleAutoAssignTrees = async () => {
+        onClose();
+
+        const apiClient = new ApiClient();
+        try {
+            await apiClient.assignTrees(giftCardRequestId, treesList, autoAssign);
+            toast.success("Successfully assigned trees to users!");
+            onSubmit();
+        } catch (error: any) {
+            toast.error(error.message);
         }
     }
 
@@ -134,12 +218,7 @@ const AssignTrees: React.FC<AssignTreesProps> = ({ giftCardRequestId, open, onCl
             width: 150,
             align: "center",
             render: (value, record, index) => (
-                <div
-                    style={{
-                        display: "flex",
-                        justifyContent: "center",
-                        alignItems: "center",
-                    }}>
+                <div style={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
                     <Button
                         variant='outlined'
                         color='success'
@@ -148,45 +227,22 @@ const AssignTrees: React.FC<AssignTreesProps> = ({ giftCardRequestId, open, onCl
                     >
                         <AccountCircleOutlined />
                     </Button>
-                    {record.gift_request_user_id && <Button
-                        variant='outlined'
-                        color='error'
-                        style={{ margin: "0 5px", textTransform: 'none' }}
-                        onClick={() => { handleUnAssign(record); }}
-                    >
-                        Unassign
-                    </Button>}
+                    {record.gift_request_user_id && (
+                        <Button
+                            variant='outlined'
+                            color='error'
+                            style={{ margin: "0 5px", textTransform: 'none' }}
+                            onClick={() => { handleUnAssign(record); }}
+                        >
+                            Unassign
+                        </Button>
+                    )}
                 </div>
             ),
         },
     ];
 
-    const handlePaginationChange = (page: number, pageSize: number) => {
-        setPage(page - 1);
-        setPageSize(pageSize);
-    }
-
-    const handleDownload = async () => {
-        return trees;
-    }
-
-    const handleUserSelection = (selectedUser: GiftRequestUser) => {
-        if (!selectedTree) return;
-
-        const idx = trees.findIndex(tree => selectedTree.id === tree.id);
-        if (idx !== -1) {
-            const newData = [...trees];
-            newData[idx].gift_request_user_id = selectedUser.id
-            newData[idx].assignee_name = selectedUser.assignee_name
-            newData[idx].recipient_name = selectedUser.recipient_name
-
-            setTrees(newData);
-        }
-
-        setIsUserModalOpen(false);
-    }
-
-    const userColumns: any[] = [
+    const userColumns: TableColumnsType<GiftRequestUser> = [
         {
             dataIndex: "assignee_name",
             key: "assignee_name",
@@ -207,13 +263,8 @@ const AssignTrees: React.FC<AssignTreesProps> = ({ giftCardRequestId, open, onCl
             title: "Actions",
             width: 100,
             align: "center",
-            render: (value: any, record: any, index: number) => (
-                <div
-                    style={{
-                        display: "flex",
-                        justifyContent: "center",
-                        alignItems: "center",
-                    }}>
+            render: (value, record) => (
+                <div style={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
                     <Button
                         variant='outlined'
                         color='success'
@@ -225,22 +276,7 @@ const AssignTrees: React.FC<AssignTreesProps> = ({ giftCardRequestId, open, onCl
                 </div>
             ),
         },
-    ]
-
-    // Assignment
-    const handleAutoAssignTrees = async () => {
-        onClose();
-
-        const apiClient = new ApiClient();
-        try {
-            await apiClient.assignTrees(giftCardRequestId, trees, autoAssign);
-            toast.success("Successfully assigned trees to users!");
-            onSubmit();
-        } catch (error: any) {
-            toast.error(error.message);
-        }
-    }
-
+    ];
 
     return (
         <Dialog open={open} fullWidth maxWidth="lg">
@@ -249,22 +285,18 @@ const AssignTrees: React.FC<AssignTreesProps> = ({ giftCardRequestId, open, onCl
                 <Box>
                     <GeneralTable
                         loading={loading}
-                        rows={trees.slice(page * pageSize, (page + 1) * pageSize)}
+                        rows={treesList}
                         columns={columns}
-                        totalRecords={trees.length}
+                        totalRecords={totalRecords}
                         page={page}
+                        pageSize={pageSize}
                         onPaginationChange={handlePaginationChange}
                         onDownload={handleDownload}
                         footer
                         tableName="Booked trees"
                     />
 
-                    <Box
-                        mt={2}
-                        display="flex"
-                        alignItems="center"
-                        justifyContent="space-between"
-                    >
+                    <Box mt={2} display="flex" alignItems="center" justifyContent="space-between">
                         <Typography mr={10}>Do you want to auto assign trees?</Typography>
                         <ToggleButtonGroup
                             color="success"
@@ -280,37 +312,37 @@ const AssignTrees: React.FC<AssignTreesProps> = ({ giftCardRequestId, open, onCl
                     </Box>
 
                     <Modal open={isUserModalOpen} aria-labelledby="tree-select-modal-title">
-                        <Box
-                            sx={{
-                                position: 'absolute',
-                                top: '50%',
-                                left: '50%',
-                                transform: 'translate(-50%, -50%)',
-                                width: '90%', // Responsive width
-                                maxWidth: '80vw',
-                                maxHeight: '90vh',
-                                bgcolor: 'background.paper',
-                                borderRadius: 2,
-                                boxShadow: 24,
-                                overflow: 'auto',
-                                p: 3,
-                                display: 'flex',
-                                flexDirection: 'column',
-                            }}
-                        >
+                        <Box sx={{
+                            position: 'absolute',
+                            top: '50%',
+                            left: '50%',
+                            transform: 'translate(-50%, -50%)',
+                            width: '90%',
+                            maxWidth: '80vw',
+                            maxHeight: '90vh',
+                            bgcolor: 'background.paper',
+                            borderRadius: 2,
+                            boxShadow: 24,
+                            overflow: 'auto',
+                            p: 3,
+                            display: 'flex',
+                            flexDirection: 'column',
+                        }}>
                             <GeneralTable
-                                rows={users.filter(user => trees.filter(tree => tree.gift_request_user_id === user.id).length < user.gifted_trees)}
+                                rows={users.filter(user => treesList.filter(tree => tree.gift_request_user_id === user.id).length < user.gifted_trees)}
                                 columns={userColumns}
-                                totalRecords={users.filter(user => trees.filter(tree => tree.gift_request_user_id === user.id).length < user.gifted_trees).length}
+                                totalRecords={users.filter(user => treesList.filter(tree => tree.gift_request_user_id === user.id).length < user.gifted_trees).length}
                                 page={page2}
                                 pageSize={pageSize2}
                                 onPaginationChange={handlePaginationChange2}
-                                onDownload={async () => { return Object.values(users) }}
+                                onDownload={async () => users}
                                 tableName="Users"
                             />
 
                             <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
-                                <Button onClick={() => { setIsUserModalOpen(false) }} variant="outlined" color='error' sx={{ mr: 1 }}>Cancel</Button>
+                                <Button onClick={() => { setIsUserModalOpen(false) }} variant="outlined" color='error' sx={{ mr: 1 }}>
+                                    Cancel
+                                </Button>
                             </Box>
                         </Box>
                     </Modal>
@@ -325,8 +357,7 @@ const AssignTrees: React.FC<AssignTreesProps> = ({ giftCardRequestId, open, onCl
                 </Button>
             </DialogActions>
         </Dialog>
-
     );
-}
+};
 
 export default AssignTrees;

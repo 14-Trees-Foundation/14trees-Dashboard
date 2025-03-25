@@ -23,35 +23,65 @@ const BookedTrees: React.FC<BookedTreesProps> = ({ giftCardRequestId, visible, o
     const [filters, setFilters] = useState<Record<string, GridFilterItem>>({});
     const [selectedIds, setSelectedIds] = useState<number[]>([]);
 
-    const [existingBookedTrees, setExistingBookedTrees] = useState<GiftCardUser[]>([]);
+    const [existingBookedTrees, setExistingBookedTrees] = useState<Record<number, GiftCardUser>>({});
+    const [treesList, setTreesList] = useState<GiftCardUser[]>([]);
+    const [totalRecords, setTotalRecords] = useState(20);
     const [unMapConfirmation, setUnMapConfirmation] = useState(false);
     const [unMapAllConfirmation, setUnMapAllConfirmation] = useState(false);
 
-    const getBookedTrees = async (giftRequestId: number) => {
+    useEffect(() => {
+        setTreesList(Object.values(existingBookedTrees));
+    }, [existingBookedTrees]);
+
+    const getBookedTrees = async (offset: number, limit: number, filters: GridFilterItem[]) => {
         setLoading(true);
         try {
             const apiClient = new ApiClient();
-            const filters = [{
-                columnField: 'gift_card_request_id',
-                operatorValue: 'equals',
-                value: giftRequestId
-            }];
-            
-            const bookedTreesResp = await apiClient.getBookedGiftTrees(
-                0,  // page
-                -1, // pageSize for all records
+            const response = await apiClient.getBookedGiftTrees(
+                offset,
+                limit,
                 filters
             );
-            setExistingBookedTrees(bookedTreesResp.results.map(item => ({ ...item, key: item.id })));
+
+            setExistingBookedTrees(prev => {
+                const treesData = { ...prev };
+                for (let i = 0; i < response.results.length; i++) {
+                    treesData[response.offset + i] = response.results[i];
+                }
+                return treesData;
+            });
+            setTotalRecords(response.total);
         } catch (error: any) {
             toast.error(error.message);
         }
         setLoading(false);
-    }
-    
+    };
+
     useEffect(() => {
-        getBookedTrees(giftCardRequestId);
-    }, [giftCardRequestId]);
+        setExistingBookedTrees({});
+        setPage(0);
+        setTreesList([]);
+        setTotalRecords(20);
+    }, [filters]);
+
+    useEffect(() => {
+        const handler = setTimeout(() => {
+            const filtersArray = [{
+                columnField: 'gift_card_request_id',
+                operatorValue: 'equals',
+                value: giftCardRequestId
+            }];
+
+            for (let i = page * pageSize; i < Math.min((page + 1) * pageSize, totalRecords); i++) {
+                if (!existingBookedTrees[i]) {
+                    getBookedTrees(page * pageSize, pageSize, filtersArray);
+                    return;
+                }
+            }
+        }, 300);
+
+        return () => clearTimeout(handler);
+    }, [giftCardRequestId, page, pageSize, filters, existingBookedTrees, totalRecords]);
 
     const handleSetFilters = (filters: Record<string, GridFilterItem>) => {
         setPage(0);
@@ -99,7 +129,7 @@ const BookedTrees: React.FC<BookedTreesProps> = ({ giftCardRequestId, visible, o
     }
 
     const handleDownload = async () => {
-        return existingBookedTrees;
+        return treesList;
     }
 
     const handleSelectionChanges = (ids: number[]) => {
@@ -109,13 +139,15 @@ const BookedTrees: React.FC<BookedTreesProps> = ({ giftCardRequestId, visible, o
     const handleUnMapTrees = async (unMapAll: boolean = false) => {
 
         try {
-            const treeIds: number[] = existingBookedTrees.filter(tree => selectedIds.some(id => id === tree.id)).map(item => item.tree_id);
+            const treeIds: number[] = treesList.filter(tree => selectedIds.some(id => id === tree.id)).map(item => item.tree_id);
             const apiClient = new ApiClient();
             await apiClient.unBookGiftTrees(giftCardRequestId, unMapAll ? [] : treeIds, unMapAll)
 
-            onUnMap && onUnMap(unMapAll ? existingBookedTrees.length : treeIds.length);
+            onUnMap && onUnMap(unMapAll ? treesList.length : treeIds.length);
             setExistingBookedTrees(prev => {
-                return prev.filter(item => selectedIds.findIndex(id => id === item.id) === -1);
+                const updatedTrees = { ...prev };
+                selectedIds.forEach(id => delete updatedTrees[id]);
+                return updatedTrees;
             });
             setSelectedIds([]);
         } catch (error: any) {
@@ -125,7 +157,7 @@ const BookedTrees: React.FC<BookedTreesProps> = ({ giftCardRequestId, visible, o
 
     return (
         <Box
-            hidden={existingBookedTrees.length > 0 ? false : !visible}
+            hidden={treesList.length > 0 ? false : !visible}
         >
             <Box
                 display="flex"
@@ -151,9 +183,9 @@ const BookedTrees: React.FC<BookedTreesProps> = ({ giftCardRequestId, visible, o
             </Box>
             <GeneralTable
                 loading={loading}
-                rows={existingBookedTrees.slice(page * pageSize, (page + 1) * pageSize)}
+                rows={treesList}
                 columns={columns}
-                totalRecords={existingBookedTrees.length}
+                totalRecords={totalRecords}
                 page={page}
                 pageSize={pageSize}
                 onSelectionChanges={handleSelectionChanges}

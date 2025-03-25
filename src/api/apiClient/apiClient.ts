@@ -1621,18 +1621,20 @@ class ApiClient {
     }
 
     async getBookedGiftTrees(
-        page: number,
-        pageSize: number,
+        offset: number, 
+        limit: number, 
         filters?: GridFilterItem[]
     ): Promise<PaginatedResponse<GiftCardUser>> {
-        const url = `/gift-cards/trees/get?offset=${page * pageSize}&limit=${pageSize}`;
+        const url = `/gift-cards/trees/get?offset=${offset}&limit=${limit}`;
         try {
             const response = await this.api.post<PaginatedResponse<GiftCardUser>>(url, { 
                 filters: filters || [] 
             });
             return response.data;
         } catch (error: any) {
-            console.error('Request failed:', error);
+            if (error.response?.data?.message) {
+                throw new Error(error.response.data.message);
+            }
             throw new Error('Failed to get booked gift trees');
         }
     }
