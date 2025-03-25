@@ -121,42 +121,32 @@ export const SitesComponent = () => {
   };
 
   const columns: TableColumnsType<Site> = [
-    {
-      dataIndex: "action",
-      key: "action",
-      title: "Actions",
-      width: 180,
-      align: "center",
-      render: (value, record, index) => (
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-          }}
-        >
-          {/* <Button
-            variant="outlined"
-            style={{ margin: "0 5px" }}
-            onClick={() => {
-              setEditModal(true);
-              setSelectedEditRow(record);
-              console.log("Row data to edit : ", record);
-            }}
-          >
-            <EditIcon />
-          </Button> */}
-          <Button
-            variant="outlined"
-            color="error"
-            style={{ margin: "0 5px" }}
-            onClick={() => handleDeleteSites(record)}
-          >
-            <DeleteIcon />
-          </Button>
-        </div>
-      ),
-    },
+    // Remove the "Actions" column object
+  // {
+  //   dataIndex: "action",
+  //   key: "action",
+  //   title: "Actions",
+  //   width: 180,
+  //   align: "center",
+  //   render: (value, record, index) => (
+  //     <div
+  //       style={{
+  //         display: "flex",
+  //         justifyContent: "center",
+  //         alignItems: "center",
+  //       }}
+  //     >
+  //       <Button
+  //         variant="outlined"
+  //         color="error"
+  //         style={{ margin: "0 5px" }}
+  //         onClick={() => handleDeleteSites(record)}
+  //       >
+  //         <DeleteIcon />
+  //       </Button>
+  //     </div>
+  //   ),
+  // },
     {
       dataIndex: "name_marathi",
       key: "name_marathi",

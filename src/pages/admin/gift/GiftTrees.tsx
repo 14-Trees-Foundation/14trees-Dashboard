@@ -19,7 +19,7 @@ import PlotSelection from "./Form/PlotSelection";
 import { Plot } from "../../../types/plot";
 import giftCardActionTypes from "../../../redux/actionTypes/giftCardActionTypes";
 import GiftCardRequestInfo from "./GiftCardRequestInfo";
-import GiftRequestNotes from "./Form/Notes";
+import Notes from "../../../components/Notes";
 import AlbumImageInput from "../../../components/AlbumImageInput";
 import EmailConfirmationModal from "./Form/EmailConfirmationModal";
 import EditUserDetailsModal from "./Form/EditUserDetailsModal";
@@ -1213,7 +1213,7 @@ const getGiftCardData = async () => {
                 data={selectedGiftCard}
             />
 
-            <GiftRequestNotes
+            <Notes
                 open={notesModal}
                 handleClose={() => { setNotesModal(false) }}
                 onSave={handleNotesSave}
