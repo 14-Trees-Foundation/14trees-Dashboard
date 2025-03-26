@@ -14,6 +14,8 @@ import { format } from 'date-fns';
 import GeneralTable from '../../../components/GenTable';
 import ApiClient from '../../../api/apiClient/apiClient';
 import { GiftCardUser } from '../../../types/gift_card';
+import getColumnSearchProps from '../../../components/Filter';
+import { GridFilterItem } from '@mui/x-data-grid';
 
 interface GiftCardRequestInfoProps {
     open: boolean
@@ -103,6 +105,44 @@ const GiftCardRequestInfo: React.FC<GiftCardRequestInfoProps> = ({ open, onClose
             </div>)
         },
     ]
+
+    // Add this function to filter the users based on search criteria
+    const getFilteredUsers = () => {
+        return users.filter(user => {
+            for (const key in filters) {
+                const filter = filters[key];
+                const value = user[key as keyof GiftCardUser];
+                
+                if (!value) continue;
+
+                switch (filter.operatorValue) {
+                    case 'contains':
+                        if (!value.toString().toLowerCase().includes(filter.value.toLowerCase())) {
+                            return false;
+                        }
+                        break;
+                    case 'equals':
+                        if (value.toString().toLowerCase() !== filter.value.toLowerCase()) {
+                            return false;
+                        }
+                        break;
+                    case 'startsWith':
+                        if (!value.toString().toLowerCase().startsWith(filter.value.toLowerCase())) {
+                            return false;
+                        }
+                        break;
+                    case 'endsWith':
+                        if (!value.toString().toLowerCase().endsWith(filter.value.toLowerCase())) {
+                            return false;
+                        }
+                        break;
+                }
+            }
+            return true;
+        });
+    };
+
+    const filteredUsers = getFilteredUsers();
 
     const getStatus = (status: string) => {
         if (status === 'pending_plot_selection') {
@@ -219,12 +259,15 @@ const GiftCardRequestInfo: React.FC<GiftCardRequestInfoProps> = ({ open, onClose
                         <GeneralTable
                             loading={false}
                             columns={columns}
-                            rows={users}
-                            totalRecords={users.length}
+                            rows={filteredUsers} // Use filteredUsers instead of users
+                            totalRecords={filteredUsers.length}
                             page={page}
                             pageSize={pageSize}
-                            onPaginationChange={(page: number, pageSize: number) => { setPage(page - 1); setPageSize(pageSize); }}
-                            onDownload={async () => users}
+                            onPaginationChange={(page: number, pageSize: number) => { 
+                                setPage(page - 1); 
+                                setPageSize(pageSize); 
+                            }}
+                            onDownload={async () => filteredUsers}
                             footer
                             tableName='Gift Request Users'
                         />
