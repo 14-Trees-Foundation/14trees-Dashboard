@@ -9,6 +9,7 @@ export type Group = {
     address: string | null,
     created_at: Date,
     updated_at: Date,
+    sponsored_trees?: number,
 }
 
 export type BulkUserGroupMappingResponse = {

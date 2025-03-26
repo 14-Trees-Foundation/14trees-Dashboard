@@ -139,6 +139,14 @@ export const OrganizationComponent = () => {
       align: 'center',
     },
     {
+    dataIndex: "sponsored_trees",
+    key: "sponsored_trees",
+    title: "Sponsored Trees",
+    width: 150,
+    align: 'center',
+    render: (value) => value || '0',  
+    },
+    {
       dataIndex: "action",
       key: "action",
       title: "Action",
