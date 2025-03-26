@@ -17,7 +17,6 @@ import { Apartment, Flag, HolidayVillage, HowToReg, LocationCity, OpacityTwoTone
 
 export const AdminHome = () => {
   const adminSummary = useRecoilValue(summary);
-  console.log("Admin Summary Data:", adminSummary);
   const classes = useStyles();
   return (
     <div>
