@@ -21,6 +21,8 @@ export type BulkUserGroupMappingResponse = {
 export type GroupMappingState = Record<number, BulkUserGroupMappingResponse>
 
 export type GroupsDataState = {
-    totalGroups: number,
-    groups: Record<string, Group>
-}
+  loading: boolean;
+  totalGroups: number,
+  groups: Record<string, Group>,
+  paginationMapping: Record<number, number>
+};

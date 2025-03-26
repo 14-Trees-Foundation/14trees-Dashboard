@@ -4,13 +4,13 @@ import { Group } from "../../types/Group";
 import { PaginatedResponse } from "../../types/pagination";
 import { toast } from "react-toastify";
 
-export const getGroups = (offset: number, limit: number, filters?: any[]) => {
+export const getGroups = (offset: number, limit: number, filters?: any[], orderBy?: any[]) => {
     const apiClient = new ApiClient()
     return (dispatch: any) => {
         dispatch({
             type: groupActionTypes.GET_GROUPS_REQUESTED,
         });
-        apiClient.getGroups(offset, limit, filters).then(
+        apiClient.getGroups(offset, limit, filters, orderBy).then(
             (value: PaginatedResponse<Group>) => {
                 for (let i = 0; i < value.results.length; i++) {
                     if (value.results[i]?.id) {

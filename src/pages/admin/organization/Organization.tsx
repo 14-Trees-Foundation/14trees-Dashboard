@@ -70,11 +70,12 @@ export const OrganizationComponent = () => {
   const [deleteSecondary, setDeleteSecondary] = useState(true);
   const [merging, setMerging] = useState(false);
 
-  // Initialize groupList at the top before it's used
   const groupsData = useAppSelector((state: RootState) => state.groupsData);
-  const groupList: Group[] = groupsData 
-    ? Object.values(groupsData.groups).sort((a, b) => b.id - a.id)
-    : [];
+  const groupList: Group[] = groupsData?.paginationMapping
+  ? Object.entries(groupsData.paginationMapping)
+      .sort(([indexA], [indexB]) => Number(indexA) - Number(indexB)) 
+      .map(([_, id]) => groupsData.groups[id])
+  : [];
 
   const handleSetFilters = (filters: Record<string, GridFilterItem>) => {
     setPage(0);
@@ -95,11 +96,14 @@ export const OrganizationComponent = () => {
     setOpen(true);
   };
 
-  const handleSortingChange = (sorter: { field: string; order?: 'ASC' | 'DESC' }) => {
-    const newOrder = sorter.order 
-      ? [{ column: sorter.field, order: sorter.order }] 
-      : [];
-    setOrderBy(newOrder);
+  const handleSortingChange = (param: { field: string; order?: 'ASC' | 'DESC' }) => {
+    if (!param.order) {
+      setOrderBy(orderBy.filter(item => item.column !== param.field));
+      return;
+    }
+    const newOrderBy = orderBy.filter(item => item.column !== param.field);
+    newOrderBy.push({ column: param.field, order: param.order });
+    setOrderBy(newOrderBy);
   };
 
   const getSortableHeader = (header: string, key: string) => {
@@ -112,7 +116,7 @@ export const OrganizationComponent = () => {
 
   useEffect(() => {
     getGroupsData();
-  }, [pageSize, page, filters]);
+  }, [pageSize, page, filters, orderBy]);
 
   const getGroupsData = async () => {
     const dataFilters = Object.values(filters).map(item => {
@@ -121,25 +125,16 @@ export const OrganizationComponent = () => {
       }
       return item;
     });
+    const sortParams = orderBy.length > 0 
+    ? { sortBy: orderBy[0].column, sortOrder: orderBy[0].order }
+    : undefined;
 
     setLoading(true);
     setTimeout(async () => {
-      getGroups(page * pageSize, pageSize, dataFilters);
+      getGroups(page * pageSize, pageSize, dataFilters, orderBy);
       setLoading(false);
     }, 10);
   };
-
-  const sortedGroups = useMemo(() => {
-    if (orderBy.length === 0) return groupList;
-
-    return [...groupList].sort((a, b) => {
-      const sortKey = orderBy[0].column as keyof Group;
-      const direction = orderBy[0].order === 'ASC' ? 1 : -1;
-      const aValue = Number(a[sortKey]) || 0;
-      const bValue = Number(b[sortKey]) || 0;
-      return (aValue - bValue) * direction;
-    });
-  }, [groupList, orderBy]);
 
   const columns: TableColumnsType<Group> = [
     {
@@ -340,7 +335,7 @@ export const OrganizationComponent = () => {
       <Box sx={{ height: 840, width: "100%" }}>
         <TableComponent
           loading={loading}
-          dataSource={sortedGroups}
+          dataSource={groupList}
           columns={columns}
           totalRecords={groupsData.totalGroups}
           fetchAllData={getAllGroupsData}
