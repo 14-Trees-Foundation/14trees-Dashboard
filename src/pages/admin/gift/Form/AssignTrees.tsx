@@ -36,21 +36,14 @@ const AssignTrees: React.FC<AssignTreesProps> = ({ giftCardRequestId, open, onCl
     const [page2, setPage2] = useState(0);
     const [pageSize2, setPageSize2] = useState(10);
 
-    // Reset states when filters change
+    // Reset states when filters change    // Reset states when giftCardRequestId changes
     useEffect(() => {
         setExistingBookedTrees({});
         setPage(0);
         setTreesList([]);
         setTotalRecords(20);
-    }, [filters]);
-
-    // Reset states when giftCardRequestId changes
-    useEffect(() => {
-        setExistingBookedTrees({});
-        setTotalRecords(20);
-        setPage(0);
         setFilters({});
-    }, [giftCardRequestId]);
+    }, [filters,giftCardRequestId]);
 
     // Update treesList when existingBookedTrees changes
     useEffect(() => {
@@ -88,7 +81,13 @@ const AssignTrees: React.FC<AssignTreesProps> = ({ giftCardRequestId, open, onCl
                 columnField: 'gift_card_request_id',
                 operatorValue: 'equals',
                 value: giftCardRequestId
-            }];
+            },
+            ...Object.entries(filters).map(([key, value]) => ({
+                columnField: key,
+                operatorValue: value.operatorValue,
+                value: value.value
+            }))
+        ];
 
             for (let i = page * pageSize; i < Math.min((page + 1) * pageSize, totalRecords); i++) {
                 if (!existingBookedTrees[i]) {
@@ -99,7 +98,7 @@ const AssignTrees: React.FC<AssignTreesProps> = ({ giftCardRequestId, open, onCl
         }, 300);
 
         return () => clearTimeout(handler);
-    }, [giftCardRequestId, page, pageSize, existingBookedTrees, totalRecords]);
+    }, [giftCardRequestId, page, pageSize,filters, existingBookedTrees, totalRecords]);
 
     const getGiftRequestUsers = async (giftRequestId: number) => {
         setLoading(true);

@@ -33,13 +33,14 @@ const GiftCardRequestInfo: React.FC<GiftCardRequestInfoProps> = ({ open, onClose
     const [loading, setLoading] = useState(false);
     const [totalRecords, setTotalRecords] = useState(0);
 
-    // Reset states when filters change
+    // Reset states when filters change or data changes
     useEffect(() => {
         setUsers({});
         setPage(0);
         setUsersList([]);
         setTotalRecords(20);
-    }, [filters]);
+        setFilters({});
+    }, [filters,data?.id]);
 
     // Update usersList when users record changes
     useEffect(() => {
@@ -100,14 +101,6 @@ const GiftCardRequestInfo: React.FC<GiftCardRequestInfoProps> = ({ open, onClose
 
         return () => clearTimeout(handler);
     }, [data?.id, page, pageSize, filters, users, totalRecords]);
-
-    // Reset states when data changes
-    useEffect(() => {
-        setUsers({});
-        setTotalRecords(20);
-        setPage(0);
-        setFilters({});
-    }, [data?.id]);
 
     const columns: any[] = [
         {

@@ -70,7 +70,13 @@ const BookedTrees: React.FC<BookedTreesProps> = ({ giftCardRequestId, visible, o
                 columnField: 'gift_card_request_id',
                 operatorValue: 'equals',
                 value: giftCardRequestId
-            }];
+            },
+            ...Object.entries(filters).map(([key, value]) => ({
+                columnField: key,
+                operatorValue: value.operatorValue,
+                value: value.value
+            }))
+        ];
 
             for (let i = page * pageSize; i < Math.min((page + 1) * pageSize, totalRecords); i++) {
                 if (!existingBookedTrees[i]) {
@@ -95,7 +101,7 @@ const BookedTrees: React.FC<BookedTreesProps> = ({ giftCardRequestId, visible, o
             title: "Sapling ID",
             align: "center",
             width: 120,
-            // ...getColumnSearchProps('sapling_id', filters, handleSetFilters)
+             ...getColumnSearchProps('sapling_id', filters, handleSetFilters)
         },
         {
             dataIndex: "plant_type",
@@ -103,7 +109,7 @@ const BookedTrees: React.FC<BookedTreesProps> = ({ giftCardRequestId, visible, o
             title: "Plant Type",
             align: "center",
             width: 200,
-            // ...getColumnSearchProps('plant_type', filters, handleSetFilters)
+             ...getColumnSearchProps('plant_type', filters, handleSetFilters)
         },
         {
             dataIndex: "recipient_name",
@@ -111,7 +117,7 @@ const BookedTrees: React.FC<BookedTreesProps> = ({ giftCardRequestId, visible, o
             title: "Recipient",
             align: "center",
             width: 200,
-            // ...getColumnSearchProps('recipient_name', filters, handleSetFilters)
+             ...getColumnSearchProps('recipient_name', filters, handleSetFilters)
         },
         {
             dataIndex: "assignee_name",
@@ -119,7 +125,7 @@ const BookedTrees: React.FC<BookedTreesProps> = ({ giftCardRequestId, visible, o
             title: "Assignee",
             align: "center",
             width: 200,
-            // ...getColumnSearchProps('assignee_name', filters, handleSetFilters)
+             ...getColumnSearchProps('assignee_name', filters, handleSetFilters)
         },
     ];
 
