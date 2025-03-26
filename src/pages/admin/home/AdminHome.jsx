@@ -8,6 +8,7 @@ import AssignmentIndTwoToneIcon from "@mui/icons-material/AssignmentIndTwoTone";
 import CardGiftcardIcon from '@mui/icons-material/CardGiftcard';
 import PersonIcon from '@mui/icons-material/Person';
 import BusinessIcon from '@mui/icons-material/Business';
+import NatureIcon from '@mui/icons-material/Nature';
 import { useRecoilValue } from "recoil";
 
 import { summary } from "../../../store/adminAtoms";
@@ -148,6 +149,28 @@ export const AdminHome = () => {
             </Typography>
           </Box>
         </div>
+        <div className={classes.card}>
+         <Box sx={{ paddingTop: "10px" }}>
+           <CardGiftcardIcon fontSize="large" style={{ color: "#9C27B0" }} />
+           <Typography variant="h3" color="#fff" sx={{ pt: 1, pb: 1 }}>
+             {adminSummary.totalGiftRequests || "0"}
+           </Typography>
+         <Typography variant="subtitle2" color="#1f3625">
+            Total Gift Requests
+         </Typography>
+        </Box>
+       </div>
+       <div className={classes.card}>
+       <Box sx={{ paddingTop: "10px" }}>
+        <NatureIcon fontSize="large" style={{ color: "#4CAF50" }} />
+        <Typography variant="h3" color="#fff" sx={{ pt: 1, pb: 1 }}>
+           {adminSummary.totalGiftedTrees || "0"}
+        </Typography>
+        <Typography variant="subtitle2" color="#1f3625">
+           Total Gifted Trees
+        </Typography>
+       </Box>
+      </div>
       </Box>
 
       <Box style={{
