@@ -66,7 +66,16 @@ const ResizableTitle = (props: any) => {
 
 function GeneralTable({ loading, rows, columns, totalRecords, page, pageSize = 10, footer, fullHeight, tableName, onDownload, onSelectionChanges, onPaginationChange, summary, rowClassName, expandable }: GeneralTableProps) {
 
-    const [checkedList, setCheckedList] = useState(columns?.filter(item => !item.hidden)?.map((item) => item.key) ?? []);
+    const [checkedList, setCheckedList] = useState<string[]>(() => {
+        const defaultColumns = columns
+          ?.filter(item => !item.hidden)
+          ?.map((item) => item.key?.toString() ?? '') 
+          ?? [];
+          
+        if (!tableName) return defaultColumns;
+        const savedColumns = localStorage.getItem(`tableColumns-${tableName}`);
+        return savedColumns ? JSON.parse(savedColumns) : defaultColumns;
+      });
     const [open, setOpen] = useState(false);
     const [tableCols, setTableCols] = useState<any[]>([]);
 
@@ -138,8 +147,15 @@ function GeneralTable({ loading, rows, columns, totalRecords, page, pageSize = 1
     }, [columns, checkedList]);
 
     useEffect(() => {
-        setCheckedList(columns?.filter(item => !item.hidden)?.map((item) => item.key) ?? []);
-    }, [columns]);
+        if (!tableName) {
+          setCheckedList(
+            columns
+              ?.filter(item => !item.hidden)
+              ?.map((item) => item.key?.toString() ?? '')
+              ?? []
+          );
+        }
+      }, [columns, tableName]);
 
     const handleOpenChange = (flag: boolean, info: { source: 'menu' | 'trigger' }) => {
         if (info.source === 'trigger') setOpen(flag);
@@ -148,6 +164,9 @@ function GeneralTable({ loading, rows, columns, totalRecords, page, pageSize = 1
     const handleColumnsSelection = (key: string) => {
         const newSelected = checkedList.includes(key) ? checkedList.filter((item) => item !== key) : [...checkedList, key];
         setCheckedList(newSelected);
+        if (tableName) {
+          localStorage.setItem(`tableColumns-${tableName}`, JSON.stringify(newSelected));
+        }
     }
 
     const items: MenuProps['items'] = columns?.map((column: any) => {
