@@ -9,6 +9,7 @@ export type Group = {
     address: string | null,
     created_at: Date,
     updated_at: Date,
+    sponsored_trees?: number,
 }
 
 export type BulkUserGroupMappingResponse = {
@@ -20,6 +21,8 @@ export type BulkUserGroupMappingResponse = {
 export type GroupMappingState = Record<number, BulkUserGroupMappingResponse>
 
 export type GroupsDataState = {
-    totalGroups: number,
-    groups: Record<string, Group>
-}
+  loading: boolean;
+  totalGroups: number,
+  groups: Record<string, Group>,
+  paginationMapping: Record<number, number>
+};

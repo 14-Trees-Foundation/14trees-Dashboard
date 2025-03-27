@@ -3,78 +3,109 @@ import { Group, GroupsDataState } from "../../types/Group";
 import groupActionTypes from "../actionTypes/groupActionTypes";
 import { PaginatedResponse } from "../../types/pagination";
 
-export const groupsDataReducer = (state = { totalGroups:0, groups: {} }, action: UnknownAction ): GroupsDataState => {
+export const groupsDataReducer = (state: GroupsDataState = { loading: false, totalGroups: 0, groups: {}, paginationMapping: {} }, action: UnknownAction): GroupsDataState => {
     switch (action.type) {
         case groupActionTypes.GET_GROUPS_SUCCEEDED:
             if (action.payload) {
-                let groupsDataState: GroupsDataState = { totalGroups: state.totalGroups, groups: { ...state.groups }}
-                let payload = action.payload as PaginatedResponse<Group>
-                if (payload.offset === 0) {
-                    groupsDataState.groups = {}
-                }
-                groupsDataState.totalGroups = payload.total
-                let groups = payload.results
-                for (let i = 0; i < groups.length; i++) {
-                    if (groups[i]?.id) {
-                        groups[i].key = groups[i].id
-                        groupsDataState.groups[groups[i].id] = groups[i]
-                    }
-                }
-                const nextState: GroupsDataState = groupsDataState;
-                return nextState;
+            const payload = action.payload as PaginatedResponse<Group>;
+             let groupsDataState: GroupsDataState = { loading: false, totalGroups: payload.total, groups: { ...state.groups }, paginationMapping: { ...state.paginationMapping }};
+
+             if (payload.offset === 0) { 
+                groupsDataState.groups = {};
+                groupsDataState.paginationMapping = {}; 
+               }
+
+            payload.results.forEach((group: Group, index: number) => {
+             if (group?.id) {
+                group.key = group.id;
+                groupsDataState.groups[group.id] = group;
+                groupsDataState.paginationMapping[payload.offset + index] = group.id;
             }
-            return state;
-        case groupActionTypes.CREATE_GROUP_SUCCEEDED:
-            if (action.payload) {
-                console.log(action.payload)
-                const nextState = { totalGroups: state.totalGroups, groups: { ...state.groups } } as GroupsDataState;
-                let payload = action.payload as Group
-                payload.key = payload.id
-                nextState.groups[payload.id] = payload;
-                nextState.totalGroups += 1;
-                return nextState;
-            }
-            return state;
-        case groupActionTypes.UPDATE_GROUP_SUCCEEDED:
-            if (action.payload) {
-                const nextState = { totalGroups: state.totalGroups, groups: { ...state.groups } } as GroupsDataState;
-                let payload = action.payload as Group
-                payload.key = payload.id
-                nextState.groups[payload.id] = payload;
-                return nextState;
-            }
-            return state;
-        case groupActionTypes.DELETE_GROUP_SUCCEEDED:
-            if (action.payload) {
-                const nextState = { totalGroups: state.totalGroups, groups: { ...state.groups } } as GroupsDataState;
-                Reflect.deleteProperty(nextState.groups, action.payload as number)
-                nextState.totalGroups -= 1;
-                return nextState;
-            }
-            return state;
-        
-        default:
-            return state;
-    }
+        });
+        return groupsDataState;
+      }
+      return state;
+    case groupActionTypes.CREATE_GROUP_SUCCEEDED:
+      if (action.payload) {
+        const payload = action.payload as Group;
+        return {
+          loading: false,
+          totalGroups: state.totalGroups + 1,
+          groups: { 
+            ...state.groups, 
+            [payload.id]: { ...payload, key: payload.id } 
+          },
+          paginationMapping: { ...state.paginationMapping }
+        };
+      }
+      return state;
+
+    case groupActionTypes.UPDATE_GROUP_SUCCEEDED:
+      if (action.payload) {
+        const payload = action.payload as Group;
+        return {
+          ...state,
+          groups: { 
+            ...state.groups, 
+            [payload.id]: { ...payload, key: payload.id } 
+          }
+        };
+      }
+      return state;
+
+    case groupActionTypes.DELETE_GROUP_SUCCEEDED:
+      if (action.payload) {
+        const id = action.payload as number;
+        const newGroups = { ...state.groups };
+        delete newGroups[id];
+        const newMapping = { ...state.paginationMapping };
+        Object.entries(newMapping).forEach(([index, groupId]) => {
+          if (groupId === id) {
+            delete newMapping[Number(index)];
+          }
+        });
+
+        return {
+          ...state,
+          totalGroups: state.totalGroups - 1,
+          groups: newGroups,
+          paginationMapping: newMapping
+        };
+      }
+      return state;
+
+    default:
+      return state;
+  }
 };
 
-export const searchGroupsDataReducer = (state = { totalGroups:0, groups: {}}, action: UnknownAction ): GroupsDataState => {
-    switch(action.type) {
-        case groupActionTypes.SEARCH_GROUPS_SUCCEEDED:
-            if (action.payload) {
-                let groupsDataState: GroupsDataState = { totalGroups: state.totalGroups, groups: { ...state.groups }};
-                let payload = action.payload as PaginatedResponse<Group>
-                for (let i = 0; i < payload.results.length; i++) {
-                    if (payload.results[i]?.id) {
-                        payload.results[i].key = payload.results[i].id
-                        groupsDataState.groups[payload.results[i].id] = payload.results[i]
-                    }
-                }
-                const nextState: GroupsDataState = groupsDataState;
-                return nextState;
-            }
-            return state;
-        default:
-            return state;
-    }
+export const searchGroupsDataReducer = (state: GroupsDataState = { loading: false, totalGroups: 0, 
+    groups: {}, 
+    paginationMapping: {} 
+  }, 
+  action: UnknownAction
+): GroupsDataState => {
+  switch(action.type) {
+    case groupActionTypes.SEARCH_GROUPS_SUCCEEDED:
+      if (action.payload) {
+        const payload = action.payload as PaginatedResponse<Group>;
+        let groupsDataState: GroupsDataState = { 
+          ...state,
+          groups: {},
+          paginationMapping: {}
+        };
+
+        payload.results.forEach((group: Group) => {
+          if (group?.id) {
+            group.key = group.id;
+            groupsDataState.groups[group.id] = group;
+          }
+        });
+
+        return groupsDataState;
+      }
+      return state;
+    default:
+      return state;
+  }
 }

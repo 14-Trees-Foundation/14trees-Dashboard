@@ -326,10 +326,10 @@ class ApiClient {
         Model- Group: CRUD Operations/Apis for organizations
     */
 
-    async getGroups(offset: number, limit: number, filters?: any[]): Promise<PaginatedResponse<Group>> {
+    async getGroups(offset: number, limit: number, filters?: any[], orderBy?: Order[]): Promise<PaginatedResponse<Group>> {
         const url = `/groups/get?offset=${offset}&limit=${limit}`;
         try {
-            const response = await this.api.post<PaginatedResponse<Group>>(url, { filters });
+            const response = await this.api.post<PaginatedResponse<Group>>(url, { filters, order_by: orderBy });
             return response.data;
         } catch (error: any) {
             console.error(error)

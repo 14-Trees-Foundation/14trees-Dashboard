@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import Box from "@mui/material/Box";
 import {
   Badge,
@@ -36,6 +36,8 @@ import { AccountBalance } from "@mui/icons-material";
 import ApiClient from "../../../api/apiClient/apiClient";
 import CombineGroupForm from "./CombineGroupForm";
 import { LoadingButton } from "@mui/lab";
+import { Order } from "../../../types/common";
+import { getSortIcon } from "../../../components/Filter";
 
 export const OrganizationComponent = () => {
   const dispatch = useAppDispatch();
@@ -60,6 +62,7 @@ export const OrganizationComponent = () => {
   const [anchorEl, setAnchorEl] = useState<any>(null);
   const [groupType, setGroupType] = useState<string>('');
   const [filters, setFilters] = useState<Record<string, GridFilterItem>>({});
+  const [orderBy, setOrderBy] = useState<Order[]>([]);
 
   const [groupCombineModal, setGroupCombineModal] = useState(false);
   const [primaryGroup, setPrimaryGroup] = useState<Group | null>(null);
@@ -67,10 +70,17 @@ export const OrganizationComponent = () => {
   const [deleteSecondary, setDeleteSecondary] = useState(true);
   const [merging, setMerging] = useState(false);
 
+  const groupsData = useAppSelector((state: RootState) => state.groupsData);
+  const groupList: Group[] = groupsData?.paginationMapping
+  ? Object.entries(groupsData.paginationMapping)
+      .sort(([indexA], [indexB]) => Number(indexA) - Number(indexB)) 
+      .map(([_, id]) => groupsData.groups[id])
+  : [];
+
   const handleSetFilters = (filters: Record<string, GridFilterItem>) => {
     setPage(0);
     setFilters(filters);
-  }
+  };
 
   const handleClick = (event: any) => {
     setAnchorEl(event.currentTarget);
@@ -86,9 +96,27 @@ export const OrganizationComponent = () => {
     setOpen(true);
   };
 
+  const handleSortingChange = (param: { field: string; order?: 'ASC' | 'DESC' }) => {
+    if (!param.order) {
+      setOrderBy(orderBy.filter(item => item.column !== param.field));
+      return;
+    }
+    const newOrderBy = orderBy.filter(item => item.column !== param.field);
+    newOrderBy.push({ column: param.field, order: param.order });
+    setOrderBy(newOrderBy);
+  };
+
+  const getSortableHeader = (header: string, key: string) => {
+    return (
+      <div style={{ display: "flex", alignItems: "center", justifyContent: 'space-between' }}>
+        {header} {getSortIcon(key, orderBy.find((item) => item.column === key)?.order, handleSortingChange)}
+      </div>
+    );
+  };
+
   useEffect(() => {
     getGroupsData();
-  }, [pageSize, page, filters]);
+  }, [pageSize, page, filters, orderBy]);
 
   const getGroupsData = async () => {
     const dataFilters = Object.values(filters).map(item => {
@@ -96,11 +124,11 @@ export const OrganizationComponent = () => {
         item.value = (item.value as string[]).map(tp => tp.toString().toLowerCase());
       }
       return item;
-    })
+    });
 
     setLoading(true);
     setTimeout(async () => {
-      getGroups(page * pageSize, pageSize, dataFilters);
+      getGroups(page * pageSize, pageSize, dataFilters, orderBy);
       setLoading(false);
     }, 10);
   };
@@ -139,19 +167,21 @@ export const OrganizationComponent = () => {
       align: 'center',
     },
     {
+      dataIndex: "sponsored_trees",
+      key: "sponsored_trees",
+      title: getSortableHeader("Sponsored Trees", "sponsored_trees"),
+      width: 150,
+      align: 'center',
+      render: (value) => value || '0',
+    },
+    {
       dataIndex: "action",
       key: "action",
       title: "Action",
       width: 300,
       align: "center",
       render: (value, record, index) => (
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-          }}>
-
+        <div style={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
           <Button
             variant="outlined"
             color="success"
@@ -171,25 +201,23 @@ export const OrganizationComponent = () => {
             color="success"
             variant="outlined"
             style={{ margin: "0 5px" }}
-            onClick={() => {
-              setSelectedOrg(record);
-            }}>
+            onClick={() => { setSelectedOrg(record); }}
+          >
             <GroupIcon />
           </Button>
           <Button
             variant="outlined"
             style={{ margin: "0 5px" }}
-            onClick={() => {
-              setSelectedEditRow(record);
-              setEditModal(true);
-            }}>
+            onClick={() => { setSelectedEditRow(record); setEditModal(true); }}
+          >
             <EditIcon />
           </Button>
           <Button
             color="error"
             variant="outlined"
             style={{ margin: "0 5px" }}
-            onClick={() => handleDelete(record)}>
+            onClick={() => handleDelete(record)}
+          >
             <DeleteIcon />
           </Button>
         </div>
@@ -197,19 +225,8 @@ export const OrganizationComponent = () => {
     },
   ];
 
-  let groupList: Group[] = [];
-  const groupsData = useAppSelector(
-    (state: RootState) => state.groupsData
-  );
-  if (groupsData) {
-    groupList = Object.values(groupsData.groups);
-    groupList = groupList.sort((a, b) => b.id - a.id);
-  }
-
   const userGroupMapping = useAppSelector((state: RootState) => state.userGroupsData);
-  const data = Object.entries(userGroupMapping).filter(([key, value]) => {
-    return value.failed !== 0
-  })
+  const data = Object.entries(userGroupMapping).filter(([key, value]) => value.failed !== 0);
   const filteredUserGroupMapping = Object.fromEntries(data);
 
   const getAllGroupsData = async () => {
@@ -235,7 +252,7 @@ export const OrganizationComponent = () => {
     setSecondaryGroup(null);
     setDeleteSecondary(true);
     setGroupCombineModal(false);
-  }
+  };
 
   const handleCombineGroup = async () => {
     if (!primaryGroup || !secondaryGroup) {
@@ -251,37 +268,23 @@ export const OrganizationComponent = () => {
       toast.error(error.message);
     }
     setMerging(false);
-
     handleCancelCombineGroup();
-  }
+  };
 
   return (
     <>
       <ToastContainer />
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "flex-end",
-          marginBottom: "20px",
-        }}>
-
-      </div>
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          padding: "4px 12px",
-        }}
-      >
+      <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: "20px" }}></div>
+      <div style={{ display: "flex", justifyContent: "space-between", padding: "4px 12px" }}>
         <Typography variant="h4" style={{ marginTop: '5px' }}>Group People</Typography>
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "flex-end",
-            marginBottom: "5px",
-            marginTop: "5px",
-          }}>
-          <Button style={{ marginLeft: "10px" }} variant="outlined" color="primary" onClick={() => setFailedRecords(true)} disabled={Object.keys(filteredUserGroupMapping).length === 0}>
+        <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: "5px", marginTop: "5px" }}>
+          <Button 
+            style={{ marginLeft: "10px" }} 
+            variant="outlined" 
+            color="primary" 
+            onClick={() => setFailedRecords(true)} 
+            disabled={Object.keys(filteredUserGroupMapping).length === 0}
+          >
             <Badge badgeContent={Object.keys(filteredUserGroupMapping).length} color="error">
               <ErrorIcon />
             </Badge>
@@ -300,7 +303,8 @@ export const OrganizationComponent = () => {
             variant="contained"
             color="success"
             style={{ marginLeft: "10px", textTransform: 'none' }}
-            onClick={() => { setGroupCombineModal(true); }}>
+            onClick={() => { setGroupCombineModal(true); }}
+          >
             Merge Groups
           </Button>
           <Menu
@@ -344,9 +348,7 @@ export const OrganizationComponent = () => {
       <Dialog open={openDeleteModal} onClose={() => setOpenDeleteModal(false)}>
         <DialogTitle>Confirm Delete</DialogTitle>
         <DialogContent>
-          <DialogContentText>
-            Do you want to delete {selectedItem?.name}?
-          </DialogContentText>
+          <DialogContentText>Do you want to delete {selectedItem?.name}?</DialogContentText>
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setOpenDeleteModal(false)} color="error" variant="outlined">
@@ -354,7 +356,6 @@ export const OrganizationComponent = () => {
           </Button>
           <Button
             onClick={() => {
-              console.log("Deleting item...", selectedItem);
               if (selectedItem !== null) {
                 deleteGroup(selectedItem);
               }
@@ -362,7 +363,8 @@ export const OrganizationComponent = () => {
             }}
             color="success"
             variant="contained"
-            autoFocus>
+            autoFocus
+          >
             Yes
           </Button>
         </DialogActions>
@@ -414,7 +416,6 @@ export const OrganizationComponent = () => {
           groupsMap={groupsData.groups}
         />
       )}
-
     </>
   );
 };
