@@ -125,9 +125,6 @@ export const OrganizationComponent = () => {
       }
       return item;
     });
-    const sortParams = orderBy.length > 0 
-    ? { sortBy: orderBy[0].column, sortOrder: orderBy[0].order }
-    : undefined;
 
     setLoading(true);
     setTimeout(async () => {
