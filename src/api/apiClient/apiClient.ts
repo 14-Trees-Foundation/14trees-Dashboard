@@ -1205,31 +1205,60 @@ class ApiClient {
     }
 
 
-    async createDonation(request_id: string, created_by: number, user_id: number, pledged: number | null, pledged_area: number | null, category: string, grove: string | null, preference: string, event_name: string, alternate_email: string, users: any[], payment_id?: number, group_id?: number, logo?: string | null): Promise<Donation> {
+    async createDonation(
+        user_id: number,
+        payment_id: number | null,
+        preference_option: 'Foundation' | 'Public',
+        grove_type: 'Visitor\'s grove' | 'Family grove' | 'Memorial grove' | 'Social/professional group grove' | 'School/College alumni grove' | 'Corporate grove' | 'Conference grove' | 'Other',
+        grove_type_other: string | null,
+        tree_count: number,
+        contribution_options: 'Planning visit' | 'CSR' | 'Volunteer' | 'Share',
+        names_for_plantation?: string | null,
+        comments?: string | null
+    ): Promise<Donation> {
         try {
-            const response = await this.api.post<Donation>(`/donations`, { request_id, created_by, user_id, pledged, pledged_area, category, group_id, logo, grove, payment_id, users, preference, event_name, alternate_email });
+            const response = await this.api.post<Donation>(`/donations`, {
+                user_id,
+                payment_id,
+                preference_option,
+                grove_type,
+                grove_type_other,
+                tree_count,
+                contribution_options,
+                names_for_plantation,
+                comments
+            });
             return response.data;
         } catch (error: any) {
             if (error.response?.data?.message) {
                 throw new Error(error.response.data.message);
             }
-            throw new Error('Failed to create Donation');
+            throw new Error('Failed to create donation');
         }
     }
 
-
-    async updateDonation(donation: Donation, users: any): Promise<Donation> {
-        try {
-            const response = await this.api.put<Donation>(`/donations/${donation.id}`, { donation, users });
-            return response.data;
-        } catch (error: any) {
-            if (error.response) {
-                throw new Error(error.response.data.message);
-            }
-            throw new Error('Failed to update donation');
+   
+async updateDonation(donation_id: number, data: {
+    user_id: number,
+    payment_id?: number | null,
+    preference_option: 'Foundation' | 'Public',
+    grove_type: string,
+    grove_type_other?: string | null,
+    tree_count: number,
+    contribution_options: string,
+    names_for_plantation?: string | null,
+    comments?: string | null
+}): Promise<Donation> {
+    try {
+        const response = await this.api.put<Donation>(`/donations/${donation_id}`, data);
+        return response.data;
+    } catch (error: any) {
+        if (error.response?.data?.message) {
+            throw new Error(error.response.data.message);
         }
+        throw new Error('Failed to update donation');
     }
-
+}
     async updateDonationFeedback(request_id: string, feedback: string, source_info: string): Promise<void> {
         try {
             await this.api.post<void>(`/donations/update-feedback`, { request_id, feedback, source_info });

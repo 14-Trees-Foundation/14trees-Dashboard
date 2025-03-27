@@ -41,7 +41,7 @@ export const DonationComponent = () => {
   const [isDeleteAltOpen, setIsDeleteAltOpen] = useState(false);
   const [isFeedbackFormOpen, setIsFeedbackFormOpen] = useState(false);
   const [donationReqId, setDonationReqId] = useState<string | null>(null);
-
+  
   // plot selection
   const [plotSelectionModalOpen, setPlotSelectionModalOpen] = useState(false);
   const [selectedPlots, setSelectedPlots] = useState<Plot[]>([]);
@@ -191,43 +191,109 @@ export const DonationComponent = () => {
     setRequestId(null);
   }
 
-  const handleCreateDonation = async (user: User, group: Group | null, pledged: number | null, pledgedArea: number | null, category: string, grove: string | null, preference: string, eventName: string, alternateEmail: string, users: any[], paymentId?: number, logo?: string | null) => {
-    if (!requestId) {
-      toast.error("Something went wrong. Please try again later!");
-      return;
+  const handleCreateDonation = async (
+    user: User,
+    payment_id: number | null,
+    preference_option: 'Foundation' | 'Public',
+    grove_type: string,
+    grove_type_other: string | null,
+    tree_count: number,
+    contribution_options: 'Planning visit' | 'CSR' | 'Volunteer' | 'Share',
+    names_for_plantation?: string,
+    comments?: string
+) => {
+    try {
+        const apiClient = new ApiClient();
+        await apiClient.createDonation(
+            user.id,
+            payment_id,
+            preference_option,
+            grove_type as any, // Cast to match enum type
+            grove_type_other,
+            tree_count,
+            contribution_options,
+            names_for_plantation?.trim() || null,
+            comments?.trim() || null
+        );
+        toast.success('Donation created successfully');
+        handleModalClose();
+        fetchDonations();
+    } catch (error: any) {
+        toast.error(error.message || 'Failed to create donation');
     }
+};
+const handleUpdateDonation = async (
+  user: User,
+  payment_id: number | null,
+  preference_option: 'Foundation' | 'Public',
+  grove_type: string,
+  grove_type_other: string | null,
+  tree_count: number,
+  contribution_options: 'Planning visit' | 'CSR' | 'Volunteer' | 'Share',
+  names_for_plantation?: string,
+  comments?: string
+) => {
+  if (!selectedDonation) return;
 
-    createDonation(requestId, user.id, user.id, pledged, pledgedArea, category, grove, preference, eventName, alternateEmail, users, paymentId, group?.id, logo);
-    setIsFeedbackFormOpen(true);
-    setDonationReqId(requestId);
+  try {
+      const apiClient = new ApiClient();
+      await apiClient.updateDonation(selectedDonation.id, {
+          user_id: user.id,
+          payment_id,
+          preference_option,
+          grove_type: grove_type as any,
+          grove_type_other: grove_type_other?.trim() || null,
+          tree_count,
+          contribution_options,
+          names_for_plantation: names_for_plantation?.trim() || null,
+          comments: comments?.trim() || null
+      });
+      toast.success('Donation updated successfully');
+      handleModalClose();
+      fetchDonations();
+  } catch (error: any) {
+      toast.error(error.message || 'Failed to update donation');
   }
+};
 
-  const handleUpdateDonation = async (user: User, group: Group | null, pledged: number | null, pledgedArea: number | null, category: string, grove: string | null, preference: string, eventName: string, alternateEmail: string, users: any[], paymentId?: number, logo?: string | null) => {
-    if (!selectedDonation) return;
-
-    const data = { ...selectedDonation };
-    data.user_id = user.id;
-    data.pledged = pledged;
-    data.pledged_area = pledgedArea;
-    data.group_id = group ? group.id : null;
-    data.category = category as any;
-    data.grove = grove;
-    data.payment_id = paymentId ? paymentId : null;
-    data.preference = preference;
-    data.event_name = eventName?.trim() ? eventName.trim() : null;
-    data.alternate_email = alternateEmail?.trim() ? alternateEmail.trim() : null;
-
-    updateDonation(data, users);
+const handleSubmit = (
+  user: User,
+  payment_id: number | null,
+  preference_option: 'Foundation' | 'Public',
+  grove_type: string,
+  grove_type_other: string | null,
+  tree_count: number,
+  contribution_options: 'Planning visit' | 'CSR' | 'Volunteer' | 'Share',
+  names_for_plantation?: string,
+  comments?: string
+) => {
+  if (!selectedDonation) {
+      handleCreateDonation(
+          user,
+          payment_id,
+          preference_option,
+          grove_type,
+          grove_type_other,
+          tree_count,
+          contribution_options,
+          names_for_plantation,
+          comments
+      );
+  } else {
+      handleUpdateDonation(
+          user,
+          payment_id,
+          preference_option,
+          grove_type,
+          grove_type_other,
+          tree_count,
+          contribution_options,
+          names_for_plantation,
+          comments
+      );
   }
+};
 
-  const handleSubmit = (user: User, group: Group | null, pledged: number | null, pledgedArea: number | null, category: string, grove: string | null, preference: string, eventName: string, alternateEmail: string, users: any[], paymentId?: number, logo?: string | null) => {
-
-    if (!selectedDonation) {
-      handleCreateDonation(user, group, pledged, pledgedArea, category, grove, preference, eventName, alternateEmail, users, paymentId, logo);
-    } else {
-      handleUpdateDonation(user, group, pledged, pledgedArea, category, grove, preference, eventName, alternateEmail, users, paymentId, logo);
-    }
-  }
 
   const handleFeedbackSubmit = async (feedback: string, sourceInfo: string) => {
     if (!donationReqId) {

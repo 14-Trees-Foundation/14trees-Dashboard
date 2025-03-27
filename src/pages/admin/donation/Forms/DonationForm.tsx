@@ -21,7 +21,17 @@ interface DonationFormProps {
     open: boolean
     requestId: string | null
     handleClose: () => void
-    onSubmit: (user: User, group: Group | null, pledged: number | null, pledgedArea: number | null, category: string, grove: string | null, preference: string, eventName: string, alternateEmail: string, users: any[], paymentId?: number, logo?: string | null) => void
+    onSubmit: (
+        user: User,
+        payment_id: number | null,
+        preference_option: 'Foundation' | 'Public',
+        grove_type: string,
+        grove_type_other: string | null,
+        tree_count: number,
+        contribution_options: 'Planning visit' | 'CSR' | 'Volunteer' | 'Share',
+        names_for_plantation?: string,
+        comments?: string
+    ) => void;
 }
 
 const DonationForm: React.FC<DonationFormProps> = ({ donation, open, requestId, handleClose, onSubmit }) => {
@@ -199,7 +209,18 @@ const DonationForm: React.FC<DonationFormProps> = ({ donation, open, requestId, 
             }
         }
 
-        onSubmit(user, group, pledgedType === "trees" ? pledged : null, pledgedType === "acres" ? pledgedArea : null, category, grove, preference, eventName, alternateEmail, users, paymentId, logoString);
+        onSubmit(
+            user,
+            paymentId || null,
+            category as 'Foundation' | 'Public',
+            grove || '',
+            null, // grove_type_other
+            pledgedType === "trees" ? pledged : pledgedArea * 14, // convert area to trees if needed
+            'Planning visit', // default contribution option
+            eventName,
+            alternateEmail
+        );
+    
 
         if (group) {
             const data = { ...group };
