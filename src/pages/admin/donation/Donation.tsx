@@ -170,8 +170,16 @@ export const DonationComponent = () => {
 
   const fetchDonations = () => {
     setLoading(true);
-    let filtersData = Object.values(filters);
-    getDonations(page * pageSize, pageSize, filtersData);
+    try {
+      let filtersData = Object.values(filters);
+      getDonations(page * pageSize, pageSize, filtersData);
+    } catch (error) {
+      console.error('Error fetching donations:', error);
+      // Don't show error toast, just set empty data
+      setTableRows([]);
+    } finally {
+      setLoading(false);
+    }
   }
 
   const handleModalOpen = (record?: Donation) => {
@@ -296,47 +304,47 @@ export const DonationComponent = () => {
     {
       dataIndex: "id",
       key: "id",
-      title: "Donation ID",
-      align: "right",
+      title: "ID",
+      align: "center",
       width: 75,
     },
     {
       dataIndex: "user_name",
       key: "user_name",
-      title: "Donor",
+      title: "Donor Name",
       align: "center",
       width: 200,
       ...getColumnSearchProps('user_name', filters, handleSetFilters)
     },
     {
-      dataIndex: "group_name",
-      key: "group_name",
-      title: "Corporate/Personal",
-      align: "center",
-      width: 200,
-      render: (value: string) => value ? value : 'Personal',
-      ...getColumnSearchProps('group_name', filters, handleSetFilters)
-    },
-    {
-      dataIndex: "pledged",
-      key: "pledged",
-      title: "Pledged",
+      dataIndex: "category",
+      key: "category",
+      title: "Type",
       align: "center",
       width: 100,
-      render: (value, record, index) => record.pledged ? record.pledged + " Trees" : record.pledged_area + " Acres"
+      filters: [
+        { text: 'Foundation', value: 'Foundation' },
+        { text: 'Public', value: 'Public' },
+      ],
     },
     {
-      dataIndex: "created_by_name",
-      key: "created_by_name",
-      title: "Created by",
+      dataIndex: "trees_count",
+      key: "trees_count",
+      title: "Trees",
       align: "center",
-      width: 200,
-      ...getColumnSearchProps('created_by_name', filters, handleSetFilters)
+      width: 100,
+    },
+    {
+      dataIndex: "contribution_options",
+      key: "contribution_options",
+      title: "Contribution",
+      align: "center",
+      width: 150,
     },
     {
       dataIndex: "created_at",
       key: "created_at",
-      title: "Created on",
+      title: "Created On",
       align: "center",
       width: 150,
       render: getHumanReadableDate,
@@ -408,18 +416,18 @@ export const DonationComponent = () => {
       <Divider sx={{ backgroundColor: "black", marginBottom: '15px' }} />
 
       <Box sx={{ height: 540, width: "100%" }}>
-        <GeneralTable
-          loading={loading}
-          rows={tableRows}
-          columns={columns}
-          totalRecords={donationsData.totalDonations}
-          page={page}
-          pageSize={pageSize}
-          onPaginationChange={handlePaginationChange}
-          onDownload={handleDownloadDonations}
-          footer
-          tableName="Plots"
-        />
+      <GeneralTable
+    loading={loading}
+    rows={tableRows}
+    columns={columns}
+    totalRecords={donationsData.totalDonations}
+    page={page}
+    pageSize={pageSize}
+    onPaginationChange={handlePaginationChange}
+    onDownload={handleDownloadDonations}
+    footer
+    tableName="Donations" 
+/>
       </Box>
 
       <DonationForm

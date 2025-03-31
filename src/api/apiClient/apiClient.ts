@@ -1191,19 +1191,25 @@ class ApiClient {
        Model- Donation: CRUD Operations/Apis for Donations
    */
 
-    async getDonations(offset: number, limit: number, filters?: any[]): Promise<PaginatedResponse<Donation>> {
-        const url = `/donations/get?offset=${offset}&limit=${limit}`;
+       async getDonations(offset: number, limit: number, filters?: any[]): Promise<PaginatedResponse<Donation>> {
+        const url = `/donations/requests/get`; // No need to add query params since it's a POST request
+    
         try {
-            const response = await this.api.post<PaginatedResponse<Donation>>(url, { filters: filters });
+            const response = await this.api.post<PaginatedResponse<Donation>>(url, { 
+                offset, 
+                limit, 
+                filters: filters || []  // Ensure filters is always an array
+            });
+    
             return response.data;
         } catch (error: any) {
             if (error.response?.data?.message) {
-                throw new Error(error.response.data.message)
+                throw new Error(error.response.data.message);
             }
-            throw new Error("Failed to fetch donations")
+            throw new Error("Failed to fetch donations");
         }
     }
-
+    
 
     async createDonation(request_id: string, created_by: number, user_id: number, pledged: number | null, pledged_area: number | null, category: string, grove: string | null, preference: string, event_name: string, alternate_email: string, users: any[], payment_id?: number, group_id?: number, logo?: string | null): Promise<Donation> {
         try {

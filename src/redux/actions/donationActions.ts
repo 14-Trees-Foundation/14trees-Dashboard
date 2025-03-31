@@ -12,12 +12,18 @@ export const getDonations = (offset: number, limit: number, filters?: any[]) => 
         });
         apiClient.getDonations(offset, limit, filters).then(
             (value: PaginatedResponse<Donation>) => {
-                for (let i = 0; i < value.results.length; i++) {
-                    value.results[i].key = value.results[i].id
-                }
+                // Map the results to include key property for antd Table
+                const donationsWithKey = value.results.map(donation => ({
+                    ...donation,
+                    key: donation.id // Add key property required by antd Table
+                }));
+
                 dispatch({
                     type: donationActionTypes.GET_DONATIONS_SUCCEEDED,
-                    payload: value,
+                    payload: {
+                        ...value,
+                        results: donationsWithKey
+                    },
                 });
             },
             (error: any) => {
