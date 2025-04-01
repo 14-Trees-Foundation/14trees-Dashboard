@@ -21,6 +21,7 @@ import FeedbackForm from "./Forms/FeedbackForm";
 import { Plot } from "../../../types/plot";
 import PlotSelection from "./Forms/PlotSelection";
 import EmailConfirmationModal from "./components/EmailConfirmationModal";
+import DonationInfo from "./DonationInfo";
 
 export const DonationComponent = () => {
 
@@ -41,6 +42,7 @@ export const DonationComponent = () => {
   const [isDeleteAltOpen, setIsDeleteAltOpen] = useState(false);
   const [isFeedbackFormOpen, setIsFeedbackFormOpen] = useState(false);
   const [donationReqId, setDonationReqId] = useState<string | null>(null);
+  const [infoModalOpen, setInfoModalOpen] = useState(false);
 
   // plot selection
   const [plotSelectionModalOpen, setPlotSelectionModalOpen] = useState(false);
@@ -274,11 +276,15 @@ export const DonationComponent = () => {
     return resp.results;
   }
 
+  const handleViewSummary = (record: Donation) => {
+    setSelectedDonation(record);
+    setInfoModalOpen(true);
+  }
 
   const getActionsMenu = (record: Donation) => (
     <Menu>
       <Menu.ItemGroup>
-        <Menu.Item key="00" onClick={() => { }} icon={<Wysiwyg />}>
+        <Menu.Item key="00" onClick={() => { handleViewSummary(record); }} icon={<Wysiwyg />}>
           View Summary
         </Menu.Item>
         <Menu.Item key="01" onClick={() => { handleModalOpen(record); }} icon={<Edit />}>
@@ -301,6 +307,31 @@ export const DonationComponent = () => {
   );
 
   const columns: TableColumnsType<Donation> = [
+    {
+      dataIndex: "action",
+      key: "action",
+      title: "Actions",
+      width: 100,
+      align: "center",
+      render: (value, record, index) => (
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+          }}>
+          <Dropdown overlay={getActionsMenu(record)} trigger={['click']}>
+            <Button
+              variant='outlined'
+              color='success'
+              style={{ margin: "0 5px" }}
+            >
+              <MenuOutlined />
+            </Button>
+          </Dropdown>
+        </div>
+      ),
+    },
     {
       dataIndex: "id",
       key: "id",
@@ -363,31 +394,6 @@ export const DonationComponent = () => {
         </IconButton>
       ),
     },
-    {
-      dataIndex: "action",
-      key: "action",
-      title: "Actions",
-      width: 100,
-      align: "center",
-      render: (value, record, index) => (
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-          }}>
-          <Dropdown overlay={getActionsMenu(record)} trigger={['click']}>
-            <Button
-              variant='outlined'
-              color='success'
-              style={{ margin: "0 5px" }}
-            >
-              <MenuOutlined />
-            </Button>
-          </Dropdown>
-        </div>
-      ),
-    },
   ]
 
   return (
@@ -417,17 +423,17 @@ export const DonationComponent = () => {
 
       <Box sx={{ height: 540, width: "100%" }}>
       <GeneralTable
-    loading={loading}
-    rows={tableRows}
-    columns={columns}
-    totalRecords={donationsData.totalDonations}
-    page={page}
-    pageSize={pageSize}
-    onPaginationChange={handlePaginationChange}
-    onDownload={handleDownloadDonations}
-    footer
-    tableName="Donations" 
-/>
+        loading={loading}
+        rows={tableRows}
+        columns={columns}
+        totalRecords={donationsData.totalDonations}
+        page={page}
+        pageSize={pageSize}
+        onPaginationChange={handlePaginationChange}
+        onDownload={handleDownloadDonations}
+        footer
+        tableName="Donations" 
+      />
       </Box>
 
       <DonationForm
@@ -448,6 +454,12 @@ export const DonationComponent = () => {
         open={emailConfirmationModal}
         onClose={handleEmailModalClose}
         onSubmit={handleSendEmails}
+      />
+
+      <DonationInfo
+        open={infoModalOpen}
+        onClose={() => setInfoModalOpen(false)}
+        data={selectedDonation}
       />
 
       <Dialog open={plotSelectionModalOpen} onClose={() => setPlotSelectionModalOpen(false)} fullWidth maxWidth="xl">
