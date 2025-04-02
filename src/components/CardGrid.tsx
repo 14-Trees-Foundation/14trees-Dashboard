@@ -44,7 +44,7 @@ const CardGrid: React.FC<CardGridProps> = ({ cards, loading }) => {
                             transition: 'background-color 0.3s',
                         }}
                         onClick={() => { window.open(card.dashboardLink) }}
-                        cover={<img height={240} alt={card.type} src={card.image} style={{ backgroundColor: 'white', width: '100%', objectFit: 'cover' }} />}
+                        cover={<img height={240} alt={card.type} src={card.image} style={{ backgroundColor: 'white', width: '100%', objectFit: 'contain' }} />}
                     >
                         <div style={{ width: "100%", zIndex: 10 }}>
                             <Typography variant="h6" gutterBottom noWrap>
