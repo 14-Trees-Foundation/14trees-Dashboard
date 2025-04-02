@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { Spinner } from "../../components/Spinner";
 import { Event } from "../../types/event";
 import { NotFound } from "../notfound/NotFound";
-import { Box, Divider, Drawer } from "@mui/material";
+import { Box, Divider, Drawer, useMediaQuery } from "@mui/material";
 import logo from "../../assets/logo_white_small.png";
 import { useParams } from "react-router-dom";
 import ApiClient from "../../api/apiClient/apiClient";
@@ -32,6 +32,7 @@ const EventPage: React.FC = () => {
 
     const { linkId } = useParams();
     const classes = useStyles();
+    const isMobile = useMediaQuery("(max-width:600px)");
     const [loading, setLoading] = useState(true);
     const [event, setEvent] = useState<Event | null>(null);
     const [index, setIndex] = useRecoilState(navIndex);
@@ -99,7 +100,7 @@ const EventPage: React.FC = () => {
             ? <NotFound />
             : (
                 <Box style={{ display: "flex", backgroundColor: 'rgb(114 143 121 / 48%)' }} >
-                    <Drawer
+                    {!isMobile && <Drawer
                         className={classes.mdrawer}
                         variant="persistent"
                         anchor="left"
@@ -108,8 +109,8 @@ const EventPage: React.FC = () => {
                         <Divider />
                         <img className={classes.logo} alt={"logo"} src={logo} />
                         {menuitem()}
-                    </Drawer>
-                    <Box style={{ padding: 10, flexGrow: 1 }}>
+                    </Drawer>}
+                    <Box style={{ padding: isMobile ? 0 : 10, flexGrow: 1 }}>
                         {mainBox()}
                     </Box>
                     {/* <RightDrawer showWhatsNew={true}/> */}
