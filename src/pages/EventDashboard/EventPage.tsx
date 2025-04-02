@@ -1,15 +1,16 @@
-import { NaturePeople } from "@mui/icons-material";
 import { createStyles, makeStyles } from "@mui/styles";
 import { useEffect, useState } from "react";
 import { Spinner } from "../../components/Spinner";
 import { Event } from "../../types/event";
 import { NotFound } from "../notfound/NotFound";
-import { Box } from "@mui/material";
-import { SinglePageDrawer } from "../admin/csr/SinglePageDrawer";
+import { Box, Divider, Drawer } from "@mui/material";
+import logo from "../../assets/logo_white_small.png";
 import { useParams } from "react-router-dom";
 import ApiClient from "../../api/apiClient/apiClient";
 import { toast } from "react-toastify";
 import EventDashboard from "./components/EventDashboard";
+import { navIndex } from "../../store/atoms";
+import { useRecoilState } from "recoil";
 
 async function getEventDetails(linkId: string): Promise<Event | null> {
     try {
@@ -33,6 +34,7 @@ const EventPage: React.FC = () => {
     const classes = useStyles();
     const [loading, setLoading] = useState(true);
     const [event, setEvent] = useState<Event | null>(null);
+    const [index, setIndex] = useRecoilState(navIndex);
 
     useEffect(() => {
         const handler = setTimeout(async () => {
@@ -49,55 +51,135 @@ const EventPage: React.FC = () => {
         }
     }, [linkId])
 
-    const items = [
-        {
-            displayName: 'Gift of Trees',
-            logo: NaturePeople,
-            key: 5,
-            display: true,
-            onClick: () => { }
-        },
-    ]
+    const onClickNav = (value: any) => {
+        setIndex(value);
+    };
 
-    return (
-        loading
-            ? <Spinner text={''} />
-            : event === null
-                ? <NotFound />
-                : (<div className={classes.box}>
-                    <Box
-                        sx={{
-                            display: "flex",
-                        }}
+    const pages = [
+        {
+            page: EventDashboard,
+            displayName: "Profile",
+            logo: logo,
+        },
+    ];
+
+    const menuitem = () => {
+        return (
+            <div className={classes.itemlist}>
+                {pages.map((item, i) => {
+                    return (
+                        <div className={classes.item} onClick={() => onClickNav(i)} key={i}>
+                            <div className={index === i ? classes.selected : classes.itembtn}>
+                                <img
+                                    className={classes.itemlogo}
+                                    alt={"items"}
+                                    src={item.logo}
+                                />
+                                <div className={classes.itemtext}>{item.displayName}</div>
+                            </div>
+                        </div>
+                    );
+                })}
+            </div>
+        );
+    };
+
+    const mainBox = () => {
+        const Page = pages[index].page;
+        return (
+            <div>
+                {event && <Page event={event} />}
+            </div>
+        );
+    };
+
+    return loading
+        ? <Spinner text={''} />
+        : event === null
+            ? <NotFound />
+            : (
+                <Box style={{ display: "flex", backgroundColor: 'rgb(114 143 121 / 48%)' }} >
+                    <Drawer
+                        className={classes.mdrawer}
+                        variant="persistent"
+                        anchor="left"
+                        open={true}
                     >
-                        {/* <SinglePageDrawer pages={items} /> */}
-                        <Box
-                            component="main"
-                        >
-                            <EventDashboard event={event}/>
-                        </Box>
+                        <Divider />
+                        <img className={classes.logo} alt={"logo"} src={logo} />
+                        {menuitem()}
+                    </Drawer>
+                    <Box style={{ padding: 10, flexGrow: 1 }}>
+                        {mainBox()}
                     </Box>
-                </div>)
-    );
+                    {/* <RightDrawer showWhatsNew={true}/> */}
+                </Box>
+            );
 }
 
 const useStyles = makeStyles((theme: any) =>
     createStyles({
-        box: {
-            overflow: "auto",
-            width: "100%",
-            position: "relative",
-            backgroundColor: "#B1BFB5",
-            minHeight: "100vh",
-            heigth: "100%",
+        mdrawer: {
+            width: "15%",
+            "& .MuiPaper-root": {
+                width: "15%",
+                backgroundColor: "#3F5344",
+                borderTopRightRadius: "10px",
+            },
         },
-        bg: {
+        itemlist: {
             width: "100%",
-            objectFit: "cover",
+            color: "#ffffff",
         },
-        outlet: {
-            [theme.breakpoints.down("768")]: {
-                marginTop: "48px",
+        item: {
+            cursor: "pointer",
+            color: "#ffffff",
+            width: "80%",
+            margin: "0 auto 20px auto",
+        },
+        itembtn: {
+            borderRadius: "20px",
+            height: "40px",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            backgroundColor: "#3F5344",
+            "&:hover": {
+                backgroundColor: "#9BC53D",
+            },
+        },
+        selected: {
+            borderRadius: "20px",
+            height: "40px",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            backgroundColor: "#9BC53D",
+        },
+        logo: {
+            width: "80px",
+            height: "100px",
+            margin: "12px auto 30px auto",
+            paddingTop: "25px",
+            [theme.breakpoints.down("md")]: {
+                width: "60px",
+                height: "80px",
+            },
+            [theme.breakpoints.down("sm")]: {
+                width: "40px",
+                height: "55px",
+            },
+        },
+        itemlogo: {
+            width: "18px",
+            height: "20px",
+        },
+        itemtext: {
+            margin: "5px",
+            fontWeight: 450,
+            fontSize: 16,
+            [theme.breakpoints.down("md")]: {
+                display: "none",
             },
         },
     })
