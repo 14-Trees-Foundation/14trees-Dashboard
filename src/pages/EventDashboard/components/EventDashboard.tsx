@@ -1,5 +1,5 @@
 import React from "react";
-import { Box, Typography, Paper } from "@mui/material";
+import { Box, Typography, Divider } from "@mui/material";
 import { makeStyles } from "@mui/styles";
 import { Event } from "../../../types/event";
 import EventMemories from "./EventMemories";
@@ -32,11 +32,8 @@ const useStyles = makeStyles({
         boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
     },
     content: {
+        marginTop: 65,
         flex: 1,
-        display: 'flex',
-        flexDirection: "column",
-        alignItems: 'center',
-        justifyContent: 'center',
         padding: "16px",
         overflowY: "auto",
         scrollbarWidth: "thin", // For Firefox
@@ -68,65 +65,67 @@ const EventDashboard: React.FC<EventDashboardProps> = ({ event }) => {
     const classes = useStyles();
 
     return (
-        <Box className={classes.root}>
-            {/* Sticky Elevated Header */}
-            <Box className={classes.header}>
-                <Paper className={classes.headerPaper} elevation={3}>
-                    <Typography variant="h4">{event.name}</Typography>
-                </Paper>
+        <Box p={1}>
+            <Box
+                sx={{
+                    position: 'relative',
+                    width: '100%',
+                }}
+            >
+                <Box
+                    sx={{
+                        p: -2,
+                        width: '100%',
+                        position: 'absolute',
+                        margin: '0 auto',
+                    }}
+                >
+                    <Typography mb={1} variant="h4" color={"#323232"}>{event.name} Dashboard</Typography>
+                    <Divider />
+                </Box>
             </Box>
 
             {/* Scrollable Content */}
             <Box className={classes.content}>
-                <Box style={{ maxWidth: "70vw", }}>
 
-                    {event.message && (
-                        <Paper className={classes.messagePaper} elevation={2}>
-                            <Typography
-                                variant="body1"
-                                paragraph
-                                style={{ whiteSpace: "pre-wrap" }} // Handle \n as new lines
-                            >
-                                {event.message}
-                            </Typography>
-                        </Paper>
-                    )}
-
-                    {/* Event Memories */}
-                    {event.memories && event.memories.length > 0 && (
-                        // <Paper
-                        //     elevation={3}
-                        //     sx={{
-                        //         marginTop: 10,
-                        //         borderRadius: "20px",
-                        //         padding: "16px",
-                        //         boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
-                        //         backgroundColor: "white"
-                        //     }}
-                        // >
-                        <Box sx={{ mt: 10 }}>
-                            <Typography variant="h6" gutterBottom>
+                {event.message && (
+                    <>
+                        <Typography
+                            variant="body1"
+                            paragraph
+                            style={{ whiteSpace: "pre-wrap" }} // Handle \n as new lines
+                        >
+                            {event.message}
+                        </Typography>
+                        <Divider sx={{ width: "100%" }} />
+                    </>
+                )}
+                {/* Event Memories */}
+                {event.memories && event.memories.length > 0 && (
+                    <>
+                        <Box sx={{ mt: 5 }}>
+                            <Typography variant="h5" fontWeight={500} gutterBottom>
                                 Event Memories
                             </Typography>
                             <Box sx={{ overflow: "hidden", height: '400px' }}>
                                 <EventMemories imageUrls={event.memories} />
                             </Box>
                         </Box>
-                        // </Paper>
-                    )}
+                        <Divider sx={{ width: "100%", mt: 2 }} />
+                    </>
+                )}
 
-                    <Box sx={{
-                        marginTop: 10
-                    }}>
-                        <Typography variant="h6" gutterBottom>
-                            Event Trees
-                        </Typography>
-                        <Box sx={{ maxWidth: "100%" }}>
-                            <EventTrees eventId={event.id} />
-                        </Box>
+                <Box sx={{
+                    marginTop: 4
+                }}>
+                    <Typography variant="h5" fontWeight={500} gutterBottom>
+                        Event Trees
+                    </Typography>
+                    <Box sx={{ maxWidth: "100%" }}>
+                        <EventTrees eventId={event.id} />
                     </Box>
-
                 </Box>
+
             </Box>
         </Box>
     );
