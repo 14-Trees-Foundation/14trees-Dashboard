@@ -1,4 +1,4 @@
-import { Box, Button, FormControl, FormControlLabel, FormGroup, IconButton, InputBase, Paper, Radio } from "@mui/material"
+import { Box, Button, FormControl, FormControlLabel, FormGroup, IconButton, InputBase, Paper, Radio, useMediaQuery } from "@mui/material"
 import CardGrid from "../../../components/CardGrid";
 import { Tree } from "../../../types/tree";
 import { useEffect, useState } from "react";
@@ -14,6 +14,7 @@ interface EventTreesProps {
 
 const EventTrees: React.FC<EventTreesProps> = ({ eventId }) => {
 
+    const isMobile = useMediaQuery("(max-width:600px)");
     const [loading, setLoading] = useState(false);
     const [trees, setTrees] = useState<Tree[]>([]);
     const [page, setPage] = useState(0);
@@ -72,7 +73,7 @@ const EventTrees: React.FC<EventTreesProps> = ({ eventId }) => {
 
     return (
         <Box sx={{ width: '100%' }}>
-            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: isMobile ? 'flex-start' : 'space-between', flexWrap: 'wrap' }}>
                 <FormControl component="fieldset">
                     <FormGroup aria-label="position" row>
                         <FormControlLabel
