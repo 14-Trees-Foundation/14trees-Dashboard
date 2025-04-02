@@ -1313,11 +1313,12 @@ class ApiClient {
         const url = `/events/get?offset=${offset}&limit=${limit}`;
         try {
             const response = await this.api.post<PaginatedResponse<Event>>(url, { filters: filters });
-            console.log("Response in api client: ", response);
             return response.data;
         } catch (error: any) {
-            console.error(error)
-            throw new Error(`Failed to fetch events: ${error.message}`);
+            if (error.response?.data?.message) {
+                throw new Error(error.response.data.message);
+            }
+            throw new Error("Faield fetch events");
         }
     }
 
