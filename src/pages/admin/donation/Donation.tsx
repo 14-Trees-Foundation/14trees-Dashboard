@@ -10,6 +10,7 @@ import { bindActionCreators } from "@reduxjs/toolkit";
 import { RootState } from "../../../redux/store/store";
 import { ToastContainer, toast } from "react-toastify";
 import DonationForm from "./Forms/DonationForm";
+import DirectEditDonationForm from "./Forms/Donationeditform";
 import { Delete, Edit, Email, Landscape, MenuOutlined, NotesOutlined, Wysiwyg } from "@mui/icons-material";
 import { Badge, Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, Divider, IconButton, Typography } from "@mui/material";
 import GeneralTable from "../../../components/GenTable";
@@ -38,6 +39,7 @@ export const DonationComponent = () => {
   const [tableRows, setTableRows] = useState<Donation[]>([]);
   const [selectedDonation, setSelectedDonation] = useState<Donation | null>(null);
   const [isFormOpen, setIsFormOpen] = useState(false);
+  const [isEditFormOpen, setIsEditFormOpen] = useState(false);
   const [requestId, setRequestId] = useState<string | null>(null);
   const [isDeleteAltOpen, setIsDeleteAltOpen] = useState(false);
   const [isFeedbackFormOpen, setIsFeedbackFormOpen] = useState(false);
@@ -194,11 +196,20 @@ export const DonationComponent = () => {
     setIsFormOpen(true);
   }
 
+  const handleEditModalOpen = (record: Donation) => {
+    setSelectedDonation(record);
+    setIsEditFormOpen(true);
+  }
 
   const handleModalClose = () => {
     setIsFormOpen(false);
     setSelectedDonation(null);
     setRequestId(null);
+  }
+
+  const handleEditModalClose = () => {
+    setIsEditFormOpen(false);
+    setSelectedDonation(null);
   }
 
   const handleCreateDonation = async (user: User, group: Group | null, pledged: number | null, pledgedArea: number | null, category: string, grove: string | null, preference: string, eventName: string, alternateEmail: string, users: any[], paymentId?: number, logo?: string | null) => {
@@ -212,22 +223,63 @@ export const DonationComponent = () => {
     setDonationReqId(requestId);
   }
 
+  const handleDirectDonationUpdate = (updatedDonation: Donation) => {
+    try {
+      // Make a copy of the donation to ensure we don't modify the state directly
+      const donationToUpdate = { ...updatedDonation };
+      
+      // Empty users array since we're not modifying users in this form
+      const users: any[] = [];
+      
+      console.log("Updating donation with data:", donationToUpdate);
+      
+      updateDonation(donationToUpdate, users);
+      handleEditModalClose();
+      toast.success("Donation updated successfully!");
+    } catch (error) {
+      console.error("Error updating donation:", error);
+      toast.error("Failed to update donation. Please try again.");
+    }
+  }
+
   const handleUpdateDonation = async (user: User, group: Group | null, pledged: number | null, pledgedArea: number | null, category: string, grove: string | null, preference: string, eventName: string, alternateEmail: string, users: any[], paymentId?: number, logo?: string | null) => {
     if (!selectedDonation) return;
 
-    const data = { ...selectedDonation };
-    data.user_id = user.id;
-    data.pledged = pledged;
-    data.pledged_area = pledgedArea;
-    data.group_id = group ? group.id : null;
-    data.category = category as any;
-    data.grove = grove;
-    data.payment_id = paymentId ? paymentId : null;
-    data.preference = preference;
-    data.event_name = eventName?.trim() ? eventName.trim() : null;
-    data.alternate_email = alternateEmail?.trim() ? alternateEmail.trim() : null;
-
-    updateDonation(data, users);
+    try {
+        // Create a copy of the selected donation
+        const data = { ...selectedDonation };
+        
+        // Update with new values
+        data.user_id = user.id;
+        data.pledged = pledged;
+        data.pledged_area = pledgedArea;
+        data.group_id = group ? group.id : null;
+        data.category = category as any;
+        data.grove = grove;
+        data.payment_id = paymentId ? paymentId : null;
+        data.preference = preference;
+        data.event_name = eventName?.trim() ? eventName.trim() : null;
+        data.alternate_email = alternateEmail?.trim() ? alternateEmail.trim() : null;
+        
+        // Make sure we keep these values from the original donation
+        if (!data.trees_count && selectedDonation.trees_count) {
+            data.trees_count = selectedDonation.trees_count;
+        }
+        if (!data.contribution_options && selectedDonation.contribution_options) {
+            data.contribution_options = selectedDonation.contribution_options;
+        }
+        if (!data.created_by) {
+            data.created_by = selectedDonation.created_by;
+        }
+        
+        console.log("Updating donation with data:", data);
+        
+        updateDonation(data, users);
+        toast.success("Donation updated successfully!");
+    } catch (error) {
+        console.error("Error updating donation:", error);
+        toast.error("Failed to update donation. Please try again.");
+    }
   }
 
   const handleSubmit = (user: User, group: Group | null, pledged: number | null, pledgedArea: number | null, category: string, grove: string | null, preference: string, eventName: string, alternateEmail: string, users: any[], paymentId?: number, logo?: string | null) => {
@@ -287,7 +339,7 @@ export const DonationComponent = () => {
         <Menu.Item key="00" onClick={() => { handleViewSummary(record); }} icon={<Wysiwyg />}>
           View Summary
         </Menu.Item>
-        <Menu.Item key="01" onClick={() => { handleModalOpen(record); }} icon={<Edit />}>
+        <Menu.Item key="01" onClick={() => { handleEditModalOpen(record); }} icon={<Edit />}>
           Edit Request
         </Menu.Item>
         <Menu.Item key="02" danger onClick={() => { setIsDeleteAltOpen(true); setSelectedDonation(record); }} icon={<Delete />}>
@@ -436,12 +488,21 @@ export const DonationComponent = () => {
       />
       </Box>
 
+      {/* Original Donation Form for creating new donations */}
       <DonationForm
         donation={selectedDonation}
         open={isFormOpen}
         handleClose={handleModalClose}
         onSubmit={handleSubmit}
         requestId={requestId}
+      />
+
+      {/* New Direct Edit Form for editing existing donations */}
+      <DirectEditDonationForm
+        donation={selectedDonation}
+        open={isEditFormOpen}
+        handleClose={handleEditModalClose}
+        onSubmit={handleDirectDonationUpdate}
       />
 
       <FeedbackForm
@@ -503,3 +564,5 @@ export const DonationComponent = () => {
     </>
   );
 };
+
+export default DonationComponent;

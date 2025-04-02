@@ -329,11 +329,28 @@ class ApiClient {
     async getGroups(offset: number, limit: number, filters?: any[], orderBy?: Order[]): Promise<PaginatedResponse<Group>> {
         const url = `/groups/get?offset=${offset}&limit=${limit}`;
         try {
-            const response = await this.api.post<PaginatedResponse<Group>>(url, { filters, order_by: orderBy });
+            // Validate filters to make sure they don't contain null or undefined values
+            const validatedFilters = filters?.filter(filter => 
+                filter && 
+                filter.columnField && 
+                filter.operatorValue &&
+                filter.value !== undefined && 
+                filter.value !== null
+            ) || [];
+            
+            const response = await this.api.post<PaginatedResponse<Group>>(url, { 
+                filters: validatedFilters, 
+                order_by: orderBy 
+            });
             return response.data;
         } catch (error: any) {
-            console.error(error)
-            throw new Error(`Failed to fetch groups: ${error.message}`);
+            console.error("Error fetching groups:", error);
+            // Return empty results instead of throwing to prevent breaking the UI
+            return {
+                offset: offset,
+                total: 0,
+                results: []
+            };
         }
     }
 
@@ -1226,10 +1243,38 @@ class ApiClient {
 
     async updateDonation(donation: Donation, users: any): Promise<Donation> {
         try {
-            const response = await this.api.put<Donation>(`/donations/${donation.id}`, { donation, users });
+            // Extract the fields that we want to update
+            const updateFields = [
+                'user_id', 
+                'payment_id',
+                'category',
+                'grove',
+                'grove_type_other',
+                'trees_count',
+                'contribution_options',
+                'names_for_plantation',
+                'comments',
+                'pledged',
+                'pledged_area',
+                'group_id',
+                'preference',
+                'event_name',
+                'alternate_email'
+            ];
+            
+            // Format request to match backend expectations
+            const payload = {
+                updateFields: updateFields,
+                data: donation,
+                users: users
+            };
+            
+            console.log("Sending donation update payload:", payload);
+            const response = await this.api.put<Donation>(`/donations/${donation.id}`, payload);
             return response.data;
         } catch (error: any) {
-            if (error.response) {
+            console.error("Update donation error:", error);
+            if (error.response?.data?.message) {
                 throw new Error(error.response.data.message);
             }
             throw new Error('Failed to update donation');

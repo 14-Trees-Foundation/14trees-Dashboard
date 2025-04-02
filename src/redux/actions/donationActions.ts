@@ -69,21 +69,32 @@ export const updateDonation = (record: Donation, users: any[]) => {
         dispatch({
             type: donationActionTypes.UPDATE_DONATION_REQUESTED,
         });
-        apiClient.updateDonation(record, users).then(
-            (value: Donation) => {
-                toast.success('Donation data updated')
+        
+        // Log the record being updated for debugging
+        console.log("Updating donation record:", record);
+        
+        apiClient.updateDonation(record, users)
+            .then((value: Donation) => {
+                console.log("Donation update success:", value);
+                toast.success('Donation data updated successfully');
                 dispatch({
                     type: donationActionTypes.UPDATE_DONATION_SUCCEEDED,
                     payload: value,
                 });
-            },
-            (error: any) => {
-                toast.error(error.message);
+            })
+            .catch((error: any) => {
+                console.error("Donation update error:", error);
+                let errorMessage = 'Failed to update donation';
+                
+                if (error.message) {
+                    errorMessage = error.message;
+                }
+                
+                toast.error(errorMessage);
                 dispatch({
                     type: donationActionTypes.UPDATE_DONATION_FAILED,
                 });
-            }
-        )
+            });
     };
 };
 
