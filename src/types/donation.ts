@@ -31,6 +31,7 @@ export type DonationUser = {
   recipient: number;
   assignee: number;
   gifted_trees: number;
+  trees_count?: number;
   donation_id: number;
   mail_sent: boolean | null;
   mail_error: string | null;

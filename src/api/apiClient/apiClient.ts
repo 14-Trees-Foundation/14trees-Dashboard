@@ -1270,7 +1270,8 @@ class ApiClient {
             };
             
             console.log("Sending donation update payload:", payload);
-            const response = await this.api.put<Donation>(`/donations/${donation.id}`, payload);
+            // Fix the URL path to use /donations/requests/:id instead of /donations/:id
+            const response = await this.api.put<Donation>(`/donations/requests/${donation.id}`, payload);
             return response.data;
         } catch (error: any) {
             console.error("Update donation error:", error);
@@ -1324,13 +1325,25 @@ class ApiClient {
 
     async getDonationUsers(donation_id: number) {
         try {
-            const response = await this.api.get<DonationUser[]>(`/donations/users/${donation_id}`);
-            return response.data;
+            // The backend expects a POST request to /donations/users/get with filters
+            // Not a GET request to /donations/users/:donation_id
+            const filters = [
+                { columnField: 'donation_id', operatorValue: 'equals', value: donation_id }
+            ];
+            
+            const response = await this.api.post<PaginatedResponse<DonationUser>>(
+                `/donations/users/get?offset=0&limit=-1`, 
+                { filters }
+            );
+            
+            // The backend returns a paginated response, but the frontend expects an array
+            // So we extract the results array from the response
+            return response.data.results;
         } catch (error: any) {
             if (error.response?.data?.message) {
                 throw new Error(error.response.data.message);
             }
-            throw new Error('Failed to recipient users for donation!');
+            throw new Error('Failed to fetch recipient users for donation!');
         }
     }
 
@@ -1353,6 +1366,97 @@ class ApiClient {
                 throw new Error(error.response.data.message);
             }
             throw new Error('Failed to send acknowledgement email!');
+        }
+    }
+
+    
+    async updateDonationUser(data: any): Promise<any> {
+        try {
+            // Extract the donation ID
+            let donationId = data.donation_id;
+            if (!donationId) {
+                throw new Error('Missing donation_id');
+            }
+            
+            // Format the user data according to what the backend expects
+            // The backend expects recipient/assignee IDs to be included if they exist
+            const userPayload = {
+                id: data.id,
+                // Here we extract the fields the backend needs
+                recipient: data.recipient, // Keep recipient ID if available
+                assignee: data.assignee, // Keep assignee ID if available
+                recipient_name: data.recipient_name,
+                recipient_email: data.recipient_email,
+                recipient_phone: data.recipient_phone || '',
+                assignee_name: data.assignee_name,
+                assignee_email: data.assignee_email,
+                assignee_phone: data.assignee_phone || '',
+                relation: data.relation || '',
+                trees_count: data.trees_count || data.gifted_trees || 1,
+                profile_image_url: data.profile_image_url || null
+            };
+            
+            // Prepare the payload in the format expected by the backend
+            const payload = {
+                donation_id: donationId,
+                user: userPayload
+            };
+            
+            console.log('Updating donation user:', payload);
+            
+            // Use the PUT /donations/users endpoint that the backend expects
+            const response = await this.api.put('/donations/users', payload);
+            return response.data;
+        } catch (error: any) {
+            console.error('Error updating donation user:', error);
+            if (error.response?.data?.message) {
+                throw new Error(error.response.data.message);
+            }
+            throw new Error('Failed to update donation user');
+        }
+    }
+
+    async createDonationUser(data: any): Promise<any> {
+        try {
+            // Extract the donation ID
+            let donationId = data.donation_id;
+            if (!donationId) {
+                throw new Error('Missing donation_id');
+            }
+            
+            // Format the user data according to what the backend expects
+            const userPayload = {
+                // No ID for new user
+                recipient_name: data.recipient_name,
+                recipient_email: data.recipient_email,
+                recipient_phone: data.recipient_phone || '',
+                assignee_name: data.assignee_name || data.recipient_name,
+                assignee_email: data.assignee_email || data.recipient_email,
+                assignee_phone: data.assignee_phone || data.recipient_phone || '',
+                relation: data.relation || '',
+                // Use trees_count as the primary field name for consistency
+                trees_count: data.trees_count || data.gifted_trees || 1,
+                profile_image_url: data.profile_image_url || null
+            };
+            
+            // Prepare the payload in the format expected by the backend
+            const payload = {
+                donation_id: donationId,
+                user: userPayload
+            };
+            
+            console.log('Creating donation user:', payload);
+            
+            // Use the existing PUT /donations/users endpoint that also handles creation
+            // The backend determines if it's a create or update based on whether there's an ID
+            const response = await this.api.put('/donations/users', payload);
+            return response.data;
+        } catch (error: any) {
+            console.error('Error creating donation user:', error);
+            if (error.response?.data?.message) {
+                throw new Error(error.response.data.message);
+            }
+            throw new Error('Failed to create donation user');
         }
     }
 
@@ -2151,7 +2255,6 @@ class ApiClient {
         }
     }
 }
-
 
 
 // new function to fetch data form localStorage
