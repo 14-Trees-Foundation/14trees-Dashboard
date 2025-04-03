@@ -77,9 +77,9 @@ const EventTrees: React.FC<EventTreesProps> = ({ eventId }) => {
                 <FormControl component="fieldset">
                     <FormGroup aria-label="position" row>
                         <FormControlLabel
-                            value="illustation"
+                            value="illustration"
                             control={<Radio color="success" checked={imageMode} onChange={() => { setImageMode(true) }} />}
-                            label="Illustations"
+                            label="Illustrations"
                             labelPlacement="end"
                         />
                         <FormControlLabel
