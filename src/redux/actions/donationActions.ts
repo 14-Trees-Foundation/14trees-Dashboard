@@ -12,12 +12,18 @@ export const getDonations = (offset: number, limit: number, filters?: any[]) => 
         });
         apiClient.getDonations(offset, limit, filters).then(
             (value: PaginatedResponse<Donation>) => {
-                for (let i = 0; i < value.results.length; i++) {
-                    value.results[i].key = value.results[i].id
-                }
+                // Map the results to include key property for antd Table
+                const donationsWithKey = value.results.map(donation => ({
+                    ...donation,
+                    key: donation.id // Add key property required by antd Table
+                }));
+
                 dispatch({
                     type: donationActionTypes.GET_DONATIONS_SUCCEEDED,
-                    payload: value,
+                    payload: {
+                        ...value,
+                        results: donationsWithKey
+                    },
                 });
             },
             (error: any) => {
@@ -63,21 +69,32 @@ export const updateDonation = (record: Donation, users: any[]) => {
         dispatch({
             type: donationActionTypes.UPDATE_DONATION_REQUESTED,
         });
-        apiClient.updateDonation(record, users).then(
-            (value: Donation) => {
-                toast.success('Donation data updated')
+        
+        // Log the record being updated for debugging
+        console.log("Updating donation record:", record);
+        
+        apiClient.updateDonation(record, users)
+            .then((value: Donation) => {
+                console.log("Donation update success:", value);
+                toast.success('Donation data updated successfully');
                 dispatch({
                     type: donationActionTypes.UPDATE_DONATION_SUCCEEDED,
                     payload: value,
                 });
-            },
-            (error: any) => {
-                toast.error(error.message);
+            })
+            .catch((error: any) => {
+                console.error("Donation update error:", error);
+                let errorMessage = 'Failed to update donation';
+                
+                if (error.message) {
+                    errorMessage = error.message;
+                }
+                
+                toast.error(errorMessage);
                 dispatch({
                     type: donationActionTypes.UPDATE_DONATION_FAILED,
                 });
-            }
-        )
+            });
     };
 };
 

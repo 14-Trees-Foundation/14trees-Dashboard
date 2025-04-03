@@ -10,6 +10,7 @@ import { bindActionCreators } from "@reduxjs/toolkit";
 import { RootState } from "../../../redux/store/store";
 import { ToastContainer, toast } from "react-toastify";
 import DonationForm from "./Forms/DonationForm";
+import DirectEditDonationForm from "./Forms/Donationeditform";
 import { Delete, Edit, Email, Landscape, MenuOutlined, NotesOutlined, Wysiwyg } from "@mui/icons-material";
 import { Badge, Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, Divider, IconButton, Typography } from "@mui/material";
 import GeneralTable from "../../../components/GenTable";
@@ -21,6 +22,7 @@ import FeedbackForm from "./Forms/FeedbackForm";
 import { Plot } from "../../../types/plot";
 import PlotSelection from "./Forms/PlotSelection";
 import EmailConfirmationModal from "./components/EmailConfirmationModal";
+import DonationInfo from "./DonationInfo";
 
 export const DonationComponent = () => {
 
@@ -37,10 +39,12 @@ export const DonationComponent = () => {
   const [tableRows, setTableRows] = useState<Donation[]>([]);
   const [selectedDonation, setSelectedDonation] = useState<Donation | null>(null);
   const [isFormOpen, setIsFormOpen] = useState(false);
+  const [isEditFormOpen, setIsEditFormOpen] = useState(false);
   const [requestId, setRequestId] = useState<string | null>(null);
   const [isDeleteAltOpen, setIsDeleteAltOpen] = useState(false);
   const [isFeedbackFormOpen, setIsFeedbackFormOpen] = useState(false);
   const [donationReqId, setDonationReqId] = useState<string | null>(null);
+  const [infoModalOpen, setInfoModalOpen] = useState(false);
 
   // plot selection
   const [plotSelectionModalOpen, setPlotSelectionModalOpen] = useState(false);
@@ -170,8 +174,16 @@ export const DonationComponent = () => {
 
   const fetchDonations = () => {
     setLoading(true);
-    let filtersData = Object.values(filters);
-    getDonations(page * pageSize, pageSize, filtersData);
+    try {
+      let filtersData = Object.values(filters);
+      getDonations(page * pageSize, pageSize, filtersData);
+    } catch (error) {
+      console.error('Error fetching donations:', error);
+      // Don't show error toast, just set empty data
+      setTableRows([]);
+    } finally {
+      setLoading(false);
+    }
   }
 
   const handleModalOpen = (record?: Donation) => {
@@ -184,11 +196,20 @@ export const DonationComponent = () => {
     setIsFormOpen(true);
   }
 
+  const handleEditModalOpen = (record: Donation) => {
+    setSelectedDonation(record);
+    setIsEditFormOpen(true);
+  }
 
   const handleModalClose = () => {
     setIsFormOpen(false);
     setSelectedDonation(null);
     setRequestId(null);
+  }
+
+  const handleEditModalClose = () => {
+    setIsEditFormOpen(false);
+    setSelectedDonation(null);
   }
 
   const handleCreateDonation = async (user: User, group: Group | null, pledged: number | null, pledgedArea: number | null, category: string, grove: string | null, preference: string, eventName: string, alternateEmail: string, users: any[], paymentId?: number, logo?: string | null) => {
@@ -202,22 +223,63 @@ export const DonationComponent = () => {
     setDonationReqId(requestId);
   }
 
+  const handleDirectDonationUpdate = (updatedDonation: Donation) => {
+    try {
+      // Make a copy of the donation to ensure we don't modify the state directly
+      const donationToUpdate = { ...updatedDonation };
+      
+      // Empty users array since we're not modifying users in this form
+      const users: any[] = [];
+      
+      console.log("Updating donation with data:", donationToUpdate);
+      
+      updateDonation(donationToUpdate, users);
+      handleEditModalClose();
+      toast.success("Donation updated successfully!");
+    } catch (error) {
+      console.error("Error updating donation:", error);
+      toast.error("Failed to update donation. Please try again.");
+    }
+  }
+
   const handleUpdateDonation = async (user: User, group: Group | null, pledged: number | null, pledgedArea: number | null, category: string, grove: string | null, preference: string, eventName: string, alternateEmail: string, users: any[], paymentId?: number, logo?: string | null) => {
     if (!selectedDonation) return;
 
-    const data = { ...selectedDonation };
-    data.user_id = user.id;
-    data.pledged = pledged;
-    data.pledged_area = pledgedArea;
-    data.group_id = group ? group.id : null;
-    data.category = category as any;
-    data.grove = grove;
-    data.payment_id = paymentId ? paymentId : null;
-    data.preference = preference;
-    data.event_name = eventName?.trim() ? eventName.trim() : null;
-    data.alternate_email = alternateEmail?.trim() ? alternateEmail.trim() : null;
-
-    updateDonation(data, users);
+    try {
+        // Create a copy of the selected donation
+        const data = { ...selectedDonation };
+        
+        // Update with new values
+        data.user_id = user.id;
+        data.pledged = pledged;
+        data.pledged_area = pledgedArea;
+        data.group_id = group ? group.id : null;
+        data.category = category as any;
+        data.grove = grove;
+        data.payment_id = paymentId ? paymentId : null;
+        data.preference = preference;
+        data.event_name = eventName?.trim() ? eventName.trim() : null;
+        data.alternate_email = alternateEmail?.trim() ? alternateEmail.trim() : null;
+        
+        // Make sure we keep these values from the original donation
+        if (!data.trees_count && selectedDonation.trees_count) {
+            data.trees_count = selectedDonation.trees_count;
+        }
+        if (!data.contribution_options && selectedDonation.contribution_options) {
+            data.contribution_options = selectedDonation.contribution_options;
+        }
+        if (!data.created_by) {
+            data.created_by = selectedDonation.created_by;
+        }
+        
+        console.log("Updating donation with data:", data);
+        
+        updateDonation(data, users);
+        toast.success("Donation updated successfully!");
+    } catch (error) {
+        console.error("Error updating donation:", error);
+        toast.error("Failed to update donation. Please try again.");
+    }
   }
 
   const handleSubmit = (user: User, group: Group | null, pledged: number | null, pledgedArea: number | null, category: string, grove: string | null, preference: string, eventName: string, alternateEmail: string, users: any[], paymentId?: number, logo?: string | null) => {
@@ -266,14 +328,18 @@ export const DonationComponent = () => {
     return resp.results;
   }
 
+  const handleViewSummary = (record: Donation) => {
+    setSelectedDonation(record);
+    setInfoModalOpen(true);
+  }
 
   const getActionsMenu = (record: Donation) => (
     <Menu>
       <Menu.ItemGroup>
-        <Menu.Item key="00" onClick={() => { }} icon={<Wysiwyg />}>
+        <Menu.Item key="00" onClick={() => { handleViewSummary(record); }} icon={<Wysiwyg />}>
           View Summary
         </Menu.Item>
-        <Menu.Item key="01" onClick={() => { handleModalOpen(record); }} icon={<Edit />}>
+        <Menu.Item key="01" onClick={() => { handleEditModalOpen(record); }} icon={<Edit />}>
           Edit Request
         </Menu.Item>
         <Menu.Item key="02" danger onClick={() => { setIsDeleteAltOpen(true); setSelectedDonation(record); }} icon={<Delete />}>
@@ -293,68 +359,6 @@ export const DonationComponent = () => {
   );
 
   const columns: TableColumnsType<Donation> = [
-    {
-      dataIndex: "id",
-      key: "id",
-      title: "Donation ID",
-      align: "right",
-      width: 75,
-    },
-    {
-      dataIndex: "user_name",
-      key: "user_name",
-      title: "Donor",
-      align: "center",
-      width: 200,
-      ...getColumnSearchProps('user_name', filters, handleSetFilters)
-    },
-    {
-      dataIndex: "group_name",
-      key: "group_name",
-      title: "Corporate/Personal",
-      align: "center",
-      width: 200,
-      render: (value: string) => value ? value : 'Personal',
-      ...getColumnSearchProps('group_name', filters, handleSetFilters)
-    },
-    {
-      dataIndex: "pledged",
-      key: "pledged",
-      title: "Pledged",
-      align: "center",
-      width: 100,
-      render: (value, record, index) => record.pledged ? record.pledged + " Trees" : record.pledged_area + " Acres"
-    },
-    {
-      dataIndex: "created_by_name",
-      key: "created_by_name",
-      title: "Created by",
-      align: "center",
-      width: 200,
-      ...getColumnSearchProps('created_by_name', filters, handleSetFilters)
-    },
-    {
-      dataIndex: "created_at",
-      key: "created_at",
-      title: "Created on",
-      align: "center",
-      width: 150,
-      render: getHumanReadableDate,
-    },
-    {
-      dataIndex: "notes",
-      key: "notes",
-      title: "Notes",
-      align: "center",
-      width: 100,
-      render: (value, record) => (
-        <IconButton onClick={() => { }}>
-          <Badge variant="dot" color="success" invisible={(!value || value.trim() === '') ? true : false}>
-            <NotesOutlined />
-          </Badge>
-        </IconButton>
-      ),
-    },
     {
       dataIndex: "action",
       key: "action",
@@ -378,6 +382,68 @@ export const DonationComponent = () => {
             </Button>
           </Dropdown>
         </div>
+      ),
+    },
+    {
+      dataIndex: "id",
+      key: "id",
+      title: "ID",
+      align: "center",
+      width: 75,
+    },
+    {
+      dataIndex: "user_name",
+      key: "user_name",
+      title: "Donor Name",
+      align: "center",
+      width: 200,
+      ...getColumnSearchProps('user_name', filters, handleSetFilters)
+    },
+    {
+      dataIndex: "category",
+      key: "category",
+      title: "Type",
+      align: "center",
+      width: 100,
+      filters: [
+        { text: 'Foundation', value: 'Foundation' },
+        { text: 'Public', value: 'Public' },
+      ],
+    },
+    {
+      dataIndex: "trees_count",
+      key: "trees_count",
+      title: "Trees",
+      align: "center",
+      width: 100,
+    },
+    {
+      dataIndex: "contribution_options",
+      key: "contribution_options",
+      title: "Contribution",
+      align: "center",
+      width: 150,
+    },
+    {
+      dataIndex: "created_at",
+      key: "created_at",
+      title: "Created On",
+      align: "center",
+      width: 150,
+      render: getHumanReadableDate,
+    },
+    {
+      dataIndex: "notes",
+      key: "notes",
+      title: "Notes",
+      align: "center",
+      width: 100,
+      render: (value, record) => (
+        <IconButton onClick={() => { }}>
+          <Badge variant="dot" color="success" invisible={(!value || value.trim() === '') ? true : false}>
+            <NotesOutlined />
+          </Badge>
+        </IconButton>
       ),
     },
   ]
@@ -408,26 +474,35 @@ export const DonationComponent = () => {
       <Divider sx={{ backgroundColor: "black", marginBottom: '15px' }} />
 
       <Box sx={{ height: 540, width: "100%" }}>
-        <GeneralTable
-          loading={loading}
-          rows={tableRows}
-          columns={columns}
-          totalRecords={donationsData.totalDonations}
-          page={page}
-          pageSize={pageSize}
-          onPaginationChange={handlePaginationChange}
-          onDownload={handleDownloadDonations}
-          footer
-          tableName="Plots"
-        />
+      <GeneralTable
+        loading={loading}
+        rows={tableRows}
+        columns={columns}
+        totalRecords={donationsData.totalDonations}
+        page={page}
+        pageSize={pageSize}
+        onPaginationChange={handlePaginationChange}
+        onDownload={handleDownloadDonations}
+        footer
+        tableName="Donations" 
+      />
       </Box>
 
+      {/* Original Donation Form for creating new donations */}
       <DonationForm
         donation={selectedDonation}
         open={isFormOpen}
         handleClose={handleModalClose}
         onSubmit={handleSubmit}
         requestId={requestId}
+      />
+
+      {/* New Direct Edit Form for editing existing donations */}
+      <DirectEditDonationForm
+        donation={selectedDonation}
+        open={isEditFormOpen}
+        handleClose={handleEditModalClose}
+        onSubmit={handleDirectDonationUpdate}
       />
 
       <FeedbackForm
@@ -440,6 +515,12 @@ export const DonationComponent = () => {
         open={emailConfirmationModal}
         onClose={handleEmailModalClose}
         onSubmit={handleSendEmails}
+      />
+
+      <DonationInfo
+        open={infoModalOpen}
+        onClose={() => setInfoModalOpen(false)}
+        data={selectedDonation}
       />
 
       <Dialog open={plotSelectionModalOpen} onClose={() => setPlotSelectionModalOpen(false)} fullWidth maxWidth="xl">
@@ -483,3 +564,5 @@ export const DonationComponent = () => {
     </>
   );
 };
+
+export default DonationComponent;

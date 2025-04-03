@@ -1,30 +1,29 @@
-
-export type Donation = {
-  id: number;
-  key: number;
-  user_id: number;
-  group_id: number | null;
-  category: "Public" | "Foundation";
-  grove: string | null;
-  pledged: number | null;
-  pledged_area: number | null;
-  preference: string;
-  payment_id: number | null;
-  feedback: string | null;
-  source_info: string | null;
-  event_name: string | null;
-  alternate_email: string | null;
-  notes: string;
-  associated_tag: string;
-  request_id: string;
-  created_by: number;
-  created_at: string;
-  updated_at: string;
-  user_name?: string;
-  group_name?: string;
-  created_by_name?: string;
-  booked: number 
-};
+export interface Donation {
+    id: number;
+    user_id: number;
+    user_name?: string;
+    user_email?: string;
+    user_phone?: string;
+    payment_id: number | null;
+    category: 'Foundation' | 'Public';
+    grove: string | null;
+    grove_type_other: string | null;
+    trees_count: number;
+    contribution_options:'Planning visit' | 'CSR' | 'Volunteer' | 'Share' | null;
+    names_for_plantation: string | null;
+    comments: string | null;
+    created_by: number;
+    created_at: Date;
+    updated_at: Date;
+    request_id: string;
+    pledged: number | null;
+    pledged_area: number | null;
+    group_id: number | null;
+    preference: string;
+    event_name: string | null;
+    alternate_email: string | null;
+    booked?: number;
+}
 
 export type DonationUser = {
   id: number;
