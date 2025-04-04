@@ -8,10 +8,12 @@ import { useRecoilValue, useRecoilState } from "recoil";
 import { usersData, openMemoryPopup, selUsersData } from "../../../store/atoms";
 import { useState } from "react";
 import { ImageViewer } from "../../../components/ImageViewer";
+import MobileImagePopup from "./MobileImagePopup";
 
 export const Memories = () => {
   const classes = useStyles();
   const matches = useMediaQuery("(max-width:481px)");
+  const isMobile = useMediaQuery("(max-width:600px)");
 
   const userinfo = useRecoilValue(usersData);
   const selUserInfo = useRecoilValue(selUsersData);
@@ -63,7 +65,9 @@ export const Memories = () => {
   };
 
   if (open) {
-    return (
+    return isMobile ? (
+      <MobileImagePopup images={images} onClose={onTogglePop}/>
+    ) : (
       <div style={{ width: "100%", height: "100%" }}>
         <Popup toggle={onTogglePop}>
           <div className={classes.slideshowWindow}>
