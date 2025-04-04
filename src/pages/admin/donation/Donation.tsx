@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { GridFilterItem } from "@mui/x-data-grid";
 import { Dropdown, Menu, TableColumnsType } from "antd";
 import { Donation } from "../../../types/donation";
-import getColumnSearchProps from "../../../components/Filter";
+import getColumnSearchProps, { getColumnSelectedItemFilter } from "../../../components/Filter";
 
 import { useAppDispatch, useAppSelector } from "../../../redux/store/hooks";
 import * as donationActionCreators from "../../../redux/actions/donationActions";
@@ -11,7 +11,7 @@ import { RootState } from "../../../redux/store/store";
 import { ToastContainer, toast } from "react-toastify";
 import DonationForm from "./Forms/DonationForm";
 import DirectEditDonationForm from "./Forms/Donationeditform";
-import { Delete, Edit, Email, Landscape, MenuOutlined, NotesOutlined, Wysiwyg } from "@mui/icons-material";
+import { Delete, Edit, Email, Landscape, LocalOffer, MenuOutlined, NotesOutlined, Wysiwyg } from "@mui/icons-material";
 import { Badge, Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, Divider, IconButton, Typography } from "@mui/material";
 import GeneralTable from "../../../components/GenTable";
 import ApiClient from "../../../api/apiClient/apiClient";
@@ -23,6 +23,7 @@ import { Plot } from "../../../types/plot";
 import PlotSelection from "./Forms/PlotSelection";
 import EmailConfirmationModal from "./components/EmailConfirmationModal";
 import DonationInfo from "./DonationInfo";
+import TagComponent from "../gift/Form/TagComponent";
 
 export const DonationComponent = () => {
 
@@ -45,6 +46,23 @@ export const DonationComponent = () => {
   const [isFeedbackFormOpen, setIsFeedbackFormOpen] = useState(false);
   const [donationReqId, setDonationReqId] = useState<string | null>(null);
   const [infoModalOpen, setInfoModalOpen] = useState(false);
+  const [tagModal, setTagModal] = useState(false);
+  const [tags, setTags] = useState<string[]>([]);
+
+  // Get tags
+  useEffect(() => {
+    const getTags = async () => {
+      try {
+        const apiClient = new ApiClient();
+        const tagsResp = await apiClient.getDonationTags();
+        setTags(tagsResp.results);
+      } catch (error: any) {
+        toast.error(error.message);
+      }
+    }
+
+    getTags();
+  }, []);
 
   // plot selection
   const [plotSelectionModalOpen, setPlotSelectionModalOpen] = useState(false);
@@ -95,6 +113,41 @@ export const DonationComponent = () => {
     handlePlotSelectionClose();
   }
 
+  // Tag functionality
+  const handleTagModalOpen = (donation: Donation) => {
+    setSelectedDonation(donation);
+    setTagModal(true);
+  }
+
+  const handleTagModalClose = () => {
+    setSelectedDonation(null);
+    setTagModal(false);
+  }
+
+  const handleTagDonationSubmit = async (tags: string[]) => {
+    if (!selectedDonation) return;
+
+    setTagModal(false);
+    try {
+      const data = { ...selectedDonation };
+      data.tags = tags;
+      const apiClient = new ApiClient();
+      
+      // Create a payload with only the tags field
+      const updatePayload = {
+        updateFields: ['tags'],
+        data: { tags }
+      };
+      
+      const response = await apiClient.updateDonation(data, []);
+      toast.success("Updated the donation tags!");
+      fetchDonations(); // Refresh the data
+    } catch (error: any) {
+      toast.error(error.message);
+    }
+
+    handleTagModalClose();
+  }
 
   // Send Emails
   const [emailConfirmationModal, setEmailConfirmationModal] = useState(false);
@@ -342,7 +395,10 @@ export const DonationComponent = () => {
         <Menu.Item key="01" onClick={() => { handleEditModalOpen(record); }} icon={<Edit />}>
           Edit Request
         </Menu.Item>
-        <Menu.Item key="02" danger onClick={() => { setIsDeleteAltOpen(true); setSelectedDonation(record); }} icon={<Delete />}>
+        <Menu.Item key="02" onClick={() => { handleTagModalOpen(record); }} icon={<LocalOffer />}>
+          Tag Request
+        </Menu.Item>
+        <Menu.Item key="03" danger onClick={() => { setIsDeleteAltOpen(true); setSelectedDonation(record); }} icon={<Delete />}>
           Delete Request
         </Menu.Item>
       </Menu.ItemGroup>
@@ -409,6 +465,15 @@ export const DonationComponent = () => {
         { text: 'Foundation', value: 'Foundation' },
         { text: 'Public', value: 'Public' },
       ],
+    },
+    {
+      dataIndex: "tags",
+      key: "Tags",
+      title: "Tags",
+      align: "center",
+      width: 200,
+      render: value => value?.join(", ") || '',
+      ...getColumnSelectedItemFilter({ dataIndex: 'tags', filters, handleSetFilters, options: tags })
     },
     {
       dataIndex: "trees_count",
@@ -521,6 +586,14 @@ export const DonationComponent = () => {
         open={infoModalOpen}
         onClose={() => setInfoModalOpen(false)}
         data={selectedDonation}
+      />
+
+      <TagComponent
+        defaultTags={tags}
+        tags={selectedDonation?.tags || []}
+        open={tagModal}
+        onClose={handleTagModalClose}
+        onSubmit={handleTagDonationSubmit}
       />
 
       <Dialog open={plotSelectionModalOpen} onClose={() => setPlotSelectionModalOpen(false)} fullWidth maxWidth="xl">

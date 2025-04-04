@@ -1227,6 +1227,15 @@ class ApiClient {
         }
     }
     
+    async getDonationTags(): Promise<PaginatedResponse<string>> {
+        const url = `/donations/tags`;
+        try {
+            const response = await this.api.get<PaginatedResponse<string>>(url);
+            return response.data;
+        } catch (error: any) {
+            throw new Error(`Failed to fetch donation tags: ${error.message}`);
+        }
+    }
 
     async createDonation(request_id: string, created_by: number, user_id: number, pledged: number | null, pledged_area: number | null, category: string, grove: string | null, preference: string, event_name: string, alternate_email: string, users: any[], payment_id?: number, group_id?: number, logo?: string | null): Promise<Donation> {
         try {
@@ -1259,7 +1268,8 @@ class ApiClient {
                 'group_id',
                 'preference',
                 'event_name',
-                'alternate_email'
+                'alternate_email',
+                'tags'
             ];
             
             // Format request to match backend expectations
@@ -1270,7 +1280,7 @@ class ApiClient {
             };
             
             console.log("Sending donation update payload:", payload);
-            const response = await this.api.put<Donation>(`/donations/${donation.id}`, payload);
+            const response = await this.api.put<Donation>(`/donations/requests/${donation.id}`, payload);
             return response.data;
         } catch (error: any) {
             console.error("Update donation error:", error);
@@ -1294,7 +1304,7 @@ class ApiClient {
 
     async deleteDonation(data: Donation): Promise<number> {
         try {
-            await this.api.delete<any>(`/donations/${data.id}`);
+            await this.api.delete<any>(`/donations/requests/${data.id}`);
             return data.id;
         } catch (error) {
             console.error(error)
