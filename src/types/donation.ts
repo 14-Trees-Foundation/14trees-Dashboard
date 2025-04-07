@@ -22,6 +22,7 @@ export interface Donation {
     preference: string;
     event_name: string | null;
     alternate_email: string | null;
+    tags?: string[] | null;
     booked?: number;
 }
 
