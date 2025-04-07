@@ -30,6 +30,7 @@ import { User } from "./pages/user/User";
 import RequestTreeCardsForm from "./pages/admin/gift/Form/TreeCardRequest/RequestTreeCardsForm";
 import SponsorProfile from "./pages/SponsorProfile/SponsorProfile";
 import CSRPage from "./pages/admin/csr/CSRPage";
+import EventPage from "./pages/EventDashboard/EventPage";
 
 function App() {
   return (
@@ -58,6 +59,7 @@ function App() {
           <Route path="/organization/:id" element={<OrgProfile />}></Route>
           <Route path="/group/:grptype" element={<OrgEvent />}></Route>
           <Route path="/events/corp/:event_id" element={<Corporate />}></Route>
+          <Route path="/events/:linkId" element={<EventPage />}></Route>
           <Route path="/login" element={<Login />} />
           <Route
             path="/admin"
