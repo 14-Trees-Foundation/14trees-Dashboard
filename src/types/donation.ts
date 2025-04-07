@@ -9,6 +9,7 @@ export interface Donation {
     grove: string | null;
     grove_type_other: string | null;
     trees_count: number;
+    pledged_area_acres: number | null;
     contribution_options:'Planning visit' | 'CSR' | 'Volunteer' | 'Share' | null;
     names_for_plantation: string | null;
     comments: string | null;

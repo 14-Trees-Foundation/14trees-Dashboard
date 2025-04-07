@@ -113,7 +113,7 @@ export const DonationComponent = () => {
         selectedDonation.id,
         selectedTrees.map(tree => tree.id),
         selectedTrees.length === 0,
-        selectedPlots.map(plot => plot.id), 
+        selectedPlots.map(plot => ({ plot_id: plot.id, trees_count: 1 })), 
         diversifyTrees,
         bookAllHabits      
       );

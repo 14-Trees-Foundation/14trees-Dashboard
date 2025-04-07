@@ -1357,10 +1357,9 @@ class ApiClient {
         }
     }
 
-    async reserveTreesForDonation(donation_id: number, tree_ids: number[], auto_reserve: boolean, plots: number[], diversify: boolean, book_all_habits: boolean = false) {
+    async reserveTreesForDonation(donation_id: number, tree_ids: number[], auto_reserve: boolean, plots: { plot_id: number, trees_count: number }[], diversify: boolean, book_all_habits: boolean = false) {
         try {
-            const transformedPlots = plots.map(plot_id => ({ plot_id, trees_count: 1 }));
-            await this.api.post<void>('/donations/trees/reserve', { donation_id, tree_ids, auto_reserve,  plots: transformedPlots, diversify, book_all_habits });
+            await this.api.post<void>('/donations/trees/reserve', { donation_id, tree_ids, auto_reserve, plots, diversify, book_all_habits });
         } catch (error: any) {
           if (error.response?.data?.message) {
             throw new Error(error.response.data.message);

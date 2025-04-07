@@ -1,5 +1,11 @@
 import { Boundaries, Location } from "./common";
 
+export const PlotAccessibilityList = [
+    { value: "accessible", label: "Accessible" },
+    { value: "inaccessible", label: "Inaccessible" },
+    { value: "moderately_accessible", label: "Moderately Accessible" },
+];
+
 export type Plot = {
     key: number,
     id: number,
