@@ -23,6 +23,7 @@ import { Plot } from "../../../types/plot";
 import PlotSelection from "./Forms/PlotSelection";
 import EmailConfirmationModal from "./components/EmailConfirmationModal";
 import DonationInfo from "./DonationInfo";
+import DonationTrees from "./Forms/DonationTrees";
 import TagComponent from "../gift/Form/TagComponent";
 
 export const DonationComponent = () => {
@@ -68,8 +69,10 @@ export const DonationComponent = () => {
   const [plotSelectionModalOpen, setPlotSelectionModalOpen] = useState(false);
   const [selectedPlots, setSelectedPlots] = useState<Plot[]>([]);
   const [selectedTrees, setSelectedTrees] = useState<any[]>([]);
+  const [reserveTreesModalOpen, setReserveTreesModalOpen] = useState(false)
   const [users, setUsers] = useState<any[]>([]);
   const [diversifyTrees, setDiversifyTrees] = useState(false);
+  const [bookAllHabits, setBookAllHabits] = useState(false);
 
   useEffect(() => {
     const getUsers = async () => {
@@ -104,8 +107,15 @@ export const DonationComponent = () => {
 
     try {
       const apiClient = new ApiClient();
-      await apiClient.bookTreesForDonation(selectedDonation.id, selectedPlots.map(plot => plot.id), selectedTrees, diversifyTrees);
-      toast.success(`Successfully booked trees for donation id: ${selectedDonation.id}!`);
+      await apiClient.reserveTreesForDonation(
+        selectedDonation.id,
+        selectedTrees.map(tree => tree.id),
+        selectedTrees.length === 0,
+        selectedPlots.map(plot => plot.id), 
+        diversifyTrees,
+        bookAllHabits      
+      );
+      toast.success(`Successfully reserved trees for donation id: ${selectedDonation.id}!`);
     } catch (error: any) {
       toast.error(error.message);
     }
@@ -410,6 +420,9 @@ export const DonationComponent = () => {
         <Menu.Item key="21" onClick={() => { setSelectedDonation(record); setEmailConfirmationModal(true); }} icon={<Email />}>
           Send Emails
         </Menu.Item>
+        <Menu.Item key="22" onClick={() => { setSelectedDonation(record); setReserveTreesModalOpen(true); }} icon={<Landscape />}>
+        Reserve Trees
+      </Menu.Item>
       </Menu.ItemGroup>
     </Menu>
   );
@@ -587,6 +600,12 @@ export const DonationComponent = () => {
         onClose={() => setInfoModalOpen(false)}
         data={selectedDonation}
       />
+
+     <DonationTrees
+      open={reserveTreesModalOpen}
+      onClose={() => setReserveTreesModalOpen(false)}
+      donation={selectedDonation}
+    />
 
       <TagComponent
         defaultTags={tags}
