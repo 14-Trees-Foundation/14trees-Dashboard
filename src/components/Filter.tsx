@@ -6,6 +6,7 @@ import { Select, Button as Btn, Input, Space, DatePicker, Segmented } from 'antd
 import type { TableColumnType, SelectProps } from 'antd';
 import { FilterConfirmProps } from 'antd/es/table/interface';
 import React, { useState } from 'react';
+import { Order } from '../types/common';
 
 interface FilterItemProps<T> {
     dataIndex: keyof T
@@ -360,6 +361,14 @@ export const getSortIcon = (field: string, order: 'ASC' | 'DESC' | undefined, ha
         >
             <ArrowDropUp style={{ margin: "-8px 0" }} htmlColor={order === 'ASC' ? '#00b96b' : "grey"} />
             <ArrowDropDown style={{ margin: "-8px 0" }} htmlColor={order === 'DESC' ? '#00b96b' : "grey"} />
+        </div>
+    )
+}
+
+export const getSortableHeader = (header: string, key: string, orderBy: Order[], handleSortingChange: (param: { field: string, order?: 'ASC' | 'DESC' }) => void) => {
+    return (
+        <div style={{ display: "flex", alignItems: "center", justifyContent: 'space-between' }}>
+            {header} {getSortIcon(key, orderBy.find((item) => item.column === key)?.order, handleSortingChange)}
         </div>
     )
 }

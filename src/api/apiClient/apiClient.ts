@@ -1208,14 +1208,15 @@ class ApiClient {
        Model- Donation: CRUD Operations/Apis for Donations
    */
 
-       async getDonations(offset: number, limit: number, filters?: any[]): Promise<PaginatedResponse<Donation>> {
+       async getDonations(offset: number, limit: number, filters?: any[], order_by?: Order[]): Promise<PaginatedResponse<Donation>> {
         const url = `/donations/requests/get`; // No need to add query params since it's a POST request
     
         try {
             const response = await this.api.post<PaginatedResponse<Donation>>(url, { 
                 offset, 
                 limit, 
-                filters: filters || []  // Ensure filters is always an array
+                filters: filters || [],  // Ensure filters is always an array
+                order_by: order_by || []
             });
     
             return response.data;

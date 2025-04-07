@@ -3,14 +3,15 @@ import donationActionTypes from "../actionTypes/donationActionTypes";
 import { Donation } from "../../types/donation";
 import { PaginatedResponse } from "../../types/pagination";
 import { toast } from "react-toastify";
+import { Order } from "../../types/common";
 
-export const getDonations = (offset: number, limit: number, filters?: any[]) => {
+export const getDonations = (offset: number, limit: number, filters?: any[], order_by?: Order[]) => {
     const apiClient = new ApiClient()
     return (dispatch: any) => {
         dispatch({
             type: donationActionTypes.GET_DONATIONS_REQUESTED,
         });
-        apiClient.getDonations(offset, limit, filters).then(
+        apiClient.getDonations(offset, limit, filters, order_by).then(
             (value: PaginatedResponse<Donation>) => {
                 // Map the results to include key property for antd Table
                 const donationsWithKey = value.results.map(donation => ({

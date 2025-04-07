@@ -192,7 +192,7 @@ export const DirectEditDonationForm: React.FC<DirectEditDonationFormProps> = ({
       open={open} 
       onClose={handleClose} 
       fullWidth 
-      maxWidth="md"
+      maxWidth="xl"
       PaperProps={{ 
         style: { 
           overflowY: "visible",
