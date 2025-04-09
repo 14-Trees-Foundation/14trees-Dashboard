@@ -437,12 +437,14 @@ const DonationRecipients: React.FC<DonationRecipientsProps> = ({
     try {
       setLoading(true);
       const apiClient = new ApiClient();
-      const users = await apiClient.getDonationUsers(donation);
+      const users = await apiClient.getDonationUsers(0, -1, [
+        { columnField: 'donation_id', operatorValue: 'equals', value: donation }
+      ]);
       
       console.log('Donation users response:', users);
       
       // Format data with keys for the table
-      const formattedUsers = users.map(user => ({
+      const formattedUsers = users.results.map(user => ({
         ...user,
         key: user.id
       }));
@@ -519,13 +521,29 @@ const DonationRecipients: React.FC<DonationRecipientsProps> = ({
       const apiClient = new ApiClient();
       const updatedData = await apiClient.updateDonationUser(dataToUpdate);
       
-      // Update the local state
-      const updatedRecipients = recipients.map(user => 
-        user.id === updatedData.id ? updatedData : user
-      );
+      // Make sure the updated data has the key property
+      const updatedDataWithKey = {
+        ...updatedData,
+        key: updatedData.id
+      };
       
+      // Update the main recipients array
+      const updatedRecipients = recipients.map(user => 
+        user.id === updatedDataWithKey.id ? updatedDataWithKey : user
+      );
       setRecipients(updatedRecipients);
-      applyFilters();
+      
+      // Update filtered recipients array
+      const updatedFilteredRecipients = filteredRecipients.map(user => 
+        user.id === updatedDataWithKey.id ? updatedDataWithKey : user
+      );
+      setFilteredRecipients(updatedFilteredRecipients);
+      
+      // Update the current page recipients directly
+      const updatedCurrentPageRecipients = currentPageRecipients.map(user => 
+        user.id === updatedDataWithKey.id ? updatedDataWithKey : user
+      );
+      setCurrentPageRecipients(updatedCurrentPageRecipients);
       
       toast.success("Recipient updated successfully");
       handleEditModalClose();

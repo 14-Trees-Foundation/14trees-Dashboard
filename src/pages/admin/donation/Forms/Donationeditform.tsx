@@ -192,7 +192,7 @@ export const DirectEditDonationForm: React.FC<DirectEditDonationFormProps> = ({
       open={open} 
       onClose={handleClose} 
       fullWidth 
-      maxWidth="md"
+      maxWidth="xl"
       PaperProps={{ 
         style: { 
           overflowY: "visible",
@@ -304,7 +304,7 @@ export const DirectEditDonationForm: React.FC<DirectEditDonationFormProps> = ({
               </Grid>
               <Grid item xs={12} md={6}>
                 <TextField
-                  label="Trees Count"
+                  label="Pledged Trees"
                   name="trees_count"
                   value={formData.trees_count || ""}
                   onChange={handleNumberChange}
@@ -316,21 +316,9 @@ export const DirectEditDonationForm: React.FC<DirectEditDonationFormProps> = ({
               </Grid>
               <Grid item xs={12} md={6}>
                 <TextField
-                  label="Pledged Trees"
-                  name="pledged"
-                  value={formData.pledged || ""}
-                  onChange={handleNumberChange}
-                  fullWidth
-                  variant="outlined"
-                  margin="normal"
-                  type="number"
-                />
-              </Grid>
-              <Grid item xs={12} md={6}>
-                <TextField
-                  label="Pledged Area"
-                  name="pledged_area"
-                  value={formData.pledged_area || ""}
+                  label="Pledged Area (Acres)"
+                  name="pledged_area_acres"
+                  value={formData.pledged_area_acres || ""}
                   onChange={handleNumberChange}
                   fullWidth
                   variant="outlined"
@@ -367,42 +355,9 @@ export const DirectEditDonationForm: React.FC<DirectEditDonationFormProps> = ({
             <Grid container spacing={2}>
               <Grid item xs={12} md={6}>
                 <TextField
-                  label="Names for Plantation"
-                  name="names_for_plantation"
-                  value={formData.names_for_plantation || ""}
-                  onChange={handleInputChange}
-                  fullWidth
-                  variant="outlined"
-                  margin="normal"
-                />
-              </Grid>
-              <Grid item xs={12} md={6}>
-                <TextField
-                  label="Preference"
-                  name="preference"
-                  value={formData.preference || ""}
-                  onChange={handleInputChange}
-                  fullWidth
-                  variant="outlined"
-                  margin="normal"
-                />
-              </Grid>
-              <Grid item xs={12} md={6}>
-                <TextField
                   label="Event Name"
                   name="event_name"
                   value={formData.event_name || ""}
-                  onChange={handleInputChange}
-                  fullWidth
-                  variant="outlined"
-                  margin="normal"
-                />
-              </Grid>
-              <Grid item xs={12} md={6}>
-                <TextField
-                  label="Alternate Email"
-                  name="alternate_email"
-                  value={formData.alternate_email || ""}
                   onChange={handleInputChange}
                   fullWidth
                   variant="outlined"

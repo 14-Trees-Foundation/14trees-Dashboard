@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { GridFilterItem } from "@mui/x-data-grid";
 import { Dropdown, Menu, TableColumnsType } from "antd";
 import { Donation } from "../../../types/donation";
-import getColumnSearchProps, { getColumnSelectedItemFilter } from "../../../components/Filter";
+import getColumnSearchProps, { getColumnDateFilter, getColumnSelectedItemFilter, getSortableHeader } from "../../../components/Filter";
 
 import { useAppDispatch, useAppSelector } from "../../../redux/store/hooks";
 import * as donationActionCreators from "../../../redux/actions/donationActions";
@@ -11,7 +11,7 @@ import { RootState } from "../../../redux/store/store";
 import { ToastContainer, toast } from "react-toastify";
 import DonationForm from "./Forms/DonationForm";
 import DirectEditDonationForm from "./Forms/Donationeditform";
-import { Delete, Edit, Email, Landscape, LocalOffer, MenuOutlined, NotesOutlined, Wysiwyg } from "@mui/icons-material";
+import { AssignmentInd, Delete, Edit, Email, Landscape, LocalOffer, MenuOutlined, NotesOutlined, Wysiwyg } from "@mui/icons-material";
 import { Badge, Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, Divider, IconButton, Typography } from "@mui/material";
 import GeneralTable from "../../../components/GenTable";
 import ApiClient from "../../../api/apiClient/apiClient";
@@ -25,11 +25,13 @@ import EmailConfirmationModal from "./components/EmailConfirmationModal";
 import DonationInfo from "./DonationInfo";
 import DonationTrees from "./Forms/DonationTrees";
 import TagComponent from "../gift/Form/TagComponent";
+import { Order } from "../../../types/common";
+import AssignTrees from "./Forms/AssignTrees/AssignTrees";
 
 export const DonationComponent = () => {
 
   const dispatch = useAppDispatch();
-  const { getDonations, createDonation, updateDonation, deleteDonation, assignTreesToDonationUsers, createWorkOrderForDonation } = bindActionCreators(
+  const { getDonations, createDonation, updateDonation, deleteDonation } = bindActionCreators(
     donationActionCreators,
     dispatch
   );
@@ -38,6 +40,7 @@ export const DonationComponent = () => {
   const [page, setPage] = useState(0);
   const [pageSize, setPageSize] = useState(10);
   const [filters, setFilters] = useState<Record<string, GridFilterItem>>({});
+  const [orderBy, setOrderBy] = useState<Order[]>([]);
   const [tableRows, setTableRows] = useState<Donation[]>([]);
   const [selectedDonation, setSelectedDonation] = useState<Donation | null>(null);
   const [isFormOpen, setIsFormOpen] = useState(false);
@@ -49,7 +52,7 @@ export const DonationComponent = () => {
   const [infoModalOpen, setInfoModalOpen] = useState(false);
   const [tagModal, setTagModal] = useState(false);
   const [tags, setTags] = useState<string[]>([]);
-
+  const [assignTreesModalOpen, setAssignTreesModalOpen] = useState(false);
   // Get tags
   useEffect(() => {
     const getTags = async () => {
@@ -80,8 +83,10 @@ export const DonationComponent = () => {
 
         try {
           const apiClient = new ApiClient();
-          const users = await apiClient.getDonationUsers(selectedDonation.id);
-          setUsers(users);
+          const donationUsers = await apiClient.getDonationUsers(0, -1, [
+            { columnField: 'donation_id', operatorValue: 'equals', value: selectedDonation.id }
+          ]);
+          setUsers(donationUsers.results);
         } catch (error: any) {
           toast.error(error.message);
         }
@@ -111,7 +116,7 @@ export const DonationComponent = () => {
         selectedDonation.id,
         selectedTrees.map(tree => tree.id),
         selectedTrees.length === 0,
-        selectedPlots.map(plot => plot.id), 
+        selectedPlots.map(plot => ({ plot_id: plot.id, trees_count: 1 })), 
         diversifyTrees,
         bookAllHabits      
       );
@@ -189,14 +194,7 @@ export const DonationComponent = () => {
     setFilters(filters);
   }
 
-  let donationList: Donation[] = [];
   const donationsData = useAppSelector((state: RootState) => state.donationsData);
-  if (donationsData) {
-    donationList = Object.values(donationsData.donations);
-    donationList = donationList.sort((a, b) => b.id - a.id);
-  }
-
-
   useEffect(() => {
     const handler = setTimeout(() => {
       const records: Donation[] = [];
@@ -233,13 +231,13 @@ export const DonationComponent = () => {
       clearTimeout(handler);
     }
 
-  }, [filters]);
+  }, [filters, orderBy]);
 
   const fetchDonations = () => {
     setLoading(true);
     try {
       let filtersData = Object.values(filters);
-      getDonations(page * pageSize, pageSize, filtersData);
+      getDonations(page * pageSize, pageSize, filtersData, orderBy);
     } catch (error) {
       console.error('Error fetching donations:', error);
       // Don't show error toast, just set empty data
@@ -387,7 +385,7 @@ export const DonationComponent = () => {
   const handleDownloadDonations = async () => {
     const apiClient = new ApiClient();
     const filtersList = Object.values(filters);
-    const resp = await apiClient.getDonations(0, -1, filtersList);
+    const resp = await apiClient.getDonations(0, -1, filtersList, orderBy);
     return resp.results;
   }
 
@@ -395,6 +393,25 @@ export const DonationComponent = () => {
     setSelectedDonation(record);
     setInfoModalOpen(true);
   }
+
+  const handleSortingChange = (sorter: any) => {
+    let newOrder = [...orderBy];
+    const updateOrder = () => {
+        const index = newOrder.findIndex((item) => item.column === sorter.field);
+        if (index > -1) {
+            if (sorter.order) newOrder[index].order = sorter.order;
+            else newOrder = newOrder.filter((item) => item.column !== sorter.field);
+        } else if (sorter.order) {
+            newOrder.push({ column: sorter.field, order: sorter.order });
+        }
+    }
+
+    if (sorter.field) {
+        setPage(0);
+        updateOrder();
+        setOrderBy(newOrder);
+    }
+}
 
   const getActionsMenu = (record: Donation) => (
     <Menu>
@@ -421,8 +438,11 @@ export const DonationComponent = () => {
           Send Emails
         </Menu.Item>
         <Menu.Item key="22" onClick={() => { setSelectedDonation(record); setReserveTreesModalOpen(true); }} icon={<Landscape />}>
-        Reserve Trees
-      </Menu.Item>
+          Reserve Trees
+        </Menu.Item>
+        <Menu.Item key="23" onClick={() => { setSelectedDonation(record); setAssignTreesModalOpen(true); }} icon={<AssignmentInd />}>
+          Assign Trees
+        </Menu.Item>
       </Menu.ItemGroup>
     </Menu>
   );
@@ -455,14 +475,14 @@ export const DonationComponent = () => {
     },
     {
       dataIndex: "id",
-      key: "id",
-      title: "ID",
+      key: "Don. Id",
+      title: "Don. Id",
       align: "center",
-      width: 75,
+      width: 100,
     },
     {
       dataIndex: "user_name",
-      key: "user_name",
+      key: "Donor Name",
       title: "Donor Name",
       align: "center",
       width: 200,
@@ -470,14 +490,11 @@ export const DonationComponent = () => {
     },
     {
       dataIndex: "category",
-      key: "category",
+      key: "Type",
       title: "Type",
       align: "center",
       width: 100,
-      filters: [
-        { text: 'Foundation', value: 'Foundation' },
-        { text: 'Public', value: 'Public' },
-      ],
+      ...getColumnSelectedItemFilter({ dataIndex: 'category', filters, handleSetFilters, options: ['Foundation', 'Public'] })
     },
     {
       dataIndex: "tags",
@@ -490,29 +507,39 @@ export const DonationComponent = () => {
     },
     {
       dataIndex: "trees_count",
-      key: "trees_count",
-      title: "Trees",
+      key: "Pledged Trees",
+      title: getSortableHeader("Pledged Trees", 'trees_count', orderBy, handleSortingChange),
       align: "center",
       width: 100,
     },
     {
+      dataIndex: "pledged_area_acres",
+      key: "Pledged Area (Acres)",
+      title: getSortableHeader("Pledged Area (Acres)", 'pledged_area_acres', orderBy, handleSortingChange),
+      align: "center",
+      width: 150,
+      render: (value) => value ? value : '-',
+    },
+    {
       dataIndex: "contribution_options",
-      key: "contribution_options",
+      key: "Contribution",
       title: "Contribution",
       align: "center",
       width: 150,
+      ...getColumnSelectedItemFilter({ dataIndex: 'contribution_options', filters, handleSetFilters, options: ['CSR', 'Planing Visit', 'Other'] }),
     },
     {
       dataIndex: "created_at",
-      key: "created_at",
+      key: "Created On",
       title: "Created On",
       align: "center",
       width: 150,
       render: getHumanReadableDate,
+      ...getColumnDateFilter({ dataIndex: 'created_at', filters, handleSetFilters, label: 'Created On' }),
     },
     {
       dataIndex: "notes",
-      key: "notes",
+      key: "Notes",
       title: "Notes",
       align: "center",
       width: 100,
@@ -614,6 +641,12 @@ export const DonationComponent = () => {
         onClose={handleTagModalClose}
         onSubmit={handleTagDonationSubmit}
       />
+
+      {selectedDonation?.id && <AssignTrees
+        donationId={selectedDonation?.id}
+        open={assignTreesModalOpen}
+        onClose={() => setAssignTreesModalOpen(false)}
+      />}
 
       <Dialog open={plotSelectionModalOpen} onClose={() => setPlotSelectionModalOpen(false)} fullWidth maxWidth="xl">
         <DialogTitle>Select Plots</DialogTitle>

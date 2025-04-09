@@ -109,8 +109,10 @@ const DonationForm: React.FC<DonationFormProps> = ({ donation, open, requestId, 
             }
 
             try {
-                const users = await apiClient.getDonationUsers(donation.id);
-                const usersData: any[] = users.map(user => {
+                const users = await apiClient.getDonationUsers(0, -1, [
+                    { columnField: 'donation_id', operatorValue: 'equals', value: donation.id }
+                ]);
+                const usersData: any[] = users.results.map(user => {
                     return {
                         ...user,
                         key: user.id,
