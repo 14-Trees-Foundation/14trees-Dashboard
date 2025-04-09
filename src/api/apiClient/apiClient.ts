@@ -5,7 +5,7 @@ import { BulkUserGroupMappingResponse, Group } from '../../types/Group';
 import { Pond, PondWaterLevelUpdate } from '../../types/pond';
 import { User } from '../../types/user';
 import { Site } from '../../types/site';
-import { Donation, DonationUser } from '../../types/donation';
+import { Donation, DonationUser, DonationTree } from '../../types/donation';
 import { OnsiteStaff } from '../../types/onSiteStaff';
 import { MapTreesUsingPlotIdRequest, MapTreesUsingSaplingIdsRequest, Tree } from '../../types/tree';
 import { UserTree, UserTreeCountPaginationResponse } from '../../types/userTree';
@@ -1365,6 +1365,32 @@ class ApiClient {
             throw new Error(error.response.data.message);
           }
           throw new Error('Failed to reserve trees for donation!');
+        }
+    }
+
+    async unreserveTreesForDonation(donation_id: number, tree_ids?: number[], unreserve_all: boolean = false): Promise<void> {
+        const url = `/donations/trees/unreserve`;
+        try {
+            const response = await this.api.post(url, { donation_id, tree_ids, unreserve_all });
+            return response.data;
+        } catch (error: any) {
+            if (error.response?.data?.message) {
+                throw new Error(error.response.data.message);
+            }
+            throw new Error('Failed to unreserve trees for donation');
+        }
+    }
+
+    async getDonationTrees(offset: number, limit: number, filters?: any[]): Promise<PaginatedResponse<DonationTree>> {
+        const url = `/donations/trees/get?offset=${offset}&limit=${limit}`;
+        try {
+            const response = await this.api.post<PaginatedResponse<DonationTree>>(url, { filters: filters });
+            return response.data;
+        } catch (error: any) {
+            if (error.response?.data?.message) {
+                throw new Error(error.response.data.message);
+            }
+            throw new Error('Failed to get donation trees');
         }
     }
 
