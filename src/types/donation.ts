@@ -49,6 +49,17 @@ export type DonationUser = {
   updated_at: string;
 }
 
+export interface DonationTree {
+  id: number;
+  sapling_id: string;
+  plant_type: string;
+  plot: string;
+  site_name: string;
+  donation_id: number;
+  created_at: string;
+  updated_at: string;
+}
+
 export type DonationDataState = {
   totalDonations: number,
   donations: Record<number, Donation>
