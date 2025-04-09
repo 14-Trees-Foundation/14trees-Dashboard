@@ -11,7 +11,7 @@ import { RootState } from "../../../redux/store/store";
 import { ToastContainer, toast } from "react-toastify";
 import DonationForm from "./Forms/DonationForm";
 import DirectEditDonationForm from "./Forms/Donationeditform";
-import { Delete, Edit, Email, Landscape, LocalOffer, MenuOutlined, NotesOutlined, Wysiwyg } from "@mui/icons-material";
+import { AssignmentInd, Delete, Edit, Email, Landscape, LocalOffer, MenuOutlined, NotesOutlined, Wysiwyg } from "@mui/icons-material";
 import { Badge, Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, Divider, IconButton, Typography } from "@mui/material";
 import GeneralTable from "../../../components/GenTable";
 import ApiClient from "../../../api/apiClient/apiClient";
@@ -26,11 +26,12 @@ import DonationInfo from "./DonationInfo";
 import DonationTrees from "./Forms/DonationTrees";
 import TagComponent from "../gift/Form/TagComponent";
 import { Order } from "../../../types/common";
+import AssignTrees from "./Forms/AssignTrees/AssignTrees";
 
 export const DonationComponent = () => {
 
   const dispatch = useAppDispatch();
-  const { getDonations, createDonation, updateDonation, deleteDonation, assignTreesToDonationUsers, createWorkOrderForDonation } = bindActionCreators(
+  const { getDonations, createDonation, updateDonation, deleteDonation } = bindActionCreators(
     donationActionCreators,
     dispatch
   );
@@ -51,7 +52,7 @@ export const DonationComponent = () => {
   const [infoModalOpen, setInfoModalOpen] = useState(false);
   const [tagModal, setTagModal] = useState(false);
   const [tags, setTags] = useState<string[]>([]);
-
+  const [assignTreesModalOpen, setAssignTreesModalOpen] = useState(false);
   // Get tags
   useEffect(() => {
     const getTags = async () => {
@@ -82,8 +83,10 @@ export const DonationComponent = () => {
 
         try {
           const apiClient = new ApiClient();
-          const users = await apiClient.getDonationUsers(selectedDonation.id);
-          setUsers(users);
+          const donationUsers = await apiClient.getDonationUsers(0, -1, [
+            { columnField: 'donation_id', operatorValue: 'equals', value: selectedDonation.id }
+          ]);
+          setUsers(donationUsers.results);
         } catch (error: any) {
           toast.error(error.message);
         }
@@ -435,8 +438,11 @@ export const DonationComponent = () => {
           Send Emails
         </Menu.Item>
         <Menu.Item key="22" onClick={() => { setSelectedDonation(record); setReserveTreesModalOpen(true); }} icon={<Landscape />}>
-        Reserve Trees
-      </Menu.Item>
+          Reserve Trees
+        </Menu.Item>
+        <Menu.Item key="23" onClick={() => { setSelectedDonation(record); setAssignTreesModalOpen(true); }} icon={<AssignmentInd />}>
+          Assign Trees
+        </Menu.Item>
       </Menu.ItemGroup>
     </Menu>
   );
@@ -635,6 +641,12 @@ export const DonationComponent = () => {
         onClose={handleTagModalClose}
         onSubmit={handleTagDonationSubmit}
       />
+
+      {selectedDonation?.id && <AssignTrees
+        donationId={selectedDonation?.id}
+        open={assignTreesModalOpen}
+        onClose={() => setAssignTreesModalOpen(false)}
+      />}
 
       <Dialog open={plotSelectionModalOpen} onClose={() => setPlotSelectionModalOpen(false)} fullWidth maxWidth="xl">
         <DialogTitle>Select Plots</DialogTitle>

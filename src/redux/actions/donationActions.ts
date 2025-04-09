@@ -123,31 +123,6 @@ export const deleteDonation = (record: Donation) => {
     };
 };
 
-export const assignTreesToDonationUsers = (donationId: number) => {
-    const apiClient = new ApiClient();
-    return (dispatch: any) => {
-        dispatch({
-            type: donationActionTypes.ASSIGN_USER_TREES_REQUESTED,
-        });
-        apiClient.assignTreesToDonation(donationId).then(
-            (value: boolean) => {
-                dispatch({
-                    type: donationActionTypes.ASSIGN_USER_TREES_SUCCEEDED,
-                    payload: value,
-                });
-                toast.success('Trees assigned successfully');
-            },
-            (error: any) => {
-                console.error(error);
-                dispatch({
-                    type: donationActionTypes.ASSIGN_USER_TREES_FAILED,
-                });
-                toast.error(error.message);
-            }
-        )
-    };
-}
-
 export const createWorkOrderForDonation = (donationId: number) => {
     const apiClient = new ApiClient();
     return (dispatch: any) => {

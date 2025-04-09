@@ -437,12 +437,14 @@ const DonationRecipients: React.FC<DonationRecipientsProps> = ({
     try {
       setLoading(true);
       const apiClient = new ApiClient();
-      const users = await apiClient.getDonationUsers(donation);
+      const users = await apiClient.getDonationUsers(0, -1, [
+        { columnField: 'donation_id', operatorValue: 'equals', value: donation }
+      ]);
       
       console.log('Donation users response:', users);
       
       // Format data with keys for the table
-      const formattedUsers = users.map(user => ({
+      const formattedUsers = users.results.map(user => ({
         ...user,
         key: user.id
       }));

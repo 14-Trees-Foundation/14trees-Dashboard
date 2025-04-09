@@ -34,8 +34,10 @@ const DonationInfo: React.FC<DonationInfoProps> = ({ open, onClose, data }) => {
       if (data) {
         try {
           const apiClient = new ApiClient();
-          const users = await apiClient.getDonationUsers(data.id);
-          setDonationUsers(users);
+          const users = await apiClient.getDonationUsers(0, -1, [
+            { columnField: 'donation_id', operatorValue: 'equals', value: data.id }
+          ]);
+          setDonationUsers(users.results);
         } catch (error) {
           console.error("Error fetching donation users:", error);
           setDonationUsers([]);

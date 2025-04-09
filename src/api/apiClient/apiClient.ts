@@ -5,7 +5,7 @@ import { BulkUserGroupMappingResponse, Group } from '../../types/Group';
 import { Pond, PondWaterLevelUpdate } from '../../types/pond';
 import { User } from '../../types/user';
 import { Site } from '../../types/site';
-import { Donation, DonationUser, DonationTree } from '../../types/donation';
+import { Donation, DonationTree, DonationUser } from '../../types/donation';
 import { OnsiteStaff } from '../../types/onSiteStaff';
 import { MapTreesUsingPlotIdRequest, MapTreesUsingSaplingIdsRequest, Tree } from '../../types/tree';
 import { UserTree, UserTreeCountPaginationResponse } from '../../types/userTree';
@@ -1209,13 +1209,11 @@ class ApiClient {
    */
 
        async getDonations(offset: number, limit: number, filters?: any[], order_by?: Order[]): Promise<PaginatedResponse<Donation>> {
-        const url = `/donations/requests/get`; // No need to add query params since it's a POST request
+        const url = `/donations/requests/get?offset=${offset}&limit=${limit}`; // No need to add query params since it's a POST request
     
         try {
             const response = await this.api.post<PaginatedResponse<Donation>>(url, { 
-                offset, 
-                limit, 
-                filters: filters || [],  // Ensure filters is always an array
+                filters: filters || [],
                 order_by: order_by || []
             });
     
@@ -1313,16 +1311,6 @@ class ApiClient {
         }
     }
 
-    async assignTreesToDonation(donationId: number): Promise<boolean> {
-        try {
-            const response = await this.api.post<void>(`/profile/assignbulk/${donationId}`);
-            return response.status === 200;
-        } catch (error: any) {
-            console.error(error)
-            throw new Error(error?.response?.data?.message || 'Failed to assign trees to donation users');
-        }
-    }
-
     async createWorkOrderForDonation(donationId: number): Promise<boolean> {
         try {
             const response = await this.api.post<void>(`/donations/work-order/${donationId}`);
@@ -1333,22 +1321,15 @@ class ApiClient {
         }
     }
 
-    async getDonationUsers(donation_id: number) {
-        try {
-            // The backend expects a POST request to /donations/users/get with filters
-            // Not a GET request to /donations/users/:donation_id
-            const filters = [
-                { columnField: 'donation_id', operatorValue: 'equals', value: donation_id }
-            ];
-            
+    async getDonationUsers(offset: number, limit: number, filters?: any[], order_by?: Order[]): Promise<PaginatedResponse<DonationUser>> {
+        try {     
+
             const response = await this.api.post<PaginatedResponse<DonationUser>>(
-                `/donations/users/get?offset=0&limit=-1`, 
-                { filters }
+                `/donations/users/get?offset=${offset}&limit=${limit}`, 
+                { filters, order_by }
             );
             
-            // The backend returns a paginated response, but the frontend expects an array
-            // So we extract the results array from the response
-            return response.data.results;
+            return response.data;
         } catch (error: any) {
             if (error.response?.data?.message) {
                 throw new Error(error.response.data.message);
@@ -1378,19 +1359,6 @@ class ApiClient {
                 throw new Error(error.response.data.message);
             }
             throw new Error('Failed to unreserve trees for donation');
-        }
-    }
-
-    async getDonationTrees(offset: number, limit: number, filters?: any[]): Promise<PaginatedResponse<DonationTree>> {
-        const url = `/donations/trees/get?offset=${offset}&limit=${limit}`;
-        try {
-            const response = await this.api.post<PaginatedResponse<DonationTree>>(url, { filters: filters });
-            return response.data;
-        } catch (error: any) {
-            if (error.response?.data?.message) {
-                throw new Error(error.response.data.message);
-            }
-            throw new Error('Failed to get donation trees');
         }
     }
 
@@ -1496,9 +1464,48 @@ class ApiClient {
         }
     }
 
+
+    async getDonationTrees(offset: number, limit: number, filters?: any[]): Promise<PaginatedResponse<DonationTree>> {
+        const url = `/donations/trees/get?offset=${offset}&limit=${limit}`;
+        try {
+            const response = await this.api.post<PaginatedResponse<DonationTree>>(url, { filters: filters });
+            return response.data;
+        } catch (error: any) {
+            if (error.response?.data?.message) {
+                throw new Error(error.response.data.message);
+            }
+            throw new Error('Failed to get donation trees');
+        }
+    }
+
+
+    async assignTreesToDonationUsers(donation_id: number, auto_assign: boolean, user_trees?: { du_id: number, tree_id: number }[]): Promise<boolean> {
+        try {
+            const response = await this.api.post<void>(`/donations/trees/assign`, { donation_id, auto_assign, user_trees });
+            return response.status === 200;
+        } catch (error: any) {
+            if (error.response?.data?.message) {
+                throw new Error(error.response.data.message);
+            }
+            throw new Error('Failed to assign trees to donation users');
+        }
+    }
+
+    async unassignDonationTrees(donation_id: number, unassign_all: boolean, tree_ids: number[]): Promise<boolean> {
+        try {
+            const response = await this.api.post<void>(`/donations/trees/unassign`, { donation_id, unassign_all, tree_ids });
+            return response.status === 200;
+        } catch (error: any) {
+            if (error.response?.data?.message) {
+                throw new Error(error.response.data.message);
+            }
+            throw new Error('Failed to unassign trees from donation users');
+        }
+    }
+
     /*
-          Model- Event : CRUD Operations/Apis for Event
-      */
+        Model- Event : CRUD Operations/Apis for Event
+    */
 
     async getEvents(offset: number, limit: number, filters?: any[]): Promise<PaginatedResponse<Event>> {
         const url = `/events/get?offset=${offset}&limit=${limit}`;
