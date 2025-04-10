@@ -645,7 +645,10 @@ export const DonationComponent = () => {
       {selectedDonation?.id && <AssignTrees
         donationId={selectedDonation?.id}
         open={assignTreesModalOpen}
-        onClose={() => setAssignTreesModalOpen(false)}
+        onClose={() => {
+          setAssignTreesModalOpen(false);
+          setSelectedDonation(null);
+        }}
       />}
 
       <Dialog open={plotSelectionModalOpen} onClose={() => setPlotSelectionModalOpen(false)} fullWidth maxWidth="xl">
