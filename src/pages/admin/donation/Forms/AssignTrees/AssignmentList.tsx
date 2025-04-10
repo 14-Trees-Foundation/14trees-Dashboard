@@ -127,7 +127,7 @@ const AssignmentList: React.FC<AssignmentListProps> = ({
 
             <Box sx={{ mb: 2 }}>
                 <TextField
-                    sx={{ width: 400 }}
+                    sx={{ width: 600 }}
                     size="small"
                     placeholder="Search by sapling ID, plant type, recipient, or assignee"
                     value={searchText}

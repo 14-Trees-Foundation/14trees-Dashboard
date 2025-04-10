@@ -134,6 +134,7 @@ const AssignedTrees: React.FC<AssignedTreesProps> = ({ donationId }) => {
         } finally {
             setUnassignLoading(false);
             setOpen(false);
+            setUnassignAll(false);
             setPage(0);
             setPageSize(10);
             setIndexToTreeMap({});
@@ -238,7 +239,7 @@ const AssignedTrees: React.FC<AssignedTreesProps> = ({ donationId }) => {
                     color="error" 
                     sx={{ ml: 2, textTransform: 'none' }} 
                     disabled={unassignedTrees.length === 0 && !unassignAll} 
-                    onClick={() => { setOpen(true); setUnassignAll(false); }}>{unassignAll ? "Unassign All" : "Unassign"}</Button>
+                    onClick={() => { setOpen(true); }}>{unassignAll ? "Unassign All" : "Unassign"}</Button>
             </Box>
         </Box>
     )

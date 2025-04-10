@@ -1,6 +1,5 @@
 import { GridFilterItem } from "@mui/x-data-grid";
 import { useEffect, useState } from "react";
-import { Tree } from "../../../../../types/tree";
 import ApiClient from "../../../../../api/apiClient/apiClient";
 import { Dialog, DialogTitle, DialogContent, DialogActions, Button, Typography, FormControlLabel, Checkbox, Box, Tabs, Tab, Divider } from "@mui/material";
 import GeneralTable from "../../../../../components/GenTable";
@@ -20,13 +19,14 @@ interface AssignTreesProps {
 }
 
 interface DonationUsersListProps {
+    assignmentList: { tree_id: number, du_id: number, sapling_id: string, plant_type: string, recipient_name: string, assignee_name: string }[];
     donationId: number;
     open: boolean;
     onClose: () => void;
     onSubmit: (donationUser: DonationUser) => void;
 }
 
-const DonationUsersList = ({ donationId, open, onClose, onSubmit }: DonationUsersListProps) => {
+const DonationUsersList = ({ donationId, open, onClose, onSubmit, assignmentList }: DonationUsersListProps) => {
 
     // handle loading, pagination, filters, etc.
     const [indexToDonationUserMap, setIndexToDonationUserMap] = useState<Record<number, DonationUser>>({});
@@ -128,6 +128,30 @@ const DonationUsersList = ({ donationId, open, onClose, onSubmit }: DonationUser
             ...getColumnSearchProps('assignee_name', filters, handleSetFilters)
         },
         {
+            dataIndex: 'trees_count',
+            key: 'Required Trees',
+            title: 'Required Trees',
+            align: 'center',
+            width: 120,
+        },
+        {
+            dataIndex: 'assigned_trees',
+            key: 'Already Assigned',
+            title: 'Already Assigned',
+            align: 'center',
+            width: 100,
+        },
+        {
+            dataIndex: 'selected',
+            key: 'Selected For Assignment',
+            title: 'Selected For Assignment',
+            align: 'center',
+            width: 150,
+            render: (value, record) => {
+                return assignmentList.filter(item => item.du_id === record.id).length;
+            }
+        },
+        {
             dataIndex: 'actions',
             key: 'Actions',
             title: 'Actions',
@@ -137,6 +161,7 @@ const DonationUsersList = ({ donationId, open, onClose, onSubmit }: DonationUser
                 return <Button
                     variant="outlined"
                     color="success"
+                    disabled={assignmentList.filter(item => item.du_id === record.id).length + Number(record.assigned_trees) >= Number(record.trees_count)}
                     onClick={() => {
                         onSubmit(record);
                         onClose();
@@ -256,6 +281,7 @@ const AssignTrees: React.FC<AssignTreesProps> = ({ donationId, open, onClose }) 
         if (open) {
             setPage(0);
             setPageSize(10);
+            setTotalTrees(10);
             setIndexToTreeMap({});
             setAssignmentList([]);
         }
@@ -421,7 +447,7 @@ const AssignTrees: React.FC<AssignTreesProps> = ({ donationId, open, onClose }) 
                             </Box>
                         )}
 
-                        <DonationUsersList donationId={donationId} open={userDialogOpen} onClose={() => setUserDialogOpen(false)} onSubmit={handleUserTreeMapping} />
+                        <DonationUsersList donationId={donationId} open={userDialogOpen} onClose={() => setUserDialogOpen(false)} onSubmit={handleUserTreeMapping} assignmentList={assignmentList} />
                         <Divider sx={{ marginBottom: 2 }} />
                         <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2 }}>
                             <Button
