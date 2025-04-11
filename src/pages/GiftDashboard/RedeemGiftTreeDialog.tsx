@@ -1,12 +1,12 @@
 import { Autocomplete, Avatar, Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, Grid, TextField, Typography } from "@mui/material"
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
-import ApiClient from "../../../api/apiClient/apiClient";
-import { AWSUtils } from "../../../helpers/aws";
+import ApiClient from "../../api/apiClient/apiClient";
+import { AWSUtils } from "../../helpers/aws";
 import { CardGiftcard } from "@mui/icons-material";
-import CardDetails from "../gift/Form/CardDetailsForm";
-import leafsPoster from "../../../assets/leafs.jpg";
-import treePlanting from "../../../assets/planting_illustration.jpg";
+import CardDetails from "../admin/gift/Form/CardDetailsForm";
+import leafsPoster from "../../assets/leafs.jpg";
+import treePlanting from "../../assets/planting_illustration.jpg";
 import { makeStyles } from "@mui/styles";
 import { LoadingButton } from "@mui/lab";
 
@@ -48,7 +48,7 @@ interface RedeemGiftTreeDialogProps {
     onClose: () => void
     onSubmit: () => void
     giftMultiple?: boolean
-    groupId: number,
+    userId: number,
     tree: {
         giftCardId: number,
         treeId: number,
@@ -60,7 +60,7 @@ interface RedeemGiftTreeDialogProps {
     }
 }
 
-const RedeemGiftTreeDialog: React.FC<RedeemGiftTreeDialogProps> = ({ tree, open, giftMultiple, groupId, onSubmit, onClose }) => {
+const RedeemGiftTreeDialog: React.FC<RedeemGiftTreeDialogProps> = ({ tree, open, giftMultiple, userId, onSubmit, onClose }) => {
 
     const classes = useStyles();
     const [errors, setErrors] = useState({
@@ -165,10 +165,10 @@ const RedeemGiftTreeDialog: React.FC<RedeemGiftTreeDialogProps> = ({ tree, open,
 
             const apiClient = new ApiClient();
             if (giftMultiple) {
-                await apiClient.redeemMultipleGiftCardTemplate(treesCount, 'group', groupId, formData as any, profileImageUrl, messages);
+                await apiClient.redeemMultipleGiftCardTemplate(treesCount, 'user', userId, formData as any, profileImageUrl, messages);
                 toast.success("Succefully gifted trees!");
             } else {
-                await apiClient.redeemGiftCardTemplate('group', groupId, tree.giftCardId, tree.saplingId, tree.treeId, formData as any, profileImageUrl, messages);
+                await apiClient.redeemGiftCardTemplate('user', userId, tree.giftCardId, tree.saplingId, tree.treeId, formData as any, profileImageUrl, messages);
                 toast.success("Succefully gifted a tree!");
             }
 

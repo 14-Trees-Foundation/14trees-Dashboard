@@ -111,7 +111,7 @@ const RedeemTree: React.FC<RedeemTreeProps> = ({ tree }) => {
             }
 
             const apiClient = new ApiClient();
-            await apiClient.redeemGiftCardTemplate(tree.id, tree.sapling_id, tree.tree_id, formData as any, profileImageUrl);
+            await apiClient.redeemGiftCardTemplate('user', null, tree.id, tree.sapling_id, tree.tree_id, formData as any, profileImageUrl);
 
             refreshPage();
         } catch (error: any) {

@@ -160,29 +160,3 @@ export const getBookedGiftCards = (giftCardId: number, offset: number = 0, limit
         )
     }
 }
-
-export const redeemGiftCard = (giftCardId: number, saplingId: string, treeId: number, user: User) => {
-    const apiClient = new ApiClient();
-    return (dispatch: any) => {
-        dispatch({
-            type: giftCardActionTypes.REDEEM_GIFT_CARD_REQUESTED,
-        });
-        apiClient.redeemGiftCardTemplate(giftCardId, saplingId, treeId, user).then(
-            (value: GiftCardUser) => {
-                dispatch({
-                    type: giftCardActionTypes.REDEEM_GIFT_CARD_SUCCEEDED,
-                    payload: value,
-                });
-
-                toast.success("Gift card redeemed successfully");
-            },
-            (error: any) => {
-                dispatch({
-                    type: giftCardActionTypes.REDEEM_GIFT_CARD_FAILED,
-                });
-
-                toast.error(error.message);
-            }
-        )
-    }
-}
