@@ -5,11 +5,13 @@ import { saveAs } from "file-saver";
 import { Card } from "antd";
 import { toast } from "react-toastify";
 import { createStyles, makeStyles } from "@mui/styles";
-import { Typography, Grid, Divider, Box, Button } from "@mui/material";
-import { OpenInNew } from "@mui/icons-material";
+import { Typography, Grid, Box, Button } from "@mui/material";
+import { OpenInNew, Email } from "@mui/icons-material";
 import { Tree } from "../../../types/tree";
 import { GiftRedeemTransaction } from "../../../types/gift_redeem_transaction";
 import ApiClient from "../../../api/apiClient/apiClient";
+import { getHumanReadableDateTime } from "../../../helpers/utils";
+import CSREmailDialog from "./CSREmailDialog";
 
 const useStyle = makeStyles((theme) =>
     createStyles({
@@ -155,9 +157,9 @@ const GiftRedeemTrees: React.FC<Props> = ({ transaction }) => {
 }
 
 const GiftRedeemSummary: React.FC<Props> = ({ transaction }) => {
+    const [emailDialogOpen, setEmailDialogOpen] = useState(false);
 
     const handleDownload = async () => {
-
         let imageUrls = transaction.tree_details?.map(tree => tree.card_image_url || '') || [];
         imageUrls = imageUrls.filter(imageUrl => imageUrl)
 
@@ -191,60 +193,118 @@ const GiftRedeemSummary: React.FC<Props> = ({ transaction }) => {
 
     return (
         <Box sx={{ mx: "auto", mt: 1, mb: 5 }}>
-            <Grid container spacing={2}>
-                {/* Created By */}
-                <Grid item xs={6}>
-                    <Typography variant="body2" fontWeight="bold">Created By:</Typography>
-                    <Typography variant="body2">{transaction.created_by_name || "N/A"}</Typography>
-                </Grid>
-
-                {/* Recipient */}
-                <Grid item xs={6}>
-                    <Typography variant="body2" fontWeight="bold">Recipient:</Typography>
-                    <Typography variant="body2">{transaction.recipient_name || "N/A"}</Typography>
-                </Grid>
-
-                {/* Primary Message */}
-                <Grid item xs={12}>
-                    <Typography variant="body2" fontWeight="bold">Primary Message:</Typography>
-                    <Typography variant="body2">{transaction.primary_message}</Typography>
-                </Grid>
-
-                {/* Secondary Message */}
-                {transaction.secondary_message && (
+            <Card 
+                style={{ 
+                    marginBottom: 32, 
+                    padding: 24,
+                    backgroundColor: '#ffffff',
+                    boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
+                    borderRadius: '12px',
+                    border: '1px solid rgba(0, 0, 0, 0.08)'
+                }}
+            >
+                <Typography variant="h6" gutterBottom sx={{ mb: 3, color: '#1a1a1a' }}>
+                    Gift Details
+                </Typography>
+                <Grid container spacing={3}>
+                    {/* Sender and Recipient Section */}
                     <Grid item xs={12}>
-                        <Typography variant="body2" fontWeight="bold">Secondary Message:</Typography>
-                        <Typography variant="body2">{transaction.secondary_message}</Typography>
+                        <Box sx={{ display: 'flex', gap: 4 }}>
+                            <Box sx={{ flex: 1 }}>
+                                <Typography variant="subtitle2" color="text.secondary">Created By</Typography>
+                                <Typography variant="body1">{transaction.created_by_name || "N/A"}</Typography>
+                            </Box>
+                            <Box sx={{ flex: 1 }}>
+                                <Typography variant="subtitle2" color="text.secondary">Recipient</Typography>
+                                <Typography variant="body1">{transaction.recipient_name || "N/A"}</Typography>
+                            </Box>
+                        </Box>
                     </Grid>
-                )}
 
-                {/* Occasion */}
-                {transaction.occasion_name && (
-                    <Grid item xs={6}>
-                        <Typography variant="body2" fontWeight="bold">Occasion:</Typography>
-                        <Typography variant="body2">{transaction.occasion_name}</Typography>
+                    {/* Gift Details Section */}
+                    <Grid item xs={12}>
+                        <Typography variant="subtitle2" color="text.secondary" gutterBottom>Gift Information</Typography>
+                        <Box sx={{ pl: 2 }}>
+                            <Grid container spacing={2}>
+                                <Grid item xs={6}>
+                                    <Typography variant="body1">
+                                        <strong>Trees Gifted:</strong> {transaction.trees_count || 0}
+                                    </Typography>
+                                </Grid>
+                                <Grid item xs={6}>
+                                    <Typography variant="body1">
+                                        <strong>Occasion:</strong> {transaction.occasion_name || "N/A"}
+                                    </Typography>
+                                </Grid>
+                                <Grid item xs={6}>
+                                    <Typography variant="body1">
+                                        <strong>Gifted On:</strong> {new Date(transaction.gifted_on).toLocaleDateString()}
+                                    </Typography>
+                                </Grid>
+                            </Grid>
+                        </Box>
                     </Grid>
-                )}
 
-                {/* Trees Count */}
-                <Grid item xs={6}>
-                    <Typography variant="body2" fontWeight="bold">Trees Gifted:</Typography>
-                    <Typography variant="body2">{transaction.trees_count || 0}</Typography>
-                </Grid>
+                    {/* Email Status Section */}
+                    <Grid item xs={12}>
+                        <Typography variant="subtitle2" color="text.secondary" gutterBottom>Email Status</Typography>
+                        <Box sx={{ pl: 2, display: 'flex', alignItems: 'center', gap: 2 }}>
+                            {transaction.mail_sent_at ? (
+                                <Typography variant="body1" color="text.primary">
+                                    Last mail sent at: {getHumanReadableDateTime(transaction.mail_sent_at)}
+                                </Typography>
+                            ) : (
+                                <>
+                                    <Typography variant="body1" color="text.secondary">
+                                        Email not sent yet
+                                    </Typography>
+                                    <Button
+                                        variant="contained"
+                                        color="success"
+                                        startIcon={<Email />}
+                                        onClick={() => setEmailDialogOpen(true)}
+                                        sx={{ textTransform: 'none' }}
+                                    >
+                                        Send Now
+                                    </Button>
+                                </>
+                            )}
+                            
+                        </Box>
+                        {transaction.mail_error && (
+                            <Typography variant="body1" color="error.main" sx={{ mt: 1 }}>
+                                Error: {transaction.mail_error}
+                            </Typography>
+                        )}
+                    </Grid>
 
-                {/* Gifted On */}
-                <Grid item xs={12}>
-                    <Typography variant="body2" fontWeight="bold">Gifted On:</Typography>
-                    <Typography variant="body2">{new Date(transaction.gifted_on).toLocaleDateString()}</Typography>
+                    {/* Tree Cards Section */}
+                    {/* <Grid item xs={12}>
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                            <Typography variant="subtitle2" color="text.secondary">Tree Cards</Typography>
+                            <Button
+                                variant="contained" 
+                                color="success" 
+                                onClick={handleDownload}
+                                startIcon={<OpenInNew />}
+                                sx={{ textTransform: 'none' }}
+                            >
+                                Download Images
+                            </Button>
+                        </Box>
+                    </Grid> */}
                 </Grid>
-                <Grid item xs={12}>
-                    <Typography variant="body2" fontWeight="bold">Tree Cards:</Typography>
-                    <Button variant="contained" color="primary" onClick={handleDownload}>
-                        Download
-                    </Button>
-                </Grid>
-            </Grid>
-            <Divider sx={{ mb: 5, mt: 2 }} />
+            </Card>
+
+            <CSREmailDialog
+                open={emailDialogOpen}
+                onClose={() => setEmailDialogOpen(false)}
+                transaction={transaction}
+            />
+
+            <Typography variant="h6" gutterBottom sx={{ mb: 3 }}>
+                Gifted Trees
+            </Typography>
             <GiftRedeemTrees transaction={transaction} />
         </Box>
     );

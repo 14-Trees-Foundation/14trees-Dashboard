@@ -7,6 +7,7 @@ export type GiftRedeemTransaction = {
     modified_by_name?: string;
     recipient: number;
     recipient_name?: string;
+    recipient_email?: string;
     primary_message: string;
     secondary_message: string;
     logo_message: string;
@@ -22,6 +23,9 @@ export type GiftRedeemTransaction = {
         illustration_s3_path?: string | null,
     }[],
     trees_count?: number;
+    mail_sent: boolean | null;
+    mail_sent_at: string | null;
+    mail_error: string | null;
     created_at: string;
     updated_at: string;
 }
