@@ -7,11 +7,10 @@ import { toast } from "react-toastify";
 import { createStyles, makeStyles } from "@mui/styles";
 import { Typography, Grid, Box, Button } from "@mui/material";
 import { OpenInNew, Email } from "@mui/icons-material";
-import { Tree } from "../../../types/tree";
-import { GiftRedeemTransaction } from "../../../types/gift_redeem_transaction";
-import ApiClient from "../../../api/apiClient/apiClient";
-import { getHumanReadableDateTime } from "../../../helpers/utils";
-import CSREmailDialog from "./CSREmailDialog";
+import { Tree } from "../../types/tree";
+import { GiftRedeemTransaction } from "../../types/gift_redeem_transaction";
+import ApiClient from "../../api/apiClient/apiClient";
+import { getHumanReadableDateTime } from "../../helpers/utils";
 
 const useStyle = makeStyles((theme) =>
     createStyles({
@@ -51,7 +50,7 @@ const GiftRedeemTrees: React.FC<Props> = ({ transaction }) => {
 
             for (let i = page * pageSize; i < Math.min((page + 1) * pageSize, totalRecords); i++) {
                 if (!trees[i]) {
-                    if (transaction.group_id) getTrees(page * pageSize, pageSize, transaction.group_id, filters);
+                    if (transaction.user_id) getTrees(page * pageSize, pageSize, transaction.user_id, filters);
                     return;
                 }
             }
@@ -60,11 +59,11 @@ const GiftRedeemTrees: React.FC<Props> = ({ transaction }) => {
         return () => { clearTimeout(handler); }
     }, [trees, page, pageSize, transaction, totalRecords])
 
-    const getTrees = async (offset: number, limit: number, groupId: number, filters: any[]) => {
+    const getTrees = async (offset: number, limit: number, userId: number, filters: any[]) => {
         setLoading(true);
         try {
             const apiClient = new ApiClient();
-            const treesResp = await apiClient.getMappedGiftTrees(offset, limit, 'group', groupId, filters);
+            const treesResp = await apiClient.getMappedGiftTrees(offset, limit, 'user', userId, filters);
 
             setTrees(prev => {
                 const treesData = { ...prev };
@@ -295,12 +294,6 @@ const GiftRedeemSummary: React.FC<Props> = ({ transaction }) => {
                     </Grid> */}
                 </Grid>
             </Card>
-
-            <CSREmailDialog
-                open={emailDialogOpen}
-                onClose={() => setEmailDialogOpen(false)}
-                transaction={transaction}
-            />
 
             <Typography variant="h6" gutterBottom sx={{ mb: 3 }}>
                 Gifted Trees

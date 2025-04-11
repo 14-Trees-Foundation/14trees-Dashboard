@@ -1,7 +1,8 @@
 export type GiftRedeemTransaction = {
     id: number;
     created_by: number;
-    group_id: number;
+    group_id: number | null;
+    user_id: number | null;
     created_by_name?: string;
     modified_by: number;
     modified_by_name?: string;

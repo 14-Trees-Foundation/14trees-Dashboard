@@ -31,6 +31,7 @@ import RequestTreeCardsForm from "./pages/admin/gift/Form/TreeCardRequest/Reques
 import SponsorProfile from "./pages/SponsorProfile/SponsorProfile";
 import CSRPage from "./pages/admin/csr/CSRPage";
 import EventPage from "./pages/EventDashboard/EventPage";
+import GiftDashboard from "./pages/GiftDashboard/GiftDashboard";
 
 function App() {
   return (
@@ -127,6 +128,14 @@ function App() {
             element={
               // <RequireAuth>
                 <CSRPage />
+              // </RequireAuth>
+            } 
+          />
+          <Route 
+            path="/personal/dashboard/:userId" 
+            element={
+              // <RequireAuth>
+                <GiftDashboard />
               // </RequireAuth>
             } 
           />
