@@ -906,10 +906,10 @@ class ApiClient {
 
     }
 
-    async getMappedGiftTrees(offset: number, limit: number, groupId: number, filters?: any[]): Promise<PaginatedResponse<Tree>> {
+    async getMappedGiftTrees(offset: number, limit: number, type: 'group' | 'user', id: number, filters?: any[]): Promise<PaginatedResponse<Tree>> {
         const url = `/trees/mapped-gift/get?offset=${offset}&limit=${limit}`;
         try {
-            const response = await this.api.post<PaginatedResponse<Tree>>(url, { group_id: groupId, filters });
+            const response = await this.api.post<PaginatedResponse<Tree>>(url, { [type === 'group' ? 'group_id' : 'user_id']: id, filters });
             return response.data;
         } catch (error: any) {
             if (error.response?.data?.message) {
@@ -919,10 +919,10 @@ class ApiClient {
         }
     }
 
-    async getMappedGiftTreesAnalytics(groupId: number): Promise<any> {
+    async getMappedGiftTreesAnalytics(type: 'group' | 'user', id: number): Promise<any> { 
         const url = `/trees/mapped-gift/analytics`;
         try{
-            const response = await this.api.post<any>(url, { group_id: groupId });
+            const response = await this.api.post<any>(url, { [type === 'group' ? 'group_id' : 'user_id']: id });
             return response.data;
         } catch (error: any) {
             if (error.response?.data?.message) {
@@ -1610,9 +1610,10 @@ class ApiClient {
         }
     }
 
-    async redeemGiftCardTemplate(gift_card_id: number, sapling_id: string, tree_id: number, user: User, profile_image_url?: string | null): Promise<GiftCardUser> {
+    async redeemGiftCardTemplate(type: 'group' | 'user', id: number | null, gift_card_id: number, sapling_id: string, tree_id: number, user: User, profile_image_url?: string | null, messages?: Record<string, any>): Promise<GiftCardUser> {
         try {
-            const resp = await this.api.post<GiftCardUser>(`/gift-cards/card/redeem`, { gift_card_id, sapling_id, tree_id, ...user, user, profile_image_url });
+            const requesting_user = localStorage.getItem("userId");
+            const resp = await this.api.post<GiftCardUser>(`/gift-cards/card/redeem`, { requesting_user, [type === 'group' ? 'sponsor_group' : 'sponsor_user']: id, gift_card_id, sapling_id, tree_id, ...user, user, profile_image_url, ...messages });
             return resp.data;
         } catch (error: any) {
             if (error.response) {
@@ -1622,10 +1623,10 @@ class ApiClient {
         }
     }
 
-    async redeemMultipleGiftCardTemplate(trees_count: number, sponsor_group: number, user: User, profile_image_url?: string | null, messages?: Record<string, any>): Promise<void> {
+    async redeemMultipleGiftCardTemplate(trees_count: number, type: 'group' | 'user', id: number, user: User, profile_image_url?: string | null, messages?: Record<string, any>): Promise<void> {
         try {
             const requesting_user = localStorage.getItem("userId");
-            await this.api.post<void>(`/gift-cards/card/redeem-multi`, { requesting_user, trees_count, sponsor_group, ...user, user, profile_image_url, ...messages });
+            await this.api.post<void>(`/gift-cards/card/redeem-multi`, { requesting_user, trees_count, [type === 'group' ? 'sponsor_group' : 'sponsor_user']: id, ...user, user, profile_image_url, ...messages });
         } catch (error: any) {
             if (error.response) {
                 throw new Error(error.response.data.message);
@@ -1727,9 +1728,9 @@ class ApiClient {
         }
     }
 
-    async getGiftTransactions(offset: number, limit: number, groupId: number, search?: string): Promise<PaginatedResponse<GiftRedeemTransaction>> {
+    async getGiftTransactions(offset: number, limit: number, type: 'group' | 'user', id: number, search?: string): Promise<PaginatedResponse<GiftRedeemTransaction>> {
         try {
-            const resp = await this.api.get<PaginatedResponse<GiftRedeemTransaction>>(`/gift-cards/transactions/${groupId}?offset=${offset}&limit=${limit}` + (search ? `&search=${search}` : ''));
+            const resp = await this.api.get<PaginatedResponse<GiftRedeemTransaction>>(`/gift-cards/transactions/${id}?type=${type}&offset=${offset}&limit=${limit}` + (search ? `&search=${search}` : ''));
             return resp.data;
         } catch (error: any) {
             if (error.response) {
