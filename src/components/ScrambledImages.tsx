@@ -12,6 +12,9 @@ const ScrambledImages: React.FC<{ images_urls: string[] }> = ({ images_urls }) =
 
     // Positioning rules for different image counts
     const positions: any = {
+        1: [
+            { top: "0%", left: "0%", rotate: 0 },
+        ],
         2: [
             { top: "0%", left: "0%", rotate: -10 },
             { top: "30%", left: "10%", rotate: 10 },
