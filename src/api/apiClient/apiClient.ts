@@ -1983,15 +1983,26 @@ class ApiClient {
         }
     }
 
-    async getGiftTransactions(offset: number, limit: number, groupId: number): Promise<PaginatedResponse<GiftRedeemTransaction>> {
+    async getGiftTransactions(offset: number, limit: number, groupId: number, search?: string): Promise<PaginatedResponse<GiftRedeemTransaction>> {
         try {
-            const resp = await this.api.get<PaginatedResponse<GiftRedeemTransaction>>(`/gift-cards/transactions/${groupId}?offset=${offset}&limit=${limit}`);
+            const resp = await this.api.get<PaginatedResponse<GiftRedeemTransaction>>(`/gift-cards/transactions/${groupId}?offset=${offset}&limit=${limit}` + (search ? `&search=${search}` : ''));
             return resp.data;
         } catch (error: any) {
             if (error.response) {
                 throw new Error(error.response.data.message);
             }
             throw new Error('Failed fetch gifted trees data!');
+        }
+    }
+
+    async sendEmailToGiftTransaction(transaction_id: number, event_type: string, recipient_email: string, cc_emails: string[]): Promise<void> {
+        try {
+            await this.api.post<void>(`/gift-cards/transactions/send-email`, { transaction_id, event_type, recipient_email, cc_emails });
+        } catch (error: any) {
+            if (error.response) {
+                throw new Error(error.response.data.message);
+            }
+            throw new Error('Failed to send email to gift transaction');
         }
     }
 

@@ -1,11 +1,13 @@
 export type GiftRedeemTransaction = {
     id: number;
     created_by: number;
+    group_id: number;
     created_by_name?: string;
     modified_by: number;
     modified_by_name?: string;
     recipient: number;
     recipient_name?: string;
+    recipient_email?: string;
     primary_message: string;
     secondary_message: string;
     logo_message: string;
@@ -13,12 +15,17 @@ export type GiftRedeemTransaction = {
     occasion_type: string | null;
     gifted_by: string | null;
     gifted_on: Date;
-    card_image_url?: string;
-    illustration_s3_path?: string;
-    template_image?: string;
-    sapling_id?: string;
-    plant_type?: string;
+    tree_details?: {
+        plant_type: string,
+        sapling_id: string,
+        card_image_url?: string | null,
+        template_image?: string | null,
+        illustration_s3_path?: string | null,
+    }[],
     trees_count?: number;
+    mail_sent: boolean | null;
+    mail_sent_at: string | null;
+    mail_error: string | null;
     created_at: string;
     updated_at: string;
 }
