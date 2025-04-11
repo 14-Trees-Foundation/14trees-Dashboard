@@ -1,8 +1,9 @@
 import { FC, useEffect, useState } from "react";
 import {
   Dialog, DialogTitle, DialogContent, DialogActions,
-  Button, Box, Typography, Checkbox, TextField, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, FormControlLabel, Tabs, Tab, DialogContentText
+  Button, Box, Typography, Checkbox, TextField, Paper, Table, TableBody, TableCell, TableContainer, TablePagination, TableHead, TableRow, FormControlLabel, Tabs, Tab, DialogContentText
 } from "@mui/material";
+import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 import { Plot, PlotAccessibilityList } from "../../../../types/plot";
 import { Donation, DonationTree } from "../../../../types/donation";
 import { useAppDispatch, useAppSelector } from "../../../../redux/store/hooks";
@@ -11,7 +12,7 @@ import * as plotActionCreators from "../../../../redux/actions/plotActions";
 import { RootState } from "../../../../redux/store/store";
 import GeneralTable from "../../../../components/GenTable";
 import ApiClient from "../../../../api/apiClient/apiClient";
-import { TableColumnsType } from "antd";
+import { TableColumnsType, Pagination } from "antd";
 import { GridFilterItem } from "@mui/x-data-grid";
 import getColumnSearchProps, { getColumnSelectedItemFilter, getSortableHeader } from "../../../../components/Filter";
 import { toast } from "react-toastify";
@@ -70,6 +71,11 @@ const DonationTrees: FC<DonationTreesProps> = ({ open, onClose, donation }) => {
   const [pageSize, setPageSize] = useState(10);
   const [filters, setFilters] = useState<Record<string, GridFilterItem>>({});
   const [orderBy, setOrderBy] = useState<Order[]>([]);
+  const [reservationStats, setReservationStats] = useState({
+    total_requested: donation?.trees_count || 0,
+    already_reserved: donation?.booked || 0,
+    remaining: donation?.trees_count ? (donation.trees_count - (donation.booked || 0)) : 0
+  });
   const [selectedPlots, setSelectedPlots] = useState<SelectedPlot[]>([]);
   const [selectedPlotIds, setSelectedPlotIds] = useState<number[]>([]);
   const [tableRows, setTableRows] = useState<Plot[]>([]);
@@ -97,10 +103,29 @@ const DonationTrees: FC<DonationTreesProps> = ({ open, onClose, donation }) => {
   const [reservedTreesLoading, setReservedTreesLoading] = useState(false);
   const [selectedReservedTrees, setSelectedReservedTrees] = useState<number[]>([]);
   const [reservedTreesTotal, setReservedTreesTotal] = useState(0);
+  const [selectedTreesPage, setSelectedTreesPage] = useState(0);
+  const [selectedTreesPerPage, setSelectedTreesPerPage] = useState(5); // Default rows per page
+  const [limitExceededDialogOpen, setLimitExceededDialogOpen] = useState(false);
+  const [plotLimitExceededDialogOpen, setPlotLimitExceededDialogOpen] = useState(false);
   const [unreserveAllDialogOpen, setUnreserveAllDialogOpen] = useState(false);
 
   const dispatch = useAppDispatch();
   const { getPlots } = bindActionCreators(plotActionCreators, dispatch);
+
+  useEffect(() => {
+    const loadReservationStats = async () => {
+      const apiClient = new ApiClient();
+      if (open && donation) {
+        try {
+          const stats = await apiClient.getDonationReservationStats(donation.id);
+          setReservationStats(stats);
+        } catch (error) {
+          console.error("Error loading reservation stats:", error);
+        }
+      }
+    };
+    loadReservationStats();
+  }, [open, donation]);
 
   // Fetch plots data
   useEffect(() => {
@@ -152,6 +177,12 @@ const DonationTrees: FC<DonationTreesProps> = ({ open, onClose, donation }) => {
     } finally {
       setTreeLoading(false);
     }
+  };
+
+  const getPaginatedSelectedTrees = () => {
+    const startIndex = selectedTreesPage * selectedTreesPerPage;
+    const endIndex = startIndex + selectedTreesPerPage;
+    return selectedTrees.slice(startIndex, endIndex);
   };
 
   const fetchReservedTrees = async () => {
@@ -243,7 +274,10 @@ const DonationTrees: FC<DonationTreesProps> = ({ open, onClose, donation }) => {
     if (selectedTreeIds.includes(id)) {
       return;
     }
-    
+    if (tabValue === 1 && selectedTrees.length >= reservationStats.remaining) {
+      setLimitExceededDialogOpen(true); // Show popup
+      return;
+    }
     // Find the tree in the current table rows
     const tree = treeTableRows.find(t => t.id === id);
     if (tree) {
@@ -382,6 +416,8 @@ const DonationTrees: FC<DonationTreesProps> = ({ open, onClose, donation }) => {
         false
       );
       toast.success(`Successfully unreserved ${selectedReservedTrees.length} trees for donation ${donation.id}`);
+      const updatedStats = await apiClient.getDonationReservationStats(donation.id);
+      setReservationStats(updatedStats);
       fetchReservedTrees();
       setSelectedReservedTrees([]);
     } catch (error: any) {
@@ -635,6 +671,20 @@ const DonationTrees: FC<DonationTreesProps> = ({ open, onClose, donation }) => {
 
   const handleConfirmReservation = async () => {
     if (!donation) return;
+    // Calculate total selected trees
+  const totalSelected = tabValue === 0 
+  ? selectedPlots.reduce((sum, plot) => sum + plot.reserveCount, 0)
+  : selectedTrees.length;
+
+// Block if over limit
+if (totalSelected > reservationStats.remaining) {
+  if (tabValue === 0) {
+    setPlotLimitExceededDialogOpen(true);
+  } else {
+    setLimitExceededDialogOpen(true);
+  }
+  return;
+}
     try {
       const apiClient = new ApiClient();
       
@@ -661,6 +711,8 @@ const DonationTrees: FC<DonationTreesProps> = ({ open, onClose, donation }) => {
         );
         toast.success(`Successfully reserved ${selectedTrees.length} trees for donation ${donation?.id}`);
       }
+      const updatedStats = await apiClient.getDonationReservationStats(donation.id);
+      setReservationStats(updatedStats);
     } catch (error: any) {
       toast.error(error.message);
     }
@@ -681,11 +733,24 @@ const DonationTrees: FC<DonationTreesProps> = ({ open, onClose, donation }) => {
       </DialogTitle>
 
       <DialogContent dividers>
-        <Box mb={2}>
-          <Typography>
-            <strong>Requested Trees:</strong> {donation?.trees_count}
-          </Typography>
-        </Box>
+      <Box mb={2} sx={{ 
+         display: 'flex', 
+         gap: 4, 
+         p: 2, 
+         bgcolor: '#f5f5f5', 
+         borderRadius: 1,
+        alignItems: 'center'
+      }}>
+    <Typography>
+       <strong>Total Requested Trees:</strong> {reservationStats.total_requested}
+    </Typography>
+    <Typography>
+       <strong>Already Reserved:</strong> {reservationStats.already_reserved}
+    </Typography>
+    <Typography>
+      <strong>Remaining:</strong> {reservationStats.remaining}
+    </Typography>
+     </Box>
 
         <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
           <Tabs 
@@ -741,6 +806,12 @@ const DonationTrees: FC<DonationTreesProps> = ({ open, onClose, donation }) => {
                 <Typography variant="body2" color="text.secondary">
                   Total Trees Selected: {selectedPlots.reduce((sum, plot) => sum + plot.reserveCount, 0)}
                 </Typography>
+                {selectedPlots.reduce((sum, plot) => sum + plot.reserveCount, 0) > reservationStats.remaining && (
+               <Typography variant="caption" color="error" sx={{ fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: 1, mt: 0.5 }}>
+                  <ErrorOutlineIcon sx={{ fontSize: '16px' }} />
+                  You can only reserve {reservationStats.remaining} trees.
+               </Typography>
+                )}
               </Box>
               <TableContainer>
                 <Table size="small">
@@ -837,7 +908,12 @@ const DonationTrees: FC<DonationTreesProps> = ({ open, onClose, donation }) => {
                     </TableRow>
                   </TableHead>
                   <TableBody>
-                    {selectedTrees.map((tree) => (
+                  {selectedTrees
+                   .slice(
+                     selectedTreesPage * 5,         
+                     selectedTreesPage * 5 + 5     
+                     )
+                    .map((tree) => (
                       <TableRow
                         key={tree.id}
                         sx={{
@@ -863,6 +939,14 @@ const DonationTrees: FC<DonationTreesProps> = ({ open, onClose, donation }) => {
                   </TableBody>
                 </Table>
               </TableContainer>
+              <Pagination
+                current={selectedTreesPage + 1}
+                pageSize={5}
+                total={selectedTrees.length}
+                onChange={(page) => setSelectedTreesPage(page - 1)}
+                simple
+                style={{ marginTop: 16, textAlign: 'center' }}
+              />
             </Paper>
           )}
         </TabPanel>
@@ -1025,6 +1109,49 @@ const DonationTrees: FC<DonationTreesProps> = ({ open, onClose, donation }) => {
           </Button>
         </DialogActions>
       </Dialog>
+      {/* Limit Exceeded Dialog - Only for Tree Selection Tab */}
+      <Dialog
+        open={limitExceededDialogOpen}
+        onClose={() => setLimitExceededDialogOpen(false)}
+      >
+       <DialogTitle>Maximum Trees Reached</DialogTitle>
+        <DialogContent>
+         <DialogContentText>
+             You can only reserve up to {reservationStats.remaining} more trees for this donation.
+         </DialogContentText>
+        </DialogContent>
+      <DialogActions>
+       <Button 
+         onClick={() => setLimitExceededDialogOpen(false)} 
+         color="success"
+         variant="contained"
+         >
+            OK
+      </Button>
+      </DialogActions>
+      </Dialog>
+      {/* Plot Limit Exceeded Dialog */}
+<Dialog
+  open={plotLimitExceededDialogOpen}
+  onClose={() => setPlotLimitExceededDialogOpen(false)}
+>
+  <DialogTitle>Reservation Limit Exceeded</DialogTitle>
+  <DialogContent>
+    <DialogContentText>
+      You've selected {selectedPlots.reduce((sum, plot) => sum + plot.reserveCount, 0)} trees,
+      but only {reservationStats.remaining} can be reserved. Please adjust your selections.
+    </DialogContentText>
+  </DialogContent>
+  <DialogActions>
+    <Button 
+      onClick={() => setPlotLimitExceededDialogOpen(false)} 
+      color="success"
+      variant="contained"
+    >
+      OK
+    </Button>
+  </DialogActions>
+</Dialog>
     </Dialog>
   );
 };

@@ -1362,6 +1362,27 @@ class ApiClient {
         }
     }
 
+    async getDonationReservationStats(donation_id: number): Promise<{
+        total_requested: number;
+        already_reserved: number;
+        remaining: number;
+    }> {
+        try {
+            const response = await this.api.get<{
+                total_requested: number;
+                already_reserved: number;
+                remaining: number;
+            }>(`/donations/trees/stats?donation_id=${donation_id}`);
+            
+            return response.data;
+        } catch (error: any) {
+            if (error.response?.data?.message) {
+                throw new Error(error.response.data.message);
+            }
+            throw new Error('Failed to fetch donation reservation stats!');
+        }
+    }
+
     async sendAckEmailToDonor(donation_id: number, test_mails: string[], cc_mails: string[]) {
         try {
             await this.api.post<void>(`/donations/emails/ack`, { donation_id, test_mails, cc_mails });
