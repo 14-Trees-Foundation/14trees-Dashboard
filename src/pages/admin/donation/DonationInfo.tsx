@@ -16,18 +16,75 @@ import { Donation } from '../../../types/donation';
 import ApiClient from '../../../api/apiClient/apiClient';
 import GeneralTable from '../../../components/GenTable';
 import { InfoOutlined, EventOutlined, ParkOutlined } from '@mui/icons-material';
-
+import getColumnSearchProps from '../../../components/Filter';
+import { GridFilterItem } from '@mui/x-data-grid';
+import { Order } from '../../../types/common';
 interface DonationInfoProps {
   open: boolean;
   onClose: () => void;
   data: Donation | null;
 }
 
+interface DonationTree {
+  recipient_name: string;
+  sapling_id: string;
+  plant_type: string;
+  scientific_name: string;
+  trees_count: number;
+  assignee_name: string;
+}
+
 const DonationInfo: React.FC<DonationInfoProps> = ({ open, onClose, data }) => {
   const [donationUsers, setDonationUsers] = useState<any[]>([]);
+  const [donationTrees, setDonationTrees] = useState<DonationTree[]>([]);
+  const [reservationStats, setReservationStats] = useState<{ already_reserved: number;  assigned_trees: number; }>({already_reserved: 0, assigned_trees: 0});
+  const [filters, setFilters] = useState<Record<string, GridFilterItem>>({});
+  const [orderBy, setOrderBy] = useState<Order[]>([]);
   const [page, setPage] = useState(0);
   const [pageSize, setPageSize] = useState(10);
   const theme = useTheme();
+
+  const handleSetFilters = (filters: Record<string, GridFilterItem>) => {
+    setPage(0);
+    setFilters(filters);
+  }
+
+  const handleSortingChange = (sorter: any) => {
+    let newOrder = [...orderBy];
+    const updateOrder = () => {
+        const index = newOrder.findIndex((item) => item.column === sorter.field);
+        if (index > -1) {
+            if (sorter.order) newOrder[index].order = sorter.order;
+            else newOrder = newOrder.filter((item) => item.column !== sorter.field);
+        } else if (sorter.order) {
+            newOrder.push({ column: sorter.field, order: sorter.order });
+        }
+    }
+
+    if (sorter.field) {
+        setPage(0);
+        updateOrder();
+        setOrderBy(newOrder);
+    }
+}
+
+useEffect(() => {
+  const loadReservationStats = async () => {
+    const apiClient = new ApiClient();
+    if (open && data) {
+      try {
+        const stats = await apiClient.getDonationReservationStats(data.id);
+        setReservationStats(stats);
+      } catch (error) {
+        console.error("Error loading reservation stats:", error);
+      }
+    }
+  };
+  loadReservationStats();
+}, [open, data]);
+
+
+  
 
   useEffect(() => {
     const getDonationUsers = async () => {
@@ -50,20 +107,67 @@ const DonationInfo: React.FC<DonationInfoProps> = ({ open, onClose, data }) => {
     }
   }, [open, data]);
 
+  useEffect(() => {
+    const getDonationTrees = async () => {
+      if (data) {
+        try {
+          const apiClient = new ApiClient();
+          const apiFilters = [
+            { columnField: 'donation_id', operatorValue: 'equals', value: data.id },
+            ...Object.values(filters) // Include dynamic filters
+          ];
+          const trees = await apiClient.getDonationTrees(
+            page * pageSize, // Use pagination
+            pageSize,
+            apiFilters
+          );
+          setDonationTrees(trees.results as unknown as DonationTree[]);
+        } catch (error) {
+          console.error("Error fetching donation trees:", error);
+          setDonationTrees([]);
+        }
+      }
+    };
+  
+    if (open && data) {
+      getDonationTrees();
+    }
+  }, [open, data, page, pageSize, filters, orderBy]);
+  
+
   const columns: any[] = [
+    {
+      dataIndex: "sapling_id",
+      key: "sapling_id",
+      title: "Sapling ID",
+      align: "center",
+      width: 150,
+          ...getColumnSearchProps('sapling_id', filters, handleSetFilters),
+
+    },
+    {
+      dataIndex: "plant_type",
+      key: "plant_type",
+      title: "Plant Type",
+      align: "center",
+      width: 150,
+          ...getColumnSearchProps('plant_type', filters, handleSetFilters),
+    },
+    {
+      dataIndex: "scientific_name",
+      key: "scientific_name",
+      title: "Scientific Name",
+      align: "center",
+      width: 200,
+      ...getColumnSearchProps('scientific_name', filters, handleSetFilters),
+    },
     {
       dataIndex: "recipient_name",
       key: "recipient",
       title: "Recipient",
       align: "center",
       width: 200,
-    },
-    {
-      dataIndex: "trees_count",
-      key: "trees_count",
-      title: "Trees Count",
-      align: "center",
-      width: 100,
+      ...getColumnSearchProps('recipient_name', filters, handleSetFilters),
     },
     {
       dataIndex: "assignee_name",
@@ -71,6 +175,7 @@ const DonationInfo: React.FC<DonationInfoProps> = ({ open, onClose, data }) => {
       title: "Assigned to",
       align: "center",
       width: 200,
+      ...getColumnSearchProps('assignee_name', filters, handleSetFilters),
     }
   ];
 
@@ -140,25 +245,42 @@ const DonationInfo: React.FC<DonationInfoProps> = ({ open, onClose, data }) => {
         )}
 
         {/* Recipients */}
-        {donationUsers.length > 0 && (
+        {(donationTrees.length > 0) && (
           <Paper elevation={1} sx={{ p: 3, mb: 3, borderRadius: 2, border: `1px solid ${theme.palette.divider}` }}>
             <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-              <InfoOutlined sx={{ color: '#2e7d32' }} /> Recipients
+              <InfoOutlined sx={{ color: '#2e7d32' }} /> Donation Trees
             </Typography>
+           
+           <Box mb={2} sx={{ 
+              display: 'flex', 
+              gap: 4, 
+              p: 2, 
+              bgcolor: '#f5f5f5', 
+              borderRadius: 1,
+              alignItems: 'center'
+            }}>
+            <Typography>
+              <strong>Reserved Trees:</strong> {reservationStats.already_reserved}
+            </Typography>
+            <Typography>
+              <strong>Assigned Trees:</strong> {reservationStats.assigned_trees}
+            </Typography>
+           </Box>
+
             <GeneralTable
               loading={false}
               columns={columns}
-              rows={donationUsers}
-              totalRecords={donationUsers.length}
+              rows={donationTrees}
+              totalRecords={donationTrees.length}
               page={page}
               pageSize={pageSize}
               onPaginationChange={(page: number, pageSize: number) => { setPage(page - 1); setPageSize(pageSize); }}
-              onDownload={async () => donationUsers}
+              onDownload={async () => donationTrees}
               footer
               tableName='Donation Recipients'
             />
           </Paper>
-        )}
+          )}           
 
         {/* Dates */}
         <Box sx={{ mt: 2, p: 1, bgcolor: 'rgba(0,0,0,0.03)', borderRadius: 1 }}>

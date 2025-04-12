@@ -1366,12 +1366,14 @@ class ApiClient {
         total_requested: number;
         already_reserved: number;
         remaining: number;
+        assigned_trees: number;
     }> {
         try {
             const response = await this.api.get<{
                 total_requested: number;
                 already_reserved: number;
                 remaining: number;
+                assigned_trees: number;
             }>(`/donations/trees/stats?donation_id=${donation_id}`);
             
             return response.data;
