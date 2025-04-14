@@ -1747,7 +1747,18 @@ class ApiClient {
             if (error.response) {
                 throw new Error(error.response.data.message);
             }
-            throw new Error('Failed to send email to gift transaction');
+            throw new Error('Failed to send email to gift transaction user!');
+        }
+    }
+
+    async updateTransaction(transaction_id: number, mask: string[], data: Record<string, any>): Promise<void> {
+        try {
+            await this.api.patch(`/gift-cards/transactions/update`, { transaction_id, mask, data });
+        } catch (error: any) {
+            if (error?.response?.data?.message) {
+                throw new Error(error.response.data.message)
+            }
+            throw new Error('Failed to update transaction details!');
         }
     }
 
@@ -1970,7 +1981,7 @@ class ApiClient {
         View Permissions
     */
 
-    async verifyViewAccess(view_id: string, user_id: number, path: string, metadata?: Record<string, any>): Promise<{ code: number, message: string }> {
+    async verifyViewAccess(view_id: string, user_id: number, path: string, metadata?: Record<string, any>): Promise<{ code: number, message: string, view_name: string }> {
         try {
             const response = await this.api.post<any>(`/view/verify-access/`, { view_id, user_id, path, metadata }, {
                 headers: {

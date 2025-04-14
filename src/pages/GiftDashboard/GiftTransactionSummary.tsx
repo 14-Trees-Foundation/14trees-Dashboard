@@ -6,12 +6,13 @@ import { Card } from "antd";
 import { toast } from "react-toastify";
 import { createStyles, makeStyles } from "@mui/styles";
 import { Typography, Grid, Box, Button } from "@mui/material";
-import { OpenInNew, Email } from "@mui/icons-material";
+import { OpenInNew, Email, Edit } from "@mui/icons-material";
 import { Tree } from "../../types/tree";
 import { GiftRedeemTransaction } from "../../types/gift_redeem_transaction";
 import ApiClient from "../../api/apiClient/apiClient";
 import { getHumanReadableDateTime } from "../../helpers/utils";
 import EmailDialog from "./EmailDialog";
+import RedeemGiftTreeDialog from "./RedeemGiftTreeDialog";
 
 const useStyle = makeStyles((theme) =>
     createStyles({
@@ -32,6 +33,7 @@ const useStyle = makeStyles((theme) =>
 
 type Props = {
     transaction: GiftRedeemTransaction;
+    onTransactionUpdated?: () => void;
 };
 
 const GiftRedeemTrees: React.FC<Props> = ({ transaction }) => {
@@ -156,8 +158,10 @@ const GiftRedeemTrees: React.FC<Props> = ({ transaction }) => {
     )
 }
 
-const GiftRedeemSummary: React.FC<Props> = ({ transaction }) => {
+const GiftRedeemSummary: React.FC<Props> = ({ transaction, onTransactionUpdated }) => {
     const [emailDialogOpen, setEmailDialogOpen] = useState(false);
+    const [editDialogOpen, setEditDialogOpen] = useState(false);
+    const [refreshKey, setRefreshKey] = useState(0);
 
     const handleDownload = async () => {
         let imageUrls = transaction.tree_details?.map(tree => tree.card_image_url || '') || [];
@@ -203,15 +207,26 @@ const GiftRedeemSummary: React.FC<Props> = ({ transaction }) => {
                     border: '1px solid rgba(0, 0, 0, 0.08)'
                 }}
             >
-                <Typography variant="h6" gutterBottom sx={{ mb: 3, color: '#1a1a1a' }}>
-                    Gift Details
-                </Typography>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+                    <Typography variant="h6" sx={{ color: '#1a1a1a' }}>
+                        Gift Details
+                    </Typography>
+                    <Button
+                        variant="outlined"
+                        color="success"
+                        startIcon={<Edit />}
+                        onClick={() => setEditDialogOpen(true)}
+                        sx={{ textTransform: 'none' }}
+                    >
+                        Edit Details
+                    </Button>
+                </Box>
                 <Grid container spacing={3}>
                     {/* Sender and Recipient Section */}
                     <Grid item xs={12}>
                         <Box sx={{ display: 'flex', gap: 4 }}>
                             <Box sx={{ flex: 1 }}>
-                                <Typography variant="subtitle2" color="text.secondary">Created By</Typography>
+                                <Typography variant="subtitle2" color="text.secondary">Gifted By</Typography>
                                 <Typography variant="body1">{transaction.created_by_name || "N/A"}</Typography>
                             </Box>
                             <Box sx={{ flex: 1 }}>
@@ -232,9 +247,9 @@ const GiftRedeemSummary: React.FC<Props> = ({ transaction }) => {
                                     </Typography>
                                 </Grid>
                                 <Grid item xs={6}>
-                                    <Typography variant="body1">
+                                    {transaction.occasion_name && <Typography variant="body1">
                                         <strong>Occasion:</strong> {transaction.occasion_name || "N/A"}
-                                    </Typography>
+                                    </Typography>}
                                 </Grid>
                                 <Grid item xs={6}>
                                     <Typography variant="body1">
@@ -256,13 +271,20 @@ const GiftRedeemSummary: React.FC<Props> = ({ transaction }) => {
                             ) : (
                                 <>
                                     <Typography variant="body1" color="text.secondary">
-                                        Email not sent yet
+                                        {(!transaction.recipient_email && !transaction.recipient_communication_email) || 
+                                         (transaction.recipient_email?.endsWith('@14trees') && 
+                                          (!transaction.recipient_communication_email || transaction.recipient_communication_email?.endsWith('@14trees'))) ? 
+                                          'Email notification cannot be sent - no valid email provided' : 
+                                          'Email not sent yet'}
                                     </Typography>
                                     <Button
                                         variant="contained"
                                         color="success"
                                         startIcon={<Email />}
                                         onClick={() => setEmailDialogOpen(true)}
+                                        disabled={(!transaction.recipient_email && !transaction.recipient_communication_email) || 
+                                                 (transaction.recipient_email?.endsWith('@14trees') && 
+                                                  (!transaction.recipient_communication_email || transaction.recipient_communication_email?.endsWith('@14trees')))}
                                         sx={{ textTransform: 'none' }}
                                     >
                                         Send Now
@@ -301,6 +323,29 @@ const GiftRedeemSummary: React.FC<Props> = ({ transaction }) => {
                 onClose={() => setEmailDialogOpen(false)}
                 transaction={transaction}
             />
+
+            {editDialogOpen && <RedeemGiftTreeDialog
+                open={editDialogOpen}
+                onClose={() => setEditDialogOpen(false)}
+                onSubmit={() => {
+                    setEditDialogOpen(false);
+                    toast.success("Transaction details updated successfully");
+                    if (onTransactionUpdated) {
+                        onTransactionUpdated();
+                    }
+                }}
+                userId={transaction.user_id || 0}
+                tree={{
+                    giftCardId: 0, // This will be ignored in edit mode
+                    treeId: 0, // This will be ignored in edit mode
+                    saplingId: transaction.tree_details?.[0]?.sapling_id || '',
+                    plantType: transaction.tree_details?.[0]?.plant_type || '',
+                    requestId: '',
+                    giftedBy: transaction.gifted_by || '',
+                    logoUrl: null
+                }}
+                existingTransaction={transaction}
+            />}
 
             <Typography variant="h6" gutterBottom sx={{ mb: 3 }}>
                 Gifted Trees
