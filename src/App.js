@@ -124,9 +124,9 @@ function App() {
           <Route 
             path="/personal/dashboard/:userId" 
             element={
-              // <RequireAuth>
+              <RequireAuth>
                 <GiftDashboard />
-              // </RequireAuth>
+              </RequireAuth>
             } 
           />
         </Routes>

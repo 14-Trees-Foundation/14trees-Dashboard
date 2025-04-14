@@ -25,10 +25,6 @@ const GiftDashboard: React.FC = () => {
     const [status, setStatus] = useState<{ code: number, message: string }>({ code: 404, message: '' })
 
     let auth = useAuth();
-    useEffect(() => {
-        auth.signin("User", 13124, ["all"], ["super-admin"], "", () => { })
-        localStorage.setItem("userId", "13124");
-    }, [])
 
     useEffect(() => {
         if (userId && !isNaN(parseInt(userId))) {
