@@ -3,7 +3,7 @@ import { Steps } from "antd";
 import { FC, useEffect, useState } from "react";
 import { User } from "../../../../types/user";
 import { Group } from "../../../../types/Group";
-import PlotSelection from "./CardCount";
+import CardCount from "./CardCount";
 import { BulkUserForm } from "./UserDetails";
 import { toast } from "react-toastify";
 import CardDetails from "./CardDetailsForm";
@@ -92,6 +92,8 @@ const GiftCardsForm: FC<GiftCardsFormProps> = ({ step, loggedinUserId, giftCardR
 
             setUsers(usersData);
             setTreeCount(giftCardRequest.no_of_cards);
+            setCategory(giftCardRequest.category || "Foundation");
+            setGrove(giftCardRequest.grove || null);
             setLogoString(giftCardRequest.logo_url);
             setGiftedOn(giftCardRequest.gifted_on);
             if (giftCardRequest.request_type) setGiftRequestType(giftCardRequest.request_type);
@@ -160,7 +162,7 @@ const GiftCardsForm: FC<GiftCardsFormProps> = ({ step, loggedinUserId, giftCardR
             title: "Book Trees",
             onClick: () => setCurrentStep(1),
             style: { cursor: 'pointer' },
-            content: <PlotSelection
+            content: <CardCount
                 disabled={giftCardRequest !== undefined && giftCardRequest.status !== 'pending_plot_selection'}
                 treeCount={treeCount}
                 onTreeCountChange={count => setTreeCount(count)}
