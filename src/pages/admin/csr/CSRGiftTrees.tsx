@@ -6,10 +6,42 @@ import { Tree } from "../../../types/tree";
 import ApiClient from "../../../api/apiClient/apiClient";
 import { toast } from "react-toastify";
 import { CardGiftcard, EditOutlined, Forest, GrassTwoTone, NaturePeople, OpenInNew, Wysiwyg } from "@mui/icons-material";
-import RedeemGiftTreeDialog from "./RedeemGiftTreeDialog";
+import RedeemGiftTreeDialog from "../../GiftDashboard/RedeemGiftTreeDialog";
 import { GiftRedeemTransaction } from "../../../types/gift_redeem_transaction";
 import ScrambledImages from "../../../components/ScrambledImages";
-import GiftRedeemSummary from "./GiftTransactionSummary";
+import GiftRedeemSummary from "../../GiftDashboard/GiftTransactionSummary";
+
+const useStyle = makeStyles((theme) =>
+    createStyles({
+        analyticsCard: {
+            backgroundColor: "#13a76c",
+            color: "#fff",
+            width: "225px",
+            minHeight: "120px",
+            borderRadius: "12px",
+            margin: "0 10px 20px 10px",
+            padding: "12px",
+            textAlign: "center",
+            boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
+            transition: "transform 0.2s ease-in-out",
+            "&:hover": {
+                transform: "translateY(-5px)",
+            },
+        },
+        customCard: {
+            backgroundColor: '#b7edc47a',
+            border: 'none',
+            overflow: 'hidden',
+            borderRadius: '20px',
+            transition: 'background-color 0.3s',
+            '&:hover': {
+                backgroundColor: '#8fcf9f7a !important', /* New hover color */
+                cursor: 'pointer',
+                transition: 'background-color 0.3s ease', /* Smooth transition */
+            },
+        },
+    })
+);
 
 interface CSRGiftTreesProps {
     groupId: number
@@ -37,6 +69,7 @@ const CSRGiftTrees: React.FC<CSRGiftTreesProps> = ({ groupId }) => {
     const [trnPage, setTrnPage] = useState(0);
     const [summaryOpen, setSummaryOpen] = useState(false);
     const [selectedTrn, setSelectedTrn] = useState<GiftRedeemTransaction | null>(null);
+    const [refreshTrigger, setRefreshTrigger] = useState(0);
 
     useEffect(() => {
         const treesList = Object.values(trees);
@@ -63,7 +96,7 @@ const CSRGiftTrees: React.FC<CSRGiftTreesProps> = ({ groupId }) => {
         }, 300);
 
         return () => { clearTimeout(handler); }
-    }, [filter, searchUser, transactions, trnPage, pageSize, groupId, totalTrnRecords])
+    }, [filter, searchUser, transactions, trnPage, pageSize, groupId, totalTrnRecords, refreshTrigger])
 
     useEffect(() => {
         if (filter === 'gifted') {
@@ -177,6 +210,17 @@ const CSRGiftTrees: React.FC<CSRGiftTreesProps> = ({ groupId }) => {
 
         return location;
     }
+
+    const handleTransactionUpdated = () => {
+        // Clear transactions cache and trigger a refresh
+        setTransactions({});
+        setRefreshTrigger(prev => prev + 1);
+        if (selectedTrn) {
+            // Close the summary dialog
+            setSummaryOpen(false);
+            setSelectedTrn(null);
+        }
+    };
 
     return (
         <Box mt={5} id="your-wall-of-tree-gifts">
@@ -405,68 +449,52 @@ const CSRGiftTrees: React.FC<CSRGiftTreesProps> = ({ groupId }) => {
                 </Button>
             </div>}
 
-            {selectedGiftTree && <RedeemGiftTreeDialog
-                open={giftDialogVisible}
-                onClose={() => { setGiftDialogVisible(false); setGiftMultiple(false); setSelectedGiftTree(null); }}
-                onSubmit={() => { setTrees({}); setPage(0); getAnanlyticsData(groupId); }}
-                tree={{
-                    treeId: selectedGiftTree.id,
-                    saplingId: selectedGiftTree.sapling_id,
-                    plantType: selectedGiftTree.plant_type || '',
-                    giftCardId: (selectedGiftTree as any).gift_card_id,
-                    requestId: (selectedGiftTree as any).request_id,
-                    giftedBy: (selectedGiftTree as any).gifted_by,
-                    logoUrl: (selectedGiftTree as any).logo_url,
-                }}
-                giftMultiple={giftMultiple}
-                groupId={groupId}
-            />}
+            {giftDialogVisible && selectedGiftTree && (
+                <RedeemGiftTreeDialog
+                    open={giftDialogVisible}
+                    onClose={() => { 
+                        setGiftDialogVisible(false); 
+                        setGiftMultiple(false); 
+                    }}
+                    onSubmit={() => {
+                        setGiftDialogVisible(false);
+                        setGiftMultiple(false);
+                        setTrees({});  // Clear trees to trigger refresh
+                    }}
+                    userId={Number(selectedGiftTree.assigned_to) || 0}
+                    tree={{
+                        giftCardId: Number((selectedGiftTree as any).gift_card_id) || 0,
+                        treeId: selectedGiftTree.id,
+                        saplingId: String(selectedGiftTree.sapling_id || ''),
+                        plantType: String(selectedGiftTree.plant_type || ''),
+                        requestId: String(Math.random().toString(36).substring(2, 15)),
+                        giftedBy: String((selectedGiftTree as any).gifted_by || ''),
+                        logoUrl: null
+                    }}
+                    giftMultiple={giftMultiple}
+                />
+            )}
 
-
-            <Dialog open={summaryOpen} fullWidth maxWidth='xl'>
-                {/* <DialogTitle>Gift Summary</DialogTitle> */}
-                <DialogContent dividers sx={{ backgroundColor: "#B1BFB5" }}>
-                    {selectedTrn && <GiftRedeemSummary transaction={selectedTrn} />}
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={() => { setSummaryOpen(false); setSelectedTrn(null); }} color="error" variant="outlined">
-                        CLose
-                    </Button>
-                </DialogActions>
-            </Dialog>
+            {summaryOpen && selectedTrn && (
+                <Dialog
+                    fullWidth
+                    maxWidth="xl"
+                    open={summaryOpen}
+                    onClose={() => { setSummaryOpen(false); }}
+                >
+                    <DialogContent>
+                        <GiftRedeemSummary 
+                            transaction={selectedTrn}
+                            onTransactionUpdated={handleTransactionUpdated}
+                        />
+                    </DialogContent>
+                    <DialogActions>
+                        <Button onClick={() => { setSummaryOpen(false); }}>Close</Button>
+                    </DialogActions>
+                </Dialog>
+            )}
         </Box>
     );
 }
-
-const useStyle = makeStyles((theme) =>
-    createStyles({
-        customCard: {
-            backgroundColor: '#b7edc47a',
-            border: 'none',
-            overflow: 'hidden',
-            borderRadius: '20px',
-            transition: 'background-color 0.3s',
-            '&:hover': {
-                backgroundColor: '#8fcf9f7a !important', /* New hover color */
-                cursor: 'pointer',
-                transition: 'background-color 0.3s ease', /* Smooth transition */
-            },
-        },
-        analyticsCard: {
-            width: "100%",
-            maxWidth: "180px",
-            minHeight: "170px",
-            maxHeight: "260px",
-            borderRadius: "15px",
-            textAlign: "center",
-            padding: "16px",
-            margin: "20px",
-            background: "linear-gradient(145deg, #9faca3, #bdccc2)",
-            // boxShadow: '0px 0px 20px rgba(0, 0, 0, 0.15)',
-            boxShadow: "7px 7px 14px #9eaaa1,-7px -7px 14px #c4d4c9",
-        },
-    })
-);
-
 
 export default CSRGiftTrees;
