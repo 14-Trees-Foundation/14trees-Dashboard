@@ -30,6 +30,7 @@ import { User } from "./pages/user/User";
 import SponsorProfile from "./pages/SponsorProfile/SponsorProfile";
 import CSRPage from "./pages/admin/csr/CSRPage";
 import EventPage from "./pages/EventDashboard/EventPage";
+import GiftDashboard from "./pages/GiftDashboard/GiftDashboard";
 
 function App() {
   return (
@@ -118,6 +119,14 @@ function App() {
               <RequireAuth>
                 <CSRPage />
               </RequireAuth>
+            } 
+          />
+          <Route 
+            path="/personal/dashboard/:userId" 
+            element={
+              // <RequireAuth>
+                <GiftDashboard />
+              // </RequireAuth>
             } 
           />
         </Routes>

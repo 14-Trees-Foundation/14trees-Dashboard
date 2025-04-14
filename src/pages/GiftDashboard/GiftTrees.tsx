@@ -2,20 +2,20 @@ import { useEffect, useState } from "react";
 import { Box, Button, Dialog, DialogActions, DialogContent, FormControl, FormControlLabel, FormGroup, Grid, Radio, TextField, Typography } from "@mui/material";
 import { Card } from "antd";
 import { createStyles, makeStyles } from "@mui/styles";
-import { Tree } from "../../../types/tree";
-import ApiClient from "../../../api/apiClient/apiClient";
+import { Tree } from "../../types/tree";
+import ApiClient from "../../api/apiClient/apiClient";
 import { toast } from "react-toastify";
 import { CardGiftcard, EditOutlined, Forest, GrassTwoTone, NaturePeople, OpenInNew, Wysiwyg } from "@mui/icons-material";
 import RedeemGiftTreeDialog from "./RedeemGiftTreeDialog";
-import { GiftRedeemTransaction } from "../../../types/gift_redeem_transaction";
-import ScrambledImages from "../../../components/ScrambledImages";
+import { GiftRedeemTransaction } from "../../types/gift_redeem_transaction";
+import ScrambledImages from "../../components/ScrambledImages";
 import GiftRedeemSummary from "./GiftTransactionSummary";
 
-interface CSRGiftTreesProps {
-    groupId: number
+interface GiftTreesProps {
+    userId: number
 }
 
-const CSRGiftTrees: React.FC<CSRGiftTreesProps> = ({ groupId }) => {
+const GiftTrees: React.FC<GiftTreesProps> = ({ userId }) => {
 
     const classes = useStyle();
 
@@ -56,14 +56,14 @@ const CSRGiftTrees: React.FC<CSRGiftTreesProps> = ({ groupId }) => {
         const handler = setTimeout(() => {
             for (let i = trnPage * pageSize; i < Math.min((trnPage + 1) * pageSize, totalTrnRecords); i++) {
                 if (!transactions[i]) {
-                    getGiftTransactions(trnPage * pageSize, pageSize, groupId, searchUser);
+                    getGiftTransactions(trnPage * pageSize, pageSize, 'user', userId, searchUser);
                     return;
                 }
             }
         }, 300);
 
         return () => { clearTimeout(handler); }
-    }, [filter, searchUser, transactions, trnPage, pageSize, groupId, totalTrnRecords])
+    }, [filter, searchUser, transactions, trnPage, pageSize, userId, totalTrnRecords])
 
     useEffect(() => {
         if (filter === 'gifted') {
@@ -78,11 +78,11 @@ const CSRGiftTrees: React.FC<CSRGiftTreesProps> = ({ groupId }) => {
         }
     }, [filter, searchUser])
 
-    const getTrees = async (offset: number, limit: number, groupId: number, filters: any[]) => {
+    const getTrees = async (offset: number, limit: number, userId: number, filters: any[]) => {
         setLoading(true);
         try {
             const apiClient = new ApiClient();
-            const treesResp = await apiClient.getMappedGiftTrees(offset, limit, 'group', groupId, filters);
+            const treesResp = await apiClient.getMappedGiftTrees(offset, limit, 'user', userId, filters);
 
             setTrees(prev => {
                 const treesData = { ...prev };
@@ -100,20 +100,20 @@ const CSRGiftTrees: React.FC<CSRGiftTreesProps> = ({ groupId }) => {
         setLoading(false);
     }
 
-    const getAnanlyticsData = async (groupId: number) => {
+    const getAnanlyticsData = async (userId: number) => {
         try {
             const apiClient = new ApiClient();
-            const treesResp = await apiClient.getMappedGiftTreesAnalytics('group', groupId);
+            const treesResp = await apiClient.getMappedGiftTreesAnalytics('user', userId);
             setAnalytics(treesResp)
         } catch (error: any) {
             toast.error(error.message);
         }
     }
 
-    const getGiftTransactions = async (offset: number, limit: number, groupId: number, search?: string) => {
+    const getGiftTransactions = async (offset: number, limit: number, type: 'group' | 'user', id: number, search?: string) => {
         try {
             const apiClient = new ApiClient();
-            const trns = await apiClient.getGiftTransactions(offset, limit, 'group', groupId, search);
+            const trns = await apiClient.getGiftTransactions(offset, limit, type, id, search);
             setTransactions(prev => {
                 const trnData = { ...prev };
                 for (let i = 0; i < trns.results.length; i++) {
@@ -135,8 +135,8 @@ const CSRGiftTrees: React.FC<CSRGiftTreesProps> = ({ groupId }) => {
         setPage(0);
 
         // fethc new analytics
-        getAnanlyticsData(groupId);
-    }, [groupId])
+        getAnanlyticsData(userId);
+    }, [userId])
 
     useEffect(() => {
         const handler = setTimeout(() => {
@@ -150,14 +150,14 @@ const CSRGiftTrees: React.FC<CSRGiftTreesProps> = ({ groupId }) => {
 
             for (let i = page * pageSize; i < Math.min((page + 1) * pageSize, totalRecords); i++) {
                 if (!trees[i]) {
-                    getTrees(page * pageSize, pageSize, groupId, filters);
+                    getTrees(page * pageSize, pageSize, userId, filters);
                     return;
                 }
             }
         }, 300);
 
         return () => { clearTimeout(handler); }
-    }, [trees, page, pageSize, groupId, totalRecords, filter, searchUser])
+    }, [trees, page, pageSize, userId, totalRecords, filter, searchUser])
 
 
     const handleMultiTreesGift = () => {
@@ -366,7 +366,7 @@ const CSRGiftTrees: React.FC<CSRGiftTreesProps> = ({ groupId }) => {
                         >
                             <div style={{ width: "100%", zIndex: 10, display: 'flex', flexDirection: 'column' }}>
                                 {trn.recipient_name && <Typography variant="body1" fontWeight={400}>
-                                    Pack of {trn.trees_count} trees gifted to {trn.recipient_name}
+                                    {Number(trn.trees_count) > 1 ? `Pack of ${trn.trees_count} trees` : `Tree`} gifted to {trn.recipient_name || ''}
                                 </Typography>}
                                 {trn.recipient && <Typography
                                     noWrap
@@ -408,7 +408,7 @@ const CSRGiftTrees: React.FC<CSRGiftTreesProps> = ({ groupId }) => {
             {selectedGiftTree && <RedeemGiftTreeDialog
                 open={giftDialogVisible}
                 onClose={() => { setGiftDialogVisible(false); setGiftMultiple(false); setSelectedGiftTree(null); }}
-                onSubmit={() => { setTrees({}); setPage(0); getAnanlyticsData(groupId); }}
+                onSubmit={() => { setTrees({}); setPage(0); getAnanlyticsData(userId); }}
                 tree={{
                     treeId: selectedGiftTree.id,
                     saplingId: selectedGiftTree.sapling_id,
@@ -416,9 +416,10 @@ const CSRGiftTrees: React.FC<CSRGiftTreesProps> = ({ groupId }) => {
                     giftCardId: (selectedGiftTree as any).gift_card_id,
                     requestId: (selectedGiftTree as any).request_id,
                     giftedBy: (selectedGiftTree as any).gifted_by,
+                    logoUrl: (selectedGiftTree as any).logo_url,
                 }}
                 giftMultiple={giftMultiple}
-                groupId={groupId}
+                userId={userId}
             />}
 
 
@@ -468,4 +469,4 @@ const useStyle = makeStyles((theme) =>
 );
 
 
-export default CSRGiftTrees;
+export default GiftTrees;

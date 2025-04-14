@@ -30,9 +30,10 @@ interface CardDetailsProps {
     saplingId?: string | null
     plantType?: string | null
     userName?: string | null
+    treesCount?: number
 }
 
-const CardDetails: FC<CardDetailsProps> = ({ logo_url, request_id, presentationId, slideId, messages, saplingId, plantType, userName, onChange, onPresentationId }) => {
+const CardDetails: FC<CardDetailsProps> = ({ logo_url, request_id, presentationId, slideId, messages, saplingId, plantType, userName, onChange, onPresentationId, treesCount }) => {
 
     const slideIdRef = useRef('');
     const presentationIdIdRef = useRef('');
@@ -40,7 +41,12 @@ const CardDetails: FC<CardDetailsProps> = ({ logo_url, request_id, presentationI
     const logoRef = useRef({ logoUrl: undefined as string | null | undefined })
     const [iframeSrc, setIframeSrc] = useState<string | null>(null);
     const [loading, setLoading] = useState(false);
-    const giftRef = useRef({ saplingId: undefined as string | null | undefined, plantType: undefined as string | null | undefined, userName: undefined as string | null | undefined })
+    const giftRef = useRef({ 
+        saplingId: undefined as string | null | undefined, 
+        plantType: undefined as string | null | undefined, 
+        userName: undefined as string | null | undefined,
+        treesCount: undefined as number | undefined,
+    })
 
     const updateSlide = async () => {
         if (!slideIdRef.current || !presentationIdIdRef.current) {
@@ -49,7 +55,7 @@ const CardDetails: FC<CardDetailsProps> = ({ logo_url, request_id, presentationI
 
         setLoading(true);
         const apiClient = new ApiClient();
-        await apiClient.updateGiftCardTemplate(slideIdRef.current, recordRef.current.primary, recordRef.current.secondary, recordRef.current.logo, logo_url, giftRef.current.saplingId, giftRef.current.userName);
+        await apiClient.updateGiftCardTemplate(slideIdRef.current, recordRef.current.primary, recordRef.current.secondary, recordRef.current.logo, logoRef.current.logoUrl, giftRef.current.saplingId, giftRef.current.userName, giftRef.current.treesCount);
         setIframeSrc(
             `https://docs.google.com/presentation/d/${presentationIdIdRef.current}/embed?rm=minimal&slide=id.${slideIdRef.current}&timestamp=${new Date().getTime()}`
         );
@@ -93,8 +99,8 @@ const CardDetails: FC<CardDetailsProps> = ({ logo_url, request_id, presentationI
     }, [logo_url])
 
     useEffect(() => {
-        giftRef.current = { userName, saplingId, plantType }
-    }, [userName, saplingId, plantType])
+        giftRef.current = { userName, saplingId, plantType, treesCount }
+    }, [userName, saplingId, plantType, treesCount])
 
     useEffect(() => {
         const eventMessage = messages.eventType === "2" ? defaultMessages.memorial : messages.eventType === "1" ? defaultMessages.birthday : defaultMessages.primary;
