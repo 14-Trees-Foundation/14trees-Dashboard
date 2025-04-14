@@ -9,6 +9,7 @@ export type GiftRedeemTransaction = {
     recipient: number;
     recipient_name?: string;
     recipient_email?: string;
+    recipient_communication_email?: string;
     primary_message: string;
     secondary_message: string;
     logo_message: string;

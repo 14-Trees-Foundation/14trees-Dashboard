@@ -3,11 +3,10 @@ import { useEffect, useState } from "react";
 import { SinglePageDrawer } from "../../components/SinglePageDrawer";
 import { NaturePeople } from "@mui/icons-material";
 import { createStyles, makeStyles } from "@mui/styles";
-import { Box } from "@mui/material";
+import { Box, Divider, Typography } from "@mui/material";
 import { useLocation, useSearchParams, useParams } from "react-router-dom";
-import { UserRoles } from "../../types/common";
 import ApiClient from "../../api/apiClient/apiClient";
-import { toast } from "react-toastify";
+import { toast, ToastContainer } from "react-toastify";
 import { Spinner } from "../../components/Spinner";
 import { NotFound } from "../notfound/NotFound";
 import GiftTrees from "./GiftTrees";
@@ -22,7 +21,7 @@ const GiftDashboard: React.FC = () => {
     const [searchParams] = useSearchParams();
     const location = useLocation();
     const [loading, setLoading] = useState(true);
-    const [status, setStatus] = useState<{ code: number, message: string }>({ code: 404, message: '' })
+    const [status, setStatus] = useState<{ code: number, message: string, view_name: string }>({ code: 404, message: '', view_name: '' })
 
     useEffect(() => {
         if (userId && !isNaN(parseInt(userId))) {
@@ -41,14 +40,7 @@ const GiftDashboard: React.FC = () => {
 
     useEffect(() => {
 
-        const roles: string[] = JSON.parse(localStorage.getItem('roles') || '[]');
         const userId = localStorage.getItem('userId') ? Number(localStorage.getItem("userId")) : 0;
-
-        if (roles.includes(UserRoles.Admin) || roles.includes(UserRoles.SuperAdmin)) {
-            setStatus({ code: 200, message: '' });
-            setLoading(false);
-            return;
-        }
 
         const intervalId = setTimeout(async () => {
             setLoading(true);
@@ -95,7 +87,19 @@ const GiftDashboard: React.FC = () => {
                             component="main"
                             sx={{ minWidth: "1080px", p: 2, width: "100%" }}
                         >
-                            <GiftTrees userId={sponsorId} />
+                            <Box>
+                                <ToastContainer />
+                                <div
+                                    style={{
+                                        display: "flex",
+                                        justifyContent: "space-between",
+                                    }}
+                                >
+                                    <Typography variant="h3" style={{ marginTop: '5px', marginBottom: '5px' }}>{status.view_name}</Typography>
+                                </div>
+                                <Divider sx={{ backgroundColor: "black", marginBottom: '15px' }} />
+                                <GiftTrees userId={sponsorId} />
+                            </Box>
                         </Box>
                     </Box>
                 </div>)

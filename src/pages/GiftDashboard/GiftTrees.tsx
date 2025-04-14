@@ -37,6 +37,7 @@ const GiftTrees: React.FC<GiftTreesProps> = ({ userId }) => {
     const [trnPage, setTrnPage] = useState(0);
     const [summaryOpen, setSummaryOpen] = useState(false);
     const [selectedTrn, setSelectedTrn] = useState<GiftRedeemTransaction | null>(null);
+    const [refreshTrigger, setRefreshTrigger] = useState(0);
 
     useEffect(() => {
         const treesList = Object.values(trees);
@@ -63,7 +64,7 @@ const GiftTrees: React.FC<GiftTreesProps> = ({ userId }) => {
         }, 300);
 
         return () => { clearTimeout(handler); }
-    }, [filter, searchUser, transactions, trnPage, pageSize, userId, totalTrnRecords])
+    }, [filter, searchUser, transactions, trnPage, pageSize, userId, totalTrnRecords, refreshTrigger])
 
     useEffect(() => {
         if (filter === 'gifted') {
@@ -177,6 +178,17 @@ const GiftTrees: React.FC<GiftTreesProps> = ({ userId }) => {
 
         return location;
     }
+
+    const handleTransactionUpdated = () => {
+        // Clear transactions cache and trigger a refresh
+        setTransactions({});
+        setRefreshTrigger(prev => prev + 1);
+        if (selectedTrn) {
+            // Close the summary dialog
+            setSummaryOpen(false);
+            setSelectedTrn(null);
+        }
+    };
 
     return (
         <Box mt={5} id="your-wall-of-tree-gifts">
@@ -423,17 +435,22 @@ const GiftTrees: React.FC<GiftTreesProps> = ({ userId }) => {
             />}
 
 
-            <Dialog open={summaryOpen} fullWidth maxWidth='xl'>
-                {/* <DialogTitle>Gift Summary</DialogTitle> */}
-                <DialogContent dividers sx={{ backgroundColor: "#B1BFB5" }}>
-                    {selectedTrn && <GiftRedeemSummary transaction={selectedTrn} />}
+            {summaryOpen && selectedTrn && <Dialog
+                fullWidth
+                maxWidth="xl"
+                open={summaryOpen}
+                onClose={() => { setSummaryOpen(false); }}
+            >
+                <DialogContent>
+                    <GiftRedeemSummary 
+                        transaction={selectedTrn}
+                        onTransactionUpdated={handleTransactionUpdated}
+                    />
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={() => { setSummaryOpen(false); setSelectedTrn(null); }} color="error" variant="outlined">
-                        CLose
-                    </Button>
+                    <Button variant="outlined" color="error" onClick={() => { setSummaryOpen(false); }}>Close</Button>
                 </DialogActions>
-            </Dialog>
+            </Dialog>}
         </Box>
     );
 }
