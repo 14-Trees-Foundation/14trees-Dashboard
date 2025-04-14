@@ -11,6 +11,7 @@ import { Tree } from "../../types/tree";
 import { GiftRedeemTransaction } from "../../types/gift_redeem_transaction";
 import ApiClient from "../../api/apiClient/apiClient";
 import { getHumanReadableDateTime } from "../../helpers/utils";
+import EmailDialog from "./EmailDialog";
 
 const useStyle = makeStyles((theme) =>
     createStyles({
@@ -294,6 +295,12 @@ const GiftRedeemSummary: React.FC<Props> = ({ transaction }) => {
                     </Grid> */}
                 </Grid>
             </Card>
+
+            <EmailDialog
+                open={emailDialogOpen}
+                onClose={() => setEmailDialogOpen(false)}
+                transaction={transaction}
+            />
 
             <Typography variant="h6" gutterBottom sx={{ mb: 3 }}>
                 Gifted Trees
