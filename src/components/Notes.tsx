@@ -1,0 +1,75 @@
+import React, { useEffect, useState } from 'react';
+import { Modal, Box, TextField, Button, Typography } from '@mui/material';
+
+const MAX_CHARS = 1000;
+
+interface NotesProps {
+    open: boolean;
+    initialText?: string;
+    handleClose: () => void;
+    onSave: (text: string) => void;
+}
+
+const Notes: React.FC<NotesProps> = ({ open, handleClose, initialText, onSave }) => {
+  const [text, setText] = useState(initialText || '');
+
+  useEffect(() => {
+    setText(initialText || '');
+  }, [open, initialText]);
+
+  const handleSave = () => {
+    onSave(text);
+    handleClose();
+  };
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.value.length <= MAX_CHARS) {
+      setText(e.target.value);
+    }
+  };
+
+  return (
+    <Modal open={open} onClose={handleClose} aria-labelledby="notes-modal-title">
+      <Box
+        sx={{
+          position: 'absolute',
+          top: '50%',
+          left: '50%',
+          transform: 'translate(-50%, -50%)',
+          width: 800,
+          bgcolor: 'background.paper',
+          borderRadius: 2,
+          boxShadow: 24,
+          p: 4,
+        }}
+      >
+        <Typography id="notes-modal-title" variant="h6" sx={{ mb: 2 }}>
+          Edit Notes
+        </Typography>
+        <TextField
+          fullWidth
+          multiline
+          rows={15}
+          variant="outlined"
+          placeholder="Notes..."
+          value={text}
+          onChange={handleChange}
+          sx={{ mb: 1 }}
+        />
+        <Typography variant="body2" color="textSecondary" sx={{ textAlign: 'right', mb: 3 }}>
+          {MAX_CHARS - text.length} characters remaining
+        </Typography>
+        <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2 }}>
+          <Button variant="outlined" color="error" onClick={handleClose}>
+            Cancel
+          </Button>
+          <Button variant="contained" color="success" onClick={handleSave}>
+            Save
+          </Button>
+        </Box>
+      </Box>
+    </Modal>
+  );
+};
+
+export default Notes;
