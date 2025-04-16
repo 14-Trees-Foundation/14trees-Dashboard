@@ -93,7 +93,6 @@ const RedeemGiftTreeDialog: React.FC<RedeemGiftTreeDialogProps> = ({ tree, open,
             return { ...prev, gifted_by: tree.giftedBy }
         })
 
-        console.log(tree);
     }, [tree])
 
     const validateTheName = (name: string) => {

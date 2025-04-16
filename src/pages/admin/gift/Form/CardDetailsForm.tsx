@@ -96,7 +96,6 @@ const CardDetails: FC<CardDetailsProps> = ({ logo_url, request_id, presentationI
 
     useEffect(() => {
         logoRef.current.logoUrl = logo_url
-        console.log(logo_url);
     }, [logo_url])
 
     useEffect(() => {
