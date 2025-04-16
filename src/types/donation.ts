@@ -25,6 +25,8 @@ export interface Donation {
   alternate_email: string | null;
   tags?: string[] | null;
   booked?: number;
+  notes?: string | null;
+  album_id?: number | null;
 }
 
 export type DonationUser = {
