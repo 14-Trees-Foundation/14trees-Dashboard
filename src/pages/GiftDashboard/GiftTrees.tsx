@@ -383,7 +383,7 @@ const GiftTrees: React.FC<GiftTreesProps> = ({ userId }) => {
                                 {trn.recipient && <Typography
                                     noWrap
                                     component='a'
-                                    href={getDashboardLink(trn as any)}
+                                    href={getDashboardLink(trn?.tree_details?.[0] as any)}
                                     target="_blank"
                                     sx={{
                                         mt: 1,

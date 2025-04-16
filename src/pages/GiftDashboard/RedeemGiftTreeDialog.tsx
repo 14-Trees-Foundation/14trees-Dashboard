@@ -223,14 +223,22 @@ const RedeemGiftTreeDialog: React.FC<RedeemGiftTreeDialogProps> = ({
 
     const handleInputChange = (event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
 
-        if (event.target.name === 'name') validateTheName(event.target.value);
-        if (event.target.name === 'email') validateTheEmail(event.target.value.trim(), 'email');
-        if (event.target.name === 'phone') validateThePhone(event.target.value);
+        let value = event.target.value;
+        if (event.target.name === 'name') validateTheName(value);
+        if (event.target.name === 'email') {
+            value = value.trim();
+            validateTheEmail(value, 'email');
+        }
+        if (event.target.name === 'phone') {
+            if (value.startsWith('+91')) value = value.slice(3);
+            if (value.startsWith('0')) value = value.slice(1);
+            validateThePhone(value);
+        }
         if (event.target.name === 'communication_email') validateTheEmail(event.target.value.trim(), 'communication_email');
 
         setFormData({
             ...formData,
-            [event.target.name]: event.target.value,
+            [event.target.name]: value,
         });
     };
 
