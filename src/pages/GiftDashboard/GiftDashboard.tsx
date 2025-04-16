@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { SinglePageDrawer } from "../../components/SinglePageDrawer";
 import { NaturePeople } from "@mui/icons-material";
 import { createStyles, makeStyles } from "@mui/styles";
-import { Box, Divider, Typography } from "@mui/material";
+import { Box, Divider, Typography, useMediaQuery, useTheme } from "@mui/material";
 import { useLocation, useSearchParams, useParams } from "react-router-dom";
 import ApiClient from "../../api/apiClient/apiClient";
 import { toast, ToastContainer } from "react-toastify";
@@ -14,6 +14,8 @@ import GiftTrees from "./GiftTrees";
 
 const GiftDashboard: React.FC = () => {
 
+    const theme = useTheme();
+    const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
     const { userId } = useParams();
     const [sponsorId, setSponsorId] = useState<number | null>(null);
 
@@ -89,7 +91,7 @@ const GiftDashboard: React.FC = () => {
                         <SinglePageDrawer pages={items} />
                         <Box
                             component="main"
-                            sx={{ minWidth: "1080px", p: 2, width: "100%" }}
+                            sx={{ minWidth: isMobile ? "98%" : "1080px", p: isMobile ? 0 : 2, width: "100%" }}
                         >
                             <Box>
                                 <ToastContainer />
@@ -99,9 +101,9 @@ const GiftDashboard: React.FC = () => {
                                         justifyContent: "space-between",
                                     }}
                                 >
-                                    <Typography variant="h3" style={{ marginTop: '5px', marginBottom: '5px' }}>{status.view_name}</Typography>
+                                    <Typography variant={isMobile ? "h5" : "h3"} style={{ marginTop: isMobile ? '70px' : '5px', marginBottom: '5px', marginLeft: isMobile ? '10px' : '0px' }}>{status.view_name}</Typography>
                                 </div>
-                                <Divider sx={{ backgroundColor: "black", marginBottom: '15px' }} />
+                                <Divider sx={{ backgroundColor: "black", marginBottom: '15px', mx: isMobile ? 1 : 0 }} />
                                 <GiftTrees userId={sponsorId} />
                             </Box>
                         </Box>

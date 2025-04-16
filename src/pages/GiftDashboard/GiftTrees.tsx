@@ -1,290 +1,152 @@
-import { useEffect, useState } from "react";
-import { Box, Button, Dialog, DialogActions, DialogContent, FormControl, FormControlLabel, FormGroup, Grid, Radio, TextField, Typography } from "@mui/material";
-import { Card } from "antd";
-import { createStyles, makeStyles } from "@mui/styles";
+import { useState, useRef, useCallback } from "react";
+import { Box, Button, Dialog, DialogActions, DialogContent, FormControl, FormControlLabel, FormGroup, Radio, TextField, Typography, useMediaQuery, useTheme } from "@mui/material";
 import { Tree } from "../../types/tree";
-import ApiClient from "../../api/apiClient/apiClient";
-import { toast } from "react-toastify";
-import { CardGiftcard, EditOutlined, Forest, GrassTwoTone, NaturePeople, OpenInNew, Wysiwyg } from "@mui/icons-material";
-import RedeemGiftTreeDialog from "./RedeemGiftTreeDialog";
 import { GiftRedeemTransaction } from "../../types/gift_redeem_transaction";
-import ScrambledImages from "../../components/ScrambledImages";
-import GiftRedeemSummary from "./GiftTransactionSummary";
+import RedeemGiftTreeDialog from "../../components/redeem/RedeemGiftTreeDialog";
+import GiftTransactionSummary from "../../components/redeem/GiftTransactionSummary";
+import ImageViewModal from "../../components/ImageViewModal";
+import GiftAnalytics from "../../components/redeem/GiftAnalytics";
+import GiftTreesGrid, { GiftTreesGridHandle } from "../../components/redeem/GiftTreesGrid";
+import { toast } from "react-toastify";
 
 interface GiftTreesProps {
     userId: number
 }
 
 const GiftTrees: React.FC<GiftTreesProps> = ({ userId }) => {
-
-    const classes = useStyle();
-
-    const [loading, setLoading] = useState(false);
-    const [page, setPage] = useState(0);
-    const [pageSize, setPageSize] = useState(20);
-    const [trees, setTrees] = useState<Record<number, Tree>>({});
-    const [treesList, setTreesList] = useState<Tree[]>([]);
-    const [totalRecords, setTotalRecords] = useState(10);
+    const theme = useTheme();
+    const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+    const isTablet = useMediaQuery(theme.breakpoints.between('sm', 'md'));
+    
     const [giftDialogVisible, setGiftDialogVisible] = useState(false);
     const [selectedGiftTree, setSelectedGiftTree] = useState<Tree | null>(null);
     const [giftMultiple, setGiftMultiple] = useState(false);
     const [filter, setFilter] = useState<'gifted' | 'non-gifted' | 'all'>('all');
     const [searchUser, setSeachUser] = useState('');
-    const [analytics, setAnalytics] = useState<any>(null)
+    const [isLoading, setIsLoading] = useState(false);
 
-    const [totalTrnRecords, setTotalTrnRecords] = useState(10);
-    const [transactions, setTransactions] = useState<Record<number, GiftRedeemTransaction>>({});
-    const [trnPage, setTrnPage] = useState(0);
     const [summaryOpen, setSummaryOpen] = useState(false);
     const [selectedTrn, setSelectedTrn] = useState<GiftRedeemTransaction | null>(null);
     const [refreshTrigger, setRefreshTrigger] = useState(0);
+    const [imageViewModalOpen, setImageViewModalOpen] = useState(false);
+    const [imageViewModalImageUrl, setImageViewModalImageUrl] = useState('');
 
-    useEffect(() => {
-        const treesList = Object.values(trees);
+    const gridRef = useRef<GiftTreesGridHandle>(null);
 
-        let filteredData: Tree[] = [];
-        if (filter === 'all') filteredData = treesList;
-        else if (filter === 'gifted') filteredData = treesList.filter(tree => tree.assigned_to);
-        else filteredData = treesList.filter(tree => !tree.assigned_to);
-
-        setTreesList(filteredData)
-    }, [trees, filter])
-
-
-    useEffect(() => {
-        if (filter !== 'gifted') return;
-
-        const handler = setTimeout(() => {
-            for (let i = trnPage * pageSize; i < Math.min((trnPage + 1) * pageSize, totalTrnRecords); i++) {
-                if (!transactions[i]) {
-                    getGiftTransactions(trnPage * pageSize, pageSize, 'user', userId, searchUser);
-                    return;
-                }
-            }
-        }, 300);
-
-        return () => { clearTimeout(handler); }
-    }, [filter, searchUser, transactions, trnPage, pageSize, userId, totalTrnRecords, refreshTrigger])
-
-    useEffect(() => {
-        if (filter === 'gifted') {
-            setTrnPage(0);
-            setTotalTrnRecords(20);
-            setTransactions({});
-        } else {
-            setTrees({});
-            setPage(0);
-            setTreesList([]);
-            setTotalRecords(20);
-        }
-    }, [filter, searchUser])
-
-    const getTrees = async (offset: number, limit: number, userId: number, filters: any[]) => {
-        setLoading(true);
+    const handleMultiTreesGift = useCallback(async () => {
+        setIsLoading(true);
         try {
-            const apiClient = new ApiClient();
-            const treesResp = await apiClient.getMappedGiftTrees(offset, limit, 'user', userId, filters);
-
-            setTrees(prev => {
-                const treesData = { ...prev };
-                for (let i = 0; i < treesResp.results.length; i++) {
-                    treesData[treesResp.offset + i] = treesResp.results[i];
-                }
-
-                return treesData;
-            })
-            setTotalRecords(Number(treesResp.total));
-
-        } catch (error: any) {
-            toast.error(error.message);
-        }
-        setLoading(false);
-    }
-
-    const getAnanlyticsData = async (userId: number) => {
-        try {
-            const apiClient = new ApiClient();
-            const treesResp = await apiClient.getMappedGiftTreesAnalytics('user', userId);
-            setAnalytics(treesResp)
-        } catch (error: any) {
-            toast.error(error.message);
-        }
-    }
-
-    const getGiftTransactions = async (offset: number, limit: number, type: 'group' | 'user', id: number, search?: string) => {
-        try {
-            const apiClient = new ApiClient();
-            const trns = await apiClient.getGiftTransactions(offset, limit, type, id, search);
-            setTransactions(prev => {
-                const trnData = { ...prev };
-                for (let i = 0; i < trns.results.length; i++) {
-                    trnData[trns.offset + i] = trns.results[i];
-                }
-
-                return trnData;
-            })
-            setTotalTrnRecords(Number(trns.total));
-        } catch (error: any) {
-            toast.error(error.message);
-        }
-    }
-
-    useEffect(() => {
-        // group id is changed, reset the states
-        setTrees({});
-        setTotalRecords(20);
-        setPage(0);
-
-        // fethc new analytics
-        getAnanlyticsData(userId);
-    }, [userId])
-
-    useEffect(() => {
-        const handler = setTimeout(() => {
-            const filters: any[] = []
-            if (searchUser.trim().length > 0) {
-                filters.push({ columnField: 'assigned_to_name', value: searchUser.trim(), operatorValue: 'contains' });
-            }
-            if (filter !== 'all') {
-                filters.push({ columnField: 'assigned_to', operatorValue: filter === 'gifted' ? 'isNotEmpty' : 'isEmpty' });
-            }
-
-            for (let i = page * pageSize; i < Math.min((page + 1) * pageSize, totalRecords); i++) {
-                if (!trees[i]) {
-                    getTrees(page * pageSize, pageSize, userId, filters);
-                    return;
+            // Use the ref to get the first available tree
+            if (gridRef.current) {
+                const tree = await gridRef.current.getFirstAvailableTree();
+                if (tree) {
+                    setSelectedGiftTree(tree);
+                    setGiftMultiple(true);
+                    setGiftDialogVisible(true);
                 }
             }
-        }, 300);
+        } catch (error: any) {
+            toast.error("Error fetching available trees: " + (error.message || "Unknown error"));
+        } finally {
+            setIsLoading(false);
+        }
+    }, []);
 
-        return () => { clearTimeout(handler); }
-    }, [trees, page, pageSize, userId, totalRecords, filter, searchUser])
-
-
-    const handleMultiTreesGift = () => {
-        setGiftMultiple(true);
+    const handleSelectTree = (tree: Tree) => {
+        setSelectedGiftTree(tree);
+        setGiftMultiple(false);
         setGiftDialogVisible(true);
-        setSelectedGiftTree(Object.values(trees)[0]);
-    }
+    };
 
-    const getDashboardLink = (tree: Tree) => {
-        let location: string = ''
-        const { hostname, host } = window.location;
-        if (hostname === "localhost" || hostname === "127.0.0.1") {
-            location = "http://" + host + "/profile/" + tree.sapling_id
-        } else {
-            location = "https://" + hostname + "/profile/" + tree.sapling_id
-        }
-
-        return location;
-    }
+    const handleSelectTransaction = (transaction: GiftRedeemTransaction) => {
+        setSelectedTrn(transaction);
+        setSummaryOpen(true);
+    };
 
     const handleTransactionUpdated = () => {
-        // Clear transactions cache and trigger a refresh
-        setTransactions({});
         setRefreshTrigger(prev => prev + 1);
         if (selectedTrn) {
-            // Close the summary dialog
             setSummaryOpen(false);
             setSelectedTrn(null);
         }
     };
 
     return (
-        <Box mt={5} id="your-wall-of-tree-gifts">
-            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                <Typography variant="h4" ml={1} mr={2}>Green Tribute Wall</Typography>
+        <Box mt={3} id="your-wall-of-tree-gifts" sx={{ px: isMobile ? 1 : 2 }}>
+            <Box sx={{ 
+                display: 'flex', 
+                flexDirection: isMobile ? 'column' : 'row',
+                alignItems: isMobile ? 'flex-start' : 'center', 
+                justifyContent: 'space-between',
+                mb: 2
+            }}>
+                <Typography variant={isMobile ? "h5" : "h4"} ml={1} mr={2}>
+                    Green Tribute Wall
+                </Typography>
             </Box>
-            <Typography variant="subtitle1" ml={1} mb={1}>Celebrate your organization's eco-friendly contributions with a dedicated wall showcasing all the trees gifted. Each entry represents a lasting tribute to sustainability, featuring recipient details, heartfelt messages, and the tree's location.</Typography>
-
-            {analytics && <Box style={{
-                display: 'flex',
-                justifyContent: 'center',
-                alignItems: 'center',
-                flexWrap: 'wrap',
-            }}
-            >
-                <div className={classes.analyticsCard}>
-                    <Box sx={{ paddingTop: "10px" }}>
-                        <Forest fontSize="large" style={{ color: "#53ad7a" }} />
-                        <Typography variant="h3" color="#fff" sx={{ pt: 1, pb: 1 }}>
-                            {analytics?.total_trees ? analytics.total_trees : '0'}
-                        </Typography>
-                        <Typography variant="subtitle2" color="#1f3625">
-                            Trees opted for Gifting
-                        </Typography>
-                    </Box>
-                </div>
-                <div className={classes.analyticsCard}>
-                    <Box sx={{ paddingTop: "10px" }}>
-                        <NaturePeople
-                            fontSize="large"
-                            style={{ color: "#573D1C" }}
-                        />
-                        <Typography variant="h3" color="#fff" sx={{ pt: 1, pb: 1 }}>
-                            {analytics?.gifted_trees ? analytics.gifted_trees : '0'}
-                        </Typography>
-                        <Typography variant="subtitle2" color="#1f3625">
-                            Trees Gifted
-                        </Typography>
-                    </Box>
-                </div>
-                <div className={classes.analyticsCard}>
-                    <Box sx={{ paddingTop: "10px" }}>
-                        <GrassTwoTone fontSize="large" style={{ color: "#F94F25" }} />
-                        <Typography variant="h3" color="#fff" sx={{ pt: 1, pb: 1 }}>
-                            {Number(analytics?.total_trees) - Number(analytics?.gifted_trees) || '0'}
-                        </Typography>
-                        <Typography variant="subtitle2" color="#1f3625">
-                            Available Giftable Inventory
-                        </Typography>
-                    </Box>
-                </div>
-            </Box>}
-            {analytics?.total_trees !== analytics?.gifted_trees && <Box
-                style={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    marginTop: 10,
+            
+            <Typography 
+                variant={isMobile ? "body2" : "subtitle1"} 
+                ml={1} 
+                mb={2}
+                sx={{
+                    maxWidth: '95%',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis'
                 }}
             >
-                <Button
-                    variant="contained"
-                    color="success"
-                    onClick={handleMultiTreesGift}
-                    style={{ textTransform: 'none', margin: '10px 5px 0 0' }}
-                    startIcon={<CardGiftcard />}
-                    disabled={analytics?.gifted_trees === analytics?.total_trees}
-                >
-                    Gift Trees Now!
-                </Button>
-                <Typography mt={1} variant='subtitle2'>(from your remaining stock of {Number(analytics?.total_trees) - Number(analytics?.gifted_trees)} trees)</Typography>
-            </Box>}
+                Celebrate your eco-friendly contributions with a dedicated wall showcasing all the trees gifted. Each entry represents a lasting tribute to sustainability, featuring heartfelt gifting messages, occasion celebrations with nature and individual dashboard tracker links for each tree.
+            </Typography>
 
-            <Box sx={{ mt: 8, paddingX: 1, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <GiftAnalytics 
+                userId={userId}
+                onGiftMultiple={handleMultiTreesGift}
+                refreshTrigger={refreshTrigger}
+                isLoading={isLoading}
+            />
+
+            <Box sx={{ 
+                mt: 4, 
+                paddingX: 1, 
+                display: 'flex', 
+                flexDirection: isMobile ? 'column' : 'row',
+                alignItems: isMobile ? 'stretch' : 'center', 
+                justifyContent: 'space-between',
+                gap: 2
+            }}>
                 <TextField
                     label="Search trees by giftee's name"
                     value={searchUser}
                     onChange={(e) => { setSeachUser(e.target.value) }}
                     fullWidth
                     size="small"
-                    sx={{ maxWidth: 500, m: 1 }}
+                    sx={{ 
+                        maxWidth: isMobile ? '100%' : '500px', 
+                        m: isMobile ? 0 : 1,
+                        mb: isMobile ? 2 : 1 
+                    }}
                 />
-                <FormControl component="fieldset">
-                    <FormGroup aria-label="position" row>
+                <FormControl component="fieldset" sx={{ width: isMobile ? '100%' : 'auto' }}>
+                    <FormGroup 
+                        aria-label="position" 
+                        row={!isMobile}
+                        sx={{
+                            justifyContent: 'space-between'
+                        }}
+                    >
                         <FormControlLabel
                             value="non-gifted"
                             control={<Radio color="success" checked={filter === 'non-gifted'} onChange={() => { setFilter('non-gifted') }} />}
                             label="Show Available Trees"
                             labelPlacement="end"
+                            sx={{ mr: 1 }}
                         />
                         <FormControlLabel
                             value="gifted"
                             control={<Radio color="success" checked={filter === 'gifted'} onChange={() => { setFilter('gifted') }} />}
                             label="Show Gifted Trees"
                             labelPlacement="end"
+                            sx={{ mr: 1 }}
                         />
                         <FormControlLabel
                             value="all"
@@ -295,132 +157,30 @@ const GiftTrees: React.FC<GiftTreesProps> = ({ userId }) => {
                     </FormGroup>
                 </FormControl>
             </Box>
-            <Grid container spacing={3} padding={3}>
-                {filter !== 'gifted' && treesList.map((tree) => (
-                    <Grid item xs={12} sm={6} md={3} key={tree.id}>
-                        <Card
-                            hoverable
-                            className={classes.customCard}
-                            cover={<img height='auto' alt={tree.plant_type}
-                                src={(tree as any).card_image_url
-                                    ? (tree as any).card_image_url
-                                    : tree.template_image
-                                        ? tree.template_image
-                                        : tree.illustration_s3_path
-                                            ? tree.illustration_s3_path
-                                            : tree.image} style={{ backgroundColor: 'white', width: '100%', objectFit: 'cover' }} />}
-                        >
-                            <div style={{ width: "100%", zIndex: 10, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                                <Typography variant="h6" gutterBottom noWrap>
-                                    {tree.plant_type}
-                                </Typography>
-                                {tree.assigned_to_name && <Typography variant="body2" color="text.secondary" noWrap>
-                                    Gifted to: {tree.assigned_to_name}
-                                </Typography>}
-                                {tree.assigned_to && <Typography
-                                    noWrap
-                                    component='a'
-                                    href={getDashboardLink(tree)}
-                                    target="_blank"
-                                    sx={{
-                                        mt: 1,
-                                        color: '#3f5344',
-                                        textTransform: 'none',
-                                        fontSize: '0.875rem', // Smaller button text
-                                        display: 'inline-flex', // Align text and icon
-                                        alignItems: 'center', // Center text and icon vertically
-                                        textDecoration: 'none', // Remove underline
-                                    }}
-                                >
-                                    Go to Dashboard <OpenInNew sx={{ ml: 1 }} fontSize='inherit' />
-                                </Typography>}
-                                {!tree.assigned_to && <Button
-                                    variant="contained"
-                                    color="success"
-                                    onClick={() => { setSelectedGiftTree(tree); setGiftDialogVisible(true); }}
-                                    style={{ textTransform: 'none', margin: '10px 5px 0 0' }}
-                                    startIcon={tree.assigned_to ? <Wysiwyg /> : <CardGiftcard />}
-                                >
-                                    {tree.assigned_to ? 'View Summary' : 'Gift Tree'}
-                                </Button>}
-                            </div>
-                        </Card>
-                    </Grid>
-                ))}
-
-
-                {/* Gifted trees transactions */}
-                {filter === 'gifted' && Object.values(transactions).map((trn) => (
-                    <Grid item xs={12} sm={6} md={3} key={trn.id}>
-                        <Card
-                            hoverable
-                            className={classes.customCard}
-                            cover={<ScrambledImages images_urls={trn.tree_details?.map(tree => {
-                                return tree.card_image_url
-                                    ? tree.card_image_url
-                                    : tree.template_image
-                                        ? tree.template_image
-                                        : tree.illustration_s3_path || ""
-                            }) || []} />}
-                            actions={[
-                                <Button
-                                    color='success'
-                                    startIcon={<Wysiwyg key="info" />}
-                                    style={{ textTransform: 'none' }}
-                                    onClick={() => { setSelectedTrn(trn); setSummaryOpen(true); }}
-                                >Summary</Button>,
-                                // <Button
-                                //     color='success'
-                                //     startIcon={<EditOutlined key="edit" />}
-                                //     style={{ textTransform: 'none' }}
-                                // >Edit</Button>
-                            ]}
-                        >
-                            <div style={{ width: "100%", zIndex: 10, display: 'flex', flexDirection: 'column' }}>
-                                {trn.recipient_name && <Typography variant="body1" fontWeight={400}>
-                                    {Number(trn.trees_count) > 1 ? `Pack of ${trn.trees_count} trees` : `Tree`} gifted to {trn.recipient_name || ''}
-                                </Typography>}
-                                {trn.recipient && <Typography
-                                    noWrap
-                                    component='a'
-                                    href={getDashboardLink(trn?.tree_details?.[0] as any)}
-                                    target="_blank"
-                                    sx={{
-                                        mt: 1,
-                                        color: '#3f5344',
-                                        textTransform: 'none',
-                                        fontSize: '0.875rem', // Smaller button text
-                                        display: 'inline-flex', // Align text and icon
-                                        alignItems: 'center', // Center text and icon vertically
-                                        textDecoration: 'none', // Remove underline
-                                    }}
-                                >
-                                    Go to Dashboard <OpenInNew sx={{ ml: 1 }} fontSize='inherit' />
-                                </Typography>}
-                            </div>
-                        </Card>
-                    </Grid>
-                ))}
-
-                {loading && [1, 2, 3, 4, 5, 6, 7, 8, 9].map(item => (<Grid item xs={12} sm={6} md={4} key={item}>
-                    <Card loading style={{ backgroundColor: '#b7edc47a', border: 'none', overflow: 'hidden', borderRadius: '20px' }}></Card>
-                </Grid>))}
-            </Grid>
-
-            {(filter !== 'gifted' && Object.values(trees).length < totalRecords) || (filter === 'gifted' && Object.values(transactions).length < totalTrnRecords) && <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-                <Button
-                    variant="contained"
-                    color="success"
-                    onClick={() => { filter === 'gifted' ? setTrnPage(trnPage + 1) : setPage(page + 1) }}
-                >
-                    Load More Trees
-                </Button>
-            </div>}
+            
+            <GiftTreesGrid
+                ref={gridRef}
+                userId={userId}
+                filter={filter}
+                searchUser={searchUser}
+                refreshTrigger={refreshTrigger}
+                onSelectTree={handleSelectTree}
+                onSelectTransaction={handleSelectTransaction}
+                onImageView={(imageUrl) => {
+                    setImageViewModalOpen(true);
+                    setImageViewModalImageUrl(imageUrl);
+                }}
+            />
 
             {selectedGiftTree && <RedeemGiftTreeDialog
                 open={giftDialogVisible}
                 onClose={() => { setGiftDialogVisible(false); setGiftMultiple(false); setSelectedGiftTree(null); }}
-                onSubmit={() => { setTrees({}); setPage(0); getAnanlyticsData(userId); }}
+                onSubmit={() => { 
+                    setGiftDialogVisible(false); 
+                    setGiftMultiple(false);
+                    setSelectedGiftTree(null);
+                    setRefreshTrigger(prev => prev + 1); 
+                }}
                 tree={{
                     treeId: selectedGiftTree.id,
                     saplingId: selectedGiftTree.sapling_id,
@@ -428,21 +188,20 @@ const GiftTrees: React.FC<GiftTreesProps> = ({ userId }) => {
                     giftCardId: (selectedGiftTree as any).gift_card_id,
                     requestId: (selectedGiftTree as any).request_id,
                     giftedBy: (selectedGiftTree as any).gifted_by,
-                    logoUrl: (selectedGiftTree as any).logo_url,
+                    logoUrl: (selectedGiftTree as any).logo_url || '',
                 }}
                 giftMultiple={giftMultiple}
                 userId={userId}
             />}
 
-
             {summaryOpen && selectedTrn && <Dialog
                 fullWidth
-                maxWidth="xl"
+                maxWidth={isMobile ? "sm" : "xl"}
                 open={summaryOpen}
                 onClose={() => { setSummaryOpen(false); }}
             >
                 <DialogContent>
-                    <GiftRedeemSummary 
+                    <GiftTransactionSummary
                         transaction={selectedTrn}
                         onTransactionUpdated={handleTransactionUpdated}
                     />
@@ -451,39 +210,14 @@ const GiftTrees: React.FC<GiftTreesProps> = ({ userId }) => {
                     <Button variant="outlined" color="error" onClick={() => { setSummaryOpen(false); }}>Close</Button>
                 </DialogActions>
             </Dialog>}
+
+            <ImageViewModal
+                open={imageViewModalOpen}
+                onClose={() => setImageViewModalOpen(false)}
+                imageUrl={imageViewModalImageUrl}
+            />
         </Box>
     );
 }
-
-const useStyle = makeStyles((theme) =>
-    createStyles({
-        customCard: {
-            backgroundColor: '#b7edc47a',
-            border: 'none',
-            overflow: 'hidden',
-            borderRadius: '20px',
-            transition: 'background-color 0.3s',
-            '&:hover': {
-                backgroundColor: '#8fcf9f7a !important', /* New hover color */
-                cursor: 'pointer',
-                transition: 'background-color 0.3s ease', /* Smooth transition */
-            },
-        },
-        analyticsCard: {
-            width: "100%",
-            maxWidth: "180px",
-            minHeight: "170px",
-            maxHeight: "260px",
-            borderRadius: "15px",
-            textAlign: "center",
-            padding: "16px",
-            margin: "20px",
-            background: "linear-gradient(145deg, #9faca3, #bdccc2)",
-            // boxShadow: '0px 0px 20px rgba(0, 0, 0, 0.15)',
-            boxShadow: "7px 7px 14px #9eaaa1,-7px -7px 14px #c4d4c9",
-        },
-    })
-);
-
 
 export default GiftTrees;

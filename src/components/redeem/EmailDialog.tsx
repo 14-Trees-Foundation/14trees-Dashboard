@@ -55,7 +55,7 @@ const EmailDialog: React.FC<EmailDialogProps> = ({ open, onClose, transaction })
                         .filter((template, index, self) => self.findIndex(item => item.event_type === template.event_type) === index);
 
                 setTemplates(uniqueTemplates);
-                setFormData(prev => ({ ...prev, event_type: uniqueTemplates[0].event_type }));
+                setFormData(prev => ({ ...prev, event_type: uniqueTemplates[0]?.event_type || '' }));
             } catch (error) {
                 toast.error("Failed to fetch email templates");
             }
@@ -248,4 +248,4 @@ const EmailDialog: React.FC<EmailDialogProps> = ({ open, onClose, transaction })
     );
 };
 
-export default EmailDialog;
+export default EmailDialog; 

@@ -1,14 +1,15 @@
 import { Autocomplete, Avatar, Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, Grid, TextField, Typography } from "@mui/material"
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
-import ApiClient from "../../../api/apiClient/apiClient";
-import { AWSUtils } from "../../../helpers/aws";
-import { CardGiftcard } from "@mui/icons-material";
-import CardDetails from "../gift/Form/CardDetailsForm";
-import leafsPoster from "../../../assets/leafs.jpg";
-import treePlanting from "../../../assets/planting_illustration.jpg";
+import ApiClient from "../../api/apiClient/apiClient";
+import { AWSUtils } from "../../helpers/aws";
+import { CardGiftcard, Email, Edit } from "@mui/icons-material";
+import CardDetails from "../../pages/admin/gift/Form/CardDetailsForm";
+import leafsPoster from "../../assets/leafs.jpg";
+import treePlanting from "../../assets/planting_illustration.jpg";
 import { makeStyles } from "@mui/styles";
 import { LoadingButton } from "@mui/lab";
+import { GiftRedeemTransaction } from "../../types/gift_redeem_transaction";
 
 const EventTypes = [
     {
@@ -48,7 +49,8 @@ interface RedeemGiftTreeDialogProps {
     onClose: () => void
     onSubmit: () => void
     giftMultiple?: boolean
-    groupId: number,
+    userId?: number,
+    groupId?: number,
     tree: {
         giftCardId: number,
         treeId: number,
@@ -58,21 +60,45 @@ interface RedeemGiftTreeDialogProps {
         giftedBy: string,
         logoUrl?: string | null,
     }
+    existingTransaction?: GiftRedeemTransaction 
 }
 
-const RedeemGiftTreeDialog: React.FC<RedeemGiftTreeDialogProps> = ({ tree, open, giftMultiple, groupId, onSubmit, onClose }) => {
+const RedeemGiftTreeDialog: React.FC<RedeemGiftTreeDialogProps> = ({ 
+    tree, 
+    open, 
+    giftMultiple, 
+    userId,
+    groupId, 
+    onSubmit, 
+    onClose, 
+    existingTransaction 
+}) => {
 
     const classes = useStyles();
     const [errors, setErrors] = useState({
         name: '',
         email: '',
-        phone: ''
+        phone: '',
+        communication_email: '',
+    });
+
+    const [initialFormData, setInitialFormData] = useState({
+        name: '',
+        phone: '',
+        email: '',
+        communication_email: '',
+        birth_date: '',
+        gifted_by: '',
+        event_name: '',
+        event_type: '',
+        gifted_on: new Date().toISOString().slice(0, 10),
     });
 
     const [formData, setFormData] = useState({
         name: '',
         phone: '',
         email: '',
+        communication_email: '',
         birth_date: '',
         gifted_by: '',
         event_name: '',
@@ -81,20 +107,87 @@ const RedeemGiftTreeDialog: React.FC<RedeemGiftTreeDialogProps> = ({ tree, open,
     });
     const [profileImage, setProfileImage] = useState<File | null>(null);
     const [selectedEventType, setSelectedEventType] = useState<{ value: string, label: string } | null>(null);
-    const [messages, setMessages] = useState({ primaryMessage: '', secondaryMessage: '', logoMessage: '', eventName: '', eventType: '' as string | undefined, plantedBy: '' });
+    const [initialMessages, setInitialMessages] = useState({ 
+        primaryMessage: '', 
+        secondaryMessage: '', 
+        logoMessage: '', 
+        eventName: '', 
+        eventType: '' as string | undefined, 
+        plantedBy: '' 
+    });
+    const [messages, setMessages] = useState({ 
+        primaryMessage: '', 
+        secondaryMessage: '', 
+        logoMessage: '', 
+        eventName: '', 
+        eventType: '' as string | undefined, 
+        plantedBy: '' 
+    });
     const [presentationId, setPresentationId] = useState<string | null>(null);
     const [slideId, setSlideId] = useState<string | null>(null);
     const [step, setStep] = useState(0);
     const [treesCount, setTreesCount] = useState(1);
     const [loading, setLoading] = useState(false);
+    const [isEditMode, setIsEditMode] = useState(false);
 
     useEffect(() => {
-        setFormData(prev => {
-            return { ...prev, gifted_by: tree.giftedBy }
-        })
+        // Initialize form with existing transaction data if in edit mode
+        if (existingTransaction) {
+            setIsEditMode(true);
+            
+            const newFormData = {
+                name: existingTransaction.recipient_name || '',
+                phone: '',  // Assuming phone not in transaction model
+                email: existingTransaction.recipient_email || '',
+                communication_email: existingTransaction.recipient_communication_email || '',
+                birth_date: '',  // Assuming not in transaction model
+                gifted_by: existingTransaction.gifted_by || '',
+                event_name: existingTransaction.occasion_name || '',
+                event_type: existingTransaction.occasion_type || '',
+                gifted_on: existingTransaction.gifted_on 
+                    ? new Date(existingTransaction.gifted_on).toISOString().slice(0, 10) 
+                    : new Date().toISOString().slice(0, 10),
+            };
+            
+            setFormData(newFormData);
+            setInitialFormData(newFormData);
+            
+            // Set event type
+            if (existingTransaction.occasion_type) {
+                const eventType = EventTypes.find(et => et.value === existingTransaction.occasion_type);
+                if (eventType) {
+                    setSelectedEventType(eventType);
+                }
+            }
+            
+            // Set messages
+            const newMessages = {
+                primaryMessage: existingTransaction.primary_message || '',
+                secondaryMessage: existingTransaction.secondary_message || '',
+                logoMessage: existingTransaction.logo_message || '',
+                eventName: existingTransaction.occasion_name || '',
+                eventType: existingTransaction.occasion_type as string | undefined,
+                plantedBy: existingTransaction.gifted_by || ''
+            };
+            
+            setMessages(newMessages);
+            setInitialMessages(newMessages);
+            
+            // Set trees count if applicable
+            if (existingTransaction.trees_count) {
+                setTreesCount(existingTransaction.trees_count);
+            }
+        } else {
+            setFormData(prev => {
+                return { ...prev, gifted_by: tree.giftedBy };
+            });
+            setInitialFormData(prev => {
+                return { ...prev, gifted_by: tree.giftedBy };
+            });
+        }
 
         console.log(tree);
-    }, [tree])
+    }, [tree, existingTransaction]);
 
     const validateTheName = (name: string) => {
         if (name.trim()) setErrors({ ...errors, name: '' });
@@ -103,14 +196,18 @@ const RedeemGiftTreeDialog: React.FC<RedeemGiftTreeDialogProps> = ({ tree, open,
         return name.trim() === '' ? false : true;
     }
 
-    const validateTheEmail = (email: string) => {
+    const validateTheEmail = (email: string, field: 'email' | 'communication_email') => {
         let isValid = true;
 
-        const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!emailPattern.test(email)) {
-            setErrors({ ...errors, email: 'Email is not valid' });
-            isValid = false;
-        } else setErrors({ ...errors, email: '' });
+        if (email) {
+            const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailPattern.test(email)) {
+                setErrors({ ...errors, [field]: 'Email is not valid' });
+                isValid = false;
+            } else setErrors({ ...errors, [field]: '' });
+        } else {
+            setErrors({ ...errors, [field]: '' });
+        }
 
         return isValid;
     }
@@ -128,13 +225,22 @@ const RedeemGiftTreeDialog: React.FC<RedeemGiftTreeDialogProps> = ({ tree, open,
 
     const handleInputChange = (event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
 
-        if (event.target.name === 'name') validateTheName(event.target.value);
-        if (event.target.name === 'email') validateTheEmail(event.target.value);
-        if (event.target.name === 'phone') validateThePhone(event.target.value);
+        let value = event.target.value;
+        if (event.target.name === 'name') validateTheName(value);
+        if (event.target.name === 'email') {
+            value = value.trim();
+            validateTheEmail(value, 'email');
+        }
+        if (event.target.name === 'phone') {
+            if (value.startsWith('+91')) value = value.slice(3);
+            if (value.startsWith('0')) value = value.slice(1);
+            validateThePhone(value);
+        }
+        if (event.target.name === 'communication_email') validateTheEmail(event.target.value.trim(), 'communication_email');
 
         setFormData({
             ...formData,
-            [event.target.name]: event.target.value,
+            [event.target.name]: value,
         });
     };
 
@@ -146,7 +252,7 @@ const RedeemGiftTreeDialog: React.FC<RedeemGiftTreeDialogProps> = ({ tree, open,
     const handleRedeemGiftTreeDialog = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
 
-        if (!giftMultiple && (!tree.saplingId || !tree.treeId)) {
+        if (!isEditMode && !giftMultiple && (!tree.saplingId || !tree.treeId)) {
             toast.error("Gifted tree not found!");
             return;
         }
@@ -154,22 +260,114 @@ const RedeemGiftTreeDialog: React.FC<RedeemGiftTreeDialogProps> = ({ tree, open,
         setStep(1);
     }
 
+    // Function to get changed fields for update
+    const getChangedFields = () => {
+        const mask: string[] = [];
+        const data: Record<string, any> = {};
+        
+        // Check form data changes
+        if (formData.name !== initialFormData.name) {
+            mask.push('name');
+            data.name = formData.name;
+        }
+        
+        if (formData.email !== initialFormData.email) {
+            mask.push('email');
+            data.email = formData.email || formData.name.trim().split(' ').join('.').toLowerCase() + '@14trees';
+        }
+        
+        if (formData.communication_email !== initialFormData.communication_email) {
+            mask.push('communication_email');
+            data.communication_email = formData.communication_email;
+        }
+        
+        if (formData.gifted_by !== initialFormData.gifted_by) {
+            mask.push('gifted_by');
+            data.gifted_by = formData.gifted_by;
+        }
+        
+        if (formData.event_name !== initialFormData.event_name) {
+            mask.push('occasion_name');
+            data.occasion_name = formData.event_name;
+        }
+        
+        if (formData.event_type !== initialFormData.event_type) {
+            mask.push('occasion_type');
+            data.occasion_type = formData.event_type;
+        }
+        
+        if (formData.gifted_on !== initialFormData.gifted_on) {
+            mask.push('gifted_on');
+            data.gifted_on = formData.gifted_on + 'T00:00:00Z';
+        }
+        
+        // Check message changes
+        if (messages.primaryMessage !== initialMessages.primaryMessage) {
+            mask.push('primary_message');
+            data.primary_message = messages.primaryMessage;
+        }
+        
+        if (messages.secondaryMessage !== initialMessages.secondaryMessage) {
+            mask.push('secondary_message');
+            data.secondary_message = messages.secondaryMessage;
+        }
+        
+        if (messages.logoMessage !== initialMessages.logoMessage) {
+            mask.push('logo_message');
+            data.logo_message = messages.logoMessage;
+        }
+        
+        return { mask, data };
+    };
+
     const handleSubmit = async () => {
         try {
             setLoading(true);
-            let profileImageUrl: string | null = null
+            let profileImageUrl: string | null = null;
+            
             if (profileImage) {
                 const awsUtils = new AWSUtils();
                 profileImageUrl = await awsUtils.uploadFileToS3("gift-request", profileImage, tree.requestId);
             }
 
             const apiClient = new ApiClient();
-            if (giftMultiple) {
-                await apiClient.redeemMultipleGiftCardTemplate(treesCount, 'group', groupId, formData as any, profileImageUrl, messages);
-                toast.success("Succefully gifted trees!");
+
+            if (isEditMode && existingTransaction) {
+                // Update existing transaction
+                const { mask, data } = getChangedFields();
+                
+                if (mask.length === 0) {
+                    toast.info("No changes detected to update");
+                    setLoading(false);
+                    onClose();
+                    return;
+                }
+                
+                // If profile image was changed
+                if (profileImage) {
+                    mask.push('profile_image_url');
+                    data.profile_image_url = profileImageUrl;
+                }
+                
+                await apiClient.updateTransaction(existingTransaction.id, mask, data);
+                toast.success("Transaction updated successfully!");
             } else {
-                await apiClient.redeemGiftCardTemplate('group', groupId, tree.giftCardId, tree.saplingId, tree.treeId, formData as any, profileImageUrl, messages);
-                toast.success("Succefully gifted a tree!");
+                // Create new transaction
+                const data: any = {
+                    ...formData,
+                    email: formData.email || formData.name.trim().split(' ').join('.').toLowerCase() + '@14trees',
+                };
+
+                const entityType = userId ? 'user' : 'group';
+                const entityId = userId || groupId || 0;
+
+                if (giftMultiple) {
+                    await apiClient.redeemMultipleGiftCardTemplate(treesCount, entityType, entityId, data, profileImageUrl, messages);
+                    toast.success("Successfully gifted trees!");
+                } else {
+                    await apiClient.redeemGiftCardTemplate(entityType, entityId, tree.giftCardId, tree.saplingId, tree.treeId, data, profileImageUrl, messages);
+                    toast.success("Successfully gifted a tree!");
+                }
             }
 
             setLoading(false);
@@ -177,29 +375,38 @@ const RedeemGiftTreeDialog: React.FC<RedeemGiftTreeDialogProps> = ({ tree, open,
             onSubmit();
         } catch (error: any) {
             toast.error(error.message);
+            setLoading(false);
         }
-    }
+    };
 
     const handleEventTypeSelection = (e: any, item: { value: string, label: string } | null) => {
         setFormData(prev => ({
             ...prev,
             event_type: item ? item.value : '',
-        }))
+        }));
         setSelectedEventType(item ? item : null);
         setMessages(prev => ({
             ...prev,
             eventType: item?.value,
-        }))
-    }
+        }));
+    };
 
     const handleNumberChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const value = Math.max(1, parseInt(event.target.value, 10));
         setTreesCount(value);
     };
 
+    const dialogTitle = isEditMode 
+        ? "✏️ Edit Gift Details" 
+        : `🌳 Gift ${giftMultiple ? 'Trees' : 'a Tree'}`;
+
+    const submitButtonText = isEditMode 
+        ? "Update Gift" 
+        : "Gift";
+
     return (
         <Dialog open={open} fullWidth maxWidth='xl'>
-            <DialogTitle>🌳 Gift {giftMultiple ? 'Trees' : 'a Tree'}</DialogTitle>
+            <DialogTitle>{dialogTitle}</DialogTitle>
             <form onSubmit={handleRedeemGiftTreeDialog}>
                 <DialogContent dividers>
                     <Box
@@ -233,11 +440,21 @@ const RedeemGiftTreeDialog: React.FC<RedeemGiftTreeDialogProps> = ({ tree, open,
                                         <TextField
                                             name="email"
                                             label="Recipient Email"
-                                            required
                                             value={formData.email}
                                             onChange={handleInputChange}
                                             error={!!errors.email}
-                                            helperText={errors.email || "will be used to send gift notification"}
+                                            helperText={errors.email ? errors.email : formData.email ? "will be used to send gift notification" : formData.communication_email ? "Recipient will use communication email for updates" : "Optional - for sending gift notification"}
+                                            fullWidth
+                                        />
+                                    </Grid>
+                                    <Grid item xs={12}>
+                                        <TextField
+                                            name="communication_email"
+                                            label="Communication Email"
+                                            value={formData.communication_email}
+                                            onChange={handleInputChange}
+                                            error={!!errors.communication_email}
+                                            helperText={errors.communication_email ? "Will be used for notifications" : "Optional - alternative email for notifications"}
                                             fullWidth
                                         />
                                     </Grid>
@@ -252,7 +469,7 @@ const RedeemGiftTreeDialog: React.FC<RedeemGiftTreeDialogProps> = ({ tree, open,
                                             fullWidth
                                         />
                                     </Grid>
-                                    {giftMultiple && <Grid item xs={6}>
+                                    {giftMultiple && !isEditMode && <Grid item xs={6}>
                                         <TextField
                                             name="trees_count"
                                             label="Number of Trees"
@@ -263,7 +480,7 @@ const RedeemGiftTreeDialog: React.FC<RedeemGiftTreeDialogProps> = ({ tree, open,
                                             fullWidth
                                         />
                                     </Grid>}
-                                    <Grid item xs={giftMultiple ? 6 : 12}>
+                                    <Grid item xs={giftMultiple && !isEditMode ? 6 : 12}>
                                         <div style={{ display: 'flex', alignItems: 'center', marginBottom: 16 }}>
                                             <Avatar
                                                 src={profileImage ? URL.createObjectURL(profileImage) : undefined}
@@ -366,6 +583,7 @@ const RedeemGiftTreeDialog: React.FC<RedeemGiftTreeDialogProps> = ({ tree, open,
                             userName={formData.name.trim() ? formData.name.trim() : undefined}
                             logo_url={tree.logoUrl}
                             treesCount={treesCount}
+                            isPersonal={userId ? true : false}
                         />
                     </Box>
                 </DialogContent>
@@ -376,27 +594,26 @@ const RedeemGiftTreeDialog: React.FC<RedeemGiftTreeDialogProps> = ({ tree, open,
                     {step === 0 && <Button
                         variant="contained" color="success" type="submit"
                         style={{ textTransform: 'none' }}
-                    >Preview Gift Card</Button>}
+                    >{isEditMode ? "Preview Updated Gift Card" : "Preview Gift Card"}</Button>}
                     {step === 1 && <Button
                         variant="contained" color="success"
                         onClick={() => { setStep(0); }} style={{ textTransform: 'none' }}
                     >
-                        Edit Details
+                        Go Back
                     </Button>}
                     {step === 1 && <LoadingButton
                         loading={loading}
                         color="success" variant="contained"
                         disabled={!!errors.name || !!errors.phone || !!errors.email}
-                        startIcon={<CardGiftcard />}
+                        startIcon={isEditMode ? <Edit /> : <CardGiftcard />}
                         onClick={handleSubmit}
                     >
-                        Gift
+                        {submitButtonText}
                     </LoadingButton>}
                 </DialogActions>
             </form>
         </Dialog>
-
-    )
+    );
 };
 
-export default RedeemGiftTreeDialog;
+export default RedeemGiftTreeDialog; 
