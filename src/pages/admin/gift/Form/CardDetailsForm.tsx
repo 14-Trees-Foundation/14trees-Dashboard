@@ -31,9 +31,10 @@ interface CardDetailsProps {
     plantType?: string | null
     userName?: string | null
     treesCount?: number
+    isPersonal?: boolean
 }
 
-const CardDetails: FC<CardDetailsProps> = ({ logo_url, request_id, presentationId, slideId, messages, saplingId, plantType, userName, onChange, onPresentationId, treesCount }) => {
+const CardDetails: FC<CardDetailsProps> = ({ logo_url, request_id, presentationId, slideId, messages, saplingId, plantType, userName, onChange, onPresentationId, treesCount, isPersonal }) => {
 
     const slideIdRef = useRef('');
     const presentationIdIdRef = useRef('');
@@ -66,7 +67,7 @@ const CardDetails: FC<CardDetailsProps> = ({ logo_url, request_id, presentationI
         const generateGiftCard = async () => {
             setLoading(true);
             const apiClient = new ApiClient();
-            const resp = await apiClient.generateCardTemplate(request_id, defaultMessages.primary, defaultMessages.secondary, defaultMessages.logo, logoRef.current.logoUrl, giftRef.current.saplingId, giftRef.current.userName, giftRef.current.plantType);
+            const resp = await apiClient.generateCardTemplate(request_id, defaultMessages.primary, defaultMessages.secondary, defaultMessages.logo, logoRef.current.logoUrl, giftRef.current.saplingId, giftRef.current.userName, giftRef.current.plantType, isPersonal);
             slideIdRef.current = resp.slide_id;
             presentationIdIdRef.current = resp.presentation_id;
 
@@ -92,7 +93,7 @@ const CardDetails: FC<CardDetailsProps> = ({ logo_url, request_id, presentationI
         return () => {
             clearTimeout(handler);
         };
-    }, [presentationId, slideId])
+    }, [presentationId, slideId, isPersonal])
 
     useEffect(() => {
         logoRef.current.logoUrl = logo_url
