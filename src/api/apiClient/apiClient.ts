@@ -1321,6 +1321,17 @@ class ApiClient {
         }
     }
 
+    async updateAlbumImagesForDonations(donation_id: number, album_id?: number): Promise<void> {
+        try {
+            
+            const response = await this.api.post(`/donations/update-album_id`, { donation_id, album_id });
+            return response.data;
+        } catch (error) {
+            console.error("Error updating album images for donation:", error);
+            throw new Error("Failed to update album images for donation.");
+        }
+    }
+
     async getDonationUsers(offset: number, limit: number, filters?: any[], order_by?: Order[]): Promise<PaginatedResponse<DonationUser>> {
         try {     
 

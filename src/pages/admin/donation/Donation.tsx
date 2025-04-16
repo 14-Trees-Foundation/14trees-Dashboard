@@ -11,7 +11,7 @@ import { RootState } from "../../../redux/store/store";
 import { ToastContainer, toast } from "react-toastify";
 import DonationForm from "./Forms/DonationForm";
 import DirectEditDonationForm from "./Forms/Donationeditform";
-import { AssignmentInd, Delete, Edit, Email, Landscape, LocalOffer, MenuOutlined, NotesOutlined, Wysiwyg } from "@mui/icons-material";
+import { AssignmentInd, Delete, Edit, Email, Landscape, LocalOffer, MenuOutlined, NotesOutlined, Wysiwyg, Photo } from "@mui/icons-material";
 import { Badge, Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, Divider, IconButton, Typography } from "@mui/material";
 import GeneralTable from "../../../components/GenTable";
 import ApiClient from "../../../api/apiClient/apiClient";
@@ -25,6 +25,8 @@ import EmailConfirmationModal from "./components/EmailConfirmationModal";
 import DonationInfo from "./DonationInfo";
 import DonationTrees from "./Forms/DonationTrees";
 import TagComponent from "../gift/Form/TagComponent";
+import Notes from "../../../components/Notes";
+import AlbumImageInput from "../../../components/AlbumImageInput";
 import { Order } from "../../../types/common";
 import AssignTrees from "./Forms/AssignTrees/AssignTrees";
 
@@ -52,6 +54,10 @@ export const DonationComponent = () => {
   const [infoModalOpen, setInfoModalOpen] = useState(false);
   const [tagModal, setTagModal] = useState(false);
   const [tags, setTags] = useState<string[]>([]);
+  const [notesModalOpen, setNotesModalOpen] = useState(false);
+  const [currentNotes, setCurrentNotes] = useState<string>('');
+  const [isAlbumInputOpen, setIsAlbumInputOpen] = useState(false);
+  const [donationImages, setDonationImages] = useState<(File | string)[]>([]);
   const [assignTreesModalOpen, setAssignTreesModalOpen] = useState(false);
   // Get tags
   useEffect(() => {
@@ -128,6 +134,43 @@ export const DonationComponent = () => {
     handlePlotSelectionClose();
   }
 
+  const handleAlbumModalOpen = (record: Donation) => {
+    setSelectedDonation(record);
+    setIsAlbumInputOpen(true);
+  };
+
+  const handleCloseAlbumInput = () => {
+    setIsAlbumInputOpen(false);
+  };
+
+  const handleAlbumSave = async (files: (File | string)[]) => {
+    if (!selectedDonation) return; 
+    setIsAlbumInputOpen(false); 
+
+    const apiClient = new ApiClient();
+    try {
+      
+        if (selectedDonation.album_id) {
+
+            await apiClient.updateAlbum(selectedDonation.album_id, files);
+            await apiClient.updateAlbumImagesForDonations(selectedDonation.id, selectedDonation.album_id); // Update the donation with the album
+        } else {
+            // Create a new album with the uploaded images
+            const album = await apiClient.createAlbum(
+                selectedDonation.event_name || selectedDonation.request_id,
+                selectedDonation.user_name || '',
+                selectedDonation.user_email || '',
+                files as File[] 
+            );
+            await apiClient.updateAlbumImagesForDonations(selectedDonation.id, album.id); // Update the donation with the new album
+        }
+
+        toast.success("Donation album images updated!"); // Notify the user of success
+    } catch (error: any) {
+        toast.error(error.message); // Handle any errors
+    }
+};
+
   // Tag functionality
   const handleTagModalOpen = (donation: Donation) => {
     setSelectedDonation(donation);
@@ -164,6 +207,44 @@ export const DonationComponent = () => {
     handleTagModalClose();
   }
 
+  const getFilters = (filters: any) => {
+    const filtersData = JSON.parse(JSON.stringify(Object.values(filters))) as GridFilterItem[];
+    filtersData.forEach((item) => {
+        if (item.columnField === 'notes') {
+            if ((item.value as string[]).includes('Yes')) {
+                item.operatorValue = 'isNotEmpty'; // Show records with notes
+            } else if ((item.value as string[]).includes('No')) {
+                item.operatorValue = 'isEmpty'; // Show records without notes
+            }
+        }
+      
+    });
+
+    return filtersData;
+};
+
+  const handleNotesModalOpen = (record: Donation) => {
+    setCurrentNotes(record.notes || ''); 
+    setSelectedDonation(record);
+    setNotesModalOpen(true);
+  };
+
+  const handleSaveNotes = async (text: string) => {
+    if (selectedDonation) {
+      try {
+        const apiClient = new ApiClient();
+        const updatedDonation = { ...selectedDonation, notes: text }; 
+        await apiClient.updateDonation(updatedDonation, []); 
+        toast.success("Notes updated successfully!");
+      } catch (error) {
+        toast.error("Failed to update notes. Please try again.");
+      }
+    }
+    setNotesModalOpen(false); 
+  };
+
+
+
   // Send Emails
   const [emailConfirmationModal, setEmailConfirmationModal] = useState(false);
 
@@ -190,8 +271,24 @@ export const DonationComponent = () => {
   }
 
   const handleSetFilters = (filters: Record<string, GridFilterItem>) => {
+
     setPage(0);
     setFilters(filters);
+    const filtersData = getFilters(filters);                                          
+    const filteredRecords = Object.values(donationsData.donations).filter((donation: Donation) => {
+      return filtersData.every((filter) => {
+        if (filter.columnField === 'notes') {
+            if (filter.operatorValue === 'isNotEmpty') {
+                return donation.notes && donation.notes.trim() !== ''; // Show records with notes
+            }
+            if (filter.operatorValue === 'isEmpty') {
+                return !donation.notes || donation.notes.trim() === ''; // Show records without notes
+            }
+        }
+        return true;
+      });
+    });
+    setTableRows(filteredRecords);
   }
 
   const donationsData = useAppSelector((state: RootState) => state.donationsData);
@@ -235,6 +332,7 @@ export const DonationComponent = () => {
 
   const fetchDonations = () => {
     setLoading(true);
+    console.log("Fetching donations with filters:", filters);
     try {
       let filtersData = Object.values(filters);
       getDonations(page * pageSize, pageSize, filtersData, orderBy);
@@ -428,6 +526,9 @@ export const DonationComponent = () => {
         <Menu.Item key="03" danger onClick={() => { setIsDeleteAltOpen(true); setSelectedDonation(record); }} icon={<Delete />}>
           Delete Request
         </Menu.Item>
+        <Menu.Item key="04" onClick={() => { handleAlbumModalOpen(record); }} icon={<Photo />}>
+          Update Memories
+        </Menu.Item>
       </Menu.ItemGroup>
       <Menu.Divider style={{ backgroundColor: '#ccc' }} />
       <Menu.ItemGroup>
@@ -544,12 +645,13 @@ export const DonationComponent = () => {
       align: "center",
       width: 100,
       render: (value, record) => (
-        <IconButton onClick={() => { }}>
-          <Badge variant="dot" color="success" invisible={(!value || value.trim() === '') ? true : false}>
+        <IconButton onClick={() => handleNotesModalOpen(record)}>
+          <Badge variant="dot" color="success" invisible={(!value || value.trim() === '')}>
             <NotesOutlined />
           </Badge>
         </IconButton>
       ),
+      ...getColumnSelectedItemFilter({ dataIndex: 'notes', filters, handleSetFilters, options: ['Yes', 'No'] }) // Add this line
     },
   ]
 
@@ -622,6 +724,14 @@ export const DonationComponent = () => {
         onSubmit={handleSendEmails}
       />
 
+      
+      <Notes
+        open={notesModalOpen}
+        handleClose={() => setNotesModalOpen(false)}
+        initialText={currentNotes}
+        onSave={handleSaveNotes}
+      />
+
       <DonationInfo
         open={infoModalOpen}
         onClose={() => setInfoModalOpen(false)}
@@ -650,6 +760,13 @@ export const DonationComponent = () => {
           setSelectedDonation(null);
         }}
       />}
+
+       <AlbumImageInput
+                open={isAlbumInputOpen}
+                onClose={handleCloseAlbumInput}
+                onSave={handleAlbumSave}
+                imageUrls={donationImages as string[]} 
+            />
 
       <Dialog open={plotSelectionModalOpen} onClose={() => setPlotSelectionModalOpen(false)} fullWidth maxWidth="xl">
         <DialogTitle>Select Plots</DialogTitle>
