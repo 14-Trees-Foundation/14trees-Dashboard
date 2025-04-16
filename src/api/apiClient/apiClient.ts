@@ -1587,7 +1587,7 @@ class ApiClient {
         }
     }
 
-    async generateCardTemplate(request_id: string, primary_message: string, secondary_message: string, logo_message: string, logo?: string | null, sapling_id?: string | null, user_name?: string | null, plant_type?: string | null): Promise<{ presentation_id: string, slide_id: string }> {
+    async generateCardTemplate(request_id: string, primary_message: string, secondary_message: string, logo_message: string, logo?: string | null, sapling_id?: string | null, user_name?: string | null, plant_type?: string | null, is_personal?: boolean = false): Promise<{ presentation_id: string, slide_id: string }> {
         try {
             const resp = await this.api.post<any>(`/gift-cards/generate-template`, { request_id, primary_message, secondary_message, logo_message, logo, sapling_id, plant_type, user_name });
             return resp.data;
@@ -1759,6 +1759,19 @@ class ApiClient {
                 throw new Error(error.response.data.message)
             }
             throw new Error('Failed to update transaction details!');
+        }
+    }
+
+
+    async getTransactionTreeCardImages(transaction_id: number): Promise<string[]> {
+        try {
+            const resp = await this.api.get<string[]>(`/gift-cards/transactions/tree-cards/${transaction_id}`);
+            return resp.data;
+        } catch (error: any) {
+            if (error?.response?.data?.message) {
+                throw new Error(error.response.data.message)
+            }
+            throw new Error('Failed to get transaction tree cards!');
         }
     }
 
