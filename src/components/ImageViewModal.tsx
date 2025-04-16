@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Modal, Box, IconButton } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 
@@ -9,23 +9,43 @@ interface ImageViewModalProps {
 }
 
 const ImageViewModal: React.FC<ImageViewModalProps> = ({ open, onClose, imageUrl }) => {
+  const [imgDimensions, setImgDimensions] = useState({ width: 0, height: 0 });
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    if (!imageUrl) return;
+
+    setIsLoading(true);
+    const img = new Image();
+    img.onload = () => {
+      setImgDimensions({ width: img.width, height: img.height });
+      setIsLoading(false);
+    };
+    img.src = imageUrl;
+  }, [imageUrl]);
+
   return (
-    <Modal open={open} onClose={onClose}>
+    <Modal 
+      open={open} 
+      onClose={onClose}
+      sx={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center'
+      }}
+    >
       <Box
         sx={{
           position: 'relative',
-          maxWidth: '90%',
-          maxHeight: '90%',
-          margin: 'auto',
-          mt: '5vh',
+          width: '90vw',
+          height: '90vh',
           bgcolor: 'background.paper',
           borderRadius: 2,
           boxShadow: 24,
-          p: 2,
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          overflow: 'hidden', // Ensures no overflow
+          p: 2,
         }}
       >
         {/* Close Button */}
@@ -36,23 +56,43 @@ const ImageViewModal: React.FC<ImageViewModalProps> = ({ open, onClose, imageUrl
             top: 8,
             right: 8,
             color: 'grey.600',
+            zIndex: 2,
+            bgcolor: 'rgba(255, 255, 255, 0.7)',
+            '&:hover': {
+              bgcolor: 'rgba(255, 255, 255, 0.9)',
+            }
           }}
         >
           <CloseIcon />
         </IconButton>
 
-        {/* Image */}
+        {/* Image Container */}
         <Box
-          component="img"
-          src={imageUrl}
-          alt="Expanded View"
           sx={{
-            maxWidth: '90%',
-            maxHeight: '90%',
-            objectFit: 'contain', // Ensures the image is scaled to fit
-            borderRadius: 1,
+            width: '100%',
+            height: '100%',
+            display: 'flex',
+            alignItems: 'center', 
+            justifyContent: 'center',
+            overflow: 'hidden',
           }}
-        />
+        >
+          {/* Image */}
+          <Box
+            component="img"
+            src={imageUrl}
+            alt="Expanded View"
+            sx={{
+              maxWidth: '100%',
+              maxHeight: '100%',
+              objectFit: 'contain',
+              borderRadius: 1,
+              // Show a subtle transition when loading
+              opacity: isLoading ? 0.7 : 1,
+              transition: 'opacity 0.3s ease-in-out',
+            }}
+          />
+        </Box>
       </Box>
     </Modal>
   );

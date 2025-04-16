@@ -13,6 +13,7 @@ import ApiClient from "../../api/apiClient/apiClient";
 import { getHumanReadableDateTime } from "../../helpers/utils";
 import EmailDialog from "./EmailDialog";
 import RedeemGiftTreeDialog from "./RedeemGiftTreeDialog";
+import ImageViewModal from "../ImageViewModal";
 
 const useStyle = makeStyles((theme) =>
     createStyles({
@@ -34,9 +35,10 @@ const useStyle = makeStyles((theme) =>
 type Props = {
     transaction: GiftRedeemTransaction;
     onTransactionUpdated?: () => void;
+    showEditButton?: boolean;
 };
 
-const GiftRedeemTrees: React.FC<Props> = ({ transaction }) => {
+const GiftRedeemTrees: React.FC<{ transaction: GiftRedeemTransaction }> = ({ transaction }) => {
     const classes = useStyle();
 
     const [loading, setLoading] = useState(false);
@@ -44,6 +46,9 @@ const GiftRedeemTrees: React.FC<Props> = ({ transaction }) => {
     const [pageSize, setPageSize] = useState(20);
     const [trees, setTrees] = useState<Record<number, Tree>>({});
     const [totalRecords, setTotalRecords] = useState(10);
+
+    const [imageViewModalOpen, setImageViewModalOpen] = useState(false);
+    const [imageViewModalImageUrl, setImageViewModalImageUrl] = useState('');
 
     useEffect(() => {
         const handler = setTimeout(() => {
@@ -53,7 +58,11 @@ const GiftRedeemTrees: React.FC<Props> = ({ transaction }) => {
 
             for (let i = page * pageSize; i < Math.min((page + 1) * pageSize, totalRecords); i++) {
                 if (!trees[i]) {
-                    if (transaction.user_id) getTrees(page * pageSize, pageSize, transaction.user_id, filters);
+                    if (transaction.user_id) {
+                        getTrees(page * pageSize, pageSize, 'user', transaction.user_id, filters);
+                    } else if (transaction.group_id) {
+                        getTrees(page * pageSize, pageSize, 'group', transaction.group_id, filters);
+                    }
                     return;
                 }
             }
@@ -62,11 +71,11 @@ const GiftRedeemTrees: React.FC<Props> = ({ transaction }) => {
         return () => { clearTimeout(handler); }
     }, [trees, page, pageSize, transaction, totalRecords])
 
-    const getTrees = async (offset: number, limit: number, userId: number, filters: any[]) => {
+    const getTrees = async (offset: number, limit: number, type: 'user' | 'group', id: number, filters: any[]) => {
         setLoading(true);
         try {
             const apiClient = new ApiClient();
-            const treesResp = await apiClient.getMappedGiftTrees(offset, limit, 'user', userId, filters);
+            const treesResp = await apiClient.getMappedGiftTrees(offset, limit, type, id, filters);
 
             setTrees(prev => {
                 const treesData = { ...prev };
@@ -103,7 +112,18 @@ const GiftRedeemTrees: React.FC<Props> = ({ transaction }) => {
                     <Card
                         hoverable
                         className={classes.customCard}
-                        cover={<img height='auto' alt={tree.plant_type}
+                        cover={<img 
+                            onClick={() => {
+                                setImageViewModalOpen(true);
+                                setImageViewModalImageUrl((tree as any).card_image_url
+                                ? (tree as any).card_image_url
+                                : tree.template_image
+                                    ? tree.template_image
+                                    : tree.illustration_s3_path
+                                        ? tree.illustration_s3_path
+                                        : tree.image);
+                            }}
+                            height='auto' alt={tree.plant_type}
                             src={(tree as any).card_image_url
                                 ? (tree as any).card_image_url
                                 : tree.template_image
@@ -154,18 +174,38 @@ const GiftRedeemTrees: React.FC<Props> = ({ transaction }) => {
                     Load More Trees
                 </Button>
             </div>}
+
+            <ImageViewModal 
+                open={imageViewModalOpen}
+                onClose={() => setImageViewModalOpen(false)}
+                imageUrl={imageViewModalImageUrl}
+            />
         </Grid>
     )
 }
 
-const GiftRedeemSummary: React.FC<Props> = ({ transaction, onTransactionUpdated }) => {
+const GiftTransactionSummary: React.FC<Props> = ({ transaction, onTransactionUpdated, showEditButton = true }) => {
     const [emailDialogOpen, setEmailDialogOpen] = useState(false);
     const [editDialogOpen, setEditDialogOpen] = useState(false);
-    const [refreshKey, setRefreshKey] = useState(0);
+    const [treeCardImages, setTreeCardImages] = useState<string[]>([]);
+
+    useEffect(() => {
+        getTransactionTreeCardImages(transaction.id);
+    }, [transaction.id])
+
+    const getTransactionTreeCardImages = async (transaction_id: number) => {
+        try {
+            const apiClient = new ApiClient();
+            const treeCardImages = await apiClient.getTransactionTreeCardImages(transaction_id);
+            setTreeCardImages(treeCardImages);
+        } catch (error: any) {
+            toast.error(error.message);
+        }
+    }
 
     const handleDownload = async () => {
-        let imageUrls = transaction.tree_details?.map(tree => tree.card_image_url || '') || [];
-        imageUrls = imageUrls.filter(imageUrl => imageUrl)
+        let imageUrls = treeCardImages;
+        const fileName = transaction.recipient_name + "_" + transaction.trees_count + ".zip";
 
         const zip = new JSZip();
         const folder = zip.folder("images");
@@ -181,7 +221,7 @@ const GiftRedeemSummary: React.FC<Props> = ({ transaction, onTransactionUpdated 
                 const url = imageUrls[i];
                 const fileName = url.split("/").slice(-1)[0]; // Customize file names as needed
 
-                const response = await axios.get(url, { responseType: "blob" });
+                const response = await axios.get(url, { responseType: "blob", withCredentials: false });
                 folder.file(fileName, response.data);
             }
 
@@ -189,7 +229,7 @@ const GiftRedeemSummary: React.FC<Props> = ({ transaction, onTransactionUpdated 
             const zipBlob = await zip.generateAsync({ type: "blob" });
 
             // Trigger the download
-            saveAs(zipBlob, "images.zip");
+            saveAs(zipBlob, fileName);
         } catch (error) {
             console.error("Error downloading images:", error);
         }
@@ -211,23 +251,27 @@ const GiftRedeemSummary: React.FC<Props> = ({ transaction, onTransactionUpdated 
                     <Typography variant="h6" sx={{ color: '#1a1a1a' }}>
                         Gift Details
                     </Typography>
-                    <Button
-                        variant="outlined"
-                        color="success"
-                        startIcon={<Edit />}
-                        onClick={() => setEditDialogOpen(true)}
-                        sx={{ textTransform: 'none' }}
-                    >
-                        Edit Details
-                    </Button>
+                    {showEditButton && (
+                        <Button
+                            variant="outlined"
+                            color="success"
+                            startIcon={<Edit />}
+                            onClick={() => setEditDialogOpen(true)}
+                            sx={{ textTransform: 'none' }}
+                        >
+                            Edit Details
+                        </Button>
+                    )}
                 </Box>
                 <Grid container spacing={3}>
                     {/* Sender and Recipient Section */}
                     <Grid item xs={12}>
                         <Box sx={{ display: 'flex', gap: 4 }}>
                             <Box sx={{ flex: 1 }}>
-                                <Typography variant="subtitle2" color="text.secondary">Gifted By</Typography>
-                                <Typography variant="body1">{transaction.created_by_name || "N/A"}</Typography>
+                                <Typography variant="subtitle2" color="text.secondary">
+                                    Gifted By
+                                </Typography>
+                                <Typography variant="body1">{transaction.gifted_by}</Typography>
                             </Box>
                             <Box sx={{ flex: 1 }}>
                                 <Typography variant="subtitle2" color="text.secondary">Recipient</Typography>
@@ -300,21 +344,21 @@ const GiftRedeemSummary: React.FC<Props> = ({ transaction, onTransactionUpdated 
                         )}
                     </Grid>
 
-                    {/* Tree Cards Section */}
-                    {/* <Grid item xs={12}>
+                    <Grid item xs={12}>
                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                            <Typography variant="subtitle2" color="text.secondary">Tree Cards</Typography>
+                            <Typography variant="subtitle2" color="text.secondary">Tree Cards: {treeCardImages.length} </Typography>
                             <Button
                                 variant="contained" 
                                 color="success" 
                                 onClick={handleDownload}
                                 startIcon={<OpenInNew />}
+                                disabled={treeCardImages.length === 0}
                                 sx={{ textTransform: 'none' }}
                             >
                                 Download Images
                             </Button>
                         </Box>
-                    </Grid> */}
+                    </Grid>
                 </Grid>
             </Card>
 
@@ -334,7 +378,8 @@ const GiftRedeemSummary: React.FC<Props> = ({ transaction, onTransactionUpdated 
                         onTransactionUpdated();
                     }
                 }}
-                userId={transaction.user_id || 0}
+                userId={transaction.user_id || undefined}
+                groupId={transaction.group_id || undefined}
                 tree={{
                     giftCardId: 0, // This will be ignored in edit mode
                     treeId: 0, // This will be ignored in edit mode
@@ -355,4 +400,4 @@ const GiftRedeemSummary: React.FC<Props> = ({ transaction, onTransactionUpdated 
     );
 };
 
-export default GiftRedeemSummary;
+export default GiftTransactionSummary; 
