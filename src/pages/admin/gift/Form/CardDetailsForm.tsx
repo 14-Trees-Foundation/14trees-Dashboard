@@ -66,7 +66,7 @@ const CardDetails: FC<CardDetailsProps> = ({ logo_url, request_id, presentationI
         const generateGiftCard = async () => {
             setLoading(true);
             const apiClient = new ApiClient();
-            const resp = await apiClient.generateCardTemplate(request_id, defaultMessages.primary, defaultMessages.secondary, defaultMessages.logo, logo_url, giftRef.current.saplingId, giftRef.current.userName, giftRef.current.plantType);
+            const resp = await apiClient.generateCardTemplate(request_id, defaultMessages.primary, defaultMessages.secondary, defaultMessages.logo, logoRef.current.logoUrl, giftRef.current.saplingId, giftRef.current.userName, giftRef.current.plantType);
             slideIdRef.current = resp.slide_id;
             presentationIdIdRef.current = resp.presentation_id;
 
