@@ -106,7 +106,7 @@ const GiftTrees: React.FC<GiftTreesProps> = ({ userId }) => {
             />
 
             <Box sx={{ 
-                mt: 4, 
+                mt: isMobile ? 8 : 4, 
                 paddingX: 1, 
                 display: 'flex', 
                 flexDirection: isMobile ? 'column' : 'row',
