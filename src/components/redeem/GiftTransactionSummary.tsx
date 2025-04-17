@@ -5,7 +5,7 @@ import { saveAs } from "file-saver";
 import { Card } from "antd";
 import { toast } from "react-toastify";
 import { createStyles, makeStyles } from "@mui/styles";
-import { Typography, Grid, Box, Button } from "@mui/material";
+import { Typography, Grid, Box, Button, useMediaQuery, useTheme } from "@mui/material";
 import { OpenInNew, Email, Edit } from "@mui/icons-material";
 import { Tree } from "../../types/tree";
 import { GiftRedeemTransaction } from "../../types/gift_redeem_transaction";
@@ -40,6 +40,8 @@ type Props = {
 
 const GiftRedeemTrees: React.FC<{ transaction: GiftRedeemTransaction }> = ({ transaction }) => {
     const classes = useStyle();
+    const theme = useTheme();
+    const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
     const [loading, setLoading] = useState(false);
     const [page, setPage] = useState(0);
@@ -106,9 +108,9 @@ const GiftRedeemTrees: React.FC<{ transaction: GiftRedeemTransaction }> = ({ tra
     }
 
     return (
-        <Grid container spacing={3} padding={3}>
+        <Grid container spacing={isMobile ? 2 : 3} padding={isMobile ? 1 : 3}>
             {Object.values(trees).map((tree) => (
-                <Grid item xs={12} sm={6} md={3} key={tree.id}>
+                <Grid item xs={12} sm={6} md={4} lg={3} key={tree.id}>
                     <Card
                         hoverable
                         className={classes.customCard}
@@ -165,15 +167,17 @@ const GiftRedeemTrees: React.FC<{ transaction: GiftRedeemTransaction }> = ({ tra
                 <Card loading style={{ backgroundColor: '#b7edc47a', border: 'none', overflow: 'hidden', borderRadius: '20px' }}></Card>
             </Grid>))}
 
-            {Object.values(trees).length < totalRecords && <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+            {Object.values(trees).length < totalRecords && <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'center', mt: isMobile ? 1 : 2 }}>
                 <Button
                     variant="contained"
                     color="success"
                     onClick={() => { setPage(page + 1) }}
+                    fullWidth={isMobile}
+                    sx={{ maxWidth: isMobile ? '100%' : '200px' }}
                 >
                     Load More Trees
                 </Button>
-            </div>}
+            </Grid>}
 
             <ImageViewModal 
                 open={imageViewModalOpen}
@@ -185,6 +189,8 @@ const GiftRedeemTrees: React.FC<{ transaction: GiftRedeemTransaction }> = ({ tra
 }
 
 const GiftTransactionSummary: React.FC<Props> = ({ transaction, onTransactionUpdated, showEditButton = true }) => {
+    const theme = useTheme();
+    const isMobile = useMediaQuery(theme.breakpoints.down('md'));
     const [emailDialogOpen, setEmailDialogOpen] = useState(false);
     const [editDialogOpen, setEditDialogOpen] = useState(false);
     const [treeCardImages, setTreeCardImages] = useState<string[]>([]);
@@ -236,18 +242,25 @@ const GiftTransactionSummary: React.FC<Props> = ({ transaction, onTransactionUpd
     };
 
     return (
-        <Box sx={{ mx: "auto", mt: 1, mb: 5 }}>
+        <Box sx={{ mx: "auto", mt: 1, mb: 5, px: isMobile ? 1 : 0 }}>
             <Card 
                 style={{ 
                     marginBottom: 32, 
-                    padding: 24,
+                    padding: isMobile ? 16 : 24,
                     backgroundColor: '#ffffff',
                     boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
                     borderRadius: '12px',
                     border: '1px solid rgba(0, 0, 0, 0.08)'
                 }}
             >
-                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+                <Box sx={{ 
+                    display: 'flex', 
+                    flexDirection: isMobile ? 'column' : 'row',
+                    justifyContent: 'space-between', 
+                    alignItems: isMobile ? 'flex-start' : 'center', 
+                    mb: 3,
+                    gap: isMobile ? 2 : 0
+                }}>
                     <Typography variant="h6" sx={{ color: '#1a1a1a' }}>
                         Gift Details
                     </Typography>
@@ -258,15 +271,20 @@ const GiftTransactionSummary: React.FC<Props> = ({ transaction, onTransactionUpd
                             startIcon={<Edit />}
                             onClick={() => setEditDialogOpen(true)}
                             sx={{ textTransform: 'none' }}
+                            fullWidth={isMobile}
                         >
                             Edit Details
                         </Button>
                     )}
                 </Box>
-                <Grid container spacing={3}>
+                <Grid container spacing={isMobile ? 2 : 3}>
                     {/* Sender and Recipient Section */}
                     <Grid item xs={12}>
-                        <Box sx={{ display: 'flex', gap: 4 }}>
+                        <Box sx={{ 
+                            display: 'flex', 
+                            flexDirection: isMobile ? 'column' : 'row',
+                            gap: isMobile ? 2 : 4 
+                        }}>
                             <Box sx={{ flex: 1 }}>
                                 <Typography variant="subtitle2" color="text.secondary">
                                     Gifted By
@@ -283,19 +301,19 @@ const GiftTransactionSummary: React.FC<Props> = ({ transaction, onTransactionUpd
                     {/* Gift Details Section */}
                     <Grid item xs={12}>
                         <Typography variant="subtitle2" color="text.secondary" gutterBottom>Gift Information</Typography>
-                        <Box sx={{ pl: 2 }}>
+                        <Box sx={{ pl: isMobile ? 0 : 2 }}>
                             <Grid container spacing={2}>
-                                <Grid item xs={6}>
+                                <Grid item xs={12} sm={6}>
                                     <Typography variant="body1">
                                         <strong>Trees Gifted:</strong> {transaction.trees_count || 0}
                                     </Typography>
                                 </Grid>
-                                <Grid item xs={6}>
+                                <Grid item xs={12} sm={6}>
                                     {transaction.occasion_name && <Typography variant="body1">
                                         <strong>Occasion:</strong> {transaction.occasion_name || "N/A"}
                                     </Typography>}
                                 </Grid>
-                                <Grid item xs={6}>
+                                <Grid item xs={12} sm={6}>
                                     <Typography variant="body1">
                                         <strong>Gifted On:</strong> {new Date(transaction.gifted_on).toLocaleDateString()}
                                     </Typography>
@@ -307,7 +325,13 @@ const GiftTransactionSummary: React.FC<Props> = ({ transaction, onTransactionUpd
                     {/* Email Status Section */}
                     <Grid item xs={12}>
                         <Typography variant="subtitle2" color="text.secondary" gutterBottom>Email Status</Typography>
-                        <Box sx={{ pl: 2, display: 'flex', alignItems: 'center', gap: 2 }}>
+                        <Box sx={{ 
+                            pl: isMobile ? 0 : 2, 
+                            display: 'flex', 
+                            flexDirection: isMobile ? 'column' : 'row',
+                            alignItems: isMobile ? 'flex-start' : 'center', 
+                            gap: 2 
+                        }}>
                             {transaction.mail_sent_at ? (
                                 <Typography variant="body1" color="text.primary">
                                     Last mail sent at: {getHumanReadableDateTime(transaction.mail_sent_at)}
@@ -330,6 +354,7 @@ const GiftTransactionSummary: React.FC<Props> = ({ transaction, onTransactionUpd
                                                  (transaction.recipient_email?.endsWith('@14trees') && 
                                                   (!transaction.recipient_communication_email || transaction.recipient_communication_email?.endsWith('@14trees')))}
                                         sx={{ textTransform: 'none' }}
+                                        fullWidth={isMobile}
                                     >
                                         Send Now
                                     </Button>
@@ -345,7 +370,12 @@ const GiftTransactionSummary: React.FC<Props> = ({ transaction, onTransactionUpd
                     </Grid>
 
                     <Grid item xs={12}>
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                        <Box sx={{ 
+                            display: 'flex', 
+                            flexDirection: isMobile ? 'column' : 'row',
+                            alignItems: isMobile ? 'flex-start' : 'center', 
+                            gap: 2 
+                        }}>
                             <Typography variant="subtitle2" color="text.secondary">Tree Cards: {treeCardImages.length} </Typography>
                             <Button
                                 variant="contained" 
@@ -354,6 +384,7 @@ const GiftTransactionSummary: React.FC<Props> = ({ transaction, onTransactionUpd
                                 startIcon={<OpenInNew />}
                                 disabled={treeCardImages.length === 0}
                                 sx={{ textTransform: 'none' }}
+                                fullWidth={isMobile}
                             >
                                 Download Images
                             </Button>
@@ -387,7 +418,7 @@ const GiftTransactionSummary: React.FC<Props> = ({ transaction, onTransactionUpd
                     plantType: transaction.tree_details?.[0]?.plant_type || '',
                     requestId: '',
                     giftedBy: transaction.gifted_by || '',
-                    logoUrl: null
+                    logoUrl: transaction.tree_details?.[0]?.logo_url || null
                 }}
                 existingTransaction={transaction}
             />}

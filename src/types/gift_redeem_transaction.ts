@@ -23,6 +23,7 @@ export type GiftRedeemTransaction = {
         card_image_url?: string | null,
         template_image?: string | null,
         illustration_s3_path?: string | null,
+        logo_url?: string | null,
     }[],
     trees_count?: number;
     mail_sent: boolean | null;

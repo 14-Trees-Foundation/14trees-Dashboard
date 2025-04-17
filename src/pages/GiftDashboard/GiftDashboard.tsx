@@ -16,6 +16,8 @@ const GiftDashboard: React.FC = () => {
 
     const theme = useTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+    const isTablet = useMediaQuery(theme.breakpoints.down('md'));
+
     const { userId } = useParams();
     const [sponsorId, setSponsorId] = useState<number | null>(null);
 
@@ -91,7 +93,7 @@ const GiftDashboard: React.FC = () => {
                         <SinglePageDrawer pages={items} />
                         <Box
                             component="main"
-                            sx={{ minWidth: isMobile ? "98%" : "1080px", p: isMobile ? 0 : 2, width: "100%" }}
+                            sx={{ minWidth: isMobile || isTablet ? "98%" : "1080px", p: isMobile || isTablet ? 0 : 2, width: "100%" }}
                         >
                             <Box>
                                 <ToastContainer />

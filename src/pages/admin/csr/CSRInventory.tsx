@@ -1,8 +1,6 @@
 import { useEffect, useState } from "react";
-import { Box, Button, Divider, Typography } from "@mui/material";
+import { Box, Divider, Typography, useMediaQuery, useTheme } from "@mui/material";
 import { createStyles, makeStyles } from "@mui/styles";
-import CSRTrees from "./CSRTrees";
-import CSRPlotStates from "./CSRPlotStates";
 import { AutocompleteWithPagination } from "../../../components/AutoComplete";
 import { useAppDispatch, useAppSelector } from "../../../redux/store/hooks";
 import { bindActionCreators } from "@reduxjs/toolkit";
@@ -10,16 +8,14 @@ import { Group } from "../../../types/Group";
 import * as groupActionCreators from '../../../redux/actions/groupActions';
 import ApiClient from "../../../api/apiClient/apiClient";
 import { toast, ToastContainer } from "react-toastify";
-import { Forest, GrassTwoTone, ModeOfTravel, NaturePeople } from "@mui/icons-material";
-import CSRSiteStates from "./CSRSiteStates";
-import CSRPlantTypeStats from "./CSRPlantTypeStates";
-import CSRTreeChart from "./CSRTreeChart";
 import { useParams } from "react-router-dom";
-import CSRGiftRequests from "./CSRGiftRequests";
 import CSRGiftTrees from "./CSRGiftTrees";
 import CSRSharePageDialog from "./CSRSharePageDialog";
 
 const CSRInventory: React.FC = () => {
+
+    const theme = useTheme();
+    const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
     const { groupId } = useParams();
 
@@ -78,24 +74,6 @@ const CSRInventory: React.FC = () => {
 
     }, [groupsList, groupId])
 
-    ///*** CSR Cards ***/
-    const classes = useStyles();
-    const [csrAnalytics, setCsrAnalytics] = useState<any>(null);
-
-    useEffect(() => {
-        const getCSRAnalytics = async () => {
-            try {
-                const apiClient = new ApiClient();
-                const data = await apiClient.getCSRAnalytics(selectedGroup?.id);
-                setCsrAnalytics(data);
-            } catch (error) {
-                toast.error("Failed to fetch CSR analytics data");
-            }
-        }
-
-        getCSRAnalytics();
-    }, [selectedGroup]);
-
     ///*** Tags ***/
     const [tags, setTags] = useState<string[]>([]);
 
@@ -120,9 +98,10 @@ const CSRInventory: React.FC = () => {
                 style={{
                     display: "flex",
                     justifyContent: "space-between",
+                    margin: isMobile ? '10px 10px 0 10px' : undefined
                 }}
             >
-                <Typography variant="h3" style={{ marginTop: '5px', marginBottom: '5px' }}>{selectedGroup ? `${selectedGroup.name}'s` : 'Corporate'} Dashboard</Typography>
+                <Typography variant={isMobile ? "h5" : "h3"} style={{ marginTop: '5px', marginBottom: '5px' }}>{selectedGroup ? `${selectedGroup.name}'s` : 'Corporate'} Dashboard</Typography>
                 {!groupId && <div
                     style={{
                         display: "flex",
@@ -165,7 +144,7 @@ const CSRInventory: React.FC = () => {
                     <CSRSharePageDialog groupId={selectedGroup?.id} groupName={selectedGroup?.name} style={{ marginLeft: 10 }}/>
                 </div>}
             </div>
-            <Divider sx={{ backgroundColor: "black", marginBottom: '15px' }} />
+            <Divider sx={{ backgroundColor: "black", marginBottom: '15px', mx: 1 }} />
             
             {/* <Typography variant="h4" mt={5} ml={1} id="corporate-impact-overview">Corporate Impact Overview</Typography>
             <Typography variant="subtitle1" mb={1} ml={1}>A comprehensive snapshot of your contributions to reforestation and sustainability efforts, including total trees sponsored, plant types supported, acres rejuvenated, and sponsorship progress over time.</Typography>
