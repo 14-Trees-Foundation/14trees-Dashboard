@@ -1,4 +1,4 @@
-import { Autocomplete, Avatar, Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, Grid, TextField, Typography } from "@mui/material"
+import { Autocomplete, Avatar, Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, Grid, TextField, Typography, useMediaQuery, useTheme } from "@mui/material"
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import ApiClient from "../../api/apiClient/apiClient";
@@ -75,6 +75,8 @@ const RedeemGiftTreeDialog: React.FC<RedeemGiftTreeDialogProps> = ({
 }) => {
 
     const classes = useStyles();
+    const theme = useTheme();
+    const isMobile = useMediaQuery(theme.breakpoints.down('md'));
     const [errors, setErrors] = useState({
         name: '',
         email: '',
@@ -415,13 +417,33 @@ const RedeemGiftTreeDialog: React.FC<RedeemGiftTreeDialogProps> = ({
                             sx={{
                                 maxWidth: '100%',
                                 display: 'flex',
+                                flexDirection: isMobile ? 'column' : 'row',
                                 justifyContent: 'space-between',
                                 position: 'relative',
                             }}
                             className={classes.backgroundImage}
                         >
-                            <Box component={'img'} src={treePlanting} sx={{ maxWidth: '45%', height: 'auto', zIndex: 1, borderRadius: 2, boxShadow: '0.3em 0.3em 1em rgba(12, 123, 115, 0.8)' }}></Box>
-                            <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', margin: 'auto', padding: '0px 0px 10px 30px' }}>
+                            {!isMobile && (
+                                <Box 
+                                    component={'img'} 
+                                    src={treePlanting} 
+                                    sx={{ 
+                                        maxWidth: '45%', 
+                                        height: 'auto', 
+                                        zIndex: 1, 
+                                        borderRadius: 2, 
+                                        boxShadow: '0.3em 0.3em 1em rgba(12, 123, 115, 0.8)' 
+                                    }}
+                                />
+                            )}
+                            <Box sx={{ 
+                                display: 'flex', 
+                                justifyContent: 'center', 
+                                alignItems: 'center', 
+                                margin: 'auto', 
+                                padding: isMobile ? '0px' : '0px 0px 10px 30px',
+                                width: isMobile ? '100%' : 'auto'
+                            }}>
                                 <Grid container rowSpacing={2} columnSpacing={1}>
                                     <Grid item xs={12}>
                                         <TextField
@@ -468,7 +490,7 @@ const RedeemGiftTreeDialog: React.FC<RedeemGiftTreeDialogProps> = ({
                                             fullWidth
                                         />
                                     </Grid>
-                                    {giftMultiple && !isEditMode && <Grid item xs={6}>
+                                    {giftMultiple && !isEditMode && <Grid item xs={12} sm={6}>
                                         <TextField
                                             name="trees_count"
                                             label="Number of Trees"
@@ -479,49 +501,66 @@ const RedeemGiftTreeDialog: React.FC<RedeemGiftTreeDialogProps> = ({
                                             fullWidth
                                         />
                                     </Grid>}
-                                    <Grid item xs={giftMultiple && !isEditMode ? 6 : 12}>
-                                        <div style={{ display: 'flex', alignItems: 'center', marginBottom: 16 }}>
+                                    <Grid item xs={12} sm={giftMultiple && !isEditMode ? 6 : 12}>
+                                        <div style={{ 
+                                            display: 'flex', 
+                                            alignItems: 'center', 
+                                            marginBottom: 16,
+                                            // flexDirection: isMobile ? 'column' : 'row',
+                                            gap: isMobile ? '10px' : '0'
+                                        }}>
                                             <Avatar
                                                 src={profileImage ? URL.createObjectURL(profileImage) : undefined}
                                                 alt="User"
-                                                sx={{ width: 80, height: 80, marginRight: 2 }}
-                                            />
-                                            <Button variant="outlined" component="label" color='success'
-                                                sx={{
-                                                    marginRight: 2,
-                                                    textTransform: 'none',
-                                                    backgroundColor: "white",
-                                                    "&:hover": {
-                                                        backgroundColor: "white", // Hover background color
-                                                    },
+                                                sx={{ 
+                                                    width: 80, 
+                                                    height: 80, 
+                                                    marginRight: isMobile ? 0 : 2,
+                                                    marginBottom: isMobile ? 1 : 0
                                                 }}
-                                            >
-                                                Add Recipient Pic
-                                                <input
-                                                    value={''}
-                                                    type="file"
-                                                    hidden
-                                                    accept="image/*"
-                                                    onChange={handleImageChange}
-                                                />
-                                            </Button>
-                                            {profileImage &&
-                                                <Button variant="outlined" component="label" color='error'
+                                            />
+                                            <Box sx={{
+                                                display: 'flex',
+                                                flexDirection: isMobile ? 'column' : 'row',
+                                                gap: isMobile ? '10px' : '0'
+                                            }}>
+                                                <Button variant="outlined" component="label" color='success'
                                                     sx={{
+                                                        marginRight: isMobile ? 0 : 2,
                                                         textTransform: 'none',
                                                         backgroundColor: "white",
                                                         "&:hover": {
                                                             backgroundColor: "white", // Hover background color
                                                         },
                                                     }}
-                                                    onClick={() => { setProfileImage(null) }}
                                                 >
-                                                    Remove Image
-                                                </Button>}
+                                                    Add Recipient Pic
+                                                    <input
+                                                        value={''}
+                                                        type="file"
+                                                        hidden
+                                                        accept="image/*"
+                                                        onChange={handleImageChange}
+                                                    />
+                                                </Button>
+                                                {profileImage &&
+                                                    <Button variant="outlined" component="label" color='error'
+                                                        sx={{
+                                                            textTransform: 'none',
+                                                            backgroundColor: "white",
+                                                            "&:hover": {
+                                                                backgroundColor: "white", // Hover background color
+                                                            },
+                                                        }}
+                                                        onClick={() => { setProfileImage(null) }}
+                                                    >
+                                                        Remove Image
+                                                    </Button>}
+                                            </Box>
                                         </div>
                                         <Typography fontSize={10}>Recipient image will be used to create more personalised dashboard, but it is not required to redeem the tree.</Typography>
                                     </Grid>
-                                    <Grid item xs={6}>
+                                    <Grid item xs={12} sm={6}>
                                         <Autocomplete
                                             fullWidth
                                             value={selectedEventType}
@@ -537,7 +576,7 @@ const RedeemGiftTreeDialog: React.FC<RedeemGiftTreeDialogProps> = ({
                                             )}
                                         />
                                     </Grid>
-                                    <Grid item xs={6}>
+                                    <Grid item xs={12} sm={6}>
                                         <TextField
                                             fullWidth
                                             label="Occasion Name"
@@ -546,7 +585,7 @@ const RedeemGiftTreeDialog: React.FC<RedeemGiftTreeDialogProps> = ({
                                             onChange={handleInputChange}
                                         />
                                     </Grid>
-                                    <Grid item xs={6}>
+                                    <Grid item xs={12} sm={6}>
                                         <TextField
                                             fullWidth
                                             label="Gifted By"
@@ -555,7 +594,7 @@ const RedeemGiftTreeDialog: React.FC<RedeemGiftTreeDialogProps> = ({
                                             onChange={handleInputChange}
                                         />
                                     </Grid>
-                                    <Grid item xs={6}>
+                                    <Grid item xs={12} sm={6}>
                                         <TextField
                                             fullWidth
                                             label="Gifted on"
@@ -586,7 +625,18 @@ const RedeemGiftTreeDialog: React.FC<RedeemGiftTreeDialogProps> = ({
                         />
                     </Box>
                 </DialogContent>
-                <DialogActions>
+                <DialogActions sx={{ 
+                    flexDirection: isMobile ? 'column' : 'row',
+                    alignItems: 'stretch',
+                    justifyContent: isMobile ? 'center' : 'flex-end',
+                    '& > button': {
+                        margin: isMobile ? '5px 0' : undefined,
+                        width: isMobile ? '100%' : undefined
+                    },
+                    '& >:not(:first-of-type)': {
+                        marginLeft: isMobile ? 0 : 1
+                    }
+                }}>
                     <Button onClick={onClose} color="error" variant="outlined">
                         Cancel
                     </Button>

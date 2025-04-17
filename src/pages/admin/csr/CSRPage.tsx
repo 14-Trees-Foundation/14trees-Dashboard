@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { SinglePageDrawer } from "./SinglePageDrawer";
 import { Dashboard, CardGiftcard, Landscape, Forest, GrassTwoTone, Map, NaturePeople } from "@mui/icons-material";
 import { createStyles, makeStyles } from "@mui/styles";
-import { Box } from "@mui/material";
+import { Box, useMediaQuery, useTheme } from "@mui/material";
 import { useLocation, useSearchParams } from "react-router-dom";
 import { UserRoles } from "../../../types/common";
 import ApiClient from "../../../api/apiClient/apiClient";
@@ -13,6 +13,9 @@ import { Spinner } from "../../../components/Spinner";
 import { NotFound } from "../../notfound/NotFound";
 
 const CSRPage: React.FC = () => {
+
+    const theme = useTheme();
+    const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
     const classes = useStyles();
     const [searchParams] = useSearchParams();
@@ -124,7 +127,7 @@ const CSRPage: React.FC = () => {
                         <SinglePageDrawer pages={items} />
                         <Box
                             component="main"
-                            sx={{ minWidth: "1080px", p: 2, width: "100%" }}
+                            sx={{ minWidth: isMobile ? "98%" : "1080px", mt: isMobile ? 8 : 0, p: isMobile ? 0 : 2, width: "100%" }}
                         >
                             <CSRInventory />
                         </Box>

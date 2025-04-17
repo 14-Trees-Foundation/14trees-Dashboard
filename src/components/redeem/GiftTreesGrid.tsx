@@ -303,7 +303,6 @@ const GiftTreesGrid = forwardRef<GiftTreesGridHandle, GiftTreesGridProps>(({
                                             backgroundColor: 'white', 
                                             width: '100%', 
                                             objectFit: 'cover',
-                                            aspectRatio: isMobile ? '1/1' : 'auto',
                                             maxWidth: '100%'
                                         }} 
                                     />
@@ -316,7 +315,6 @@ const GiftTreesGrid = forwardRef<GiftTreesGridHandle, GiftTreesGridProps>(({
                                 display: 'flex', 
                                 flexDirection: 'column', 
                                 alignItems: 'center',
-                                padding: isMobile ? '8px 4px' : undefined,
                                 overflow: 'hidden'
                             }}>
                                 <Typography 
