@@ -1,5 +1,5 @@
 import { FC, useEffect, useRef, useState } from "react";
-import { Box, Button, CircularProgress, TextField, Typography } from "@mui/material";
+import { Box, Button, CircularProgress, TextField, Typography, useMediaQuery, useTheme } from "@mui/material";
 import ApiClient from "../../../../api/apiClient/apiClient";
 
 const defaultMessages = {
@@ -36,6 +36,8 @@ interface CardDetailsProps {
 
 const CardDetails: FC<CardDetailsProps> = ({ logo_url, request_id, presentationId, slideId, messages, saplingId, plantType, userName, onChange, onPresentationId, treesCount, isPersonal }) => {
 
+    const theme = useTheme();
+    const isMobile = useMediaQuery(theme.breakpoints.down('md'));
     const slideIdRef = useRef('');
     const presentationIdIdRef = useRef('');
     const recordRef = useRef({ primary: '', secondary: '', logo: '' })
@@ -137,8 +139,19 @@ const CardDetails: FC<CardDetailsProps> = ({ logo_url, request_id, presentationI
     }
 
     return (
-        <div style={{ display: 'flex', padding: '10px 10px', width: '100%', justifyContent: 'space-between' }}>
-            <div style={{ display: 'flex', flexDirection: 'column', width: '42%' }}>
+        <div style={{ 
+            display: 'flex', 
+            flexDirection: isMobile ? 'column' : 'row',
+            padding: isMobile ? '0px' : '10px 10px', 
+            width: '100%', 
+            justifyContent: 'space-between',
+            gap: isMobile ? '20px' : '0'
+        }}>
+            <div style={{ 
+                display: 'flex', 
+                flexDirection: 'column', 
+                width: isMobile ? '100%' : '42%'
+            }}>
                 <Typography variant='h6'>{messages.eventType === "1" ? "Birthday" : messages.eventType === "2" ? "Memorial" : "General"} Gift</Typography>
                 <Typography variant='body1' mt={1}>If you would like to tweak/add some personalised touch, change the messaging below: </Typography>
                 <Typography variant="body1" sx={{ mt: 2 }}><strong>Primary Message</strong></Typography>
@@ -175,7 +188,7 @@ const CardDetails: FC<CardDetailsProps> = ({ logo_url, request_id, presentationI
                     />
                 </Box>}
                 <Box style={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'center', marginTop: 20 }}>
-                    <Typography mr={1}>Click to refresh the card template on the right:</Typography>
+                    <Typography mr={1}>Click to refresh the card template{isMobile ? '' : ' on the right'}:</Typography>
                     <Button onClick={updateSlide} size='small' variant="contained" color="success" disabled={!presentationIdIdRef.current}>
                         Preview
                     </Button>
@@ -186,10 +199,15 @@ const CardDetails: FC<CardDetailsProps> = ({ logo_url, request_id, presentationI
                 flexDirection="column"
                 alignItems="center"
                 justifyContent="center"
-                minWidth="800px"
-                margin="auto"
-                border="2px solid #ccc" // Add border
-                height="600px" // Set height to center loading content
+                minWidth={isMobile ? '100%' : '800px'}
+                maxWidth={isMobile ? '100%' : '800px'}
+                margin={isMobile ? '20px 0 0 0' : 'auto'}
+                border="2px solid #ccc"
+                height={isMobile ? '300px' : '600px'}
+                sx={{
+                    overflowX: 'auto',
+                    overflowY: 'hidden'
+                }}
             >
                 {(!iframeSrc || loading) ? (
                     <Box textAlign="center">
@@ -204,8 +222,8 @@ const CardDetails: FC<CardDetailsProps> = ({ logo_url, request_id, presentationI
                 ) : (
                     <iframe
                         src={iframeSrc}
-                        width="800"
-                        height="600"
+                        width={isMobile ? '100%' : '800'}
+                        height={isMobile ? '400' : '600'}
                         allowFullScreen
                         style={{ border: "none" }}
                     ></iframe>
