@@ -210,34 +210,33 @@ const GiftTransactionSummary: React.FC<Props> = ({ transaction, onTransactionUpd
     }
 
     const handleDownload = async () => {
-        let imageUrls = treeCardImages;
-        const fileName = transaction.recipient_name + "_" + transaction.trees_count + ".zip";
-
-        const zip = new JSZip();
-        const folder = zip.folder("images");
-
-        if (!folder) {
-            console.error("Failed to create ZIP folder.");
-            return;
+        const imageUrls = treeCardImages;
+        let url = '';
+        let fileName = '';
+        
+        if (imageUrls.length === 1) {
+            url = imageUrls[0];
+            fileName = imageUrls[0].split('/').pop() || 'image.png';
+        } else {
+            fileName = transaction.recipient_name + "_" + transaction.trees_count;
+            let location: string = process.env.REACT_APP_BASE_URL || '';
+            url = location + '/gift-cards/transactions/tree-cards/download/' + transaction.id + '?file_name=' + fileName;
         }
 
         try {
-            // Fetch and add each image to the ZIP
-            for (let i = 0; i < imageUrls.length; i++) {
-                const url = imageUrls[i];
-                const fileName = url.split("/").slice(-1)[0]; // Customize file names as needed
-
-                const response = await axios.get(url, { responseType: "blob", withCredentials: false });
-                folder.file(fileName, response.data);
-            }
-
-            // Generate the ZIP file
-            const zipBlob = await zip.generateAsync({ type: "blob" });
-
-            // Trigger the download
-            saveAs(zipBlob, fileName);
+            // Create an anchor element and trigger download
+            const link = document.createElement('a');
+            link.href = url;
+            link.setAttribute('download', fileName);
+            link.setAttribute('target', '_blank');
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            return;
         } catch (error) {
-            console.error("Error downloading images:", error);
+            console.error("Error downloading image:", error);
+            toast.error("Failed to download image. Try right-clicking and 'Save image as' instead.");
+            return;
         }
     };
 
@@ -386,7 +385,7 @@ const GiftTransactionSummary: React.FC<Props> = ({ transaction, onTransactionUpd
                                 sx={{ textTransform: 'none' }}
                                 fullWidth={isMobile}
                             >
-                                Download Images
+                                Download
                             </Button>
                         </Box>
                     </Grid>
