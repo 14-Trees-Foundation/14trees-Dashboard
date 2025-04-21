@@ -69,7 +69,7 @@ export default function ChatBot() {
       width: '60px',
       height: '60px',
       borderRadius: '50%',
-      backgroundColor: '#007bff',
+      backgroundColor: '#28a745 ',
       color: 'white',
       display: 'flex',
       alignItems: 'center',
@@ -135,7 +135,7 @@ export default function ChatBot() {
     },
     button: {
       padding: '8px 16px',
-      backgroundColor: '#007bff',
+      backgroundColor: '#28a745',
       color: 'white',
       border: 'none',
       borderRadius: '4px',
