@@ -1,4 +1,6 @@
 import { useState, useRef, useEffect, CSSProperties } from 'react';
+import ApiClient from '../api/apiClient/apiClient';
+import ReactMarkdown from 'react-markdown';
 
 type Message = {
   id: string;
@@ -10,11 +12,11 @@ type Message = {
 export default function ChatBot() {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([
-    { 
-      id: '1', 
-      text: 'Hi! How can I help you today?', 
-      sender: 'bot', 
-      timestamp: new Date() 
+    {
+      id: '1',
+      text: 'Hi! How can I help you today?',
+      sender: 'bot',
+      timestamp: new Date()
     }
   ]);
   const [inputValue, setInputValue] = useState('');
@@ -39,10 +41,10 @@ export default function ChatBot() {
     setInputValue('');
 
     // Simulate bot response (replace with actual API call)
-    setTimeout(() => {
+    setTimeout(async () => {
       const botResponse: Message = {
         id: (Date.now() + 1).toString(),
-        text: getBotResponse(inputValue),
+        text: await getBotResponse(inputValue, messages),
         sender: 'bot',
         timestamp: new Date()
       };
@@ -50,14 +52,10 @@ export default function ChatBot() {
     }, 500);
   };
 
-  const getBotResponse = (userInput: string): string => {
-    const input = userInput.toLowerCase();
-    if (input.includes('hello') || input.includes('hi')) {
-      return "Hello! How can I assist you?";
-    } else if (input.includes('gift') && input.includes('tree')) {
-      return "I can help with that! What's the recipient's name?";
-    }
-    return "I'm not sure I understand. Could you rephrase that?";
+  const getBotResponse = async (userInput: string, messages: Message[]): Promise<string> => {
+    const apiClient = new ApiClient();
+    const resp = await apiClient.serveUserQuery(userInput, messages);
+    return resp.output;
   };
 
   // Styles
@@ -109,7 +107,7 @@ export default function ChatBot() {
       maxWidth: '80%'
     },
     userMessage: {
-      backgroundColor: '#007bff',
+      backgroundColor: '#28a745',
       color: 'white',
       marginLeft: 'auto',
       borderBottomRightRadius: '4px'
@@ -146,17 +144,17 @@ export default function ChatBot() {
   return (
     <>
       {/* Chat Icon */}
-      <div 
+      <div
         style={styles.chatIcon}
         onClick={() => setIsOpen(!isOpen)}
         aria-label="Chat support"
       >
-        <svg 
-          width="24" 
-          height="24" 
-          viewBox="0 0 24 24" 
-          fill="none" 
-          stroke="currentColor" 
+        <svg
+          width="24"
+          height="24"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
           strokeWidth="2"
         >
           <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
@@ -167,19 +165,20 @@ export default function ChatBot() {
       <div style={styles.chatContainer}>
         <div style={styles.messages}>
           {messages.map((message) => (
-            <div 
-              key={message.id} 
+            <div
+              key={message.id}
               style={{
                 ...styles.message,
                 ...(message.sender === 'user' ? styles.userMessage : styles.botMessage)
               }}
             >
-              {message.text}
+              <ReactMarkdown>{message.text}</ReactMarkdown>
             </div>
           ))}
           <div ref={messagesEndRef} />
         </div>
-        
+
+
         <div style={styles.inputContainer}>
           <input
             type="text"
@@ -189,7 +188,7 @@ export default function ChatBot() {
             placeholder="Type your message..."
             style={styles.input}
           />
-          <button 
+          <button
             onClick={handleSendMessage}
             style={styles.button}
           >
