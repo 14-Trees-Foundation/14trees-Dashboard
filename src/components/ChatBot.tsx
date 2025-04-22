@@ -1,6 +1,17 @@
-import { useState, useRef, useEffect, CSSProperties } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import ApiClient from '../api/apiClient/apiClient';
 import ReactMarkdown from 'react-markdown';
+import { styled } from '@mui/material/styles';
+
+const defaultMessage = `**Hello! 🌿 Greetings from 14 Trees Foundation!**  
+I'm your digital assistant, here to help you spread green joy. Here's what I can assist you with:
+
+1. 🌱 **Gift trees** to someone with a personalized message.  
+2. 📬 **Send tree dashboards and tree cards** directly to recipients via email.  
+3. 📋 **View your past gift tree requests** anytime.
+4. 🤝 **Help you get connected** with someone from our team.
+
+How can I assist you today?`
 
 type Message = {
   id: string;
@@ -9,12 +20,103 @@ type Message = {
   timestamp: Date;
 };
 
+// Styled Components
+const ChatIcon = styled('div')({
+  position: 'fixed',
+  bottom: '20px',
+  right: '20px',
+  width: '60px',
+  height: '60px',
+  borderRadius: '50%',
+  backgroundColor: '#28a745',
+  color: 'white',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  cursor: 'pointer',
+  boxShadow: '0 2px 10px rgba(0,0,0,0.2)',
+  zIndex: 1000
+});
+
+const ChatContainer = styled('div')<{ isOpen: boolean }>(({ isOpen }) => ({
+  position: 'fixed',
+  bottom: '90px',
+  right: '20px',
+  width: '350px',
+  height: isOpen ? '500px' : '0',
+  border: isOpen ? '1px solid #ccc' : 'none',
+  borderRadius: '8px',
+  display: 'flex',
+  flexDirection: 'column',
+  fontFamily: 'Arial, sans-serif',
+  backgroundColor: 'white',
+  overflow: 'hidden',
+  transition: 'all 0.3s ease',
+  zIndex: 1000,
+  boxShadow: '0 5px 15px rgba(0,0,0,0.1)'
+}));
+
+const MessagesContainer = styled('div')<{ isOpen: boolean }>(({ isOpen }) => ({
+  flex: 1,
+  padding: '10px',
+  overflowY: 'auto',
+  backgroundColor: '#f9f9f9',
+  display: isOpen ? 'block' : 'none'
+}));
+
+const MessageBubble = styled('div')({
+  margin: '8px 0',
+  padding: '8px 12px',
+  borderRadius: '18px',
+  maxWidth: '80%'
+});
+
+const UserMessage = styled(MessageBubble)({
+  backgroundColor: '#28a745',
+  color: 'white',
+  marginLeft: 'auto',
+  borderBottomRightRadius: '4px'
+});
+
+const BotMessage = styled(MessageBubble)({
+  backgroundColor: '#e9ecef',
+  color: 'black',
+  marginRight: 'auto',
+  borderBottomLeftRadius: '4px'
+});
+
+const InputContainer = styled('div')<{ isOpen: boolean }>(({ isOpen }) => ({
+  display: isOpen ? 'flex' : 'none',
+  padding: '10px',
+  borderTop: '1px solid #ccc',
+  backgroundColor: 'white'
+}));
+
+const TextInput = styled('input')({
+  flex: 1,
+  padding: '8px',
+  border: '1px solid #ccc',
+  borderRadius: '4px',
+  marginRight: '8px'
+});
+
+const SendButton = styled('button')({
+  padding: '8px 16px',
+  backgroundColor: '#28a745',
+  color: 'white',
+  border: 'none',
+  borderRadius: '4px',
+  cursor: 'pointer'
+});
+
+// Component
 export default function ChatBot() {
   const [isOpen, setIsOpen] = useState(false);
+  const [botTyping, setBotTyping] = useState(false);
   const [messages, setMessages] = useState<Message[]>([
     {
       id: '1',
-      text: 'Hi! How can I help you today?',
+      text: defaultMessage,
       sender: 'bot',
       timestamp: new Date()
     }
@@ -22,7 +124,6 @@ export default function ChatBot() {
   const [inputValue, setInputValue] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  // Auto-scroll to bottom when messages change
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
@@ -30,7 +131,6 @@ export default function ChatBot() {
   const handleSendMessage = async () => {
     if (!inputValue.trim()) return;
 
-    // Add user message
     const userMessage: Message = {
       id: Date.now().toString(),
       text: inputValue,
@@ -40,16 +140,26 @@ export default function ChatBot() {
     setMessages(prev => [...prev, userMessage]);
     setInputValue('');
 
-    // Simulate bot response (replace with actual API call)
-    setTimeout(async () => {
-      const botResponse: Message = {
-        id: (Date.now() + 1).toString(),
-        text: await getBotResponse(inputValue, messages),
-        sender: 'bot',
-        timestamp: new Date()
-      };
-      setMessages(prev => [...prev, botResponse]);
-    }, 500);
+    setBotTyping(true);
+    const typingMessage: Message = {
+      id: 'typing',
+      text: '...',
+      sender: 'bot',
+      timestamp: new Date()
+    };
+    setMessages(prev => [...prev, typingMessage]);
+
+    const botResponse: Message = {
+      id: (Date.now() + 1).toString(),
+      text: await getBotResponse(inputValue, messages),
+      sender: 'bot',
+      timestamp: new Date()
+    };
+    setMessages(prev => [
+      ...prev.filter(msg => msg.id !== 'typing'),
+      botResponse
+    ]);
+    setBotTyping(false);
   };
 
   const getBotResponse = async (userInput: string, messages: Message[]): Promise<string> => {
@@ -58,144 +168,56 @@ export default function ChatBot() {
     return resp.output;
   };
 
-  // Styles
-  const styles: Record<string, CSSProperties> = {
-    chatIcon: {
-      position: 'fixed',
-      bottom: '20px',
-      right: '20px',
-      width: '60px',
-      height: '60px',
-      borderRadius: '50%',
-      backgroundColor: '#28a745 ',
-      color: 'white',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      cursor: 'pointer',
-      boxShadow: '0 2px 10px rgba(0,0,0,0.2)',
-      zIndex: 1000
-    },
-    chatContainer: {
-      position: 'fixed',
-      bottom: '90px',
-      right: '20px',
-      width: '350px',
-      height: isOpen ? '500px' : '0',
-      border: isOpen ? '1px solid #ccc' : 'none',
-      borderRadius: '8px',
-      display: 'flex',
-      flexDirection: 'column',
-      fontFamily: 'Arial, sans-serif',
-      backgroundColor: 'white',
-      overflow: 'hidden',
-      transition: 'all 0.3s ease',
-      zIndex: 1000,
-      boxShadow: '0 5px 15px rgba(0,0,0,0.1)'
-    },
-    messages: {
-      flex: 1,
-      padding: '10px',
-      overflowY: 'auto',
-      backgroundColor: '#f9f9f9',
-      display: isOpen ? 'block' : 'none'
-    },
-    message: {
-      margin: '8px 0',
-      padding: '8px 12px',
-      borderRadius: '18px',
-      maxWidth: '80%'
-    },
-    userMessage: {
-      backgroundColor: '#28a745',
-      color: 'white',
-      marginLeft: 'auto',
-      borderBottomRightRadius: '4px'
-    },
-    botMessage: {
-      backgroundColor: '#e9ecef',
-      color: 'black',
-      marginRight: 'auto',
-      borderBottomLeftRadius: '4px'
-    },
-    inputContainer: {
-      display: isOpen ? 'flex' : 'none',
-      padding: '10px',
-      borderTop: '1px solid #ccc',
-      backgroundColor: 'white'
-    },
-    input: {
-      flex: 1,
-      padding: '8px',
-      border: '1px solid #ccc',
-      borderRadius: '4px',
-      marginRight: '8px'
-    },
-    button: {
-      padding: '8px 16px',
-      backgroundColor: '#28a745',
-      color: 'white',
-      border: 'none',
-      borderRadius: '4px',
-      cursor: 'pointer'
-    }
+  const TypingAnimation = () => {
+    const [dots, setDots] = useState('');
+    useEffect(() => {
+      const interval = setInterval(() => {
+        setDots(prev => (prev.length >= 3 ? '' : prev + '.'));
+      }, 500);
+      return () => clearInterval(interval);
+    }, []);
+    return <span>Typing{dots}</span>;
   };
 
   return (
     <>
-      {/* Chat Icon */}
-      <div
-        style={styles.chatIcon}
-        onClick={() => setIsOpen(!isOpen)}
-        aria-label="Chat support"
-      >
-        <svg
-          width="24"
-          height="24"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-        >
+      <ChatIcon onClick={() => setIsOpen(!isOpen)} aria-label="Chat support">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
           <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
         </svg>
-      </div>
+      </ChatIcon>
 
-      {/* Chat Container */}
-      <div style={styles.chatContainer}>
-        <div style={styles.messages}>
+      <ChatContainer isOpen={isOpen}>
+        <MessagesContainer isOpen={isOpen}>
           {messages.map((message) => (
-            <div
-              key={message.id}
-              style={{
-                ...styles.message,
-                ...(message.sender === 'user' ? styles.userMessage : styles.botMessage)
-              }}
-            >
-              <ReactMarkdown>{message.text}</ReactMarkdown>
-            </div>
+            message.sender === 'user' ? (
+              <UserMessage key={message.id}>
+                <ReactMarkdown>{message.text}</ReactMarkdown>
+              </UserMessage>
+            ) : (
+              <BotMessage key={message.id}>
+                {message.id === 'typing' ? (
+                  <TypingAnimation />
+                ) : (
+                  <ReactMarkdown>{message.text}</ReactMarkdown>
+                )}
+              </BotMessage>
+            )
           ))}
           <div ref={messagesEndRef} />
-        </div>
+        </MessagesContainer>
 
-
-        <div style={styles.inputContainer}>
-          <input
+        <InputContainer isOpen={isOpen}>
+          <TextInput
             type="text"
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
             onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
             placeholder="Type your message..."
-            style={styles.input}
           />
-          <button
-            onClick={handleSendMessage}
-            style={styles.button}
-          >
-            Send
-          </button>
-        </div>
-      </div>
+          <SendButton onClick={handleSendMessage}>Send</SendButton>
+        </InputContainer>
+      </ChatContainer>
     </>
   );
 }
