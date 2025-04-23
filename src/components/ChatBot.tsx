@@ -3,15 +3,26 @@ import ApiClient from '../api/apiClient/apiClient';
 import ReactMarkdown from 'react-markdown';
 import { styled } from '@mui/material/styles';
 
+// 4. 🤝 **Help you get connected** with someone from our team.
 const defaultMessage = `**Hello! 🌿 Greetings from 14 Trees Foundation!**  
 I'm your digital assistant, here to help you spread green joy. Here's what I can assist you with:
 
 1. 🌱 **Gift trees** to someone with a personalized message.  
 2. 📬 **Send tree dashboards and tree cards** directly to recipients via email.  
 3. 📋 **View your past gift tree requests** anytime.
-4. 🤝 **Help you get connected** with someone from our team.
+4. 📋 **View tree recipient** of any request.
+5. 📝 **Edit occasion and recipient** details.
 
 How can I assist you today?`
+
+// const defaultMessage = `**Hello! 🌿 Greetings from 14 Trees Foundation!**  
+// I'm your digital assistant, here to help you spread green joy. Here's what I can assist you with:
+
+// 1. List your previous orders of giftable trees
+// 2. List your previous gift trees actions
+// 3. Fetch number of available giftable trees from your previos purchased orders
+
+// How can I assist you today?`
 
 type Message = {
   id: string;
@@ -112,7 +123,6 @@ const SendButton = styled('button')({
 // Component
 export default function ChatBot() {
   const [isOpen, setIsOpen] = useState(false);
-  const [botTyping, setBotTyping] = useState(false);
   const [messages, setMessages] = useState<Message[]>([
     {
       id: '1',
@@ -140,7 +150,6 @@ export default function ChatBot() {
     setMessages(prev => [...prev, userMessage]);
     setInputValue('');
 
-    setBotTyping(true);
     const typingMessage: Message = {
       id: 'typing',
       text: '...',
@@ -159,7 +168,6 @@ export default function ChatBot() {
       ...prev.filter(msg => msg.id !== 'typing'),
       botResponse
     ]);
-    setBotTyping(false);
   };
 
   const getBotResponse = async (userInput: string, messages: Message[]): Promise<string> => {
