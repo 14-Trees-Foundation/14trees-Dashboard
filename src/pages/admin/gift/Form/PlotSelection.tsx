@@ -1,5 +1,5 @@
 
-import { FC, useEffect, useState } from "react";
+import { FC, useEffect, useRef, useState } from "react";
 import { Box, Button, Chip, Divider, ToggleButton, ToggleButtonGroup, Typography } from "@mui/material";
 import { Plot } from "../../../../types/plot";
 import { useAppDispatch, useAppSelector } from "../../../../redux/store/hooks";
@@ -48,6 +48,7 @@ const TableSummary = (plots: Plot[], selectedPlotIds: number[], totalColumns: nu
 interface PlotSelectionProps {
     giftCardRequestId: number
     requiredTrees: number
+    remainingTrees: number
     plots: Plot[]
     onPlotsChange: (plots: Plot[]) => void
     onTreeSelection: (trees: any[]) => void
@@ -60,7 +61,7 @@ interface PlotSelectionProps {
 
 }
 
-const PlotSelection: FC<PlotSelectionProps> = ({ giftCardRequestId, requiredTrees, plots, onPlotsChange, onTreeSelection, bookNonGiftable, onBookNonGiftableChange, diversify, onDiversifyChange, bookAllHabits, onBookAllHabitsChange }) => {
+const PlotSelection: FC<PlotSelectionProps> = ({ giftCardRequestId, requiredTrees,remainingTrees: initialRemaining,  plots, onPlotsChange, onTreeSelection, bookNonGiftable, onBookNonGiftableChange, diversify, onDiversifyChange, bookAllHabits, onBookAllHabitsChange }) => {
 
     const [page, setPage] = useState(0);
     const [loading, setLoading] = useState(false);
@@ -70,7 +71,9 @@ const PlotSelection: FC<PlotSelectionProps> = ({ giftCardRequestId, requiredTree
     const [filters, setFilters] = useState<Record<string, GridFilterItem>>({});
     const [selectedPlotIds, setSelectedPlotIds] = useState<number[]>([]);
     const [selectedTags, setSelectedTags] = useState<string[]>([]);
-    const [treesCount, setTreesCount] = useState<number>(requiredTrees);
+    //const [treesCount, setTreesCount] = useState<number>(requiredTrees);
+    const originalRequestedTrees = useRef<number>(requiredTrees);
+    const [remainingTrees, setRemainingTrees] = useState<number>(initialRemaining);
 
     const [orderBy, setOrderBy] = useState<{ column: string, order: 'ASC' | 'DESC' }[]>([]);
     const [treeSelectionModal, setTreeSelectionModal] = useState(false);
@@ -149,6 +152,10 @@ const PlotSelection: FC<PlotSelectionProps> = ({ giftCardRequestId, requiredTree
         setLoading(false);
         setTableRows(records);
     }, [pageSize, page, plotsData]);
+
+    useEffect(() => {
+        console.log("RequiredTrees prop changed from", originalRequestedTrees.current, "to", requiredTrees);
+      }, [requiredTrees]);
 
     const getPlotData = async () => {
         let filtersData = JSON.parse(JSON.stringify(Object.values(filters))) as GridFilterItem[];
@@ -349,6 +356,10 @@ const PlotSelection: FC<PlotSelectionProps> = ({ giftCardRequestId, requiredTree
         setPageSize2(pageSize);
     }
 
+    const handleUnmap = (count: number) => {
+        setRemainingTrees((prev: number) => prev + count);
+    };
+
     const treeColumns: TableColumnsType<any> = [
         {
             dataIndex: "sapling_id",
@@ -379,10 +390,10 @@ const PlotSelection: FC<PlotSelectionProps> = ({ giftCardRequestId, requiredTree
             <Box style={{
                 marginBottom: 20
             }}>
-                <Typography variant='subtitle1'>Total Trees Requested: <strong>{treesCount}</strong></Typography>
+                <Typography variant='subtitle1'>Total Trees Requested: <strong>{originalRequestedTrees}</strong></Typography>
                 {selectedTrees.length === 0 && <Box>
                     <Typography variant='subtitle1'>Remaining tree count for plot selection: <strong>{
-                        Math.max(treesCount - plots
+                        Math.max(remainingTrees - plots
                             .map(pt => ( bookAllHabits 
                                             ? bookNonGiftable
                                                 ? pt.available 
@@ -392,6 +403,28 @@ const PlotSelection: FC<PlotSelectionProps> = ({ giftCardRequestId, requiredTree
                                                 : pt.card_available) ?? 0)
                             .reduce((prev, current) => prev + current, 0), 0)
                     }</strong></Typography>
+
+                    {selectedPlotIds.length > 0 && (
+                       <Box mt={1}>
+                       <Typography variant='subtitle1'>
+                         Sum of available {bookAllHabits ? "plants" : "trees"} from selected plots: 
+                    <strong> {
+                    plots.filter(plot => selectedPlotIds.includes(plot.id))
+                        .reduce((sum, plot) => {
+                            const trees = plot.card_available_trees || 0;
+                            if (bookAllHabits) {
+                                const shrubs = plot.card_available_shrubs || 0;
+                                const herbs = plot.card_available_herbs || 0;
+                                return sum + trees + shrubs + herbs;
+                            }
+                            return sum + trees;
+                         }, 0)
+                     }</strong>
+                        </Typography>
+                       </Box>
+                     )}
+
+
                     <Typography variant='subtitle1'>Tree distribution across the plots:</Typography>
                     {plots.map((plot, idx) => {
                         const treesAllocated = plots
@@ -411,7 +444,7 @@ const PlotSelection: FC<PlotSelectionProps> = ({ giftCardRequestId, requiredTree
                                                                     : plot.card_available
                                                                 : bookNonGiftable
                                                                     ? plot.available_trees
-                                                                    : plot.card_available) ?? 0, treesCount - treesAllocated);
+                                                                    : plot.card_available) ?? 0, remainingTrees - treesAllocated);
 
                         return (
                             <Typography variant="body1" key={idx}>
@@ -565,13 +598,13 @@ const PlotSelection: FC<PlotSelectionProps> = ({ giftCardRequestId, requiredTree
                 <BookedTrees
                     giftCardRequestId={giftCardRequestId}
                     visible={false}
-                    onUnMap={count => { setTreesCount(prev => prev + count); }}
+                    onUnMap={handleUnmap} 
                 />
             </Box>
 
             <TreeSelectionComponent
                 open={treeSelectionModal}
-                max={treesCount}
+                max={remainingTrees}
                 includeNonGiftable={bookNonGiftable}
                 plotIds={plots.map(plot => plot.id)}
                 plantTypes={calculateUnion(plots.map(plot => plot.distinct_plants))}
@@ -579,6 +612,7 @@ const PlotSelection: FC<PlotSelectionProps> = ({ giftCardRequestId, requiredTree
                 selectedTrees={selectedTrees}
                 onSelectedTreesChange={(trees: any) => { setSelectedTrees(trees) }}
                 onSubmit={(trees: any[]) => {
+                    setRemainingTrees(prev => prev - trees.length); 
                     const data = trees.map(tree => ({
                         tree_id: tree.id,
                         sapling_id: tree.sapling_id,
