@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import ApiClient from '../api/apiClient/apiClient';
 import ReactMarkdown from 'react-markdown';
 import { styled } from '@mui/material/styles';
+import { AvatarContainer } from './AvatarContainer';
 
 // 4. 🤝 **Help you get connected** with someone from our team.
 const defaultMessage = `**Hello! 🌿 Greetings from 14 Trees Foundation!**  
@@ -213,6 +214,7 @@ export default function ChatBot() {
 
   return (
     <>
+      <AvatarContainer isVisible={isOpen} />
       <ChatIcon onClick={() => setIsOpen(!isOpen)} aria-label="Chat support">
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
           <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
