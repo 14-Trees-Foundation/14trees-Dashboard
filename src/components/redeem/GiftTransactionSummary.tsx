@@ -14,6 +14,7 @@ import { getHumanReadableDateTime } from "../../helpers/utils";
 import EmailDialog from "./EmailDialog";
 import RedeemGiftTreeDialog from "./RedeemGiftTreeDialog";
 import ImageViewModal from "../ImageViewModal";
+import EditUserEmailDialog from "./EditUserEmailDialog";
 
 const useStyle = makeStyles((theme) =>
     createStyles({
@@ -194,6 +195,7 @@ const GiftTransactionSummary: React.FC<Props> = ({ transaction, onTransactionUpd
     const [emailDialogOpen, setEmailDialogOpen] = useState(false);
     const [editDialogOpen, setEditDialogOpen] = useState(false);
     const [treeCardImages, setTreeCardImages] = useState<string[]>([]);
+    const [editEmailDialogOpen, setEditEmailDialogOpen] = useState(false);
 
     useEffect(() => {
         getTransactionTreeCardImages(transaction.id);
@@ -328,7 +330,7 @@ const GiftTransactionSummary: React.FC<Props> = ({ transaction, onTransactionUpd
                             pl: isMobile ? 0 : 2, 
                             display: 'flex', 
                             flexDirection: isMobile ? 'column' : 'row',
-                            alignItems: isMobile ? 'flex-start' : 'center', 
+                            alignItems: 'flex-start', 
                             gap: 2 
                         }}>
                             {transaction.mail_sent_at ? (
@@ -337,29 +339,52 @@ const GiftTransactionSummary: React.FC<Props> = ({ transaction, onTransactionUpd
                                 </Typography>
                             ) : (
                                 <>
-                                    <Typography variant="body1" color="text.secondary">
-                                        {(!transaction.recipient_email && !transaction.recipient_communication_email) || 
-                                         (transaction.recipient_email?.endsWith('@14trees') && 
-                                          (!transaction.recipient_communication_email || transaction.recipient_communication_email?.endsWith('@14trees'))) ? 
-                                          'Email notification cannot be sent - no valid email provided' : 
-                                          'Email not sent yet'}
-                                    </Typography>
-                                    <Button
-                                        variant="contained"
-                                        color="success"
-                                        startIcon={<Email />}
-                                        onClick={() => setEmailDialogOpen(true)}
-                                        disabled={(!transaction.recipient_email && !transaction.recipient_communication_email) || 
+                                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1, flex: 1 }}>
+                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                                            <Typography variant="body1" color="text.secondary">
+                                                {(!transaction.recipient_email && !transaction.recipient_communication_email) || 
                                                  (transaction.recipient_email?.endsWith('@14trees') && 
-                                                  (!transaction.recipient_communication_email || transaction.recipient_communication_email?.endsWith('@14trees')))}
-                                        sx={{ textTransform: 'none' }}
-                                        fullWidth={isMobile}
-                                    >
-                                        Send Now
-                                    </Button>
+                                                  (!transaction.recipient_communication_email || transaction.recipient_communication_email?.endsWith('@14trees'))) ? 
+                                                  'Email notification cannot be sent - no valid email provided' : 
+                                                  'Email not sent yet'}
+                                            </Typography>
+                                            <Box sx={{ display: 'flex', gap: 2 }}>
+                                                <Button
+                                                    variant="contained"
+                                                    color="success"
+                                                    startIcon={<Email />}
+                                                    onClick={() => setEmailDialogOpen(true)}
+                                                    disabled={(!transaction.recipient_email && !transaction.recipient_communication_email) || 
+                                                             (transaction.recipient_email?.endsWith('@14trees') && 
+                                                              (!transaction.recipient_communication_email || transaction.recipient_communication_email?.endsWith('@14trees')))}
+                                                    sx={{ textTransform: 'none' }}
+                                                >
+                                                    Send Now
+                                                </Button>
+                                                {((!transaction.recipient_email && !transaction.recipient_communication_email) || 
+                                                  (transaction.recipient_email?.endsWith('@14trees') && 
+                                                   (!transaction.recipient_communication_email || transaction.recipient_communication_email?.endsWith('@14trees')))) && (
+                                                    <Button
+                                                        variant="outlined"
+                                                        color="success"
+                                                        onClick={() => setEditEmailDialogOpen(true)}
+                                                        sx={{ textTransform: 'none' }}
+                                                    >
+                                                        Edit Email
+                                                    </Button>
+                                                )}
+                                            </Box>
+                                        </Box>
+                                        {(!transaction.recipient_email || transaction.recipient_email?.endsWith('@14trees')) && 
+                                         transaction.recipient_communication_email && 
+                                         !transaction.recipient_communication_email?.endsWith('@14trees') && (
+                                            <Typography variant="body2" color="text.secondary" sx={{ fontStyle: 'italic' }}>
+                                                This is the communication email address
+                                            </Typography>
+                                        )}
+                                    </Box>
                                 </>
                             )}
-                            
                         </Box>
                         {transaction.mail_error && (
                             <Typography variant="body1" color="error.main" sx={{ mt: 1 }}>
@@ -396,6 +421,20 @@ const GiftTransactionSummary: React.FC<Props> = ({ transaction, onTransactionUpd
                 open={emailDialogOpen}
                 onClose={() => setEmailDialogOpen(false)}
                 transaction={transaction}
+            />
+
+            <EditUserEmailDialog
+                open={editEmailDialogOpen}
+                onClose={() => setEditEmailDialogOpen(false)}
+                onSubmit={() => {
+                    if (onTransactionUpdated) {
+                        onTransactionUpdated();
+                    }
+                }}
+                userId={transaction.recipient}
+                recipientName={transaction.recipient_name || ''}
+                recipientEmail={transaction.recipient_email}
+                recipientCommunicationEmail={transaction.recipient_communication_email}
             />
 
             {editDialogOpen && <RedeemGiftTreeDialog
