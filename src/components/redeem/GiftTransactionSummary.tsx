@@ -330,7 +330,7 @@ const GiftTransactionSummary: React.FC<Props> = ({ transaction, onTransactionUpd
                             pl: isMobile ? 0 : 2, 
                             display: 'flex', 
                             flexDirection: isMobile ? 'column' : 'row',
-                            alignItems: 'flex-start', 
+                            alignItems: isMobile ? 'flex-start' : 'center', 
                             gap: 2 
                         }}>
                             {transaction.mail_sent_at ? (
