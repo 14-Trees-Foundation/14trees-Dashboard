@@ -1,4 +1,4 @@
-import ChatBot, { Params } from "react-chatbotify";
+import ChatBot, { Button, Params } from "react-chatbotify";
 import HtmlRenderer, { HtmlRendererBlock } from "@rcb-plugins/html-renderer";
 import ApiClient from "../api/apiClient/apiClient";
 import { useState } from "react";
