@@ -22,3 +22,16 @@ body {
 }
 
 /*# sourceMappingURL=index.css.map */
+
+.rcb-notification-icon {
+  width: 25px;
+  height: 25px;
+}
+
+/* .rcb-chat-input {
+  padding: 0px 8px;
+} */
+
+textarea.rcb-chat-input-textarea {
+  font-family: Arial, sans-serif;
+}

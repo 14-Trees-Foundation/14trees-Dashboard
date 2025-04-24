@@ -14,21 +14,8 @@ marked.use({ renderer });
 
 const defaultMessage = `**Hello! 🌿 Greetings from 14 Trees Foundation!**  
 I'm your digital assistant, here to help you spread green joy through tree gifting. Here’s what I can help you with:
-
-1. 🌱 **Create a Tree Gifting Request**  
-   Gift trees to someone special with a personalized message and occasion.
-
-2. 📝 **Update an Existing Request**  
-   Edit the occasion, message, or recipient details of a tree gift you've already created.
-
-3. 📋 **View Your Past Requests**  
-   See all your previous tree gifting requests and their details.
-
-4. 🎁 **Send Tree Cards or Dashboards**  
-   Email tree cards or tree dashboards to recipients from your past requests.
-
-5. 💬 **Get Support**  
-   Connect with a team member for help or additional questions.
+1. 🌱 **Create a Tree Gifting Request**
+    Gift trees to someone special with a personalized message and occasion.
 `
 
 type Message = {
@@ -70,10 +57,17 @@ const ChatbotV2 = () => {
         const resp = await apiClient.serveUserQuery(userInput, history);
         return resp.output;
     };
+    const helpOptions = ["Quickstart", "API Docs", "Examples", "Github", "Discord"];
+    const handleUpload = (params) => {
+		const files = params.files;
+		// handle files logic here
+	}
 
     const flow = {
         start: {
             message: marked(defaultMessage),
+            // options: helpOptions,
+            file: (params) => handleUpload(params),
             path: "user",
             renderHtml: ["BOT", "USER"],
         } as HtmlRendererBlock,
@@ -105,59 +99,135 @@ const ChatbotV2 = () => {
 
                 });
             },
+            file: (params) => handleUpload(params),
             path: "user",
             renderHtml: ["BOT", "USER"],
         } as HtmlRendererBlock,
+        process_options: {
+			transition: {duration: 0},
+			chatDisabled: false,
+			path: async (params) => {
+				let link = "";
+				switch (params.userInput) {
+				case "Quickstart":
+					link = "https://react-chatbotify.com/docs/introduction/quickstart/";
+					break;
+				case "API Docs":
+					link = "https://react-chatbotify.com/docs/api/settings";
+					break;
+				case "Examples":
+					link = "https://react-chatbotify.com/docs/examples/basic_form";
+					break;
+				case "Github":
+					link = "https://github.com/tjtanjin/react-chatbotify/";
+					break;
+				case "Discord":
+					link = "https://discord.gg/6R4DK4G5Zh";
+					break;
+				default:
+					return "unknown_input";
+				}
+				await params.injectMessage("Sit tight! I'll send you right there!");
+				setTimeout(() => {
+					window.open(link);
+				}, 1000)
+				return "repeat"
+			},
+		},
+		repeat: {
+			transition: {duration: 3000},
+			path: "prompt_again"
+		},
+        prompt_again: {
+			message: "Do you need any other help?",
+			options: helpOptions,
+			path: "process_options"
+		},
     }
 
     return (
+        // <ChatBot settings={{general: {embedded: true}, chatHistory: {storageKey: "example_simulation_stream"}, botBubble: {simulateStream: true}}} flow={flow}/>
         <ChatBot
             plugins={plugins}
             flow={flow}
-            settings={{
-                chatButton: {
-                    icon: Chat
-                },
-                header: {
-                    title: <div style={{ cursor: 'pointer', margin: '0px', fontSize: '20px', fontWeight: 'bold' }}>14 Trees</div>
-                },
-                footer: {
-                    text: ''
-                },
-                fileAttachment: {
-                    multiple: true,
-                    accept: 'image/*',
-                    sendFileName: true,
-                    showMediaDisplay: true,
-                }
-            }}
+            settings={
+                {
+                    chatButton: {
+                        icon: Chat
+                        // icon: 'src/assets/logo_light.png'
+                    },
+
+                    general: {
+                        primaryColor: 'brown',
+                        secondaryColor: 'green',
+                        fontFamily: 'Arial, sans-serif',
+                        showFooter: false
+                    },
+                    botBubble: { simulateStream: true, showAvatar: true, animate: true, avatar: 'src/assets/tree-chat.png' },
+                    userBubble: { showAvatar: true },
+                    // audio: { disabled: false },
+                    audio: {disabled: false, defaultToggledOn: true, tapToPlay: true},
+                    voice: { language: "en-US", defaultToggledOn: false, disabled: false },
+                    chatWindow: { showScrollbar: true, defaultOpen: true },
+                    chatInput: { allowNewline: true, botDelay: 500, buttons: [Button.FILE_ATTACHMENT_BUTTON, Button.EMOJI_PICKER_BUTTON, Button.VOICE_MESSAGE_BUTTON, Button.SEND_MESSAGE_BUTTON] },
+                    fileAttachment: { disabled: false, accept: '*', sendFileName: true, showMediaDisplay: true },
+                    header: {
+                        title: <div style={{ cursor: 'pointer', margin: '0px', paddingTop: '5px',  fontSize: '16px', fontWeight: 'light' }}>Gifty</div>,
+                        avatar: 'src/assets/logo_light.png',
+                        buttons: [Button.NOTIFICATION_BUTTON, Button.CLOSE_CHAT_BUTTON]
+                    },
+                    // tooltip: {text: "Let's spread green!", mode: 'ALWAYS'},
+                    footer: {
+                        text: ''
+                    }
+                }}
             styles={{
-                chatButtonStyle: {
-                    backgroundColor: '#28a745',
-                    backgroundImage: 'none',
-                },
-                botBubbleStyle: {
-                    backgroundColor: 'rgb(14 142 81)'
-                },
-                userBubbleStyle: {
-                    color: 'black',
-                    backgroundColor: 'rgb(167 235 199)'
-                },
+                // chatButtonStyle: {
+                //     backgroundColor: '#28a745',
+                //     backgroundImage: 'none',
+                // },
+                // botBubbleStyle: {
+                //     backgroundColor: 'rgb(14 142 81)'
+                // },
+                // userBubbleStyle: {
+                //     color: 'black',
+                //     backgroundColor: 'rgb(167 235 199)'
+                // },
                 sendButtonStyle: {
                     backgroundColor: 'rgb(14 142 81)'
                 },
                 sendButtonHoveredStyle: {
                     backgroundColor: 'rgb(167 235 199)'
                 },
-                chatInputAreaFocusedStyle: {
-                    boxShadow: 'rgb(167 235 199) 0px 0px 5px'
-                },
-                tooltipStyle: {
-                    backgroundColor: 'rgb(14 142 81)'
-                },
+                // chatInputAreaFocusedStyle: {
+                //     boxShadow: 'rgb(167 235 199) 0px 0px 5px'
+                // },
+                // tooltipStyle: {
+                //     backgroundColor: 'rgb(14 142 81)'
+                // },
                 headerStyle: {
                     backgroundImage: 'linear-gradient(to right, rgb(14 142 81), rgb(110 197 151))',
-                }
+                    padding: '8px'
+                },
+                chatInputContainerStyle:{
+                    padding: '0px 16px'
+                },
+                chatInputAreaStyle:{
+                    fontFamily: 'Arial, sans-serif',
+                    fontSize: '15px'
+                },
+                // notificationButtonStyle:{
+                //     width: '25px',
+                //     height: '25px'
+                // },
+                // voiceIconStyle:{
+                //     width: '25px',
+                //     height: '25px'
+                // },
+                // closeChatIconStyle:{
+                //     width: '25px',
+                //     height: '25px'
+                // }
             }}
         />
     );
