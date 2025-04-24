@@ -167,7 +167,7 @@ export default function ChatBot() {
     setMessages(prev => [...prev, typingMessage]);
 
     let tries = 3;
-    while(tries--) {
+    while (tries--) {
       let botResponse: Message = { ...typingMessage };
       try {
         const message = await getBotResponse(inputValue, messages);
@@ -176,13 +176,13 @@ export default function ChatBot() {
       } catch {
         // Sleep for 2 seconds before retrying
         await new Promise(resolve => setTimeout(resolve, 2000));
-        botResponse.text = tries 
+        botResponse.text = tries
           ? "Something went wrong. Trying again\n"
           : "Failed to process you request please try again later!"
 
-          if (tries === 0) {
-            botResponse.id = (Date.now() + 1).toString();
-          }
+        if (tries === 0) {
+          botResponse.id = (Date.now() + 1).toString();
+        }
       }
 
       setMessages(prev => [
@@ -200,7 +200,7 @@ export default function ChatBot() {
     return resp.output;
   };
 
-  const TypingAnimation = ({text}: { text?: string }) => {
+  const TypingAnimation = ({ text }: { text?: string }) => {
     const [dots, setDots] = useState('');
     useEffect(() => {
       const interval = setInterval(() => {
@@ -231,7 +231,18 @@ export default function ChatBot() {
                 {message.id === 'typing' ? (
                   <TypingAnimation text={message.text} />
                 ) : (
-                  <ReactMarkdown>{message.text}</ReactMarkdown>
+                  <ReactMarkdown
+                  components={{
+                    img: ({ node, ...props }) => (
+                      <img
+                        {...props}
+                        style={{ maxWidth: '100%' }}
+                      />
+                    )
+                  }}
+                >
+                  {message.text}
+                </ReactMarkdown>
                 )}
               </BotMessage>
             )
