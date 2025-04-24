@@ -27,7 +27,7 @@ class ApiClient {
     private token: string | null;
 
     constructor() {
-        const baseURL = process.env.REACT_APP_BASE_URL;
+        const baseURL = import.meta.env.VITE_APP_BASE_URL;
         this.api = axios.create({
             baseURL: baseURL,
         });

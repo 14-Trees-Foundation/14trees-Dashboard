@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+/*import React, { useEffect, useState } from 'react';
 import * as treeTypeActionCreators from '../../redux/actions/plantTypeActions';
 import { bindActionCreators } from 'redux';
 import { useAppDispatch, useAppSelector } from '../../redux/store/hooks';
@@ -96,4 +96,4 @@ export const TestTreeType = () => {
             </div>
         </>
     );
-}
+}*/

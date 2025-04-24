@@ -6,15 +6,23 @@ import { AvatarContainer } from './AvatarContainer';
 
 // 4. 🤝 **Help you get connected** with someone from our team.
 const defaultMessage = `**Hello! 🌿 Greetings from 14 Trees Foundation!**  
-I'm your digital assistant, here to help you spread green joy. Here's what I can assist you with:
+I'm your digital assistant, here to help you spread green joy through tree gifting. Here’s what I can help you with:
 
-1. 🌱 **Gift trees** to someone with a personalized message.  
-2. 📬 **Send tree dashboards and tree cards** directly to recipients via email.  
-3. 📋 **View your past gift tree requests** anytime.
-4. 📋 **View tree recipient** of any request.
-5. 📝 **Edit occasion and recipient** details.
+1. 🌱 **Create a Tree Gifting Request**  
+   Gift trees to someone special with a personalized message and occasion.
 
-How can I assist you today?`
+2. 📝 **Update an Existing Request**  
+   Edit the occasion, message, or recipient details of a tree gift you've already created.
+
+3. 📋 **View Your Past Requests**  
+   See all your previous tree gifting requests and their details.
+
+4. 🎁 **Send Tree Cards or Dashboards**  
+   Email tree cards or tree dashboards to recipients from your past requests.
+
+5. 💬 **Get Support**  
+   Connect with a team member for help or additional questions.
+`
 
 // const defaultMessage = `**Hello! 🌿 Greetings from 14 Trees Foundation!**  
 // I'm your digital assistant, here to help you spread green joy. Here's what I can assist you with:
@@ -153,22 +161,38 @@ export default function ChatBot() {
 
     const typingMessage: Message = {
       id: 'typing',
-      text: '...',
+      text: 'Typing',
       sender: 'bot',
       timestamp: new Date()
     };
     setMessages(prev => [...prev, typingMessage]);
 
-    const botResponse: Message = {
-      id: (Date.now() + 1).toString(),
-      text: await getBotResponse(inputValue, messages),
-      sender: 'bot',
-      timestamp: new Date()
-    };
-    setMessages(prev => [
-      ...prev.filter(msg => msg.id !== 'typing'),
-      botResponse
-    ]);
+    let tries = 3;
+    while(tries--) {
+      let botResponse: Message = { ...typingMessage };
+      try {
+        const message = await getBotResponse(inputValue, messages);
+        botResponse.id = (Date.now() + 1).toString();
+        botResponse.text = message;
+      } catch {
+        // Sleep for 2 seconds before retrying
+        await new Promise(resolve => setTimeout(resolve, 2000));
+        botResponse.text = tries 
+          ? "Something went wrong. Trying again\n"
+          : "Failed to process you request please try again later!"
+
+          if (tries === 0) {
+            botResponse.id = (Date.now() + 1).toString();
+          }
+      }
+
+      setMessages(prev => [
+        ...prev.filter(msg => msg.id !== 'typing'),
+        botResponse
+      ]);
+
+      if (botResponse.id !== 'typing') break;
+    }
   };
 
   const getBotResponse = async (userInput: string, messages: Message[]): Promise<string> => {
@@ -177,7 +201,7 @@ export default function ChatBot() {
     return resp.output;
   };
 
-  const TypingAnimation = () => {
+  const TypingAnimation = ({text}: { text?: string }) => {
     const [dots, setDots] = useState('');
     useEffect(() => {
       const interval = setInterval(() => {
@@ -185,7 +209,7 @@ export default function ChatBot() {
       }, 500);
       return () => clearInterval(interval);
     }, []);
-    return <span>Typing{dots}</span>;
+    return <span>{text ? text : "Typing"}{dots}</span>;
   };
 
   return (
@@ -207,7 +231,7 @@ export default function ChatBot() {
             ) : (
               <BotMessage key={message.id}>
                 {message.id === 'typing' ? (
-                  <TypingAnimation />
+                  <TypingAnimation text={message.text} />
                 ) : (
                   <ReactMarkdown>{message.text}</ReactMarkdown>
                 )}

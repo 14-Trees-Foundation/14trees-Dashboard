@@ -8,7 +8,7 @@ import { Pond } from '../../types/pond';
 export const TestPond = () => {
 
   const dispatch = useAppDispatch();
-  const { getPonds, createPond, updatePond, deletePond, updatePondWaterLevel, searchPonds }
+  const { getPonds, createPond, updatePond, deletePond, searchPonds }
     = bindActionCreators(pondActionCreators, dispatch);
 
   const [file, setFile] = useState<File>();
@@ -41,7 +41,9 @@ export const TestPond = () => {
     }
   };
   const handleButtonClickGet = () => {
-    getPonds()
+    const offset = 0;
+    const limit = 20; 
+    getPonds(offset, limit);
   };
   const handleButtonClickUpdate = () => {
     try {
@@ -51,14 +53,14 @@ export const TestPond = () => {
       console.error('Error parsing JSON:', error);
     }
   };
-  const handleButtonClickUpdateWater = () => {
+ /* const handleButtonClickUpdateWater = () => {
     try {
       const parsedData = JSON.parse(jsonData) as any;
       updatePondWaterLevel(parsedData.pond_name, parsedData.levelFt, parsedData.user_id, file);
     } catch (error) {
       console.error('Error parsing JSON:', error);
     }
-  };
+  };*/
   const handleButtonClickDelete = () => {
     try {
       const parsedData = JSON.parse(jsonData) as Pond;
@@ -112,7 +114,7 @@ export const TestPond = () => {
           style={{ width: '100%', minHeight: '100px' }}
         />
         <Input type="file" onChange={handleFileChange} />
-        <Button variant="contained" onClick={handleButtonClickUpdateWater}>Update Water Level</Button>
+       {/*<Button variant="contained" onClick={handleButtonClickUpdateWater}>Update Water Level</Button>*/}
       </div>
       <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '20px' }}>
         <textarea

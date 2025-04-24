@@ -13,9 +13,8 @@ import { RecoilRoot } from "recoil";
 import {Provider} from 'react-redux';
 import { store } from "./redux/store/store";
 import { ConfigProvider } from 'antd'
-require("dotenv").config();
 
-if (process.env.REACT_APP_ENV === "development") {
+if (import.meta.env.VITE_ENV === "development") {
   makeServer({
     environment: "development",
   });

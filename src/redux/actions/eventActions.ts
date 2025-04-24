@@ -34,7 +34,7 @@ export const getEvents = (offset: number, limit: number, filters?: any[]) => {
   };
 };
 
-export const deleteEvent = (data: Event) => {
+/*export const deleteEvent = (data: Event) => {
   const apiClient = new ApiClient();
   return (dispatch: any) => {
     dispatch({
@@ -57,10 +57,10 @@ export const deleteEvent = (data: Event) => {
       }
     );
   };
-};
+}; */
 
 
-export const updateEvent = (data: Event)=>{
+/*export const updateEvent = (data: Event)=>{
     const apiClient = new ApiClient();
     return (dispatch: any) => {
         dispatch({
@@ -86,4 +86,4 @@ export const updateEvent = (data: Event)=>{
             }
         )
     };
-}
+}*/

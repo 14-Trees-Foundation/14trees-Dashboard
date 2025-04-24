@@ -2,6 +2,38 @@ import logo from '../assets/dark_logo.png'
 import { User } from "../types/user";
 import { useEffect } from "react";
 
+interface RazorpayOptions {
+    key: string;
+    amount: string;
+    currency: string;
+    name: string;
+    description?: string;
+    image: any;
+    order_id: string;
+    handler: (response: any) => void;
+    modal?: {
+        ondismiss: () => void;
+    };
+    prefill?: {
+        name?: string;
+        email?: string;
+        contact?: string;
+    };
+    theme?: {
+        color: string;
+    };
+}
+
+interface RazorpayInstance {
+    open: () => void;
+}
+
+declare global {
+    interface Window {
+        Razorpay: new (options: RazorpayOptions) => RazorpayInstance;
+    }
+}
+
 interface RazonpayComponentProps {
     amount: number,
     orderId: string,
@@ -41,7 +73,7 @@ const RazonpayComponent: React.FC<RazonpayComponentProps> = ({ amount, orderId, 
                 }
         
                 const options = {
-                    key: process.env.RAZORPAY_KEY_ID,
+                    key: import.meta.env.RAZORPAY_KEY_ID,
                     amount: (amount * 100).toFixed(0), // in paise
                     currency: "INR",
                     name: "14 Trees",
