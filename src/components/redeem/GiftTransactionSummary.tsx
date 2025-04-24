@@ -221,7 +221,7 @@ const GiftTransactionSummary: React.FC<Props> = ({ transaction, onTransactionUpd
             fileName = imageUrls[0].split('/').pop() || 'image.png';
         } else {
             fileName = transaction.recipient_name + "_" + transaction.trees_count;
-            let location: string = process.env.REACT_APP_BASE_URL || '';
+            let location: string = import.meta.env.VITE_APP_BASE_URL || '';
             url = location + '/gift-cards/transactions/tree-cards/download/' + transaction.id + '?file_name=' + fileName;
         }
 

@@ -17,8 +17,6 @@ import { useAppDispatch, useAppSelector } from "../../../../redux/store/hooks";
 import { useDispatch } from "react-redux";
 import { Switch } from "antd";
 
-require("dotenv").config();
-
 interface Center {
    lat: number,
    lng: number
@@ -65,7 +63,7 @@ export const SiteMap = (KmlSource: any) => {
 
   const { isLoaded } = useJsApiLoader({
     id: "google-map-script-for-sites",
-    googleMapsApiKey: process.env.REACT_APP_API_MAP_KEY?process.env.REACT_APP_API_MAP_KEY:"" ,
+    googleMapsApiKey: import.meta.env.VITE_APP_API_MAP_KEY?import.meta.env.VITE_APP_API_MAP_KEY:"" ,
   });
 
   const [selectedCenter, setSelectedCenter] = useState<Center| null>(null);
