@@ -37,13 +37,37 @@ interface SendEmailPayload {
 const EmailDialog: React.FC<EmailDialogProps> = ({ open, onClose, transaction }) => {
     const [loading, setLoading] = useState(false);
     const [templates, setTemplates] = useState<ApiEmailTemplate[]>([]);
+    const [ccEmailInput, setCcEmailInput] = useState('');
+    const [errors, setErrors] = useState<Partial<SendEmailPayload>>({});
+
+    const isValidEmail = (email?: string): boolean => {
+        if (!email) return false;
+        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    };
+
+    const getInitialRecipientEmail = (): string => {
+        if (transaction.recipient_email && isValidEmail(transaction.recipient_email)) {
+            return transaction.recipient_email;
+        }
+        if (transaction.recipient_communication_email && isValidEmail(transaction.recipient_communication_email)) {
+            return transaction.recipient_communication_email;
+        }
+        return '';
+    };
+
     const [formData, setFormData] = useState<SendEmailPayload>({
-        recipient_email: transaction.recipient_email || '',
+        recipient_email: getInitialRecipientEmail(),
         cc_emails: [],
         event_type: ''
     });
-    const [ccEmailInput, setCcEmailInput] = useState('');
-    const [errors, setErrors] = useState<Partial<SendEmailPayload>>({});
+
+    useEffect(() => {
+        const newRecipientEmail = getInitialRecipientEmail();
+        setFormData(prev => ({
+            ...prev,
+            recipient_email: newRecipientEmail
+        }));
+    }, [transaction]);
 
     useEffect(() => {
         const fetchTemplates = async () => {
