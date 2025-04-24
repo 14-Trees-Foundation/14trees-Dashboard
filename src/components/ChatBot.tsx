@@ -39,7 +39,7 @@ type Message = {
 const ChatIcon = styled('div')({
   position: 'fixed',
   bottom: '20px',
-  right: '20px',
+  left: '20px',
   width: '60px',
   height: '60px',
   borderRadius: '50%',
@@ -56,7 +56,7 @@ const ChatIcon = styled('div')({
 const ChatContainer = styled('div')<{ isOpen: boolean }>(({ isOpen }) => ({
   position: 'fixed',
   bottom: '90px',
-  right: '20px',
+  left: '20px',
   width: '350px',
   height: isOpen ? '500px' : '0',
   border: isOpen ? '1px solid #ccc' : 'none',

@@ -14,6 +14,7 @@
     "@mui/styles": "^5.0.0-rc.0",
     "@mui/x-data-grid": "^5.5.1",
     "@mui/x-date-pickers": "^5.0.0-alpha.4",
+    "@rcb-plugins/markdown-renderer": "^0.2.0",
     "@react-google-maps/api": "^2.2.0",
     "@reduxjs/toolkit": "^2.2.3",
     "@testing-library/react": "^11.1.0",
@@ -44,6 +45,7 @@
     "react": "^17.0.2",
     "react-bootstrap": "^2.0.4",
     "react-chartjs-2": "^5.3.0",
+    "react-chatbotify": "^2.0.0-beta.33",
     "react-copy-to-clipboard": "^5.1.0",
     "react-csv": "^2.2.2",
     "react-dnd": "^16.0.1",
@@ -110,11 +112,11 @@
     ]
   },
   "devDependencies": {
-    "typescript": "^5.8.3",
     "@types/file-saver": "^2.0.7",
     "@types/papaparse": "^5.3.14",
     "@types/react-resizable": "^3.0.8",
     "@types/react-slick": "^0.23.13",
-    "react-error-overlay": "^6.0.9"
+    "react-error-overlay": "^6.0.9",
+    "typescript": "^5.8.3"
   }
 }

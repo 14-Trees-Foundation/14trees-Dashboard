@@ -21,6 +21,7 @@ import image2 from '../../assets/home/personal-gifts.jpeg'
 import image3 from '../../assets/home/grove-gifts.jpeg'
 import { Button, Typography } from "@mui/material";
 import ChatBot from "../../components/ChatBot";
+import ChatbotV2 from "../../components/ChatBotV2";
 
 export const Search = () => {
   const classes = UseStyle();
@@ -71,6 +72,7 @@ export const Search = () => {
       return (
         <div className={classes.box}>
           <ChatBot />
+          <ChatbotV2 />
           <img
             alt="bg"
             src={bg}
