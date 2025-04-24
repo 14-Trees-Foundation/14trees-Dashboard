@@ -73,7 +73,7 @@ const RazonpayComponent: React.FC<RazonpayComponentProps> = ({ amount, orderId, 
                 }
         
                 const options = {
-                    key: import.meta.env.RAZORPAY_KEY_ID,
+                    key: import.meta.env.VITE_RAZORPAY_KEY_ID,
                     amount: (amount * 100).toFixed(0), // in paise
                     currency: "INR",
                     name: "14 Trees",

@@ -1,8 +1,16 @@
 import ChatBot, { Params } from "react-chatbotify";
-import MarkdownRenderer, { MarkdownRendererBlock } from "@rcb-plugins/markdown-renderer";
+import HtmlRenderer, { HtmlRendererBlock } from "@rcb-plugins/html-renderer";
 import ApiClient from "../api/apiClient/apiClient";
 import { useState } from "react";
-import { Yard as YardIcon } from "@mui/icons-material";
+import { marked } from 'marked'
+
+const renderer = {
+    image({ href, title, text }: { href: string; title: string | null; text: string }) {
+        return `<img src="${href}" alt="${text}" title="${title || ''}" style="max-width: 100%;" />`;
+    },
+};
+
+marked.use({ renderer });
 
 const defaultMessage = `**Hello! 🌿 Greetings from 14 Trees Foundation!**  
 I'm your digital assistant, here to help you spread green joy through tree gifting. Here’s what I can help you with:
@@ -33,21 +41,21 @@ type Message = {
 
 const Chat: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
     <svg
-      {...props}
-      xmlns="http://www.w3.org/2000/svg"
-      height="24"
-      viewBox="0 0 24 24"
-      width="24"
-      style={{ ...props.style, padding: 15 }}
-      fill="currentColor"
+        {...props}
+        xmlns="http://www.w3.org/2000/svg"
+        height="24"
+        viewBox="0 0 24 24"
+        width="24"
+        style={{ ...props.style, padding: 15 }}
+        fill="currentColor"
     >
-      <path d="M20 2H4c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2M8 8.22c0-.86.7-1.56 1.56-1.56.33 0 .64.1.89.28l-.01-.12c0-.86.7-1.56 1.56-1.56s1.56.7 1.56 1.56l-.01.12c.26-.18.56-.28.89-.28.86 0 1.56.7 1.56 1.56 0 .62-.37 1.16-.89 1.4.52.25.89.79.89 1.41 0 .86-.7 1.56-1.56 1.56-.33 0-.64-.11-.89-.28l.01.12c0 .86-.7 1.56-1.56 1.56s-1.56-.7-1.56-1.56l.01-.12c-.26.18-.56.28-.89.28-.86 0-1.56-.7-1.56-1.56 0-.62.37-1.16.89-1.4C8.37 9.38 8 8.84 8 8.22M12 19c-3.31 0-6-2.69-6-6 3.31 0 6 2.69 6 6 0-3.31 2.69-6 6-6 0 3.31-2.69 6-6 6"></path>
+        <path d="M20 2H4c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2M8 8.22c0-.86.7-1.56 1.56-1.56.33 0 .64.1.89.28l-.01-.12c0-.86.7-1.56 1.56-1.56s1.56.7 1.56 1.56l-.01.12c.26-.18.56-.28.89-.28.86 0 1.56.7 1.56 1.56 0 .62-.37 1.16-.89 1.4.52.25.89.79.89 1.41 0 .86-.7 1.56-1.56 1.56-.33 0-.64-.11-.89-.28l.01.12c0 .86-.7 1.56-1.56 1.56s-1.56-.7-1.56-1.56l.01-.12c-.26.18-.56.28-.89.28-.86 0-1.56-.7-1.56-1.56 0-.62.37-1.16.89-1.4C8.37 9.38 8 8.84 8 8.22M12 19c-3.31 0-6-2.69-6-6 3.31 0 6 2.69 6 6 0-3.31 2.69-6 6-6 0 3.31-2.69 6-6 6"></path>
     </svg>
-  );
+);
 
 const ChatbotV2 = () => {
 
-    const plugins = [MarkdownRenderer()];
+    const plugins = [HtmlRenderer()];
     const [messages, setMessages] = useState<Message[]>([
         {
             id: '1',
@@ -65,10 +73,10 @@ const ChatbotV2 = () => {
 
     const flow = {
         start: {
-            message: defaultMessage,
+            message: marked(defaultMessage),
             path: "user",
-            renderMarkdown: ["BOT", "USER"],
-        } as MarkdownRendererBlock,
+            renderHtml: ["BOT", "USER"],
+        } as HtmlRendererBlock,
         user: {
             message: async (params: Params) => {
                 let history: Message[] = []
@@ -93,11 +101,13 @@ const ChatbotV2 = () => {
                 };
 
                 setMessages(prev => [...prev, botResponse]);
-                return resp;
+                return marked(resp, {
+
+                });
             },
             path: "user",
-            renderMarkdown: ["BOT", "USER"],
-        } as MarkdownRendererBlock,
+            renderHtml: ["BOT", "USER"],
+        } as HtmlRendererBlock,
     }
 
     return (
@@ -109,10 +119,16 @@ const ChatbotV2 = () => {
                     icon: Chat
                 },
                 header: {
-                    title: <div style={{ cursor: 'pointer', margin: '0px', fontSize: '20px', fontWeight: 'bold'}}>14 Trees</div>
+                    title: <div style={{ cursor: 'pointer', margin: '0px', fontSize: '20px', fontWeight: 'bold' }}>14 Trees</div>
                 },
                 footer: {
                     text: ''
+                },
+                fileAttachment: {
+                    multiple: true,
+                    accept: 'image/*',
+                    sendFileName: true,
+                    showMediaDisplay: true,
                 }
             }}
             styles={{
