@@ -72,7 +72,10 @@ export const Map: FC<TreeMapProps> = ({ tree }) => {
 
     let position = { lat: boundaries[0][0], lng: boundaries[0][1] };
     if (tree.location?.coordinates && tree.location.coordinates.length === 2) {
-        position = { lat: 18.92752599978088 || tree.location.coordinates[0], lng: 73.7721940988185 || tree.location.coordinates[1] };
+        position = { 
+            lat: tree.location.coordinates[0] !== undefined ? tree.location.coordinates[0] : boundaries[0][0], 
+            lng: tree.location.coordinates[1] !== undefined ? tree.location.coordinates[1] : boundaries[0][1] 
+        };
     }
 
     return (

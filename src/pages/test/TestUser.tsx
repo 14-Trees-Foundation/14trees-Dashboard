@@ -29,7 +29,9 @@ export const TestUser = () => {
         }
       };
     const handleButtonClickGet = () => {
-        getUsers()
+      const offset = 0;
+      const limit = 20; 
+      getUsers(offset, limit);
     };
     const handleButtonClickUpdate = () => {
         try {

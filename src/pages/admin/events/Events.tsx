@@ -44,7 +44,7 @@ function LoadingOverlay() {
 
 export const EventsComponent = () => {
   const dispatch = useAppDispatch();
-  const { getEvents , deleteEvent , updateEvent } =
+  const { getEvents} =
     bindActionCreators(eventActionCreators, dispatch);
 
   const [open, setOpen] = useState(false);
@@ -271,7 +271,7 @@ export const EventsComponent = () => {
   };
 
   const handleEditSubmit = (formData: any) => {
-    updateEvent(formData);
+    //updateEvent(formData);
   };
 
     const handleCreateEventsData = (formData: any) => {
@@ -334,9 +334,9 @@ export const EventsComponent = () => {
           <Button
             onClick={() => {
               console.log("Deleting item...", selectedItem);
-              if (selectedItem !== null) {
+            /*  if (selectedItem !== null) {
                 deleteEvent(selectedItem);
-              }
+              }*/
               setOpenDeleteModal(false);
             }}
             color="primary"

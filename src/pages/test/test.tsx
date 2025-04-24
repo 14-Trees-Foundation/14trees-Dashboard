@@ -3,7 +3,7 @@ import { TestUser } from './TestUser';
 import { TestTree } from './TestTree';
 import { TestPlot } from './TestPlot';
 import { TestPond } from './TestPond';
-import { TestTreeType } from './TestTreeType';
+//import { TestTreeType } from './TestTreeType';
 
 export const Test = () => {
 
@@ -14,7 +14,7 @@ export const Test = () => {
             <br />
             <Collapsible title='Tree' ><TestTree/></Collapsible>
             <br />
-            <Collapsible title='TreeType' ><TestTreeType/></Collapsible>
+          {/*  <Collapsible title='TreeType' ><TestTreeType/></Collapsible> */}
             <br />
             <Collapsible title='Pond' ><TestPond/></Collapsible>
             <br />

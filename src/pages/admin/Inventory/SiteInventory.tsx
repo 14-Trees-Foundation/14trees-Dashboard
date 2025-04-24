@@ -9,7 +9,7 @@ import { Plot } from "../../../types/plot";
 import ApiClient from "../../../api/apiClient/apiClient";
 import SitesMap from "./SiteMap";
 import { Table, TableColumnType } from "antd";
-import { TableRowSelection } from "antd/es/table/interface";
+import { ColumnType, TableRowSelection } from "antd/es/table/interface";
 import './inventory.css'
 import InventoryStats from "./InventoryStats";
 
@@ -95,9 +95,10 @@ const SiteInventory: FC = () => {
         },
     }
 
-    const columns: TableColumnType<Plot> = [
+    const columns: any[] = [
         {
             title: 'Plot Details',
+            key: 'plotDetails',
             children: [
                 {
                     title: 'Name',
@@ -171,6 +172,7 @@ const SiteInventory: FC = () => {
         },
         {
             title: 'Tree Details',
+            key: 'treeDetails',
             children: [
                 {
                     title: 'Total',
@@ -245,7 +247,7 @@ const SiteInventory: FC = () => {
                     key: "card_available",
                     align: 'right',
                 },
-            ]
+            ] as ColumnType<Plot>[],
         },
     ]
 
@@ -290,7 +292,7 @@ const SiteInventory: FC = () => {
             {selectedSite && <Box>
                 <Table
                     style={{ marginTop: 20 }}
-                    columns={columns}
+                    columns={columns as ColumnType<Plot>[]}
                     dataSource={showAvailablePlots ? plots.filter((plot) => plot.available && plot.available > 0) : plots}
                     rowClassName={getRowClassName}
                     summary={() => (

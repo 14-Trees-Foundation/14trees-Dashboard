@@ -54,6 +54,8 @@ export type DonationTree = {
   id: number;
   sapling_id: string;
   plant_type: string;
+  plot: string;
+  site_name: string;
   scientific_name: string | null;
   assignee: number | null;
   recipient: number | null;

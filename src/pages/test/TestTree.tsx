@@ -34,7 +34,9 @@ export const TestTree = () => {
     };
     const handleButtonClickGet = () => {
         try {
-            getTrees()
+            const offset = 0;
+            const limit = 20; 
+            getTrees(offset, limit)
         } catch (error) {
             console.error('Error parsing JSON:', error);
         }
