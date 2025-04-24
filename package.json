@@ -72,7 +72,6 @@
     "recoil": "^0.4.1",
     "sass": "^1.35.1",
     "slick-carousel": "^1.8.1",
-    "typescript": "^4.6.3",
     "vite": "^6.3.3",
     "vite-tsconfig-paths": "^5.1.4",
     "web-vitals": "^1.0.1"
@@ -111,6 +110,7 @@
     ]
   },
   "devDependencies": {
+    "typescript": "^5.8.3",
     "@types/file-saver": "^2.0.7",
     "@types/papaparse": "^5.3.14",
     "@types/react-resizable": "^3.0.8",
