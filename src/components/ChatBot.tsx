@@ -2,8 +2,13 @@ import { useState, useRef, useEffect } from 'react';
 import ApiClient from '../api/apiClient/apiClient';
 import ReactMarkdown from 'react-markdown';
 import { styled } from '@mui/material/styles';
+import { IconButton } from '@mui/material';
+import AttachFileIcon from '@mui/icons-material/AttachFile';
+import CloseIcon from '@mui/icons-material/Close';
+import Collapse from '@mui/material/Collapse';
+import ExpandLessIcon from '@mui/icons-material/ExpandLess';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 
-// 4. 🤝 **Help you get connected** with someone from our team.
 const defaultMessage = `**Hello! 🌿 Greetings from 14 Trees Foundation!**  
 I'm your digital assistant, here to help you spread green joy through tree gifting. Here’s what I can help you with:
 
@@ -22,15 +27,6 @@ I'm your digital assistant, here to help you spread green joy through tree gifti
 5. 💬 **Get Support**  
    Connect with a team member for help or additional questions.
 `
-
-// const defaultMessage = `**Hello! 🌿 Greetings from 14 Trees Foundation!**  
-// I'm your digital assistant, here to help you spread green joy. Here's what I can assist you with:
-
-// 1. List your previous orders of giftable trees
-// 2. List your previous gift trees actions
-// 3. Fetch number of available giftable trees from your previos purchased orders
-
-// How can I assist you today?`
 
 type Message = {
   id: string;
@@ -128,6 +124,36 @@ const SendButton = styled('button')({
   cursor: 'pointer'
 });
 
+const AttachmentPreview = styled('div')({
+  display: 'flex',
+  flexWrap: 'wrap',
+  gap: '8px',
+  marginBottom: '8px',
+  maxHeight: '100px',
+  overflowY: 'auto'
+});
+
+const ImageThumb = styled('img')({
+  width: '40px',
+  height: '40px',
+  objectFit: 'cover',
+  borderRadius: '4px',
+  border: '1px solid #ccc'
+});
+
+const ImageItem = styled('div')({
+  position: 'relative'
+});
+
+const RemoveButton = styled(IconButton)({
+  position: 'absolute',
+  top: '-8px',
+  right: '-8px',
+  backgroundColor: '#fff',
+  border: '1px solid #ccc',
+  padding: '2px'
+});
+
 // Component
 export default function ChatBot() {
   const [isOpen, setIsOpen] = useState(false);
@@ -140,6 +166,8 @@ export default function ChatBot() {
     }
   ]);
   const [inputValue, setInputValue] = useState('');
+  const [attachments, setAttachments] = useState<File[]>([]);
+  const [showImagePreview, setShowImagePreview] = useState(true);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -194,6 +222,22 @@ export default function ChatBot() {
     }
   };
 
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files) return;
+    const fileArray = Array.from(files);
+    const validFiles = fileArray.filter(
+      (file) =>
+        (file.type === 'image/jpeg' || file.type === 'image/png') &&
+        attachments.length < 10
+    );
+    setAttachments((prev) => [...prev, ...validFiles].slice(0, 10));
+  };
+
+  const removeAttachment = (index: number) => {
+    setAttachments((prev) => prev.filter((_, i) => i !== index));
+  };
+
   const getBotResponse = async (userInput: string, messages: Message[]): Promise<string> => {
     const apiClient = new ApiClient();
     const resp = await apiClient.serveUserQuery(userInput, messages);
@@ -232,33 +276,73 @@ export default function ChatBot() {
                   <TypingAnimation text={message.text} />
                 ) : (
                   <ReactMarkdown
-                  components={{
-                    img: ({ node, ...props }) => (
-                      <img
-                        {...props}
-                        style={{ maxWidth: '100%' }}
-                      />
-                    )
-                  }}
-                >
-                  {message.text}
-                </ReactMarkdown>
+                    components={{
+                      img: ({ node, ...props }) => (
+                        <img
+                          {...props}
+                          style={{ maxWidth: '100%' }}
+                        />
+                      ),
+                      a: ({ node, ...props }) => (
+                        <a
+                          {...props}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          {props.children}
+                        </a>
+                      )
+                    }}
+                  >
+                    {message.text}
+                  </ReactMarkdown>
                 )}
               </BotMessage>
             )
           ))}
           <div ref={messagesEndRef} />
         </MessagesContainer>
-
+        {attachments.length > 0 && (
+          <>
+            <IconButton onClick={() => setShowImagePreview((prev) => !prev)}>
+              {showImagePreview ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+            </IconButton>
+            <Collapse in={showImagePreview}>
+              <AttachmentPreview>
+                {attachments.map((file, index) => (
+                  <ImageItem key={index}>
+                    <ImageThumb src={URL.createObjectURL(file)} alt={`attachment-${index}`} />
+                    <RemoveButton size="small" onClick={() => removeAttachment(index)}>
+                      <CloseIcon fontSize="small" />
+                    </RemoveButton>
+                  </ImageItem>
+                ))}
+              </AttachmentPreview>
+            </Collapse>
+          </>
+        )}
         <InputContainer isOpen={isOpen}>
           <TextInput
             type="text"
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
-            onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
+            onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
             placeholder="Type your message..."
           />
           <SendButton onClick={handleSendMessage}>Send</SendButton>
+          <input
+            accept="image/jpeg,image/png"
+            multiple
+            type="file"
+            style={{ display: 'none' }}
+            id="image-upload"
+            onChange={handleFileChange}
+          />
+          <label htmlFor="image-upload">
+            <IconButton component="span" color="primary">
+              <AttachFileIcon />
+            </IconButton>
+          </label>
         </InputContainer>
       </ChatContainer>
     </>
