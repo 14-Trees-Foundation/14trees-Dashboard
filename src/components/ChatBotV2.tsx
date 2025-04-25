@@ -3,6 +3,7 @@ import HtmlRenderer, { HtmlRendererBlock } from "@rcb-plugins/html-renderer";
 import ApiClient from "../api/apiClient/apiClient";
 import { useState } from "react";
 import { marked } from 'marked'
+import { AWSUtils } from "../helpers/aws";
 
 const renderer = {
     image({ href, title, text }: { href: string; title: string | null; text: string }) {
@@ -43,6 +44,7 @@ const Chat: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
 const ChatbotV2 = () => {
 
     const plugins = [HtmlRenderer()];
+    const uploadedFiles: Promise<string>[] = [];
     const [messages, setMessages] = useState<Message[]>([
         {
             id: '1',
@@ -57,11 +59,19 @@ const ChatbotV2 = () => {
         const resp = await apiClient.serveUserQuery(userInput, history);
         return resp.output;
     };
-    const helpOptions = ["Quickstart", "API Docs", "Examples", "Github", "Discord"];
-    const handleUpload = (params) => {
-		const files = params.files;
-		// handle files logic here
-	}
+    // const helpOptions = ["Quickstart", "API Docs", "Examples", "Github", "Discord"];
+    const handleUpload = async (params: Params) => {
+        if (!params.files || params.files.length === 0) return;
+
+        const awsUtils = new AWSUtils();
+        const date = new Date(new Date().toDateString()).getTime()
+        for (const file of params.files) {
+            const uploadPromise = awsUtils.uploadFileToS3('gift-request', file, 'images/' + date); // your S3 upload function
+            uploadedFiles.push(uploadPromise);
+        }
+
+        await Promise.all(uploadedFiles);
+    }
 
     const flow = {
         start: {
@@ -74,9 +84,16 @@ const ChatbotV2 = () => {
         user: {
             message: async (params: Params) => {
                 let history: Message[] = []
+                const strings = await Promise.all(uploadedFiles);
+
+                let userInput = params.userInput;
+                if (strings.length > 0) {
+                    userInput += '  \n\n' + "Image urls:\n" + strings.join("  \n");
+                }
+
                 const userMessage: Message = {
                     id: Date.now().toString(),
-                    text: params.userInput,
+                    text: userInput,
                     sender: 'user',
                     timestamp: new Date()
                 };
@@ -86,7 +103,7 @@ const ChatbotV2 = () => {
                     return [...prev, userMessage]
                 })
 
-                const resp = await getBotResponse(params.userInput, history);
+                const resp = await getBotResponse(userInput, history);
                 const botResponse: Message = {
                     id: Date.now().toString(),
                     text: resp,
@@ -95,58 +112,55 @@ const ChatbotV2 = () => {
                 };
 
                 setMessages(prev => [...prev, botResponse]);
-                return marked(resp, {
-
-                });
+                return marked(resp);
             },
             file: (params) => handleUpload(params),
             path: "user",
             renderHtml: ["BOT", "USER"],
         } as HtmlRendererBlock,
         process_options: {
-			transition: {duration: 0},
-			chatDisabled: false,
-			path: async (params) => {
-				let link = "";
-				switch (params.userInput) {
-				case "Quickstart":
-					link = "https://react-chatbotify.com/docs/introduction/quickstart/";
-					break;
-				case "API Docs":
-					link = "https://react-chatbotify.com/docs/api/settings";
-					break;
-				case "Examples":
-					link = "https://react-chatbotify.com/docs/examples/basic_form";
-					break;
-				case "Github":
-					link = "https://github.com/tjtanjin/react-chatbotify/";
-					break;
-				case "Discord":
-					link = "https://discord.gg/6R4DK4G5Zh";
-					break;
-				default:
-					return "unknown_input";
-				}
-				await params.injectMessage("Sit tight! I'll send you right there!");
-				setTimeout(() => {
-					window.open(link);
-				}, 1000)
-				return "repeat"
-			},
-		},
-		repeat: {
-			transition: {duration: 3000},
-			path: "prompt_again"
-		},
+            transition: { duration: 0 },
+            chatDisabled: false,
+            path: async (params: Params) => {
+                let link = "";
+                switch (params.userInput) {
+                    case "Quickstart":
+                        link = "https://react-chatbotify.com/docs/introduction/quickstart/";
+                        break;
+                    case "API Docs":
+                        link = "https://react-chatbotify.com/docs/api/settings";
+                        break;
+                    case "Examples":
+                        link = "https://react-chatbotify.com/docs/examples/basic_form";
+                        break;
+                    case "Github":
+                        link = "https://github.com/tjtanjin/react-chatbotify/";
+                        break;
+                    case "Discord":
+                        link = "https://discord.gg/6R4DK4G5Zh";
+                        break;
+                    default:
+                        return "unknown_input";
+                }
+                await params.injectMessage("Sit tight! I'll send you right there!");
+                setTimeout(() => {
+                    window.open(link);
+                }, 1000)
+                return "repeat"
+            },
+        },
+        repeat: {
+            transition: { duration: 3000 },
+            path: "prompt_again"
+        },
         prompt_again: {
-			message: "Do you need any other help?",
-			options: helpOptions,
-			path: "process_options"
-		},
+            message: "Do you need any other help?",
+            // options: helpOptions,
+            path: "process_options"
+        },
     }
 
     return (
-        // <ChatBot settings={{general: {embedded: true}, chatHistory: {storageKey: "example_simulation_stream"}, botBubble: {simulateStream: true}}} flow={flow}/>
         <ChatBot
             plugins={plugins}
             flow={flow}
@@ -165,14 +179,13 @@ const ChatbotV2 = () => {
                     },
                     botBubble: { simulateStream: true, showAvatar: true, animate: true, avatar: 'src/assets/tree-chat.png' },
                     userBubble: { showAvatar: true },
-                    // audio: { disabled: false },
-                    audio: {disabled: false, defaultToggledOn: true, tapToPlay: true},
+                    audio: { disabled: false, defaultToggledOn: true },
                     voice: { language: "en-US", defaultToggledOn: false, disabled: false },
                     chatWindow: { showScrollbar: true, defaultOpen: true },
                     chatInput: { allowNewline: true, botDelay: 500, buttons: [Button.FILE_ATTACHMENT_BUTTON, Button.EMOJI_PICKER_BUTTON, Button.VOICE_MESSAGE_BUTTON, Button.SEND_MESSAGE_BUTTON] },
-                    fileAttachment: { disabled: false, accept: '*', sendFileName: true, showMediaDisplay: true },
+                    fileAttachment: { disabled: false, multiple: true, accept: '*', sendFileName: true, showMediaDisplay: true },
                     header: {
-                        title: <div style={{ cursor: 'pointer', margin: '0px', paddingTop: '5px',  fontSize: '16px', fontWeight: 'light' }}>Gifty</div>,
+                        title: <div style={{ cursor: 'pointer', margin: '0px', paddingTop: '5px', fontSize: '16px', fontWeight: 'light' }}>Gifty</div>,
                         avatar: 'src/assets/logo_light.png',
                         buttons: [Button.NOTIFICATION_BUTTON, Button.CLOSE_CHAT_BUTTON]
                     },
@@ -182,52 +195,23 @@ const ChatbotV2 = () => {
                     }
                 }}
             styles={{
-                // chatButtonStyle: {
-                //     backgroundColor: '#28a745',
-                //     backgroundImage: 'none',
-                // },
-                // botBubbleStyle: {
-                //     backgroundColor: 'rgb(14 142 81)'
-                // },
-                // userBubbleStyle: {
-                //     color: 'black',
-                //     backgroundColor: 'rgb(167 235 199)'
-                // },
                 sendButtonStyle: {
                     backgroundColor: 'rgb(14 142 81)'
                 },
                 sendButtonHoveredStyle: {
                     backgroundColor: 'rgb(167 235 199)'
                 },
-                // chatInputAreaFocusedStyle: {
-                //     boxShadow: 'rgb(167 235 199) 0px 0px 5px'
-                // },
-                // tooltipStyle: {
-                //     backgroundColor: 'rgb(14 142 81)'
-                // },
                 headerStyle: {
                     backgroundImage: 'linear-gradient(to right, rgb(14 142 81), rgb(110 197 151))',
                     padding: '8px'
                 },
-                chatInputContainerStyle:{
+                chatInputContainerStyle: {
                     padding: '0px 16px'
                 },
-                chatInputAreaStyle:{
+                chatInputAreaStyle: {
                     fontFamily: 'Arial, sans-serif',
                     fontSize: '15px'
                 },
-                // notificationButtonStyle:{
-                //     width: '25px',
-                //     height: '25px'
-                // },
-                // voiceIconStyle:{
-                //     width: '25px',
-                //     height: '25px'
-                // },
-                // closeChatIconStyle:{
-                //     width: '25px',
-                //     height: '25px'
-                // }
             }}
         />
     );
