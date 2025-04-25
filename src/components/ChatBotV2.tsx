@@ -4,6 +4,7 @@ import ApiClient from "../api/apiClient/apiClient";
 import { useState } from "react";
 import { marked } from 'marked'
 import { AWSUtils } from "../helpers/aws";
+import ReactMarkdown from "react-markdown";
 
 const renderer = {
     image({ href, title, text }: { href: string; title: string | null; text: string }) {
@@ -45,6 +46,9 @@ const ChatbotV2 = () => {
 
     const plugins = [HtmlRenderer()];
     const uploadedFiles: Promise<string>[] = [];
+    const [botResp, setBotResp] = useState<string>('');
+    let resolveMessage: ((value: string) => void) | null = null;
+    let messageResponsePromise: Promise<string> | null = null;
     const [messages, setMessages] = useState<Message[]>([
         {
             id: '1',
@@ -84,8 +88,13 @@ const ChatbotV2 = () => {
         user: {
             message: async (params: Params) => {
                 let history: Message[] = []
-                const strings = await Promise.all(uploadedFiles);
+                if (!messageResponsePromise) {
+                    messageResponsePromise = new Promise((resolve) => {
+                        resolveMessage = resolve;
+                    });
+                }
 
+                const strings = await Promise.all(uploadedFiles);
                 let userInput = params.userInput;
                 if (strings.length > 0) {
                     userInput += '  \n\n' + "Image urls:\n" + strings.join("  \n");
@@ -112,7 +121,37 @@ const ChatbotV2 = () => {
                 };
 
                 setMessages(prev => [...prev, botResponse]);
+                setBotResp(resp);
+
+                if (resolveMessage) {
+                    resolveMessage(resp);
+                    resolveMessage = null;
+                    messageResponsePromise = null;
+                }
+
                 return marked(resp);
+                // params.injectMessage(<div
+                //     className="rcb-bot-message rcb-bot-message-entry"
+                //     style={{ backgroundColor: 'green', 'color': 'rgb(255, 255, 255)', maxWidth: '65%' }}
+                // ><ReactMarkdown
+                //     components={{
+                //         img: ({ node, ...props }) => (
+                //             <img
+                //                 {...props}
+                //                 style={{ maxWidth: '100%' }}
+                //             />
+                //         ),
+                //         a: ({ node, ...props }) => (
+                //             <a
+                //                 {...props}
+                //                 target="_blank"
+                //                 rel="noopener noreferrer"
+                //             >
+                //                 {props.children}
+                //             </a>
+                //         )
+                //     }}
+                // >{resp}</ReactMarkdown></div>, 'BOT')
             },
             file: (params) => handleUpload(params),
             path: "user",

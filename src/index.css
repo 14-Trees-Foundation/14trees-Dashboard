@@ -35,3 +35,7 @@ body {
 textarea.rcb-chat-input-textarea {
   font-family: Arial, sans-serif;
 }
+
+div.rcb-bot-message {
+  white-space: normal;
+}
