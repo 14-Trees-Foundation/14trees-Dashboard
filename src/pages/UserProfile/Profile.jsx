@@ -203,6 +203,7 @@ const useStyles = makeStyles((theme) =>
       [theme.breakpoints.down("480")]: {
         width: "100%",
         maxHeight: "60vh",
+        minHeight: "300px",
         marginRight: "0px",
         marginLeft: "0px",
         paddingBottom: "20px",
