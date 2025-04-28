@@ -20,8 +20,8 @@ import image1 from '../../assets/home/corporate-gifts.jpeg'
 import image2 from '../../assets/home/personal-gifts.jpeg'
 import image3 from '../../assets/home/grove-gifts.jpeg'
 import { Button, Typography } from "@mui/material";
-import ChatBot from "../../components/ChatBot";
-import ChatbotV2 from "../../components/ChatBotV2";
+import ChatBot from "../../components/Chatbot/ChatBot";
+import ChatbotV2 from "../../components/Chatbot/ChatBotV2";
 
 export const Search = () => {
   const classes = UseStyle();

@@ -1,8 +1,10 @@
 import ChatBot, { Button, Params } from "react-chatbotify";
 import HtmlRenderer, { HtmlRendererBlock } from "@rcb-plugins/html-renderer";
-import ApiClient from "../api/apiClient/apiClient";
-import { useState } from "react";
+import ApiClient from "../../api/apiClient/apiClient";
+import { useEffect, useState } from "react";
 import { marked } from 'marked'
+import { setupResizableDiv } from "./resizableHandler";
+
 
 const renderer = {
     image({ href, title, text }: { href: string; title: string | null; text: string }) {
@@ -13,7 +15,7 @@ const renderer = {
 marked.use({ renderer });
 
 const defaultMessage = `**Hello! 🌿 Greetings from 14 Trees Foundation!**  
-I'm your digital assistant, here to help you spread green joy through tree gifting. Here’s what I can help you with:
+I'm Gifty, your digital assistant, here to help you spread green joy through tree gifting. Here’s what I can help you with:
 1. 🌱 **Create a Tree Gifting Request**
     Gift trees to someone special with a personalized message and occasion.
 `
@@ -52,22 +54,31 @@ const ChatbotV2 = () => {
         }
     ]);
 
+    useEffect(() => {
+        setTimeout(() => {
+            setupResizableDiv();
+        }, 5000)
+    }, []);
+
     const getBotResponse = async (userInput: string, history: Message[]): Promise<string> => {
         const apiClient = new ApiClient();
         const resp = await apiClient.serveUserQuery(userInput, history);
         return resp.output;
     };
     const helpOptions = ["Quickstart", "API Docs", "Examples", "Github", "Discord"];
-    const handleUpload = (params) => {
-		const files = params.files;
-		// handle files logic here
-	}
+    const handleUpload = (params: { files: FileList | undefined }) => {
+        const files = params.files;
+        if (files) {
+            const fileArray = Array.from(files); // Convert FileList to an array
+            // handle files logic here
+        }
+    }
 
     const flow = {
         start: {
             message: marked(defaultMessage),
             // options: helpOptions,
-            file: (params) => handleUpload(params),
+            file: (params: any) => params,
             path: "user",
             renderHtml: ["BOT", "USER"],
         } as HtmlRendererBlock,
@@ -99,7 +110,7 @@ const ChatbotV2 = () => {
 
                 });
             },
-            file: (params) => handleUpload(params),
+            file: (params: any) => params,
             path: "user",
             renderHtml: ["BOT", "USER"],
         } as HtmlRendererBlock,
@@ -145,6 +156,8 @@ const ChatbotV2 = () => {
 		},
     }
 
+
+
     return (
         // <ChatBot settings={{general: {embedded: true}, chatHistory: {storageKey: "example_simulation_stream"}, botBubble: {simulateStream: true}}} flow={flow}/>
         <ChatBot
@@ -166,7 +179,7 @@ const ChatbotV2 = () => {
                     botBubble: { simulateStream: true, showAvatar: true, animate: true, avatar: 'src/assets/tree-chat.png' },
                     userBubble: { showAvatar: true },
                     // audio: { disabled: false },
-                    audio: {disabled: false, defaultToggledOn: true, tapToPlay: true},
+                    audio: {disabled: false, defaultToggledOn: true},
                     voice: { language: "en-US", defaultToggledOn: false, disabled: false },
                     chatWindow: { showScrollbar: true, defaultOpen: true },
                     chatInput: { allowNewline: true, botDelay: 500, buttons: [Button.FILE_ATTACHMENT_BUTTON, Button.EMOJI_PICKER_BUTTON, Button.VOICE_MESSAGE_BUTTON, Button.SEND_MESSAGE_BUTTON] },
@@ -181,20 +194,24 @@ const ChatbotV2 = () => {
                         text: ''
                     }
                 }}
-            styles={{
+             styles={{
                 // chatButtonStyle: {
                 //     backgroundColor: '#28a745',
                 //     backgroundImage: 'none',
                 // },
-                // botBubbleStyle: {
-                //     backgroundColor: 'rgb(14 142 81)'
-                // },
-                // userBubbleStyle: {
-                //     color: 'black',
-                //     backgroundColor: 'rgb(167 235 199)'
-                // },
+                botBubbleStyle: {
+                    backgroundColor: '#B2E0B2', // Pistachio green (warm)
+                    color: '#1a3e1a', 
+                    borderRadius: '0 18px 18px 18px', 
+                },
+                 userBubbleStyle: {
+                    backgroundColor: '#c1e1c1', // Soft lime green
+                    color: '#1a3e1a', // Dark green text
+                    borderRadius: '18px 0 18px 18px',
+                 },
+
                 sendButtonStyle: {
-                    backgroundColor: 'rgb(14 142 81)'
+                    backgroundColor: '#005700'
                 },
                 sendButtonHoveredStyle: {
                     backgroundColor: 'rgb(167 235 199)'
@@ -212,9 +229,14 @@ const ChatbotV2 = () => {
                 chatInputContainerStyle:{
                     padding: '0px 16px'
                 },
-                chatInputAreaStyle:{
+                chatInputAreaStyle: {
                     fontFamily: 'Arial, sans-serif',
-                    fontSize: '15px'
+                    fontSize: '16px',
+                    padding: '10px 15px',
+                    borderRadius: '8px',
+                    border: '1px solid #ccc',
+                    boxShadow: '0 2px 5px rgba(0, 0, 0, 0.1)',
+                    margin: '10px 0',
                 },
                 // notificationButtonStyle:{
                 //     width: '25px',
