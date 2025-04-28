@@ -4,6 +4,7 @@ import ApiClient from "../../api/apiClient/apiClient";
 import { useEffect, useState } from "react";
 import { marked } from 'marked'
 import { setupResizableDiv } from "./resizableHandler";
+import path from "path";
 
 
 const renderer = {
@@ -65,7 +66,8 @@ const ChatbotV2 = () => {
         const resp = await apiClient.serveUserQuery(userInput, history);
         return resp.output;
     };
-    const helpOptions = ["Quickstart", "API Docs", "Examples", "Github", "Discord"];
+
+    const helpOptions = ["🎁 View Gifts", "👋 Visitor Page"];
     const handleUpload = (params: { files: FileList | undefined }) => {
         const files = params.files;
         if (files) {
@@ -77,11 +79,11 @@ const ChatbotV2 = () => {
     const flow = {
         start: {
             message: marked(defaultMessage),
-            // options: helpOptions,
+             options: helpOptions,
             file: (params: any) => params,
-            path: "user",
+            path: "process_options",
             renderHtml: ["BOT", "USER"],
-        } as HtmlRendererBlock,
+        } as HtmlRendererBlock,  
         user: {
             message: async (params: Params) => {
                 let history: Message[] = []
@@ -106,6 +108,10 @@ const ChatbotV2 = () => {
                 };
 
                 setMessages(prev => [...prev, botResponse]);
+                
+                if (resp.includes("Your tree gifting request has been successfully created")) {
+                    await params.showToast("🎉 Your gift request was created successfully!", 3000);
+                }
                 return marked(resp, {
 
                 });
@@ -118,31 +124,22 @@ const ChatbotV2 = () => {
 			transition: {duration: 0},
 			chatDisabled: false,
 			path: async (params) => {
-				let link = "";
+				let path = "";
 				switch (params.userInput) {
-				case "Quickstart":
-					link = "https://react-chatbotify.com/docs/introduction/quickstart/";
-					break;
-				case "API Docs":
-					link = "https://react-chatbotify.com/docs/api/settings";
-					break;
-				case "Examples":
-					link = "https://react-chatbotify.com/docs/examples/basic_form";
-					break;
-				case "Github":
-					link = "https://github.com/tjtanjin/react-chatbotify/";
-					break;
-				case "Discord":
-					link = "https://discord.gg/6R4DK4G5Zh";
-					break;
-				default:
-					return "unknown_input";
-				}
+                    case "🎁 View Gifts":
+                    path = "/gifts";
+                    break;
+                case "👋 Visitor Page":
+                    path = "/visitor";
+                    break;
+                default:
+                    return "user";
+            }
 				await params.injectMessage("Sit tight! I'll send you right there!");
 				setTimeout(() => {
-					window.open(link);
-				}, 1000)
-				return "repeat"
+                    window.location.pathname = path;
+                }, 800);
+                return "end";
 			},
 		},
 		repeat: {
@@ -150,10 +147,12 @@ const ChatbotV2 = () => {
 			path: "prompt_again"
 		},
         prompt_again: {
-			message: "Do you need any other help?",
-			options: helpOptions,
-			path: "process_options"
-		},
+            message: "Would you like help with anything else today?",
+            options: helpOptions,
+            transition: { duration: 1000 },
+            path: "process_options",
+            renderHtml: ["BOT"],
+        },
     }
 
 
