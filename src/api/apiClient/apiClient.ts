@@ -2371,6 +2371,41 @@ class ApiClient {
             throw new Error('Failed to connect with our Supplier AI bot!');
         }
     }
+
+    async updateSupplier(supplierData: any): Promise<{ message: string }> {
+        try {
+            const response = await this.api.put<{ message: string }>(`/suppliers/update`, supplierData, {
+                headers: {
+                    "x-access-token": this.token,
+                    "content-type": "application/json",
+                }
+            });
+            return response.data;
+        } catch (error: any) {
+            if (error.response) {
+                throw new Error(error.response.data.message);
+            }
+            throw new Error('Failed to update supplier data!');
+        }
+    }
+
+    async getSupplierDetails(supplierCode: string): Promise<any> {
+        try {
+            const response = await this.api.get<any>(`/suppliers/get`, {
+                headers: {
+                    "x-access-token": this.token,
+                    "content-type": "application/json",
+                },
+                params: { code: supplierCode } // Assuming you want to fetch by supplier code
+            });
+            return response.data;
+        } catch (error: any) {
+            if (error.response) {
+                throw new Error(error.response.data.message);
+            }
+            throw new Error('Failed to fetch supplier details!');
+        }
+    }
 }
 
 

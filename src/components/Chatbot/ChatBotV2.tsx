@@ -48,7 +48,6 @@ const Chat: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
 );
 
 const ChatbotV2 = () => {
-
     const plugins = [HtmlRenderer()];
     const [messages, setMessages] = useState<Message[]>([
         {
@@ -59,14 +58,15 @@ const ChatbotV2 = () => {
         }
     ]);
 
+    const apiClient = new ApiClient();
+
     useEffect(() => {
         setTimeout(() => {
             setupResizableDiv();
-        }, 5000)
+        }, 5000);
     }, []);
 
     const getBotResponse = async (userInput: string, history: Message[]): Promise<string> => {
-        const apiClient = new ApiClient();
         const resp = await apiClient.handleSupplierQuery(userInput, history); // Call the new method
         return resp.output;
     };
@@ -79,6 +79,22 @@ const ChatbotV2 = () => {
             // handle files logic here
         }
     }
+
+    const handleUserInput = async (userInput: string) => {
+        // Example of how to call the update supplier method
+        if (userInput.startsWith("Update Supplier:")) {
+            const supplierData = { /* Extract supplier data from user input */ };
+            const response = await apiClient.updateSupplier(supplierData);
+            return response.message; // Return the response message to the user
+        }
+
+        // Example of how to call the get supplier details method
+        if (userInput.startsWith("Get Supplier Details:")) {
+            const supplierCode = userInput.split(":")[1].trim(); // Extract supplier code
+            const supplierDetails = await apiClient.getSupplierDetails(supplierCode);
+            return JSON.stringify(supplierDetails); // Return supplier details to the user
+        }
+    };
 
     const flow = {
         start: {
