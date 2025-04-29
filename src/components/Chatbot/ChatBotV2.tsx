@@ -6,7 +6,7 @@ import { marked } from 'marked'
 import { setupResizableDiv } from "./resizableHandler";
 import path from "path";
 
-import { AWSUtils } from "../helpers/aws";
+import { AWSUtils } from "../../helpers/aws";
 import ReactMarkdown from "react-markdown";
 
 const renderer = {
@@ -17,9 +17,9 @@ const renderer = {
 
 marked.use({ renderer });
 
-const defaultMessage = `**Hello! 🌿 Welcome to the Supplier Management System!**  
-I'm your digital assistant, here to help you create new suppliers with ease. Here's what I can assist you with:
-1. 📝 **Create a New Supplier**
+const defaultMessage = `**Hello!! Welcome to LightHouse AI Automation!**  
+I'm your digital assistant, here to help you onboard new suppliers with ease. Here's what I can assist you with:
+1. 📝 **Onboard a New Supplier**
     Provide the necessary details to add a new supplier to our system.
 2. 📋 **View Existing Suppliers**
     Check the list of suppliers already in the system.
@@ -93,7 +93,7 @@ const ChatbotV2 = () => {
     const flow = {
         start: {
             message: marked(defaultMessage),
-             options: helpOptions,
+            // options: helpOptions,
             file: (params: any) => params,
             path: "process_options",
             renderHtml: ["BOT", "USER"],
@@ -202,7 +202,7 @@ const ChatbotV2 = () => {
 		},
         prompt_again: {
             message: "Would you like help with anything else today?",
-            options: helpOptions,
+          //  options: helpOptions,
             transition: { duration: 1000 },
             path: "process_options",
             renderHtml: ["BOT"],
@@ -218,17 +218,17 @@ const ChatbotV2 = () => {
             settings={
                 {
                     chatButton: {
-                        icon: Chat
-                        // icon: 'src/assets/logo_light.png'
+                       // icon: Chat
+                        icon: 'src/assets/logo_lightthouse.jpg'
                     },
 
                     general: {
-                        primaryColor: 'brown',
-                        secondaryColor: 'green',
+                        primaryColor: '#007BFF', // Bluish color
+                        secondaryColor: '#003366', // Change this to the logo's blue color
                         fontFamily: 'Arial, sans-serif',
                         showFooter: false
                     },
-                    botBubble: { simulateStream: true, showAvatar: true, animate: true, avatar: 'src/assets/tree-chat.png' },
+                    botBubble: { simulateStream: true, showAvatar: true, animate: true, avatar: 'src/assets/botbubble_icon.jpg' },
                     userBubble: { showAvatar: true },
                     audio: { disabled: false, defaultToggledOn: true },
                     voice: { language: "en-US", defaultToggledOn: false, disabled: false },
@@ -236,8 +236,8 @@ const ChatbotV2 = () => {
                     chatInput: { allowNewline: true, botDelay: 500, buttons: [Button.FILE_ATTACHMENT_BUTTON, Button.EMOJI_PICKER_BUTTON, Button.VOICE_MESSAGE_BUTTON, Button.SEND_MESSAGE_BUTTON] },
                     fileAttachment: { disabled: false, multiple: true, accept: '*', sendFileName: true, showMediaDisplay: true },
                     header: {
-                        title: <div style={{ cursor: 'pointer', margin: '0px', paddingTop: '5px', fontSize: '16px', fontWeight: 'light' }}>Gifty</div>,
-                        avatar: 'src/assets/logo_light.png',
+                        title: <div style={{ cursor: 'pointer', margin: '0px', paddingTop: '5px', fontSize: '16px', fontWeight: 'light' }}>LightHouse</div>,
+                        avatar: 'src/assets/logo_lightthouse.jpg',
                         buttons: [Button.NOTIFICATION_BUTTON, Button.CLOSE_CHAT_BUTTON]
                     },
                     // tooltip: {text: "Let's spread green!", mode: 'ALWAYS'},
@@ -251,30 +251,29 @@ const ChatbotV2 = () => {
                 //     backgroundImage: 'none',
                 // },
                 botBubbleStyle: {
-                    backgroundColor: '#B2E0B2', // Pistachio green (warm)
-                    color: '#1a3e1a', 
-                    borderRadius: '0 18px 18px 18px', 
+                    backgroundColor: '#B2D4E0', // Light bluish color
+                    color: '#000000', // Black text
+                    borderRadius: '0 18px 18px 18px',
                 },
                  userBubbleStyle: {
-                    backgroundColor: '#c1e1c1', // Soft lime green
-                    color: '#1a3e1a', // Dark green text
+                    backgroundColor: '#ADD8E6', // White
+                    color: '#000000', // Black text
                     borderRadius: '18px 0 18px 18px',
                  },
 
                 sendButtonStyle: {
-                    backgroundColor: '#005700'
+                    backgroundColor: '#003366'
                 },
                 sendButtonHoveredStyle: {
                     backgroundColor: 'rgb(167 235 199)'
                 },
                 headerStyle: {
-                    backgroundImage: 'linear-gradient(to right, rgb(14 142 81), rgb(110 197 151))',
+                    backgroundImage: 'linear-gradient(to right, #007BFF, #B2D4E0)', // Gradient
                     padding: '8px'
                 },
                 chatInputContainerStyle: {
                     padding: '0px 16px'
                 },
-                chatInputAreaStyle: {
                 chatInputAreaStyle: {
                     fontFamily: 'Arial, sans-serif',
                     fontSize: '15px'
