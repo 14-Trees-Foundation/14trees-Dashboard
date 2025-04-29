@@ -15,11 +15,15 @@ const renderer = {
 
 marked.use({ renderer });
 
-const defaultMessage = `**Hello! 🌿 Greetings from 14 Trees Foundation!**  
-I'm Gifty, your digital assistant, here to help you spread green joy through tree gifting. Here’s what I can help you with:
-1. 🌱 **Create a Tree Gifting Request**
-    Gift trees to someone special with a personalized message and occasion.
-`
+const defaultMessage = `**Hello! 🌿 Welcome to the Supplier Management System!**  
+I'm your digital assistant, here to help you create new suppliers with ease. Here's what I can assist you with:
+1. 📝 **Create a New Supplier**
+    Provide the necessary details to add a new supplier to our system.
+2. 📋 **View Existing Suppliers**
+    Check the list of suppliers already in the system.
+3. 🔍 **Search for a Supplier**
+    Find a specific supplier by name or ID.
+`;
 
 type Message = {
     id: string;
@@ -63,7 +67,7 @@ const ChatbotV2 = () => {
 
     const getBotResponse = async (userInput: string, history: Message[]): Promise<string> => {
         const apiClient = new ApiClient();
-        const resp = await apiClient.serveUserQuery(userInput, history);
+        const resp = await apiClient.handleSupplierQuery(userInput, history); // Call the new method
         return resp.output;
     };
 

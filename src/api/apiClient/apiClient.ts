@@ -2354,6 +2354,23 @@ class ApiClient {
             throw new Error('Failed to connect with our AI bot!');
         }
     }
+
+    async handleSupplierQuery(message: string, history: any[]): Promise<{ output: string }> {
+        try {
+            const response = await this.api.post<{ output: string }>(`/suppliers/gen-ai`, { message, history }, {
+                headers: {
+                    "x-access-token": this.token,
+                    "content-type": "application/json",
+                }
+            });
+            return response.data;
+        } catch (error: any) {
+            if (error.response) {
+                throw new Error(error.response.data.message);
+            }
+            throw new Error('Failed to connect with our Supplier AI bot!');
+        }
+    }
 }
 
 
