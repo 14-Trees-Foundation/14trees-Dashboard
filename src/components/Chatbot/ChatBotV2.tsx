@@ -15,11 +15,15 @@ const renderer = {
 
 marked.use({ renderer });
 
-const defaultMessage = `**Hello! 🌿 Greetings from 14 Trees Foundation!**  
-I'm Gifty, your digital assistant, here to help you spread green joy through tree gifting. Here’s what I can help you with:
-1. 🌱 **Create a Tree Gifting Request**
-    Gift trees to someone special with a personalized message and occasion.
-`
+const defaultMessage = `**Hello! 🌿 Welcome to the Supplier Management System!**  
+I'm your digital assistant, here to help you create new suppliers with ease. Here's what I can assist you with:
+1. 📝 **Create a New Supplier**
+    Provide the necessary details to add a new supplier to our system.
+2. 📋 **View Existing Suppliers**
+    Check the list of suppliers already in the system.
+3. 🔍 **Search for a Supplier**
+    Find a specific supplier by name or ID.
+`;
 
 type Message = {
     id: string;
@@ -44,7 +48,6 @@ const Chat: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
 );
 
 const ChatbotV2 = () => {
-
     const plugins = [HtmlRenderer()];
     const [messages, setMessages] = useState<Message[]>([
         {
@@ -55,15 +58,16 @@ const ChatbotV2 = () => {
         }
     ]);
 
+    const apiClient = new ApiClient();
+
     useEffect(() => {
         setTimeout(() => {
             setupResizableDiv();
-        }, 5000)
+        }, 5000);
     }, []);
 
     const getBotResponse = async (userInput: string, history: Message[]): Promise<string> => {
-        const apiClient = new ApiClient();
-        const resp = await apiClient.serveUserQuery(userInput, history);
+        const resp = await apiClient.handleSupplierQuery(userInput, history); // Call the new method
         return resp.output;
     };
 
@@ -75,6 +79,22 @@ const ChatbotV2 = () => {
             // handle files logic here
         }
     }
+
+    const handleUserInput = async (userInput: string) => {
+        // Example of how to call the update supplier method
+        if (userInput.startsWith("Update Supplier:")) {
+            const supplierData = { /* Extract supplier data from user input */ };
+            const response = await apiClient.updateSupplier(supplierData);
+            return response.message; // Return the response message to the user
+        }
+
+        // Example of how to call the get supplier details method
+        if (userInput.startsWith("Get Supplier Details:")) {
+            const supplierCode = userInput.split(":")[1].trim(); // Extract supplier code
+            const supplierDetails = await apiClient.getSupplierDetails(supplierCode);
+            return JSON.stringify(supplierDetails); // Return supplier details to the user
+        }
+    };
 
     const flow = {
         start: {

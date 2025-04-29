@@ -32,6 +32,7 @@ import SponsorProfile from "./pages/SponsorProfile/SponsorProfile";
 import CSRPage from "./pages/admin/csr/CSRPage";
 import EventPage from "./pages/EventDashboard/EventPage";
 import GiftDashboard from "./pages/GiftDashboard/GiftDashboard";
+import Chatbot from "./pages/chatbot/Chatbot";
 
 function App() {
   return (
@@ -139,6 +140,7 @@ function App() {
               // </RequireAuth>
             } 
           />
+           <Route path="/chatbot" element={<Chatbot />}></Route>
         </Routes>
       </Layout>
     </AuthProvider>
