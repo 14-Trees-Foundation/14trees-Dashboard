@@ -6,6 +6,8 @@ import { marked } from 'marked'
 import { setupResizableDiv } from "./resizableHandler";
 import path from "path";
 
+import { AWSUtils } from "../helpers/aws";
+import ReactMarkdown from "react-markdown";
 
 const renderer = {
     image({ href, title, text }: { href: string; title: string | null; text: string }) {
@@ -49,6 +51,10 @@ const Chat: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
 
 const ChatbotV2 = () => {
     const plugins = [HtmlRenderer()];
+    const uploadedFiles: Promise<string>[] = [];
+    const [botResp, setBotResp] = useState<string>('');
+    let resolveMessage: ((value: string) => void) | null = null;
+    let messageResponsePromise: Promise<string> | null = null;
     const [messages, setMessages] = useState<Message[]>([
         {
             id: '1',
@@ -70,31 +76,19 @@ const ChatbotV2 = () => {
         const resp = await apiClient.handleSupplierQuery(userInput, history); // Call the new method
         return resp.output;
     };
+    // const helpOptions = ["Quickstart", "API Docs", "Examples", "Github", "Discord"];
+    const handleUpload = async (params: Params) => {
+        if (!params.files || params.files.length === 0) return;
 
-    const helpOptions = ["🎁 View Gifts", "👋 Visitor Page"];
-    const handleUpload = (params: { files: FileList | undefined }) => {
-        const files = params.files;
-        if (files) {
-            const fileArray = Array.from(files); // Convert FileList to an array
-            // handle files logic here
+        const awsUtils = new AWSUtils();
+        const date = new Date(new Date().toDateString()).getTime()
+        for (const file of params.files) {
+            const uploadPromise = awsUtils.uploadFileToS3('gift-request', file, 'images/' + date); // your S3 upload function
+            uploadedFiles.push(uploadPromise);
         }
+
+        await Promise.all(uploadedFiles);
     }
-
-    const handleUserInput = async (userInput: string) => {
-        // Example of how to call the update supplier method
-        if (userInput.startsWith("Update Supplier:")) {
-            const supplierData = { /* Extract supplier data from user input */ };
-            const response = await apiClient.updateSupplier(supplierData);
-            return response.message; // Return the response message to the user
-        }
-
-        // Example of how to call the get supplier details method
-        if (userInput.startsWith("Get Supplier Details:")) {
-            const supplierCode = userInput.split(":")[1].trim(); // Extract supplier code
-            const supplierDetails = await apiClient.getSupplierDetails(supplierCode);
-            return JSON.stringify(supplierDetails); // Return supplier details to the user
-        }
-    };
 
     const flow = {
         start: {
@@ -107,9 +101,21 @@ const ChatbotV2 = () => {
         user: {
             message: async (params: Params) => {
                 let history: Message[] = []
+                if (!messageResponsePromise) {
+                    messageResponsePromise = new Promise((resolve) => {
+                        resolveMessage = resolve;
+                    });
+                }
+
+                const strings = await Promise.all(uploadedFiles);
+                let userInput = params.userInput;
+                if (strings.length > 0) {
+                    userInput += '  \n\n' + "Image urls:\n" + strings.join("  \n");
+                }
+
                 const userMessage: Message = {
                     id: Date.now().toString(),
-                    text: params.userInput,
+                    text: userInput,
                     sender: 'user',
                     timestamp: new Date()
                 };
@@ -119,7 +125,7 @@ const ChatbotV2 = () => {
                     return [...prev, userMessage]
                 })
 
-                const resp = await getBotResponse(params.userInput, history);
+                const resp = await getBotResponse(userInput, history);
                 const botResponse: Message = {
                     id: Date.now().toString(),
                     text: resp,
@@ -132,9 +138,37 @@ const ChatbotV2 = () => {
                 if (resp.includes("Your tree gifting request has been successfully created")) {
                     await params.showToast("🎉 Your gift request was created successfully!", 3000);
                 }
-                return marked(resp, {
+                setBotResp(resp);
 
-                });
+                if (resolveMessage) {
+                    resolveMessage(resp);
+                    resolveMessage = null;
+                    messageResponsePromise = null;
+                }
+
+                return marked(resp);
+                // params.injectMessage(<div
+                //     className="rcb-bot-message rcb-bot-message-entry"
+                //     style={{ backgroundColor: 'green', 'color': 'rgb(255, 255, 255)', maxWidth: '65%' }}
+                // ><ReactMarkdown
+                //     components={{
+                //         img: ({ node, ...props }) => (
+                //             <img
+                //                 {...props}
+                //                 style={{ maxWidth: '100%' }}
+                //             />
+                //         ),
+                //         a: ({ node, ...props }) => (
+                //             <a
+                //                 {...props}
+                //                 target="_blank"
+                //                 rel="noopener noreferrer"
+                //             >
+                //                 {props.children}
+                //             </a>
+                //         )
+                //     }}
+                // >{resp}</ReactMarkdown></div>, 'BOT')
             },
             file: (params: any) => params,
             path: "user",
@@ -178,7 +212,6 @@ const ChatbotV2 = () => {
 
 
     return (
-        // <ChatBot settings={{general: {embedded: true}, chatHistory: {storageKey: "example_simulation_stream"}, botBubble: {simulateStream: true}}} flow={flow}/>
         <ChatBot
             plugins={plugins}
             flow={flow}
@@ -197,14 +230,13 @@ const ChatbotV2 = () => {
                     },
                     botBubble: { simulateStream: true, showAvatar: true, animate: true, avatar: 'src/assets/tree-chat.png' },
                     userBubble: { showAvatar: true },
-                    // audio: { disabled: false },
-                    audio: {disabled: false, defaultToggledOn: true},
+                    audio: { disabled: false, defaultToggledOn: true },
                     voice: { language: "en-US", defaultToggledOn: false, disabled: false },
                     chatWindow: { showScrollbar: true, defaultOpen: true },
                     chatInput: { allowNewline: true, botDelay: 500, buttons: [Button.FILE_ATTACHMENT_BUTTON, Button.EMOJI_PICKER_BUTTON, Button.VOICE_MESSAGE_BUTTON, Button.SEND_MESSAGE_BUTTON] },
-                    fileAttachment: { disabled: false, accept: '*', sendFileName: true, showMediaDisplay: true },
+                    fileAttachment: { disabled: false, multiple: true, accept: '*', sendFileName: true, showMediaDisplay: true },
                     header: {
-                        title: <div style={{ cursor: 'pointer', margin: '0px', paddingTop: '5px',  fontSize: '16px', fontWeight: 'light' }}>Gifty</div>,
+                        title: <div style={{ cursor: 'pointer', margin: '0px', paddingTop: '5px', fontSize: '16px', fontWeight: 'light' }}>Gifty</div>,
                         avatar: 'src/assets/logo_light.png',
                         buttons: [Button.NOTIFICATION_BUTTON, Button.CLOSE_CHAT_BUTTON]
                     },
@@ -235,27 +267,17 @@ const ChatbotV2 = () => {
                 sendButtonHoveredStyle: {
                     backgroundColor: 'rgb(167 235 199)'
                 },
-                // chatInputAreaFocusedStyle: {
-                //     boxShadow: 'rgb(167 235 199) 0px 0px 5px'
-                // },
-                // tooltipStyle: {
-                //     backgroundColor: 'rgb(14 142 81)'
-                // },
                 headerStyle: {
                     backgroundImage: 'linear-gradient(to right, rgb(14 142 81), rgb(110 197 151))',
                     padding: '8px'
                 },
-                chatInputContainerStyle:{
+                chatInputContainerStyle: {
                     padding: '0px 16px'
                 },
                 chatInputAreaStyle: {
+                chatInputAreaStyle: {
                     fontFamily: 'Arial, sans-serif',
-                    fontSize: '16px',
-                    padding: '10px 15px',
-                    borderRadius: '8px',
-                    border: '1px solid #ccc',
-                    boxShadow: '0 2px 5px rgba(0, 0, 0, 0.1)',
-                    margin: '10px 0',
+                    fontSize: '15px'
                 },
                 // notificationButtonStyle:{
                 //     width: '25px',
