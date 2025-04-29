@@ -2338,9 +2338,9 @@ class ApiClient {
     /**
      * Gen AI
      */
-    async serveUserQuery(message: string, history: any[]): Promise<{output: string}> {
+    async serveUserQuery(message: string, history: any[]): Promise<{text_output: string, data: any}> {
         try {
-            const response = await this.api.post<{output: string}>(`/gift-cards/gen-ai`, { message, history }, {
+            const response = await this.api.post<{text_output: string, data: any}>(`/gift-cards/gen-ai`, { message, history }, {
                 headers: {
                     "x-access-token": this.token,
                     "content-type": "application/json",

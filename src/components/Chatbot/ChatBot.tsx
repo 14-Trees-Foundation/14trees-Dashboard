@@ -241,7 +241,7 @@ export default function ChatBot() {
   const getBotResponse = async (userInput: string, messages: Message[]): Promise<string> => {
     const apiClient = new ApiClient();
     const resp = await apiClient.serveUserQuery(userInput, messages);
-    return resp.output;
+    return resp.text_output;
   };
 
   const TypingAnimation = ({ text }: { text?: string }) => {
