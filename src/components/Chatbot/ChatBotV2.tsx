@@ -135,9 +135,12 @@ const ChatbotV2 = () => {
 
                 setMessages(prev => [...prev, botResponse]);
                 
-                if (resp.includes("Your tree gifting request has been successfully created")) {
-                    await params.showToast("🎉 Your gift request was created successfully!", 3000);
+                const respLower = resp.toLowerCase();
+                 if (respLower.includes("successfully created") || 
+                     respLower.includes("supplier has been created")) {
+                     await params.showToast("✅ Supplier onboarded successfully!", 3000);
                 }
+
                 setBotResp(resp);
 
                 if (resolveMessage) {
