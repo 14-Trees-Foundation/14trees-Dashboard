@@ -4,7 +4,6 @@ import ApiClient from "../api/apiClient/apiClient";
 import { useState } from "react";
 import { marked } from 'marked'
 import { AWSUtils } from "../helpers/aws";
-import ReactMarkdown from "react-markdown";
 
 const renderer = {
     image({ href, title, text }: { href: string; title: string | null; text: string }) {
@@ -46,9 +45,7 @@ const ChatbotV2 = () => {
 
     const plugins = [HtmlRenderer()];
     const uploadedFiles: Promise<string>[] = [];
-    const [botResp, setBotResp] = useState<string>('');
-    let resolveMessage: ((value: string) => void) | null = null;
-    let messageResponsePromise: Promise<string> | null = null;
+    const [isFirstChat, setIsFirstChat] = useState(true);
     const [messages, setMessages] = useState<Message[]>([
         {
             id: '1',
@@ -61,7 +58,8 @@ const ChatbotV2 = () => {
     const getBotResponse = async (userInput: string, history: Message[]): Promise<string> => {
         const apiClient = new ApiClient();
         const resp = await apiClient.serveUserQuery(userInput, history);
-        return resp.output;
+        console.log(resp.data);
+        return resp.text_output;
     };
     // const helpOptions = ["Quickstart", "API Docs", "Examples", "Github", "Discord"];
     const handleUpload = async (params: Params) => {
@@ -77,27 +75,65 @@ const ChatbotV2 = () => {
         await Promise.all(uploadedFiles);
     }
 
+    const handleInitialMessage = () => {
+        const userName = localStorage.getItem("userName");
+        const userEmail = localStorage.getItem("userEmail");
+
+        if (!userName)
+            return "Greatings!\n\nBefore we start, please share your fullname."
+        else if (!userEmail)
+            return `Hi ${userName},\n\nPlease share your email address.`
+        else
+            return marked(defaultMessage);
+    }
+
     const flow = {
         start: {
-            message: marked(defaultMessage),
-            // options: helpOptions,
+            message: handleInitialMessage,
             file: (params) => handleUpload(params),
+            path: () => {
+                const userName = localStorage.getItem("userName");
+                const userEmail = localStorage.getItem("userEmail");
+                return !userName
+                    ? "name"
+                    : !userEmail
+                        ? "email"
+                        : "user"
+            },
+            renderHtml: ["BOT", "USER"],
+        } as HtmlRendererBlock,
+        name: {
+            message: (params: Params) => {
+                localStorage.setItem("userName", params.userInput);
+                return handleInitialMessage();
+            },
+            path: "email",
+            renderHtml: ["BOT", "USER"],
+        } as HtmlRendererBlock,
+        email: {
+            message: (params: Params) => {
+                localStorage.setItem("userEmail", params.userInput);
+                return handleInitialMessage();
+            },
             path: "user",
             renderHtml: ["BOT", "USER"],
         } as HtmlRendererBlock,
         user: {
             message: async (params: Params) => {
+
                 let history: Message[] = []
-                if (!messageResponsePromise) {
-                    messageResponsePromise = new Promise((resolve) => {
-                        resolveMessage = resolve;
-                    });
-                }
 
                 const strings = await Promise.all(uploadedFiles);
                 let userInput = params.userInput;
                 if (strings.length > 0) {
                     userInput += '  \n\n' + "Image urls:\n" + strings.join("  \n");
+                }
+
+                if (isFirstChat) {
+                    setIsFirstChat(false);
+                    const userName = localStorage.getItem("userName");
+                    const userEmail = localStorage.getItem("userEmail");
+                    userInput += `\n\nUsername: ${userName}\nUseremail: ${userEmail}`;
                 }
 
                 const userMessage: Message = {
@@ -121,37 +157,8 @@ const ChatbotV2 = () => {
                 };
 
                 setMessages(prev => [...prev, botResponse]);
-                setBotResp(resp);
-
-                if (resolveMessage) {
-                    resolveMessage(resp);
-                    resolveMessage = null;
-                    messageResponsePromise = null;
-                }
 
                 return marked(resp);
-                // params.injectMessage(<div
-                //     className="rcb-bot-message rcb-bot-message-entry"
-                //     style={{ backgroundColor: 'green', 'color': 'rgb(255, 255, 255)', maxWidth: '65%' }}
-                // ><ReactMarkdown
-                //     components={{
-                //         img: ({ node, ...props }) => (
-                //             <img
-                //                 {...props}
-                //                 style={{ maxWidth: '100%' }}
-                //             />
-                //         ),
-                //         a: ({ node, ...props }) => (
-                //             <a
-                //                 {...props}
-                //                 target="_blank"
-                //                 rel="noopener noreferrer"
-                //             >
-                //                 {props.children}
-                //             </a>
-                //         )
-                //     }}
-                // >{resp}</ReactMarkdown></div>, 'BOT')
             },
             file: (params) => handleUpload(params),
             path: "user",
