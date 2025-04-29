@@ -73,7 +73,15 @@ const ChatbotV2 = () => {
     }, []);
 
     const getBotResponse = async (userInput: string, history: Message[]): Promise<string> => {
-        const resp = await apiClient.handleSupplierQuery(userInput, history); // Call the new method
+        let resp;
+        
+        // Check if the user input is related to buyers
+        if (userInput.toLowerCase().includes("buyer")) {
+            resp = await apiClient.handleBuyerQuery(userInput, history); // Call the buyer method
+        } else {
+            resp = await apiClient.handleSupplierQuery(userInput, history); // Call the supplier method
+        }
+        
         return resp.output;
     };
     // const helpOptions = ["Quickstart", "API Docs", "Examples", "Github", "Discord"];
@@ -139,6 +147,12 @@ const ChatbotV2 = () => {
                  if (respLower.includes("successfully created") || 
                      respLower.includes("supplier has been created")) {
                      await params.showToast("✅ Supplier onboarded successfully!", 3000);
+                }
+                
+                // New condition for buyer
+                if (respLower.includes("successfully added") || 
+                    respLower.includes("buyer has been created")) {
+                    await params.showToast("✅ Buyer onboarded successfully!", 3000);
                 }
 
                 setBotResp(resp);
