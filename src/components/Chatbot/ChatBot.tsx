@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import ApiClient from '../api/apiClient/apiClient';
+import ApiClient from '../../api/apiClient/apiClient';
 import ReactMarkdown from 'react-markdown';
 import { styled } from '@mui/material/styles';
 import { IconButton } from '@mui/material';
@@ -156,7 +156,7 @@ const RemoveButton = styled(IconButton)({
 
 // Component
 export default function ChatBot() {
-  const [isOpen, setIsOpen] = useState(false);
+ const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([
     {
       id: '1',

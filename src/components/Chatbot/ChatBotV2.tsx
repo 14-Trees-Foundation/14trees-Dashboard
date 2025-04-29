@@ -1,9 +1,12 @@
 import ChatBot, { Button, Params } from "react-chatbotify";
 import HtmlRenderer, { HtmlRendererBlock } from "@rcb-plugins/html-renderer";
-import ApiClient from "../api/apiClient/apiClient";
-import { useState } from "react";
+import ApiClient from "../../api/apiClient/apiClient";
+import { useEffect, useState } from "react";
 import { marked } from 'marked'
-import { AWSUtils } from "../helpers/aws";
+import { AWSUtils } from "../../helpers/aws";
+import { setupResizableDiv } from "./resizableHandler";
+import path from "path";
+
 
 const renderer = {
     image({ href, title, text }: { href: string; title: string | null; text: string }) {
@@ -14,7 +17,7 @@ const renderer = {
 marked.use({ renderer });
 
 const defaultMessage = `**Hello! 🌿 Greetings from 14 Trees Foundation!**  
-I'm your digital assistant, here to help you spread green joy through tree gifting. Here’s what I can help you with:
+I'm Gifty, your digital assistant, here to help you spread green joy through tree gifting. Here’s what I can help you with:
 1. 🌱 **Create a Tree Gifting Request**
     Gift trees to someone special with a personalized message and occasion.
 `
@@ -54,6 +57,12 @@ const ChatbotV2 = () => {
             timestamp: new Date()
         }
     ]);
+
+    useEffect(() => {
+        setTimeout(() => {
+            setupResizableDiv();
+        }, 5000)
+    }, []);
 
     const getBotResponse = async (userInput: string, history: Message[]): Promise<string> => {
         const apiClient = new ApiClient();
@@ -158,9 +167,13 @@ const ChatbotV2 = () => {
 
                 setMessages(prev => [...prev, botResponse]);
 
+                if (resp.includes("Your tree gifting request has been successfully created")) {
+                    await params.showToast("🎉 Your gift request was created successfully!", 3000);
+                }
+
                 return marked(resp);
             },
-            file: (params) => handleUpload(params),
+            file: (params: any) => params,
             path: "user",
             renderHtml: ["BOT", "USER"],
         } as HtmlRendererBlock,
@@ -168,31 +181,22 @@ const ChatbotV2 = () => {
             transition: { duration: 0 },
             chatDisabled: false,
             path: async (params: Params) => {
-                let link = "";
+                let path = "";
                 switch (params.userInput) {
-                    case "Quickstart":
-                        link = "https://react-chatbotify.com/docs/introduction/quickstart/";
+                    case "🎁 View Gifts":
+                        path = "/gifts";
                         break;
-                    case "API Docs":
-                        link = "https://react-chatbotify.com/docs/api/settings";
-                        break;
-                    case "Examples":
-                        link = "https://react-chatbotify.com/docs/examples/basic_form";
-                        break;
-                    case "Github":
-                        link = "https://github.com/tjtanjin/react-chatbotify/";
-                        break;
-                    case "Discord":
-                        link = "https://discord.gg/6R4DK4G5Zh";
+                    case "👋 Visitor Page":
+                        path = "/visitor";
                         break;
                     default:
-                        return "unknown_input";
+                        return "user";
                 }
                 await params.injectMessage("Sit tight! I'll send you right there!");
                 setTimeout(() => {
-                    window.open(link);
-                }, 1000)
-                return "repeat"
+                    window.location.pathname = path;
+                }, 800);
+                return "end";
             },
         },
         repeat: {
@@ -200,11 +204,15 @@ const ChatbotV2 = () => {
             path: "prompt_again"
         },
         prompt_again: {
-            message: "Do you need any other help?",
+            message: "Would you like help with anything else today?",
             // options: helpOptions,
-            path: "process_options"
+            transition: { duration: 1000 },
+            path: "process_options",
+            renderHtml: ["BOT"],
         },
     }
+
+
 
     return (
         <ChatBot
@@ -241,8 +249,18 @@ const ChatbotV2 = () => {
                     }
                 }}
             styles={{
+                botBubbleStyle: {
+                    backgroundColor: '#B2E0B2', // Pistachio green (warm)
+                    color: '#1a3e1a',
+                    borderRadius: '0 18px 18px 18px',
+                },
+                userBubbleStyle: {
+                    backgroundColor: '#c1e1c1', // Soft lime green
+                    color: '#1a3e1a', // Dark green text
+                    borderRadius: '18px 0 18px 18px',
+                },
                 sendButtonStyle: {
-                    backgroundColor: 'rgb(14 142 81)'
+                    backgroundColor: '#005700'
                 },
                 sendButtonHoveredStyle: {
                     backgroundColor: 'rgb(167 235 199)'
