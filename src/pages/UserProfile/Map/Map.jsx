@@ -144,6 +144,9 @@ const useStyles = makeStyles((theme) =>
       width: "100%",
       height: "100%",
       marginRight: "20px",
+      [theme.breakpoints.down("480")]: {
+        height: "300px", // Set a fixed height for mobile screens
+      },
     },
     treeimg: {
       width: "50px",
