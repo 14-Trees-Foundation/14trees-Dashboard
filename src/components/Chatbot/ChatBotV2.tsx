@@ -16,7 +16,7 @@ const renderer = {
 
 marked.use({ renderer });
 
-const defaultMessage = `**Hello! 🌿 Greetings from 14 Trees Foundation!**  
+const defaultMessage = `**Hello USER_NAME! 🌿 Greetings from 14 Trees Foundation!**  
 I'm Gifty, your digital assistant, here to help you spread green joy through tree gifting. Here’s what I can help you with:
 1. 🌱 **Create a Tree Gifting Request**
     Gift trees to someone special with a personalized message and occasion.
@@ -93,7 +93,7 @@ const ChatbotV2 = () => {
         else if (!userEmail)
             return `Hi ${userName},\n\nPlease share your email address.`
         else
-            return marked(defaultMessage);
+            return marked(defaultMessage.replace("USER_NAME", userName));
     }
 
     const flow = {
