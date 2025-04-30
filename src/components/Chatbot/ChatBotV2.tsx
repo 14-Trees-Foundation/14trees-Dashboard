@@ -67,7 +67,20 @@ const ChatbotV2 = () => {
     const getBotResponse = async (userInput: string, history: Message[]): Promise<string> => {
         const apiClient = new ApiClient();
         const resp = await apiClient.serveUserQuery(userInput, history);
-        console.log(resp.data);
+        console.log(resp.sponsor_details);
+        if (resp.sponsor_details) {
+            if (resp.sponsor_details.name) {
+                const userName = localStorage.getItem("userName")
+                if (userName != resp.sponsor_details.name)
+                    localStorage.setItem("userName", resp.sponsor_details.name);
+            }
+
+            if (resp.sponsor_details.email) {
+                const userEmail = localStorage.getItem("userEmail")
+                if (userEmail != resp.sponsor_details.email)
+                    localStorage.setItem("userEmail", resp.sponsor_details.email);
+            }
+        }
         return resp.text_output;
     };
     // const helpOptions = ["Quickstart", "API Docs", "Examples", "Github", "Discord"];
@@ -86,29 +99,32 @@ const ChatbotV2 = () => {
 
     const handleInitialMessage = () => {
         const userName = localStorage.getItem("userName");
-        const userEmail = localStorage.getItem("userEmail");
+        // const userEmail = localStorage.getItem("userEmail");
 
-        if (!userName)
-            return "Greatings!\n\nBefore we start, please share your fullname."
-        else if (!userEmail)
-            return `Hi ${userName},\n\nPlease share your email address.`
-        else
-            return marked(defaultMessage.replace("USER_NAME", userName));
+        // if (!userName)
+        //     return "Greatings!\n\nBefore we start, please share your fullname."
+        // else if (!userEmail)
+        //     return `Hi ${userName},\n\nPlease share your email address.`
+        // else
+
+
+        return marked(defaultMessage.replace(" USER_NAME", userName ? " " + userName : ""));
     }
 
     const flow = {
         start: {
             message: handleInitialMessage,
             file: (params) => handleUpload(params),
-            path: () => {
-                const userName = localStorage.getItem("userName");
-                const userEmail = localStorage.getItem("userEmail");
-                return !userName
-                    ? "name"
-                    : !userEmail
-                        ? "email"
-                        : "user"
-            },
+            // path: () => {
+            //     const userName = localStorage.getItem("userName");
+            //     const userEmail = localStorage.getItem("userEmail");
+            //     return !userName
+            //         ? "name"
+            //         : !userEmail
+            //             ? "email"
+            //             : "user"
+            // },
+            path: 'user',
             renderHtml: ["BOT", "USER"],
         } as HtmlRendererBlock,
         name: {
@@ -142,7 +158,8 @@ const ChatbotV2 = () => {
                     setIsFirstChat(false);
                     const userName = localStorage.getItem("userName");
                     const userEmail = localStorage.getItem("userEmail");
-                    userInput += `\n\nUsername: ${userName}\nUseremail: ${userEmail}`;
+                    if (userName || userEmail)
+                        userInput += `\n\nUsername: ${userName}\nUseremail: ${userEmail}`;
                 }
 
                 const userMessage: Message = {
