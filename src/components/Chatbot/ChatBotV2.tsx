@@ -18,13 +18,13 @@ const renderer = {
 marked.use({ renderer });
 
 const defaultMessage = `**Hello!! Welcome to LightHouse AI Automation!**  
-I'm your digital assistant, here to help you onboard new suppliers with ease. Here's what I can assist you with:
-1. 📝 **Onboard a New Supplier**
-    Provide the necessary details to add a new supplier to our system.
-2. 📋 **View Existing Suppliers**
-    Check the list of suppliers already in the system.
-3. 🔍 **Search for a Supplier**
-    Find a specific supplier by name or ID.
+I'm your digital assistant, here to help you onboard new suppliers/buyers with ease. Here's what I can assist you with:
+1. 📝 **Onboard a New Supplier/Buyer**
+    Provide the necessary details to add a new supplier/buyer to our system.
+2. 📋 **View Existing Suppliers/Buyers**
+    Check the list of suppliers/buyers already in the system.
+3. 🔍 **Search for a Supplier/Buyers**
+    Find a specific supplier/buyer by name or ID.
 `;
 
 type Message = {
@@ -73,17 +73,33 @@ const ChatbotV2 = () => {
     }, []);
 
     const getBotResponse = async (userInput: string, history: Message[]): Promise<string> => {
-        let resp;
-        
-        // Check if the user input is related to buyers
-        if (userInput.toLowerCase().includes("buyer")) {
-            resp = await apiClient.handleBuyerQuery(userInput, history); // Call the buyer method
-        } else {
-            resp = await apiClient.handleSupplierQuery(userInput, history); // Call the supplier method
+        try {
+            const isErrorQuery = /error|log|fail/i.test(userInput.toLowerCase());
+            const context = isErrorQuery ? 'error' : undefined;
+            
+            // Call API and get full response
+            const response = await apiClient.handleAgentQuery(userInput, history, context);
+            
+            // Handle both response formats
+            const output = response.data || response.output;
+            
+            console.log('API Response:', {
+                input: userInput,
+                output: output, // Now shows actual content
+                type: isErrorQuery ? 'error' : 'entity'
+            });
+    
+            if (!output) {
+                throw new Error('Empty response from server');
+            }
+    
+            return output;
+        } catch (error) {
+            console.error('API Error:', error);
+            return "Sorry, I couldn't process your request. Please try again.";
         }
-        
-        return resp.output;
     };
+    
     // const helpOptions = ["Quickstart", "API Docs", "Examples", "Github", "Discord"];
     const handleUpload = async (params: Params) => {
         if (!params.files || params.files.length === 0) return;
