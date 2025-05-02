@@ -73,33 +73,10 @@ const ChatbotV2 = () => {
     }, []);
 
     const getBotResponse = async (userInput: string, history: Message[]): Promise<string> => {
-        try {
-            const isErrorQuery = /error|log|fail/i.test(userInput.toLowerCase());
-            const context = isErrorQuery ? 'error' : undefined;
-            
-            // Call API and get full response
-            const response = await apiClient.handleAgentQuery(userInput, history, context);
-            
-            // Handle both response formats
-            const output = response.data || response.output;
-            
-            console.log('API Response:', {
-                input: userInput,
-                output: output, // Now shows actual content
-                type: isErrorQuery ? 'error' : 'entity'
-            });
-    
-            if (!output) {
-                throw new Error('Empty response from server');
-            }
-    
-            return output;
-        } catch (error) {
-            console.error('API Error:', error);
-            return "Sorry, I couldn't process your request. Please try again.";
-        }
+        const resp = await apiClient.handleAgentQuery(userInput, history);
+        return resp.output;
     };
-    
+
     // const helpOptions = ["Quickstart", "API Docs", "Examples", "Github", "Discord"];
     const handleUpload = async (params: Params) => {
         if (!params.files || params.files.length === 0) return;
