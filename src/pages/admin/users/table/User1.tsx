@@ -31,6 +31,7 @@ import { toast } from "react-toastify";
 import ApiClient from "../../../../api/apiClient/apiClient";
 import { AccountBalance, Forest } from "@mui/icons-material";
 import UserForm from "./UserForm";
+import GeneralTable from "../../../../components/GenTable";
 
 export const User1 = () => {
   const dispatch = useAppDispatch();
@@ -51,11 +52,24 @@ export const User1 = () => {
   const [page, setPage] = useState(0);
   const [pageSize, setPageSize] = useState(10);
   const [filters, setFilters] = useState<Record<string, GridFilterItem>>({});
+  const [tableRows, setTableRows] = useState<User[]>([]);
 
   const [userCombineModal, setUserCombineModal] = useState(false);
   const [primaryUser, setPrimaryUser] = useState<User | null>(null);
   const [secondaryUser, setSecondaryUser] = useState<User | null>(null);
   const [deleteSecondary, setDeleteSecondary] = useState(true);
+
+  let usersList: User[] = [];
+  const usersData = useAppSelector((state: RootState) => state.usersData);
+  if (usersData) {
+    usersList = Object.values(usersData.users);
+    usersList = usersList.sort((a, b) => b.id - a.id);
+  }
+
+  const handlePaginationChange = (page: number, pageSize: number) => {
+    setPage(page - 1);
+    setPageSize(pageSize);
+  }
 
   const handleSetFilters = (filters: Record<string, GridFilterItem>) => {
     setPage(0);
@@ -64,7 +78,34 @@ export const User1 = () => {
 
   useEffect(() => {
     getUserData();
-  }, [pageSize, page, filters]);
+  }, [filters]);
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      if (usersData.loading) return;
+
+      const records: User[] = [];
+      const maxLength = Math.min((page + 1) * pageSize, usersData.totalUsers);
+      for (let i = page * pageSize; i < maxLength; i++) {
+        if (Object.hasOwn(usersData.paginationMapping, i)) {
+          const id = usersData.paginationMapping[i];
+          const record = usersData.users[id];
+          if (record) {
+            records.push(record);
+          }
+        } else {
+          getUserData();
+          break;
+        }
+      }
+
+      setTableRows(records);
+    }, 500)
+
+    return () => {
+      clearTimeout(handler);
+    }
+  }, [pageSize, page, usersData]);
 
   const getUserData = async () => {
     let filtersData = Object.values(filters);
@@ -75,7 +116,7 @@ export const User1 = () => {
     }, 1000);
   };
 
-  const antdColumns: TableColumnsType<User> = [
+  const columns: TableColumnsType<User> = [
     {
       dataIndex: "name",
       key: "name",
@@ -192,16 +233,15 @@ export const User1 = () => {
     },
   ];
 
-  let usersList: User[] = [];
-  const usersData = useAppSelector((state: RootState) => state.usersData);
-  if (usersData) {
-    usersList = Object.values(usersData.users);
-    usersList = usersList.sort((a, b) => b.id - a.id);
-  }
-
   const getAllUsersData = async () => {
-    let filtersData = Object.values(filters);
-    getUsers(0, usersData.totalUsers, filtersData);
+    const apiClient = new ApiClient();
+    try {
+      const usersResp = await apiClient.getUsers(0, -1, Object.values(filters));
+      return usersResp.results;
+    } catch (error: any) {
+      toast.error(error.message);
+      return [];
+    }
   };
 
   const handleDelete = (row: User) => {
@@ -244,7 +284,7 @@ export const User1 = () => {
     try {
       const apiClient = new ApiClient();
       await apiClient.combineUsers(primaryUser.id, secondaryUser.id, deleteSecondary);
-    } catch(error: any) {
+    } catch (error: any) {
       toast.error(error.message);
     }
 
@@ -275,9 +315,9 @@ export const User1 = () => {
             onClick={() => { setUserCombineModal(true); }}>
             Combine Users
           </Button>
-          <Button 
-            variant="contained" 
-            color="success" 
+          <Button
+            variant="contained"
+            color="success"
             style={{ marginLeft: "10px", textTransform: 'none' }}
             onClick={handleModalOpen}>
             Add User
@@ -304,17 +344,19 @@ export const User1 = () => {
       </div>
       <Divider sx={{ backgroundColor: "black", marginBottom: '15px' }} />
       <Box sx={{ height: 840, width: "100%" }}>
-        <TableComponent
-          loading={loading}
-          dataSource={usersList}
-          columns={antdColumns}
+        <GeneralTable
+          loading={usersData.loading}
+          rows={tableRows}
+          columns={columns}
           totalRecords={usersData.totalUsers}
-          fetchAllData={getAllUsersData}
-          setPage={setPage}
-          setPageSize={setPageSize}
+          page={page}
+          pageSize={pageSize}
+          onPaginationChange={handlePaginationChange}
+          onDownload={getAllUsersData}
+          footer
           tableName="Users"
         />
-      </Box>
+      </Box >
 
       <Dialog open={openDeleteModal} onClose={() => setOpenDeleteModal(false)}>
         <DialogTitle>Confirm Delete</DialogTitle>
@@ -347,7 +389,7 @@ export const User1 = () => {
         <DialogTitle>Merge users</DialogTitle>
         <DialogContent>
           <DialogContentText>
-            <CombineUserForm 
+            <CombineUserForm
               primaryUser={primaryUser}
               secondaryUser={secondaryUser}
               deleteSecondary={deleteSecondary}
@@ -371,19 +413,21 @@ export const User1 = () => {
         </DialogActions>
       </Dialog>
 
-      {selectedEditRow && (
-        <EditUser
-          row={selectedEditRow}
-          openeditModal={editModal}
-          onClose={() => {
-            setEditModal(false);
-            setSelectedEditRow(null);
-          }}
-          editSubmit={handleEditSubmit}
-        />
-      )}
+      {
+        selectedEditRow && (
+          <EditUser
+            row={selectedEditRow}
+            openeditModal={editModal}
+            onClose={() => {
+              setEditModal(false);
+              setSelectedEditRow(null);
+            }}
+            editSubmit={handleEditSubmit}
+          />
+        )
+      }
 
-      <UserForm 
+      <UserForm
         user={selectedEditRow}
         open={open}
         onClose={() => {
