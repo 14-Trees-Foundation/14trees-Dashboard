@@ -32,8 +32,8 @@ type Message = {
 
 interface ApiResponse {
     output?: string;
-  text_output?: string;
-  [key: string]: any; // Allows other properties
+    text_output?: string;
+    [key: string]: any;
   }
 
 
@@ -84,6 +84,12 @@ const ChatbotV2 = () => {
                 setAvatarAnimation('idle');
             }, 3000);
         }
+        
+        else if (responseText.includes("Your tree gifting request has been successfully created")) {
+            setAvatarAnimation('victory');
+            setTimeout(() => setAvatarAnimation('idle'), 3000);
+        }
+
 
         console.log(resp.sponsor_details);
         if (resp.sponsor_details) {
