@@ -202,13 +202,6 @@ const ChatbotV2 = () => {
 
                 setMessages(prev => [...prev, botResponse]);
 
-                const apiResponse = resp as ApiResponse;
-const responseText = typeof resp === 'string' 
-  ? resp 
-  : apiResponse?.output || apiResponse?.text_output || "";
-
-
-
                 if (resp.includes("Your tree gifting request has been successfully created")) {
                     await params.showToast("🎉 Your gift request was created successfully!", 3000);
                 }

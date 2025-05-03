@@ -1,5 +1,5 @@
-import React from "react";
-import ReactDOM from 'react-dom/client'
+import * as React from "react";
+import ReactDOM from 'react-dom'
 
 import { ThemeProvider } from "@mui/material/styles";
 
@@ -20,8 +20,7 @@ if (import.meta.env.VITE_ENV === "development") {
   });
 }
 
-const root = ReactDOM.createRoot(document.getElementById('root'));
-root.render(
+ReactDOM.render(
   <React.StrictMode>
     <ConfigProvider
     theme={{
@@ -68,7 +67,8 @@ root.render(
       </ThemeProvider>
     </BrowserRouter>
     </ConfigProvider>
-  </React.StrictMode>
+    </React.StrictMode>,
+    document.getElementById("root")
 );
 
 // If you want to start measuring performance in your app, pass a function
