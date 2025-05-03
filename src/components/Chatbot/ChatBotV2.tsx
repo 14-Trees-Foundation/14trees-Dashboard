@@ -6,6 +6,7 @@ import { marked } from 'marked'
 import { AWSUtils } from "../../helpers/aws";
 import { setupResizableDiv } from "./resizableHandler";
 import path from "path";
+import AvatarContainer from "../Avatar/avatarContainer";
 
 
 const renderer = {
@@ -29,6 +30,12 @@ type Message = {
     timestamp: Date;
 };
 
+interface ApiResponse {
+    output?: string;
+    text_output?: string;
+    [key: string]: any;
+  }
+
 
 const Chat: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
     <svg
@@ -45,6 +52,8 @@ const Chat: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
 );
 
 const ChatbotV2 = () => {
+    const [isOpen, setIsOpen] = useState(true);
+    const [avatarAnimation, setAvatarAnimation] = useState<'idle' | 'clapping' | 'victory'>('idle');
 
     const plugins = [HtmlRenderer()];
     const uploadedFiles: Promise<string>[] = [];
@@ -67,6 +76,21 @@ const ChatbotV2 = () => {
     const getBotResponse = async (userInput: string, history: Message[]): Promise<string> => {
         const apiClient = new ApiClient();
         const resp = await apiClient.serveUserQuery(userInput, history);
+
+        if (userInput.toLowerCase().includes('create a gift request' )) {
+            
+            setAvatarAnimation('clapping');
+            setTimeout(() => {
+                setAvatarAnimation('idle');
+            }, 3000);
+        }
+        
+        else if (responseText.includes("Your tree gifting request has been successfully created")) {
+            setAvatarAnimation('victory');
+            setTimeout(() => setAvatarAnimation('idle'), 3000);
+        }
+
+
         console.log(resp.sponsor_details);
         if (resp.sponsor_details) {
             if (resp.sponsor_details.name) {
@@ -232,69 +256,72 @@ const ChatbotV2 = () => {
 
 
     return (
-        <ChatBot
-            plugins={plugins}
-            flow={flow}
-            settings={
-                {
-                    chatButton: {
-                        icon: Chat
-                        // icon: 'src/assets/logo_light.png'
-                    },
+        <>
+            <AvatarContainer isVisible={isOpen} animation={avatarAnimation} />
+            <ChatBot
+                plugins={plugins}
+                flow={flow}
+                settings={
+                    {
+                        chatButton: {
+                            icon: Chat
+                            // icon: 'src/assets/logo_light.png'
+                        },
 
-                    general: {
-                        primaryColor: 'brown',
-                        secondaryColor: 'green',
+                        general: {
+                            primaryColor: 'brown',
+                            secondaryColor: 'green',
+                            fontFamily: 'Arial, sans-serif',
+                            showFooter: false
+                        },
+                        botBubble: { simulateStream: true, showAvatar: true, animate: true, avatar: 'src/assets/tree-chat.png' },
+                        userBubble: { showAvatar: true },
+                        audio: { disabled: false, defaultToggledOn: true },
+                        voice: { language: "en-US", defaultToggledOn: false, disabled: false },
+                        chatWindow: { showScrollbar: true, defaultOpen: true },
+                        chatInput: { allowNewline: true, botDelay: 500, buttons: [Button.FILE_ATTACHMENT_BUTTON, Button.EMOJI_PICKER_BUTTON, Button.VOICE_MESSAGE_BUTTON, Button.SEND_MESSAGE_BUTTON] },
+                        fileAttachment: { disabled: false, multiple: true, accept: '*', sendFileName: true, showMediaDisplay: true },
+                        header: {
+                            title: <div style={{ cursor: 'pointer', margin: '0px', paddingTop: '5px', fontSize: '16px', fontWeight: 'light' }}>Gifty</div>,
+                            avatar: 'src/assets/logo_light.png',
+                            buttons: [Button.NOTIFICATION_BUTTON, Button.CLOSE_CHAT_BUTTON]
+                        },
+                        // tooltip: {text: "Let's spread green!", mode: 'ALWAYS'},
+                        footer: {
+                            text: ''
+                        }
+                    }}
+                styles={{
+                    botBubbleStyle: {
+                        backgroundColor: '#B2E0B2', // Pistachio green (warm)
+                        color: '#1a3e1a',
+                        borderRadius: '0 18px 18px 18px',
+                    },
+                    userBubbleStyle: {
+                        backgroundColor: '#c1e1c1', // Soft lime green
+                        color: '#1a3e1a', // Dark green text
+                        borderRadius: '18px 0 18px 18px',
+                    },
+                    sendButtonStyle: {
+                        backgroundColor: '#005700'
+                    },
+                    sendButtonHoveredStyle: {
+                        backgroundColor: 'rgb(167 235 199)'
+                    },
+                    headerStyle: {
+                        backgroundImage: 'linear-gradient(to right, rgb(14 142 81), rgb(110 197 151))',
+                        padding: '8px'
+                    },
+                    chatInputContainerStyle: {
+                        padding: '0px 16px'
+                    },
+                    chatInputAreaStyle: {
                         fontFamily: 'Arial, sans-serif',
-                        showFooter: false
+                        fontSize: '15px'
                     },
-                    botBubble: { simulateStream: true, showAvatar: true, animate: true, avatar: 'src/assets/tree-chat.png' },
-                    userBubble: { showAvatar: true },
-                    audio: { disabled: false, defaultToggledOn: true },
-                    voice: { language: "en-US", defaultToggledOn: false, disabled: false },
-                    chatWindow: { showScrollbar: true, defaultOpen: true },
-                    chatInput: { allowNewline: true, botDelay: 500, buttons: [Button.FILE_ATTACHMENT_BUTTON, Button.EMOJI_PICKER_BUTTON, Button.VOICE_MESSAGE_BUTTON, Button.SEND_MESSAGE_BUTTON] },
-                    fileAttachment: { disabled: false, multiple: true, accept: '*', sendFileName: true, showMediaDisplay: true },
-                    header: {
-                        title: <div style={{ cursor: 'pointer', margin: '0px', paddingTop: '5px', fontSize: '16px', fontWeight: 'light' }}>Gifty</div>,
-                        avatar: 'src/assets/logo_light.png',
-                        buttons: [Button.NOTIFICATION_BUTTON, Button.CLOSE_CHAT_BUTTON]
-                    },
-                    // tooltip: {text: "Let's spread green!", mode: 'ALWAYS'},
-                    footer: {
-                        text: ''
-                    }
                 }}
-            styles={{
-                botBubbleStyle: {
-                    backgroundColor: '#B2E0B2', // Pistachio green (warm)
-                    color: '#1a3e1a',
-                    borderRadius: '0 18px 18px 18px',
-                },
-                userBubbleStyle: {
-                    backgroundColor: '#c1e1c1', // Soft lime green
-                    color: '#1a3e1a', // Dark green text
-                    borderRadius: '18px 0 18px 18px',
-                },
-                sendButtonStyle: {
-                    backgroundColor: '#005700'
-                },
-                sendButtonHoveredStyle: {
-                    backgroundColor: 'rgb(167 235 199)'
-                },
-                headerStyle: {
-                    backgroundImage: 'linear-gradient(to right, rgb(14 142 81), rgb(110 197 151))',
-                    padding: '8px'
-                },
-                chatInputContainerStyle: {
-                    padding: '0px 16px'
-                },
-                chatInputAreaStyle: {
-                    fontFamily: 'Arial, sans-serif',
-                    fontSize: '15px'
-                },
-            }}
-        />
+            />
+        </>
     );
 }
 
