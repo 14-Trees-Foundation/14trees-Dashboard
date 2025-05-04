@@ -16,6 +16,7 @@ import {
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import ImageIcon from "@mui/icons-material/Image";
+import HistoryIcon from "@mui/icons-material/History";
 import { type Tree } from "../../../../types/tree";
 import * as treeActionCreators from "../../../../redux/actions/treeActions";
 import * as userTreesActionCreators from "../../../../redux/actions/userTreeActions";
@@ -39,6 +40,7 @@ import { toast } from "react-toastify";
 import ApiClient from "../../../../api/apiClient/apiClient";
 import { Order } from "../../../../types/common";
 import { getHumanReadableDate } from "../../../../helpers/utils";
+import TreeAuditTable from '../../../../components/TreeAuditTable';
 
 export const TreeNew = () => {
     const dispatch = useAppDispatch();
@@ -81,6 +83,7 @@ export const TreeNew = () => {
     const [selectedPlot, setSelectedPlot] = useState<Plot | null>(null);
     const [changePlotModal, setChangePlotModal] = useState<boolean>(false);
     const [tags, setTags] = useState<string[]>([]);
+    const [selectedTreeForAudit, setSelectedTreeForAudit] = useState<Tree | null>(null);
 
     const handleSetFilters = (filters: Record<string, GridFilterItem>) => {
         setPage(0);
@@ -320,12 +323,11 @@ export const TreeNew = () => {
             width: 300,
             align: "center",
             render: (value, record, index) => (
-                <div
-                    style={{
-                        display: "flex",
-                        justifyContent: "center",
-                        alignItems: "center",
-                    }}>
+                <div style={{
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                }}>
                     <Button
                         variant="outlined"
                         style={{ margin: "0 5px" }}
@@ -333,6 +335,15 @@ export const TreeNew = () => {
                             setSelectedTreeForTimeline(record);
                         }}>
                         <ImageIcon />
+                    </Button>
+                    <Button
+                        variant="outlined"
+                        color="info"
+                        style={{ margin: "0 5px" }}
+                        onClick={() => {
+                            setSelectedTreeForAudit(record);
+                        }}>
+                        <HistoryIcon />
                     </Button>
                     <Button
                         variant="outlined"
@@ -681,6 +692,25 @@ export const TreeNew = () => {
                     >
                         Change Plot
                     </Button>
+                </DialogActions>
+            </Dialog>
+
+            <Dialog 
+                open={selectedTreeForAudit !== null} 
+                onClose={() => setSelectedTreeForAudit(null)}
+                maxWidth="md"
+                fullWidth
+            >
+                <DialogTitle>
+                    Audit History - Sapling ID: {selectedTreeForAudit?.sapling_id}
+                </DialogTitle>
+                <DialogContent>
+                    {selectedTreeForAudit && (
+                        <TreeAuditTable saplingId={selectedTreeForAudit.sapling_id} />
+                    )}
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={() => setSelectedTreeForAudit(null)}>Close</Button>
                 </DialogActions>
             </Dialog>
         </>
