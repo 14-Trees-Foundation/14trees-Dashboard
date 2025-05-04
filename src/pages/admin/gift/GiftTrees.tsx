@@ -19,7 +19,7 @@ import PlotSelection from "./Form/PlotSelection";
 import { Plot } from "../../../types/plot";
 import giftCardActionTypes from "../../../redux/actionTypes/giftCardActionTypes";
 import GiftCardRequestInfo from "./GiftCardRequestInfo";
-import GiftRequestNotes from "./Form/Notes";
+import Notes from "../../../components/Notes";
 import AlbumImageInput from "../../../components/AlbumImageInput";
 import EmailConfirmationModal from "./Form/EmailConfirmationModal";
 import EditUserDetailsModal from "./Form/EditUserDetailsModal";
@@ -32,6 +32,7 @@ import TagComponent from "./Form/TagComponent";
 import AssignTrees from "./Form/AssignTrees";
 import GiftCardCreationModal from "./Components/GiftCardCreationModal";
 import GeneralTable from "../../../components/GenTable";
+import "./GiftTrees.css";
 
 const pendingPlotSelection = 'Pending Plot & Tree(s) Reservation';
 
@@ -41,24 +42,32 @@ const calculateUnion = (plantTypes: (string[] | undefined)[]) => {
 }
 
 const TableSummary = (giftRequests: GiftCard[], selectedGiftRequestIds: number[], totalColumns: number) => {
-
+ 
     const calculateSum = (data: (number | undefined)[]) => {
         return data.reduce((a, b) => (a ?? 0) + (b ?? 0), 0);
     }    
 
     return (
-        <Table.Summary fixed='bottom'>
-            <Table.Summary.Row style={{ backgroundColor: 'rgba(172, 252, 172, 0.2)' }}>
-                <Table.Summary.Cell align="center" index={1} colSpan={5}>
-                    <strong>Total</strong>
-                </Table.Summary.Cell>
-                <Table.Summary.Cell align="center" index={3} colSpan={1}>{calculateSum(giftRequests.filter((giftRequest) => selectedGiftRequestIds.includes(giftRequest.id)).map((giftRequest) => giftRequest.no_of_cards))}</Table.Summary.Cell>
-                <Table.Summary.Cell align="center" index={10} colSpan={7}></Table.Summary.Cell>
-                <Table.Summary.Cell align="center" index={11} colSpan={1}>{calculateSum(giftRequests.filter((giftRequest) => selectedGiftRequestIds.includes(giftRequest.id)).map((giftRequest: any) => giftRequest.total_amount))}</Table.Summary.Cell>
-                <Table.Summary.Cell align="center" index={12} colSpan={1}>{calculateSum(giftRequests.filter((giftRequest) => selectedGiftRequestIds.includes(giftRequest.id)).map((giftRequest) => giftRequest.amount_received))}</Table.Summary.Cell>
-                <Table.Summary.Cell align="center" index={13} colSpan={3}></Table.Summary.Cell>
-            </Table.Summary.Row>
-        </Table.Summary>
+        <Table.Summary fixed="bottom">
+    <Table.Summary.Row style={{ backgroundColor: "rgba(172, 252, 172, 0.2)" }}>
+        <Table.Summary.Cell align="center" index={1} colSpan={5}>
+            <strong>Total</strong>
+        </Table.Summary.Cell>
+        <Table.Summary.Cell align="center" index={6}>
+        {calculateSum(giftRequests.filter((giftRequest) => selectedGiftRequestIds.includes(giftRequest.id)).map((giftRequest) => giftRequest.no_of_cards))}
+        </Table.Summary.Cell>
+
+        <Table.Summary.Cell index={7} colSpan={9}></Table.Summary.Cell>
+        <Table.Summary.Cell align="center" index={11}>
+        {calculateSum(giftRequests.filter((giftRequest) => selectedGiftRequestIds.includes(giftRequest.id)).map((giftRequest: any) => giftRequest.total_amount))}
+        </Table.Summary.Cell>
+        <Table.Summary.Cell align="center" index={12}>
+        {calculateSum(giftRequests.filter((giftRequest) => selectedGiftRequestIds.includes(giftRequest.id)).map((giftRequest) => giftRequest.amount_received))}
+        </Table.Summary.Cell>
+        <Table.Summary.Cell index={13} colSpan={4}></Table.Summary.Cell>
+    </Table.Summary.Row>
+</Table.Summary>
+
     )
 }
 
@@ -103,6 +112,9 @@ const GiftTrees: FC = () => {
     const [corporateCount, setCorporateCount] = useState(0);
     const [personalCount, setPersonalCount] = useState(0);
 
+    const [totalReceived, setTotalReceived] = useState(0);
+    const [totalAmount, setTotalAmount] = useState(0);
+
     // payment
     const [paymentModal, setPaymentModal] = useState(false);
     const [selectedPaymentGR, setSelectedPaymentGR] = useState<GiftCard | null>(null);
@@ -136,12 +148,12 @@ const GiftTrees: FC = () => {
         const handler = setTimeout(() => {
             getGiftCardData();
         }, 300)
-
+    
         return () => { clearTimeout(handler) };
     }, [filters, orderBy, auth]);
-
+    
     useEffect(() => {
-
+        
         const handler = setTimeout(() => {
 
             if (giftCardsData.loading) return;
@@ -153,17 +165,18 @@ const GiftTrees: FC = () => {
                     getGiftCardData();
                     break;
                 }
+                
 
                 const id = giftCardsData.paginationMapping[i];
                 const record = giftCardsData.giftCards[id];
                 if (record) records.push(record);
             }
-
-            setTableRows(records);
+    
+             setTableRows(records);
         }, 300)
-
+    
         return () => { clearTimeout(handler) };
-    }, [pageSize, page, giftCardsData]);
+    }, [pageSize, page, giftCardsData]);   
 
     // Chart Useffect
     useEffect(() => {
@@ -175,11 +188,28 @@ const GiftTrees: FC = () => {
         setCorporateCount(corporate);
         setPersonalCount(personal);
     }, [giftCards]);
-    
-    console.log("Gift Cards:", giftCards);
-    console.log("Corporate Count:", corporateCount);
-    console.log("Personal Count:", personalCount);
+   
 
+    useEffect(() => {
+        // Function to stop scroll propagation
+        const stopPropagation = (e: Event) => {
+            if (e instanceof WheelEvent) {
+                e.stopPropagation();
+            }
+        };
+    
+        // Prevent whole page scrolling when scrolling inside the menu
+        const menuElement = document.querySelector(".scrollable-menu");
+        if (menuElement) {
+            menuElement.addEventListener("wheel", stopPropagation as EventListener, { passive: false });
+    
+            // Cleanup function
+            return () => {
+                menuElement.removeEventListener("wheel", stopPropagation as EventListener);
+            };
+        }
+    }, []);
+    
 
     const getFilters = (filters: any) => {
         const filtersData = JSON.parse(JSON.stringify(Object.values(filters))) as GridFilterItem[];
@@ -211,14 +241,14 @@ const GiftTrees: FC = () => {
         return filtersData;
     }
 
-    const getGiftCardData = async () => {
-        // check if user logged in
-        if (!authRef.current?.signedin) return;
+const getGiftCardData = async () => {
+    // check if user logged in
+    if (!authRef.current?.signedin) return;
 
-        const filtersData = getFilters(filters);
+    const filtersData = getFilters(filters);
 
-        getGiftCards(page * pageSize, pageSize, filtersData, orderBy);
-    };
+    getGiftCards(page * pageSize, pageSize, filtersData, orderBy);
+};
 
     const getAllGiftCardsData = async () => {
         let filtersData = getFilters(filters);
@@ -226,8 +256,6 @@ const GiftTrees: FC = () => {
         const resp = await apiClient.getGiftCards(0, -1, filtersData, orderBy);
         return resp.results;
     };
-
-
     const handleSetFilters = (filters: Record<string, GridFilterItem>) => {
         setPage(0);
         setFilters(filters);
@@ -686,7 +714,7 @@ const GiftTrees: FC = () => {
     }
 
     const getActionsMenu = (record: GiftCard) => (
-        <Menu>
+        <Menu className="scrollable-menu"> {/* Added class for scrollable menu */}
             <Menu.ItemGroup>
                 <Menu.Item key="50" onClick={() => { handleModalOpenEdit(record, 2); }} icon={<Wysiwyg />}>
                     Edit Dashboard Details
@@ -747,18 +775,32 @@ const GiftTrees: FC = () => {
                     }
                 </Menu.ItemGroup>
             }
-            {(record.presentation_id || record.presentation_ids.length > 0) && <Menu.Divider style={{ backgroundColor: '#ccc' }} />}
-            {(record.presentation_id || record.presentation_ids.length > 0) && <Menu.ItemGroup>
-                {record.presentation_id && <Menu.Item key="30" onClick={() => { handleDownloadCards(record.id, record.user_name + '_' + record.no_of_cards, 'zip') }} icon={<Download />}>
-                    Download Tree Cards
-                </Menu.Item>}
-                <Menu.Item key="31" onClick={() => { window.open('https://docs.google.com/presentation/d/' + (record.presentation_id ? record.presentation_id : record.presentation_ids[0])); }} icon={<Slideshow />}>
-                    Tree Cards Slide
-                </Menu.Item>
-                <Menu.Item key="32" onClick={() => { handleUpdateGiftCardImagess(record.id) }} icon={<Photo />}>
-                    Update Cards Images
-                </Menu.Item>
-            </Menu.ItemGroup>}
+            {(record.presentation_id || record.presentation_ids?.length > 0) && (
+    <Menu.ItemGroup>
+        {record.presentation_id && (
+            <Menu.Item key="30" onClick={() => { handleDownloadCards(record.id, record.user_name + '_' + record.no_of_cards, 'zip') }} icon={<Download />}>
+                Download Tree Cards
+            </Menu.Item>
+        )}
+        {/* Submenu for multiple presentation links */}
+        {record.presentation_ids?.length > 1 ? (
+            <Menu.SubMenu key="31" title="Tree Card Slides" icon={<Slideshow />}popupOffset={[20, 5]}popupClassName="custom-submenu">
+                {record.presentation_ids.map((id: string, index: number) => (
+                    <Menu.Item key={`31-${index}`} onClick={() => { window.open(`https://docs.google.com/presentation/d/${id}`); }}>
+                        Presentation {index + 1}
+                    </Menu.Item>
+                ))}
+            </Menu.SubMenu>
+        ) : (
+            <Menu.Item key="31" onClick={() => { window.open('https://docs.google.com/presentation/d/' + (record.presentation_id ? record.presentation_id : record.presentation_ids[0])); }} icon={<Slideshow />}>
+                Tree Cards Slide
+            </Menu.Item>
+        )}
+        <Menu.Item key="32" onClick={() => { handleUpdateGiftCardImagess(record.id) }} icon={<Photo />}>
+            Update Cards Images
+        </Menu.Item>
+    </Menu.ItemGroup>
+)}
             {!auth.roles.includes(UserRoles.User) && <Menu.Divider style={{ backgroundColor: '#ccc' }} />}
             {!auth.roles.includes(UserRoles.User) && <Menu.ItemGroup>
                 <Menu.Item key="40" onClick={() => { setBookNonGiftable(record.request_type === GiftRequestType_NORAML_ASSIGNMENT ? true : false); setSelectedGiftCard(record); setPlotModal(true); }} icon={<Landscape />}>
@@ -965,7 +1007,6 @@ const GiftTrees: FC = () => {
             ...getColumnDateFilter({ dataIndex: 'created_at', filters, handleSetFilters, label: 'Created' })
         },
     ]
-
     return (
         <div>
             <ToastContainer />
@@ -1158,7 +1199,7 @@ const GiftTrees: FC = () => {
                 data={selectedGiftCard}
             />
 
-            <GiftRequestNotes
+            <Notes
                 open={notesModal}
                 handleClose={() => { setNotesModal(false) }}
                 onSave={handleNotesSave}

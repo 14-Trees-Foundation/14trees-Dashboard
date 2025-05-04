@@ -27,26 +27,28 @@ const BookedTrees: React.FC<BookedTreesProps> = ({ giftCardRequestId, visible, o
     const [unMapConfirmation, setUnMapConfirmation] = useState(false);
     const [unMapAllConfirmation, setUnMapAllConfirmation] = useState(false);
 
-    const getBookedTrees = async (giftRequestId: number) => {
+    const getBookedTrees = async (giftRequestId: number, page: number, pageSize: number, filters?: Record<string, GridFilterItem>) => {
         setLoading(true);
         try {
             const apiClient = new ApiClient();
-            const bookedTreesResp = await apiClient.getBookedGiftTrees(giftRequestId, 0, -1);
+            const filtersArray = filters ? Object.values(filters) : undefined;
+            const bookedTreesResp = await apiClient.getBookedGiftTrees(giftRequestId, page * pageSize, pageSize, filtersArray);
             setExistingBookedTrees(bookedTreesResp.results.map(item => ({ ...item, key: item.id })));
         } catch (error: any) {
             toast.error(error.message);
         }
         setLoading(false);
-    }
+    };
 
     useEffect(() => {
-        getBookedTrees(giftCardRequestId);
-    }, [giftCardRequestId])
-
-    const handleSetFilters = (filters: Record<string, GridFilterItem>) => {
-        setPage(0);
-        setFilters(filters);
-    }
+        getBookedTrees(giftCardRequestId, page, pageSize, filters);
+    }, [giftCardRequestId, page, pageSize, filters]); // Fetch data when filters, page, or pageSize changes
+    
+    
+    const handleSetFilters = (newFilters: Record<string, GridFilterItem>) => {
+        setPage(0); // Reset to the first page when filters change
+        setFilters(newFilters); // Update filters state
+    };
 
     const columns: TableColumnsType<GiftCardUser> = [
         {
@@ -55,7 +57,7 @@ const BookedTrees: React.FC<BookedTreesProps> = ({ giftCardRequestId, visible, o
             title: "Sapling ID",
             align: "center",
             width: 120,
-            // ...getColumnSearchProps('sapling_id', filters, handleSetFilters)
+            ...getColumnSearchProps('sapling_id', filters, handleSetFilters)
         },
         {
             dataIndex: "plant_type",
@@ -63,7 +65,7 @@ const BookedTrees: React.FC<BookedTreesProps> = ({ giftCardRequestId, visible, o
             title: "Plant Type",
             align: "center",
             width: 200,
-            // ...getColumnSearchProps('plant_type', filters, handleSetFilters)
+            ...getColumnSearchProps('plant_type', filters, handleSetFilters)
         },
         {
             dataIndex: "recipient_name",
@@ -71,7 +73,7 @@ const BookedTrees: React.FC<BookedTreesProps> = ({ giftCardRequestId, visible, o
             title: "Recipient",
             align: "center",
             width: 200,
-            // ...getColumnSearchProps('recipient_name', filters, handleSetFilters)
+            ...getColumnSearchProps('recipient_name', filters, handleSetFilters)
         },
         {
             dataIndex: "assignee_name",
@@ -79,7 +81,7 @@ const BookedTrees: React.FC<BookedTreesProps> = ({ giftCardRequestId, visible, o
             title: "Assignee",
             align: "center",
             width: 200,
-            // ...getColumnSearchProps('assignee_name', filters, handleSetFilters)
+            ...getColumnSearchProps('assignee_name', filters, handleSetFilters)
         },
     ];
 
@@ -141,10 +143,10 @@ const BookedTrees: React.FC<BookedTreesProps> = ({ giftCardRequestId, visible, o
             </Box>
             <GeneralTable
                 loading={loading}
-                rows={existingBookedTrees.slice(page * pageSize, (page + 1) * pageSize)}
+                rows={existingBookedTrees}
                 columns={columns}
-                totalRecords={existingBookedTrees.length}
-                page={page}
+                totalRecords={existingBookedTrees.length} 
+                page={page + 1}
                 pageSize={pageSize}
                 onSelectionChanges={handleSelectionChanges}
                 onPaginationChange={handlePaginationChange}
