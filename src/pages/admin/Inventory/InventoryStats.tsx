@@ -338,11 +338,10 @@ const InventoryStats: FC = () => {
             </Box>
 
             <Box
+                className={"no-scrollbar"}
                 style={{
                     height: '65vh',
                     overflowY: 'scroll',
-                    scrollbarWidth: 'none', // For Firefox
-                   // '&::-webkit-scrollbar': { display: 'none' } // For Chrome, Safari
                 }}
             >
                 <Box>

@@ -30,8 +30,8 @@ export const UserList = () => {
       <div>
         <div className={classes.header}>
           <div className={classes.itemlong}>Name</div>
-          <div className={classes.itemshort}>Trees Assigned</div>
           <div className={classes.itemshort}>Trees Sponsored</div>
+          <div className={classes.itemshort}>Trees Assigned</div>
           <div className={classes.itemshort}></div>
           <div className={classes.itemshort}></div>
         </div>

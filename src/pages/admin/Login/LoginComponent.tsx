@@ -36,7 +36,7 @@ export const LoginComponent = () => {
   const textStyle = { margin: "8px auto" };
   const btnstyle = { margin: "8px 0" };
 
-  let from = (location.state as any)?.from?.pathname;
+  let from = (location.state as any)?.from?.pathname + (location.state as any)?.from?.search;;
 
   const responseGoogle = async (response: any) => {
     try {

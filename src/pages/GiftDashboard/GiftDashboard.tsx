@@ -27,12 +27,6 @@ const GiftDashboard: React.FC = () => {
     const [loading, setLoading] = useState(true);
     const [status, setStatus] = useState<{ code: number, message: string, view_name: string }>({ code: 404, message: '', view_name: '' })
 
-    let auth = useAuth();
-    useEffect(() => {
-        auth.signin("User", 13124, ["all"], ["super-admin"], "", () => { })
-        localStorage.setItem("userId", "13124");
-    }, [])
-
     useEffect(() => {
         if (userId && !isNaN(parseInt(userId))) {
             setSponsorId(parseInt(userId));
@@ -55,7 +49,7 @@ const GiftDashboard: React.FC = () => {
             try {
                 const viewId = searchParams.get('v') || '';
                 const apiClient = new ApiClient();
-                const resp = await apiClient.verifyViewAccess(viewId, auth.userId, location.pathname);
+                const resp = await apiClient.verifyViewAccess(viewId, Number(userId) || 0, location.pathname);
                 setStatus(resp);
             } catch (error: any) {
                 toast.error(error.message);
@@ -67,7 +61,7 @@ const GiftDashboard: React.FC = () => {
             clearTimeout(intervalId);
         }
 
-    }, [auth, location])
+    }, [location])
 
     const items = [
         {

@@ -131,6 +131,10 @@ export const Admin = () => {
       displayName: "Gift Cards",
     },
     {
+      page: CSRInventory,
+      displayName: "CSR Analytics",
+    },
+    {
       page: Images,
       displayName: "Images",
     },

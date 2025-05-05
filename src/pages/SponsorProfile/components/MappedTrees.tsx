@@ -128,11 +128,10 @@ const MappedTrees: React.FC<MappedTreesProps> = ({ }) => {
             <Box
                 mt={1}
                 padding="0 50px"
+                className={"no-scrollbar"}
                 style={{
                     height: '83vh',
                     overflowY: 'scroll',
-                    scrollbarWidth: 'none', // For Firefox
-                   // '&::-webkit-scrollbar': { display: 'none' } // For Chrome, Safari
                 }}
             >
                 <CardGrid

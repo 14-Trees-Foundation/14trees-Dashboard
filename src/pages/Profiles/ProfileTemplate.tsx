@@ -84,7 +84,7 @@ const ProfileTemplate: FC<ProfileTemplateProps> = ({ title, children }) => {
         }
     ]
 
-    //setActivities(activities);
+    setActivities(activities);
 
     return (
         <Box style={{ display: "flex" }} >
