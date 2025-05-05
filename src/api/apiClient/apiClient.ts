@@ -5,7 +5,7 @@ import { BulkUserGroupMappingResponse, Group } from '../../types/Group';
 import { Pond, PondWaterLevelUpdate } from '../../types/pond';
 import { User } from '../../types/user';
 import { Site } from '../../types/site';
-import { Donation } from '../../types/donation';
+import { Donation, DonationTree, DonationUser } from '../../types/donation';
 import { OnsiteStaff } from '../../types/onSiteStaff';
 import { MapTreesUsingPlotIdRequest, MapTreesUsingSaplingIdsRequest, Tree } from '../../types/tree';
 import { UserTree, UserTreeCountPaginationResponse } from '../../types/userTree';
@@ -27,7 +27,7 @@ class ApiClient {
     private token: string | null;
 
     constructor() {
-        const baseURL = process.env.REACT_APP_BASE_URL;
+        const baseURL = import.meta.env.VITE_APP_BASE_URL;
         this.api = axios.create({
             baseURL: baseURL,
         });
@@ -326,14 +326,31 @@ class ApiClient {
         Model- Group: CRUD Operations/Apis for organizations
     */
 
-    async getGroups(offset: number, limit: number, filters?: any[]): Promise<PaginatedResponse<Group>> {
+    async getGroups(offset: number, limit: number, filters?: any[], orderBy?: Order[]): Promise<PaginatedResponse<Group>> {
         const url = `/groups/get?offset=${offset}&limit=${limit}`;
         try {
-            const response = await this.api.post<PaginatedResponse<Group>>(url, { filters });
+            // Validate filters to make sure they don't contain null or undefined values
+            const validatedFilters = filters?.filter(filter => 
+                filter && 
+                filter.columnField && 
+                filter.operatorValue &&
+                filter.value !== undefined && 
+                filter.value !== null
+            ) || [];
+            
+            const response = await this.api.post<PaginatedResponse<Group>>(url, { 
+                filters: validatedFilters, 
+                order_by: orderBy 
+            });
             return response.data;
         } catch (error: any) {
-            console.error(error)
-            throw new Error(`Failed to fetch groups: ${error.message}`);
+            console.error("Error fetching groups:", error);
+            // Return empty results instead of throwing to prevent breaking the UI
+            return {
+                offset: offset,
+                total: 0,
+                results: []
+            };
         }
     }
 
@@ -400,6 +417,17 @@ class ApiClient {
         } catch (error: any) {
             console.error(error)
             throw new Error(`Failed to fetch groups: ${error.message}`);
+        }
+    }
+
+    async mergeGroups(primary_group: number, secondary_group: number, delete_secondary: boolean): Promise<void> {
+        try {
+            await this.api.post<any>(`/groups/merge`, { primary_group, secondary_group, delete_secondary });
+        } catch (error: any) {
+            if (error?.response?.data?.message) {
+                throw new Error(error.response.data.message);
+            }
+            throw new Error('Failed to merge groups!');
         }
     }
 
@@ -1180,36 +1208,92 @@ class ApiClient {
        Model- Donation: CRUD Operations/Apis for Donations
    */
 
-    async getDonations(offset: number, limit: number, filters?: any[]): Promise<PaginatedResponse<Donation>> {
-        const url = `/donations/get?offset=${offset}&limit=${limit}`;
+       async getDonations(offset: number, limit: number, filters?: any[], order_by?: Order[]): Promise<PaginatedResponse<Donation>> {
+        const url = `/donations/requests/get?offset=${offset}&limit=${limit}`; // No need to add query params since it's a POST request
+    
         try {
-            const response = await this.api.post<PaginatedResponse<Donation>>(url, { filters: filters });
-            console.log("Response in api client: ", response);
+            const response = await this.api.post<PaginatedResponse<Donation>>(url, { 
+                filters: filters || [],
+                order_by: order_by || []
+            });
+    
             return response.data;
         } catch (error: any) {
-            console.error(error)
-            throw new Error(`Failed to fetch donations: ${error.message}`);
+            if (error.response?.data?.message) {
+                throw new Error(error.response.data.message);
+            }
+            throw new Error("Failed to fetch donations");
+        }
+    }
+    
+    async getDonationTags(): Promise<PaginatedResponse<string>> {
+        const url = `/donations/tags`;
+        try {
+            const response = await this.api.get<PaginatedResponse<string>>(url);
+            return response.data;
+        } catch (error: any) {
+            throw new Error(`Failed to fetch donation tags: ${error.message}`);
         }
     }
 
-
-    async createDonation(data: Donation): Promise<Donation> {
+    async createDonation(request_id: string, created_by: number, user_id: number, pledged: number | null, pledged_area: number | null, category: string, grove: string | null, preference: string, event_name: string, alternate_email: string, users: any[], payment_id?: number, group_id?: number, logo?: string | null): Promise<Donation> {
         try {
-            const response = await this.api.post<Donation>(`/donations`, data);
+            const response = await this.api.post<Donation>(`/donations`, { request_id, created_by, user_id, pledged, pledged_area, category, group_id, logo, grove, payment_id, users, preference, event_name, alternate_email });
             return response.data;
-        } catch (error) {
-            console.error(error)
+        } catch (error: any) {
+            if (error.response?.data?.message) {
+                throw new Error(error.response.data.message);
+            }
             throw new Error('Failed to create Donation');
         }
     }
 
 
-    async updateDonation(data: Donation): Promise<Donation> {
+    async updateDonation(donation: Donation, users: any): Promise<Donation> {
         try {
-            const response = await this.api.put<Donation>(`/donations/${data.id}`, data);
+            // Extract the fields that we want to update
+            const updateFields = [
+                'user_id', 
+                'payment_id',
+                'category',
+                'grove',
+                'grove_type_other',
+                'trees_count',
+                'contribution_options',
+                'names_for_plantation',
+                'comments',
+                'pledged',
+                'pledged_area',
+                'group_id',
+                'preference',
+                'event_name',
+                'alternate_email',
+                'tags'
+            ];
+            
+            // Format request to match backend expectations
+            const payload = {
+                updateFields: updateFields,
+                data: donation,
+                users: users
+            };
+            
+            console.log("Sending donation update payload:", payload);
+            const response = await this.api.put<Donation>(`/donations/requests/${donation.id}`, payload);
             return response.data;
         } catch (error: any) {
-            console.error(error)
+            console.error("Update donation error:", error);
+            if (error.response?.data?.message) {
+                throw new Error(error.response.data.message);
+            }
+            throw new Error('Failed to update donation');
+        }
+    }
+
+    async updateDonationFeedback(request_id: string, feedback: string, source_info: string): Promise<void> {
+        try {
+            await this.api.post<void>(`/donations/update-feedback`, { request_id, feedback, source_info });
+        } catch (error: any) {
             if (error.response) {
                 throw new Error(error.response.data.message);
             }
@@ -1219,21 +1303,11 @@ class ApiClient {
 
     async deleteDonation(data: Donation): Promise<number> {
         try {
-            await this.api.delete<any>(`/donations/${data.id}`);
+            await this.api.delete<any>(`/donations/requests/${data.id}`);
             return data.id;
         } catch (error) {
             console.error(error)
             throw new Error('Failed to delete Donation');
-        }
-    }
-
-    async assignTreesToDonation(donationId: number): Promise<boolean> {
-        try {
-            const response = await this.api.post<void>(`/profile/assignbulk/${donationId}`);
-            return response.status === 200;
-        } catch (error: any) {
-            console.error(error)
-            throw new Error(error?.response?.data?.message || 'Failed to assign trees to donation users');
         }
     }
 
@@ -1247,9 +1321,191 @@ class ApiClient {
         }
     }
 
+    async getDonationUsers(offset: number, limit: number, filters?: any[], order_by?: Order[]): Promise<PaginatedResponse<DonationUser>> {
+        try {     
+
+            const response = await this.api.post<PaginatedResponse<DonationUser>>(
+                `/donations/users/get?offset=${offset}&limit=${limit}`, 
+                { filters, order_by }
+            );
+            
+            return response.data;
+        } catch (error: any) {
+            if (error.response?.data?.message) {
+                throw new Error(error.response.data.message);
+            }
+            throw new Error('Failed to fetch recipient users for donation!');
+        }
+    }
+
+    async reserveTreesForDonation(donation_id: number, tree_ids: number[], auto_reserve: boolean, plots: { plot_id: number, trees_count: number }[], diversify: boolean, book_all_habits: boolean = false) {
+        try {
+            await this.api.post<void>('/donations/trees/reserve', { donation_id, tree_ids, auto_reserve, plots, diversify, book_all_habits });
+        } catch (error: any) {
+          if (error.response?.data?.message) {
+            throw new Error(error.response.data.message);
+          }
+          throw new Error('Failed to reserve trees for donation!');
+        }
+    }
+
+    async unreserveTreesForDonation(donation_id: number, tree_ids?: number[], unreserve_all: boolean = false): Promise<void> {
+        const url = `/donations/trees/unreserve`;
+        try {
+            const response = await this.api.post(url, { donation_id, tree_ids, unreserve_all });
+            return response.data;
+        } catch (error: any) {
+            if (error.response?.data?.message) {
+                throw new Error(error.response.data.message);
+            }
+            throw new Error('Failed to unreserve trees for donation');
+        }
+    }
+
+    async sendAckEmailToDonor(donation_id: number, test_mails: string[], cc_mails: string[]) {
+        try {
+            await this.api.post<void>(`/donations/emails/ack`, { donation_id, test_mails, cc_mails });
+        } catch (error: any) {
+            if (error.response?.data?.message) {
+                throw new Error(error.response.data.message);
+            }
+            throw new Error('Failed to send acknowledgement email!');
+        }
+    }
+
+    
+    async updateDonationUser(data: any): Promise<any> {
+        try {
+            // Extract the donation ID
+            let donationId = data.donation_id;
+            if (!donationId) {
+                throw new Error('Missing donation_id');
+            }
+            
+            // Format the user data according to what the backend expects
+            // The backend expects recipient/assignee IDs to be included if they exist
+            const userPayload = {
+                id: data.id,
+                // Here we extract the fields the backend needs
+                recipient: data.recipient, // Keep recipient ID if available
+                assignee: data.assignee, // Keep assignee ID if available
+                recipient_name: data.recipient_name,
+                recipient_email: data.recipient_email,
+                recipient_phone: data.recipient_phone || '',
+                assignee_name: data.assignee_name,
+                assignee_email: data.assignee_email,
+                assignee_phone: data.assignee_phone || '',
+                relation: data.relation || '',
+                trees_count: data.trees_count || data.gifted_trees || 1,
+                profile_image_url: data.profile_image_url || null
+            };
+            
+            // Prepare the payload in the format expected by the backend
+            const payload = {
+                donation_id: donationId,
+                user: userPayload
+            };
+            
+            console.log('Updating donation user:', payload);
+            
+            // Use the PUT /donations/users endpoint that the backend expects
+            const response = await this.api.put('/donations/users', payload);
+            return response.data;
+        } catch (error: any) {
+            console.error('Error updating donation user:', error);
+            if (error.response?.data?.message) {
+                throw new Error(error.response.data.message);
+            }
+            throw new Error('Failed to update donation user');
+        }
+    }
+
+    async createDonationUser(data: any): Promise<any> {
+        try {
+            // Extract the donation ID
+            let donationId = data.donation_id;
+            if (!donationId) {
+                throw new Error('Missing donation_id');
+            }
+            
+            // Format the user data according to what the backend expects
+            const userPayload = {
+                // No ID for new user
+                recipient_name: data.recipient_name,
+                recipient_email: data.recipient_email,
+                recipient_phone: data.recipient_phone || '',
+                assignee_name: data.assignee_name || data.recipient_name,
+                assignee_email: data.assignee_email || data.recipient_email,
+                assignee_phone: data.assignee_phone || data.recipient_phone || '',
+                relation: data.relation || '',
+                // Use trees_count as the primary field name for consistency
+                trees_count: data.trees_count || data.gifted_trees || 1,
+                profile_image_url: data.profile_image_url || null
+            };
+            
+            // Prepare the payload in the format expected by the backend
+            const payload = {
+                donation_id: donationId,
+                user: userPayload
+            };
+            
+            console.log('Creating donation user:', payload);
+            
+            // Use the existing PUT /donations/users endpoint that also handles creation
+            // The backend determines if it's a create or update based on whether there's an ID
+            const response = await this.api.put('/donations/users', payload);
+            return response.data;
+        } catch (error: any) {
+            console.error('Error creating donation user:', error);
+            if (error.response?.data?.message) {
+                throw new Error(error.response.data.message);
+            }
+            throw new Error('Failed to create donation user');
+        }
+    }
+
+
+    async getDonationTrees(offset: number, limit: number, filters?: any[]): Promise<PaginatedResponse<DonationTree>> {
+        const url = `/donations/trees/get?offset=${offset}&limit=${limit}`;
+        try {
+            const response = await this.api.post<PaginatedResponse<DonationTree>>(url, { filters: filters });
+            return response.data;
+        } catch (error: any) {
+            if (error.response?.data?.message) {
+                throw new Error(error.response.data.message);
+            }
+            throw new Error('Failed to get donation trees');
+        }
+    }
+
+
+    async assignTreesToDonationUsers(donation_id: number, auto_assign: boolean, user_trees?: { du_id: number, tree_id: number }[]): Promise<boolean> {
+        try {
+            const response = await this.api.post<void>(`/donations/trees/assign`, { donation_id, auto_assign, user_trees });
+            return response.status === 200;
+        } catch (error: any) {
+            if (error.response?.data?.message) {
+                throw new Error(error.response.data.message);
+            }
+            throw new Error('Failed to assign trees to donation users');
+        }
+    }
+
+    async unassignDonationTrees(donation_id: number, unassign_all: boolean, tree_ids: number[]): Promise<boolean> {
+        try {
+            const response = await this.api.post<void>(`/donations/trees/unassign`, { donation_id, unassign_all, tree_ids });
+            return response.status === 200;
+        } catch (error: any) {
+            if (error.response?.data?.message) {
+                throw new Error(error.response.data.message);
+            }
+            throw new Error('Failed to unassign trees from donation users');
+        }
+    }
+
     /*
-          Model- Event : CRUD Operations/Apis for Event
-      */
+        Model- Event : CRUD Operations/Apis for Event
+    */
 
     async getEvents(offset: number, limit: number, filters?: any[]): Promise<PaginatedResponse<Event>> {
         const url = `/events/get?offset=${offset}&limit=${limit}`;
@@ -2078,8 +2334,27 @@ class ApiClient {
             throw new Error('Failed to update permission details');
         }
     }
-}
 
+    /**
+     * Gen AI
+     */
+    async serveUserQuery(message: string, history: any[]): Promise<{text_output: string, sponsor_details?: any}> {
+        try {
+            const response = await this.api.post<{text_output: string, sponsor_details: any}>(`/gift-cards/gen-ai`, { message, history }, {
+                headers: {
+                    "x-access-token": this.token,
+                    "content-type": "application/json",
+                }
+            });
+            return response.data;
+        } catch (error: any) {
+            if (error.response) {
+                throw new Error(error.response.data.message);
+            }
+            throw new Error('Failed to connect with our AI bot!');
+        }
+    }
+}
 
 
 // new function to fetch data form localStorage

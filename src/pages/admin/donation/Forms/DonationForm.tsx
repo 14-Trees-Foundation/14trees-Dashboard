@@ -5,65 +5,291 @@ import { Button, Dialog, DialogTitle } from "@mui/material";
 import { Steps } from "antd";
 import DonorUserForm from "./DonorUserForm";
 import TreePlantationForm from "./TreePlantationForm";
-import PaymentForm from "./PaymentForm";
+import DonorGroupForm from "./DonorGroupForm";
+import { Group } from "../../../../types/Group";
+import PaymentForm from "../../../../components/payment/PaymentForm";
+import { Payment } from "../../../../types/payment";
+import { BulkUserForm } from "./UserDetails";
+import ApiClient from "../../../../api/apiClient/apiClient";
+import { AWSUtils } from "../../../../helpers/aws";
+import { Donation } from "../../../../types/donation";
+import DonorPreferencesFrom from "./DonorPreferencesForm";
+import DonorDetailsForm from "./DonorDetailsForm";
 
 interface DonationFormProps {
+    donation: Donation | null,
     open: boolean
+    requestId: string | null
     handleClose: () => void
+    onSubmit: (user: User, group: Group | null, pledged: number | null, pledgedArea: number | null, category: string, grove: string | null, preference: string, eventName: string, alternateEmail: string, users: any[], paymentId?: number, logo?: string | null) => void
 }
 
-const DonationForm: React.FC<DonationFormProps> = ({ open, handleClose }) => {
+const DonationForm: React.FC<DonationFormProps> = ({ donation, open, requestId, handleClose, onSubmit }) => {
 
     const [currentStep, setCurrentStep] = useState(0);
     const [user, setUser] = useState<User | null>(null);
     const [category, setCategory] = useState<string>('Foundation');
     const [grove, setGrove] = useState<string | null>(null);
     const [pledged, setPledged] = useState<number>(14);
-    const [userVisit, setUserVisit] = useState(true);
+    const [pledgedArea, setPledgedArea] = useState<number>(5);
+    const [pledgedType, setPledgedType] = useState<"trees" | "acres">("acres");
     const [donorType, setDonorType] = useState<string>("Indian Citizen");
-    const [paymentMethod, setPaymentMethod] = useState<string>("UPI");
     const [panNumber, setPanNumber] = useState<string | null>(null);
+    const [consent, setConsent] = useState(false);
+    const [group, setGroup] = useState<Group | null>(null);
+    const [groupAddress, setGroupAddress] = useState<string>('');
+    const [file, setFile] = useState<File | null>(null);
+    const [users, setUsers] = useState<any[]>([]);
+    const [logo, setLogo] = useState<File | null>(null);
+    const [logoString, setLogoString] = useState<string | null>(null);
+    const [payment, setPayment] = useState<Payment | null>(null);
+    const [preference, setPreference] = useState<string>('');
+    const [eventName, setEventName] = useState<string>('');
+    const [alternateEmail, setAlternateEmail] = useState<string>('');
+
+    useEffect(() => {
+        const uploadFile = async () => {
+            if (logo && requestId) {
+                const awsUtils = new AWSUtils();
+                const location = await awsUtils.uploadFileToS3('gift-request', logo, requestId);
+                setLogoString(location);
+            } else {
+                setLogoString(null);
+            }
+        }
+
+        uploadFile();
+    }, [logo, requestId])
+
+    const getDonationDetails = async () => {
+        const apiClient = new ApiClient();
+        if (donation) {
+            try {
+                const userResp = await apiClient.getUsers(0, 1, [{ columnField: 'id', operatorValue: 'equals', value: donation.user_id }]);
+                if (userResp.results.length === 1) setUser(userResp.results[0]);
+            } catch (error) {
+                console.error("Failed to fetch user data:", error);
+                toast.error("Error loading user data");
+            }
+
+            if (donation.group_id) {
+                try {
+                    const groupResp = await apiClient.getGroups(0, 1, [{ columnField: 'id', operatorValue: 'equals', value: donation.group_id }]);
+                    if (groupResp.results.length === 1) {
+                        setGroup(groupResp.results[0]);
+                        setGroupAddress(groupResp.results[0].address || '');
+                        setLogoString(groupResp.results[0].logo_url);
+                    }
+                } catch (error) {
+                    console.error("Failed to fetch group data:", error);
+                    toast.error("Error loading group data, but you can continue editing");
+                    // Set group to null so form can still work
+                    setGroup(null);
+                }
+            }
+
+            setCategory(donation.category);
+            setGrove(donation.grove || '');
+            setPledged(donation.pledged || 0);
+            setPledgedArea(donation.pledged_area || 0);
+            setPledgedType(donation.pledged ? "trees" : "acres")
+            setPreference(donation.preference || '');
+            setEventName(donation.event_name || '');
+            setAlternateEmail(donation.alternate_email || '');
+
+            if (donation.payment_id) {
+                try {
+                    const payment = await apiClient.getPayment(donation.payment_id);
+                    setPayment(payment);
+                    setPanNumber(payment.pan_number);
+                } catch (error) {
+                    console.error("Failed to fetch payment data:", error);
+                    toast.error("Error loading payment data");
+                }
+            }
+
+            try {
+                const users = await apiClient.getDonationUsers(0, -1, [
+                    { columnField: 'donation_id', operatorValue: 'equals', value: donation.id }
+                ]);
+                const usersData: any[] = users.results.map(user => {
+                    return {
+                        ...user,
+                        key: user.id,
+                        count: user.gifted_trees,
+                        image: user.profile_image_url ? true : undefined,
+                        image_name: user.profile_image_url ? user.profile_image_url.split("/").slice(-1)[0] : undefined,
+                        image_url: user.profile_image_url,
+                        editable: true,
+                    }
+                })
+                setUsers(usersData);
+            } catch (error) {
+                console.error("Failed to fetch donation users:", error);
+                toast.error("Error loading recipient data");
+            }
+        }
+    }
+
+    useEffect(() => {
+        if (open) getDonationDetails();
+    }, [open, donation])
 
     const steps = [
         {
             key: 0,
             title: "Donor Details",
-            content: <DonorUserForm user={user} onSelect={user => setUser(user)} />,
+            content: <DonorDetailsForm
+                user={user}
+                onUserSelect={user => setUser(user)}
+                group={group}
+                onGroupSelect={group => { setGroup(group); }}
+                logo={logo ?? logoString}
+                onLogoChange={file => { setLogo(file); }}
+                address=""
+                onAddressChange={() => {}}
+            />,
         },
         {
             key: 1,
             title: "Tree Plantation",
-            content: <TreePlantationForm 
+            content: <TreePlantationForm
                 category={category}
                 grove={grove}
                 pledged={pledged}
-                userVisit={userVisit}
-                onCategoryChange={category => setCategory(category) }
-                onGroveChange={grove => setGrove(grove) }
-                onPledgedChange={pledged => setPledged(pledged) }
-                onUserVisitChange={userVisit => setUserVisit(userVisit) }
+                pledgedArea={pledgedArea}
+                pledgedType={pledgedType}
+                onCategoryChange={category => setCategory(category)}
+                onGroveChange={grove => setGrove(grove)}
+                onPledgedChange={(type: "trees" | "acres", pledged: number) => {
+                    setPledgedType(type);
+                    type === "acres" ? setPledgedArea(pledged) : setPledged(pledged);
+                }}
             />,
         },
         {
             key: 2,
+            title: "Preferences",
+            content: <DonorPreferencesFrom
+                eventName={eventName}
+                alternateEmail={alternateEmail}
+                preference={preference}
+                onPreferenceChange={preference => { setPreference(preference); }}
+                onEventNameChange={eventName => { setEventName(eventName); }}
+                onAlternateEmailChange={email => { setAlternateEmail(email); }}
+            />,
+        },
+        {
+            key: 3,
             title: "Payment Details",
-            content: <PaymentForm 
-                donorType={donorType}
-                paymentMethod={paymentMethod}
-                panNumber={panNumber}
-                onDonorTypeChange={donorType => { setDonorType(donorType) }}
-                onPaymentMethodChange={paymentMethod => { setPaymentMethod(paymentMethod) }}
-                onPanNumberChange={panNumber => { setPanNumber(panNumber) }}
+            content: <PaymentForm
+                amount={pledged * (category === "Foundation" ? 3000 : 1500)}
+                onChange={(donorType: string, panNumber: string | null, consent: boolean) => { setDonorType(donorType); setPanNumber(panNumber); setConsent(consent); }}
+                onPaymentChange={payment => { setPayment(payment) }}
+                payment={payment}
+            />,
+        },
+        {
+            key: 4,
+            title: "Recipient Details",
+            content: <BulkUserForm
+                users={users}
+                onUsersChange={users => { setUsers(users) }}
+                requestId={''}
+                onFileChange={file => { setFile(file) }}
+                treeCount={pledged}
             />,
         },
     ]
 
-    const handleSubmit = () => {
+    const handleSubmit = async () => {
+        if (!user) {
+            toast.error("User details are required");
+            return;
+        }
+        
+        try {
+            const apiClient = new ApiClient();
+            const amount = pledged * (category === "Foundation" ? 3000 : 1500);
+            let paymentId = payment ? payment.id : undefined;
+            
+            if (!payment) {
+                try {
+                    const payment = await apiClient.createPayment(amount, donorType, panNumber, consent);
+                    paymentId = payment.id;
+                } catch (error) {
+                    console.error("Failed to create payment:", error);
+                    toast.error("Error creating payment, but continuing with donation");
+                }
+            } else {
+                const data = {
+                    ...payment,
+                };
 
-        handleCloseForm();
+                if (payment.amount !== amount || payment.pan_number !== panNumber || payment.donor_type !== donorType) {
+                    if (payment.amount !== amount) data.amount = amount;
+                    if (payment.pan_number !== panNumber) data.pan_number = panNumber;
+                    if (payment.donor_type !== donorType) data.donor_type = donorType;
+
+                    try {
+                        await apiClient.updatedPayment(data);
+                    } catch (error) {
+                        console.error("Failed to update payment:", error);
+                        toast.error("Error updating payment, but continuing with donation");
+                    }
+                }
+            }
+
+            onSubmit(user, group, pledgedType === "trees" ? pledged : null, pledgedType === "acres" ? pledgedArea : null, category, grove, preference, eventName, alternateEmail, users, paymentId, logoString);
+
+            if (group) {
+                const data = { ...group };
+                let change = false;
+                if (groupAddress.trim() === '' && group.address !== null) {
+                    data.address = null;
+                    change = true;
+                }
+                if (logoString !== group.logo_url) {
+                    data.logo_url = logoString;
+                    change = true;
+                }
+
+                if (change) {
+                    try {
+                        await apiClient.updateGroup(data);
+                    } catch (error) {
+                        console.error("Failed to update group:", error);
+                        toast.error("Error updating group details");
+                    }
+                }
+            }
+            
+            handleCloseForm();
+        } catch (error) {
+            console.error("Error in handleSubmit:", error);
+            toast.error("An error occurred while saving the donation");
+        }
     }
 
     const handleCloseForm = () => {
+        setCurrentStep(0);
+        setUser(null);
+        setGroup(null);
+        setPanNumber(null);
+        setCategory("Foundation");
+        setFile(null);
+        setLogo(null);
+        setLogoString(null);
+        setUsers([]);
+        setEventName('');
+        setAlternateEmail('');
+        setPreference('');
+        setPayment(null);
+        setGroup(null);
+        setConsent(false);
+        setPledgedType("acres");
+        setPledgedArea(5);
+        setPledged(14);
         handleClose();
     }
 
@@ -75,10 +301,9 @@ const DonationForm: React.FC<DonationFormProps> = ({ open, handleClose }) => {
                 else nextStep = 1;
                 break;
             case 1:
-                nextStep = 2;
-                break;
             case 2:
-                nextStep = 3;
+            case 3:
+                nextStep += 1;
                 break;
             default:
                 break;

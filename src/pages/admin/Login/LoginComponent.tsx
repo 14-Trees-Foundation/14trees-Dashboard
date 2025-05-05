@@ -65,7 +65,6 @@ export const LoginComponent = () => {
         );
         localStorage.setItem("token", JSON.stringify(res.data.token));
         localStorage.setItem("roles", JSON.stringify(roles));
-        localStorage.setItem("userId", res.data.user.id.toString());
         auth.signin(
           res.data.user.name,
           res.data.user.id,
@@ -205,7 +204,7 @@ export const LoginComponent = () => {
             style={{ width: "100%", textAlign: "center", paddingTop: "24px" }}
           >
             <GoogleLogin
-              clientId={process.env.REACT_APP_CLIENT_ID}
+              clientId={import.meta.env.VITE_APP_CLIENT_ID || ''}
               buttonText="Log in with Google"
               onSuccess={responseGoogle}
               onFailure={responseGoogle}

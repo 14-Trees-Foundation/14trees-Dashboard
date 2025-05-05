@@ -27,7 +27,7 @@ import { useAppDispatch, useAppSelector } from "../../../../redux/store/hooks";
 import { RootState } from "../../../../redux/store/store";
 import EditTree from "./EditTree";
 import AssignTreeModal from "./AssignTreeModal";
-import getColumnSearchProps, { getColumnSelectedItemFilter, getSortIcon } from "../../../../components/Filter";
+import getColumnSearchProps, { getColumnDateFilter, getColumnSelectedItemFilter, getSortIcon } from "../../../../components/Filter";
 import { TableColumnsType } from "antd";
 import { Plot } from "../../../../types/plot";
 import TableComponent from "../../../../components/Table";
@@ -285,12 +285,13 @@ export const TreeNew = () => {
         },
         {
             dataIndex: "mapped_at",
-            key: "Booked on",
-            title: getSortableHeader("Booked on", "mapped_at"),
+            key: "Reserved on",
+            title: getSortableHeader("Reserved on", "mapped_at"),
             width: 250,
             align: 'center',
             hidden: true,
             render: value => value ? getHumanReadableDate(value) : '',
+            ...getColumnDateFilter({dataIndex: 'mapped_at', filters, handleSetFilters, label: 'Reserved'})
         },
         {
             dataIndex: "assigned_at",
@@ -300,6 +301,7 @@ export const TreeNew = () => {
             align: 'center',
             hidden: true,
             render: value => value ? getHumanReadableDate(value) : '',
+            ...getColumnDateFilter({dataIndex: 'assigned_at', filters, handleSetFilters, label: 'Assigned'})
         },
         {
             dataIndex: "created_at",
@@ -309,6 +311,7 @@ export const TreeNew = () => {
             align: 'center',
             hidden: true,
             render: value => value ? getHumanReadableDate(value) : '',
+            ...getColumnDateFilter({dataIndex: 'created_at', filters, handleSetFilters, label: 'Uploaded'})
         },
         {
             dataIndex: "action",

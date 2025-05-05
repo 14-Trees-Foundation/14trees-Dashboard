@@ -27,6 +27,7 @@ import VisitProfile from "./pages/Profiles/VisitProfile";
 import OrgProfile from "./pages/Profiles/OrgProfile";
 import RedeemCard from "./pages/admin/gift/RedeemCard";
 import { User } from "./pages/user/User";
+import RequestTreeCardsForm from "./pages/admin/gift/Form/TreeCardRequest/RequestTreeCardsForm";
 import SponsorProfile from "./pages/SponsorProfile/SponsorProfile";
 import CSRPage from "./pages/admin/csr/CSRPage";
 import EventPage from "./pages/EventDashboard/EventPage";
@@ -77,7 +78,16 @@ function App() {
           <Route
             path="/tree-cards"
             element={
+              // <RequireAuth>
                 <User />
+              // </RequireAuth>
+            }
+          >
+          </Route>
+          <Route
+            path="/gift-trees"
+            element={
+                <RequestTreeCardsForm />
             }
           >
           </Route>

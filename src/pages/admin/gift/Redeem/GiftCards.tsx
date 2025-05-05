@@ -13,6 +13,7 @@ import TableComponent from "../../../../components/Table";
 import CardActivation from "./CardActivation";
 import axios from "axios";
 import { User } from "../../../../types/user";
+import { getGiftCards } from "../../../../redux/actions/giftCardActions";
 
 const GiftCards: FC = () => {
     const userId = 6428;
@@ -23,7 +24,7 @@ const GiftCards: FC = () => {
     }]
 
     const dispatch = useAppDispatch();
-    const { getGiftCards, getBookedGiftCards, redeemGiftCard } =
+    const { getGiftCards, getBookedGiftCards } =
         bindActionCreators(giftCardActionCreators, dispatch);
 
     const [page, setPage] = useState(0);
@@ -115,9 +116,9 @@ const GiftCards: FC = () => {
             return;
         }
 
-        if (selectedGiftCardUser.sapling_id && selectedGiftCardUser.tree_id) {
+       /* if (selectedGiftCardUser.sapling_id && selectedGiftCardUser.tree_id) {
             redeemGiftCard(selectedGiftCardUser.id, selectedGiftCardUser.sapling_id, selectedGiftCardUser.tree_id, selectedUser);
-        }
+        }*/
         setActivationModal(false);
     }
 

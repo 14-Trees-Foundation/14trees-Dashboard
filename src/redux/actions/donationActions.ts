@@ -3,28 +3,32 @@ import donationActionTypes from "../actionTypes/donationActionTypes";
 import { Donation } from "../../types/donation";
 import { PaginatedResponse } from "../../types/pagination";
 import { toast } from "react-toastify";
+import { Order } from "../../types/common";
 
-export const getDonations = (offset: number, limit: number, filters?: any[]) => {
+export const getDonations = (offset: number, limit: number, filters?: any[], order_by?: Order[]) => {
     const apiClient = new ApiClient()
     return (dispatch: any) => {
         dispatch({
             type: donationActionTypes.GET_DONATIONS_REQUESTED,
         });
-        apiClient.getDonations(offset, limit, filters).then(
+        apiClient.getDonations(offset, limit, filters, order_by).then(
             (value: PaginatedResponse<Donation>) => {
-                console.log("Response in action: ", value)
-                for (let i = 0; i < value.results.length; i++) {
-                    if (value.results[i]?.id) {
-                        value.results[i].key = value.results[i].id
-                    }
-                }
+                // Map the results to include key property for antd Table
+                const donationsWithKey = value.results.map(donation => ({
+                    ...donation,
+                    key: donation.id // Add key property required by antd Table
+                }));
+
                 dispatch({
                     type: donationActionTypes.GET_DONATIONS_SUCCEEDED,
-                    payload: value,
+                    payload: {
+                        ...value,
+                        results: donationsWithKey
+                    },
                 });
             },
             (error: any) => {
-                console.log(error)
+                toast.error(error.message);
                 dispatch({
                     type: donationActionTypes.GET_DONATIONS_FAILED,
                     payload: error
@@ -35,13 +39,13 @@ export const getDonations = (offset: number, limit: number, filters?: any[]) => 
 };
 
 
-export const createDonation = (record: Donation) => {
+export const createDonation = (requestId: string, createdBy: number, userId: number, pledged: number | null, pledgedArea: number | null, category: string, grove: string | null, preference: string, eventName: string, alternateEmail: string, users: any[], paymentId?: number, groupId?: number, logo?: string | null) => {
     const apiClient = new ApiClient();
     return (dispatch: any) => {
         dispatch({
             type: donationActionTypes.CREATE_DONATION_REQUESTED,
         });
-        apiClient.createDonation(record).then(
+        apiClient.createDonation(requestId, createdBy, userId, pledged, pledgedArea, category, grove, preference, eventName, alternateEmail, users, paymentId, groupId, logo).then(
             (value: Donation) => {
                 toast.success('New Donation Added')
                 dispatch({
@@ -49,11 +53,9 @@ export const createDonation = (record: Donation) => {
                     payload: value,
 
                 });
-                console.log(value)
             },
             (error: any) => {
-                console.error(error);
-                toast.error('Failed to add Donation')
+                toast.error(error.message);
                 dispatch({
                     type: donationActionTypes.CREATE_DONATION_FAILED,
                 });
@@ -62,28 +64,38 @@ export const createDonation = (record: Donation) => {
     };
 };
 
-export const updateDonation = (record: Donation) => {
+export const updateDonation = (record: Donation, users: any[]) => {
     const apiClient = new ApiClient();
     return (dispatch: any) => {
         dispatch({
             type: donationActionTypes.UPDATE_DONATION_REQUESTED,
         });
-        apiClient.updateDonation(record).then(
-            (value: Donation) => {
-                toast.success('Donation data updated')
+        
+        // Log the record being updated for debugging
+        console.log("Updating donation record:", record);
+        
+        apiClient.updateDonation(record, users)
+            .then((value: Donation) => {
+                console.log("Donation update success:", value);
+                toast.success('Donation data updated successfully');
                 dispatch({
                     type: donationActionTypes.UPDATE_DONATION_SUCCEEDED,
                     payload: value,
                 });
-            },
-            (error: any) => {
-                toast.error('Failed to update Donation data')
-                console.log(error)
+            })
+            .catch((error: any) => {
+                console.error("Donation update error:", error);
+                let errorMessage = 'Failed to update donation';
+                
+                if (error.message) {
+                    errorMessage = error.message;
+                }
+                
+                toast.error(errorMessage);
                 dispatch({
                     type: donationActionTypes.UPDATE_DONATION_FAILED,
                 });
-            }
-        )
+            });
     };
 };
 
@@ -102,7 +114,7 @@ export const deleteDonation = (record: Donation) => {
                 });
             },
             (error: any) => {
-                console.error(error);
+                toast.error(error.message);
                 dispatch({
                     type: donationActionTypes.DELETE_DONATION_FAILED,
                 });
@@ -110,31 +122,6 @@ export const deleteDonation = (record: Donation) => {
         )
     };
 };
-
-export const assignTreesToDonationUsers = (donationId: number) => {
-    const apiClient = new ApiClient();
-    return (dispatch: any) => {
-        dispatch({
-            type: donationActionTypes.ASSIGN_USER_TREES_REQUESTED,
-        });
-        apiClient.assignTreesToDonation(donationId).then(
-            (value: boolean) => {
-                dispatch({
-                    type: donationActionTypes.ASSIGN_USER_TREES_SUCCEEDED,
-                    payload: value,
-                });
-                toast.success('Trees assigned successfully');
-            },
-            (error: any) => {
-                console.error(error);
-                dispatch({
-                    type: donationActionTypes.ASSIGN_USER_TREES_FAILED,
-                });
-                toast.error(error.message);
-            }
-        )
-    };
-}
 
 export const createWorkOrderForDonation = (donationId: number) => {
     const apiClient = new ApiClient();

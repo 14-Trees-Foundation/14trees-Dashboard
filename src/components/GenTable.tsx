@@ -3,7 +3,7 @@ import { Button, Divider, IconButton } from '@mui/material';
 import { Checkbox, Dropdown, MenuProps, Table, TableColumnsType } from 'antd';
 import { AnyObject } from 'antd/es/_util/type';
 import { TableRowSelection } from 'antd/es/table/interface';
-import { Parser } from 'json2csv';
+import { unparse } from 'papaparse';
 import { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 import { Resizable } from "react-resizable";
@@ -83,9 +83,8 @@ function GeneralTable({ loading, rows, columns, totalRecords, page, pageSize = 1
         }
     }
 
-    const handleDownload = (data: any) => {
-        const json2csvParser = new Parser();
-        const csv = json2csvParser.parse(data);
+    const handleDownload = async (data: any) => {
+        const csv = unparse(data);
 
         let fileName = tableName ? tableName : "data";
         fileName += " - " + new Date().toDateString() + '.csv'
@@ -126,7 +125,7 @@ function GeneralTable({ loading, rows, columns, totalRecords, page, pageSize = 1
             return row
         })
 
-        handleDownload(data);
+        await handleDownload(data);
         toast.success('File downloaded successfully!');
     }
 

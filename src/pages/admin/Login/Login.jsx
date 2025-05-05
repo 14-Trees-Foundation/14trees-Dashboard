@@ -208,7 +208,7 @@ export const Login = () => {
               style={{ width: "100%", textAlign: "center", paddingTop: "24px" }}
             >
               <GoogleLogin
-                clientId={process.env.REACT_APP_CLIENT_ID}
+                clientId={import.meta.env.VITE_APP_CLIENT_ID}
                 buttonText="Log in with Google"
                 onSuccess={responseGoogle}
                 onFailure={responseGoogle}
@@ -217,7 +217,7 @@ export const Login = () => {
             </div>
             {/* <div style={{width: '100%', textAlign:'center', paddingTop: '24px'}}>
                             <GoogleLogout
-                                clientId={process.env.REACT_APP_CLIENT_ID}
+                                clientId={import.meta.env.VITE_APP_CLIENT_ID}
                                 buttonText="Log out"
                                 onLogoutSuccess={onLogoutSuccess}
                             />

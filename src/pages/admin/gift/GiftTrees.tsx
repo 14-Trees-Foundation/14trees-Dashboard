@@ -1,5 +1,6 @@
 import { Badge, Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, Divider, IconButton, Tooltip, Typography } from "@mui/material";
 import { FC, useEffect, useRef, useState } from "react";
+import GiftTreesChart from "./GiftTreesChart";
 import GiftCardsForm from "./Form/GiftCardForm";
 import { User } from "../../../types/user";
 import { Group } from "../../../types/Group";
@@ -43,7 +44,7 @@ const TableSummary = (giftRequests: GiftCard[], selectedGiftRequestIds: number[]
 
     const calculateSum = (data: (number | undefined)[]) => {
         return data.reduce((a, b) => (a ?? 0) + (b ?? 0), 0);
-    }
+    }    
 
     return (
         <Table.Summary fixed='bottom'>
@@ -98,6 +99,9 @@ const GiftTrees: FC = () => {
     const [testingMail, setTestingMail] = useState(false);
     const [giftCardNotification, setGiftCardNotification] = useState(false);
     const [selectedGiftRequestIds, setSelectedGiftRequestIds] = useState<number[]>([]);
+    // Chart
+    const [corporateCount, setCorporateCount] = useState(0);
+    const [personalCount, setPersonalCount] = useState(0);
 
     // payment
     const [paymentModal, setPaymentModal] = useState(false);
@@ -160,6 +164,22 @@ const GiftTrees: FC = () => {
 
         return () => { clearTimeout(handler) };
     }, [pageSize, page, giftCardsData]);
+
+    // Chart Useffect
+    useEffect(() => {
+        if (!giftCards || !Array.isArray(giftCards)) return;
+    
+        const corporate = giftCards.filter(card => card.group_name && card.group_name !== 'Personal').length || 0;
+        const personal = giftCards.filter(card => !card.group_name || card.group_name === 'Personal').length || 0;
+    
+        setCorporateCount(corporate);
+        setPersonalCount(personal);
+    }, [giftCards]);
+    
+    console.log("Gift Cards:", giftCards);
+    console.log("Corporate Count:", corporateCount);
+    console.log("Personal Count:", personalCount);
+
 
     const getFilters = (filters: any) => {
         const filtersData = JSON.parse(JSON.stringify(Object.values(filters))) as GridFilterItem[];
@@ -720,7 +740,7 @@ const GiftTrees: FC = () => {
                             Generate Gift Cards
                         </Menu.Item>
                     }
-                    {(record.status === 'completed' || record.status === 'pending_gift_cards') &&
+                    {Number(record.assigned) > 0 &&
                         <Menu.Item key="21" onClick={() => { setSelectedGiftCard(record); setEmailConfirmationModal(true); }} icon={<Email />}>
                             Send Emails
                         </Menu.Item>
@@ -1075,8 +1095,8 @@ const GiftTrees: FC = () => {
                 </DialogActions>
             </Dialog>
 
-            <Dialog open={paymentModal} fullWidth maxWidth='md'>
-                <DialogTitle>Payment Details</DialogTitle>
+            <Dialog open={paymentModal} fullWidth maxWidth='xl'>
+                <DialogTitle>Sponsorship/Payment Details</DialogTitle>
                 <DialogContent dividers>
                     <PaymentComponent
                         initialAmount={(selectedPaymentGR?.no_of_cards || 0) * (selectedPaymentGR?.category === 'Foundation' ? 3000 : selectedPaymentGR?.request_type === 'Normal Assignment' ? 1500 : 2000)}
@@ -1090,7 +1110,12 @@ const GiftTrees: FC = () => {
                     />
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={() => setPaymentModal(false)} color="error">
+                    <Button 
+                        onClick={() => setPaymentModal(false)} 
+                        color="error"
+                        variant="outlined"
+                        sx={{ mr: 2 }}
+                    >
                         Close
                     </Button>
                 </DialogActions>
@@ -1149,6 +1174,11 @@ const GiftTrees: FC = () => {
             />
 
             <GiftCardCreationModal open={giftCardNotification} onClose={() => { setGiftCardNotification(false) }} />
+
+            <div style={{ marginTop: '20px' }}>
+                <h2>Sponsorship Distribution</h2>
+                <GiftTreesChart corporateCount={corporateCount} personalCount={personalCount} />
+            </div>
         </div>
     );
 };

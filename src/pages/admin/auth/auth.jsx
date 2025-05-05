@@ -11,7 +11,6 @@ export const AuthProvider = ({ children }) => {
   let [signedin, setSignedin] = React.useState(false);
 
   let signin = (name, userId, perm, roles, token, callback) => {
-    console.log("Received in signin:", { name, userId, perm, roles, token });
     setUser(name);
     setUserId(userId);
     setPermissions(perm);

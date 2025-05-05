@@ -6,6 +6,7 @@ import { Select, Button as Btn, Input, Space, DatePicker, Segmented } from 'antd
 import type { TableColumnType, SelectProps } from 'antd';
 import { FilterConfirmProps } from 'antd/es/table/interface';
 import React, { useState } from 'react';
+import { Order } from '../types/common';
 
 interface FilterItemProps<T> {
     dataIndex: keyof T
@@ -260,10 +261,11 @@ const SelectItemFilterDropdown = <T extends object>({ dataIndex, filters, option
 
 export const getColumnDateFilter = <T extends object>({ dataIndex, filters, handleSetFilters, label }: FilterItemProps<T> & { label: string }): TableColumnType<T> => {
     return {
-        filterDropdown: ({ confirm, clearFilters, close }) => (
+        filterDropdown: ({ confirm, clearFilters, setSelectedKeys, close }) => (
             <DateFilterDropdown<T>
                 dataIndex={dataIndex}
                 filters={filters}
+                setSelectedKeys={setSelectedKeys}
                 handleSetFilters={handleSetFilters}
                 confirm={confirm}
                 clearFilters={clearFilters}
@@ -278,13 +280,14 @@ export const getColumnDateFilter = <T extends object>({ dataIndex, filters, hand
 };
 
 interface DateFilterDropdownProps<T> extends FilterItemProps<T> {
+    setSelectedKeys: (selectedKeys: React.Key[]) => void,
     confirm: (param?: FilterConfirmProps) => void;
     clearFilters?: () => void;
     close: () => void;
     label: string;
 }
 
-const DateFilterDropdown = <T extends object>({ dataIndex, filters, label, handleSetFilters, confirm, clearFilters, close }: DateFilterDropdownProps<T>) => {
+const DateFilterDropdown = <T extends object>({ dataIndex, filters, label, setSelectedKeys, handleSetFilters, confirm, clearFilters, close }: DateFilterDropdownProps<T>) => {
     const [lower, setLower] = useState<string>('');
     const [upper, setUpper] = useState<string>('');
 
@@ -314,6 +317,7 @@ const DateFilterDropdown = <T extends object>({ dataIndex, filters, label, handl
                 ...filters,
                 [dataIndex.toString()]: filter,
             });
+            setSelectedKeys(['1'])
         }
     };
 
@@ -357,6 +361,14 @@ export const getSortIcon = (field: string, order: 'ASC' | 'DESC' | undefined, ha
         >
             <ArrowDropUp style={{ margin: "-8px 0" }} htmlColor={order === 'ASC' ? '#00b96b' : "grey"} />
             <ArrowDropDown style={{ margin: "-8px 0" }} htmlColor={order === 'DESC' ? '#00b96b' : "grey"} />
+        </div>
+    )
+}
+
+export const getSortableHeader = (header: string, key: string, orderBy: Order[], handleSortingChange: (param: { field: string, order?: 'ASC' | 'DESC' }) => void) => {
+    return (
+        <div style={{ display: "flex", alignItems: "center", justifyContent: 'space-between' }}>
+            {header} {getSortIcon(key, orderBy.find((item) => item.column === key)?.order, handleSortingChange)}
         </div>
     )
 }

@@ -45,7 +45,7 @@ const DonorUserForm: FC<DonorUserFormProps> = ({ user, onSelect }) => {
 
     useEffect(() => {
         const handler = setTimeout(() => {
-            if (userSearchQuery.length >= 1) searchUsers(userSearchQuery);
+            if (userSearchQuery.length >= 3) searchUsers(userSearchQuery);
         }, 300)
 
         return () => {
@@ -163,7 +163,7 @@ const DonorUserForm: FC<DonorUserFormProps> = ({ user, onSelect }) => {
                     fullWidth
                     size="medium"
                 />
-                <Typography variant="body1">Couldn't find yourself in the system? <Typography color="primary" style={{ cursor: 'pointer' }} onClick={() => setFormOption('new')} variant="body1" component="span">Add sponsor details</Typography>.</Typography>
+                <Typography variant="body1">Couldn't find yourself in the system? <Typography color="primary" style={{ cursor: 'pointer' }} onClick={() => setFormOption('new')} variant="body1" component="span">Add donor info</Typography>.</Typography>
             </Box>}
 
             {formOption === 'new' && <Box>

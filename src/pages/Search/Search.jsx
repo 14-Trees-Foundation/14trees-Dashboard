@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { createStyles, makeStyles } from "@mui/styles";
 import { useRecoilValue } from "recoil";
 import { ToastContainer, toast } from "react-toastify";
@@ -20,6 +20,9 @@ import image1 from '../../assets/home/corporate-gifts.jpeg'
 import image2 from '../../assets/home/personal-gifts.jpeg'
 import image3 from '../../assets/home/grove-gifts.jpeg'
 import { Button, Typography } from "@mui/material";
+import ChatBot from "../../components/Chatbot/ChatBot";
+import ChatbotV2 from "../../components/Chatbot/ChatBotV2";
+import { UserRoles } from "../../types/common";
 
 export const Search = () => {
   const classes = UseStyle();
@@ -28,6 +31,17 @@ export const Search = () => {
   const [key, setKey] = useState('');
   const setSearchResult = useSetRecoilState(searchResults);
   const [loading, setLoading] = useState(false);
+  const [roles, setRoles] = useState(['']);
+
+  useEffect(() => {
+    const roles = localStorage.getItem("roles") || '[]';
+    try {
+      const rolesArr = JSON.parse(roles);
+      setRoles(rolesArr);
+    } catch (error) {
+
+    }
+  }, [])
 
   const handleSearch = (value) => {
     setKey(value);
@@ -69,6 +83,7 @@ export const Search = () => {
     if (Object.keys(results.users).length === 0 && key === "") {
       return (
         <div className={classes.box}>
+          {roles.includes(UserRoles.SuperAdmin) && <ChatbotV2 />}
           <img
             alt="bg"
             src={bg}

@@ -114,10 +114,6 @@ export const Admin = () => {
     //   page: EventsComponent,
     //   displayName: "Events",
     // },
-    // {
-    //   page: DonationComponent,
-    //   displayName: "Donations",
-    // },
     {
       page: VisitsComponent,
       displayName: "Visits",

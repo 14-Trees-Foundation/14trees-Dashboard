@@ -64,6 +64,19 @@ const theme = createTheme({
         },
       ],
     },
+    MuiToggleButton: {
+      styleOverrides: {
+        root: {
+          "&.Mui-selected": {
+            backgroundColor: "#2e7d32d9",
+            color: "white",
+            "&:hover": {
+              backgroundColor: "#2e7d32",
+            },
+          },
+        },
+      },
+    },
   },
 });
 

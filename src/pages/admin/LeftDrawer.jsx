@@ -115,11 +115,6 @@ export const AdminLeftDrawer = () => {
     //   logo: FestivalIcon,
     //   display: true,
     // },
-    // {
-    //   displayName: "Donation",
-    //   logo: VolunteerActivismIcon,
-    //   display: true,
-    // },
     {
       displayName: "Visits",
       logo: TourIcon,
@@ -145,10 +140,16 @@ export const AdminLeftDrawer = () => {
       key: 11,
     },
     {
+      displayName: "Donations",
+      logo: VolunteerActivismIcon,
+      display: true,
+      key: 12,
+    },
+    {
       displayName: "Corporate Dashboard",
       logo: Analytics,
       display: true,
-      key: 12,
+      key: 13,
     },
     // {
     //   displayName: "Images",

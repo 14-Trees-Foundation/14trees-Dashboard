@@ -86,6 +86,7 @@ const TreePage: FC<TreePageProps> = ({ }) => {
                     visit_name: "IIT Kanpur Alumni Visit",
                     created_at: new Date("2024-08-08T00:00:00Z"),
                     user_count: 4,
+                    site_id: null,
                     id: 0,
                     visit_type: 'corporate',
                     visit_images: [],

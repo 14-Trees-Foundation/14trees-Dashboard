@@ -48,7 +48,7 @@ const EventTrees: React.FC<EventTreesProps> = ({ eventId }) => {
             }
 
             const apiClient = new ApiClient();
-            const treesResp = await apiClient.getTrees(offset, limit, filteredData, [{ column: 'assigned_to_name', order: 'ASC' }])
+            const treesResp = await apiClient.getTrees(offset, limit, filteredData)
 
             if (offset === 0) setTrees(treesResp.results);
             else setTrees(prev => [...prev, ...treesResp.results]);
