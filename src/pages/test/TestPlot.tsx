@@ -29,7 +29,9 @@ export const TestPlot = () => {
     };
     const handleButtonClickGet = () => {
         try {
-            getPlots()
+            const offset = 0;
+            const limit = 20; 
+            getPlots(offset, limit);
         } catch (error) {
             console.error('Error parsing JSON:', error);
         }

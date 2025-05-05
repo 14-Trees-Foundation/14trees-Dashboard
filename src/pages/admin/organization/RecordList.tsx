@@ -1,9 +1,7 @@
 import { Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, List, ListItem, ListItemText } from '@mui/material';
 import FileDownloadIcon from '@mui/icons-material/FileDownload';
-import { Parser } from 'json2csv';
 import { Group, GroupMappingState } from '../../../types/Group';
-import React from 'react';
-import { Divider } from 'rc-menu';
+import { unparse } from 'papaparse';
 
 interface FailedRecordsListProps {
   open: boolean;
@@ -22,10 +20,9 @@ const FailedRecordsList = ( { open, handleClose, groupsMap, failedRecords }: Fai
     return acc;
   }, {} as GroupMappingState);
 
-  const handleDownload = (id: number) => {
+  const handleDownload = async (id: number) => {
     const data = failedRecords[id].failed_records;
-    const json2csvParser = new Parser();
-    const csv = json2csvParser.parse(data);
+    const csv = unparse(data);
 
     // Create a Blob from the CSV string
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });

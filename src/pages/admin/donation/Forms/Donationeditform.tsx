@@ -210,8 +210,14 @@ export const DirectEditDonationForm: React.FC<DirectEditDonationFormProps> = ({
           onChange={handleTabChange} 
           aria-label="donation edit tabs"
           variant="fullWidth"
-          textColor="success"
-          indicatorColor="success"
+          sx={{
+            '& .MuiTab-root.Mui-selected': {
+              color: 'success.main'
+            },
+            '& .MuiTabs-indicator': {
+              backgroundColor: 'success.main'
+            }
+          }}
         >
           <Tab label="Donation Details" id="donation-edit-tab-0" />
           <Tab label="Recipients" id="donation-edit-tab-1" />

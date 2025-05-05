@@ -95,7 +95,7 @@ const SitesMap: React.FC<SitesMapProps> = ({ groupId, site }) => {
         getSites(sitePage * 10, 10, [siteNameFilter]);
     };
 
-    const googleMapsApiKey = process.env.REACT_APP_API_MAP_KEY ?? '';
+    const googleMapsApiKey = import.meta.env.VITE_APP_API_MAP_KEY ?? '';
     const mapRef = React.useRef<google.maps.Map | null>(null);
 
     const [center, setCenter] = React.useState<google.maps.LatLngLiteral>({ lat: 0, lng: 0 });

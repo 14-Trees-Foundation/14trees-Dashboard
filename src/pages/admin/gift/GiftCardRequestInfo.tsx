@@ -10,10 +10,10 @@ import {
     Box,
     Link,
 } from '@mui/material';
-import { format } from 'date-fns';
 import GeneralTable from '../../../components/GenTable';
 import ApiClient from '../../../api/apiClient/apiClient';
 import { GiftCardUser } from '../../../types/gift_card';
+import { getHumanReadableDate } from '../../../helpers/utils';
 
 interface GiftCardRequestInfoProps {
     open: boolean
@@ -235,10 +235,10 @@ const GiftCardRequestInfo: React.FC<GiftCardRequestInfoProps> = ({ open, onClose
                 {/* Extra */}
                 <Box mt={2} mb={2}>
                     <Typography variant="body2" color="textSecondary">
-                        <strong>Created At:</strong> {format(new Date(data.created_at), 'yyyy-MM-dd HH:mm:ss')}
+                        <strong>Created At:</strong> {getHumanReadableDate(data.created_at)}
                     </Typography>
                     <Typography variant="body2" color="textSecondary">
-                        <strong>Updated At:</strong> {format(new Date(data.updated_at), 'yyyy-MM-dd HH:mm:ss')}
+                        <strong>Updated At:</strong> {getHumanReadableDate(data.updated_at)}
                     </Typography>
                 </Box>
             </DialogContent>

@@ -13,8 +13,6 @@ import icon from "../../../assets/marker.png";
 import { Tree } from "../../../types/tree";
 import { Card } from "@mui/material";
 
-require("dotenv").config();
-
 const containerStyle = {
     width: "100%",
     height: "100%",
@@ -69,12 +67,15 @@ export const Map: FC<TreeMapProps> = ({ tree }) => {
 
     const { isLoaded } = useJsApiLoader({
         id: "google-map-script-for-profile",
-        googleMapsApiKey: process.env.REACT_APP_API_MAP_KEY ? process.env.REACT_APP_API_MAP_KEY : "",
+        googleMapsApiKey: import.meta.env.VITE_APP_API_MAP_KEY ? import.meta.env.VITE_APP_API_MAP_KEY : "",
     });
 
     let position = { lat: boundaries[0][0], lng: boundaries[0][1] };
     if (tree.location?.coordinates && tree.location.coordinates.length === 2) {
-        position = { lat: 18.92752599978088 || tree.location.coordinates[0], lng: 73.7721940988185 || tree.location.coordinates[1] };
+        position = { 
+            lat: tree.location.coordinates[0] !== undefined ? tree.location.coordinates[0] : boundaries[0][0], 
+            lng: tree.location.coordinates[1] !== undefined ? tree.location.coordinates[1] : boundaries[0][1] 
+        };
     }
 
     return (

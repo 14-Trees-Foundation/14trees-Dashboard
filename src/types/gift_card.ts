@@ -70,6 +70,8 @@ export type GiftRequestUser = {
 }
 
 export type GiftCardUser = {
+    user_id: any
+    user_name: string
     key: number;
     id: number;
     gifted_to: number;

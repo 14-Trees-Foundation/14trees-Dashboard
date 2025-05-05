@@ -3,11 +3,11 @@ import { Button, Divider, FormControlLabel, IconButton } from '@mui/material';
 import { Checkbox, Dropdown, MenuProps, Table, TableColumnsType } from 'antd';
 import { AnyObject } from 'antd/es/_util/type';
 import { TableRowSelection } from 'antd/es/table/interface';
-import { Parser } from 'json2csv';
 import { ReactElement, useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 import { Resizable } from "react-resizable";
 import './GenTable.css'
+import { unparse } from 'papaparse';
 
 interface TableColoringLabels { className: string, label: string }
 
@@ -102,9 +102,8 @@ function TableComponent({ loading, dataSource, columns, totalRecords, tableName,
         }
     }
 
-    const handleDownload = (data: any) => {
-        const json2csvParser = new Parser();
-        const csv = json2csvParser.parse(data);
+    const handleDownload = async (data: any) => {
+        const csv = unparse(data);
 
         let fileName = tableName ? tableName : "data";
         fileName += " - " + new Date().toDateString() + '.csv'
@@ -138,7 +137,7 @@ function TableComponent({ loading, dataSource, columns, totalRecords, tableName,
             })
             return row
         })
-        handleDownload(data);
+        await handleDownload(data);
         setDownload(false);
         toast.success('File downloaded successfully!');
     }

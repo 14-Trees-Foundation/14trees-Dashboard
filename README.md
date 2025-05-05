@@ -1,9 +1,9 @@
 # 14 Trees Dashboard Frontend
 
 Set the environment variables:
-- `REACT_APP_API_MAP_KEY`
-- `REACT_APP_CLIENT_ID`
-- `REACT_APP_ENV=development|production`
+- `VITE_APP_API_MAP_KEY`
+- `VITE_APP_CLIENT_ID`
+- `VITE_APP_ENV=development|production`
 
 Install dependencies `yarn install`
 and start the development server: `yarn dev`

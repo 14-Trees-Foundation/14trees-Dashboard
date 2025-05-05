@@ -12,10 +12,12 @@ interface DonorDetailsFormProps {
     logo: File | string | null,
     onLogoChange: (logo: File | null) => void,
     group: Group | null,
-    onGroupSelect: (group: Group | null) => void
+    onGroupSelect: (group: Group | null) => void,
+    address: string,
+    onAddressChange: (address: string) => void
 }
 
-const DonorDetailsForm: React.FC<DonorDetailsFormProps> = ({ user, logo, group, onUserSelect, onGroupSelect, onLogoChange }) => {
+const DonorDetailsForm: React.FC<DonorDetailsFormProps> = ({ user, logo, group, onUserSelect, onGroupSelect, onLogoChange, address, onAddressChange }) => {
 
     const [donorType, setDonorType] = useState<"corporate" | "individual">("individual");
     useEffect(() => {
@@ -52,6 +54,8 @@ const DonorDetailsForm: React.FC<DonorDetailsFormProps> = ({ user, logo, group, 
                     onSelect={onGroupSelect}
                     logo={logo}
                     onLogoChange={onLogoChange}
+                    address={address}
+                    onAddressChange={onAddressChange}
                 />
             }
         </div>

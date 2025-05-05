@@ -27,7 +27,7 @@ class ApiClient {
     private token: string | null;
 
     constructor() {
-        const baseURL = process.env.REACT_APP_BASE_URL;
+        const baseURL = import.meta.env.VITE_APP_BASE_URL;
         this.api = axios.create({
             baseURL: baseURL,
         });
@@ -2338,9 +2338,9 @@ class ApiClient {
     /**
      * Gen AI
      */
-    async serveUserQuery(message: string, history: any[]): Promise<{output: string}> {
+    async serveUserQuery(message: string, history: any[]): Promise<{text_output: string, sponsor_details?: any}> {
         try {
-            const response = await this.api.post<{output: string}>(`/gift-cards/gen-ai`, { message, history }, {
+            const response = await this.api.post<{text_output: string, sponsor_details: any}>(`/gift-cards/gen-ai`, { message, history }, {
                 headers: {
                     "x-access-token": this.token,
                     "content-type": "application/json",

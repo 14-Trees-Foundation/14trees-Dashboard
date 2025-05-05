@@ -138,7 +138,7 @@ const UserForm: React.FC<UserFormProps> = ({ open, user, onClose }) => {
             open={open}
             onClose={handleClose}
             PaperProps={{
-                component: 'form',
+                //component: 'form',
                 onSubmit: handleSubmit,
             }}
             maxWidth='md'

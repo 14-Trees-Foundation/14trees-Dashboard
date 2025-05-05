@@ -204,7 +204,7 @@ export const LoginComponent = () => {
             style={{ width: "100%", textAlign: "center", paddingTop: "24px" }}
           >
             <GoogleLogin
-              clientId={process.env.REACT_APP_CLIENT_ID}
+              clientId={import.meta.env.VITE_APP_CLIENT_ID || ''}
               buttonText="Log in with Google"
               onSuccess={responseGoogle}
               onFailure={responseGoogle}

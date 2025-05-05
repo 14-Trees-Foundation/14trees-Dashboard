@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import ApiClient from '../api/apiClient/apiClient';
+import ApiClient from '../../api/apiClient/apiClient';
 import ReactMarkdown from 'react-markdown';
 import { styled } from '@mui/material/styles';
 import { IconButton } from '@mui/material';
@@ -39,7 +39,7 @@ type Message = {
 const ChatIcon = styled('div')({
   position: 'fixed',
   bottom: '20px',
-  right: '20px',
+  left: '20px',
   width: '60px',
   height: '60px',
   borderRadius: '50%',
@@ -56,7 +56,7 @@ const ChatIcon = styled('div')({
 const ChatContainer = styled('div')<{ isOpen: boolean }>(({ isOpen }) => ({
   position: 'fixed',
   bottom: '90px',
-  right: '20px',
+  left: '20px',
   width: '350px',
   height: isOpen ? '500px' : '0',
   border: isOpen ? '1px solid #ccc' : 'none',
@@ -156,7 +156,7 @@ const RemoveButton = styled(IconButton)({
 
 // Component
 export default function ChatBot() {
-  const [isOpen, setIsOpen] = useState(false);
+ const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([
     {
       id: '1',
@@ -241,7 +241,7 @@ export default function ChatBot() {
   const getBotResponse = async (userInput: string, messages: Message[]): Promise<string> => {
     const apiClient = new ApiClient();
     const resp = await apiClient.serveUserQuery(userInput, messages);
-    return resp.output;
+    return resp.text_output;
   };
 
   const TypingAnimation = ({ text }: { text?: string }) => {

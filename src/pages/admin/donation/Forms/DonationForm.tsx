@@ -146,6 +146,8 @@ const DonationForm: React.FC<DonationFormProps> = ({ donation, open, requestId, 
                 onGroupSelect={group => { setGroup(group); }}
                 logo={logo ?? logoString}
                 onLogoChange={file => { setLogo(file); }}
+                address=""
+                onAddressChange={() => {}}
             />,
         },
         {
