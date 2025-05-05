@@ -44,12 +44,14 @@ const GiftDashboard: React.FC = () => {
 
     useEffect(() => {
 
+        const userId = localStorage.getItem('userId') ? Number(localStorage.getItem("userId")) : 0;
+
         const intervalId = setTimeout(async () => {
             setLoading(true);
             try {
                 const viewId = searchParams.get('v') || '';
                 const apiClient = new ApiClient();
-                const resp = await apiClient.verifyViewAccess(viewId, Number(userId) || 0, location.pathname);
+                const resp = await apiClient.verifyViewAccess(viewId, userId, location.pathname);
                 setStatus(resp);
             } catch (error: any) {
                 toast.error(error.message);
