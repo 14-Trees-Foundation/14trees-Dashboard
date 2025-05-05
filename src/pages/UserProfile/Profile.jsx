@@ -93,7 +93,7 @@ export const Profile = ({ saplingId }) => {
             </div>
           </div>
         </div>
-        {selUserInfo.tree_audits && selUserInfo.tree_audits.length > 1 && <div >
+        {selUserInfo.tree_audits && selUserInfo.tree_audits.length > 0 && <div >
           <TreeTimelineInfo />
         </div>}
       </div>
