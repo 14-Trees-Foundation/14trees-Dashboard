@@ -34,7 +34,7 @@ export const Search = () => {
   const [roles, setRoles] = useState(['']);
 
   useEffect(() => {
-    const roles = localStorage.getItem("roles");
+    const roles = localStorage.getItem("roles") || '[]';
     try {
       const rolesArr = JSON.parse(roles);
       setRoles(rolesArr);
