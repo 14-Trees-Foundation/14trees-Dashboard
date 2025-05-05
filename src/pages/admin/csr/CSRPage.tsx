@@ -21,7 +21,7 @@ const CSRPage: React.FC = () => {
     const [searchParams] = useSearchParams();
     const location = useLocation();
     const [loading, setLoading] = useState(true);
-    const [status, setStatus] = useState<{ code: number, message: string }>({ code: 404, message: '' })
+    const [status, setStatus] = useState<{ code: number, message: string }>({ code: 404, message: '' });
 
     const handleScroll = (id: string) => {
         const element = document.getElementById(id);
