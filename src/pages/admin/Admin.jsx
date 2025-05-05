@@ -128,15 +128,7 @@ export const Admin = () => {
     },
     {
       page: GiftTrees,
-      displayName: "Tree Cards",
-    },
-    {
-      page: DonationComponent,
-      displayName: "Donations",
-    },
-    {
-      page: CSRInventory,
-      displayName: "CSR Analytics",
+      displayName: "Gift Cards",
     },
     {
       page: Images,

@@ -37,7 +37,7 @@ export const Login = () => {
   const textStyle = { margin: "8px auto" };
   const btnstyle = { margin: "8px 0" };
 
-  let from = location.state?.from?.pathname || "/admin";
+  let from = location.state?.from?.pathname + location.state?.from?.search || "/admin";
 
   const responseGoogle = async (response) => {
     try {
@@ -56,8 +56,8 @@ export const Login = () => {
         localStorage.setItem("loginInfo", JSON.stringify(response));
         let permissions = [];
         let roles = [];
-        if (res.data.user.roles && res.data.user.roles.includes("admin")) {
-          permissions = ["all"]
+        if (res.data.user.roles) {
+          if (res.data.user.roles.includes("admin") || res.data.user.roles.includes("super-admin")) permissions = ["all"];
           roles = res.data.user.roles;
         }
         localStorage.setItem(
@@ -66,6 +66,7 @@ export const Login = () => {
         );
         localStorage.setItem("token", JSON.stringify(res.data.token));
         localStorage.setItem("roles", JSON.stringify(roles));
+        localStorage.setItem("userId", res.data.user.id.toString());
         auth.signin(
           res.data.user.name,
           res.data.user.id,
@@ -76,8 +77,9 @@ export const Login = () => {
             navigate(from, { replace: true });
           }
         );
+      } else {
+        toast.error("User not authorized! Contact Admin");
       }
-      toast.error("User not authorized! Contact Admin");
     } catch (error) {
       if (error.response.status === 404) {
         toast.error("User not Found! Contact Admin");

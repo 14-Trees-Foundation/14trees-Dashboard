@@ -65,9 +65,9 @@ function App() {
           <Route
             path="/admin"
             element={
-              // <RequireAuth>
+              <RequireAuth>
                 <Admin />
-              // </RequireAuth>
+              </RequireAuth>
             }
           >
             <Route path="forms" element={<Forms />}>
@@ -95,9 +95,9 @@ function App() {
             <Route 
               path=":email" 
               element={ 
-                // <RequireAuth>
+                <RequireAuth>
                   <GiftTrees />
-                // </RequireAuth>
+                </RequireAuth>
               } 
             ></Route>
           </Route>
@@ -105,9 +105,9 @@ function App() {
             <Route 
               path=":group_id" 
               element={ 
-                // <RequireAuth>
+                <RequireAuth>
                   <GiftTrees />
-                // </RequireAuth>
+                </RequireAuth>
               } 
             ></Route>
           </Route>
@@ -118,25 +118,25 @@ function App() {
           <Route 
             path="/test" 
             element={
-              // <RequireAuth>
+              <RequireAuth>
                 <Test />
-              // </RequireAuth>
+              </RequireAuth>
             } 
           />
           <Route 
             path="/csr/dashboard/:groupId" 
             element={
-              // <RequireAuth>
+              <RequireAuth>
                 <CSRPage />
-              // </RequireAuth>
+              </RequireAuth>
             } 
           />
           <Route 
             path="/personal/dashboard/:userId" 
             element={
-              // <RequireAuth>
+              <RequireAuth>
                 <GiftDashboard />
-              // </RequireAuth>
+              </RequireAuth>
             } 
           />
         </Routes>

@@ -38,10 +38,6 @@ export const AdminLeftDrawer = () => {
   const [expanded, setExpanded] = useState(null);
 
   useEffect(() => {
-    auth.signin("User", 0, ["all"], ["super-admin"], "", () => { })
-  }, [])
-
-  useEffect(() => {
     if (auth.roles.includes(UserRoles.User)) {
       navigate("/tree-cards");
     }

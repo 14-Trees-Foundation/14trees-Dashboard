@@ -38,9 +38,9 @@ export const Search = () => {
   let selectedChips = "All";
 
   const fetchData = async (searchKey) => {
-    if (searchKey.length === 0) return;
+    if (searchKey.trim().length === 0) return;
     let params = {
-      key: searchKey,
+      key: searchKey.trim(),
     };
     setLoading(true);
 
