@@ -15,8 +15,11 @@ import { Payment } from "../../../../types/payment";
 import DashboardDetails from "./DashboardDetailsForm";
 import SponsorDetailsForm from "./SponsorDetailsForm";
 import PlantationInfo from "./PlantationInfo";
+import { LoadingButton } from "@mui/lab";
 
 interface GiftCardsFormProps {
+    loading: boolean,
+    setLoading: (value: boolean) => void,
     giftCardRequest?: GiftCard
     step?: number
     requestId: string | null
@@ -26,7 +29,7 @@ interface GiftCardsFormProps {
     onSubmit: (user: User, sponsor: User | null, createdByUser: User, group: Group | null, treeCount: number, category: string, grove: string | null, requestType: string, users: any[], giftedOn: string, paymentId?: number, logo?: string, messages?: any, file?: File) => void
 }
 
-const GiftCardsForm: FC<GiftCardsFormProps> = ({ step, loggedinUserId, giftCardRequest, requestId, open, handleClose, onSubmit }) => {
+const GiftCardsForm: FC<GiftCardsFormProps> = ({ loading, setLoading, step, loggedinUserId, giftCardRequest, requestId, open, handleClose, onSubmit }) => {
 
     const [currentStep, setCurrentStep] = useState(0);
     const [user, setUser] = useState<User | null>(null);
@@ -270,6 +273,7 @@ const GiftCardsForm: FC<GiftCardsFormProps> = ({ step, loggedinUserId, giftCardR
             return;
         }
 
+        setLoading(true);
         const apiClient = new ApiClient();
         if (logoString && group && group.logo_url !== logoString) {
             await apiClient.updateGroup({ ...group, logo_url: logoString })
@@ -424,12 +428,13 @@ const GiftCardsForm: FC<GiftCardsFormProps> = ({ step, loggedinUserId, giftCardR
                         style={{ alignSelf: 'right' }}
                     >Next</Button>}
 
-                    {currentStep === formSteps.length - 1 && <Button
+                    {currentStep === formSteps.length - 1 && <LoadingButton
+                        loading={loading}
                         onClick={handleSubmit}
                         variant="contained"
                         color="success"
                         style={{ alignSelf: 'right' }}
-                    >Finish</Button>}
+                    >Finish</LoadingButton>}
                 </div>
             </Dialog>
         </div>
