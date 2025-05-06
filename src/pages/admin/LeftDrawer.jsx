@@ -139,17 +139,17 @@ export const AdminLeftDrawer = () => {
       display: auth.signedin,
       key: 11,
     },
-    {
-      displayName: "Donations",
-      logo: VolunteerActivismIcon,
-      display: true,
-      key: 12,
-    },
+    // {
+    //   displayName: "Donations",
+    //   logo: VolunteerActivismIcon,
+    //   display: true,
+    //   key: 12,
+    // },
     {
       displayName: "Corporate Dashboard",
       logo: Analytics,
       display: true,
-      key: 13,
+      key: 12,
     },
     // {
     //   displayName: "Images",
