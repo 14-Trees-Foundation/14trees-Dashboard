@@ -1,29 +1,21 @@
-import React from "react";
 import PropTypes from "prop-types";
 import CancelIcon from "@mui/icons-material/Cancel";
 import { createStyles, makeStyles } from "@mui/styles";
-import { Dialog, DialogContent } from "@mui/material";
+import { Modal } from "@mui/material";
 
 export const Popup = ({ toggle, ...props }) => {
   const classes = useStyles();
   return (
-    // <div className={classes.main}>
-    <Dialog open={true} maxWidth="lg"
-     fullWidth={true} 
-     sx={{ height: "60vh", overflowY:"scroll" }}
-     onClose={toggle}
-     >
-      <DialogContent>
-        <div className={classes.window}>
-          <div className={classes.close} onClick={toggle}>
-            <CancelIcon fontSize={"medium"} />
+    <Modal open={true}>
+        <div className={classes.main}>
+          <div className={classes.window}>
+            <div className={classes.close} onClick={toggle}>
+              <CancelIcon fontSize={"medium"} />
+            </div>
+            {props.children}
           </div>
-          {props.children}
         </div>
-      </DialogContent>
-    </Dialog>
-      
-    // </div>
+    </Modal>
   );
 };
 
