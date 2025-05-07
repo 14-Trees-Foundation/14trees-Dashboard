@@ -1,4 +1,4 @@
-import { Fragment } from "react";
+import { Fragment, useEffect, useRef, useState } from "react";
 import { createStyles, makeStyles } from "@mui/styles";
 import {
   GoogleMap,
@@ -8,8 +8,7 @@ import {
   InfoBox,
 } from "@react-google-maps/api";
 
-import icon from "../../../assets/marker.png";
-
+import icon from "../../../assets/tree-1.svg";
 import { useRecoilValue } from "recoil";
 import { usersData, selUsersData } from "../../../store/atoms";
 
@@ -17,10 +16,9 @@ const containerStyle = {
   width: "100%",
   height: "100%",
   borderRadius: "6px",
-  // boxShadow: '0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23)'
 };
 
-const options = {
+const initialOptions = {
   fillColor: "green",
   fillOpacity: 0.1,
   strokeColor: "lightgreen",
@@ -32,15 +30,9 @@ const options = {
   geodesic: false,
 };
 
-const selectedOption = {
-  ...options,
-  fillOpacity: 0.35,
-};
-
 const mapOptions = {
   disableDefaultUI: true,
   mapTypeId: "hybrid",
-  zoom: 12,
   minZoom: 6,
   maxZoom: 22,
   panControl: true,
@@ -62,39 +54,86 @@ export const Map = () => {
   );
   pathObj && boundaries.push(pathObj);
 
-  let { isLoaded } = useJsApiLoader({
+  const { isLoaded } = useJsApiLoader({
     id: "google-map-script",
     googleMapsApiKey: import.meta.env.VITE_APP_API_MAP_KEY,
   });
 
-  if (boundaries.length === 0) isLoaded = false;
+  const mapRef = useRef(null);
+  const [polygonOptions, setPolygonOptions] = useState(initialOptions);
+  const [zoomLevel, setZoomLevel] = useState(1); // Start with a higher zoom level
+
+  useEffect(() => {
+    if (isLoaded && mapRef.current) {
+      let opacity = 0.1;
+      const interval = setInterval(() => {
+        opacity = opacity === 0.1 ? 0.5 : 0.1;
+        setPolygonOptions((prevOptions) => ({
+          ...prevOptions,
+          fillOpacity: opacity,
+        }));
+      }, 1000);
+
+      return () => clearInterval(interval);
+    }
+  }, [isLoaded]);
+
+  useEffect(() => {
+    if (isLoaded) {
+      // console.log("Map loaded");
+      const targetZoom = 16; // Desired zoom level
+      const zoomInterval = setInterval(() => {
+        
+        setZoomLevel((prevZoom) => {
+          // console.log("Zooming current level: ", prevZoom);
+          if (prevZoom > targetZoom) {
+            clearInterval(zoomInterval);
+            return prevZoom;
+          }
+          return prevZoom + 0.1; // Decrease zoom level gradually
+        });
+      }, 100); // Adjust the interval time for smoother animation
+
+      return () => clearInterval(zoomInterval);
+    }
+  }, [isLoaded]);
 
   const onMarkerClick = (i) => {
     console.log(i);
   };
-  return isLoaded ? (
+
+  // Check if boundaries is empty or null
+  if (!isLoaded || !boundaries.length) {
+    return <></>;
+  }
+  return (
     <div className={classes.map}>
       <GoogleMap
         mapContainerStyle={containerStyle}
         center={boundaries[0][0]}
-        zoom={16}
+        zoom={zoomLevel}
         options={mapOptions}
+        onLoad={(map) => (mapRef.current = map)}
       >
         {trees.map((tree, i) => (
           <Fragment key={i}>
             {currTree.sapling_id === tree.sapling_id && (
               <>
                 <Marker
-                  icon={icon}
+                  icon={{
+                    url: icon,
+                    scaledSize: new window.google.maps.Size(30, 30),
+                  }}
                   position={boundaries[0][0]}
                   animation={1}
                   onClick={() => onMarkerClick(i)}
-                ></Marker>
-                <Polygon paths={boundaries[0]} options={selectedOption} />
-                <InfoBox
-                  options={boxOptions}
-                  position={boundaries[0][0]}
-                >
+                />
+                <Polygon
+                  paths={boundaries[0]}
+                  options={polygonOptions}
+                  className="polygon-path"
+                />
+                <InfoBox options={boxOptions} position={boundaries[0][0]}>
                   <div
                     style={{
                       backgroundColor: "#ffffff",
@@ -107,9 +146,10 @@ export const Map = () => {
                     <img
                       alt="tree"
                       src={
-                        tree.image && tree.image !== ''
+                        tree.image && tree.image !== ""
                           ? tree.image
-                          : tree.plant_type_images && tree.plant_type_images.length > 0
+                          : tree.plant_type_images &&
+                            tree.plant_type_images.length > 0
                           ? tree.plant_type_images[0]
                           : ""
                       }
@@ -133,9 +173,8 @@ export const Map = () => {
         ))}
       </GoogleMap>
     </div>
-  ) : (
-    <></>
-  );
+  )
+  
 };
 
 const useStyles = makeStyles((theme) =>
@@ -145,7 +184,7 @@ const useStyles = makeStyles((theme) =>
       height: "100%",
       marginRight: "20px",
       [theme.breakpoints.down("480")]: {
-        height: "300px", // Set a fixed height for mobile screens
+        height: "300px",
       },
     },
     treeimg: {
