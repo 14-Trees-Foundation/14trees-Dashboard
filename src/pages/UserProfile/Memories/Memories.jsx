@@ -2,13 +2,13 @@ import { createStyles, makeStyles } from "@mui/styles";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
 import useMediaQuery from "@mui/material/useMediaQuery";
-
 import { Popup } from "../../../stories/Popup/Popup";
 import { useRecoilValue, useRecoilState } from "recoil";
 import { usersData, openMemoryPopup, selUsersData } from "../../../store/atoms";
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { ImageViewer } from "../../../components/ImageViewer";
 import MobileImagePopup from "./MobileImagePopup";
+import { gsap } from "gsap";
 
 export const Memories = () => {
   const classes = useStyles();
@@ -19,41 +19,34 @@ export const Memories = () => {
   const selUserInfo = useRecoilValue(selUsersData);
   const [open, setOpenPopup] = useRecoilState(openMemoryPopup);
   const [index, setIndex] = useState(0);
+  const sliderRef = useRef(null);
 
   let images = [];
-  // for (const tree of userinfo.user_trees) {
-  //   images.push.apply(images, tree["memory_images"]);
-  // }
   images.push.apply(images, selUserInfo["memory_images"]);
   images.push.apply(images, selUserInfo["visit_images"]);
 
-  let allImages = [];
-  allImages = [
+  let allImages = [
     6, 1, 3, 5, 4, 8, 9, 1, 11, 12, 13, 14, 15, 23, 16, 17, 18, 19, 20, 21, 22,
   ].map((number) => {
     return `https://14treesplants.s3.ap-south-1.amazonaws.com/memories/memory${number}.jpg`;
   });
 
   images = [...new Set(images)];
-  images = images.filter(function (e) {
-    return e;
-  });
+  images = images.filter((e) => e);
   images = [...images, ...allImages];
-  images = images.map((image) => {
-    // return encodeURI(image).replace(/#/g, "%23");
-    return image.replace(/#/g, "%23");
-  });
+  images = images.map((image) => image.replace(/#/g, "%23"));
 
   const next = () => {
-    if (index < images.length - 1) {
-      setIndex(index + 1);
-    }
+
+    setIndex((prevIndex) => {
+      console.log("Current Index: ", prevIndex);
+      console.log("Images Length: ", images.length);
+      return prevIndex < images.length - 1 ? prevIndex + 1 : 0;
+    });
   };
 
   const prev = () => {
-    if (index !== 0) {
-      setIndex(index - 1);
-    }
+    setIndex((prevIndex) => (prevIndex !== 0 ? prevIndex - 1 : images.length - 1));
   };
 
   const onTogglePop = () => {
@@ -64,28 +57,35 @@ export const Memories = () => {
     setOpenPopup(true);
   };
 
+  useEffect(() => {
+    if (sliderRef.current) {
+      gsap.to(sliderRef.current, {
+        x: matches ? -index * 310 : -index * 700,
+        duration: 1,
+        ease: "power3.out",
+      });
+    }
+  }, [index, matches]);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      next();
+    }, 3000); // Change image every 3 seconds
+
+    // return () => clearInterval(interval); // Cleanup interval on component unmount
+  }, []);
+
   if (open) {
     return isMobile ? (
-      <MobileImagePopup images={images} onClose={onTogglePop}/>
+      <MobileImagePopup images={images} onClose={onTogglePop} />
     ) : (
       <div style={{ width: "100%", height: "100%" }}>
         <Popup toggle={onTogglePop}>
           <div className={classes.slideshowWindow}>
-            <div
-              className={classes.slider}
-              style={{
-                transform: matches
-                  ? `translate3d(${-index * 310}px, 0, 0)`
-                  : `translate3d(${-index * 700}px, 0, 0)`,
-              }}
-            >
-              {images.map((image, index) => (
-                <div className={classes.slide} key={index}>
-                  <img
-                    className={classes.memimageWindow}
-                    src={image}
-                    alt={"A"}
-                  />
+            <div className={classes.slider} ref={sliderRef}>
+              {images.map((image, idx) => (
+                <div className={classes.slide} key={idx}>
+                  <img className={classes.memimageWindow} src={image} alt={"A"} />
                 </div>
               ))}
             </div>
@@ -101,12 +101,12 @@ export const Memories = () => {
             <ArrowBackIosIcon
               fontSize="large"
               style={{ color: "white", cursor: "pointer" }}
-              onClick={() => prev()}
+              onClick={prev}
             />
             <ArrowForwardIosIcon
               fontSize="large"
               style={{ color: "white", cursor: "pointer", marginLeft: "30px" }}
-              onClick={() => next()}
+              onClick={next}
             />
           </div>
         </Popup>
@@ -119,7 +119,6 @@ export const Memories = () => {
           <div style={{ fontSize: "16px", fontWeight: "700", padding: "5px" }}>
             Memories
           </div>
-          {/* <Chip label={"See All"} mode={'primary'} size={'small'} onClick={() => console.log("cliicked")}/> */}
           <div
             style={{
               marginLeft: "auto",
@@ -130,22 +129,19 @@ export const Memories = () => {
             <ArrowBackIosIcon
               fontSize="small"
               style={{ color: "green", cursor: "pointer" }}
-              onClick={() => prev()}
+              onClick={prev}
             />
             <ArrowForwardIosIcon
               fontSize="small"
               style={{ color: "green", cursor: "pointer" }}
-              onClick={() => next()}
+              onClick={next}
             />
           </div>
         </div>
         <div className={classes.slideshow}>
-          <div
-            className={classes.slider}
-            style={{ transform: `translate3d(${-index * 240}px, 0, 0)` }}
-          >
-            {images.map((image, index) => (
-              <div className={classes.slide} key={index}>
+          <div className={classes.slider} ref={sliderRef}>
+            {images.map((image, idx) => (
+              <div className={classes.slide} key={idx}>
                 <div className={classes.memimage}>
                   <ImageViewer image={image} handleClick={handleOpenPopup} />
                 </div>
@@ -200,7 +196,6 @@ const useStyles = makeStyles((theme) =>
     },
     slider: {
       whiteSpace: "nowrap",
-      transition: "ease 1000ms",
     },
     slide: {
       display: "inline-block",
