@@ -62,10 +62,10 @@ const GiftCardsForm: FC<GiftCardsFormProps> = ({ step, loggedinUserId, giftCardR
     const getGiftCardRequestDetails = async () => {
         const apiClient = new ApiClient();
 
-        if (loggedinUserId) {
-            const createdByResp = await apiClient.getUsers(0, 1, [{ columnField: 'id', operatorValue: 'equals', value: giftCardRequest?.created_by ? giftCardRequest.created_by : loggedinUserId }]);
-            if (createdByResp.results.length === 1) setCreatedBy(createdByResp.results[0]);
-        }
+   //     if (loggedinUserId) {
+   //         const createdByResp = await apiClient.getUsers(0, 1, [{ columnField: 'id', operatorValue: 'equals', value: giftCardRequest?.created_by ? giftCardRequest.created_by : loggedinUserId }]);
+   //         if (createdByResp.results.length === 1) setCreatedBy(createdByResp.results[0]);
+   //     }
 
         if (giftCardRequest) {
             const userResp = await apiClient.getUsers(0, 1, [{ columnField: 'id', operatorValue: 'equals', value: giftCardRequest.user_id }]);
@@ -116,9 +116,33 @@ const GiftCardsForm: FC<GiftCardsFormProps> = ({ step, loggedinUserId, giftCardR
         }
     }
 
+    const getCreatorUser = async () => {
+        const apiClient = new ApiClient();    
+        if (!giftCardRequest?.created_by) return;
+        
+        try {
+            const createdByResp = await apiClient.getUsers(0, 1, [{
+                columnField: 'id',
+                operatorValue: 'equals',
+                value: giftCardRequest.created_by
+            }]);
+            
+            setCreatedBy(createdByResp.results[0] || null);
+        } catch (error) {
+            console.error('Failed to fetch creator:', error);
+            toast.error('Failed to load creator details');
+        }
+    };
+
     useEffect(() => {
-        if (open) getGiftCardRequestDetails();
-    }, [open, giftCardRequest])
+        if (open && giftCardRequest) {
+            const fetchData = async () => {
+                await getGiftCardRequestDetails();
+                await getCreatorUser();
+            };
+            fetchData();
+        }
+    }, [open, giftCardRequest]);
 
     useEffect(() => {
         const uploadFile = async () => {
