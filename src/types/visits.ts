@@ -33,11 +33,14 @@ export type BulkVisitUsersMappingResponse = {
 export type VisitUsersMappingState = Record<number, BulkVisitUsersMappingResponse>
 
 export type VisitsDataState = {
-  totalVisits: number,
-  visits: Record<number, Visit>
+  loading: boolean,
+    totalVisits: number,
+    visits: Record<number, Visit>,
+    paginationMapping: Record<number, number>,
 }
 
 export type VisitUsersDataState = {
   totalUsers: number,
   users: Record<number, User>
+
 }

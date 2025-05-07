@@ -21,6 +21,7 @@ import { TableColumnsType } from "antd";
 import { Site } from "../../../types/site";
 import getColumnSearchProps, { getColumnSelectedItemFilter } from "../../../components/Filter";
 import TableComponent from "../../../components/Table";
+import GeneralTable from "../../../components/GenTable";
 import { useAppDispatch, useAppSelector } from "../../../redux/store/hooks";
 import * as siteActionCreators from "../../../redux/actions/siteActions";
 import { bindActionCreators } from "@reduxjs/toolkit";
@@ -50,6 +51,7 @@ export const SitesComponent = () => {
   const [editModal, setEditModal] = useState(false);
   const [page, setPage] = useState(0);
   const [pageSize, setPageSize] = useState(10);
+  const [tableRows, setTableRows] = useState<Site[]>([]);
   const [filters, setFilters] = useState<Record<string, GridFilterItem>>({});
 
   const siteCategories = ['Public', 'Foundation', 'Unknown']
@@ -59,38 +61,78 @@ export const SitesComponent = () => {
     setFilters(filters);
   };
 
-  useEffect(() => {
-    getSiteData();
-  }, [pageSize, page, filters]);
+  let sitesList: Site[] = [];
+const sitesData = useAppSelector((state: RootState) => state.sitesData);
+if (sitesData) {
+  sitesList = Object.values(sitesData.sites);
+  sitesList = sitesList.sort((a, b) => b.id - a.id);
+}
 
-  const getSiteData = async () => {
-    let filtersData = Object.values(filters);
+const handlePaginationChange = (page: number, pageSize: number) => {
+  setPage(page - 1);
+  setPageSize(pageSize);
+}
 
-    const categoryIdx = filtersData.findIndex(item => item.columnField === 'category');
-    if (categoryIdx > -1) {
-      filtersData[categoryIdx].value = (filtersData[categoryIdx].value as string[]).filter(item => item !== 'Unknown');
-      filtersData[categoryIdx].value.push(null);
+useEffect(() => {
+  getSiteData();
+}, [filters]);
+
+useEffect(() => {
+  const handler = setTimeout(() => {
+    if (sitesData.loading) return;
+
+    const records: Site[] = [];
+    const maxLength = Math.min((page + 1) * pageSize, sitesData.totalSites);
+    for (let i = page * pageSize; i < maxLength; i++) {
+      if (Object.hasOwn(sitesData.paginationMapping, i)) {
+        const id = sitesData.paginationMapping[i];
+        const record = sitesData.sites[id];
+        if (record) {
+          records.push(record);
+        }
+      } else {
+        getSiteData();
+        break;
+      }
     }
 
-    getSites(page * pageSize, pageSize, filtersData);
-  };
+    setTableRows(records);
+  }, 500)
 
-  let sitesList: Site[] = [];
-  const sitesData = useAppSelector((state: RootState) => state.sitesData);
-  if (sitesData) {
-    sitesList = Object.values(sitesData.sites);
-    sitesList = sitesList.sort((a, b) => b.id - a.id);
+  return () => {
+    clearTimeout(handler);
+  }
+}, [pageSize, page, sitesData]);
+
+const getSiteData = async () => {
+  let filtersData = Object.values(filters);
+
+  const categoryIdx = filtersData.findIndex(item => item.columnField === 'category');
+  if (categoryIdx > -1) {
+    filtersData[categoryIdx].value = (filtersData[categoryIdx].value as string[]).filter(item => item !== 'Unknown');
+    filtersData[categoryIdx].value.push(null);
   }
 
-  const getAllSitesData = async () => {
-    let filtersData = Object.values(filters);
-    const categoryIdx = filtersData.findIndex(item => item.columnField === 'category');
-    if (categoryIdx > -1) {
-      filtersData[categoryIdx].value = (filtersData[categoryIdx].value as string[]).filter(item => item !== 'Unknown');
-      filtersData[categoryIdx].value.push(null);
-    }
-    getSites(0, sitesData.totalSites, filtersData);
-  };
+  getSites(page * pageSize, pageSize, filtersData);
+};
+
+const getAllSitesData = async () => {
+  let filtersData = Object.values(filters);
+  const categoryIdx = filtersData.findIndex(item => item.columnField === 'category');
+  if (categoryIdx > -1) {
+    filtersData[categoryIdx].value = (filtersData[categoryIdx].value as string[]).filter(item => item !== 'Unknown');
+    filtersData[categoryIdx].value.push(null);
+  }
+  
+  const apiClient = new ApiClient();
+  try {
+    const sitesResp = await apiClient.getSites(0, -1, filtersData);
+    return sitesResp.results;
+  } catch (error: any) {
+    toast.error(error.message);
+    return [];
+  }
+};
 
   const handleDeleteSites = (row: Site) => {
     setOpenDeleteModal(true);
@@ -312,14 +354,17 @@ export const SitesComponent = () => {
       </div>
       <Divider sx={{ backgroundColor: "black", marginBottom: '15px' }} />
       <Box sx={{ height: 840, width: "100%" }}>
-        <TableComponent
-          dataSource={sitesList}
-          columns={columns}
-          totalRecords={sitesData.totalSites}
-          fetchAllData={getAllSitesData}
-          setPage={setPage}
-          setPageSize={setPageSize}
-          tableName="Sites"
+        <GeneralTable
+           loading={sitesData.loading}
+           rows={tableRows}
+           columns={columns}
+           totalRecords={sitesData.totalSites}
+           page={page}
+           pageSize={pageSize}
+           onPaginationChange={handlePaginationChange}
+           onDownload={getAllSitesData}
+           footer
+           tableName="Sites"
         />
       </Box>
 

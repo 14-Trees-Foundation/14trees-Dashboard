@@ -24,7 +24,10 @@ import {
 import EditPond from "./EditPond";
 import { getFormattedDate } from "../../../../helpers/utils";
 import { TableColumnsType } from "antd";
+import { toast, ToastContainer } from "react-toastify";
 import TableComponent from "../../../../components/Table";
+import GeneralTable from "../../../../components/GenTable";
+import ApiClient from "../../../../api/apiClient/apiClient";
 import getColumnSearchProps, { getColumnSelectedItemFilter } from "../../../../components/Filter";
 
 function getCapacity(pond: any) {
@@ -60,7 +63,13 @@ export const PondComponent = ({ setSelectedPond }: PondComponentInputProps) => {
     const [editModal, setEditModal] = useState(false);
     const [page, setPage] = useState(0);
     const [pageSize, setPageSize] = useState(10);
+    const [tableRows, setTableRows] = useState<Pond[]>([]);
     const [filters, setFilters] = useState<Record<string, GridFilterItem>>({});
+
+    const handlePaginationChange = (page: number, pageSize: number) => {
+        setPage(page - 1);
+        setPageSize(pageSize);
+      }
 
     const handleSetFilters = (filters: Record<string, GridFilterItem>) => {
         setPage(0);
@@ -190,31 +199,60 @@ export const PondComponent = ({ setSelectedPond }: PondComponentInputProps) => {
         
       ];
 
-    useEffect(() => {
-        getPondData();
-    }, [pageSize, page, filters]);
-
-    const getPondData = async () => {
-        let filtersData = Object.values(filters);
-        setLoading(true);
-        getPonds(page*pageSize, pageSize, filtersData);
-        setTimeout(() => {
-            setLoading(false);
-        }, 1000);
-    };
-
-    
-    let pondsList: Pond[] = [];
-    const pondsData = useAppSelector((state: RootState) => state.pondsData);
-    if (pondsData) {
+      let pondsList: Pond[] = [];
+      const pondsData = useAppSelector((state: RootState) => state.pondsData);
+      if (pondsData) {
         pondsList = Object.values(pondsData.ponds);
         pondsList = pondsList.sort((a, b) => b.id - a.id)
-    }
+      }
+      
+      useEffect(() => {
+        getPondData();
+      }, [filters]);
+      
+      useEffect(() => {
+        const handler = setTimeout(() => {
+          if (pondsData.loading) return;
+      
+          const records: Pond[] = [];
+          const maxLength = Math.min((page + 1) * pageSize, pondsData.totalPonds);
+          for (let i = page * pageSize; i < maxLength; i++) {
+            if (Object.hasOwn(pondsData.paginationMapping, i)) {
+              const id = pondsData.paginationMapping[i];
+              const record = pondsData.ponds[id];
+              if (record) {
+                records.push(record);
+              }
+            } else {
+              getPondData();
+              break;
+            }
+          }
+      
+          setTableRows(records);
+        }, 500)
+      
+        return () => {
+          clearTimeout(handler);
+        }
+      }, [pageSize, page, pondsData]);
 
-    const getAllPondsData = async () => {
+      const getPondData = async () => {
         let filtersData = Object.values(filters);
-        getPonds(0, pondsData.totalPonds, filtersData);
-    };
+        getPonds(page*pageSize, pageSize, filtersData);
+      };
+      
+      const getAllPondsData = async () => {
+        let filtersData = Object.values(filters);
+        const apiClient = new ApiClient();
+        try {
+          const pondsResp = await apiClient.getPonds(0, -1, filtersData);
+          return pondsResp.results;
+        } catch (error: any) {
+          toast.error(error.message);
+          return [];
+        }
+      };
 
     const handleDelete = (row: Pond) => {
         setOpenDeleteModal(true);
@@ -263,15 +301,17 @@ export const PondComponent = ({ setSelectedPond }: PondComponentInputProps) => {
             <Divider sx={{ backgroundColor: "black", marginBottom: '15px' }} />
             
             <Box sx={{ height: 840, width: "100%" }}>
-                <TableComponent
-                    loading={loading}
-                    dataSource={pondsList}
-                    columns={columns}
-                    totalRecords={pondsData.totalPonds}
-                    fetchAllData={getAllPondsData}
-                    setPage={setPage}
-                    setPageSize={setPageSize}
-                    tableName="Ponds"
+            <GeneralTable
+              loading={pondsData.loading}
+              rows={tableRows}
+              columns={columns}
+              totalRecords={pondsData.totalPonds}
+              page={page}
+              pageSize={pageSize}
+              onPaginationChange={handlePaginationChange}
+              onDownload={getAllPondsData}
+              footer
+              tableName="Ponds"
                 />
             </Box>
 
