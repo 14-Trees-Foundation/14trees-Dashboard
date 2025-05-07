@@ -15,7 +15,6 @@ export const Memories = () => {
   const matches = useMediaQuery("(max-width:481px)");
   const isMobile = useMediaQuery("(max-width:600px)");
 
-  const userinfo = useRecoilValue(usersData);
   const selUserInfo = useRecoilValue(selUsersData);
   const [open, setOpenPopup] = useRecoilState(openMemoryPopup);
   const [index, setIndex] = useState(0);
@@ -37,12 +36,7 @@ export const Memories = () => {
   images = images.map((image) => image.replace(/#/g, "%23"));
 
   const next = () => {
-
-    setIndex((prevIndex) => {
-      console.log("Current Index: ", prevIndex);
-      console.log("Images Length: ", images.length);
-      return prevIndex < images.length - 1 ? prevIndex + 1 : 0;
-    });
+    setIndex((prevIndex) => (prevIndex < images.length - 1 ? prevIndex + 1 : 0));
   };
 
   const prev = () => {
@@ -60,20 +54,20 @@ export const Memories = () => {
   useEffect(() => {
     if (sliderRef.current) {
       gsap.to(sliderRef.current, {
-        x: matches ? -index * 310 : -index * 700,
+        x: -index * 220,
         duration: 1,
         ease: "power3.out",
       });
     }
-  }, [index, matches]);
+  }, [index, matches, images]);
 
   useEffect(() => {
     const interval = setInterval(() => {
       next();
     }, 3000); // Change image every 3 seconds
 
-    // return () => clearInterval(interval); // Cleanup interval on component unmount
-  }, []);
+    return () => clearInterval(interval);
+  }, [images.length]);
 
   if (open) {
     return isMobile ? (

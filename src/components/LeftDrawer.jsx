@@ -165,7 +165,7 @@ export const LeftDrawer = () => {
     return (
       <Drawer className={classes.drawer} variant="permanent" anchor="left">
         <Divider />
-        <img className={classes.logo} alt={"logo"} src={logo} />
+        <img className={classes.logo} alt={"logo"} src={logo} onClick={() => { window.open("https://www.14trees.org") }} />
         {menuitem()}
       </Drawer>
     );
@@ -247,6 +247,7 @@ const useStyles = makeStyles((theme) =>
       backgroundColor: "#9BC53D",
     },
     logo: {
+      cursor: "pointer",
       width: "80px",
       height: "100px",
       margin: "12px auto 30px auto",
