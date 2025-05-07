@@ -57,12 +57,12 @@ export const Profile = ({ saplingId }) => {
     //   { opacity: 0, y: -20 },
     //   { opacity: 1, y: 0, duration: 1, ease: "power3.out" }
     // )
-      tl.fromTo(
-        dividerRef.current,
-        { opacity: 0, scaleX: 0 },
-        { opacity: 1, scaleX: 1, duration: 0.5, ease: "power3.out" },
-        "-=0.5"
-      )
+    tl.fromTo(
+      dividerRef.current,
+      { opacity: 0, scaleX: 0 },
+      { opacity: 1, scaleX: 1, duration: 0.5, ease: "power3.out" },
+      "-=0.5"
+    )
       .fromTo(
         userInfoRef.current,
         { opacity: 0, y: 20 },
@@ -138,6 +138,9 @@ export const Profile = ({ saplingId }) => {
         <div className={classes.user} ref={userInfoRef}>
           <UserInfo />
         </div>
+        {matches && selUserInfo.tree_audits && selUserInfo.tree_audits.length > 1 && <div >
+          <TreeTimelineInfo />
+        </div>}
         <div className={classes.treemap}>
           <div style={{ display: matches ? "block" : "flex" }}>
             <div className={classes.tree} ref={treesRef}>
@@ -148,7 +151,7 @@ export const Profile = ({ saplingId }) => {
             </div>
           </div>
         </div>
-        {selUserInfo.tree_audits && selUserInfo.tree_audits.length > 1 && <div >
+        {!matches && selUserInfo.tree_audits && selUserInfo.tree_audits.length > 1 && <div style={{ marginTop: '20px' }}>
           <TreeTimelineInfo />
         </div>}
       </div>
