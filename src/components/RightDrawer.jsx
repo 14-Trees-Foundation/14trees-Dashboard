@@ -37,7 +37,7 @@ export const RightDrawer = ({showWhatsNew = true, children = null}) => {
         </div>
         {children}
         { showWhatsNew ? <div>
-          <h3 style={{ marginLeft: "9%" }}>What's New</h3>
+          <h3 style={{ marginLeft: "9%" }}>About 14 Trees</h3>
           <Divider style={{ margin: "0 9% 2% 9%" }} />
           <div className={classes.feed}>
             <NewsFeed />

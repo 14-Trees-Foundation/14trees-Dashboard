@@ -130,9 +130,15 @@ const useStyles = makeStyles((theme: any) =>
       objectFit: "cover",
       padding: "2%",
       maxHeight: "480px",
+      transition: "transform 0.3s ease, box-shadow 0.3s ease",
+      "&:hover": {
+        transform: "scale(1.05)", // Slightly scale up the image
+        boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)", // Add shadow
+      },
       [theme.breakpoints.down("480")]: {
         maxHeight: "300px",
       },
+
     },
   })
 );

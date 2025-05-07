@@ -1,9 +1,9 @@
-import { Fragment, useState } from "react";
+import { Fragment, useState, useEffect, useRef } from "react";
 import { Dialog, Grid } from "@mui/material";
 import { createStyles, makeStyles } from "@mui/styles";
 import { useRecoilValue, useRecoilState } from "recoil";
+import { gsap } from "gsap";
 import { strEquals } from "../../../helpers/utils";
-// import { useSetRecoilState } from 'recoil';
 
 import { Memories } from "../Memories/Memories";
 import { InfoChip } from "../../../stories/InfoChip/InfoChip";
@@ -13,7 +13,6 @@ import {
   openProfilePopup,
 } from "../../../store/atoms";
 import { Progress } from "../../../components/CircularProgress";
-// import { navIndex } from '../../../store/atoms';
 
 export const UserInfo = () => {
   const classes = useStyles();
@@ -21,11 +20,62 @@ export const UserInfo = () => {
   const [imgLoad, setImgLoad] = useState(false);
   const userinfo = useRecoilValue(usersData);
   const selUserInfo = useRecoilValue(selUsersData);
-  // const setIndex = useSetRecoilState(navIndex);
   const [open, setOpenPopup] = useRecoilState(openProfilePopup);
+
+  const gridRefs = useRef([]);
+  const plantationDetailsRef = useRef(null);
+
+  gridRefs.current = [];
+
+  const addToRefs = (el) => {
+    if (el && !gridRefs.current.includes(el)) {
+      gridRefs.current.push(el);
+    }
+  };
+
+  useEffect(() => {
+    const tl = gsap.timeline();
+  
+    gridRefs.current.forEach((el, index) => {
+      // tl.fromTo(
+      //   el,
+      //   { opacity: 0, y: 20 },
+      //   { opacity: 1, y: 0, duration: 3, ease: "power3.out" },
+      //   0.5
+      // );
+
+      // Add a stagger effect
+      tl.staggerFromTo(
+        el,
+        0.5,
+        { opacity: 0, y: 20 },
+        { opacity: 1, y: 0, ease: "power3.out" },
+        0.2 // Stagger delay
+      );
+
+      const divs = plantationDetailsRef.current.querySelectorAll("div");
+
+      gsap.fromTo(
+        divs,
+        { opacity: 0, y: 20 },
+        {
+          opacity: 1,
+          y: 0,
+          duration: 1,
+          ease: "power3.out",
+          stagger: 0.2, // Stagger the animations
+        }
+      );
+      
+    });
+  
+    
+  }, []);
+
   const handleTreeClick = () => {
     // setIndex(2);
   };
+
   const onTogglePop = () => {
     setOpenPopup(!open);
   };
@@ -44,12 +94,13 @@ export const UserInfo = () => {
             className={imgLoad ? classes.imageWindow : classes.none}
             src={
               selUserInfo.user_tree_image && selUserInfo.user_tree_image !== ""
-              ? selUserInfo.user_tree_image
-              : ( selUserInfo.image && selUserInfo.image !== "" )
+                ? selUserInfo.user_tree_image
+                : selUserInfo.image && selUserInfo.image !== ""
                 ? selUserInfo.image
-                : selUserInfo.plant_type_images && selUserInfo.plant_type_images.length > 0
-                  ? selUserInfo.plant_type_images[0]
-                  : ""
+                : selUserInfo.plant_type_images &&
+                  selUserInfo.plant_type_images.length > 0
+                ? selUserInfo.plant_type_images[0]
+                : ""
             }
             alt={"A"}
           />
@@ -60,7 +111,7 @@ export const UserInfo = () => {
     return (
       <div style={{ width: "100%", height: "100%" }}>
         <Grid container>
-          <Grid item xs={6} md={3} sx={{ maxHeight: "260px" }}>
+          <Grid item xs={6} md={3} sx={{ maxHeight: "260px" }} ref={addToRefs}>
             {!imgLoad && <Progress />}
             <img
               onClick={() => handleOpenPopup()}
@@ -70,55 +121,69 @@ export const UserInfo = () => {
               src={
                 selUserInfo.user_tree_image && selUserInfo.user_tree_image !== ""
                   ? selUserInfo.user_tree_image
-                  : ( selUserInfo.image && selUserInfo.image !== "" )
-                    ? selUserInfo.image
-                    : selUserInfo.plant_type_images && selUserInfo.plant_type_images.length > 0
-                      ? selUserInfo.plant_type_images[0]
-                      : ""
+                  : selUserInfo.image && selUserInfo.image !== ""
+                  ? selUserInfo.image
+                  : selUserInfo.plant_type_images &&
+                    selUserInfo.plant_type_images.length > 0
+                  ? selUserInfo.plant_type_images[0]
+                  : ""
               }
             />
           </Grid>
-          <Grid item xs={6} md={3} className={classes.infobox}>
-            <div className={classes.info}>
-              {selUserInfo.event_type &&
-                selUserInfo.event_type === "2" ? (
+          <Grid item xs={6} md={3} className={classes.infobox} ref={addToRefs} id='plantation_details'>
+            <div className={classes.info} ref={plantationDetailsRef}>
+              {selUserInfo.event_type && selUserInfo.event_type === "2" ? (
                 <div className={classes.label}>In Memory of</div>
               ) : (
                 <div className={classes.label}>Name</div>
               )}
               <div className={classes.data}>{selUserInfo.assigned_to}</div>
-              {(
-                <>
-                  {(selUserInfo.gifted_by_name || (selUserInfo.gifted_by_user !== undefined && !strEquals(selUserInfo.gifted_by_user, selUserInfo.assigned_to) && !strEquals(selUserInfo.gifted_by_user, "ACM India") && !strEquals(selUserInfo.gifted_by_user, "ACM India Council") && selUserInfo.gifted_by)) && (
-                      <>
-                        <div className={classes.label}>Gifted By</div>
-                        <div
-                          style={{
-                            fontSize: "15px",
-                            fontWeight: "600",
-                            marginBottom: "8px",
-                          }}
-                        >
-                          {selUserInfo.gifted_by_name || selUserInfo.gifted_by_user}
-                        </div>
-                      </>
-                    )}
-                  {!(selUserInfo.gifted_by_name || selUserInfo.gifted_by_user) && selUserInfo.planted_by &&
-                    selUserInfo.planted_by !== undefined && (
-                      <>
-                        <div className={classes.label}>{strEquals(selUserInfo.planted_by, "ACM India Council") ? "Planted via" : "Planted By"}</div>
-                        <div
-                          style={{
-                            fontSize: "15px",
-                            fontWeight: "600",
-                            marginBottom: "8px",
-                          }}
-                        >
-                          {selUserInfo.planted_by}
-                        </div>
-                      </>
-                    )}
-                  {(selUserInfo.description && selUserInfo.description.trim() !== '') && 
+              <>
+                {(selUserInfo.gifted_by_name ||
+                  (selUserInfo.gifted_by_user !== undefined &&
+                    !strEquals(
+                      selUserInfo.gifted_by_user,
+                      selUserInfo.assigned_to
+                    ) &&
+                    !strEquals(selUserInfo.gifted_by_user, "ACM India") &&
+                    !strEquals(selUserInfo.gifted_by_user, "ACM India Council") &&
+                    selUserInfo.gifted_by)) && (
+                  <>
+                    <div className={classes.label}>Gifted By</div>
+                    <div
+                      style={{
+                        fontSize: "15px",
+                        fontWeight: "600",
+                        marginBottom: "8px",
+                      }}
+                    >
+                      {selUserInfo.gifted_by_name ||
+                        selUserInfo.gifted_by_user}
+                    </div>
+                  </>
+                )}
+                {!(selUserInfo.gifted_by_name || selUserInfo.gifted_by_user) &&
+                  selUserInfo.planted_by &&
+                  selUserInfo.planted_by !== undefined && (
+                    <>
+                      <div className={classes.label}>
+                        {strEquals(selUserInfo.planted_by, "ACM India Council")
+                          ? "Planted via"
+                          : "Planted By"}
+                      </div>
+                      <div
+                        style={{
+                          fontSize: "15px",
+                          fontWeight: "600",
+                          marginBottom: "8px",
+                        }}
+                      >
+                        {selUserInfo.planted_by}
+                      </div>
+                    </>
+                  )}
+                {selUserInfo.description &&
+                  selUserInfo.description.trim() !== "" && (
                     <div>
                       <div className={classes.label}>Event</div>
                       <div
@@ -128,8 +193,10 @@ export const UserInfo = () => {
                         {selUserInfo.description}
                       </div>
                     </div>
-                  }
-                  {(!selUserInfo.planted_by && !selUserInfo.gifted_by_name && !selUserInfo.gifted_by_user) && (
+                  )}
+                {!selUserInfo.planted_by &&
+                  !selUserInfo.gifted_by_name &&
+                  !selUserInfo.gifted_by_user && (
                     <Fragment>
                       <div className={classes.growth}>
                         <div style={{ marginTop: "20px" }}>
@@ -140,128 +207,32 @@ export const UserInfo = () => {
                               onClick={handleTreeClick}
                             />
                           </div>
-                          {(14 - userinfo.user_trees.length) > 0 && <div className={classes.overall}>
-                            <div
-                              className={classes.done}
-                              style={{ width: `${treeDoneWidth}%` }}
-                            ></div>
-                            <div className={classes.count}>
-                              {Math.max(14 - userinfo.user_trees.length, 0)}
-                              <div className={classes.countdesc}>
-                                Trees away from neutralising your carbon
-                                footprint
+                          {14 - userinfo.user_trees.length > 0 && (
+                            <div className={classes.overall}>
+                              <div
+                                className={classes.done}
+                                style={{ width: `${treeDoneWidth}%` }}
+                              ></div>
+                              <div className={classes.count}>
+                                {Math.max(
+                                  14 - userinfo.user_trees.length,
+                                  0
+                                )}
+                                <div className={classes.countdesc}>
+                                  Trees away from neutralising your carbon
+                                  footprint
+                                </div>
                               </div>
                             </div>
-                          </div>}
+                          )}
                         </div>
                       </div>
                     </Fragment>
-                  )
-                  }
-                </>
-              ) 
-              // : (
-              //   <>
-              //     {selUserInfo.sponsored_by &&
-              //       selUserInfo.sponsored_by !== selUserInfo.assigned_to_id && !strEquals(selUserInfo.gifted_by_user, "ACM India") && !strEquals(selUserInfo.gifted_by_user, "ACM India Council") && !(!selUserInfo.gifted_by && (strEquals(selUserInfo.sponsored_by_name, "ACM India") || strEquals(selUserInfo.sponsored_by_name, "ACM India Council"))) && (
-              //         <>
-              //           <div className={classes.label}>Donated By</div>
-              //           {selUserInfo.gifted_by_user &&
-              //             selUserInfo.gifted_by_user !== "undefined" ? (
-              //             <div className={classes.data}>
-              //               {selUserInfo.gifted_by_user}
-              //             </div>
-              //           ) : (
-              //             <div className={classes.data}>
-              //               {selUserInfo.sponsored_by_name}
-              //             </div>
-              //           )}
-              //         </>
-              //       )}
-              //     {selUserInfo.planted_by &&
-              //       selUserInfo.planted_by !== undefined && (
-
-              //         <>
-              //           <div className={classes.label}>{
-              //             strEquals(selUserInfo.planted_by, "ACM India Council") ? "Planted via" : "Planted By"
-              //           }</div>
-              //           <div
-              //             style={{
-              //               fontSize: "15px",
-              //               fontWeight: "600",
-              //               marginBottom: "8px",
-              //             }}
-              //           >
-              //             {selUserInfo.planted_by}
-              //           </div>
-              //         </>
-              //       )}
-              //     {(!selUserInfo.planted_by) && (
-              //       (selUserInfo.sponsored_by !== undefined &&
-              //         selUserInfo.sponsored_by === selUserInfo.assigned_to) ? (
-              //         <>
-              //           <div className={classes.label}>Organization</div>
-              //           <div className={classes.data}>
-              //             {selUserInfo.orgid?.name}
-              //           </div>
-              //         </>
-              //       ) : ("")
-              //     )}
-              //     {/* {(selUserInfo.planted_by || (selUserInfo.donated_by !== undefined &&
-              //       selUserInfo.donated_by._id !== selUserInfo.user._id)) && (
-              //         <>
-              //           <div className={classes.label}>Tree Name</div>
-              //           <div className={classes.data}>
-              //             {selUserInfo.tree.tree_type.name}
-              //           </div>
-              //         </>
-              //       )} */}
-              //     {((!selUserInfo.planted_by && !selUserInfo.donated_by) ||
-              //       (selUserInfo.donated_by && selUserInfo.donated_by === selUserInfo.assigned_to)) ? (
-              //       <Fragment>
-              //         <div className={classes.growth}>
-              //           <div style={{ marginTop: "20px" }}>
-              //             <div style={{ display: "flex" }}>
-              //               <InfoChip
-              //                 count={userinfo.user_trees.length}
-              //                 label="Trees Planted"
-              //                 onClick={handleTreeClick}
-              //               />
-              //             </div>
-              //             <div className={classes.overall}>
-              //               <div
-              //                 className={classes.done}
-              //                 style={{ width: `${treeDoneWidth}%` }}
-              //               ></div>
-              //               <div className={classes.count}>
-              //                 {14 - userinfo.user_trees.length}
-              //                 <div className={classes.countdesc}>
-              //                   Trees away from neutralising your carbon
-              //                   footprint
-              //                 </div>
-              //               </div>
-              //             </div>
-              //           </div>
-              //         </div>
-              //       </Fragment>
-              //     ) :
-              //       // (selUserInfo.planted_by ||
-              //       //   (selUserInfo.donated_by && selUserInfo.donated_by._id !== selUserInfo.user._id)) && (
-              //       //   <>
-              //       //     <div className={classes.label}>Location</div>
-              //       //     <div className={classes.data}>
-              //       //       {selUserInfo.tree.plot.name}
-              //       //     </div>
-              //       //   </>
-              //       // )
-              //       <></>
-              //     }
-              //   </>
-              // )
-            }
+                  )}
+              </>
             </div>
           </Grid>
-          <Grid item xs={12} md={6}>
+          <Grid item xs={12} md={6} ref={addToRefs}>
             <Memories />
           </Grid>
         </Grid>
@@ -288,6 +259,11 @@ const useStyles = makeStyles((theme) =>
       objectFit: "cover",
       maxWidth: "250px",
       cursor: "pointer",
+      transition: "transform 0.3s ease, box-shadow 0.3s ease",
+      "&:hover": {
+        transform: "scale(1.05)", // Slightly scale up the image
+        boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)", // Add shadow
+      },
       [theme.breakpoints.down("1500")]: {
         maxHeight: "220px",
         maxWidth: "210px",
@@ -386,6 +362,11 @@ const useStyles = makeStyles((theme) =>
       padding: "2%",
       width: "auto",
       maxWidth: "540px",
+      transition: "transform 0.3s ease, box-shadow 0.3s ease",
+      "&:hover": {
+        transform: "scale(1.05)", // Slightly scale up the image
+        boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)", // Add shadow
+      },
     },
   })
 );

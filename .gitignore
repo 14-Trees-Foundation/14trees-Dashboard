@@ -27,3 +27,5 @@ yarn-error.log*
 .netlify
 
 .env.development
+14trees-Dashboard.code-workspace
+.env
