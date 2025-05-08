@@ -7,7 +7,7 @@ import { Group } from "../../../types/Group";
 import ApiClient from "../../../api/apiClient/apiClient";
 import { ToastContainer, toast } from "react-toastify";
 import { GiftCard, GiftRequestType_CARDS_REQUEST, GiftRequestType_NORAML_ASSIGNMENT, GiftRequestUser, SponsorshipType } from "../../../types/gift_card";
-import getColumnSearchProps, { getColumnDateFilter, getColumnSelectedItemFilter, getSortIcon } from "../../../components/Filter";
+import getColumnSearchProps, { getColumnDateFilter, getColumnNumericFilter, getColumnSelectedItemFilter, getSortIcon } from "../../../components/Filter";
 import { GridFilterItem } from "@mui/x-data-grid";
 import * as giftCardActionCreators from "../../../redux/actions/giftCardActions";
 import { useAppDispatch, useAppSelector } from "../../../redux/store/hooks";
@@ -808,7 +808,8 @@ const GiftTrees: FC = () => {
             key: "Req. No.",
             title: "Req. No.",
             align: "right",
-            width: 100,
+            width: 130,
+            ...getColumnNumericFilter({ dataIndex: 'id', filters, handleSetFilters, label: 'Req. No.' })
         },
         {
             dataIndex: "user_name",
