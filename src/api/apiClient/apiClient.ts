@@ -2355,107 +2355,39 @@ class ApiClient {
         }
     }
 
-    async handleSupplierQuery(message: string, history: any[]): Promise<{ output: string }> {
+
+    async handleAgentQuery(
+        message: string, 
+        history: any[] = [],
+        context?: 'buyer' | 'supplier' | 'error'
+    ): Promise<{ output: string }> {
         try {
-            const response = await this.api.post<{ output: string }>(`/suppliers/gen-ai`, { message, history }, {
-                headers: {
-                    "x-access-token": this.token,
-                    "content-type": "application/json",
+            const processedMessage = context 
+                ? `[${context}] ${message}`
+                : message;
+    
+            const response = await this.api.post<{ output: string }>(
+                '/lighthouse/gen-ai', 
+                { 
+                    message: processedMessage, 
+                    history 
+                }, 
+                {
+                    headers: {
+                        "x-access-token": this.token,
+                        "content-type": "application/json",
+                    }
                 }
-            });
+            );
+            
             return response.data;
         } catch (error: any) {
             if (error.response) {
-                throw new Error(error.response.data.message);
+                throw new Error(error.response.data.message || 'Request failed');
             }
-            throw new Error('Failed to connect with our Supplier AI bot!');
+            throw new Error('Failed to connect with the AI agent');
         }
-    }
-
-    async updateSupplier(supplierData: any): Promise<{ message: string }> {
-        try {
-            const response = await this.api.put<{ message: string }>(`/suppliers/update`, supplierData, {
-                headers: {
-                    "x-access-token": this.token,
-                    "content-type": "application/json",
-                }
-            });
-            return response.data;
-        } catch (error: any) {
-            if (error.response) {
-                throw new Error(error.response.data.message);
-            }
-            throw new Error('Failed to update supplier data!');
-        }
-    }
-
-    async getSupplierDetails(supplierCode: string): Promise<any> {
-        try {
-            const response = await this.api.get<any>(`/suppliers/get`, {
-                headers: {
-                    "x-access-token": this.token,
-                    "content-type": "application/json",
-                },
-                params: { code: supplierCode } // Assuming you want to fetch by supplier code
-            });
-            return response.data;
-        } catch (error: any) {
-            if (error.response) {
-                throw new Error(error.response.data.message);
-            }
-            throw new Error('Failed to fetch supplier details!');
-        }
-    }
-
-    /*
-        Model- Buyer: CRUD Operations/Apis for buyers
-    */
-
-    async handleBuyerQuery(message: string, history: any[]): Promise<{ output: string }> {
-        try {
-            const response = await this.api.post<{ output: string }>(`/buyers/gen-ai`, { message, history }, {
-                headers: {
-                    "x-access-token": this.token,
-                    "content-type": "application/json",
-                }
-            });
-            return response.data;
-        } catch (error: any) {
-            if (error.response) {
-                throw new Error(error.response.data.message);
-            }
-            throw new Error('Failed to connect with our Buyer AI bot!');
-        }
-    }
-
-    async updateBuyer(buyerData: any): Promise<any> {
-        try {
-            const response = await this.api.put<any>(`/buyers/update`, buyerData, {
-                headers: {
-                    "x-access-token": this.token,
-                    "content-type": "application/json",
-                },
-            });
-            return response.data;
-        } catch (error: any) {
-            throw new Error('Error updating buyer');
-        }
-    }
-
-    async getBuyerDetails(code: string): Promise<any> {
-        try {
-            const response = await this.api.get<any>(`/buyers/get`, {
-                headers: {
-                    "x-access-token": this.token,
-                    "content-type": "application/json",
-                },
-                params: { code },
-            });
-            return response.data;
-        } catch (error: any) {
-            throw new Error('Error fetching buyer details');
-        }
-    }
+    };
 }
 
 

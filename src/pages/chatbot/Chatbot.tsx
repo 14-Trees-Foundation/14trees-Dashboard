@@ -59,10 +59,10 @@ const Chatbot = () => {
   return (
     <div style={styles.container}>
       <header style={styles.header}>
-        <div style={styles.logo}>LightHouse Supplier Portal</div>
+        <div style={styles.logo}>LightHouse Portal</div>
         <p style={styles.tagline}>
-          AI-powered supplier management system. 
-          Start a conversation below to onboard suppliers or manage existing relationships.
+          AI-powered management system. 
+          Start a conversation below to onboard suppliers/buyers or manage existing relationships.
         </p>
       </header>
       
@@ -71,7 +71,9 @@ const Chatbot = () => {
           <div style={styles.gettingStartedTitle}>Getting Started</div>
           <p style={styles.gettingStartedText}>
             Type your request in natural language or try:
-            "Create a new supplier" • "Find supplier ABC123" • "Show active suppliers"
+             • "Create a new supplier/buyer"
+             • "Find supplier/buyer ABC123" 
+             • "Show active suppliers/buyers"
           </p>
         </div>
         <ChatbotV2 />
