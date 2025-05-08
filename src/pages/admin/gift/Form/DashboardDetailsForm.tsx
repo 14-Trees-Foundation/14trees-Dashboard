@@ -16,7 +16,7 @@ const EventTypes = [
     },
 ]
 
-const GiftRequestTypes = ['Cards Request', 'Normal Assignment', 'Promotion', 'Test']
+const GiftRequestTypes = ['Gift Cards', 'Normal Assignment', 'Promotion', 'Visit', 'Test']
 
 interface Massages {
     primaryMessage: string,
@@ -66,6 +66,20 @@ const DashboardDetails: FC<DashboardDetailsProps> = ({ messages, onChange, gifte
         <div style={{ display: 'flex', padding: '10px 10px', width: '100%', justifyContent: 'center' }}>
             <div style={{ display: 'flex', justifyContent: 'center', flexDirection: 'column', width: '42%' }}>
                 <Typography variant='h6'>A few more details to make a bit more personalised dashboard: </Typography>
+                <Box sx={{ mt: 2 }}>
+                    <FormControl fullWidth>
+                        <InputLabel id="request-type">Request Type</InputLabel>
+                        <Select
+                            labelId="request-type"
+                            value={requestType}
+                            label="Request Type"
+                            size="small"
+                            onChange={(e) => { onRequestTypeChange(e.target.value); }}
+                        >
+                            {GiftRequestTypes.map(item => <MenuItem key={item} value={item}>{item}</MenuItem>)}
+                        </Select>
+                    </FormControl>
+                </Box>
                 <Typography variant="body1" sx={{ mt: 2 }}>Event/Occasion</Typography>
                 <Autocomplete
                     size="small"
@@ -89,29 +103,15 @@ const DashboardDetails: FC<DashboardDetailsProps> = ({ messages, onChange, gifte
                     onChange={handleChange}
                     size="small"
                 />
-                <Box sx={{ mt: 2 }}>
-                    <FormControl fullWidth>
-                        <InputLabel id="request-type">Request Type</InputLabel>
-                        <Select
-                            labelId="request-type"
-                            value={requestType}
-                            label="Request Type"
-                            size="small"
-                            onChange={(e) => { onRequestTypeChange(e.target.value); }}
-                        >
-                            {GiftRequestTypes.map(item => <MenuItem key={item} value={item}>{item}</MenuItem>)}
-                        </Select>
-                    </FormControl>
-                </Box>
                 {requestType !== 'Normal Assignment' && <>
-                    <Typography variant="body1" sx={{ mt: 2 }}>Gifted By</Typography>
-                    <TextField
+                    {requestType !== 'Visit' && <Typography variant="body1" sx={{ mt: 2 }}>Gifted By</Typography>}
+                    {requestType !== 'Visit' && <TextField
                         name="plantedBy"
                         value={messages.plantedBy}
                         onChange={handleChange}
                         size="small"
-                    />
-                    <Typography variant="body1" sx={{ mt: 2 }}>Gifted On</Typography>
+                    />}
+                    <Typography variant="body1" sx={{ mt: 2 }}>{requestType === 'Visit' ? 'Visited' : 'Gifted'} On</Typography>
                     <TextField
                         name="giftedOn"
                         value={giftedOn}

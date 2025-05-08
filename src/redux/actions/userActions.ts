@@ -48,7 +48,11 @@ export const searchUsers = (searchStr: string) => {
                 }
                 dispatch({
                     type: userActionTypes.SEARCH_USERS_SUCCEEDED,
-                    payload: value,
+                    payload: {
+                        total: value.length,
+                        offset: 0,
+                        results: value
+                    },
                 });
             },
             (error: any) => {
