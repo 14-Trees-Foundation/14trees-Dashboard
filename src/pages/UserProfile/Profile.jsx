@@ -15,13 +15,27 @@ import { Button } from "@mui/material";
 import { useEffect } from "react";
 import TreeTimelineInfo from "./Trees/TreeTimelineInfo";
 
+const getUsername = (fullname) => {
+  if (!fullname) return "";
+
+  const prefixes = ["Prof.", "Late", "Prof", "Rtn.", "Shri", "Mrs.", "Smt.", "Devi"];
+  const parts = fullname.split(" ");
+  let firstname = parts[0];
+
+  if ((firstname.length <= 3 || prefixes.some(prefix => prefix.toLocaleLowerCase() === firstname.trim().toLocaleLowerCase())) && parts.length > 1) {
+    firstname += " " + parts[1];
+  }
+
+  return firstname;
+}
+
 export const Profile = ({ saplingId }) => {
   const matches = useMediaQuery("(max-width:481px)");
   const classes = useStyles();
   const selUserInfo = useRecoilValue(selUsersData);
   const usersInfo = useRecoilValue(usersData);
 
-  const username = selUserInfo.assigned_to.split(" ")[0];
+  const username = getUsername(selUserInfo.assigned_to);
   const userId = selUserInfo.assigned_to_id;
 
   useEffect(() => {
