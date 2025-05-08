@@ -26,6 +26,7 @@ import { RootState } from "../../../redux/store/store";
 import EditOrganization from "./EditOrganization";
 import { TableColumnsType } from "antd";
 import TableComponent from "../../../components/Table";
+import GeneralTable from "../../../components/GenTable";
 import FailedRecordsList from "./RecordList";
 import { OrganizationUsers } from "./OrganizationUsers";
 import { organizationTypes } from "./organizationType";
@@ -58,6 +59,7 @@ export const OrganizationComponent = () => {
   const [editModal, setEditModal] = useState(false);
   const [page, setPage] = useState(0);
   const [pageSize, setPageSize] = useState(10);
+  const [tableRows, setTableRows] = useState<Group[]>([]);
   const [srNoPage, SetSrNoPage] = useState(0);
   const [anchorEl, setAnchorEl] = useState<any>(null);
   const [groupType, setGroupType] = useState<string>('');
@@ -70,12 +72,11 @@ export const OrganizationComponent = () => {
   const [deleteSecondary, setDeleteSecondary] = useState(true);
   const [merging, setMerging] = useState(false);
 
-  const groupsData = useAppSelector((state: RootState) => state.groupsData);
-  const groupList: Group[] = groupsData?.paginationMapping
-  ? Object.entries(groupsData.paginationMapping)
-      .sort(([indexA], [indexB]) => Number(indexA) - Number(indexB)) 
-      .map(([_, id]) => groupsData.groups[id])
-  : [];
+
+  const handlePaginationChange = (page: number, pageSize: number) => {
+    setPage(page - 1);
+    setPageSize(pageSize);
+  };
 
   const handleSetFilters = (filters: Record<string, GridFilterItem>) => {
     setPage(0);
@@ -114,24 +115,67 @@ export const OrganizationComponent = () => {
     );
   };
 
+  const groupsData = useAppSelector((state: RootState) => state.groupsData);
+
+ useEffect(() => {
+  getGroupsData();
+ }, [filters, orderBy]);
+
   useEffect(() => {
-    getGroupsData();
-  }, [pageSize, page, filters, orderBy]);
+  const handler = setTimeout(() => {
+    if (groupsData.loading) return;
 
-  const getGroupsData = async () => {
-    const dataFilters = Object.values(filters).map(item => {
-      if (item.columnField === 'type') {
-        item.value = (item.value as string[]).map(tp => tp.toString().toLowerCase());
+    const records: Group[] = [];
+    const maxLength = Math.min((page + 1) * pageSize, groupsData.totalGroups);
+    for (let i = page * pageSize; i < maxLength; i++) {
+      if (Object.hasOwn(groupsData.paginationMapping, i)) {
+        const id = groupsData.paginationMapping[i];
+        const record = groupsData.groups[id];
+        if (record) {
+          records.push(record);
+        }
+      } else {
+        getGroupsData();
+        break;
       }
-      return item;
-    });
+    }
 
-    setLoading(true);
-    setTimeout(async () => {
-      getGroups(page * pageSize, pageSize, dataFilters, orderBy);
-      setLoading(false);
-    }, 10);
-  };
+    setTableRows(records);
+  }, 500)
+
+  return () => {
+    clearTimeout(handler);
+  }
+ }, [pageSize, page, groupsData]);
+
+ const getGroupsData = async () => {
+  const dataFilters = Object.values(filters).map(item => {
+    if (item.columnField === 'type') {
+      item.value = (item.value as string[]).map(tp => tp.toString().toLowerCase());
+    }
+    return item;
+  });
+
+  getGroups(page * pageSize, pageSize, dataFilters, orderBy);
+ };
+
+ const getAllGroupsData = async () => {
+  const dataFilters = Object.values(filters).map(item => {
+    if (item.columnField === 'type') {
+      item.value = (item.value as string[]).map(tp => tp.toString().toLowerCase());
+    }
+    return item;
+  });
+  
+  const apiClient = new ApiClient();
+  try {
+    const groupsResp = await apiClient.getGroups(0, -1, dataFilters, orderBy);
+    return groupsResp.results;
+  } catch (error: any) {
+    toast.error(error.message);
+    return [];
+  }
+ };
 
   const columns: TableColumnsType<Group> = [
     {
@@ -229,9 +273,6 @@ export const OrganizationComponent = () => {
   const data = Object.entries(userGroupMapping).filter(([key, value]) => value.failed !== 0);
   const filteredUserGroupMapping = Object.fromEntries(data);
 
-  const getAllGroupsData = async () => {
-    getGroups(0, groupsData.totalGroups);
-  };
 
   const handleDelete = (row: Group) => {
     setOpenDeleteModal(true);
@@ -330,16 +371,17 @@ export const OrganizationComponent = () => {
       </div>
       <Divider sx={{ backgroundColor: "black", marginBottom: '15px' }} />
       <Box sx={{ height: 840, width: "100%" }}>
-        <TableComponent
-          loading={loading}
-          dataSource={groupList}
-          columns={columns}
-          totalRecords={groupsData.totalGroups}
-          fetchAllData={getAllGroupsData}
-          setPage={setPage}
-          setPageSize={setPageSize}
-          setSrNoPage={SetSrNoPage}
-          tableName="Groups"
+      <GeneralTable
+        loading={groupsData.loading}
+        rows={tableRows}
+        columns={columns}
+        totalRecords={groupsData.totalGroups}
+        page={page}
+        pageSize={pageSize}
+        onPaginationChange={handlePaginationChange}
+        onDownload={getAllGroupsData}
+        footer
+        tableName="Groups"
         />
       </Box>
       <Divider style={{ marginBottom: "20px" }} />

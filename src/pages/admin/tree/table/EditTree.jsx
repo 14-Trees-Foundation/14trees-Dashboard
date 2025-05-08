@@ -40,6 +40,7 @@ function EditTree({ row, openeditModal, handleCloseEditModal, editSubmit }) {
     const [groupSearchQuery, setGroupSearchQuery] = useState('');
     const [reservedGroup, setReservedGroup] = useState(null);
     const [sponoredGroup, setSponsoredGroup] = useState(null);
+    const [plantedBy, setPlantedBy] = useState('');
 
     const getPlantTypeData = async () => {
         let nameFilter;
@@ -150,6 +151,7 @@ function EditTree({ row, openeditModal, handleCloseEditModal, editSubmit }) {
     const handleEditSubmit = () => {
         const updated = { 
             ...formData,
+            planted_by: plantedBy,
             sponsored_by_group: sponoredGroup ? sponoredGroup.id : null,
             sponsored_by_user: sponoredUser ? sponoredUser.id : null,
             mapped_to_group: reservedGroup ? reservedGroup.id : null,
@@ -271,6 +273,17 @@ function EditTree({ row, openeditModal, handleCloseEditModal, editSubmit }) {
                             onInputChange={(event) => { setGroupSearchQuery(event.target.value) }}
                             fullWidth
                             size="medium"
+                        />
+                    </Grid>
+                    <Grid item xs={6}>
+                        <TextField
+                            margin="dense"
+                            name="planted_by"
+                            label="Planted By"
+                            type="text"
+                            fullWidth
+                            value={plantedBy}
+                            onChange={(e) => setPlantedBy(e.target.value)}
                         />
                     </Grid>
                 </Grid>

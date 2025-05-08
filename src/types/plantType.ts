@@ -27,6 +27,8 @@ export type PlantType = {
 }
 
 export type PlantTypesDataState = {
+    loading: boolean,
     totalPlantTypes: number,
-    plantTypes: Record<number, PlantType>
+    plantTypes: Record<number, PlantType>,
+    paginationMapping: Record<number, number>,
 }

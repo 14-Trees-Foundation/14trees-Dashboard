@@ -24,10 +24,12 @@ import EditPlantType from "./EditPlantType";
 import { TableColumnsType } from "antd";
 import getColumnSearchProps, { getColumnSelectedItemFilter } from "../../../components/Filter";
 import TableComponent from "../../../components/Table";
-import { ToastContainer } from "react-toastify";
+import GeneralTable from "../../../components/GenTable.js";
+import { toast, ToastContainer } from "react-toastify";
 import { plantTypeHabitList } from "./habitList";
 import { PlotPlantTypes } from "./PlotPlantTypes";
 import PlantTypeTemplateForm from "./PlantTypeTemplateForm";
+import ApiClient from "../../../api/apiClient/apiClient";
 
 
 export const PlantTypeComponent = () => {
@@ -45,9 +47,15 @@ export const PlantTypeComponent = () => {
     const [editModal, setEditModal] = useState(false);
     const [page, setPage] = useState(0);
     const [pageSize, setPageSize] = useState(10);
+    const [tableRows, setTableRows] = useState<PlantType[]>([]);
     const [srNoPage, setSrNoPage] = useState(0);
     const [filters, setFilters] = useState<Record<string, GridFilterItem>>({});
     const [addTemplate, setAddTemplate] = useState(false);
+
+    const handlePaginationChange = (page: number, pageSize: number) => {
+        setPage(page - 1);
+        setPageSize(pageSize);
+      }
 
     const handleSetFilters = (filters: Record<string, GridFilterItem>) => {
         setPage(0);
@@ -214,32 +222,62 @@ export const PlantTypeComponent = () => {
         },
     ];
 
-    useEffect(() => {
-        getPlantTypeData();
-    }, [pageSize, page, filters]);
-
-    const getPlantTypeData = async () => {
-        const filtersData = Object.values(filters);
-        setLoading(true);
-        getPlantTypes(page * pageSize, pageSize, filtersData);
-        setTimeout(async () => {
-            setLoading(false);
-        }, 1000);
-    };
-
     let plantTypesList: PlantType[] = [];
-    const plantTypesData = useAppSelector(
-        (state: RootState) => state.plantTypesData
-    );
-    if (plantTypesData) {
-        plantTypesList = Object.values(plantTypesData.plantTypes);
-        plantTypesList = plantTypesList.sort((a, b) => b.id - a.id)
+ const plantTypesData = useAppSelector(
+  (state: RootState) => state.plantTypesData
+ );
+ if (plantTypesData) {
+  plantTypesList = Object.values(plantTypesData.plantTypes);
+  plantTypesList = plantTypesList.sort((a, b) => b.id - a.id)
+ }
+
+ useEffect(() => {
+  getPlantTypeData();
+ }, [filters]);
+
+ useEffect(() => {
+  const handler = setTimeout(() => {
+    if (plantTypesData.loading) return;
+
+    const records: PlantType[] = [];
+    const maxLength = Math.min((page + 1) * pageSize, plantTypesData.totalPlantTypes);
+    for (let i = page * pageSize; i < maxLength; i++) {
+      if (Object.hasOwn(plantTypesData.paginationMapping, i)) {
+        const id = plantTypesData.paginationMapping[i];
+        const record = plantTypesData.plantTypes[id];
+        if (record) {
+          records.push(record);
+        }
+      } else {
+        getPlantTypeData();
+        break;
+      }
     }
 
-    const getAllPlantTypesData = async () => {
-        let filtersData = Object.values(filters);
-        getPlantTypes(0, plantTypesData.totalPlantTypes, filtersData);
-    };
+    setTableRows(records);
+  }, 500)
+
+  return () => {
+    clearTimeout(handler);
+  }
+ }, [pageSize, page, plantTypesData]);
+
+ const getPlantTypeData = async () => {
+    const filtersData = Object.values(filters);
+    getPlantTypes(page * pageSize, pageSize, filtersData);
+  };
+  
+  const getAllPlantTypesData = async () => {
+    const filtersData = Object.values(filters);
+    const apiClient = new ApiClient();
+    try {
+      const plantTypesResp = await apiClient.getPlantTypes(0, -1, filtersData);
+      return plantTypesResp.results;
+    } catch (error: any) {
+      toast.error(error.message);
+      return [];
+    }
+  };
 
     const handleCreatePlantTypeData = (formData: PlantType, files: Blob[]) => {
         createPlantType(formData, files);
@@ -297,16 +335,17 @@ export const PlantTypeComponent = () => {
             </div>
             <Divider sx={{ backgroundColor: "black", marginBottom: '15px' }} />
             <Box sx={{ height: 840, width: "100%" }}>
-                <TableComponent
-                    loading={loading}
-                    dataSource={plantTypesList}
-                    columns={columns}
-                    totalRecords={plantTypesData.totalPlantTypes}
-                    setPage={setPage}
-                    setPageSize={setPageSize}
-                    fetchAllData={getAllPlantTypesData}
-                    setSrNoPage={setSrNoPage}
-                    tableName="Plant Types"
+            <GeneralTable
+              loading={plantTypesData.loading}
+              rows={tableRows}
+              columns={columns}
+              totalRecords={plantTypesData.totalPlantTypes}
+              page={page}
+              pageSize={pageSize}
+              onPaginationChange={handlePaginationChange}
+              onDownload={getAllPlantTypesData}
+              footer
+              tableName="Plant Types"
                 />
             </Box>
 
