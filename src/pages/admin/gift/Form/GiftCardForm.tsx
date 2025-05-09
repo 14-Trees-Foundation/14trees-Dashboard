@@ -15,8 +15,11 @@ import { Payment } from "../../../../types/payment";
 import DashboardDetails from "./DashboardDetailsForm";
 import SponsorDetailsForm from "./SponsorDetailsForm";
 import PlantationInfo from "./PlantationInfo";
+import { LoadingButton } from "@mui/lab";
 
 interface GiftCardsFormProps {
+    loading: boolean,
+    setLoading: (value: boolean) => void,
     giftCardRequest?: GiftCard
     step?: number
     requestId: string | null
@@ -26,7 +29,7 @@ interface GiftCardsFormProps {
     onSubmit: (user: User, sponsor: User | null, createdByUser: User, group: Group | null, treeCount: number, category: string, grove: string | null, requestType: string, users: any[], giftedOn: string, paymentId?: number, logo?: string, messages?: any, file?: File) => void
 }
 
-const GiftCardsForm: FC<GiftCardsFormProps> = ({ step, loggedinUserId, giftCardRequest, requestId, open, handleClose, onSubmit }) => {
+const GiftCardsForm: FC<GiftCardsFormProps> = ({ loading, setLoading, step, loggedinUserId, giftCardRequest, requestId, open, handleClose, onSubmit }) => {
 
     const [currentStep, setCurrentStep] = useState(0);
     const [user, setUser] = useState<User | null>(null);
@@ -200,26 +203,11 @@ const GiftCardsForm: FC<GiftCardsFormProps> = ({ step, loggedinUserId, giftCardR
             key: 2,
             onClick: () => setCurrentStep(2),
             style: { cursor: 'pointer' },
-            title: "Tree Card Messages",
-            content: <CardDetails
-                request_id={requestId || ''}
-                presentationId={presentationId}
-                slideId={slideId}
-                logo_url={logoString ? logoString : giftCardRequest?.logo_url}
-                messages={{ ...messages, plantedBy: messages.plantedBy || group?.name || user?.name || '' }}
-                onChange={messages => { setMessages(messages) }}
-                onPresentationId={(presentationId: string, slideId: string) => { setPresentationId(presentationId); setSlideId(slideId); }}
-            />,
-        },
-        {
-            key: 3,
-            onClick: () => setCurrentStep(3),
-            style: { cursor: 'pointer' },
             title: "Recipient Details",
             content: <BulkUserForm treeCount={treeCount} requestId={requestId} users={users} onUsersChange={users => setUsers(users)} onFileChange={file => setFile(file)} />,
         },
         {
-            key: 4,
+            key: 3,
             title: "Sponsor Details",
             content: <SponsorDetailsForm 
                 requestType={giftRequestType}
@@ -240,16 +228,32 @@ const GiftCardsForm: FC<GiftCardsFormProps> = ({ step, loggedinUserId, giftCardR
                     setLogoString(prev => group?.logo_url ? group.logo_url : prev); 
                     setMessages(prev => ({ ...prev, plantedBy: group ? group.name : "" }))}
                 }/>,
+            onClick: () => setCurrentStep(3),
+            style: { cursor: 'pointer' },
+        },
+        {
+            key: 4,
             onClick: () => setCurrentStep(4),
             style: { cursor: 'pointer' },
+            title: "Tree Card Messages",
+            content: <CardDetails
+                request_id={requestId || ''}
+                presentationId={presentationId}
+                slideId={slideId}
+                logo_url={logoString ? logoString : giftCardRequest?.logo_url}
+                messages={{ ...messages, plantedBy: messages.plantedBy || group?.name || user?.name || '' }}
+                onChange={messages => { setMessages(messages) }}
+                onPresentationId={(presentationId: string, slideId: string) => { setPresentationId(presentationId); setSlideId(slideId); }}
+                userName={users.length > 0 ? users[0].recipient_name : undefined}
+            />,
         },
     ]
 
     const [formSteps, setFormSteps] = useState(steps);
     useEffect(() => {
-        const disabled = giftRequestType === 'Normal Assignmet' || giftRequestType === 'Visit'
-        setFormSteps(prev => prev.map(step => {
-            return step.key == 1 || step.key == 2
+        const disabled = giftRequestType === 'Normal Assignment' || giftRequestType === 'Visit'
+        setFormSteps(steps.slice(0, disabled ? -1 : undefined).map(step => {
+            return step.key == 1
                 ? { ...step, onClick: disabled ? undefined : () => setCurrentStep(step.key) }
                 : step
         }))
@@ -259,16 +263,17 @@ const GiftCardsForm: FC<GiftCardsFormProps> = ({ step, loggedinUserId, giftCardR
     const handleSubmit = async () => {
         if (!user) {
             toast.error("Please select user to reserve trees");
-            setCurrentStep(5);
+            setCurrentStep(3);
             return;
         }
 
         if (giftRequestType === 'Gift Cards' && !sponsor) {
             toast.error("Please select sponsor");
-            setCurrentStep(5);
+            setCurrentStep(3);
             return;
         }
 
+        setLoading(true);
         const apiClient = new ApiClient();
         if (logoString && group && group.logo_url !== logoString) {
             await apiClient.updateGroup({ ...group, logo_url: logoString })
@@ -324,23 +329,33 @@ const GiftCardsForm: FC<GiftCardsFormProps> = ({ step, loggedinUserId, giftCardR
         switch (currentStep) {
             case 0:
                 if (treeCount === 0) toast.error("Please provide number of trees to gift");
-                else nextStep = giftRequestType === 'Visit' ? 3 : 1;
+                else nextStep = giftRequestType === 'Visit' ? 2 : 1;
                 break;
             case 1:
                 nextStep = currentStep + 1;
                 break;
             case 2:
-                if (messages.primaryMessage === "" || messages.secondaryMessage === "") toast.error("Please provide gift card details");
-                else nextStep = 3;
+                nextStep = 3;
                 break;
             case 3:
                 nextStep = 4;
+                break;
+            case 4:
+                if (messages.primaryMessage === "" || messages.secondaryMessage === "") toast.error("Please provide gift card details");
                 break;
             default:
                 break;
         }
 
         setCurrentStep(nextStep);
+    }
+
+    const handlePrevious = () => {
+        const step = giftRequestType === 'Visit' && currentStep == 2
+                        ? 0
+                        : currentStep - 1; 
+
+        setCurrentStep(step);
     }
 
 
@@ -394,7 +409,7 @@ const GiftCardsForm: FC<GiftCardsFormProps> = ({ step, loggedinUserId, giftCardR
                     justifyContent: "space-between",
                 }}>
                     {currentStep > 0 && <Button
-                        onClick={() => setCurrentStep(giftRequestType === 'Visit' && currentStep == 3 ? 0 : currentStep - 1)}
+                        onClick={handlePrevious}
                         variant="outlined"
                         color="success"
                     >Previous</Button>}
@@ -406,19 +421,20 @@ const GiftCardsForm: FC<GiftCardsFormProps> = ({ step, loggedinUserId, giftCardR
                         color="error"
                         style={{ alignSelf: 'right', marginRight: 10 }}
                     >Cancel</Button>
-                    {currentStep < steps.length - 1 && <Button
+                    {currentStep < formSteps.length - 1 && <Button
                         onClick={handleNext}
                         variant="contained"
                         color="success"
                         style={{ alignSelf: 'right' }}
                     >Next</Button>}
 
-                    {currentStep === steps.length - 1 && <Button
+                    {currentStep === formSteps.length - 1 && <LoadingButton
+                        loading={loading}
                         onClick={handleSubmit}
                         variant="contained"
                         color="success"
                         style={{ alignSelf: 'right' }}
-                    >Finish</Button>}
+                    >Finish</LoadingButton>}
                 </div>
             </Dialog>
         </div>
