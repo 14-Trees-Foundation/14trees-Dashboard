@@ -7,8 +7,11 @@ import SponsorGroupForm from "./SponsorGroup";
 
 
 interface SponsorDetailsFormProps {
+    requestType: string
     user: User | null;
     onUserSelect: (user: User | null) => void;
+    sponsor: User | null;
+    onSponsorSelect: (user: User | null) => void;
     createdBy: User | null;
     onCreatedByUserSelect: (createdBy: User | null) => void;
     logo: File | string | null,
@@ -17,7 +20,7 @@ interface SponsorDetailsFormProps {
     onGroupSelect: (group: Group | null) => void
 }
 
-const SponsorDetailsForm: React.FC<SponsorDetailsFormProps> = ({ user, createdBy, logo, group, onUserSelect, onCreatedByUserSelect, onGroupSelect, onLogoChange }) => {
+const SponsorDetailsForm: React.FC<SponsorDetailsFormProps> = ({ requestType, user, sponsor, createdBy, logo, group, onUserSelect, onSponsorSelect, onCreatedByUserSelect, onGroupSelect, onLogoChange }) => {
 
     const [donorType, setSponsorType] = useState<"corporate" | "individual">("individual");
     useEffect(() => {
@@ -29,8 +32,11 @@ const SponsorDetailsForm: React.FC<SponsorDetailsFormProps> = ({ user, createdBy
     return (
         <div>
             <SponsorUserForm
-                user={user}
-                onSelect={onUserSelect}
+                requestType={requestType}
+                reserveFor={user}
+                onReserveForSelect={onUserSelect}
+                sponsor={sponsor}
+                onSponsorSelect={onSponsorSelect}
                 createdBy={createdBy}
                 onCreatedBySelect={onCreatedByUserSelect}
             />
