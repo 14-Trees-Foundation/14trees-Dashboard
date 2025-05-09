@@ -305,7 +305,9 @@ const GiftCardsForm: FC<GiftCardsFormProps> = ({ step, loggedinUserId, giftCardR
         setCurrentStep(0);
         setUser(null);
         setGroup(null);
+        setSponsor(null);
         setTreeCount(100);
+        setGiftRequestType('Gift Cards');
         setFile(null);
         setUsers([]);
         setLogo(null);

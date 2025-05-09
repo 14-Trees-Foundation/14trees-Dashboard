@@ -1698,6 +1698,7 @@ class ApiClient {
 
             if (sponsor_id && formData.has('sponsor_id')) formData.set('sponsor_id', sponsor_id.toString());
             else if (sponsor_id) formData.append('sponsor_id', sponsor_id.toString());
+            else formData.delete('sponsor_id')
 
             if (formData.has('category')) formData.set('category', category);
             else formData.append('category', category);
@@ -1732,6 +1733,7 @@ class ApiClient {
 
                 if (messages.eventName && formData.has('event_name')) formData.set('event_name', messages.eventName);
                 else if (messages.eventName) formData.append('event_name', messages.eventName);
+                else formData.delete('event_name')
 
                 if (messages.eventType && formData.has('event_type')) formData.set('event_type', messages.eventType);
                 else if (messages.eventType) formData.append('event_type', messages.eventType);
