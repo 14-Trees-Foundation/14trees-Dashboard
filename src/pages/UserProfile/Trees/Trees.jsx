@@ -39,7 +39,7 @@ export const Trees = ({ saplingId }) => {
         <div className={classes.trees}>
           <div className={classes.scroll}>
             {userinfo.user_trees.map((item, idx) => {
-              const date = (item.gifted_by_name || item.gifted_by_user || Number(item.event_type) === 2) ? item.assigned_at.slice(0, 10) : item.created_at.slice(0, 10);
+              const date = (item.gifted_by_name || item.gifted_by_user || Number(item.event_type) === 2 || item.visit_id) ? item.assigned_at.slice(0, 10) : item.created_at.slice(0, 10);
               return (
                 <div
                   key={idx}
