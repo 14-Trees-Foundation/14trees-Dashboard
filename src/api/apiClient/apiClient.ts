@@ -329,17 +329,8 @@ class ApiClient {
     async getGroups(offset: number, limit: number, filters?: any[], orderBy?: Order[]): Promise<PaginatedResponse<Group>> {
         const url = `/groups/get?offset=${offset}&limit=${limit}`;
         try {
-            // Validate filters to make sure they don't contain null or undefined values
-            const validatedFilters = filters?.filter(filter => 
-                filter && 
-                filter.columnField && 
-                filter.operatorValue &&
-                filter.value !== undefined && 
-                filter.value !== null
-            ) || [];
-            
             const response = await this.api.post<PaginatedResponse<Group>>(url, { 
-                filters: validatedFilters, 
+                filters: filters, 
                 order_by: orderBy 
             });
             return response.data;
@@ -1657,7 +1648,7 @@ class ApiClient {
     }
 
 
-    async createGiftCard(request_id: string, created_by: number, no_of_cards: number, user_id: number, category: string, grove: string | null, requestType: string, giftedOn: string, group_id?: number, payment_id?: number, logo?: string, messages?: any, file?: File): Promise<GiftCard> {
+    async createGiftCard(request_id: string, created_by: number, no_of_cards: number, user_id: number, sponsor_id: number | null, category: string, grove: string | null, requestType: string, giftedOn: string, group_id?: number, payment_id?: number, logo?: string, messages?: any, file?: File): Promise<GiftCard> {
         try {
             const formData = new FormData();
             formData.append('request_id', request_id);
@@ -1677,6 +1668,7 @@ class ApiClient {
             }
             if (grove) formData.append('grove', grove);
             if (group_id) formData.append('group_id', group_id.toString());
+            if (sponsor_id) formData.append('sponsor_id', sponsor_id.toString());
             if (payment_id) formData.append('payment_id', payment_id.toString());
             if (logo) formData.append('logo_url', logo);
             if (file) formData.append('csv_file', file, file.name);
@@ -1691,7 +1683,7 @@ class ApiClient {
         }
     }
 
-    async updateGiftCard(request: GiftCard, no_of_cards: number, user_id: number, category: string, grove: string | null, requestType: string, giftedOn: string, group_id?: number, payment_id?: number, logo?: string, messages?: any, file?: File): Promise<GiftCard> {
+    async updateGiftCard(request: GiftCard, no_of_cards: number, user_id: number, sponsor_id: number | null, category: string, grove: string | null, requestType: string, giftedOn: string, group_id?: number, payment_id?: number, logo?: string, messages?: any, file?: File): Promise<GiftCard> {
         try {
             const formData = new FormData();
             for (const [key, value] of Object.entries(request)) {
@@ -1703,6 +1695,10 @@ class ApiClient {
 
             if (formData.has('user_id')) formData.set('user_id', user_id.toString());
             else formData.append('user_id', user_id.toString());
+
+            if (sponsor_id && formData.has('sponsor_id')) formData.set('sponsor_id', sponsor_id.toString());
+            else if (sponsor_id) formData.append('sponsor_id', sponsor_id.toString());
+            else formData.delete('sponsor_id')
 
             if (formData.has('category')) formData.set('category', category);
             else formData.append('category', category);
@@ -1737,6 +1733,7 @@ class ApiClient {
 
                 if (messages.eventName && formData.has('event_name')) formData.set('event_name', messages.eventName);
                 else if (messages.eventName) formData.append('event_name', messages.eventName);
+                else formData.delete('event_name')
 
                 if (messages.eventType && formData.has('event_type')) formData.set('event_type', messages.eventType);
                 else if (messages.eventType) formData.append('event_type', messages.eventType);
