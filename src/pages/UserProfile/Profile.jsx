@@ -1,8 +1,9 @@
 import { createStyles, makeStyles } from "@mui/styles";
 import Divider from "@mui/material/Divider";
 import useMediaQuery from "@mui/material/useMediaQuery";
+import { useEffect, useRef } from "react";
+import { gsap } from "gsap";
 
-// import { useState } from "react";
 import { UserInfo } from "./UserInfo/UserInfo";
 import { Trees } from "./Trees/Trees";
 import { Map } from "./Map/Map";
@@ -12,8 +13,10 @@ import { selUsersData, usersData } from "../../store/atoms";
 
 import logo from "../../assets/icon_round.png";
 import { Button } from "@mui/material";
-import { useEffect } from "react";
 import TreeTimelineInfo from "./Trees/TreeTimelineInfo";
+import CardGiftcardIcon from "@mui/icons-material/CardGiftcard"; // Example icon import
+import NaturePeopleIcon from "@mui/icons-material/NaturePeople"; // Example icon import
+
 
 export const Profile = ({ saplingId }) => {
   const matches = useMediaQuery("(max-width:481px)");
@@ -24,16 +27,65 @@ export const Profile = ({ saplingId }) => {
   const username = selUserInfo.assigned_to.split(" ")[0];
   const userId = selUserInfo.assigned_to_id;
 
+  const userNameRef = useRef(null);
+  const headerRef = useRef(null);
+  const dividerRef = useRef(null);
+  const userInfoRef = useRef(null);
+  const treesRef = useRef(null);
+  const mapRef = useRef(null);
+
   useEffect(() => {
     document.title = "14Trees Dashboard - Profile: " + username;
-  }, [username])
+
+    // GSAP animation for the username text
+    gsap.fromTo(
+      userNameRef.current,
+      { width: 0, opacity: 0 },
+      {
+        duration: 2,
+        width: "auto",
+        opacity: 1,
+        ease: "power3.out",
+        overflow: "hidden",
+        whiteSpace: "nowrap",
+      });
+
+    const tl = gsap.timeline();
+
+    // tl.fromTo(
+    //   headerRef.current,
+    //   { opacity: 0, y: -20 },
+    //   { opacity: 1, y: 0, duration: 1, ease: "power3.out" }
+    // )
+    tl.fromTo(
+      dividerRef.current,
+      { opacity: 0, scaleX: 0 },
+      { opacity: 1, scaleX: 1, duration: 0.5, ease: "power3.out" },
+      "-=0.5"
+    )
+      .fromTo(
+        userInfoRef.current,
+        { opacity: 0, y: 20 },
+        { opacity: 1, y: 0, duration: 1, ease: "power3.out" }
+      )
+      .fromTo(
+        treesRef.current,
+        { opacity: 0, x: -20 },
+        { opacity: 1, x: 0, duration: 1, ease: "power3.out" }
+      )
+      .fromTo(
+        mapRef.current,
+        { opacity: 0, x: 20 },
+        { opacity: 1, x: 0, duration: 1, ease: "power3.out" }
+      );
+  }, [username]);
 
   const header = () => {
     if (!matches) {
       return (
-        <div className={classes.header}>
+        <div className={classes.header} ref={headerRef}>
           <img src={logo} alt={logo} className={classes.img} />
-          <div className={classes.username}>
+          <div className={classes.username} ref={userNameRef}>
             {selUserInfo.event_type && selUserInfo.event_type === "2"
               ? "Memorial Dashboard"
               : `${username}'s Dashboard`}
@@ -41,7 +93,7 @@ export const Profile = ({ saplingId }) => {
           {selUserInfo.event_type && (selUserInfo.event_type === "2" || selUserInfo.event_type === "4") ? (
             ""
           ) : (
-            <div style={{ justifyContent: "flex-end" }}>
+            <div className={classes.buttonContainer}>
               <Button
                 color="primary"
                 variant="contained"
@@ -50,10 +102,12 @@ export const Profile = ({ saplingId }) => {
                     "https://docs.google.com/forms/d/e/1FAIpQLSfumyti7x9f26BPvUb0FDYzI2nnuEl5HA63EO8svO3DG2plXg/viewform"
                   );
                 }}
+                startIcon={<CardGiftcardIcon />}
               >
-                Gift a Tree
+                <span className={classes.buttonText}>Gift a Tree</span>
               </Button>
               {usersInfo.sponsored_trees > 0 && <Button
+                className={classes.sponsorViewButton}
                 variant="contained"
                 color="primary"
                 style={{ margin: "0 5px" }}
@@ -65,8 +119,9 @@ export const Profile = ({ saplingId }) => {
                     window.open("https://" + hostname + "/dashboard/" + userId);
                   }
                 }}
+                startIcon={<NaturePeopleIcon />}
               >
-                Your Sponsored View
+                <span className={classes.buttonText}>Your Sponsored View</span>
               </Button>}
             </div>
           )}
@@ -78,22 +133,25 @@ export const Profile = ({ saplingId }) => {
   return (
     <div className={matches ? classes.mbmain : classes.main}>
       {header()}
-      <Divider style={{ marginLeft: "4%", marginRight: "4%" }} />
+      <Divider style={{ marginLeft: "4%", marginRight: "4%" }} ref={dividerRef} />
       <div style={{ padding: "4%" }}>
-        <div className={classes.user}>
+        <div className={classes.user} ref={userInfoRef}>
           <UserInfo />
         </div>
+        {matches && selUserInfo.tree_audits && selUserInfo.tree_audits.length > 1 && <div >
+          <TreeTimelineInfo />
+        </div>}
         <div className={classes.treemap}>
           <div style={{ display: matches ? "block" : "flex" }}>
-            <div className={classes.tree}>
+            <div className={classes.tree} ref={treesRef}>
               <Trees saplingId={saplingId} />
             </div>
-            <div className={classes.map}>
+            <div className={classes.map} ref={mapRef}>
               <Map />
             </div>
           </div>
         </div>
-        {selUserInfo.tree_audits && selUserInfo.tree_audits.length > 1 && <div >
+        {!matches && selUserInfo.tree_audits && selUserInfo.tree_audits.length > 1 && <div style={{ marginTop: '20px' }}>
           <TreeTimelineInfo />
         </div>}
       </div>
@@ -119,9 +177,24 @@ const useStyles = makeStyles((theme) =>
         height: "35px",
       },
     },
+    // header: {
+    //   display: "flex",
+    //   justifyContent: "flex-end",
+    //   height: "5vh",
+    //   padding: "3.5vh",
+    //   [theme.breakpoints.down("1500")]: {
+    //     height: "4vh",
+    //     padding: "3vh",
+    //   },
+    //   [theme.breakpoints.down("480")]: {
+    //     height: "3vh",
+    //     padding: "3vh",
+    //   },
+    // },
     header: {
       display: "flex",
-      justifyContent: "flex-end",
+      justifyContent: "space-between", // Adjust to space-between for better alignment
+      alignItems: "center", // Center items vertically
       height: "5vh",
       padding: "3.5vh",
       [theme.breakpoints.down("1500")]: {
@@ -129,8 +202,30 @@ const useStyles = makeStyles((theme) =>
         padding: "3vh",
       },
       [theme.breakpoints.down("480")]: {
-        height: "3vh",
-        padding: "3vh",
+        height: "auto", // Allow height to adjust based on content
+        padding: "2vh",
+        flexDirection: "column", // Stack items vertically on small screens
+        alignItems: "flex-start", // Align items to the start
+      },
+    },
+    buttonContainer: {
+      display: "flex",
+      justifyContent: "flex-end",
+      flexWrap: "wrap", // Allow buttons to wrap on smaller screens
+      gap: "5px", // Add gap between buttons
+      [theme.breakpoints.down("480")]: {
+        justifyContent: "flex-start", // Align buttons to the start on small screens
+        width: "100%", // Ensure full width for better alignment
+      },
+    },
+    buttonText: {
+      [theme.breakpoints.down("1145")]: {
+        display: "none",
+      },
+    },
+    sponsorViewButton: {
+      [theme.breakpoints.down("1145")]: {
+        display: "none",
       },
     },
     username: {

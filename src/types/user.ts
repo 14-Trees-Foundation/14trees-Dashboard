@@ -13,6 +13,8 @@ export type User = {
 };
 
 export type UsersDataState = {
+    loading: boolean,
     totalUsers: number,
-    users: Record<number, User>
+    users: Record<number, User>,
+    paginationMapping: Record<number, number>,
 }

@@ -77,66 +77,66 @@ const ColumnSearchDropdown = <T extends object>({ dataIndex, filters, selectedKe
 
     return (
         <div style={{ padding: 8 }} onKeyDown={(e) => e.stopPropagation()}>
-                <div style={{ display: 'flex', alignItems: 'center' }} >
-                    <Select
-                        defaultValue={filterOptionsArray[0]}
-                        style={{ marginBottom: 8, marginRight: 6 }}
-                        options={filterOptionsArray}
-                        dropdownStyle={{ zIndex: 10001 }}
-                        onChange={(value) => { setFilterOption(value) }}
-                    />
-                    {filterOption !== "isAnyOf" && <Input
-                        placeholder={`Search ${dataIndex.toString()}`}
-                        value={selectedKeys[0]}
-                        onChange={(e) => setSelectedKeys(e.target.value ? [e.target.value] : [])}
-                        style={{ marginBottom: 8, display: 'block' }}
-                    />}
-                    {filterOption === "isAnyOf" && <Select
-                        mode="tags"
-                        placeholder="Please select"
-                        value={selectedKeys}
-                        onChange={(value) => setSelectedKeys(value)}
-                        tokenSeparators={['\n', ',']}
-                        dropdownStyle={{ zIndex: 10001 }}
-                        style={{ display: 'block', marginBottom: 8, alignItems: 'center', width: 250 }}
-                    />}
-                </div>
-                <Space style={{ display: 'flex', alignItems: 'center' }}>
-                    <Btn
-                        onClick={() => clearFilters && handleReset(clearFilters, confirm, dataIndex)}
-                        size="small"
-                        style={{ width: 90 }}
-                    >
-                        Reset
-                    </Btn>
-                    <Btn
-                        size="small"
-                        onClick={() => {
-                            if (filterOption === 'isEmpty' || filterOption === 'isNotEmpty') setSelectedKeys([' '])
-                            confirm({ closeDropdown: false });
-                            let newFilters = { ...filters }
-                            newFilters[dataIndex.toString()] = {
-                                columnField: dataIndex.toString(),
-                                operatorValue: filterOption,
-                                value: filterOption !== "isAnyOf" 
-                                        ? (selectedKeys as string[])[0]?.trim()
-                                        : (selectedKeys as string[]).map(item => item.trim()),
-                            }
-                            handleSetFilters(newFilters);
-                        }}
-                    >
-                        Apply
-                    </Btn>
-                    <Btn
-                        size="small"
-                        onClick={() => {
-                            close();
-                        }}
-                    >
-                        close
-                    </Btn>
-                </Space>
+            <div style={{ display: 'flex', alignItems: 'center' }} >
+                <Select
+                    defaultValue={filterOptionsArray[0]}
+                    style={{ marginBottom: 8, marginRight: 6 }}
+                    options={filterOptionsArray}
+                    dropdownStyle={{ zIndex: 10001 }}
+                    onChange={(value) => { setFilterOption(value) }}
+                />
+                {filterOption !== "isAnyOf" && <Input
+                    placeholder={`Search ${dataIndex.toString()}`}
+                    value={selectedKeys[0]}
+                    onChange={(e) => setSelectedKeys(e.target.value ? [e.target.value] : [])}
+                    style={{ marginBottom: 8, display: 'block' }}
+                />}
+                {filterOption === "isAnyOf" && <Select
+                    mode="tags"
+                    placeholder="Please select"
+                    value={selectedKeys}
+                    onChange={(value) => setSelectedKeys(value)}
+                    tokenSeparators={['\n', ',']}
+                    dropdownStyle={{ zIndex: 10001 }}
+                    style={{ display: 'block', marginBottom: 8, alignItems: 'center', width: 250 }}
+                />}
             </div>
+            <Space style={{ display: 'flex', alignItems: 'center' }}>
+                <Btn
+                    onClick={() => clearFilters && handleReset(clearFilters, confirm, dataIndex)}
+                    size="small"
+                    style={{ width: 90 }}
+                >
+                    Reset
+                </Btn>
+                <Btn
+                    size="small"
+                    onClick={() => {
+                        if (filterOption === 'isEmpty' || filterOption === 'isNotEmpty') setSelectedKeys([' '])
+                        confirm({ closeDropdown: false });
+                        let newFilters = { ...filters }
+                        newFilters[dataIndex.toString()] = {
+                            columnField: dataIndex.toString(),
+                            operatorValue: filterOption,
+                            value: filterOption !== "isAnyOf"
+                                ? (selectedKeys as string[])[0]?.trim()
+                                : (selectedKeys as string[]).map(item => item.trim()),
+                        }
+                        handleSetFilters(newFilters);
+                    }}
+                >
+                    Apply
+                </Btn>
+                <Btn
+                    size="small"
+                    onClick={() => {
+                        close();
+                    }}
+                >
+                    close
+                </Btn>
+            </Space>
+        </div>
     )
 }
 
@@ -333,6 +333,162 @@ const DateFilterDropdown = <T extends object>({ dataIndex, filters, label, setSe
                     <DatePicker onChange={(date, stringDate) => setUpper(stringDate as string)} style={{ margin: 2, backgroundColor: 'white' }} popupStyle={{ zIndex: 100001 }} />
                 </div>
             </div>
+            <Space style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 8 }}>
+                <Btn onClick={handleReset} size="small" style={{ width: 90 }}>
+                    Reset
+                </Btn>
+                <Btn size="small" onClick={handleApply}>
+                    Apply
+                </Btn>
+                <Btn size="small" onClick={() => close()}>
+                    Close
+                </Btn>
+            </Space>
+        </div>
+    );
+};
+
+/**
+ * Filter for numeric column
+ */
+export const getColumnNumericFilter = <T extends object>({ dataIndex, filters, handleSetFilters, label }: FilterItemProps<T> & { label: string }): TableColumnType<T> => {
+    return {
+        filterDropdown: ({ confirm, clearFilters, setSelectedKeys, close }) => (
+            <NumericFilterDropdown<T>
+                dataIndex={dataIndex}
+                filters={filters}
+                setSelectedKeys={setSelectedKeys}
+                handleSetFilters={handleSetFilters}
+                confirm={confirm}
+                clearFilters={clearFilters}
+                close={close}
+                label={label}
+            />
+        ),
+        filterIcon: (filtered: boolean) => (
+            <FilterAltRoundedIcon style={{ color: filtered ? '#1677ff' : undefined }} />
+        ),
+    };
+};
+
+interface NumericFilterDropdownProps<T> extends FilterItemProps<T> {
+    setSelectedKeys: (selectedKeys: React.Key[]) => void;
+    confirm: (param?: FilterConfirmProps) => void;
+    clearFilters?: () => void;
+    close: () => void;
+    label: string;
+}
+
+const NumericFilterDropdown = <T extends object>({ dataIndex, filters, label, setSelectedKeys, handleSetFilters, confirm, clearFilters, close }: NumericFilterDropdownProps<T>) => {
+    const [filterType, setFilterType] = useState<'equals' | 'range' | 'isAnyOf'>('equals'); // Default to 'equals'
+    const [lower, setLower] = useState<string>('');
+    const [upper, setUpper] = useState<string>('');
+    const [equalTo, setEqualTo] = useState<string>('');
+    const [anyOfValues, setAnyOfValues] = useState<string[]>([]); // For "Is Any Of"
+
+    const handleReset = () => {
+        clearFilters && clearFilters();
+        setLower('');
+        setUpper('');
+        setEqualTo('');
+        setAnyOfValues([]);
+        confirm({ closeDropdown: false });
+        let newFilters = { ...filters };
+        Reflect.deleteProperty(newFilters, dataIndex);
+        handleSetFilters(newFilters);
+    };
+
+    const handleApply = () => {
+        confirm({ closeDropdown: false });
+        let filter: GridFilterItem | null = null;
+
+        if (filterType === 'equals' && equalTo) {
+            filter = { columnField: dataIndex.toString(), operatorValue: 'equals', value: equalTo };
+        } else if (filterType === 'range' && lower && upper) {
+            filter = { columnField: dataIndex.toString(), operatorValue: 'between', value: [lower, upper] };
+        } else if (filterType === 'isAnyOf' && anyOfValues.length > 0) {
+            filter = { columnField: dataIndex.toString(), operatorValue: 'isAnyOf', value: anyOfValues };
+        }
+
+        if (filter) {
+            handleSetFilters({
+                ...filters,
+                [dataIndex.toString()]: filter,
+            });
+            setSelectedKeys(['1']);
+        }
+    };
+
+    return (
+        <div style={{ padding: 8 }} onKeyDown={(e) => e.stopPropagation()}>
+            {/* Filter Type Selector */}
+            <div style={{ marginBottom: 8 }}>
+                <Select
+                    value={filterType}
+                    onChange={(value) => {
+                        setFilterType(value);
+                        setLower('');
+                        setUpper('');
+                        setEqualTo('');
+                        setAnyOfValues([]);
+                    }}
+                    options={[
+                        { label: 'Equals', value: 'equals' },
+                        { label: 'Range', value: 'range' },
+                        { label: 'Is Any Of', value: 'isAnyOf' },
+                    ]}
+                    style={{ width: '100%' }}
+                    dropdownStyle={{ zIndex: 10001 }}
+                />
+            </div>
+
+            {/* Input Fields Based on Filter Type */}
+            {filterType === 'equals' && (
+                <Input
+                    type="number"
+                    value={equalTo}
+                    onChange={(e) => setEqualTo(e.target.value)}
+                    placeholder={`Enter ${label}`}
+                    style={{ marginBottom: 8, width: 250 }}
+                />
+            )}
+
+            {filterType === 'range' && (
+                <>
+                    <div>
+                        <Input
+                            type="number"
+                            value={lower}
+                            onChange={(e) => setLower(e.target.value)}
+                            placeholder={`Enter Min ${label}`}
+                            style={{ marginBottom: 8, width: 250 }}
+                        />
+                    </div>
+                    <div>
+                        <Input
+                            type="number"
+                            value={upper}
+                            onChange={(e) => setUpper(e.target.value)}
+                            placeholder={`Enter Max ${label}`}
+                            style={{ marginBottom: 8, width: 250 }}
+                        />
+                    </div>
+                </>
+            )}
+
+            {filterType === 'isAnyOf' && (
+                <Select
+                    mode="tags"
+                    placeholder="Please select"
+                    value={anyOfValues}
+                    onChange={(value) => setAnyOfValues(value)}
+                    tokenSeparators={['\n', ',']}
+                    dropdownStyle={{ display: 'none', zIndex: 10001 }}
+                    style={{ display: 'block', marginBottom: 8, alignItems: 'center', width: 250 }}
+                />
+            )}
+
+            {/* Action Buttons */}
             <Space style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 8 }}>
                 <Btn onClick={handleReset} size="small" style={{ width: 90 }}>
                     Reset

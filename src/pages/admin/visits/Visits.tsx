@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { ToastContainer } from "react-toastify";
+import { toast, ToastContainer } from "react-toastify";
 import Box from "@mui/material/Box";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -28,6 +28,7 @@ import { bindActionCreators } from "@reduxjs/toolkit";
 import { VisitUsers } from "./VisitUser";
 import getColumnSearchProps, { getColumnDateFilter, getColumnSelectedItemFilter } from "../../../components/Filter";
 import TableComponent from "../../../components/Table";
+import GeneralTable from "../../../components/GenTable";
 
 //import types
 import { Visit, VisitTypeList } from "../../../types/visits";
@@ -40,6 +41,7 @@ import { RootState } from "../../../redux/store/store";
 import { getHumanReadableDate } from "../../../helpers/utils";
 import VisitForm from "./VisitForm";
 import ImageGridModal from "../../../components/ImagesGrid";
+import ApiClient from "../../../api/apiClient/apiClient";
 
 
 export const VisitsComponent = () => {
@@ -57,10 +59,23 @@ export const VisitsComponent = () => {
   const [editModal, setEditModal] = useState(false);
   const [page, setPage] = useState(0);
   const [pageSize, setPageSize] = useState(10);
+  const [tableRows, setTableRows] = useState<Visit[]>([]);
   const [filters, setFilters] = useState<Record<string, GridFilterItem>>({});
   const [selectedVisit , setSelectedVisit] = useState<Visit | null>(null);
   const [selectedVisitForImages , setSelectedVisitForImages] = useState<Visit | null>(null);
   const [imagesModalOpen, setImagesModalOpen] = useState(false);
+
+  let visitsList: Visit[] = [];
+  const visitsData = useAppSelector((state: RootState) => state.visitsData);
+  if (visitsData) {
+    visitsList = Object.values(visitsData.visits);
+    visitsList = visitsList.sort((a, b) => b.id - a.id);
+  }
+
+  const handlePaginationChange = (page: number, pageSize: number) => {
+    setPage(page - 1);
+    setPageSize(pageSize);
+  }
 
 
   const handleSetFilters = (filters: Record<string, GridFilterItem>) => {
@@ -70,24 +85,51 @@ export const VisitsComponent = () => {
 
   useEffect(() => {
     getVisitData();
-  }, [pageSize, page, filters]);
+  }, [filters]);
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      if (visitsData.loading) return;
+
+      const records: Visit[] = [];
+      const maxLength = Math.min((page + 1) * pageSize, visitsData.totalVisits);
+      for (let i = page * pageSize; i < maxLength; i++) {
+        if (Object.hasOwn(visitsData.paginationMapping, i)) {
+          const id = visitsData.paginationMapping[i];
+          const record = visitsData.visits[id];
+          if (record) {
+            records.push(record);
+          }
+        } else {
+          getVisitData();
+          break;
+        }
+      }
+
+      setTableRows(records);
+    }, 500)
+
+    return () => {
+      clearTimeout(handler);
+    }
+  }, [pageSize, page, visitsData]);
 
   const getVisitData = async () => {
     let filtersData = Object.values(filters);
     getVisits(page * pageSize, pageSize, filtersData);
   };
 
-  let visitsList: Visit[] = [];
-  const visitsData = useAppSelector((state: RootState) => state.visitsData);
-  if (visitsData) {
-    visitsList = Object.values(visitsData.visits);
-    visitsList = visitsList.sort((a, b) => b.id - a.id);
-  }
 
 
   const getAllVisitsData = async () => {
-    let filtersData = Object.values(filters);
-    getVisits(0, visitsData.totalVisits, filtersData);
+    const apiClient = new ApiClient();
+    try {
+      const visitsResp = await apiClient.getVisits(0, -1, Object.values(filters));
+      return visitsResp.results;
+    } catch (error: any) {
+      toast.error(error.message);
+      return [];
+    }
   };
 
   const handleDeleteVisit = (row: Visit) => {
@@ -266,14 +308,17 @@ export const VisitsComponent = () => {
       </div>
       <Divider sx={{ backgroundColor: "black", marginBottom: '15px' }} />
       <Box sx={{ maxHeight: 840, width: "100%", overflowY: 'auto', marginBottom: '40px' }}>
-        <TableComponent
-          dataSource={visitsList}
-          columns={columns}
-          totalRecords={visitsData.totalVisits}
-          fetchAllData={getAllVisitsData}
-          setPage={setPage}
-          setPageSize={setPageSize}
-          tableName="Visits"
+      <GeneralTable
+         loading={visitsData.loading}
+         rows={tableRows}
+         columns={columns}
+         totalRecords={visitsData.totalVisits}
+         page={page}
+         pageSize={pageSize}
+         onPaginationChange={handlePaginationChange}
+         onDownload={getAllVisitsData}
+         footer
+         tableName="Visits"
         />
       </Box>
       {selectedVisit && <VisitUsers selectedVisit={selectedVisit}/>}
