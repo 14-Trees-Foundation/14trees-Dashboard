@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import MuiAppBar from "@mui/material/AppBar";
 import Toolbar from "@mui/material/Toolbar";
@@ -11,6 +11,7 @@ import Box from "@mui/material/Box";
 import IconButton from "@mui/material/IconButton";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
+import { gsap } from "gsap";
 
 import { Profile } from "../pages/UserProfile/Profile";
 
@@ -18,6 +19,8 @@ import { useRecoilState, useRecoilValue } from "recoil";
 import { navIndex, selUsersData } from "../store/atoms";
 import logo from "../assets/logo_white_small.png";
 import icon from "../assets/icon_round.png";
+import { Button } from "@mui/material";
+import CardGiftcardIcon from "@mui/icons-material/CardGiftcard";
 
 const drawerWidth = 120;
 
@@ -54,6 +57,7 @@ export const LeftDrawer = () => {
   const classes = useStyles();
   const [index, setIndex] = useRecoilState(navIndex);
   const selUserInfo = useRecoilValue(selUsersData);
+  const userNameRef = useRef(null);
 
   const onClickNav = (value) => {
     setIndex(value);
@@ -65,6 +69,24 @@ export const LeftDrawer = () => {
   const handleDrawerClose = () => {
     setOpen(false);
   };
+
+  useEffect(() => {
+
+    // GSAP animation for the username text
+    gsap.fromTo(
+      userNameRef.current,
+      { width: 0, opacity: 0 },
+      {
+        duration: 2,
+        delay: 2,
+        width: "auto",
+        opacity: 1,
+        ease: "power3.out",
+        overflow: "hidden",
+        whiteSpace: "nowrap",
+      });
+
+  }, [selUserInfo, userNameRef]);
 
   const pages = [
     {
@@ -118,10 +140,25 @@ export const LeftDrawer = () => {
                   className={classes.img}
                   onClick={handleDrawerOpen}
                 />
-                <div className={classes.username}>
+                <div className={classes.username} ref={userNameRef}>
                   {selUserInfo.event_type && selUserInfo.event_type === "2"
                     ? "Memorial Dashboard"
                     : `${selUserInfo.assigned_to.split(" ")[0]}'s Dashboard`}
+                </div>
+                <div className={classes.buttonContainer}>
+                  <Button
+                    size="small"
+                    color="primary"
+                    variant="contained"
+                    onClick={() => {
+                      window.open(
+                        "https://docs.google.com/forms/d/e/1FAIpQLSfumyti7x9f26BPvUb0FDYzI2nnuEl5HA63EO8svO3DG2plXg/viewform"
+                      );
+                    }}
+                    startIcon={<CardGiftcardIcon />}
+                  >
+                    <span className={classes.buttonText}>Gift a Tree</span>
+                  </Button>
                 </div>
               </div>)
               : (
@@ -165,7 +202,7 @@ export const LeftDrawer = () => {
     return (
       <Drawer className={classes.drawer} variant="permanent" anchor="left">
         <Divider />
-        <img className={classes.logo} alt={"logo"} src={logo} />
+        <img className={classes.logo} alt={"logo"} src={logo} onClick={() => { window.open("https://www.14trees.org") }} />
         {menuitem()}
       </Drawer>
     );
@@ -191,7 +228,10 @@ const useStyles = makeStyles((theme) =>
       height: "35px",
     },
     header: {
+      width: "100%",
       display: "flex",
+      justifyContent: "space-between",
+      alignItems: 'center',
       height: "5vh",
     },
     username: {
@@ -247,6 +287,7 @@ const useStyles = makeStyles((theme) =>
       backgroundColor: "#9BC53D",
     },
     logo: {
+      cursor: "pointer",
       width: "80px",
       height: "100px",
       margin: "12px auto 30px auto",
@@ -271,6 +312,13 @@ const useStyles = makeStyles((theme) =>
       [theme.breakpoints.down("md")]: {
         display: "none",
       },
+    },
+    buttonContainer: {
+      display: "flex",
+      justifyContent: "flex-end",
+      flexGrow: 1,
+      flexWrap: "wrap", // Allow buttons to wrap on smaller screens
+      gap: "5px", // Add gap between buttons
     },
   })
 );

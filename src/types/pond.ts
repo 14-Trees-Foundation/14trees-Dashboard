@@ -28,8 +28,10 @@ export type Pond = {
 };
 
 export type PondsDataState = {
-  totalPonds: number,
-  ponds: Record<number, Pond>
+  loading: boolean,
+    totalPonds: number,
+    ponds: Record<number, Pond>,
+    paginationMapping: Record<number, number>,
 }
 
 export type PondWaterLevelUpdatesDataState = {

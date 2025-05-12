@@ -49,6 +49,8 @@ export type Site = {
 };
 
 export type SitesDataState = {
-    totalSites: number,
-    sites: Record<number, Site>
-}
+    loading: boolean,
+      totalSites: number,
+      sites: Record<number, Site>,
+      paginationMapping: Record<number, number>,
+  }

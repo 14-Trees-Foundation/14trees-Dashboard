@@ -10,8 +10,6 @@ export const NewsFeed = () => {
   const setOpen = useSetRecoilState(openVideo);
   const setVideoUrl = useSetRecoilState(videoUrl);
 
-  console.log(activities)
-
   const playVideo = (url) => {
     setVideoUrl(url);
     setOpen(true);
