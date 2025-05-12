@@ -298,7 +298,8 @@ const GiftCardsForm: FC<GiftCardsFormProps> = ({ loading, setLoading, step, logg
             }
         }
 
-        const logoStr = logoString ? logoString : group?.logo_url ?? undefined;
+        let logoStr = logoString ? logoString : group?.logo_url ?? undefined;
+        if (!group) logoStr = undefined;
         onSubmit(user, sponsor, createdBy ?? user, group, treeCount, category, grove, giftRequestType, users, giftedOn, paymentId, logoStr, messages, file ?? undefined);
 
         handleCloseForm();
