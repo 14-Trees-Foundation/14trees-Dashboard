@@ -1714,6 +1714,7 @@ class ApiClient {
 
             if (group_id && formData.has('group_id')) formData.set('group_id', group_id.toString());
             else if (group_id) formData.append('group_id', group_id.toString());
+            else formData.delete('group_id');
 
             if (payment_id && formData.has('payment_id')) formData.set('payment_id', payment_id.toString());
             else if (payment_id) formData.append('payment_id', payment_id.toString());
