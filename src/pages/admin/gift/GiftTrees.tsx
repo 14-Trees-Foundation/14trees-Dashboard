@@ -47,10 +47,10 @@ const TableSummary = (giftRequests: GiftCard[], selectedGiftRequestIds: number[]
                 <Table.Summary.Cell align="center" index={1} colSpan={5}>
                     <strong>Total</strong>
                 </Table.Summary.Cell>
-                <Table.Summary.Cell align="center" index={3} colSpan={1}>{calculateSum(giftRequests.filter((giftRequest) => selectedGiftRequestIds.includes(giftRequest.id)).map((giftRequest) => giftRequest.no_of_cards))}</Table.Summary.Cell>
-                <Table.Summary.Cell align="center" index={10} colSpan={7}></Table.Summary.Cell>
-                <Table.Summary.Cell align="center" index={11} colSpan={1}>{calculateSum(giftRequests.filter((giftRequest) => selectedGiftRequestIds.includes(giftRequest.id)).map((giftRequest: any) => giftRequest.total_amount))}</Table.Summary.Cell>
-                <Table.Summary.Cell align="center" index={12} colSpan={1}>{calculateSum(giftRequests.filter((giftRequest) => selectedGiftRequestIds.includes(giftRequest.id)).map((giftRequest) => giftRequest.amount_received))}</Table.Summary.Cell>
+                <Table.Summary.Cell align="center" index={5} colSpan={1}>{calculateSum(giftRequests.filter((giftRequest) => selectedGiftRequestIds.includes(giftRequest.id)).map((giftRequest) => giftRequest.no_of_cards))}</Table.Summary.Cell>
+                <Table.Summary.Cell align="center" index={8} colSpan={9}></Table.Summary.Cell>
+                <Table.Summary.Cell align="center" index={15} colSpan={1}>{calculateSum(giftRequests.filter((giftRequest) => selectedGiftRequestIds.includes(giftRequest.id)).map((giftRequest: any) => giftRequest.total_amount))}</Table.Summary.Cell>
+                <Table.Summary.Cell align="center" index={16} colSpan={1}>{calculateSum(giftRequests.filter((giftRequest) => selectedGiftRequestIds.includes(giftRequest.id)).map((giftRequest) => giftRequest.amount_received))}</Table.Summary.Cell>
                 <Table.Summary.Cell align="center" index={13} colSpan={3}></Table.Summary.Cell>
             </Table.Summary.Row>
         </Table.Summary>
@@ -320,7 +320,7 @@ const GiftTrees: FC = () => {
         setSelectedGiftCard(null);
     }
 
-    const saveNewGiftCardsRequest = async (user: User, createdBy: User, group: Group | null, treeCount: number, category: string, grove: string | null, requestType: string, users: any[], giftedOn: string, paymentId?: number, logo?: string, messages?: any, file?: File) => {
+    const saveNewGiftCardsRequest = async (user: User, sponsor: User | null, createdBy: User, group: Group | null, treeCount: number, category: string, grove: string | null, requestType: string, users: any[], giftedOn: string, paymentId?: number, logo?: string, messages?: any, file?: File) => {
         if (!requestId) {
             toast.error("Something went wrong. Please try again later!");
             return;
@@ -328,7 +328,7 @@ const GiftTrees: FC = () => {
         const apiClient = new ApiClient();
         let giftCardId: number;
         try {
-            const response = await apiClient.createGiftCard(requestId, createdBy.id, treeCount, user.id, category, grove, requestType, giftedOn, group?.id, paymentId, logo, messages, file);
+            const response = await apiClient.createGiftCard(requestId, createdBy.id, treeCount, user.id, sponsor?.id || null, category, grove, requestType, giftedOn, group?.id, paymentId, logo, messages, file);
             giftCardId = response.id;
             
             getGiftCardData();
@@ -353,7 +353,7 @@ const GiftTrees: FC = () => {
         }
     }
 
-    const updateGiftCardRequest = async (user: User, createdBy: User, group: Group | null, treeCount: number, category: string, grove: string | null, requestType: string, users: any[], giftedOn: string, paymentId?: number, logo?: string, messages?: any, file?: File) => {
+    const updateGiftCardRequest = async (user: User, sponsor: User | null, createdBy: User, group: Group | null, treeCount: number, category: string, grove: string | null, requestType: string, users: any[], giftedOn: string, paymentId?: number, logo?: string, messages?: any, file?: File) => {
         if (!selectedGiftCard) return;
 
         const apiClient = new ApiClient();
@@ -362,7 +362,7 @@ const GiftTrees: FC = () => {
 
             const data = { ...selectedGiftCard };
             data.created_by = createdBy.id;
-            const response = await apiClient.updateGiftCard(data, treeCount, user.id, category, grove, requestType, giftedOn, group?.id, paymentId, logo, messages, file);
+            const response = await apiClient.updateGiftCard(data, treeCount, user.id, sponsor?.id || null, category, grove, requestType, giftedOn, group?.id, paymentId, logo, messages, file);
 
             toast.success("Tree Request updated successfully");
             dispatch({
@@ -394,11 +394,11 @@ const GiftTrees: FC = () => {
         }
     }
 
-    const handleSubmit = async (user: User, createdBy: User, group: Group | null, treeCount: number, category: string, grove: string | null, requestType: string, users: any[], giftedOn: string, paymentId?: number, logo?: string, messages?: any, file?: File) => {
+    const handleSubmit = async (user: User, sponsor: User | null, createdBy: User, group: Group | null, treeCount: number, category: string, grove: string | null, requestType: string, users: any[], giftedOn: string, paymentId?: number, logo?: string, messages?: any, file?: File) => {
         if (changeMode === 'add') {
-            await saveNewGiftCardsRequest(user, createdBy, group, treeCount, category, grove, requestType, users, giftedOn, paymentId, logo, messages, file);
+            await saveNewGiftCardsRequest(user, sponsor, createdBy, group, treeCount, category, grove, requestType, users, giftedOn, paymentId, logo, messages, file);
         } else if (changeMode === 'edit') {
-            await updateGiftCardRequest(user, createdBy, group, treeCount, category, grove, requestType, users, giftedOn, paymentId, logo, messages, file);
+            await updateGiftCardRequest(user, sponsor, createdBy, group, treeCount, category, grove, requestType, users, giftedOn, paymentId, logo, messages, file);
         }
 
         handleModalClose();
@@ -520,7 +520,7 @@ const GiftTrees: FC = () => {
 
         try {
             const apiClient = new ApiClient();
-            const response = await apiClient.updateGiftCard({ ...selectedGiftCard, notes: text }, selectedGiftCard.no_of_cards, selectedGiftCard.user_id, selectedGiftCard.category, selectedGiftCard.grove, selectedGiftCard.request_type ?? GiftRequestType_CARDS_REQUEST, selectedGiftCard.gifted_on);
+            const response = await apiClient.updateGiftCard({ ...selectedGiftCard, notes: text }, selectedGiftCard.no_of_cards, selectedGiftCard.user_id, selectedGiftCard.sponsor_id, selectedGiftCard.category, selectedGiftCard.grove, selectedGiftCard.request_type ?? GiftRequestType_CARDS_REQUEST, selectedGiftCard.gifted_on);
             toast.success("Tree card request updated successfully");
             dispatch({
                 type: giftCardActionTypes.UPDATE_GIFT_CARD_SUCCEEDED,
@@ -555,7 +555,7 @@ const GiftTrees: FC = () => {
 
         try {
             const apiClient = new ApiClient();
-            const response = await apiClient.updateGiftCard(selectedPaymentGR, selectedPaymentGR.no_of_cards, selectedPaymentGR.user_id, selectedPaymentGR.category, selectedPaymentGR.grove, selectedPaymentGR.request_type ?? GiftRequestType_CARDS_REQUEST, selectedPaymentGR.gifted_on, selectedPaymentGR.group_id, paymentId);
+            const response = await apiClient.updateGiftCard(selectedPaymentGR, selectedPaymentGR.no_of_cards, selectedPaymentGR.user_id, selectedPaymentGR.sponsor_id, selectedPaymentGR.category, selectedPaymentGR.grove, selectedPaymentGR.request_type ?? GiftRequestType_CARDS_REQUEST, selectedPaymentGR.gifted_on, selectedPaymentGR.group_id, paymentId);
         } catch (error: any) {
             toast.error(error.message)
         }
@@ -572,7 +572,7 @@ const GiftTrees: FC = () => {
 
         try {
             const apiClient = new ApiClient();
-            const response = await apiClient.updateGiftCard(data, selectedPaymentGR.no_of_cards, selectedPaymentGR.user_id, selectedPaymentGR.category, selectedPaymentGR.grove, selectedPaymentGR.request_type ?? GiftRequestType_CARDS_REQUEST, selectedPaymentGR.gifted_on);
+            const response = await apiClient.updateGiftCard(data, selectedPaymentGR.no_of_cards, selectedPaymentGR.user_id, selectedPaymentGR.sponsor_id, selectedPaymentGR.category, selectedPaymentGR.grove, selectedPaymentGR.request_type ?? GiftRequestType_CARDS_REQUEST, selectedPaymentGR.gifted_on);
             dispatch({
                 type: giftCardActionTypes.UPDATE_GIFT_CARD_SUCCEEDED,
                 payload: response,
@@ -603,7 +603,7 @@ const GiftTrees: FC = () => {
             const data = { ...selectedGiftCard };
             data.tags = tags;
             const apiClient = new ApiClient();
-            const response = await apiClient.updateGiftCard(data, selectedGiftCard.no_of_cards, selectedGiftCard.user_id, selectedGiftCard.category, selectedGiftCard.grove, selectedGiftCard.request_type ?? GiftRequestType_CARDS_REQUEST, selectedGiftCard.gifted_on, selectedGiftCard.group_id);
+            const response = await apiClient.updateGiftCard(data, selectedGiftCard.no_of_cards, selectedGiftCard.user_id, selectedGiftCard.sponsor_id, selectedGiftCard.category, selectedGiftCard.grove, selectedGiftCard.request_type ?? GiftRequestType_CARDS_REQUEST, selectedGiftCard.gifted_on, selectedGiftCard.group_id);
             dispatch({
                 type: giftCardActionTypes.UPDATE_GIFT_CARD_SUCCEEDED,
                 payload: response,
@@ -849,7 +849,7 @@ const GiftTrees: FC = () => {
             title: "Request Type",
             align: "center",
             width: 200,
-            ...getColumnSelectedItemFilter({ dataIndex: 'request_type', filters, handleSetFilters, options: ['Cards Request', 'Normal Assignment', 'Test', 'Promotion'] })
+            ...getColumnSelectedItemFilter({ dataIndex: 'request_type', filters, handleSetFilters, options: ['Gift Cards', 'Normal Assignment', 'Test', 'Promotion'] })
         },
         {
             dataIndex: "tags",

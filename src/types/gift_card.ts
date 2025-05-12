@@ -1,8 +1,8 @@
 
-export type GiftRequestType = 'Cards Request' | 'Normal Assignment' | 'Promotion' | 'Test'
+export type GiftRequestType = 'Gift Cards' | 'Normal Assignment' | 'Promotion' | 'Test'
 export type SponsorshipType = 'Unverified' | 'Pledged' | 'Promotional' | 'Unsponsored Visit' | 'Donation Received'
 
-export const GiftRequestType_CARDS_REQUEST: GiftRequestType = 'Cards Request'
+export const GiftRequestType_CARDS_REQUEST: GiftRequestType = 'Gift Cards'
 export const GiftRequestType_NORAML_ASSIGNMENT: GiftRequestType = 'Normal Assignment'
 export const GiftRequestType_PROMOTION: GiftRequestType = 'Promotion'
 export const GiftRequestType_TEST: GiftRequestType = 'Test'
@@ -11,6 +11,7 @@ export type GiftCard = {
     key: number;
     id: number;
     user_id: number;
+    sponsor_id: number | null;
     created_by: number;
     group_id: number;
     no_of_cards: number;

@@ -54,7 +54,7 @@ const CardCount: FC<CardCountProps> = ({ disabled, treeCount, onTreeCountChange,
                     </Select>
                 </FormControl>
             </Box>
-            <Box sx={{ mt: 2 }} style={{ display: category === 'Public' ? 'none' : 'block' }}>
+            {/* <Box sx={{ mt: 2 }} style={{ display: category === 'Public' ? 'none' : 'block' }}>
                 <Typography mb={1} variant='body1'>Select a grove, such as birthday or memorial, based on the gifting occasion, or leave it blank for us to choose the best fit for you.</Typography>
                 <FormControl fullWidth>
                     <Select
@@ -72,7 +72,7 @@ const CardCount: FC<CardCountProps> = ({ disabled, treeCount, onTreeCountChange,
                         <MenuItem value={'Conference'}>Conference Grove</MenuItem>
                     </Select>
                 </FormControl>
-            </Box>
+            </Box> */}
         </div>
     )
 }

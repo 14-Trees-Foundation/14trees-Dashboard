@@ -14,6 +14,7 @@ import PaymentForm from "../../../../components/payment/PaymentForm";
 import { Payment } from "../../../../types/payment";
 import DashboardDetails from "./DashboardDetailsForm";
 import SponsorDetailsForm from "./SponsorDetailsForm";
+import PlantationInfo from "./PlantationInfo";
 import { LoadingButton } from "@mui/lab";
 
 interface GiftCardsFormProps {
@@ -25,13 +26,14 @@ interface GiftCardsFormProps {
     loggedinUserId?: number
     open: boolean
     handleClose: () => void
-    onSubmit: (user: User, createdByUser: User, group: Group | null, treeCount: number, category: string, grove: string | null, requestType: string, users: any[], giftedOn: string, paymentId?: number, logo?: string, messages?: any, file?: File) => void
+    onSubmit: (user: User, sponsor: User | null, createdByUser: User, group: Group | null, treeCount: number, category: string, grove: string | null, requestType: string, users: any[], giftedOn: string, paymentId?: number, logo?: string, messages?: any, file?: File) => void
 }
 
 const GiftCardsForm: FC<GiftCardsFormProps> = ({ loading, setLoading, step, loggedinUserId, giftCardRequest, requestId, open, handleClose, onSubmit }) => {
 
     const [currentStep, setCurrentStep] = useState(0);
     const [user, setUser] = useState<User | null>(null);
+    const [sponsor, setSponsor] = useState<User | null>(null);
     const [createdBy, setCreatedBy] = useState<User | null>(null);
     const [group, setGroup] = useState<Group | null>(null);
     const [treeCount, setTreeCount] = useState<number>(100);
@@ -43,8 +45,8 @@ const GiftCardsForm: FC<GiftCardsFormProps> = ({ loading, setLoading, step, logg
     const [giftedOn, setGiftedOn] = useState(new Date().toISOString().slice(0, 10));
     const [presentationId, setPresentationId] = useState<string | null>(null)
     const [slideId, setSlideId] = useState<string | null>(null)
-    const [category, setCategory] = useState<string>("Foundation");
-    const [giftRequestType, setGiftRequestType] = useState<string>("Cards Request");
+    const [category, setCategory] = useState<string>("Public");
+    const [giftRequestType, setGiftRequestType] = useState<string>("Gift Cards");
     const [grove, setGrove] = useState<string | null>(null);
     const [consent, setConsent] = useState(false);
 
@@ -71,8 +73,11 @@ const GiftCardsForm: FC<GiftCardsFormProps> = ({ loading, setLoading, step, logg
    //     }
 
         if (giftCardRequest) {
-            const userResp = await apiClient.getUsers(0, 1, [{ columnField: 'id', operatorValue: 'equals', value: giftCardRequest.user_id }]);
-            if (userResp.results.length === 1) setUser(userResp.results[0]);
+            const userResp = await apiClient.getUsers(0, 1, [{ columnField: 'id', operatorValue: 'isAnyOf', value: [giftCardRequest.user_id, giftCardRequest.sponsor_id] }]);
+            const user = userResp.results.find(user => user.id === giftCardRequest.user_id);
+            if (user) setUser(user);
+            const sponsor = userResp.results.find(user => user.id === giftCardRequest.sponsor_id);
+            if (sponsor) setSponsor(sponsor);
 
             const groupResp = await apiClient.getGroups(0, 1, [{ columnField: 'id', operatorValue: 'equals', value: giftCardRequest.group_id }]);
             if (groupResp.results.length === 1) {
@@ -95,7 +100,7 @@ const GiftCardsForm: FC<GiftCardsFormProps> = ({ loading, setLoading, step, logg
 
             setUsers(usersData);
             setTreeCount(giftCardRequest.no_of_cards);
-            setCategory(giftCardRequest.category || "Foundation");
+            setCategory(giftCardRequest.category || "Public");
             setGrove(giftCardRequest.grove || null);
             setLogoString(giftCardRequest.logo_url);
             setGiftedOn(giftCardRequest.gifted_on);
@@ -161,13 +166,55 @@ const GiftCardsForm: FC<GiftCardsFormProps> = ({ loading, setLoading, step, logg
         uploadFile();
     }, [logo, requestId])
 
-    const steps = [
+    const steps: any[] = [
         {
             key: 0,
+            onClick: () => setCurrentStep(0),
+            style: { cursor: 'pointer' },
+            title: "Plantation Info",
+            content: <PlantationInfo
+                treeCountDisabled={giftCardRequest !== undefined && giftCardRequest.status !== 'pending_plot_selection'}
+                treeCount={treeCount}
+                onTreeCountChange={count => setTreeCount(count)}
+                category={category}
+                onCategoryChange={category => { setCategory(category) }}
+                messages={{ ...messages, plantedBy: messages.plantedBy || group?.name || user?.name || '' }}
+                onChange={messages => { setMessages(messages) }}
+                giftedOn={giftedOn}
+                onGiftedOnChange={(date) => { setGiftedOn(date) }}
+                requestType={giftRequestType}
+                onRequestTypeChange={requestType => { setGiftRequestType(requestType); }}
+            />,
+        },
+        {
+            key: 1,
+            onClick: () => setCurrentStep(1),
+            style: { cursor: 'pointer' },
+            title: "Payment",
+            content: <PaymentForm
+                indianDonor={true}
+                payment={payment}
+                amount={amount}
+                onPaymentChange={payment => setPayment(payment)}
+                onChange={(donorType: string, panNumber: string | null, consent: boolean) => { setDonorType(donorType); setPanNumber(panNumber); setConsent(consent) }}
+            />,
+        },
+        {
+            key: 2,
+            onClick: () => setCurrentStep(2),
+            style: { cursor: 'pointer' },
+            title: "Recipient Details",
+            content: <BulkUserForm treeCount={treeCount} requestId={requestId} users={users} onUsersChange={users => setUsers(users)} onFileChange={file => setFile(file)} />,
+        },
+        {
+            key: 3,
             title: "Sponsor Details",
             content: <SponsorDetailsForm 
+                requestType={giftRequestType}
                 user={user} 
                 onUserSelect={user => setUser(user)} 
+                sponsor={sponsor}
+                onSponsorSelect={sponsor => setSponsor(sponsor)}
                 createdBy={createdBy} 
                 onCreatedByUserSelect={user => setCreatedBy(user)} 
                 logo={logoString} 
@@ -181,50 +228,8 @@ const GiftCardsForm: FC<GiftCardsFormProps> = ({ loading, setLoading, step, logg
                     setLogoString(prev => group?.logo_url ? group.logo_url : prev); 
                     setMessages(prev => ({ ...prev, plantedBy: group ? group.name : "" }))}
                 }/>,
-            onClick: () => setCurrentStep(0),
-            style: { cursor: 'pointer' },
-        },
-        {
-            key: 1,
-            title: "Book Trees",
-            onClick: () => setCurrentStep(1),
-            style: { cursor: 'pointer' },
-            content: <CardCount
-                disabled={giftCardRequest !== undefined && giftCardRequest.status !== 'pending_plot_selection'}
-                treeCount={treeCount}
-                onTreeCountChange={count => setTreeCount(count)}
-                category={category}
-                onCategoryChange={category => { setCategory(category) }}
-                grove={grove}
-                onGroveChange={grove => setGrove(grove)}
-            />,
-        },
-        {
-            key: 2,
-            onClick: () => setCurrentStep(2),
-            style: { cursor: 'pointer' },
-            title: "Dashboard Details",
-            content: <DashboardDetails
-                messages={{ ...messages, plantedBy: messages.plantedBy || group?.name || user?.name || '' }}
-                onChange={messages => { setMessages(messages) }}
-                giftedOn={giftedOn}
-                onGiftedOnChange={(date) => { setGiftedOn(date) }}
-                requestType={giftRequestType}
-                onRequestTypeChange={requestType => { setGiftRequestType(requestType); }}
-            />,
-        },
-        {
-            key: 3,
             onClick: () => setCurrentStep(3),
             style: { cursor: 'pointer' },
-            title: "Payment",
-            content: <PaymentForm
-                indianDonor={true}
-                payment={payment}
-                amount={amount}
-                onPaymentChange={payment => setPayment(payment)}
-                onChange={(donorType: string, panNumber: string | null, consent: boolean) => { setDonorType(donorType); setPanNumber(panNumber); setConsent(consent) }}
-            />,
         },
         {
             key: 4,
@@ -239,21 +244,32 @@ const GiftCardsForm: FC<GiftCardsFormProps> = ({ loading, setLoading, step, logg
                 messages={{ ...messages, plantedBy: messages.plantedBy || group?.name || user?.name || '' }}
                 onChange={messages => { setMessages(messages) }}
                 onPresentationId={(presentationId: string, slideId: string) => { setPresentationId(presentationId); setSlideId(slideId); }}
+                userName={users.length > 0 ? users[0].recipient_name : undefined}
             />,
-        },
-        {
-            key: 5,
-            onClick: () => setCurrentStep(5),
-            style: { cursor: 'pointer' },
-            title: "Recipient Details",
-            content: <BulkUserForm treeCount={treeCount} requestId={requestId} users={users} onUsersChange={users => setUsers(users)} onFileChange={file => setFile(file)} />,
         },
     ]
 
+    const [formSteps, setFormSteps] = useState(steps);
+    useEffect(() => {
+        const disabled = giftRequestType === 'Normal Assignment' || giftRequestType === 'Visit'
+        setFormSteps(steps.slice(0, disabled ? -1 : undefined).map(step => {
+            return step.key == 1
+                ? { ...step, onClick: disabled ? undefined : () => setCurrentStep(step.key) }
+                : step
+        }))
+
+    }, [giftRequestType])
+
     const handleSubmit = async () => {
         if (!user) {
+            toast.error("Please select user to reserve trees");
+            setCurrentStep(3);
+            return;
+        }
+
+        if (giftRequestType === 'Gift Cards' && !sponsor) {
             toast.error("Please select sponsor");
-            setCurrentStep(0);
+            setCurrentStep(3);
             return;
         }
 
@@ -283,7 +299,7 @@ const GiftCardsForm: FC<GiftCardsFormProps> = ({ loading, setLoading, step, logg
         }
 
         const logoStr = logoString ? logoString : group?.logo_url ?? undefined;
-        onSubmit(user, createdBy ?? user, group, treeCount, category, grove, giftRequestType, users, giftedOn, paymentId, logoStr, messages, file ?? undefined);
+        onSubmit(user, sponsor, createdBy ?? user, group, treeCount, category, grove, giftRequestType, users, giftedOn, paymentId, logoStr, messages, file ?? undefined);
 
         handleCloseForm();
     }
@@ -294,7 +310,9 @@ const GiftCardsForm: FC<GiftCardsFormProps> = ({ loading, setLoading, step, logg
         setCurrentStep(0);
         setUser(null);
         setGroup(null);
+        setSponsor(null);
         setTreeCount(100);
+        setGiftRequestType('Gift Cards');
         setFile(null);
         setUsers([]);
         setLogo(null);
@@ -310,26 +328,34 @@ const GiftCardsForm: FC<GiftCardsFormProps> = ({ loading, setLoading, step, logg
         let nextStep = currentStep;
         switch (currentStep) {
             case 0:
-                if (!user) toast.error("Please provide sponsor details");
-                else nextStep = 1;
+                if (treeCount === 0) toast.error("Please provide number of trees to gift");
+                else nextStep = giftRequestType === 'Visit' ? 2 : 1;
                 break;
             case 1:
-                if (treeCount === 0) toast.error("Please provide number of trees to gift");
-                else nextStep = 2;
+                nextStep = currentStep + 1;
                 break;
             case 2:
+                nextStep = 3;
+                break;
             case 3:
-                nextStep = currentStep + 1;
+                nextStep = 4;
                 break;
             case 4:
                 if (messages.primaryMessage === "" || messages.secondaryMessage === "") toast.error("Please provide gift card details");
-                else nextStep = 5;
                 break;
             default:
                 break;
         }
 
         setCurrentStep(nextStep);
+    }
+
+    const handlePrevious = () => {
+        const step = giftRequestType === 'Visit' && currentStep == 2
+                        ? 0
+                        : currentStep - 1; 
+
+        setCurrentStep(step);
     }
 
 
@@ -353,7 +379,7 @@ const GiftCardsForm: FC<GiftCardsFormProps> = ({ loading, setLoading, step, logg
                         >
                             <Steps
                                 current={currentStep}
-                                items={steps}
+                                items={formSteps}
                             />
                         </div>
                     </>
@@ -383,7 +409,7 @@ const GiftCardsForm: FC<GiftCardsFormProps> = ({ loading, setLoading, step, logg
                     justifyContent: "space-between",
                 }}>
                     {currentStep > 0 && <Button
-                        onClick={() => setCurrentStep(currentStep - 1)}
+                        onClick={handlePrevious}
                         variant="outlined"
                         color="success"
                     >Previous</Button>}
@@ -395,14 +421,14 @@ const GiftCardsForm: FC<GiftCardsFormProps> = ({ loading, setLoading, step, logg
                         color="error"
                         style={{ alignSelf: 'right', marginRight: 10 }}
                     >Cancel</Button>
-                    {currentStep < steps.length - 1 && <Button
+                    {currentStep < formSteps.length - 1 && <Button
                         onClick={handleNext}
                         variant="contained"
                         color="success"
                         style={{ alignSelf: 'right' }}
                     >Next</Button>}
 
-                    {currentStep === steps.length - 1 && <LoadingButton
+                    {currentStep === formSteps.length - 1 && <LoadingButton
                         loading={loading}
                         onClick={handleSubmit}
                         variant="contained"
