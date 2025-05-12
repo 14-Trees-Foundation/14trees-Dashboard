@@ -67,10 +67,10 @@ const GiftCardsForm: FC<GiftCardsFormProps> = ({ loading, setLoading, step, logg
     const getGiftCardRequestDetails = async () => {
         const apiClient = new ApiClient();
 
-   //     if (loggedinUserId) {
-   //         const createdByResp = await apiClient.getUsers(0, 1, [{ columnField: 'id', operatorValue: 'equals', value: giftCardRequest?.created_by ? giftCardRequest.created_by : loggedinUserId }]);
-   //         if (createdByResp.results.length === 1) setCreatedBy(createdByResp.results[0]);
-   //     }
+       if (loggedinUserId) {
+            const createdByResp = await apiClient.getUsers(0, 1, [{ columnField: 'id', operatorValue: 'equals', value: giftCardRequest?.created_by ? giftCardRequest.created_by : loggedinUserId }]);
+           if (createdByResp.results.length === 1) setCreatedBy(createdByResp.results[0]);
+       }
 
         if (giftCardRequest) {
             const userResp = await apiClient.getUsers(0, 1, [{ columnField: 'id', operatorValue: 'isAnyOf', value: [giftCardRequest.user_id, giftCardRequest.sponsor_id] }]);
