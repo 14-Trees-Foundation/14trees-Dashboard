@@ -35,11 +35,6 @@ import GeneralTable from "../../../components/GenTable";
 
 const pendingPlotSelection = 'Pending Plot & Tree(s) Reservation';
 
-const calculateUnion = (plantTypes: (string[] | undefined)[]) => {
-    const allTypes = plantTypes.flat().filter((type): type is string => type !== undefined);
-    return Array.from(new Set(allTypes));
-}
-
 const TableSummary = (giftRequests: GiftCard[], selectedGiftRequestIds: number[], totalColumns: number) => {
 
     const calculateSum = (data: (number | undefined)[]) => {
@@ -99,6 +94,10 @@ const GiftTrees: FC = () => {
     const [testingMail, setTestingMail] = useState(false);
     const [giftCardNotification, setGiftCardNotification] = useState(false);
     const [selectedGiftRequestIds, setSelectedGiftRequestIds] = useState<number[]>([]);
+
+    // create/update loading
+    const [savingChange, setSavingChange] = useState(false);
+
     // Chart
     const [corporateCount, setCorporateCount] = useState(0);
     const [personalCount, setPersonalCount] = useState(0);
@@ -252,6 +251,7 @@ const GiftTrees: FC = () => {
 
     const handleModalClose = () => {
         setModalOpen(false);
+        setSavingChange(false);
         setSelectedGiftCard(null);
         setRequestId(null);
     }
@@ -394,14 +394,14 @@ const GiftTrees: FC = () => {
         }
     }
 
-    const handleSubmit = (user: User, createdBy: User, group: Group | null, treeCount: number, category: string, grove: string | null, requestType: string, users: any[], giftedOn: string, paymentId?: number, logo?: string, messages?: any, file?: File) => {
-        handleModalClose();
-
+    const handleSubmit = async (user: User, createdBy: User, group: Group | null, treeCount: number, category: string, grove: string | null, requestType: string, users: any[], giftedOn: string, paymentId?: number, logo?: string, messages?: any, file?: File) => {
         if (changeMode === 'add') {
-            saveNewGiftCardsRequest(user, createdBy, group, treeCount, category, grove, requestType, users, giftedOn, paymentId, logo, messages, file);
+            await saveNewGiftCardsRequest(user, createdBy, group, treeCount, category, grove, requestType, users, giftedOn, paymentId, logo, messages, file);
         } else if (changeMode === 'edit') {
-            updateGiftCardRequest(user, createdBy, group, treeCount, category, grove, requestType, users, giftedOn, paymentId, logo, messages, file);
+            await updateGiftCardRequest(user, createdBy, group, treeCount, category, grove, requestType, users, giftedOn, paymentId, logo, messages, file);
         }
+
+        handleModalClose();
     }
 
     const handlePlotSelectionCancel = () => {
@@ -1040,7 +1040,9 @@ const GiftTrees: FC = () => {
                 </Box>
             }
 
-            <GiftCardsForm 
+            <GiftCardsForm
+                loading={savingChange}
+                setLoading={(value) => { setSavingChange(value) }}
                 loggedinUserId={authRef.current?.userId} 
                 step={step} 
                 giftCardRequest={selectedGiftCard ?? undefined} 
