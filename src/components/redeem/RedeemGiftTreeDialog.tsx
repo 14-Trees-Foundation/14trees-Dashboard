@@ -111,7 +111,6 @@ const RedeemGiftTreeDialog: React.FC<RedeemGiftTreeDialogProps> = ({
     const [selectedEventType, setSelectedEventType] = useState<{ value: string, label: string } | null>(null);
     const [initialMessages, setInitialMessages] = useState({ 
         primaryMessage: '', 
-        secondaryMessage: '', 
         logoMessage: '', 
         eventName: '', 
         eventType: '' as string | undefined, 
@@ -119,7 +118,6 @@ const RedeemGiftTreeDialog: React.FC<RedeemGiftTreeDialogProps> = ({
     });
     const [messages, setMessages] = useState({ 
         primaryMessage: '', 
-        secondaryMessage: '', 
         logoMessage: '', 
         eventName: '', 
         eventType: '' as string | undefined, 
@@ -165,7 +163,6 @@ const RedeemGiftTreeDialog: React.FC<RedeemGiftTreeDialogProps> = ({
             // Set messages
             const newMessages = {
                 primaryMessage: existingTransaction.primary_message || '',
-                secondaryMessage: existingTransaction.secondary_message || '',
                 logoMessage: existingTransaction.logo_message || '',
                 eventName: existingTransaction.occasion_name || '',
                 eventType: existingTransaction.occasion_type as string | undefined,
@@ -307,11 +304,6 @@ const RedeemGiftTreeDialog: React.FC<RedeemGiftTreeDialogProps> = ({
         if (messages.primaryMessage !== initialMessages.primaryMessage) {
             mask.push('primary_message');
             data.primary_message = messages.primaryMessage;
-        }
-        
-        if (messages.secondaryMessage !== initialMessages.secondaryMessage) {
-            mask.push('secondary_message');
-            data.secondary_message = messages.secondaryMessage;
         }
         
         if (messages.logoMessage !== initialMessages.logoMessage) {
