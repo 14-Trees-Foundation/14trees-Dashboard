@@ -118,7 +118,7 @@ const DonationInfo: React.FC<DonationInfoProps> = ({ open, onClose, data }) => {
               <Typography sx={{ mb: 1 }}><strong>Grove Type (Other):</strong> {data.grove_type_other}</Typography>
             )}
             <Typography sx={{ mb: 1 }}><strong>Trees Count:</strong> <Chip size="small" label={data.trees_count} sx={{ ml: 1, bgcolor: '#2e7d32', color: 'white' }} /></Typography>
-            <Typography><strong>Contribution Options:</strong> {data.contribution_options || 'N/A'}</Typography>
+            <Typography><strong>Additional Contribution:</strong> {data.contribution_options ? (Array.isArray(data.contribution_options) ? data.contribution_options.join(', ') : String(data.contribution_options).replace(/([a-z])([A-Z])/g, '$1 $2').split(/\s+|(?=[A-Z])/).filter(Boolean).join(', ')) : 'N/A'}</Typography>
           </Box>
         </Paper>
 
@@ -126,7 +126,7 @@ const DonationInfo: React.FC<DonationInfoProps> = ({ open, onClose, data }) => {
         {(data.names_for_plantation || data.comments) && (
           <Paper elevation={1} sx={{ p: 3, mb: 3, borderRadius: 2, border: `1px solid ${theme.palette.divider}` }}>
             <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-              <InfoOutlined sx={{ color: '#2e7d32' }} /> Additional Information
+              <InfoOutlined sx={{ color: '#2e7d32' }} /> Comments/Feedback
             </Typography>
             <Box sx={{ ml: 4 }}>
               {data.names_for_plantation && (

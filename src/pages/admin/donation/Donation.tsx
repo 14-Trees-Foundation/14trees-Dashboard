@@ -523,9 +523,16 @@ export const DonationComponent = () => {
     {
       dataIndex: "contribution_options",
       key: "Contribution",
-      title: "Contribution",
+      title: "Additional Contribution",
       align: "center",
       width: 150,
+      render: (contributions) => {
+                if (!contributions) return '';
+        if (Array.isArray(contributions)) {
+          return contributions.join(', ');
+        }
+        return contributions;
+      },
       ...getColumnSelectedItemFilter({ dataIndex: 'contribution_options', filters, handleSetFilters, options: ['CSR', 'Planing Visit', 'Other'] }),
     },
     {

@@ -75,6 +75,7 @@ const DonationTrees: FC<DonationTreesProps> = ({ open, onClose, donation }) => {
   const [tableRows, setTableRows] = useState<Plot[]>([]);
   const [bookAllHabits, setBookAllHabits] = useState(false);
   const [diversify, setDiversify] = useState(false);
+  const [validationDialog, setValidationDialog] = useState({ open: false, title: '', message: '' });
   
   // New state variables for the tree selection tab
   const [tabValue, setTabValue] = useState(0);
@@ -269,9 +270,24 @@ const DonationTrees: FC<DonationTreesProps> = ({ open, onClose, donation }) => {
 
   // Handle reserve count input change
   const handleReserveCountChange = (id: number, value: number) => {
+    if (!donation) return;
+    
+    const requestedCount = donation.trees_count || 0;
+    const currentTotal = selectedPlots.reduce((sum, plot) => sum + (plot.id === id ? 0 : plot.reserveCount), 0);
+    const plot = selectedPlots.find(p => p.id === id);
+    
+    if (!plot) return;
+
+    const maxAllowed = Math.min(
+      plot.availableTrees,
+      requestedCount - currentTotal
+    );
+
+    const newValue = Math.max(0, Math.min(value, maxAllowed));
+  
     setSelectedPlots(prev =>
       prev.map(plot =>
-        plot.id === id ? { ...plot, reserveCount: value } : plot
+        plot.id === id ? { ...plot, reserveCount: newValue } : plot
       )
     );
   };
@@ -635,6 +651,36 @@ const DonationTrees: FC<DonationTreesProps> = ({ open, onClose, donation }) => {
 
   const handleConfirmReservation = async () => {
     if (!donation) return;
+    const requestedCount = donation.trees_count || 0;
+    let totalToReserve = 0;
+  
+    // Calculate total trees to be reserved
+    if (tabValue === 0) {
+      totalToReserve = selectedPlots.reduce((sum, plot) => sum + plot.reserveCount, 0);
+    } else {
+      totalToReserve = selectedTrees.length;
+    }
+  
+    // Validation: Check if trying to reserve more than requested
+    if (totalToReserve > requestedCount) {
+      setValidationDialog({
+        open: true,
+        title: 'Reservation Error',
+        message: `Cannot reserve more trees (${totalToReserve}) than requested (${requestedCount})`
+      });
+      return; // Stop execution here - don't submit
+    }
+  
+    // Validation: Check if trying to reserve zero trees
+    if (totalToReserve === 0) {
+      setValidationDialog({
+        open: true,
+        title: 'Reservation Error',
+        message: 'Please select at least one tree to reserve'
+      });
+      return;
+    }
+  
     try {
       const apiClient = new ApiClient();
       
@@ -644,11 +690,10 @@ const DonationTrees: FC<DonationTreesProps> = ({ open, onClose, donation }) => {
           donation.id,
           [],
           true,
-          selectedPlots.map(plot => ({ plot_id: plot.id, trees_count: plot.reserveCount })), // plots
+          selectedPlots.map(plot => ({ plot_id: plot.id, trees_count: plot.reserveCount })),
           diversify,
           bookAllHabits
         );
-        toast.success(`Successfully reserved trees for donation ${donation?.id}`);
       } else {
         // Tree-based reservation
         await apiClient.reserveTreesForDonation(
@@ -659,10 +704,14 @@ const DonationTrees: FC<DonationTreesProps> = ({ open, onClose, donation }) => {
           diversify,
           bookAllHabits
         );
-        toast.success(`Successfully reserved ${selectedTrees.length} trees for donation ${donation?.id}`);
       }
+      handleClose(); // Close dialog on success
     } catch (error: any) {
-      toast.error(error.message);
+      setValidationDialog({
+        open: true,
+        title: 'Reservation Failed',
+        message: error.message || "Failed to reserve trees"
+      });
     }
   };
 
@@ -980,16 +1029,40 @@ const DonationTrees: FC<DonationTreesProps> = ({ open, onClose, donation }) => {
           </Paper>
         )}
       </DialogContent>
+              <Dialog
+                 open={validationDialog.open}
+                 onClose={() => setValidationDialog(prev => ({...prev, open: false}))}
+                 maxWidth="xs"
+                 fullWidth
+              >
+              <DialogTitle>{validationDialog.title}</DialogTitle>
+       <DialogContent>
+            <DialogContentText>{validationDialog.message}</DialogContentText>
+        </DialogContent>
+        <DialogActions>
+         <Button 
+              onClick={() => setValidationDialog(prev => ({...prev, open: false}))} 
+              color="success" 
+              variant="contained"  
+              autoFocus
+              sx={{
+                backgroundColor: '#4caf50',
+                '&:hover': {
+                  backgroundColor: '#388e3c',
+                }
+              }}
+              >
+                 OK
+          </Button>
+      </DialogActions>
+    </Dialog>
 
       <DialogActions>
         <Button onClick={handleClose} color="error" variant="outlined">
           Cancel
         </Button>
         <Button
-          onClick={() => {
-            handleConfirmReservation();
-            handleClose();
-          }}
+          onClick={handleConfirmReservation}
           color="success"
           variant="contained"
           disabled={(tabValue === 0 && selectedPlots.length === 0) || (tabValue === 1 && selectedTrees.length === 0)}
