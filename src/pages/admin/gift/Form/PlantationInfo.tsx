@@ -21,7 +21,6 @@ const GiftRequestTypes = ['Gift Cards', 'Normal Assignment', 'Promotion', 'Visit
 
 interface Massages {
     primaryMessage: string,
-    secondaryMessage: string,
     eventName: string,
     eventType: string | undefined,
     plantedBy: string,

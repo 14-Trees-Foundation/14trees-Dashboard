@@ -154,10 +154,7 @@ const GiftCardRequestInfo: React.FC<GiftCardRequestInfoProps> = ({ open, onClose
                 <Box mt={2} mb={2}>
                     <Typography variant="h6" gutterBottom>Messages</Typography>
                     <Typography variant="body1" gutterBottom>
-                        <strong>Primary Message:</strong> {data.primary_message || 'N/A'}
-                    </Typography>
-                    <Typography variant="body1" gutterBottom>
-                        <strong>Secondary Message:</strong> {data.secondary_message || 'N/A'}
+                        <strong>Gift Card Message:</strong> {data.primary_message || 'N/A'}
                     </Typography>
                     <Typography variant="body1" gutterBottom>
                         <strong>Logo Message:</strong> {data.logo_message || 'N/A'}
