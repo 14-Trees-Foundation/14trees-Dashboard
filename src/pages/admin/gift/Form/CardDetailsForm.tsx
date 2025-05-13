@@ -7,7 +7,7 @@ const secondaryMessage = 'We invite you to visit 14 Trees and firsthand experien
 
 const defaultMessages = {
     primary: prefixMessage + 'We are immensely delighted to share that a tree has been planted in your name at the 14 Trees Foundation, Pune. This tree will be nurtured in your honour, rejuvenating ecosystems, supporting biodiversity, and helping offset the harmful effects of climate change.' + "\n\n" + secondaryMessage,
-    birthday: prefixMessage + 'We are immensely delighted to share that a tree has been planted in your name on the occasion of your birthday at the 14 Trees Foundation, Pune. This tree will be nurtured in your honour, helping offset the harmful effects of climate change.' + "\n\n" + secondaryMessage,
+    birthday: prefixMessage + 'We are immensely delighted to share that a tree has been planted in your name on the occasion of your birthday by {giftedBy} at the 14 Trees Foundation, Pune. This tree will be nurtured in your honour, helping offset the harmful effects of climate change.' + "\n\n" + secondaryMessage,
     memorial: prefixMessage + 'A tree has been planted in the memory of <name here> at the 14 Trees Foundation reforestation site. For many years, this tree will help rejuvenate local ecosystems, support local biodiversity and offset the harmful effects of climate change and global warming.' + "\n\n" + secondaryMessage,
     logo: 'Gifted by 14 Trees in partnership with'
 }
@@ -49,6 +49,7 @@ const CardDetails: FC<CardDetailsProps> = ({ logo_url, request_id, presentationI
         saplingId: undefined as string | null | undefined,
         plantType: undefined as string | null | undefined,
         userName: undefined as string | null | undefined,
+        giftedBy: undefined as string | null | undefined,
         treesCount: undefined as number | undefined,
     })
     const [msgError, setMsgError] = useState<string>("");
@@ -60,7 +61,7 @@ const CardDetails: FC<CardDetailsProps> = ({ logo_url, request_id, presentationI
 
         setLoading(true);
         const apiClient = new ApiClient();
-        await apiClient.updateGiftCardTemplate(slideIdRef.current, recordRef.current.primary, recordRef.current.logo, logoRef.current.logoUrl, giftRef.current.saplingId, giftRef.current.userName, giftRef.current.treesCount);
+        await apiClient.updateGiftCardTemplate(slideIdRef.current, recordRef.current.primary, recordRef.current.logo, logoRef.current.logoUrl, giftRef.current.saplingId, giftRef.current.userName, giftRef.current.giftedBy,  giftRef.current.treesCount);
         setIframeSrc(
             `https://docs.google.com/presentation/d/${presentationIdIdRef.current}/embed?rm=minimal&slide=id.${slideIdRef.current}&timestamp=${new Date().getTime()}`
         );
@@ -71,7 +72,7 @@ const CardDetails: FC<CardDetailsProps> = ({ logo_url, request_id, presentationI
         const generateGiftCard = async () => {
             setLoading(true);
             const apiClient = new ApiClient();
-            const resp = await apiClient.generateCardTemplate(request_id, defaultMessages.primary, defaultMessages.logo, logoRef.current.logoUrl, giftRef.current.saplingId, giftRef.current.userName, giftRef.current.plantType, isPersonal);
+            const resp = await apiClient.generateCardTemplate(request_id, defaultMessages.primary, defaultMessages.logo, logoRef.current.logoUrl, giftRef.current.saplingId, giftRef.current.userName, giftRef.current.giftedBy, giftRef.current.plantType, isPersonal);
             slideIdRef.current = resp.slide_id;
             presentationIdIdRef.current = resp.presentation_id;
 
@@ -104,8 +105,8 @@ const CardDetails: FC<CardDetailsProps> = ({ logo_url, request_id, presentationI
     }, [logo_url])
 
     useEffect(() => {
-        giftRef.current = { userName, saplingId, plantType, treesCount }
-    }, [userName, saplingId, plantType, treesCount])
+        giftRef.current = { userName, saplingId, plantType, treesCount, giftedBy: messages.plantedBy }
+    }, [userName, saplingId, plantType, treesCount, messages])
 
     useEffect(() => {
         const eventMessage = messages.eventType === "2" ? defaultMessages.memorial : messages.eventType === "1" ? defaultMessages.birthday : defaultMessages.primary;
@@ -126,6 +127,7 @@ const CardDetails: FC<CardDetailsProps> = ({ logo_url, request_id, presentationI
             recordRef.current.logo = messages.logoMessage;
 
             if (!messages.primaryMessage.includes("{recipient}")) setMsgError("Didn't found \"{recipient}\" placeholder text in your message. Recipient's name will not be visible in the generate tree card");
+            if (messages.eventType === "1" && !messages.primaryMessage.includes("{giftedBy}")) setMsgError("Didn't found \"{giftedBy}\" placeholder text in your message. Gifted by will not be visible in the generate tree card");
             else setMsgError("");
         }
     }, [messages])

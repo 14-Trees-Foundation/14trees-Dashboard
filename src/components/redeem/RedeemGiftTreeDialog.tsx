@@ -183,6 +183,9 @@ const RedeemGiftTreeDialog: React.FC<RedeemGiftTreeDialogProps> = ({
             setInitialFormData(prev => {
                 return { ...prev, gifted_by: tree.giftedBy };
             });
+            setMessages(prev => {
+                return { ...prev, plantedBy: tree.giftedBy };
+            })
         }
 
         console.log(tree);
@@ -236,6 +239,8 @@ const RedeemGiftTreeDialog: React.FC<RedeemGiftTreeDialogProps> = ({
             validateThePhone(value);
         }
         if (event.target.name === 'communication_email') validateTheEmail(event.target.value.trim(), 'communication_email');
+
+        if (event.target.name === 'gifted_by') setMessages(prev => ({ ...prev, plantedBy: value }));
 
         setFormData({
             ...formData,

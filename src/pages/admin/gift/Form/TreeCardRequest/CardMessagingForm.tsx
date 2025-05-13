@@ -7,7 +7,7 @@ const secondaryMessage = 'We invite you to visit 14 Trees and firsthand experien
 
 const defaultMessages = {
     primary: prefixMessage + 'We are immensely delighted to share that a tree has been planted in your name at the 14 Trees Foundation, Pune. This tree will be nurtured in your honour, rejuvenating ecosystems, supporting biodiversity, and helping offset the harmful effects of climate change.' + "\n\n" + secondaryMessage,
-    birthday: prefixMessage + 'We are immensely delighted to share that a tree has been planted in your name on the occasion of your birthday at the 14 Trees Foundation, Pune. This tree will be nurtured in your honour, helping offset the harmful effects of climate change.' + "\n\n" + secondaryMessage,
+    birthday: prefixMessage + 'We are immensely delighted to share that a tree has been planted in your name on the occasion of your birthday by {giftedBy} at the 14 Trees Foundation, Pune. This tree will be nurtured in your honour, helping offset the harmful effects of climate change.' + "\n\n" + secondaryMessage,
     memorial: prefixMessage + 'A tree has been planted in the memory of <name here> at the 14 Trees Foundation reforestation site. For many years, this tree will help rejuvenate local ecosystems, support local biodiversity and offset the harmful effects of climate change and global warming.' + "\n\n" + secondaryMessage,
     logo: 'Gifted by 14 Trees in partnership with'
 }
@@ -100,6 +100,7 @@ const CardDetails: FC<CardDetailsProps> = ({ eventType }) => {
             recordRef.current.logo = formData.logoMessage;
 
             if (!formData.primaryMessage.includes("{recipient}")) setMsgError("Didn't found \"{recipient}\" placeholder text in your message. Recipient's name will not be visible in the generate tree card");
+            if (eventType === "1" && !formData.primaryMessage.includes("{giftedBy}")) setMsgError("Didn't found \"{giftedBy}\" placeholder text in your message. Gifted by will not be visible in the generate tree card");
             else setMsgError("");
         }
     }, [eventType, formData])
