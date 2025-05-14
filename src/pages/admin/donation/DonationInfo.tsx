@@ -92,16 +92,6 @@ const DonationInfo: React.FC<DonationInfoProps> = ({ open, onClose, data }) => {
         <InfoOutlined /> Donation Summary
       </DialogTitle>
       <DialogContent dividers sx={{ p: 3 }}>
-        {/* Donor Details */}
-        <Paper elevation={1} sx={{ p: 3, mb: 3, borderRadius: 2, border: `1px solid ${theme.palette.divider}` }}>
-          <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            <ParkOutlined sx={{ color: '#2e7d32' }} /> Donor Details
-          </Typography>
-          <Box sx={{ ml: 4 }}>
-            <Typography sx={{ mb: 1 }}><strong>Name:</strong> {data.user_name || 'N/A'}</Typography>
-            <Typography><strong>Email:</strong> {data.user_email || 'N/A'}</Typography>
-          </Box>
-        </Paper>
 
         {/* Donation Details */}
         <Paper elevation={1} sx={{ p: 3, mb: 3, borderRadius: 2, border: `1px solid ${theme.palette.divider}` }}>
@@ -111,14 +101,25 @@ const DonationInfo: React.FC<DonationInfoProps> = ({ open, onClose, data }) => {
           <Box sx={{ ml: 4 }}>
             <Typography sx={{ mb: 1 }}><strong>Donation ID:</strong> {data.id}</Typography>
             <Typography sx={{ mb: 1 }}>
-              <strong>Category:</strong> <Chip size="small" label={data.category} sx={{ ml: 1, bgcolor: '#2e7d32', color: 'white' }} />
+              <strong>Land Category:</strong> <Chip size="small" label={data.category} sx={{ ml: 1, bgcolor: '#2e7d32', color: 'white' }} />
             </Typography>
-            <Typography sx={{ mb: 1 }}><strong>Grove:</strong> {data.grove || 'N/A'}</Typography>
+            {/* <Typography sx={{ mb: 1 }}><strong>Grove:</strong> {data.grove || 'N/A'}</Typography> */}
             {data.grove_type_other && (
               <Typography sx={{ mb: 1 }}><strong>Grove Type (Other):</strong> {data.grove_type_other}</Typography>
             )}
             <Typography sx={{ mb: 1 }}><strong>Trees Count:</strong> <Chip size="small" label={data.trees_count} sx={{ ml: 1, bgcolor: '#2e7d32', color: 'white' }} /></Typography>
             <Typography><strong>Additional Contribution:</strong> {data.contribution_options ? (Array.isArray(data.contribution_options) ? data.contribution_options.join(', ') : String(data.contribution_options).replace(/([a-z])([A-Z])/g, '$1 $2').split(/\s+|(?=[A-Z])/).filter(Boolean).join(', ')) : 'N/A'}</Typography>
+          </Box>
+        </Paper>
+
+        {/* Donor Details */}
+        <Paper elevation={1} sx={{ p: 3, mb: 3, borderRadius: 2, border: `1px solid ${theme.palette.divider}` }}>
+          <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <ParkOutlined sx={{ color: '#2e7d32' }} /> Donor Details
+          </Typography>
+          <Box sx={{ ml: 4 }}>
+            <Typography sx={{ mb: 1 }}><strong>Name:</strong> {data.user_name || 'N/A'}</Typography>
+            <Typography><strong>Email:</strong> {data.user_email || 'N/A'}</Typography>
           </Box>
         </Paper>
 
