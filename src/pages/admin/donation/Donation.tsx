@@ -689,8 +689,9 @@ export const DonationComponent = () => {
         onSubmit={handleTagDonationSubmit}
       />
 
-      {selectedDonation?.id && <AssignTrees
-        donationId={selectedDonation?.id}
+      {selectedDonation && <AssignTrees
+        donationId={selectedDonation.id}
+        donation={selectedDonation}
         open={assignTreesModalOpen}
         onClose={() => {
           setAssignTreesModalOpen(false);

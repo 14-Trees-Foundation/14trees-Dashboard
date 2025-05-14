@@ -6,7 +6,7 @@ import GeneralTable from "../../../../../components/GenTable";
 import { TableColumnsType } from "antd";
 import getColumnSearchProps from "../../../../../components/Filter";
 import { UserAddOutlined } from "@ant-design/icons";
-import { DonationTree, DonationUser } from "../../../../../types/donation";
+import { Donation, DonationTree, DonationUser } from "../../../../../types/donation";
 import { toast } from "react-toastify";
 import AssignmentList from "./AssignmentList";
 import AssignedTrees from "./AssignedTrees";
@@ -14,19 +14,21 @@ import AssignedTrees from "./AssignedTrees";
 
 interface AssignTreesProps {
     donationId: number;
+    donation: Donation;
     open: boolean;
     onClose: () => void;
 }
 
 interface DonationUsersListProps {
     assignmentList: { tree_id: number, du_id: number, sapling_id: string, plant_type: string, recipient_name: string, assignee_name: string }[];
+    setUsersCount: (value: number) => void;
     donationId: number;
     open: boolean;
     onClose: () => void;
     onSubmit: (donationUser: DonationUser) => void;
 }
 
-const DonationUsersList = ({ donationId, open, onClose, onSubmit, assignmentList }: DonationUsersListProps) => {
+const DonationUsersList = ({ donationId, open, setUsersCount, onClose, onSubmit, assignmentList }: DonationUsersListProps) => {
 
     // handle loading, pagination, filters, etc.
     const [indexToDonationUserMap, setIndexToDonationUserMap] = useState<Record<number, DonationUser>>({});
@@ -69,6 +71,8 @@ const DonationUsersList = ({ donationId, open, onClose, onSubmit, assignmentList
                 });
                 return newData;
             });
+
+            if (filters.length === 1) setUsersCount(Number(donationUsers.total));
         } catch (error) {
             console.error(error);
         } finally {
@@ -197,7 +201,7 @@ const DonationUsersList = ({ donationId, open, onClose, onSubmit, assignmentList
     )
 }
 
-const AssignTrees: React.FC<AssignTreesProps> = ({ donationId, open, onClose }) => {
+const AssignTrees: React.FC<AssignTreesProps> = ({ donationId, donation, open, onClose }) => {
 
     // Get the trees for the donation, facilitate loading, filters, pagination, etc.
     const [indexToTreeMap, setIndexToTreeMap] = useState<Record<number, DonationTree>>({});
@@ -211,6 +215,8 @@ const AssignTrees: React.FC<AssignTreesProps> = ({ donationId, open, onClose }) 
     const [autoAssign, setAutoAssign] = useState(false);
     const [isAssigning, setIsAssigning] = useState(false);
     const [tabValue, setTabValue] = useState("assign");
+    const [totalUsers, setTotalUsers] = useState(0);
+    const [assignSponsor, setAssignSponsor] = useState(false);
 
     // tree - user mapping
     const [selectedTree, setSelectedTree] = useState<DonationTree | null>(null);
@@ -291,6 +297,26 @@ const AssignTrees: React.FC<AssignTreesProps> = ({ donationId, open, onClose }) 
         const apiClient = new ApiClient();
         const trees = await apiClient.getTrees(0, totalTrees, getFilters(donationId, filters));
         return trees.results;
+    }
+
+    const handleAssignToSponsor = async () => {
+        try {
+            const apiClient = new ApiClient();
+            await apiClient.createDonationUser({
+                donation_id: donation.id,
+                recipient_email: donation.user_email,
+                recipient_name: donation.user_name,
+                assignee_email: donation.user_email,
+                assignee_name: donation.user_name,
+                trees_count: donation.trees_count  || 0,
+                profile_image_url: null
+            })
+        } catch (error: any) {
+            toast.error(error.message);
+            return;
+        }
+
+        handleAssign();
     }
 
     const handleAssign = async () => {
@@ -447,7 +473,7 @@ const AssignTrees: React.FC<AssignTreesProps> = ({ donationId, open, onClose }) 
                             </Box>
                         )}
 
-                        <DonationUsersList donationId={donationId} open={userDialogOpen} onClose={() => setUserDialogOpen(false)} onSubmit={handleUserTreeMapping} assignmentList={assignmentList} />
+                        <DonationUsersList donationId={donationId} open={userDialogOpen} onClose={() => setUserDialogOpen(false)} onSubmit={handleUserTreeMapping} setUsersCount={setTotalUsers} assignmentList={assignmentList} />
                         <Divider sx={{ marginBottom: 2 }} />
                         <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2 }}>
                             <Button
@@ -457,7 +483,7 @@ const AssignTrees: React.FC<AssignTreesProps> = ({ donationId, open, onClose }) 
                                 disabled={isAssigning}
                             >Cancel</Button>
                             <Button
-                                onClick={handleAssign}
+                                onClick={autoAssign && totalUsers === 0 ? () => { setAssignSponsor(true); } : handleAssign}
                                 variant="contained"
                                 color="success"
                                 disabled={isAssigning || (!autoAssign && assignmentList.length === 0)}
@@ -468,6 +494,30 @@ const AssignTrees: React.FC<AssignTreesProps> = ({ donationId, open, onClose }) 
                 {tabValue === "unassign" && (
                     <AssignedTrees onClose={onClose} donationId={donationId} />
                 )}
+
+                <Dialog open={assignSponsor}>
+                    <DialogContent dividers>
+                        <Typography variant='h6'>
+                            Warning:
+                        </Typography>
+                        <Typography variant='body1'>
+                            You haven't provided recipient details for assigning trees. All the reserved trees will be assigned to sponsor.
+                        </Typography>
+                    </DialogContent>
+                    <DialogActions>
+                        <Button
+                            onClick={() => { setAssignSponsor(false) }}
+                            variant="outlined"
+                            color="error"
+                        >Cancel</Button>
+                        <Button
+                            onClick={handleAssignToSponsor}
+                            variant="contained"
+                            color="success"
+                            disabled={isAssigning || (!autoAssign && assignmentList.length === 0)}
+                        >{isAssigning ? 'Assigning...' : 'Assign'}</Button>
+                    </DialogActions>
+                </Dialog>
 
             </DialogContent>
         </Dialog>
