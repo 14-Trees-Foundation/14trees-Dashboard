@@ -25,7 +25,10 @@ export interface Donation {
   alternate_email: string | null;
   tags?: string[] | null;
   booked?: number;
+  assigned?: number;
   status: 'UserSubmitted' | 'OrderFulfilled';
+  mail_status: 'AckSent' | 'DashboardsSent' | null;
+  mail_error: string | null;
 }
 
 export type DonationUser = {
