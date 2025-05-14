@@ -466,7 +466,7 @@ const AssignTrees: React.FC<AssignTreesProps> = ({ donationId, open, onClose }) 
                     </>
                 )}
                 {tabValue === "unassign" && (
-                    <AssignedTrees donationId={donationId} />
+                    <AssignedTrees onClose={onClose} donationId={donationId} />
                 )}
 
             </DialogContent>

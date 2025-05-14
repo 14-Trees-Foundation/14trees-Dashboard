@@ -219,6 +219,8 @@ const DonationTrees: FC<DonationTreesProps> = ({ open, onClose, donation }) => {
   const handleSelectionChange = (ids: number[]) => {
     // Update selectedPlots list
     const newSelectedPlots: SelectedPlot[] = [];
+    const remaining = (donation?.trees_count || 0) - Number(donation?.booked || 0) - selectedPlots.map(plot => plot.reserveCount).reduce((prev, curr) => prev + curr, 0);
+
     ids.forEach(id => {
       const plot = plotsList.find(p => p.id === id);
       if (plot && !selectedPlots.some(sp => sp.id === id)) {
@@ -226,7 +228,7 @@ const DonationTrees: FC<DonationTreesProps> = ({ open, onClose, donation }) => {
           id: plot.id,
           name: plot.name,
           availableTrees: plot.available_trees || 0,
-          reserveCount: plot.available_trees || 0,
+          reserveCount: Math.min(Math.max(0, remaining), plot.available_trees || 0),
         });
       }
     });
@@ -242,6 +244,12 @@ const DonationTrees: FC<DonationTreesProps> = ({ open, onClose, donation }) => {
   const handleTreeSelection = (id: number) => {
     // Check if tree is already selected
     if (selectedTreeIds.includes(id)) {
+      return;
+    }
+
+    const remaining = (donation?.trees_count || 0) - Number(donation?.booked || 0) - selectedTrees.length;
+    if (remaining <= 0) {
+      toast.warn("You already have selected requested number of trees!");
       return;
     }
     
@@ -562,7 +570,7 @@ const DonationTrees: FC<DonationTreesProps> = ({ open, onClose, donation }) => {
         return (
           <Button
             variant="contained"
-            color={isSelected ? "success" : "primary"}
+            color="success"
             size="small"
             onClick={() => handleTreeSelection(record.id)}
             disabled={isSelected}
@@ -705,8 +713,10 @@ const DonationTrees: FC<DonationTreesProps> = ({ open, onClose, donation }) => {
           bookAllHabits
         );
       }
+      toast.success("Trees reserved successfully!")
       handleClose(); // Close dialog on success
     } catch (error: any) {
+      toast.error(error.message);
       setValidationDialog({
         open: true,
         title: 'Reservation Failed',

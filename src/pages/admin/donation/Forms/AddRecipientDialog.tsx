@@ -1,17 +1,17 @@
 import React, { useState } from 'react';
-import { 
-  Autocomplete, 
-  Avatar, 
-  Button, 
-  Checkbox, 
-  Dialog, 
-  DialogActions, 
-  DialogContent, 
-  DialogTitle, 
-  FormControl, 
-  FormControlLabel, 
-  Grid, 
-  TextField, 
+import {
+  Autocomplete,
+  Avatar,
+  Button,
+  Checkbox,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  FormControl,
+  FormControlLabel,
+  Grid,
+  TextField,
   Typography,
   Box,
   Divider
@@ -54,7 +54,7 @@ const AddRecipientDialog: React.FC<AddRecipientDialogProps> = ({
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    
+
     // Convert gifted_trees to a number
     if (name === 'gifted_trees') {
       const numValue = parseInt(value, 10);
@@ -68,7 +68,7 @@ const AddRecipientDialog: React.FC<AddRecipientDialogProps> = ({
 
   const usersData = useAppSelector((state) => state.searchUsersData);
   let usersList: any[] = [];
-  
+
   if (usersData) {
     usersList = Object.values(usersData.users);
   }
@@ -78,7 +78,7 @@ const AddRecipientDialog: React.FC<AddRecipientDialogProps> = ({
     if (!value || value.trim() === '' || /^\s*\(.*\)\s*$/.test(value)) {
       return;
     }
-    
+
     let isSet = false;
     usersList.forEach((user) => {
       if (`${user.name} (${user.email})` === value) {
@@ -107,13 +107,13 @@ const AddRecipientDialog: React.FC<AddRecipientDialogProps> = ({
       // Only update the field if it contains meaningful text
       // and filter out parentheses patterns
       const cleanValue = value.replace(/\s*\([^)]*\)\s*/g, '').trim();
-      
+
       if (cleanValue.length > 0) {
         setFormData(prev => ({
           ...prev,
           [field]: cleanValue,
         }));
-        
+
         // Only search if we have at least 3 meaningful characters
         if (cleanValue.length >= 3) {
           searchUsers(cleanValue);
@@ -139,7 +139,7 @@ const AddRecipientDialog: React.FC<AddRecipientDialogProps> = ({
         finalFormData.assignee_email = finalFormData.recipient_email;
         finalFormData.assignee_phone = finalFormData.recipient_phone;
       }
-      
+
       // If a new image is provided, upload it
       if (profileImage) {
         const awsUtils = new AWSUtils();
@@ -184,50 +184,69 @@ const AddRecipientDialog: React.FC<AddRecipientDialogProps> = ({
               <Divider />
             </Box>
           </Grid>
-          
+
           <Grid item xs={12}>
             <Autocomplete
               fullWidth
-              options={usersList.map((user) => `${user.name} (${user.email})`)}
+              options={usersList}
+              value={formData.recipient_email}
               onInputChange={(e, value) => { handleEmailChange(e, value, 'recipient_email') }}
-              value={formData.recipient_email ? `${formData.recipient_name} (${formData.recipient_email})` : ''}
+              getOptionLabel={(option: any) => option.email ? `${option.name} (${option.email})` : option}
+              isOptionEqualToValue={(option, value) => option.email ? option.email === value.email : option === value}
+              renderOption={(props: any, option) => {
+                return (
+                  <Box
+                    {...props}
+                  >
+                    {option.email ? (
+                      <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
+                        <Typography variant='body1'>{option.name}</Typography>
+                        <Typography variant='body2' color={'#494b4b'}>Email: {option.email}</Typography>
+                        {option.communication_email && <Typography variant='subtitle2' color={'GrayText'}>Comm. Email: {option.communication_email}</Typography>}
+                      </Box>
+                    ) : (
+                      <Typography>{option}</Typography>
+                    )}
+                  </Box>
+                );
+              }}
               renderInput={(params) => (
                 <TextField
                   {...params}
-                  label="Recipient Email"
+                  label="Recipient Email id"
                   variant="outlined"
                   name="recipient_email"
-                  required
                 />
-              )}
-            />
+              )}>
+            </Autocomplete>
+
           </Grid>
           <Grid item xs={12}>
-            <TextField 
-              name="recipient_name" 
-              label="Recipient Name" 
-              value={formData.recipient_name || ''} 
-              onChange={handleInputChange} 
-              fullWidth 
+            <TextField
+              name="recipient_name"
+              label="Recipient Name"
+              value={formData.recipient_name || ''}
+              onChange={handleInputChange}
+              fullWidth
               required
             />
           </Grid>
           <Grid item xs={12}>
-            <TextField 
-              name="recipient_phone" 
-              label="Recipient Phone (Optional)" 
-              value={formData.recipient_phone || ''} 
-              onChange={handleInputChange} 
-              fullWidth 
+            <TextField
+              name="recipient_phone"
+              label="Recipient Phone (Optional)"
+              value={formData.recipient_phone || ''}
+              onChange={handleInputChange}
+              fullWidth
             />
           </Grid>
           <Grid item xs={12}>
-            <TextField 
-              name="gifted_trees" 
-              label="Trees Count" 
-              value={formData.gifted_trees || 1} 
-              onChange={handleInputChange} 
-              fullWidth 
+            <TextField
+              name="gifted_trees"
+              label="Trees Count"
+              value={formData.gifted_trees || 1}
+              onChange={handleInputChange}
+              fullWidth
               type="number"
               inputProps={{ min: 1 }}
               helperText="Minimum 1 tree required"
@@ -238,17 +257,17 @@ const AddRecipientDialog: React.FC<AddRecipientDialogProps> = ({
             <FormControl component="fieldset">
               <FormControlLabel
                 control={
-                  <Checkbox 
-                    checked={showAssignedFields} 
-                    onChange={(e) => { setShowAssignedFields(e.target.checked) }} 
-                    name="show_all" 
+                  <Checkbox
+                    checked={showAssignedFields}
+                    onChange={(e) => { setShowAssignedFields(e.target.checked) }}
+                    name="show_all"
                   />
                 }
                 label="Do you want to assign trees to someone else (related to recipient)?"
               />
             </FormControl>
           </Grid>
-          
+
           {showAssignedFields && (
             <>
               <Grid item xs={12}>
@@ -277,37 +296,37 @@ const AddRecipientDialog: React.FC<AddRecipientDialogProps> = ({
                 />
               </Grid>
               <Grid item xs={12}>
-                <TextField 
-                  name="assignee_name" 
-                  label="Assignee Name" 
-                  value={formData.assignee_name || ''} 
-                  onChange={handleInputChange} 
-                  fullWidth 
+                <TextField
+                  name="assignee_name"
+                  label="Assignee Name"
+                  value={formData.assignee_name || ''}
+                  onChange={handleInputChange}
+                  fullWidth
                   required
                 />
               </Grid>
               <Grid item xs={12}>
-                <TextField 
-                  name="assignee_phone" 
-                  label="Assignee Phone (Optional)" 
-                  value={formData.assignee_phone || ''} 
-                  onChange={handleInputChange} 
-                  fullWidth 
+                <TextField
+                  name="assignee_phone"
+                  label="Assignee Phone (Optional)"
+                  value={formData.assignee_phone || ''}
+                  onChange={handleInputChange}
+                  fullWidth
                 />
               </Grid>
               <Grid item xs={12}>
-                <TextField 
-                  name="relation" 
-                  label="Relation to Recipient" 
-                  value={formData.relation || ''} 
-                  onChange={handleInputChange} 
-                  fullWidth 
+                <TextField
+                  name="relation"
+                  label="Relation to Recipient"
+                  value={formData.relation || ''}
+                  onChange={handleInputChange}
+                  fullWidth
                   placeholder="e.g., Father, Mother, Son, Daughter"
                 />
               </Grid>
             </>
           )}
-          
+
           <Grid item xs={12}>
             <Box mt={2} mb={2}>
               <Typography variant="subtitle1" gutterBottom color="success">
@@ -323,10 +342,10 @@ const AddRecipientDialog: React.FC<AddRecipientDialogProps> = ({
                 alt={showAssignedFields ? formData.assignee_name : formData.recipient_name}
                 sx={{ width: 80, height: 80 }}
               />
-              <Button 
-                variant="outlined" 
-                component="label" 
-                color='success' 
+              <Button
+                variant="outlined"
+                component="label"
+                color='success'
                 sx={{ marginRight: 2, textTransform: 'none' }}
               >
                 Upload {showAssignedFields ? "Assignee" : "Recipient"} Image
@@ -338,15 +357,15 @@ const AddRecipientDialog: React.FC<AddRecipientDialogProps> = ({
                   onChange={handleImageChange}
                 />
               </Button>
-              
-              {profileImage && 
-                <Button 
-                  variant="outlined" 
-                  component="label" 
-                  color='error' 
-                  sx={{ textTransform: 'none' }} 
-                  onClick={() => { 
-                    setProfileImage(null); 
+
+              {profileImage &&
+                <Button
+                  variant="outlined"
+                  component="label"
+                  color='error'
+                  sx={{ textTransform: 'none' }}
+                  onClick={() => {
+                    setProfileImage(null);
                   }}
                 >
                   Remove Image

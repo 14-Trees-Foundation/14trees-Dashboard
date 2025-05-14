@@ -15,9 +15,10 @@ import UnassignConfirmationDialog from "./UnassignConfirmationDialog";
 
 interface AssignedTreesProps {
     donationId: number;
+    onClose: () => void
 }
 
-const AssignedTrees: React.FC<AssignedTreesProps> = ({ donationId }) => {
+const AssignedTrees: React.FC<AssignedTreesProps> = ({ donationId, onClose }) => {
 
 
     const [loading, setLoading] = useState(false);
@@ -140,7 +141,7 @@ const AssignedTrees: React.FC<AssignedTreesProps> = ({ donationId }) => {
             setIndexToTreeMap({});
             setTotalTrees(10);
         }
-     }
+    }
 
 
     const columns: TableColumnType<DonationTree>[] = [
@@ -191,7 +192,7 @@ const AssignedTrees: React.FC<AssignedTreesProps> = ({ donationId }) => {
                 variant="outlined"
                 color="error"
                 size="small"
-                sx={{ textTransform: 'none'}}
+                sx={{ textTransform: 'none' }}
             >Unassign</Button>
         }
     ]
@@ -234,11 +235,16 @@ const AssignedTrees: React.FC<AssignedTreesProps> = ({ donationId }) => {
             {unassignedTrees.length > 0 && <UnassignmentList trees={unassignedTrees} onRemove={handleRemoveTree} />}
             <Divider sx={{ marginBottom: 2 }} />
             <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
-                <Button 
-                    variant="contained" 
-                    color="error" 
-                    sx={{ ml: 2, textTransform: 'none' }} 
-                    disabled={unassignedTrees.length === 0 && !unassignAll} 
+                <Button
+                    onClick={onClose}
+                    variant="outlined"
+                    color="error"
+                >Cancel</Button>
+                <Button
+                    variant="contained"
+                    color="error"
+                    sx={{ ml: 2, textTransform: 'none' }}
+                    disabled={unassignedTrees.length === 0 && !unassignAll}
                     onClick={() => { setOpen(true); }}>{unassignAll ? "Unassign All" : "Unassign"}</Button>
             </Box>
         </Box>
