@@ -25,6 +25,7 @@ export interface Donation {
   alternate_email: string | null;
   tags?: string[] | null;
   booked?: number;
+  status: 'UserSubmitted' | 'OrderFulfilled';
 }
 
 export type DonationUser = {
