@@ -555,6 +555,25 @@ export const DonationComponent = () => {
       ...getColumnSelectedItemFilter({ dataIndex: 'contribution_options', filters, handleSetFilters, options: ['CSR', 'Planing Visit', 'Other'] }),
     },
     {
+      dataIndex: "status",
+      key: "status",
+      title: "Status",
+      align: "center",
+      width: 120,
+      render: (status) => {
+        // Format the status for display
+        switch(status) {
+          case 'UserSubmitted':
+            return 'Submitted';
+          case 'OrderFulfilled':
+            return 'Fulfilled';
+          default:
+            return 'Submitted'; // Default to UserSubmitted if not set
+        }
+      },
+      ...getColumnSelectedItemFilter({ dataIndex: 'status', filters, handleSetFilters, options: ['UserSubmitted', 'OrderFulfilled'] }),
+    },
+    {
       dataIndex: "created_at",
       key: "Created On",
       title: "Created On",
