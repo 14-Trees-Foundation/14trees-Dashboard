@@ -688,16 +688,16 @@ const GiftTrees: FC = () => {
     const getActionsMenu = (record: GiftCard) => (
         <Menu>
             <Menu.ItemGroup>
-                <Menu.Item key="50" onClick={() => { handleModalOpenEdit(record, 2); }} icon={<Wysiwyg />}>
+                <Menu.Item key="50" onClick={() => { handleModalOpenEdit(record, 0); }} icon={<Wysiwyg />}>
                     Edit Dashboard Details
                 </Menu.Item>
-                <Menu.Item key="51" onClick={() => { handleModalOpenEdit(record, 4); }} icon={<CardGiftcard />}>
+                {record.request_type !== 'Visit' && record.request_type !== 'Normal Assignment' && <Menu.Item key="51" onClick={() => { handleModalOpenEdit(record, 4); }} icon={<CardGiftcard />}>
                     Edit Card Messaging
-                </Menu.Item>
-                <Menu.Item key="52" onClick={() => { handleModalOpenEdit(record, 3); }} icon={<AssuredWorkload />}>
+                </Menu.Item>}
+                <Menu.Item key="52" onClick={() => { handleModalOpenEdit(record, 1); }} icon={<AssuredWorkload />}>
                     View/Make Payments
                 </Menu.Item>
-                <Menu.Item key="53" onClick={() => { handleModalOpenEdit(record, 5); }} icon={<ManageAccounts />}>
+                <Menu.Item key="53" onClick={() => { handleModalOpenEdit(record, 2); }} icon={<ManageAccounts />}>
                     Add/Edit Recipient Details
                 </Menu.Item>
             </Menu.ItemGroup>
