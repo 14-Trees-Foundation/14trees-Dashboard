@@ -137,10 +137,8 @@ const UserForm: React.FC<UserFormProps> = ({ open, user, onClose }) => {
         <Dialog
             open={open}
             onClose={handleClose}
-            PaperProps={{
-                //component: 'form',
-                onSubmit: handleSubmit,
-            }}
+            component='form'
+            onSubmit={handleSubmit}
             maxWidth='md'
         >
             <DialogTitle>{user ? 'Edit User' : 'Add User'}</DialogTitle>

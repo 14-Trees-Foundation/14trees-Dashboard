@@ -17,6 +17,7 @@ import UserImagesForm from "./UserImagesForm";
 import ImageViewModal from "../../../../components/ImageViewModal";
 
 interface User {
+  id: number;
   key: string;
   recipient_name: string;
   recipient_phone: string;
@@ -122,7 +123,7 @@ interface BulkUserFormProps {
   requestId: string | null;
   treeCount: number,
   users: User[];
-  onUsersChange: (users: User[]) => void;
+  onUsersChange: (users: User[], deletedIds?: number[]) => void; // Modified
   onFileChange: (file: File | null) => void;
 }
 
@@ -225,6 +226,21 @@ export const BulkUserForm: FC<BulkUserFormProps> = ({ requestId, treeCount, user
     setFilteredUsers(filteredUsers);
   }, [filters, users])
 
+  const prepareUsersPayload = (users: User[]) => users.map(user => ({
+    id: user.id || undefined,
+    recipient_name: user.recipient_name,
+    recipient_email: user.recipient_email,
+    recipient_phone: user.recipient_phone,
+    recipient_communication_email: user.recipient_communication_email,
+    assignee_name: user.assignee_name,
+    assignee_email: user.assignee_email,
+    assignee_phone: user.assignee_phone,
+    assignee_communication_email: user.assignee_communication_email,
+    gifted_trees: user.gifted_trees,
+    relation: user.relation,
+    image_url: user.image_url
+  }));
+
   const handleFileChange = (file: File) => {
 
     const awsUtils = new AWSUtils();
@@ -242,6 +258,7 @@ export const BulkUserForm: FC<BulkUserFormProps> = ({ requestId, treeCount, user
             if (user[recipientNameField]) {
 
               const parsedUser: User = {
+                id: user.id,
                 key: getUniqueRequestId(),
                 recipient_name: (user[recipientNameField] as string).trim(),
                 recipient_phone: (user[recipientPhoneField] as string).trim(),
@@ -385,8 +402,9 @@ export const BulkUserForm: FC<BulkUserFormProps> = ({ requestId, treeCount, user
   }
 
   const handleDeleteUser = (user: User) => {
-    onUsersChange(users.filter(item => item.recipient_email !== user.recipient_email));
-  }
+    const updatedUsers = users.filter(item => item.key !== user.key);
+    onUsersChange(updatedUsers, user.id ? [user.id] : []);
+  };
 
   const handlePaginationChange = (page: number, pageSize: number) => {
     setPage(page - 1);

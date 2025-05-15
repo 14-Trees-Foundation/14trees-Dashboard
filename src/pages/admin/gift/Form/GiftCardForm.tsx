@@ -23,13 +23,14 @@ interface GiftCardsFormProps {
     giftCardRequest?: GiftCard
     step?: number
     requestId: string | null
+    giftrequestId: number
     loggedinUserId?: number
     open: boolean
     handleClose: () => void
     onSubmit: (user: User, sponsor: User | null, createdByUser: User, group: Group | null, treeCount: number, category: string, grove: string | null, requestType: string, users: any[], giftedOn: string, paymentId?: number, logo?: string, messages?: any, file?: File) => void
 }
 
-const GiftCardsForm: FC<GiftCardsFormProps> = ({ loading, setLoading, step, loggedinUserId, giftCardRequest, requestId, open, handleClose, onSubmit }) => {
+const GiftCardsForm: FC<GiftCardsFormProps> = ({ loading, setLoading, step, loggedinUserId, giftCardRequest, requestId, giftrequestId, open, handleClose, onSubmit }) => {
 
     const [currentStep, setCurrentStep] = useState(0);
     const [user, setUser] = useState<User | null>(null);
@@ -49,6 +50,8 @@ const GiftCardsForm: FC<GiftCardsFormProps> = ({ loading, setLoading, step, logg
     const [giftRequestType, setGiftRequestType] = useState<string>("Gift Cards");
     const [grove, setGrove] = useState<string | null>(null);
     const [consent, setConsent] = useState(false);
+    const [originalRecipients, setOriginalRecipients] = useState<any[]>([])
+    const [deletedUserIds, setDeletedUserIds] = useState<number[]>([]);
 
     // payment details
     const [payment, setPayment] = useState<Payment | null>(null);
@@ -142,14 +145,18 @@ const GiftCardsForm: FC<GiftCardsFormProps> = ({ loading, setLoading, step, logg
     };
 
     useEffect(() => {
-        if (open && giftCardRequest) {
-            const fetchData = async () => {
-                await getGiftCardRequestDetails();
-                await getCreatorUser();
-            };
-            fetchData();
-        }
-    }, [open, giftCardRequest]);
+    console.log('Users updated:', users); // Debugging
+  }, [users]);
+
+  useEffect(() => {
+    if (open && giftCardRequest && users.length === 0) { // Only fetch if empty
+        const fetchData = async () => {
+            await getGiftCardRequestDetails();
+            await getCreatorUser();
+        };
+        fetchData();
+    }
+}, [open, giftCardRequest]);
 
     useEffect(() => {
         const uploadFile = async () => {
@@ -203,7 +210,14 @@ const GiftCardsForm: FC<GiftCardsFormProps> = ({ loading, setLoading, step, logg
             onClick: () => setCurrentStep(2),
             style: { cursor: 'pointer' },
             title: "Recipient Details",
-            content: <BulkUserForm treeCount={treeCount} requestId={requestId} users={users} onUsersChange={users => setUsers(users)} onFileChange={file => setFile(file)} />,
+            content: <BulkUserForm treeCount={treeCount} requestId={requestId} users={users}
+            onUsersChange={(updatedUsers, deletedIds = []) => {
+                setUsers(updatedUsers);
+                if (deletedIds.length > 0) {
+                  setDeletedUserIds(prev => [...prev, ...deletedIds]);
+                }
+            }} 
+            onFileChange={setFile} />,
         },
         {
             key: 3,
@@ -259,6 +273,17 @@ const GiftCardsForm: FC<GiftCardsFormProps> = ({ loading, setLoading, step, logg
 
     }, [giftRequestType])
 
+    // In parent component
+    const prepareUsersPayload = (users: User[]) => {
+        return users.map((u) => ({
+          gift_request_id: giftrequestId,
+          user_id: u.id,
+        }));
+      };
+  
+
+    
+
     const handleSubmit = async () => {
         if (!user) {
             toast.error("Please select user to reserve trees");
@@ -274,6 +299,28 @@ const GiftCardsForm: FC<GiftCardsFormProps> = ({ loading, setLoading, step, logg
 
         setLoading(true);
         const apiClient = new ApiClient();
+
+        const preparedUsers = prepareUsersPayload(users);
+        console.log("Users to submit:", preparedUsers);
+        console.log("IDs to delete:", deletedUserIds);
+      
+
+        if (preparedUsers.length > 0 || deletedUserIds.length > 0) {
+            try {
+              const response = await apiClient.upsertGiftCardUsers(
+                Number(giftrequestId),
+                preparedUsers,
+                deletedUserIds
+              );
+              console.log("Upsert response:", response);
+            } catch (error) {
+              console.error("Upsert failed:", error);
+              toast.error("Failed to submit user data");
+            } finally {
+              setLoading(false);
+            }
+}
+      
         if (logoString && group && group.logo_url !== logoString) {
             await apiClient.updateGroup({ ...group, logo_url: logoString })
         }
