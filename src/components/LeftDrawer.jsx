@@ -59,6 +59,22 @@ export const LeftDrawer = () => {
   const selUserInfo = useRecoilValue(selUsersData);
   const userNameRef = useRef(null);
 
+  const getUsername = (fullname) => {
+    if (!fullname) return "";
+  
+    const prefixes = ["Prof.", "Late", "Prof", "Rtn.", "Shri", "Mrs.", "Smt.", "Devi"];
+    const parts = fullname.split(" ");
+    let firstname = parts[0];
+  
+    if ((firstname.length <= 3 || prefixes.some(prefix => prefix.toLocaleLowerCase() === firstname.trim().toLocaleLowerCase())) && parts.length > 1) {
+      firstname += " " + parts[1];
+    }
+  
+    return firstname;
+  }
+
+  const username = getUsername(selUserInfo.assigned_to);
+
   const onClickNav = (value) => {
     setIndex(value);
   };
@@ -143,10 +159,10 @@ export const LeftDrawer = () => {
                 <div className={classes.username} ref={userNameRef}>
                   {selUserInfo.event_type && selUserInfo.event_type === "2"
                     ? "Memorial Dashboard"
-                    : `${selUserInfo.assigned_to.split(" ")[0]}'s Dashboard`}
+                    : `${username}'s Dashboard`}
                 </div>
                 <div className={classes.buttonContainer}>
-                  <Button
+                  {username.length <= 8 && <Button
                     size="small"
                     color="primary"
                     variant="contained"
@@ -158,7 +174,7 @@ export const LeftDrawer = () => {
                     startIcon={<CardGiftcardIcon />}
                   >
                     <span className={classes.buttonText}>Gift a Tree</span>
-                  </Button>
+                  </Button>}
                 </div>
               </div>)
               : (
@@ -320,5 +336,10 @@ const useStyles = makeStyles((theme) =>
       flexWrap: "wrap", // Allow buttons to wrap on smaller screens
       gap: "5px", // Add gap between buttons
     },
+    buttonText: {
+      [theme.breakpoints.down("1145")]: {
+        display: "none",
+      },
+    }
   })
 );
