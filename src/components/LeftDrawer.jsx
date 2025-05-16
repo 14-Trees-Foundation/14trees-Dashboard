@@ -59,21 +59,7 @@ export const LeftDrawer = () => {
   const selUserInfo = useRecoilValue(selUsersData);
   const userNameRef = useRef(null);
 
-  const getUsername = (fullname) => {
-    if (!fullname) return "";
-  
-    const prefixes = ["Prof.", "Late", "Prof", "Rtn.", "Shri", "Mrs.", "Smt.", "Devi"];
-    const parts = fullname.split(" ");
-    let firstname = parts[0];
-  
-    if ((firstname.length <= 3 || prefixes.some(prefix => prefix.toLocaleLowerCase() === firstname.trim().toLocaleLowerCase())) && parts.length > 1) {
-      firstname += " " + parts[1];
-    }
-  
-    return firstname;
-  }
-
-  const username = getUsername(selUserInfo.assigned_to);
+  const username = selUserInfo.assigned_to;
 
   const onClickNav = (value) => {
     setIndex(value);
@@ -251,17 +237,17 @@ const useStyles = makeStyles((theme) =>
       height: "5vh",
     },
     username: {
-      lineHeight: "50px",
+      lineHeight: "normal",
       fontSize: "34px",
       color: "#1F3625",
       fontWeight: "500",
       marginLeft: "20px",
       [theme.breakpoints.down("1500")]: {
-        lineHeight: "40px",
+        lineHeight: "normal",
         fontSize: "28px",
       },
       [theme.breakpoints.down("480")]: {
-        lineHeight: "40px",
+        lineHeight: "normal",
         fontSize: "20px",
       },
     },
