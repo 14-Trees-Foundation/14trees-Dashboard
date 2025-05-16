@@ -32,6 +32,7 @@ import SponsorProfile from "./pages/SponsorProfile/SponsorProfile";
 import CSRPage from "./pages/admin/csr/CSRPage";
 import EventPage from "./pages/EventDashboard/EventPage";
 import GiftDashboard from "./pages/GiftDashboard/GiftDashboard";
+import { Gifty } from "./pages/Gifty/Gifty";
 
 function App() {
   return (
@@ -62,6 +63,7 @@ function App() {
           <Route path="/events/corp/:event_id" element={<Corporate />}></Route>
           <Route path="/events/:linkId" element={<EventPage />}></Route>
           <Route path="/login" element={<Login />} />
+          <Route path="/gifty" element={<Gifty />} />
           <Route
             path="/admin"
             element={
