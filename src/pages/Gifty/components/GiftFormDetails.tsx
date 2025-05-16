@@ -1,5 +1,5 @@
 import { CardGiftcard, Event, ParkOutlined, People } from "@mui/icons-material";
-import { Box, Paper, Typography, useTheme } from "@mui/material";
+import { Box, CircularProgress, Paper, Typography, useTheme } from "@mui/material";
 import DynamicTable from "../../../components/dynamic/Table";
 import { useEffect, useRef, useState } from "react";
 import ApiClient from "../../../api/apiClient/apiClient";
@@ -23,20 +23,23 @@ const GiftFormDetails: React.FC<GiftFormDetailsProps> = ({ data }) => {
     })
 
     useEffect(() => {
-        if (isGeneratingPreview) return;
 
         const handler = setTimeout(() => {
             if (data.card_message) cardDetailsRef.current.card_message = data.card_message;
             if (data.gifted_by) cardDetailsRef.current.giftedBy = data.gifted_by;
+
+            handleGeneratePreview();
         }, 1000)
 
         return () => { clearTimeout(handler) }
-    }, [data, isGeneratingPreview])
+    }, [data])
 
     const handleGeneratePreview = async () => {
+        if (isGeneratingPreview) return;
+
         setIsGeneratingPreview(true);
         try {
-            
+
             const apiClient = new ApiClient();
             if (cardDetailsRef.current.presentationId && cardDetailsRef.current.slideId) {
                 await apiClient.updateGiftCardTemplate(cardDetailsRef.current.slideId, cardDetailsRef.current.card_message, "", undefined, null, cardDetailsRef.current.userName, cardDetailsRef.current.giftedBy);
@@ -94,6 +97,58 @@ const GiftFormDetails: React.FC<GiftFormDetailsProps> = ({ data }) => {
                 </Typography>
                 <Box sx={{ ml: 4 }}>
                     {data.card_message && <Typography sx={{ mb: 1, whiteSpace: "pre-wrap" }}><strong>Card Message:</strong> {data.card_message}</Typography>}
+                </Box>
+                <Box
+                    sx={{
+                        minHeight: "250px",
+                        maxHeight: "600px",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                    }}
+                >
+                    {isGeneratingPreview ? (
+                        <Box
+                            sx={{
+                                textAlign: "center",
+                                py: 8,
+                            }}
+                        >
+                            <CircularProgress sx={{ color: "green", mb: 2 }} />
+                            <Typography sx={{ color: "gray.600" }}>
+                                Generating your card preview...
+                            </Typography>
+                        </Box>
+                    ) : previewUrl ? (
+                        <Box
+                            sx={{
+                                width: "100%",
+                                height: "100%",
+                                minHeight: "250px",
+                                maxHeight: "540px",
+                                maxWidth: "960px",
+                                aspectRatio: "16/9",
+                                border: "1px solid",
+                                borderColor: "gray.200",
+                                borderRadius: 2,
+                            }}
+                        >
+                            <iframe
+                                src={previewUrl}
+                                title="Gift card preview"
+                                style={{
+                                    width: "100%",
+                                    height: "100%",
+                                    border: "none",
+                                    borderRadius: "8px",
+                                }}
+                            />
+                        </Box>
+                    ) : (
+                        <Typography sx={{ color: "gray.500", py: 8 }}>
+                            Your card preview will appear here
+                        </Typography>
+                    )}
                 </Box>
             </Paper>}
         </div>
