@@ -552,7 +552,7 @@ export const DonationComponent = () => {
         }
         return contributions;
       },
-      ...getColumnSelectedItemFilter({ dataIndex: 'contribution_options', filters, handleSetFilters, options: ['CSR', 'Planing Visit', 'Other'] }),
+      ...getColumnSelectedItemFilter({ dataIndex: 'contribution_options', filters, handleSetFilters, options: ['CSR', 'Planning visit', 'Other'] }),
     },
     {
       dataIndex: "status",
