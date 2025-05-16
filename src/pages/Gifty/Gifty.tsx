@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import ChatbotV2 from "../../components/Chatbot/ChatBotV2";
 import DynamicTable from "../../components/dynamic/Table";
+import GiftFormDetails from "./components/GiftFormDetails";
 
 export const Gifty: React.FC = () => {
     const [htmlContent, setHtmlContent] = useState<string>("");
@@ -19,6 +20,10 @@ export const Gifty: React.FC = () => {
 
             {data && Array.isArray(data) && <div style={{ padding: '10px' }}>
                 <DynamicTable data={data} />
+            </div>}
+
+            {data && !Array.isArray(data) && <div style={{ padding: '10px' }}>
+                <GiftFormDetails data={data} />
             </div>}
 
             <ChatbotV2 onHtmlLoad={onHtmlLoad} onDataLoad={onDataLoad} />
