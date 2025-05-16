@@ -18,7 +18,7 @@ export const Gifty: React.FC = () => {
 
   return (
     <Box sx={{ width: "100%" }}>
-      {/* Header Section - Flush left */}
+      {/* Header Section - Centered */}
       <Paper
         elevation={1}
         sx={{
@@ -28,32 +28,14 @@ export const Gifty: React.FC = () => {
           borderRadius: 0,
           width: "100%",
           boxShadow: "0px 1px 4px rgba(0, 0, 0, 0.1)",
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center"
         }}
       >
-
-        <Box sx={{ display: "flex", flexDirection: "column" }}>
-          <Box sx={{ display: "flex", alignItems: "center" }}>
-            <Typography variant="h6" component="h1" sx={{ fontWeight: 600 }}>
-              Gift Management Portal
-            </Typography>
-            <img
-              src="/dark_logo.png"
-              alt="Logo"
-              style={{
-                height: 24,
-                width: "auto",
-                marginLeft: 8,
-              }}
-              onError={(e) => {
-                (e.target as HTMLImageElement).style.display = "none";
-                console.error("Logo failed to load");
-              }}
-            />
-          </Box>
-          <Typography variant="body2" color="text.secondary" sx={{ mt: 0.25 }}>
-            View and manage gift recipient details
-          </Typography>
-        </Box>
+        <Typography variant="h6" component="h1" sx={{ fontWeight: 600 }}>
+          Gift Request Summary
+        </Typography>
       </Paper>
 
       {/* Main content */}
