@@ -253,10 +253,10 @@ const ChatbotV2: React.FC<ChatbotV2Props> = ({ onHtmlLoad, onDataLoad }) => {
                         fontFamily: 'Arial, sans-serif',
                         showFooter: false
                     },
-                    botBubble: { simulateStream: true, showAvatar: true, animate: true, avatar: 'src/assets/tree-chat.png' },
+                    botBubble: { simulateStream: false, showAvatar: true, animate: true, avatar: 'src/assets/tree-chat.png' },
                     userBubble: { showAvatar: true },
-                    audio: { disabled: false, defaultToggledOn: true },
-                    voice: { language: "en-US", defaultToggledOn: false, disabled: false },
+                    // audio: { disabled: false, defaultToggledOn: true },
+                    // voice: { language: "en-US", defaultToggledOn: false, disabled: false },
                     chatWindow: { showScrollbar: true, defaultOpen: true },
                     chatInput: { allowNewline: true, botDelay: 500, buttons: [Button.FILE_ATTACHMENT_BUTTON, Button.EMOJI_PICKER_BUTTON, Button.VOICE_MESSAGE_BUTTON, Button.SEND_MESSAGE_BUTTON] },
                     fileAttachment: { disabled: false, multiple: true, accept: '*', sendFileName: true, showMediaDisplay: true },
