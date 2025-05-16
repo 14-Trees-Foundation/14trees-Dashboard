@@ -38,7 +38,7 @@ export const Profile = ({ saplingId }) => {
   const selUserInfo = useRecoilValue(selUsersData);
   const usersInfo = useRecoilValue(usersData);
 
-  const username = getUsername(selUserInfo.assigned_to);
+  const username = selUserInfo.assigned_to;
   const userId = selUserInfo.assigned_to_id;
 
   const userNameRef = useRef(null);
