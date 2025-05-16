@@ -243,11 +243,11 @@ const useStyles = makeStyles((theme) =>
       fontWeight: "500",
       marginLeft: "20px",
       [theme.breakpoints.down("1500")]: {
-        lineHeight: "40px",
+        lineHeight: "normal",
         fontSize: "28px",
       },
       [theme.breakpoints.down("480")]: {
-        lineHeight: "40px",
+        lineHeight: "normal",
         fontSize: "20px",
       },
     },
