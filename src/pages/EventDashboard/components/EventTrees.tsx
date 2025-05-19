@@ -108,6 +108,7 @@ const EventTrees: React.FC<EventTreesProps> = ({ eventId }) => {
             </Box>
             <CardGrid
                 loading={loading}
+                padding="24px 0 24px 0"
                 cards={trees.map((tree: any) => {
                     let location: string = ''
                     const { hostname, host } = window.location;

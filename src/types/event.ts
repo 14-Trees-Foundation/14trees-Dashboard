@@ -7,7 +7,7 @@ export type Event = {
   assigned_by: number,
   site_id: number,
   name: string,
-  type: number,
+  type: string,
   description?: string,
   tags?: string[],
   event_date: Date,

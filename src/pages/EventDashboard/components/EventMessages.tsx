@@ -108,7 +108,17 @@ const EventMessages: React.FC<EventMessagesProps> = ({ messages }) => {
                 ))}
             </Slider>
 
-            <Dialog open={open} onClose={handleClose} fullWidth maxWidth="sm">
+            <Dialog 
+                open={open} 
+                onClose={handleClose} 
+                fullWidth 
+                maxWidth="sm"
+                PaperProps={{
+                    sx: {
+                        borderRadius: '20px',
+                    },
+                }}
+            >
                 <DialogContent dividers>
                     <DialogContentText color='black' style={{ whiteSpace: 'pre-wrap' }}>{selectedEventMessage?.message}</DialogContentText>
                     <Box mt={2} textAlign="right">

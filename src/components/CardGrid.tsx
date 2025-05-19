@@ -19,9 +19,10 @@ type CardData = {
 interface CardGridProps {
     loading?: boolean
     cards: CardData[]
+    padding?: number | string
 }
 
-const CardGrid: React.FC<CardGridProps> = ({ cards, loading }) => {
+const CardGrid: React.FC<CardGridProps> = ({ cards, loading, padding = 3 }) => {
 
     const classes = useStyle();
 
@@ -30,7 +31,7 @@ const CardGrid: React.FC<CardGridProps> = ({ cards, loading }) => {
             <Empty description="Trees not found for the user!" />
         </Box>
     ) : (
-        <Grid container spacing={3} padding={3}>
+        <Grid container spacing={3} padding={padding}>
             {cards.map((card) => (
                 <Grid item xs={12} sm={6} md={3} key={card.id}>
                     <Card
