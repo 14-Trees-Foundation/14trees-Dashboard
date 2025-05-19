@@ -1,7 +1,7 @@
 import { createStyles, makeStyles } from "@mui/styles";
 import { useEffect, useState } from "react";
 import { Spinner } from "../../components/Spinner";
-import { Event } from "../../types/event";
+import { Event, EventMessage } from "../../types/event";
 import { NotFound } from "../notfound/NotFound";
 import { Box, Divider, Drawer, useMediaQuery } from "@mui/material";
 import logo from "../../assets/logo_white_small.png";
@@ -12,19 +12,30 @@ import EventDashboard from "./components/EventDashboard";
 import { navIndex } from "../../store/atoms";
 import { useRecoilState } from "recoil";
 
-async function getEventDetails(linkId: string): Promise<Event | null> {
+async function getEventDetails(linkId: string) {
     try {
         const apiClient = new ApiClient();
+
+        const eventMessages = await apiClient.getEventMessages(linkId);
+
         const resp = await apiClient.getEvents(0, 1, [
             { columnField: 'link', operatorValue: 'equals', value: linkId },
         ])
 
-        return resp.results.length === 1
+        const event = resp.results.length === 1
             ? resp.results[0]
             : null
+
+        return {
+            event,
+            eventMessages,
+        }
     } catch (error: any) {
         toast.error(error.message);
-        return null;
+        return {
+            event: null,
+            eventMessages: []
+        };
     }
 }
 
@@ -35,6 +46,7 @@ const EventPage: React.FC = () => {
     const isMobile = useMediaQuery("(max-width:600px)");
     const [loading, setLoading] = useState(true);
     const [event, setEvent] = useState<Event | null>(null);
+    const [eventMessages, setEventMessages] = useState<EventMessage[]>([]);
     const [index, setIndex] = useRecoilState(navIndex);
 
     useEffect(() => {
@@ -42,8 +54,9 @@ const EventPage: React.FC = () => {
             if (!linkId) return;
 
             setLoading(true);
-            const event = await getEventDetails(linkId);
+            const { event, eventMessages } = await getEventDetails(linkId);
             setEvent(event);
+            setEventMessages(eventMessages);
             setLoading(false);
         }, 300)
 
@@ -89,7 +102,7 @@ const EventPage: React.FC = () => {
         const Page = pages[index].page;
         return (
             <div>
-                {event && <Page event={event} />}
+                {event && <Page event={event} eventMessages={eventMessages} />}
             </div>
         );
     };

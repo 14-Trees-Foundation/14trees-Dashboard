@@ -20,7 +20,7 @@ const EventTrees: React.FC<EventTreesProps> = ({ eventId }) => {
     const [page, setPage] = useState(0);
     const [pageSize, setPageSize] = useState(20);
     const [total, setTotal] = useState(20);
-    const [imageMode, setImageMode] = useState(true);
+    const [imageMode, setImageMode] = useState(false);
     const [searchStr, setSearchStr] = useState('');
 
     useEffect(() => {
@@ -77,15 +77,15 @@ const EventTrees: React.FC<EventTreesProps> = ({ eventId }) => {
                 <FormControl component="fieldset">
                     <FormGroup aria-label="position" row>
                         <FormControlLabel
-                            value="illustation"
-                            control={<Radio color="success" checked={imageMode} onChange={() => { setImageMode(true) }} />}
-                            label="Illustations"
-                            labelPlacement="end"
-                        />
-                        <FormControlLabel
                             value="profile"
                             control={<Radio color="success" checked={!imageMode} onChange={() => { setImageMode(false) }} />}
                             label="Profile Images"
+                            labelPlacement="end"
+                        />
+                        <FormControlLabel
+                            value="illustrations"
+                            control={<Radio color="success" checked={imageMode} onChange={() => { setImageMode(true) }} />}
+                            label="Illustrations"
                             labelPlacement="end"
                         />
                     </FormGroup>
@@ -119,7 +119,7 @@ const EventTrees: React.FC<EventTreesProps> = ({ eventId }) => {
 
                     return {
                         id: tree.id,
-                        name: tree.assigned_to_name,
+                        name: tree.planted_by ? tree.planted_by : tree.assigned_to_name,
                         type: tree.plant_type,
                         dashboardLink: location,
                         image: imageMode
