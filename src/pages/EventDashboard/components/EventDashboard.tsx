@@ -161,7 +161,7 @@ const EventDashboard: React.FC<EventDashboardProps> = ({ event, eventMessages })
                         {event.type === "2" ? "Memorial Trees" : "Event Trees"}
                     </Typography>
                     <Box sx={{ maxWidth: "100%" }}>
-                        <EventTrees eventId={event.id} />
+                        <EventTrees eventId={event.id} eventType={event.type} />
                     </Box>
                 </Box>
             </Box>
