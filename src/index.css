@@ -39,3 +39,8 @@ textarea.rcb-chat-input-textarea {
 div.rcb-bot-message {
   white-space: normal;
 }
+
+.slick-prev:before,
+.slick-next:before {
+    color: green;
+}

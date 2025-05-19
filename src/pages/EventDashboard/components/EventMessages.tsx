@@ -2,20 +2,15 @@ import React, { useState } from 'react';
 import {
     Box,
     Card,
-    CardContent,
     Typography,
     Dialog,
-    DialogTitle,
     DialogContent,
     DialogContentText,
-    IconButton,
     useMediaQuery,
     DialogActions,
     Button
 } from '@mui/material';
-import CloseIcon from '@mui/icons-material/Close';
 import { EventMessage } from '../../../types/event';
-import { Carousel } from 'antd';
 import Slider from 'react-slick';
 
 interface EventMessagesProps {
@@ -40,14 +35,13 @@ const EventMessages: React.FC<EventMessagesProps> = ({ messages }) => {
     };
 
     const settings = {
-        dots: false,
+        dots: true,
         infinite: true,
-        speed: 1000,
+        speed: 3000,
         slidesToShow: 3,
         slidesToScroll: 1,
         autoplay: true,
-        autoplaySpeed: 3000,
-        arrows: false,
+        autoplaySpeed: 15000,
         responsive: [
             {
                 breakpoint: 960, // md
@@ -67,10 +61,10 @@ const EventMessages: React.FC<EventMessagesProps> = ({ messages }) => {
     return (
         <div
             style={{
-                width: "100%",
+                width: "96%",
                 maxWidth: isMobile ? "96vw" : "80vw", // Full width for mobile, 80vw for larger screens
                 height: "250px",
-                overflow: "hidden",
+                margin: "0 16px 0 16px"
             }}
         >
             <Slider {...settings}>

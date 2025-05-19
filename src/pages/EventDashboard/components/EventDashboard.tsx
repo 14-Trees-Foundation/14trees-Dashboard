@@ -116,7 +116,6 @@ const EventDashboard: React.FC<EventDashboardProps> = ({ event, eventMessages })
                         </Typography>
                         <Box
                             sx={{
-                                overflow: "hidden",
                                 height: "220px",
                             }}
                         >
