@@ -112,7 +112,7 @@ const EventDashboard: React.FC<EventDashboardProps> = ({ event, eventMessages })
                             gutterBottom
                             textAlign={isMobile ? "center" : "left"}
                         >
-                            Event Messages
+                            {event.type === "2" ? "Messages of Love and Remembrance" : "Event Messages"}
                         </Typography>
                         <Box
                             sx={{
@@ -135,7 +135,7 @@ const EventDashboard: React.FC<EventDashboardProps> = ({ event, eventMessages })
                                 gutterBottom
                                 textAlign={isMobile ? "center" : "left"}
                             >
-                                Event Memories
+                                {event.type === "2" ? "" : "Event"} Memories
                             </Typography>
                             <Box
                                 sx={{
@@ -158,10 +158,10 @@ const EventDashboard: React.FC<EventDashboardProps> = ({ event, eventMessages })
                         gutterBottom
                         textAlign={isMobile ? "center" : "left"}
                     >
-                        Event Trees
+                        {event.type === "2" ? "Memorial Trees" : "Event Trees"}
                     </Typography>
                     <Box sx={{ maxWidth: "100%" }}>
-                        <EventTrees eventId={event.id} />
+                        <EventTrees eventId={event.id} eventType={event.type} />
                     </Box>
                 </Box>
             </Box>

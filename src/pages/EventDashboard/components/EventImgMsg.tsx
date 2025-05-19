@@ -68,7 +68,7 @@ const EventImgMsg: React.FC<Props> = ({ imageUrls, message }) => {
                 {/* Image Carousel */}
                 {imageUrls && imageUrls.length > 0 && <Box
                     sx={{
-                        maxWidth: 300,
+                        maxWidth: isMobile ? "100%" : 300,
                         maxHeight: 300,
                         width: "100%",
                         flexShrink: 0,
@@ -88,7 +88,7 @@ const EventImgMsg: React.FC<Props> = ({ imageUrls, message }) => {
                                         height: 300,
                                         objectFit: "contain",
                                         borderRadius: '20px',
-                                        backgroundColor: 'white',
+                                        backgroundColor: '#6f927a',
                                     }}
                                 />
                             </Box>
@@ -129,7 +129,16 @@ const EventImgMsg: React.FC<Props> = ({ imageUrls, message }) => {
             </Box>
 
             {/* Dialog for full message */}
-            <Dialog open={open} onClose={() => setOpen(false)} fullWidth maxWidth="sm">
+            <Dialog
+                open={open}
+                onClose={() => setOpen(false)}
+                fullWidth
+                PaperProps={{
+                    sx: {
+                        borderRadius: '20px',
+                    },
+                }}
+                maxWidth="sm">
                 <DialogContent dividers>
                     <Typography sx={{ whiteSpace: "pre-wrap" }}>{message}</Typography>
                 </DialogContent>
