@@ -2,13 +2,15 @@ import React from "react";
 import { Box, Typography, Divider, useMediaQuery } from "@mui/material";
 import logo from "../../../assets/icon_round.png";
 import { createStyles, makeStyles } from "@mui/styles";
-import { Event } from "../../../types/event";
+import { Event, EventMessage } from "../../../types/event";
 import EventMemories from "./EventMemories";
 import EventTrees from "./EventTrees";
-import { theme } from "antd";
+import EventMessages from "./EventMessages";
+import EventImgMsg from "./EventImgMsg";
 
 interface EventDashboardProps {
     event: Event;
+    eventMessages: EventMessage[];
 }
 
 const useStyles = makeStyles((theme: any) =>
@@ -59,7 +61,7 @@ const useStyles = makeStyles((theme: any) =>
         },
     }))
 
-const EventDashboard: React.FC<EventDashboardProps> = ({ event }) => {
+const EventDashboard: React.FC<EventDashboardProps> = ({ event, eventMessages }) => {
     const classes = useStyles();
     const isMobile = useMediaQuery("(max-width:600px)");
 
@@ -98,16 +100,29 @@ const EventDashboard: React.FC<EventDashboardProps> = ({ event }) => {
             <Box className={classes.content}>
                 {/* Event Message */}
                 {event.message && (
-                    <>
+                    <EventImgMsg imageUrls={event.images} message={event.message} />
+                )}
+
+                {/* Event Messages */}
+                {eventMessages.length > 0 && (
+                    <Box sx={{ mt: isMobile ? 3 : 5 }}>
                         <Typography
-                            variant={isMobile ? "body2" : "body1"}
-                            paragraph
-                            style={{ whiteSpace: "pre-wrap" }} // Handle \n as new lines
+                            variant={isMobile ? "h6" : "h5"}
+                            fontWeight={500}
+                            gutterBottom
+                            textAlign={isMobile ? "center" : "left"}
                         >
-                            {event.message}
+                            {event.type === "2" ? "Messages of Love and Remembrance" : "Event Messages"}
                         </Typography>
-                        <Divider sx={{ width: "100%" }} />
-                    </>
+                        <Box
+                            sx={{
+                                overflow: "hidden",
+                                height: "220px",
+                            }}
+                        >
+                            <EventMessages messages={eventMessages} />
+                        </Box>
+                    </Box>
                 )}
 
                 {/* Event Memories */}
@@ -120,7 +135,7 @@ const EventDashboard: React.FC<EventDashboardProps> = ({ event }) => {
                                 gutterBottom
                                 textAlign={isMobile ? "center" : "left"}
                             >
-                                Event Memories
+                                {event.type === "2" ? "" : "Event"} Memories
                             </Typography>
                             <Box
                                 sx={{
@@ -143,10 +158,10 @@ const EventDashboard: React.FC<EventDashboardProps> = ({ event }) => {
                         gutterBottom
                         textAlign={isMobile ? "center" : "left"}
                     >
-                        Event Trees
+                        {event.type === "2" ? "Memorial Trees" : "Event Trees"}
                     </Typography>
                     <Box sx={{ maxWidth: "100%" }}>
-                        <EventTrees eventId={event.id} />
+                        <EventTrees eventId={event.id} eventType={event.type} />
                     </Box>
                 </Box>
             </Box>

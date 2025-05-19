@@ -8,11 +8,12 @@ import { LoadingButton } from "@mui/lab";
 import { Search } from "@mui/icons-material";
 
 interface EventTreesProps {
-    eventId: number
+    eventId: number,
+    eventType: string,
 }
 
 
-const EventTrees: React.FC<EventTreesProps> = ({ eventId }) => {
+const EventTrees: React.FC<EventTreesProps> = ({ eventId, eventType }) => {
 
     const isMobile = useMediaQuery("(max-width:600px)");
     const [loading, setLoading] = useState(false);
@@ -20,7 +21,7 @@ const EventTrees: React.FC<EventTreesProps> = ({ eventId }) => {
     const [page, setPage] = useState(0);
     const [pageSize, setPageSize] = useState(20);
     const [total, setTotal] = useState(20);
-    const [imageMode, setImageMode] = useState(true);
+    const [imageMode, setImageMode] = useState(false);
     const [searchStr, setSearchStr] = useState('');
 
     useEffect(() => {
@@ -77,15 +78,15 @@ const EventTrees: React.FC<EventTreesProps> = ({ eventId }) => {
                 <FormControl component="fieldset">
                     <FormGroup aria-label="position" row>
                         <FormControlLabel
-                            value="illustration"
+                            value="illustrations"
                             control={<Radio color="success" checked={imageMode} onChange={() => { setImageMode(true) }} />}
-                            label="Illustrations"
+                            label={eventType === "2" ? "Blossoms of Legacy" : "Illustrations"}
                             labelPlacement="end"
                         />
                         <FormControlLabel
                             value="profile"
                             control={<Radio color="success" checked={!imageMode} onChange={() => { setImageMode(false) }} />}
-                            label="Profile Images"
+                            label={eventType === "2" ? "Guardians of Memory" : "Profile Images"}
                             labelPlacement="end"
                         />
                     </FormGroup>
@@ -108,6 +109,7 @@ const EventTrees: React.FC<EventTreesProps> = ({ eventId }) => {
             </Box>
             <CardGrid
                 loading={loading}
+                padding="24px 0 24px 0"
                 cards={trees.map((tree: any) => {
                     let location: string = ''
                     const { hostname, host } = window.location;
@@ -119,7 +121,7 @@ const EventTrees: React.FC<EventTreesProps> = ({ eventId }) => {
 
                     return {
                         id: tree.id,
-                        name: tree.assigned_to_name,
+                        name: tree.planted_by ? tree.planted_by : tree.assigned_to_name,
                         type: tree.plant_type,
                         dashboardLink: location,
                         image: imageMode
