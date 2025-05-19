@@ -41,9 +41,7 @@ const Chat: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
 );
 
 const ChatbotV2 = () => {
-    const plugins = [HtmlRenderer()];
-    const uploadedFiles: Promise<string>[] = [];
-    const [isFirstChat, setIsFirstChat] = useState(true);
+    
     const [messages, setMessages] = useState<Message[]>([
         {
             id: '1',
@@ -76,177 +74,48 @@ const ChatbotV2 = () => {
     const getBotResponse = async (userInput: string, history: Message[]): Promise<string> => {
         const apiClient = new ApiClient();
         const resp = await apiClient.serve14TreesQuery(userInput, history, sessionId); // Pass sessionId to API
-        console.log(resp.sponsor_details);
-        if (resp.sponsor_details) {
-            if (resp.sponsor_details.name) {
-                const userName = localStorage.getItem("userName")
-                if (userName != resp.sponsor_details.name)
-                    localStorage.setItem("userName", resp.sponsor_details.name);
-            }
-
-            if (resp.sponsor_details.email) {
-                const userEmail = localStorage.getItem("userEmail")
-                if (userEmail != resp.sponsor_details.email)
-                    localStorage.setItem("userEmail", resp.sponsor_details.email);
-            }
-        }
+      
         return resp.text_output;
     };
 
-    // const helpOptions = ["Quickstart", "API Docs", "Examples", "Github", "Discord"];
-    const handleUpload = async (params: Params) => {
-        if (!params.files || params.files.length === 0) return;
-
-        const awsUtils = new AWSUtils();
-        const date = new Date(new Date().toDateString()).getTime()
-        for (const file of params.files) {
-            const uploadPromise = awsUtils.uploadFileToS3('gift-request', file, 'images/' + date);
-            uploadedFiles.push(uploadPromise);
-        }
-
-        await Promise.all(uploadedFiles);
-    }
-
-    const handleInitialMessage = () => {
-        const userName = localStorage.getItem("userName");
-        // const userEmail = localStorage.getItem("userEmail");
-
-        // if (!userName)
-        //     return "Greatings!\n\nBefore we start, please share your fullname."
-        // else if (!userEmail)
-        //     return `Hi ${userName},\n\nPlease share your email address.`
-        // else
-
-        return marked(defaultMessage.replace(" USER_NAME", userName ? " " + userName : ""));
-    }
-
     const flow = {
         start: {
-            message: handleInitialMessage,
-            file: (params) => handleUpload(params),
-            // path: () => {
-            //     const userName = localStorage.getItem("userName");
-            //     const userEmail = localStorage.getItem("userEmail");
-            //     return !userName
-            //         ? "name"
-            //         : !userEmail
-            //             ? "email"
-            //             : "user"
-            // },
-            path: 'user',
-            renderHtml: ["BOT", "USER"],
-        } as HtmlRendererBlock,
-        name: {
-            message: (params: Params) => {
-                localStorage.setItem("userName", params.userInput);
-                return handleInitialMessage();
-            },
-            path: "email",
-            renderHtml: ["BOT", "USER"],
-        } as HtmlRendererBlock,
-        email: {
-            message: (params: Params) => {
-                localStorage.setItem("userEmail", params.userInput);
-                return handleInitialMessage();
-            },
-            path: "user",
-            renderHtml: ["BOT", "USER"],
-        } as HtmlRendererBlock,
-        user: {
-            message: async (params: Params) => {
-                let history: Message[] = []
-
-                const strings = await Promise.all(uploadedFiles);
-                let userInput = params.userInput;
-                if (strings.length > 0) {
-                    userInput += '  \n\n' + "Image urls:\n" + strings.join("  \n");
-                }
-
-                if (isFirstChat) {
-                    setIsFirstChat(false);
-                    const userName = localStorage.getItem("userName");
-                    const userEmail = localStorage.getItem("userEmail");
-                    if (userName || userEmail)
-                        userInput += `\n\nUsername: ${userName}\nUseremail: ${userEmail}`;
-                }
-
-                const userMessage: Message = {
-                    id: Date.now().toString(),
-                    text: userInput,
-                    sender: 'user',
-                    timestamp: new Date()
-                };
-
-                setMessages(prev => {
-                    history = prev;
-                    return [...prev, userMessage]
-                })
-
-                const resp = await getBotResponse(userInput, history);
-                const botResponse: Message = {
-                    id: Date.now().toString(),
-                    text: resp,
-                    sender: 'bot',
-                    timestamp: new Date()
-                };
-
-                setMessages(prev => [...prev, botResponse]);
-
-                if (resp.includes("Your tree gifting request has been successfully created")) {
-                    await params.showToast("🎉 Your gift request was created successfully!", 3000);
-                }
-
-                return marked(resp);
-            },
-            file: (params: any) => params,
-            path: "user",
-            renderHtml: ["BOT", "USER"],
-        } as HtmlRendererBlock,
-        process_options: {
-            transition: { duration: 0 },
-            chatDisabled: false,
-            path: async (params: Params) => {
-                let path = "";
-                switch (params.userInput) {
-                    case "🎁 View Gifts":
-                        path = "/gifts";
-                        break;
-                    case "👋 Visitor Page":
-                        path = "/visitor";
-                        break;
-                    default:
-                        return "user";
-                }
-                await params.injectMessage("Sit tight! I'll send you right there!");
-                setTimeout(() => {
-                    window.location.pathname = path;
-                }, 800);
-                return "end";
-            },
+          message: defaultMessage,
+          path: "chat",
         },
-        repeat: {
-            transition: { duration: 3000 },
-            path: "prompt_again"
-        },
-        prompt_again: {
-            message: "Would you like help with anything else today?",
-            // options: helpOptions,
-            transition: { duration: 1000 },
-            path: "process_options",
-            renderHtml: ["BOT"],
-        },
+        chat: {
+          message: async (params: any) => {
+            const userMessage: Message = {
+              id: Date.now().toString(),
+              text: params.userInput,
+              sender: 'user',
+              timestamp: new Date()
+            };
+    
+            setMessages(prev => [...prev, userMessage]);
+
+            const resp = await getBotResponse(params.userInput, messages);
+        const botResponse: Message = {
+          id: Date.now().toString(),
+          text: resp,
+          sender: 'bot',
+          timestamp: new Date()
+        };
+
+        setMessages(prev => [...prev, botResponse]);
+        return resp;
+      },
+      path: "chat",
     }
+  };
 
     return (
         <ChatBot
-            plugins={plugins}
-            flow={flow}
-            settings={
-                {
-                    chatButton: {
-                        icon: Chat
-                        // icon: 'src/assets/logo_light.png'
-                    },
+           flow={flow}
+           settings={{
+                      chatButton: {
+                                    icon: Chat
+                        },
 
                     general: {
                         primaryColor: 'brown',
@@ -262,7 +131,7 @@ const ChatbotV2 = () => {
                     chatInput: { allowNewline: true, botDelay: 500, buttons: [Button.FILE_ATTACHMENT_BUTTON, Button.EMOJI_PICKER_BUTTON, Button.VOICE_MESSAGE_BUTTON, Button.SEND_MESSAGE_BUTTON] },
                     fileAttachment: { disabled: false, multiple: true, accept: '*', sendFileName: true, showMediaDisplay: true },
                     header: {
-                        title: <div style={{ cursor: 'pointer', margin: '0px', paddingTop: '5px', fontSize: '16px', fontWeight: 'light' }}>Gifty</div>,
+                        title: <div style={{ cursor: 'pointer', margin: '0px', paddingTop: '5px', fontSize: '16px', fontWeight: 'light' }}>14Trees Assistant</div>,
                         avatar: 'src/assets/logo_light.png',
                         buttons: [Button.NOTIFICATION_BUTTON, Button.CLOSE_CHAT_BUTTON]
                     },

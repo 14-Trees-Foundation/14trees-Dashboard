@@ -2364,9 +2364,9 @@ class ApiClient {
         }
     }
 
-    async serve14TreesQuery(message: string, history: any[], request_id?: string): Promise<{text_output: string, request_id: string, sponsor_details?: any }> {
+    async serve14TreesQuery(message: string, history: any[], request_id?: string): Promise<{text_output: string, request_id: string,}> {
         try {
-            const response = await this.api.post<{ text_output: string, request_id: string, sponsor_details?: any }>('/14trees/genai', 
+            const response = await this.api.post<{ text_output: string, request_id: string, }>('/14trees/genai', 
                 { message, history, request_id }, 
                 {
                     headers: {
