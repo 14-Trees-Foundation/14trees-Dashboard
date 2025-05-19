@@ -2363,6 +2363,26 @@ class ApiClient {
             throw new Error('Failed to connect with our AI bot!');
         }
     }
+
+    async serve14TreesQuery(message: string, history: any[], request_id?: string): Promise<{text_output: string, request_id: string, sponsor_details?: any }> {
+        try {
+            const response = await this.api.post<{ text_output: string, request_id: string, sponsor_details?: any }>('/14trees/genai', 
+                { message, history, request_id }, 
+                {
+                    headers: {
+                        "x-access-token": this.token,
+                        "content-type": "application/json",
+                    }
+                }
+            );
+            return response.data;
+        } catch (error: any) {
+            if (error.response) {
+                throw new Error(error.response.data.message || 'Failed to process your tree planting query');
+            }
+            throw new Error('Failed to connect with the 14Trees AI service!');
+        }
+    }
 }
 
 

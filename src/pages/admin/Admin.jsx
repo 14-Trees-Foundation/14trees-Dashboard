@@ -29,6 +29,7 @@ import SiteInventory from "./Inventory/SiteInventory";
 import GiftTrees from "./gift/GiftTrees";
 import GCInventory from "./Inventory/GCInventory";
 import CSRInventory from "./csr/CSRInventory";
+import ChatbotV2 from "../../components/14treesChatbot/ChatBotV2";
 
 export const Admin = () => {
   const classes = useStyles();
@@ -170,6 +171,7 @@ export const Admin = () => {
             sx={{ minWidth: "1080px", p: 2, width: "100%" }}
           >
             {mainBox()}
+            <ChatbotV2 />
           </Box>
         </Box>
       </div>
