@@ -15,10 +15,8 @@ const renderer = {
 
 marked.use({ renderer });
 
-const defaultMessage = `**Hello USER_NAME! 🌿 Greetings from 14 Trees Foundation!**  
-I'm Gifty, your digital assistant, here to help you spread green joy through tree gifting. Here’s what I can help you with:
-1. 🌱 **Create a Tree Gifting Request**
-    Gift trees to someone special with a personalized message and occasion.
+const defaultMessage = `Hello!!!  
+I'm your digital assistant, what can i help you with today?
 `
 
 type Message = {
