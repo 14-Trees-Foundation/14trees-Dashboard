@@ -10,7 +10,7 @@ import { OnsiteStaff } from '../../types/onSiteStaff';
 import { MapTreesUsingPlotIdRequest, MapTreesUsingSaplingIdsRequest, Tree } from '../../types/tree';
 import { UserTree, UserTreeCountPaginationResponse } from '../../types/userTree';
 import { PaginatedResponse } from '../../types/pagination';
-import { Event } from '../../types/event';
+import { Event, EventMessage } from '../../types/event';
 import { Visit, BulkVisitUsersMappingResponse } from '../../types/visits';
 import { TreeImage } from '../../types/tree_snapshots';
 import { GiftCard, GiftCardUser, GiftRequestUser } from '../../types/gift_card';
@@ -1519,6 +1519,19 @@ class ApiClient {
                 throw new Error(error.response.data.message);
             }
             throw new Error("Faield fetch events");
+        }
+    }
+
+    async getEventMessages(event_link: string): Promise<EventMessage[]> {
+        const url = `/events/messages/${event_link}`;
+        try {
+            const response = await this.api.get<EventMessage[]>(url);
+            return response.data;
+        } catch (error: any) {
+            if (error.response?.data?.message) {
+                throw new Error(error.response.data.message);
+            }
+            throw new Error("Faield fetch event messages");
         }
     }
 

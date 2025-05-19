@@ -12,8 +12,20 @@ export type Event = {
   tags?: string[],
   event_date: Date,
   memories?: string[],
+  images: string[] | null,
   message: string | null,
   event_location: EventLocation
+};
+
+export type EventMessage = {
+  id: number;
+  key: number;
+  user_id: number | null;
+  user_name: string;
+  event_id: number;
+  message: string;
+  created_at: string;
+  updated_at: string;
 };
 
 export type EventPaginationResponse = {
