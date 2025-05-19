@@ -4,7 +4,7 @@ import ApiClient from "../../api/apiClient/apiClient";
 import { useEffect, useState } from "react";
 import { marked } from 'marked'
 import { AWSUtils } from "../../helpers/aws";
-import { setupResizableDiv } from "./resizableHandler";
+import { setupResizableDiv } from "../Chatbot/resizableHandler";
 import path from "path";
 
 const renderer = {
