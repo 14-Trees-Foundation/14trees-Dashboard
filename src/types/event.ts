@@ -34,6 +34,8 @@ export type EventPaginationResponse = {
 }
 
 export type EventsDataState = {
+  loading: boolean,
   totalEvents: number,
   Events: Record<string, Event>
+  paginationMapping: Record<number, number> 
 }
