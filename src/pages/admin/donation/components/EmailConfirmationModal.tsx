@@ -111,7 +111,7 @@ const EmailConfirmationModal: React.FC<EmailConfirmationModalProps> = ({ donorMa
             const apiClient = new ApiClient();
             await apiClient.sendEmailForDonation(
                 parseInt(donation_id), // Convert string to number
-                test_mails,
+                [],
                 sponsor_cc_mails,
                 recipient_cc_mails,
                 assignee_cc_mails,

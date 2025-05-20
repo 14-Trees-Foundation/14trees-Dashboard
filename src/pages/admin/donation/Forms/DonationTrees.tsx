@@ -17,6 +17,7 @@ import getColumnSearchProps, { getColumnSelectedItemFilter, getSortableHeader } 
 import { toast } from "react-toastify";
 import { Order } from "../../../../types/common";
 import { Tree } from "../../../../types/tree";
+import donationActionTypes from "../../../../redux/actionTypes/donationActionTypes";
 
 interface DonationTreesProps {
   open: boolean;
@@ -66,7 +67,6 @@ function TabPanel(props: TabPanelProps) {
 
 const DonationTrees: FC<DonationTreesProps> = ({ open, onClose, donation }) => {
   const [page, setPage] = useState(0);
-  const [loading, setLoading] = useState(false);
   const [pageSize, setPageSize] = useState(10);
   const [filters, setFilters] = useState<Record<string, GridFilterItem>>({});
   const [orderBy, setOrderBy] = useState<Order[]>([]);
@@ -76,7 +76,7 @@ const DonationTrees: FC<DonationTreesProps> = ({ open, onClose, donation }) => {
   const [bookAllHabits, setBookAllHabits] = useState(false);
   const [diversify, setDiversify] = useState(false);
   const [validationDialog, setValidationDialog] = useState({ open: false, title: '', message: '' });
-  
+
   // New state variables for the tree selection tab
   const [tabValue, setTabValue] = useState(0);
   const [treePage, setTreePage] = useState(0);
@@ -106,9 +106,10 @@ const DonationTrees: FC<DonationTreesProps> = ({ open, onClose, donation }) => {
   // Fetch plots data
   useEffect(() => {
     if (open && tabValue === 0) {
+      setPage(0);
       fetchPlots();
     }
-  }, [open, filters, page, pageSize, tabValue]);
+  }, [open, tabValue, filters, orderBy]);
 
   // Fetch trees data
   useEffect(() => {
@@ -125,15 +126,8 @@ const DonationTrees: FC<DonationTreesProps> = ({ open, onClose, donation }) => {
   }, [open, reservedTreesFilters, reservedTreesPage, reservedTreesPageSize, tabValue, donation]);
 
   const fetchPlots = async () => {
-    setLoading(true);
-    try {
-      const filtersData = Object.values(filters);
-      await getPlots(page * pageSize, pageSize, filtersData);
-    } catch (error) {
-      console.error("Error fetching plots:", error);
-    } finally {
-      setLoading(false);
-    }
+    const filtersData = Object.values(filters);
+    getPlots(page * pageSize, pageSize, filtersData, orderBy);
   };
 
   const fetchTrees = async () => {
@@ -157,7 +151,7 @@ const DonationTrees: FC<DonationTreesProps> = ({ open, onClose, donation }) => {
 
   const fetchReservedTrees = async () => {
     if (!donation) return;
-    
+
     setReservedTreesLoading(true);
     try {
       const apiClient = new ApiClient();
@@ -167,13 +161,13 @@ const DonationTrees: FC<DonationTreesProps> = ({ open, onClose, donation }) => {
         operatorValue: "equals",
         value: donation.id
       };
-      
+
       // Combine with existing filters
       const filtersData = [
         ...Object.values(reservedTreesFilters),
         donationFilter
       ];
-      
+
       const response = await apiClient.getDonationTrees(
         reservedTreesPage * reservedTreesPageSize,
         reservedTreesPageSize,
@@ -252,7 +246,7 @@ const DonationTrees: FC<DonationTreesProps> = ({ open, onClose, donation }) => {
       toast.warn("You already have selected requested number of trees!");
       return;
     }
-    
+
     // Find the tree in the current table rows
     const tree = treeTableRows.find(t => t.id === id);
     if (tree) {
@@ -263,7 +257,7 @@ const DonationTrees: FC<DonationTreesProps> = ({ open, onClose, donation }) => {
         plant_type: tree.plant_type || '',
         plot: tree.plot || ''
       };
-      
+
       // Update selected trees and IDs
       setSelectedTrees([...selectedTrees, newSelectedTree]);
       setSelectedTreeIds([...selectedTreeIds, id]);
@@ -279,11 +273,11 @@ const DonationTrees: FC<DonationTreesProps> = ({ open, onClose, donation }) => {
   // Handle reserve count input change
   const handleReserveCountChange = (id: number, value: number) => {
     if (!donation) return;
-    
+
     const requestedCount = donation.trees_count || 0;
     const currentTotal = selectedPlots.reduce((sum, plot) => sum + (plot.id === id ? 0 : plot.reserveCount), 0);
     const plot = selectedPlots.find(p => p.id === id);
-    
+
     if (!plot) return;
 
     const maxAllowed = Math.min(
@@ -292,7 +286,7 @@ const DonationTrees: FC<DonationTreesProps> = ({ open, onClose, donation }) => {
     );
 
     const newValue = Math.max(0, Math.min(value, maxAllowed));
-  
+
     setSelectedPlots(prev =>
       prev.map(plot =>
         plot.id === id ? { ...plot, reserveCount: newValue } : plot
@@ -397,14 +391,18 @@ const DonationTrees: FC<DonationTreesProps> = ({ open, onClose, donation }) => {
 
   const handleUnreserveSelectedTrees = async () => {
     if (!donation || selectedReservedTrees.length === 0) return;
-    
+
     try {
       const apiClient = new ApiClient();
-      await apiClient.unreserveTreesForDonation(
+      const updatedDonation = await apiClient.unreserveTreesForDonation(
         donation.id,
         selectedReservedTrees,
         false
       );
+      dispatch({
+        type: donationActionTypes.UPDATE_DONATION_SUCCEEDED,
+        payload: updatedDonation,
+      });
       toast.success(`Successfully unreserved ${selectedReservedTrees.length} trees for donation ${donation.id}`);
       fetchReservedTrees();
       setSelectedReservedTrees([]);
@@ -415,14 +413,18 @@ const DonationTrees: FC<DonationTreesProps> = ({ open, onClose, donation }) => {
 
   const handleUnreserveAllTrees = async () => {
     if (!donation) return;
-    
+
     try {
       const apiClient = new ApiClient();
-      await apiClient.unreserveTreesForDonation(
+      const updatedDonation = await apiClient.unreserveTreesForDonation(
         donation.id,
         undefined,
         true
       );
+      dispatch({
+        type: donationActionTypes.UPDATE_DONATION_SUCCEEDED,
+        payload: updatedDonation,
+      });
       toast.success(`Successfully unreserved all trees for donation ${donation.id}`);
       fetchReservedTrees();
       setSelectedReservedTrees([]);
@@ -634,7 +636,7 @@ const DonationTrees: FC<DonationTreesProps> = ({ open, onClose, donation }) => {
 
   const handleReservedTreesDownload = async () => {
     if (!donation) return [];
-    
+
     const apiClient = new ApiClient();
     // Create a filter for donation_id in the format expected by the backend
     const donationFilter = {
@@ -642,13 +644,13 @@ const DonationTrees: FC<DonationTreesProps> = ({ open, onClose, donation }) => {
       operatorValue: "equals",
       value: donation.id
     };
-    
+
     // Combine with existing filters
     const reservedFiltersList = [
       ...Object.values(reservedTreesFilters),
       donationFilter
     ];
-    
+
     const reservedResp = await apiClient.getDonationTrees(
       0,
       reservedTreesTotal,
@@ -661,14 +663,14 @@ const DonationTrees: FC<DonationTreesProps> = ({ open, onClose, donation }) => {
     if (!donation) return;
     const requestedCount = donation.trees_count || 0;
     let totalToReserve = 0;
-  
+
     // Calculate total trees to be reserved
     if (tabValue === 0) {
       totalToReserve = selectedPlots.reduce((sum, plot) => sum + plot.reserveCount, 0);
     } else {
       totalToReserve = selectedTrees.length;
     }
-  
+
     // Validation: Check if trying to reserve more than requested
     if (totalToReserve > requestedCount) {
       setValidationDialog({
@@ -678,7 +680,7 @@ const DonationTrees: FC<DonationTreesProps> = ({ open, onClose, donation }) => {
       });
       return; // Stop execution here - don't submit
     }
-  
+
     // Validation: Check if trying to reserve zero trees
     if (totalToReserve === 0) {
       setValidationDialog({
@@ -688,13 +690,13 @@ const DonationTrees: FC<DonationTreesProps> = ({ open, onClose, donation }) => {
       });
       return;
     }
-  
+
     try {
       const apiClient = new ApiClient();
-      
+
       if (tabValue === 0) {
         // Plot-based reservation
-        await apiClient.reserveTreesForDonation(
+        const updatedDonation = await apiClient.reserveTreesForDonation(
           donation.id,
           [],
           true,
@@ -702,9 +704,13 @@ const DonationTrees: FC<DonationTreesProps> = ({ open, onClose, donation }) => {
           diversify,
           bookAllHabits
         );
+        dispatch({
+          type: donationActionTypes.UPDATE_DONATION_SUCCEEDED,
+          payload: updatedDonation,
+        });
       } else {
         // Tree-based reservation
-        await apiClient.reserveTreesForDonation(
+        const updatedDonation = await apiClient.reserveTreesForDonation(
           donation.id,
           selectedTrees.map(tree => tree.id),
           false,
@@ -712,6 +718,10 @@ const DonationTrees: FC<DonationTreesProps> = ({ open, onClose, donation }) => {
           diversify,
           bookAllHabits
         );
+        dispatch({
+          type: donationActionTypes.UPDATE_DONATION_SUCCEEDED,
+          payload: updatedDonation,
+        });
       }
       toast.success("Trees reserved successfully!")
       handleClose(); // Close dialog on success
@@ -744,30 +754,36 @@ const DonationTrees: FC<DonationTreesProps> = ({ open, onClose, donation }) => {
           <Typography>
             <strong>Requested Trees:</strong> {donation?.trees_count}
           </Typography>
+          <Typography>
+            <strong>Reserved:</strong> {donation?.booked}
+          </Typography>
+          <Typography>
+            <strong>Remaining:</strong> {(donation?.trees_count || 0) - (donation?.booked || 0)}
+          </Typography>
         </Box>
 
         <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-          <Tabs 
-            value={tabValue} 
-            onChange={handleTabChange} 
+          <Tabs
+            value={tabValue}
+            onChange={handleTabChange}
             aria-label="reservation tabs"
             TabIndicatorProps={{ style: { backgroundColor: 'green' } }}
             variant="fullWidth"
           >
-            <Tab 
-              label="Reserve by Plot" 
+            <Tab
+              label="Reserve by Plot"
               sx={{
                 '&.Mui-selected': { color: 'green' }
               }}
             />
-            <Tab 
-              label="Select Individual Trees" 
+            <Tab
+              label="Select Individual Trees"
               sx={{
                 '&.Mui-selected': { color: 'green' }
               }}
             />
-            <Tab 
-              label="Unreserve Trees" 
+            <Tab
+              label="Unreserve Trees"
               sx={{
                 '&.Mui-selected': { color: 'green' }
               }}
@@ -777,7 +793,7 @@ const DonationTrees: FC<DonationTreesProps> = ({ open, onClose, donation }) => {
 
         <TabPanel value={tabValue} index={0}>
           <GeneralTable
-            loading={loading}
+            loading={plotsData.loading}
             rows={tableRows}
             columns={columns}
             totalRecords={plotsData.totalPlots}
@@ -931,16 +947,16 @@ const DonationTrees: FC<DonationTreesProps> = ({ open, onClose, donation }) => {
             <Typography variant="h6" color="green">
               Reserved Trees
             </Typography>
-            <Button 
-              variant="contained" 
-              color="error" 
+            <Button
+              variant="contained"
+              color="error"
               onClick={() => setUnreserveAllDialogOpen(true)}
               disabled={reservedTreesTotal === 0}
             >
               Unreserve All Trees
             </Button>
           </Box>
-          
+
           <GeneralTable
             loading={reservedTreesLoading}
             rows={reservedTreesTableRows}
@@ -954,12 +970,12 @@ const DonationTrees: FC<DonationTreesProps> = ({ open, onClose, donation }) => {
             footer
             tableName="Reserved Trees"
           />
-          
+
           {selectedReservedTrees.length > 0 && (
             <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 2 }}>
-              <Button 
-                variant="contained" 
-                color="error" 
+              <Button
+                variant="contained"
+                color="error"
                 onClick={handleUnreserveSelectedTrees}
               >
                 Unreserve Selected Trees ({selectedReservedTrees.length})
@@ -1039,33 +1055,33 @@ const DonationTrees: FC<DonationTreesProps> = ({ open, onClose, donation }) => {
           </Paper>
         )}
       </DialogContent>
-              <Dialog
-                 open={validationDialog.open}
-                 onClose={() => setValidationDialog(prev => ({...prev, open: false}))}
-                 maxWidth="xs"
-                 fullWidth
-              >
-              <DialogTitle>{validationDialog.title}</DialogTitle>
-       <DialogContent>
-            <DialogContentText>{validationDialog.message}</DialogContentText>
+      <Dialog
+        open={validationDialog.open}
+        onClose={() => setValidationDialog(prev => ({ ...prev, open: false }))}
+        maxWidth="xs"
+        fullWidth
+      >
+        <DialogTitle>{validationDialog.title}</DialogTitle>
+        <DialogContent>
+          <DialogContentText>{validationDialog.message}</DialogContentText>
         </DialogContent>
         <DialogActions>
-         <Button 
-              onClick={() => setValidationDialog(prev => ({...prev, open: false}))} 
-              color="success" 
-              variant="contained"  
-              autoFocus
-              sx={{
-                backgroundColor: '#4caf50',
-                '&:hover': {
-                  backgroundColor: '#388e3c',
-                }
-              }}
-              >
-                 OK
+          <Button
+            onClick={() => setValidationDialog(prev => ({ ...prev, open: false }))}
+            color="success"
+            variant="contained"
+            autoFocus
+            sx={{
+              backgroundColor: '#4caf50',
+              '&:hover': {
+                backgroundColor: '#388e3c',
+              }
+            }}
+          >
+            OK
           </Button>
-      </DialogActions>
-    </Dialog>
+        </DialogActions>
+      </Dialog>
 
       <DialogActions>
         <Button onClick={handleClose} color="error" variant="outlined">
@@ -1080,7 +1096,7 @@ const DonationTrees: FC<DonationTreesProps> = ({ open, onClose, donation }) => {
           Confirm Reservation
         </Button>
       </DialogActions>
-      
+
       {/* Confirmation Dialog for Unreserve All */}
       <Dialog
         open={unreserveAllDialogOpen}
@@ -1096,12 +1112,12 @@ const DonationTrees: FC<DonationTreesProps> = ({ open, onClose, donation }) => {
           <Button onClick={() => setUnreserveAllDialogOpen(false)} color="primary">
             Cancel
           </Button>
-          <Button 
+          <Button
             onClick={() => {
               setUnreserveAllDialogOpen(false);
               handleUnreserveAllTrees();
-            }} 
-            color="error" 
+            }}
+            color="error"
             variant="contained"
           >
             Unreserve All

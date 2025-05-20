@@ -54,6 +54,7 @@ export type Plot = {
 };
 
 export type PlotsDataState = {
+    loading: boolean,
     totalPlots: number,
     plots: Record<number, Plot>
     paginationMapping: Record<number, number> 
