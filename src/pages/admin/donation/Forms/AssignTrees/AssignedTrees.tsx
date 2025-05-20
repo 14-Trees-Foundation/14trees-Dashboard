@@ -12,14 +12,17 @@ import GeneralTable from "../../../../../components/GenTable";
 import getColumnSearchProps from "../../../../../components/Filter";
 import UnassignmentList from "./UnassignmentList";
 import UnassignConfirmationDialog from "./UnassignConfirmationDialog";
+import donationActionTypes from "../../../../../redux/actionTypes/donationActionTypes";
+import { useDispatch } from "react-redux";
 
 interface AssignedTreesProps {
     donationId: number;
+    onClose: () => void
 }
 
-const AssignedTrees: React.FC<AssignedTreesProps> = ({ donationId }) => {
+const AssignedTrees: React.FC<AssignedTreesProps> = ({ donationId, onClose }) => {
 
-
+    const dispatch = useDispatch();
     const [loading, setLoading] = useState(false);
     const [indexToTreeMap, setIndexToTreeMap] = useState<Record<number, DonationTree>>({});
     const [trees, setTrees] = useState<DonationTree[]>([]);
@@ -127,7 +130,11 @@ const AssignedTrees: React.FC<AssignedTreesProps> = ({ donationId }) => {
         setUnassignLoading(true);
         try {
             const api = new ApiClient();
-            await api.unassignDonationTrees(donationId, unassignAll, unassignedTrees.map(tree => tree.id));
+            const updatedDonation = await api.unassignDonationTrees(donationId, unassignAll, unassignedTrees.map(tree => tree.id));
+            dispatch({
+                type: donationActionTypes.UPDATE_DONATION_SUCCEEDED,
+                payload: updatedDonation,
+            });
             setUnassignedTrees([]);
         } catch (error: any) {
             toast.error(error.message);
@@ -140,7 +147,7 @@ const AssignedTrees: React.FC<AssignedTreesProps> = ({ donationId }) => {
             setIndexToTreeMap({});
             setTotalTrees(10);
         }
-     }
+    }
 
 
     const columns: TableColumnType<DonationTree>[] = [
@@ -191,7 +198,7 @@ const AssignedTrees: React.FC<AssignedTreesProps> = ({ donationId }) => {
                 variant="outlined"
                 color="error"
                 size="small"
-                sx={{ textTransform: 'none'}}
+                sx={{ textTransform: 'none' }}
             >Unassign</Button>
         }
     ]
@@ -234,11 +241,16 @@ const AssignedTrees: React.FC<AssignedTreesProps> = ({ donationId }) => {
             {unassignedTrees.length > 0 && <UnassignmentList trees={unassignedTrees} onRemove={handleRemoveTree} />}
             <Divider sx={{ marginBottom: 2 }} />
             <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
-                <Button 
-                    variant="contained" 
-                    color="error" 
-                    sx={{ ml: 2, textTransform: 'none' }} 
-                    disabled={unassignedTrees.length === 0 && !unassignAll} 
+                <Button
+                    onClick={onClose}
+                    variant="outlined"
+                    color="error"
+                >Cancel</Button>
+                <Button
+                    variant="contained"
+                    color="error"
+                    sx={{ ml: 2, textTransform: 'none' }}
+                    disabled={unassignedTrees.length === 0 && !unassignAll}
                     onClick={() => { setOpen(true); }}>{unassignAll ? "Unassign All" : "Unassign"}</Button>
             </Box>
         </Box>
