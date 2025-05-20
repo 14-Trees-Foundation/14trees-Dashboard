@@ -154,10 +154,7 @@ const GiftCardRequestInfo: React.FC<GiftCardRequestInfoProps> = ({ open, onClose
                 <Box mt={2} mb={2}>
                     <Typography variant="h6" gutterBottom>Messages</Typography>
                     <Typography variant="body1" gutterBottom>
-                        <strong>Primary Message:</strong> {data.primary_message || 'N/A'}
-                    </Typography>
-                    <Typography variant="body1" gutterBottom>
-                        <strong>Secondary Message:</strong> {data.secondary_message || 'N/A'}
+                        <strong>Gift Card Message:</strong> {data.primary_message || 'N/A'}
                     </Typography>
                     <Typography variant="body1" gutterBottom>
                         <strong>Logo Message:</strong> {data.logo_message || 'N/A'}
@@ -170,7 +167,7 @@ const GiftCardRequestInfo: React.FC<GiftCardRequestInfoProps> = ({ open, onClose
                 <Box mt={2} mb={2}>
                     <Typography variant="h6" gutterBottom>Additional Information</Typography>
                     <Typography><strong>Event Name:</strong> {data.event_name || 'N/A'}</Typography>
-                    <Typography><strong>Planted By:</strong> {data.planted_by || 'N/A'}</Typography>
+                    <Typography><strong>Gifted By:</strong> {data.planted_by || 'N/A'}</Typography>
                     <Typography><strong>Total No. of Cards Requested:</strong> {data.no_of_cards}</Typography>
                     <Typography>
                         <strong>Status:</strong> {getStatus(data.status)}

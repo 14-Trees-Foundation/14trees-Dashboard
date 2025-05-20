@@ -41,7 +41,7 @@ const GiftCardsForm: FC<GiftCardsFormProps> = ({ loading, setLoading, step, logg
     const [users, setUsers] = useState<any[]>([]);
     const [logo, setLogo] = useState<File | null>(null);
     const [logoString, setLogoString] = useState<string | null>(null);
-    const [messages, setMessages] = useState({ primaryMessage: "", secondaryMessage: "", eventName: "", eventType: undefined as string | undefined, plantedBy: "", logoMessage: "" });
+    const [messages, setMessages] = useState({ primaryMessage: "", eventName: "", eventType: undefined as string | undefined, plantedBy: "", logoMessage: "" });
     const [giftedOn, setGiftedOn] = useState(new Date().toISOString().slice(0, 10));
     const [presentationId, setPresentationId] = useState<string | null>(null)
     const [slideId, setSlideId] = useState<string | null>(null)
@@ -107,7 +107,6 @@ const GiftCardsForm: FC<GiftCardsFormProps> = ({ loading, setLoading, step, logg
             if (giftCardRequest.request_type) setGiftRequestType(giftCardRequest.request_type);
             setMessages({
                 primaryMessage: giftCardRequest.primary_message,
-                secondaryMessage: giftCardRequest.secondary_message,
                 eventName: giftCardRequest.event_name || '',
                 plantedBy: giftCardRequest.planted_by || '',
                 logoMessage: giftCardRequest.logo_message,
@@ -317,7 +316,7 @@ const GiftCardsForm: FC<GiftCardsFormProps> = ({ loading, setLoading, step, logg
         setFile(null);
         setUsers([]);
         setLogo(null);
-        setMessages({ primaryMessage: "", secondaryMessage: "", eventName: "", plantedBy: "", logoMessage: "", eventType: undefined });
+        setMessages({ primaryMessage: "", eventName: "", plantedBy: "", logoMessage: "", eventType: undefined });
         setPresentationId(null);
         setSlideId(null);
         setPayment(null);
@@ -342,7 +341,7 @@ const GiftCardsForm: FC<GiftCardsFormProps> = ({ loading, setLoading, step, logg
                 nextStep = 4;
                 break;
             case 4:
-                if (messages.primaryMessage === "" || messages.secondaryMessage === "") toast.error("Please provide gift card details");
+                if (messages.primaryMessage === "") toast.error("Please provide gift card details");
                 break;
             default:
                 break;

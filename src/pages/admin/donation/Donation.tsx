@@ -172,7 +172,16 @@ export const DonationComponent = () => {
     setSelectedDonation(null);
   }
 
-  const handleSendEmails = async (emailDonor: boolean, emailReceiver: boolean, emailAssignee: boolean, testMails: string[], ccMails: string[], templateType: string) => {
+  const handleSendEmails = async (
+    email_sponsor: boolean, 
+    email_recipient: boolean, 
+    email_assignee: boolean, 
+    test_mails: string[], 
+    sponsor_cc_mails: string[], 
+    recipient_cc_mails: string[], 
+    assignee_cc_mails: string[], 
+    event_type: string
+  ) => {
     if (!selectedDonation) {
       toast.error("Invalid input!");
       return;
@@ -180,8 +189,18 @@ export const DonationComponent = () => {
 
     try {
       const apiClient = new ApiClient();
-      await apiClient.sendAckEmailToDonor(selectedDonation.id, testMails, ccMails);
-      toast.success(`Successfully acknowledgement mail to donor!`);
+      await apiClient.sendEmailForDonation(
+        selectedDonation.id, 
+        test_mails, 
+        sponsor_cc_mails, 
+        recipient_cc_mails, 
+        assignee_cc_mails, 
+        event_type, 
+        email_sponsor, 
+        email_recipient, 
+        email_assignee
+      );
+      toast.success(`Successfully sent emails for donation id: ${selectedDonation.id}!`);
     } catch (error: any) {
       toast.error(error.message);
     }
@@ -523,10 +542,36 @@ export const DonationComponent = () => {
     {
       dataIndex: "contribution_options",
       key: "Contribution",
-      title: "Contribution",
+      title: "Additional Contribution",
       align: "center",
       width: 150,
+      render: (contributions) => {
+                if (!contributions) return '';
+        if (Array.isArray(contributions)) {
+          return contributions.join(', ');
+        }
+        return contributions;
+      },
       ...getColumnSelectedItemFilter({ dataIndex: 'contribution_options', filters, handleSetFilters, options: ['CSR', 'Planing Visit', 'Other'] }),
+    },
+    {
+      dataIndex: "status",
+      key: "status",
+      title: "Status",
+      align: "center",
+      width: 120,
+      render: (status) => {
+        // Format the status for display
+        switch(status) {
+          case 'UserSubmitted':
+            return 'Submitted';
+          case 'OrderFulfilled':
+            return 'Fulfilled';
+          default:
+            return 'Submitted'; // Default to UserSubmitted if not set
+        }
+      },
+      ...getColumnSelectedItemFilter({ dataIndex: 'status', filters, handleSetFilters, options: ['UserSubmitted', 'OrderFulfilled'] }),
     },
     {
       dataIndex: "created_at",
@@ -620,6 +665,8 @@ export const DonationComponent = () => {
         open={emailConfirmationModal}
         onClose={handleEmailModalClose}
         onSubmit={handleSendEmails}
+        donorMail={selectedDonation?.user_email}
+        donation_id={selectedDonation?.id?.toString() || ''}
       />
 
       <DonationInfo
@@ -642,8 +689,9 @@ export const DonationComponent = () => {
         onSubmit={handleTagDonationSubmit}
       />
 
-      {selectedDonation?.id && <AssignTrees
-        donationId={selectedDonation?.id}
+      {selectedDonation && <AssignTrees
+        donationId={selectedDonation.id}
+        donation={selectedDonation}
         open={assignTreesModalOpen}
         onClose={() => {
           setAssignTreesModalOpen(false);

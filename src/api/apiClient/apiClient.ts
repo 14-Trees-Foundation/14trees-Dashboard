@@ -1331,7 +1331,8 @@ class ApiClient {
 
     async reserveTreesForDonation(donation_id: number, tree_ids: number[], auto_reserve: boolean, plots: { plot_id: number, trees_count: number }[], diversify: boolean, book_all_habits: boolean = false) {
         try {
-            await this.api.post<void>('/donations/trees/reserve', { donation_id, tree_ids, auto_reserve, plots, diversify, book_all_habits });
+            const resp = await this.api.post<Donation>('/donations/trees/reserve', { donation_id, tree_ids, auto_reserve, plots, diversify, book_all_habits });
+            return resp.data;
         } catch (error: any) {
           if (error.response?.data?.message) {
             throw new Error(error.response.data.message);
@@ -1340,10 +1341,10 @@ class ApiClient {
         }
     }
 
-    async unreserveTreesForDonation(donation_id: number, tree_ids?: number[], unreserve_all: boolean = false): Promise<void> {
+    async unreserveTreesForDonation(donation_id: number, tree_ids?: number[], unreserve_all: boolean = false): Promise<Donation> {
         const url = `/donations/trees/unreserve`;
         try {
-            const response = await this.api.post(url, { donation_id, tree_ids, unreserve_all });
+            const response = await this.api.post<Donation>(url, { donation_id, tree_ids, unreserve_all });
             return response.data;
         } catch (error: any) {
             if (error.response?.data?.message) {
@@ -1364,7 +1365,18 @@ class ApiClient {
         }
     }
 
-    
+    async sendEmailForDonation(donation_id: number, test_mails: string[], sponsor_cc_mails: string[] = [], recipient_cc_mails: string[] = [], assignee_cc_mails: string[] = [], 
+    event_type: string = 'default', email_sponsor: boolean = true, email_recipient: boolean = false,  email_assignee: boolean = false ) {
+        try {
+            await this.api.post<void>(`/donations/emails/send`, { donation_id, test_mails, sponsor_cc_mails, recipient_cc_mails, assignee_cc_mails, event_type, email_sponsor, email_recipient, email_assignee });
+        } catch (error: any) {
+            if (error.response?.data?.message) {
+                throw new Error(error.response.data.message);
+            }
+            throw new Error('Failed to send email for donation');
+        }
+    }
+
     async updateDonationUser(data: any): Promise<any> {
         try {
             // Extract the donation ID
@@ -1470,10 +1482,10 @@ class ApiClient {
     }
 
 
-    async assignTreesToDonationUsers(donation_id: number, auto_assign: boolean, user_trees?: { du_id: number, tree_id: number }[]): Promise<boolean> {
+    async assignTreesToDonationUsers(donation_id: number, auto_assign: boolean, user_trees?: { du_id: number, tree_id: number }[]): Promise<Donation> {
         try {
-            const response = await this.api.post<void>(`/donations/trees/assign`, { donation_id, auto_assign, user_trees });
-            return response.status === 200;
+            const response = await this.api.post<Donation>(`/donations/trees/assign`, { donation_id, auto_assign, user_trees });
+            return response.data;
         } catch (error: any) {
             if (error.response?.data?.message) {
                 throw new Error(error.response.data.message);
@@ -1482,10 +1494,10 @@ class ApiClient {
         }
     }
 
-    async unassignDonationTrees(donation_id: number, unassign_all: boolean, tree_ids: number[]): Promise<boolean> {
+    async unassignDonationTrees(donation_id: number, unassign_all: boolean, tree_ids: number[]): Promise<Donation> {
         try {
-            const response = await this.api.post<void>(`/donations/trees/unassign`, { donation_id, unassign_all, tree_ids });
-            return response.status === 200;
+            const response = await this.api.post<Donation>(`/donations/trees/unassign`, { donation_id, unassign_all, tree_ids });
+            return response.data;
         } catch (error: any) {
             if (error.response?.data?.message) {
                 throw new Error(error.response.data.message);
@@ -1854,9 +1866,9 @@ class ApiClient {
         }
     }
 
-    async generateCardTemplate(request_id: string, primary_message: string, secondary_message: string, logo_message: string, logo?: string | null, sapling_id?: string | null, user_name?: string | null, plant_type?: string | null, is_personal?: boolean): Promise<{ presentation_id: string, slide_id: string }> {
+    async generateCardTemplate(request_id: string, primary_message: string, logo_message: string, logo?: string | null, sapling_id?: string | null, user_name?: string | null, gifted_by?: string |null, plant_type?: string | null, is_personal?: boolean): Promise<{ presentation_id: string, slide_id: string }> {
         try {
-            const resp = await this.api.post<any>(`/gift-cards/generate-template`, { request_id, primary_message, secondary_message, logo_message, logo, sapling_id, plant_type, user_name, is_personal });
+            const resp = await this.api.post<any>(`/gift-cards/generate-template`, { request_id, primary_message, logo_message, logo, sapling_id, plant_type, user_name, gifted_by, is_personal });
             return resp.data;
         } catch (error: any) {
             if (error.response) {
@@ -1866,9 +1878,9 @@ class ApiClient {
         }
     }
 
-    async updateGiftCardTemplate(slide_id: string, primary_message: string, secondary_message: string, logo_message: string, logo?: string | null, sapling_id?: string | null, user_name?: string | null, trees_count?: number): Promise<void> {
+    async updateGiftCardTemplate(slide_id: string, primary_message: string, logo_message: string, logo?: string | null, sapling_id?: string | null, user_name?: string | null, gifted_by?: string |null, trees_count?: number): Promise<void> {
         try {
-            await this.api.post<any>(`/gift-cards/update-template`, { slide_id, primary_message, secondary_message, logo_message, logo, sapling_id, user_name, trees_count });
+            await this.api.post<any>(`/gift-cards/update-template`, { slide_id, primary_message, logo_message, logo, sapling_id, user_name, gifted_by, trees_count });
         } catch (error: any) {
             if (error.response) {
                 throw new Error(error.response.data.message);
