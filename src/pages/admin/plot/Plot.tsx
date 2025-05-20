@@ -97,17 +97,10 @@ export const PlotComponent = () => {
 
   const [orderBy, setOrderBy] = useState<{ column: string, order: 'ASC' | 'DESC' }[]>([]);
 
-  const handleSetFilters = (newFilters: Record<string, GridFilterItem>) => {
+  const handleSetFilters = (filters: Record<string, GridFilterItem>) => {
     setPage(0);
-    if (Object.keys(newFilters).length === 0) {
-      setFilters({});
-      return;
-    }
-    setFilters(prev => ({
-      ...prev,
-      ...newFilters
-    }));
-  };
+    setFilters(filters);
+  }
 
   const plotsData = useAppSelector((state: RootState) => state.plotsData);
 
@@ -136,14 +129,26 @@ export const PlotComponent = () => {
 
   const getPlotData = async () => {
     setLoading(true);
-    // Convert filters to array of GridFilterItem
-    const filtersData = Object.entries(filters).map(([field, filter]) => ({
-      ...filter,
-      columnField: field 
-    }));
-  
+    let filtersData = JSON.parse(JSON.stringify(Object.values(filters))) as GridFilterItem[];
+
+    const accessibilityIdx = filtersData.findIndex(item => item.columnField === 'accessibility_status');
+    if (accessibilityIdx > -1) {
+      filtersData[accessibilityIdx].value = filtersData[accessibilityIdx].value.map((item: string) => {
+        switch (item) {
+          case "Accessible":
+            return "accessible";
+          case "Inaccessible":
+            return "inaccessible";
+          case "Moderately Accessible":
+            return "moderately_accessible";
+          default:
+            return null;
+        }
+      })
+    }
+
     getPlots(page * pageSize, pageSize, filtersData, orderBy);
-    setTimeout(() => {
+    setTimeout(async () => {
       setLoading(false);
     }, 1000);
   };
@@ -274,11 +279,8 @@ export const PlotComponent = () => {
       title: "Accessibility",
       align: "center",
       width: 200,
-      render: (value) => {
-        const status = accessibilityList.find(item => item.value === value);
-        return status ? status.label : "Unknown";
-      },
-      ...getColumnSelectedItemFilter({ dataIndex: 'accessibility_status', filters, handleSetFilters, options: accessibilityList.map(item => item.value)})
+      render: (value) => value ? accessibilityList.find((item) => item.value === value)?.label : "Unknown",
+      ...getColumnSelectedItemFilter({ dataIndex: 'accessibility_status', filters, handleSetFilters, options: accessibilityList.map((item) => item.label).concat("Unknown") })
     },
     {
       dataIndex: "gat",
