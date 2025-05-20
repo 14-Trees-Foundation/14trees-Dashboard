@@ -97,25 +97,28 @@ export const searchGroupsDataReducer = (state = { loading: false, totalGroups: 0
         case groupActionTypes.SEARCH_GROUPS_SUCCEEDED:
             if (action.payload) {
                 let groupsDataState: GroupsDataState = {
-                    loading: false,
+                    loading: state.loading,
                     totalGroups: state.totalGroups,
                     groups: { ...state.groups },
                     paginationMapping: { ...state.paginationMapping }
                 };
-                let payload = action.payload as Group[];
-                
-                // Reset state for new search results
-                groupsDataState.groups = {};
-                groupsDataState.paginationMapping = {};
-                
-                for (let i = 0; i < payload.length; i++) {
-                    if (payload[i]?.id) {
-                        payload[i].key = payload[i].id
-                        groupsDataState.groups[payload[i].id] = payload[i]
-                        groupsDataState.paginationMapping[i] = payload[i].id
+                let payload = action.payload as PaginatedResponse<Group>;
+                const offset = payload.offset;
+
+                if (payload.offset === 0) {
+                    groupsDataState.groups = {}
+                    groupsDataState.paginationMapping = {}
+                }
+
+                let groups = payload.results;
+                for (let i = 0; i < groups.length; i++) {
+                    if (groups[i]?.id) {
+                        groups[i].key = groups[i].id
+                        groupsDataState.groups[groups[i].id] = groups[i]
+                        groupsDataState.paginationMapping[offset + i] = groups[i].id
                     }
                 }
-                return groupsDataState;
+                return { ...groupsDataState, loading: false, totalGroups: payload.total };
             }
             return state;
         default:
