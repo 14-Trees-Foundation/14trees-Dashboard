@@ -98,15 +98,10 @@ export const PlotComponent = () => {
   const [orderBy, setOrderBy] = useState<{ column: string, order: 'ASC' | 'DESC' }[]>([]);
 
   const handleSetFilters = (newFilters: Record<string, GridFilterItem>) => {
+    console.log('New Filters:', newFilters);
+    console.log('Current Filters:', filters);
     setPage(0);
-    if (Object.keys(newFilters).length === 0) {
-      setFilters({});
-      return;
-    }
-    setFilters(prev => ({
-      ...prev,
-      ...newFilters
-    }));
+    setFilters(newFilters);
   };
 
   const plotsData = useAppSelector((state: RootState) => state.plotsData);
@@ -218,7 +213,7 @@ export const PlotComponent = () => {
     )
   }
 
-  const [columns, setColumns] = useState<TableColumnsType<Plot>>([
+  const columns: TableColumnsType<Plot> = [
     {
       dataIndex: "action",
       key: "action",
@@ -387,82 +382,7 @@ export const PlotComponent = () => {
       align: "right",
       width: 150,
     },
-  ]);
-
-  useEffect(() => {
-
-    const getColumnClass = () => {
-      if (treeHabit === 'trees') return 'bg-green';
-      if (treeHabit === 'shrubs') return 'bg-cyan';
-      if (treeHabit === 'herbs') return 'bg-yellow';
-
-      return 'bg-orange'
-    }
-
-    setColumns(prev => {
-      return prev.map((column: any) => {
-        if (column.dataIndex.startsWith("booked")) {
-          return {
-            ...column,
-            dataIndex: getColumn("booked", treeHabit),
-            title: getSortableHeader("Booked Trees", getColumn("booked", treeHabit)),
-            className: getColumnClass(),
-          }
-        } else if (column.dataIndex.startsWith("assigned")) {
-          return {
-            ...column,
-            dataIndex: getColumn("assigned", treeHabit),
-            title: getSortableHeader("Assigned Trees", getColumn("assigned", treeHabit)),
-            className: getColumnClass(),
-          }
-        } else if (column.dataIndex.startsWith("unbooked_assigned")) {
-          return {
-            ...column,
-            dataIndex: getColumn("unbooked_assigned", treeHabit),
-            title: getSortableHeader("Unfunded Inventory (Assigned)", getColumn("unbooked_assigned", treeHabit)),
-            className: getColumnClass(),
-          }
-        } else if (column.dataIndex.startsWith("available")) {
-          return {
-            ...column,
-            dataIndex: getColumn("available", treeHabit),
-            title: getSortableHeader("Unfunded Inventory (Unassigned)", getColumn("available", treeHabit)),
-            className: getColumnClass(),
-          }
-        } else if (column.dataIndex.startsWith("card_available")) {
-          return {
-            ...column,
-            dataIndex: getColumn("card_available", treeHabit),
-            title: getSortableHeader("Giftable Inventory", getColumn("card_available", treeHabit)),
-            className: getColumnClass(),
-          }
-        } else if (column.dataIndex === "total") {
-          return {
-            ...column,
-            className: treeHabit === '' ? 'bg-orange' : undefined,
-          }
-        } else if (column.dataIndex === "tree_count") {
-          return {
-            ...column,
-            className: treeHabit === 'trees' ? 'bg-green' : undefined,
-          }
-        } else if (column.dataIndex === "shrub_count") {
-          return {
-            ...column,
-            className: treeHabit === 'shrubs' ? 'bg-cyan' : undefined,
-          }
-        } else if (column.dataIndex === "herb_count") {
-          return {
-            ...column,
-            className: treeHabit === 'herbs' ? 'bg-yellow' : undefined,
-          }
-        }
-
-        return column;
-      })
-    })
-
-  }, [treeHabit, orderBy])
+  ];
 
   const handleSelectionChanges = (plotIds: number[]) => {
     setSelectedPlotIds(plotIds);
