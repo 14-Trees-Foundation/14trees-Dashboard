@@ -10,6 +10,8 @@ import { Donation, DonationTree, DonationUser } from "../../../../../types/donat
 import { toast } from "react-toastify";
 import AssignmentList from "./AssignmentList";
 import AssignedTrees from "./AssignedTrees";
+import { useDispatch } from "react-redux";
+import donationActionTypes from "../../../../../redux/actionTypes/donationActionTypes";
 
 
 interface AssignTreesProps {
@@ -203,6 +205,8 @@ const DonationUsersList = ({ donationId, open, setUsersCount, onClose, onSubmit,
 
 const AssignTrees: React.FC<AssignTreesProps> = ({ donationId, donation, open, onClose }) => {
 
+    const dispatch = useDispatch();
+
     // Get the trees for the donation, facilitate loading, filters, pagination, etc.
     const [indexToTreeMap, setIndexToTreeMap] = useState<Record<number, DonationTree>>({});
     const [treesList, setTreesList] = useState<DonationTree[]>([]);
@@ -308,7 +312,7 @@ const AssignTrees: React.FC<AssignTreesProps> = ({ donationId, donation, open, o
                 recipient_name: donation.user_name,
                 assignee_email: donation.user_email,
                 assignee_name: donation.user_name,
-                trees_count: donation.trees_count  || 0,
+                trees_count: donation.trees_count || 0,
                 profile_image_url: null
             })
         } catch (error: any) {
@@ -326,7 +330,11 @@ const AssignTrees: React.FC<AssignTreesProps> = ({ donationId, donation, open, o
 
             if (autoAssign) {
                 // Auto-assign all trees
-                await apiClient.assignTreesToDonationUsers(donationId, true, []);
+                const updatedDonation = await apiClient.assignTreesToDonationUsers(donationId, true, []);
+                dispatch({
+                    type: donationActionTypes.UPDATE_DONATION_SUCCEEDED,
+                    payload: updatedDonation,
+                });
                 toast.success('Trees automatically assigned successfully');
             } else {
                 // Manual assignment with the assignment map
@@ -335,7 +343,11 @@ const AssignTrees: React.FC<AssignTreesProps> = ({ donationId, donation, open, o
                     tree_id: item.tree_id
                 }));
 
-                await apiClient.assignTreesToDonationUsers(donationId, false, userTrees);
+                const updatedDonation = await apiClient.assignTreesToDonationUsers(donationId, false, userTrees);
+                dispatch({
+                    type: donationActionTypes.UPDATE_DONATION_SUCCEEDED,
+                    payload: updatedDonation,
+                });
                 toast.success('Trees assigned successfully');
             }
 

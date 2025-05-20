@@ -1331,7 +1331,8 @@ class ApiClient {
 
     async reserveTreesForDonation(donation_id: number, tree_ids: number[], auto_reserve: boolean, plots: { plot_id: number, trees_count: number }[], diversify: boolean, book_all_habits: boolean = false) {
         try {
-            await this.api.post<void>('/donations/trees/reserve', { donation_id, tree_ids, auto_reserve, plots, diversify, book_all_habits });
+            const resp = await this.api.post<Donation>('/donations/trees/reserve', { donation_id, tree_ids, auto_reserve, plots, diversify, book_all_habits });
+            return resp.data;
         } catch (error: any) {
           if (error.response?.data?.message) {
             throw new Error(error.response.data.message);
@@ -1340,10 +1341,10 @@ class ApiClient {
         }
     }
 
-    async unreserveTreesForDonation(donation_id: number, tree_ids?: number[], unreserve_all: boolean = false): Promise<void> {
+    async unreserveTreesForDonation(donation_id: number, tree_ids?: number[], unreserve_all: boolean = false): Promise<Donation> {
         const url = `/donations/trees/unreserve`;
         try {
-            const response = await this.api.post(url, { donation_id, tree_ids, unreserve_all });
+            const response = await this.api.post<Donation>(url, { donation_id, tree_ids, unreserve_all });
             return response.data;
         } catch (error: any) {
             if (error.response?.data?.message) {
@@ -1481,10 +1482,10 @@ class ApiClient {
     }
 
 
-    async assignTreesToDonationUsers(donation_id: number, auto_assign: boolean, user_trees?: { du_id: number, tree_id: number }[]): Promise<boolean> {
+    async assignTreesToDonationUsers(donation_id: number, auto_assign: boolean, user_trees?: { du_id: number, tree_id: number }[]): Promise<Donation> {
         try {
-            const response = await this.api.post<void>(`/donations/trees/assign`, { donation_id, auto_assign, user_trees });
-            return response.status === 200;
+            const response = await this.api.post<Donation>(`/donations/trees/assign`, { donation_id, auto_assign, user_trees });
+            return response.data;
         } catch (error: any) {
             if (error.response?.data?.message) {
                 throw new Error(error.response.data.message);
@@ -1493,10 +1494,10 @@ class ApiClient {
         }
     }
 
-    async unassignDonationTrees(donation_id: number, unassign_all: boolean, tree_ids: number[]): Promise<boolean> {
+    async unassignDonationTrees(donation_id: number, unassign_all: boolean, tree_ids: number[]): Promise<Donation> {
         try {
-            const response = await this.api.post<void>(`/donations/trees/unassign`, { donation_id, unassign_all, tree_ids });
-            return response.status === 200;
+            const response = await this.api.post<Donation>(`/donations/trees/unassign`, { donation_id, unassign_all, tree_ids });
+            return response.data;
         } catch (error: any) {
             if (error.response?.data?.message) {
                 throw new Error(error.response.data.message);

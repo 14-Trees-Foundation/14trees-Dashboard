@@ -3,12 +3,13 @@ import { PlotsDataState, Plot } from "../../types/plot";
 import plotActionTypes from "../actionTypes/plotActionTypes";
 import { PaginatedResponse } from "../../types/pagination";
 
-export const plotsDataReducer = (state = { totalPlots:0, plots: {}, paginationMapping: {} }, action: UnknownAction ): PlotsDataState => {
+export const plotsDataReducer = (state = { loading: false, totalPlots:0, plots: {}, paginationMapping: {} }, action: UnknownAction ): PlotsDataState => {
     switch (action.type) {
         case plotActionTypes.GET_PLOTS_SUCCEEDED:
             if (action.payload) {
 
                 let plotsDataState: PlotsDataState = { 
+                    loading: state.loading,
                     totalPlots: state.totalPlots, 
                     plots: { ...state.plots }, 
                     paginationMapping: { ...state.paginationMapping }
@@ -29,12 +30,17 @@ export const plotsDataReducer = (state = { totalPlots:0, plots: {}, paginationMa
                         plotsDataState.paginationMapping[offset + i] = plots[i].id
                     }
                 }
-                return {...plotsDataState, totalPlots: payload.total};
+                return {...plotsDataState, loading: false, totalPlots: payload.total};
             }
             return state;
+        case plotActionTypes.GET_PLOTS_REQUESTED:
+            return { ...state, loading: true };
+        case plotActionTypes.GET_PLOTS_FAILED:
+            return { ...state, loading: false };
         case plotActionTypes.CREATE_PLOT_SUCCEEDED:
             if (action.payload) {
-                const nextState: PlotsDataState = { 
+                const nextState: PlotsDataState = {
+                    loading: state.loading, 
                     totalPlots: state.totalPlots, 
                     plots: { ...state.plots },
                     paginationMapping: { ...state.paginationMapping }
@@ -49,7 +55,8 @@ export const plotsDataReducer = (state = { totalPlots:0, plots: {}, paginationMa
             return state;
         case plotActionTypes.UPDATE_PLOT_SUCCEEDED:
             if (action.payload) {
-                const nextState: PlotsDataState = { 
+                const nextState: PlotsDataState = {
+                    loading: state.loading,  
                     totalPlots: state.totalPlots, 
                     plots: { ...state.plots },
                     paginationMapping: { ...state.paginationMapping }
@@ -64,6 +71,7 @@ export const plotsDataReducer = (state = { totalPlots:0, plots: {}, paginationMa
         case plotActionTypes.DELETE_PLOT_SUCCEEDED:
             if (action.payload) {
                 const nextState: PlotsDataState = { 
+                    loading: state.loading, 
                     totalPlots: state.totalPlots, 
                     plots: { ...state.plots },
                     paginationMapping: { ...state.paginationMapping }
@@ -80,11 +88,12 @@ export const plotsDataReducer = (state = { totalPlots:0, plots: {}, paginationMa
     }
 };
 
-export const searchPlotsDataReducer = (state = { totalPlots:0, plots: {}, paginationMapping: {} }, action: UnknownAction ): PlotsDataState => {
+export const searchPlotsDataReducer = (state = { loading: false, totalPlots:0, plots: {}, paginationMapping: {} }, action: UnknownAction ): PlotsDataState => {
     switch(action.type) {
         case plotActionTypes.SEARCH_PLOTS_SUCCEEDED:
             if (action.payload) {
                 let plotsDataState: PlotsDataState = { 
+                    loading: state.loading, 
                     totalPlots: state.totalPlots, 
                     plots: { ...state.plots },
                     paginationMapping: { ...state.paginationMapping }
