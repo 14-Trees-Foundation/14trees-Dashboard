@@ -509,11 +509,8 @@ const AssignTrees: React.FC<AssignTreesProps> = ({ donationId, donation, open, o
 
                 <Dialog open={assignSponsor}>
                     <DialogContent dividers>
-                        <Typography variant='h6'>
-                            Warning:
-                        </Typography>
                         <Typography variant='body1'>
-                            You haven't provided recipient details for assigning trees. All the reserved trees will be assigned to sponsor.
+                            Since recipient details are not provided, All the reserved trees will be assigned to sponsor.
                         </Typography>
                     </DialogContent>
                     <DialogActions>

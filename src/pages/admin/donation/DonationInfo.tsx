@@ -150,14 +150,14 @@ const DonationTrees: React.FC<DonationTreesProps> = ({ donationId }) => {
       width: 250,
       ...getColumnSearchProps('scientific_name', filters, handleSetFilters)
     },
-    {
-      dataIndex: "recipient_name",
-      key: "Recipient",
-      title: "Recipient",
-      align: "center",
-      width: 200,
-      ...getColumnSearchProps('recipient_name', filters, handleSetFilters)
-    },
+    // {
+    //   dataIndex: "recipient_name",
+    //   key: "Recipient",
+    //   title: "Recipient",
+    //   align: "center",
+    //   width: 200,
+    //   ...getColumnSearchProps('recipient_name', filters, handleSetFilters)
+    // },
     {
       dataIndex: "assignee_name",
       key: "Assignee",
@@ -172,26 +172,23 @@ const DonationTrees: React.FC<DonationTreesProps> = ({ donationId }) => {
       title: "Dashboard Link",
       align: "center",
       width: 200,
-      render: (saplingId: string) => (
+      render: (saplingId: string, record: any) => (
         <a 
           href={`/profile/${saplingId}`} 
           target="_blank"  
           rel="noopener noreferrer" 
-          style={{ textDecoration: 'none' }}
+          style={{ textDecoration: 'none', pointerEvents: !record.assignee_name ? 'none' : undefined }}
         >
           <Button 
-            variant="contained"
-            color="primary"
+            variant="outlined"
+            color="success"
             size="small"
+            disabled={!record.assignee_name}
             sx={{
               textTransform: 'none',
-              backgroundColor: '#2e7d32',
-              '&:hover': {
-                backgroundColor: '#1b5e20',
-              }
             }}
           >
-            View Dashboard
+            Dashboard
           </Button>
         </a>
       )
@@ -255,14 +252,14 @@ const DonationInfo: React.FC<DonationInfoProps> = ({ open, onClose, data }) => {
     {
       dataIndex: "recipient_name",
       key: "recipient",
-      title: "Recipient",
+      title: "Assignee",
       align: "center",
       width: 200,
     },
     {
       dataIndex: "recipient_email",
       key: "recipient_email",
-      title: "Recipient Email",
+      title: "Assignee Email",
       align: "center",
       width: 250,
     },
@@ -300,7 +297,7 @@ const DonationInfo: React.FC<DonationInfoProps> = ({ open, onClose, data }) => {
   });
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="lg" fullWidth>
+    <Dialog open={open} onClose={onClose} maxWidth="xl" fullWidth>
       <DialogTitle sx={{ bgcolor: '#2e7d32', color: 'white', display: 'flex', alignItems: 'center', gap: 1 }}>
         <InfoOutlined /> Donation Summary
       </DialogTitle>

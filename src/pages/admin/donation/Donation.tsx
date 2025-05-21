@@ -609,7 +609,7 @@ export const DonationComponent = () => {
         }}
       >
         <Typography variant="h4" style={{ marginTop: '5px' }}>Donations</Typography>
-        <div
+        {/* <div
           style={{
             display: "flex",
             justifyContent: "flex-end",
@@ -619,7 +619,7 @@ export const DonationComponent = () => {
           <Button variant="contained" color="success" onClick={() => { handleModalOpen() }}>
             Donate
           </Button>
-        </div>
+        </div> */}
       </div>
       <Divider sx={{ backgroundColor: "black", marginBottom: '15px' }} />
 

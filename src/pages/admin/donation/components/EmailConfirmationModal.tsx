@@ -103,7 +103,7 @@ const EmailConfirmationModal: React.FC<EmailConfirmationModalProps> = ({ donorMa
                     email_recipient,
                     email_assignee
                 );
-                toast.success('Test email sent successfully!');
+                toast.success('Test emails initiated!');
                 resetState(); // Reset state after sending test email
             } catch (error) {
                 toast.error('Failed to send test email.');
@@ -128,13 +128,7 @@ const EmailConfirmationModal: React.FC<EmailConfirmationModalProps> = ({ donorMa
                 email_recipient,
                 email_assignee
             );
-            toast.success(
-                <div>
-                    Emails sent successfully!<br />
-                    You can check the View Summary section to see the status of recipient & sponsor emails.
-                </div>,
-                { autoClose: 5000 }
-            );
+            toast.success("Processor for sending email has started. You can check email status for individual in view summary after some time!");
             resetState();
             onClose(); // Close modal only on successful confirmation
         } catch (error) {

@@ -68,7 +68,7 @@ export const DirectEditDonationForm: React.FC<DirectEditDonationFormProps> = ({
 }) => {
   const [formData, setFormData] = useState<Donation | null>(null);
   const [loading, setLoading] = useState(false);
-  const [tabValue, setTabValue] = useState(0);
+  const [tabValue, setTabValue] = useState(1);
   const [isRecipientsModalOpen, setIsRecipientsModalOpen] = useState(false);
   const [isAddRecipientModalOpen, setIsAddRecipientModalOpen] = useState(false);
   const [recipientsRefreshCounter, setRecipientsRefreshCounter] = useState(0);
@@ -447,14 +447,14 @@ export const DirectEditDonationForm: React.FC<DirectEditDonationFormProps> = ({
         <Button onClick={handleClose} color="error" variant="outlined">
           Cancel
         </Button>
-        <Button 
+        {tabValue === 0 && <Button
           onClick={handleSubmit} 
           color="success" 
           variant="contained"
           disabled={loading}
         >
           {loading ? "Updating..." : "Update Donation"}
-        </Button>
+        </Button>}
       </DialogActions>
 
       {formData && formData.id && (

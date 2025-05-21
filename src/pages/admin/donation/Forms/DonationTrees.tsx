@@ -69,7 +69,7 @@ const DonationTrees: FC<DonationTreesProps> = ({ open, onClose, donation }) => {
   const [page, setPage] = useState(0);
   const [pageSize, setPageSize] = useState(10);
   const [filters, setFilters] = useState<Record<string, GridFilterItem>>({});
-  const [orderBy, setOrderBy] = useState<Order[]>([]);
+  const [orderBy, setOrderBy] = useState<Order[]>([{ column: 'available_trees', order: 'DESC' }]);
   const [selectedPlots, setSelectedPlots] = useState<SelectedPlot[]>([]);
   const [selectedPlotIds, setSelectedPlotIds] = useState<number[]>([]);
   const [tableRows, setTableRows] = useState<Plot[]>([]);
@@ -208,6 +208,7 @@ const DonationTrees: FC<DonationTreesProps> = ({ open, onClose, donation }) => {
           if (record) records.push(record);
         } else {
           fetchPlots();
+          break;
         }
       }
 
