@@ -65,6 +65,10 @@ const EventPage: React.FC = () => {
         }
     }, [linkId])
 
+    useEffect(() => {
+        if (event?.name) document.title = event.name;
+    }, [event]);
+
     const onClickNav = (value: any) => {
         setIndex(value);
     };
