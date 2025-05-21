@@ -195,18 +195,26 @@ const DonationTrees: FC<DonationTreesProps> = ({ open, onClose, donation }) => {
 
   // Update table rows when data changes
   useEffect(() => {
-    const records: Plot[] = [];
-    const maxLength = Math.min((page + 1) * pageSize, plotsData.totalPlots);
+    const handler = setTimeout(() => {
+      if (plotsData.loading) return;
 
-    for (let i = page * pageSize; i < maxLength; i++) {
-      if (Object.hasOwn(plotsData.paginationMapping, i)) {
-        const id = plotsData.paginationMapping[i];
-        const record = plotsData.plots[id];
-        if (record) records.push(record);
+      const records: Plot[] = [];
+      const maxLength = Math.min((page + 1) * pageSize, plotsData.totalPlots);
+
+      for (let i = page * pageSize; i < maxLength; i++) {
+        if (Object.hasOwn(plotsData.paginationMapping, i)) {
+          const id = plotsData.paginationMapping[i];
+          const record = plotsData.plots[id];
+          if (record) records.push(record);
+        } else {
+          fetchPlots();
+        }
       }
-    }
 
-    setTableRows(records);
+      setTableRows(records);
+    }, 300);
+
+    return () => { clearTimeout(handler) }
   }, [pageSize, page, plotsData]);
 
   // Handle plot selection
@@ -308,11 +316,6 @@ const DonationTrees: FC<DonationTreesProps> = ({ open, onClose, donation }) => {
     setPage(newPage - 1);
     setPageSize(newPageSize);
   };
-  useEffect(() => {
-    if (open && tabValue === 0) {
-      fetchPlots();
-    }
-  }, [open, tabValue, filters, orderBy, page, pageSize]);
 
   const handleTreePaginationChange = (newPage: number, newPageSize: number) => {
     setTreePage(newPage - 1);
