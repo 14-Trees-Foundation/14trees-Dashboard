@@ -9,6 +9,9 @@ const defaultMessages = {
     primary: prefixMessage + 'We are immensely delighted to share that a tree has been planted in your name at the 14 Trees Foundation, Pune. This tree will be nurtured in your honour, rejuvenating ecosystems, supporting biodiversity, and helping offset the harmful effects of climate change.' + "\n\n" + secondaryMessage,
     birthday: prefixMessage + 'We are immensely delighted to share that a tree has been planted in your name on the occasion of your birthday by {giftedBy} at the 14 Trees Foundation, Pune. This tree will be nurtured in your honour, helping offset the harmful effects of climate change.' + "\n\n" + secondaryMessage,
     memorial: prefixMessage + 'A tree has been planted in the memory of <name here> at the 14 Trees Foundation reforestation site. For many years, this tree will help rejuvenate local ecosystems, support local biodiversity and offset the harmful effects of climate change and global warming.' + "\n\n" + secondaryMessage,
+    wedding: prefixMessage + 'We are delighted to share that a tree has been planted in your name to celebrate your special union by {giftedBy} at the 14 Trees Foundation, Pune. This tree will be nurtured in your honour, helping offset the harmful effects of climate change.' + "\n\n" + secondaryMessage,
+    anniversary: prefixMessage + 'We are delighted to share that a tree has been planted in your name to celebrate your Wedding Anniversary by {giftedBy} at the 14 Trees Foundation, Pune. This tree will be nurtured in your honour, helping offset the harmful effects of climate change.' + "\n\n" + secondaryMessage,
+    festival: prefixMessage + 'We are delighted to share that a tree has been planted in your name to celebrate this joyous occasion by {giftedBy} at the 14 Trees Foundation, Pune. This tree will be nurtured in your honour, helping offset the harmful effects of climate change.' + "\n\n" + secondaryMessage,
     logo: 'Gifted by 14 Trees in partnership with'
 }
 
@@ -109,9 +112,9 @@ const CardDetails: FC<CardDetailsProps> = ({ logo_url, request_id, presentationI
     }, [userName, saplingId, plantType, treesCount, messages])
 
     useEffect(() => {
-        const eventMessage = messages.eventType === "2" ? defaultMessages.memorial : messages.eventType === "1" ? defaultMessages.birthday : defaultMessages.primary;
+        const eventMessage = messages.eventType === "2" ? defaultMessages.memorial : messages.eventType === "1" ? defaultMessages.birthday : messages.eventType === "4" ? defaultMessages.wedding : messages.eventType === "5" ? defaultMessages.anniversary : messages.eventType === "6" ? defaultMessages.festival : defaultMessages.primary;
         if (messages.primaryMessage === "" || messages.logoMessage === ""
-            || ((messages.primaryMessage === defaultMessages.primary || messages.primaryMessage === defaultMessages.birthday || messages.primaryMessage === defaultMessages.memorial) && messages.primaryMessage !== eventMessage)) {
+            || ((messages.primaryMessage === defaultMessages.primary || messages.primaryMessage === defaultMessages.birthday || messages.primaryMessage === defaultMessages.memorial || messages.primaryMessage === defaultMessages.wedding || messages.primaryMessage === defaultMessages.anniversary || messages.primaryMessage === defaultMessages.festival) && messages.primaryMessage !== eventMessage)) {
             onChange({
                 ...messages,
                 primaryMessage: eventMessage,
