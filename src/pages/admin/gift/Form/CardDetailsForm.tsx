@@ -220,7 +220,8 @@ const CardDetails: FC<CardDetailsProps> = ({ logo_url, request_id, presentationI
                         width={isMobile ? '100%' : '800'}
                         height={isMobile ? '400' : '600'}
                         allowFullScreen
-                        style={{ border: "none" }}
+                        style={{ border: "none", pointerEvents: "none" }}
+                        sandbox="allow-scripts allow-same-origin"
                     ></iframe>
                 )}
             </Box>
