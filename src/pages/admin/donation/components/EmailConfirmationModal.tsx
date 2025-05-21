@@ -34,6 +34,8 @@ const EmailConfirmationModal: React.FC<EmailConfirmationModalProps> = ({ donorMa
     const [email_recipient, setEmailRecipient] = useState(true);
     const [email_assignee, setEmailAssignee] = useState(false);
     const [isTestEmailValid, setIsTestEmailValid] = useState(false);
+    const [isTestLoading, setIsTestLoading] = useState(false);
+    const [isConfirmLoading, setIsConfirmLoading] = useState(false);
 
     useEffect(() => {
         if (open && donorMail) {
@@ -70,6 +72,8 @@ const EmailConfirmationModal: React.FC<EmailConfirmationModalProps> = ({ donorMa
         setEmailRecipient(true);
         setEmailAssignee(false);
         setIsTestEmailValid(false);
+        setIsTestLoading(false);
+        setIsConfirmLoading(false);
     };
 
     const handleClose = () => {
@@ -85,11 +89,12 @@ const EmailConfirmationModal: React.FC<EmailConfirmationModalProps> = ({ donorMa
 
     const handleTestEmail = async () => {
         if (test_mails.length > 0) {
+            setIsTestLoading(true);
             try {
                 const apiClient = new ApiClient();
                 await apiClient.sendEmailForDonation(
-                    parseInt(donation_id), // Convert string to number
-                    test_mails, // Test emails
+                    parseInt(donation_id),
+                    test_mails,
                     sponsor_cc_mails,
                     recipient_cc_mails,
                     assignee_cc_mails,
@@ -102,28 +107,40 @@ const EmailConfirmationModal: React.FC<EmailConfirmationModalProps> = ({ donorMa
                 resetState(); // Reset state after sending test email
             } catch (error) {
                 toast.error('Failed to send test email.');
+            } finally {
+                setIsTestLoading(false);
             }
         }
     };
 
     const handleSendMails = async () => {
+        setIsConfirmLoading(true);
         try {
             const apiClient = new ApiClient();
             await apiClient.sendEmailForDonation(
-                parseInt(donation_id), // Convert string to number
+                parseInt(donation_id),
                 [],
                 sponsor_cc_mails,
                 recipient_cc_mails,
                 assignee_cc_mails,
-                'default', // Event type
+                'default',
                 email_sponsor,
                 email_recipient,
                 email_assignee
             );
-            toast.success('Emails sent successfully!');
-            resetState(); // Reset state after sending emails
+            toast.success(
+                <div>
+                    Emails sent successfully!<br />
+                    You can check the View Summary section to see the status of recipient & sponsor emails.
+                </div>,
+                { autoClose: 5000 }
+            );
+            resetState();
+            onClose(); // Close modal only on successful confirmation
         } catch (error) {
-            toast.error('Failed to send emails.');
+            toast.error('Failed to send emails. Please try again.');
+        } finally {
+            setIsConfirmLoading(false);
         }
     };
 
@@ -292,21 +309,26 @@ const EmailConfirmationModal: React.FC<EmailConfirmationModalProps> = ({ donorMa
                         variant="contained" 
                         color="success" 
                         onClick={handleTestEmail}
-                        disabled={test_mails.length === 0}
+                        disabled={test_mails.length === 0 || isTestLoading}
                         sx={{ ml: 2 }}
                         startIcon={<EmailOutlined />}
                     >
-                        Test
+                        {isTestLoading ? 'Sending...' : 'Test'}
                     </Button>
                 </Box>
             </DialogContent>
 
             <DialogActions>
-                <Button onClick={handleClose} color="error">
+                <Button onClick={handleClose} color="error" disabled={isConfirmLoading}>
                     Cancel
                 </Button>
-                <Button onClick={handleSendMails} color="success" variant="contained">
-                    Confirm
+                <Button 
+                    onClick={handleSendMails} 
+                    color="success" 
+                    variant="contained"
+                    disabled={isConfirmLoading}
+                >
+                    {isConfirmLoading ? 'Sending...' : 'Confirm'}
                 </Button>
             </DialogActions>
         </Dialog>

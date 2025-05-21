@@ -308,6 +308,11 @@ const DonationTrees: FC<DonationTreesProps> = ({ open, onClose, donation }) => {
     setPage(newPage - 1);
     setPageSize(newPageSize);
   };
+  useEffect(() => {
+    if (open && tabValue === 0) {
+      fetchPlots();
+    }
+  }, [open, tabValue, filters, orderBy, page, pageSize]);
 
   const handleTreePaginationChange = (newPage: number, newPageSize: number) => {
     setTreePage(newPage - 1);

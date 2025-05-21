@@ -166,6 +166,36 @@ const DonationTrees: React.FC<DonationTreesProps> = ({ donationId }) => {
       width: 200,
       ...getColumnSearchProps('assignee_name', filters, handleSetFilters)
     },
+    {
+      dataIndex: "sapling_id",
+      key: "dashboard_link",
+      title: "Dashboard Link",
+      align: "center",
+      width: 200,
+      render: (saplingId: string) => (
+        <a 
+          href={`/profile/${saplingId}`} 
+          target="_blank"  
+          rel="noopener noreferrer" 
+          style={{ textDecoration: 'none' }}
+        >
+          <Button 
+            variant="contained"
+            color="primary"
+            size="small"
+            sx={{
+              textTransform: 'none',
+              backgroundColor: '#2e7d32',
+              '&:hover': {
+                backgroundColor: '#1b5e20',
+              }
+            }}
+          >
+            View Dashboard
+          </Button>
+        </a>
+      )
+    }
   ]
 
   return totalRecords === 0 && Object.values(filters).length === 0 ? (
@@ -230,6 +260,13 @@ const DonationInfo: React.FC<DonationInfoProps> = ({ open, onClose, data }) => {
       width: 200,
     },
     {
+      dataIndex: "recipient_email",
+      key: "recipient_email",
+      title: "Recipient Email",
+      align: "center",
+      width: 250,
+    },
+    {
       dataIndex: "trees_count",
       key: "trees_count",
       title: "Trees Count",
@@ -237,11 +274,16 @@ const DonationInfo: React.FC<DonationInfoProps> = ({ open, onClose, data }) => {
       width: 100,
     },
     {
-      dataIndex: "assignee_name",
-      key: "assignee",
-      title: "Assigned to",
+      dataIndex: "mail_sent",
+      key: "mail_sent",
+      title: "Email Status",
       align: "center",
       width: 200,
+      render: (value: boolean | null) => {
+        if (value === true) return 'Sent';
+        if (value === false) return 'Failed';
+        return 'Not Sent';
+      }
     }
   ];
 
@@ -266,45 +308,63 @@ const DonationInfo: React.FC<DonationInfoProps> = ({ open, onClose, data }) => {
 
         {/* Donation Status */}
         <Paper elevation={1} sx={{ p: 3, mb: 3, borderRadius: 2, border: `1px solid ${theme.palette.divider}` }}>
-          <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            <EventOutlined sx={{ color: '#2e7d32' }} /> Donation Status
-          </Typography>
+           <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+             <EventOutlined sx={{ color: '#2e7d32' }} /> Donation Status
+           </Typography>
           <Box sx={{ ml: 4 }}>
-            <Typography sx={{ mb: 1 }}><strong>Trees Reserved:</strong> {data.trees_count ? `${data.booked}/${data.trees_count}` : "N/A"}</Typography>
-            <Typography sx={{ mb: 1 }}><strong>Trees Assigned:</strong> {data.trees_count ? `${data.assigned}/${data.trees_count}` : "N/A"}</Typography>
-            <Typography sx={{ mb: 1 }}>
-              <strong>Sponsor Email Status:</strong>
+             {data.trees_count > 0 ? (
+          <>
+             <Typography sx={{ mb: 1 }}><strong>Trees Reserved:</strong> {`${data.booked}/${data.trees_count}`}</Typography>
+             <Typography sx={{ mb: 1 }}><strong>Trees Assigned:</strong> {`${data.assigned}/${data.trees_count}`}</Typography>
+            </>
+           ) : null}
+          <Typography sx={{ mb: 1 }}>
+             <strong>Sponsor Email Status:</strong>
               {data.mail_status && <Chip size="small" label={'Ack Sent'} sx={{ ml: 1, bgcolor: '#2e7d32', color: 'white' }} />}
               {data.mail_status === 'DashboardsSent' && <Chip size="small" label={'Dashboard Links Sent'} sx={{ ml: 1, bgcolor: '#2e7d32', color: 'white' }} />}
               {data.mail_error && <Typography color='red'>{data.mail_error}</Typography>}
-            </Typography>
-            <Typography sx={{ mb: 1 }}>
+          </Typography>
+          <Typography sx={{ mb: 1 }}>
               <strong>Request Status:</strong>
-              <Chip size="small" label={data.status === 'UserSubmitted' ? 'Submitted' : 'Fulfilled'} sx={{ ml: 1, bgcolor: '#2e7d32', color: 'white' }} />
-            </Typography>
-          </Box>
-        </Paper>
+               <Chip size="small" label={data.status === 'UserSubmitted' ? 'Submitted' : 'Fulfilled'} sx={{ ml: 1, bgcolor: '#2e7d32', color: 'white' }} />
+          </Typography>
+            </Box>
+          </Paper>
 
         <DonationTrees donationId={data.id} />
 
-        {/* Donation Details */}
-        <Paper elevation={1} sx={{ p: 3, mb: 3, borderRadius: 2, border: `1px solid ${theme.palette.divider}` }}>
-          <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            <EventOutlined sx={{ color: '#2e7d32' }} /> Donation Details
-          </Typography>
-          <Box sx={{ ml: 4 }}>
-            <Typography sx={{ mb: 1 }}><strong>Donation ID:</strong> {data.id}</Typography>
-            <Typography sx={{ mb: 1 }}>
-              <strong>Land Category:</strong> <Chip size="small" label={data.category} sx={{ ml: 1, bgcolor: '#2e7d32', color: 'white' }} />
+           {/* Donation Details */}
+              <Paper elevation={1} sx={{ p: 3, mb: 3, borderRadius: 2, border: `1px solid ${theme.palette.divider}` }}>
+                <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                 <EventOutlined sx={{ color: '#2e7d32' }} /> Donation Details
+                </Typography>
+              <Box sx={{ ml: 4 }}>
+                 <Typography sx={{ mb: 1 }}><strong>Donation ID:</strong> {data.id}</Typography>
+    
+                  {data.trees_count > 0 ? (
+                 <>
+                  <Typography sx={{ mb: 1 }}>
+                       <strong>Land Category:</strong> <Chip size="small" label={data.category} sx={{ ml: 1, bgcolor: '#2e7d32', color: 'white' }} />
+                   </Typography>
+                  {data.grove_type_other && (
+                    <Typography sx={{ mb: 1 }}><strong>Grove Type (Other):</strong> {data.grove_type_other}</Typography>
+                  )}
+                   <Typography sx={{ mb: 1 }}><strong>Trees Count:</strong> <Chip size="small" label={data.trees_count} sx={{ ml: 1, bgcolor: '#2e7d32', color: 'white' }} /></Typography>
+                     <Typography sx={{ mb: 1 }}>
+                        <strong>Visit Date:</strong> {data.visit_date 
+                            ? format(new Date(data.visit_date), 'PPP')
+                            : 'Not scheduled'}
+                     </Typography>
+                 </>
+                ) : (
+              <Typography sx={{ mb: 1 }}><strong>Amount Donated:</strong> ₹{data.amount_donated || 'N/A'}</Typography>
+              )}
+    
+            <Typography>
+               <strong>Additional Contribution:</strong> {data.contribution_options ? (Array.isArray(data.contribution_options) ? data.contribution_options.join(', ') : String(data.contribution_options).replace(/([a-z])([A-Z])/g, '$1 $2').split(/\s+|(?=[A-Z])/).filter(Boolean).join(', ')) : 'N/A'}
             </Typography>
-            {/* <Typography sx={{ mb: 1 }}><strong>Grove:</strong> {data.grove || 'N/A'}</Typography> */}
-            {data.grove_type_other && (
-              <Typography sx={{ mb: 1 }}><strong>Grove Type (Other):</strong> {data.grove_type_other}</Typography>
-            )}
-            <Typography sx={{ mb: 1 }}><strong>Trees Count:</strong> <Chip size="small" label={data.trees_count} sx={{ ml: 1, bgcolor: '#2e7d32', color: 'white' }} /></Typography>
-            <Typography><strong>Additional Contribution:</strong> {data.contribution_options ? (Array.isArray(data.contribution_options) ? data.contribution_options.join(', ') : String(data.contribution_options).replace(/([a-z])([A-Z])/g, '$1 $2').split(/\s+|(?=[A-Z])/).filter(Boolean).join(', ')) : 'N/A'}</Typography>
-          </Box>
-        </Paper>
+           </Box>
+          </Paper>
 
         {/* Donor Details */}
         <Paper elevation={1} sx={{ p: 3, mb: 3, borderRadius: 2, border: `1px solid ${theme.palette.divider}` }}>
