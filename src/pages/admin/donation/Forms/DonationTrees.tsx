@@ -69,7 +69,7 @@ const DonationTrees: FC<DonationTreesProps> = ({ open, onClose, donation }) => {
   const [page, setPage] = useState(0);
   const [pageSize, setPageSize] = useState(10);
   const [filters, setFilters] = useState<Record<string, GridFilterItem>>({});
-  const [orderBy, setOrderBy] = useState<Order[]>([]);
+  const [orderBy, setOrderBy] = useState<Order[]>([{ column: 'available_trees', order: 'DESC' }]);
   const [selectedPlots, setSelectedPlots] = useState<SelectedPlot[]>([]);
   const [selectedPlotIds, setSelectedPlotIds] = useState<number[]>([]);
   const [tableRows, setTableRows] = useState<Plot[]>([]);
@@ -195,18 +195,27 @@ const DonationTrees: FC<DonationTreesProps> = ({ open, onClose, donation }) => {
 
   // Update table rows when data changes
   useEffect(() => {
-    const records: Plot[] = [];
-    const maxLength = Math.min((page + 1) * pageSize, plotsData.totalPlots);
+    const handler = setTimeout(() => {
+      if (plotsData.loading) return;
 
-    for (let i = page * pageSize; i < maxLength; i++) {
-      if (Object.hasOwn(plotsData.paginationMapping, i)) {
-        const id = plotsData.paginationMapping[i];
-        const record = plotsData.plots[id];
-        if (record) records.push(record);
+      const records: Plot[] = [];
+      const maxLength = Math.min((page + 1) * pageSize, plotsData.totalPlots);
+
+      for (let i = page * pageSize; i < maxLength; i++) {
+        if (Object.hasOwn(plotsData.paginationMapping, i)) {
+          const id = plotsData.paginationMapping[i];
+          const record = plotsData.plots[id];
+          if (record) records.push(record);
+        } else {
+          fetchPlots();
+          break;
+        }
       }
-    }
 
-    setTableRows(records);
+      setTableRows(records);
+    }, 300);
+
+    return () => { clearTimeout(handler) }
   }, [pageSize, page, plotsData]);
 
   // Handle plot selection
