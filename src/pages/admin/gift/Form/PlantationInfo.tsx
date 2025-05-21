@@ -15,6 +15,18 @@ const EventTypes = [
         value: '3',
         label: 'General gift'
     },
+    {
+        value: '4',
+        label: 'Wedding'
+    },
+    {
+        value: '5',
+        label: 'Anniversary'
+    },
+    {
+        value: '6',
+        label: 'Festival'
+    }
 ]
 
 const GiftRequestTypes = ['Gift Cards', 'Normal Assignment', 'Promotion', 'Visit', 'Test']
