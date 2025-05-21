@@ -12,10 +12,6 @@ const EventTypes = [
         label: 'Memorial'
     },
     {
-        value: '3',
-        label: 'General gift'
-    },
-    {
         value: '4',
         label: 'Wedding'
     },
@@ -26,7 +22,11 @@ const EventTypes = [
     {
         value: '6',
         label: 'Festival'
-    }
+    },
+    {
+        value: '3',
+        label: 'General gift'
+    },
 ]
 
 const GiftRequestTypes = ['Gift Cards', 'Normal Assignment', 'Promotion', 'Visit', 'Test']
