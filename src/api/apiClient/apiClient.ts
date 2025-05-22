@@ -856,7 +856,7 @@ class ApiClient {
     }
 
     async getMappedTreesForGroup(groupId: number, offset: number, limit: number): Promise<PaginatedResponse<Tree>> {
-        const url = `/trees/mapped/${groupId}?offset=${offset}&limit=${limit}`;
+        const url = `/trees/mapped/group/${groupId}?offset=${offset}&limit=${limit}`;
         try {
             const response = await this.api.get<PaginatedResponse<Tree>>(url);
             return response.data;

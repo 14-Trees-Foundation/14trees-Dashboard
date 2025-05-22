@@ -1,4 +1,4 @@
-import { Box, Button, Checkbox, Divider, FormControl, FormControlLabel, FormGroup, IconButton, InputBase, Paper, Typography, ToggleButton, ToggleButtonGroup  } from "@mui/material";
+import { Box, Button, Checkbox, Divider, FormControl, FormControlLabel, FormGroup, IconButton, InputBase, Paper, Typography, ToggleButton, ToggleButtonGroup } from "@mui/material";
 import CardGrid from "../../../components/CardGrid";
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
@@ -14,6 +14,7 @@ const MappedTrees: React.FC<MappedTreesProps> = ({ }) => {
 
     const location = useLocation();
     const isGroupView = location.pathname.includes('/group/');
+    console.log(location.pathname)
     const [searchStr, setSearchStr] = useState('');
     const [filteredTrees, setFilteredTrees] = useState<any[]>([]);
     const [filter, setFilter] = useState<'default' | 'memorial' | 'all'>('default');
@@ -21,42 +22,50 @@ const MappedTrees: React.FC<MappedTreesProps> = ({ }) => {
     const [loading, setLoading] = useState(false);
     const [trees, setTrees] = useState<any[]>([]);
     const [total, setTotal] = useState(0);
-    const [name, setName] = useState(''); 
-    
+    const [name, setName] = useState('');
+
 
     const getTrees = async (id: string, offset: number = 0) => {
         try {
             setLoading(true);
             const apiClient = new ApiClient();
             let response;
-            
+
             if (isGroupView) {
                 response = await apiClient.getMappedTreesForGroup(Number(id), offset, 200);
-                setName(response.results[0]?.mapped_group_name || 'Group');
+                console.log("Group API Response:", response);
             } else {
                 response = await apiClient.getMappedTreesForTheUser(Number(id), offset, 200);
-                // Set user name from first result or fallback
-                setName(response.results[0]?.mapped_user_name || 'User');
+                console.log("User API Response:", response);
             }
-            
+
+            // Check if response and response.results are valid arrays
+            const name = isGroupView
+                ? (response as any).group_name || 'Group'
+                : (response as any).results?.[0]?.sponsor_user_name || 'User';
+
+            setName(name);
             setTotal(Number(response.total));
             setTrees(prev => [...prev, ...response.results]);
+
         } catch (error: any) {
-            toast.error(error.message);
+            toast.error(error.message || "Something went wrong");
+        } finally {
+            setLoading(false);
         }
-        setLoading(false);
     }
 
-   /* const handleViewTypeChange = (
-        event: React.MouseEvent<HTMLElement>,
-        newViewType: 'user' | 'group',
-    ) => {
-        if (newViewType !== null) {
-            setViewType(newViewType);
-            setTrees([]); // Reset trees when switching views
-            if (userId) getTrees(userId); // Refetch data for new view type
-        }
-    }; */
+
+    /* const handleViewTypeChange = (
+         event: React.MouseEvent<HTMLElement>,
+         newViewType: 'user' | 'group',
+     ) => {
+         if (newViewType !== null) {
+             setViewType(newViewType);
+             setTrees([]); // Reset trees when switching views
+             if (userId) getTrees(userId); // Refetch data for new view type
+         }
+     }; */
 
     useEffect(() => {
 
@@ -65,11 +74,11 @@ const MappedTrees: React.FC<MappedTreesProps> = ({ }) => {
             if (filter === 'all') filteredData = trees;
             else if (filter === 'memorial') filteredData = trees.filter(tree => tree.event_type === '2');
             else filteredData = trees.filter(tree => tree.event_type !== '2');
-    
+
             if (searchStr.trim() !== '') {
                 filteredData = filteredData.filter(item => item.assigned_to_name?.toLowerCase()?.includes(searchStr.toLocaleLowerCase()));
             }
-    
+
             setFilteredTrees(filteredData)
         }, 300);
 
@@ -81,7 +90,7 @@ const MappedTrees: React.FC<MappedTreesProps> = ({ }) => {
     useEffect(() => {
         if (id) getTrees(id);
     }, [id]);
-    
+
 
     return (
         <Box p={1}>
@@ -99,8 +108,8 @@ const MappedTrees: React.FC<MappedTreesProps> = ({ }) => {
                         margin: '0 auto',
                     }}
                 >
-                  <Typography mb={1} variant="h4" color={"#323232"}>
-                        {isGroupView ? `${name}'s Group Dashboard` : `${name}'s Dashboard`}
+                    <Typography mb={1} variant="h4" color={"#323232"}>
+                        {name}'s Dashboard
                     </Typography>
                     <Divider />
                 </Box>
@@ -142,7 +151,7 @@ const MappedTrees: React.FC<MappedTreesProps> = ({ }) => {
                     </IconButton>
                     <InputBase
                         value={searchStr}
-                        onChange={(e) =>{  setSearchStr(e.target.value) }}
+                        onChange={(e) => { setSearchStr(e.target.value) }}
                         sx={{ ml: 1, flex: 1 }}
                         placeholder="Search name"
                         inputProps={{ 'aria-label': 'search friends & family members' }}
@@ -156,7 +165,7 @@ const MappedTrees: React.FC<MappedTreesProps> = ({ }) => {
                     height: '83vh',
                     overflowY: 'scroll',
                     scrollbarWidth: 'none', // For Firefox
-                   // '&::-webkit-scrollbar': { display: 'none' } // For Chrome, Safari
+                    // '&::-webkit-scrollbar': { display: 'none' } // For Chrome, Safari
                 }}
             >
                 <CardGrid

@@ -52,7 +52,7 @@ function App() {
           {/* <Route path="/addtree" element={<AddTree />}></Route> */}
           <Route path="/profile/:saplingId" element={<Dashboard />}></Route>
           <Route path="/profile/user/:userId" element={<Dashboard />}></Route>
-          <Route path="/dashboard/:userId" element={<SponsorProfile />}></Route>
+          <Route path="/dashboard/:id" element={<SponsorProfile />}></Route>
           <Route path="/group/:id" element={<SponsorProfile />}></Route>
           <Route path="/tree/:saplingId" element={<TreeProfile />}></Route>
           <Route path="/user/:id" element={<UserProfile />}></Route>
