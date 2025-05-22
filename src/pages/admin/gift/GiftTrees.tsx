@@ -32,6 +32,7 @@ import TagComponent from "./Form/TagComponent";
 import AssignTrees from "./Form/AssignTrees";
 import GiftCardCreationModal from "./Components/GiftCardCreationModal";
 import GeneralTable from "../../../components/GenTable";
+import AnalyticsChats from "./Components/AnalyticsChats";
 
 const pendingPlotSelection = 'Pending Plot & Tree(s) Reservation';
 
@@ -994,7 +995,7 @@ const GiftTrees: FC = () => {
             </div>
             <Divider sx={{ backgroundColor: "black", marginBottom: '15px' }} />
 
-            {auth.signedin && <Box sx={{ height: 840, width: "100%" }}>
+            {auth.signedin && <Box sx={{ width: "100%" }}>
                 <GeneralTable
                     loading={giftCardsData.loading}
                     rows={tableRows}
@@ -1012,6 +1013,8 @@ const GiftTrees: FC = () => {
                     footer
                     tableName="Tree Cards"
                 />
+
+                <AnalyticsChats style={{ margin: '50px 10px' }} />
             </Box>}
 
             {!auth.signedin &&

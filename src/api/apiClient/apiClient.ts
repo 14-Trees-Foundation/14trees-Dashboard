@@ -1797,6 +1797,19 @@ class ApiClient {
         }
     }
 
+
+    async getGiftRequestAnalytics(): Promise<any> {
+        try {
+            const response = await this.api.get<any>(`/gift-cards/requests/analytics`);
+            return response.data;
+        } catch (error: any) {
+            if (error.response) {
+                throw new Error(error.response.data.message);
+            }
+            throw new Error('Failed to fetch analytical data');
+        }
+    }
+
     async getGiftRequestUsers(gift_card_request_id: number): Promise<GiftRequestUser[]> {
         try {
             const response = await this.api.get<GiftRequestUser[]>(`/gift-cards/users/${gift_card_request_id}`);
