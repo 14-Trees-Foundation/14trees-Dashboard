@@ -329,8 +329,17 @@ class ApiClient {
     async getGroups(offset: number, limit: number, filters?: any[], orderBy?: Order[]): Promise<PaginatedResponse<Group>> {
         const url = `/groups/get?offset=${offset}&limit=${limit}`;
         try {
+            // Validate filters to make sure they don't contain null or undefined values
+            const validatedFilters = filters?.filter(filter => 
+                filter && 
+                filter.columnField && 
+                filter.operatorValue &&
+                filter.value !== undefined && 
+                filter.value !== null
+            ) || [];
+            
             const response = await this.api.post<PaginatedResponse<Group>>(url, { 
-                filters: filters, 
+                filters: validatedFilters, 
                 order_by: orderBy 
             });
             return response.data;
@@ -1365,18 +1374,7 @@ class ApiClient {
         }
     }
 
-    async sendEmailForDonation(donation_id: number, test_mails: string[], sponsor_cc_mails: string[] = [], recipient_cc_mails: string[] = [], assignee_cc_mails: string[] = [], 
-    event_type: string = 'default', email_sponsor: boolean = true, email_recipient: boolean = false,  email_assignee: boolean = false ) {
-        try {
-            await this.api.post<void>(`/donations/emails/send`, { donation_id, test_mails, sponsor_cc_mails, recipient_cc_mails, assignee_cc_mails, event_type, email_sponsor, email_recipient, email_assignee });
-        } catch (error: any) {
-            if (error.response?.data?.message) {
-                throw new Error(error.response.data.message);
-            }
-            throw new Error('Failed to send email for donation');
-        }
-    }
-
+    
     async updateDonationUser(data: any): Promise<any> {
         try {
             // Extract the donation ID
@@ -1673,7 +1671,7 @@ class ApiClient {
     }
 
 
-    async createGiftCard(request_id: string, created_by: number, no_of_cards: number, user_id: number, sponsor_id: number | null, category: string, grove: string | null, requestType: string, giftedOn: string, group_id?: number, payment_id?: number, logo?: string, messages?: any, file?: File): Promise<GiftCard> {
+    async createGiftCard(request_id: string, created_by: number, no_of_cards: number, user_id: number, category: string, grove: string | null, requestType: string, giftedOn: string, group_id?: number, payment_id?: number, logo?: string, messages?: any, file?: File): Promise<GiftCard> {
         try {
             const formData = new FormData();
             formData.append('request_id', request_id);
@@ -1693,7 +1691,6 @@ class ApiClient {
             }
             if (grove) formData.append('grove', grove);
             if (group_id) formData.append('group_id', group_id.toString());
-            if (sponsor_id) formData.append('sponsor_id', sponsor_id.toString());
             if (payment_id) formData.append('payment_id', payment_id.toString());
             if (logo) formData.append('logo_url', logo);
             if (file) formData.append('csv_file', file, file.name);
@@ -1708,7 +1705,7 @@ class ApiClient {
         }
     }
 
-    async updateGiftCard(request: GiftCard, no_of_cards: number, user_id: number, sponsor_id: number | null, category: string, grove: string | null, requestType: string, giftedOn: string, group_id?: number, payment_id?: number, logo?: string, messages?: any, file?: File): Promise<GiftCard> {
+    async updateGiftCard(request: GiftCard, no_of_cards: number, user_id: number, category: string, grove: string | null, requestType: string, giftedOn: string, group_id?: number, payment_id?: number, logo?: string, messages?: any, file?: File): Promise<GiftCard> {
         try {
             const formData = new FormData();
             for (const [key, value] of Object.entries(request)) {
@@ -1720,10 +1717,6 @@ class ApiClient {
 
             if (formData.has('user_id')) formData.set('user_id', user_id.toString());
             else formData.append('user_id', user_id.toString());
-
-            if (sponsor_id && formData.has('sponsor_id')) formData.set('sponsor_id', sponsor_id.toString());
-            else if (sponsor_id) formData.append('sponsor_id', sponsor_id.toString());
-            else formData.delete('sponsor_id')
 
             if (formData.has('category')) formData.set('category', category);
             else formData.append('category', category);
@@ -1739,7 +1732,6 @@ class ApiClient {
 
             if (group_id && formData.has('group_id')) formData.set('group_id', group_id.toString());
             else if (group_id) formData.append('group_id', group_id.toString());
-            else formData.delete('group_id');
 
             if (payment_id && formData.has('payment_id')) formData.set('payment_id', payment_id.toString());
             else if (payment_id) formData.append('payment_id', payment_id.toString());
@@ -1759,7 +1751,6 @@ class ApiClient {
 
                 if (messages.eventName && formData.has('event_name')) formData.set('event_name', messages.eventName);
                 else if (messages.eventName) formData.append('event_name', messages.eventName);
-                else formData.delete('event_name')
 
                 if (messages.eventType && formData.has('event_type')) formData.set('event_type', messages.eventType);
                 else if (messages.eventType) formData.append('event_type', messages.eventType);
@@ -1809,9 +1800,9 @@ class ApiClient {
         }
     }
 
-    async upsertGiftCardUsers(gift_card_request_id: number, users: any[]): Promise<GiftCard> {
+    async upsertGiftCardUsers(gift_card_request_id: number, users: any[], deletedUserIds: number[]): Promise<GiftCard> {
         try {
-            const response = await this.api.post<GiftCard>(`/gift-cards/users`, { gift_card_request_id, users });
+            const response = await this.api.post<GiftCard>(`/gift-cards/users`, { gift_card_request_id, users, deletedUserIds });
             return response.data;
         } catch (error: any) {
             if (error.response?.data?.message) {
@@ -1866,9 +1857,9 @@ class ApiClient {
         }
     }
 
-    async generateCardTemplate(request_id: string, primary_message: string, logo_message: string, logo?: string | null, sapling_id?: string | null, user_name?: string | null, gifted_by?: string |null, plant_type?: string | null, is_personal?: boolean): Promise<{ presentation_id: string, slide_id: string }> {
+    async generateCardTemplate(request_id: string, primary_message: string, secondary_message: string, logo_message: string, logo?: string | null, sapling_id?: string | null, user_name?: string | null, plant_type?: string | null, is_personal?: boolean): Promise<{ presentation_id: string, slide_id: string }> {
         try {
-            const resp = await this.api.post<any>(`/gift-cards/generate-template`, { request_id, primary_message, logo_message, logo, sapling_id, plant_type, user_name, gifted_by, is_personal });
+            const resp = await this.api.post<any>(`/gift-cards/generate-template`, { request_id, primary_message, secondary_message, logo_message, logo, sapling_id, plant_type, user_name, is_personal });
             return resp.data;
         } catch (error: any) {
             if (error.response) {
@@ -1878,9 +1869,9 @@ class ApiClient {
         }
     }
 
-    async updateGiftCardTemplate(slide_id: string, primary_message: string, logo_message: string, logo?: string | null, sapling_id?: string | null, user_name?: string | null, gifted_by?: string |null, trees_count?: number): Promise<void> {
+    async updateGiftCardTemplate(slide_id: string, primary_message: string, secondary_message: string, logo_message: string, logo?: string | null, sapling_id?: string | null, user_name?: string | null, trees_count?: number): Promise<void> {
         try {
-            await this.api.post<any>(`/gift-cards/update-template`, { slide_id, primary_message, logo_message, logo, sapling_id, user_name, gifted_by, trees_count });
+            await this.api.post<any>(`/gift-cards/update-template`, { slide_id, primary_message, secondary_message, logo_message, logo, sapling_id, user_name, trees_count });
         } catch (error: any) {
             if (error.response) {
                 throw new Error(error.response.data.message);
@@ -2361,9 +2352,9 @@ class ApiClient {
     /**
      * Gen AI
      */
-    async serveUserQuery(message: string, history: any[]): Promise<{text_output: string, sponsor_details?: any}> {
+    async serveUserQuery(message: string, history: any[]): Promise<{output: string}> {
         try {
-            const response = await this.api.post<{text_output: string, sponsor_details: any}>(`/gift-cards/gen-ai`, { message, history }, {
+            const response = await this.api.post<{output: string}>(`/gift-cards/gen-ai`, { message, history }, {
                 headers: {
                     "x-access-token": this.token,
                     "content-type": "application/json",
@@ -2375,6 +2366,129 @@ class ApiClient {
                 throw new Error(error.response.data.message);
             }
             throw new Error('Failed to connect with our AI bot!');
+        }
+    }
+
+    async queryShippingData(message: string, history: any[]): Promise<{output: string}> {
+        try {
+            const response = await this.api.post<{output: string}>(
+                '/api/shipment/genai', 
+                { message, history }, 
+                {
+                    headers: {
+                        "x-access-token": this.token,
+                        "content-type": "application/json",
+                    }
+                }
+            );
+            return response.data;
+        } catch (error: any) {
+            if (error.response) {
+                throw new Error(error.response.data.message || 'Shipping AI query failed');
+            }
+            throw new Error('Failed to connect with the Shipping AI service');
+        }
+    }
+
+    async handleSupplierQuery(message: string, history: any[]): Promise<{ output: string }> {
+        try {
+            const response = await this.api.post<{ output: string }>(`/suppliers/gen-ai`, { message, history }, {
+                headers: {
+                    "x-access-token": this.token,
+                    "content-type": "application/json",
+                }
+            });
+            return response.data;
+        } catch (error: any) {
+            if (error.response) {
+                throw new Error(error.response.data.message);
+            }
+            throw new Error('Failed to connect with our Supplier AI bot!');
+        }
+    }
+
+    async updateSupplier(supplierData: any): Promise<{ message: string }> {
+        try {
+            const response = await this.api.put<{ message: string }>(`/suppliers/update`, supplierData, {
+                headers: {
+                    "x-access-token": this.token,
+                    "content-type": "application/json",
+                }
+            });
+            return response.data;
+        } catch (error: any) {
+            if (error.response) {
+                throw new Error(error.response.data.message);
+            }
+            throw new Error('Failed to update supplier data!');
+        }
+    }
+
+    async getSupplierDetails(supplierCode: string): Promise<any> {
+        try {
+            const response = await this.api.get<any>(`/suppliers/get`, {
+                headers: {
+                    "x-access-token": this.token,
+                    "content-type": "application/json",
+                },
+                params: { code: supplierCode } // Assuming you want to fetch by supplier code
+            });
+            return response.data;
+        } catch (error: any) {
+            if (error.response) {
+                throw new Error(error.response.data.message);
+            }
+            throw new Error('Failed to fetch supplier details!');
+        }
+    }
+
+    /*
+        Model- Buyer: CRUD Operations/Apis for buyers
+    */
+
+    async handleBuyerQuery(message: string, history: any[]): Promise<{ output: string }> {
+        try {
+            const response = await this.api.post<{ output: string }>(`/buyers/gen-ai`, { message, history }, {
+                headers: {
+                    "x-access-token": this.token,
+                    "content-type": "application/json",
+                }
+            });
+            return response.data;
+        } catch (error: any) {
+            if (error.response) {
+                throw new Error(error.response.data.message);
+            }
+            throw new Error('Failed to connect with our Buyer AI bot!');
+        }
+    }
+
+    async updateBuyer(buyerData: any): Promise<any> {
+        try {
+            const response = await this.api.put<any>(`/buyers/update`, buyerData, {
+                headers: {
+                    "x-access-token": this.token,
+                    "content-type": "application/json",
+                },
+            });
+            return response.data;
+        } catch (error: any) {
+            throw new Error('Error updating buyer');
+        }
+    }
+
+    async getBuyerDetails(code: string): Promise<any> {
+        try {
+            const response = await this.api.get<any>(`/buyers/get`, {
+                headers: {
+                    "x-access-token": this.token,
+                    "content-type": "application/json",
+                },
+                params: { code },
+            });
+            return response.data;
+        } catch (error: any) {
+            throw new Error('Error fetching buyer details');
         }
     }
 }
