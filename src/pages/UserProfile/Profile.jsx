@@ -120,7 +120,7 @@ export const Profile = ({ saplingId }) => {
               >
                 <span className={classes.buttonText}>Gift a Tree</span>
               </Button>
-              {usersInfo.sponsored_trees > 0 && <Button
+              {usersInfo.sponsored_trees > 0 && username.length < 15 && <Button
                 className={classes.sponsorViewButton}
                 variant="contained"
                 color="primary"
@@ -225,7 +225,6 @@ const useStyles = makeStyles((theme) =>
     buttonContainer: {
       display: "flex",
       justifyContent: "flex-end",
-      flexWrap: "wrap", // Allow buttons to wrap on smaller screens
       gap: "5px", // Add gap between buttons
       [theme.breakpoints.down("480")]: {
         justifyContent: "flex-start", // Align buttons to the start on small screens
