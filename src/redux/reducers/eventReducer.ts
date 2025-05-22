@@ -9,25 +9,25 @@ export const eventsDataReducer = (
 ): EventsDataState => {
   switch (action.type) {
     case eventActionTypes.GET_EVENTS_REQUESTED:
-      return { 
-        ...state, 
-        loading: true 
+      return {
+        ...state,
+        loading: true
       };
 
     case eventActionTypes.GET_EVENTS_SUCCEEDED:
       if (action.payload) {
-        let eventsDataState: EventsDataState = { 
+        let eventsDataState: EventsDataState = {
           loading: false,
-          totalEvents: state.totalEvents, 
-          Events: { ...state.Events }, 
+          totalEvents: state.totalEvents,
+          Events: { ...state.Events },
           paginationMapping: { ...state.paginationMapping }
         };
-        
+
         let payload = action.payload as PaginatedResponse<Event>;
         const offset = payload.offset;
 
         // Reset data if it's the first page (offset 0)
-        if (payload.offset === 0) { 
+        if (payload.offset === 0) {
           eventsDataState.Events = {};
           eventsDataState.paginationMapping = {};
         }
@@ -41,22 +41,23 @@ export const eventsDataReducer = (
           }
         }
 
-        return { 
-          ...eventsDataState, 
-          totalEvents: payload.total 
+        return {
+          ...eventsDataState,
+          totalEvents: payload.total
+
         };
       }
       return state;
 
     case eventActionTypes.GET_EVENTS_FAILED:
-      return { 
-        ...state, 
-        loading: false 
+      return {
+        ...state,
+        loading: false
       };
 
     case eventActionTypes.UPDATE_EVENTS_SUCCEEDED:
       if (action.payload) {
-        let nextState: EventsDataState = { 
+        let nextState: EventsDataState = {
           ...state,
           Events: { ...state.Events }
         };
@@ -70,7 +71,7 @@ export const eventsDataReducer = (
 
     case eventActionTypes.DELETE_EVENTS_SUCCEEDED:
       if (action.payload) {
-        let nextState: EventsDataState = { 
+        let nextState: EventsDataState = {
           ...state,
           Events: { ...state.Events }
         };
