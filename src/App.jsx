@@ -53,6 +53,7 @@ function App() {
           <Route path="/profile/:saplingId" element={<Dashboard />}></Route>
           <Route path="/profile/user/:userId" element={<Dashboard />}></Route>
           <Route path="/dashboard/:userId" element={<SponsorProfile />}></Route>
+          <Route path="/group/:id" element={<SponsorProfile />}></Route>
           <Route path="/tree/:saplingId" element={<TreeProfile />}></Route>
           <Route path="/user/:id" element={<UserProfile />}></Route>
           <Route path="/visit/:id" element={<VisitProfile />}></Route>

@@ -1,41 +1,62 @@
-import { Box, Button, Checkbox, Divider, FormControl, FormControlLabel, FormGroup, IconButton, InputBase, Paper, Typography } from "@mui/material";
+import { Box, Button, Checkbox, Divider, FormControl, FormControlLabel, FormGroup, IconButton, InputBase, Paper, Typography, ToggleButton, ToggleButtonGroup  } from "@mui/material";
 import CardGrid from "../../../components/CardGrid";
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import ApiClient from "../../../api/apiClient/apiClient";
-import { useParams } from "react-router-dom";
+import { useLocation, useParams } from "react-router-dom";
 import { Search } from "@mui/icons-material";
 
 interface MappedTreesProps {
 }
 
 const MappedTrees: React.FC<MappedTreesProps> = ({ }) => {
-    const { userId } = useParams();
+    const { id } = useParams();
 
+    const location = useLocation();
+    const isGroupView = location.pathname.includes('/group/');
     const [searchStr, setSearchStr] = useState('');
     const [filteredTrees, setFilteredTrees] = useState<any[]>([]);
     const [filter, setFilter] = useState<'default' | 'memorial' | 'all'>('default');
+    const [viewType, setViewType] = useState<'user' | 'group'>('user');
     const [loading, setLoading] = useState(false);
     const [trees, setTrees] = useState<any[]>([]);
     const [total, setTotal] = useState(0);
-    const [userName, setUserName] = useState('User');
+    const [name, setName] = useState(''); 
+    
 
-    const getTrees = async (userId: string, offset: number = 0) => {
+    const getTrees = async (id: string, offset: number = 0) => {
         try {
             setLoading(true);
             const apiClient = new ApiClient();
-            const response = await apiClient.getMappedTreesForTheUser(Number(userId), offset, 200);
+            let response;
+            
+            if (isGroupView) {
+                response = await apiClient.getMappedTreesForGroup(Number(id), offset, 200);
+                setName(response.results[0]?.mapped_group_name || 'Group');
+            } else {
+                response = await apiClient.getMappedTreesForTheUser(Number(id), offset, 200);
+                // Set user name from first result or fallback
+                setName(response.results[0]?.mapped_user_name || 'User');
+            }
+            
             setTotal(Number(response.total));
             setTrees(prev => [...prev, ...response.results]);
-
-            if (response.results.length > 0 && response.results[0].mapped_user_name) {
-                setUserName(response.results[0].mapped_user_name)
-            }
         } catch (error: any) {
             toast.error(error.message);
         }
         setLoading(false);
     }
+
+   /* const handleViewTypeChange = (
+        event: React.MouseEvent<HTMLElement>,
+        newViewType: 'user' | 'group',
+    ) => {
+        if (newViewType !== null) {
+            setViewType(newViewType);
+            setTrees([]); // Reset trees when switching views
+            if (userId) getTrees(userId); // Refetch data for new view type
+        }
+    }; */
 
     useEffect(() => {
 
@@ -58,8 +79,9 @@ const MappedTrees: React.FC<MappedTreesProps> = ({ }) => {
     }, [searchStr, filter, trees])
 
     useEffect(() => {
-        if (userId) getTrees(userId);
-    }, [userId]);
+        if (id) getTrees(id);
+    }, [id]);
+    
 
     return (
         <Box p={1}>
@@ -77,7 +99,9 @@ const MappedTrees: React.FC<MappedTreesProps> = ({ }) => {
                         margin: '0 auto',
                     }}
                 >
-                    <Typography mb={1} variant="h4" color={"#323232"}                                                                                                                                                                                                                                                                                                                                                       >{userName}'s Dashboard</Typography>
+                  <Typography mb={1} variant="h4" color={"#323232"}>
+                        {isGroupView ? `${name}'s Group Dashboard` : `${name}'s Dashboard`}
+                    </Typography>
                     <Divider />
                 </Box>
             </Box>
@@ -157,7 +181,7 @@ const MappedTrees: React.FC<MappedTreesProps> = ({ }) => {
                         }
                     })}
                 />
-                {userId && total > trees.length && <Box
+                {id && total > trees.length && <Box
                     display="flex"
                     alignItems="center"
                     justifyContent="center"
@@ -166,7 +190,7 @@ const MappedTrees: React.FC<MappedTreesProps> = ({ }) => {
                         variant="contained"
                         color="success"
                         disabled={loading}
-                        onClick={() => { getTrees(userId, trees.length) }}
+                        onClick={() => { getTrees(id, trees.length) }}
                     >
                         Load More
                     </Button>

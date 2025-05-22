@@ -14,6 +14,7 @@ import {
   Typography,
 } from "@mui/material";
 import AddOrganization from "./AddOrganization";
+import ParkIcon from '@mui/icons-material/Park';
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import GroupIcon from '@mui/icons-material/Group';
@@ -211,6 +212,14 @@ export const OrganizationComponent = () => {
       align: 'center',
     },
     {
+      dataIndex: "reserved_trees",
+      key: "reserved_trees",
+      title: getSortableHeader("Reserved Trees", "reserved_trees"),
+      width: 150,
+      align: 'center',
+      render: (value) => value || '0',
+    },
+    {
       dataIndex: "sponsored_trees",
       key: "sponsored_trees",
       title: getSortableHeader("Sponsored Trees", "sponsored_trees"),
@@ -240,6 +249,23 @@ export const OrganizationComponent = () => {
             }}
           >
             <AccountBalance />
+          </Button>
+          <Button
+            variant="outlined"
+            color="primary"
+            style={{ margin: "0 5px" }}
+            onClick={() => {
+              const { hostname, host } = window.location;
+              const url = `/group/${record.id}`; 
+              if (hostname === "localhost" || hostname === "127.0.0.1") {
+                window.open(`http://${host}${url}`);
+              } else {
+                window.open(`https://${hostname}${url}`);
+              }
+            }}
+          >
+            {/* You can use a tree icon from MUI or another library */}
+            <ParkIcon /> {/* Make sure to import ParkIcon from @mui/icons-material/Park */}
           </Button>
           <Button
             color="success"

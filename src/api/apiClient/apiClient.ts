@@ -855,6 +855,19 @@ class ApiClient {
         }
     }
 
+    async getMappedTreesForGroup(groupId: number, offset: number, limit: number): Promise<PaginatedResponse<Tree>> {
+        const url = `/trees/mapped/${groupId}?offset=${offset}&limit=${limit}`;
+        try {
+            const response = await this.api.get<PaginatedResponse<Tree>>(url);
+            return response.data;
+        } catch (error: any) {
+            if (error.response?.data?.message) {
+                throw new Error(error.response.data.message)
+            }
+            throw new Error(`Failed to fetch trees!`);
+        }
+    }
+
     async getUserTreeCount(offset: number, limit: number, filters?: any): Promise<UserTreeCountPaginationResponse> {
         let url = `/mapping/count/usertreescount?offset=${offset}&limit=${limit}`
         try {
