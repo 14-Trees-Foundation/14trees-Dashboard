@@ -89,51 +89,43 @@ const EditRecipientDialog: React.FC<EditRecipientDialogProps> = ({
   }
 
   const handleEmailChange = (event: React.SyntheticEvent, value: string, field: 'recipient_email' | 'assignee_email') => {
-    // Don't search if value is empty, null, or contains only spaces and parentheses
+    // Skip if empty or just whitespace/parentheses
     if (!value || value.trim() === '' || /^\s*\(.*\)\s*$/.test(value)) {
       return;
     }
-    
-    let isSet = false;
-    usersList.forEach((user) => {
-      if (`${user.name} (${user.email})` === value) {
-        isSet = true;
-        if (field === 'recipient_email') {
-          setFormData(prev => ({
-            ...prev,
-            recipient: user.id,
-            recipient_email: user.email,
-            recipient_name: user.name,
-            recipient_phone: user.phone ?? '',
-          }));
-        } else {
-          setFormData(prev => ({
-            ...prev,
-            assignee: user.id,
-            assignee_email: user.email,
-            assignee_name: user.name,
-            assignee_phone: user.phone ?? '',
-          }));
-        }
-      }
-    });
 
-    if (!isSet && user[field] !== value && value !== ` ()`) {
-      // Only update the field if it contains meaningful text
-      // and filter out parentheses patterns
-      const cleanValue = value.replace(/\s*\([^)]*\)\s*/g, '').trim();
-      
-      if (cleanValue.length > 0) {
+    // Extract email from "Name (Email)" format if present
+    const emailMatch = value.match(/\(([^)]+)\)/);
+    const extractedEmail = emailMatch ? emailMatch[1] : value;
+    const cleanValue = extractedEmail.trim();
+  
+
+    setFormData(prev => ({
+      ...prev,
+      [field]: cleanValue,
+    }));
+  
+    if (emailMatch) {
+      const matchingUser = usersList.find(user => 
+        `${user.name} (${user.email})` === value
+      );
+  
+      if (matchingUser) {
+        const idField = field === 'recipient_email' ? 'recipient' : 'assignee';
+        const phoneField = field === 'recipient_email' ? 'recipient_phone' : 'assignee_phone';
+        
+
         setFormData(prev => ({
           ...prev,
-          [field]: cleanValue,
+          [idField]: matchingUser.id,
+          [phoneField]: prev[phoneField] || matchingUser.phone || '',
         }));
-        
-        // Only search if we have at least 3 meaningful characters
-        if (cleanValue.length >= 3) {
-          searchUsers(cleanValue);
-        }
       }
+    }
+  
+    // Search when we have at least 3 meaningful characters
+    if (cleanValue.length >= 3) {
+      searchUsers(cleanValue);
     }
   };
 
@@ -174,17 +166,17 @@ const EditRecipientDialog: React.FC<EditRecipientDialogProps> = ({
           </Grid>
           
           <Grid item xs={12}>
-            <Autocomplete
+          <Autocomplete
+              freeSolo
               fullWidth
               options={usersList.map((user) => `${user.name} (${user.email})`)}
-              onInputChange={(e, value) => { handleEmailChange(e, value, 'recipient_email') }}
-              value={formData.recipient_email ? `${formData.recipient_name} (${formData.recipient_email})` : ''}
+              onInputChange={(e, value) => handleEmailChange(e, value, 'recipient_email')}
+              inputValue={formData.recipient_email || ''}
               renderInput={(params) => (
                 <TextField
                   {...params}
                   label="Recipient Email"
                   variant="outlined"
-                  name="recipient_email"
                 />
               )}
             />
@@ -245,20 +237,20 @@ const EditRecipientDialog: React.FC<EditRecipientDialogProps> = ({
                 </Box>
               </Grid>
               <Grid item xs={12}>
-                <Autocomplete
-                  fullWidth
-                  options={usersList.map((user) => `${user.name} (${user.email})`)}
-                  onInputChange={(e, value) => { handleEmailChange(e, value, 'assignee_email') }}
-                  value={formData.assignee_email ? `${formData.assignee_name} (${formData.assignee_email})` : ''}
-                  renderInput={(params) => (
-                    <TextField
-                      {...params}
-                      label="Assignee Email"
-                      variant="outlined"
-                      name="assignee_email"
-                    />
-                  )}
-                />
+          <Autocomplete
+              freeSolo
+              fullWidth
+              options={usersList.map((user) => `${user.name} (${user.email})`)}
+              onInputChange={(e, value) => handleEmailChange(e, value, 'assignee_email')}
+              inputValue={formData.assignee_email || ''}
+              renderInput={(params) => (
+                <TextField
+                     {...params}
+                     label="Assignee Email"
+                     variant="outlined"
+                 />
+                )}
+              />
               </Grid>
               <Grid item xs={12}>
                 <TextField 

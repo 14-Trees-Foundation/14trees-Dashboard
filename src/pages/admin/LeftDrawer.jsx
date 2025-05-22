@@ -44,6 +44,12 @@ export const AdminLeftDrawer = () => {
   }, [auth])
 
   const onClickNav = (value, subValue) => {
+    
+    if (value === undefined || value === null) {
+      console.error('Invalid navigation value:', value);
+      return;
+    }
+  
     if (subValue !== undefined) {
       setIndex(value);
       setSubIndex(subValue);
@@ -110,11 +116,6 @@ export const AdminLeftDrawer = () => {
     {
       divider: true,
     },
-    // {
-    //   displayName: "Events",
-    //   logo: FestivalIcon,
-    //   display: true,
-    // },
     {
       displayName: "Visits",
       logo: TourIcon,
@@ -122,34 +123,40 @@ export const AdminLeftDrawer = () => {
       key: 8,
     },
     {
-      displayName: "Site Inventory",
-      logo: Inventory,
-      display: true,
-      key: 9,
+       displayName: "Events",
+       logo: FestivalIcon,
+       display: true,
+       key: 9,
     },
     {
-      displayName: "GC Inventory",
+      displayName: "Site Inventory",
       logo: Inventory,
       display: true,
       key: 10,
     },
     {
+      displayName: "GC Inventory",
+      logo: Inventory,
+      display: true,
+      key: 11,
+    },
+    {
       displayName: "Tree Cards",
       logo: CardGiftcard,
       display: auth.signedin,
-      key: 11,
+      key: 12,
     },
-    // {
-    //   displayName: "Donations",
-    //   logo: VolunteerActivismIcon,
-    //   display: true,
-    //   key: 12,
-    // },
+    {
+      displayName: "Donations",
+      logo: VolunteerActivismIcon,
+      display: true,
+      key: 13,
+    },
     {
       displayName: "Corporate Dashboard",
       logo: Analytics,
       display: true,
-      key: 12,
+      key: 14,
     },
     // {
     //   displayName: "Images",

@@ -110,13 +110,13 @@ export const Admin = () => {
       page: OrganizationComponent,
       displayName: "Organizations",
     },
-    // {
-    //   page: EventsComponent,
-    //   displayName: "Events",
-    // },
     {
       page: VisitsComponent,
       displayName: "Visits",
+    },
+    {
+       page: EventsComponent,
+       displayName: "Events",
     },
     {
       page: SiteInventory,
@@ -131,6 +131,10 @@ export const Admin = () => {
       displayName: "Gift Cards",
     },
     {
+      page: DonationComponent,
+      displayName: "Donations",
+    },
+    {
       page: CSRInventory,
       displayName: "CSR Analytics",
     },
@@ -141,6 +145,9 @@ export const Admin = () => {
   ];
 
   const mainBox = () => {
+    if (index === undefined || index >= pages.length) {
+      return <div>Please select a valid page</div>;
+    }
     const Page = pages[index].page;
     return (
       <div className={classes.outlet}>
