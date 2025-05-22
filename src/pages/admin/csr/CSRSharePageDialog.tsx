@@ -280,55 +280,55 @@ const CSRSharePageDialog: FC<CSRSharePageDialogProps> = ({ groupId, groupName, s
                         variant="outlined"
                     />
                  
-{showNameInput && (
-  <Box sx={{ mt: 2, display: 'flex', gap: 2 }}>
-    <TextField
-      autoFocus
-      fullWidth
-      label="Name"
-      value={newUserName}
-      onChange={(e) => {
-        console.log("Typing:", e.target.value); // Check if this logs
-        setNewUserName(e.target.value);
-      }}
-    />
-    <TextField
-      fullWidth
-      label="Email"
-      value={newUserEmail}
-      disabled
-    />
-    <Button 
-      variant="contained" 
-      onClick={() => {
-        if (newUserName?.trim() && newUserEmail) { 
-          setSelectedUsers([...selectedUsers, {
-            id: -1, // Temporary ID for new users
-            name: newUserName,
-            email: newUserEmail
-          }]);
-          setShowNameInput(false); // Change this to false to hide the input fields
-          setNewUserName('');
-          setNewUserEmail('');
-          setSearchStr(''); // Clear the search string
-        }
-      }}
-    >
-      Add
-    </Button>
-    <Button 
-      variant="outlined" 
-      onClick={() => {
-        setShowNameInput(false);
-        setNewUserName('');
-        setNewUserEmail('');
-      }}
-    >
-      Cancel
-    </Button>
-  </Box>
-)}
-    </Box>
+                {showNameInput && (
+                  <Box sx={{ mt: 2, display: 'flex', gap: 2 }}>
+                    <TextField
+                         autoFocus
+                         fullWidth
+                         label="Name"
+                         value={newUserName}
+                         onChange={(e) => setNewUserName(e.target.value)}
+                         error={!newUserName?.trim()}
+                         helperText={!newUserName?.trim() ? "Name is required" : ""}
+                         required
+                        />
+                   <TextField
+                     fullWidth
+                        label="Email"
+                        value={newUserEmail}
+                        disabled
+                    />
+                    <Button 
+                      variant="contained" 
+                      onClick={() => {
+                       if (newUserName?.trim() && newUserEmail) { 
+                            setSelectedUsers([...selectedUsers, {
+                               id: -1, // Temporary ID for new users
+                               name: newUserName,
+                               email: newUserEmail
+                            }]);
+                              setShowNameInput(false); // Change this to false to hide the input fields
+                              setNewUserName('');
+                              setNewUserEmail('');
+                              setSearchStr(''); // Clear the search string
+                            }
+                           }}
+                         >
+                      Add
+               </Button>
+                   <Button 
+                      variant="outlined" 
+                      onClick={() => {
+                         setShowNameInput(false);
+                         setNewUserName('');
+                         setNewUserEmail('');
+                        }}
+                     >
+                     Cancel
+                    </Button>
+                  </Box>
+                )}
+                 </Box>
                             )}>
                         </Autocomplete>
                         <Box sx={{ mt: 2, display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
