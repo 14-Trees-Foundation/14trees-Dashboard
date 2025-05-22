@@ -28,10 +28,9 @@ import EditEvents from "./EditEvents";
 
 export const EventsComponent = () => {
   const dispatch = useAppDispatch();
-  const { getEvents} =
+  const { getEvents } =
     bindActionCreators(eventActionCreators, dispatch);
 
-  const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
   const handleModalOpen = () => setOpen(true);
   const handleModalClose = () => setOpen(false);
@@ -93,12 +92,9 @@ export const EventsComponent = () => {
 
   const getEventsData = async () => {
     let filtersData = Object.values(filters);
-    setLoading(true);
     getEvents(page * pageSize, pageSize, filtersData);
-    setTimeout(() => {
-      setLoading(false);
-    }, 1000);
   };
+
   const getAllEventsData = async () => {
     const apiClient = new ApiClient();
     try {
@@ -139,37 +135,12 @@ export const EventsComponent = () => {
             variant="outlined"
             color="error"
             style={{ margin: "0 5px" }}
-            onClick={()=>handleDeleteEvent(record)}
+            onClick={() => handleDeleteEvent(record)}
           >
             <DeleteIcon />
           </Button>
         </div>
       ),
-    },
-
-    {
-      dataIndex: "assigned_by",
-      key: "assigned_by",
-      title: "Assigned By",
-      width: 150,
-      align: "center",
-      ...getColumnSearchProps('assigned_by', filters, handleSetFilters)
-    },
-    {
-      dataIndex: "site_id",
-      key: "site_id",
-      title: "Site ID",
-      width: 120,
-      align: "center",
-      ...getColumnSearchProps('site_id', filters, handleSetFilters)
-    },
-    {
-      dataIndex: "type",
-      key: "type",
-      title: "Type",
-      width: 100,
-      align: "center",
-      ...getColumnSearchProps('type', filters, handleSetFilters)
     },
     {
       dataIndex: "name",
@@ -180,20 +151,12 @@ export const EventsComponent = () => {
       ...getColumnSearchProps('name', filters, handleSetFilters)
     },
     {
-      dataIndex: "description",
-      key: "description",
-      title: "Description",
-      width: 200,
+      dataIndex: "site_name",
+      key: "site_name",
+      title: "Site Name",
+      width: 120,
       align: "center",
-      ...getColumnSearchProps('description', filters, handleSetFilters)
-    },
-    {
-      dataIndex: "event_location",
-      key: "event_location",
-      title: "Location",
-      width: 150,
-      align: "center",
-      ...getColumnSearchProps('event_location', filters, handleSetFilters)
+      ...getColumnSearchProps('site_name', filters, handleSetFilters)
     },
     {
       dataIndex: "tags",
@@ -204,14 +167,6 @@ export const EventsComponent = () => {
       ...getColumnSearchProps('tags', filters, handleSetFilters)
     },
     {
-      dataIndex: "memories",
-      key: "memories",
-      title: "Memories",
-      width: 220,
-      align: "center",
-      ...getColumnSearchProps('memories', filters, handleSetFilters)
-    },
-    {
       dataIndex: "event_date",
       key: "event_date",
       title: "Event Date",
@@ -220,76 +175,32 @@ export const EventsComponent = () => {
       ...getColumnSearchProps('event_date', filters, handleSetFilters),
       render: (date: string) => new Date(date).toLocaleDateString()
     },
+    {
+      dataIndex: "link",
+      key: "link",
+      title: "Event Dashboard",
+      width: 150,
+      align: "center",
+      render: (linkId: string) => (
+        <a
+          href={`/events/${linkId}`}
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <Button
+            variant="outlined"
+            color="success"
+            size="small"
+            sx={{
+              textTransform: 'none',
+            }}
+          >
+            Dashboard
+          </Button>
+        </a>
+      )
+    },
   ]
-
-  const data = [
-    {
-      "id": 1,
-      "assigned_by": 294,
-      "site_id": null,
-      "type": "1",
-      "name": null,
-      "description": null,
-      "event_location": null,
-      "tags": "[]",
-      "memories": null,
-      "event_date": "2022-01-04T22:03:14.000Z"
-    },
-    {
-      "id": 2,
-      "assigned_by": 265,
-      "site_id": null,
-      "type": "1",
-      "name": null,
-      "description": null,
-      "event_location": null,
-      "tags": "[]",
-      "memories": null,
-      "event_date": "2022-02-28T10:12:06.000Z"
-    },
-    {
-      "id": 3,
-      "assigned_by": 265,
-      "site_id": null,
-      "type": "1",
-      "name": null,
-      "description": null,
-      "event_location": null,
-      "tags": "[]",
-      "memories": null,
-      "event_date": "2022-02-28T10:22:02.000Z"
-    },
-    {
-      "id": 4,
-      "assigned_by": 336,
-      "site_id": null,
-      "type": "2",
-      "name": null,
-      "description": null,
-      "event_location": null,
-      "tags": "[]",
-      "memories": null,
-      "event_date": "2022-04-02T01:56:54.000Z"
-    },
-    {
-      "id": 5,
-      "assigned_by": 294,
-      "site_id": null,
-      "type": "1",
-      "name": null,
-      "description": null,
-      "event_location": null,
-      "tags": "[]",
-      "memories": null,
-      "event_date": "2022-02-18T06:49:39.000Z"
-    }
-  ];
-
-
-  type RowType = {
-    id: string;
-    name: string;
-  };
 
   const handleDeleteEvent = (row: Event) => {
     setOpenDeleteModal(true);
@@ -309,7 +220,7 @@ export const EventsComponent = () => {
 
   return (
     <>
-    <ToastContainer/>
+      <ToastContainer />
       <div style={{
         display: "flex",
         justifyContent: "space-between",

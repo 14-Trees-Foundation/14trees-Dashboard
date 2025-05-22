@@ -6,6 +6,7 @@ export type Event = {
   key: number;
   assigned_by: number,
   site_id: number,
+  site_name: string,
   name: string,
   type: string,
   description?: string,
@@ -14,7 +15,8 @@ export type Event = {
   memories?: string[],
   images: string[] | null,
   message: string | null,
-  event_location: EventLocation
+  event_location: EventLocation,
+  link: string,
 };
 
 export type EventMessage = {
