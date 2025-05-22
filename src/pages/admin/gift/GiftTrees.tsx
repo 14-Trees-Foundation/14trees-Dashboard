@@ -875,8 +875,27 @@ const GiftTrees: FC = () => {
             title: "Email Status",
             align: "center",
             width: 150,
-            render: (value, record: any, index) => 
-                record.mail_sent ? 'Mail Sent to Sponsor' : ''
+            render: (_, record: GiftCard) => {
+                const statusParts = [];
+        
+                // 1. Sponsor Status (boolean)
+                if (record.mail_sent) statusParts.push("Sponsor");
+        
+                // 2. Recipient Status (only if all recipients have been sent the email)
+                const recipientSent = record.mailed_count ?? 0;
+                const recipientTotal = record.users_count ?? 1;
+        
+                if (recipientSent >= recipientTotal && recipientTotal > 0) {
+                    statusParts.push("Recipient");
+                }
+        
+                // 3. Assignee Status (boolean)
+                if (record.mail_sent_to_assignee) statusParts.push("Assignee");
+        
+                return statusParts.length > 0 
+                    ? `Sent to ${statusParts.join("/")}` 
+                    : "";
+            }
         },
         {
             dataIndex: "validation_errors",

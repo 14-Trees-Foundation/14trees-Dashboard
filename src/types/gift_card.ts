@@ -49,6 +49,10 @@ export type GiftCard = {
     donation_receipt_number: string | null;
     amount_received: number;
     donation_date: string | null;
+    mail_sent?: boolean;     
+    mailed_count?: number;   
+    users_count?: number;
+    mail_sent_to_assignee?: string;
 }
 
 export type GiftRequestUser = {
