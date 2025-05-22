@@ -44,10 +44,16 @@ const Chat: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
     </svg>
 );
 
-const ChatbotV2 = () => {
+interface ChatbotV2Props {
+    onHtmlLoad?: (htmlStr: string) => void
+    onDataLoad?: (data: any) => void
+}
+
+const ChatbotV2: React.FC<ChatbotV2Props> = ({ onHtmlLoad, onDataLoad }) => {
 
     const plugins = [HtmlRenderer()];
     const uploadedFiles: Promise<string>[] = [];
+    let sharedAiResponse: Promise<{ text_output: string, data?: any, html?: string }> | null = null;
     const [isFirstChat, setIsFirstChat] = useState(true);
     const [messages, setMessages] = useState<Message[]>([
         {
@@ -64,10 +70,9 @@ const ChatbotV2 = () => {
         }, 5000)
     }, []);
 
-    const getBotResponse = async (userInput: string, history: Message[]): Promise<string> => {
+    const getBotResponse = async (userInput: string, history: Message[]) => {
         const apiClient = new ApiClient();
         const resp = await apiClient.serveUserQuery(userInput, history);
-        console.log(resp.sponsor_details);
         if (resp.sponsor_details) {
             if (resp.sponsor_details.name) {
                 const userName = localStorage.getItem("userName")
@@ -81,7 +86,15 @@ const ChatbotV2 = () => {
                     localStorage.setItem("userEmail", resp.sponsor_details.email);
             }
         }
-        return resp.text_output;
+
+        if (resp.html && onHtmlLoad) {
+            onHtmlLoad(resp.html);
+        }
+        if (resp.data && onDataLoad) {
+            onDataLoad(resp.data);
+        }
+
+        return resp;
     };
     // const helpOptions = ["Quickstart", "API Docs", "Examples", "Github", "Discord"];
     const handleUpload = async (params: Params) => {
@@ -99,31 +112,61 @@ const ChatbotV2 = () => {
 
     const handleInitialMessage = () => {
         const userName = localStorage.getItem("userName");
-        // const userEmail = localStorage.getItem("userEmail");
-
-        // if (!userName)
-        //     return "Greatings!\n\nBefore we start, please share your fullname."
-        // else if (!userEmail)
-        //     return `Hi ${userName},\n\nPlease share your email address.`
-        // else
-
-
         return marked(defaultMessage.replace(" USER_NAME", userName ? " " + userName : ""));
     }
+
+    const handleUserMessage = async (params: Params) => {
+
+        let history: Message[] = []
+
+        const strings = await Promise.all(uploadedFiles);
+        let userInput = params.userInput;
+        if (strings.length > 0) {
+            userInput += '  \n\n' + "Image urls:\n" + strings.join("  \n");
+        }
+
+        if (isFirstChat) {
+            setIsFirstChat(false);
+            const userName = localStorage.getItem("userName");
+            const userEmail = localStorage.getItem("userEmail");
+            if (userName || userEmail)
+                userInput += `\n\nUsername: ${userName}\nUseremail: ${userEmail}`;
+        }
+
+        const userMessage: Message = {
+            id: Date.now().toString(),
+            text: userInput,
+            sender: 'user',
+            timestamp: new Date()
+        };
+
+        setMessages(prev => {
+            history = prev;
+            return [...prev, userMessage]
+        })
+
+        sharedAiResponse = getBotResponse(userInput, history)
+        const resp = await sharedAiResponse;
+        const botResponse: Message = {
+            id: Date.now().toString(),
+            text: resp.text_output,
+            sender: 'bot',
+            timestamp: new Date()
+        };
+
+        setMessages(prev => [...prev, botResponse]);
+
+        if (resp.text_output.includes("Your tree gifting request has been successfully created")) {
+            await params.showToast("🎉 Your gift request was created successfully!", 3000);
+        }
+
+        return marked(resp.text_output);
+    };
 
     const flow = {
         start: {
             message: handleInitialMessage,
             file: (params) => handleUpload(params),
-            // path: () => {
-            //     const userName = localStorage.getItem("userName");
-            //     const userEmail = localStorage.getItem("userEmail");
-            //     return !userName
-            //         ? "name"
-            //         : !userEmail
-            //             ? "email"
-            //             : "user"
-            // },
             path: 'user',
             renderHtml: ["BOT", "USER"],
         } as HtmlRendererBlock,
@@ -144,53 +187,15 @@ const ChatbotV2 = () => {
             renderHtml: ["BOT", "USER"],
         } as HtmlRendererBlock,
         user: {
-            message: async (params: Params) => {
+            message: handleUserMessage,
+            file: handleUpload,
+            options: async (params: Params) => {
+                await Promise.all(uploadedFiles);
+                const resp = await sharedAiResponse;
 
-                let history: Message[] = []
-
-                const strings = await Promise.all(uploadedFiles);
-                let userInput = params.userInput;
-                if (strings.length > 0) {
-                    userInput += '  \n\n' + "Image urls:\n" + strings.join("  \n");
-                }
-
-                if (isFirstChat) {
-                    setIsFirstChat(false);
-                    const userName = localStorage.getItem("userName");
-                    const userEmail = localStorage.getItem("userEmail");
-                    if (userName || userEmail)
-                        userInput += `\n\nUsername: ${userName}\nUseremail: ${userEmail}`;
-                }
-
-                const userMessage: Message = {
-                    id: Date.now().toString(),
-                    text: userInput,
-                    sender: 'user',
-                    timestamp: new Date()
-                };
-
-                setMessages(prev => {
-                    history = prev;
-                    return [...prev, userMessage]
-                })
-
-                const resp = await getBotResponse(userInput, history);
-                const botResponse: Message = {
-                    id: Date.now().toString(),
-                    text: resp,
-                    sender: 'bot',
-                    timestamp: new Date()
-                };
-
-                setMessages(prev => [...prev, botResponse]);
-
-                if (resp.includes("Your tree gifting request has been successfully created")) {
-                    await params.showToast("🎉 Your gift request was created successfully!", 3000);
-                }
-
-                return marked(resp);
+                if (resp && resp.data?.need_confirmation) return ["Confirm"];
+                return [];
             },
-            file: (params: any) => params,
             path: "user",
             renderHtml: ["BOT", "USER"],
         } as HtmlRendererBlock,
@@ -248,10 +253,10 @@ const ChatbotV2 = () => {
                         fontFamily: 'Arial, sans-serif',
                         showFooter: false
                     },
-                    botBubble: { simulateStream: true, showAvatar: true, animate: true, avatar: 'src/assets/tree-chat.png' },
+                    botBubble: { simulateStream: false, showAvatar: true, animate: true, avatar: 'src/assets/tree-chat.png' },
                     userBubble: { showAvatar: true },
-                    audio: { disabled: false, defaultToggledOn: true },
-                    voice: { language: "en-US", defaultToggledOn: false, disabled: false },
+                    // audio: { disabled: false, defaultToggledOn: true },
+                    // voice: { language: "en-US", defaultToggledOn: false, disabled: false },
                     chatWindow: { showScrollbar: true, defaultOpen: true },
                     chatInput: { allowNewline: true, botDelay: 500, buttons: [Button.FILE_ATTACHMENT_BUTTON, Button.EMOJI_PICKER_BUTTON, Button.VOICE_MESSAGE_BUTTON, Button.SEND_MESSAGE_BUTTON] },
                     fileAttachment: { disabled: false, multiple: true, accept: '*', sendFileName: true, showMediaDisplay: true },
