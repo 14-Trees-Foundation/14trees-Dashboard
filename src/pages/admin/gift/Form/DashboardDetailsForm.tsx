@@ -11,6 +11,18 @@ const EventTypes = [
         label: 'Memorial'
     },
     {
+        value: '4',
+        label: 'Wedding'
+    },
+    {
+        value: '5',
+        label: 'Anniversary'
+    },
+    {
+        value: '6',
+        label: 'Festival'
+    },
+    {
         value: '3',
         label: 'General gift'
     },
