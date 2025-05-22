@@ -15,6 +15,14 @@ interface CSRSharePageDialogProps {
     style?: React.CSSProperties
 }
 
+interface UserOption {
+    id?: number;
+    name: string;
+    email: string;
+    isNew?: boolean;
+  }
+  
+
 const CSRSharePageDialog: FC<CSRSharePageDialogProps> = ({ groupId, groupName, style }) => {
 
     const dispatch = useAppDispatch();
@@ -26,6 +34,9 @@ const CSRSharePageDialog: FC<CSRSharePageDialogProps> = ({ groupId, groupName, s
     const [selectedUsers, setSelectedUsers] = useState<{ id: number, name: string, email: string }[]>([]);
     const [searchStr, setSearchStr] = useState('');
     const [viewName, setViewName] = useState('');
+    const [showNameInput, setShowNameInput] = useState(false);
+    const [newUserName, setNewUserName] = useState('');
+    const [newUserEmail, setNewUserEmail] = useState('');
 
     useEffect(() => {
 
@@ -102,20 +113,43 @@ const CSRSharePageDialog: FC<CSRSharePageDialogProps> = ({ groupId, groupName, s
         setLoadingButton(true);
         try {
             const apiClient = new ApiClient();
+            
+            // First create any new users
+            const newUsers = selectedUsers.filter(user => user.id === -1);
+            const createdUsers = await Promise.all(
+                newUsers.map(user => apiClient.createUser({
+                    name: user.name,
+                    email: user.email,
+                    key: 0,
+                    id: 0,
+                    user_id: "",
+                    phone: "",
+                    communication_email: null,
+                    birth_date: null,
+                    created_at: new Date(), 
+                    updated_at: new Date()
+                }))
+            );
+    
+            // Replace temp users with created ones
+            const allUsers = [
+                ...selectedUsers.filter(user => user.id !== -1),
+                ...createdUsers
+            ];
+    
             if (viewDetails) {
                 if (viewName !== viewDetails.name) {
                     const data = { ...viewDetails, name: viewName };
                     await apiClient.updateView(data);
                 }
-
-                const viewData = await apiClient.updateViewUsers(viewDetails.id, selectedUsers);
+                const viewData = await apiClient.updateViewUsers(viewDetails.id, allUsers);
                 setViewDetails(viewData);
             } else {
                 const path = '/csr/dashboard/' + groupId;
-                const viewData = await apiClient.createNewView(viewName, path, selectedUsers);
+                const viewData = await apiClient.createNewView(viewName, path, allUsers);
                 setViewDetails(viewData);
             }
-
+    
         } catch (error: any) {
             toast.error(error.message);
         }
@@ -140,6 +174,18 @@ const CSRSharePageDialog: FC<CSRSharePageDialogProps> = ({ groupId, groupName, s
             <Dialog open={open} fullWidth maxWidth='lg'>
                 <DialogTitle>Share corporate dashboard</DialogTitle>
                 <DialogContent dividers>
+                <Box 
+            sx={{ 
+                backgroundColor: '#fff8e1', 
+                padding: 2, 
+                borderRadius: 1,
+                mb: 3
+            }}
+        >
+            <Typography variant="body2" color="text.secondary">
+                ⚠️ Currently we only support google login, Please use valid google account email address only!
+            </Typography>
+        </Box>
 
                     <Box mt={3}>
                         <TextField
@@ -154,44 +200,142 @@ const CSRSharePageDialog: FC<CSRSharePageDialogProps> = ({ groupId, groupName, s
                         <Typography variant="body1" gutterBottom>
                             Share with users
                         </Typography>
-                        <Autocomplete
-                            fullWidth
-                            options={usersList}
-                            value={searchStr}
-                            onInputChange={(e, value) => { handleUserSelect(value) }}
-                            getOptionLabel={(option: any) => option.email ? `${option.name} (${option.email})` : option}
-                            isOptionEqualToValue={(option, value) => option.email ? option.email === value.email : option === value}
-                            renderOption={(props: any, option) => {
-                                return (
-                                    <Box
-                                        {...props}
-                                    >
-                                        {option.email ? (
-                                            <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
-                                                <Typography variant='body1'>{option.name}</Typography>
-                                                <Typography variant='body2' color={'#494b4b'}>Email: {option.email}</Typography>
-                                                {option.communication_email && <Typography variant='subtitle2' color={'GrayText'}>Comm. Email: {option.communication_email}</Typography>}
-                                            </Box>
-                                        ) : (
-                                            <Typography>{option}</Typography>
-                                        )}
-                                    </Box>
-                                );
-                            }}
-                            renderInput={(params) => (
-                                <TextField
-                                    {...params}
-                                    placeholder="Enter user email to search"
-                                    variant="outlined"
-                                    name="recipient_email"
-                                />
+                      
+               <Autocomplete
+                    fullWidth
+                    freeSolo
+                    options={usersList}
+                    value={searchStr}
+                    onInputChange={(e: React.SyntheticEvent, value: string) => { 
+                    setSearchStr(value) 
+                    }}
+                     getOptionLabel={(option: string | UserOption) => {
+                        if (typeof option === 'string') return option;
+                           return `${option.name} (${option.email})`;
+                     }}
+                    isOptionEqualToValue={(option: UserOption, value: UserOption) => {
+                        if (typeof option === 'string' || typeof value === 'string') return false;
+                            return option.email === value.email;
+                    }}
+                  filterOptions={(options: UserOption[], params) => {
+                     const filtered = options.filter(option => 
+                        option.email.toLowerCase().includes(params.inputValue.toLowerCase()) ||
+                        option.name.toLowerCase().includes(params.inputValue.toLowerCase())
+                    );
+
+                   // Show "Add new user" option if input looks like an email but not found
+                 if (params.inputValue.includes('@') && 
+                  !options.some(opt => opt.email === params.inputValue)) {
+                  return [...filtered, { isNew: true, email: params.inputValue } as UserOption];
+                }
+
+                return filtered;
+                }}
+               renderOption={(props: React.HTMLAttributes<HTMLLIElement>, option: UserOption) => {
+               if (option.isNew) {
+               return (
+                       <Box 
+                         component="li" 
+                           {...props} 
+                         sx={{ p: 2 }}
+                         >
+                         <Typography color="primary">
+                         Add new user: {option.email}
+                         </Typography>
+                        </Box>
+                     );
+                }
+            return (
+                     <Box component="li" {...props}>
+                       <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
+                          <Typography variant='body1'>{option.name}</Typography>
+                            <Typography variant='body2' color={'#494b4b'}>Email: {option.email}</Typography>
+                        </Box>
+                    </Box>
+                );
+             }}
+                 onChange={(event: React.SyntheticEvent, newValue: string | UserOption | null) => {
+                     if (!newValue) return;
+    
+                     if (typeof newValue === 'string') {
+                    // Handle free text entry
+                     if (newValue.includes('@')) {
+                          setNewUserEmail(newValue);
+                          setShowNameInput(true);
+                      }
+                   } else if (newValue.isNew) {
+                       // "Add new user" option selected
+                          setNewUserEmail(newValue.email);
+                          setShowNameInput(true);
+                } else {
+                       // Existing user selected
+                       handleUserSelect(newValue.email);
+                 }
+               }}
+                renderInput={(params) => (
+                <Box>
+                    <TextField
+                       {...params}
+                        placeholder="Enter name or email to search"
+                        variant="outlined"
+                    />
+                 
+{showNameInput && (
+  <Box sx={{ mt: 2, display: 'flex', gap: 2 }}>
+    <TextField
+      autoFocus
+      fullWidth
+      label="Name"
+      value={newUserName}
+      onChange={(e) => {
+        console.log("Typing:", e.target.value); // Check if this logs
+        setNewUserName(e.target.value);
+      }}
+    />
+    <TextField
+      fullWidth
+      label="Email"
+      value={newUserEmail}
+      disabled
+    />
+    <Button 
+      variant="contained" 
+      onClick={() => {
+        if (newUserName?.trim() && newUserEmail) { 
+          setSelectedUsers([...selectedUsers, {
+            id: -1, // Temporary ID for new users
+            name: newUserName,
+            email: newUserEmail
+          }]);
+          setShowNameInput(false); // Change this to false to hide the input fields
+          setNewUserName('');
+          setNewUserEmail('');
+          setSearchStr(''); // Clear the search string
+        }
+      }}
+    >
+      Add
+    </Button>
+    <Button 
+      variant="outlined" 
+      onClick={() => {
+        setShowNameInput(false);
+        setNewUserName('');
+        setNewUserEmail('');
+      }}
+    >
+      Cancel
+    </Button>
+  </Box>
+)}
+    </Box>
                             )}>
                         </Autocomplete>
                         <Box sx={{ mt: 2, display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
                             {selectedUsers.map((user) => (
                                 <Chip
                                     key={user.id}
-                                    label={`${user.name} (${user.email})`}
+                                    label={`${user.name || ''}  (${user.email})`.trim()}
                                     onDelete={() => handleUserDelete(user.id)}
                                     color="secondary"
                                     sx={{ marginRight: 0.5 }}
