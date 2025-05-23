@@ -2,15 +2,16 @@ import CSRInventory from "./CSRInventory";
 import { useAuth } from "../auth/auth";
 import { useEffect, useState } from "react";
 import { SinglePageDrawer } from "./SinglePageDrawer";
-import { Dashboard, CardGiftcard, Landscape, Forest, GrassTwoTone, Map, NaturePeople } from "@mui/icons-material";
+import { Dashboard, CardGiftcard, Landscape, Forest, GrassTwoTone, Map, NaturePeople, Notifications } from "@mui/icons-material";
 import { createStyles, makeStyles } from "@mui/styles";
-import { Box, useMediaQuery, useTheme } from "@mui/material";
+import { Box, useMediaQuery, useTheme, IconButton, Badge, Popover, List, ListItem, ListItemText, Typography } from "@mui/material";
 import { useLocation, useSearchParams } from "react-router-dom";
 import { UserRoles } from "../../../types/common";
 import ApiClient from "../../../api/apiClient/apiClient";
 import { toast } from "react-toastify";
 import { Spinner } from "../../../components/Spinner";
 import { NotFound } from "../../notfound/NotFound";
+import {BirthdayNotification} from "../../../types/notification"
 
 const CSRPage: React.FC = () => {
 
@@ -21,13 +22,33 @@ const CSRPage: React.FC = () => {
     const [searchParams] = useSearchParams();
     const location = useLocation();
     const [loading, setLoading] = useState(true);
-    const [status, setStatus] = useState<{ code: number, message: string }>({ code: 404, message: '' })
+    const [status, setStatus] = useState<{ code: number, message: string }>({ code: 404, message: '' });
+    // Notification state
+    const [notifications, setNotifications] = useState<BirthdayNotification[]>([]);
+    const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+    const open = Boolean(anchorEl);
 
     let auth = useAuth();
     useEffect(() => {
         auth.signin("User", 13124, ["all"], ["super-admin"], "", () => { })
         localStorage.setItem("userId", "13124");
-    }, [])
+        
+        const fetchNotifications = async () => {
+            try {
+                const apiClient = new ApiClient();
+                // Assuming you have the user ID available (replace 13124 with actual dynamic ID if needed)
+                const userId = 13124; // Or get from auth: auth.userId
+                const notifications = await apiClient.getBirthdayNotifications([userId]);
+                setNotifications(notifications);
+                
+            } catch (error) {
+                console.error("Failed to fetch notifications:", error);
+                toast.error("Could not load notifications");
+            }
+        };
+    
+        fetchNotifications();
+    }, []);
 
     const handleScroll = (id: string) => {
         const element = document.getElementById(id);
@@ -38,7 +59,15 @@ const CSRPage: React.FC = () => {
         }
     };
 
-    useEffect(() => {
+    const handleNotificationClick = (event: React.MouseEvent<HTMLElement>) => {
+        setAnchorEl(event.currentTarget);
+    };
+
+    const handleNotificationClose = () => {
+        setAnchorEl(null);
+    };
+
+    useEffect(() => { 
         console.log(auth);
         if (auth.roles?.includes(UserRoles.Admin) || auth.roles?.includes(UserRoles.SuperAdmin)) {
             setStatus({ code: 200, message: '' });
@@ -62,11 +91,10 @@ const CSRPage: React.FC = () => {
         return () => {
             clearTimeout(intervalId);
         }
-
     }, [auth, location])
 
     const items = [
-        // {
+         // {
         //     displayName: 'Overview',
         //     logo: Dashboard,
         //     key: 0,
@@ -126,13 +154,73 @@ const CSRPage: React.FC = () => {
                     <Box
                         sx={{
                             display: "flex",
+                            position: 'relative',
                         }}
                     >
                         <SinglePageDrawer pages={items} />
                         <Box
                             component="main"
-                            sx={{ minWidth: isMobile ? "98%" : "1080px", mt: isMobile ? 8 : 0, p: isMobile ? 0 : 2, width: "100%" }}
+                            sx={{ 
+                                minWidth: isMobile ? "98%" : "1080px", 
+                                mt: isMobile ? 8 : 0, 
+                                p: isMobile ? 0 : 2, 
+                                width: "100%" 
+                            }}
                         >
+                            {/* Notification Bell Icon */}
+                            <Box sx={{ 
+                                position: 'absolute', 
+                                top: 16, 
+                                right: 16, 
+                                zIndex: 1 
+                            }}>
+                                <IconButton 
+                                    color="inherit" 
+                                    onClick={handleNotificationClick}
+                                    aria-label="notifications"
+                                >
+                                    <Badge badgeContent={notifications.length} color="error">
+                                        <Notifications />
+                                    </Badge>
+                                </IconButton>
+                            </Box>
+                            
+                            <Popover
+                                open={open}
+                                anchorEl={anchorEl}
+                                onClose={handleNotificationClose}
+                                anchorOrigin={{
+                                    vertical: 'bottom',
+                                    horizontal: 'right',
+                                }}
+                                transformOrigin={{
+                                    vertical: 'top',
+                                    horizontal: 'right',
+                                }}
+                            >
+                                <Box sx={{ p: 2, width: 300 }}>
+                                    <Typography variant="h6" component="div">
+                                        Notifications
+                                    </Typography>
+                                    {notifications.length > 0 ? (
+                                        <List>
+                                            {notifications.map((notification) => (
+                                                <ListItem key={notification.id}>
+                                                    <ListItemText 
+                                                        primary={notification.message}
+                                                        secondary={notification.date}
+                                                    />
+                                                </ListItem>
+                                            ))}
+                                        </List>
+                                    ) : (
+                                        <Typography variant="body2" sx={{ p: 2 }}>
+                                            No new notifications
+                                        </Typography>
+                                    )}
+                                </Box>
+                            </Popover>
+                            
                             <CSRInventory />
                         </Box>
                     </Box>

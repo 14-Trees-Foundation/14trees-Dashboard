@@ -6,6 +6,7 @@ import { Pond, PondWaterLevelUpdate } from '../../types/pond';
 import { User } from '../../types/user';
 import { Site } from '../../types/site';
 import { Donation, DonationTree, DonationUser } from '../../types/donation';
+import { BirthdayNotification } from '../../types/notification'
 import { OnsiteStaff } from '../../types/onSiteStaff';
 import { MapTreesUsingPlotIdRequest, MapTreesUsingSaplingIdsRequest, Tree } from '../../types/tree';
 import { UserTree, UserTreeCountPaginationResponse } from '../../types/userTree';
@@ -656,6 +657,26 @@ class ApiClient {
                 throw new Error(error.response.data.message);
             }
             throw new Error('Failed to combine users!');
+        }
+    }
+
+    async getBirthdayNotifications(userIds: number[]): Promise<BirthdayNotification[]> {
+        const url = '/users/birthday-notifications';
+        try {
+            const response = await this.api.get<BirthdayNotification[]>(url, {
+                params: {
+                    user_ids: userIds.join(',') // Converts array to comma-separated string
+                },
+                paramsSerializer: params => {
+                    return new URLSearchParams(params).toString();
+                }
+            });
+            return response.data;
+        } catch (error: any) {
+            if (error.response) {
+                throw new Error(error.response.data.error || 'Failed to fetch birthday notifications');
+            }
+            throw new Error(`Network error: ${error.message}`);
         }
     }
 
