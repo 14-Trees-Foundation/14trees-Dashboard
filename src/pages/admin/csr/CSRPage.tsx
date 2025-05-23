@@ -1,47 +1,77 @@
+import { useEffect, useState } from "react";
 import CSRInventory from "./CSRInventory";
 import { useAuth } from "../auth/auth";
-import { useEffect, useState } from "react";
 import { SinglePageDrawer } from "./SinglePageDrawer";
-import { Dashboard, CardGiftcard, Landscape, Forest, GrassTwoTone, Map, NaturePeople } from "@mui/icons-material";
+import { NaturePeople, ExitToApp } from "@mui/icons-material";
 import { createStyles, makeStyles } from "@mui/styles";
-import { Box, useMediaQuery, useTheme } from "@mui/material";
-import { useLocation, useSearchParams } from "react-router-dom";
+import { Box, useMediaQuery, useTheme, Button, Backdrop, Avatar, Typography, } from "@mui/material";
+import { useLocation, useSearchParams, useNavigate,} from "react-router-dom";
 import { UserRoles } from "../../../types/common";
 import ApiClient from "../../../api/apiClient/apiClient";
 import { toast } from "react-toastify";
 import { Spinner } from "../../../components/Spinner";
 import { NotFound } from "../../notfound/NotFound";
+import { GoogleLogout } from "react-google-login";
 
 const CSRPage: React.FC = () => {
-
     const theme = useTheme();
-    const isMobile = useMediaQuery(theme.breakpoints.down('md'));
-
+    const isMobile = useMediaQuery(theme.breakpoints.down("md"));
     const classes = useStyles();
     const [searchParams] = useSearchParams();
     const location = useLocation();
     const [loading, setLoading] = useState(true);
-    const [status, setStatus] = useState<{ code: number, message: string }>({ code: 404, message: '' })
+    const [status, setStatus] = useState<{ code: number; message: string }>({ code: 404, message: "", });
+    const [logoutLoading, setLogoutLoading] = useState(false);
 
     let auth = useAuth();
+    const navigate = useNavigate();
+
+    const getInitials = (name: string) => {
+        if (!name) return "";
+        return name
+            .split(" ")
+            .map((part) => part[0])
+            .join("")
+            .toUpperCase();
+    };
+
     useEffect(() => {
-        auth.signin("User", 13124, ["all"], ["super-admin"], "", () => { })
+        auth.signin("User", 13124, ["all"], ["super-admin"], "", () => {});
         localStorage.setItem("userId", "13124");
-    }, [])
+    }, []);
+
+    const handleLogout = () => {
+        setLogoutLoading(true);
+        localStorage.removeItem("loginInfo");
+        localStorage.removeItem("token");
+        localStorage.removeItem("permissions");
+        localStorage.removeItem("roles");
+        localStorage.removeItem("userId");
+
+        auth.signout(() => {
+            setLogoutLoading(false);
+            toast.success("Logged out successfully!");
+            navigate("/login", { replace: true });
+        });
+    };
+
+    const onGoogleLogoutSuccess = () => {
+        handleLogout();
+    };
 
     const handleScroll = (id: string) => {
         const element = document.getElementById(id);
         if (element) {
             const rect = element.getBoundingClientRect();
             const offset = window.scrollY + rect.top - parseFloat(getComputedStyle(element).marginTop);
-            window.scrollTo({ top: offset, behavior: 'smooth' });
+            window.scrollTo({ top: offset, behavior: "smooth" });
         }
     };
 
     useEffect(() => {
         console.log(auth);
         if (auth.roles?.includes(UserRoles.Admin) || auth.roles?.includes(UserRoles.SuperAdmin)) {
-            setStatus({ code: 200, message: '' });
+            setStatus({ code: 200, message: "" });
             setLoading(false);
             return;
         }
@@ -49,7 +79,7 @@ const CSRPage: React.FC = () => {
         const intervalId = setTimeout(async () => {
             setLoading(true);
             try {
-                const viewId = searchParams.get('v') || '';
+                const viewId = searchParams.get("v") || "";
                 const apiClient = new ApiClient();
                 const resp = await apiClient.verifyViewAccess(viewId, auth.userId, location.pathname);
                 setStatus(resp);
@@ -118,25 +148,88 @@ const CSRPage: React.FC = () => {
     ]
 
     return (
-        loading
-            ? <Spinner text={''} />
-            : status.code !== 200
-                ? <NotFound text={status.message} />
-                : (<div className={classes.box}>
-                    <Box
-                        sx={{
-                            display: "flex",
-                        }}
-                    >
+        <>
+            <Backdrop open={logoutLoading} sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}>
+                <Spinner text={"Logging you out..."} />
+            </Backdrop>
+
+            {loading ? (
+                <Spinner text={""} />
+            ) : status.code !== 200 ? (
+                <NotFound text={status.message} />
+            ) : (
+                <div className={classes.box}>
+                    <Box sx={{ display: "flex", position: "relative" }}>
                         <SinglePageDrawer pages={items} />
+
+                        {/* Bottom-left user info row */}
+                        <Box
+                            sx={{
+                                position: "fixed",
+                                bottom: 16,
+                                left: 16,
+                                zIndex: 1000,
+                                display: "flex",
+                                alignItems: "center",
+                                gap: 1.5,
+                                backgroundColor: "#f1f5f4",
+                                borderRadius: 999,
+                                px: 2,
+                                py: 1,
+                                boxShadow: 3,
+                            }}
+                        >
+                            <Avatar
+                                sx={{
+                                    bgcolor: "#336B43",
+                                    color: "#ffffff",
+                                    width: 36,
+                                    height: 36,
+                                    fontWeight: "bold",
+                                    fontSize: "0.9rem",
+                                }}
+                            >
+                                {auth.user?.name ? getInitials(auth.user.name) : "U"}
+                            </Avatar>
+
+                            <Typography variant="subtitle2" sx={{ fontWeight: 500, color: "#1a1a1a" }}>
+                                {auth.user?.name || "User"}
+                            </Typography>
+
+                            <GoogleLogout
+                                clientId={import.meta.env.VITE_APP_CLIENT_ID}
+                                onLogoutSuccess={onGoogleLogoutSuccess}
+                                render={(renderProps) => (
+                                    <Button
+                                        onClick={renderProps.onClick}
+                                        variant="text"
+                                        sx={{
+                                            minWidth: "auto",
+                                            p: 0.5,
+                                            color: "#336B43",
+                                        }}
+                                    >
+                                        <ExitToApp />
+                                    </Button>
+                                )}
+                            />
+                        </Box>
+
                         <Box
                             component="main"
-                            sx={{ minWidth: isMobile ? "98%" : "1080px", mt: isMobile ? 8 : 0, p: isMobile ? 0 : 2, width: "100%" }}
+                            sx={{
+                                minWidth: isMobile ? "98%" : "1080px",
+                                mt: isMobile ? 8 : 0,
+                                p: isMobile ? 0 : 2,
+                                width: "100%",
+                            }}
                         >
                             <CSRInventory />
                         </Box>
                     </Box>
-                </div>)
+                </div>
+            )}
+        </>
     );
 }
 
@@ -148,7 +241,7 @@ const useStyles = makeStyles((theme: any) =>
             position: "relative",
             backgroundColor: "#B1BFB5",
             minHeight: "100vh",
-            heigth: "100%",
+            height: "100%",
         },
         bg: {
             width: "100%",

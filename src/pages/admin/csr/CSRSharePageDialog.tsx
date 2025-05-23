@@ -12,7 +12,8 @@ import { LoadingButton } from "@mui/lab";
 interface CSRSharePageDialogProps {
     groupId?: number
     groupName?: string
-    style?: React.CSSProperties
+    style?: React.CSSProperties;
+    disabled?: boolean;
 }
 
 interface UserOption {
@@ -23,7 +24,7 @@ interface UserOption {
   }
   
 
-const CSRSharePageDialog: FC<CSRSharePageDialogProps> = ({ groupId, groupName, style }) => {
+const CSRSharePageDialog: FC<CSRSharePageDialogProps> = ({ groupId, groupName, style, disabled = false }) => {
 
     const dispatch = useAppDispatch();
     const { searchUsers } = bindActionCreators(userActionCreators, dispatch);
