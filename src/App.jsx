@@ -7,7 +7,7 @@ import { Dashboard } from "./pages/Dashboard";
 import { Events } from "./pages/events/Events";
 import { NotFound } from "./pages/notfound/NotFound";
 import { AssignTree } from "./pages/admin/Forms/components/AssignTree";
-import { Admin } from "./pages/admin/Admin";
+import { AdminLayout } from "./pages/admin/Admin";
 import { Layout } from "./components/Layout";
 import { GiftTrees } from "./pages/ww/GiftTrees";
 import { WW } from "./pages/ww/WW";
@@ -32,6 +32,20 @@ import SponsorProfile from "./pages/SponsorProfile/SponsorProfile";
 import CSRPage from "./pages/admin/csr/CSRPage";
 import EventPage from "./pages/EventDashboard/EventPage";
 import GiftDashboard from "./pages/GiftDashboard/GiftDashboard";
+import { AdminHome } from "./pages/admin/home/AdminHome";
+import { SitesComponent } from "./pages/admin/sites/Sites";
+import { PlotComponent } from "./pages/admin/plot/Plot";
+import { Trees } from "./pages/admin/tree/Tree";
+import { PlantTypeComponent } from "./pages/admin/plantType/PlantType";
+import { Ponds } from "./pages/admin/Ponds/Ponds";
+import { Users } from "./pages/admin/users/Users";
+import { OrganizationComponent } from "./pages/admin/organization/Organization";
+import { VisitsComponent } from "./pages/admin/visits/Visits";
+import { EventsComponent } from "./pages/admin/events/Events";
+import SiteInventory from "./pages/admin/Inventory/SiteInventory";
+import GCInventory from "./pages/admin/Inventory/GCInventory";
+import { DonationComponent } from "./pages/admin/donation/Donation";
+import CSRInventory from "./pages/admin/csr/CSRInventory";
 
 function App() {
   return (
@@ -67,10 +81,26 @@ function App() {
             path="/admin"
             element={
               // <RequireAuth>
-                <Admin />
+                <AdminLayout />
               // </RequireAuth>
             }
           >
+             <Route index element={<AdminHome />} /> {/* Default route */}
+             <Route path="home" element={<AdminHome />} />
+             <Route path="sites" element={<SitesComponent />} />
+             <Route path="plots" element={<PlotComponent />} />
+             <Route path="trees" element={<Trees />} />
+             <Route path="plant-types" element={<PlantTypeComponent />} />
+             <Route path="ponds" element={<Ponds />} />
+             <Route path="people" element={<Users />} />
+             <Route path="people-group" element={<OrganizationComponent />} />
+             <Route path="visits" element={<VisitsComponent />} />
+             <Route path="events" element={<EventsComponent />} />
+             <Route path="site-inventory" element={<SiteInventory />} />
+             <Route path="gc-inventory" element={<GCInventory />} />
+             <Route path="tree-cards" element={<GiftTrees />} />
+             <Route path="donations" element={<DonationComponent />} />
+             <Route path="corporate-dashboard" element={<CSRInventory />} />
             <Route path="forms" element={<Forms />}>
               <Route path="assigntrees" element={<AssignTree />}></Route>
               <Route path="addorg" element={<AddOrg />}></Route>
