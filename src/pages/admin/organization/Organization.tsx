@@ -231,7 +231,7 @@ export const OrganizationComponent = () => {
       dataIndex: "action",
       key: "action",
       title: "Action",
-      width: 300,
+      width: 400,
       align: "center",
       render: (value, record, index) => (
         <div style={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
@@ -252,7 +252,7 @@ export const OrganizationComponent = () => {
           </Button>
           <Button
             variant="outlined"
-            color="primary"
+            color="success"
             style={{ margin: "0 5px" }}
             onClick={() => {
               const { hostname, host } = window.location;
@@ -264,8 +264,7 @@ export const OrganizationComponent = () => {
               }
             }}
           >
-            {/* You can use a tree icon from MUI or another library */}
-            <ParkIcon /> {/* Make sure to import ParkIcon from @mui/icons-material/Park */}
+            <ParkIcon />
           </Button>
           <Button
             color="success"
