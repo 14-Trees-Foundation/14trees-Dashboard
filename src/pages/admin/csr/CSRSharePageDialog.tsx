@@ -114,13 +114,18 @@ const CSRSharePageDialog: FC<CSRSharePageDialogProps> = ({ groupId, groupName, s
         setLoadingButton(true);
         try {
             const apiClient = new ApiClient();
+            // Filter out any invalid users (where name might be undefined)
+            const validUsers = selectedUsers.filter(user => 
+               user.email && user.email.trim() && 
+               user.name && user.name.trim()
+        );
             
             // First create any new users
-            const newUsers = selectedUsers.filter(user => user.id === -1);
+            const newUsers = validUsers.filter(user => user.id === -1);
             const createdUsers = await Promise.all(
                 newUsers.map(user => apiClient.createUser({
-                    name: user.name,
-                    email: user.email,
+                    name: user.name.trim(),
+                    email: user.email.trim(),
                     key: 0,
                     id: 0,
                     user_id: "",
@@ -134,7 +139,7 @@ const CSRSharePageDialog: FC<CSRSharePageDialogProps> = ({ groupId, groupName, s
     
             // Replace temp users with created ones
             const allUsers = [
-                ...selectedUsers.filter(user => user.id !== -1),
+                ...validUsers.filter(user => user.id !== -1),
                 ...createdUsers
             ];
     
@@ -305,8 +310,8 @@ const CSRSharePageDialog: FC<CSRSharePageDialogProps> = ({ groupId, groupName, s
                        if (newUserName?.trim() && newUserEmail) { 
                             setSelectedUsers([...selectedUsers, {
                                id: -1, // Temporary ID for new users
-                               name: newUserName,
-                               email: newUserEmail
+                               name: newUserName.trim(), 
+                               email: newUserEmail.trim()
                             }]);
                               setShowNameInput(false); // Change this to false to hide the input fields
                               setNewUserName('');
