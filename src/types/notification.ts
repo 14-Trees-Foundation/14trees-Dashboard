@@ -1,5 +1,12 @@
-export interface BirthdayNotification {
-    id: string;
-    message: string;
-    date: string; // ISO 8601 format
+export interface BirthdayResponse {
+    hasBirthday: boolean;
+    count: number;
+    upcomingBirthdays: {
+      id: number;
+      name: string;
+      birth_date: string;
+      upcoming_date: string;
+    }[];
+    checkedDates: string[];
+    checkedUserCount: number;
   }

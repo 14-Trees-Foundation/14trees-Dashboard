@@ -4,51 +4,49 @@ import { useEffect, useState } from "react";
 import { SinglePageDrawer } from "./SinglePageDrawer";
 import { Dashboard, CardGiftcard, Landscape, Forest, GrassTwoTone, Map, NaturePeople, Notifications } from "@mui/icons-material";
 import { createStyles, makeStyles } from "@mui/styles";
-import { Box, useMediaQuery, useTheme, IconButton, Badge, Popover, List, ListItem, ListItemText, Typography } from "@mui/material";
+import { Box, useMediaQuery, useTheme, IconButton, Badge, Popover, Typography, List, ListItem, ListItemText, Divider } from "@mui/material";
 import { useLocation, useSearchParams } from "react-router-dom";
 import { UserRoles } from "../../../types/common";
 import ApiClient from "../../../api/apiClient/apiClient";
 import { toast } from "react-toastify";
 import { Spinner } from "../../../components/Spinner";
 import { NotFound } from "../../notfound/NotFound";
-import {BirthdayNotification} from "../../../types/notification"
+
+interface BirthdayResponse {
+  hasBirthday: boolean;
+  count: number;
+  upcomingBirthdays: Array<{
+    id: number;
+    name: string;
+    birth_date: string;
+    upcoming_date: string;
+  }>;
+}
 
 const CSRPage: React.FC = () => {
-
     const theme = useTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down('md'));
-
     const classes = useStyles();
     const [searchParams] = useSearchParams();
     const location = useLocation();
     const [loading, setLoading] = useState(true);
     const [status, setStatus] = useState<{ code: number, message: string }>({ code: 404, message: '' });
-    // Notification state
-    const [notifications, setNotifications] = useState<BirthdayNotification[]>([]);
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-    const open = Boolean(anchorEl);
+    const [birthdayData, setBirthdayData] = useState<BirthdayResponse | null>(null);
 
     let auth = useAuth();
     useEffect(() => {
         auth.signin("User", 13124, ["all"], ["super-admin"], "", () => { })
         localStorage.setItem("userId", "13124");
-        
-        const fetchNotifications = async () => {
-            try {
-                const apiClient = new ApiClient();
-                // Assuming you have the user ID available (replace 13124 with actual dynamic ID if needed)
-                const userId = 13124; // Or get from auth: auth.userId
-                const notifications = await apiClient.getBirthdayNotifications([userId]);
-                setNotifications(notifications);
-                
-            } catch (error) {
-                console.error("Failed to fetch notifications:", error);
-                toast.error("Could not load notifications");
-            }
-        };
-    
-        fetchNotifications();
     }, []);
+
+    const handleNotificationsClick = (event: React.MouseEvent<HTMLElement>) => {
+        setAnchorEl(event.currentTarget);
+    };
+
+    const handleNotificationsClose = () => {
+        setAnchorEl(null);
+    };
 
     const handleScroll = (id: string) => {
         const element = document.getElementById(id);
@@ -59,22 +57,13 @@ const CSRPage: React.FC = () => {
         }
     };
 
-    const handleNotificationClick = (event: React.MouseEvent<HTMLElement>) => {
-        setAnchorEl(event.currentTarget);
-    };
-
-    const handleNotificationClose = () => {
-        setAnchorEl(null);
-    };
-
-    useEffect(() => { 
+    useEffect(() => {
         console.log(auth);
         if (auth.roles?.includes(UserRoles.Admin) || auth.roles?.includes(UserRoles.SuperAdmin)) {
             setStatus({ code: 200, message: '' });
             setLoading(false);
             return;
         }
-
         const intervalId = setTimeout(async () => {
             setLoading(true);
             try {
@@ -87,14 +76,13 @@ const CSRPage: React.FC = () => {
             }
             setLoading(false);
         }, 300)
-
         return () => {
             clearTimeout(intervalId);
         }
-    }, [auth, location])
+    }, [auth, location]);
 
     const items = [
-         // {
+        // {
         //     displayName: 'Overview',
         //     logo: Dashboard,
         //     key: 0,
@@ -143,7 +131,10 @@ const CSRPage: React.FC = () => {
         //     display: true,
         //     onClick: () => { handleScroll('green-gift-contributions') }
         // },
-    ]
+    ];
+
+    const open = Boolean(anchorEl);
+    const id = open ? 'birthday-notifications-popover' : undefined;
 
     return (
         loading
@@ -151,77 +142,81 @@ const CSRPage: React.FC = () => {
             : status.code !== 200
                 ? <NotFound text={status.message} />
                 : (<div className={classes.box}>
+                    {/* Notification Button */}
                     <Box
                         sx={{
                             display: "flex",
-                            position: 'relative',
+                            justifyContent: "flex-end",
+                            padding: 2,
+                            position: "fixed",
+                            right: 0,
+                            top: 0,
+                            zIndex: theme.zIndex.appBar
+                        }}
+                    >
+                        <IconButton 
+                            color="inherit" 
+                            onClick={handleNotificationsClick}
+                            aria-describedby={id}
+                        >
+                            <Badge 
+                                badgeContent={birthdayData?.count || 0} 
+                                color="error"
+                                invisible={!birthdayData?.hasBirthday}
+                            >
+                                <Notifications />
+                            </Badge>
+                        </IconButton>
+                        <Popover
+                            id={id}
+                            open={open}
+                            anchorEl={anchorEl}
+                            onClose={handleNotificationsClose}
+                            anchorOrigin={{
+                                vertical: 'bottom',
+                                horizontal: 'right',
+                            }}
+                            transformOrigin={{
+                                vertical: 'top',
+                                horizontal: 'right',
+                            }}
+                        >
+                            <Box sx={{ p: 2, width: 300 }}>
+                                <Typography variant="h6" component="div">
+                                    Upcoming Birthdays
+                                </Typography>
+                                <Divider sx={{ my: 1 }} />
+                                {birthdayData?.hasBirthday ? (
+                                    <List dense>
+                                        {birthdayData.upcomingBirthdays.map((user) => (
+                                            <ListItem key={user.id}>
+                                                <ListItemText
+                                                    primary={user.name}
+                                                    secondary={`Birthday on ${new Date(user.upcoming_date).toLocaleDateString()}`}
+                                                />
+                                            </ListItem>
+                                        ))}
+                                    </List>
+                                ) : (
+                                    <Typography variant="body2" color="text.secondary">
+                                        No upcoming birthdays
+                                    </Typography>
+                                )}
+                            </Box>
+                        </Popover>
+                    </Box>
+
+                    <Box
+                        sx={{
+                            display: "flex",
                         }}
                     >
                         <SinglePageDrawer pages={items} />
                         <Box
                             component="main"
-                            sx={{ 
-                                minWidth: isMobile ? "98%" : "1080px", 
-                                mt: isMobile ? 8 : 0, 
-                                p: isMobile ? 0 : 2, 
-                                width: "100%" 
-                            }}
+                            sx={{ minWidth: isMobile ? "98%" : "1080px", mt: isMobile ? 8 : 0, p: isMobile ? 0 : 2, width: "100%" }}
                         >
-                            {/* Notification Bell Icon */}
-                            <Box sx={{ 
-                                position: 'absolute', 
-                                top: 16, 
-                                right: 16, 
-                                zIndex: 1 
-                            }}>
-                                <IconButton 
-                                    color="inherit" 
-                                    onClick={handleNotificationClick}
-                                    aria-label="notifications"
-                                >
-                                    <Badge badgeContent={notifications.length} color="error">
-                                        <Notifications />
-                                    </Badge>
-                                </IconButton>
-                            </Box>
-                            
-                            <Popover
-                                open={open}
-                                anchorEl={anchorEl}
-                                onClose={handleNotificationClose}
-                                anchorOrigin={{
-                                    vertical: 'bottom',
-                                    horizontal: 'right',
-                                }}
-                                transformOrigin={{
-                                    vertical: 'top',
-                                    horizontal: 'right',
-                                }}
-                            >
-                                <Box sx={{ p: 2, width: 300 }}>
-                                    <Typography variant="h6" component="div">
-                                        Notifications
-                                    </Typography>
-                                    {notifications.length > 0 ? (
-                                        <List>
-                                            {notifications.map((notification) => (
-                                                <ListItem key={notification.id}>
-                                                    <ListItemText 
-                                                        primary={notification.message}
-                                                        secondary={notification.date}
-                                                    />
-                                                </ListItem>
-                                            ))}
-                                        </List>
-                                    ) : (
-                                        <Typography variant="body2" sx={{ p: 2 }}>
-                                            No new notifications
-                                        </Typography>
-                                    )}
-                                </Box>
-                            </Popover>
-                            
-                            <CSRInventory />
+                            <CSRInventory onBirthdayData={setBirthdayData} />
                         </Box>
                     </Box>
                 </div>)
