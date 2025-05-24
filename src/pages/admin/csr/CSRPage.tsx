@@ -36,7 +36,7 @@ const CSRPage: React.FC = () => {
     };
 
     useEffect(() => {
-        auth.signin("User", 13124, ["all"], ["super-admin"], "", () => {});
+        auth.signin("user", 13124, ["all"], ["super-admin"], "", () => {});
         localStorage.setItem("userId", "13124");
     }, []);
 
@@ -162,27 +162,28 @@ const CSRPage: React.FC = () => {
                     <Box sx={{ display: "flex", position: "relative" }}>
                         <SinglePageDrawer pages={items} />
 
-                        {/* Bottom-left user info row */}
+                        {/* Updated Bottom-left user info row */}
                         <Box
                             sx={{
                                 position: "fixed",
                                 bottom: 16,
-                                left: 16,
-                                zIndex: 1000,
+                                left: 16, 
+                                zIndex: 1200,
                                 display: "flex",
                                 alignItems: "center",
                                 gap: 1.5,
-                                backgroundColor: "#f1f5f4",
+                                backgroundColor: "white",
                                 borderRadius: 999,
                                 px: 2,
                                 py: 1,
                                 boxShadow: 3,
+                                border: "1px solid rgba(0,0,0,0.1)",
                             }}
                         >
                             <Avatar
                                 sx={{
                                     bgcolor: "#336B43",
-                                    color: "#ffffff",
+                                    color: "white",
                                     width: 36,
                                     height: 36,
                                     fontWeight: "bold",
@@ -192,7 +193,7 @@ const CSRPage: React.FC = () => {
                                 {auth.user?.name ? getInitials(auth.user.name) : "U"}
                             </Avatar>
 
-                            <Typography variant="subtitle2" sx={{ fontWeight: 500, color: "#1a1a1a" }}>
+                            <Typography variant="subtitle2" sx={{ fontWeight: 500, color: "#333" }}>
                                 {auth.user?.name || "User"}
                             </Typography>
 
