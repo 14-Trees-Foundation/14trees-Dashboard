@@ -2,9 +2,9 @@ import CSRInventory from "./CSRInventory";
 import { useAuth } from "../auth/auth";
 import { useEffect, useState } from "react";
 import { SinglePageDrawer } from "./SinglePageDrawer";
-import { Dashboard, CardGiftcard, Landscape, Forest, GrassTwoTone, Map, NaturePeople } from "@mui/icons-material";
+import { Dashboard, CardGiftcard, Landscape, Forest, GrassTwoTone, Map, NaturePeople, Notifications } from "@mui/icons-material";
 import { createStyles, makeStyles } from "@mui/styles";
-import { Box, useMediaQuery, useTheme } from "@mui/material";
+import { Box, useMediaQuery, useTheme, IconButton, Badge, Popover, Typography, List, ListItem, ListItemText, Divider } from "@mui/material";
 import { useLocation, useSearchParams } from "react-router-dom";
 import { UserRoles } from "../../../types/common";
 import ApiClient from "../../../api/apiClient/apiClient";
@@ -12,22 +12,41 @@ import { toast } from "react-toastify";
 import { Spinner } from "../../../components/Spinner";
 import { NotFound } from "../../notfound/NotFound";
 
-const CSRPage: React.FC = () => {
+interface BirthdayResponse {
+  hasBirthday: boolean;
+  count: number;
+  upcomingBirthdays: Array<{
+    id: number;
+    name: string;
+    birth_date: string;
+    upcoming_date: string;
+  }>;
+}
 
+const CSRPage: React.FC = () => {
     const theme = useTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down('md'));
-
     const classes = useStyles();
     const [searchParams] = useSearchParams();
     const location = useLocation();
     const [loading, setLoading] = useState(true);
-    const [status, setStatus] = useState<{ code: number, message: string }>({ code: 404, message: '' })
+    const [status, setStatus] = useState<{ code: number, message: string }>({ code: 404, message: '' });
+    const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+    const [birthdayData, setBirthdayData] = useState<BirthdayResponse | null>(null);
 
     let auth = useAuth();
     useEffect(() => {
         auth.signin("User", 13124, ["all"], ["super-admin"], "", () => { })
         localStorage.setItem("userId", "13124");
-    }, [])
+    }, []);
+
+    const handleNotificationsClick = (event: React.MouseEvent<HTMLElement>) => {
+        setAnchorEl(event.currentTarget);
+    };
+
+    const handleNotificationsClose = () => {
+        setAnchorEl(null);
+    };
 
     const handleScroll = (id: string) => {
         const element = document.getElementById(id);
@@ -45,7 +64,6 @@ const CSRPage: React.FC = () => {
             setLoading(false);
             return;
         }
-
         const intervalId = setTimeout(async () => {
             setLoading(true);
             try {
@@ -58,12 +76,10 @@ const CSRPage: React.FC = () => {
             }
             setLoading(false);
         }, 300)
-
         return () => {
             clearTimeout(intervalId);
         }
-
-    }, [auth, location])
+    }, [auth, location]);
 
     const items = [
         // {
@@ -115,7 +131,10 @@ const CSRPage: React.FC = () => {
         //     display: true,
         //     onClick: () => { handleScroll('green-gift-contributions') }
         // },
-    ]
+    ];
+
+    const open = Boolean(anchorEl);
+    const id = open ? 'birthday-notifications-popover' : undefined;
 
     return (
         loading
@@ -123,6 +142,70 @@ const CSRPage: React.FC = () => {
             : status.code !== 200
                 ? <NotFound text={status.message} />
                 : (<div className={classes.box}>
+                    {/* Notification Button */}
+                    <Box
+                        sx={{
+                            display: "flex",
+                            justifyContent: "flex-end",
+                            padding: 2,
+                            position: "fixed",
+                            right: 0,
+                            top: 0,
+                            zIndex: theme.zIndex.appBar
+                        }}
+                    >
+                        <IconButton 
+                            color="inherit" 
+                            onClick={handleNotificationsClick}
+                            aria-describedby={id}
+                        >
+                            <Badge 
+                                badgeContent={birthdayData?.count || 0} 
+                                color="error"
+                                invisible={!birthdayData?.hasBirthday}
+                            >
+                                <Notifications />
+                            </Badge>
+                        </IconButton>
+                        <Popover
+                            id={id}
+                            open={open}
+                            anchorEl={anchorEl}
+                            onClose={handleNotificationsClose}
+                            anchorOrigin={{
+                                vertical: 'bottom',
+                                horizontal: 'right',
+                            }}
+                            transformOrigin={{
+                                vertical: 'top',
+                                horizontal: 'right',
+                            }}
+                        >
+                            <Box sx={{ p: 2, width: 300 }}>
+                                <Typography variant="h6" component="div">
+                                    Upcoming Birthdays
+                                </Typography>
+                                <Divider sx={{ my: 1 }} />
+                                {birthdayData?.hasBirthday ? (
+                                    <List dense>
+                                        {birthdayData.upcomingBirthdays.map((user) => (
+                                            <ListItem key={user.id}>
+                                                <ListItemText
+                                                    primary={user.name}
+                                                    secondary={`Birthday on ${new Date(user.upcoming_date).toLocaleDateString()}`}
+                                                />
+                                            </ListItem>
+                                        ))}
+                                    </List>
+                                ) : (
+                                    <Typography variant="body2" color="text.secondary">
+                                        No upcoming birthdays
+                                    </Typography>
+                                )}
+                            </Box>
+                        </Popover>
+                    </Box>
+
                     <Box
                         sx={{
                             display: "flex",
@@ -133,7 +216,7 @@ const CSRPage: React.FC = () => {
                             component="main"
                             sx={{ minWidth: isMobile ? "98%" : "1080px", mt: isMobile ? 8 : 0, p: isMobile ? 0 : 2, width: "100%" }}
                         >
-                            <CSRInventory />
+                            <CSRInventory onBirthdayData={setBirthdayData} />
                         </Box>
                     </Box>
                 </div>)

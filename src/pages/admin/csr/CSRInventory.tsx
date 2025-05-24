@@ -11,8 +11,13 @@ import { toast, ToastContainer } from "react-toastify";
 import { useParams } from "react-router-dom";
 import CSRGiftTrees from "./CSRGiftTrees";
 import CSRSharePageDialog from "./CSRSharePageDialog";
+import { BirthdayResponse } from "../../../types/notification"
 
-const CSRInventory: React.FC = () => {
+interface CSRInventoryProps {
+    onBirthdayData?: (data: BirthdayResponse) => void;
+}
+
+const CSRInventory: React.FC<CSRInventoryProps> = ({ onBirthdayData }) => {
 
     const theme = useTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down('md'));
@@ -73,6 +78,24 @@ const CSRInventory: React.FC = () => {
         }
 
     }, [groupsList, groupId])
+
+    // Add this with your other useEffect hooks
+    useEffect(() => {
+        const fetchBirthdays = async () => {
+            if (!selectedGroup?.id) return;
+
+            try {
+                const apiClient = new ApiClient();
+                const data = await apiClient.checkGroupBirthdays(selectedGroup.id);
+                onBirthdayData?.(data);
+            } catch (error) {
+                console.error('Failed to fetch birthdays:', error);
+                toast.error('Failed to load birthday data');
+            }
+        };
+
+        fetchBirthdays();
+    }, [selectedGroup?.id, onBirthdayData]);
 
     ///*** Tags ***/
     const [tags, setTags] = useState<string[]>([]);
@@ -141,11 +164,11 @@ const CSRInventory: React.FC = () => {
                     >
                         CSR View
                     </Button> */}
-                    <CSRSharePageDialog groupId={selectedGroup?.id} groupName={selectedGroup?.name} style={{ marginLeft: 10 }}/>
+                    <CSRSharePageDialog groupId={selectedGroup?.id} groupName={selectedGroup?.name} style={{ marginLeft: 10 }} />
                 </div>}
             </div>
             <Divider sx={{ backgroundColor: "black", marginBottom: '15px', mx: 1 }} />
-            
+
             {/* <Typography variant="h4" mt={5} ml={1} id="corporate-impact-overview">Corporate Impact Overview</Typography>
             <Typography variant="subtitle1" mb={1} ml={1}>A comprehensive snapshot of your contributions to reforestation and sustainability efforts, including total trees sponsored, plant types supported, acres rejuvenated, and sponsorship progress over time.</Typography>
             <Box
