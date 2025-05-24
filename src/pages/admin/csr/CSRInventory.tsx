@@ -102,13 +102,14 @@ const CSRInventory: React.FC = () => {
                 }}
             >
                 <Typography variant={isMobile ? "h5" : "h3"} style={{ marginTop: '5px', marginBottom: '5px' }}>{selectedGroup ? `${selectedGroup.name}'s` : 'Corporate'} Dashboard</Typography>
-                {!groupId && <div
+                 <div
                     style={{
                         display: "flex",
                         justifyContent: "space-between",
                         alignItems: 'center',
                     }}
                 >
+                    {!groupId &&(
                     <AutocompleteWithPagination
                         label="Select a corporate group"
                         options={groupsList}
@@ -125,6 +126,7 @@ const CSRInventory: React.FC = () => {
                         size="small"
                         value={selectedGroup}
                     />
+                )}
                     {/* <Button
                         sx={{ ml: 2 }}
                         disabled={!selectedGroup}
@@ -141,8 +143,12 @@ const CSRInventory: React.FC = () => {
                     >
                         CSR View
                     </Button> */}
-                    <CSRSharePageDialog groupId={selectedGroup?.id} groupName={selectedGroup?.name} style={{ marginLeft: 10 }}/>
-                </div>}
+                     <CSRSharePageDialog 
+      groupId={groupId ? parseInt(groupId) : selectedGroup?.id} 
+      groupName={selectedGroup?.name} 
+      style={{ marginLeft: !groupId ? 10 : 0 }}
+      disabled={!groupId && !selectedGroup}/>
+                </div>
             </div>
             <Divider sx={{ backgroundColor: "black", marginBottom: '15px', mx: 1 }} />
             
