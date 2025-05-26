@@ -6,6 +6,7 @@ import { Pond, PondWaterLevelUpdate } from '../../types/pond';
 import { User } from '../../types/user';
 import { Site } from '../../types/site';
 import { Donation, DonationTree, DonationUser } from '../../types/donation';
+import { BirthdayResponse } from '../../types/notification'
 import { OnsiteStaff } from '../../types/onSiteStaff';
 import { MapTreesUsingPlotIdRequest, MapTreesUsingSaplingIdsRequest, Tree } from '../../types/tree';
 import { UserTree, UserTreeCountPaginationResponse } from '../../types/userTree';
@@ -656,6 +657,18 @@ class ApiClient {
                 throw new Error(error.response.data.message);
             }
             throw new Error('Failed to combine users!');
+        }
+    }
+
+   async checkGroupBirthdays(groupId: number): Promise<BirthdayResponse> { 
+        try {
+            const response = await this.api.get(`/users/birthday/notifications?group_id=${groupId}`);
+            return response.data;
+        } catch (error: any) {
+            if (error.response) {
+                throw new Error(error.response.data.message);
+            }
+            throw new Error('Failed to update User');
         }
     }
 
