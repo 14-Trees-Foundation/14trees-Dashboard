@@ -26,7 +26,7 @@ interface GiftAnalyticsProps {
     userId?: number;
     groupId?: number;
     onGiftMultiple: () => void;
-    onBulkGifting: () => void;
+    onBulkGifting?: () => void;
     refreshTrigger?: number;
     isLoading?: boolean;
 }
@@ -168,15 +168,15 @@ const GiftAnalytics: React.FC<GiftAnalyticsProps> = ({
                         >
                             {isLoading ? "Loading Trees..." : "Gift Trees Now!"}
                         </Button>
-                        <Typography style={{
+                        {onBulkGifting && <Typography style={{
                             textTransform: 'none',
                             margin: isMobile ? '8px 0 0 0' : '10px 5px 0 0',
                             padding: isMobile ? '8px 16px' : '6px 16px',
                             fontSize: isMobile ? '0.85rem' : 'inherit',
                             width: isMobile ? '96%' : 'auto',
                             textAlign: 'center'
-                        }}>OR</Typography>
-                        <Button
+                        }}>OR</Typography>}
+                        {onBulkGifting && <Button
                             variant="contained"
                             color="success"
                             onClick={onBulkGifting}
@@ -192,7 +192,7 @@ const GiftAnalytics: React.FC<GiftAnalyticsProps> = ({
                             size={isMobile ? "small" : "medium"}
                         >
                             {"Gift in Bulk!"}
-                        </Button>
+                        </Button>}
                     </Box>
                     <Typography mt={1} variant={isMobile ? 'caption' : 'subtitle2'}>
                         (from your remaining stock of {availableTrees} trees)
