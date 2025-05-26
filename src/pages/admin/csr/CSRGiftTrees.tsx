@@ -8,6 +8,7 @@ import ImageViewModal from "../../../components/ImageViewModal";
 import GiftAnalytics from "../../../components/redeem/GiftAnalytics";
 import GiftTreesGrid, { GiftTreesGridHandle } from "../../../components/redeem/GiftTreesGrid";
 import { toast } from "react-toastify";
+import CSRBulkGift from "./CSRBulkGift";
 
 interface CSRGiftTreesProps {
     groupId: number
@@ -30,6 +31,7 @@ const CSRGiftTrees: React.FC<CSRGiftTreesProps> = ({ groupId }) => {
     const [refreshTrigger, setRefreshTrigger] = useState(0);
     const [imageViewModalOpen, setImageViewModalOpen] = useState(false);
     const [imageViewModalImageUrl, setImageViewModalImageUrl] = useState('');
+    const [bulkGifting, setBulkGifting] = useState(false);
 
     const gridRef = useRef<GiftTreesGridHandle>(null);
 
@@ -96,6 +98,7 @@ const CSRGiftTrees: React.FC<CSRGiftTreesProps> = ({ groupId }) => {
             <GiftAnalytics 
                 groupId={groupId}
                 onGiftMultiple={handleMultiTreesGift}
+                onBulkGifting={() => { setBulkGifting(true) }}
                 refreshTrigger={refreshTrigger}
                 isLoading={isLoading}
             />
@@ -166,6 +169,8 @@ const CSRGiftTrees: React.FC<CSRGiftTreesProps> = ({ groupId }) => {
                     setImageViewModalImageUrl(imageUrl);
                 }}
             />
+
+            <CSRBulkGift groupId={groupId} open={bulkGifting} onClose={() => { setBulkGifting(false); }} />
 
             {giftDialogVisible && selectedGiftTree && (
                 <RedeemGiftTreeDialog

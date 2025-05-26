@@ -1940,6 +1940,18 @@ class ApiClient {
         }
     }
 
+    async bulkRedeemGiftCardTemplate(type: 'group' | 'user', id: number, users: any[], messages?: Record<string, any>): Promise<void> {
+        try {
+            const requesting_user = localStorage.getItem("userId");
+            await this.api.post<void>(`/gift-cards/card/bulk-redeem`, { requesting_user, [type === 'group' ? 'sponsor_group' : 'sponsor_user']: id, users, ...messages });
+        } catch (error: any) {
+            if (error.response) {
+                throw new Error(error.response.data.message);
+            }
+            throw new Error('Failed to redeem gift cards');
+        }
+    }
+
     async assignTrees(gift_card_request_id: number, trees: GiftCardUser[], auto_assign: boolean): Promise<void> {
         try {
             await this.api.post<void>(`/gift-cards/assign`, { gift_card_request_id, trees, auto_assign });
