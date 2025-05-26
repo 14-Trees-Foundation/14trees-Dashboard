@@ -18,7 +18,10 @@ export const Memories = () => {
   const selUserInfo = useRecoilValue(selUsersData);
   const [open, setOpenPopup] = useRecoilState(openMemoryPopup);
   const [index, setIndex] = useState(0);
+  const [imagesLoaded, setImagesLoaded] = useState(false);
+  const [isAutoScrolling, setIsAutoScrolling] = useState(true);
   const sliderRef = useRef(null);
+  const autoScrollIntervalRef = useRef(null);
 
   let images = [];
   images.push.apply(images, selUserInfo["memory_images"]);
@@ -51,6 +54,13 @@ export const Memories = () => {
     setOpenPopup(true);
   };
 
+  const handleManualInteraction = () => {
+    setIsAutoScrolling(false);
+    if (autoScrollIntervalRef.current) {
+      clearInterval(autoScrollIntervalRef.current);
+    }
+  };
+
   useEffect(() => {
     if (sliderRef.current) {
       gsap.to(sliderRef.current, {
@@ -62,12 +72,42 @@ export const Memories = () => {
   }, [index, matches, images]);
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      next();
-    }, 3000); // Change image every 3 seconds
+    // Preload images
+    const loadImages = async () => {
+      const imagePromises = images.map((src) => {
+        return new Promise((resolve, reject) => {
+          const img = new Image();
+          img.src = src;
+          img.onload = resolve;
+          img.onerror = reject;
+        });
+      });
 
-    return () => clearInterval(interval);
-  }, [images.length]);
+      try {
+        await Promise.all(imagePromises);
+        setImagesLoaded(true);
+      } catch (error) {
+        console.error('Error loading images:', error);
+        setImagesLoaded(true); // Still set to true to allow interaction even if some images fail to load
+      }
+    };
+
+    loadImages();
+  }, [images]);
+
+  useEffect(() => {
+    if (imagesLoaded && isAutoScrolling) {
+      autoScrollIntervalRef.current = setInterval(() => {
+        next();
+      }, 3000);
+    }
+
+    return () => {
+      if (autoScrollIntervalRef.current) {
+        clearInterval(autoScrollIntervalRef.current);
+      }
+    };
+  }, [imagesLoaded, isAutoScrolling]);
 
   if (open) {
     return isMobile ? (
@@ -95,12 +135,18 @@ export const Memories = () => {
             <ArrowBackIosIcon
               fontSize="large"
               style={{ color: "white", cursor: "pointer" }}
-              onClick={prev}
+              onClick={() => {
+                handleManualInteraction();
+                prev();
+              }}
             />
             <ArrowForwardIosIcon
               fontSize="large"
               style={{ color: "white", cursor: "pointer", marginLeft: "30px" }}
-              onClick={next}
+              onClick={() => {
+                handleManualInteraction();
+                next();
+              }}
             />
           </div>
         </Popup>
@@ -123,17 +169,28 @@ export const Memories = () => {
             <ArrowBackIosIcon
               fontSize="small"
               style={{ color: "green", cursor: "pointer" }}
-              onClick={prev}
+              onClick={() => {
+                handleManualInteraction();
+                prev();
+              }}
             />
             <ArrowForwardIosIcon
               fontSize="small"
               style={{ color: "green", cursor: "pointer" }}
-              onClick={next}
+              onClick={() => {
+                handleManualInteraction();
+                next();
+              }}
             />
           </div>
         </div>
         <div className={classes.slideshow}>
-          <div className={classes.slider} ref={sliderRef}>
+          <div 
+            className={classes.slider} 
+            ref={sliderRef}
+            onMouseEnter={handleManualInteraction}
+            onTouchStart={handleManualInteraction}
+          >
             {images.map((image, idx) => (
               <div className={classes.slide} key={idx}>
                 <div className={classes.memimage}>

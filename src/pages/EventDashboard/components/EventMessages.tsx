@@ -2,21 +2,18 @@ import React, { useState } from 'react';
 import {
     Box,
     Card,
-    CardContent,
     Typography,
     Dialog,
-    DialogTitle,
     DialogContent,
     DialogContentText,
-    IconButton,
     useMediaQuery,
     DialogActions,
     Button
 } from '@mui/material';
-import CloseIcon from '@mui/icons-material/Close';
 import { EventMessage } from '../../../types/event';
-import { Carousel } from 'antd';
 import Slider from 'react-slick';
+import "slick-carousel/slick/slick.css";
+import "slick-carousel/slick/slick-theme.css";
 
 interface EventMessagesProps {
     messages: EventMessage[];
@@ -46,8 +43,7 @@ const EventMessages: React.FC<EventMessagesProps> = ({ messages }) => {
         slidesToShow: 3,
         slidesToScroll: 1,
         autoplay: true,
-        autoplaySpeed: 3000,
-        arrows: false,
+        autoplaySpeed: 30000,
         responsive: [
             {
                 breakpoint: 960, // md
@@ -73,45 +69,47 @@ const EventMessages: React.FC<EventMessagesProps> = ({ messages }) => {
                 overflow: "hidden",
             }}
         >
-            <Slider {...settings}>
-                {messages.map((t, index) => (
-                    <Box key={index}>
-                        <Card
-                            sx={{
-                                height: 150,
-                                display: 'flex',
-                                flexDirection: 'column',
-                                justifyContent: 'space-between',
-                                cursor: 'pointer',
-                                padding: 2,
-                                marginLeft: 1,
-                                borderRadius: '20px',
-                            }}
-                            onClick={() => handleOpen(t)}
-                        >
-                            <Typography
-                                variant="body2"
+            <div style={{ padding: "0 25px" }}>
+                <Slider {...settings}>
+                    {messages.map((t, index) => (
+                        <Box key={index}>
+                            <Card
                                 sx={{
-                                    overflow: 'hidden',
-                                    display: '-webkit-box',
-                                    WebkitLineClamp: 5,
-                                    WebkitBoxOrient: 'vertical'
+                                    height: 150,
+                                    display: 'flex',
+                                    flexDirection: 'column',
+                                    justifyContent: 'space-between',
+                                    cursor: 'pointer',
+                                    padding: 2,
+                                    marginLeft: 1,
+                                    borderRadius: '20px',
                                 }}
+                                onClick={() => handleOpen(t)}
                             >
-                                {t.message}
-                            </Typography>
-                            <Typography variant="subtitle2" color="text.secondary" mt={2}>
-                                — {t.user_name}
-                            </Typography>
-                        </Card>
-                    </Box>
-                ))}
-            </Slider>
+                                <Typography
+                                    variant="body2"
+                                    sx={{
+                                        overflow: 'hidden',
+                                        display: '-webkit-box',
+                                        WebkitLineClamp: 5,
+                                        WebkitBoxOrient: 'vertical'
+                                    }}
+                                >
+                                    {t.message}
+                                </Typography>
+                                <Typography variant="subtitle2" color="text.secondary" mt={2}>
+                                    — {t.user_name}
+                                </Typography>
+                            </Card>
+                        </Box>
+                    ))}
+                </Slider>
+            </div>
 
-            <Dialog 
-                open={open} 
-                onClose={handleClose} 
-                fullWidth 
+            <Dialog
+                open={open}
+                onClose={handleClose}
+                fullWidth
                 maxWidth="sm"
                 PaperProps={{
                     sx: {
