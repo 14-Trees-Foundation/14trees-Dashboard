@@ -16,13 +16,11 @@ import LandscapeIcon from "@mui/icons-material/Landscape";
 import CorporateFareIcon from "@mui/icons-material/CorporateFare";
 import TourIcon from "@mui/icons-material/TourOutlined";
 import logo from "../../assets/logo_white_small.png";
-import { useRecoilState } from "recoil";
-import { adminNavIndex } from "../../store/adminAtoms";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "./auth/auth";
 import VolunteerActivismIcon from "@mui/icons-material/VolunteerActivism";
 import MapIcon from "@mui/icons-material/Map";
 import FestivalIcon from "@mui/icons-material/Festival";
-import { useNavigate } from "react-router-dom";
 import { Analytics, CardGiftcard, Inventory } from "@mui/icons-material";
 import { UserRoles } from "../../types/common";
 
@@ -31,63 +29,45 @@ export const AdminLeftDrawer = () => {
   const matches = useMediaQuery("(max-width:481px)");
   const [open, setOpen] = useState(false);
   const classes = useStyles();
-  const [index, setIndex] = useRecoilState(adminNavIndex);
+  const location = useLocation();
   const navigate = useNavigate();
-  let auth = useAuth();
-  const [subIndex, setSubIndex] = useState(null);
+  const auth = useAuth();
   const [expanded, setExpanded] = useState(null);
 
   useEffect(() => {
-    auth.signin("User", 0, ["all"], ["super-admin"], "", () => { })
-  }, [])
+    auth.signin("User", 0, ["all"], ["super-admin"], "", () => {});
+  }, []);
 
   useEffect(() => {
     if (auth.roles.includes(UserRoles.User)) {
       navigate("/tree-cards");
     }
-  }, [auth])
-
-  const onClickNav = (value, subValue) => {
-    
-    if (value === undefined || value === null) {
-      console.error('Invalid navigation value:', value);
-      return;
-    }
-  
-    if (subValue !== undefined) {
-      setIndex(value);
-      setSubIndex(subValue);
-    } else {
-      setIndex(value);
-      setSubIndex(null);
-      setExpanded(value !== expanded ? value : null);
-    }
-  };
+  }, [auth]);
 
   const pages = [
     {
       displayName: "Home",
       logo: LeaderBoardOutlined,
       display: true,
-      key: 0,
+      path: "home",
     },
     {
       displayName: "Sites",
       logo: MapIcon,
       display: true,
-      key: 1,
+      path: "sites",
     },
     {
       displayName: "Plots",
       logo: LandscapeIcon,
       display: true,
-      key: 2,
+      path: "plots",
     },
     {
       displayName: "Trees",
       logo: ForestOutlined,
       display: true,
-      key: 3,
+      path: "trees",
     },
     {
       divider: true,
@@ -96,26 +76,25 @@ export const AdminLeftDrawer = () => {
       displayName: "Plant Types",
       logo: GrassTwoToneIcon,
       display: true,
-      key: 4,
+      path: "plant-types",
     },
     {
       displayName: "Ponds",
       logo: OpacityOutlined,
       display: true,
-      key: 5,
+      path: "ponds",
     },
     {
       displayName: "People",
       logo: AccountCircleOutlined,
-      // display: auth.permissions.includes("all"),
       display: true,
-      key: 6,
+      path: "people",
     },
     {
       displayName: "People Groups",
       logo: CorporateFareIcon,
       display: true,
-      key: 7,
+      path: "people-group",
     },
     {
       divider: true,
@@ -124,43 +103,43 @@ export const AdminLeftDrawer = () => {
       displayName: "Visits",
       logo: TourIcon,
       display: true,
-      key: 8,
+      path: "visits",
     },
     {
-       displayName: "Events",
-       logo: FestivalIcon,
-       display: true,
-       key: 9,
+      displayName: "Events",
+      logo: FestivalIcon,
+      display: true,
+      path: "events",
     },
     {
       displayName: "Site Inventory",
       logo: Inventory,
       display: true,
-      key: 10,
+      path: "site-inventory",
     },
     {
       displayName: "GC Inventory",
       logo: Inventory,
       display: true,
-      key: 11,
+      path: "gc-inventory",
     },
     {
       displayName: "Tree Cards",
       logo: CardGiftcard,
       display: auth.signedin,
-      key: 12,
+      path: "tree-cards",
     },
     {
       displayName: "Donations",
       logo: VolunteerActivismIcon,
       display: true,
-      key: 13,
+      path: "donations",
     },
     {
       displayName: "Corporate Dashboard",
       logo: Analytics,
       display: true,
-      key: 14,
+      path: "corporate-dashboard",
     },
     // {
     //   displayName: "Images",
@@ -169,52 +148,44 @@ export const AdminLeftDrawer = () => {
     //   display: true,
     // },
   ];
+
+  const isActive = (path) => {
+    return location.pathname === `/admin/${path}` || 
+           (path === 'home' && location.pathname === '/admin');
+  };
+
   const menuitem = () => {
     return (
       <div className={classes.itemlist}>
         {pages.map((item, i) => {
           if (item.divider) {
-            return <Divider sx={{ width: "calc(100% - 20px)", margin: "0 0 20px 20px", backgroundColor: 'white' }} key={i} />;
+            return (
+              <Divider 
+                sx={{ 
+                  width: "calc(100% - 20px)", 
+                  margin: "0 0 20px 20px", 
+                  backgroundColor: 'white' 
+                }} 
+                key={i} 
+              />
+            );
           } else if (item.display) {
             return (
-              <div
-                className={classes.item}
-                onClick={() => onClickNav(item.key)}
+              <Link 
+                to={`/admin/${item.path}`} 
                 key={i}
+                style={{ textDecoration: 'none' }}
               >
-                <div
-                  className={index === item.key ? classes.selected : classes.itembtn}
-                >
-                  <item.logo />
-                  <div className={classes.itemtext}>{item.displayName}</div>
+                <div className={classes.item}>
+                  <div className={isActive(item.path) ? classes.selected : classes.itembtn}>
+                    <item.logo />
+                    <div className={classes.itemtext}>{item.displayName}</div>
+                  </div>
                 </div>
-                {i === expanded &&
-                  item.subPages &&
-                  item.subPages.map((subItem, j) => (
-                    <div
-                      className={classes.item}
-                      onClick={() => onClickNav(i, j)}
-                      key={j}
-                      style={{ marginLeft: 20, marginTop: 10 }}
-                    >
-                      <div
-                        className={
-                          index === i && subIndex === j
-                            ? classes.selected
-                            : classes.itembtn
-                        }
-                      >
-                        <subItem.logo />
-                        <div className={classes.itemtext}>
-                          {subItem.displayName}
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-              </div>
+              </Link>
             );
           } else {
-            return <></>;
+            return null;
           }
         })}
       </div>
@@ -249,9 +220,7 @@ export const AdminLeftDrawer = () => {
             className={classes.logo}
             alt={"logo"}
             src={logo}
-            onClick={() => {
-              navigate("/");
-            }}
+            onClick={() => navigate("/")}
             style={{ cursor: "pointer" }}
           />
           {menuitem()}
@@ -266,9 +235,7 @@ export const AdminLeftDrawer = () => {
           className={classes.logo}
           alt={"logo"}
           src={logo}
-          onClick={() => {
-            navigate("/");
-          }}
+          onClick={() => navigate("/")}
           style={{ cursor: "pointer" }}
         />
         {menuitem()}
