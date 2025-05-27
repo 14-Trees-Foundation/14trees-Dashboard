@@ -37,7 +37,7 @@ export const Admin = () => {
   const setTreeLoggedByDate = useSetRecoilState(treeLoggedByDate);
   const setPlotsList = useSetRecoilState(plotsList);
   const index = useRecoilValue(adminNavIndex);
-  const token = JSON.parse(localStorage.getItem("token"));
+  const token = localStorage.getItem("token") || "";
   const navigate = useNavigate();
 
   const fetchData = useCallback(async () => {
