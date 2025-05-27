@@ -20,7 +20,11 @@ const EventTypes = [
     },
     {
         value: '6',
-        label: 'Festival'
+        label: 'Festival Celebration'
+    },
+    {
+        value: '7',
+        label: 'Retirement'
     },
     {
         value: '3',
