@@ -1,12 +1,12 @@
 import React, { useEffect, useState, useRef } from "react";
-import { 
-  Button, 
-  Dialog, 
-  DialogTitle, 
-  DialogContent, 
-  DialogActions, 
-  TextField, 
-  Grid, 
+import {
+  Button,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  TextField,
+  Grid,
   FormControl,
   InputLabel,
   Select,
@@ -73,10 +73,10 @@ export const DirectEditDonationForm: React.FC<DirectEditDonationFormProps> = ({
   const [isAddRecipientModalOpen, setIsAddRecipientModalOpen] = useState(false);
   const [recipientsRefreshCounter, setRecipientsRefreshCounter] = useState(0);
   const refreshRecipientsRef = useRef<(() => void) | null>(null);
-  
+
   useEffect(() => {
     if (open && donation) {
-      setFormData({...donation});
+      setFormData({ ...donation });
     }
   }, [open, donation]);
 
@@ -86,7 +86,7 @@ export const DirectEditDonationForm: React.FC<DirectEditDonationFormProps> = ({
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     if (!formData) return;
-    
+
     const { name, value } = e.target;
     setFormData({
       ...formData,
@@ -96,7 +96,7 @@ export const DirectEditDonationForm: React.FC<DirectEditDonationFormProps> = ({
 
   const handleSelectChange = (e: any) => {
     if (!formData) return;
-    
+
     const { name, value } = e.target;
     setFormData({
       ...formData,
@@ -104,19 +104,39 @@ export const DirectEditDonationForm: React.FC<DirectEditDonationFormProps> = ({
     });
   };
 
+  const getMinTreesValue = () => {
+    if (!formData) return 1;
+    // Use booked trees if available, otherwise fall back to 1
+    return formData.booked ? Math.max(1, formData.booked) : 1;
+  };
+
+  const isAmountDonation = () => {
+    return formData?.donation_method === "amount";
+  };
+
   const handleNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (!formData) return;
-    
+    if (!formData || isAmountDonation()) return; 
+
     const { name, value } = e.target;
+    let numericValue = value === "" ? null : Number(value);
+
+    // For trees_count specifically, ensure minimum of 1
+    if (name === "trees_count" && numericValue !== null) {
+      const minValue = getMinTreesValue();
+      if (numericValue < minValue) {
+        numericValue = minValue;
+      }
+    }
+
     setFormData({
       ...formData,
-      [name]: value === "" ? null : Number(value)
+      [name]: numericValue
     });
   };
 
   const handleSubmit = async () => {
     if (!formData) return;
-    
+
     try {
       setLoading(true);
       onSubmit(formData);
@@ -163,10 +183,10 @@ export const DirectEditDonationForm: React.FC<DirectEditDonationFormProps> = ({
       // Create the recipient in the backend
       const apiClient = new ApiClient();
       const createdRecipient = await apiClient.createDonationUser(recipientData);
-      
+
       toast.success("Recipient added successfully");
       handleAddRecipientClose();
-      
+
       // Refresh the recipients list
       if (refreshRecipientsRef.current) {
         refreshRecipientsRef.current();
@@ -174,7 +194,7 @@ export const DirectEditDonationForm: React.FC<DirectEditDonationFormProps> = ({
         // Fallback to forcing re-render via the key
         setRecipientsRefreshCounter(prevCounter => prevCounter + 1);
       }
-      
+
       // Switch to the Recipients tab after adding a new recipient
       setTabValue(1);
     } catch (error) {
@@ -188,26 +208,26 @@ export const DirectEditDonationForm: React.FC<DirectEditDonationFormProps> = ({
   if (!formData) return null;
 
   return (
-    <Dialog 
-      open={open} 
-      onClose={handleClose} 
-      fullWidth 
+    <Dialog
+      open={open}
+      onClose={handleClose}
+      fullWidth
       maxWidth="xl"
-      PaperProps={{ 
-        style: { 
+      PaperProps={{
+        style: {
           overflowY: "visible",
           padding: "10px"
-        } 
+        }
       }}
     >
       <DialogTitle>
         <Typography variant="h5" align="center">Edit Donation #{formData.id}</Typography>
       </DialogTitle>
 
-      <Box sx={{ borderBottom: 1, borderColor: 'divider', px: 3}}>
-        <Tabs 
-          value={tabValue} 
-          onChange={handleTabChange} 
+      <Box sx={{ borderBottom: 1, borderColor: 'divider', px: 3 }}>
+        <Tabs
+          value={tabValue}
+          onChange={handleTabChange}
           aria-label="donation edit tabs"
           variant="fullWidth"
           sx={{
@@ -231,7 +251,7 @@ export const DirectEditDonationForm: React.FC<DirectEditDonationFormProps> = ({
               Donor Information
             </Typography>
             <Divider sx={{ mb: 2 }} />
-            
+
             <Grid container spacing={2}>
               <Grid item xs={12} md={6}>
                 <TextField
@@ -280,7 +300,7 @@ export const DirectEditDonationForm: React.FC<DirectEditDonationFormProps> = ({
               Donation Details
             </Typography>
             <Divider sx={{ mb: 2 }} />
-            
+
             <Grid container spacing={2}>
               <Grid item xs={12} md={6}>
                 <FormControl fullWidth margin="normal" variant="outlined">
@@ -318,6 +338,29 @@ export const DirectEditDonationForm: React.FC<DirectEditDonationFormProps> = ({
                   variant="outlined"
                   margin="normal"
                   type="number"
+                  inputProps={{
+                    min: getMinTreesValue(),
+                    step: 1,
+                    readOnly: isAmountDonation()
+                  }}
+                  onInput={(e) => {
+                    if (isAmountDonation()) return; // Skip validation for amount donations
+                    const target = e.target as HTMLInputElement;
+                    const minValue = getMinTreesValue();
+                    if (target.valueAsNumber < minValue) {
+                      target.value = minValue.toString();
+                      setFormData({
+                        ...formData,
+                        trees_count: minValue
+                      });
+                    }
+                  }}
+                  helperText={
+                    formData.booked && formData.booked > 0
+                      ? `Minimum ${formData.booked} (already booked trees)`
+                      : undefined
+                  }
+                  disabled={isAmountDonation()} // Visual disabled state
                 />
               </Grid>
               <Grid item xs={12} md={6}>
@@ -357,7 +400,7 @@ export const DirectEditDonationForm: React.FC<DirectEditDonationFormProps> = ({
               Additional Information
             </Typography>
             <Divider sx={{ mb: 2 }} />
-            
+
             <Grid container spacing={2}>
               <Grid item xs={12} md={6}>
                 <TextField
@@ -391,7 +434,7 @@ export const DirectEditDonationForm: React.FC<DirectEditDonationFormProps> = ({
               Payment Information
             </Typography>
             <Divider sx={{ mb: 2 }} />
-            
+
             <Grid container spacing={2}>
               <Grid item xs={12} md={6}>
                 <TextField
@@ -419,21 +462,21 @@ export const DirectEditDonationForm: React.FC<DirectEditDonationFormProps> = ({
               Donation Recipients
             </Typography>
             <Divider />
-            <Fab 
-              color="success" 
-              size="small" 
+            <Fab
+              color="success"
+              size="small"
               onClick={handleAddRecipientOpen}
               sx={{ position: 'absolute', top: 0, right: 0 }}
             >
               <AddIcon />
             </Fab>
           </Box>
-          
+
           {formData && formData.id && (
-            <DonationRecipients 
-              donation={formData.id} 
+            <DonationRecipients
+              donation={formData.id}
               open={true}
-              onClose={() => {}}
+              onClose={() => { }}
               embedded={true}
               onAddNewRecipient={handleAddRecipientOpen}
               key={`recipients-${formData.id}-${recipientsRefreshCounter}`}
@@ -448,8 +491,8 @@ export const DirectEditDonationForm: React.FC<DirectEditDonationFormProps> = ({
           Cancel
         </Button>
         {tabValue === 0 && <Button
-          onClick={handleSubmit} 
-          color="success" 
+          onClick={handleSubmit}
+          color="success"
           variant="contained"
           disabled={loading}
         >

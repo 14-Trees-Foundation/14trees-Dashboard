@@ -418,7 +418,7 @@ const AssignTrees: React.FC<AssignTreesProps> = ({ donationId, donation, open, o
 
     return (
         <Dialog open={open} fullWidth maxWidth="xl">
-            {/* <DialogTitle>Donation #{donationId}: Trees Assignment</DialogTitle> */}
+            <DialogTitle>Assign Trees for Donation #{donationId}: </DialogTitle> 
             <DialogContent dividers>
 
                 <Tabs
@@ -445,9 +445,6 @@ const AssignTrees: React.FC<AssignTreesProps> = ({ donationId, donation, open, o
                 </Tabs>
                 {tabValue === "assign" && (
                     <>
-                        <Typography variant="h6" sx={{ marginBottom: 2 }}>
-                            Assign trees to donation recipients!
-                        </Typography>
                         <FormControlLabel
                             control={<Checkbox disabled={assignmentList.length > 0} checked={autoAssign} onChange={(e) => setAutoAssign(e.target.checked)} />}
                             label={
