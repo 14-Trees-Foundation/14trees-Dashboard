@@ -516,6 +516,20 @@ export const DonationComponent = () => {
       ...getColumnSelectedItemFilter({ dataIndex: 'category', filters, handleSetFilters, options: ['Foundation', 'Public'] })
     },
     {
+      dataIndex: "trees_count",
+      key: "Pledged Trees",
+      title: getSortableHeader("Pledged Trees", 'trees_count', orderBy, handleSortingChange),
+      align: "center",
+      width: 100,
+    },
+    {
+      dataIndex: "amount_donated",
+      key: "Donation Amount",
+      title: getSortableHeader("Donation Amount", 'amount_donated', orderBy, handleSortingChange),
+      align: "center",
+      width: 120,
+    },
+    {
       dataIndex: "tags",
       key: "Tags",
       title: "Tags",
@@ -524,21 +538,14 @@ export const DonationComponent = () => {
       render: value => value?.join(", ") || '',
       ...getColumnSelectedItemFilter({ dataIndex: 'tags', filters, handleSetFilters, options: tags })
     },
-    {
-      dataIndex: "trees_count",
-      key: "Pledged Trees",
-      title: getSortableHeader("Pledged Trees", 'trees_count', orderBy, handleSortingChange),
-      align: "center",
-      width: 100,
-    },
-    {
-      dataIndex: "pledged_area_acres",
-      key: "Pledged Area (Acres)",
-      title: getSortableHeader("Pledged Area (Acres)", 'pledged_area_acres', orderBy, handleSortingChange),
-      align: "center",
-      width: 150,
-      render: (value) => value ? value : '-',
-    },
+    // {
+    //   dataIndex: "pledged_area_acres",
+    //   key: "Pledged Area (Acres)",
+    //   title: getSortableHeader("Pledged Area (Acres)", 'pledged_area_acres', orderBy, handleSortingChange),
+    //   align: "center",
+    //   width: 150,
+    //   render: (value) => value ? value : '-',
+    // },
     {
       dataIndex: "contribution_options",
       key: "Contribution",

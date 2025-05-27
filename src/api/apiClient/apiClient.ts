@@ -6,6 +6,7 @@ import { Pond, PondWaterLevelUpdate } from '../../types/pond';
 import { User } from '../../types/user';
 import { Site } from '../../types/site';
 import { Donation, DonationTree, DonationUser } from '../../types/donation';
+import { BirthdayResponse } from '../../types/notification';
 import { OnsiteStaff } from '../../types/onSiteStaff';
 import { MapTreesUsingPlotIdRequest, MapTreesUsingSaplingIdsRequest, Tree } from '../../types/tree';
 import { UserTree, UserTreeCountPaginationResponse } from '../../types/userTree';
@@ -656,6 +657,18 @@ class ApiClient {
                 throw new Error(error.response.data.message);
             }
             throw new Error('Failed to combine users!');
+        }
+    }
+
+    async checkGroupBirthdays(groupId: number): Promise<BirthdayResponse> { 
+        try {
+            const response = await this.api.get(`/users/birthday/notifications?group_id=${groupId}`);
+            return response.data;
+        } catch (error: any) {
+            if (error.response) {
+                throw new Error(error.response.data.message);
+            }
+            throw new Error('Failed to update User');
         }
     }
 
@@ -1919,6 +1932,18 @@ class ApiClient {
         try {
             const requesting_user = localStorage.getItem("userId");
             await this.api.post<void>(`/gift-cards/card/redeem-multi`, { requesting_user, trees_count, [type === 'group' ? 'sponsor_group' : 'sponsor_user']: id, ...user, user, profile_image_url, ...messages });
+        } catch (error: any) {
+            if (error.response) {
+                throw new Error(error.response.data.message);
+            }
+            throw new Error('Failed to redeem gift cards');
+        }
+    }
+
+    async bulkRedeemGiftCardTemplate(type: 'group' | 'user', id: number, users: any[], messages?: Record<string, any>): Promise<void> {
+        try {
+            const requesting_user = localStorage.getItem("userId");
+            await this.api.post<void>(`/gift-cards/card/bulk-redeem`, { requesting_user, [type === 'group' ? 'sponsor_group' : 'sponsor_user']: id, users, ...messages });
         } catch (error: any) {
             if (error.response) {
                 throw new Error(error.response.data.message);
