@@ -299,7 +299,7 @@ const DonationInfo: React.FC<DonationInfoProps> = ({ open, onClose, data }) => {
   return (
     <Dialog open={open} onClose={onClose} maxWidth="xl" fullWidth>
       <DialogTitle sx={{ bgcolor: '#2e7d32', color: 'white', display: 'flex', alignItems: 'center', gap: 1 }}>
-        <InfoOutlined /> Donation Summary
+        <InfoOutlined /> Donation Summary: {data.id}
       </DialogTitle>
       <DialogContent dividers sx={{ p: 3 }}>
 
