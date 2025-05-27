@@ -43,6 +43,7 @@ import { OrganizationComponent } from "./pages/admin/organization/Organization";
 import { VisitsComponent } from "./pages/admin/visits/Visits";
 import { EventsComponent } from "./pages/admin/events/Events";
 import SiteInventory from "./pages/admin/Inventory/SiteInventory";
+import GiftTreesComponet from "./pages/admin/gift/GiftTrees";
 import GCInventory from "./pages/admin/Inventory/GCInventory";
 import { DonationComponent } from "./pages/admin/donation/Donation";
 import CSRInventory from "./pages/admin/csr/CSRInventory";
@@ -81,26 +82,26 @@ function App() {
             path="/admin"
             element={
               // <RequireAuth>
-                <AdminLayout />
+              <AdminLayout />
               // </RequireAuth>
             }
           >
-             <Route index element={<AdminHome />} /> {/* Default route */}
-             <Route path="home" element={<AdminHome />} />
-             <Route path="sites" element={<SitesComponent />} />
-             <Route path="plots" element={<PlotComponent />} />
-             <Route path="trees" element={<Trees />} />
-             <Route path="plant-types" element={<PlantTypeComponent />} />
-             <Route path="ponds" element={<Ponds />} />
-             <Route path="people" element={<Users />} />
-             <Route path="people-group" element={<OrganizationComponent />} />
-             <Route path="visits" element={<VisitsComponent />} />
-             <Route path="events" element={<EventsComponent />} />
-             <Route path="site-inventory" element={<SiteInventory />} />
-             <Route path="gc-inventory" element={<GCInventory />} />
-             <Route path="tree-cards" element={<GiftTrees />} />
-             <Route path="donations" element={<DonationComponent />} />
-             <Route path="corporate-dashboard" element={<CSRInventory />} />
+            <Route index element={<AdminHome />} /> {/* Default route */}
+            <Route path="home" element={<AdminHome />} />
+            <Route path="sites" element={<SitesComponent />} />
+            <Route path="plots" element={<PlotComponent />} />
+            <Route path="trees" element={<Trees />} />
+            <Route path="plant-types" element={<PlantTypeComponent />} />
+            <Route path="ponds" element={<Ponds />} />
+            <Route path="people" element={<Users />} />
+            <Route path="people-group" element={<OrganizationComponent />} />
+            <Route path="visits" element={<VisitsComponent />} />
+            <Route path="events" element={<EventsComponent />} />
+            <Route path="site-inventory" element={<SiteInventory />} />
+            <Route path="gc-inventory" element={<GCInventory />} />
+            <Route path="tree-cards" element={<GiftTreesComponet />} />
+            <Route path="donations" element={<DonationComponent />} />
+            <Route path="corporate-dashboard" element={<CSRInventory />} />
             <Route path="forms" element={<Forms />}>
               <Route path="assigntrees" element={<AssignTree />}></Route>
               <Route path="addorg" element={<AddOrg />}></Route>
@@ -110,7 +111,7 @@ function App() {
             path="/tree-cards"
             element={
               // <RequireAuth>
-                <User />
+              <User />
               // </RequireAuth>
             }
           >
@@ -118,57 +119,57 @@ function App() {
           <Route
             path="/gift-trees"
             element={
-                <RequestTreeCardsForm />
+              <RequestTreeCardsForm />
             }
           >
           </Route>
           <Route path="/ww" element={<WW />}>
-            <Route 
-              path=":email" 
-              element={ 
+            <Route
+              path=":email"
+              element={
                 // <RequireAuth>
-                  <GiftTrees />
+                <GiftTrees />
                 // </RequireAuth>
-              } 
+              }
             ></Route>
           </Route>
           <Route path="/ww/group" element={<WW />}>
-            <Route 
-              path=":group_id" 
-              element={ 
+            <Route
+              path=":group_id"
+              element={
                 // <RequireAuth>
-                  <GiftTrees />
+                <GiftTrees />
                 // </RequireAuth>
-              } 
+              }
             ></Route>
           </Route>
           <Route path="/events" element={<Events />}>
             <Route path="birthday/:id" element={<Birthday />}></Route>
           </Route>
           <Route path="/notfound" element={<NotFound />} />
-          <Route 
-            path="/test" 
+          <Route
+            path="/test"
             element={
               // <RequireAuth>
-                <Test />
+              <Test />
               // </RequireAuth>
-            } 
+            }
           />
-          <Route 
-            path="/csr/dashboard/:groupId" 
+          <Route
+            path="/csr/dashboard/:groupId"
             element={
               // <RequireAuth>
-                <CSRPage />
+              <CSRPage />
               // </RequireAuth>
-            } 
+            }
           />
-          <Route 
-            path="/personal/dashboard/:userId" 
+          <Route
+            path="/personal/dashboard/:userId"
             element={
               // <RequireAuth>
-                <GiftDashboard />
+              <GiftDashboard />
               // </RequireAuth>
-            } 
+            }
           />
         </Routes>
       </Layout>

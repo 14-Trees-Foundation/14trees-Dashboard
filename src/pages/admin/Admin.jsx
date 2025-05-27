@@ -1,5 +1,5 @@
 import { useEffect, useCallback, useState } from "react";
-import { useSetRecoilState } from "recoil";
+import { useRecoilValue, useSetRecoilState } from "recoil";
 import { createStyles, makeStyles } from "@mui/styles";
 import { useNavigate, Outlet } from "react-router-dom";
 import { Box } from "@mui/material";
@@ -16,6 +16,7 @@ import {
 export const AdminLayout = () => {
   const classes = useStyles();
   const [loading, setLoading] = useState(true);
+  const summaryData = useRecoilValue(summary);
   const setSummary = useSetRecoilState(summary);
   const setTreeLoggedByDate = useSetRecoilState(treeLoggedByDate);
   const setPlotsList = useSetRecoilState(plotsList);
@@ -23,6 +24,9 @@ export const AdminLayout = () => {
   const navigate = useNavigate();
 
   const fetchData = useCallback(async () => {
+
+    if (summaryData && Object.keys(summaryData).length !== 0) return;
+
     setLoading(true);
     try {
       // Fetch summary data
