@@ -130,6 +130,10 @@ const DonationTrees: FC<DonationTreesProps> = ({ open, onClose, donation }) => {
     getPlots(page * pageSize, pageSize, filtersData, orderBy);
   };
 
+  const hasAtLeastOneNonZeroReserve = () => {
+    return selectedPlots.some(plot => plot.reserveCount > 0);
+  };
+
   const fetchTrees = async () => {
     setTreeLoading(true);
     try {
@@ -675,6 +679,14 @@ const DonationTrees: FC<DonationTreesProps> = ({ open, onClose, donation }) => {
 
     // Calculate total trees to be reserved
     if (tabValue === 0) {
+      if (!hasAtLeastOneNonZeroReserve()) {
+        setValidationDialog({
+          open: true,
+          title: 'Reservation Error',
+          message: 'At least one selected plot must have a reserve count greater than zero'
+        });
+        return;
+      }
       totalToReserve = selectedPlots.reduce((sum, plot) => sum + plot.reserveCount, 0);
     } else {
       totalToReserve = selectedTrees.length;
@@ -1100,7 +1112,10 @@ const DonationTrees: FC<DonationTreesProps> = ({ open, onClose, donation }) => {
           onClick={handleConfirmReservation}
           color="success"
           variant="contained"
-          disabled={(tabValue === 0 && selectedPlots.length === 0) || (tabValue === 1 && selectedTrees.length === 0)}
+          disabled={
+            (tabValue === 0 && (selectedPlots.length === 0 || !hasAtLeastOneNonZeroReserve())) ||
+            (tabValue === 1 && selectedTrees.length === 0)
+          }
         >
           Confirm Reservation
         </Button>
