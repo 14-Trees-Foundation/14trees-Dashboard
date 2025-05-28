@@ -11,7 +11,7 @@ import { RootState } from "../../../redux/store/store";
 import { ToastContainer, toast } from "react-toastify";
 import DonationForm from "./Forms/DonationForm";
 import DirectEditDonationForm from "./Forms/Donationeditform";
-import { AssignmentInd, Delete, Edit, Email, Landscape, LocalOffer, MenuOutlined, NotesOutlined, Wysiwyg } from "@mui/icons-material";
+import { AssignmentInd, AutoMode, Delete, Edit, Email, Landscape, LocalOffer, MenuOutlined, NotesOutlined, Wysiwyg } from "@mui/icons-material";
 import { Badge, Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, Divider, IconButton, Typography } from "@mui/material";
 import GeneralTable from "../../../components/GenTable";
 import ApiClient from "../../../api/apiClient/apiClient";
@@ -27,6 +27,8 @@ import DonationTrees from "./Forms/DonationTrees";
 import TagComponent from "../gift/Form/TagComponent";
 import { Order } from "../../../types/common";
 import AssignTrees from "./Forms/AssignTrees/AssignTrees";
+import AutoProcessConfirmationModal from "./components/AutoProcessConfirmationModal";
+import donationActionTypes from "../../../redux/actionTypes/donationActionTypes";
 
 export const DonationComponent = () => {
 
@@ -53,6 +55,9 @@ export const DonationComponent = () => {
   const [tagModal, setTagModal] = useState(false);
   const [tags, setTags] = useState<string[]>([]);
   const [assignTreesModalOpen, setAssignTreesModalOpen] = useState(false);
+  const [autoPrsConfirm, setPrsConfirm] = useState(false);
+  const [autoProcessing, setAutoProcessing] = useState(false);
+
   // Get tags
   useEffect(() => {
     const getTags = async () => {
@@ -116,9 +121,9 @@ export const DonationComponent = () => {
         selectedDonation.id,
         selectedTrees.map(tree => tree.id),
         selectedTrees.length === 0,
-        selectedPlots.map(plot => ({ plot_id: plot.id, trees_count: 1 })), 
+        selectedPlots.map(plot => ({ plot_id: plot.id, trees_count: 1 })),
         diversifyTrees,
-        bookAllHabits      
+        bookAllHabits
       );
       toast.success(`Successfully reserved trees for donation id: ${selectedDonation.id}!`);
     } catch (error: any) {
@@ -147,13 +152,13 @@ export const DonationComponent = () => {
       const data = { ...selectedDonation };
       data.tags = tags;
       const apiClient = new ApiClient();
-      
+
       // Create a payload with only the tags field
       const updatePayload = {
         updateFields: ['tags'],
         data: { tags }
       };
-      
+
       const response = await apiClient.updateDonation(data, []);
       toast.success("Updated the donation tags!");
       fetchDonations(); // Refresh the data
@@ -173,13 +178,13 @@ export const DonationComponent = () => {
   }
 
   const handleSendEmails = async (
-    email_sponsor: boolean, 
-    email_recipient: boolean, 
-    email_assignee: boolean, 
-    test_mails: string[], 
-    sponsor_cc_mails: string[], 
-    recipient_cc_mails: string[], 
-    assignee_cc_mails: string[], 
+    email_sponsor: boolean,
+    email_recipient: boolean,
+    email_assignee: boolean,
+    test_mails: string[],
+    sponsor_cc_mails: string[],
+    recipient_cc_mails: string[],
+    assignee_cc_mails: string[],
     event_type: string
   ) => {
     if (!selectedDonation) {
@@ -190,14 +195,14 @@ export const DonationComponent = () => {
     try {
       const apiClient = new ApiClient();
       await apiClient.sendEmailForDonation(
-        selectedDonation.id, 
-        test_mails, 
-        sponsor_cc_mails, 
-        recipient_cc_mails, 
-        assignee_cc_mails, 
-        event_type, 
-        email_sponsor, 
-        email_recipient, 
+        selectedDonation.id,
+        test_mails,
+        sponsor_cc_mails,
+        recipient_cc_mails,
+        assignee_cc_mails,
+        event_type,
+        email_sponsor,
+        email_recipient,
         email_assignee
       );
       toast.success(`Successfully sent emails for donation id: ${selectedDonation.id}!`);
@@ -307,12 +312,12 @@ export const DonationComponent = () => {
     try {
       // Make a copy of the donation to ensure we don't modify the state directly
       const donationToUpdate = { ...updatedDonation };
-      
+
       // Empty users array since we're not modifying users in this form
       const users: any[] = [];
-      
+
       console.log("Updating donation with data:", donationToUpdate);
-      
+
       updateDonation(donationToUpdate, users);
       handleEditModalClose();
       toast.success("Donation updated successfully!");
@@ -326,39 +331,39 @@ export const DonationComponent = () => {
     if (!selectedDonation) return;
 
     try {
-        // Create a copy of the selected donation
-        const data = { ...selectedDonation };
-        
-        // Update with new values
-        data.user_id = user.id;
-        data.pledged = pledged;
-        data.pledged_area = pledgedArea;
-        data.group_id = group ? group.id : null;
-        data.category = category as any;
-        data.grove = grove;
-        data.payment_id = paymentId ? paymentId : null;
-        data.preference = preference;
-        data.event_name = eventName?.trim() ? eventName.trim() : null;
-        data.alternate_email = alternateEmail?.trim() ? alternateEmail.trim() : null;
-        
-        // Make sure we keep these values from the original donation
-        if (!data.trees_count && selectedDonation.trees_count) {
-            data.trees_count = selectedDonation.trees_count;
-        }
-        if (!data.contribution_options && selectedDonation.contribution_options) {
-            data.contribution_options = selectedDonation.contribution_options;
-        }
-        if (!data.created_by) {
-            data.created_by = selectedDonation.created_by;
-        }
-        
-        console.log("Updating donation with data:", data);
-        
-        updateDonation(data, users);
-        toast.success("Donation updated successfully!");
+      // Create a copy of the selected donation
+      const data = { ...selectedDonation };
+
+      // Update with new values
+      data.user_id = user.id;
+      data.pledged = pledged;
+      data.pledged_area = pledgedArea;
+      data.group_id = group ? group.id : null;
+      data.category = category as any;
+      data.grove = grove;
+      data.payment_id = paymentId ? paymentId : null;
+      data.preference = preference;
+      data.event_name = eventName?.trim() ? eventName.trim() : null;
+      data.alternate_email = alternateEmail?.trim() ? alternateEmail.trim() : null;
+
+      // Make sure we keep these values from the original donation
+      if (!data.trees_count && selectedDonation.trees_count) {
+        data.trees_count = selectedDonation.trees_count;
+      }
+      if (!data.contribution_options && selectedDonation.contribution_options) {
+        data.contribution_options = selectedDonation.contribution_options;
+      }
+      if (!data.created_by) {
+        data.created_by = selectedDonation.created_by;
+      }
+
+      console.log("Updating donation with data:", data);
+
+      updateDonation(data, users);
+      toast.success("Donation updated successfully!");
     } catch (error) {
-        console.error("Error updating donation:", error);
-        toast.error("Failed to update donation. Please try again.");
+      console.error("Error updating donation:", error);
+      toast.error("Failed to update donation. Please try again.");
     }
   }
 
@@ -416,21 +421,44 @@ export const DonationComponent = () => {
   const handleSortingChange = (sorter: any) => {
     let newOrder = [...orderBy];
     const updateOrder = () => {
-        const index = newOrder.findIndex((item) => item.column === sorter.field);
-        if (index > -1) {
-            if (sorter.order) newOrder[index].order = sorter.order;
-            else newOrder = newOrder.filter((item) => item.column !== sorter.field);
-        } else if (sorter.order) {
-            newOrder.push({ column: sorter.field, order: sorter.order });
-        }
+      const index = newOrder.findIndex((item) => item.column === sorter.field);
+      if (index > -1) {
+        if (sorter.order) newOrder[index].order = sorter.order;
+        else newOrder = newOrder.filter((item) => item.column !== sorter.field);
+      } else if (sorter.order) {
+        newOrder.push({ column: sorter.field, order: sorter.order });
+      }
     }
 
     if (sorter.field) {
-        setPage(0);
-        updateOrder();
-        setOrderBy(newOrder);
+      setPage(0);
+      updateOrder();
+      setOrderBy(newOrder);
     }
-}
+  }
+
+  const handleAutoProcess = async () => {
+    if (!selectedDonation) return;
+    const donationId = selectedDonation.id;
+
+    setAutoProcessing(true);
+    try {
+      const apiClient = new ApiClient();
+      const donation = await apiClient.autoProcessDonation(donationId);
+      dispatch({
+        type: donationActionTypes.UPDATE_DONATION_SUCCEEDED,
+        payload: donation,
+      });
+
+      toast.success("Auto processed request!")
+      setSelectedDonation(null);
+      setPrsConfirm(false);
+    } catch (error: any) {
+      toast.error(error.message);
+    } finally {
+      setAutoProcessing(false);
+    }
+  }
 
   const getActionsMenu = (record: Donation) => (
     <Menu>
@@ -462,6 +490,9 @@ export const DonationComponent = () => {
         <Menu.Item key="23" onClick={() => { setSelectedDonation(record); setAssignTreesModalOpen(true); }} icon={<AssignmentInd />}>
           Assign Trees
         </Menu.Item>
+        {record.donation_method === 'trees' && record.trees_count > (record.booked || 0) && <Menu.Item key="25" onClick={() => { setSelectedDonation(record); setPrsConfirm(true); }} icon={<AutoMode />}>
+          Auto Process
+        </Menu.Item>}
       </Menu.ItemGroup>
     </Menu>
   );
@@ -553,7 +584,7 @@ export const DonationComponent = () => {
       align: "center",
       width: 150,
       render: (contributions) => {
-                if (!contributions) return '';
+        if (!contributions) return '';
         if (Array.isArray(contributions)) {
           return contributions.join(', ');
         }
@@ -569,7 +600,7 @@ export const DonationComponent = () => {
       width: 120,
       render: (status) => {
         // Format the status for display
-        switch(status) {
+        switch (status) {
           case 'UserSubmitted':
             return 'Submitted';
           case 'OrderFulfilled':
@@ -631,18 +662,18 @@ export const DonationComponent = () => {
       <Divider sx={{ backgroundColor: "black", marginBottom: '15px' }} />
 
       <Box sx={{ height: 540, width: "100%" }}>
-      <GeneralTable
-        loading={loading}
-        rows={tableRows}
-        columns={columns}
-        totalRecords={donationsData.totalDonations}
-        page={page}
-        pageSize={pageSize}
-        onPaginationChange={handlePaginationChange}
-        onDownload={handleDownloadDonations}
-        footer
-        tableName="Donations" 
-      />
+        <GeneralTable
+          loading={loading}
+          rows={tableRows}
+          columns={columns}
+          totalRecords={donationsData.totalDonations}
+          page={page}
+          pageSize={pageSize}
+          onPaginationChange={handlePaginationChange}
+          onDownload={handleDownloadDonations}
+          footer
+          tableName="Donations"
+        />
       </Box>
 
       {/* Original Donation Form for creating new donations */}
@@ -682,11 +713,11 @@ export const DonationComponent = () => {
         data={selectedDonation}
       />
 
-     <DonationTrees
-      open={reserveTreesModalOpen}
-      onClose={() => setReserveTreesModalOpen(false)}
-      donation={selectedDonation}
-    />
+      <DonationTrees
+        open={reserveTreesModalOpen}
+        onClose={() => setReserveTreesModalOpen(false)}
+        donation={selectedDonation}
+      />
 
       <TagComponent
         defaultTags={tags}
@@ -704,6 +735,16 @@ export const DonationComponent = () => {
           setAssignTreesModalOpen(false);
           setSelectedDonation(null);
         }}
+      />}
+
+      {selectedDonation && <AutoProcessConfirmationModal
+        loading={autoProcessing}
+        open={autoPrsConfirm}
+        onClose={() => {
+          setPrsConfirm(false);
+          setSelectedDonation(null);
+        }}
+        onConfirm={handleAutoProcess}
       />}
 
       <Dialog open={plotSelectionModalOpen} onClose={() => setPlotSelectionModalOpen(false)} fullWidth maxWidth="xl">
