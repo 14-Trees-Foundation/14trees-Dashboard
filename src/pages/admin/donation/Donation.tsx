@@ -27,6 +27,7 @@ import DonationTrees from "./Forms/DonationTrees";
 import TagComponent from "../gift/Form/TagComponent";
 import { Order } from "../../../types/common";
 import AssignTrees from "./Forms/AssignTrees/AssignTrees";
+import MapTrees from "./Forms/MapTrees/MapTrees";
 
 export const DonationComponent = () => {
 
@@ -53,6 +54,8 @@ export const DonationComponent = () => {
   const [tagModal, setTagModal] = useState(false);
   const [tags, setTags] = useState<string[]>([]);
   const [assignTreesModalOpen, setAssignTreesModalOpen] = useState(false);
+  const [mapTreesOpen, setMapTreesOpen] = useState(false);
+
   // Get tags
   useEffect(() => {
     const getTags = async () => {
@@ -462,6 +465,9 @@ export const DonationComponent = () => {
         <Menu.Item key="23" onClick={() => { setSelectedDonation(record); setAssignTreesModalOpen(true); }} icon={<AssignmentInd />}>
           Assign Trees
         </Menu.Item>
+        {record.visit_date && <Menu.Item key="24" onClick={() => { setSelectedDonation(record); setMapTreesOpen(true); }} icon={<AssignmentInd />}>
+          Map Visit Trees
+        </Menu.Item>}
       </Menu.ItemGroup>
     </Menu>
   );
@@ -704,6 +710,12 @@ export const DonationComponent = () => {
           setAssignTreesModalOpen(false);
           setSelectedDonation(null);
         }}
+      />}
+
+      {selectedDonation && mapTreesOpen && <MapTrees
+        open={mapTreesOpen}
+        onClose={() => { setMapTreesOpen(false); }}
+        donation={selectedDonation}
       />}
 
       <Dialog open={plotSelectionModalOpen} onClose={() => setPlotSelectionModalOpen(false)} fullWidth maxWidth="xl">
