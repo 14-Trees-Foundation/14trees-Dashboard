@@ -1,5 +1,4 @@
 import { Box, Button } from "@mui/material";
-
 import { useEffect, useState } from "react";
 import { Tree } from "../../../../../types/tree";
 import { GridFilterItem } from "@mui/x-data-grid";
@@ -8,15 +7,19 @@ import getColumnSearchProps from "../../../../../components/Filter";
 import ApiClient from "../../../../../api/apiClient/apiClient";
 import GeneralTable from "../../../../../components/GenTable";
 
-
-
 interface Props {
     selectedTrees: number[]
     onSelect: (tree: Tree) => void
+    disableSelect?: boolean
+    remainingCount: number
 }
 
-const AssignedTrees: React.FC<Props> = ({ selectedTrees, onSelect }) => {
-
+const AssignedTrees: React.FC<Props> = ({
+    selectedTrees,
+    onSelect,
+    disableSelect = false,
+    remainingCount
+}) => {
     const [loading, setLoading] = useState(false);
     const [treesData, setTreesData] = useState<Record<number, Tree>>({});
     const [totalRecords, setTotalRecords] = useState(10);
@@ -33,14 +36,13 @@ const AssignedTrees: React.FC<Props> = ({ selectedTrees, onSelect }) => {
     const getTrees = async (offset: number, limit: number) => {
         const apiClient = new ApiClient();
         setLoading(true);
-        
+
         const filtersData = Object.values(filters);
         filtersData.push(...[
             { columnField: 'donation_id', operatorValue: 'isEmpty', value: null },
             { columnField: 'assigned_to', operatorValue: 'isNotEmpty', value: null },
-        ])
+        ]);
 
-        filtersData.push(...Object.values(filters));
         const treesResp = await apiClient.getTrees(offset, limit, filtersData);
         setTotalRecords(Number(treesResp.total));
 
@@ -49,7 +51,6 @@ const AssignedTrees: React.FC<Props> = ({ selectedTrees, onSelect }) => {
             for (let i = 0; i < treesResp.results.length; i++) {
                 newTrees[treesResp.offset + i] = treesResp.results[i];
             }
-
             return newTrees;
         });
         setLoading(false);
@@ -74,7 +75,7 @@ const AssignedTrees: React.FC<Props> = ({ selectedTrees, onSelect }) => {
                         records.push(record);
                     }
                 } else {
-                    getTrees(page*pageSize, pageSize,);
+                    getTrees(page * pageSize, pageSize);
                     break;
                 }
             }
@@ -115,7 +116,7 @@ const AssignedTrees: React.FC<Props> = ({ selectedTrees, onSelect }) => {
             title: "Plot",
             width: 350,
             align: 'center',
-            render: (value, record, index) => record?.plot,
+            render: (value, record) => record?.plot || 'N/A',
             ...getColumnSearchProps('plot', filters, handleSetFilters)
         },
         // {
@@ -148,7 +149,7 @@ const AssignedTrees: React.FC<Props> = ({ selectedTrees, onSelect }) => {
             title: "Actions",
             width: 300,
             align: "center",
-            render: (value, record, index) => (
+            render: (value, record) => (
                 <div
                     style={{
                         display: "flex",
@@ -159,11 +160,10 @@ const AssignedTrees: React.FC<Props> = ({ selectedTrees, onSelect }) => {
                         variant="outlined"
                         color="success"
                         size="small"
-                        disabled={selectedTrees.includes(record.id)}
+                        disabled={selectedTrees.includes(record.id) || disableSelect}
                         style={{ margin: "0 5px", textTransform: 'none' }}
-                        onClick={() => {
-                            onSelect(record);
-                        }}>
+                        onClick={() => onSelect(record)}
+                    >
                         Select
                     </Button>
                 </div>
@@ -181,7 +181,7 @@ const AssignedTrees: React.FC<Props> = ({ selectedTrees, onSelect }) => {
                 page={page}
                 pageSize={pageSize}
                 onPaginationChange={handlePaginationChange}
-                onDownload={async () => { return Object.values(treesData) }}
+                onDownload={async () => Object.values(treesData)}
                 tableName="Trees"
             />
         </Box>
