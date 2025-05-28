@@ -1315,6 +1315,18 @@ class ApiClient {
         }
     }
 
+    async autoProcessDonation(donation_id: number): Promise<Donation> {
+        try {
+            const response = await this.api.post<Donation>(`/donations/requests/auto-process`, { donation_id });
+            return response.data;
+        } catch (error: any) {
+            if (error.response?.data?.message) {
+                throw new Error(error.response.data.message);
+            }
+            throw new Error('Failed to process donation');
+        }
+    }
+
     async createWorkOrderForDonation(donationId: number): Promise<boolean> {
         try {
             const response = await this.api.post<void>(`/donations/work-order/${donationId}`);
@@ -1725,7 +1737,10 @@ class ApiClient {
         try {
             const formData = new FormData();
             for (const [key, value] of Object.entries(request)) {
-                if (value) formData.append(key, value.toString());
+                if (value) {
+                    if (Array.isArray(value)) value.forEach(item => formData.append(key, item.toString()))
+                    else formData.append(key, value.toString());
+                }
             }
 
             if (formData.has('no_of_cards')) formData.set('no_of_cards', no_of_cards.toString());
@@ -1807,6 +1822,18 @@ class ApiClient {
                 throw new Error(error.response.data.message);
             }
             throw new Error('Failed to clone gift card request');
+        }
+    }
+
+    async autoProcessGiftRequest(gift_request_id: number): Promise<GiftCard> {
+        try {
+            const response = await this.api.post<GiftCard>(`/gift-cards/requests/auto-process`, { gift_request_id });
+            return response.data;
+        } catch (error: any) {
+            if (error.response?.data?.message) {
+                throw new Error(error.response.data.message);
+            }
+            throw new Error('Failed to process gift request!');
         }
     }
 
