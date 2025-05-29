@@ -33,6 +33,7 @@ export interface Donation {
   amount_donated: number | null; 
   donation_method: "amount" | "trees";
   processed_by: number | null;
+  processed_by_name?: string;
 }
 
 export type DonationUser = {

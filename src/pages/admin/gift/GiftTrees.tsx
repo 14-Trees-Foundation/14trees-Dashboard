@@ -913,21 +913,16 @@ const GiftTrees: FC = () => {
             ...getColumnSelectedItemFilter({ dataIndex: 'request_type', filters, handleSetFilters, options: ['Gift Cards', 'Normal Assignment', 'Test', 'Promotion'] })
         },
         {
-            dataIndex: "processed_by",
+            dataIndex: "processed_by_name",
             key: "processed_by",
             title: "Processed By",
             align: "center",
             width: 150,
             render: (value, record) => {
                 if (!value) return 'Pending';
-                return record.user_name || `User ${value}`;
+                return record.processed_by_name || `User ${value}`;
             },
-            ...getColumnSelectedItemFilter({
-                dataIndex: 'processed_by',
-                filters,
-                handleSetFilters,
-                options: ['Pending', 'Processed']
-            }),
+            ...getColumnSearchProps('processed_by_name', filters, handleSetFilters)
         },
         {
             dataIndex: "tags",
