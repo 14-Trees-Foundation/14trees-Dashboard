@@ -460,6 +460,27 @@ export const DonationComponent = () => {
     }
   }
 
+  const handlePickDonation = async (donationId: number) => {
+    try {
+      const apiClient = new ApiClient();
+      const currentUserId = localStorage.getItem('userId');
+
+      if (!currentUserId) {
+        toast.error('User not authenticated');
+        return;
+      }
+
+      const response = await apiClient.pickDonation(donationId, parseInt(currentUserId));
+
+      toast.success('Donation picked successfully');
+      fetchDonations(); // Refresh the data
+
+    } catch (error: any) {
+      console.error('Error picking donation:', error);
+      toast.error(error.message || 'Failed to pick donation');
+    }
+  };
+
   const getActionsMenu = (record: Donation) => (
     <Menu>
       <Menu.ItemGroup>
@@ -493,6 +514,16 @@ export const DonationComponent = () => {
         {record.donation_method === 'trees' && record.trees_count > (record.booked || 0) && <Menu.Item key="25" onClick={() => { setSelectedDonation(record); setPrsConfirm(true); }} icon={<AutoMode />}>
           Auto Process
         </Menu.Item>}
+        {!record.processed_by && (
+          <Menu.Item
+            key="pick"
+            onClick={() => handlePickDonation(record.id)}
+            icon={<AssignmentInd />}
+          >
+            Pick This Up
+          </Menu.Item>
+        )}
+
       </Menu.ItemGroup>
     </Menu>
   );
@@ -610,6 +641,23 @@ export const DonationComponent = () => {
         }
       },
       ...getColumnSelectedItemFilter({ dataIndex: 'status', filters, handleSetFilters, options: ['UserSubmitted', 'OrderFulfilled'] }),
+    },
+    {
+      dataIndex: "processed_by",
+      key: "processed_by",
+      title: "Processed By",
+      align: "center",
+      width: 150,
+      render: (value, record) => {
+        if (!value) return 'Pending';
+        return record.user_name || `User ${value}`;
+      },
+      ...getColumnSelectedItemFilter({
+        dataIndex: 'processed_by',
+        filters,
+        handleSetFilters,
+        options: ['Pending', 'Processed']
+      }),
     },
     {
       dataIndex: "created_at",

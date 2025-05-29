@@ -50,6 +50,7 @@ export type GiftCard = {
     amount_received: number;
     donation_date: string | null;
     mail_status: string[] | null;
+    processed_by: number | null;
 }
 
 export type GiftRequestUser = {
