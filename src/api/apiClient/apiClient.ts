@@ -1340,6 +1340,23 @@ class ApiClient {
         }
     }
 
+    async pickDonation(donationId: number, userId: number): Promise<{ success: boolean }> {
+        try {
+            const response = await this.api.post<{ success: boolean }>(
+                `/donations/${donationId}/process`,
+                { userId }
+            );
+            return response.data;
+        } catch (error: any) {
+            if (error.response?.data?.message) {
+                throw new Error(error.response.data.message);
+            }
+            throw new Error('Failed to pick donation');
+        }
+    }
+
+
+
     async createWorkOrderForDonation(donationId: number): Promise<boolean> {
         try {
             const response = await this.api.post<void>(`/donations/work-order/${donationId}`);
@@ -1889,6 +1906,21 @@ class ApiClient {
                 throw new Error(error.response.data.message);
             }
             throw new Error('Failed to process gift request!');
+        }
+    }
+
+    async pickGiftCardRequest(giftCardId: number, userId: number): Promise<{ success: boolean }> {
+        try {
+            const response = await this.api.post<{ success: boolean }>(
+                `/gift-cards/${giftCardId}/process`,
+                { userId }
+            );
+            return response.data;
+        } catch (error: any) {
+            if (error.response?.data?.message) {
+                throw new Error(error.response.data.message);
+            }
+            throw new Error('Failed to request gift card');
         }
     }
 
