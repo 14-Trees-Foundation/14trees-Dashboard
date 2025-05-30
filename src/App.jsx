@@ -47,6 +47,9 @@ import GiftTreesComponet from "./pages/admin/gift/GiftTrees";
 import GCInventory from "./pages/admin/Inventory/GCInventory";
 import { DonationComponent } from "./pages/admin/donation/Donation";
 import CSRInventory from "./pages/admin/csr/CSRInventory";
+import { CampaignsPage } from "./pages/campaign/campaignpage";
+import { ReferralsPage } from "./pages/campaign/referralpage"
+import { ReferralUserPage } from "./pages/campaign/referraluser"
 
 function App() {
   return (
@@ -77,6 +80,9 @@ function App() {
           <Route path="/group/:grptype" element={<OrgEvent />}></Route>
           <Route path="/events/corp/:event_id" element={<Corporate />}></Route>
           <Route path="/events/:linkId" element={<EventPage />}></Route>
+          <Route path="/campaign/:c_key" element={<CampaignsPage />}></Route>
+          <Route path="/referral" element={<ReferralsPage />}></Route>
+          <Route path="/referral/:rfr" element={<ReferralUserPage />}></Route>
           <Route path="/login" element={<Login />} />
           <Route
             path="/admin"

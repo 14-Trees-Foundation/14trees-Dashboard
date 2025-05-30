@@ -2498,6 +2498,107 @@ class ApiClient {
     }
 
     /**
+     * Campaign
+     */
+
+    async getCampaignAnalytics(c_key: string): Promise<{
+        summary: {
+            donationCount: number;
+            giftRequestCount: number;
+            totalAmount: number;
+            treesCount: number;
+        };
+        champion: {
+            name: string;
+            email: string;
+            referralDonationsCount: number;
+            amountRaised: number;
+            treesSponsored: number;
+        } | null;
+    }> {
+        try {
+            const response = await this.api.get<{
+                summary: {
+                    donationCount: number;
+                    giftRequestCount: number;
+                    totalAmount: number;
+                    treesCount: number;
+                };
+                champion: {
+                    name: string;
+                    email: string;
+                    referralDonationsCount: number;
+                    amountRaised: number;
+                    treesSponsored: number;
+                } | null;
+            }>(`/campaigns/${c_key}/analytics`);
+
+            return response.data;
+        } catch (error: any) {
+            if (error.response?.data?.message) {
+                throw new Error(error.response.data.message);
+            }
+            throw new Error('Failed to fetch campaign analytics');
+        }
+    }
+
+    async getReferralCounts(): Promise<{ personalReferrals: number, campaignReferrals: number, totalReferrals: number; }> {
+        try {
+            const response = await this.api.get<{ personalReferrals: number, campaignReferrals: number, totalReferrals: number; }>('/campaigns/referralcount');
+
+            return {
+                personalReferrals: response.data.personalReferrals,
+                campaignReferrals: response.data.campaignReferrals,
+                totalReferrals: response.data.totalReferrals
+            };
+        } catch (error: any) {
+            if (error.response?.data?.message) {
+                throw new Error(error.response.data.message);
+            }
+            throw new Error('Failed to fetch referral counts');
+        }
+    }
+
+    async getReferralDashboard(rfrCode: string) {
+        try {
+            // Changed to match backend route exactly
+            const response = await this.api.get(`/campaigns/referral/${encodeURIComponent(rfrCode)}`);
+
+            return {
+                totalRaised: response.data.totalRaised || 0,
+                totalTrees: response.data.totalTrees || 0,
+                donations: response.data.donations || [],
+                gifts: response.data.gifts || []
+            };
+        } catch (error: unknown) {
+            if (error instanceof Error && 'response' in error) {
+                const axiosError = error as { response?: { data?: { message?: string } } };
+                if (axiosError.response?.data?.message) {
+                    throw new Error(axiosError.response.data.message);
+                }
+            }
+            throw new Error('Failed to fetch referral dashboard data');
+        }
+    }
+
+    async getUserNameByReferral(rfrCode: string): Promise<{ name: string }> {
+        try {
+            const response = await this.api.post('/referrals/referralname', { rfr: rfrCode });
+            return {
+                name: response.data.name
+            };
+        } catch (error: unknown) {
+            if (error instanceof Error && 'response' in error) {
+                const axiosError = error as { response?: { data?: { message?: string } } };
+                if (axiosError.response?.data?.message) {
+                    throw new Error(axiosError.response.data.message);
+                }
+            }
+            throw new Error('Failed to fetch user name by referral code');
+        }
+    }
+
+    /**
      * Gen AI
      */
     async serveUserQuery(message: string, history: any[]): Promise<{ text_output: string, sponsor_details?: any }> {
