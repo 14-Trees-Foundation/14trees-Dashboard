@@ -713,6 +713,27 @@ const GiftTrees: FC = () => {
         )
     }
 
+    const handlePickGiftRequest = async (giftCardId: number) => {
+        try {
+            const apiClient = new ApiClient();
+            const currentUserId = localStorage.getItem('userId');
+
+            if (!currentUserId) {
+                toast.error('User not authenticated');
+                return;
+            }
+
+            const response = await apiClient.pickGiftCardRequest(giftCardId, parseInt(currentUserId));
+
+            toast.success('Request picked successfully');
+            getGiftCardData(); // Refresh the data
+
+        } catch (error: any) {
+            console.error('Error picking Request:', error);
+            toast.error(error.message || 'Failed to pick Request');
+        }
+    };
+
     const getActionsMenu = (record: GiftCard) => (
         <Menu>
             <Menu.ItemGroup>
@@ -804,6 +825,15 @@ const GiftTrees: FC = () => {
                 {record.group_id && <Menu.Item key="43" onClick={() => { handleDownloadFundRequest(record.id); }} icon={<Description />}>
                     Fund Request
                 </Menu.Item>}
+                {!record.processed_by && (
+                    <Menu.Item
+                        key="pick"
+                        onClick={() => handlePickGiftRequest(record.id)}
+                        icon={<AssignmentInd />}
+                    >
+                        Pick This Up
+                    </Menu.Item>
+                )}
             </Menu.ItemGroup>}
         </Menu>
     );
@@ -881,6 +911,18 @@ const GiftTrees: FC = () => {
             align: "center",
             width: 200,
             ...getColumnSelectedItemFilter({ dataIndex: 'request_type', filters, handleSetFilters, options: ['Gift Cards', 'Normal Assignment', 'Test', 'Promotion'] })
+        },
+        {
+            dataIndex: "processed_by_name",
+            key: "processed_by",
+            title: "Processed By",
+            align: "center",
+            width: 150,
+            render: (value, record) => {
+                if (!value) return 'Pending';
+                return record.processed_by_name || `User ${value}`;
+            },
+            ...getColumnSearchProps('processed_by_name', filters, handleSetFilters)
         },
         {
             dataIndex: "tags",

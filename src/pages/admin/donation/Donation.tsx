@@ -27,6 +27,7 @@ import DonationTrees from "./Forms/DonationTrees";
 import TagComponent from "../gift/Form/TagComponent";
 import { Order } from "../../../types/common";
 import AssignTrees from "./Forms/AssignTrees/AssignTrees";
+import MapTrees from "./Forms/MapTrees/MapTrees";
 import AutoProcessConfirmationModal from "./components/AutoProcessConfirmationModal";
 import donationActionTypes from "../../../redux/actionTypes/donationActionTypes";
 
@@ -55,6 +56,8 @@ export const DonationComponent = () => {
   const [tagModal, setTagModal] = useState(false);
   const [tags, setTags] = useState<string[]>([]);
   const [assignTreesModalOpen, setAssignTreesModalOpen] = useState(false);
+  const [mapTreesOpen, setMapTreesOpen] = useState(false);
+
   const [autoPrsConfirm, setPrsConfirm] = useState(false);
   const [autoProcessing, setAutoProcessing] = useState(false);
 
@@ -460,6 +463,27 @@ export const DonationComponent = () => {
     }
   }
 
+  const handlePickDonation = async (donationId: number) => {
+    try {
+      const apiClient = new ApiClient();
+      const currentUserId = localStorage.getItem('userId');
+
+      if (!currentUserId) {
+        toast.error('User not authenticated');
+        return;
+      }
+
+      const response = await apiClient.pickDonation(donationId, parseInt(currentUserId));
+
+      toast.success('Donation picked successfully');
+      fetchDonations(); // Refresh the data
+
+    } catch (error: any) {
+      console.error('Error picking donation:', error);
+      toast.error(error.message || 'Failed to pick donation');
+    }
+  };
+
   const getActionsMenu = (record: Donation) => (
     <Menu>
       <Menu.ItemGroup>
@@ -490,9 +514,22 @@ export const DonationComponent = () => {
         <Menu.Item key="23" onClick={() => { setSelectedDonation(record); setAssignTreesModalOpen(true); }} icon={<AssignmentInd />}>
           Assign Trees
         </Menu.Item>
+        {record.visit_date && <Menu.Item key="24" onClick={() => { setSelectedDonation(record); setMapTreesOpen(true); }} icon={<AssignmentInd />}>
+          Map Visit Trees
+        </Menu.Item>}
         {record.donation_method === 'trees' && record.trees_count > (record.assigned || 0) && <Menu.Item key="25" onClick={() => { setSelectedDonation(record); setPrsConfirm(true); }} icon={<AutoMode />}>
           Auto Process
         </Menu.Item>}
+        {!record.processed_by && (
+          <Menu.Item
+            key="pick"
+            onClick={() => handlePickDonation(record.id)}
+            icon={<AssignmentInd />}
+          >
+            Pick This Up
+          </Menu.Item>
+        )}
+
       </Menu.ItemGroup>
     </Menu>
   );
@@ -610,6 +647,18 @@ export const DonationComponent = () => {
         }
       },
       ...getColumnSelectedItemFilter({ dataIndex: 'status', filters, handleSetFilters, options: ['UserSubmitted', 'OrderFulfilled'] }),
+    },
+    {
+      dataIndex: "processed_by_name",
+      key: "processed_by",
+      title: "Processed By",
+      align: "center",
+      width: 150,
+      render: (value, record) => {
+        if (!value) return 'Pending';
+        return record.processed_by_name || `User ${value}`;
+      },
+      ...getColumnSearchProps('processed_by_name', filters, handleSetFilters)
     },
     {
       dataIndex: "created_at",
@@ -735,6 +784,12 @@ export const DonationComponent = () => {
           setAssignTreesModalOpen(false);
           setSelectedDonation(null);
         }}
+      />}
+
+      {selectedDonation && mapTreesOpen && <MapTrees
+        open={mapTreesOpen}
+        onClose={() => { setMapTreesOpen(false); }}
+        donation={selectedDonation}
       />}
 
       {selectedDonation && <AutoProcessConfirmationModal
