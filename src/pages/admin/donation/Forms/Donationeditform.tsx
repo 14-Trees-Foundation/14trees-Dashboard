@@ -360,7 +360,7 @@ export const DirectEditDonationForm: React.FC<DirectEditDonationFormProps> = ({
                       ? `Minimum ${formData.booked} (already booked trees)`
                       : undefined
                   }
-                  disabled={isAmountDonation()} // Visual disabled state
+                  disabled={isAmountDonation() || (donation?.assigned || 0) > 0}
                 />
               </Grid>
               <Grid item xs={12} md={6}>
