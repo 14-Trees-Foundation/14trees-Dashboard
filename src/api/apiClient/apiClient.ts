@@ -1327,6 +1327,18 @@ class ApiClient {
         }
     }
 
+    async getPlotTreesCountForAutoProcessDonation(donation_id: number): Promise<{ plot_id: number, trees_count: number, plot_name: string }[]> {
+        try {
+            const response = await this.api.post<{ plot_id: number, trees_count: number, plot_name: string }[]>(`/donations/requests/plot-trees-cnt/get`, { donation_id });
+            return response.data;
+        } catch (error: any) {
+            if (error.response?.data?.message) {
+                throw new Error(error.response.data.message);
+            }
+            throw new Error('Failed to get plot trees count for auto process donation!');
+        }
+    }
+
     async autoProcessDonation(donation_id: number): Promise<Donation> {
         try {
             const response = await this.api.post<Donation>(`/donations/requests/auto-process`, { donation_id });
@@ -1893,6 +1905,18 @@ class ApiClient {
                 throw new Error(error.response.data.message);
             }
             throw new Error('Failed to clone gift card request');
+        }
+    }
+
+    async getPlotTreesCountForAutoProcessGiftRequest(gift_request_id: number): Promise<{ plot_id: number, trees_count: number, plot_name: string }[]> {
+        try {
+            const response = await this.api.post<{ plot_id: number, trees_count: number, plot_name: string }[]>(`/gift-cards/requests/plot-trees-cnt/get`, { gift_request_id });
+            return response.data;
+        } catch (error: any) {
+            if (error.response?.data?.message) {
+                throw new Error(error.response.data.message);
+            }
+            throw new Error('Failed to get plot trees count for auto process!');
         }
     }
 
