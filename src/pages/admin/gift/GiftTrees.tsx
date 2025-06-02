@@ -14,7 +14,7 @@ import { useAppDispatch, useAppSelector } from "../../../redux/store/hooks";
 import { bindActionCreators } from "@reduxjs/toolkit";
 import { RootState } from "../../../redux/store/store";
 import { Dropdown, Menu, Table, TableColumnsType } from "antd";
-import { AssignmentInd, AssuredWorkload, CardGiftcard, Collections, Delete, Description, Download, Edit, Email, ErrorOutline, FileCopy, Landscape, LocalOffer, ManageAccounts, MenuOutlined, NotesOutlined, Photo, Slideshow, Wysiwyg } from "@mui/icons-material";
+import { AssignmentInd, AssuredWorkload, AutoMode, CardGiftcard, Collections, Delete, Description, Download, Edit, Email, ErrorOutline, FileCopy, Landscape, LocalOffer, ManageAccounts, MenuOutlined, NotesOutlined, Photo, Slideshow, Wysiwyg } from "@mui/icons-material";
 import PlotSelection from "./Form/PlotSelection";
 import { Plot } from "../../../types/plot";
 import giftCardActionTypes from "../../../redux/actionTypes/giftCardActionTypes";
@@ -32,6 +32,7 @@ import TagComponent from "./Form/TagComponent";
 import AssignTrees from "./Form/AssignTrees";
 import GiftCardCreationModal from "./Components/GiftCardCreationModal";
 import GeneralTable from "../../../components/GenTable";
+import AutoProcessConfirmationModal from "./Components/AutoProcessConfirmationModal";
 
 const pendingPlotSelection = 'Pending Plot & Tree(s) Reservation';
 
@@ -39,7 +40,7 @@ const TableSummary = (giftRequests: GiftCard[], selectedGiftRequestIds: number[]
 
     const calculateSum = (data: (number | undefined)[]) => {
         return data.reduce((a, b) => (a ?? 0) + (b ?? 0), 0);
-    }    
+    }
 
     return (
         <Table.Summary fixed='bottom'>
@@ -106,6 +107,10 @@ const GiftTrees: FC = () => {
     const [paymentModal, setPaymentModal] = useState(false);
     const [selectedPaymentGR, setSelectedPaymentGR] = useState<GiftCard | null>(null);
 
+    // Auto process request
+    const [autoPrsConfirm, setPrsConfirm] = useState(false);
+    const [autoProcessing, setAutoProcessing] = useState(false);
+
     let giftCards: GiftCard[] = [];
     const giftCardsData = useAppSelector((state: RootState) => state.giftCardsData);
     if (giftCardsData) {
@@ -167,14 +172,14 @@ const GiftTrees: FC = () => {
     // Chart Useffect
     useEffect(() => {
         if (!giftCards || !Array.isArray(giftCards)) return;
-    
+
         const corporate = giftCards.filter(card => card.group_name && card.group_name !== 'Personal').length || 0;
         const personal = giftCards.filter(card => !card.group_name || card.group_name === 'Personal').length || 0;
-    
+
         setCorporateCount(corporate);
         setPersonalCount(personal);
     }, [giftCards]);
-    
+
     console.log("Gift Cards:", giftCards);
     console.log("Corporate Count:", corporateCount);
     console.log("Personal Count:", personalCount);
@@ -330,7 +335,7 @@ const GiftTrees: FC = () => {
         try {
             const response = await apiClient.createGiftCard(requestId, createdBy.id, treeCount, user.id, sponsor?.id || null, category, grove, requestType, giftedOn, group?.id, paymentId, logo, messages, file);
             giftCardId = response.id;
-            
+
             getGiftCardData();
             setRequestId(null);
         } catch (error) {
@@ -677,6 +682,29 @@ const GiftTrees: FC = () => {
         setSelectedGiftRequestIds(giftRequestIds);
     }
 
+    const handleAutoProcess = async () => {
+        if (!selectedGiftCard) return;
+        const giftRequestId = selectedGiftCard.id;
+
+        setAutoProcessing(true);
+        try {
+            const apiClient = new ApiClient();
+            const giftRequest = await apiClient.autoProcessGiftRequest(giftRequestId);
+            dispatch({
+                type: giftCardActionTypes.UPDATE_GIFT_CARD_REQUESTED,
+                payload: giftRequest,
+            });
+
+            toast.success("Auto processed request!")
+            setSelectedGiftCard(null);
+            setPrsConfirm(false);
+        } catch (error: any) {
+            toast.error(error.message);
+        } finally {
+            setAutoProcessing(false);
+        }
+    }
+
     const getSortableHeader = (header: string, key: string) => {
         return (
             <div style={{ display: "flex", alignItems: "center", justifyContent: 'space-between' }}>
@@ -684,6 +712,27 @@ const GiftTrees: FC = () => {
             </div>
         )
     }
+
+    const handlePickGiftRequest = async (giftCardId: number) => {
+        try {
+            const apiClient = new ApiClient();
+            const currentUserId = localStorage.getItem('userId');
+
+            if (!currentUserId) {
+                toast.error('User not authenticated');
+                return;
+            }
+
+            const response = await apiClient.pickGiftCardRequest(giftCardId, parseInt(currentUserId));
+
+            toast.success('Request picked successfully');
+            getGiftCardData(); // Refresh the data
+
+        } catch (error: any) {
+            console.error('Error picking Request:', error);
+            toast.error(error.message || 'Failed to pick Request');
+        }
+    };
 
     const getActionsMenu = (record: GiftCard) => (
         <Menu>
@@ -767,12 +816,24 @@ const GiftTrees: FC = () => {
                 <Menu.Item key="41" onClick={() => { setSelectedGiftCard(record); setAutoAssignModal(true); }} icon={<AssignmentInd />}>
                     Assign Trees
                 </Menu.Item>
+                {record.no_of_cards > (record.booked || 0) && <Menu.Item key="25" onClick={() => { setSelectedGiftCard(record); setPrsConfirm(true); }} icon={<AutoMode />}>
+                    Auto Process
+                </Menu.Item>}
                 <Menu.Item key="42" onClick={() => { handlePaymentModalOpen(record); }} icon={<AssuredWorkload />}>
                     Payment Details
                 </Menu.Item>
                 {record.group_id && <Menu.Item key="43" onClick={() => { handleDownloadFundRequest(record.id); }} icon={<Description />}>
                     Fund Request
                 </Menu.Item>}
+                {!record.processed_by && (
+                    <Menu.Item
+                        key="pick"
+                        onClick={() => handlePickGiftRequest(record.id)}
+                        icon={<AssignmentInd />}
+                    >
+                        Pick This Up
+                    </Menu.Item>
+                )}
             </Menu.ItemGroup>}
         </Menu>
     );
@@ -852,6 +913,18 @@ const GiftTrees: FC = () => {
             ...getColumnSelectedItemFilter({ dataIndex: 'request_type', filters, handleSetFilters, options: ['Gift Cards', 'Normal Assignment', 'Test', 'Promotion'] })
         },
         {
+            dataIndex: "processed_by_name",
+            key: "processed_by",
+            title: "Processed By",
+            align: "center",
+            width: 150,
+            render: (value, record) => {
+                if (!value) return 'Pending';
+                return record.processed_by_name || `User ${value}`;
+            },
+            ...getColumnSearchProps('processed_by_name', filters, handleSetFilters)
+        },
+        {
             dataIndex: "tags",
             key: "Tags",
             title: "Tags",
@@ -875,7 +948,7 @@ const GiftTrees: FC = () => {
             title: "Email Status",
             align: "center",
             width: 150,
-            render: (value, record: any, index) => 
+            render: (value, record: any, index) =>
                 record.mail_sent ? 'Mail Sent to Sponsor' : ''
         },
         {
@@ -915,7 +988,7 @@ const GiftTrees: FC = () => {
             title: "Donation Date",
             align: "center",
             width: 200,
-            ...getColumnDateFilter({dataIndex: 'donation_date', filters, handleSetFilters, label: 'Received'})
+            ...getColumnDateFilter({ dataIndex: 'donation_date', filters, handleSetFilters, label: 'Received' })
         },
         {
             dataIndex: "total_amount",
@@ -1043,13 +1116,13 @@ const GiftTrees: FC = () => {
             <GiftCardsForm
                 loading={savingChange}
                 setLoading={(value) => { setSavingChange(value) }}
-                loggedinUserId={authRef.current?.userId} 
-                step={step} 
-                giftCardRequest={selectedGiftCard ?? undefined} 
-                requestId={requestId} 
-                open={modalOpen} 
-                handleClose={handleModalClose} 
-                onSubmit={handleSubmit} 
+                loggedinUserId={authRef.current?.userId}
+                step={step}
+                giftCardRequest={selectedGiftCard ?? undefined}
+                requestId={requestId}
+                open={modalOpen}
+                handleClose={handleModalClose}
+                onSubmit={handleSubmit}
             />
 
             <Dialog open={plotModal} onClose={() => setPlotModal(false)} fullWidth maxWidth="xl">
@@ -1110,8 +1183,8 @@ const GiftTrees: FC = () => {
                     />
                 </DialogContent>
                 <DialogActions>
-                    <Button 
-                        onClick={() => setPaymentModal(false)} 
+                    <Button
+                        onClick={() => setPaymentModal(false)}
                         color="error"
                         variant="outlined"
                         sx={{ mr: 2 }}
@@ -1172,6 +1245,16 @@ const GiftTrees: FC = () => {
                 onClose={handleTagModalClose}
                 onSubmit={handleTagTreeCardRequestSubmit}
             />
+
+            {selectedGiftCard && <AutoProcessConfirmationModal
+                loading={autoProcessing}
+                open={autoPrsConfirm}
+                onClose={() => {
+                    setPrsConfirm(false);
+                    setSelectedGiftCard(null);
+                }}
+                onConfirm={handleAutoProcess}
+            />}
 
             <GiftCardCreationModal open={giftCardNotification} onClose={() => { setGiftCardNotification(false) }} />
 

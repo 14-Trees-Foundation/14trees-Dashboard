@@ -329,9 +329,9 @@ class ApiClient {
     async getGroups(offset: number, limit: number, filters?: any[], orderBy?: Order[]): Promise<PaginatedResponse<Group>> {
         const url = `/groups/get?offset=${offset}&limit=${limit}`;
         try {
-            const response = await this.api.post<PaginatedResponse<Group>>(url, { 
-                filters: filters, 
-                order_by: orderBy 
+            const response = await this.api.post<PaginatedResponse<Group>>(url, {
+                filters: filters,
+                order_by: orderBy
             });
             return response.data;
         } catch (error: any) {
@@ -659,6 +659,18 @@ class ApiClient {
         }
     }
 
+    async checkGroupBirthdays(groupId: number): Promise<any> {
+        try {
+            const response = await this.api.get(`/users/birthday/notifications?group_id=${groupId}`);
+            return response.data;
+        } catch (error: any) {
+            if (error.response) {
+                throw new Error(error.response.data.message);
+            }
+            throw new Error('Failed to update User');
+        }
+    }
+
     /*
         Model- OnsiteStaff: CRUD Operations/Apis for Onsite staff
     */
@@ -951,9 +963,9 @@ class ApiClient {
         }
     }
 
-    async getMappedGiftTreesAnalytics(type: 'group' | 'user', id: number): Promise<any> { 
+    async getMappedGiftTreesAnalytics(type: 'group' | 'user', id: number): Promise<any> {
         const url = `/trees/mapped-gift/analytics`;
-        try{
+        try {
             const response = await this.api.post<any>(url, { [type === 'group' ? 'group_id' : 'user_id']: id });
             return response.data;
         } catch (error: any) {
@@ -1212,15 +1224,15 @@ class ApiClient {
        Model- Donation: CRUD Operations/Apis for Donations
    */
 
-       async getDonations(offset: number, limit: number, filters?: any[], order_by?: Order[]): Promise<PaginatedResponse<Donation>> {
+    async getDonations(offset: number, limit: number, filters?: any[], order_by?: Order[]): Promise<PaginatedResponse<Donation>> {
         const url = `/donations/requests/get?offset=${offset}&limit=${limit}`; // No need to add query params since it's a POST request
-    
+
         try {
-            const response = await this.api.post<PaginatedResponse<Donation>>(url, { 
+            const response = await this.api.post<PaginatedResponse<Donation>>(url, {
                 filters: filters || [],
                 order_by: order_by || []
             });
-    
+
             return response.data;
         } catch (error: any) {
             if (error.response?.data?.message) {
@@ -1229,7 +1241,7 @@ class ApiClient {
             throw new Error("Failed to fetch donations");
         }
     }
-    
+
     async getDonationTags(): Promise<PaginatedResponse<string>> {
         const url = `/donations/tags`;
         try {
@@ -1257,7 +1269,7 @@ class ApiClient {
         try {
             // Extract the fields that we want to update
             const updateFields = [
-                'user_id', 
+                'user_id',
                 'payment_id',
                 'category',
                 'grove',
@@ -1274,14 +1286,14 @@ class ApiClient {
                 'alternate_email',
                 'tags'
             ];
-            
+
             // Format request to match backend expectations
             const payload = {
                 updateFields: updateFields,
                 data: donation,
                 users: users
             };
-            
+
             console.log("Sending donation update payload:", payload);
             const response = await this.api.put<Donation>(`/donations/requests/${donation.id}`, payload);
             return response.data;
@@ -1315,6 +1327,35 @@ class ApiClient {
         }
     }
 
+    async autoProcessDonation(donation_id: number): Promise<Donation> {
+        try {
+            const response = await this.api.post<Donation>(`/donations/requests/auto-process`, { donation_id });
+            return response.data;
+        } catch (error: any) {
+            if (error.response?.data?.message) {
+                throw new Error(error.response.data.message);
+            }
+            throw new Error('Failed to process donation');
+        }
+    }
+
+    async pickDonation(donationId: number, userId: number): Promise<{ success: boolean }> {
+        try {
+            const response = await this.api.post<{ success: boolean }>(
+                `/donations/${donationId}/process`,
+                { userId }
+            );
+            return response.data;
+        } catch (error: any) {
+            if (error.response?.data?.message) {
+                throw new Error(error.response.data.message);
+            }
+            throw new Error('Failed to pick donation');
+        }
+    }
+
+
+
     async createWorkOrderForDonation(donationId: number): Promise<boolean> {
         try {
             const response = await this.api.post<void>(`/donations/work-order/${donationId}`);
@@ -1326,13 +1367,13 @@ class ApiClient {
     }
 
     async getDonationUsers(offset: number, limit: number, filters?: any[], order_by?: Order[]): Promise<PaginatedResponse<DonationUser>> {
-        try {     
+        try {
 
             const response = await this.api.post<PaginatedResponse<DonationUser>>(
-                `/donations/users/get?offset=${offset}&limit=${limit}`, 
+                `/donations/users/get?offset=${offset}&limit=${limit}`,
                 { filters, order_by }
             );
-            
+
             return response.data;
         } catch (error: any) {
             if (error.response?.data?.message) {
@@ -1347,10 +1388,10 @@ class ApiClient {
             const resp = await this.api.post<Donation>('/donations/trees/reserve', { donation_id, tree_ids, auto_reserve, plots, diversify, book_all_habits });
             return resp.data;
         } catch (error: any) {
-          if (error.response?.data?.message) {
-            throw new Error(error.response.data.message);
-          }
-          throw new Error('Failed to reserve trees for donation!');
+            if (error.response?.data?.message) {
+                throw new Error(error.response.data.message);
+            }
+            throw new Error('Failed to reserve trees for donation!');
         }
     }
 
@@ -1367,6 +1408,48 @@ class ApiClient {
         }
     }
 
+    async mapAssignedTreesToDonation(donation_id: number, tree_ids: number[]) {
+        try {
+            const resp = await this.api.post<Donation>('/donations/trees/map', {
+                donation_id,
+                tree_ids
+            });
+            return resp.data;
+        } catch (error: any) {
+            if (error.response?.data?.message) {
+                throw new Error(error.response.data.message);
+            }
+            throw new Error('Failed to map trees to donation!');
+        }
+    }
+
+    async unmapAssignedTreesFromDonation(donation_id: number, tree_ids: number[]) {
+        try {
+            const resp = await this.api.post<Donation>('/donations/trees/unmap', {
+                donation_id,
+                tree_ids
+            });
+            return resp.data;
+        } catch (error: any) {
+            if (error.response?.data?.message) {
+                throw new Error(error.response.data.message);
+            }
+            throw new Error('Failed to unmap trees from donation!');
+        }
+    }
+
+    async getMappedTreesByDonation(donation_id: number, offset: number = 0, limit: number = 20, filters: any[] = [], orderBy: any[] = []) {
+        try {
+            const resp = await this.api.post<Tree[]>('donations/trees/getmapped', { donation_id, offset, limit, filters, orderBy });
+            return resp.data;
+        } catch (error: any) {
+            if (error.response?.data?.message) {
+                throw new Error(error.response.data.message);
+            }
+            throw new Error('Failed to get mapped trees for donation!');
+        }
+    }
+
     async sendAckEmailToDonor(donation_id: number, test_mails: string[], cc_mails: string[]) {
         try {
             await this.api.post<void>(`/donations/emails/ack`, { donation_id, test_mails, cc_mails });
@@ -1378,8 +1461,8 @@ class ApiClient {
         }
     }
 
-    async sendEmailForDonation(donation_id: number, test_mails: string[], sponsor_cc_mails: string[] = [], recipient_cc_mails: string[] = [], assignee_cc_mails: string[] = [], 
-    event_type: string = 'default', email_sponsor: boolean = true, email_recipient: boolean = false,  email_assignee: boolean = false ) {
+    async sendEmailForDonation(donation_id: number, test_mails: string[], sponsor_cc_mails: string[] = [], recipient_cc_mails: string[] = [], assignee_cc_mails: string[] = [],
+        event_type: string = 'default', email_sponsor: boolean = true, email_recipient: boolean = false, email_assignee: boolean = false) {
         try {
             await this.api.post<void>(`/donations/emails/send`, { donation_id, test_mails, sponsor_cc_mails, recipient_cc_mails, assignee_cc_mails, event_type, email_sponsor, email_recipient, email_assignee });
         } catch (error: any) {
@@ -1397,7 +1480,7 @@ class ApiClient {
             if (!donationId) {
                 throw new Error('Missing donation_id');
             }
-            
+
             // Format the user data according to what the backend expects
             // The backend expects recipient/assignee IDs to be included if they exist
             const userPayload = {
@@ -1415,15 +1498,15 @@ class ApiClient {
                 trees_count: data.trees_count || data.gifted_trees || 1,
                 profile_image_url: data.profile_image_url || null
             };
-            
+
             // Prepare the payload in the format expected by the backend
             const payload = {
                 donation_id: donationId,
                 user: userPayload
             };
-            
+
             console.log('Updating donation user:', payload);
-            
+
             // Use the PUT /donations/users endpoint that the backend expects
             const response = await this.api.put('/donations/users', payload);
             return response.data;
@@ -1443,7 +1526,7 @@ class ApiClient {
             if (!donationId) {
                 throw new Error('Missing donation_id');
             }
-            
+
             // Format the user data according to what the backend expects
             const userPayload = {
                 // No ID for new user
@@ -1458,15 +1541,15 @@ class ApiClient {
                 trees_count: data.trees_count || data.gifted_trees || 1,
                 profile_image_url: data.profile_image_url || null
             };
-            
+
             // Prepare the payload in the format expected by the backend
             const payload = {
                 donation_id: donationId,
                 user: userPayload
             };
-            
+
             console.log('Creating donation user:', payload);
-            
+
             // Use the existing PUT /donations/users endpoint that also handles creation
             // The backend determines if it's a create or update based on whether there's an ID
             const response = await this.api.put('/donations/users', payload);
@@ -1725,7 +1808,10 @@ class ApiClient {
         try {
             const formData = new FormData();
             for (const [key, value] of Object.entries(request)) {
-                if (value) formData.append(key, value.toString());
+                if (value) {
+                    if (Array.isArray(value)) value.forEach(item => formData.append(key, item.toString()))
+                    else formData.append(key, value.toString());
+                }
             }
 
             if (formData.has('no_of_cards')) formData.set('no_of_cards', no_of_cards.toString());
@@ -1810,6 +1896,33 @@ class ApiClient {
         }
     }
 
+    async autoProcessGiftRequest(gift_request_id: number): Promise<GiftCard> {
+        try {
+            const response = await this.api.post<GiftCard>(`/gift-cards/requests/auto-process`, { gift_request_id });
+            return response.data;
+        } catch (error: any) {
+            if (error.response?.data?.message) {
+                throw new Error(error.response.data.message);
+            }
+            throw new Error('Failed to process gift request!');
+        }
+    }
+
+    async pickGiftCardRequest(giftCardId: number, userId: number): Promise<{ success: boolean }> {
+        try {
+            const response = await this.api.post<{ success: boolean }>(
+                `/gift-cards/${giftCardId}/process`,
+                { userId }
+            );
+            return response.data;
+        } catch (error: any) {
+            if (error.response?.data?.message) {
+                throw new Error(error.response.data.message);
+            }
+            throw new Error('Failed to request gift card');
+        }
+    }
+
     async getGiftRequestUsers(gift_card_request_id: number): Promise<GiftRequestUser[]> {
         try {
             const response = await this.api.get<GiftRequestUser[]>(`/gift-cards/users/${gift_card_request_id}`);
@@ -1879,7 +1992,7 @@ class ApiClient {
         }
     }
 
-    async generateCardTemplate(request_id: string, primary_message: string, logo_message: string, logo?: string | null, sapling_id?: string | null, user_name?: string | null, gifted_by?: string |null, plant_type?: string | null, is_personal?: boolean): Promise<{ presentation_id: string, slide_id: string }> {
+    async generateCardTemplate(request_id: string, primary_message: string, logo_message: string, logo?: string | null, sapling_id?: string | null, user_name?: string | null, gifted_by?: string | null, plant_type?: string | null, is_personal?: boolean): Promise<{ presentation_id: string, slide_id: string }> {
         try {
             const resp = await this.api.post<any>(`/gift-cards/generate-template`, { request_id, primary_message, logo_message, logo, sapling_id, plant_type, user_name, gifted_by, is_personal });
             return resp.data;
@@ -1891,7 +2004,7 @@ class ApiClient {
         }
     }
 
-    async updateGiftCardTemplate(slide_id: string, primary_message: string, logo_message: string, logo?: string | null, sapling_id?: string | null, user_name?: string | null, gifted_by?: string |null, trees_count?: number): Promise<void> {
+    async updateGiftCardTemplate(slide_id: string, primary_message: string, logo_message: string, logo?: string | null, sapling_id?: string | null, user_name?: string | null, gifted_by?: string | null, trees_count?: number): Promise<void> {
         try {
             await this.api.post<any>(`/gift-cards/update-template`, { slide_id, primary_message, logo_message, logo, sapling_id, user_name, gifted_by, trees_count });
         } catch (error: any) {
@@ -2374,9 +2487,9 @@ class ApiClient {
     /**
      * Gen AI
      */
-    async serveUserQuery(message: string, history: any[]): Promise<{text_output: string, sponsor_details?: any}> {
+    async serveUserQuery(message: string, history: any[]): Promise<{ text_output: string, sponsor_details?: any }> {
         try {
-            const response = await this.api.post<{text_output: string, sponsor_details: any}>(`/gift-cards/gen-ai`, { message, history }, {
+            const response = await this.api.post<{ text_output: string, sponsor_details: any }>(`/gift-cards/gen-ai`, { message, history }, {
                 headers: {
                     "x-access-token": this.token,
                     "content-type": "application/json",
