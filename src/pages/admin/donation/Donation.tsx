@@ -490,7 +490,7 @@ export const DonationComponent = () => {
         <Menu.Item key="23" onClick={() => { setSelectedDonation(record); setAssignTreesModalOpen(true); }} icon={<AssignmentInd />}>
           Assign Trees
         </Menu.Item>
-        {record.donation_method === 'trees' && record.trees_count > (record.booked || 0) && <Menu.Item key="25" onClick={() => { setSelectedDonation(record); setPrsConfirm(true); }} icon={<AutoMode />}>
+        {record.donation_method === 'trees' && record.trees_count > (record.assigned || 0) && <Menu.Item key="25" onClick={() => { setSelectedDonation(record); setPrsConfirm(true); }} icon={<AutoMode />}>
           Auto Process
         </Menu.Item>}
       </Menu.ItemGroup>
@@ -745,6 +745,8 @@ export const DonationComponent = () => {
           setSelectedDonation(null);
         }}
         onConfirm={handleAutoProcess}
+        donationId={selectedDonation.id}
+        treesToBook={selectedDonation.trees_count - (selectedDonation.booked || 0)}
       />}
 
       <Dialog open={plotSelectionModalOpen} onClose={() => setPlotSelectionModalOpen(false)} fullWidth maxWidth="xl">

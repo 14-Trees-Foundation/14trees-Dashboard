@@ -795,7 +795,7 @@ const GiftTrees: FC = () => {
                 <Menu.Item key="41" onClick={() => { setSelectedGiftCard(record); setAutoAssignModal(true); }} icon={<AssignmentInd />}>
                     Assign Trees
                 </Menu.Item>
-                {record.no_of_cards > (record.booked || 0) && <Menu.Item key="25" onClick={() => { setSelectedGiftCard(record); setPrsConfirm(true); }} icon={<AutoMode />}>
+                {record.no_of_cards > (record.assigned || 0) && <Menu.Item key="25" onClick={() => { setSelectedGiftCard(record); setPrsConfirm(true); }} icon={<AutoMode />}>
                     Auto Process
                 </Menu.Item>}
                 <Menu.Item key="42" onClick={() => { handlePaymentModalOpen(record); }} icon={<AssuredWorkload />}>
@@ -1211,7 +1211,9 @@ const GiftTrees: FC = () => {
                     setPrsConfirm(false);
                     setSelectedGiftCard(null);
                 }}
+                treesToBook={selectedGiftCard?.no_of_cards - Number(selectedGiftCard?.booked)}
                 onConfirm={handleAutoProcess}
+                giftId={selectedGiftCard?.id}
             />}
 
             <GiftCardCreationModal open={giftCardNotification} onClose={() => { setGiftCardNotification(false) }} />
