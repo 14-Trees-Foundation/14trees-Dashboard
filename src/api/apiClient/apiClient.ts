@@ -1340,6 +1340,16 @@ class ApiClient {
         }
     }
 
+    async deleteDonationUser(userId: number): Promise<number> {
+        try {
+            await this.api.delete<any>(`/donations/users/${userId}`);
+            return userId;
+        } catch (error) {
+            console.error('[API Client] Failed to delete donation user:', error);
+            throw new Error('Failed to delete Donation User');
+        }
+    }
+
     async autoProcessDonation(donation_id: number): Promise<Donation> {
         try {
             const response = await this.api.post<Donation>(`/donations/requests/auto-process`, { donation_id });
