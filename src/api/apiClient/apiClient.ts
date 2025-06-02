@@ -1327,6 +1327,28 @@ class ApiClient {
         }
     }
 
+    async getPlotTreesCountForAutoProcessDonation(donation_id: number): Promise<{ plot_id: number, trees_count: number, plot_name: string }[]> {
+        try {
+            const response = await this.api.post<{ plot_id: number, trees_count: number, plot_name: string }[]>(`/donations/requests/plot-trees-cnt/get`, { donation_id });
+            return response.data;
+        } catch (error: any) {
+            if (error.response?.data?.message) {
+                throw new Error(error.response.data.message);
+            }
+            throw new Error('Failed to get plot trees count for auto process donation!');
+        }
+    }
+
+    async deleteDonationUser(userId: number): Promise<number> {
+        try {
+            await this.api.delete<any>(`/donations/users/${userId}`);
+            return userId;
+        } catch (error) {
+            console.error('[API Client] Failed to delete donation user:', error);
+            throw new Error('Failed to delete Donation User');
+        }
+    }
+
     async autoProcessDonation(donation_id: number): Promise<Donation> {
         try {
             const response = await this.api.post<Donation>(`/donations/requests/auto-process`, { donation_id });
@@ -1893,6 +1915,18 @@ class ApiClient {
                 throw new Error(error.response.data.message);
             }
             throw new Error('Failed to clone gift card request');
+        }
+    }
+
+    async getPlotTreesCountForAutoProcessGiftRequest(gift_request_id: number): Promise<{ plot_id: number, trees_count: number, plot_name: string }[]> {
+        try {
+            const response = await this.api.post<{ plot_id: number, trees_count: number, plot_name: string }[]>(`/gift-cards/requests/plot-trees-cnt/get`, { gift_request_id });
+            return response.data;
+        } catch (error: any) {
+            if (error.response?.data?.message) {
+                throw new Error(error.response.data.message);
+            }
+            throw new Error('Failed to get plot trees count for auto process!');
         }
     }
 
@@ -2481,6 +2515,107 @@ class ApiClient {
                 throw new Error(error.response.data.message);
             }
             throw new Error('Failed to update permission details');
+        }
+    }
+
+    /**
+     * Campaign
+     */
+
+    async getCampaignAnalytics(c_key: string): Promise<{
+        summary: {
+            donationCount: number;
+            giftRequestCount: number;
+            totalAmount: number;
+            treesCount: number;
+        };
+        champion: {
+            name: string;
+            email: string;
+            referralDonationsCount: number;
+            amountRaised: number;
+            treesSponsored: number;
+        } | null;
+    }> {
+        try {
+            const response = await this.api.get<{
+                summary: {
+                    donationCount: number;
+                    giftRequestCount: number;
+                    totalAmount: number;
+                    treesCount: number;
+                };
+                champion: {
+                    name: string;
+                    email: string;
+                    referralDonationsCount: number;
+                    amountRaised: number;
+                    treesSponsored: number;
+                } | null;
+            }>(`/campaigns/${c_key}/analytics`);
+
+            return response.data;
+        } catch (error: any) {
+            if (error.response?.data?.message) {
+                throw new Error(error.response.data.message);
+            }
+            throw new Error('Failed to fetch campaign analytics');
+        }
+    }
+
+    async getReferralCounts(): Promise<{ personalReferrals: number, campaignReferrals: number, totalReferrals: number; }> {
+        try {
+            const response = await this.api.get<{ personalReferrals: number, campaignReferrals: number, totalReferrals: number; }>('/campaigns/referralcount');
+
+            return {
+                personalReferrals: response.data.personalReferrals,
+                campaignReferrals: response.data.campaignReferrals,
+                totalReferrals: response.data.totalReferrals
+            };
+        } catch (error: any) {
+            if (error.response?.data?.message) {
+                throw new Error(error.response.data.message);
+            }
+            throw new Error('Failed to fetch referral counts');
+        }
+    }
+
+    async getReferralDashboard(rfrCode: string) {
+        try {
+            // Changed to match backend route exactly
+            const response = await this.api.get(`/campaigns/referral/${encodeURIComponent(rfrCode)}`);
+
+            return {
+                totalRaised: response.data.totalRaised || 0,
+                totalTrees: response.data.totalTrees || 0,
+                donations: response.data.donations || [],
+                gifts: response.data.gifts || []
+            };
+        } catch (error: unknown) {
+            if (error instanceof Error && 'response' in error) {
+                const axiosError = error as { response?: { data?: { message?: string } } };
+                if (axiosError.response?.data?.message) {
+                    throw new Error(axiosError.response.data.message);
+                }
+            }
+            throw new Error('Failed to fetch referral dashboard data');
+        }
+    }
+
+    async getUserNameByReferral(rfrCode: string): Promise<{ name: string }> {
+        try {
+            const response = await this.api.post('/referrals/referralname', { rfr: rfrCode });
+            return {
+                name: response.data.name
+            };
+        } catch (error: unknown) {
+            if (error instanceof Error && 'response' in error) {
+                const axiosError = error as { response?: { data?: { message?: string } } };
+                if (axiosError.response?.data?.message) {
+                    throw new Error(axiosError.response.data.message);
+                }
+            }
+            throw new Error('Failed to fetch user name by referral code');
         }
     }
 
