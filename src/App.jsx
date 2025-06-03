@@ -47,9 +47,10 @@ import GiftTreesComponet from "./pages/admin/gift/GiftTrees";
 import GCInventory from "./pages/admin/Inventory/GCInventory";
 import { DonationComponent } from "./pages/admin/donation/Donation";
 import CSRInventory from "./pages/admin/csr/CSRInventory";
-import { CampaignsPage } from "./pages/campaign/campaignpage";
-import { ReferralsPage } from "./pages/campaign/referralpage"
-import { ReferralUserPage } from "./pages/campaign/referraluser"
+import { CampaignComponent } from "./pages/admin/campaign/campaign";
+import { CampaignsPage } from "./pages/admin/campaign/campaignpage";
+import { ReferralsPage } from "./pages/admin/campaign/referralpage"
+import { ReferralUserPage } from "./pages/admin/campaign/referraluser"
 
 function App() {
   return (
@@ -105,6 +106,7 @@ function App() {
             <Route path="events" element={<EventsComponent />} />
             <Route path="site-inventory" element={<SiteInventory />} />
             <Route path="gc-inventory" element={<GCInventory />} />
+            <Route path="campaigns" element={<CampaignComponent />}></Route>
             <Route path="tree-cards" element={<GiftTreesComponet />} />
             <Route path="donations" element={<DonationComponent />} />
             <Route path="corporate-dashboard" element={<CSRInventory />} />
