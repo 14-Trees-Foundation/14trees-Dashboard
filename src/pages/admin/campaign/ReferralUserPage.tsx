@@ -4,35 +4,50 @@ import {
     Typography,
     CircularProgress,
     Alert,
-    Container
+    Container,
+    Avatar
 } from "@mui/material";
-import { ReferralCards } from "./component/referralCards";
-import ApiClient from '../../api/apiClient/apiClient';
+import { ReferralUserCards } from "./component/referraluser";
+import ApiClient from '../../../api/apiClient/apiClient';
+import { useParams } from 'react-router-dom';
 
-export const ReferralsPage = () => {
+export const ReferralUserPage = () => {
+    const { rfr } = useParams();
     const [loading, setLoading] = useState(true);
+    const [userNameLoading, setUserNameLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
-    const [referralData, setReferralData] = useState({
-        personalReferrals: 0,
-        campaignReferrals: 0,
-        totalReferrals: 0
+    const [userName, setUserName] = useState<string | null>(null);
+    const [dashboardData, setDashboardData] = useState({
+        totalRaised: 0,
+        totalTrees: 0,
+        donations: [],
+        gifts: []
     });
 
     useEffect(() => {
-        const fetchReferralData = async () => {
+        const fetchData = async () => {
             const apiClient = new ApiClient();
             try {
-                const data = await apiClient.getReferralCounts();
-                setReferralData(data);
+                if (!rfr) return;
+
+                // Fetch user name first
+                const nameResponse = await apiClient.getUserNameByReferral(rfr);
+                setUserName(nameResponse.name);
+
+                // Then fetch dashboard data
+                const dashboardResponse = await apiClient.getReferralDashboard(rfr);
+                setDashboardData(dashboardResponse);
+
             } catch (err: unknown) {
-                setError(err instanceof Error ? err.message : 'Failed to load referral data');
+                setError(err instanceof Error ? err.message : 'Failed to load data');
             } finally {
+                setUserNameLoading(false);
                 setLoading(false);
             }
         };
 
-        fetchReferralData();
-    }, []);
+        fetchData();
+    }, [rfr]);
 
     const pageContainerStyle = {
         p: 3,
@@ -40,7 +55,7 @@ export const ReferralsPage = () => {
         minHeight: '100vh'
     };
 
-    if (loading) {
+    if (loading || userNameLoading) {
         return (
             <Box sx={{
                 display: "flex",
@@ -56,7 +71,7 @@ export const ReferralsPage = () => {
 
     return (
         <Box sx={{ ...pageContainerStyle, p: 0, m: 0 }}>
-            {/* Added Header */}
+            {/* FULL-WIDTH HEADER */}
             <Box
                 sx={{
                     width: '100vw',
@@ -83,10 +98,11 @@ export const ReferralsPage = () => {
                     fontWeight: 600,
                     textShadow: '1px 1px 1.5px rgba(0,0,0,0.05)'
                 }}>
-                    Referral Analytics Dashboard
+                    {userName ? `${userName}'s Referral Contributions` : 'Referral Contributions'}
                 </Typography>
             </Box>
 
+            {/* PAGE CONTENT */}
             <Container maxWidth="lg" sx={{ backgroundColor: 'transparent', mt: 3 }}>
                 {error && (
                     <Alert severity="error" sx={{
@@ -98,7 +114,7 @@ export const ReferralsPage = () => {
                     </Alert>
                 )}
 
-                <ReferralCards data={referralData} />
+                <ReferralUserCards data={dashboardData} />
             </Container>
         </Box>
     );
