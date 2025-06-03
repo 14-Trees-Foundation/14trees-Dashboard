@@ -21,7 +21,7 @@ import { useAuth } from "./auth/auth";
 import VolunteerActivismIcon from "@mui/icons-material/VolunteerActivism";
 import MapIcon from "@mui/icons-material/Map";
 import FestivalIcon from "@mui/icons-material/Festival";
-import { Analytics, CardGiftcard, Inventory } from "@mui/icons-material";
+import { Analytics, CardGiftcard, Inventory, Campaign  } from "@mui/icons-material";
 import { UserRoles } from "../../types/common";
 
 export const AdminLeftDrawer = () => {
@@ -118,6 +118,12 @@ export const AdminLeftDrawer = () => {
       logo: Inventory,
       display: true,
       path: "gc-inventory",
+    },
+    {
+      displayName: "Campaigns",
+      logo: Campaign,
+      display: auth.signedin,
+      path: "campaigns",
     },
     {
       displayName: "Tree Cards",

@@ -20,6 +20,9 @@ import { Payment, PaymentHistory } from '../../types/payment';
 import { Order } from '../../types/common';
 import { View } from '../../types/viewPermission';
 import { GiftRedeemTransaction } from '../../types/gift_redeem_transaction';
+import { Campaign } from '../../types/campaign';
+import { SortOrder } from 'antd/es/table/interface';
+import { GridFilterItem } from '@mui/x-data-grid';
 
 
 class ApiClient {
@@ -2521,6 +2524,57 @@ class ApiClient {
     /**
      * Campaign
      */
+
+    async createCampaign(name: string, c_key: string, description?: string): Promise<Campaign> {
+        try {
+            const response = await this.api.post<Campaign>(`/campaigns`, { 
+                name, 
+                c_key, 
+                description 
+            });
+            return response.data;
+        } catch (error: any) {
+            if (error.response?.data?.message) {
+                throw new Error(error.response.data.message);
+            }
+            throw new Error('Failed to create campaign');
+        }
+    }
+
+    async updateCampaign(id: number, updateFields: string[], updateData: Partial<Campaign>): Promise<Campaign> {
+        try {
+            const payload = {
+                updateFields,
+                data: updateData
+            };
+            
+            const response = await this.api.put<Campaign>(`/campaigns/update/${id}`, payload);
+            return response.data;
+        } catch (error: any) {
+            if (error.response?.data?.message) {
+                throw new Error(error.response.data.message);
+            }
+            throw new Error('Failed to update campaign');
+        }
+    }
+
+    async getCampaigns(offset: number, limit: number, filters?: any[], orderBy?: any[]): Promise<{ results: Campaign[], total: number, offset: number }> {
+        const url = `/campaigns/list/get?offset=${offset}&limit=${limit}`;
+    
+        try {
+            const response = await this.api.post<{ results: Campaign[], total: number, offset: number }>(url, {
+                filters: filters || [],
+                order_by: orderBy || []
+            });
+            return response.data;
+        } catch (error: any) {
+            if (error.response?.data?.message) {
+                throw new Error(error.response.data.message);
+            }
+            throw new Error('Failed to list campaigns');
+        }
+    }
+
 
     async getCampaignAnalytics(c_key: string): Promise<{
         summary: {
