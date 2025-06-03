@@ -19,8 +19,9 @@ import { useRecoilState, useRecoilValue } from "recoil";
 import { navIndex, selUsersData } from "../store/atoms";
 import logo from "../assets/logo_white_small.png";
 import icon from "../assets/icon_round.png";
-import { Button } from "@mui/material";
+import { Button, Typography } from "@mui/material";
 import CardGiftcardIcon from "@mui/icons-material/CardGiftcard";
+import { ReferralDialog } from "./Referral/ReferralDialog";
 
 const drawerWidth = 120;
 
@@ -58,6 +59,7 @@ export const LeftDrawer = () => {
   const [index, setIndex] = useRecoilState(navIndex);
   const selUserInfo = useRecoilValue(selUsersData);
   const userNameRef = useRef(null);
+  const [referralOpen, setReferralOpen] = useState(false);
 
   const username = selUserInfo.assigned_to;
 
@@ -206,6 +208,52 @@ export const LeftDrawer = () => {
         <Divider />
         <img className={classes.logo} alt={"logo"} src={logo} onClick={() => { window.open("https://www.14trees.org") }} />
         {menuitem()}
+        <Box
+          sx={{
+            margin: "20px 10px",
+            padding: "10px",
+            backgroundColor: "#ffffff",
+            borderRadius: "10px",
+          }}
+        >
+          <Typography
+            variant="h6"
+            sx={{
+              color: "#2e7d32",
+              fontWeight: "bold",
+              marginBottom: "10px",
+            }}
+          >
+            Inspire Others to Give
+          </Typography>
+          <Typography
+            variant="body2"
+            sx={{
+              color: "#4caf50",
+              marginBottom: "10px",
+            }}
+          >
+            Do you know, you can create your personal referral link and share
+            it with friends and family? Every contribution made through your
+            link will be tracked. When someone contributes using your link,
+            you&apos;ll receive an email with your personal referral dashboard
+            where you can see the impact you&apos;ve inspired as others join
+            you in gifting trees.
+          </Typography>
+          <Typography
+            variant="body2"
+            sx={{
+              color: "#2e7d32",
+              textDecoration: "underline",
+              cursor: "pointer",
+            }}
+            onClick={() => setReferralOpen(true)}
+          >
+            Create & Share Your Link
+          </Typography>
+        </Box>
+
+        <ReferralDialog open={referralOpen} onClose={() => { setReferralOpen(false) }} linkType="donate" />
       </Drawer>
     );
   }

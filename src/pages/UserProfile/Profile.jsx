@@ -1,7 +1,7 @@
 import { createStyles, makeStyles } from "@mui/styles";
 import Divider from "@mui/material/Divider";
 import useMediaQuery from "@mui/material/useMediaQuery";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { gsap } from "gsap";
 
 import { UserInfo } from "./UserInfo/UserInfo";
@@ -12,10 +12,11 @@ import { useRecoilValue } from "recoil";
 import { selUsersData, usersData } from "../../store/atoms";
 
 import logo from "../../assets/icon_round.png";
-import { Button } from "@mui/material";
+import { Box, Button, Typography } from "@mui/material";
 import TreeTimelineInfo from "./Trees/TreeTimelineInfo";
 import CardGiftcardIcon from "@mui/icons-material/CardGiftcard"; // Example icon import
 import NaturePeopleIcon from "@mui/icons-material/NaturePeople"; // Example icon import
+import { ReferralDialog } from "../../components/Referral/ReferralDialog";
 
 
 const getUsername = (fullname) => {
@@ -47,6 +48,8 @@ export const Profile = ({ saplingId }) => {
   const userInfoRef = useRef(null);
   const treesRef = useRef(null);
   const mapRef = useRef(null);
+
+  const [referralOpen, setReferralOpen] = useState(false);
 
   useEffect(() => {
     document.title = "14Trees Dashboard - Profile: " + username;
@@ -168,6 +171,55 @@ export const Profile = ({ saplingId }) => {
         {!matches && selUserInfo.tree_audits && selUserInfo.tree_audits.length > 1 && <div style={{ marginTop: '20px' }}>
           <TreeTimelineInfo />
         </div>}
+
+        {matches && (
+          <Box
+            sx={{
+              margin: "20px 0px",
+              padding: "10px",
+              backgroundColor: "#85f9bb47",
+              borderRadius: "10px",
+            }}
+          >
+            <Typography
+              variant="h6"
+              sx={{
+                color: "#2e7d32",
+                fontWeight: "bold",
+                marginBottom: "10px",
+              }}
+            >
+              Inspire Others to Give
+            </Typography>
+            <Typography
+              variant="body2"
+              sx={{
+                color: "#4caf50",
+                marginBottom: "10px",
+              }}
+            >
+              Do you know, you can create your personal referral link and share
+              it with friends and family? Every contribution made through your
+              link will be tracked. When someone contributes using your link,
+              you&apos;ll receive an email with your personal referral dashboard
+              where you can see the impact you&apos;ve inspired as others join
+              you in gifting trees.
+            </Typography>
+            <Typography
+              variant="body2"
+              sx={{
+                color: "#2e7d32",
+                textDecoration: "underline",
+                cursor: "pointer",
+              }}
+              onClick={() => setReferralOpen(true)}
+            >
+              Create & Share Your Link
+            </Typography>
+          </Box>
+        )}
+
+        <ReferralDialog open={referralOpen} onClose={() => { setReferralOpen(false) }} linkType="donate" />
       </div>
     </div>
   );

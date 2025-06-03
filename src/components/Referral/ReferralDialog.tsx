@@ -60,8 +60,8 @@ export const ReferralDialog = ({ linkType, open, onClose, c_key }: ReferralDialo
         const fetchCampaigns = async () => {
             try {
                 const apiClient = new ApiClient();
-                const response = await apiClient.listCampaigns();
-                setCampaigns(Array.isArray(response) ? response : []);
+                const response = await apiClient.getCampaigns(0, 20);
+                setCampaigns(Array.isArray(response.results) ? response.results : []);
             } catch (err) {
                 console.error('Failed to fetch campaigns:', err);
                 setError('Failed to load campaigns. Please try again.');
@@ -75,7 +75,7 @@ export const ReferralDialog = ({ linkType, open, onClose, c_key }: ReferralDialo
 
     useEffect(() => {
         if (referralData) {
-            const baseUrl = typeof window !== 'undefined' ? window.location.origin : 'https://www.14trees.org';
+            const baseUrl = 'https://www.14trees.org';
             let link = `${baseUrl}/${linkType}`;
             const params = new URLSearchParams();
 
