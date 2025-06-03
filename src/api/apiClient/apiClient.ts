@@ -32,8 +32,14 @@ class ApiClient {
 
     constructor() {
         const baseURL = import.meta.env.VITE_APP_BASE_URL;
+        const userId = localStorage.getItem("userId")
         this.api = axios.create({
             baseURL: baseURL,
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+                'x-user-id': userId ? userId : '',
+            },
         });
         const token = localStorage.getItem("token")
         this.token = token ? JSON.parse(token) : null;
