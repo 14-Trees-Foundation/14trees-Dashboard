@@ -8,7 +8,7 @@ import {
   Avatar
 } from "@mui/material";
 import { CampaignCards } from "./component/summary";
-import ApiClient from '../../api/apiClient/apiClient';
+import ApiClient from '../../../api/apiClient/apiClient';
 import { useParams } from 'react-router-dom';
 
 export const CampaignsPage = () => {
