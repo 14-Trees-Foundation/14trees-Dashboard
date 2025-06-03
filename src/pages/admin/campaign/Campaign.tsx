@@ -12,7 +12,7 @@ import { Edit, OpenInNew, NotesOutlined } from "@mui/icons-material";
 import EditCampaign from "./EditCampaign";
 import AddCampaignDialog from "./AddCampaign";
 
-export const CampaignComponent = () => {
+const Campaigns: React.FC = () => {
     const [loading, setLoading] = useState(false);
     const [page, setPage] = useState(0);
     const [pageSize, setPageSize] = useState(10);
@@ -276,4 +276,4 @@ export const CampaignComponent = () => {
     );
 };
 
-export default CampaignComponent;
+export default Campaigns;
