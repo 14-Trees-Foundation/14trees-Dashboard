@@ -6,9 +6,12 @@ import { NewsFeed } from "./NewsFeed";
 import { Impact } from "../stories/Impact/Impact";
 import { overallData } from "../store/atoms";
 import { useRecoilValue } from "recoil";
+import { useState } from "react";
+import { ReferralDialog } from "./Referral/ReferralDialog";
 
-export const RightDrawer = ({showWhatsNew = true, children = null}) => {
+export const RightDrawer = ({ showWhatsNew = true, children = null }) => {
   const classes = useStyles();
+  const [open, setOpen] = useState(false);
 
   const overAllStates = useRecoilValue(overallData);
   return (
@@ -35,8 +38,20 @@ export const RightDrawer = ({showWhatsNew = true, children = null}) => {
             />
           </div>
         </div>
+        <p
+          style={{
+            textAlign: "center",
+            color: "green",
+            cursor: "pointer",
+            fontWeight: "bold",
+            textDecoration: "underline"
+          }}
+          onClick={() => setOpen(true)}
+        >
+          Create & Share Your Link
+        </p>
         {children}
-        { showWhatsNew ? <div>
+        {showWhatsNew ? <div>
           <h3 style={{ marginLeft: "9%" }}>About 14 Trees</h3>
           <Divider style={{ margin: "0 9% 2% 9%" }} />
           <div className={classes.feed}>
@@ -44,6 +59,8 @@ export const RightDrawer = ({showWhatsNew = true, children = null}) => {
           </div>
         </div> : null}
       </div>
+
+      <ReferralDialog linkType="donate" open={open} onClose={() => { setOpen(false) }} />
     </Drawer>
   );
 };
@@ -63,9 +80,10 @@ const useStyles = makeStyles((theme) =>
       },
     },
     main: {
-      minHeight: "55vh",
+      marginBottom: "20px",
+      minHeight: "45vh",
       [theme.breakpoints.up("lg")]: {
-        minHeight: "45vh",
+        minHeight: "35vh",
       },
     },
     infobox: {
