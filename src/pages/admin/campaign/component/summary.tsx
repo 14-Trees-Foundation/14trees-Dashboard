@@ -8,7 +8,8 @@ import {
     TableContainer,
     TableHead,
     TableRow,
-    Paper
+    Paper,
+    Grid
 } from "@mui/material";
 import {
     Payments as DonationsIcon,
@@ -36,21 +37,17 @@ interface CampaignCardsProps {
 
 export const CampaignCards = ({ data }: CampaignCardsProps) => {
     const summaryCardStyle = {
-        width: "100%",
-        maxWidth: "220px",
-        minHeight: "170px",
+        height: "100%",
         borderRadius: "15px",
         textAlign: "center",
-        padding: "16px",
-        margin: "15px",
+        padding: { xs: "12px", sm: "16px" },
         background: "linear-gradient(145deg, #9faca3, #bdccc2)",
         boxShadow: "7px 7px 14px #9eaaa1,-7px -7px 14px #c4d4c9",
+        mb: { xs: 2, sm: 0 }
     };
 
     const tableContainerStyle = {
         width: "100%",
-        maxWidth: "1000px",
-        margin: "20px auto",
         borderRadius: "15px",
         overflow: "hidden",
         boxShadow: "0px 2px 8px rgba(63, 83, 68, 0.1)",
@@ -87,67 +84,149 @@ export const CampaignCards = ({ data }: CampaignCardsProps) => {
 
     return (
         <>
-            {/* Summary Cards Row */}
-            <Box sx={{
-                display: 'flex',
-                justifyContent: 'center',
-                alignItems: 'center',
-                flexWrap: 'wrap',
-                marginBottom: '20px'
+            {/* Title Section */}
+            <Box sx={{ 
+                textAlign: 'center', 
+                mb: 2,
+                position: 'relative'
             }}>
-                <Card sx={summaryCardStyle}>
-                    <Box sx={{ paddingTop: "10px" }}>
-                        <DonationsIcon fontSize="large" sx={{ color: "#4CAF50" }} />
-                        <Typography variant="h3" color="#fff" sx={{ pt: 1, pb: 1 }}>
-                            {donationCount}
-                        </Typography>
-                        <Typography variant="subtitle2" color="#1f3625">
-                            No of donations
-                        </Typography>
-                    </Box>
-                </Card>
+                <Typography 
+                    variant="h4" 
+                    sx={{ 
+                        color: "#1f3625",
+                        mb: 1,
+                        textShadow: '2px 2px 4px rgba(0,0,0,0.1)'
+                    }}
+                >
+                    Growing Impact, One Tree at a Time
+                </Typography>
+            </Box>
 
-                <Card sx={summaryCardStyle}>
-                    <Box sx={{ paddingTop: "10px" }}>
-                        <GiftsIcon fontSize="large" sx={{ color: "#E91E63" }} />
-                        <Typography variant="h3" color="#fff" sx={{ pt: 1, pb: 1 }}>
-                            {giftRequestCount}
-                        </Typography>
-                        <Typography variant="subtitle2" color="#1f3625">
-                            No of gift requests
-                        </Typography>
-                    </Box>
-                </Card>
+            {/* Summary Cards Row */}
+            <Box sx={{ mb: 4 }}>
+                <Grid container spacing={3}>
+                    <Grid item xs={12} sm={6} md={3} sx={{ mb: { xs: 2, sm: 0 } }}>
+                        <Card sx={summaryCardStyle}>
+                            <Box sx={{ paddingTop: { xs: "5px", sm: "10px" } }}>
+                                <DonationsIcon sx={{ 
+                                    fontSize: { xs: "2rem", sm: "large" },
+                                    color: "#4CAF50" 
+                                }} />
+                                <Typography 
+                                    variant="h3" 
+                                    color="#fff" 
+                                    sx={{ 
+                                        pt: { xs: 0.5, sm: 1 }, 
+                                        pb: { xs: 0.5, sm: 1 },
+                                        fontSize: { xs: "2rem", sm: "3rem" }
+                                    }}
+                                >
+                                    {donationCount}
+                                </Typography>
+                                <Typography 
+                                    variant="subtitle2" 
+                                    color="#1f3625"
+                                    sx={{ fontSize: { xs: "0.875rem", sm: "1rem" } }}
+                                >
+                                    No of donations
+                                </Typography>
+                            </Box>
+                        </Card>
+                    </Grid>
 
-                <Card sx={summaryCardStyle}>
-                    <Box sx={{ paddingTop: "10px" }}>
-                        <AmountIcon fontSize="large" sx={{ color: "#FF9800" }} />
-                        <Typography variant="h3" color="#fff" sx={{ pt: 1, pb: 1 }}>
-                            {formatAmount(totalAmount)}
-                        </Typography>
-                        <Typography variant="subtitle2" color="#1f3625">
-                            Amount Raised (₹)
-                        </Typography>
-                    </Box>
-                </Card>
+                    <Grid item xs={12} sm={6} md={3} sx={{ mb: { xs: 2, sm: 0 } }}>
+                        <Card sx={summaryCardStyle}>
+                            <Box sx={{ paddingTop: { xs: "5px", sm: "10px" } }}>
+                                <GiftsIcon sx={{ 
+                                    fontSize: { xs: "2rem", sm: "large" },
+                                    color: "#E91E63" 
+                                }} />
+                                <Typography 
+                                    variant="h3" 
+                                    color="#fff" 
+                                    sx={{ 
+                                        pt: { xs: 0.5, sm: 1 }, 
+                                        pb: { xs: 0.5, sm: 1 },
+                                        fontSize: { xs: "2rem", sm: "3rem" }
+                                    }}
+                                >
+                                    {giftRequestCount}
+                                </Typography>
+                                <Typography 
+                                    variant="subtitle2" 
+                                    color="#1f3625"
+                                    sx={{ fontSize: { xs: "0.875rem", sm: "1rem" } }}
+                                >
+                                    No of gift requests
+                                </Typography>
+                            </Box>
+                        </Card>
+                    </Grid>
 
-                <Card sx={summaryCardStyle}>
-                    <Box sx={{ paddingTop: "10px" }}>
-                        <TreesIcon fontSize="large" sx={{ color: "#1F3625" }} />
-                        <Typography variant="h3" color="#fff" sx={{ pt: 1, pb: 1 }}>
-                            {treesCount}
-                        </Typography>
-                        <Typography variant="subtitle2" color="#1f3625">
-                            No of Trees Nurtured
-                        </Typography>
-                    </Box>
-                </Card>
+                    <Grid item xs={12} sm={6} md={3} sx={{ mb: { xs: 2, sm: 0 } }}>
+                        <Card sx={summaryCardStyle}>
+                            <Box sx={{ paddingTop: { xs: "5px", sm: "10px" } }}>
+                                <AmountIcon sx={{ 
+                                    fontSize: { xs: "2rem", sm: "large" },
+                                    color: "#FF9800" 
+                                }} />
+                                <Typography 
+                                    variant="h3" 
+                                    color="#fff" 
+                                    sx={{ 
+                                        pt: { xs: 0.5, sm: 1 }, 
+                                        pb: { xs: 0.5, sm: 1 },
+                                        fontSize: { xs: "2rem", sm: "3rem" }
+                                    }}
+                                >
+                                    {formatAmount(totalAmount)}
+                                </Typography>
+                                <Typography 
+                                    variant="subtitle2" 
+                                    color="#1f3625"
+                                    sx={{ fontSize: { xs: "0.875rem", sm: "1rem" } }}
+                                >
+                                    Amount Raised (₹)
+                                </Typography>
+                            </Box>
+                        </Card>
+                    </Grid>
+
+                    <Grid item xs={12} sm={6} md={3} sx={{ mb: { xs: 2, sm: 0 } }}>
+                        <Card sx={summaryCardStyle}>
+                            <Box sx={{ paddingTop: { xs: "5px", sm: "10px" } }}>
+                                <TreesIcon sx={{ 
+                                    fontSize: { xs: "2rem", sm: "large" },
+                                    color: "#1F3625" 
+                                }} />
+                                <Typography 
+                                    variant="h3" 
+                                    color="#fff" 
+                                    sx={{ 
+                                        pt: { xs: 0.5, sm: 1 }, 
+                                        pb: { xs: 0.5, sm: 1 },
+                                        fontSize: { xs: "2rem", sm: "3rem" }
+                                    }}
+                                >
+                                    {treesCount}
+                                </Typography>
+                                <Typography 
+                                    variant="subtitle2" 
+                                    color="#1f3625"
+                                    sx={{ fontSize: { xs: "0.875rem", sm: "1rem" } }}
+                                >
+                                    No of Trees Nurtured
+                                </Typography>
+                            </Box>
+                        </Card>
+                    </Grid>
+                </Grid>
             </Box>
 
             {/* Champions Table */}
             {champions && champions.length > 0 && (
-                <Box sx={{ textAlign: 'center', margin: '30px 0' }}>
-                    <Typography variant="h4" color="#1f3625" sx={{ mb: 3 }}>
+                <Box sx={{ textAlign: 'center', mt: 12 }}>
+                    <Typography variant="h4" color="#1f3625" sx={{ mb: 2 }}>
                         <ChampionIcon sx={{ verticalAlign: 'middle', marginRight: 1, color: "#FFC107" }} />
                         Campaign Champions
                     </Typography>
@@ -160,7 +239,7 @@ export const CampaignCards = ({ data }: CampaignCardsProps) => {
                                     <TableCell sx={tableHeaderStyle}>Name</TableCell>
                                     <TableCell sx={tableHeaderStyle}>Amount Raised (₹)</TableCell>
                                     <TableCell sx={tableHeaderStyle}>Trees Sponsored</TableCell>
-                                    <TableCell sx={tableHeaderStyle}>Referral Donations</TableCell>
+                                    <TableCell sx={tableHeaderStyle}>Memories Planted</TableCell>
                                 </TableRow>
                             </TableHead>
                             <TableBody>
