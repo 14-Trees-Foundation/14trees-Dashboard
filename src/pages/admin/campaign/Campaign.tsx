@@ -7,7 +7,7 @@ import GeneralTable from "../../../components/GenTable";
 import ApiClient from "../../../api/apiClient/apiClient";
 import { getHumanReadableDate } from "../../../helpers/utils";
 import { Order } from "../../../types/common";
-import getColumnSearchProps, { getColumnDateFilter, getSortableHeader } from "../../../components/Filter";
+import getColumnSearchProps, { getColumnDateFilter } from "../../../components/Filter";
 import { Edit, OpenInNew, NotesOutlined } from "@mui/icons-material";
 import EditCampaign from "./EditCampaign";
 import AddCampaignDialog from "./AddCampaign";
