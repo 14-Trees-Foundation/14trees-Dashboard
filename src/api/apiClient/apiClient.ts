@@ -2596,6 +2596,7 @@ class ApiClient {
 
 
     async getCampaignAnalytics(c_key: string): Promise<{
+        campaign: Campaign
         summary: {
             donationCount: number;
             giftRequestCount: number;
@@ -2605,13 +2606,14 @@ class ApiClient {
         champion: {
             name: string;
             email: string;
-            referralDonationsCount: number;
+            giftedTrees: number;
             amountRaised: number;
             treesSponsored: number;
         } | null;
     }> {
         try {
             const response = await this.api.get<{
+                campaign: Campaign
                 summary: {
                     donationCount: number;
                     giftRequestCount: number;
@@ -2621,7 +2623,7 @@ class ApiClient {
                 champion: {
                     name: string;
                     email: string;
-                    referralDonationsCount: number;
+                    giftedTrees: number;
                     amountRaised: number;
                     treesSponsored: number;
                 } | null;
