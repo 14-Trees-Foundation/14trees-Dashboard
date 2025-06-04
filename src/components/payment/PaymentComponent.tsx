@@ -91,22 +91,43 @@ const PaymentComponent: React.FC<PaymentProps> = ({ initialAmount, paymentId, am
     const [donationDate, setDonationDate] = useState('');
 
     useEffect(() => {
-        const handler = setTimeout(() =>{ 
+        const handler = setTimeout(() => {
             setAmountReceived(ar ? ar : 0);
             setDonationReceiptNumber(donationReceipt ? donationReceipt : '');
             setDonationDate(dt ? dt : '');
             setSponosrshipType(st ? st : 'Unverified')
         }, 300);
 
-        return () =>{ clearTimeout(handler); }
-    }, [donationReceipt, st, ar, dt]) 
+        return () => { clearTimeout(handler); }
+    }, [donationReceipt, st, ar, dt])
 
     useEffect(() => {
-        let paid = 0, verified = 0;
-        if (payment && payment.payment_history && payment.payment_history.length > 0) {
-            paid = payment.payment_history.map(item => item.amount).reduce((prev, curr) => prev + curr, 0);
-            verified = payment.payment_history.filter(item => item.status === 'validated').map(item => item.amount_received).reduce((prev, curr) => prev + curr, 0);
+        let paid = 0;
+        let verified = 0;
 
+        if (payment) {
+            // 1. From local payment history (already in rupees)
+            const dbPayments = payment.payment_history || [];
+            paid += dbPayments
+                .map(item => item.amount)
+                .reduce((prev, curr) => prev + curr, 0);
+
+            verified += dbPayments
+                .filter(item => item.status === 'validated')
+                .map(item => item.amount_received)
+                .reduce((prev, curr) => prev + curr, 0);
+
+            // 2. From Razorpay payment history (in paise → convert to rupees)
+            const rpPayments = payment.razorpay_history || [];
+
+            paid += rpPayments
+                .map(item => item.amount)
+                .reduce((prev, curr) => prev + curr, 0) / 100;
+
+            verified += rpPayments
+                .filter(item => item.status === 'captured')
+                .map(item => item.amount)
+                .reduce((prev, curr) => prev + curr, 0) / 100;
         }
 
         setAmountData({
@@ -115,8 +136,8 @@ const PaymentComponent: React.FC<PaymentProps> = ({ initialAmount, paymentId, am
             verifiedAmount: verified,
         });
 
-        setPayingAmount(amount - paid);
-    }, [payment, amount])
+        setPayingAmount(amount - paid > 0 ? amount - paid : 0);
+    }, [payment, amount]);
 
     const getPayment = async (paymentId: number) => {
         try {
@@ -255,6 +276,21 @@ const PaymentComponent: React.FC<PaymentProps> = ({ initialAmount, paymentId, am
         }
     }
 
+    const mergedHistory = [
+        ...(payment?.payment_history || []),
+        ...(payment?.razorpay_history?.map((item, idx) => ({
+            ...item,
+            id: `razorpay-${idx}`,
+            amount_received: item.amount, // mimic amount_received structure
+            payment_date: item.created_at,
+            payment_received_date: item.created_at,
+            payment_method: item.method,
+            payment_proof: null,
+            status: item.status
+        })) || [])
+    ];
+
+
     const columns: any[] = [
         {
             dataIndex: "amount",
@@ -262,6 +298,7 @@ const PaymentComponent: React.FC<PaymentProps> = ({ initialAmount, paymentId, am
             title: "Amount paid",
             align: "center",
             width: 100,
+            render: (value: any) => (Number(value) / 100).toLocaleString('en-IN')
         },
         {
             dataIndex: "payment_method",
@@ -309,6 +346,7 @@ const PaymentComponent: React.FC<PaymentProps> = ({ initialAmount, paymentId, am
             title: "Amount received",
             align: "center",
             width: 150,
+            render: (value: any) => (Number(value) / 100).toLocaleString('en-IN')
         },
         {
             dataIndex: "status",
@@ -562,13 +600,13 @@ const PaymentComponent: React.FC<PaymentProps> = ({ initialAmount, paymentId, am
                 <Typography variant="h6" mb={1}>Payment History</Typography>
                 <GeneralTable
                     loading={false}
-                    rows={payment?.payment_history ? payment.payment_history.slice(page * pageSize, page * pageSize + pageSize) : []}
+                    rows={mergedHistory.slice(page * pageSize, page * pageSize + pageSize)}
                     columns={columns}
-                    totalRecords={payment?.payment_history ? payment.payment_history.length : 0}
+                    totalRecords={mergedHistory.length}
                     page={page}
                     pageSize={pageSize}
                     onPaginationChange={handlePaginationChange}
-                    onDownload={async () => { return payment?.payment_history || [] }}
+                    onDownload={async () => mergedHistory}
                     tableName="Payment History"
                 />
             </Box>
