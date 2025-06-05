@@ -214,6 +214,34 @@ class ApiClient {
         }
     }
 
+    async addAutoProcessPlot(data: { plot_ids: number[]; type: 'donation' | 'gift' }): Promise<any> {
+        const url = `/auto-process/addPlots`;
+        try {
+            const response = await this.api.post(url, data);
+            return response.data;
+        } catch (error: any) {
+            console.error('Failed to add auto-processing plot:', error);
+            throw new Error(`Failed to add plot: ${error.message}`);
+        }
+    }
+
+
+
+    async getPlotsByType( type: 'donation' | 'gift' ): Promise<PaginatedResponse<Plot>> {
+        const url = `/auto-process/getPlot`;
+
+        try {
+            const response = await this.api.get<PaginatedResponse<Plot>>(url, {
+                params: { type }
+            });
+            return response.data;
+        } catch (error: any) {
+            console.error('Error fetching plots by type:', error);
+            throw new Error(`Failed to fetch ${type} plots: ${error.message}`);
+        }
+    }
+
+
     async searchPlots(searchStr: string): Promise<Plot[]> {
         const url = `/plots/${searchStr}`;
         try {
@@ -2546,10 +2574,10 @@ class ApiClient {
 
     async createCampaign(name: string, c_key: string, description?: string): Promise<Campaign> {
         try {
-            const response = await this.api.post<Campaign>(`/campaigns`, { 
-                name, 
-                c_key, 
-                description 
+            const response = await this.api.post<Campaign>(`/campaigns`, {
+                name,
+                c_key,
+                description
             });
             return response.data;
         } catch (error: any) {
@@ -2566,7 +2594,7 @@ class ApiClient {
                 updateFields,
                 data: updateData
             };
-            
+
             const response = await this.api.put<Campaign>(`/campaigns/update/${id}`, payload);
             return response.data;
         } catch (error: any) {
@@ -2579,7 +2607,7 @@ class ApiClient {
 
     async getCampaigns(offset: number, limit: number, filters?: any[], orderBy?: any[]): Promise<{ results: Campaign[], total: number, offset: number }> {
         const url = `/campaigns/list/get?offset=${offset}&limit=${limit}`;
-    
+
         try {
             const response = await this.api.post<{ results: Campaign[], total: number, offset: number }>(url, {
                 filters: filters || [],
