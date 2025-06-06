@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import CSRInventory from "./CSRInventory";
 import { useAuth } from "../auth/auth";
 import { SinglePageDrawer } from "./SinglePageDrawer";
-import { NaturePeople, ExitToApp } from "@mui/icons-material";
+import { NaturePeople, ExitToApp, Settings } from "@mui/icons-material";
 import { createStyles, makeStyles } from "@mui/styles";
 import {
     Box,
@@ -182,6 +182,13 @@ const CSRPage: React.FC = () => {
         //     display: true,
         //     onClick: () => { handleScroll('green-gift-contributions') }
         // },
+        {
+            displayName: "Settings",
+            logo: Settings,
+            key: 7,
+            display: true,
+            onClick: () => { handleScroll("Setting-Details");}
+        },
     ];
 
     return (

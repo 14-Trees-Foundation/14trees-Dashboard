@@ -1,5 +1,22 @@
 import { useState, useRef, useCallback } from "react";
-import { Box, Button, Dialog, DialogActions, DialogContent, FormControl, FormControlLabel, FormGroup, Radio, TextField, Typography, useMediaQuery, useTheme } from "@mui/material";
+import {
+    Box,
+    Button,
+    Dialog,
+    DialogActions,
+    DialogContent,
+    FormControl,
+    FormControlLabel,
+    FormGroup,
+    Radio,
+    TextField,
+    Typography,
+    useMediaQuery,
+    useTheme,
+    Avatar,
+    IconButton,
+    Card
+} from "@mui/material";
 import { Tree } from "../../../types/tree";
 import { GiftRedeemTransaction } from "../../../types/gift_redeem_transaction";
 import RedeemGiftTreeDialog from "../../../components/redeem/RedeemGiftTreeDialog";
@@ -9,16 +26,27 @@ import GiftAnalytics from "../../../components/redeem/GiftAnalytics";
 import GiftTreesGrid, { GiftTreesGridHandle } from "../../../components/redeem/GiftTreesGrid";
 import { toast } from "react-toastify";
 import CSRBulkGift from "./CSRBulkGift";
+import EditIcon from '@mui/icons-material/Edit';
+import EditOrganizationDialog from "./EditOrganizationDialog";
 
 interface CSRGiftTreesProps {
-    groupId: number
+    groupId: number;
+    organizationData: {
+        name: string;
+        address: string;
+        logo_url: string;
+    };
+    onOrganizationUpdate: (
+        updatedData: { name: string; address: string; logo_url: string },
+        logoFile?: File
+      ) => Promise<void>;
+    
 }
 
-const CSRGiftTrees: React.FC<CSRGiftTreesProps> = ({ groupId }) => {
+const CSRGiftTrees: React.FC<CSRGiftTreesProps> = ({ groupId, organizationData }) => {
     const theme = useTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
-    const isTablet = useMediaQuery(theme.breakpoints.between('sm', 'md'));
-    
+
     const [giftDialogVisible, setGiftDialogVisible] = useState(false);
     const [selectedGiftTree, setSelectedGiftTree] = useState<Tree | null>(null);
     const [giftMultiple, setGiftMultiple] = useState(false);
@@ -32,13 +60,28 @@ const CSRGiftTrees: React.FC<CSRGiftTreesProps> = ({ groupId }) => {
     const [imageViewModalOpen, setImageViewModalOpen] = useState(false);
     const [imageViewModalImageUrl, setImageViewModalImageUrl] = useState('');
     const [bulkGifting, setBulkGifting] = useState(false);
+    const [editOrgDialogOpen, setEditOrgDialogOpen] = useState(false);
+    const [currentOrgData, setCurrentOrgData] = useState(organizationData);
 
     const gridRef = useRef<GiftTreesGridHandle>(null);
+
+    const summaryCardStyle = {
+        width: "100%",
+        minHeight: "170px",
+        borderRadius: "15px",
+        padding: "16px",
+        margin: "15px 0",
+        background: "linear-gradient(145deg, #9faca3, #bdccc2)",
+        boxShadow: "7px 7px 14px #9eaaa1,-7px -7px 14px #c4d4c9",
+        transition: "transform 0.3s ease",
+        '&:hover': {
+            transform: "scale(1.03)"
+        }
+    };
 
     const handleMultiTreesGift = useCallback(async () => {
         setIsLoading(true);
         try {
-            // Use the ref to get the first available tree
             if (gridRef.current) {
                 const tree = await gridRef.current.getFirstAvailableTree();
                 if (tree) {
@@ -73,12 +116,85 @@ const CSRGiftTrees: React.FC<CSRGiftTreesProps> = ({ groupId }) => {
         }
     };
 
+    const handleSaveOrganization = (updatedData: { name: string; address: string; logo_url: string }) => {
+        // In a real app, you would make an API call here to save the changes
+        setCurrentOrgData(updatedData);
+        toast.success("Organization details updated successfully!");
+    };
+
     return (
-        <Box mt={3} id="your-wall-of-tree-gifts" sx={{ px: isMobile ? 1 : 2 }}>
-            <Box sx={{ 
-                display: 'flex', 
+        <Box mt={3} id="Setting-Details" sx={{ px: isMobile ? 1 : 2 }}>
+            {/* Organization Details Section */}
+            {currentOrgData && (
+                <Box sx={{
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    flexWrap: 'wrap',
+                    marginBottom: '20px',
+                    backgroundColor: 'transparent'
+                }}>
+                    <Card sx={summaryCardStyle}>
+                        <Box sx={{ 
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'space-between',
+                            height: '100%',
+                            padding: '0 16px'
+                        }}>
+                            <Box sx={{ 
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: 3
+                            }}>
+                                <Avatar
+                                    src={currentOrgData.logo_url}
+                                    alt={`${currentOrgData.name} logo`}
+                                    sx={{ 
+                                        width: 120, 
+                                        height: 120, 
+                                        mb: 2,
+                                        '& img': {
+                                            objectFit: 'contain'
+                                        }
+                                    }}
+                                >
+                                    {currentOrgData.name?.[0]}
+                                </Avatar>
+                                <Box>
+                                    <Typography variant="h4" color="#fff" sx={{ fontWeight: 600 }}>
+                                        {currentOrgData.name}
+                                    </Typography>
+                                    <Typography variant="subtitle1" color="#1f3625" sx={{ mt: 1 }}>
+                                        {currentOrgData.address || 'Address not available'}
+                                    </Typography>
+                                </Box>
+                            </Box>
+                            
+                            <IconButton
+                                sx={{
+                                    color: "#1f3625",
+                                    '&:hover': {
+                                        color: "#fff",
+                                        backgroundColor: 'transparent'
+                                    }
+                                }}
+                                aria-label="Edit organization details"
+                                onClick={() => setEditOrgDialogOpen(true)}
+                            >
+                                <EditIcon fontSize="large" />
+                            </IconButton>
+                        </Box>
+                    </Card>
+                </Box>
+            )}
+
+
+            <Box mt={3} id="your-wall-of-tree-gifts" sx={{ px: isMobile ? 1 : 2 }}></Box>
+            <Box sx={{
+                display: 'flex',
                 flexDirection: isMobile ? 'column' : 'row',
-                alignItems: isMobile ? 'flex-start' : 'center', 
+                alignItems: isMobile ? 'flex-start' : 'center',
                 justifyContent: 'space-between',
                 mb: 2
             }}>
@@ -86,16 +202,16 @@ const CSRGiftTrees: React.FC<CSRGiftTreesProps> = ({ groupId }) => {
                     Green Tribute Wall
                 </Typography>
             </Box>
-            
-            <Typography 
-                variant={isMobile ? "body2" : "subtitle1"} 
-                ml={1} 
+
+            <Typography
+                variant={isMobile ? "body2" : "subtitle1"}
+                ml={1}
                 mb={2}
             >
                 Celebrate your organization's eco-friendly contributions with a dedicated wall showcasing all the trees gifted. Each entry represents a lasting tribute to sustainability, featuring recipient details, heartfelt messages, and the tree's location.
             </Typography>
 
-            <GiftAnalytics 
+            <GiftAnalytics
                 groupId={groupId}
                 onGiftMultiple={handleMultiTreesGift}
                 onBulkGifting={() => { setBulkGifting(true) }}
@@ -103,12 +219,12 @@ const CSRGiftTrees: React.FC<CSRGiftTreesProps> = ({ groupId }) => {
                 isLoading={isLoading}
             />
 
-            <Box sx={{ 
-                mt: 4, 
-                paddingX: 1, 
-                display: 'flex', 
+            <Box sx={{
+                mt: 4,
+                paddingX: 1,
+                display: 'flex',
                 flexDirection: isMobile ? 'column' : 'row',
-                alignItems: isMobile ? 'stretch' : 'center', 
+                alignItems: isMobile ? 'stretch' : 'center',
                 justifyContent: 'space-between',
                 gap: 2
             }}>
@@ -118,15 +234,15 @@ const CSRGiftTrees: React.FC<CSRGiftTreesProps> = ({ groupId }) => {
                     onChange={(e) => { setSeachUser(e.target.value) }}
                     fullWidth
                     size="small"
-                    sx={{ 
-                        maxWidth: isMobile ? '100%' : '500px', 
+                    sx={{
+                        maxWidth: isMobile ? '100%' : '500px',
                         m: isMobile ? 0 : 1,
-                        mb: isMobile ? 2 : 1 
+                        mb: isMobile ? 2 : 1
                     }}
                 />
                 <FormControl component="fieldset" sx={{ width: isMobile ? '100%' : 'auto' }}>
-                    <FormGroup 
-                        aria-label="position" 
+                    <FormGroup
+                        aria-label="position"
                         row={!isMobile}
                         sx={{
                             justifyContent: 'space-between'
@@ -155,7 +271,7 @@ const CSRGiftTrees: React.FC<CSRGiftTreesProps> = ({ groupId }) => {
                     </FormGroup>
                 </FormControl>
             </Box>
-            
+
             <GiftTreesGrid
                 ref={gridRef}
                 groupId={groupId}
@@ -214,9 +330,9 @@ const CSRGiftTrees: React.FC<CSRGiftTreesProps> = ({ groupId }) => {
                         />
                     </DialogContent>
                     <DialogActions>
-                        <Button 
-                            variant="outlined" 
-                            color="error" 
+                        <Button
+                            variant="outlined"
+                            color="error"
                             onClick={() => { setSummaryOpen(false); }}
                         >
                             Close
@@ -229,6 +345,13 @@ const CSRGiftTrees: React.FC<CSRGiftTreesProps> = ({ groupId }) => {
                 open={imageViewModalOpen}
                 onClose={() => setImageViewModalOpen(false)}
                 imageUrl={imageViewModalImageUrl}
+            />
+
+            <EditOrganizationDialog
+                open={editOrgDialogOpen}
+                onClose={() => setEditOrgDialogOpen(false)}
+                organizationData={currentOrgData}
+                onSave={handleSaveOrganization}
             />
         </Box>
     );

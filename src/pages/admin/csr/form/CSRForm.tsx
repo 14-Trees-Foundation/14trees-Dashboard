@@ -22,7 +22,8 @@ import  ApiClient  from '../../../../api/apiClient/apiClient';
 interface TreeSponsorshipFormProps {
   open: boolean;
   onClose: () => void;
-  group_id: number; // Added group_id prop
+  group_id: number;
+  onSubmit: (formData: FormData) => void;
 }
 
 interface Recipient {
