@@ -1800,6 +1800,47 @@ class ApiClient {
         }
     }
 
+    async createGiftCardRequestV2( group_id: number, sponsor_name: string, sponsor_email: string, no_of_cards: number, event_type: string, event_name: string, created_by: number, gifted_by?: string, logo_message?: string, primary_message?: string, users?: any[], tags?: string[], payment_id?: number ): Promise<{ gift_request: any, order_id: string }> {
+        try {
+            const formData = new FormData();
+            
+            // Required fields
+            formData.append('group_id', group_id.toString());
+            formData.append('sponsor_name', sponsor_name);
+            formData.append('sponsor_email', sponsor_email);
+            formData.append('no_of_cards', no_of_cards.toString());
+            formData.append('event_type', event_type);
+            formData.append('event_name', event_name);
+            formData.append('created_by', created_by.toString());
+    
+            // Optional fields
+            if (gifted_by) formData.append('gifted_by', gifted_by);
+            if (logo_message) formData.append('logo_message', logo_message);
+            if (primary_message) formData.append('primary_message', primary_message);
+            if (payment_id) formData.append('payment_id', payment_id.toString());
+            
+            // Array fields
+            if (users && Array.isArray(users)) {
+                formData.append('users', JSON.stringify(users));
+            }
+            if (tags && Array.isArray(tags)) {
+                formData.append('tags', JSON.stringify(tags));
+            }
+    
+            const response = await this.api.post<{ 
+                gift_request: any, 
+                order_id: string 
+            }>('/gift-cards/requests/createv2', formData);
+    
+            return response.data;
+        } catch (error: any) {
+            if (error.response) {
+                throw new Error(error.response.data.message || 'Failed to create gift card request');
+            }
+            throw new Error('Failed to create gift card request');
+        }
+    }
+
 
     async createGiftCard(request_id: string, created_by: number, no_of_cards: number, user_id: number, sponsor_id: number | null, category: string, grove: string | null, requestType: string, giftedOn: string, group_id?: number, payment_id?: number, logo?: string, messages?: any, file?: File): Promise<GiftCard> {
         try {

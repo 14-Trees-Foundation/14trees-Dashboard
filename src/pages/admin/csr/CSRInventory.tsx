@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Box, Divider, Typography, useMediaQuery, useTheme } from "@mui/material";
+import { Box, Divider, Typography, useMediaQuery, useTheme, Button } from "@mui/material";
 import { createStyles, makeStyles } from "@mui/styles";
 import { AutocompleteWithPagination } from "../../../components/AutoComplete";
 import { useAppDispatch, useAppSelector } from "../../../redux/store/hooks";
@@ -11,10 +11,30 @@ import { toast, ToastContainer } from "react-toastify";
 import { useParams } from "react-router-dom";
 import CSRGiftTrees from "./CSRGiftTrees";
 import CSRSharePageDialog from "./CSRSharePageDialog";
+import { TreeSponsorshipForm } from "./form/CSRForm"
 import { BirthdayResponse } from "../../../types/notification"
 
 interface CSRInventoryProps {
     onBirthdayData?: (data: BirthdayResponse) => void;
+}
+
+interface Recipient {
+    name: string;
+    email: string;
+    message: string;
+}
+
+interface FormData {
+    treeCount: number;
+    amount: number;
+    occasionType: string;
+    occasionName: string;
+    occasionDate: Date;
+    recipients: Recipient[];
+    sponsorName: string;
+    sponsorEmail: string;
+    sponsorPhone: string;
+    panNumber: string;
 }
 
 const CSRInventory: React.FC<CSRInventoryProps> = ({ onBirthdayData }) => {
@@ -31,6 +51,7 @@ const CSRInventory: React.FC<CSRInventoryProps> = ({ onBirthdayData }) => {
     const [groupPage, setGroupPage] = useState(0);
     const [selectedGroup, setSelectedGroup] = useState<Group | null>(null);
     const [groupNameInput, setGroupNameInput] = useState("");
+    const [formOpen, setFormOpen] = useState(false);
 
     useEffect(() => {
         const handler = setTimeout(() => {
@@ -41,6 +62,16 @@ const CSRInventory: React.FC<CSRInventoryProps> = ({ onBirthdayData }) => {
             clearTimeout(handler);
         }
     }, [groupPage, groupNameInput]);
+
+    const handleFormSubmit = (formData: FormData) => {
+        console.log('Form submitted:', formData);
+        // You might want to validate at least one recipient exists
+        if (formData.recipients.length === 0 || !formData.recipients[0].name) {
+            toast.error('Please add at least one recipient');
+            return;
+        }
+        setFormOpen(false);
+    };
 
     const getGroupsData = async () => {
         const groupNameFilter = {
@@ -125,30 +156,30 @@ const CSRInventory: React.FC<CSRInventoryProps> = ({ onBirthdayData }) => {
                 }}
             >
                 <Typography variant={isMobile ? "h5" : "h3"} style={{ marginTop: '5px', marginBottom: '5px' }}>{selectedGroup ? `${selectedGroup.name}'s` : 'Corporate'} Dashboard</Typography>
-                 <div
+                <div
                     style={{
                         display: "flex",
                         justifyContent: "space-between",
                         alignItems: 'center',
                     }}
                 >
-                    {!groupId &&(
-                    <AutocompleteWithPagination
-                        label="Select a corporate group"
-                        options={groupsList}
-                        getOptionLabel={(option) => option?.name || ''}
-                        onChange={(event, newValue) => {
-                            setSelectedGroup(newValue);
-                        }}
-                        onInputChange={(event) => {
-                            const { value } = event.target;
-                            setGroupPage(0);
-                            setGroupNameInput(value);
-                        }}
-                        setPage={setGroupPage}
-                        size="small"
-                        value={selectedGroup}
-                    />
+                    {!groupId && (
+                        <AutocompleteWithPagination
+                            label="Select a corporate group"
+                            options={groupsList}
+                            getOptionLabel={(option) => option?.name || ''}
+                            onChange={(event, newValue) => {
+                                setSelectedGroup(newValue);
+                            }}
+                            onInputChange={(event) => {
+                                const { value } = event.target;
+                                setGroupPage(0);
+                                setGroupNameInput(value);
+                            }}
+                            setPage={setGroupPage}
+                            size="small"
+                            value={selectedGroup}
+                        />
                     )}
                     {/* <Button
                         sx={{ ml: 2 }}
@@ -166,8 +197,21 @@ const CSRInventory: React.FC<CSRInventoryProps> = ({ onBirthdayData }) => {
                     >
                         CSR View
                     </Button> */}
+                    <Button
+                        variant="contained"
+                        color="success"
+                        onClick={() => setFormOpen(true)}
+                        style={{ marginLeft: 10 }}
+                    >
+                        Purchase Gifts
+                    </Button>
                     <CSRSharePageDialog groupId={selectedGroup?.id} groupName={selectedGroup?.name} style={{ marginLeft: 10 }} />
                 </div>
+                <TreeSponsorshipForm
+                    open={formOpen}
+                    onClose={() => setFormOpen(false)}
+                    onSubmit={handleFormSubmit}
+                />
             </div>
             <Divider sx={{ backgroundColor: "black", marginBottom: '15px', mx: 1 }} />
 
