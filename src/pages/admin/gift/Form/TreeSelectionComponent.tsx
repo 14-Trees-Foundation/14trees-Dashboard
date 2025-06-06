@@ -9,6 +9,7 @@ import GeneralTable from "../../../../components/GenTable"
 interface TreeSelectionComponentProps {
     max: number
     includeNonGiftable: boolean
+    includeAllHabitats: boolean
     plotIds: number[]
     plantTypes: string[]
     open: boolean
@@ -18,7 +19,7 @@ interface TreeSelectionComponentProps {
     onSelectedTreesChange: (trees: any[]) => void
 }
 
-const TreeSelectionComponent: React.FC<TreeSelectionComponentProps> = ({ plotIds, includeNonGiftable, max, open, plantTypes, onClose, onSubmit, selectedTrees, onSelectedTreesChange }) => {
+const TreeSelectionComponent: React.FC<TreeSelectionComponentProps> = ({ plotIds, includeNonGiftable, includeAllHabitats, max, open, plantTypes, onClose, onSubmit, selectedTrees, onSelectedTreesChange }) => {
 
     const [treesData, setTreesData] = useState<Record<number, any>>({})
     const [total, setTotal] = useState(0)
@@ -49,7 +50,7 @@ const TreeSelectionComponent: React.FC<TreeSelectionComponentProps> = ({ plotIds
             }]
 
             filtersData.push(...Object.values(filters));
-            const treesResp = await apiClient.getGiftAbleTrees(page * pageSize, pageSize, filtersData, includeNonGiftable);
+            const treesResp = await apiClient.getGiftAbleTrees(page * pageSize, pageSize, filtersData, includeNonGiftable, includeAllHabitats);
             setTotal(Number(treesResp.total));
 
             setTreesData(prev => {
