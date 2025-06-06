@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Box, Divider, Typography, useMediaQuery, useTheme } from "@mui/material";
+import { Box, Divider, Typography, useMediaQuery, useTheme, Button } from "@mui/material";
 import { createStyles, makeStyles } from "@mui/styles";
 import { AutocompleteWithPagination } from "../../../components/AutoComplete";
 import { useAppDispatch, useAppSelector } from "../../../redux/store/hooks";
@@ -11,10 +11,30 @@ import { toast, ToastContainer } from "react-toastify";
 import { useParams } from "react-router-dom";
 import CSRGiftTrees from "./CSRGiftTrees";
 import CSRSharePageDialog from "./CSRSharePageDialog";
+import { TreeSponsorshipForm } from "./form/CSRForm"
 import { BirthdayResponse } from "../../../types/notification"
 
 interface CSRInventoryProps {
     onBirthdayData?: (data: BirthdayResponse) => void;
+}
+
+interface Recipient {
+    name: string;
+    email: string;
+    message: string;
+}
+
+interface FormData {
+    treeCount: number;
+    amount: number;
+    occasionType: string;
+    occasionName: string;
+    occasionDate: Date;
+    recipients: Recipient[];
+    sponsorName: string;
+    sponsorEmail: string;
+    sponsorPhone: string;
+    panNumber: string;
 }
 
 const CSRInventory: React.FC<CSRInventoryProps> = ({ onBirthdayData }) => {
@@ -25,12 +45,13 @@ const CSRInventory: React.FC<CSRInventoryProps> = ({ onBirthdayData }) => {
     const { groupId } = useParams();
 
     const dispatch = useAppDispatch();
-    const { getGroups } = bindActionCreators(groupActionCreators, dispatch);
+    const { getGroups, updateGroup } = bindActionCreators(groupActionCreators, dispatch);
 
     ///*** GROUP ***/
     const [groupPage, setGroupPage] = useState(0);
     const [selectedGroup, setSelectedGroup] = useState<Group | null>(null);
     const [groupNameInput, setGroupNameInput] = useState("");
+    const [formOpen, setFormOpen] = useState(false);
 
     useEffect(() => {
         const handler = setTimeout(() => {
@@ -39,8 +60,18 @@ const CSRInventory: React.FC<CSRInventoryProps> = ({ onBirthdayData }) => {
 
         return () => {
             clearTimeout(handler);
-        }
+        };
     }, [groupPage, groupNameInput]);
+
+    const handleFormSubmit = (formData: FormData) => {
+        console.log('Form submitted:', formData);
+        // You might want to validate at least one recipient exists
+        if (formData.recipients.length === 0 || !formData.recipients[0].name) {
+            toast.error('Please add at least one recipient');
+            return;
+        }
+        setFormOpen(false);
+    };
 
     const getGroupsData = async () => {
         const groupNameFilter = {
@@ -49,13 +80,13 @@ const CSRInventory: React.FC<CSRInventoryProps> = ({ onBirthdayData }) => {
             operatorValue: "contains",
         };
 
-        const filters = [groupNameFilter]
+        const filters = [groupNameFilter];
         if (groupId && !isNaN(parseInt(groupId))) {
             filters.push({
                 columnField: "id",
                 value: groupId,
                 operatorValue: "equals",
-            })
+            });
         }
 
         getGroups(groupPage * 10, 10, filters);
@@ -76,8 +107,7 @@ const CSRInventory: React.FC<CSRInventoryProps> = ({ onBirthdayData }) => {
             const group = groupsList.find(item => item.id === parseInt(groupId));
             if (group) setSelectedGroup(group);
         }
-
-    }, [groupsList, groupId])
+    }, [groupsList, groupId]);
 
     // Add this with your other useEffect hooks
     useEffect(() => {
@@ -105,14 +135,48 @@ const CSRInventory: React.FC<CSRInventoryProps> = ({ onBirthdayData }) => {
             try {
                 const apiClient = new ApiClient();
                 const tagsResp = await apiClient.getTags(0, 100);
-                setTags(tagsResp.results.map(item => item.tag))
+                setTags(tagsResp.results.map(item => item.tag));
             } catch (error: any) {
                 toast.error(error.message);
             }
-        }
+        };
 
         getTags();
     }, []);
+
+    const handleOrganizationUpdate = async (
+        updatedData: { name: string; address: string; logo_url: string },
+        logoFile?: File
+      ) => {
+        if (!selectedGroup) return;
+      
+        setFormOpen(false);
+      
+        try {
+          const apiClient = new ApiClient();
+      
+          // Create updated group object
+          const updatedGroup = {
+            ...selectedGroup,
+            name: updatedData.name,
+            address: updatedData.address,
+            logo_url: updatedData.logo_url,
+            updated_at: new Date()
+          };
+      
+          // Call with correct signature: (data: Group, logo?: File)
+          const response = await apiClient.updateGroup(updatedGroup, logoFile);
+      
+          setSelectedGroup(response); // response is the updated group
+      
+          toast.success("Organization details updated successfully!");
+        } catch (error: any) {
+          console.error("Failed to update organization:", error);
+          toast.error("Failed to update organization details");
+        }
+      };
+      
+      
 
     return (
         <Box>
@@ -124,31 +188,33 @@ const CSRInventory: React.FC<CSRInventoryProps> = ({ onBirthdayData }) => {
                     margin: isMobile ? '10px 10px 0 10px' : undefined
                 }}
             >
-                <Typography variant={isMobile ? "h5" : "h3"} style={{ marginTop: '5px', marginBottom: '5px' }}>{selectedGroup ? `${selectedGroup.name}'s` : 'Corporate'} Dashboard</Typography>
-                 <div
-                    style={{
-                        display: "flex",
-                        justifyContent: "space-between",
-                        alignItems: 'center',
+                <Typography variant={isMobile ? "h5" : "h3"} style={{ marginTop: '5px', marginBottom: '5px' }}>
+                    {selectedGroup ? `${selectedGroup.name}'s` : 'Corporate'} Dashboard
+                </Typography>
+                <div
+                   style={{
+                     display: "flex",
+                      justifyContent: "space-between",
+                      alignItems: 'center'
                     }}
                 >
-                    {!groupId &&(
-                    <AutocompleteWithPagination
-                        label="Select a corporate group"
-                        options={groupsList}
-                        getOptionLabel={(option) => option?.name || ''}
-                        onChange={(event, newValue) => {
-                            setSelectedGroup(newValue);
-                        }}
-                        onInputChange={(event) => {
-                            const { value } = event.target;
-                            setGroupPage(0);
-                            setGroupNameInput(value);
-                        }}
-                        setPage={setGroupPage}
-                        size="small"
-                        value={selectedGroup}
-                    />
+                    {!groupId && (
+                        <AutocompleteWithPagination
+                            label="Select a corporate group"
+                            options={groupsList}
+                            getOptionLabel={(option) => option?.name || ''}
+                            onChange={(event, newValue) => {
+                                setSelectedGroup(newValue);
+                            }}
+                            onInputChange={(event) => {
+                                const { value } = event.target;
+                                setGroupPage(0);
+                                setGroupNameInput(value);
+                            }}
+                            setPage={setGroupPage}
+                            size="small"
+                            value={selectedGroup}
+                        />
                     )}
                     {/* <Button
                         sx={{ ml: 2 }}
@@ -166,8 +232,22 @@ const CSRInventory: React.FC<CSRInventoryProps> = ({ onBirthdayData }) => {
                     >
                         CSR View
                     </Button> */}
+                    <Button
+                        variant="contained"
+                        color="success"
+                        onClick={() => setFormOpen(true)}
+                        style={{ marginLeft: 10 }}
+                    >
+                        Purchase Gifts
+                    </Button>
                     <CSRSharePageDialog groupId={selectedGroup?.id} groupName={selectedGroup?.name} style={{ marginLeft: 10 }} />
                 </div>
+                <TreeSponsorshipForm
+                    open={formOpen}
+                    onClose={() => setFormOpen(false)}
+                    group_id={selectedGroup?.id ?? 0}
+                    onSubmit={handleFormSubmit}
+                />
             </div>
             <Divider sx={{ backgroundColor: "black", marginBottom: '15px', mx: 1 }} />
 
@@ -250,12 +330,22 @@ const CSRInventory: React.FC<CSRInventoryProps> = ({ onBirthdayData }) => {
             <CSRPlantTypeStats groupId={selectedGroup?.id} />
             <CSRTrees groupId={selectedGroup?.id} /> */}
 
-            {selectedGroup && <CSRGiftTrees groupId={selectedGroup.id} />}
+            {selectedGroup && (
+                <CSRGiftTrees
+                    groupId={selectedGroup.id}
+                    organizationData={{
+                        name: selectedGroup.name,
+                        address: selectedGroup.address ?? "Address not available",
+                        logo_url: selectedGroup.logo_url ?? "/default-logo.png"
+                    }}
+                    onOrganizationUpdate={handleOrganizationUpdate}
+                />
+            )}
 
             {/* {selectedGroup && <CSRGiftRequests groupId={selectedGroup.id} />} */}
         </Box>
     );
-}
+};
 
 export default CSRInventory;
 
