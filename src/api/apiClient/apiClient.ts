@@ -22,7 +22,6 @@ import { Order } from '../../types/common';
 import { View } from '../../types/viewPermission';
 import { GiftRedeemTransaction } from '../../types/gift_redeem_transaction';
 import { Campaign } from '../../types/campaign';
-import { SortOrder } from 'antd/es/table/interface';
 import { GridFilterItem } from '@mui/x-data-grid';
 
 
@@ -227,12 +226,12 @@ class ApiClient {
 
 
 
-    async getPlotsByType( type: 'donation' | 'gift' ): Promise<PaginatedResponse<Plot>> {
+    async getPlotsByType( type: 'donation' | 'gift', filters?: any[], order_by?: any[]): Promise<PaginatedResponse<Plot>> {
         const url = `/auto-process/getPlot`;
 
         try {
-            const response = await this.api.get<PaginatedResponse<Plot>>(url, {
-                params: { type }
+            const response = await this.api.post<PaginatedResponse<Plot>>(url, { filters, order_by }, {
+                params: { type },
             });
             return response.data;
         } catch (error: any) {

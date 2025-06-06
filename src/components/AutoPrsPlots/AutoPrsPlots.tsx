@@ -27,8 +27,10 @@ const AutoPrsPlots: React.FC<Props> = ({ type }) => {
         setLoading(true);
         try {
             const apiType = type === "donate" ? "donation" : "gift";
+
+            const filtersData = Object.values(filters);
             const apiClient = new ApiClient();
-            const response = await apiClient.getPlotsByType(apiType);
+            const response = await apiClient.getPlotsByType(apiType, filtersData, orderBy);
 
             setTableRows(response.results);
             setTotalRecords(response.total);
@@ -55,8 +57,12 @@ const AutoPrsPlots: React.FC<Props> = ({ type }) => {
 
     const handleDownload = async () => {
         const apiClient = new ApiClient();
+
+        const filtersData = Object.values(filters);
         const resp = await apiClient.getPlotsByType(
-            type === "donate" ? "donation" : "gift"
+            type === "donate" ? "donation" : "gift",
+            filtersData,
+            orderBy,
         );
         return resp.results;
     };
