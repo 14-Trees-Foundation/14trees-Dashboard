@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import CSRInventory from "./CSRInventory";
 import { useAuth } from "../auth/auth";
 import { SinglePageDrawer } from "./SinglePageDrawer";
-import { NaturePeople, ExitToApp, Settings } from "@mui/icons-material";
+import { NaturePeople, ExitToApp, Settings, CardGiftcard } from "@mui/icons-material";
 import { createStyles, makeStyles } from "@mui/styles";
 import {
     Box,
@@ -17,7 +17,7 @@ import {
     Stack,
     Divider,
 } from "@mui/material";
-import { useLocation, useSearchParams, useNavigate } from "react-router-dom";
+import { useLocation, useSearchParams, useNavigate, useParams } from "react-router-dom";
 import { UserRoles } from "../../../types/common";
 import ApiClient from "../../../api/apiClient/apiClient";
 import { toast } from "react-toastify";
@@ -28,6 +28,8 @@ import { GoogleLogout } from "react-google-login";
 import NotificationsNoneIcon from "@mui/icons-material/NotificationsNone";
 import EventIcon from "@mui/icons-material/Event";
 import { Group } from "../../../types/Group";
+import CSRGiftRequests from "./CSRGiftRequests";
+import CSRHeader from "./CSRHeader";
 
 type BirthdayData = {
     hasBirthday: boolean;
@@ -56,6 +58,7 @@ const CSRPage: React.FC = () => {
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
     const open = Boolean(anchorEl);
     const id = open ? "birthday-popover" : undefined;
+    const { groupId } = useParams();
 
     let auth = useAuth();
     const navigate = useNavigate();
@@ -179,13 +182,13 @@ const CSRPage: React.FC = () => {
             display: true,
             onClick: () => setActiveTab("greenTributeWall")
         },
-        // {
-        //     displayName: 'Green Gift Contributions',
-        //     logo: CardGiftcard,
-        //     key: 6,
-        //     display: true,
-        //     onClick: () => { handleScroll('green-gift-contributions') }
-        // },
+        {
+            displayName: 'Orders',
+            logo: CardGiftcard,
+            key: 6,
+            display: true,
+            onClick: () => setActiveTab("orders")
+        },
         {
             displayName: "Settings",
             logo: Settings,
@@ -299,55 +302,6 @@ const CSRPage: React.FC = () => {
                                 </Box>
                                 <Divider sx={{ width: "100%" }} />
 
-                                {/* === Dummy Data for Events (keeping original logic unchanged) === 
-                                <Stack spacing={1} sx={{ maxHeight: 120, overflowY: "auto" }}> */}
-                                {/* Dummy Birthday Event 
-                                    <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                                        <Avatar
-                                            sx={{
-                                                width: 28,
-                                                height: 28,
-                                                bgcolor: "#336B43",
-                                                fontSize: 12,
-                                            }}
-                                        >
-                                            JD
-                                        </Avatar>
-                                        <Box>
-                                            <Typography fontSize={12} fontWeight={500}>
-                                                John Doe's Birthday 🎂
-                                            </Typography>
-                                            <Typography fontSize={11} color="gray">
-                                                <EventIcon sx={{ fontSize: 14, mr: 0.5 }} />
-                                                {new Date().toLocaleDateString()}
-                                            </Typography>
-                                        </Box>
-                                    </Box> */}
-
-                                {/* Dummy Diwali Event 
-                                    <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                                        <Avatar
-                                            sx={{
-                                                width: 28,
-                                                height: 28,
-                                                bgcolor: "#336B43",
-                                                fontSize: 12,
-                                            }}
-                                        >
-                                            🎆
-                                        </Avatar>
-                                        <Box>
-                                            <Typography fontSize={12} fontWeight={500}>
-                                                Diwali 🪔
-                                            </Typography>
-                                            <Typography fontSize={11} color="gray">
-                                                <EventIcon sx={{ fontSize: 14, mr: 0.5 }} />
-                                                {new Date(new Date().setDate(new Date().getDate() + 3)).toLocaleDateString()}
-                                            </Typography>
-                                        </Box>
-                                    </Box>
-                                </Stack> */}
-
                                 {birthdayData?.upcomingBirthdays?.length ? (
                                     <Stack spacing={1} sx={{ maxHeight: 120, overflowY: "auto" }}>
                                         {birthdayData.upcomingBirthdays.map((b) => (
@@ -385,9 +339,12 @@ const CSRPage: React.FC = () => {
                             </Box>
                         </Box>
 
+
                         <Box sx={{ flex: 1 }}>
-                            {activeTab === "greenTributeWall" && <CSRInventory/>}
-                            {activeTab === "Setting-Details" && <CSRSettings />}
+                            <CSRHeader groupId={groupId} onGroupChange={group => { setCurrentGroup(group) }} />
+                            {activeTab === "greenTributeWall" && currentGroup && <CSRInventory selectedGroup={currentGroup}/>}
+                            {activeTab === "Setting-Details" && currentGroup && <CSRSettings group={currentGroup} onGroupChange={group => { setCurrentGroup(group) }}/>}
+                            {activeTab === "orders" && currentGroup && <CSRGiftRequests selectedGroup={currentGroup} groupId={currentGroup.id}/>}
                         </Box>
                     </Box>
                 </div>

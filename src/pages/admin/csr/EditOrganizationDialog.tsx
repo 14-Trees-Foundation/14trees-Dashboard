@@ -7,12 +7,10 @@ import {
     TextField,
     Button,
     Avatar,
-    IconButton,
     Box,
     Typography
 } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
-import EditIcon from '@mui/icons-material/Edit';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 
 interface EditOrganizationDialogProps {
@@ -21,9 +19,9 @@ interface EditOrganizationDialogProps {
     organizationData: {
         name: string;
         address: string;
-        logo_url: string;
+        logo_url: string | null;
     };
-    onSave: (data: { name: string; address: string; logo_url: string }) => void;
+    onSave: (data: { name: string; address: string; logo_url: string | null }) => void;
 }
 
 const EditOrganizationDialog: React.FC<EditOrganizationDialogProps> = ({
@@ -70,7 +68,7 @@ const EditOrganizationDialog: React.FC<EditOrganizationDialogProps> = ({
             <DialogContent dividers>
                 <Box display="flex" flexDirection="column" alignItems="center" mb={3}>
                     <Avatar
-                        src={logoPreview}
+                        src={logoPreview || undefined}
                         alt="Organization logo"
                         sx={{
                             width: 120,

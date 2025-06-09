@@ -13,9 +13,6 @@ import {
     Typography,
     useMediaQuery,
     useTheme,
-    Avatar,
-    IconButton,
-    Card
 } from "@mui/material";
 import { Tree } from "../../../types/tree";
 import { GiftRedeemTransaction } from "../../../types/gift_redeem_transaction";
@@ -26,24 +23,12 @@ import GiftAnalytics from "../../../components/redeem/GiftAnalytics";
 import GiftTreesGrid, { GiftTreesGridHandle } from "../../../components/redeem/GiftTreesGrid";
 import { toast } from "react-toastify";
 import CSRBulkGift from "./CSRBulkGift";
-import EditIcon from '@mui/icons-material/Edit';
-import EditOrganizationDialog from "./EditOrganizationDialog";
 
 interface CSRGiftTreesProps {
     groupId: number;
-    organizationData: {
-        name: string;
-        address: string;
-        logo_url: string;
-    };
-    onOrganizationUpdate: (
-        updatedData: { name: string; address: string; logo_url: string },
-        logoFile?: File
-      ) => Promise<void>;
-    
 }
 
-const CSRGiftTrees: React.FC<CSRGiftTreesProps> = ({ groupId, organizationData }) => {
+const CSRGiftTrees: React.FC<CSRGiftTreesProps> = ({ groupId }) => {
     const theme = useTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
@@ -60,24 +45,8 @@ const CSRGiftTrees: React.FC<CSRGiftTreesProps> = ({ groupId, organizationData }
     const [imageViewModalOpen, setImageViewModalOpen] = useState(false);
     const [imageViewModalImageUrl, setImageViewModalImageUrl] = useState('');
     const [bulkGifting, setBulkGifting] = useState(false);
-    const [editOrgDialogOpen, setEditOrgDialogOpen] = useState(false);
-    const [currentOrgData, setCurrentOrgData] = useState(organizationData);
 
     const gridRef = useRef<GiftTreesGridHandle>(null);
-
-    const summaryCardStyle = {
-        width: "100%",
-        minHeight: "170px",
-        borderRadius: "15px",
-        padding: "16px",
-        margin: "15px 0",
-        background: "linear-gradient(145deg, #9faca3, #bdccc2)",
-        boxShadow: "7px 7px 14px #9eaaa1,-7px -7px 14px #c4d4c9",
-        transition: "transform 0.3s ease",
-        '&:hover': {
-            transform: "scale(1.03)"
-        }
-    };
 
     const handleMultiTreesGift = useCallback(async () => {
         setIsLoading(true);
@@ -116,80 +85,8 @@ const CSRGiftTrees: React.FC<CSRGiftTreesProps> = ({ groupId, organizationData }
         }
     };
 
-    const handleSaveOrganization = (updatedData: { name: string; address: string; logo_url: string }) => {
-        // In a real app, you would make an API call here to save the changes
-        setCurrentOrgData(updatedData);
-        toast.success("Organization details updated successfully!");
-    };
-
     return (
         <Box mt={3} id="Setting-Details" sx={{ px: isMobile ? 1 : 2 }}>
-            {/* Organization Details Section */}
-            {currentOrgData && (
-                <Box sx={{
-                    display: 'flex',
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    flexWrap: 'wrap',
-                    marginBottom: '20px',
-                    backgroundColor: 'transparent'
-                }}>
-                    <Card sx={summaryCardStyle}>
-                        <Box sx={{ 
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'space-between',
-                            height: '100%',
-                            padding: '0 16px'
-                        }}>
-                            <Box sx={{ 
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: 3
-                            }}>
-                                <Avatar
-                                    src={currentOrgData.logo_url}
-                                    alt={`${currentOrgData.name} logo`}
-                                    sx={{ 
-                                        width: 120, 
-                                        height: 120, 
-                                        mb: 2,
-                                        '& img': {
-                                            objectFit: 'contain'
-                                        }
-                                    }}
-                                >
-                                    {currentOrgData.name?.[0]}
-                                </Avatar>
-                                <Box>
-                                    <Typography variant="h4" color="#fff" sx={{ fontWeight: 600 }}>
-                                        {currentOrgData.name}
-                                    </Typography>
-                                    <Typography variant="subtitle1" color="#1f3625" sx={{ mt: 1 }}>
-                                        {currentOrgData.address || 'Address not available'}
-                                    </Typography>
-                                </Box>
-                            </Box>
-                            
-                            <IconButton
-                                sx={{
-                                    color: "#1f3625",
-                                    '&:hover': {
-                                        color: "#fff",
-                                        backgroundColor: 'transparent'
-                                    }
-                                }}
-                                aria-label="Edit organization details"
-                                onClick={() => setEditOrgDialogOpen(true)}
-                            >
-                                <EditIcon fontSize="large" />
-                            </IconButton>
-                        </Box>
-                    </Card>
-                </Box>
-            )}
-
-
             <Box mt={3} id="your-wall-of-tree-gifts" sx={{ px: isMobile ? 1 : 2 }}></Box>
             <Box sx={{
                 display: 'flex',
@@ -345,13 +242,6 @@ const CSRGiftTrees: React.FC<CSRGiftTreesProps> = ({ groupId, organizationData }
                 open={imageViewModalOpen}
                 onClose={() => setImageViewModalOpen(false)}
                 imageUrl={imageViewModalImageUrl}
-            />
-
-            <EditOrganizationDialog
-                open={editOrgDialogOpen}
-                onClose={() => setEditOrgDialogOpen(false)}
-                organizationData={currentOrgData}
-                onSave={handleSaveOrganization}
             />
         </Box>
     );

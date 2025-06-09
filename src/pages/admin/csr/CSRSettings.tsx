@@ -11,40 +11,29 @@ import EditIcon from '@mui/icons-material/Edit';
 import { toast } from "react-toastify";
 import EditOrganizationDialog from "./EditOrganizationDialog";
 import ApiClient from "../../../api/apiClient/apiClient";
-import { Group } from "../../../types"; // Adjust path if needed
+import { Group } from "../../../types/Group";
 
-const CSRSettings = () => {
+type Props = {
+    group: Group
+    onGroupChange: (group: Group) => void
+}
+
+const CSRSettings: React.FC<Props> = ({ group, onGroupChange }) => {
     const theme = useTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
     const [editOrgDialogOpen, setEditOrgDialogOpen] = useState(false);
-    const [currentGroup, setCurrentGroup] = useState<Group | null>(null);
-
-    useEffect(() => {
-        // Fetch current group info when component mounts
-        const fetchGroup = async () => {
-            try {
-                const apiClient = new ApiClient();
-                const group = await apiClient.getCurrentGroup(); // adjust this method as per your API
-                setCurrentGroup(group);
-            } catch (error) {
-                toast.error("Failed to fetch organization data");
-                console.error(error);
-            }
-        };
-        fetchGroup();
-    }, []);
 
     const handleSaveOrganization = async (
-        updatedData: { name: string; address: string; logo_url: string },
+        updatedData: { name: string; address: string; logo_url: string | null },
         logoFile?: File
     ) => {
         try {
-            if (!currentGroup) return;
+            if (!group) return;
 
             const apiClient = new ApiClient();
             const updatedGroup = {
-                ...currentGroup,
+                ...group,
                 name: updatedData.name,
                 address: updatedData.address,
                 logo_url: updatedData.logo_url,
@@ -52,7 +41,7 @@ const CSRSettings = () => {
             };
 
             const response = await apiClient.updateGroup(updatedGroup, logoFile);
-            setCurrentGroup(response);
+            onGroupChange(response);
             toast.success("Organization updated successfully!");
         } catch (error) {
             toast.error("Failed to update organization");
@@ -76,7 +65,7 @@ const CSRSettings = () => {
 
     return (
         <Box mt={3} id="Setting-Details" sx={{ px: isMobile ? 1 : 2 }}>
-            {currentGroup && (
+            {group && (
                 <Box sx={{
                     display: 'flex',
                     justifyContent: 'center',
@@ -99,8 +88,8 @@ const CSRSettings = () => {
                                 gap: 3
                             }}>
                                 <Avatar
-                                    src={currentGroup.logo_url}
-                                    alt={`${currentGroup.name} logo`}
+                                    src={group.logo_url || undefined}
+                                    alt={`${group.name} logo`}
                                     sx={{
                                         width: 120,
                                         height: 120,
@@ -110,14 +99,14 @@ const CSRSettings = () => {
                                         }
                                     }}
                                 >
-                                    {currentGroup.name?.[0]}
+                                    {group.name?.[0]}
                                 </Avatar>
                                 <Box>
                                     <Typography variant="h4" color="#fff" sx={{ fontWeight: 600 }}>
-                                        {currentGroup.name}
+                                        {group.name}
                                     </Typography>
                                     <Typography variant="subtitle1" color="#1f3625" sx={{ mt: 1 }}>
-                                        {currentGroup.address || 'Address not available'}
+                                        {group.address || 'Address not available'}
                                     </Typography>
                                 </Box>
                             </Box>
@@ -142,9 +131,9 @@ const CSRSettings = () => {
                         open={editOrgDialogOpen}
                         onClose={() => setEditOrgDialogOpen(false)}
                         organizationData={{
-                            name: currentGroup.name,
-                            address: currentGroup.address,
-                            logo_url: currentGroup.logo_url
+                            name: group.name,
+                            address: group.address || "",
+                            logo_url: group.logo_url
                         }}
                         onSave={handleSaveOrganization}
                     />
