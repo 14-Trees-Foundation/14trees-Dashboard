@@ -911,7 +911,7 @@ const GiftTrees: FC = () => {
             title: "Recipient Name",
             align: "center",
             width: 200,
-            ...getColumnSearchProps('recipient_name', filters, handleSetFilters) // or use getColumnSelectedItemFilter if you want dropdown
+            ...getColumnSearchProps('recipient_name', filters, handleSetFilters)
         },
         {
             dataIndex: "request_type",
