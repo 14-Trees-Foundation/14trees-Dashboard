@@ -905,6 +905,14 @@ const GiftTrees: FC = () => {
             ...getColumnSearchProps('created_by_name', filters, handleSetFilters)
         },
         {
+            dataIndex: "recipient_name",
+            key: "Recipient Name",
+            title: "Recipient Name",
+            align: "center",
+            width: 200,
+            ...getColumnSearchProps('recipient_name', filters, handleSetFilters)
+        },
+        {
             dataIndex: "request_type",
             key: "Request Type",
             title: "Request Type",
@@ -948,8 +956,21 @@ const GiftTrees: FC = () => {
             title: "Email Status",
             align: "center",
             width: 150,
-            render: (value, record: any, index) =>
-                record.mail_sent ? 'Mail Sent to Sponsor' : ''
+            render: (value, record: any, index) => {
+                const usersCount = parseInt(record.users_count || "0");
+                const mailedCount = parseInt(record.mailed_count || "0");
+                
+                const statusMessages: string[] = [];
+                
+                if (record.mail_sent) {
+                    statusMessages.push("Mail Sent to Sponsor");
+                }
+                if (usersCount > 0 && usersCount === mailedCount) {
+                    statusMessages.push("Mail Sent to Recipient");
+                }
+                
+                return statusMessages.join(", ");
+            }
         },
         {
             dataIndex: "validation_errors",
