@@ -28,6 +28,7 @@ import { GoogleLogout } from "react-google-login";
 import NotificationsNoneIcon from "@mui/icons-material/NotificationsNone";
 import EventIcon from "@mui/icons-material/Event";
 import { Group } from "../../../types/Group";
+import { User } from "../../../types/user"
 import CSRGiftRequests from "./CSRGiftRequests";
 import CSRHeader from "./CSRHeader";
 
@@ -342,9 +343,17 @@ const CSRPage: React.FC = () => {
 
                         <Box sx={{ flex: 1 }}>
                             <CSRHeader groupId={groupId} onGroupChange={group => { setCurrentGroup(group) }} />
-                            {activeTab === "greenTributeWall" && currentGroup && <CSRInventory selectedGroup={currentGroup}/>}
-                            {activeTab === "Setting-Details" && currentGroup && <CSRSettings group={currentGroup} onGroupChange={group => { setCurrentGroup(group) }}/>}
-                            {activeTab === "orders" && currentGroup && <CSRGiftRequests selectedGroup={currentGroup} groupId={currentGroup.id}/>}
+                            {activeTab === "greenTributeWall" && currentGroup && <CSRInventory selectedGroup={currentGroup} />}
+                            {activeTab === "Setting-Details" && currentGroup && auth.user && (
+                                <CSRSettings
+                                    group={currentGroup}
+                                    user={{
+                                        name: auth.user.name,
+                                        email: auth.user.email,
+                                    }}
+                                    onGroupChange={group => setCurrentGroup(group)}
+                                />
+                            )}                            {activeTab === "orders" && currentGroup && <CSRGiftRequests selectedGroup={currentGroup} groupId={currentGroup.id} />}
                         </Box>
                     </Box>
                 </div>
