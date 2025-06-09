@@ -13,6 +13,7 @@ import CSRGiftTrees from "./CSRGiftTrees";
 import CSRSharePageDialog from "./CSRSharePageDialog";
 import { TreeSponsorshipForm } from "./form/CSRForm"
 import { BirthdayResponse } from "../../../types/notification"
+import PurchaseTreesForm from "./form/PurchaseTreesForm";
 
 interface CSRInventoryProps {
     onBirthdayData?: (data: BirthdayResponse) => void;
@@ -44,6 +45,8 @@ const CSRInventory: React.FC<CSRInventoryProps> = ({ onBirthdayData, onGroupChan
     const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
     const { groupId } = useParams();
+    const userName = JSON.parse(localStorage.getItem("user") || "")
+    const userEmail = localStorage.getItem("userEmail")
 
     const dispatch = useAppDispatch();
     const { getGroups, updateGroup } = bindActionCreators(groupActionCreators, dispatch);
@@ -250,12 +253,21 @@ const CSRInventory: React.FC<CSRInventoryProps> = ({ onBirthdayData, onGroupChan
                     </Button>
                     <CSRSharePageDialog groupId={selectedGroup?.id} groupName={selectedGroup?.name} style={{ marginLeft: 10 }} />
                 </div>
-                <TreeSponsorshipForm
+                {/* <TreeSponsorshipForm
                     open={formOpen}
                     onClose={() => setFormOpen(false)}
                     group_id={selectedGroup?.id ?? 0}
                     onSubmit={handleFormSubmit}
-                />
+                /> */}
+                {selectedGroup && formOpen && <PurchaseTreesForm
+                    open={formOpen}
+                    onClose={() => { setFormOpen(false) }}
+                    corporateName={selectedGroup.name}
+                    corporateLogo={selectedGroup.logo_url ?? undefined}
+                    groupId={selectedGroup.id}
+                    userName={userName}
+                    userEmail={userEmail || ""}
+                />}
             </div>
             <Divider sx={{ backgroundColor: "black", marginBottom: '15px', mx: 1 }} />
 

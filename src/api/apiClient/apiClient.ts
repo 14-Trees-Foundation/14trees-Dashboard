@@ -1800,38 +1800,25 @@ class ApiClient {
         }
     }
 
-    async createGiftCardRequestV2( group_id: number, sponsor_name: string, sponsor_email: string, no_of_cards: number, event_type: string, event_name: string, created_by: number, gifted_by?: string, logo_message?: string, primary_message?: string, users?: any[], tags?: string[], payment_id?: number ): Promise<{ gift_request: any, order_id: string }> {
+    async createGiftCardRequestV2(group_id: number, sponsor_name: string, sponsor_email: string, no_of_cards: number, event_type: string, event_name: string, gifted_by?: string, tags?: string[], users?: any[], logo_message?: string, primary_message?: string): Promise<{ gift_request: GiftCard, order_id: string }> {
         try {
-            const formData = new FormData();
-            
-            // Required fields
-            formData.append('group_id', group_id.toString());
-            formData.append('sponsor_name', sponsor_name);
-            formData.append('sponsor_email', sponsor_email);
-            formData.append('no_of_cards', no_of_cards.toString());
-            formData.append('event_type', event_type);
-            formData.append('event_name', event_name);
-            formData.append('created_by', created_by.toString());
-    
-            // Optional fields
-            if (gifted_by) formData.append('gifted_by', gifted_by);
-            if (logo_message) formData.append('logo_message', logo_message);
-            if (primary_message) formData.append('primary_message', primary_message);
-            if (payment_id) formData.append('payment_id', payment_id.toString());
-            
-            // Array fields
-            if (users && Array.isArray(users)) {
-                formData.append('users', JSON.stringify(users));
-            }
-            if (tags && Array.isArray(tags)) {
-                formData.append('tags', JSON.stringify(tags));
-            }
-    
-            const response = await this.api.post<{ 
-                gift_request: any, 
-                order_id: string 
-            }>('/gift-cards/requests/createv2', formData);
-    
+            const response = await this.api.post<{
+                gift_request: GiftCard,
+                order_id: string
+            }>('/gift-cards/requests/createv2', {
+                group_id,
+                sponsor_name,
+                sponsor_email,
+                no_of_cards,
+                event_type,
+                event_name,
+                gifted_by,
+                logo_message,
+                primary_message,
+                users,
+                tags,
+            });
+
             return response.data;
         } catch (error: any) {
             if (error.response) {
@@ -2587,10 +2574,10 @@ class ApiClient {
 
     async createCampaign(name: string, c_key: string, description?: string): Promise<Campaign> {
         try {
-            const response = await this.api.post<Campaign>(`/campaigns`, { 
-                name, 
-                c_key, 
-                description 
+            const response = await this.api.post<Campaign>(`/campaigns`, {
+                name,
+                c_key,
+                description
             });
             return response.data;
         } catch (error: any) {
@@ -2607,7 +2594,7 @@ class ApiClient {
                 updateFields,
                 data: updateData
             };
-            
+
             const response = await this.api.put<Campaign>(`/campaigns/update/${id}`, payload);
             return response.data;
         } catch (error: any) {
@@ -2620,7 +2607,7 @@ class ApiClient {
 
     async getCampaigns(offset: number, limit: number, filters?: any[], orderBy?: any[]): Promise<{ results: Campaign[], total: number, offset: number }> {
         const url = `/campaigns/list/get?offset=${offset}&limit=${limit}`;
-    
+
         try {
             const response = await this.api.post<{ results: Campaign[], total: number, offset: number }>(url, {
                 filters: filters || [],

@@ -286,7 +286,7 @@ const CSRGiftTrees: React.FC<CSRGiftTreesProps> = ({ groupId, organizationData }
                 }}
             />
 
-            <CSRBulkGift groupId={groupId} open={bulkGifting} onClose={() => { setBulkGifting(false); }} />
+            {bulkGifting && <CSRBulkGift groupId={groupId} open={bulkGifting} onClose={() => { setBulkGifting(false); }} />}
 
             {giftDialogVisible && selectedGiftTree && (
                 <RedeemGiftTreeDialog
