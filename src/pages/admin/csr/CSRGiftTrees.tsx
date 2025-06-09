@@ -1,5 +1,19 @@
 import { useState, useRef, useCallback } from "react";
-import { Box, Button, Dialog, DialogActions, DialogContent, FormControl, FormControlLabel, FormGroup, Radio, TextField, Typography, useMediaQuery, useTheme } from "@mui/material";
+import {
+    Box,
+    Button,
+    Dialog,
+    DialogActions,
+    DialogContent,
+    FormControl,
+    FormControlLabel,
+    FormGroup,
+    Radio,
+    TextField,
+    Typography,
+    useMediaQuery,
+    useTheme,
+} from "@mui/material";
 import { Tree } from "../../../types/tree";
 import { GiftRedeemTransaction } from "../../../types/gift_redeem_transaction";
 import RedeemGiftTreeDialog from "../../../components/redeem/RedeemGiftTreeDialog";
@@ -11,14 +25,13 @@ import { toast } from "react-toastify";
 import CSRBulkGift from "./CSRBulkGift";
 
 interface CSRGiftTreesProps {
-    groupId: number
+    groupId: number;
 }
 
 const CSRGiftTrees: React.FC<CSRGiftTreesProps> = ({ groupId }) => {
     const theme = useTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
-    const isTablet = useMediaQuery(theme.breakpoints.between('sm', 'md'));
-    
+
     const [giftDialogVisible, setGiftDialogVisible] = useState(false);
     const [selectedGiftTree, setSelectedGiftTree] = useState<Tree | null>(null);
     const [giftMultiple, setGiftMultiple] = useState(false);
@@ -38,7 +51,6 @@ const CSRGiftTrees: React.FC<CSRGiftTreesProps> = ({ groupId }) => {
     const handleMultiTreesGift = useCallback(async () => {
         setIsLoading(true);
         try {
-            // Use the ref to get the first available tree
             if (gridRef.current) {
                 const tree = await gridRef.current.getFirstAvailableTree();
                 if (tree) {
@@ -74,11 +86,12 @@ const CSRGiftTrees: React.FC<CSRGiftTreesProps> = ({ groupId }) => {
     };
 
     return (
-        <Box mt={3} id="your-wall-of-tree-gifts" sx={{ px: isMobile ? 1 : 2 }}>
-            <Box sx={{ 
-                display: 'flex', 
+        <Box mt={3} id="Setting-Details" sx={{ px: isMobile ? 1 : 2 }}>
+            <Box mt={3} id="your-wall-of-tree-gifts" sx={{ px: isMobile ? 1 : 2 }}></Box>
+            <Box sx={{
+                display: 'flex',
                 flexDirection: isMobile ? 'column' : 'row',
-                alignItems: isMobile ? 'flex-start' : 'center', 
+                alignItems: isMobile ? 'flex-start' : 'center',
                 justifyContent: 'space-between',
                 mb: 2
             }}>
@@ -86,16 +99,16 @@ const CSRGiftTrees: React.FC<CSRGiftTreesProps> = ({ groupId }) => {
                     Green Tribute Wall
                 </Typography>
             </Box>
-            
-            <Typography 
-                variant={isMobile ? "body2" : "subtitle1"} 
-                ml={1} 
+
+            <Typography
+                variant={isMobile ? "body2" : "subtitle1"}
+                ml={1}
                 mb={2}
             >
                 Celebrate your organization's eco-friendly contributions with a dedicated wall showcasing all the trees gifted. Each entry represents a lasting tribute to sustainability, featuring recipient details, heartfelt messages, and the tree's location.
             </Typography>
 
-            <GiftAnalytics 
+            <GiftAnalytics
                 groupId={groupId}
                 onGiftMultiple={handleMultiTreesGift}
                 onBulkGifting={() => { setBulkGifting(true) }}
@@ -103,12 +116,12 @@ const CSRGiftTrees: React.FC<CSRGiftTreesProps> = ({ groupId }) => {
                 isLoading={isLoading}
             />
 
-            <Box sx={{ 
-                mt: 4, 
-                paddingX: 1, 
-                display: 'flex', 
+            <Box sx={{
+                mt: 4,
+                paddingX: 1,
+                display: 'flex',
                 flexDirection: isMobile ? 'column' : 'row',
-                alignItems: isMobile ? 'stretch' : 'center', 
+                alignItems: isMobile ? 'stretch' : 'center',
                 justifyContent: 'space-between',
                 gap: 2
             }}>
@@ -118,15 +131,15 @@ const CSRGiftTrees: React.FC<CSRGiftTreesProps> = ({ groupId }) => {
                     onChange={(e) => { setSeachUser(e.target.value) }}
                     fullWidth
                     size="small"
-                    sx={{ 
-                        maxWidth: isMobile ? '100%' : '500px', 
+                    sx={{
+                        maxWidth: isMobile ? '100%' : '500px',
                         m: isMobile ? 0 : 1,
-                        mb: isMobile ? 2 : 1 
+                        mb: isMobile ? 2 : 1
                     }}
                 />
                 <FormControl component="fieldset" sx={{ width: isMobile ? '100%' : 'auto' }}>
-                    <FormGroup 
-                        aria-label="position" 
+                    <FormGroup
+                        aria-label="position"
                         row={!isMobile}
                         sx={{
                             justifyContent: 'space-between'
@@ -155,7 +168,7 @@ const CSRGiftTrees: React.FC<CSRGiftTreesProps> = ({ groupId }) => {
                     </FormGroup>
                 </FormControl>
             </Box>
-            
+
             <GiftTreesGrid
                 ref={gridRef}
                 groupId={groupId}
@@ -170,7 +183,7 @@ const CSRGiftTrees: React.FC<CSRGiftTreesProps> = ({ groupId }) => {
                 }}
             />
 
-            <CSRBulkGift groupId={groupId} open={bulkGifting} onClose={() => { setBulkGifting(false); }} />
+            {bulkGifting && <CSRBulkGift groupId={groupId} open={bulkGifting} onClose={() => { setBulkGifting(false); }} />}
 
             {giftDialogVisible && selectedGiftTree && (
                 <RedeemGiftTreeDialog
@@ -214,9 +227,9 @@ const CSRGiftTrees: React.FC<CSRGiftTreesProps> = ({ groupId }) => {
                         />
                     </DialogContent>
                     <DialogActions>
-                        <Button 
-                            variant="outlined" 
-                            color="error" 
+                        <Button
+                            variant="outlined"
+                            color="error"
                             onClick={() => { setSummaryOpen(false); }}
                         >
                             Close

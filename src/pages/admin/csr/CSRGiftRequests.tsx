@@ -1,5 +1,5 @@
-import { Box, Button, IconButton, Tooltip, Typography } from "@mui/material";
-import { useEffect, useRef, useState } from "react";
+import { Box, Button, Typography } from "@mui/material";
+import { useEffect, useState } from "react";
 import ApiClient from "../../../api/apiClient/apiClient";
 import { toast } from "react-toastify";
 import { GiftCard } from "../../../types/gift_card";
@@ -9,49 +9,39 @@ import * as giftCardActionCreators from "../../../redux/actions/giftCardActions"
 import { useAppDispatch, useAppSelector } from "../../../redux/store/hooks";
 import { bindActionCreators } from "@reduxjs/toolkit";
 import { RootState } from "../../../redux/store/store";
-import { Dropdown, Menu, TableColumnsType } from "antd";
-import { Download, ErrorOutline, MenuOutlined, Slideshow, Wysiwyg } from "@mui/icons-material";
+import { TableColumnsType } from "antd";
 import { getHumanReadableDate } from "../../../helpers/utils";
-import { useAuth } from "../auth/auth";
-import { Order, UserRoles } from "../../../types/common";
+import { Order } from "../../../types/common";
 import GeneralTable from "../../../components/GenTable";
-import GiftCardRequestInfo from "../gift/GiftCardRequestInfo";
+import PurchaseTreesForm from "./form/PurchaseTreesForm";
+import { Group } from "../../../types/Group";
+import PaymentIcon from '@mui/icons-material/Payment';
+import PaymentDialog from "./components/PaymentDialog";
 
-const pendingPlotSelection = 'Pending Plot & Tree(s) Reservation';
 
 interface CSRGiftRequestsProps {
     groupId: number
+    selectedGroup: Group
 }
 
-const CSRGiftRequests: React.FC<CSRGiftRequestsProps> = ({ groupId }) => {
-
+const CSRGiftRequests: React.FC<CSRGiftRequestsProps> = ({ groupId, selectedGroup }) => {
     const dispatch = useAppDispatch();
-    const { getGiftCards } =
-        bindActionCreators(giftCardActionCreators, dispatch);
+    const { getGiftCards } = bindActionCreators(giftCardActionCreators, dispatch);
 
-    let auth = useAuth();
-    const authRef = useRef<any>(null);
-
+    const userName = localStorage.getItem("userName") || "Guest";
+    const userEmail = localStorage.getItem("userEmail");
 
     const [page, setPage] = useState(0);
     const [pageSize, setPageSize] = useState(10);
     const [filters, setFilters] = useState<Record<string, GridFilterItem>>({});
     const [orderBy, setOrderBy] = useState<Order[]>([]);
     const [tableRows, setTableRows] = useState<GiftCard[]>([]);
-    const [selectedGiftCard, setSelectedGiftCard] = useState<GiftCard | null>(null);
     const [tags, setTags] = useState<string[]>([]);
-    const [infoModal, setInfoModal] = useState(false);
+    const [formOpen, setFormOpen] = useState(false);
+    const [paymentDialogOpen, setPaymentDialogOpen] = useState(false);
+    const [selectedGiftCard, setSelectedGiftCard] = useState<GiftCard | null>(null);
 
-    let giftCards: GiftCard[] = [];
     const giftCardsData = useAppSelector((state: RootState) => state.giftCardsData);
-    if (giftCardsData) {
-        giftCards = Object.values(giftCardsData.giftCards);
-        giftCards = giftCards.sort((a, b) => b.id - a.id);
-    }
-
-    useEffect(() => {
-        authRef.current = auth;
-    }, [auth])
 
     useEffect(() => {
         const getTags = async () => {
@@ -63,13 +53,8 @@ const CSRGiftRequests: React.FC<CSRGiftRequestsProps> = ({ groupId }) => {
                 toast.error(error.message);
             }
         }
-
         getTags();
     }, []);
-
-    useEffect(() => {
-        authRef.current = auth;
-    }, [auth])
 
     useEffect(() => {
         const handler = setTimeout(() => {
@@ -77,10 +62,12 @@ const CSRGiftRequests: React.FC<CSRGiftRequestsProps> = ({ groupId }) => {
         }, 300)
 
         return () => { clearTimeout(handler) };
-    }, [filters, orderBy, auth, groupId]);
+    }, [filters, orderBy, groupId]);
 
     useEffect(() => {
 
+        if (giftCardsData.loading) return;
+        
         const handler = setTimeout(() => {
             const records: GiftCard[] = [];
             const maxLength = Math.min((page + 1) * pageSize, giftCardsData.totalGiftCards);
@@ -107,102 +94,76 @@ const CSRGiftRequests: React.FC<CSRGiftRequestsProps> = ({ groupId }) => {
         const filtersData = JSON.parse(JSON.stringify(Object.values(filters))) as GridFilterItem[];
         filtersData.forEach((item) => {
             if (item.columnField === 'status') {
-                item.value = (item.value as string[]).map(value => {
-                    if (value === pendingPlotSelection) return 'pending_plot_selection';
-                    else if (value === 'Pending assignment') return 'pending_assignment';
-                    else return 'completed'
-                })
-            } else if (item.columnField === 'validation_errors' || item.columnField === 'notes') {
-                if ((item.value as string[]).includes('Yes')) {
-                    item.operatorValue = 'isNotEmpty';
-                } else {
-                    item.operatorValue = 'isEmpty'
+                const items: string[] = [];
+                if ((item.value as string[]).includes('Pending')) {
+                    items.push('pending_plot_selection');
                 }
+                if ((item.value as string[]).includes('Completed')) {
+                    items.push('pending_assignment');
+                    items.push('completed');
+                }
+                item.value = items;
+            } else if (item.columnField === 'validation_errors' || item.columnField === 'notes') {
+                item.operatorValue = (item.value as string[]).includes('Yes') ? 'isNotEmpty' : 'isEmpty';
             }
-        })
-
-        // if normal user the fetch user specific data
-        if (authRef.current?.roles?.includes(UserRoles.User) && authRef.current?.userId) {
-            filtersData.push({
-                columnField: 'user_id',
-                operatorValue: 'equals',
-                value: authRef.current.userId
-            })
-        }
+        });
 
         filtersData.push({
             columnField: 'group_id',
             operatorValue: 'equals',
             value: groupId,
-        })
+        });
 
         return filtersData;
-    }
+    };
 
     const getGiftCardData = async () => {
-
-        // check if user logged in
-        if (!authRef.current?.signedin) return;
-
         const filtersData = getFilters(filters, groupId);
-
         getGiftCards(page * pageSize, pageSize, filtersData, orderBy);
     };
 
-    const getAllGiftCardsData = async () => {
-        let filtersData = getFilters(filters, groupId);
-        const apiClient = new ApiClient();
-        const resp = await apiClient.getGiftCards(0, -1, filtersData, orderBy);
-        return resp.results;
-    };
+    useEffect(() => {
+        const handler = setTimeout(() => {
+            getGiftCardData();
+        }, 300);
 
+        return () => clearTimeout(handler);
+    }, [filters, orderBy, groupId, page, pageSize]);
+
+    useEffect(() => {
+        const handler = setTimeout(() => {
+            const records: GiftCard[] = [];
+            const maxLength = Math.min((page + 1) * pageSize, giftCardsData.totalGiftCards);
+            for (let i = page * pageSize; i < maxLength; i++) {
+                if (Object.hasOwn(giftCardsData.paginationMapping, i)) {
+                    const id = giftCardsData.paginationMapping[i];
+                    const record = giftCardsData.giftCards[id];
+                    if (record) records.push(record);
+                } else {
+                    getGiftCardData();
+                    return;
+                }
+            }
+            setTableRows(records);
+        }, 300);
+
+        return () => clearTimeout(handler);
+    }, [giftCardsData, page, pageSize]);
+
+    const handleFormSuccess = () => {
+        setFormOpen(false);
+        setPage(0);
+        getGiftCardData();
+    };
 
     const handleSetFilters = (filters: Record<string, GridFilterItem>) => {
         setPage(0);
         setFilters(filters);
-    }
-
-    const handleDownloadCards = async (id: number, name: string, type: 'pdf' | 'ppt' | 'zip') => {
-        try {
-            const apiClient = new ApiClient();
-            const data = await apiClient.downloadGiftCards(id, type);
-
-            const blob = new Blob([data], { type: 'application/zip' });
-            const url = window.URL.createObjectURL(blob);
-
-            const link = document.createElement('a');
-            link.href = url;
-            link.download = name + '.' + type;
-            document.body.appendChild(link);
-            link.click();
-
-            link.remove();
-            window.URL.revokeObjectURL(url);
-        } catch (error) {
-            console.error('Error downloading the file:', error);
-        }
-
-    }
+    };
 
     const getStatus = (card: GiftCard) => {
-        if (card.status === 'pending_plot_selection') {
-            return pendingPlotSelection;
-        } else if (card.status === 'pending_assignment') {
-            return 'Pending assignment';
-        } else if (card.status === 'pending_gift_cards') {
-            return 'Pending Tree cards creation';
-        } else {
-            return 'Completed';
-        }
-    }
-
-    const getValidationErrors = (errorValues: string[]) => {
-        let errors = []
-        if (errorValues.includes('MISSING_LOGO')) errors.push('Missing Company Logo');
-        if (errorValues.includes('MISSING_USER_DETAILS')) errors.push('Missing user details for assignment');
-
-        return errors;
-    }
+        return card.status === 'pending_plot_selection' ? 'Pending' : 'Completed';
+    };
 
     const handleSortingChange = (sorter: any) => {
         let newOrder = [...orderBy];
@@ -214,41 +175,33 @@ const CSRGiftRequests: React.FC<CSRGiftRequestsProps> = ({ groupId }) => {
             } else if (sorter.order) {
                 newOrder.push({ column: sorter.field, order: sorter.order });
             }
-        }
+        };
 
         if (sorter.field) {
             setPage(0);
             updateOrder();
             setOrderBy(newOrder);
         }
-    }
+    };
 
-    const getSortableHeader = (header: string, key: string) => {
-        return (
-            <div style={{ display: "flex", alignItems: "center", justifyContent: 'space-between' }}>
-                {header} {getSortIcon(key, orderBy.find((item) => item.column === key)?.order, handleSortingChange)}
-            </div>
-        )
-    }
-
-    const getActionsMenu = (record: GiftCard) => (
-        <Menu>
-            <Menu.ItemGroup>
-                <Menu.Item key="00" onClick={() => { setSelectedGiftCard(record); setInfoModal(true); }} icon={<Wysiwyg />}>
-                    View Summary
-                </Menu.Item>
-            </Menu.ItemGroup>
-            {(record.presentation_id || record.presentation_ids.length > 0) && <Menu.Divider style={{ backgroundColor: '#ccc' }} />}
-            {(record.presentation_id || record.presentation_ids.length > 0) && <Menu.ItemGroup>
-                {record.presentation_id && <Menu.Item key="30" onClick={() => { handleDownloadCards(record.id, record.user_name + '_' + record.no_of_cards, 'zip') }} icon={<Download />}>
-                    Download Tree Cards
-                </Menu.Item>}
-                <Menu.Item key="31" onClick={() => { window.open('https://docs.google.com/presentation/d/' + (record.presentation_id ? record.presentation_id : record.presentation_ids[0])); }} icon={<Slideshow />}>
-                    Tree Cards Slide
-                </Menu.Item>
-            </Menu.ItemGroup>}
-        </Menu>
+    const getSortableHeader = (header: string, key: string) => (
+        <div style={{ display: "flex", alignItems: "center", justifyContent: 'space-between' }}>
+            {header} {getSortIcon(key, orderBy.find((item) => item.column === key)?.order, handleSortingChange)}
+        </div>
     );
+
+    const getAllGiftCardsData = async () => {
+        const filtersData = getFilters(filters, groupId);
+        const apiClient = new ApiClient();
+        const resp = await apiClient.getGiftCards(0, -1, filtersData, orderBy);
+        return resp.results;
+    };
+
+    const handlePaymentSuccess = () => {
+        setPaymentDialogOpen(false);
+        getGiftCardData();
+        toast.success('Payment successful!');
+    };
 
     const columns: TableColumnsType<GiftCard> = [
         {
@@ -257,28 +210,12 @@ const CSRGiftRequests: React.FC<CSRGiftRequestsProps> = ({ groupId }) => {
             title: "Req. No.",
             align: "right",
             width: 100,
-        },
-        {
-            dataIndex: "user_name",
-            key: "Sponsor",
-            title: "Sponsor",
-            align: "center",
-            width: 200,
-            ...getColumnSearchProps('user_name', filters, handleSetFilters)
-        },
-        {
-            dataIndex: "group_name",
-            key: "Sponsorship (Corporate/Personal)",
-            title: "Sponsorship (Corporate/Personal)",
-            align: "center",
-            width: 200,
-            render: (value: string) => value ? value : 'Personal',
-            ...getColumnSearchProps('group_name', filters, handleSetFilters)
+            fixed: 'left',
         },
         {
             dataIndex: "no_of_cards",
-            key: "# Cards",
-            title: getSortableHeader("# Cards", 'no_of_cards'),
+            key: "# Trees",
+            title: getSortableHeader("# Trees", 'no_of_cards'),
             align: "center",
             width: 100,
         },
@@ -288,18 +225,7 @@ const CSRGiftRequests: React.FC<CSRGiftRequestsProps> = ({ groupId }) => {
             title: "Created by",
             align: "center",
             width: 200,
-            hidden: true,
             ...getColumnSearchProps('created_by_name', filters, handleSetFilters)
-        },
-        {
-            dataIndex: "tags",
-            key: "Tags",
-            title: "Tags",
-            align: "center",
-            width: 200,
-            hidden: true,
-            render: value => value?.join(", ") || '',
-            ...getColumnSelectedItemFilter({ dataIndex: 'tags', filters, handleSetFilters, options: tags })
         },
         {
             dataIndex: "status",
@@ -308,41 +234,7 @@ const CSRGiftRequests: React.FC<CSRGiftRequestsProps> = ({ groupId }) => {
             align: "center",
             width: 150,
             render: (value, record, index) => getStatus(record),
-            ...getColumnSelectedItemFilter({ dataIndex: 'status', filters, handleSetFilters, options: [pendingPlotSelection, 'Pending assignment', 'Completed'] })
-        },
-        {
-            dataIndex: "validation_errors",
-            key: "Validation Errors",
-            title: "Validation Errors",
-            align: "center",
-            width: 120,
-            hidden: true,
-            render: (value) => value && value.length > 0 ? (
-                <Tooltip title={<div>{getValidationErrors(value).map(item => (<p>{item}</p>))}</div>}>
-                    <IconButton>
-                        <ErrorOutline color="error" />
-                    </IconButton>
-                </Tooltip>
-            ) : '',
-            ...getColumnSelectedItemFilter({ dataIndex: 'validation_errors', filters, handleSetFilters, options: ['Yes', 'No'] }),
-        },
-        {
-            dataIndex: "sponsorship_type",
-            key: "Sponosorship Type",
-            title: "Sponsorship Type",
-            align: "center",
-            width: 150,
-            hidden: true,
-            ...getColumnSelectedItemFilter({ dataIndex: 'sponsorship_type', filters, handleSetFilters, options: ['Unverified', 'Pledged', 'Promotional', 'Unsponsored Visit', 'Donation Received'] })
-        },
-        {
-            dataIndex: "donation_receipt_number",
-            key: "Donation Receipt No.",
-            title: "Donation Receipt No.",
-            align: "center",
-            width: 200,
-            hidden: true,
-            ...getColumnSearchProps('donation_receipt_number', filters, handleSetFilters)
+            ...getColumnSelectedItemFilter({ dataIndex: 'status', filters, handleSetFilters, options: ['Pending', 'Completed'] })
         },
         {
             dataIndex: "total_amount",
@@ -350,6 +242,7 @@ const CSRGiftRequests: React.FC<CSRGiftRequestsProps> = ({ groupId }) => {
             title: getSortableHeader("Total Amount", 'total_amount'),
             align: "center",
             width: 150,
+            render: (value: number) => new Intl.NumberFormat('en-IN').format(value)
         },
         {
             dataIndex: "amount_received",
@@ -358,6 +251,7 @@ const CSRGiftRequests: React.FC<CSRGiftRequestsProps> = ({ groupId }) => {
             align: "center",
             width: 200,
             hidden: true,
+            render: (value: number) => new Intl.NumberFormat('en-IN').format(value)
         },
         {
             dataIndex: "payment_status",
@@ -365,7 +259,6 @@ const CSRGiftRequests: React.FC<CSRGiftRequestsProps> = ({ groupId }) => {
             title: "Payment Status",
             align: "center",
             width: 150,
-            hidden: true,
         },
         {
             dataIndex: "created_at",
@@ -377,36 +270,48 @@ const CSRGiftRequests: React.FC<CSRGiftRequestsProps> = ({ groupId }) => {
             ...getColumnDateFilter({ dataIndex: 'created_at', filters, handleSetFilters, label: 'Created' })
         },
         {
-            dataIndex: "action",
             key: "action",
-            title: "Actions",
-            width: 100,
+            title: "Action",
             align: "center",
-            render: (value, record, index) => (
-                <div
-                    style={{
-                        display: "flex",
-                        justifyContent: "center",
-                        alignItems: "center",
-                    }}>
-                    <Dropdown overlay={getActionsMenu(record)} trigger={['click']}>
-                        <Button
-                            variant='outlined'
-                            color='success'
-                            style={{ margin: "0 5px" }}
-                        >
-                            <MenuOutlined />
-                        </Button>
-                    </Dropdown>
-                </div>
+            width: 120,
+            fixed: 'right',
+            render: (_, record) => (
+                record.amount_received !== record.total_amount && (
+                    <Button
+                        variant="contained"
+                        color="success"
+                        size="small"
+                        startIcon={<PaymentIcon />}
+                        onClick={() => {
+                            setSelectedGiftCard(record);
+                            setPaymentDialogOpen(true);
+                        }}
+                    >
+                        Pay
+                    </Button>
+                )
             ),
         },
     ]
 
     return (
-        <Box mt={10} id="green-gift-contributions">
-            <Typography variant="h4" ml={1}>Green Gift Contributions</Typography>
-            <Typography variant="subtitle1" ml={1} mb={1}>Track tree gifting activities initiated by your organization and the impact of these eco-friendly gifts.</Typography>
+        <Box p={2} id="green-gift-contributions">
+            <Box sx={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                mb: 1,
+            }}>
+                <Typography variant="h4" ml={1}>Orders</Typography>
+                <Button
+                    variant="contained"
+                    color="success"
+                    onClick={() => setFormOpen(true)}
+                    style={{ marginLeft: 10 }}
+                >
+                    Purchase Gifts
+                </Button>
+            </Box>
             <Box sx={{ height: 840, width: "100%" }}>
                 <GeneralTable
                     loading={giftCardsData.loading}
@@ -418,17 +323,41 @@ const CSRGiftRequests: React.FC<CSRGiftRequestsProps> = ({ groupId }) => {
                     onPaginationChange={(page: number, pageSize: number) => { setPage(page - 1); setPageSize(pageSize); }}
                     onDownload={getAllGiftCardsData}
                     footer
-                    tableName="Green Gift Contributions"
+                    tableName="Orders"
                 />
             </Box>
 
-            <GiftCardRequestInfo
-                open={infoModal}
-                onClose={() => { setInfoModal(false) }}
-                data={selectedGiftCard}
-            />
+            {selectedGroup && formOpen && (
+                <PurchaseTreesForm
+                    open={formOpen}
+                    onClose={() => setFormOpen(false)}
+                    onSuccess={handleFormSuccess}
+                    corporateName={selectedGroup.name}
+                    corporateLogo={selectedGroup.logo_url ?? undefined}
+                    groupId={selectedGroup.id}
+                    userName={userName}
+                    userEmail={userEmail || ""}
+                />
+            )}
+
+            {selectedGiftCard && (
+                <PaymentDialog
+                    open={paymentDialogOpen}
+                    onClose={() => {
+                        setPaymentDialogOpen(false);
+                        setSelectedGiftCard(null);
+                    }}
+                    paymentId={selectedGiftCard.payment_id!}
+                    giftRequestId={selectedGiftCard.id}
+                    requestId={selectedGiftCard.request_id}
+                    totalAmount={selectedGiftCard.total_amount}
+                    userName={userName}
+                    userEmail={userEmail || ""}
+                    onPaymentSuccess={handlePaymentSuccess}
+                />
+            )}
         </Box>
     );
-}
+};
 
 export default CSRGiftRequests;

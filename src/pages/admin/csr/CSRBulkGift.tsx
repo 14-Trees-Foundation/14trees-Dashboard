@@ -72,6 +72,7 @@ const CSRBulkGift: React.FC<CSRBulkGiftProps> = ({ groupId, open, onClose }) => 
     const [imageUrls, setImageUrls] = useState<string[]>([]);
     const [imageValidationErrors, setImageValidationErrors] = useState<Record<number, string>>({});
     const [imagePreviews, setImagePreviews] = useState<Record<string, string>>({});
+    const fileInputRef = React.useRef<HTMLInputElement>(null);
 
     // Card details state
     const [presentationId, setPresentationId] = useState<string>('');
@@ -222,11 +223,29 @@ const CSRBulkGift: React.FC<CSRBulkGiftProps> = ({ groupId, open, onClose }) => 
     const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0];
         if (!file) return;
-
+    
+        // Clear previous data while loading new file
+        setData([]);
+        setHeaders([]);
+        setErrorsMap({});
+        setImageValidationErrors({});
+        setHeaderErrors([]);
+    
         Papa.parse<string[]>(file, {
+            skipEmptyLines: true,
             complete: (result) => {
                 processCsvData(result.data as string[][]);
+                // Reset the input value after processing
+                if (fileInputRef.current) {
+                    fileInputRef.current.value = '';
+                }
             },
+            error: (error) => {
+                toast.error(`Error parsing CSV: ${error.message}`);
+                if (fileInputRef.current) {
+                    fileInputRef.current.value = '';
+                }
+            }
         });
     };
 
@@ -362,9 +381,9 @@ const CSRBulkGift: React.FC<CSRBulkGiftProps> = ({ groupId, open, onClose }) => 
         try {
             setIsSubmitting(true);
             const apiClient = new ApiClient();
-            
+
             const userData = prepareUserData();
-            
+
             await apiClient.bulkRedeemGiftCardTemplate(
                 'group',
                 groupId,
@@ -448,7 +467,7 @@ const CSRBulkGift: React.FC<CSRBulkGiftProps> = ({ groupId, open, onClose }) => 
                     <UserImagesForm requestId={requestId} onUpload={handleImageUpload} />
                     <Button variant="contained" sx={{ mt: 2 }} color="success" component="label">
                         Upload CSV
-                        <input type="file" accept=".csv" hidden onChange={handleFileUpload} />
+                        <input type="file" accept=".csv" hidden onChange={handleFileUpload} ref={fileInputRef}  />
                     </Button>
                 </Box>
             </Box>
@@ -557,9 +576,9 @@ const CSRBulkGift: React.FC<CSRBulkGiftProps> = ({ groupId, open, onClose }) => 
                     slideId={slideId}
                     messages={messages}
                     onChange={(newMessages) => { setMessages(newMessages) }}
-                    onPresentationId={(newPresentationId: string, newSlideId: string) => { 
-                        setPresentationId(newPresentationId); 
-                        setSlideId(newSlideId); 
+                    onPresentationId={(newPresentationId: string, newSlideId: string) => {
+                        setPresentationId(newPresentationId);
+                        setSlideId(newSlideId);
                     }}
                     saplingId="000000"
                     plantType={undefined}
@@ -585,10 +604,10 @@ const CSRBulkGift: React.FC<CSRBulkGiftProps> = ({ groupId, open, onClose }) => 
                     Close
                 </Button>
                 {currentStep === 'csv' && (
-                    <Button 
-                        onClick={() => setCurrentStep('event')} 
-                        variant="contained" 
-                        color="success" 
+                    <Button
+                        onClick={() => setCurrentStep('event')}
+                        variant="contained"
+                        color="success"
                         sx={{ textTransform: "none" }}
                     >
                         Previous
@@ -596,10 +615,10 @@ const CSRBulkGift: React.FC<CSRBulkGiftProps> = ({ groupId, open, onClose }) => 
                 )}
                 {currentStep === 'card' && (
                     <>
-                        <Button 
-                            onClick={() => setCurrentStep('csv')} 
-                            variant="contained" 
-                            color="success" 
+                        <Button
+                            onClick={() => setCurrentStep('csv')}
+                            variant="contained"
+                            color="success"
                             sx={{ textTransform: "none" }}
                         >
                             Previous
@@ -623,10 +642,10 @@ const CSRBulkGift: React.FC<CSRBulkGiftProps> = ({ groupId, open, onClose }) => 
                     </>
                 )}
                 {currentStep !== 'card' && (
-                    <Button 
-                        onClick={handleNext} 
-                        variant="contained" 
-                        color="success" 
+                    <Button
+                        onClick={handleNext}
+                        variant="contained"
+                        color="success"
                         sx={{ textTransform: "none" }}
                         disabled={
                             (currentStep === 'event' && !formData.event_type) ||

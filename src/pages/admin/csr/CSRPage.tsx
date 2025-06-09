@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import CSRInventory from "./CSRInventory";
 import { useAuth } from "../auth/auth";
 import { SinglePageDrawer } from "./SinglePageDrawer";
-import { NaturePeople, ExitToApp } from "@mui/icons-material";
+import { NaturePeople, ExitToApp, Settings, CardGiftcard } from "@mui/icons-material";
 import { createStyles, makeStyles } from "@mui/styles";
 import {
     Box,
@@ -17,15 +17,20 @@ import {
     Stack,
     Divider,
 } from "@mui/material";
-import { useLocation, useSearchParams, useNavigate } from "react-router-dom";
+import { useLocation, useSearchParams, useNavigate, useParams } from "react-router-dom";
 import { UserRoles } from "../../../types/common";
 import ApiClient from "../../../api/apiClient/apiClient";
 import { toast } from "react-toastify";
 import { Spinner } from "../../../components/Spinner";
+import CSRSettings from "./CSRSettings";
 import { NotFound } from "../../notfound/NotFound";
 import { GoogleLogout } from "react-google-login";
 import NotificationsNoneIcon from "@mui/icons-material/NotificationsNone";
 import EventIcon from "@mui/icons-material/Event";
+import { Group } from "../../../types/Group";
+import { User } from "../../../types/user"
+import CSRGiftRequests from "./CSRGiftRequests";
+import CSRHeader from "./CSRHeader";
 
 type BirthdayData = {
     hasBirthday: boolean;
@@ -48,10 +53,13 @@ const CSRPage: React.FC = () => {
     const [status, setStatus] = useState<{ code: number; message: string }>({ code: 404, message: "", });
     const [logoutLoading, setLogoutLoading] = useState(false);
     const [birthdayData, setBirthdayData] = useState<BirthdayData | null>(null);
+    const [activeTab, setActiveTab] = useState<string>("greenTributeWall"); // Default to first tab
+    const [currentGroup, setCurrentGroup] = useState<Group | null>(null);
 
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
     const open = Boolean(anchorEl);
     const id = open ? "birthday-popover" : undefined;
+    const { groupId } = useParams();
 
     let auth = useAuth();
     const navigate = useNavigate();
@@ -171,17 +179,24 @@ const CSRPage: React.FC = () => {
         {
             displayName: "Green Tribute Wall",
             logo: NaturePeople,
-            key: 5,
+            key: 5, // Changed from number to string for consistency
             display: true,
-            onClick: () => { handleScroll("your-wall-of-tree-gifts");}
+            onClick: () => setActiveTab("greenTributeWall")
         },
-        // {
-        //     displayName: 'Green Gift Contributions',
-        //     logo: CardGiftcard,
-        //     key: 6,
-        //     display: true,
-        //     onClick: () => { handleScroll('green-gift-contributions') }
-        // },
+        {
+            displayName: 'Orders',
+            logo: CardGiftcard,
+            key: 6,
+            display: true,
+            onClick: () => setActiveTab("orders")
+        },
+        {
+            displayName: "Settings",
+            logo: Settings,
+            key: 7,
+            display: true,
+            onClick: () => setActiveTab("Setting-Details")
+        },
     ];
 
     return (
@@ -288,56 +303,7 @@ const CSRPage: React.FC = () => {
                                 </Box>
                                 <Divider sx={{ width: "100%" }} />
 
-                                {/* === Dummy Data for Events (keeping original logic unchanged) === 
-                                <Stack spacing={1} sx={{ maxHeight: 120, overflowY: "auto" }}> */}
-                                    {/* Dummy Birthday Event 
-                                    <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                                        <Avatar
-                                            sx={{
-                                                width: 28,
-                                                height: 28,
-                                                bgcolor: "#336B43",
-                                                fontSize: 12,
-                                            }}
-                                        >
-                                            JD
-                                        </Avatar>
-                                        <Box>
-                                            <Typography fontSize={12} fontWeight={500}>
-                                                John Doe's Birthday 🎂
-                                            </Typography>
-                                            <Typography fontSize={11} color="gray">
-                                                <EventIcon sx={{ fontSize: 14, mr: 0.5 }} />
-                                                {new Date().toLocaleDateString()}
-                                            </Typography>
-                                        </Box>
-                                    </Box> */}
-
-                                    {/* Dummy Diwali Event 
-                                    <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                                        <Avatar
-                                            sx={{
-                                                width: 28,
-                                                height: 28,
-                                                bgcolor: "#336B43",
-                                                fontSize: 12,
-                                            }}
-                                        >
-                                            🎆
-                                        </Avatar>
-                                        <Box>
-                                            <Typography fontSize={12} fontWeight={500}>
-                                                Diwali 🪔
-                                            </Typography>
-                                            <Typography fontSize={11} color="gray">
-                                                <EventIcon sx={{ fontSize: 14, mr: 0.5 }} />
-                                                {new Date(new Date().setDate(new Date().getDate() + 3)).toLocaleDateString()}
-                                            </Typography>
-                                        </Box>
-                                    </Box>
-                                </Stack> */}
-
-                                 {birthdayData?.upcomingBirthdays?.length ? (
+                                {birthdayData?.upcomingBirthdays?.length ? (
                                     <Stack spacing={1} sx={{ maxHeight: 120, overflowY: "auto" }}>
                                         {birthdayData.upcomingBirthdays.map((b) => (
                                             <Box
@@ -370,11 +336,17 @@ const CSRPage: React.FC = () => {
                                     <Typography fontSize={12} color="gray">
                                         No Events soon.
                                     </Typography>
-                                )} 
+                                )}
                             </Box>
                         </Box>
 
-                        <CSRInventory />
+
+                        <Box sx={{ flex: 1 }}>
+                            <CSRHeader groupId={groupId} onGroupChange={group => { setCurrentGroup(group) }} />
+                            {activeTab === "greenTributeWall" && currentGroup && <CSRInventory selectedGroup={currentGroup}/>}
+                            {activeTab === "orders" && currentGroup && <CSRGiftRequests selectedGroup={currentGroup} groupId={currentGroup.id}/>}
+                            {activeTab === "Setting-Details" && currentGroup && <CSRSettings group={currentGroup} onGroupChange={group => { setCurrentGroup(group) }}/>}
+                        </Box>
                     </Box>
                 </div>
             )}

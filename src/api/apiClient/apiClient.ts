@@ -1827,6 +1827,34 @@ class ApiClient {
         }
     }
 
+    async createGiftCardRequestV2(group_id: number, sponsor_name: string, sponsor_email: string, no_of_cards: number, event_type: string, event_name: string, gifted_by?: string, tags?: string[], users?: any[], logo_message?: string, primary_message?: string): Promise<{ gift_request: GiftCard, order_id: string }> {
+        try {
+            const response = await this.api.post<{
+                gift_request: GiftCard,
+                order_id: string
+            }>('/gift-cards/requests/createv2', {
+                group_id,
+                sponsor_name,
+                sponsor_email,
+                no_of_cards,
+                event_type,
+                event_name,
+                gifted_by,
+                logo_message,
+                primary_message,
+                users,
+                tags,
+            });
+
+            return response.data;
+        } catch (error: any) {
+            if (error.response) {
+                throw new Error(error.response.data.message || 'Failed to create gift card request');
+            }
+            throw new Error('Failed to create gift card request');
+        }
+    }
+
 
     async createGiftCard(request_id: string, created_by: number, no_of_cards: number, user_id: number, sponsor_id: number | null, category: string, grove: string | null, requestType: string, giftedOn: string, group_id?: number, payment_id?: number, logo?: string, messages?: any, file?: File): Promise<GiftCard> {
         try {
@@ -2260,6 +2288,17 @@ class ApiClient {
                 throw new Error(error.response.data.message)
             }
             throw new Error('Failed to get transaction tree cards!');
+        }
+    }
+
+    async paymentSuccessForGiftRequest(gift_request_id: number, is_corporate: boolean) {
+        try {
+            await this.api.post<void>(`/gift-cards/requests/payment-success`, { gift_request_id, is_corporate });
+        } catch (error: any) {
+            if (error?.response?.data?.message) {
+                throw new Error(error.response.data.message)
+            }
+            throw new Error('update payment status in the system!');
         }
     }
 

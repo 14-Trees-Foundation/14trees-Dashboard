@@ -46,7 +46,7 @@ import SiteInventory from "./pages/admin/Inventory/SiteInventory";
 import GiftTreesComponet from "./pages/admin/gift/GiftTrees";
 import GCInventory from "./pages/admin/Inventory/GCInventory";
 import { DonationComponent } from "./pages/admin/donation/Donation";
-import CSRInventory from "./pages/admin/csr/CSRInventory";
+import CSRAdminPage from "./pages/admin/csr/CSRAdminPage";
 import Campaigns from "./pages/admin/campaign/Campaign";
 import { CampaignsPage } from "./pages/admin/campaign/CampaignsPage";
 import { ReferralsPage } from "./pages/admin/campaign/ReferralsPage"
@@ -109,7 +109,7 @@ function App() {
             <Route path="campaigns" element={<Campaigns />}></Route>
             <Route path="tree-cards" element={<GiftTreesComponet />} />
             <Route path="donations" element={<DonationComponent />} />
-            <Route path="corporate-dashboard" element={<CSRInventory />} />
+            <Route path="corporate-dashboard" element={<CSRAdminPage />} />
             <Route path="forms" element={<Forms />}>
               <Route path="assigntrees" element={<AssignTree />}></Route>
               <Route path="addorg" element={<AddOrg />}></Route>
