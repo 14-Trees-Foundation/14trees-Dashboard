@@ -22,10 +22,12 @@ import { UserRoles } from "../../../types/common";
 import ApiClient from "../../../api/apiClient/apiClient";
 import { toast } from "react-toastify";
 import { Spinner } from "../../../components/Spinner";
+import CSRSettings from "./CSRSettings";
 import { NotFound } from "../../notfound/NotFound";
 import { GoogleLogout } from "react-google-login";
 import NotificationsNoneIcon from "@mui/icons-material/NotificationsNone";
 import EventIcon from "@mui/icons-material/Event";
+import { Group } from "../../../types/Group";
 
 type BirthdayData = {
     hasBirthday: boolean;
@@ -48,6 +50,8 @@ const CSRPage: React.FC = () => {
     const [status, setStatus] = useState<{ code: number; message: string }>({ code: 404, message: "", });
     const [logoutLoading, setLogoutLoading] = useState(false);
     const [birthdayData, setBirthdayData] = useState<BirthdayData | null>(null);
+    const [activeTab, setActiveTab] = useState<string>("greenTributeWall"); // Default to first tab
+    const [currentGroup, setCurrentGroup] = useState<Group | null>(null);
 
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
     const open = Boolean(anchorEl);
@@ -171,9 +175,9 @@ const CSRPage: React.FC = () => {
         {
             displayName: "Green Tribute Wall",
             logo: NaturePeople,
-            key: 5,
+            key: 5, // Changed from number to string for consistency
             display: true,
-            onClick: () => { handleScroll("your-wall-of-tree-gifts");}
+            onClick: () => setActiveTab("greenTributeWall")
         },
         // {
         //     displayName: 'Green Gift Contributions',
@@ -187,7 +191,7 @@ const CSRPage: React.FC = () => {
             logo: Settings,
             key: 7,
             display: true,
-            onClick: () => { handleScroll("Setting-Details");}
+            onClick: () => setActiveTab("Setting-Details")
         },
     ];
 
@@ -297,7 +301,7 @@ const CSRPage: React.FC = () => {
 
                                 {/* === Dummy Data for Events (keeping original logic unchanged) === 
                                 <Stack spacing={1} sx={{ maxHeight: 120, overflowY: "auto" }}> */}
-                                    {/* Dummy Birthday Event 
+                                {/* Dummy Birthday Event 
                                     <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                                         <Avatar
                                             sx={{
@@ -320,7 +324,7 @@ const CSRPage: React.FC = () => {
                                         </Box>
                                     </Box> */}
 
-                                    {/* Dummy Diwali Event 
+                                {/* Dummy Diwali Event 
                                     <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                                         <Avatar
                                             sx={{
@@ -344,7 +348,7 @@ const CSRPage: React.FC = () => {
                                     </Box>
                                 </Stack> */}
 
-                                 {birthdayData?.upcomingBirthdays?.length ? (
+                                {birthdayData?.upcomingBirthdays?.length ? (
                                     <Stack spacing={1} sx={{ maxHeight: 120, overflowY: "auto" }}>
                                         {birthdayData.upcomingBirthdays.map((b) => (
                                             <Box
@@ -377,11 +381,14 @@ const CSRPage: React.FC = () => {
                                     <Typography fontSize={12} color="gray">
                                         No Events soon.
                                     </Typography>
-                                )} 
+                                )}
                             </Box>
                         </Box>
 
-                        <CSRInventory />
+                        <Box sx={{ flex: 1 }}>
+                            {activeTab === "greenTributeWall" && <CSRInventory/>}
+                            {activeTab === "Setting-Details" && <CSRSettings />}
+                        </Box>
                     </Box>
                 </div>
             )}

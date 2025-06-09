@@ -16,6 +16,7 @@ import { BirthdayResponse } from "../../../types/notification"
 
 interface CSRInventoryProps {
     onBirthdayData?: (data: BirthdayResponse) => void;
+    onGroupChange?: (group: Group | null) => void;
 }
 
 interface Recipient {
@@ -37,7 +38,7 @@ interface FormData {
     panNumber: string;
 }
 
-const CSRInventory: React.FC<CSRInventoryProps> = ({ onBirthdayData }) => {
+const CSRInventory: React.FC<CSRInventoryProps> = ({ onBirthdayData, onGroupChange }) => {
 
     const theme = useTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down('md'));
@@ -105,7 +106,13 @@ const CSRInventory: React.FC<CSRInventoryProps> = ({ onBirthdayData }) => {
     useEffect(() => {
         if (groupId) {
             const group = groupsList.find(item => item.id === parseInt(groupId));
-            if (group) setSelectedGroup(group);
+            if (group) {
+                setSelectedGroup(group);
+                onGroupChange?.(group);
+            } else {
+                setSelectedGroup(null);
+                onGroupChange?.(null);
+            }
         }
     }, [groupsList, groupId]);
 
@@ -168,6 +175,7 @@ const CSRInventory: React.FC<CSRInventoryProps> = ({ onBirthdayData }) => {
           const response = await apiClient.updateGroup(updatedGroup, logoFile);
       
           setSelectedGroup(response); // response is the updated group
+          onGroupChange?.(response);
       
           toast.success("Organization details updated successfully!");
         } catch (error: any) {
