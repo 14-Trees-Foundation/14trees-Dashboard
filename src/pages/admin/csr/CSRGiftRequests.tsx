@@ -15,6 +15,8 @@ import { Order } from "../../../types/common";
 import GeneralTable from "../../../components/GenTable";
 import PurchaseTreesForm from "./form/PurchaseTreesForm";
 import { Group } from "../../../types/Group";
+import PaymentIcon from '@mui/icons-material/Payment';
+import PaymentDialog from "./components/PaymentDialog";
 
 
 interface CSRGiftRequestsProps {
@@ -36,6 +38,8 @@ const CSRGiftRequests: React.FC<CSRGiftRequestsProps> = ({ groupId, selectedGrou
     const [tableRows, setTableRows] = useState<GiftCard[]>([]);
     const [tags, setTags] = useState<string[]>([]);
     const [formOpen, setFormOpen] = useState(false);
+    const [paymentDialogOpen, setPaymentDialogOpen] = useState(false);
+    const [selectedGiftCard, setSelectedGiftCard] = useState<GiftCard | null>(null);
 
     const giftCardsData = useAppSelector((state: RootState) => state.giftCardsData);
 
@@ -51,6 +55,40 @@ const CSRGiftRequests: React.FC<CSRGiftRequestsProps> = ({ groupId, selectedGrou
         }
         getTags();
     }, []);
+
+    useEffect(() => {
+        const handler = setTimeout(() => {
+            getGiftCardData();
+        }, 300)
+
+        return () => { clearTimeout(handler) };
+    }, [filters, orderBy, groupId]);
+
+    useEffect(() => {
+
+        if (giftCardsData.loading) return;
+        
+        const handler = setTimeout(() => {
+            const records: GiftCard[] = [];
+            const maxLength = Math.min((page + 1) * pageSize, giftCardsData.totalGiftCards);
+            for (let i = page * pageSize; i < maxLength; i++) {
+                if (Object.hasOwn(giftCardsData.paginationMapping, i)) {
+                    const id = giftCardsData.paginationMapping[i];
+                    const record = giftCardsData.giftCards[id];
+                    if (record) {
+                        records.push(record);
+                    }
+                } else {
+                    getGiftCardData();
+                    break;
+                }
+            }
+
+            setTableRows(records);
+        }, 300)
+
+        return () => { clearTimeout(handler) };
+    }, [pageSize, page, giftCardsData]);
 
     const getFilters = (filters: any, groupId: number) => {
         const filtersData = JSON.parse(JSON.stringify(Object.values(filters))) as GridFilterItem[];
@@ -159,18 +197,25 @@ const CSRGiftRequests: React.FC<CSRGiftRequestsProps> = ({ groupId, selectedGrou
         return resp.results;
     };
 
+    const handlePaymentSuccess = () => {
+        setPaymentDialogOpen(false);
+        getGiftCardData();
+        toast.success('Payment successful!');
+    };
+
     const columns: TableColumnsType<GiftCard> = [
         {
             dataIndex: "id",
             key: "Req. No.",
             title: "Req. No.",
             align: "right",
-            width: 50,
+            width: 100,
+            fixed: 'left',
         },
         {
             dataIndex: "no_of_cards",
             key: "# Trees",
-            title: getSortableHeader("# Cards", 'no_of_cards'),
+            title: getSortableHeader("# Trees", 'no_of_cards'),
             align: "center",
             width: 100,
         },
@@ -180,18 +225,7 @@ const CSRGiftRequests: React.FC<CSRGiftRequestsProps> = ({ groupId, selectedGrou
             title: "Created by",
             align: "center",
             width: 200,
-            hidden: true,
             ...getColumnSearchProps('created_by_name', filters, handleSetFilters)
-        },
-        {
-            dataIndex: "tags",
-            key: "Tags",
-            title: "Tags",
-            align: "center",
-            width: 200,
-            hidden: true,
-            render: value => value?.join(", ") || '',
-            ...getColumnSelectedItemFilter({ dataIndex: 'tags', filters, handleSetFilters, options: tags })
         },
         {
             dataIndex: "status",
@@ -208,6 +242,7 @@ const CSRGiftRequests: React.FC<CSRGiftRequestsProps> = ({ groupId, selectedGrou
             title: getSortableHeader("Total Amount", 'total_amount'),
             align: "center",
             width: 150,
+            render: (value: number) => new Intl.NumberFormat('en-IN').format(value)
         },
         {
             dataIndex: "amount_received",
@@ -216,6 +251,7 @@ const CSRGiftRequests: React.FC<CSRGiftRequestsProps> = ({ groupId, selectedGrou
             align: "center",
             width: 200,
             hidden: true,
+            render: (value: number) => new Intl.NumberFormat('en-IN').format(value)
         },
         {
             dataIndex: "payment_status",
@@ -223,7 +259,6 @@ const CSRGiftRequests: React.FC<CSRGiftRequestsProps> = ({ groupId, selectedGrou
             title: "Payment Status",
             align: "center",
             width: 150,
-            hidden: true,
         },
         {
             dataIndex: "created_at",
@@ -233,6 +268,29 @@ const CSRGiftRequests: React.FC<CSRGiftRequestsProps> = ({ groupId, selectedGrou
             width: 200,
             render: getHumanReadableDate,
             ...getColumnDateFilter({ dataIndex: 'created_at', filters, handleSetFilters, label: 'Created' })
+        },
+        {
+            key: "action",
+            title: "Action",
+            align: "center",
+            width: 120,
+            fixed: 'right',
+            render: (_, record) => (
+                record.amount_received !== record.total_amount && (
+                    <Button
+                        variant="contained"
+                        color="success"
+                        size="small"
+                        startIcon={<PaymentIcon />}
+                        onClick={() => {
+                            setSelectedGiftCard(record);
+                            setPaymentDialogOpen(true);
+                        }}
+                    >
+                        Pay
+                    </Button>
+                )
+            ),
         },
     ]
 
@@ -279,6 +337,23 @@ const CSRGiftRequests: React.FC<CSRGiftRequestsProps> = ({ groupId, selectedGrou
                     groupId={selectedGroup.id}
                     userName={userName}
                     userEmail={userEmail || ""}
+                />
+            )}
+
+            {selectedGiftCard && (
+                <PaymentDialog
+                    open={paymentDialogOpen}
+                    onClose={() => {
+                        setPaymentDialogOpen(false);
+                        setSelectedGiftCard(null);
+                    }}
+                    paymentId={selectedGiftCard.payment_id!}
+                    giftRequestId={selectedGiftCard.id}
+                    requestId={selectedGiftCard.request_id}
+                    totalAmount={selectedGiftCard.total_amount}
+                    userName={userName}
+                    userEmail={userEmail || ""}
+                    onPaymentSuccess={handlePaymentSuccess}
                 />
             )}
         </Box>

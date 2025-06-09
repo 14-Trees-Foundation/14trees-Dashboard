@@ -2264,6 +2264,17 @@ class ApiClient {
         }
     }
 
+    async paymentSuccessForGiftRequest(gift_request_id: number, is_corporate: boolean) {
+        try {
+            await this.api.post<void>(`/gift-cards/requests/payment-success`, { gift_request_id, is_corporate });
+        } catch (error: any) {
+            if (error?.response?.data?.message) {
+                throw new Error(error.response.data.message)
+            }
+            throw new Error('update payment status in the system!');
+        }
+    }
+
     // Utils
     async getSignedPutUrl(type: string, key: string): Promise<string> {
         try {

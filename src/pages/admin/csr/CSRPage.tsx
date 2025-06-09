@@ -343,17 +343,9 @@ const CSRPage: React.FC = () => {
 
                         <Box sx={{ flex: 1 }}>
                             <CSRHeader groupId={groupId} onGroupChange={group => { setCurrentGroup(group) }} />
-                            {activeTab === "greenTributeWall" && currentGroup && <CSRInventory selectedGroup={currentGroup} />}
-                            {activeTab === "Setting-Details" && currentGroup && auth.user && (
-                                <CSRSettings
-                                    group={currentGroup}
-                                    user={{
-                                        name: auth.user.name,
-                                        email: auth.user.email,
-                                    }}
-                                    onGroupChange={group => setCurrentGroup(group)}
-                                />
-                            )}                            {activeTab === "orders" && currentGroup && <CSRGiftRequests selectedGroup={currentGroup} groupId={currentGroup.id} />}
+                            {activeTab === "greenTributeWall" && currentGroup && <CSRInventory selectedGroup={currentGroup}/>}
+                            {activeTab === "orders" && currentGroup && <CSRGiftRequests selectedGroup={currentGroup} groupId={currentGroup.id}/>}
+                            {activeTab === "Setting-Details" && currentGroup && <CSRSettings group={currentGroup} onGroupChange={group => { setCurrentGroup(group) }}/>}
                         </Box>
                     </Box>
                 </div>

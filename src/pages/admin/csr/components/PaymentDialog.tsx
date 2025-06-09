@@ -1,126 +1,64 @@
 import { useState } from "react";
-import { Box, Button, Dialog, DialogTitle, DialogContent, DialogActions, Alert, Snackbar, LinearProgress, Typography } from "@mui/material";
-import { Steps } from 'antd';
+import { Box, Button, Dialog, DialogTitle, DialogContent, DialogActions, Alert, Snackbar, Typography } from "@mui/material";
 import { LoadingButton } from '@mui/lab';
-import TreesCount from "./components/TreesCount";
-import PurchaseSummary from "./components/PurchaseSummary";
-import FileUploadField from "./components/FileUploadField";
 import RazorpayComponent from "../../../../components/RazorpayComponent";
 import PaymentQRInfo from "../../../../components/PaymentQRInfo";
+import FileUploadField from "../form/components/FileUploadField";
 import ApiClient from "../../../../api/apiClient/apiClient";
 import { AWSUtils } from "../../../../helpers/aws";
-import { GiftCard } from "../../../../types/gift_card";
+import { Payment } from "../../../../types/payment";
+import { User } from "../../../../types/user";
 
 const apiClient = new ApiClient();
 const awsUtils = new AWSUtils();
 
-type Props = {
+interface PaymentDialogProps {
     open: boolean;
     onClose: () => void;
-    corporateName?: string;
-    corporateLogo?: string;
-    userName?: string;
-    userEmail?: string;
-    groupId?: number;
-    onSuccess?: () => void;
+    paymentId: number;
+    giftRequestId: number;
+    requestId: string;
+    totalAmount: number;
+    userName: string;
+    userEmail: string;
+    onPaymentSuccess: () => void;
 }
 
 type PaymentStatus = 'idle' | 'pending' | 'success' | 'failed';
 
-const PurchaseTreesForm: React.FC<Props> = ({ 
-    open, 
-    onClose, 
-    corporateName = '',
-    corporateLogo = '',
-    userName = '',
-    userEmail = '',
-    groupId,
-    onSuccess,
+const PaymentDialog: React.FC<PaymentDialogProps> = ({
+    open,
+    onClose,
+    paymentId,
+    giftRequestId,
+    requestId,
+    totalAmount,
+    userName,
+    userEmail,
+    onPaymentSuccess
 }) => {
-    const [currentStep, setCurrentStep] = useState(0);
-    const [treesCount, setTreesCount] = useState<number>(14);
     const [loading, setLoading] = useState(false);
-    const [orderId, setOrderId] = useState<string>('');
-    const [giftRequest, setGiftRequest] = useState<GiftCard | null>(null);
+    const [payment, setPayment] = useState<Payment | null>(null);
     const [paymentStatus, setPaymentStatus] = useState<PaymentStatus>('idle');
-    const [giftRequestId, setGiftRequestId] = useState<string>('');
     const [error, setError] = useState<string>('');
     const [uploadProgress, setUploadProgress] = useState(0);
     const [paymentProof, setPaymentProof] = useState<File | null>(null);
     const [uploadedFileUrl, setUploadedFileUrl] = useState<string>('');
     const RAZORPAY_LIMIT = 500000;
-    const TREE_PRICE = 2000;
 
-    const totalAmount = treesCount * TREE_PRICE;
     const isAboveLimit = totalAmount > RAZORPAY_LIMIT;
 
-    const steps = [
-        {
-            title: 'Tree Count',
-            content: (
-                <Box sx={{ p: 2 }}>
-                    <TreesCount
-                        isAboveLimit={isAboveLimit}
-                        treesCount={treesCount}
-                        onTreesCountChange={setTreesCount}
-                    />
-                </Box>
-            ),
-        },
-        {
-            title: 'Summary',
-            content: (
-                <PurchaseSummary
-                    treesCount={treesCount}
-                    corporateName={corporateName}
-                    corporateLogo={corporateLogo}
-                    userName={userName}
-                    userEmail={userEmail}
-                    treePrice={TREE_PRICE}
-                />
-            ),
-        },
-    ];
-
-    const handleNext = () => {
-        setCurrentStep((prev) => prev + 1);
-    };
-
-    const handleBack = () => {
-        setCurrentStep((prev) => prev - 1);
-    };
-
-    const handleSubmit = async () => {
-        if (!groupId) {
-            setError('Group ID is required');
-            return;
-        }
-
+    const fetchPayment = async () => {
         try {
             setLoading(true);
             setError('');
-            const response = await apiClient.createGiftCardRequestV2(
-                groupId,
-                userName,
-                userEmail,
-                treesCount,
-                "3", // event type (General)
-                "", // event name
-                corporateName,
-                ["Corporate"],
-            );
-
-            if (response.order_id) {
-                setOrderId(response.order_id);
-            }
-            if (response.gift_request?.id) {
-                setGiftRequest(response.gift_request);
-                setGiftRequestId(response.gift_request.id.toString());
-            }
+            const paymentData = await apiClient.getPayment(paymentId);
+            setPayment(paymentData);
             setPaymentStatus('pending');
-        } catch (error) {
-            console.error('Error creating gift card request:', error);
-            setError('Failed to create order. Please try again.');
+        } catch (error: any) {
+            console.error('Error fetching payment:', error);
+            setError('Failed to fetch payment details. Please try again.');
+            setPaymentStatus('failed');
         } finally {
             setLoading(false);
         }
@@ -130,14 +68,15 @@ const PurchaseTreesForm: React.FC<Props> = ({
         try {
             setPaymentStatus('success');
             setLoading(true);
-            await apiClient.paymentSuccessForGiftRequest(Number(giftRequestId), true);
+            await apiClient.paymentSuccessForGiftRequest(giftRequestId, true);
+            onPaymentSuccess();
         } catch (error: any) {
+            console.error('Error updating payment status:', error);
             setError('Payment successful but failed to update status. Please contact support.');
             setPaymentStatus('failed');
         } finally {
             setLoading(false);
         }
-        onSuccess?.(); 
     };
 
     const handlePaymentFailure = () => {
@@ -163,11 +102,6 @@ const PurchaseTreesForm: React.FC<Props> = ({
             return;
         }
 
-        if (!giftRequest?.payment_id) {
-            setError('Something went wrong. Please contact the 14trees team');
-            return;
-        }
-
         try {
             setLoading(true);
             setError('');
@@ -176,7 +110,7 @@ const PurchaseTreesForm: React.FC<Props> = ({
             const fileUrl = await awsUtils.uploadFileToS3(
                 "gift-request",
                 paymentProof,
-                `cards/${giftRequest.request_id}/payment_proof`,
+                `${requestId}/payment_proof`,
                 setUploadProgress
             );
 
@@ -184,14 +118,14 @@ const PurchaseTreesForm: React.FC<Props> = ({
 
             // Create payment history
             await apiClient.createPaymentHistory(
-                giftRequest.payment_id,
+                paymentId,
                 totalAmount,
                 "Net Banking",
                 fileUrl
             );
 
             setPaymentStatus('success');
-            onSuccess?.(); 
+            onPaymentSuccess();
         } catch (error) {
             console.error('Error processing bank transfer:', error);
             setError('Failed to process payment proof. Please try again.');
@@ -201,10 +135,24 @@ const PurchaseTreesForm: React.FC<Props> = ({
         }
     };
 
-    const user: any = {
+    // Fetch payment details when dialog opens
+    useState(() => {
+        if (open && paymentId) {
+            fetchPayment();
+        }
+    });
+
+    const user: User = {
+        key: 0,
+        id: 0,
         name: userName,
-        email: userEmail,
+        user_id: '',
         phone: '',
+        email: userEmail,
+        communication_email: userEmail,
+        birth_date: null,
+        created_at: new Date(),
+        updated_at: new Date()
     };
 
     return (
@@ -215,15 +163,9 @@ const PurchaseTreesForm: React.FC<Props> = ({
             fullWidth
         >
             <DialogTitle>
-                Purchase Trees
+                Make Payment
             </DialogTitle>
             <DialogContent dividers>
-                {paymentStatus === 'idle' && (
-                    <Box sx={{ mb: 3 }}>
-                        <Steps current={currentStep} items={steps.map(step => ({ title: step.title }))} />
-                    </Box>
-                )}
-                {paymentStatus === 'idle' && steps[currentStep].content}
                 {paymentStatus === 'pending' && (
                     <>
                         <Alert severity="warning" sx={{ mt: 2 }}>
@@ -247,11 +189,11 @@ const PurchaseTreesForm: React.FC<Props> = ({
                                 </Box>
                             </Box>
                         ) : (
-                            orderId && <RazorpayComponent
+                            payment?.order_id && <RazorpayComponent
                                 amount={totalAmount}
-                                orderId={orderId}
+                                orderId={payment.order_id}
                                 user={user}
-                                description={`Purchase of ${treesCount} trees`}
+                                description={`Payment for gift request ${giftRequestId}`}
                                 onPaymentDone={handlePaymentSuccess}
                                 onClose={handlePaymentFailure}
                             />
@@ -279,35 +221,6 @@ const PurchaseTreesForm: React.FC<Props> = ({
                 <Button onClick={handleClose} color="error" variant="outlined">
                     {giftRequestId ? 'Close' : 'Cancel'}
                 </Button>
-                {paymentStatus === 'idle' && (
-                    <>
-                        {currentStep > 0 && (
-                            <Button onClick={handleBack} color="success" variant="outlined">
-                                Back
-                            </Button>
-                        )}
-                        {currentStep < steps.length - 1 ? (
-                            <Button
-                                onClick={handleNext}
-                                color="success"
-                                variant="contained"
-                                disabled={treesCount < 1}
-                            >
-                                Next
-                            </Button>
-                        ) : (
-                            <LoadingButton
-                                loading={loading}
-                                onClick={handleSubmit}
-                                color="success"
-                                variant="contained"
-                                disabled={treesCount < 1}
-                            >
-                                Proceed to Payment
-                            </LoadingButton>
-                        )}
-                    </>
-                )}
                 {paymentStatus === 'pending' && isAboveLimit && (
                     <LoadingButton
                         loading={loading}
@@ -342,5 +255,4 @@ const PurchaseTreesForm: React.FC<Props> = ({
     );
 };
 
-export default PurchaseTreesForm;
-
+export default PaymentDialog; 

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import {
     Box,
     Avatar,
@@ -13,13 +13,10 @@ import { toast } from "react-toastify";
 import EditOrganizationDialog from "./EditOrganizationDialog";
 import ApiClient from "../../../api/apiClient/apiClient";
 import { Group } from "../../../types/Group";
+import { AWSUtils } from "../../../helpers/aws";
 
 type Props = {
     group: Group;
-    user: {
-        name: string;
-        email: string;
-    };
     onGroupChange: (group: Group) => void;
 }
 
@@ -40,6 +37,12 @@ const CSRSettings: React.FC<Props> = ({ group, onGroupChange }) => {
             if (!group) return;
 
             const apiClient = new ApiClient();
+            if (logoFile) {
+                const awsUtil = new AWSUtils();
+                const url = await awsUtil.uploadFileToS3("gift-request", logoFile, "logos");
+                updatedData.logo_url = url
+            }
+
             const updatedGroup = {
                 ...group,
                 name: updatedData.name,

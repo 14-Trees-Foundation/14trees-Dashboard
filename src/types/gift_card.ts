@@ -1,4 +1,3 @@
-
 export type GiftRequestType = 'Gift Cards' | 'Normal Assignment' | 'Promotion' | 'Test'
 export type SponsorshipType = 'Unverified' | 'Pledged' | 'Promotional' | 'Unsponsored Visit' | 'Donation Received'
 
@@ -48,6 +47,7 @@ export type GiftCard = {
     sponsorship_type: SponsorshipType;
     donation_receipt_number: string | null;
     amount_received: number;
+    total_amount: number;
     donation_date: string | null;
     mail_status: string[] | null;
     processed_by: number | null;

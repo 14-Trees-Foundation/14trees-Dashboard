@@ -10,7 +10,6 @@ import {
     Box,
     Typography
 } from "@mui/material";
-import { useTheme } from "@mui/material/styles";
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 
 interface EditOrganizationDialogProps {
@@ -21,7 +20,7 @@ interface EditOrganizationDialogProps {
         address: string;
         logo_url: string | null;
     };
-    onSave: (data: { name: string; address: string; logo_url: string | null }) => void;
+    onSave: (data: { name: string; address: string; logo_url: string | null }, logoFile?: File) => void;
 }
 
 const EditOrganizationDialog: React.FC<EditOrganizationDialogProps> = ({
@@ -30,10 +29,9 @@ const EditOrganizationDialog: React.FC<EditOrganizationDialogProps> = ({
     organizationData,
     onSave
 }) => {
-    const theme = useTheme();
     const [name, setName] = useState(organizationData.name);
     const [address, setAddress] = useState(organizationData.address);
-    const [logoUrl, setLogoUrl] = useState(organizationData.logo_url);
+    const [file, setFile] = useState<File | undefined>(undefined);
     const [logoPreview, setLogoPreview] = useState(organizationData.logo_url);
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -44,17 +42,16 @@ const EditOrganizationDialog: React.FC<EditOrganizationDialogProps> = ({
                 setLogoPreview(reader.result as string);
             };
             reader.readAsDataURL(file);
-            // In a real app, you would upload the file to your server here
-            // and get back the new URL to save
         }
+        setFile(file);
     };
 
     const handleSave = () => {
         onSave({
             name,
             address,
-            logo_url: logoPreview // In a real app, this would be the new URL from the server
-        });
+            logo_url: logoPreview,
+        }, file);
         onClose();
     };
 
