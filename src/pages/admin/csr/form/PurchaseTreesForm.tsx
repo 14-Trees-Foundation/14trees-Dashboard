@@ -22,6 +22,7 @@ type Props = {
     userName?: string;
     userEmail?: string;
     groupId?: number;
+    onSuccess?: () => void;
 }
 
 type PaymentStatus = 'idle' | 'pending' | 'success' | 'failed';
@@ -34,12 +35,13 @@ const PurchaseTreesForm: React.FC<Props> = ({
     userName = '',
     userEmail = '',
     groupId,
+    onSuccess,
 }) => {
     const [currentStep, setCurrentStep] = useState(0);
     const [treesCount, setTreesCount] = useState<number>(14);
     const [loading, setLoading] = useState(false);
     const [orderId, setOrderId] = useState<string>('');
-    const [giftRequest, setGiftReques] = useState<GiftCard | null>(null);
+    const [giftRequest, setGiftRequest] = useState<GiftCard | null>(null);
     const [paymentStatus, setPaymentStatus] = useState<PaymentStatus>('idle');
     const [giftRequestId, setGiftRequestId] = useState<string>('');
     const [error, setError] = useState<string>('');
@@ -112,7 +114,7 @@ const PurchaseTreesForm: React.FC<Props> = ({
                 setOrderId(response.order_id);
             }
             if (response.gift_request?.id) {
-                setGiftReques(response.gift_request);
+                setGiftRequest(response.gift_request);
                 setGiftRequestId(response.gift_request.id.toString());
             }
             setPaymentStatus('pending');
@@ -126,6 +128,7 @@ const PurchaseTreesForm: React.FC<Props> = ({
 
     const handlePaymentSuccess = () => {
         setPaymentStatus('success');
+        onSuccess?.(); 
     };
 
     const handlePaymentFailure = () => {
@@ -179,6 +182,7 @@ const PurchaseTreesForm: React.FC<Props> = ({
             );
 
             setPaymentStatus('success');
+            onSuccess?.(); 
         } catch (error) {
             console.error('Error processing bank transfer:', error);
             setError('Failed to process payment proof. Please try again.');
@@ -330,3 +334,4 @@ const PurchaseTreesForm: React.FC<Props> = ({
 };
 
 export default PurchaseTreesForm;
+

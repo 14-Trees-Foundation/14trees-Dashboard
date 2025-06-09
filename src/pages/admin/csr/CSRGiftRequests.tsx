@@ -23,13 +23,11 @@ interface CSRGiftRequestsProps {
 }
 
 const CSRGiftRequests: React.FC<CSRGiftRequestsProps> = ({ groupId, selectedGroup }) => {
-
     const dispatch = useAppDispatch();
-    const { getGiftCards } =
-        bindActionCreators(giftCardActionCreators, dispatch);
+    const { getGiftCards } = bindActionCreators(giftCardActionCreators, dispatch);
 
-    const userName = JSON.parse(localStorage.getItem("user") || "")
-    const userEmail = localStorage.getItem("userEmail")
+    const userName = localStorage.getItem("userName") || "Guest";
+    const userEmail = localStorage.getItem("userEmail");
 
     const [page, setPage] = useState(0);
     const [pageSize, setPageSize] = useState(10);
@@ -39,12 +37,7 @@ const CSRGiftRequests: React.FC<CSRGiftRequestsProps> = ({ groupId, selectedGrou
     const [tags, setTags] = useState<string[]>([]);
     const [formOpen, setFormOpen] = useState(false);
 
-    let giftCards: GiftCard[] = [];
     const giftCardsData = useAppSelector((state: RootState) => state.giftCardsData);
-    if (giftCardsData) {
-        giftCards = Object.values(giftCardsData.giftCards);
-        giftCards = giftCards.sort((a, b) => b.id - a.id);
-    }
 
     useEffect(() => {
         const getTags = async () => {
@@ -56,41 +49,8 @@ const CSRGiftRequests: React.FC<CSRGiftRequestsProps> = ({ groupId, selectedGrou
                 toast.error(error.message);
             }
         }
-
         getTags();
     }, []);
-
-    useEffect(() => {
-        const handler = setTimeout(() => {
-            getGiftCardData();
-        }, 300)
-
-        return () => { clearTimeout(handler) };
-    }, [filters, orderBy, groupId]);
-
-    useEffect(() => {
-
-        const handler = setTimeout(() => {
-            const records: GiftCard[] = [];
-            const maxLength = Math.min((page + 1) * pageSize, giftCardsData.totalGiftCards);
-            for (let i = page * pageSize; i < maxLength; i++) {
-                if (Object.hasOwn(giftCardsData.paginationMapping, i)) {
-                    const id = giftCardsData.paginationMapping[i];
-                    const record = giftCardsData.giftCards[id];
-                    if (record) {
-                        records.push(record);
-                    }
-                } else {
-                    getGiftCardData();
-                    break;
-                }
-            }
-
-            setTableRows(records);
-        }, 300)
-
-        return () => { clearTimeout(handler) };
-    }, [pageSize, page, giftCardsData]);
 
     const getFilters = (filters: any, groupId: number) => {
         const filtersData = JSON.parse(JSON.stringify(Object.values(filters))) as GridFilterItem[];
@@ -98,60 +58,74 @@ const CSRGiftRequests: React.FC<CSRGiftRequestsProps> = ({ groupId, selectedGrou
             if (item.columnField === 'status') {
                 const items: string[] = [];
                 if ((item.value as string[]).includes('Pending')) {
-                    items.push('pending_plot_selection')
+                    items.push('pending_plot_selection');
                 }
-
                 if ((item.value as string[]).includes('Completed')) {
-                    items.push('pending_assignment')
-                    items.push('completed')
+                    items.push('pending_assignment');
+                    items.push('completed');
                 }
-
                 item.value = items;
             } else if (item.columnField === 'validation_errors' || item.columnField === 'notes') {
-                if ((item.value as string[]).includes('Yes')) {
-                    item.operatorValue = 'isNotEmpty';
-                } else {
-                    item.operatorValue = 'isEmpty'
-                }
+                item.operatorValue = (item.value as string[]).includes('Yes') ? 'isNotEmpty' : 'isEmpty';
             }
-        })
+        });
 
         filtersData.push({
             columnField: 'group_id',
             operatorValue: 'equals',
             value: groupId,
-        })
+        });
 
         return filtersData;
-    }
+    };
 
     const getGiftCardData = async () => {
-
         const filtersData = getFilters(filters, groupId);
-
         getGiftCards(page * pageSize, pageSize, filtersData, orderBy);
     };
 
-    const getAllGiftCardsData = async () => {
-        let filtersData = getFilters(filters, groupId);
-        const apiClient = new ApiClient();
-        const resp = await apiClient.getGiftCards(0, -1, filtersData, orderBy);
-        return resp.results;
-    };
+    useEffect(() => {
+        const handler = setTimeout(() => {
+            getGiftCardData();
+        }, 300);
 
+        return () => clearTimeout(handler);
+    }, [filters, orderBy, groupId, page, pageSize]);
+
+    useEffect(() => {
+        const handler = setTimeout(() => {
+            const records: GiftCard[] = [];
+            const maxLength = Math.min((page + 1) * pageSize, giftCardsData.totalGiftCards);
+            for (let i = page * pageSize; i < maxLength; i++) {
+                if (Object.hasOwn(giftCardsData.paginationMapping, i)) {
+                    const id = giftCardsData.paginationMapping[i];
+                    const record = giftCardsData.giftCards[id];
+                    if (record) records.push(record);
+                } else {
+                    getGiftCardData();
+                    return;
+                }
+            }
+            setTableRows(records);
+        }, 300);
+
+        return () => clearTimeout(handler);
+    }, [giftCardsData, page, pageSize]);
+
+    const handleFormSuccess = () => {
+        setFormOpen(false);
+        setPage(0);
+        getGiftCardData();
+    };
 
     const handleSetFilters = (filters: Record<string, GridFilterItem>) => {
         setPage(0);
         setFilters(filters);
-    }
+    };
 
     const getStatus = (card: GiftCard) => {
-        if (card.status === 'pending_plot_selection') {
-            return "Pending";
-        }
-
-        return 'Completed';
-    }
+        return card.status === 'pending_plot_selection' ? 'Pending' : 'Completed';
+    };
 
     const handleSortingChange = (sorter: any) => {
         let newOrder = [...orderBy];
@@ -163,22 +137,27 @@ const CSRGiftRequests: React.FC<CSRGiftRequestsProps> = ({ groupId, selectedGrou
             } else if (sorter.order) {
                 newOrder.push({ column: sorter.field, order: sorter.order });
             }
-        }
+        };
 
         if (sorter.field) {
             setPage(0);
             updateOrder();
             setOrderBy(newOrder);
         }
-    }
+    };
 
-    const getSortableHeader = (header: string, key: string) => {
-        return (
-            <div style={{ display: "flex", alignItems: "center", justifyContent: 'space-between' }}>
-                {header} {getSortIcon(key, orderBy.find((item) => item.column === key)?.order, handleSortingChange)}
-            </div>
-        )
-    }
+    const getSortableHeader = (header: string, key: string) => (
+        <div style={{ display: "flex", alignItems: "center", justifyContent: 'space-between' }}>
+            {header} {getSortIcon(key, orderBy.find((item) => item.column === key)?.order, handleSortingChange)}
+        </div>
+    );
+
+    const getAllGiftCardsData = async () => {
+        const filtersData = getFilters(filters, groupId);
+        const apiClient = new ApiClient();
+        const resp = await apiClient.getGiftCards(0, -1, filtersData, orderBy);
+        return resp.results;
+    };
 
     const columns: TableColumnsType<GiftCard> = [
         {
@@ -290,17 +269,20 @@ const CSRGiftRequests: React.FC<CSRGiftRequestsProps> = ({ groupId, selectedGrou
                 />
             </Box>
 
-            {selectedGroup && formOpen && <PurchaseTreesForm
-                open={formOpen}
-                onClose={() => { setFormOpen(false) }}
-                corporateName={selectedGroup.name}
-                corporateLogo={selectedGroup.logo_url ?? undefined}
-                groupId={selectedGroup.id}
-                userName={userName}
-                userEmail={userEmail || ""}
-            />}
+            {selectedGroup && formOpen && (
+                <PurchaseTreesForm
+                    open={formOpen}
+                    onClose={() => setFormOpen(false)}
+                    onSuccess={handleFormSuccess}
+                    corporateName={selectedGroup.name}
+                    corporateLogo={selectedGroup.logo_url ?? undefined}
+                    groupId={selectedGroup.id}
+                    userName={userName}
+                    userEmail={userEmail || ""}
+                />
+            )}
         </Box>
     );
-}
+};
 
 export default CSRGiftRequests;
