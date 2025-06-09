@@ -173,13 +173,11 @@ export const TreeSponsorshipForm = ({ open, onClose, group_id }: TreeSponsorship
         formData.treeCount, // no_of_cards is the total treeCount
         formData.eventType || formData.occasionType || '',
         formData.eventName || formData.occasionName || '',
-        1, // created_by (you might want to get this from auth context)
         formData.giftedBy,
+        ['Corporate'],
+        users,
         formData.logoMessage,
         formData.primaryMessage,
-        users,
-        ['corporate'], // tags (optional)
-        undefined  // payment_id (optional, might be handled separately)
       );
   
       // Handle successful submission
