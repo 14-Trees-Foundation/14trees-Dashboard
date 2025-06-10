@@ -137,51 +137,44 @@ export const CorporateLogin = () => {
                 display: "flex",
                 flexDirection: "column",
                 alignItems: "center",
-                gap: 3,
+                gap: 2.5,
               }}
             >
-              <Avatar sx={{ backgroundColor: "#1bbd7e", mb: 1 }}>
+              <Avatar sx={{ backgroundColor: "#1bbd7e" }}>
                 <LockOutlinedIcon />
               </Avatar>
-              <Typography variant="h5" gutterBottom>
+
+              <Typography variant="h5">
                 Login
               </Typography>
 
-              <Box sx={{ width: "100%" }}>
+              <Box sx={{ display: "flex", justifyContent: "center", width: "100%" }}>
                 <AutocompleteWithPagination
-                  label="Select a corporate group"
+                  label="Select your corporate"
                   options={groupsList}
                   getOptionLabel={(option: Group) => option?.name || ""}
                   onChange={(event: any, newValue: Group | null) => setSelectedGroup(newValue)}
                   onInputChange={(event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
                     setGroupPage(0);
-                    setGroupNameInput(newInputValue);
+                    setGroupNameInput(event.target.value);
                   }}
                   setPage={setGroupPage}
                   size="small"
                   value={selectedGroup}
-                  ListboxProps={{
-                    style: {
-                      maxHeight: "200px",
-                    },
-                  }}
-                  sx={{
-                    width: "100%",
-                    '& .MuiOutlinedInput-root': {
-                      paddingRight: '48px',
-                    },
-                  }}
                 />
               </Box>
 
-              <GoogleLogin
-                clientId={import.meta.env.VITE_APP_CLIENT_ID}
-                buttonText="Log in with Google"
-                onSuccess={responseGoogle}
-                onFailure={responseGoogle}
-                cookiePolicy={"single_host_origin"}
-              />
+              <Box sx={{ display: "flex", justifyContent: "center", width: "100%" }}>
+                <GoogleLogin
+                  clientId={import.meta.env.VITE_APP_CLIENT_ID}
+                  buttonText="Log in with Google"
+                  onSuccess={responseGoogle}
+                  onFailure={responseGoogle}
+                  cookiePolicy={"single_host_origin"}
+                />
+              </Box>
             </Paper>
+
           </Grid>
         </Grid>
       </div>
