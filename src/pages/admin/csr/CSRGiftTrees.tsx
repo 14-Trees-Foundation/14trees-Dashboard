@@ -23,12 +23,14 @@ import GiftAnalytics from "../../../components/redeem/GiftAnalytics";
 import GiftTreesGrid, { GiftTreesGridHandle } from "../../../components/redeem/GiftTreesGrid";
 import { toast } from "react-toastify";
 import CSRBulkGift from "./CSRBulkGift";
+import { Group } from "../../../types/Group";
 
 interface CSRGiftTreesProps {
+    selectedGroup: Group;
     groupId: number;
 }
 
-const CSRGiftTrees: React.FC<CSRGiftTreesProps> = ({ groupId }) => {
+const CSRGiftTrees: React.FC<CSRGiftTreesProps> = ({ groupId, selectedGroup }) => {
     const theme = useTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
@@ -183,7 +185,7 @@ const CSRGiftTrees: React.FC<CSRGiftTreesProps> = ({ groupId }) => {
                 }}
             />
 
-            {bulkGifting && <CSRBulkGift groupId={groupId} open={bulkGifting} onClose={() => { setBulkGifting(false); }} />}
+            {bulkGifting && <CSRBulkGift groupId={groupId} logoUrl={selectedGroup.logo_url} open={bulkGifting} onClose={() => { setBulkGifting(false); }} onSubmit={() => { setRefreshTrigger(prev => prev + 1); }} />}
 
             {giftDialogVisible && selectedGiftTree && (
                 <RedeemGiftTreeDialog

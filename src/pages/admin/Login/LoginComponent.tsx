@@ -67,6 +67,7 @@ export const LoginComponent = () => {
         localStorage.setItem("roles", JSON.stringify(roles));
         auth.signin(
           res.data.user.name,
+          res.data.user.email,
           res.data.user.id,
           permissions,
           roles,

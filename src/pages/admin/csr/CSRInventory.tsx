@@ -13,6 +13,7 @@ const CSRInventory: React.FC<CSRInventoryProps> = ({ selectedGroup }) => {
             {selectedGroup && (
                 <CSRGiftTrees
                     groupId={selectedGroup.id}
+                    selectedGroup={selectedGroup}
                 />
             )}
         </Box>

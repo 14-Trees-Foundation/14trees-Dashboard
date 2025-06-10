@@ -35,7 +35,7 @@ export const AdminLeftDrawer = () => {
   const [expanded, setExpanded] = useState(null);
 
   useEffect(() => {
-    auth.signin("User", 0, ["all"], ["super-admin"], "", () => {});
+    auth.signin("User", "user@example.com", 0, ["all"], ["super-admin"], "", () => {});
   }, []);
 
   useEffect(() => {

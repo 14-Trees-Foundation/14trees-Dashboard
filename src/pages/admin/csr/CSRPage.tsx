@@ -74,7 +74,7 @@ const CSRPage: React.FC = () => {
     };
 
     useEffect(() => {
-        auth.signin("user", 13124, ["all"], ["super-admin"], "", () => { });
+        auth.signin("user", "user@example.com", 13124, ["all"], ["super-admin"], "", () => { });
         localStorage.setItem("userId", "13124");
     }, []);
 

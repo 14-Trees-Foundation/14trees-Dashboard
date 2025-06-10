@@ -26,7 +26,7 @@ const CSRSettings: React.FC<Props> = ({ group, onGroupChange }) => {
 
     const [editOrgDialogOpen, setEditOrgDialogOpen] = useState(false);
 
-    const userName = JSON.parse(localStorage.getItem("name") || "");
+    const userName = localStorage.getItem("userName") || "";
     const userEmail = localStorage.getItem("userEmail");
 
     const handleSaveOrganization = async (

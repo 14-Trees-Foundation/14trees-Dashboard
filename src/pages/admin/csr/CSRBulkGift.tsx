@@ -33,8 +33,10 @@ import { toast } from "react-toastify";
 
 interface CSRBulkGiftProps {
     groupId: number
+    logoUrl: string | null
     open: boolean
     onClose: () => void
+    onSubmit: () => void
 }
 
 interface Messages {
@@ -43,6 +45,7 @@ interface Messages {
     eventName: string;
     eventType: string | undefined;
     plantedBy: string;
+    giftedOn: string;
 }
 
 const REQUIRED_HEADERS = [
@@ -60,7 +63,7 @@ const OPTIONAL_HEADERS = [
     "Gifted On",
 ];
 
-const CSRBulkGift: React.FC<CSRBulkGiftProps> = ({ groupId, open, onClose }) => {
+const CSRBulkGift: React.FC<CSRBulkGiftProps> = ({ groupId, logoUrl, open, onClose, onSubmit }) => {
     const [data, setData] = useState<string[][]>([]);
     const [headers, setHeaders] = useState<string[]>([]);
     const [errorsMap, setErrorsMap] = useState<Record<number, string[]>>({});
@@ -83,18 +86,25 @@ const CSRBulkGift: React.FC<CSRBulkGiftProps> = ({ groupId, open, onClose }) => 
         eventName: '',
         eventType: undefined,
         plantedBy: '',
-    });
-
-    const [formData, setFormData] = useState({
-        event_type: "",
-        event_name: "",
-        gifted_by: "",
-        gifted_on: new Date().toISOString().slice(0, 10),
+        giftedOn:  new Date().toISOString().slice(0, 10),
     });
 
     const [selectedEventType, setSelectedEventType] = useState<{ value: string, label: string } | null>(null);
     const [showAdditionalFields, setShowAdditionalFields] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
+
+    useEffect(() => {
+        const userData = prepareUserData();
+        console.log(userData)
+        const giftedBy = userData.length > 0 ? userData[0].gifted_by : undefined;
+
+        if (giftedBy && messages.plantedBy != giftedBy) {
+            setMessages(prev => ({
+                ...prev,
+                plantedBy: giftedBy
+            }))
+        }
+    }, [data, messages])
 
     const validateHeaders = (headers: string[]): string[] => {
         const errors: string[] = [];
@@ -259,19 +269,19 @@ const CSRBulkGift: React.FC<CSRBulkGiftProps> = ({ groupId, open, onClose }) => 
     };
 
     const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setFormData({
-            ...formData,
+        setMessages(prev => ({
+            ...prev,
             [event.target.name]: event.target.value,
-        });
+        }));
     };
 
     const handleEventTypeSelection = (e: any, item: { value: string, label: string } | null) => {
         const newEventType = item ? item.value : '';
         setSelectedEventType(item);
-        setFormData(prev => ({
+        setMessages(prev => ({
             ...prev,
-            event_type: newEventType,
-        }));
+            eventType: newEventType
+        }))
 
         // Show additional fields only for General gift (3) or Festival (6)
         setShowAdditionalFields(newEventType === '3' || newEventType === '6');
@@ -340,7 +350,7 @@ const CSRBulkGift: React.FC<CSRBulkGiftProps> = ({ groupId, open, onClose }) => 
 
     const handleNext = () => {
         if (currentStep === 'event') {
-            if (formData.event_type) {
+            if (messages.eventType) {
                 setCurrentStep('csv');
             }
         } else if (currentStep === 'csv') {
@@ -359,6 +369,12 @@ const CSRBulkGift: React.FC<CSRBulkGiftProps> = ({ groupId, open, onClose }) => 
         const commEmailIndex = headers.findIndex(header => header === "Recipient Communication Email (optional)");
         const dobIndex = headers.findIndex(header => header === "Recipient DoB (optional)");
         const treesIndex = headers.findIndex(header => header === "Number of trees to assign");
+        const giftedByIndex = headers.findIndex(header => header === "Gifted By");
+        const giftedOnIndex = headers.findIndex(header => header === "Gifted On");
+        const eventNameIndex = headers.findIndex(header => header === "Occation Name");
+
+        const eventInCsv = messages.eventType !== '3' && messages.eventType !== '6'
+
         return data.map(row => {
             const imageName = row[imageNameIndex]?.trim();
             const treesCount: number = parseInt(row[treesIndex]?.trim() || '1');
@@ -369,10 +385,10 @@ const CSRBulkGift: React.FC<CSRBulkGiftProps> = ({ groupId, open, onClose }) => 
                 email: row[emailIndex]?.trim() || '',
                 communication_email: row[commEmailIndex]?.trim() || '',
                 birth_date: row[dobIndex]?.trim() || '',
-                profile_image_url: imageName ? imagePreviews[imageName] : '',
-                event_name: formData.event_name,
-                gifted_by: formData.gifted_by,
-                gifted_on: formData.gifted_on,
+                profile_image_url: imageName ?  imagePreviews[imageName] : '',
+                event_name: eventInCsv ? row[eventNameIndex]?.trim() : messages.eventType,
+                gifted_by: eventInCsv ? row[giftedByIndex]?.trim() : messages.plantedBy,
+                gifted_on: eventInCsv ? row[giftedOnIndex]?.trim() : messages.giftedOn,
             };
         });
     };
@@ -392,6 +408,7 @@ const CSRBulkGift: React.FC<CSRBulkGiftProps> = ({ groupId, open, onClose }) => 
             );
 
             toast.success("Bulk gift cards created successfully!");
+            onSubmit();
         } catch (error: any) {
             toast.error(error.message || "Failed to create bulk gift cards");
         } finally {
@@ -414,7 +431,7 @@ const CSRBulkGift: React.FC<CSRBulkGiftProps> = ({ groupId, open, onClose }) => 
                         renderInput={(params) => (
                             <TextField
                                 {...params}
-                                name="event_type"
+                                name="eventType"
                                 label='Occasion Type'
                             />
                         )}
@@ -427,8 +444,8 @@ const CSRBulkGift: React.FC<CSRBulkGiftProps> = ({ groupId, open, onClose }) => 
                             <TextField
                                 fullWidth
                                 label="Occasion Name"
-                                name="event_name"
-                                value={formData.event_name}
+                                name="eventName"
+                                value={messages.eventName}
                                 onChange={handleInputChange}
                             />
                         </Grid>
@@ -436,8 +453,8 @@ const CSRBulkGift: React.FC<CSRBulkGiftProps> = ({ groupId, open, onClose }) => 
                             <TextField
                                 fullWidth
                                 label="Gifted By"
-                                name="gifted_by"
-                                value={formData.gifted_by}
+                                name="plantedBy"
+                                value={messages.plantedBy}
                                 onChange={handleInputChange}
                             />
                         </Grid>
@@ -445,8 +462,8 @@ const CSRBulkGift: React.FC<CSRBulkGiftProps> = ({ groupId, open, onClose }) => 
                             <TextField
                                 fullWidth
                                 label="Gifted on"
-                                name="gifted_on"
-                                value={formData.gifted_on}
+                                name="giftedOn"
+                                value={messages.giftedOn}
                                 type="date"
                                 onChange={handleInputChange}
                             />
@@ -567,7 +584,12 @@ const CSRBulkGift: React.FC<CSRBulkGiftProps> = ({ groupId, open, onClose }) => 
         </Box>
     );
 
-    const renderCardPreviewStep = () => {
+    const renderCardPreviewStep = (messages: Messages) => {
+
+        const userData = prepareUserData();
+        const userName = userData.length > 0 ? userData[0].name : undefined;
+        const treesCount = userData.length > 0 ? userData[0].trees_count : undefined;
+
         return (
             <Box>
                 <CardDetails
@@ -575,16 +597,15 @@ const CSRBulkGift: React.FC<CSRBulkGiftProps> = ({ groupId, open, onClose }) => 
                     presentationId={presentationId}
                     slideId={slideId}
                     messages={messages}
-                    onChange={(newMessages) => { setMessages(newMessages) }}
+                    onChange={(newMessages: any) => { setMessages(newMessages) }}
                     onPresentationId={(newPresentationId: string, newSlideId: string) => {
                         setPresentationId(newPresentationId);
                         setSlideId(newSlideId);
                     }}
                     saplingId="000000"
-                    plantType={undefined}
-                    userName={formData.event_name.trim() ? formData.event_name.trim() : undefined}
-                    logo_url=""
-                    treesCount={data.length}
+                    userName={userName}
+                    logo_url={logoUrl}
+                    treesCount={treesCount}
                     isPersonal={false}
                 />
             </Box>
@@ -597,7 +618,7 @@ const CSRBulkGift: React.FC<CSRBulkGiftProps> = ({ groupId, open, onClose }) => 
             <DialogContent dividers>
                 {currentStep === 'event' && renderEventStep()}
                 {currentStep === 'csv' && renderCsvStep()}
-                {currentStep === 'card' && renderCardPreviewStep()}
+                {currentStep === 'card' && renderCardPreviewStep(messages)}
             </DialogContent>
             <DialogActions>
                 <Button onClick={onClose} variant="outlined" color="error" sx={{ textTransform: "none" }}>
@@ -648,8 +669,8 @@ const CSRBulkGift: React.FC<CSRBulkGiftProps> = ({ groupId, open, onClose }) => 
                         color="success"
                         sx={{ textTransform: "none" }}
                         disabled={
-                            (currentStep === 'event' && !formData.event_type) ||
-                            (currentStep === 'csv' && (Object.keys(errorsMap).length > 0 || Object.keys(imageValidationErrors).length > 0))
+                            (currentStep === 'event' && !messages.eventType) ||
+                            (currentStep === 'csv' && (Object.keys(errorsMap).length > 0 || Object.keys(imageValidationErrors).length > 0 || data.length == 0))
                         }
                     >
                         Next

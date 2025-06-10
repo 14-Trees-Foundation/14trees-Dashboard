@@ -10,8 +10,10 @@ export const AuthProvider = ({ children }) => {
   let [roles, setRoles] = React.useState([]);
   let [signedin, setSignedin] = React.useState(false);
 
-  let signin = (name, userId, perm, roles, token, callback) => {
+  let signin = (name, email, userId, perm, roles, token, callback) => {
     setUser(name);
+    localStorage.setItem("userName", name);
+    localStorage.setItem("userEmail", email);
     setUserId(userId);
     setPermissions(perm);
     setRoles(roles)
@@ -21,6 +23,8 @@ export const AuthProvider = ({ children }) => {
   };
 
   let signout = (callback) => {
+    localStorage.removeItem("userName")
+    localStorage.removeItem("userEmail")
     setUser(null);
     setSignedin(false);
     return callback();
