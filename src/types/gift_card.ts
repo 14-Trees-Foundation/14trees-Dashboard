@@ -52,6 +52,7 @@ export type GiftCard = {
     mail_status: string[] | null;
     processed_by: number | null;
     processed_by_name?: string;
+    recipient_name: string;
 }
 
 export type GiftRequestUser = {
