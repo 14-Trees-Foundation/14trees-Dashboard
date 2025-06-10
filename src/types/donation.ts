@@ -79,6 +79,7 @@ export type DonationTree = {
 }
 
 export type DonationDataState = {
+  loading: boolean,
   totalDonations: number,
   donations: Record<number, Donation>
   paginationMapping: Record<number, number>
