@@ -15,6 +15,7 @@ const CSRAdminPage: React.FC<Props> = ({}) => {
             {selectedGroup && (
                 <CSRGiftTrees
                     groupId={selectedGroup.id}
+                    selectedGroup={selectedGroup}
                 />
             )}
         </Box>
