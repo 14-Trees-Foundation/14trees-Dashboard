@@ -31,6 +31,7 @@ import { Group } from "../../../types/Group";
 import { User } from "../../../types/user"
 import CSRGiftRequests from "./CSRGiftRequests";
 import CSRHeader from "./CSRHeader";
+import CSRDonations from "./CSRDonations";
 
 type BirthdayData = {
     hasBirthday: boolean;
@@ -191,6 +192,13 @@ const CSRPage: React.FC = () => {
             onClick: () => setActiveTab("orders")
         },
         {
+            displayName: 'Donations',
+            logo: CardGiftcard,
+            key: 8,
+            display: true,
+            onClick: () => setActiveTab("donations")
+        },
+        {
             displayName: "Settings",
             logo: Settings,
             key: 7,
@@ -345,6 +353,7 @@ const CSRPage: React.FC = () => {
                             <CSRHeader groupId={groupId} onGroupChange={group => { setCurrentGroup(group) }} />
                             {activeTab === "greenTributeWall" && currentGroup && <CSRInventory selectedGroup={currentGroup}/>}
                             {activeTab === "orders" && currentGroup && <CSRGiftRequests selectedGroup={currentGroup} groupId={currentGroup.id}/>}
+                            {activeTab === "donations" && currentGroup && <CSRDonations selectedGroup={currentGroup} />}
                             {activeTab === "Setting-Details" && currentGroup && <CSRSettings group={currentGroup} onGroupChange={group => { setCurrentGroup(group) }}/>}
                         </Box>
                     </Box>
