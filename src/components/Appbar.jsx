@@ -34,6 +34,15 @@ export const AppBar = () => {
               color="primary"
               size="large"
               style={{ marginRight: "2%" }}
+              onClick={() => navigate('/corporate-login')}
+            >
+              Corporate Login
+            </Button>
+            <Button
+              variant="contained"
+              color="primary"
+              size="large"
+              style={{ marginRight: "2%" }}
               onClick={() => navigate("/admin")}
             >
               Admin
