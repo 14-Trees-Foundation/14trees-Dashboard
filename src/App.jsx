@@ -15,6 +15,7 @@ import { WW } from "./pages/ww/WW";
 import { RequireAuth } from "./pages/admin/auth/RequireAuth";
 import { AuthProvider } from "./pages/admin/auth/auth";
 import { Login } from "./pages/admin/Login/Login";
+import {CorporateLogin} from "./pages/admin/Login/CorporateLogin"
 import { Forms } from "./pages/admin/Forms/Forms";
 import { Birthday } from "./pages/events/Birthday";
 import { VisitorNew } from "./pages/Visitor/Visitor2";
@@ -85,6 +86,7 @@ function App() {
           <Route path="/referral" element={<ReferralsPage />}></Route>
           <Route path="/referral/:rfr" element={<ReferralUserPage />}></Route>
           <Route path="/login" element={<Login />} />
+          <Route path="/corporate-login" element={<CorporateLogin />} />
           <Route
             path="/admin"
             element={
