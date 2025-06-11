@@ -17,6 +17,7 @@ import DonationTreesForm from "./form/DonateTreesForm";
 import GeneralTable from "../../../components/GenTable";
 import PaymentIcon from '@mui/icons-material/Payment';
 import PaymentDialog from "./components/PaymentDialog";
+import DonationAnalytics from "../../../../src/components/redeem/DonationAnalytics"
 
 interface CSRDonationsProps {
     selectedGroup: Group
@@ -236,6 +237,7 @@ const CSRDonations: React.FC<CSRDonationsProps> = ({ selectedGroup }) => {
                     Donate Trees
                 </Button>
             </Box>
+            <DonationAnalytics groupId={selectedGroup.id} />
             <Box sx={{ height: 840, width: "100%" }}>
                 <GeneralTable
                     loading={donationsData.loading}

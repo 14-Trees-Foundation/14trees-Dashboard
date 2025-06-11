@@ -59,7 +59,7 @@ const PurchaseTreesForm: React.FC<Props> = ({
             title: 'Tree Count',
             content: (
                 <Box sx={{ p: 2 }}>
-                    <TreesCount
+                    <TreesCount isGifting={true}
                         isAboveLimit={isAboveLimit}
                         treesCount={treesCount}
                         onTreesCountChange={setTreesCount}

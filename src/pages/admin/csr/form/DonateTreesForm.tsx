@@ -28,9 +28,9 @@ type Props = {
 
 type PaymentStatus = 'idle' | 'pending' | 'success' | 'failed';
 
-const DonationTreesForm: React.FC<Props> = ({ 
-    open, 
-    onClose, 
+const DonationTreesForm: React.FC<Props> = ({
+    open,
+    onClose,
     corporateName = '',
     corporateLogo = '',
     userName = '',
@@ -42,9 +42,11 @@ const DonationTreesForm: React.FC<Props> = ({
     const [treesCount, setTreesCount] = useState<number>(14);
     const [loading, setLoading] = useState(false);
     const [orderId, setOrderId] = useState<string>('');
-    const [giftRequest, setGiftRequest] = useState<GiftCard | null>(null);
+    const [donationId, setDonationId] = useState<string>(''); // Changed from giftRequestId
+    const [donationData, setDonationData] = useState<any>(null);
+    const [donationRequest, setDonationRequest] = useState<any>(null);
     const [paymentStatus, setPaymentStatus] = useState<PaymentStatus>('idle');
-    const [giftRequestId, setGiftRequestId] = useState<string>('');
+    const [recipients, setRecipients] = useState<any[]>([]);
     const [error, setError] = useState<string>('');
     const [uploadProgress, setUploadProgress] = useState(0);
     const [paymentProof, setPaymentProof] = useState<File | null>(null);
@@ -55,7 +57,7 @@ const DonationTreesForm: React.FC<Props> = ({
         error: ''
     });
     const RAZORPAY_LIMIT = 500000;
-    const TREE_PRICE = 2000;
+    const TREE_PRICE = 1500;
 
     const totalAmount = treesCount * TREE_PRICE;
     const isAboveLimit = totalAmount > RAZORPAY_LIMIT;
@@ -77,16 +79,20 @@ const DonationTreesForm: React.FC<Props> = ({
             title: 'Upload CSV',
             content: (
                 <Box sx={{ p: 2 }}>
-                    <CSVUploadSection 
-                        onValidationChange={(isValid: boolean, isUploaded: boolean, error: string) => {
-                            return setCsvValidation({
+                    <CSVUploadSection
+                        onValidationChange={(isValid, isUploaded, error) => {
+                            setCsvValidation({
                                 isValid,
                                 isUploaded,
                                 error
                             });
                         }}
+                        onRecipientsChange={(recipients) => {
+                            setRecipients(recipients);
+                        }}
                         totalTreesSelected={treesCount}
                     />
+
                 </Box>
             ),
         },
@@ -122,36 +128,47 @@ const DonationTreesForm: React.FC<Props> = ({
     };
 
     const handleSubmit = async () => {
-        if (!groupId) {
-            setError('Group ID is required');
+        // Validate required fields
+        if (!user?.name || !userEmail) {
+            setError('Logged-in user name and email are required');
             return;
         }
-
+        if (!treesCount || treesCount <= 0) {
+            setError('Tree count must be greater than 0');
+            return;
+        }
+    
         try {
             setLoading(true);
             setError('');
-            const response = await apiClient.createGiftCardRequestV2(
-                groupId,
-                userName,
-                userEmail,
-                treesCount,
-                "3", // event type (General)
-                "", // event name
-                corporateName,
-                ["Corporate"],
+    
+            // Prepare the exact payload structure expected by backend
+            const response = await apiClient.createDonationV2(
+                user.name,                     // sponsor_name (required string)
+                userEmail,                     // sponsor_email (required string)
+                treesCount,                    // trees_count (required number)
+                totalAmount || undefined,       // amount_donated (optional - undefined instead of 0)
+                undefined,                     // sponsor_phone (explicit undefined when empty)
+                ["Corporate"],                 // tags (array with "Corporate" string)
+                recipients?.length ? recipients.map(r => ({
+                    name: r.name,              // Ensure each user has name
+                    email: r.email,            // and email at minimum
+                    ...(r.phone && { phone: r.phone }) // optional phone
+                })) : undefined,               // users (undefined instead of empty array)
+                groupId ? groupId.toString() : undefined
             );
-
+    
+            // Handle response
             if (response.order_id) {
                 setOrderId(response.order_id);
             }
-            if (response.gift_request?.id) {
-                setGiftRequest(response.gift_request);
-                setGiftRequestId(response.gift_request.id.toString());
+            if (response.donation?.id) {
+                setDonationId(response.donation.id.toString());
             }
             setPaymentStatus('pending');
-        } catch (error) {
-            console.error('Error creating gift card request:', error);
-            setError('Failed to create order. Please try again.');
+        } catch (error: any) {
+            console.error('Error creating donation:', error);
+            setError(error.message || 'Failed to create donation. Please try again.');
         } finally {
             setLoading(false);
         }
@@ -161,14 +178,19 @@ const DonationTreesForm: React.FC<Props> = ({
         try {
             setPaymentStatus('success');
             setLoading(true);
-            await apiClient.paymentSuccessForGiftRequest(Number(giftRequestId), true);
+
+            await apiClient.paymentSuccessForDonation(
+                Number(donationId),
+                !!corporateName
+            );
+
+            onSuccess?.();
         } catch (error: any) {
-            setError('Payment successful but failed to update status. Please contact support.');
+            setError(error.message || 'Payment successful but failed to update status. Please contact support.');
             setPaymentStatus('failed');
         } finally {
             setLoading(false);
         }
-        onSuccess?.(); 
     };
 
     const handlePaymentFailure = () => {
@@ -194,7 +216,7 @@ const DonationTreesForm: React.FC<Props> = ({
             return;
         }
 
-        if (!giftRequest?.payment_id) {
+        if (!donationRequest?.payment_id) {
             setError('Something went wrong. Please contact the 14trees team');
             return;
         }
@@ -202,12 +224,12 @@ const DonationTreesForm: React.FC<Props> = ({
         try {
             setLoading(true);
             setError('');
-            
+
             // Upload payment proof to S3
             const fileUrl = await awsUtils.uploadFileToS3(
-                "gift-request",
+                "donation-request",
                 paymentProof,
-                `cards/${giftRequest.request_id}/payment_proof`,
+                `cards/${donationRequest.request_id}/payment_proof`,
                 setUploadProgress
             );
 
@@ -215,14 +237,14 @@ const DonationTreesForm: React.FC<Props> = ({
 
             // Create payment history
             await apiClient.createPaymentHistory(
-                giftRequest.payment_id,
+                donationRequest.payment_id,
                 totalAmount,
                 "Net Banking",
                 fileUrl
             );
 
             setPaymentStatus('success');
-            onSuccess?.(); 
+            onSuccess?.();
         } catch (error) {
             console.error('Error processing bank transfer:', error);
             setError('Failed to process payment proof. Please try again.');
@@ -266,7 +288,7 @@ const DonationTreesForm: React.FC<Props> = ({
                 {paymentStatus === 'pending' && (
                     <>
                         <Alert severity="warning" sx={{ mt: 2 }}>
-                            Order ID: {giftRequestId}.
+                            Order ID: {donationId}.
                             Payment is required to complete the order!
                         </Alert>
                         {isAboveLimit ? (
@@ -299,13 +321,13 @@ const DonationTreesForm: React.FC<Props> = ({
                 )}
                 {paymentStatus === 'success' && (
                     <Alert severity="success" sx={{ mt: 2 }}>
-                        Payment successful! Gift Request ID: {giftRequestId}
+                        Payment successful! Gift Request ID: {donationId}
                     </Alert>
                 )}
                 {paymentStatus === 'failed' && (
                     <>
                         <Alert severity="warning" sx={{ mt: 2 }}>
-                            Order ID: {giftRequestId}.
+                            Order ID: {donationId}.
                             Payment is required to complete the order!
                         </Alert>
                         <Alert severity="error" sx={{ mt: 2 }}>
@@ -316,7 +338,7 @@ const DonationTreesForm: React.FC<Props> = ({
             </DialogContent>
             <DialogActions>
                 <Button onClick={handleClose} color="error" variant="outlined">
-                    {giftRequestId ? 'Close' : 'Cancel'}
+                    {donationId ? 'Close' : 'Cancel'}
                 </Button>
                 {paymentStatus === 'idle' && (
                     <>
