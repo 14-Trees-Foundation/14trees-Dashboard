@@ -165,7 +165,7 @@ export const Profile = ({ saplingId }) => {
             </div>
           </div>
         </div>
-        {!matches && selUserInfo.tree_audits && selUserInfo.tree_audits.length > 1 && <div style={{ marginTop: '20px' }}>
+        {!matches && selUserInfo.tree_audits && selUserInfo.tree_audits.length > 0 && <div style={{ marginTop: '20px' }}>
           <TreeTimelineInfo />
         </div>}
       </div>
