@@ -144,19 +144,24 @@ const DonationTreesForm: React.FC<Props> = ({
     
             // Prepare the exact payload structure expected by backend
             const response = await apiClient.createDonationV2(
-                user.name,                     // sponsor_name (required string)
-                userEmail,                     // sponsor_email (required string)
-                treesCount,                    // trees_count (required number)
-                totalAmount || undefined,       // amount_donated (optional - undefined instead of 0)
-                undefined,                     // sponsor_phone (explicit undefined when empty)
-                ["Corporate"],                 // tags (array with "Corporate" string)
+                user.name,
+                userEmail,
+                treesCount,
+                totalAmount || undefined,
+                undefined,
+                ["Corporate"],
                 recipients?.length ? recipients.map(r => ({
-                    name: r.name,              // Ensure each user has name
-                    email: r.email,            // and email at minimum
-                    ...(r.phone && { phone: r.phone }) // optional phone
-                })) : undefined,               // users (undefined instead of empty array)
+                  recipient_name: r.name,
+                  recipient_email: r.email,
+                  ...(r.phone && { recipient_phone: r.phone }),
+                  assignee_name: r.assigneeName || r.name,
+                  assignee_email: r.assigneeEmail || r.email,
+                  ...(r.assigneePhone && { assignee_phone: r.assigneePhone }),
+                  ...((!r.assigneePhone && r.phone) && { assignee_phone: r.phone }),
+                  trees_count: r.treeCount || Math.floor(treesCount / recipients.length) || 1
+                })) : undefined,
                 groupId ? groupId.toString() : undefined
-            );
+              );
     
             // Handle response
             if (response.order_id) {

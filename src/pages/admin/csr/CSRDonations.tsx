@@ -171,6 +171,13 @@ const CSRDonations: React.FC<CSRDonationsProps> = ({ selectedGroup }) => {
             width: 200,
             ...getColumnSearchProps('user_name', filters, handleSetFilters)
         },
+        {
+            dataIndex: "trees_count",
+            key: "Pledged Trees",
+            title: getSortableHeader("Pledged Trees", 'trees_count'),
+            align: "center",
+            width: 100,
+          },
           {
             dataIndex: "amount_donated",
             key: "Donation Amount",
@@ -201,7 +208,7 @@ const CSRDonations: React.FC<CSRDonationsProps> = ({ selectedGroup }) => {
             width: 120,
             fixed: 'right',
             render: (_, record) => (
-                record.amount_donated && (
+                record.amount_donated === 0 && (
                     <Button
                         variant="contained"
                         color="success"

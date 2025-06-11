@@ -95,7 +95,7 @@ const DonationAnalytics: React.FC<DonationAnalyticsProps> = ({
                         {analytics?.total_trees ? analytics.total_trees : '0'}
                     </Typography>
                     <Typography variant={isMobile ? "caption" : "subtitle2"} color="#1f3625">
-                        Trees Allocated for Donation
+                        Total Trees
                     </Typography>
                 </Box>
             </div>
@@ -109,7 +109,7 @@ const DonationAnalytics: React.FC<DonationAnalyticsProps> = ({
                         {analytics?.donated_trees ? analytics.donated_trees : '0'}
                     </Typography>
                     <Typography variant={isMobile ? "caption" : "subtitle2"} color="#1f3625">
-                        Trees Donated
+                        Trees Assigned
                     </Typography>
                 </Box>
             </div>
@@ -120,7 +120,7 @@ const DonationAnalytics: React.FC<DonationAnalyticsProps> = ({
                         {availableTrees}
                     </Typography>
                     <Typography variant={isMobile ? "caption" : "subtitle2"} color="#1f3625">
-                        Available for Donation
+                        Trees available for assignment
                     </Typography>
                 </Box>
             </div>
