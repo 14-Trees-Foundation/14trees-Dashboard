@@ -1,31 +1,21 @@
 // CSVUploadSection.tsx
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import {
-    Box,
-    Typography,
-    Button,
-    Table,
-    TableHead,
-    TableBody,
-    TableCell,
-    TableContainer,
-    TableRow,
-    Paper,
-    Tooltip,
-    TablePagination,
-    Link,
-    Avatar
+    Box, Typography, Button, Table, TableHead, TableBody, TableCell, TableContainer, TableRow,
+    Paper, Tooltip, TablePagination, Link, Avatar
 } from "@mui/material";
 import { Close as CloseIcon, Done, Image as ImageIcon } from "@mui/icons-material";
-import { getUniqueRequestId } from "../../../../helpers/utils"
-import UserImagesForm from "../../donation/Forms/UserImagesForm"
 import Papa from "papaparse";
 import { toast } from "react-toastify";
+import { getUniqueRequestId } from "../../../../helpers/utils";
+import UserImagesForm from "../../donation/Forms/UserImagesForm";
+import ApiClient from "../../../../api/apiClient/apiClient";
 
 type CSVUploadSectionProps = {
     onValidationChange: (isValid: boolean, isUploaded: boolean, error: string) => void;
-    onRecipientsChange?: (recipients: any[]) => void;  // New callback
-    totalTreesSelected: number;
+    onRecipientsChange?: (recipients: any[]) => void;
+    totalTreesSelected?: number;
+    groupId?: number;
 };
 
 const REQUIRED_HEADERS = [
@@ -42,34 +32,48 @@ const SAMPLE_CSV_DATA = [
     ["Bob Johnson", "bob@example.com", "10", "bob.png"]
 ];
 
-const CSVUploadSection: React.FC<CSVUploadSectionProps> = ({ onValidationChange, onRecipientsChange, totalTreesSelected }) => {
+const CSVUploadSection: React.FC<CSVUploadSectionProps> = ({
+    onValidationChange, onRecipientsChange, totalTreesSelected = 0, groupId
+}) => {
+    const [remainingTrees, setRemainingTrees] = useState<number>(totalTreesSelected);
     const [data, setData] = useState<string[][]>([]);
     const [headers, setHeaders] = useState<string[]>([]);
     const [errorsMap, setErrorsMap] = useState<Record<number, string[]>>({});
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(10);
-    const [requestId, setRequestId] = useState<string>(getUniqueRequestId());
+    const [requestId] = useState<string>(getUniqueRequestId());
     const [imageUrls, setImageUrls] = useState<string[]>([]);
     const [imageValidationErrors, setImageValidationErrors] = useState<Record<number, string>>({});
     const [imagePreviews, setImagePreviews] = useState<Record<string, string>>({});
     const fileInputRef = useRef<HTMLInputElement>(null);
 
-    const validateHeaders = (headers: string[]): string[] => {
-        return REQUIRED_HEADERS.filter(header => !headers.includes(header))
-            .map(missing => `Missing required header: ${missing}`);
-    };
+    useEffect(() => {
+        if (groupId) {
+            const fetchRemaining = async () => {
+                try {
+                    const apiClient = new ApiClient();
+                    const res =await apiClient.getMappedDonationTreesAnalytics("group", groupId);
+                    setRemainingTrees(res.remaining_trees || 0);
+                } catch (err) {
+                    toast.error("Failed to fetch remaining trees");
+                    console.error(err);
+                }
+            };
+            fetchRemaining();
+        }
+    }, [groupId]);
+
+    const validateHeaders = (headers: string[]): string[] =>
+        REQUIRED_HEADERS.filter(h => !headers.includes(h)).map(m => `Missing required header: ${m}`);
 
     const validateRow = (row: string[]): string[] => {
-        const errors: string[] = [];
         const [name, email, trees] = row;
-
         const isValidEmail = (val: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val);
+        const errors: string[] = [];
 
         if (!name?.trim()) errors.push("Recipient Name is required");
         if (email && !isValidEmail(email)) errors.push("Invalid Email format");
-        if (!trees || isNaN(Number(trees)) || Number(trees) <= 0) {
-            errors.push("Number of trees is required");
-        }
+        if (!trees || isNaN(Number(trees)) || Number(trees) <= 0) errors.push("Number of trees is required");
 
         return errors;
     };
@@ -88,12 +92,9 @@ const CSVUploadSection: React.FC<CSVUploadSectionProps> = ({ onValidationChange,
 
     const getFilenameFromUrl = (url: string): string => {
         try {
-            const urlObj = new URL(url);
-            const pathname = urlObj.pathname;
-            const filename = pathname.split('/').pop() || '';
-            return decodeURIComponent(filename);
+            return decodeURIComponent(new URL(url).pathname.split("/").pop() || "");
         } catch {
-            return '';
+            return "";
         }
     };
 
@@ -114,23 +115,20 @@ const CSVUploadSection: React.FC<CSVUploadSectionProps> = ({ onValidationChange,
 
         setHeaders(firstRow);
 
-        const newErrorsMap: Record<number, string[]> = {};
-        let totalCsvTrees = 0;
         const nameIndex = firstRow.findIndex(h => h === "Recipient Name");
         const emailIndex = firstRow.findIndex(h => h === "Recipient Email");
         const treesIndex = firstRow.findIndex(h => h === "Number of trees");
         const imageIndex = firstRow.findIndex(h => h === "Image Name (optional)");
 
+        let totalCsvTrees = 0;
+        const newErrorsMap: Record<number, string[]> = {};
+
         const formattedRecipients = rows.map((row, idx) => {
             const errors = validateRow(row);
-            if (errors.length > 0) {
-                newErrorsMap[idx] = errors;
-            }
+            if (errors.length > 0) newErrorsMap[idx] = errors;
 
             const trees = Number(row[treesIndex]);
-            if (!isNaN(trees)) {
-                totalCsvTrees += trees;
-            }
+            if (!isNaN(trees)) totalCsvTrees += trees;
 
             return {
                 name: row[nameIndex],
@@ -141,29 +139,22 @@ const CSVUploadSection: React.FC<CSVUploadSectionProps> = ({ onValidationChange,
             };
         });
 
-        // Validate total trees
-        if (totalCsvTrees > totalTreesSelected) {
-            toast.error(`Total trees in CSV (${totalCsvTrees}) exceeds selected trees (${totalTreesSelected})`);
-            onValidationChange(false, true, `Total trees in CSV (${totalCsvTrees}) exceeds selected trees (${totalTreesSelected})`);
+        if (totalCsvTrees > remainingTrees) {
+            toast.error(`Total trees in CSV (${totalCsvTrees}) exceed allowed count (${remainingTrees})`);
+            onValidationChange(false, true, `Total trees in CSV (${totalCsvTrees}) exceed allowed count (${remainingTrees})`);
             return;
         }
 
-        setData(rows); // Keep original rows for display
+        setData(rows);
         setErrorsMap(newErrorsMap);
 
         const hasErrors = Object.keys(newErrorsMap).length > 0;
-        onValidationChange(
-            !hasErrors,
-            true,
-            hasErrors ? "One or more rows have validation errors" : ""
-        );
+        onValidationChange(!hasErrors, true, hasErrors ? "Row validation errors" : "");
 
-        // Call separate callback for recipients if no errors
         if (!hasErrors && onRecipientsChange) {
             onRecipientsChange(formattedRecipients);
         }
-    }
-
+    };
 
     const validateImages = (csvData: string[][], headers: string[], uploadedImages: string[]) => {
         const imageNameIndex = headers.findIndex(h => h === "Image Name (optional)");
@@ -193,18 +184,12 @@ const CSVUploadSection: React.FC<CSVUploadSectionProps> = ({ onValidationChange,
         setImageValidationErrors(errors);
         setImagePreviews(previews);
 
-        // Combine CSV + image errors
-        const hasRowErrors = Object.keys(errorsMap).length > 0;
-        const hasImageErrors = Object.keys(errors).length > 0;
-
-        const isValid = !hasRowErrors && !hasImageErrors;
+        const isValid = Object.keys(errorsMap).length === 0 && Object.keys(errors).length === 0;
         onValidationChange(isValid, data.length > 0, isValid ? "" : "Image validation failed");
     };
 
-
     const handleImageUpload = (urls: string[]) => {
         setImageUrls(urls);
-        // Revalidate images when new images are uploaded
         if (data.length > 0 && headers.length > 0) {
             validateImages(data, headers, urls);
         }
@@ -223,10 +208,9 @@ const CSVUploadSection: React.FC<CSVUploadSectionProps> = ({ onValidationChange,
             error: (err) => {
                 toast.error(`CSV Parsing Error: ${err.message}`);
                 if (fileInputRef.current) fileInputRef.current.value = '';
-            },
+            }
         });
     };
-
 
     return (
         <Box>
@@ -239,12 +223,7 @@ const CSVUploadSection: React.FC<CSVUploadSectionProps> = ({ onValidationChange,
 
             <UserImagesForm requestId={requestId} onUpload={handleImageUpload} />
 
-            <Button
-                variant="contained"
-                component="label"
-                color="success"
-                sx={{ mr: 2 }}
-            >
+            <Button variant="contained" component="label" color="success" sx={{ mr: 2 }}>
                 Upload CSV
                 <input type="file" accept=".csv" hidden onChange={handleFileUpload} ref={fileInputRef} />
             </Button>
@@ -259,6 +238,7 @@ const CSVUploadSection: React.FC<CSVUploadSectionProps> = ({ onValidationChange,
                                     {headers.map((h, i) => (
                                         <TableCell key={i}>{h}</TableCell>
                                     ))}
+                                    <TableCell>Image</TableCell>
                                 </TableRow>
                             </TableHead>
                             <TableBody>
@@ -272,12 +252,8 @@ const CSVUploadSection: React.FC<CSVUploadSectionProps> = ({ onValidationChange,
                                         const imageName = imageNameIndex !== -1 ? row[imageNameIndex]?.trim() : "";
                                         const imageError = imageValidationErrors[idx];
 
-
                                         return (
-                                            <TableRow
-                                                key={idx}
-                                                sx={{ backgroundColor: hasError ? '#ffe6e6' : 'inherit' }}
-                                            >
+                                            <TableRow key={idx} sx={{ backgroundColor: hasError ? '#ffe6e6' : 'inherit' }}>
                                                 <TableCell>
                                                     {hasError ? (
                                                         <Tooltip title={errors?.join(", ")} arrow>
@@ -293,11 +269,7 @@ const CSVUploadSection: React.FC<CSVUploadSectionProps> = ({ onValidationChange,
                                                 <TableCell>
                                                     {imageName && (
                                                         imagePreviews[imageName] ? (
-                                                            <Avatar
-                                                                src={imagePreviews[imageName]}
-                                                                alt={imageName}
-                                                                sx={{ width: 40, height: 40 }}
-                                                            />
+                                                            <Avatar src={imagePreviews[imageName]} alt={imageName} sx={{ width: 40, height: 40 }} />
                                                         ) : (
                                                             <Tooltip title={imageError || "Image not found"} arrow>
                                                                 <ImageIcon color="error" />

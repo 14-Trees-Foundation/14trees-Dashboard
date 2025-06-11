@@ -18,6 +18,7 @@ import GeneralTable from "../../../components/GenTable";
 import PaymentIcon from '@mui/icons-material/Payment';
 import PaymentDialog from "./components/PaymentDialog";
 import DonationAnalytics from "../../../../src/components/redeem/DonationAnalytics"
+import CSRBulkDonation from "./CSRBUlkDonation"
 
 interface CSRDonationsProps {
     selectedGroup: Group
@@ -38,6 +39,8 @@ const CSRDonations: React.FC<CSRDonationsProps> = ({ selectedGroup }) => {
     const [tableRows, setTableRows] = useState<Donation[]>([]);
     const [paymentDialogOpen, setPaymentDialogOpen] = useState(false);
     const [selectedDonation, setSelectedDonation] = useState<Donation | null>(null);
+    const [bulkDialogOpen, setBulkDialogOpen] = useState(false);
+    const [selectedTreeCount, setSelectedTreeCount] = useState<number>(0);
 
     const donationsData = useAppSelector((state: RootState) => state.donationsData);
 
@@ -51,7 +54,7 @@ const CSRDonations: React.FC<CSRDonationsProps> = ({ selectedGroup }) => {
 
     useEffect(() => {
         if (donationsData.loading) return;
-        
+
         const handler = setTimeout(() => {
             const records: Donation[] = [];
             const maxLength = Math.min((page + 1) * pageSize, donationsData.totalDonations);
@@ -162,8 +165,8 @@ const CSRDonations: React.FC<CSRDonationsProps> = ({ selectedGroup }) => {
             title: "Don. Id",
             align: "center",
             width: 100,
-          },
-          {
+        },
+        {
             dataIndex: "user_name",
             key: "Donor Name",
             title: "Donor Name",
@@ -177,21 +180,21 @@ const CSRDonations: React.FC<CSRDonationsProps> = ({ selectedGroup }) => {
             title: getSortableHeader("Pledged Trees", 'trees_count'),
             align: "center",
             width: 100,
-          },
-          {
+        },
+        {
             dataIndex: "amount_donated",
             key: "Donation Amount",
             title: getSortableHeader("Donation Amount", 'amount_donated'),
             align: "center",
             width: 120,
-          },
- /*       {
-            dataIndex: "payment_status",
-            key: "Payment Status",
-            title: "Payment Status",
-            align: "center",
-            width: 150,
-        }, */
+        },
+        /*       {
+                   dataIndex: "payment_status",
+                   key: "Payment Status",
+                   title: "Payment Status",
+                   align: "center",
+                   width: 150,
+               }, */
         {
             dataIndex: "created_at",
             key: "Created on",
@@ -244,7 +247,11 @@ const CSRDonations: React.FC<CSRDonationsProps> = ({ selectedGroup }) => {
                     Donate Trees
                 </Button>
             </Box>
-            <DonationAnalytics groupId={selectedGroup.id} />
+            <DonationAnalytics
+                groupId={selectedGroup.id}
+                onAssignMultiple={() => console.log('Assign multiple trees')}
+                onBulkAssignment={() => setBulkDialogOpen(true)}
+            />
             <Box sx={{ height: 840, width: "100%" }}>
                 <GeneralTable
                     loading={donationsData.loading}
@@ -272,6 +279,17 @@ const CSRDonations: React.FC<CSRDonationsProps> = ({ selectedGroup }) => {
                     userEmail={userEmail || ""}
                 />
             )}
+
+            <CSRBulkDonation
+                open={bulkDialogOpen}
+                onClose={() => setBulkDialogOpen(false)}
+                onSubmit={(recipients) => {
+                    console.log("Submitted Recipients:", recipients);
+                    setBulkDialogOpen(false);
+                }}
+                groupId={selectedGroup.id} // <-- Make sure this is defined in your parent component
+            />
+
 
             {selectedDonation && (
                 <PaymentDialog
