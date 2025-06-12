@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import CSRInventory from "./CSRInventory";
 import { useAuth } from "../auth/auth";
 import { SinglePageDrawer } from "./SinglePageDrawer";
-import { NaturePeople, ExitToApp, Settings, CardGiftcard } from "@mui/icons-material";
+import { NaturePeople, ExitToApp, Settings, CardGiftcard, VolunteerActivism } from "@mui/icons-material";
 import { createStyles, makeStyles } from "@mui/styles";
 import {
     Box,
@@ -75,7 +75,7 @@ const CSRPage: React.FC = () => {
     };
 
     useEffect(() => {
-        auth.signin("user", "user@example.com", 13124, ["all"], ["super-admin"], "", () => { });
+        auth.signin("User", "user@example.com", 13124, ["all"], ["super-admin"], "", () => { });
         localStorage.setItem("userId", "13124");
     }, []);
 
@@ -193,7 +193,7 @@ const CSRPage: React.FC = () => {
         },
         {
             displayName: 'Donations',
-            logo: CardGiftcard,
+            logo: VolunteerActivism,
             key: 8,
             display: true,
             onClick: () => setActiveTab("donations")
@@ -289,7 +289,7 @@ const CSRPage: React.FC = () => {
                             </Box>
 
                             {/* Birthday Box (above avatar) */}
-                            <Box
+                            {/* <Box
                                 sx={{
                                     display: "flex",
                                     flexDirection: "column",
@@ -345,7 +345,7 @@ const CSRPage: React.FC = () => {
                                         No Events soon.
                                     </Typography>
                                 )}
-                            </Box>
+                            </Box> */}
                         </Box>
 
 

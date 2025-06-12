@@ -189,6 +189,9 @@ const DonationAnalytics: React.FC<DonationAnalyticsProps> = ({
                             </>
                         )}
                     </Box>
+                    <Typography mt={1} variant={isMobile ? 'caption' : 'subtitle2'}>
+                        (from your remaining stock of {availableTrees} trees)
+                    </Typography>
                 </Box>
             )}
         </>

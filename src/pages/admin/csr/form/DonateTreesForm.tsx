@@ -52,7 +52,7 @@ const DonationTreesForm: React.FC<Props> = ({
     const [paymentProof, setPaymentProof] = useState<File | null>(null);
     const [uploadedFileUrl, setUploadedFileUrl] = useState<string>('');
     const [csvValidation, setCsvValidation] = useState({
-        isValid: false,
+        isValid: true,
         isUploaded: false,
         error: ''
     });
@@ -115,7 +115,7 @@ const DonationTreesForm: React.FC<Props> = ({
         // If we're moving to the CSV upload step, reset validation
         if (currentStep === 0) {
             setCsvValidation({
-                isValid: false,
+                isValid: true,
                 isUploaded: false,
                 error: ''
             });
@@ -147,18 +147,18 @@ const DonationTreesForm: React.FC<Props> = ({
                 user.name,
                 userEmail,
                 treesCount,
-                totalAmount || undefined,
+                totalAmount,
                 undefined,
                 ["Corporate"],
                 recipients?.length ? recipients.map(r => ({
                   recipient_name: r.name,
                   recipient_email: r.email,
-                  ...(r.phone && { recipient_phone: r.phone }),
+                  recipient_phone: r.phone,
                   assignee_name: r.assigneeName || r.name,
                   assignee_email: r.assigneeEmail || r.email,
-                  ...(r.assigneePhone && { assignee_phone: r.assigneePhone }),
-                  ...((!r.assigneePhone && r.phone) && { assignee_phone: r.phone }),
-                  trees_count: r.treeCount || Math.floor(treesCount / recipients.length) || 1
+                  assignee_phone: r.assigneePhone || r.email,
+                  trees_count: r.trees_count ||  1,
+                  image_url: r.image_url,
                 })) : undefined,
                 groupId ? groupId.toString() : undefined
               );
@@ -169,6 +169,7 @@ const DonationTreesForm: React.FC<Props> = ({
             }
             if (response.donation?.id) {
                 setDonationId(response.donation.id.toString());
+                setDonationRequest(response.donation)
             }
             setPaymentStatus('pending');
         } catch (error: any) {
@@ -186,7 +187,7 @@ const DonationTreesForm: React.FC<Props> = ({
 
             await apiClient.paymentSuccessForDonation(
                 Number(donationId),
-                !!corporateName
+                true
             );
 
             onSuccess?.();
@@ -268,7 +269,7 @@ const DonationTreesForm: React.FC<Props> = ({
     // Determine if Next button should be disabled
     const isNextDisabled = () => {
         if (currentStep === 1) { // CSV Upload step
-            return !csvValidation.isValid || !csvValidation.isUploaded;
+            return !csvValidation.isValid;
         }
         return false;
     };

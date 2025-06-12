@@ -12,16 +12,21 @@ import { User } from "../../../../types/user";
 const apiClient = new ApiClient();
 const awsUtils = new AWSUtils();
 
+type PaymentType = 'gift' | 'donation';
+
 interface PaymentDialogProps {
     open: boolean;
     onClose: () => void;
     paymentId: number;
-    giftRequestId: number;
+    type: PaymentType;
     requestId: string;
     totalAmount: number;
     userName: string;
     userEmail: string;
     onPaymentSuccess: () => void;
+    // Optional fields for specific types
+    giftRequestId?: number;
+    donationId?: number;
 }
 
 type PaymentStatus = 'idle' | 'pending' | 'success' | 'failed';
@@ -30,12 +35,14 @@ const PaymentDialog: React.FC<PaymentDialogProps> = ({
     open,
     onClose,
     paymentId,
-    giftRequestId,
+    type,
     requestId,
     totalAmount,
     userName,
     userEmail,
-    onPaymentSuccess
+    onPaymentSuccess,
+    giftRequestId,
+    donationId
 }) => {
     const [loading, setLoading] = useState(false);
     const [payment, setPayment] = useState<Payment | null>(null);
@@ -47,6 +54,7 @@ const PaymentDialog: React.FC<PaymentDialogProps> = ({
     const RAZORPAY_LIMIT = 500000;
 
     const isAboveLimit = totalAmount > RAZORPAY_LIMIT;
+    const referenceId = type === 'gift' ? giftRequestId : donationId;
 
     const fetchPayment = async () => {
         try {
@@ -68,7 +76,13 @@ const PaymentDialog: React.FC<PaymentDialogProps> = ({
         try {
             setPaymentStatus('success');
             setLoading(true);
-            await apiClient.paymentSuccessForGiftRequest(giftRequestId, true);
+            
+            if (type === 'gift' && giftRequestId) {
+                await apiClient.paymentSuccessForGiftRequest(giftRequestId, true);
+            } else if (type === 'donation' && donationId) {
+                await apiClient.paymentSuccessForDonation(donationId, true);
+            }
+            
             onPaymentSuccess();
         } catch (error: any) {
             console.error('Error updating payment status:', error);
@@ -155,6 +169,13 @@ const PaymentDialog: React.FC<PaymentDialogProps> = ({
         updated_at: new Date()
     };
 
+    const getDescription = () => {
+        if (type === 'gift') {
+            return `Payment for gift request ${giftRequestId}`;
+        }
+        return `Payment for donation ${donationId}`;
+    };
+
     return (
         <Dialog
             open={open}
@@ -169,7 +190,7 @@ const PaymentDialog: React.FC<PaymentDialogProps> = ({
                 {paymentStatus === 'pending' && (
                     <>
                         <Alert severity="warning" sx={{ mt: 2 }}>
-                            Order ID: {giftRequestId}.
+                            {type === 'gift' ? 'Gift Request' : 'Donation'} ID: {referenceId}.
                             Payment is required to complete the order!
                         </Alert>
                         {isAboveLimit ? (
@@ -193,7 +214,7 @@ const PaymentDialog: React.FC<PaymentDialogProps> = ({
                                 amount={totalAmount}
                                 orderId={payment.order_id}
                                 user={user}
-                                description={`Payment for gift request ${giftRequestId}`}
+                                description={getDescription()}
                                 onPaymentDone={handlePaymentSuccess}
                                 onClose={handlePaymentFailure}
                             />
@@ -202,13 +223,13 @@ const PaymentDialog: React.FC<PaymentDialogProps> = ({
                 )}
                 {paymentStatus === 'success' && (
                     <Alert severity="success" sx={{ mt: 2 }}>
-                        Payment successful! Gift Request ID: {giftRequestId}
+                        Payment successful! {type === 'gift' ? 'Gift Request' : 'Donation'} ID: {referenceId}
                     </Alert>
                 )}
                 {paymentStatus === 'failed' && (
                     <>
                         <Alert severity="warning" sx={{ mt: 2 }}>
-                            Order ID: {giftRequestId}.
+                            {type === 'gift' ? 'Gift Request' : 'Donation'} ID: {referenceId}.
                             Payment is required to complete the order!
                         </Alert>
                         <Alert severity="error" sx={{ mt: 2 }}>
@@ -219,7 +240,7 @@ const PaymentDialog: React.FC<PaymentDialogProps> = ({
             </DialogContent>
             <DialogActions>
                 <Button onClick={handleClose} color="error" variant="outlined">
-                    {giftRequestId ? 'Close' : 'Cancel'}
+                    {referenceId ? 'Close' : 'Cancel'}
                 </Button>
                 {paymentStatus === 'pending' && isAboveLimit && (
                     <LoadingButton

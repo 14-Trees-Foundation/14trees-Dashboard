@@ -18,7 +18,7 @@ import GeneralTable from "../../../components/GenTable";
 import PaymentIcon from '@mui/icons-material/Payment';
 import PaymentDialog from "./components/PaymentDialog";
 import DonationAnalytics from "../../../../src/components/redeem/DonationAnalytics"
-import CSRBulkDonation from "./CSRBUlkDonation"
+import CSRBulkDonation from "./CSRBulkDonation"
 
 interface CSRDonationsProps {
     selectedGroup: Group
@@ -40,7 +40,9 @@ const CSRDonations: React.FC<CSRDonationsProps> = ({ selectedGroup }) => {
     const [paymentDialogOpen, setPaymentDialogOpen] = useState(false);
     const [selectedDonation, setSelectedDonation] = useState<Donation | null>(null);
     const [bulkDialogOpen, setBulkDialogOpen] = useState(false);
-    const [selectedTreeCount, setSelectedTreeCount] = useState<number>(0);
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [bulkError, setBulkError] = useState<string | null>(null);
+    const [refreshTrigger, setRefreshTrigger] = useState(0);
 
     const donationsData = useAppSelector((state: RootState) => state.donationsData);
 
@@ -155,7 +157,45 @@ const CSRDonations: React.FC<CSRDonationsProps> = ({ selectedGroup }) => {
     const handlePaymentSuccess = () => {
         setPaymentDialogOpen(false);
         getDonationData();
+        setRefreshTrigger(prev => prev+1)
         toast.success('Payment successful!');
+    };
+
+    const handleBulkSubmit = async (recipients: any[]) => {
+        setIsSubmitting(true);
+        setBulkError(null);
+        const apiClient = new ApiClient();
+
+        const updatedRecipients = recipients.map(item => {
+            const recipient = { ...item };
+
+            item.recipient_name = item.recipient_name?.trim()
+            item.assignee_name = item.assignee_name?.trim() || item.recipient_name
+
+            item.recipient_email = item.recipient_email?.trim() 
+                ? item.recipient_email?.trim()
+                : String(item.recipient_name).toLocaleLowerCase().split(" ").join(".") + "@14trees"
+
+            item.assignee_email = item.assignee_email?.trim() 
+                ? item.assignee_email?.trim()
+                : String(item.recipient_name).toLocaleLowerCase().split(" ").join(".") + "@14trees"
+
+            return recipient
+        })
+
+        try {
+            await apiClient.bulkAssignTreesToDonationUsers(selectedGroup.id, updatedRecipients);
+            toast.success('Trees assigned successfully!');
+            setBulkDialogOpen(false);
+            getDonationData(); // Refresh the donations list
+            setRefreshTrigger(prev => prev+1)
+        } catch (error: any) {
+            const errorMessage = error.message || 'Failed to assign trees to users';
+            setBulkError(errorMessage);
+            toast.error(errorMessage);
+        } finally {
+            setIsSubmitting(false);
+        }
     };
 
     const columns: TableColumnsType<Donation> = [
@@ -168,8 +208,8 @@ const CSRDonations: React.FC<CSRDonationsProps> = ({ selectedGroup }) => {
         },
         {
             dataIndex: "user_name",
-            key: "Donor Name",
-            title: "Donor Name",
+            key: "Created By",
+            title: "Created By",
             align: "center",
             width: 200,
             ...getColumnSearchProps('user_name', filters, handleSetFilters)
@@ -188,13 +228,22 @@ const CSRDonations: React.FC<CSRDonationsProps> = ({ selectedGroup }) => {
             align: "center",
             width: 120,
         },
-        /*       {
-                   dataIndex: "payment_status",
-                   key: "Payment Status",
-                   title: "Payment Status",
-                   align: "center",
-                   width: 150,
-               }, */
+        {
+            dataIndex: "status",
+            key: "Status",
+            title: "Status",
+            align: "center",
+            width: 120,
+            render: (value, record) => Number(record.booked) < record.trees_count ? 'Pending' : 'Completed'
+        },
+        {
+            dataIndex: "payment",
+            key: "Payment Status",
+            title: "Payment Status",
+            align: "center",
+            width: 120,
+            render: (value, record) => record.amount_received > 0 ? 'Fully Paid' : 'Pending Payment'
+        },
         {
             dataIndex: "created_at",
             key: "Created on",
@@ -211,7 +260,7 @@ const CSRDonations: React.FC<CSRDonationsProps> = ({ selectedGroup }) => {
             width: 120,
             fixed: 'right',
             render: (_, record) => (
-                record.amount_donated === 0 && (
+                !record.amount_received && (
                     <Button
                         variant="contained"
                         color="success"
@@ -231,11 +280,13 @@ const CSRDonations: React.FC<CSRDonationsProps> = ({ selectedGroup }) => {
 
     return (
         <Box p={2} id="csr-donations">
+            <DonationAnalytics groupId={selectedGroup.id} refreshTrigger={refreshTrigger} onBulkAssignment={() => { setBulkDialogOpen(true) }} />
             <Box sx={{
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'space-between',
                 mb: 1,
+                mt: 1,
             }}>
                 <Typography variant="h4" ml={1}>Donations</Typography>
                 <Button
@@ -247,11 +298,6 @@ const CSRDonations: React.FC<CSRDonationsProps> = ({ selectedGroup }) => {
                     Donate Trees
                 </Button>
             </Box>
-            <DonationAnalytics
-                groupId={selectedGroup.id}
-                onAssignMultiple={() => console.log('Assign multiple trees')}
-                onBulkAssignment={() => setBulkDialogOpen(true)}
-            />
             <Box sx={{ height: 840, width: "100%" }}>
                 <GeneralTable
                     loading={donationsData.loading}
@@ -282,29 +328,32 @@ const CSRDonations: React.FC<CSRDonationsProps> = ({ selectedGroup }) => {
 
             <CSRBulkDonation
                 open={bulkDialogOpen}
-                onClose={() => setBulkDialogOpen(false)}
-                onSubmit={(recipients) => {
-                    console.log("Submitted Recipients:", recipients);
+                onClose={() => {
                     setBulkDialogOpen(false);
+                    setBulkError(null);
                 }}
-                groupId={selectedGroup.id} // <-- Make sure this is defined in your parent component
+                onSubmit={handleBulkSubmit}
+                groupId={selectedGroup.id}
+                isSubmitting={isSubmitting}
+                error={bulkError}
             />
 
 
-            {selectedDonation && (
+            {selectedDonation && selectedDonation.payment_id && selectedDonation.amount_donated && (
                 <PaymentDialog
                     open={paymentDialogOpen}
                     onClose={() => {
                         setPaymentDialogOpen(false);
                         setSelectedDonation(null);
                     }}
-                    paymentId={selectedDonation.payment_id!}
-                    donationId={selectedDonation.id}
+                    paymentId={selectedDonation.payment_id}
+                    type="donation"
                     requestId={selectedDonation.request_id}
                     totalAmount={selectedDonation.amount_donated}
                     userName={userName}
                     userEmail={userEmail || ""}
                     onPaymentSuccess={handlePaymentSuccess}
+                    donationId={selectedDonation.id}
                 />
             )}
         </Box>

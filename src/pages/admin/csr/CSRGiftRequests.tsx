@@ -347,6 +347,7 @@ const CSRGiftRequests: React.FC<CSRGiftRequestsProps> = ({ groupId, selectedGrou
                         setPaymentDialogOpen(false);
                         setSelectedGiftCard(null);
                     }}
+                    type="gift"
                     paymentId={selectedGiftCard.payment_id!}
                     giftRequestId={selectedGiftCard.id}
                     requestId={selectedGiftCard.request_id}

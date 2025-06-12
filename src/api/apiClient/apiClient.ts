@@ -1696,6 +1696,17 @@ class ApiClient {
         }
     }
 
+    async bulkAssignTreesToDonationUsers(group_id: number, users: any[]): Promise<void> {
+        try {
+            await this.api.post<Donation>(`/donations/trees/bulk-assign`, { group_id, users });
+        } catch (error: any) {
+            if (error.response?.data?.message) {
+                throw new Error(error.response.data.message);
+            }
+            throw new Error('Failed to assign trees to users');
+        }
+    }
+
     async unassignDonationTrees(donation_id: number, unassign_all: boolean, tree_ids: number[]): Promise<Donation> {
         try {
             const response = await this.api.post<Donation>(`/donations/trees/unassign`, { donation_id, unassign_all, tree_ids });

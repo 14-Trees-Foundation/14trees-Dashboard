@@ -31,6 +31,7 @@ export interface Donation {
   mail_error: string | null;
   visit_date: Date | null;
   amount_donated: number | null; 
+  amount_received: number; 
   donation_method: "amount" | "trees";
   processed_by: number | null;
   processed_by_name?: string;
