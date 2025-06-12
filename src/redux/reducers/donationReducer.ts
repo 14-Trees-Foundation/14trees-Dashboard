@@ -4,13 +4,14 @@ import donationActionTypes from "../actionTypes/donationActionTypes";
 import { PaginatedResponse } from "../../types/pagination";
 
 export const donationsDataReducer = (
-    state = { totalDonations: 0, donations: {}, paginationMapping: {} }, 
+    state = { loading: false, totalDonations: 0, donations: {}, paginationMapping: {} }, 
     action: UnknownAction
 ): DonationDataState => {
     switch (action.type) {
         case donationActionTypes.GET_DONATIONS_SUCCEEDED:
             if (action.payload) {
                 let donationsDataState: DonationDataState = {
+                    loading: state.loading,
                     totalDonations: state.totalDonations,
                     donations: { ...state.donations },
                     paginationMapping: { ...state.paginationMapping }
@@ -31,13 +32,20 @@ export const donationsDataReducer = (
                     donationsDataState.paginationMapping[offset + index] = donation.id;
                 });
 
-                return { ...donationsDataState, totalDonations: payload.total };
+                return { ...donationsDataState, loading: false, totalDonations: payload.total };
             }
             return state;
+
+        case donationActionTypes.CREATE_DONATION_REQUESTED:
+            return { ...state, loading: true };
+
+        case donationActionTypes.CREATE_DONATION_FAILED:
+            return { ...state, loading: false };
 
         case donationActionTypes.CREATE_DONATION_SUCCEEDED:
             if (action.payload) {
                 const nextState: DonationDataState = { 
+                    loading: state.loading,
                     totalDonations: state.totalDonations, 
                     donations: { ...state.donations },
                     paginationMapping: { ...state.paginationMapping }
@@ -53,6 +61,7 @@ export const donationsDataReducer = (
         case donationActionTypes.UPDATE_DONATION_SUCCEEDED:
             if (action.payload) {
                 const nextState: DonationDataState = { 
+                    loading: state.loading,
                     totalDonations: state.totalDonations, 
                     donations: { ...state.donations },
                     paginationMapping: { ...state.paginationMapping }
@@ -66,6 +75,7 @@ export const donationsDataReducer = (
         case donationActionTypes.DELETE_DONATION_SUCCEEDED:
             if (action.payload) {
                 const nextState: DonationDataState = { 
+                    loading: state.loading,
                     totalDonations: state.totalDonations, 
                     donations: { ...state.donations },
                     paginationMapping: { ...state.paginationMapping }
