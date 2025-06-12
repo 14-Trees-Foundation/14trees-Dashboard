@@ -2,33 +2,22 @@ import { useEffect, useState } from "react";
 import CSRInventory from "./CSRInventory";
 import { useAuth } from "../auth/auth";
 import { SinglePageDrawer } from "./SinglePageDrawer";
-import { NaturePeople, ExitToApp, Settings, CardGiftcard, VolunteerActivism } from "@mui/icons-material";
+import { NaturePeople, Settings, CardGiftcard, VolunteerActivism } from "@mui/icons-material";
 import { createStyles, makeStyles } from "@mui/styles";
 import {
     Box,
     useMediaQuery,
     useTheme,
-    Button,
     Backdrop,
-    Avatar,
-    Typography,
-    Popover,
-    IconButton,
-    Stack,
-    Divider,
 } from "@mui/material";
-import { useLocation, useSearchParams, useNavigate, useParams } from "react-router-dom";
+import { useLocation, useSearchParams, useParams } from "react-router-dom";
 import { UserRoles } from "../../../types/common";
 import ApiClient from "../../../api/apiClient/apiClient";
 import { toast } from "react-toastify";
 import { Spinner } from "../../../components/Spinner";
 import CSRSettings from "./CSRSettings";
 import { NotFound } from "../../notfound/NotFound";
-import { GoogleLogout } from "react-google-login";
-import NotificationsNoneIcon from "@mui/icons-material/NotificationsNone";
-import EventIcon from "@mui/icons-material/Event";
 import { Group } from "../../../types/Group";
-import { User } from "../../../types/user"
 import CSRGiftRequests from "./CSRGiftRequests";
 import CSRHeader from "./CSRHeader";
 import CSRDonations from "./CSRDonations";
@@ -63,36 +52,6 @@ const CSRPage: React.FC = () => {
     const { groupId } = useParams();
 
     let auth = useAuth();
-    const userName = localStorage.getItem("userName");
-    const navigate = useNavigate();
-
-    const getInitials = (name: string) => {
-        if (!name) return "";
-        return name
-            .split(" ")
-            .map((part) => part[0])
-            .join("")
-            .toUpperCase();
-    };
-
-    const handleLogout = () => {
-        setLogoutLoading(true);
-        localStorage.removeItem("loginInfo");
-        localStorage.removeItem("token");
-        localStorage.removeItem("permissions");
-        localStorage.removeItem("roles");
-        localStorage.removeItem("userId");
-
-        auth.signout(() => {
-            setLogoutLoading(false);
-            toast.success("Logged out successfully!");
-            navigate("/login", { replace: true });
-        });
-    };
-
-    const onGoogleLogoutSuccess = () => {
-        handleLogout();
-    };
 
     const handleScroll = (id: string) => {
         const element = document.getElementById(id);
@@ -212,7 +171,7 @@ const CSRPage: React.FC = () => {
             ) : (
                 <div className={classes.box}>
                     <Box sx={{ display: "flex", position: "relative" }}>
-                        <SinglePageDrawer pages={items} />
+                        <SinglePageDrawer pages={items} setLogoutLoading={setLogoutLoading} />
 
                         {/* === Bottom Left Stack: Birthday + Avatar === */}
                         <Box
@@ -227,58 +186,6 @@ const CSRPage: React.FC = () => {
                                 gap: 2, // separation between boxes
                             }}
                         >
-                            {/* Logout Avatar Box */}
-                            <Box
-                                sx={{
-                                    display: "flex",
-                                    alignItems: "center",
-                                    gap: 1.5,
-                                    backgroundColor: "#A8B6A9",
-                                    borderRadius: 999,
-                                    px: 2,
-                                    py: 1,
-                                    boxShadow: 3,
-                                    border: "1px solid rgba(0,0,0,0.1)",
-                                }}
-                            >
-                                <Avatar
-                                    sx={{
-                                        bgcolor: "#336B43",
-                                        color: "white",
-                                        width: 36,
-                                        height: 36,
-                                        fontWeight: "bold",
-                                        fontSize: "0.9rem",
-                                    }}
-                                >
-                                    {userName ? getInitials(userName) : "U"}
-                                </Avatar>
-
-                                <Typography
-                                    variant="subtitle2"
-                                    sx={{ fontWeight: 500, color: "#333", flexGrow: 1 }}
-                                >
-                                    {userName || "User"}
-                                </Typography>
-
-                                <GoogleLogout
-                                    clientId={import.meta.env.VITE_APP_CLIENT_ID}
-                                    onLogoutSuccess={onGoogleLogoutSuccess}
-                                    render={(renderProps) => (
-                                        <Button
-                                            onClick={renderProps.onClick}
-                                            variant="text"
-                                            sx={{
-                                                minWidth: "auto",
-                                                p: 0.5,
-                                                color: "#336B43",
-                                            }}
-                                        >
-                                            <ExitToApp />
-                                        </Button>
-                                    )}
-                                />
-                            </Box>
 
                             {/* Birthday Box (above avatar) */}
                             {/* <Box
