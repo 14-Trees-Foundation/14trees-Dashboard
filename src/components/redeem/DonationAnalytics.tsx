@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import { Box, Button, Typography, CircularProgress, useMediaQuery, useTheme } from "@mui/material";
-import { CardGiftcard, Forest, GrassTwoTone, NaturePeople } from "@mui/icons-material";
+import { Box, Button, Typography, CircularProgress, useMediaQuery, useTheme, Divider } from "@mui/material";
+import { Forest, GrassTwoTone, NaturePeople, GroupAdd } from "@mui/icons-material";
 import { createStyles, makeStyles } from "@mui/styles";
 import ApiClient from "../../api/apiClient/apiClient";
 import { toast } from "react-toastify";
@@ -22,22 +22,22 @@ const useStyles = makeStyles((theme) =>
     })
 );
 
-interface GiftAnalyticsProps {
+interface DonationAnalyticsProps {
     userId?: number;
     groupId?: number;
-    onGiftMultiple: () => void;
-    onBulkGifting?: () => void;
     refreshTrigger?: number;
+    onAssignMultiple?: () => void;
+    onBulkAssignment?: () => void;
     isLoading?: boolean;
 }
 
-const GiftAnalytics: React.FC<GiftAnalyticsProps> = ({
+const DonationAnalytics: React.FC<DonationAnalyticsProps> = ({
     userId,
     groupId,
-    onGiftMultiple,
-    onBulkGifting,
     refreshTrigger = 0,
-    isLoading = false
+    onAssignMultiple,
+    onBulkAssignment,
+    isLoading = false,
 }) => {
     const classes = useStyles();
     const theme = useTheme();
@@ -58,14 +58,14 @@ const GiftAnalytics: React.FC<GiftAnalyticsProps> = ({
             let analyticsData;
 
             if (userId) {
-                analyticsData = await apiClient.getMappedGiftTreesAnalytics('user', userId);
+                analyticsData = await apiClient.getMappedDonationTreesAnalytics('user', userId);
             } else if (groupId) {
-                analyticsData = await apiClient.getMappedGiftTreesAnalytics('group', groupId);
+                analyticsData = await apiClient.getMappedDonationTreesAnalytics('group', groupId);
             }
 
             setAnalytics(analyticsData);
         } catch (error: any) {
-            toast.error(error.message || "Failed to load analytics data");
+            toast.error(error.message || "Failed to load donation analytics");
         } finally {
             setLoading(false);
         }
@@ -74,15 +74,16 @@ const GiftAnalytics: React.FC<GiftAnalyticsProps> = ({
     if (loading && !analytics) {
         return (
             <Box sx={{ textAlign: 'center', py: 4 }}>
-                <Typography>Loading analytics...</Typography>
+                <CircularProgress />
+                <Typography>Loading donation analytics...</Typography>
             </Box>
         );
     }
 
     if (!analytics) return null;
 
-    const availableTrees = Number(analytics?.total_trees) - Number(analytics?.gifted_trees) || 0;
-    const canGiftMore = analytics?.total_trees !== analytics?.gifted_trees;
+    const availableTrees = Number(analytics?.remaining_trees) || 0;
+    const canAssignMore = availableTrees > 0;
 
     return (
         <>
@@ -102,7 +103,7 @@ const GiftAnalytics: React.FC<GiftAnalyticsProps> = ({
                             {analytics?.total_trees ? analytics.total_trees : '0'}
                         </Typography>
                         <Typography variant={isMobile ? "caption" : "subtitle2"} color="#1f3625">
-                            Trees opted for Gifting
+                            Total Trees
                         </Typography>
                     </Box>
                 </div>
@@ -113,10 +114,10 @@ const GiftAnalytics: React.FC<GiftAnalyticsProps> = ({
                             style={{ color: "#573D1C" }}
                         />
                         <Typography variant={isMobile ? "h4" : "h3"} color="#fff" sx={{ pt: 1, pb: 1 }}>
-                            {analytics?.gifted_trees ? analytics.gifted_trees : '0'}
+                            {analytics?.donated_trees ? analytics.donated_trees : '0'}
                         </Typography>
                         <Typography variant={isMobile ? "caption" : "subtitle2"} color="#1f3625">
-                            Trees Gifted
+                            Trees Assigned
                         </Typography>
                     </Box>
                 </div>
@@ -127,34 +128,32 @@ const GiftAnalytics: React.FC<GiftAnalyticsProps> = ({
                             {availableTrees}
                         </Typography>
                         <Typography variant={isMobile ? "caption" : "subtitle2"} color="#1f3625">
-                            Available Giftable Inventory
+                            Trees available for assignment
                         </Typography>
                     </Box>
                 </div>
             </Box>
 
-            {canGiftMore &&
-                <Box
-                    style={{
-                        display: 'flex',
-                        flexDirection: 'column',
-                        justifyContent: 'center',
-                        alignItems: 'center',
-                        marginTop: isMobile ? 16 : 10,
-                    }}
-                >
+            {canAssignMore && (onAssignMultiple || onBulkAssignment) && (
+                <Box sx={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    mt: 2,
+                    width: '100%'
+                }}>
                     <Box sx={{
                         display: 'flex',
                         flexDirection: isMobile ? 'column' : 'row',
                         alignItems: 'center',
-                        justifyContent: 'center',
-                        width: isMobile ? '96%' : 'auto',
-                        gap: 2
+                        gap: 2,
+                        width: isMobile ? '100%' : 'auto'
                     }}>
-                        <Button
+                        {onAssignMultiple && (
+                            <Button
                             variant="contained"
                             color="success"
-                            onClick={onGiftMultiple}
+                            onClick={onAssignMultiple}
                             style={{
                                 textTransform: 'none',
                                 margin: isMobile ? '8px 0 0 0' : '10px 5px 0 0',
@@ -162,45 +161,41 @@ const GiftAnalytics: React.FC<GiftAnalyticsProps> = ({
                                 fontSize: isMobile ? '0.85rem' : 'inherit',
                                 width: isMobile ? '96%' : 'auto'
                             }}
-                            startIcon={isLoading ? <CircularProgress size={20} color="inherit" /> : <CardGiftcard />}
-                            disabled={!canGiftMore || isLoading}
-                            size={isMobile ? "small" : "medium"}
-                        >
-                            {isLoading ? "Loading Trees..." : "Gift Trees Now!"}
-                        </Button>
-                        {onBulkGifting && <Typography style={{
-                            textTransform: 'none',
-                            margin: isMobile ? '8px 0 0 0' : '10px 5px 0 0',
-                            padding: isMobile ? '8px 16px' : '6px 16px',
-                            fontSize: isMobile ? '0.85rem' : 'inherit',
-                            width: isMobile ? '96%' : 'auto',
-                            textAlign: 'center'
-                        }}>OR</Typography>}
-                        {onBulkGifting && <Button
-                            variant="contained"
-                            color="success"
-                            onClick={onBulkGifting}
-                            style={{
-                                textTransform: 'none',
-                                margin: isMobile ? '8px 0 0 0' : '10px 5px 0 0',
-                                padding: isMobile ? '8px 16px' : '6px 16px',
-                                fontSize: isMobile ? '0.85rem' : 'inherit',
-                                width: isMobile ? '96%' : 'auto'
-                            }}
-                            startIcon={<CardGiftcard />}
-                            disabled={!canGiftMore || isLoading}
-                            size={isMobile ? "small" : "medium"}
-                        >
-                            {"Gift in Bulk!"}
-                        </Button>}
+                                startIcon={isLoading ? <CircularProgress size={20} /> : <GroupAdd />}
+                                disabled={isLoading}
+                            >
+                                Assign Trees Now!
+                            </Button>
+                        )}
+
+                        {onBulkAssignment && (
+                            <>
+                                {onAssignMultiple && <Typography>OR</Typography>}
+                                <Button
+                                     variant="contained"
+                                     color="success"
+                                     onClick={onBulkAssignment}
+                                     style={{
+                                         textTransform: 'none',
+                                         margin: isMobile ? '8px 0 0 0' : '10px 5px 0 0',
+                                         padding: isMobile ? '8px 16px' : '6px 16px',
+                                         fontSize: isMobile ? '0.85rem' : 'inherit',
+                                         width: isMobile ? '96%' : 'auto'
+                                     }}
+                                    disabled={isLoading}
+                                >
+                                    Assign In Bulk!
+                                </Button>
+                            </>
+                        )}
                     </Box>
                     <Typography mt={1} variant={isMobile ? 'caption' : 'subtitle2'}>
                         (from your remaining stock of {availableTrees} trees)
                     </Typography>
                 </Box>
-            }
+            )}
         </>
     );
 };
 
-export default GiftAnalytics; 
+export default DonationAnalytics;

@@ -46,7 +46,7 @@ import SiteInventory from "./pages/admin/Inventory/SiteInventory";
 import GiftTreesComponet from "./pages/admin/gift/GiftTrees";
 import GCInventory from "./pages/admin/Inventory/GCInventory";
 import { DonationComponent } from "./pages/admin/donation/Donation";
-import CSRInventory from "./pages/admin/csr/CSRInventory";
+import CSRAdminPage from "./pages/admin/csr/CSRAdminPage";
 import Campaigns from "./pages/admin/campaign/Campaign";
 import { CampaignsPage } from "./pages/admin/campaign/CampaignsPage";
 import { ReferralsPage } from "./pages/admin/campaign/ReferralsPage"

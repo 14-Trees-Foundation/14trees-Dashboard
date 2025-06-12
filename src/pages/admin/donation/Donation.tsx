@@ -20,6 +20,7 @@ import { User } from "../../../types/user";
 import { Group } from "../../../types/Group";
 import FeedbackForm from "./Forms/FeedbackForm";
 import { Plot } from "../../../types/plot";
+import AutoPrsPlots from "../../../components/AutoPrsPlots/AutoPrsPlots"
 import PlotSelection from "./Forms/PlotSelection";
 import EmailConfirmationModal from "./components/EmailConfirmationModal";
 import DonationInfo from "./DonationInfo";
@@ -708,22 +709,30 @@ export const DonationComponent = () => {
           </Button>
         </div> */}
       </div>
-      <Divider sx={{ backgroundColor: "black", marginBottom: '15px' }} />
+      <Box sx={{ width: '100%' }}>
+        <Divider sx={{ backgroundColor: "black", mb: 2 }} />
 
-      <Box sx={{ height: 540, width: "100%" }}>
-        <GeneralTable
-          loading={loading}
-          rows={tableRows}
-          columns={columns}
-          totalRecords={donationsData.totalDonations}
-          page={page}
-          pageSize={pageSize}
-          onPaginationChange={handlePaginationChange}
-          onDownload={handleDownloadDonations}
-          footer
-          tableName="Donations"
-        />
-      </Box>
+        <Box sx={{ height: 540, width: "100%", px: 2 }}>
+          <GeneralTable
+            loading={loading}
+            rows={tableRows}
+            columns={columns}
+            totalRecords={donationsData.totalDonations}
+            page={page}
+            pageSize={pageSize}
+            onPaginationChange={handlePaginationChange}
+            onDownload={handleDownloadDonations}
+            footer
+            tableName="Donations"
+          />
+        </Box>
+
+        {/* Auto Processing Plots Section */}
+        <Divider sx={{ my: 18, backgroundColor: 'transparent'}} /> 
+          <Box sx={{ minHeight: 540 }}>
+            <AutoPrsPlots type="donate" />
+          </Box>
+        </Box>
 
       {/* Original Donation Form for creating new donations */}
       <DonationForm
