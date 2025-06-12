@@ -7,9 +7,10 @@ import { List } from '@mui/icons-material';
 
 interface UserImagesFormProps {
     requestId: string | null
+    onUpload?: (urls: string[]) => void
 }
 
-const UserImagesForm: React.FC<UserImagesFormProps> = ({ requestId }) => {
+const UserImagesForm: React.FC<UserImagesFormProps> = ({ requestId, onUpload }) => {
     const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
     const [uploading, setUploading] = useState(false);
     const [uploadProgress, setUploadProgress] = useState<number | null>(null);
@@ -32,10 +33,14 @@ const UserImagesForm: React.FC<UserImagesFormProps> = ({ requestId }) => {
         if (selectedFiles.length === 0) return;
         const awsUtils = new AWSUtils();
 
+        let urls: string[] = [];
         setUploading(true);
         for (const file of selectedFiles) {
-            await awsUtils.uploadFileToS3('gift-request', file, requestId, setUploadProgress);
+            const url = await awsUtils.uploadFileToS3('gift-request', file, requestId, setUploadProgress);
+            urls.push(url);
         }
+        
+        onUpload?.(urls);
         setUploading(false);
         setSelectedFiles([]);
         toast.success('User images uploaded successfully!');

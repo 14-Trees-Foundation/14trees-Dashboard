@@ -69,6 +69,7 @@ export const Login = () => {
         localStorage.setItem("userId", res.data.user.id.toString());
         auth.signin(
           res.data.user.name,
+          res.data.user.email,
           res.data.user.id,
           permissions,
           roles,

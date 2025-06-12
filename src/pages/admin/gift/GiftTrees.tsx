@@ -25,6 +25,7 @@ import EmailConfirmationModal from "./Form/EmailConfirmationModal";
 import EditUserDetailsModal from "./Form/EditUserDetailsModal";
 import { getHumanReadableDate, getUniqueRequestId } from "../../../helpers/utils";
 import PaymentComponent from "../../../components/payment/PaymentComponent";
+import AutoPrsPlots from "../../../components/AutoPrsPlots/AutoPrsPlots"
 import { useAuth } from "../auth/auth";
 import { Order, UserRoles } from "../../../types/common";
 import { LoginComponent } from "../Login/LoginComponent";
@@ -1281,6 +1282,10 @@ const GiftTrees: FC = () => {
 
             <GiftCardCreationModal open={giftCardNotification} onClose={() => { setGiftCardNotification(false) }} />
 
+            <Divider sx={{ my: 4, backgroundColor: 'transparent' }} />
+                    <Box sx={{ minHeight: 540 }}>
+                        <AutoPrsPlots type="gift-trees" />
+                    </Box>
             <div style={{ marginTop: '20px' }}>
                 <h2>Sponsorship Distribution</h2>
                 <GiftTreesChart corporateCount={corporateCount} personalCount={personalCount} />

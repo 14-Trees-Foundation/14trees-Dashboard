@@ -6,6 +6,7 @@ import { Pond, PondWaterLevelUpdate } from '../../types/pond';
 import { User } from '../../types/user';
 import { Site } from '../../types/site';
 import { Donation, DonationTree, DonationUser } from '../../types/donation';
+import { BirthdayResponse } from '../../types/notification';
 import { OnsiteStaff } from '../../types/onSiteStaff';
 import { MapTreesUsingPlotIdRequest, MapTreesUsingSaplingIdsRequest, Tree } from '../../types/tree';
 import { UserTree, UserTreeCountPaginationResponse } from '../../types/userTree';
@@ -212,6 +213,34 @@ class ApiClient {
             throw new Error(`Failed to fetch plots: ${error.message}`);
         }
     }
+
+    async addAutoProcessPlot(data: { plot_ids: number[]; type: 'donation' | 'gift' }): Promise<any> {
+        const url = `/auto-process/addPlots`;
+        try {
+            const response = await this.api.post(url, data);
+            return response.data;
+        } catch (error: any) {
+            console.error('Failed to add auto-processing plot:', error);
+            throw new Error(`Failed to add plot: ${error.message}`);
+        }
+    }
+
+
+
+    async getPlotsByType(type: 'donation' | 'gift', filters?: any[], order_by?: any[]): Promise<PaginatedResponse<Plot>> {
+        const url = `/auto-process/getPlot`;
+
+        try {
+            const response = await this.api.post<PaginatedResponse<Plot>>(url, { filters, order_by }, {
+                params: { type },
+            });
+            return response.data;
+        } catch (error: any) {
+            console.error('Error fetching plots by type:', error);
+            throw new Error(`Failed to fetch ${type} plots: ${error.message}`);
+        }
+    }
+
 
     async searchPlots(searchStr: string): Promise<Plot[]> {
         const url = `/plots/${searchStr}`;
@@ -985,6 +1014,21 @@ class ApiClient {
         }
     }
 
+    async getMappedDonationTreesAnalytics(type: 'group' | 'user', id: number): Promise<any> {
+        const url = `/trees/mapped-donation/analytics`;
+        try {
+            const response = await this.api.post<any>(url, {
+                [type === 'group' ? 'group_id' : 'user_id']: id
+            });
+            return response.data;
+        } catch (error: any) {
+            if (error.response?.data?.message) {
+                throw new Error(error.response.data.message);
+            }
+            throw new Error(`Failed to fetch donation trees analytics: ${error.message}`);
+        }
+    }
+
 
     /*
         Model- UserTree: CRUD Operations/Apis for user_tree_regs
@@ -1315,6 +1359,38 @@ class ApiClient {
         }
     }
 
+    async createDonationV2( sponsor_name: string, sponsor_email: string, trees_count: number, amount_donated?: number, sponsor_phone?: string, tags?: any[], users?: any[], group_id?: string ): Promise<{ donation: any, order_id: string | null }> {
+        try {
+            const response = await this.api.post<{ donation: any, order_id: string | null }>(`/donations/requests/v2`, {
+                sponsor_name,
+                sponsor_email,
+                trees_count,
+                amount_donated,
+                sponsor_phone,
+                tags,
+                users,
+                group_id
+            });
+            return response.data;
+        } catch (error: any) {
+            if (error.response?.data?.message) {
+                throw new Error(error.response.data.message);
+            }
+            throw new Error('Failed to create donation');
+        }
+    }
+
+    async paymentSuccessForDonation(donation_id: number, is_corporate: boolean) {
+        try {
+            await this.api.post<void>(`/donations/requests/payment-success`, { donation_id, is_corporate });
+        } catch (error: any) {
+            if (error?.response?.data?.message) {
+                throw new Error(error.response.data.message);
+            }
+            throw new Error('Failed to update donation payment status!');
+        }
+    }
+
     async updateDonationFeedback(request_id: string, feedback: string, source_info: string): Promise<void> {
         try {
             await this.api.post<void>(`/donations/update-feedback`, { request_id, feedback, source_info });
@@ -1621,6 +1697,17 @@ class ApiClient {
         }
     }
 
+    async bulkAssignTreesToDonationUsers(group_id: number, users: any[]): Promise<void> {
+        try {
+            await this.api.post<Donation>(`/donations/trees/bulk-assign`, { group_id, users });
+        } catch (error: any) {
+            if (error.response?.data?.message) {
+                throw new Error(error.response.data.message);
+            }
+            throw new Error('Failed to assign trees to users');
+        }
+    }
+
     async unassignDonationTrees(donation_id: number, unassign_all: boolean, tree_ids: number[]): Promise<Donation> {
         try {
             const response = await this.api.post<Donation>(`/donations/trees/unassign`, { donation_id, unassign_all, tree_ids });
@@ -1796,6 +1883,34 @@ class ApiClient {
             return response.data;
         } catch (error: any) {
             throw new Error(`Failed to fetch gift cards: ${error.message}`);
+        }
+    }
+
+    async createGiftCardRequestV2(group_id: number, sponsor_name: string, sponsor_email: string, no_of_cards: number, event_type: string, event_name: string, gifted_by?: string, tags?: string[], users?: any[], logo_message?: string, primary_message?: string): Promise<{ gift_request: GiftCard, order_id: string }> {
+        try {
+            const response = await this.api.post<{
+                gift_request: GiftCard,
+                order_id: string
+            }>('/gift-cards/requests/createv2', {
+                group_id,
+                sponsor_name,
+                sponsor_email,
+                no_of_cards,
+                event_type,
+                event_name,
+                gifted_by,
+                logo_message,
+                primary_message,
+                users,
+                tags,
+            });
+
+            return response.data;
+        } catch (error: any) {
+            if (error.response) {
+                throw new Error(error.response.data.message || 'Failed to create gift card request');
+            }
+            throw new Error('Failed to create gift card request');
         }
     }
 
@@ -2083,6 +2198,18 @@ class ApiClient {
         }
     }
 
+    async bulkRedeemGiftCardTemplate(type: 'group' | 'user', id: number, users: any[], messages?: Record<string, any>): Promise<void> {
+        try {
+            const requesting_user = localStorage.getItem("userId");
+            await this.api.post<void>(`/gift-cards/card/bulk-redeem`, { requesting_user, [type === 'group' ? 'sponsor_group' : 'sponsor_user']: id, users, ...messages });
+        } catch (error: any) {
+            if (error.response) {
+                throw new Error(error.response.data.message);
+            }
+            throw new Error('Failed to redeem gift cards');
+        }
+    }
+
     async assignTrees(gift_card_request_id: number, trees: GiftCardUser[], auto_assign: boolean): Promise<void> {
         try {
             await this.api.post<void>(`/gift-cards/assign`, { gift_card_request_id, trees, auto_assign });
@@ -2220,6 +2347,17 @@ class ApiClient {
                 throw new Error(error.response.data.message)
             }
             throw new Error('Failed to get transaction tree cards!');
+        }
+    }
+
+    async paymentSuccessForGiftRequest(gift_request_id: number, is_corporate: boolean) {
+        try {
+            await this.api.post<void>(`/gift-cards/requests/payment-success`, { gift_request_id, is_corporate });
+        } catch (error: any) {
+            if (error?.response?.data?.message) {
+                throw new Error(error.response.data.message)
+            }
+            throw new Error('update payment status in the system!');
         }
     }
 
