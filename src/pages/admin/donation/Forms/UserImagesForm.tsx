@@ -7,6 +7,8 @@ import { List } from '@mui/icons-material';
 
 interface UserImagesFormProps {
     requestId: string | null
+    onUpload?: (urls: string[]) => void
+    onValidationChange?: (isValid: boolean, isUploaded: boolean, error: string) => void;
 }
 
 const UserImagesForm: React.FC<UserImagesFormProps> = ({ requestId }) => {

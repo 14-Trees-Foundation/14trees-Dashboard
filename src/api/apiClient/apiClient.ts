@@ -226,7 +226,7 @@ class ApiClient {
 
 
 
-    async getPlotsByType( type: 'donation' | 'gift', filters?: any[], order_by?: any[]): Promise<PaginatedResponse<Plot>> {
+    async getPlotsByType(type: 'donation' | 'gift', filters?: any[], order_by?: any[]): Promise<PaginatedResponse<Plot>> {
         const url = `/auto-process/getPlot`;
 
         try {
@@ -1013,6 +1013,21 @@ class ApiClient {
         }
     }
 
+    async getMappedDonationTreesAnalytics(type: 'group' | 'user', id: number): Promise<any> {
+        const url = `/trees/mapped-donation/analytics`;
+        try {
+            const response = await this.api.post<any>(url, {
+                [type === 'group' ? 'group_id' : 'user_id']: id
+            });
+            return response.data;
+        } catch (error: any) {
+            if (error.response?.data?.message) {
+                throw new Error(error.response.data.message);
+            }
+            throw new Error(`Failed to fetch donation trees analytics: ${error.message}`);
+        }
+    }
+
 
     /*
         Model- UserTree: CRUD Operations/Apis for user_tree_regs
@@ -1343,6 +1358,38 @@ class ApiClient {
         }
     }
 
+    async createDonationV2( sponsor_name: string, sponsor_email: string, trees_count: number, amount_donated?: number, sponsor_phone?: string, tags?: any[], users?: any[], group_id?: string ): Promise<{ donation: any, order_id: string | null }> {
+        try {
+            const response = await this.api.post<{ donation: any, order_id: string | null }>(`/donations/requests/v2`, {
+                sponsor_name,
+                sponsor_email,
+                trees_count,
+                amount_donated,
+                sponsor_phone,
+                tags,
+                users,
+                group_id
+            });
+            return response.data;
+        } catch (error: any) {
+            if (error.response?.data?.message) {
+                throw new Error(error.response.data.message);
+            }
+            throw new Error('Failed to create donation');
+        }
+    }
+
+    async paymentSuccessForDonation(donation_id: number, is_corporate: boolean) {
+        try {
+            await this.api.post<void>(`/donations/requests/payment-success`, { donation_id, is_corporate });
+        } catch (error: any) {
+            if (error?.response?.data?.message) {
+                throw new Error(error.response.data.message);
+            }
+            throw new Error('Failed to update donation payment status!');
+        }
+    }
+
     async updateDonationFeedback(request_id: string, feedback: string, source_info: string): Promise<void> {
         try {
             await this.api.post<void>(`/donations/update-feedback`, { request_id, feedback, source_info });
@@ -1646,6 +1693,17 @@ class ApiClient {
                 throw new Error(error.response.data.message);
             }
             throw new Error('Failed to assign trees to donation users');
+        }
+    }
+
+    async bulkAssignTreesToDonationUsers(group_id: number, users: any[]): Promise<void> {
+        try {
+            await this.api.post<Donation>(`/donations/trees/bulk-assign`, { group_id, users });
+        } catch (error: any) {
+            if (error.response?.data?.message) {
+                throw new Error(error.response.data.message);
+            }
+            throw new Error('Failed to assign trees to users');
         }
     }
 

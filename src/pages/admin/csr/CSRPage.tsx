@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import CSRInventory from "./CSRInventory";
 import { useAuth } from "../auth/auth";
 import { SinglePageDrawer } from "./SinglePageDrawer";
-import { NaturePeople, ExitToApp, Settings, CardGiftcard } from "@mui/icons-material";
+import { NaturePeople, ExitToApp, Settings, CardGiftcard, VolunteerActivism } from "@mui/icons-material";
 import { createStyles, makeStyles } from "@mui/styles";
 import {
     Box,
@@ -31,6 +31,7 @@ import { Group } from "../../../types/Group";
 import { User } from "../../../types/user"
 import CSRGiftRequests from "./CSRGiftRequests";
 import CSRHeader from "./CSRHeader";
+import CSRDonations from "./CSRDonations";
 
 type BirthdayData = {
     hasBirthday: boolean;
@@ -74,7 +75,7 @@ const CSRPage: React.FC = () => {
     };
 
     useEffect(() => {
-        auth.signin("user", "user@example.com", 13124, ["all"], ["super-admin"], "", () => { });
+        auth.signin("User", "user@example.com", 13124, ["all"], ["super-admin"], "", () => { });
         localStorage.setItem("userId", "13124");
     }, []);
 
@@ -191,6 +192,13 @@ const CSRPage: React.FC = () => {
             onClick: () => setActiveTab("orders")
         },
         {
+            displayName: 'Donations',
+            logo: VolunteerActivism,
+            key: 8,
+            display: true,
+            onClick: () => setActiveTab("donations")
+        },
+        {
             displayName: "Settings",
             logo: Settings,
             key: 7,
@@ -281,7 +289,7 @@ const CSRPage: React.FC = () => {
                             </Box>
 
                             {/* Birthday Box (above avatar) */}
-                            <Box
+                            {/* <Box
                                 sx={{
                                     display: "flex",
                                     flexDirection: "column",
@@ -337,7 +345,7 @@ const CSRPage: React.FC = () => {
                                         No Events soon.
                                     </Typography>
                                 )}
-                            </Box>
+                            </Box> */}
                         </Box>
 
 
@@ -345,6 +353,7 @@ const CSRPage: React.FC = () => {
                             <CSRHeader groupId={groupId} onGroupChange={group => { setCurrentGroup(group) }} />
                             {activeTab === "greenTributeWall" && currentGroup && <CSRInventory selectedGroup={currentGroup}/>}
                             {activeTab === "orders" && currentGroup && <CSRGiftRequests selectedGroup={currentGroup} groupId={currentGroup.id}/>}
+                            {activeTab === "donations" && currentGroup && <CSRDonations selectedGroup={currentGroup} />}
                             {activeTab === "Setting-Details" && currentGroup && <CSRSettings group={currentGroup} onGroupChange={group => { setCurrentGroup(group) }}/>}
                         </Box>
                     </Box>

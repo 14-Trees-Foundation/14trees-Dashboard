@@ -5,12 +5,16 @@ type Props = {
     isAboveLimit: boolean
     treesCount: number,
     onTreesCountChange: (value: number) => void
+    isGifting?: boolean  // Add this prop to distinguish between modes
 }
 
-const TreesCount: React.FC<Props> = ({ isAboveLimit, treesCount, onTreesCountChange }) => {
+const TreesCount: React.FC<Props> = ({ isAboveLimit, treesCount, onTreesCountChange, isGifting = false }) => {
     const treePresets = [2, 5, 10, 14, 50, 100];
     const [showCustomInput, setShowCustomInput] = useState(!treePresets.includes(treesCount));
     const [error, setError] = useState<string>("");
+    
+    // Calculate price per tree based on mode
+    const pricePerTree = isGifting ? 2000 : 1500;
 
     const handlePresetSelect = (count: number) => {
         onTreesCountChange(count);
@@ -63,7 +67,7 @@ const TreesCount: React.FC<Props> = ({ isAboveLimit, treesCount, onTreesCountCha
     return (
         <Box sx={{ p: 3 }}>
             <Typography variant="h6" gutterBottom>
-                How many trees would you like to sponsor?*
+                How many trees would you like to {isGifting ? 'gift' : 'donate'}?*
             </Typography>
 
             <Box sx={{
@@ -134,12 +138,17 @@ const TreesCount: React.FC<Props> = ({ isAboveLimit, treesCount, onTreesCountCha
                 </Grid>
 
                 <Typography variant="body1" sx={{ mt: 2 }}>
-                    Total Amount: ₹{(treesCount * 2000).toLocaleString()}
+                    Total Amount: ₹{(treesCount * pricePerTree).toLocaleString()}
                     {isAboveLimit && (
                         <Typography component="span" color="error" sx={{ ml: 1 }}>
                             (Above Razorpay limit - Bank Transfer recommended)
                         </Typography>
                     )}
+                </Typography>
+                
+                {/* Optional: Show price per tree information */}
+                <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+                    Price per tree: ₹{pricePerTree.toLocaleString()}
                 </Typography>
             </Box>
         </Box>

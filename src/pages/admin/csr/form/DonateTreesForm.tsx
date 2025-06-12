@@ -3,13 +3,14 @@ import { Box, Button, Dialog, DialogTitle, DialogContent, DialogActions, Alert, 
 import { Steps } from 'antd';
 import { LoadingButton } from '@mui/lab';
 import TreesCount from "./components/TreesCount";
-import PurchaseSummary from "./components/PurchaseSummary";
+import DonationSummary from "./components/DonationSummary";
 import FileUploadField from "./components/FileUploadField";
 import RazorpayComponent from "../../../../components/RazorpayComponent";
 import PaymentQRInfo from "../../../../components/PaymentQRInfo";
 import ApiClient from "../../../../api/apiClient/apiClient";
 import { AWSUtils } from "../../../../helpers/aws";
 import { GiftCard } from "../../../../types/gift_card";
+import CSVUploadSection from "../components/DonationCSV"
 
 const apiClient = new ApiClient();
 const awsUtils = new AWSUtils();
@@ -27,9 +28,9 @@ type Props = {
 
 type PaymentStatus = 'idle' | 'pending' | 'success' | 'failed';
 
-const PurchaseTreesForm: React.FC<Props> = ({ 
-    open, 
-    onClose, 
+const DonationTreesForm: React.FC<Props> = ({
+    open,
+    onClose,
     corporateName = '',
     corporateLogo = '',
     userName = '',
@@ -41,15 +42,22 @@ const PurchaseTreesForm: React.FC<Props> = ({
     const [treesCount, setTreesCount] = useState<number>(14);
     const [loading, setLoading] = useState(false);
     const [orderId, setOrderId] = useState<string>('');
-    const [giftRequest, setGiftRequest] = useState<GiftCard | null>(null);
+    const [donationId, setDonationId] = useState<string>(''); // Changed from giftRequestId
+    const [donationData, setDonationData] = useState<any>(null);
+    const [donationRequest, setDonationRequest] = useState<any>(null);
     const [paymentStatus, setPaymentStatus] = useState<PaymentStatus>('idle');
-    const [giftRequestId, setGiftRequestId] = useState<string>('');
+    const [recipients, setRecipients] = useState<any[]>([]);
     const [error, setError] = useState<string>('');
     const [uploadProgress, setUploadProgress] = useState(0);
     const [paymentProof, setPaymentProof] = useState<File | null>(null);
     const [uploadedFileUrl, setUploadedFileUrl] = useState<string>('');
+    const [csvValidation, setCsvValidation] = useState({
+        isValid: true,
+        isUploaded: false,
+        error: ''
+    });
     const RAZORPAY_LIMIT = 500000;
-    const TREE_PRICE = 2000;
+    const TREE_PRICE = 1500;
 
     const totalAmount = treesCount * TREE_PRICE;
     const isAboveLimit = totalAmount > RAZORPAY_LIMIT;
@@ -59,7 +67,7 @@ const PurchaseTreesForm: React.FC<Props> = ({
             title: 'Tree Count',
             content: (
                 <Box sx={{ p: 2 }}>
-                    <TreesCount isGifting={true}
+                    <TreesCount
                         isAboveLimit={isAboveLimit}
                         treesCount={treesCount}
                         onTreesCountChange={setTreesCount}
@@ -68,9 +76,30 @@ const PurchaseTreesForm: React.FC<Props> = ({
             ),
         },
         {
+            title: 'Upload CSV',
+            content: (
+                <Box sx={{ p: 2 }}>
+                    <CSVUploadSection
+                        onValidationChange={(isValid, isUploaded, error) => {
+                            setCsvValidation({
+                                isValid,
+                                isUploaded,
+                                error
+                            });
+                        }}
+                        onRecipientsChange={(recipients) => {
+                            setRecipients(recipients);
+                        }}
+                        totalTreesSelected={treesCount}
+                    />
+
+                </Box>
+            ),
+        },
+        {
             title: 'Summary',
             content: (
-                <PurchaseSummary
+                <DonationSummary
                     treesCount={treesCount}
                     corporateName={corporateName}
                     corporateLogo={corporateLogo}
@@ -83,6 +112,14 @@ const PurchaseTreesForm: React.FC<Props> = ({
     ];
 
     const handleNext = () => {
+        // If we're moving to the CSV upload step, reset validation
+        if (currentStep === 0) {
+            setCsvValidation({
+                isValid: true,
+                isUploaded: false,
+                error: ''
+            });
+        }
         setCurrentStep((prev) => prev + 1);
     };
 
@@ -91,36 +128,53 @@ const PurchaseTreesForm: React.FC<Props> = ({
     };
 
     const handleSubmit = async () => {
-        if (!groupId) {
-            setError('Group ID is required');
+        // Validate required fields
+        if (!user?.name || !userEmail) {
+            setError('Logged-in user name and email are required');
             return;
         }
-
+        if (!treesCount || treesCount <= 0) {
+            setError('Tree count must be greater than 0');
+            return;
+        }
+    
         try {
             setLoading(true);
             setError('');
-            const response = await apiClient.createGiftCardRequestV2(
-                groupId,
-                userName,
+    
+            // Prepare the exact payload structure expected by backend
+            const response = await apiClient.createDonationV2(
+                user.name,
                 userEmail,
                 treesCount,
-                "3", // event type (General)
-                "", // event name
-                corporateName,
+                totalAmount,
+                undefined,
                 ["Corporate"],
-            );
-
+                recipients?.length ? recipients.map(r => ({
+                  recipient_name: r.name,
+                  recipient_email: r.email,
+                  recipient_phone: r.phone,
+                  assignee_name: r.assigneeName || r.name,
+                  assignee_email: r.assigneeEmail || r.email,
+                  assignee_phone: r.assigneePhone || r.email,
+                  trees_count: r.trees_count ||  1,
+                  image_url: r.image_url,
+                })) : undefined,
+                groupId ? groupId.toString() : undefined
+              );
+    
+            // Handle response
             if (response.order_id) {
                 setOrderId(response.order_id);
             }
-            if (response.gift_request?.id) {
-                setGiftRequest(response.gift_request);
-                setGiftRequestId(response.gift_request.id.toString());
+            if (response.donation?.id) {
+                setDonationId(response.donation.id.toString());
+                setDonationRequest(response.donation)
             }
             setPaymentStatus('pending');
-        } catch (error) {
-            console.error('Error creating gift card request:', error);
-            setError('Failed to create order. Please try again.');
+        } catch (error: any) {
+            console.error('Error creating donation:', error);
+            setError(error.message || 'Failed to create donation. Please try again.');
         } finally {
             setLoading(false);
         }
@@ -130,14 +184,19 @@ const PurchaseTreesForm: React.FC<Props> = ({
         try {
             setPaymentStatus('success');
             setLoading(true);
-            await apiClient.paymentSuccessForGiftRequest(Number(giftRequestId), true);
+
+            await apiClient.paymentSuccessForDonation(
+                Number(donationId),
+                true
+            );
+
+            onSuccess?.();
         } catch (error: any) {
-            setError('Payment successful but failed to update status. Please contact support.');
+            setError(error.message || 'Payment successful but failed to update status. Please contact support.');
             setPaymentStatus('failed');
         } finally {
             setLoading(false);
         }
-        onSuccess?.(); 
     };
 
     const handlePaymentFailure = () => {
@@ -163,7 +222,7 @@ const PurchaseTreesForm: React.FC<Props> = ({
             return;
         }
 
-        if (!giftRequest?.payment_id) {
+        if (!donationRequest?.payment_id) {
             setError('Something went wrong. Please contact the 14trees team');
             return;
         }
@@ -171,12 +230,12 @@ const PurchaseTreesForm: React.FC<Props> = ({
         try {
             setLoading(true);
             setError('');
-            
+
             // Upload payment proof to S3
             const fileUrl = await awsUtils.uploadFileToS3(
-                "gift-request",
+                "donation-request",
                 paymentProof,
-                `cards/${giftRequest.request_id}/payment_proof`,
+                `cards/${donationRequest.request_id}/payment_proof`,
                 setUploadProgress
             );
 
@@ -184,14 +243,14 @@ const PurchaseTreesForm: React.FC<Props> = ({
 
             // Create payment history
             await apiClient.createPaymentHistory(
-                giftRequest.payment_id,
+                donationRequest.payment_id,
                 totalAmount,
                 "Net Banking",
                 fileUrl
             );
 
             setPaymentStatus('success');
-            onSuccess?.(); 
+            onSuccess?.();
         } catch (error) {
             console.error('Error processing bank transfer:', error);
             setError('Failed to process payment proof. Please try again.');
@@ -207,6 +266,14 @@ const PurchaseTreesForm: React.FC<Props> = ({
         phone: '',
     };
 
+    // Determine if Next button should be disabled
+    const isNextDisabled = () => {
+        if (currentStep === 1) { // CSV Upload step
+            return !csvValidation.isValid;
+        }
+        return false;
+    };
+
     return (
         <Dialog
             open={open}
@@ -215,7 +282,7 @@ const PurchaseTreesForm: React.FC<Props> = ({
             fullWidth
         >
             <DialogTitle>
-                Purchase Trees
+                Donate Trees
             </DialogTitle>
             <DialogContent dividers>
                 {paymentStatus === 'idle' && (
@@ -227,7 +294,7 @@ const PurchaseTreesForm: React.FC<Props> = ({
                 {paymentStatus === 'pending' && (
                     <>
                         <Alert severity="warning" sx={{ mt: 2 }}>
-                            Order ID: {giftRequestId}.
+                            Order ID: {donationId}.
                             Payment is required to complete the order!
                         </Alert>
                         {isAboveLimit ? (
@@ -260,13 +327,13 @@ const PurchaseTreesForm: React.FC<Props> = ({
                 )}
                 {paymentStatus === 'success' && (
                     <Alert severity="success" sx={{ mt: 2 }}>
-                        Payment successful! Gift Request ID: {giftRequestId}
+                        Payment successful! Gift Request ID: {donationId}
                     </Alert>
                 )}
                 {paymentStatus === 'failed' && (
                     <>
                         <Alert severity="warning" sx={{ mt: 2 }}>
-                            Order ID: {giftRequestId}.
+                            Order ID: {donationId}.
                             Payment is required to complete the order!
                         </Alert>
                         <Alert severity="error" sx={{ mt: 2 }}>
@@ -277,7 +344,7 @@ const PurchaseTreesForm: React.FC<Props> = ({
             </DialogContent>
             <DialogActions>
                 <Button onClick={handleClose} color="error" variant="outlined">
-                    {giftRequestId ? 'Close' : 'Cancel'}
+                    {donationId ? 'Close' : 'Cancel'}
                 </Button>
                 {paymentStatus === 'idle' && (
                     <>
@@ -291,7 +358,7 @@ const PurchaseTreesForm: React.FC<Props> = ({
                                 onClick={handleNext}
                                 color="success"
                                 variant="contained"
-                                disabled={treesCount < 1}
+                                disabled={treesCount < 1 || isNextDisabled()}
                             >
                                 Next
                             </Button>
@@ -342,5 +409,4 @@ const PurchaseTreesForm: React.FC<Props> = ({
     );
 };
 
-export default PurchaseTreesForm;
-
+export default DonationTreesForm;
