@@ -956,20 +956,23 @@ const GiftTrees: FC = () => {
             key: "Email Status",
             title: "Email Status",
             align: "center",
-            width: 150,
+            width: 200,
             render: (value, record: any, index) => {
                 const usersCount = parseInt(record.users_count || "0");
                 const mailedCount = parseInt(record.mailed_count || "0");
-                
+                const mailedAssigneeCount = parseInt(record.mailed_assignee_count || "0");
+        
                 const statusMessages: string[] = [];
-                
                 if (record.mail_sent) {
                     statusMessages.push("Mail Sent to Sponsor");
                 }
                 if (usersCount > 0 && usersCount === mailedCount) {
                     statusMessages.push("Mail Sent to Recipient");
                 }
-                
+                if (usersCount > 0 && usersCount === mailedAssigneeCount) {
+                    statusMessages.push("Mail Sent to Assignee");
+                }
+
                 return statusMessages.join(", ");
             }
         },
