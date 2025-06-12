@@ -109,7 +109,7 @@ function App() {
             <Route path="campaigns" element={<Campaigns />}></Route>
             <Route path="tree-cards" element={<GiftTreesComponet />} />
             <Route path="donations" element={<DonationComponent />} />
-            <Route path="corporate-dashboard" element={<CSRInventory />} />
+            <Route path="corporate-dashboard" element={<CSRAdminPage />} />
             <Route path="forms" element={<Forms />}>
               <Route path="assigntrees" element={<AssignTree />}></Route>
               <Route path="addorg" element={<AddOrg />}></Route>

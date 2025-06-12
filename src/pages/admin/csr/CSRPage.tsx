@@ -63,6 +63,7 @@ const CSRPage: React.FC = () => {
     const { groupId } = useParams();
 
     let auth = useAuth();
+    const userName = localStorage.getItem("userName");
     const navigate = useNavigate();
 
     const getInitials = (name: string) => {
@@ -73,11 +74,6 @@ const CSRPage: React.FC = () => {
             .join("")
             .toUpperCase();
     };
-
-    useEffect(() => {
-        auth.signin("User", "user@example.com", 13124, ["all"], ["super-admin"], "", () => { });
-        localStorage.setItem("userId", "13124");
-    }, []);
 
     const handleLogout = () => {
         setLogoutLoading(true);
@@ -255,14 +251,14 @@ const CSRPage: React.FC = () => {
                                         fontSize: "0.9rem",
                                     }}
                                 >
-                                    {auth.user?.name ? getInitials(auth.user.name) : "U"}
+                                    {userName ? getInitials(userName) : "U"}
                                 </Avatar>
 
                                 <Typography
                                     variant="subtitle2"
                                     sx={{ fontWeight: 500, color: "#333", flexGrow: 1 }}
                                 >
-                                    {auth.user?.name || "User"}
+                                    {userName || "User"}
                                 </Typography>
 
                                 <GoogleLogout
