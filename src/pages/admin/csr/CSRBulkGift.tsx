@@ -405,6 +405,25 @@ const CSRBulkGift: React.FC<CSRBulkGiftProps> = ({ groupId, logoUrl, open, onClo
             setTotalAmount(treesCount * 2000); // Assuming each tree costs 2000
             setUserData(preparedUserData);
 
+            const userData = prepareUserData();
+            const users = userData.map(item => {
+                let user = {
+                    recipient_name: item.name.trim(),
+                    recipient_email: item.email.trim() ? item.email.trim() : item.name.trim().toLowerCase().split(" ").join(".") + "@14trees",
+                    recipient_communication_email: item.communication_email.trim() || null,
+                    gifted_trees: item.trees_count,
+                    image_url: item.profile_image_url,
+                    assignee_name: item.name.trim(),
+                    assignee_email: item.email.trim() ? item.email.trim() : item.name.trim().toLowerCase().split(" ").join(".") + "@14trees",
+                    assignee_communication_email: item.communication_email.trim() || null,
+                    gifted_on: item.gifted_on?.trim() || null,
+                    gifted_by: item.gifted_by?.trim() || null,
+                    event_name: item.event_name?.trim() || null,
+                }
+
+                return user
+            })
+
             const response = await apiClient.createGiftCardRequestV2(
                 groupId,
                 preparedUserData[0].name,
@@ -413,7 +432,10 @@ const CSRBulkGift: React.FC<CSRBulkGiftProps> = ({ groupId, logoUrl, open, onClo
                 messages.eventType || "3",
                 messages.eventName,
                 messages.plantedBy,
-                ["Corporate"],
+                ["Corporate", isPayLater ? "PayLater" : "GiftAndPay"],
+                users,
+                messages.primaryMessage,
+                messages.logoMessage
             );
 
             if (response.order_id) {
@@ -425,7 +447,7 @@ const CSRBulkGift: React.FC<CSRBulkGiftProps> = ({ groupId, logoUrl, open, onClo
             }
 
             if (isPayLater) {
-                toast.success("Gift request created successfully! Payment can be made later.");
+                toast.success("Gift request created successfully!");
                 onSubmit();
                 onClose();
             } else {
