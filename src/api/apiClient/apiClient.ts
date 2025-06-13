@@ -411,6 +411,7 @@ class ApiClient {
             formData.append("type", data.type);
             if (data.description) formData.append("description", data.description);
             if (data.address) formData.append("address", data.address);
+            if (data.billing_email) formData.append("billing_email", data.billing_email);
             if (data.logo_url) formData.append("logo_url", data.logo_url);
             formData.append("create_at", data.created_at as any);
             formData.append("updated_at", data.updated_at as any);
@@ -456,6 +457,32 @@ class ApiClient {
                 throw new Error(error.response.data.message);
             }
             throw new Error('Failed to merge groups!');
+        }
+    }
+
+    async registerGroup(corporateData: { name: string, type:string, logo_url?: string, address?: string, billing_email?: string, description?: string}, userData: { name: string, email: string, phone?: string;}): Promise<Group> {
+        try {
+          const response = await this.api.post<Group>('/groups/register', {
+            corporate: {
+              name: corporateData.name,
+              type: "corporate",
+              logo_url: corporateData.logo_url,
+              address: corporateData.address,
+              billing_email: corporateData.billing_email,
+              description: corporateData.description,
+            },
+            user: {
+              name: userData.name,
+              email: userData.email,
+              phone: userData.phone,
+            }
+          });
+          return response.data;
+        } catch (error: any) {
+          if (error.response?.data?.message) {
+            throw new Error(error.response.data.message);
+          }
+          throw new Error('Failed to register group');
         }
     }
 
