@@ -13,18 +13,16 @@ import { TableColumnsType } from "antd";
 import { getHumanReadableDate } from "../../../helpers/utils";
 import { Order } from "../../../types/common";
 import GeneralTable from "../../../components/GenTable";
-import PurchaseTreesForm from "./form/PurchaseTreesForm";
 import { Group } from "../../../types/Group";
 import PaymentIcon from '@mui/icons-material/Payment';
 import PaymentDialog from "./components/PaymentDialog";
 
-
-interface CSRGiftRequestsProps {
-    groupId: number
-    selectedGroup: Group
+interface CSRGiftHistoryProps {
+    groupId: number;
+    selectedGroup: Group;
 }
 
-const CSRGiftRequests: React.FC<CSRGiftRequestsProps> = ({ groupId, selectedGroup }) => {
+const CSRGiftHistory: React.FC<CSRGiftHistoryProps> = ({ groupId, selectedGroup }) => {
     const dispatch = useAppDispatch();
     const { getGiftCards } = bindActionCreators(giftCardActionCreators, dispatch);
 
@@ -35,62 +33,14 @@ const CSRGiftRequests: React.FC<CSRGiftRequestsProps> = ({ groupId, selectedGrou
     const [pageSize, setPageSize] = useState(10);
     const [filters, setFilters] = useState<Record<string, GridFilterItem>>({});
     const [orderBy, setOrderBy] = useState<Order[]>([]);
-    const [tableRows, setTableRows] = useState<GiftCard[]>([]);
-    const [tags, setTags] = useState<string[]>([]);
-    const [formOpen, setFormOpen] = useState(false);
+    const [tableRowsPrePaid, setTableRowsPrePaid] = useState<GiftCard[]>([]);
+    const [tableRowsPayLater, setTableRowsPayLater] = useState<GiftCard[]>([]);
     const [paymentDialogOpen, setPaymentDialogOpen] = useState(false);
     const [selectedGiftCard, setSelectedGiftCard] = useState<GiftCard | null>(null);
 
     const giftCardsData = useAppSelector((state: RootState) => state.giftCardsData);
 
-    useEffect(() => {
-        const getTags = async () => {
-            try {
-                const apiClient = new ApiClient();
-                const tagsResp = await apiClient.getGiftRequestTags();
-                setTags(tagsResp.results);
-            } catch (error: any) {
-                toast.error(error.message);
-            }
-        }
-        getTags();
-    }, []);
-
-    useEffect(() => {
-        const handler = setTimeout(() => {
-            getGiftCardData();
-        }, 300)
-
-        return () => { clearTimeout(handler) };
-    }, [filters, orderBy, groupId]);
-
-    useEffect(() => {
-
-        if (giftCardsData.loading) return;
-        
-        const handler = setTimeout(() => {
-            const records: GiftCard[] = [];
-            const maxLength = Math.min((page + 1) * pageSize, giftCardsData.totalGiftCards);
-            for (let i = page * pageSize; i < maxLength; i++) {
-                if (Object.hasOwn(giftCardsData.paginationMapping, i)) {
-                    const id = giftCardsData.paginationMapping[i];
-                    const record = giftCardsData.giftCards[id];
-                    if (record) {
-                        records.push(record);
-                    }
-                } else {
-                    getGiftCardData();
-                    break;
-                }
-            }
-
-            setTableRows(records);
-        }, 300)
-
-        return () => { clearTimeout(handler) };
-    }, [pageSize, page, giftCardsData]);
-
-    const getFilters = (filters: any, groupId: number) => {
+    const getFilters = (filters: any, groupId: number, tags: string[]) => {
         const filtersData = JSON.parse(JSON.stringify(Object.values(filters))) as GridFilterItem[];
         filtersData.forEach((item) => {
             if (item.columnField === 'status') {
@@ -98,7 +48,7 @@ const CSRGiftRequests: React.FC<CSRGiftRequestsProps> = ({ groupId, selectedGrou
                 if ((item.value as string[]).includes('Pending')) {
                     items.push('pending_plot_selection');
                 }
-                if ((item.value as string[]).includes('Completed')) {
+                if ((item.value as string[]).includes('Fulfilled')) {
                     items.push('pending_assignment');
                     items.push('completed');
                 }
@@ -114,54 +64,57 @@ const CSRGiftRequests: React.FC<CSRGiftRequestsProps> = ({ groupId, selectedGrou
             value: groupId,
         });
 
-        return filtersData;
-    };
-
-    const getGiftCardData = async () => {
-        const filtersData = getFilters(filters, groupId);
-    
         filtersData.push({
             columnField: 'tags',
             operatorValue: 'contains',
-            value: ['Pre-Purchased'],
+            value: tags,
         });
-    
+
+        return filtersData;
+    };
+
+    const getGiftCardData = async (type: 'prepaid' | 'paylater') => {
+        const tags = type === 'prepaid' ? ['Pre-Paid'] : ['Pay-Later'];
+        const filtersData = getFilters(filters, groupId, tags);
+        
         getGiftCards(page * pageSize, pageSize, filtersData, orderBy);
     };
 
     useEffect(() => {
         const handler = setTimeout(() => {
-            getGiftCardData();
-        }, 300);
+            getGiftCardData('prepaid');
+            getGiftCardData('paylater');
+        }, 300)
 
-        return () => clearTimeout(handler);
-    }, [filters, orderBy, groupId, page, pageSize]);
+        return () => { clearTimeout(handler) };
+    }, [filters, orderBy, groupId]);
 
     useEffect(() => {
-        const handler = setTimeout(() => {
-            const records: GiftCard[] = [];
-            const maxLength = Math.min((page + 1) * pageSize, giftCardsData.totalGiftCards);
-            for (let i = page * pageSize; i < maxLength; i++) {
-                if (Object.hasOwn(giftCardsData.paginationMapping, i)) {
-                    const id = giftCardsData.paginationMapping[i];
-                    const record = giftCardsData.giftCards[id];
-                    if (record) records.push(record);
-                } else {
-                    getGiftCardData();
-                    return;
-                }
-            }
-            setTableRows(records);
-        }, 300);
-
-        return () => clearTimeout(handler);
-    }, [giftCardsData, page, pageSize]);
-
-    const handleFormSuccess = () => {
-        setFormOpen(false);
-        setPage(0);
-        getGiftCardData();
-    };
+        if (giftCardsData.loading) return;
+    
+        // Debug: Log the complete state structure
+        console.log('Full giftCardsData state:', giftCardsData);
+        
+        // Process all available records directly from the Redux store
+        const allRecords = Object.values(giftCardsData.giftCards);
+        
+        // Filter records by their tags
+        const prePaidRecords = allRecords.filter(record => 
+            record.tags?.some(tag => tag.toLowerCase().includes('pre-paid') || tag.toLowerCase().includes('prepaid'))
+        );
+        
+        const payLaterRecords = allRecords.filter(record => 
+            record.tags?.includes('Pay-Later')
+        );
+    
+        // Debug: Verify the filtered records
+        console.log('Filtered Pre-Paid records:', prePaidRecords);
+        console.log('Filtered Pay-Later records:', payLaterRecords);
+    
+        // Update state with the filtered records
+        setTableRowsPrePaid(prePaidRecords);
+        setTableRowsPayLater(payLaterRecords);
+    }, [giftCardsData]); // Removed page and pageSize dependencies
 
     const handleSetFilters = (filters: Record<string, GridFilterItem>) => {
         setPage(0);
@@ -169,7 +122,7 @@ const CSRGiftRequests: React.FC<CSRGiftRequestsProps> = ({ groupId, selectedGrou
     };
 
     const getStatus = (card: GiftCard) => {
-        return card.status === 'pending_plot_selection' ? 'Pending' : 'Completed';
+        return card.status === 'pending_plot_selection' ? 'Pending' : 'Fulfilled';
     };
 
     const handleSortingChange = (sorter: any) => {
@@ -197,8 +150,9 @@ const CSRGiftRequests: React.FC<CSRGiftRequestsProps> = ({ groupId, selectedGrou
         </div>
     );
 
-    const getAllGiftCardsData = async () => {
-        const filtersData = getFilters(filters, groupId);
+    const getAllGiftCardsData = async (type: 'prepaid' | 'paylater') => {
+        const tags = type === 'prepaid' ? ['Pre-Paid'] : ['Pay-Later'];
+        const filtersData = getFilters(filters, groupId, tags);
         const apiClient = new ApiClient();
         const resp = await apiClient.getGiftCards(0, -1, filtersData, orderBy);
         return resp.results;
@@ -206,11 +160,12 @@ const CSRGiftRequests: React.FC<CSRGiftRequestsProps> = ({ groupId, selectedGrou
 
     const handlePaymentSuccess = () => {
         setPaymentDialogOpen(false);
-        getGiftCardData();
+        getGiftCardData('prepaid');
+        getGiftCardData('paylater');
         toast.success('Payment successful!');
     };
 
-    const columns: TableColumnsType<GiftCard> = [
+    const getCommonColumns = (): TableColumnsType<GiftCard> => [
         {
             dataIndex: "id",
             key: "Req. No.",
@@ -241,7 +196,7 @@ const CSRGiftRequests: React.FC<CSRGiftRequestsProps> = ({ groupId, selectedGrou
             align: "center",
             width: 150,
             render: (value, record, index) => getStatus(record),
-            ...getColumnSelectedItemFilter({ dataIndex: 'status', filters, handleSetFilters, options: ['Pending', 'Completed'] })
+            ...getColumnSelectedItemFilter({ dataIndex: 'status', filters, handleSetFilters, options: ['Pending', 'Fulfilled'] })
         },
         {
             dataIndex: "total_amount",
@@ -276,76 +231,81 @@ const CSRGiftRequests: React.FC<CSRGiftRequestsProps> = ({ groupId, selectedGrou
             render: getHumanReadableDate,
             ...getColumnDateFilter({ dataIndex: 'created_at', filters, handleSetFilters, label: 'Created' })
         },
-        {
-            key: "action",
-            title: "Action",
-            align: "center",
-            width: 120,
-            fixed: 'right',
-            render: (_, record) => (
-                record.amount_received !== record.total_amount && (
-                    <Button
-                        variant="contained"
-                        color="success"
-                        size="small"
-                        startIcon={<PaymentIcon />}
-                        onClick={() => {
-                            setSelectedGiftCard(record);
-                            setPaymentDialogOpen(true);
-                        }}
-                    >
-                        Pay
-                    </Button>
-                )
-            ),
-        },
-    ]
+    ];
+
+    const getPayLaterColumns = (): TableColumnsType<GiftCard> => {
+        const commonColumns = getCommonColumns();
+        return [
+            ...commonColumns,
+            {
+                key: "action",
+                title: "Action",
+                align: "center",
+                width: 120,
+                fixed: 'right',
+                render: (_, record) => (
+                    record.amount_received !== record.total_amount && (
+                        <Button
+                            variant="contained"
+                            color="success"
+                            size="small"
+                            startIcon={<PaymentIcon />}
+                            onClick={() => {
+                                setSelectedGiftCard(record);
+                                setPaymentDialogOpen(true);
+                            }}
+                        >
+                            Pay
+                        </Button>
+                    )
+                ),
+            },
+        ];
+    };
 
     return (
-        <Box p={2} id="green-gift-contributions">
+        <Box p={2} id="green-gift-history">
             <Box sx={{
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'space-between',
                 mb: 1,
             }}>
-                <Typography variant="h4" ml={1}>Pre-Purchase History</Typography>
-                <Button
-                    variant="contained"
-                    color="success"
-                    onClick={() => setFormOpen(true)}
-                    style={{ marginLeft: 10, textTransform: 'none' }}
-                >
-                    Pre-Purchase Trees
-                </Button>
             </Box>
-            <Box sx={{ height: 840, width: "100%" }}>
+
+            {/* Pre-Paid Table */}
+            <Typography variant="h5" gutterBottom sx={{ mt: 3 }}>Pre-Paid Orders</Typography>
+            <Box sx={{ height: 400, width: "100%", mb: 4 }}>
                 <GeneralTable
                     loading={giftCardsData.loading}
-                    rows={tableRows}
-                    columns={columns}
-                    totalRecords={giftCardsData.totalGiftCards}
-                    page={page}
+                    rows={tableRowsPrePaid}
+                    columns={getCommonColumns()}
+                    totalRecords={giftCardsData.totalGiftCards} 
+                    page={page + 1}
                     pageSize={pageSize}
                     onPaginationChange={(page: number, pageSize: number) => { setPage(page - 1); setPageSize(pageSize); }}
-                    onDownload={getAllGiftCardsData}
+                    onDownload={() => getAllGiftCardsData('prepaid')}
                     footer
-                    tableName="Orders"
+                    tableName="Pre-Paid Orders"
                 />
             </Box>
 
-            {selectedGroup && formOpen && (
-                <PurchaseTreesForm
-                    open={formOpen}
-                    onClose={() => setFormOpen(false)}
-                    onSuccess={handleFormSuccess}
-                    corporateName={selectedGroup.name}
-                    corporateLogo={selectedGroup.logo_url ?? undefined}
-                    groupId={selectedGroup.id}
-                    userName={userName}
-                    userEmail={userEmail || ""}
+            {/* Pay-Later Table */}
+            <Typography variant="h5" gutterBottom sx={{ mt: 3 }}>Pay-Later Orders</Typography>
+            <Box sx={{ height: 400, width: "100%", mb: 4 }}>
+                <GeneralTable
+                    loading={giftCardsData.loading}
+                    rows={tableRowsPayLater}
+                    columns={getPayLaterColumns()}
+                    totalRecords={tableRowsPayLater.length}
+                    page={page + 1}
+                    pageSize={pageSize}
+                    onPaginationChange={(page: number, pageSize: number) => { setPage(page - 1); setPageSize(pageSize); }}
+                    onDownload={() => getAllGiftCardsData('paylater')}
+                    footer
+                    tableName="Pay-Later Orders"
                 />
-            )}
+            </Box>
 
             {selectedGiftCard && (
                 <PaymentDialog
@@ -368,4 +328,4 @@ const CSRGiftRequests: React.FC<CSRGiftRequestsProps> = ({ groupId, selectedGrou
     );
 };
 
-export default CSRGiftRequests;
+export default CSRGiftHistory;

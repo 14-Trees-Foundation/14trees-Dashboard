@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import CSRInventory from "./CSRInventory";
 import { useAuth } from "../auth/auth";
 import { SinglePageDrawer } from "./SinglePageDrawer";
-import { NaturePeople, Settings, CardGiftcard, VolunteerActivism } from "@mui/icons-material";
+import { NaturePeople, Settings, CardGiftcard, VolunteerActivism, History } from "@mui/icons-material";
 import { createStyles, makeStyles } from "@mui/styles";
 import {
     Box,
@@ -21,6 +21,7 @@ import { Group } from "../../../types/Group";
 import CSRGiftRequests from "./CSRGiftRequests";
 import CSRHeader from "./CSRHeader";
 import CSRDonations from "./CSRDonations";
+import CSRGiftHistory from "./CSRGiftHistory";
 
 type BirthdayData = {
     hasBirthday: boolean;
@@ -152,6 +153,13 @@ const CSRPage: React.FC = () => {
             onClick: () => setActiveTab("prePurchase")
         },
         {
+            displayName: 'Gift History',
+            logo: History,
+            key: 9,
+            display: true,
+            onClick: () => setActiveTab("giftHistory")
+        },
+        {
             displayName: 'Donations',
             logo: VolunteerActivism,
             key: 8,
@@ -261,6 +269,7 @@ const CSRPage: React.FC = () => {
                             <CSRHeader groupId={groupId} onGroupChange={group => { setCurrentGroup(group) }} />
                             {activeTab === "greenTributeWall" && currentGroup && <CSRInventory selectedGroup={currentGroup}/>}
                             {activeTab === "prePurchase" && currentGroup && <CSRGiftRequests selectedGroup={currentGroup} groupId={currentGroup.id}/>}
+                            {activeTab === "giftHistory" && currentGroup && <CSRGiftHistory selectedGroup={currentGroup} groupId={currentGroup.id} />}
                             {activeTab === "donations" && currentGroup && <CSRDonations selectedGroup={currentGroup} />}
                             {activeTab === "Setting-Details" && currentGroup && <CSRSettings group={currentGroup} onGroupChange={group => { setCurrentGroup(group) }}/>}
                         </Box>
