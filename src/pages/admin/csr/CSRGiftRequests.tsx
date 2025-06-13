@@ -123,7 +123,7 @@ const CSRGiftRequests: React.FC<CSRGiftRequestsProps> = ({ groupId, selectedGrou
         filtersData.push({
             columnField: 'tags',
             operatorValue: 'contains',
-            value: ['Pre-Purchased'],
+            value: ['PrePurchased'],
         });
     
         getGiftCards(page * pageSize, pageSize, filtersData, orderBy);

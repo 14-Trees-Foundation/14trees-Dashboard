@@ -434,8 +434,8 @@ const CSRBulkGift: React.FC<CSRBulkGiftProps> = ({ groupId, logoUrl, open, onClo
                 messages.plantedBy,
                 ["Corporate", isPayLater ? "PayLater" : "GiftAndPay"],
                 users,
-                messages.primaryMessage,
-                messages.logoMessage
+                messages.logoMessage,
+                messages.primaryMessage
             );
 
             if (response.order_id) {

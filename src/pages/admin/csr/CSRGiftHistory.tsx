@@ -73,7 +73,7 @@ const CSRGiftHistory: React.FC<CSRGiftHistoryProps> = ({ groupId, selectedGroup 
     };
 
     const getGiftCardData = async (type: 'prepaid' | 'paylater') => {
-        const tags = type === 'prepaid' ? ['Pre-Paid'] : ['Pay-Later'];
+        const tags = type === 'prepaid' ? ['GiftAndPay'] : ['PayLater'];
         const filtersData = getFilters(filters, groupId, tags);
         
         const apiClient = new ApiClient();
