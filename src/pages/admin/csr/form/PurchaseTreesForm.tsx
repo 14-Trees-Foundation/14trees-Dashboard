@@ -107,7 +107,7 @@ const PurchaseTreesForm: React.FC<Props> = ({
                 "3", // event type (General)
                 "", // event name
                 corporateName,
-                ["Corporate"],
+                ["Corporate", "PrePurchased"],
             );
 
             if (response.order_id) {
@@ -152,7 +152,7 @@ const PurchaseTreesForm: React.FC<Props> = ({
 
     const handleClose = () => {
         if (paymentStatus === 'pending') {
-            setError('Payment is required to complete the order. You can make the payment later.');
+            setError('Payment is mandatory to complete the order. The request will not be fulfilled without payment.');
         }
         onClose();
     };
@@ -265,12 +265,9 @@ const PurchaseTreesForm: React.FC<Props> = ({
                 )}
                 {paymentStatus === 'failed' && (
                     <>
-                        <Alert severity="warning" sx={{ mt: 2 }}>
-                            Order ID: {giftRequestId}.
-                            Payment is required to complete the order!
-                        </Alert>
                         <Alert severity="error" sx={{ mt: 2 }}>
-                            {error}
+                            Payment failed. The request will not be fulfilled without successful payment.
+                            Please retry the payment or contact support if the issue persists.
                         </Alert>
                     </>
                 )}
@@ -319,7 +316,7 @@ const PurchaseTreesForm: React.FC<Props> = ({
                         Submit Payment Proof
                     </LoadingButton>
                 )}
-                {paymentStatus === 'failed' && !isAboveLimit && (
+                {paymentStatus === 'failed' && (
                     <Button
                         onClick={handleRetryPayment}
                         color="success"

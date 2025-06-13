@@ -30,7 +30,7 @@ const CSRSettings: React.FC<Props> = ({ group, onGroupChange }) => {
     const userEmail = localStorage.getItem("userEmail");
 
     const handleSaveOrganization = async (
-        updatedData: { name: string; address: string; logo_url: string | null },
+        updatedData: { name: string; address: string; logo_url: string | null, billing_email: string; },
         logoFile?: File
     ) => {
         try {
@@ -47,6 +47,7 @@ const CSRSettings: React.FC<Props> = ({ group, onGroupChange }) => {
                 ...group,
                 name: updatedData.name,
                 address: updatedData.address,
+                billing_email: updatedData.billing_email,
                 logo_url: updatedData.logo_url,
                 updated_at: new Date()
             };
@@ -118,6 +119,11 @@ const CSRSettings: React.FC<Props> = ({ group, onGroupChange }) => {
                                         <Typography variant="h4" color="#fff" sx={{ fontWeight: 600 }}>
                                             {group.name}
                                         </Typography>
+                                        {group.billing_email && (
+                                            <Typography variant="subtitle1" color="#1f3625" sx={{ mt: 1 }}>
+                                                 {group.billing_email}
+                                            </Typography>
+                                        )}
                                         <Typography variant="subtitle1" color="#1f3625" sx={{ mt: 1 }}>
                                             {group.address || 'Address not available'}
                                         </Typography>
@@ -203,7 +209,8 @@ const CSRSettings: React.FC<Props> = ({ group, onGroupChange }) => {
                 organizationData={{
                     name: group.name,
                     address: group.address || "",
-                    logo_url: group.logo_url
+                    billing_email: group.billing_email || "",
+                    logo_url: group.logo_url,
                 }}
                 onSave={handleSaveOrganization}
             />
