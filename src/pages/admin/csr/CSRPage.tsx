@@ -145,11 +145,11 @@ const CSRPage: React.FC = () => {
             onClick: () => setActiveTab("greenTributeWall")
         },
         {
-            displayName: 'Orders',
+            displayName: 'Pre-Purchase',
             logo: CardGiftcard,
             key: 6,
             display: true,
-            onClick: () => setActiveTab("orders")
+            onClick: () => setActiveTab("prePurchase")
         },
         {
             displayName: 'Donations',
@@ -260,7 +260,7 @@ const CSRPage: React.FC = () => {
                         <Box sx={{ flex: 1 }}>
                             <CSRHeader groupId={groupId} onGroupChange={group => { setCurrentGroup(group) }} />
                             {activeTab === "greenTributeWall" && currentGroup && <CSRInventory selectedGroup={currentGroup}/>}
-                            {activeTab === "orders" && currentGroup && <CSRGiftRequests selectedGroup={currentGroup} groupId={currentGroup.id}/>}
+                            {activeTab === "prePurchase" && currentGroup && <CSRGiftRequests selectedGroup={currentGroup} groupId={currentGroup.id}/>}
                             {activeTab === "donations" && currentGroup && <CSRDonations selectedGroup={currentGroup} />}
                             {activeTab === "Setting-Details" && currentGroup && <CSRSettings group={currentGroup} onGroupChange={group => { setCurrentGroup(group) }}/>}
                         </Box>

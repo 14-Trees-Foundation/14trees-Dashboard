@@ -302,14 +302,14 @@ const CSRGiftRequests: React.FC<CSRGiftRequestsProps> = ({ groupId, selectedGrou
                 justifyContent: 'space-between',
                 mb: 1,
             }}>
-                <Typography variant="h4" ml={1}>Orders</Typography>
+                <Typography variant="h4" ml={1}>Pre-Purchase History</Typography>
                 <Button
                     variant="contained"
                     color="success"
                     onClick={() => setFormOpen(true)}
-                    style={{ marginLeft: 10 }}
+                    style={{ marginLeft: 10, textTransform: 'none' }}
                 >
-                    Purchase Gifts
+                    Pre-Purchase Trees
                 </Button>
             </Box>
             <Box sx={{ height: 840, width: "100%" }}>
