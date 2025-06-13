@@ -45,11 +45,10 @@ const CSRGiftHistory: React.FC<CSRGiftHistoryProps> = ({ groupId, selectedGroup 
         filtersData.forEach((item) => {
             if (item.columnField === 'status') {
                 const items: string[] = [];
-                if ((item.value as string[]).includes('Pending')) {
+                if ((item.value as string[]).includes('Pending Fulfillment')) {
                     items.push('pending_plot_selection');
                 }
-                if ((item.value as string[]).includes('Fulfilled')) {
-                    items.push('pending_assignment');
+                if ((item.value as string[]).includes('Completed')) {
                     items.push('completed');
                 }
                 item.value = items;
@@ -77,7 +76,14 @@ const CSRGiftHistory: React.FC<CSRGiftHistoryProps> = ({ groupId, selectedGroup 
         const tags = type === 'prepaid' ? ['Pre-Paid'] : ['Pay-Later'];
         const filtersData = getFilters(filters, groupId, tags);
         
-        getGiftCards(page * pageSize, pageSize, filtersData, orderBy);
+        const apiClient = new ApiClient();
+        const response = await apiClient.getGiftCards(page * pageSize, pageSize, filtersData, orderBy);
+        
+        if (type === 'prepaid') {
+            setTableRowsPrePaid(response.results);
+        } else {
+            setTableRowsPayLater(response.results);
+        }
     };
 
     useEffect(() => {
@@ -87,34 +93,7 @@ const CSRGiftHistory: React.FC<CSRGiftHistoryProps> = ({ groupId, selectedGroup 
         }, 300)
 
         return () => { clearTimeout(handler) };
-    }, [filters, orderBy, groupId]);
-
-    useEffect(() => {
-        if (giftCardsData.loading) return;
-    
-        // Debug: Log the complete state structure
-        console.log('Full giftCardsData state:', giftCardsData);
-        
-        // Process all available records directly from the Redux store
-        const allRecords = Object.values(giftCardsData.giftCards);
-        
-        // Filter records by their tags
-        const prePaidRecords = allRecords.filter(record => 
-            record.tags?.some(tag => tag.toLowerCase().includes('pre-paid') || tag.toLowerCase().includes('prepaid'))
-        );
-        
-        const payLaterRecords = allRecords.filter(record => 
-            record.tags?.includes('Pay-Later')
-        );
-    
-        // Debug: Verify the filtered records
-        console.log('Filtered Pre-Paid records:', prePaidRecords);
-        console.log('Filtered Pay-Later records:', payLaterRecords);
-    
-        // Update state with the filtered records
-        setTableRowsPrePaid(prePaidRecords);
-        setTableRowsPayLater(payLaterRecords);
-    }, [giftCardsData]); // Removed page and pageSize dependencies
+    }, [filters, orderBy, groupId, page, pageSize]);
 
     const handleSetFilters = (filters: Record<string, GridFilterItem>) => {
         setPage(0);
@@ -122,7 +101,7 @@ const CSRGiftHistory: React.FC<CSRGiftHistoryProps> = ({ groupId, selectedGroup 
     };
 
     const getStatus = (card: GiftCard) => {
-        return card.status === 'pending_plot_selection' ? 'Pending' : 'Fulfilled';
+        return card.status === 'completed' ? 'Completed' : 'Pending Fulfillment';
     };
 
     const handleSortingChange = (sorter: any) => {
@@ -196,7 +175,12 @@ const CSRGiftHistory: React.FC<CSRGiftHistoryProps> = ({ groupId, selectedGroup 
             align: "center",
             width: 150,
             render: (value, record, index) => getStatus(record),
-            ...getColumnSelectedItemFilter({ dataIndex: 'status', filters, handleSetFilters, options: ['Pending', 'Fulfilled'] })
+            ...getColumnSelectedItemFilter({ 
+                dataIndex: 'status', 
+                filters, 
+                handleSetFilters, 
+                options: ['Pending Fulfillment', 'Completed'] 
+            })
         },
         {
             dataIndex: "total_amount",
@@ -280,7 +264,7 @@ const CSRGiftHistory: React.FC<CSRGiftHistoryProps> = ({ groupId, selectedGroup 
                     loading={giftCardsData.loading}
                     rows={tableRowsPrePaid}
                     columns={getCommonColumns()}
-                    totalRecords={giftCardsData.totalGiftCards} 
+                    totalRecords={tableRowsPrePaid.length} 
                     page={page + 1}
                     pageSize={pageSize}
                     onPaginationChange={(page: number, pageSize: number) => { setPage(page - 1); setPageSize(pageSize); }}
