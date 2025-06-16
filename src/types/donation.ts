@@ -27,7 +27,7 @@ export interface Donation {
   booked?: number;
   assigned?: number;
   status: 'UserSubmitted' | 'OrderFulfilled';
-  mail_status: 'AckSent' | 'DashboardsSent' | null;
+  mail_status: string[];
   mail_error: string | null;
   visit_date: Date | null;
   amount_donated: number | null; 

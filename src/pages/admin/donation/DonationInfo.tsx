@@ -317,8 +317,7 @@ const DonationInfo: React.FC<DonationInfoProps> = ({ open, onClose, data }) => {
            ) : null}
           <Typography sx={{ mb: 1 }}>
              <strong>Sponsor Email Status:</strong>
-              {data.mail_status && <Chip size="small" label={'Ack Sent'} sx={{ ml: 1, bgcolor: '#2e7d32', color: 'white' }} />}
-              {data.mail_status === 'DashboardsSent' && <Chip size="small" label={'Dashboard Links Sent'} sx={{ ml: 1, bgcolor: '#2e7d32', color: 'white' }} />}
+              {data.mail_status.map(item => <Chip size="small" label={item} sx={{ ml: 1, bgcolor: '#2e7d32', color: 'white' }} />)}
               {data.mail_error && <Typography color='red'>{data.mail_error}</Typography>}
           </Typography>
           <Typography sx={{ mb: 1 }}>
