@@ -77,7 +77,6 @@ const Campaigns: React.FC = () => {
 
     const handleCampaignSubmit = async (data: any) => {
         try {
-            console.log("Submitting campaign with ID:", data.id);
             const apiClient = new ApiClient();
             await apiClient.updateCampaign(
                 data.id,
