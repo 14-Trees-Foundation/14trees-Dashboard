@@ -67,7 +67,7 @@ const TreesCount: React.FC<Props> = ({ isAboveLimit, treesCount, onTreesCountCha
     return (
         <Box sx={{ p: 3 }}>
             <Typography variant="h6" gutterBottom>
-                How many trees would you like to {isGifting ? 'gift' : 'donate'}?*
+                How many trees would you like to {isGifting ? 'pre-purchase' : 'donate'}?*
             </Typography>
 
             <Box sx={{

@@ -141,35 +141,35 @@ const CSRPage: React.FC = () => {
         {
             displayName: "Green Tribute Wall",
             logo: NaturePeople,
-            key: 5, // Changed from number to string for consistency
+            key: 0, // Changed from number to string for consistency
             display: true,
             onClick: () => setActiveTab("greenTributeWall")
         },
         {
             displayName: 'Pre-Purchase',
             logo: CardGiftcard,
-            key: 6,
+            key: 1,
             display: true,
             onClick: () => setActiveTab("prePurchase")
         },
         {
             displayName: 'Gift History',
             logo: History,
-            key: 9,
+            key: 2,
             display: true,
             onClick: () => setActiveTab("giftHistory")
         },
         {
             displayName: 'Donations',
             logo: VolunteerActivism,
-            key: 8,
+            key: 3,
             display: true,
             onClick: () => setActiveTab("donations")
         },
         {
-            displayName: "Settings",
+            displayName: "Corporate Settings",
             logo: Settings,
-            key: 7,
+            key: 4,
             display: true,
             onClick: () => setActiveTab("Setting-Details")
         },
