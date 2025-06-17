@@ -15,10 +15,12 @@ import { format } from 'date-fns';
 import { Donation, DonationTree } from '../../../types/donation';
 import ApiClient from '../../../api/apiClient/apiClient';
 import GeneralTable from '../../../components/GenTable';
-import { InfoOutlined, EventOutlined, ParkOutlined } from '@mui/icons-material';
+import { InfoOutlined, EventOutlined, ParkOutlined, VisibilityOutlined } from '@mui/icons-material';
 import { GridFilterItem } from '@mui/x-data-grid';
 import { toast } from 'react-toastify';
 import getColumnSearchProps from '../../../components/Filter';
+import { Payment, PaymentHistory } from '../../../types/payment';
+import { getHumanReadableDate } from '../../../helpers/utils';
 
 interface DonationTreesProps {
   donationId: number
@@ -226,6 +228,10 @@ const DonationInfo: React.FC<DonationInfoProps> = ({ open, onClose, data }) => {
   const [page, setPage] = useState(0);
   const [pageSize, setPageSize] = useState(10);
   const theme = useTheme();
+  const [payment, setPayment] = useState<Payment | null>(null);
+  const [rpPayments, setRPPayments] = useState<any[]>([]);
+  const [filePreview, setFilePreview] = useState(false);
+  const [selectedHistory, setSelectedHistory] = useState<PaymentHistory | null>(null);
 
   useEffect(() => {
     const getDonationUsers = async () => {
@@ -243,10 +249,38 @@ const DonationInfo: React.FC<DonationInfoProps> = ({ open, onClose, data }) => {
       }
     };
 
+    const getPaymentDetails = async () => {
+      if (data?.payment_id) {
+        try {
+          const apiClient = new ApiClient();
+          const paymentData = await apiClient.getPayment(data.payment_id);
+          setPayment(paymentData);
+          
+          if (paymentData.order_id) {
+            const rpData = await apiClient.getPaymentsForOrder(paymentData.order_id);
+            setRPPayments(rpData);
+          }
+        } catch (error) {
+          console.error("Error fetching payment details:", error);
+        }
+      }
+    };
+
     if (open && data) {
       getDonationUsers();
+      getPaymentDetails();
     }
   }, [open, data]);
+
+  const handleOpenPreview = (record: PaymentHistory) => {
+    setFilePreview(true);
+    setSelectedHistory(record);
+  }
+
+  const handleClosePreview = () => {
+    setFilePreview(false);
+    setSelectedHistory(null);
+  }
 
   const columns: any[] = [
     {
@@ -284,6 +318,89 @@ const DonationInfo: React.FC<DonationInfoProps> = ({ open, onClose, data }) => {
     }
   ];
 
+  const paymentColumns: any[] = [
+    {
+      dataIndex: "amount",
+      key: "amount",
+      title: "Amount paid",
+      align: "center",
+      width: 100,
+      render: (value: number, record: any) => record.payment_method ? value : value / 100
+    },
+    {
+      dataIndex: "method",
+      key: "method",
+      title: "Payment Method",
+      align: "center",
+      width: 200,
+      render: (value: any, record: any) => value ? value : record.payment_method
+    },
+    {
+      dataIndex: "payment_proof",
+      key: "payment_proof",
+      title: "Payment Proof",
+      align: "center",
+      width: 150,
+      render: (value: any, record: any) => (
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+          }}>
+          <Button
+            variant='outlined'
+            color='success'
+            disabled={!value}
+            style={{ margin: "0 5px" }}
+            onClick={() => { handleOpenPreview(record) }}
+          >
+            <VisibilityOutlined />
+          </Button>
+        </div>
+      ),
+    },
+    {
+      dataIndex: "reference_number",
+      key: "reference_number",
+      title: "Transaction Id",
+      align: "center",
+      width: 150,
+      render: (value: number, record: any) => {
+        if (record.acquirer_data) {
+          const keys = Object.keys(record.acquirer_data);
+          for (const key of keys) {
+            if (key.endsWith("transaction_id")) return record.acquirer_data[key];
+          }
+        }
+        return '';
+      }
+    },
+    {
+      dataIndex: "created_at",
+      key: "created_at",
+      title: "Payment Date",
+      align: "center",
+      width: 150,
+      render: (value: number, record: any) => record.payment_date ? getHumanReadableDate(record.payment_date) : getHumanReadableDate(value * 1000),
+    },
+    {
+      dataIndex: "status",
+      key: "status",
+      title: "Status",
+      align: "center",
+      width: 150,
+      render: (value: string) => value === "captured" ? "Success" : value === "failed" ? "Failed" : value,
+    },
+  ];
+
+  const getCapturedAmount = () => {
+    const capturedAmount = rpPayments
+      .filter(payment => payment.status === "captured")
+      .reduce((sum, payment) => sum + payment.amount, 0) / 100; // Convert from paise to rupees
+    return capturedAmount;
+  };
+
   if (!data) return null;
 
   // Check if additional information section should be displayed
@@ -315,9 +432,14 @@ const DonationInfo: React.FC<DonationInfoProps> = ({ open, onClose, data }) => {
              <Typography sx={{ mb: 1 }}><strong>Trees Assigned:</strong> {`${data.assigned}/${data.trees_count}`}</Typography>
             </>
            ) : null}
+           {data.amount_donated && (
+             <Typography sx={{ mb: 1 }}>
+               <strong>Payment Status:</strong> <Chip size="small" label={getCapturedAmount() == data.amount_donated ? "Fully Paid" : "Pending"} sx={{ ml: 1, bgcolor: '#2e7d32', color: 'white' }} />
+             </Typography>
+           )}
           <Typography sx={{ mb: 1 }}>
              <strong>Sponsor Email Status:</strong>
-              {data.mail_status.map(item => <Chip size="small" label={item} sx={{ ml: 1, bgcolor: '#2e7d32', color: 'white' }} />)}
+              {data.mail_status?.map(item => <Chip size="small" label={item} sx={{ ml: 1, bgcolor: '#2e7d32', color: 'white' }} />)}
               {data.mail_error && <Typography color='red'>{data.mail_error}</Typography>}
           </Typography>
           <Typography sx={{ mb: 1 }}>
@@ -411,6 +533,27 @@ const DonationInfo: React.FC<DonationInfoProps> = ({ open, onClose, data }) => {
           </Paper>
         )}
 
+        {/* Payment History Section */}
+        {(rpPayments.length > 0 || (payment?.payment_history && payment?.payment_history.length > 0)) && (
+          <Paper elevation={1} sx={{ p: 3, mb: 3, borderRadius: 2, border: `1px solid ${theme.palette.divider}` }}>
+            <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+              <InfoOutlined sx={{ color: '#2e7d32' }} /> Payment History
+            </Typography>
+            <GeneralTable
+              loading={false}
+              rows={[...rpPayments, ...(payment?.payment_history ? payment.payment_history : [])].slice(page * pageSize, page * pageSize + pageSize)}
+              columns={paymentColumns}
+              totalRecords={rpPayments.length + (payment?.payment_history ? payment.payment_history.length : 0)}
+              page={page}
+              pageSize={pageSize}
+              onPaginationChange={(page: number, pageSize: number) => { setPage(page - 1); setPageSize(pageSize); }}
+              onDownload={async () => { return payment?.payment_history || [] }}
+              tableName="Payment History"
+              rowClassName={(record, index) => record.status === 'failed' ? 'pending-item' : ''}
+            />
+          </Paper>
+        )}
+
         {/* Dates */}
         <Box sx={{ mt: 2, p: 1, bgcolor: 'rgba(0,0,0,0.03)', borderRadius: 1 }}>
           <Typography variant="body2" color="textSecondary" sx={{ mb: 1 }}>
@@ -437,6 +580,40 @@ const DonationInfo: React.FC<DonationInfoProps> = ({ open, onClose, data }) => {
           Close
         </Button>
       </DialogActions>
+
+      {/* Payment Proof Preview Dialog */}
+      <Dialog open={filePreview} fullWidth maxWidth="lg">
+        <DialogTitle>Payment Proof</DialogTitle>
+        <DialogContent dividers>
+          {selectedHistory && selectedHistory.payment_proof &&
+            <Box
+              width="100%"
+              maxHeight="65vh"
+              display="flex"
+              alignItems="center"
+              p={2}
+            >
+              {selectedHistory.payment_proof.endsWith('.pdf') ? (
+                <iframe
+                  src={selectedHistory.payment_proof}
+                  title="PDF Preview"
+                  style={{ border: 'none', width: '100%', height: '65vh', display: 'block' }}
+                ></iframe>
+              ) : (
+                <img
+                  src={selectedHistory.payment_proof}
+                  alt="Preview"
+                  style={{ maxWidth: '100%', maxHeight: '100%' }}
+                />
+              )}
+            </Box>}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleClosePreview} color="error" variant="outlined">
+            Cancel
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Dialog>
   );
 };
