@@ -5,6 +5,10 @@ import { toast } from "react-toastify";
 import { GiftCard } from "../../../types/gift_card";
 import getColumnSearchProps, { getColumnDateFilter, getColumnSelectedItemFilter, getSortIcon } from "../../../components/Filter";
 import { GridFilterItem } from "@mui/x-data-grid";
+import * as giftCardActionCreators from "../../../redux/actions/giftCardActions";
+import { useAppDispatch, useAppSelector } from "../../../redux/store/hooks";
+import { bindActionCreators } from "@reduxjs/toolkit";
+import { RootState } from "../../../redux/store/store";
 import { TableColumnsType } from "antd";
 import { getHumanReadableDate } from "../../../helpers/utils";
 import { Order } from "../../../types/common";
@@ -21,6 +25,8 @@ interface CSRGiftHistoryProps {
 type OrderType = 'all' | 'prepaid' | 'paylater';
 
 const CSRGiftHistory: React.FC<CSRGiftHistoryProps> = ({ groupId, selectedGroup }) => {
+    const dispatch = useAppDispatch();
+    const { getGiftCards } = bindActionCreators(giftCardActionCreators, dispatch);
 
     const userName = localStorage.getItem("userName") || "Guest";
     const userEmail = localStorage.getItem("userEmail");
@@ -34,6 +40,41 @@ const CSRGiftHistory: React.FC<CSRGiftHistoryProps> = ({ groupId, selectedGroup 
     const [selectedGiftCard, setSelectedGiftCard] = useState<GiftCard | null>(null);
     const [orderType, setOrderType] = useState<OrderType>('all');
 
+    const giftCardsData = useAppSelector((state: RootState) => state.giftCardsData);
+
+    useEffect(() => {
+        const handler = setTimeout(() => {
+            setPage(0);
+            getGiftCardData();
+        }, 300)
+
+        return () => { clearTimeout(handler) };
+    }, [filters, orderBy, orderType, groupId]);
+
+    useEffect(() => {
+        if (giftCardsData.loading) return;
+        
+        const handler = setTimeout(() => {
+            const records: GiftCard[] = [];
+            const maxLength = Math.min((page + 1) * pageSize, giftCardsData.totalGiftCards);
+            for (let i = page * pageSize; i < maxLength; i++) {
+                if (Object.hasOwn(giftCardsData.paginationMapping, i)) {
+                    const id = giftCardsData.paginationMapping[i];
+                    const record = giftCardsData.giftCards[id];
+                    if (record) {
+                        records.push(record);
+                    }
+                } else {
+                    getGiftCardData();
+                    break;
+                }
+            }
+
+            setTableRows(records);
+        }, 300)
+
+        return () => { clearTimeout(handler) };
+    }, [pageSize, page, giftCardsData]);
 
     const getFilters = (filters: any, groupId: number, tags: string[]) => {
         const filtersData = JSON.parse(JSON.stringify(Object.values(filters))) as GridFilterItem[];
@@ -61,7 +102,7 @@ const CSRGiftHistory: React.FC<CSRGiftHistoryProps> = ({ groupId, selectedGroup 
         if (tags.length > 0) {
             filtersData.push({
                 columnField: 'tags',
-                operatorValue: 'contains',
+                operatorValue: 'isAnyOf',
                 value: tags,
             });
         }
@@ -75,22 +116,13 @@ const CSRGiftHistory: React.FC<CSRGiftHistoryProps> = ({ groupId, selectedGroup 
             tags = ['GiftAndPay'];
         } else if (orderType === 'paylater') {
             tags = ['PayLater'];
+        } else if (orderType === 'all') {
+            tags = ['GiftAndPay', 'PayLater'];
         }
 
         const filtersData = getFilters(filters, groupId, tags);
-        
-        const apiClient = new ApiClient();
-        const response = await apiClient.getGiftCards(page * pageSize, pageSize, filtersData, orderBy);
-        setTableRows(response.results);
+        getGiftCards(page * pageSize, pageSize, filtersData, orderBy);
     };
-
-    useEffect(() => {
-        const handler = setTimeout(() => {
-            getGiftCardData();
-        }, 300)
-
-        return () => { clearTimeout(handler) };
-    }, [filters, orderBy, groupId, page, pageSize, orderType]);
 
     const handleSetFilters = (filters: Record<string, GridFilterItem>) => {
         setPage(0);
@@ -129,9 +161,9 @@ const CSRGiftHistory: React.FC<CSRGiftHistoryProps> = ({ groupId, selectedGroup 
     const getAllGiftCardsData = async () => {
         let tags: string[] = [];
         if (orderType === 'prepaid') {
-            tags = ['Pre-Paid'];
+            tags = ['GiftAndPay'];
         } else if (orderType === 'paylater') {
-            tags = ['Pay-Later'];
+            tags = ['PayLater'];
         }
         const filtersData = getFilters(filters, groupId, tags);
         const apiClient = new ApiClient();
@@ -271,10 +303,11 @@ const CSRGiftHistory: React.FC<CSRGiftHistoryProps> = ({ groupId, selectedGroup 
 
             <Box sx={{ height: 400, width: "100%", mb: 4 }}>
                 <GeneralTable
+                    loading={giftCardsData.loading}
                     rows={tableRows}
                     columns={getColumns()}
-                    totalRecords={tableRows.length}
-                    page={page + 1}
+                    totalRecords={giftCardsData.totalGiftCards}
+                    page={page}
                     pageSize={pageSize}
                     onPaginationChange={(page: number, pageSize: number) => { setPage(page - 1); setPageSize(pageSize); }}
                     onDownload={getAllGiftCardsData}

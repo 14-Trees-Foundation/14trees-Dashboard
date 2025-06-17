@@ -291,10 +291,15 @@ const DateFilterDropdown = <T extends object>({ dataIndex, filters, label, setSe
     const [lower, setLower] = useState<string>('');
     const [upper, setUpper] = useState<string>('');
 
+    const [ld, setLd] = useState<any>(null);
+    const [ud, setUd] = useState<any>(null);
+
     const handleReset = () => {
         clearFilters && clearFilters();
         setLower('');
         setUpper('');
+        setLd(null);
+        setUd(null);
         confirm({ closeDropdown: false });
         let newFilters = { ...filters };
         Reflect.deleteProperty(newFilters, dataIndex);
@@ -326,11 +331,11 @@ const DateFilterDropdown = <T extends object>({ dataIndex, filters, label, setSe
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <div style={{ margin: 2 }}>{label} After:</div>
-                    <DatePicker onChange={(date, stringDate) => setLower(stringDate as string)} style={{ margin: 2, backgroundColor: 'white' }} popupStyle={{ zIndex: 100001 }} />
+                    <DatePicker value={ld} onChange={(date, stringDate) => {setLower(stringDate as string); setLd(date)}} style={{ margin: 2, backgroundColor: 'white' }} popupStyle={{ zIndex: 100001 }} />
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <div style={{ margin: 2 }}>{label} Before:</div>
-                    <DatePicker onChange={(date, stringDate) => setUpper(stringDate as string)} style={{ margin: 2, backgroundColor: 'white' }} popupStyle={{ zIndex: 100001 }} />
+                    <DatePicker value={ud} onChange={(date, stringDate) => {setUpper(stringDate as string); setUd(date)}} style={{ margin: 2, backgroundColor: 'white' }} popupStyle={{ zIndex: 100001 }} />
                 </div>
             </div>
             <Space style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 8 }}>
