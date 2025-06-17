@@ -108,6 +108,9 @@ const CSRBulkGift: React.FC<CSRBulkGiftProps> = ({ groupId, logoUrl, open, onClo
     const [totalTrees, setTotalTrees] = useState<number>(0);
     const [userData, setUserData] = useState<any[]>([]);
 
+    const userName = localStorage.getItem("userName");
+    const userEmail = localStorage.getItem("userEmail");
+
     useEffect(() => {
         const userData = prepareUserData();
         console.log(userData)
@@ -426,8 +429,8 @@ const CSRBulkGift: React.FC<CSRBulkGiftProps> = ({ groupId, logoUrl, open, onClo
 
             const response = await apiClient.createGiftCardRequestV2(
                 groupId,
-                preparedUserData[0].name,
-                preparedUserData[0].email,
+                userName || preparedUserData[0].name,
+                userEmail || preparedUserData[0].email,
                 treesCount,
                 messages.eventType || "3",
                 messages.eventName,
@@ -481,6 +484,26 @@ const CSRBulkGift: React.FC<CSRBulkGiftProps> = ({ groupId, logoUrl, open, onClo
     const handlePaymentFailure = () => {
         setPaymentStatus('failed');
         toast.error('Payment failed. Please try again later or contact support.');
+    };
+
+    const handleRetryPayment = () => {
+        setPaymentStatus('pending');
+    };
+
+    const handleClose = async () => {
+        if (paymentStatus === 'pending' || paymentStatus === 'failed') {
+            toast.warning('Payment is mandatory to complete the order. The request will not be fulfilled without payment.');
+            if (giftRequest) {
+                try {
+                    const apiClient = new ApiClient();
+                    await apiClient.pathGiftCard(giftRequest.id, { tags: ['Corporate', 'PayLater'] }, ['tags']);
+                    toast.info('Your request has been updated to Pay Later');
+                } catch (error: any) {
+                    toast.error('Failed to update your request to Pay Later');
+                }
+            }
+        }
+        onClose();
     };
 
     const prepareUserData = () => {
@@ -1030,15 +1053,16 @@ const CSRBulkGift: React.FC<CSRBulkGiftProps> = ({ groupId, logoUrl, open, onClo
                 )}
                 {!payLater && paymentStatus === 'failed' && (
                     <Alert severity="error" sx={{ mt: 2 }}>
-                        Payment failed. Please try again or contact support.
+                        Payment failed. The request will not be fulfilled without successful payment.
+                        Please retry the payment or contact support if the issue persists.
                     </Alert>
                 )}
             </DialogContent>
             <DialogActions>
-                <Button onClick={onClose} variant="outlined" color="error" sx={{ textTransform: "none" }}>
-                    Close
+                <Button onClick={handleClose} variant="outlined" color="error" sx={{ textTransform: "none" }}>
+                    {giftRequestId ? 'Close' : 'Cancel'}
                 </Button>
-                {currentStep === 'csv' && (
+                {!giftRequestId && currentStep === 'csv' && (
                     <Button
                         onClick={() => setCurrentStep('event')}
                         variant="contained"
@@ -1048,7 +1072,7 @@ const CSRBulkGift: React.FC<CSRBulkGiftProps> = ({ groupId, logoUrl, open, onClo
                         Previous
                     </Button>
                 )}
-                {currentStep === 'card' && (
+                {!giftRequestId && currentStep === 'card' && (
                     <Button
                         onClick={() => setCurrentStep('csv')}
                         variant="contained"
@@ -1058,7 +1082,7 @@ const CSRBulkGift: React.FC<CSRBulkGiftProps> = ({ groupId, logoUrl, open, onClo
                         Previous
                     </Button>
                 )}
-                {!payLater && currentStep === 'giftType' && (
+                {!payLater && !giftRequestId && currentStep === 'giftType' && (
                     <Button
                         onClick={() => setCurrentStep('card')}
                         variant="contained"
@@ -1068,7 +1092,7 @@ const CSRBulkGift: React.FC<CSRBulkGiftProps> = ({ groupId, logoUrl, open, onClo
                         Previous
                     </Button>
                 )}
-                {currentStep === 'summary' && (
+                {!giftRequestId && currentStep === 'summary' && (
                     <Button
                         onClick={() => payLater ? setCurrentStep('card') : setCurrentStep('giftType')}
                         variant="contained"
@@ -1078,7 +1102,7 @@ const CSRBulkGift: React.FC<CSRBulkGiftProps> = ({ groupId, logoUrl, open, onClo
                         Previous
                     </Button>
                 )}
-                {currentStep !== 'summary' && (
+                {!giftRequestId && currentStep !== 'summary' && (
                     <Button
                         onClick={handleNext}
                         variant="contained"
@@ -1093,7 +1117,7 @@ const CSRBulkGift: React.FC<CSRBulkGiftProps> = ({ groupId, logoUrl, open, onClo
                         Next
                     </Button>
                 )}
-                {currentStep === 'summary' && (
+                {!giftRequestId && currentStep === 'summary' && (
                     <Button
                         onClick={handleNext}
                         variant="contained"
@@ -1109,6 +1133,16 @@ const CSRBulkGift: React.FC<CSRBulkGiftProps> = ({ groupId, logoUrl, open, onClo
                         ) : (
                             payLater ? 'Submit' : (giftType === 'new' ? 'Proceed to Payment' : 'Submit')
                         )}
+                    </Button>
+                )}
+                {!payLater && paymentStatus === 'failed' && (
+                    <Button
+                        onClick={handleRetryPayment}
+                        variant="contained"
+                        color="success"
+                        sx={{ textTransform: "none" }}
+                    >
+                        Retry Payment
                     </Button>
                 )}
             </DialogActions>
