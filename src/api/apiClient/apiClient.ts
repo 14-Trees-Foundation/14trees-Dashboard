@@ -2052,6 +2052,17 @@ class ApiClient {
         }
     }
 
+    async pathGiftCard(gift_card_request_id: number, data: Partial<GiftCard>, fields: (keyof GiftCard)[]) {
+        try {
+            await this.api.patch<void>(`/gift-cards/requests/update`, { gift_card_request_id, data, updateFields: fields });
+        } catch (error: any) {
+            if (error.response) {
+                throw new Error(error.response.data.message);
+            }
+            throw new Error('Failed to create gift card');
+        }
+    }
+
     async deleteGiftCardRequest(gift_card_request_id: number): Promise<void> {
         await this.api.delete<void>(`/gift-cards/requests/${gift_card_request_id}`);
     }
