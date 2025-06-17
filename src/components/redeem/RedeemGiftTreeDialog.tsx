@@ -204,7 +204,6 @@ const RedeemGiftTreeDialog: React.FC<RedeemGiftTreeDialogProps> = ({
             })
         }
 
-        console.log(tree);
     }, [tree, existingTransaction]);
 
     const validateTheName = (name: string) => {

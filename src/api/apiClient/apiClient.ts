@@ -255,7 +255,6 @@ class ApiClient {
     async createPlot(data: Plot): Promise<Plot> {
         try {
             const response = await this.api.post<Plot>(`/plots`, data);
-            console.log("create plot response: ", response.data);
             return response.data;
         } catch (error) {
             console.error(error)
@@ -1373,7 +1372,6 @@ class ApiClient {
                 users: users
             };
 
-            console.log("Sending donation update payload:", payload);
             const response = await this.api.put<Donation>(`/donations/requests/${donation.id}`, payload);
             return response.data;
         } catch (error: any) {
@@ -1638,8 +1636,6 @@ class ApiClient {
                 user: userPayload
             };
 
-            console.log('Updating donation user:', payload);
-
             // Use the PUT /donations/users endpoint that the backend expects
             const response = await this.api.put('/donations/users', payload);
             return response.data;
@@ -1680,8 +1676,6 @@ class ApiClient {
                 donation_id: donationId,
                 user: userPayload
             };
-
-            console.log('Creating donation user:', payload);
 
             // Use the existing PUT /donations/users endpoint that also handles creation
             // The backend determines if it's a create or update based on whether there's an ID

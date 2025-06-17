@@ -113,7 +113,6 @@ const CSRBulkGift: React.FC<CSRBulkGiftProps> = ({ groupId, logoUrl, open, onClo
 
     useEffect(() => {
         const userData = prepareUserData();
-        console.log(userData)
         const giftedBy = userData.length > 0 ? userData[0].gifted_by : undefined;
 
         if (giftedBy && messages.plantedBy != giftedBy) {

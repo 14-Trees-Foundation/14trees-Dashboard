@@ -153,7 +153,6 @@ const PurchaseTreesForm: React.FC<Props> = ({
     const handleClose = async () => {
         if (paymentStatus === 'pending' || paymentStatus === 'failed') {
             setError('Payment is mandatory to complete the order. The request will not be fulfilled without payment.');
-            console.log(giftRequest);
             if (giftRequest) {
                 try {
                     await apiClient.pathGiftCard(giftRequest.id, { tags: ['Corporate', 'PayLater'] }, ['tags']);

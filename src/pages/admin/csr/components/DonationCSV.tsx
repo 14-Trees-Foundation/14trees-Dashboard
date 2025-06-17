@@ -186,13 +186,11 @@ const CSVUploadSection: React.FC<CSVUploadSectionProps> = ({
         setErrorsMap(newErrorsMap);
 
         // Validate images if any are uploaded
-        if (imageUrls.length > 0) {
-            const imageErrors = validateImages(rows, firstRow, imageUrls);
-            const hasImageErrors = Object.keys(imageErrors).length > 0;
-            
-            if (hasImageErrors) {
-                toast.error("Some images referenced in CSV are not found in uploaded images");
-            }
+        const imageErrors = validateImages(rows, firstRow, imageUrls);
+        const hasImageErrors = Object.keys(imageErrors).length > 0;
+        
+        if (hasImageErrors) {
+            toast.error("Some images referenced in CSV are not found in uploaded images");
         }
 
         const hasErrors = Object.keys(newErrorsMap).length > 0;

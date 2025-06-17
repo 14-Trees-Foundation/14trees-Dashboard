@@ -181,7 +181,6 @@ export const TreeSponsorshipForm = ({ open, onClose, group_id }: TreeSponsorship
       );
   
       // Handle successful submission
-      console.log('Gift card request created:', response);
       onClose();
       setActiveStep(0);
   
