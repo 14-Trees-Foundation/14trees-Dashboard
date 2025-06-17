@@ -214,7 +214,7 @@ const CSRPage: React.FC = () => {
                                 width: { xs: "100%", md: "80%" },
                             }}
                         >
-                            <CSRHeader groupId={groupId} onGroupChange={group => { setCurrentGroup(group) }} />
+                            <CSRHeader groupId={groupId} onGroupChange={group => { setCurrentGroup(prev => prev ? prev : group) }} />
                             <Box sx={{ p: 2 }}>
                                 {activeTab === "greenTributeWall" && currentGroup && <CSRInventory selectedGroup={currentGroup}/>}
                                 {activeTab === "prePurchase" && currentGroup && <CSRGiftRequests selectedGroup={currentGroup} groupId={currentGroup.id}/>}
