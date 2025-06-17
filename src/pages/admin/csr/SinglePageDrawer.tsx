@@ -268,6 +268,15 @@ const useStyles = makeStyles((theme: any) =>
       justifyContent: "flex-start",
       boxShadow: "7px 7px 11px #0d1710,-7px -7px 11px #31553a",
       background: "linear-gradient(145deg, #1c3121, #213a28)",
+      borderLeft: "1px solid #4CAF50",
+      borderBottom: "1px solid #4CAF50",
+      "& svg": {
+        color: "#4CAF50"
+      },
+      "& .MuiTypography-root": {
+        color: "#4CAF50",
+        fontWeight: 600
+      }
     },
     logo: {
       width: "80px",
