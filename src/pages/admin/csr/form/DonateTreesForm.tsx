@@ -268,10 +268,11 @@ const DonationTreesForm: React.FC<Props> = ({
 
     // Determine if Next button should be disabled
     const isNextDisabled = () => {
-        if (currentStep === 1) { // CSV Upload step
-            return !csvValidation.isValid;
-        }
-        return false;
+        const disabled = currentStep === 1 
+            ? (!csvValidation.isUploaded || !csvValidation.isValid)
+            : false;
+
+        return disabled;
     };
 
     return (

@@ -19,6 +19,7 @@ const useStyles = makeStyles((theme) =>
             transition: 'background-color 0.3s',
             width: '100%',
             maxWidth: '100%',
+            minHeight: '380px',
             '&:hover': {
                 backgroundColor: '#8fcf9f7a !important', /* New hover color */
                 cursor: 'pointer',
@@ -142,7 +143,7 @@ const GiftTreesGrid = forwardRef<GiftTreesGridHandle, GiftTreesGridProps>(({
             setTreesList([]);
             setTotalRecords(10);
         }
-    }, [filter, searchUser]);
+    }, [filter, searchUser, refreshTrigger]);
 
     // Fetch trees
     useEffect(() => {
@@ -332,17 +333,17 @@ const GiftTreesGrid = forwardRef<GiftTreesGridHandle, GiftTreesGridProps>(({
                                     {tree.plant_type}
                                 </Typography>
                                 {tree.assigned_to_name && 
-                                    <Typography 
-                                        variant="body2" 
-                                        color="text.secondary" 
-                                        noWrap
-                                        sx={{ 
-                                            fontSize: isMobile ? '0.75rem' : undefined,
-                                            textAlign: 'center'
-                                        }}
-                                    >
-                                        Gifted to: {tree.assigned_to_name}
-                                    </Typography>
+                                   <Typography
+                                   variant="body2"
+                                   sx={{
+                                     fontSize: isMobile ? '0.75rem' : undefined,
+                                     textAlign: 'center',
+                                     whiteSpace: 'normal',
+                                     wordBreak: 'break-word'
+                                   }}
+                                 >
+                                   Gifted to: {tree.assigned_to_name}
+                                 </Typography>
                                 }
                                 {tree.assigned_to && 
                                     <Typography
