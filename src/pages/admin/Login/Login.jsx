@@ -16,6 +16,7 @@ import { useAuth } from "../auth/auth";
 import Axios from "../../../api/local";
 import bg from "../../../assets/bg.png";
 import { Spinner } from "../../../components/Spinner";
+import ApiClient from "../../../api/apiClient/apiClient";
 
 export const Login = () => {
   let navigate = useNavigate();
@@ -39,6 +40,62 @@ export const Login = () => {
 
   let from = location.state?.from?.pathname || "/admin";
 
+  const handlePostAuth = (user, token, tokenId, redirectPath = "/admin") => {
+    localStorage.setItem("loginInfo", JSON.stringify({ tokenId }));
+    let permissions = [];
+    let roles = [];
+    if (user.roles && user.roles.includes("admin")) {
+      permissions = ["all"]
+      roles = user.roles;
+    }
+    localStorage.setItem("permissions", JSON.stringify(permissions));
+    localStorage.setItem("token", JSON.stringify(token));
+    localStorage.setItem("roles", JSON.stringify(roles));
+    auth.signin(
+      user.name,
+      user.email,
+      user.id,
+      permissions,
+      roles,
+      tokenId,
+      () => {
+        navigate(redirectPath, { replace: true });
+      }
+    );
+  };
+
+  // Handle URL parameters and token authentication
+  React.useEffect(() => {
+    const handleUrlParams = async () => {
+      const searchParams = new URLSearchParams(location.search);
+      const token = searchParams.get('credential');
+      const redirect = searchParams.get('redirect');
+
+      if (token) {
+        setBackdropOpen(true);
+        try {
+          const apiClient = new ApiClient();
+          const res = await apiClient.authenticateToken(token);
+          if (res.user && res.token) {
+            handlePostAuth(res.user, res.token, token, redirect);
+          } else {
+            toast.error("User not authorized! Contact Admin");
+          }
+        } catch (error) {
+          if (error.response?.status === 404) {
+            toast.error("User not Found! Contact Admin");
+          } else {
+            toast.error("Authentication failed! Please try again.");
+          }
+        } finally {
+          setBackdropOpen(false);
+        }
+      }
+    };
+
+    handleUrlParams();
+  }, [location.search]);
+
   const responseGoogle = async (response) => {
     try {
       let res = await Axios.post(
@@ -53,30 +110,7 @@ export const Login = () => {
         }
       );
       if (res.status === 201 && res.data.user.roles) {
-        localStorage.setItem("loginInfo", JSON.stringify(response));
-        let permissions = [];
-        let roles = [];
-        if (res.data.user.roles && res.data.user.roles.includes("admin")) {
-          permissions = ["all"]
-          roles = res.data.user.roles;
-        }
-        localStorage.setItem(
-          "permissions",
-          JSON.stringify(permissions)
-        );
-        localStorage.setItem("token", JSON.stringify(res.data.token));
-        localStorage.setItem("roles", JSON.stringify(roles));
-        auth.signin(
-          res.data.user.name,
-          res.data.user.email,
-          res.data.user.id,
-          permissions,
-          roles,
-          response.tokenId,
-          () => {
-            navigate(from, { replace: true });
-          }
-        );
+        handlePostAuth(res.data.user, res.data.token, response.tokenId);
       }
       toast.error("User not authorized! Contact Admin");
     } catch (error) {
