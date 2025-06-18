@@ -44,6 +44,17 @@ class ApiClient {
         this.token = token ? JSON.parse(token) : null;
     }
 
+    async authenticateToken(token_id: string): Promise<{ user: User, token: string }> {
+        const url = `/auth/validate-token`;
+        try {
+            const response = await this.api.post<{ user: User, token: string }>(url, { token_id });
+            return response.data;
+        } catch (error: any) {
+            console.error(error)
+            throw new Error(`Failed to fetch tree types: ${error.message}`);
+        }
+    }
+
     /*
         Model- PlantTypes: CRUD Operations/Apis for tree types 
     */
