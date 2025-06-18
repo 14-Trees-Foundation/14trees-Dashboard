@@ -650,6 +650,22 @@ export const DonationComponent = () => {
       ...getColumnSelectedItemFilter({ dataIndex: 'status', filters, handleSetFilters, options: ['UserSubmitted', 'OrderFulfilled'] }),
     },
     {
+      dataIndex: "sponsorship_type",
+      key: "Sponosorship Type",
+      title: "Sponsorship Type",
+      align: "center",
+      width: 150,
+      ...getColumnSelectedItemFilter({ dataIndex: 'sponsorship_type', filters, handleSetFilters, options: ['Unverified', 'Pledged', 'Promotional', 'Unsponsored Visit', 'Donation Received'] })
+    },
+    {
+      dataIndex: "donation_receipt_number",
+      key: "Donation Receipt No.",
+      title: "Donation Receipt No.",
+      align: "center",
+      width: 200,
+      ...getColumnSearchProps('donation_receipt_number', filters, handleSetFilters)
+    },
+    {
       dataIndex: "processed_by_name",
       key: "processed_by",
       title: "Processed By",
