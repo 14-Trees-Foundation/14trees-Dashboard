@@ -86,7 +86,6 @@ function App() {
           <Route path="/referral" element={<ReferralsPage />}></Route>
           <Route path="/referral/:rfr" element={<ReferralUserPage />}></Route>
           <Route path="/login" element={<Login />} />
-          <Route path="/login" element={<Login />} />
           <Route path="/corporate/registration" element={<CorpRegistration />} />
           <Route
             path="/admin"
