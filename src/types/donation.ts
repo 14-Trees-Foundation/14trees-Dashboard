@@ -1,3 +1,6 @@
+
+export type DonationSponsorshipType = 'Unverified' | 'Pledged' | 'Promotional' | 'Unsponsored Visit' | 'Donation Received'
+
 export interface Donation {
   id: number;
   user_id: number;
@@ -33,6 +36,8 @@ export interface Donation {
   amount_donated: number | null; 
   amount_received: number; 
   donation_method: "amount" | "trees";
+  sponsorship_type: DonationSponsorshipType;
+  donation_receipt_number: string | null;
   processed_by: number | null;
   processed_by_name?: string;
 }

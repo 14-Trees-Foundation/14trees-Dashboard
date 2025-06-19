@@ -1,4 +1,3 @@
-// CSVUploadSection.tsx
 import React, { useState, useRef, useEffect } from "react";
 import {
     Box, Typography, Button, Table, TableHead, TableBody, TableCell, TableContainer, TableRow,
@@ -63,6 +62,16 @@ const CSVUploadSection: React.FC<CSVUploadSectionProps> = ({
         }
     }, [groupId]);
 
+    useEffect(() => {
+        setData([]);
+        setHeaders([]);
+        setErrorsMap({});
+        setImageValidationErrors({});
+        setImagePreviews({});
+        setImageUrls([]);
+        onValidationChange(false, false, "");
+    }, [groupId]);
+
     const validateHeaders = (headers: string[]): string[] =>
         REQUIRED_HEADERS.filter(h => !headers.includes(h)).map(m => `Missing required header: ${m}`);
 
@@ -72,14 +81,17 @@ const CSVUploadSection: React.FC<CSVUploadSectionProps> = ({
         const isValidEmail = (val: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val);
 
         if (!name?.trim()) errors.push("Recipient Name is required");
-        if (email && !isValidEmail(email)) errors.push("Invalid Email format");
+        if (!email?.trim()) {
+            errors.push("Recipient Email is required");
+        } else if (!isValidEmail(email)) {
+            errors.push("Invalid Email format");
+        }
         if (!trees || isNaN(Number(trees)) || Number(trees) <= 0) {
             errors.push("Number of trees must be a positive number");
         }
 
-        // Check for duplicates
         const duplicateIndex = allRows.findIndex((r, i) => {
-            if (i === index) return false; // Skip current row
+            if (i === index) return false;
             const [rName, rEmail] = r;
             return rName?.trim() === name?.trim() && rEmail?.trim() === email?.trim();
         });
@@ -118,7 +130,6 @@ const CSVUploadSection: React.FC<CSVUploadSectionProps> = ({
 
         setImageValidationErrors(errors);
         setImagePreviews(previews);
-
         return errors;
     };
 
@@ -167,7 +178,6 @@ const CSVUploadSection: React.FC<CSVUploadSectionProps> = ({
         let totalCsvTrees = 0;
         const newErrorsMap: Record<number, string[]> = {};
 
-        // Validate each row
         rows.forEach((row, idx) => {
             const errors = validateRow(row, idx, rows);
             if (errors.length > 0) newErrorsMap[idx] = errors;
@@ -177,7 +187,7 @@ const CSVUploadSection: React.FC<CSVUploadSectionProps> = ({
         });
 
         if (totalCsvTrees > remainingTrees) {
-            toast.error(`Total trees in CSV (${totalCsvTrees}) exceed allowed count (${remainingTrees})`);
+          //  toast.error(`Total trees in CSV (${totalCsvTrees}) exceed allowed count (${remainingTrees})`);
             onValidationChange(false, true, `Total trees in CSV (${totalCsvTrees}) exceed allowed count (${remainingTrees})`);
             return;
         }
@@ -185,20 +195,18 @@ const CSVUploadSection: React.FC<CSVUploadSectionProps> = ({
         setData(rows);
         setErrorsMap(newErrorsMap);
 
-        // Validate images if any are uploaded
-        if (imageUrls.length > 0) {
-            const imageErrors = validateImages(rows, firstRow, imageUrls);
-            const hasImageErrors = Object.keys(imageErrors).length > 0;
-            
-            if (hasImageErrors) {
-                toast.error("Some images referenced in CSV are not found in uploaded images");
-            }
+        const imageErrors = validateImages(rows, firstRow, imageUrls);
+        const hasImageErrors = Object.keys(imageErrors).length > 0;
+        const hasRowErrors = Object.keys(newErrorsMap).length > 0;
+        const hasAnyErrors = hasRowErrors || hasImageErrors;
+
+        if (hasImageErrors) {
+            toast.error("Some images referenced in CSV are not found in uploaded images");
         }
 
-        const hasErrors = Object.keys(newErrorsMap).length > 0;
-        onValidationChange(!hasErrors, true, hasErrors ? "Row validation errors" : "");
+        onValidationChange(!hasAnyErrors, true, hasAnyErrors ? "Validation errors found" : "");
 
-        if (!hasErrors && onRecipientsChange) {
+        if (!hasRowErrors && onRecipientsChange) {
             const formattedRecipients = rows.map((row, idx) => ({
                 name: row[nameIndex],
                 email: row[emailIndex],
@@ -215,10 +223,14 @@ const CSVUploadSection: React.FC<CSVUploadSectionProps> = ({
         if (data.length > 0 && headers.length > 0) {
             const imageErrors = validateImages(data, headers, urls);
             const hasImageErrors = Object.keys(imageErrors).length > 0;
+            const hasRowErrors = Object.keys(errorsMap).length > 0;
             
             if (hasImageErrors) {
                 toast.error("Some images referenced in CSV are not found in uploaded images");
             }
+            
+            onValidationChange(!(hasRowErrors || hasImageErrors), true, 
+                            hasImageErrors ? "Image validation errors" : "");
         }
     };
 

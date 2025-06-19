@@ -18,9 +18,10 @@ interface EditOrganizationDialogProps {
     organizationData: {
         name: string;
         address: string;
+        billing_email: string;
         logo_url: string | null;
     };
-    onSave: (data: { name: string; address: string; logo_url: string | null }, logoFile?: File) => void;
+    onSave: (data: { name: string; address: string; logo_url: string | null, billing_email: string }, logoFile?: File) => void;
 }
 
 const EditOrganizationDialog: React.FC<EditOrganizationDialogProps> = ({
@@ -33,6 +34,7 @@ const EditOrganizationDialog: React.FC<EditOrganizationDialogProps> = ({
     const [address, setAddress] = useState(organizationData.address);
     const [file, setFile] = useState<File | undefined>(undefined);
     const [logoPreview, setLogoPreview] = useState(organizationData.logo_url);
+    const [billingEmail, setBillingEmail] = useState(organizationData.billing_email);
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
@@ -50,6 +52,7 @@ const EditOrganizationDialog: React.FC<EditOrganizationDialogProps> = ({
         onSave({
             name,
             address,
+            billing_email: billingEmail,
             logo_url: logoPreview,
         }, file);
         onClose();
@@ -101,6 +104,15 @@ const EditOrganizationDialog: React.FC<EditOrganizationDialogProps> = ({
                     onChange={(e) => setName(e.target.value)}
                     margin="normal"
                     variant="outlined"
+                />
+                <TextField
+                    label="Billing Email"
+                    fullWidth
+                    value={billingEmail}
+                    onChange={(e) => setBillingEmail(e.target.value)}
+                    margin="normal"
+                    variant="outlined"
+                    type="email"
                 />
                 <TextField
                     label="Address"
