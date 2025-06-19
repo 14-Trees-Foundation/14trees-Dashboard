@@ -401,10 +401,27 @@ const GiftTrees: FC = () => {
     }
 
     const handleSubmit = async (user: User, sponsor: User | null, createdBy: User, group: Group | null, treeCount: number, category: string, grove: string | null, requestType: string, users: any[], giftedOn: string, paymentId?: number, logo?: string, messages?: any, file?: File) => {
+
+        const updatedUsers: any[] = []
+        if (users && users.length > 0) {
+            users.forEach(item => {
+                const updated = { ...item }
+                if (updated.recipient_email.includes(".donor")) {
+                    updated.recipient_email = updated.recipient_email.replace(".donor", "." + (sponsor?.name || user.name).trim().toLowerCase().replaceAll(" ", ''))
+                }
+
+                if (updated.assignee_email.includes(".donor")) {
+                    updated.assignee_email = updated.assignee_email.replace(".donor", "." + (sponsor?.name || user.name).trim().toLowerCase().replaceAll(" ", ''))
+                }
+
+                updatedUsers.push(updated)
+            })
+        }
+
         if (changeMode === 'add') {
-            await saveNewGiftCardsRequest(user, sponsor, createdBy, group, treeCount, category, grove, requestType, users, giftedOn, paymentId, logo, messages, file);
+            await saveNewGiftCardsRequest(user, sponsor, createdBy, group, treeCount, category, grove, requestType, updatedUsers, giftedOn, paymentId, logo, messages, file);
         } else if (changeMode === 'edit') {
-            await updateGiftCardRequest(user, sponsor, createdBy, group, treeCount, category, grove, requestType, users, giftedOn, paymentId, logo, messages, file);
+            await updateGiftCardRequest(user, sponsor, createdBy, group, treeCount, category, grove, requestType, updatedUsers, giftedOn, paymentId, logo, messages, file);
         }
 
         handleModalClose();
