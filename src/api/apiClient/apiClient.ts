@@ -45,6 +45,17 @@ class ApiClient {
         this.token = token ? JSON.parse(token) : null;
     }
 
+    async authenticateToken(token_id: string): Promise<{ user: User, token: string }> {
+        const url = `/auth/validate-token`;
+        try {
+            const response = await this.api.post<{ user: User, token: string }>(url, { token_id });
+            return response.data;
+        } catch (error: any) {
+            console.error(error)
+            throw new Error(`Failed to fetch tree types: ${error.message}`);
+        }
+    }
+
     /*
         Model- PlantTypes: CRUD Operations/Apis for tree types 
     */
@@ -256,7 +267,6 @@ class ApiClient {
     async createPlot(data: Plot): Promise<Plot> {
         try {
             const response = await this.api.post<Plot>(`/plots`, data);
-            console.log("create plot response: ", response.data);
             return response.data;
         } catch (error) {
             console.error(error)
@@ -412,6 +422,7 @@ class ApiClient {
             formData.append("type", data.type);
             if (data.description) formData.append("description", data.description);
             if (data.address) formData.append("address", data.address);
+            if (data.billing_email) formData.append("billing_email", data.billing_email);
             if (data.logo_url) formData.append("logo_url", data.logo_url);
             formData.append("create_at", data.created_at as any);
             formData.append("updated_at", data.updated_at as any);
@@ -457,6 +468,32 @@ class ApiClient {
                 throw new Error(error.response.data.message);
             }
             throw new Error('Failed to merge groups!');
+        }
+    }
+
+    async registerGroup(corporateData: { name: string, type:string, logo_url?: string, address?: string, billing_email?: string, description?: string}, userData: { name: string, email: string, phone?: string;}): Promise<Group> {
+        try {
+          const response = await this.api.post<Group>('/groups/register', {
+            corporate: {
+              name: corporateData.name,
+              type: "corporate",
+              logo_url: corporateData.logo_url,
+              address: corporateData.address,
+              billing_email: corporateData.billing_email,
+              description: corporateData.description,
+            },
+            user: {
+              name: userData.name,
+              email: userData.email,
+              phone: userData.phone,
+            }
+          });
+          return response.data;
+        } catch (error: any) {
+          if (error.response?.data?.message) {
+            throw new Error(error.response.data.message);
+          }
+          throw new Error('Failed to register group');
         }
     }
 
@@ -1347,7 +1384,6 @@ class ApiClient {
                 users: users
             };
 
-            console.log("Sending donation update payload:", payload);
             const response = await this.api.put<Donation>(`/donations/requests/${donation.id}`, payload);
             return response.data;
         } catch (error: any) {
@@ -1612,8 +1648,6 @@ class ApiClient {
                 user: userPayload
             };
 
-            console.log('Updating donation user:', payload);
-
             // Use the PUT /donations/users endpoint that the backend expects
             const response = await this.api.put('/donations/users', payload);
             return response.data;
@@ -1654,8 +1688,6 @@ class ApiClient {
                 donation_id: donationId,
                 user: userPayload
             };
-
-            console.log('Creating donation user:', payload);
 
             // Use the existing PUT /donations/users endpoint that also handles creation
             // The backend determines if it's a create or update based on whether there's an ID
@@ -2018,6 +2050,17 @@ class ApiClient {
 
             const response = await this.api.put<GiftCard>(`/gift-cards/requests/${request.id}`, formData);
             return response.data;
+        } catch (error: any) {
+            if (error.response) {
+                throw new Error(error.response.data.message);
+            }
+            throw new Error('Failed to create gift card');
+        }
+    }
+
+    async pathGiftCard(gift_card_request_id: number, data: Partial<GiftCard>, fields: (keyof GiftCard)[]) {
+        try {
+            await this.api.patch<void>(`/gift-cards/requests/update`, { gift_card_request_id, data, updateFields: fields });
         } catch (error: any) {
             if (error.response) {
                 throw new Error(error.response.data.message);

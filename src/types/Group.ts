@@ -7,6 +7,7 @@ export type Group = {
     description: string,
     logo_url: string | null,
     address: string | null,
+    billing_email: string,
     created_at: Date,
     updated_at: Date,
     sponsored_trees?: number,

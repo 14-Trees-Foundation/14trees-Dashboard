@@ -105,7 +105,6 @@ const RazonpayComponent: React.FC<RazonpayComponentProps> = ({ amount, orderId, 
                     },
                 }
                 
-                console.log( "Razorpay display called:" ,options);
                 const paymentObject = new window.Razorpay(options);
                 paymentObject.open();
             }

@@ -21,6 +21,11 @@ import {
     Autocomplete,
     Avatar,
     CircularProgress,
+    Alert,
+    FormControl,
+    FormGroup,
+    FormControlLabel,
+    Radio,
 } from "@mui/material";
 import Papa from "papaparse";
 import { Close as CloseIcon, Done, Image as ImageIcon } from "@mui/icons-material";
@@ -30,6 +35,7 @@ import UserImagesForm from "../gift/Form/UserImagesForm";
 import CardDetails from "../gift/Form/CardDetailsForm";
 import ApiClient from "../../../api/apiClient/apiClient";
 import { toast } from "react-toastify";
+import RazorpayComponent from "../../../components/RazorpayComponent";
 
 interface CSRBulkGiftProps {
     groupId: number
@@ -37,6 +43,7 @@ interface CSRBulkGiftProps {
     open: boolean
     onClose: () => void
     onSubmit: () => void
+    payLater?: boolean
 }
 
 interface Messages {
@@ -63,13 +70,13 @@ const OPTIONAL_HEADERS = [
     "Gifted On",
 ];
 
-const CSRBulkGift: React.FC<CSRBulkGiftProps> = ({ groupId, logoUrl, open, onClose, onSubmit }) => {
+const CSRBulkGift: React.FC<CSRBulkGiftProps> = ({ groupId, logoUrl, open, onClose, onSubmit, payLater = false }) => {
     const [data, setData] = useState<string[][]>([]);
     const [headers, setHeaders] = useState<string[]>([]);
     const [errorsMap, setErrorsMap] = useState<Record<number, string[]>>({});
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(10);
-    const [currentStep, setCurrentStep] = useState<'event' | 'csv' | 'card'>('event');
+    const [currentStep, setCurrentStep] = useState<'event' | 'csv' | 'card' | 'giftType' | 'summary'>('event');
     const [headerErrors, setHeaderErrors] = useState<string[]>([]);
     const [requestId, setRequestId] = useState<string>(getUniqueRequestId());
     const [imageUrls, setImageUrls] = useState<string[]>([]);
@@ -92,10 +99,20 @@ const CSRBulkGift: React.FC<CSRBulkGiftProps> = ({ groupId, logoUrl, open, onClo
     const [selectedEventType, setSelectedEventType] = useState<{ value: string, label: string } | null>(null);
     const [showAdditionalFields, setShowAdditionalFields] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [giftType, setGiftType] = useState<'existing' | 'new'>('existing');
+    const [orderId, setOrderId] = useState<string>('');
+    const [paymentStatus, setPaymentStatus] = useState<'idle' | 'pending' | 'success' | 'failed'>('idle');
+    const [giftRequest, setGiftRequest] = useState<any>(null);
+    const [giftRequestId, setGiftRequestId] = useState<string>('');
+    const [totalAmount, setTotalAmount] = useState<number>(0);
+    const [totalTrees, setTotalTrees] = useState<number>(0);
+    const [userData, setUserData] = useState<any[]>([]);
+
+    const userName = localStorage.getItem("userName");
+    const userEmail = localStorage.getItem("userEmail");
 
     useEffect(() => {
         const userData = prepareUserData();
-        console.log(userData)
         const giftedBy = userData.length > 0 ? userData[0].gifted_by : undefined;
 
         if (giftedBy && messages.plantedBy != giftedBy) {
@@ -359,7 +376,133 @@ const CSRBulkGift: React.FC<CSRBulkGiftProps> = ({ groupId, logoUrl, open, onClo
             if (!hasErrors) {
                 setCurrentStep('card');
             }
+        } else if (currentStep === 'card') {
+            if (presentationId && slideId) {
+                if (payLater) {
+                    setCurrentStep('summary');
+                } else {
+                    setCurrentStep('giftType');
+                }
+            }
+        } else if (currentStep === 'giftType') {
+            setCurrentStep('summary');
+        } else if (currentStep === 'summary') {
+            if (payLater) {
+                handlePurchaseNewTrees(true);
+            } else if (giftType === 'existing') {
+                handleSubmit();
+            } else {
+                handlePurchaseNewTrees(false);
+            }
         }
+    };
+
+    const handlePurchaseNewTrees = async (isPayLater: boolean = false) => {
+        try {
+            setIsSubmitting(true);
+            const apiClient = new ApiClient();
+            const preparedUserData = prepareUserData();
+            const treesCount = preparedUserData.reduce((sum, user) => sum + user.trees_count, 0);
+            setTotalTrees(treesCount);
+            setTotalAmount(treesCount * 2000); // Assuming each tree costs 2000
+            setUserData(preparedUserData);
+
+            const userData = prepareUserData();
+            const users = userData.map(item => {
+                let user = {
+                    recipient_name: item.name.trim(),
+                    recipient_email: item.email.trim() ? item.email.trim() : item.name.trim().toLowerCase().split(" ").join(".") + "@14trees",
+                    recipient_communication_email: item.communication_email.trim() || null,
+                    gifted_trees: item.trees_count,
+                    image_url: item.profile_image_url,
+                    assignee_name: item.name.trim(),
+                    assignee_email: item.email.trim() ? item.email.trim() : item.name.trim().toLowerCase().split(" ").join(".") + "@14trees",
+                    assignee_communication_email: item.communication_email.trim() || null,
+                    gifted_on: item.gifted_on?.trim() || null,
+                    gifted_by: item.gifted_by?.trim() || null,
+                    event_name: item.event_name?.trim() || null,
+                }
+
+                return user
+            })
+
+            const response = await apiClient.createGiftCardRequestV2(
+                groupId,
+                userName || preparedUserData[0].name,
+                userEmail || preparedUserData[0].email,
+                treesCount,
+                messages.eventType || "3",
+                messages.eventName,
+                messages.plantedBy,
+                ["Corporate", isPayLater ? "PayLater" : "GiftAndPay"],
+                users,
+                messages.logoMessage,
+                messages.primaryMessage
+            );
+
+            if (response.order_id) {
+                setOrderId(response.order_id);
+            }
+            if (response.gift_request?.id) {
+                setGiftRequest(response.gift_request);
+                setGiftRequestId(response.gift_request.id.toString());
+            }
+
+            if (isPayLater) {
+                toast.success("Gift request created successfully!");
+                onSubmit();
+                onClose();
+            } else {
+                setPaymentStatus('pending');
+            }
+        } catch (error: any) {
+            toast.error(error.message || "Failed to create gift card request");
+            setPaymentStatus('failed');
+        } finally {
+            setIsSubmitting(false);
+        }
+    };
+
+    const handlePaymentSuccess = async () => {
+        try {
+            setPaymentStatus('success');
+            setIsSubmitting(true);
+            const apiClient = new ApiClient();
+            await apiClient.paymentSuccessForGiftRequest(Number(giftRequestId), true);
+            toast.success("Payment successful! Gift cards will be created shortly.");
+            onSubmit();
+            onClose();
+        } catch (error: any) {
+            toast.error('Payment successful but failed to update status. Please contact support.');
+            setPaymentStatus('failed');
+        } finally {
+            setIsSubmitting(false);
+        }
+    };
+
+    const handlePaymentFailure = () => {
+        setPaymentStatus('failed');
+        toast.error('Payment failed. Please try again later or contact support.');
+    };
+
+    const handleRetryPayment = () => {
+        setPaymentStatus('pending');
+    };
+
+    const handleClose = async () => {
+        if (paymentStatus === 'pending' || paymentStatus === 'failed') {
+            toast.warning('Payment is mandatory to complete the order. The request will not be fulfilled without payment.');
+            if (giftRequest) {
+                try {
+                    const apiClient = new ApiClient();
+                    await apiClient.pathGiftCard(giftRequest.id, { tags: ['Corporate', 'PayLater'] }, ['tags']);
+                    toast.info('Your request has been updated to Pay Later');
+                } catch (error: any) {
+                    toast.error('Failed to update your request to Pay Later');
+                }
+            }
+        }
+        onClose();
     };
 
     const prepareUserData = () => {
@@ -385,7 +528,7 @@ const CSRBulkGift: React.FC<CSRBulkGiftProps> = ({ groupId, logoUrl, open, onClo
                 email: row[emailIndex]?.trim() || '',
                 communication_email: row[commEmailIndex]?.trim() || '',
                 birth_date: row[dobIndex]?.trim() || '',
-                profile_image_url: imageName ?  imagePreviews[imageName] : '',
+                profile_image_url: imageName ? imagePreviews[imageName] : '',
                 event_name: eventInCsv ? row[eventNameIndex]?.trim() : messages.eventType,
                 gifted_by: eventInCsv ? row[giftedByIndex]?.trim() : messages.plantedBy,
                 gifted_on: eventInCsv ? row[giftedOnIndex]?.trim() : messages.giftedOn,
@@ -584,6 +727,41 @@ const CSRBulkGift: React.FC<CSRBulkGiftProps> = ({ groupId, logoUrl, open, onClo
         </Box>
     );
 
+    const renderGiftTypeStep = () => (
+        <Box>
+            <Typography variant="h6" gutterBottom>
+                Choose Gift Type
+            </Typography>
+            <Typography variant="body1" gutterBottom>
+                Would you like to gift trees from your existing inventory or purchase new trees?
+            </Typography>
+            <FormControl component="fieldset" sx={{ mt: 2 }}>
+                <FormGroup>
+                    <FormControlLabel
+                        control={
+                            <Radio
+                                checked={giftType === 'existing'}
+                                onChange={() => setGiftType('existing')}
+                                color="success"
+                            />
+                        }
+                        label="Gift from Existing Inventory"
+                    />
+                    <FormControlLabel
+                        control={
+                            <Radio
+                                checked={giftType === 'new'}
+                                onChange={() => setGiftType('new')}
+                                color="success"
+                            />
+                        }
+                        label="Purchase New Trees"
+                    />
+                </FormGroup>
+            </FormControl>
+        </Box>
+    );
+
     const renderCardPreviewStep = (messages: Messages) => {
 
         const userData = prepareUserData();
@@ -612,6 +790,224 @@ const CSRBulkGift: React.FC<CSRBulkGiftProps> = ({ groupId, logoUrl, open, onClo
         );
     };
 
+    const RecipientsTable = ({ data, page, rowsPerPage, onPageChange, onRowsPerPageChange }: {
+        data: any[],
+        page: number,
+        rowsPerPage: number,
+        onPageChange: (event: unknown, newPage: number) => void,
+        onRowsPerPageChange: (event: React.ChangeEvent<HTMLInputElement>) => void
+    }) => (
+        <TableContainer component={Paper}>
+            <Table size="small" stickyHeader>
+                <TableHead>
+                    <TableRow>
+                        <TableCell>Name</TableCell>
+                        <TableCell>Email</TableCell>
+                        <TableCell>Communication Email</TableCell>
+                        <TableCell>Date of Birth</TableCell>
+                        <TableCell>Trees</TableCell>
+                        <TableCell>Profile Image</TableCell>
+                    </TableRow>
+                </TableHead>
+                <TableBody>
+                    {data
+                        .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                        .map((row, index) => (
+                            <TableRow key={index}>
+                                <TableCell>{row.name}</TableCell>
+                                <TableCell>{row.email}</TableCell>
+                                <TableCell>{row.communication_email || '-'}</TableCell>
+                                <TableCell>{row.birth_date || '-'}</TableCell>
+                                <TableCell>{row.trees_count}</TableCell>
+                                <TableCell>
+                                    {row.profile_image_url ? (
+                                        <Avatar
+                                            src={row.profile_image_url}
+                                            alt={row.name}
+                                            sx={{ width: 40, height: 40 }}
+                                        />
+                                    ) : (
+                                        <ImageIcon color="disabled" />
+                                    )}
+                                </TableCell>
+                            </TableRow>
+                        ))}
+                </TableBody>
+            </Table>
+            <TablePagination
+                rowsPerPageOptions={[5, 10, 25, 50, 100]}
+                component="div"
+                count={data.length}
+                rowsPerPage={rowsPerPage}
+                page={page}
+                onPageChange={onPageChange}
+                onRowsPerPageChange={onRowsPerPageChange}
+            />
+        </TableContainer>
+    );
+
+    const renderSummaryStep = () => {
+        const userData = prepareUserData();
+        const totalTrees = userData.reduce((sum, user) => sum + user.trees_count, 0);
+        const totalAmount = totalTrees * 2000; // Assuming each tree costs 2000
+
+        return (
+            <Box>
+                <Typography variant="h6" gutterBottom>
+                    Summary
+                </Typography>
+                <Grid container spacing={3}>
+                    {/* Corporate Details */}
+                    <Grid item xs={12}>
+                        <Paper sx={{ p: 2 }}>
+                            <Typography variant="subtitle1" gutterBottom fontWeight="bold">
+                                Corporate Details
+                            </Typography>
+                            <Box display="flex" alignItems="center" gap={2}>
+                                {logoUrl && (
+                                    <Box
+                                        component="img"
+                                        src={logoUrl}
+                                        alt="Corporate Logo"
+                                        sx={{
+                                            maxHeight: 100,
+                                            maxWidth: '100%',
+                                            objectFit: 'contain'
+                                        }}
+                                    />
+                                )}
+                                <Box>
+                                    <Typography variant="body1">
+                                        {messages.plantedBy}
+                                    </Typography>
+                                </Box>
+                            </Box>
+                        </Paper>
+                    </Grid>
+
+                    {/* Gift Details */}
+                    <Grid item xs={12}>
+                        <Paper sx={{ p: 2 }}>
+                            <Typography variant="subtitle1" gutterBottom fontWeight="bold">
+                                Gift Details
+                            </Typography>
+                            <Grid container spacing={2}>
+                                <Grid item xs={12} sm={6}>
+                                    <Typography variant="body2" color="textSecondary">
+                                        Event Type
+                                    </Typography>
+                                    <Typography variant="body1">
+                                        {selectedEventType?.label || 'General'}
+                                    </Typography>
+                                </Grid>
+                                {messages.eventName && (
+                                    <Grid item xs={12} sm={6}>
+                                        <Typography variant="body2" color="textSecondary">
+                                            Event Name
+                                        </Typography>
+                                        <Typography variant="body1">
+                                            {messages.eventName}
+                                        </Typography>
+                                    </Grid>
+                                )}
+                                <Grid item xs={12} sm={6}>
+                                    <Typography variant="body2" color="textSecondary">
+                                        Gifted On
+                                    </Typography>
+                                    <Typography variant="body1">
+                                        {messages.giftedOn}
+                                    </Typography>
+                                </Grid>
+                            </Grid>
+                        </Paper>
+                    </Grid>
+
+                    {/* Recipients Summary */}
+                    <Grid item xs={12}>
+                        <Paper sx={{ p: 2 }}>
+                            <Typography variant="subtitle1" gutterBottom fontWeight="bold">
+                                Recipients Summary
+                            </Typography>
+                            <Grid container spacing={2}>
+                                <Grid item xs={12} sm={6}>
+                                    <Typography variant="body2" color="textSecondary">
+                                        Total Recipients
+                                    </Typography>
+                                    <Typography variant="body1">
+                                        {userData.length}
+                                    </Typography>
+                                </Grid>
+                                <Grid item xs={12} sm={6}>
+                                    <Typography variant="body2" color="textSecondary">
+                                        Total Trees
+                                    </Typography>
+                                    <Typography variant="body1">
+                                        {totalTrees}
+                                    </Typography>
+                                </Grid>
+                                {giftType === 'new' && (
+                                    <Grid item xs={12}>
+                                        <Typography variant="body2" color="textSecondary">
+                                            Total Amount
+                                        </Typography>
+                                        <Typography variant="body1" fontWeight="bold" color="success.main">
+                                            ₹{totalAmount.toLocaleString()}
+                                        </Typography>
+                                    </Grid>
+                                )}
+                            </Grid>
+                        </Paper>
+                    </Grid>
+
+                    {/* Recipients Table */}
+                    <Grid item xs={12}>
+                        <Paper sx={{ p: 2 }}>
+                            <Typography variant="subtitle1" gutterBottom fontWeight="bold">
+                                Recipients List
+                            </Typography>
+                            <RecipientsTable
+                                data={userData}
+                                page={page}
+                                rowsPerPage={rowsPerPage}
+                                onPageChange={handleChangePage}
+                                onRowsPerPageChange={handleChangeRowsPerPage}
+                            />
+                        </Paper>
+                    </Grid>
+
+                    {/* Card Details */}
+                    <Grid item xs={12}>
+                        <Paper sx={{ p: 2 }}>
+                            <Typography variant="subtitle1" gutterBottom fontWeight="bold">
+                                Card Details
+                            </Typography>
+                            <Grid container spacing={2}>
+                                <Grid item xs={12}>
+                                    <Typography variant="body2" color="textSecondary">
+                                        Primary Message
+                                    </Typography>
+                                    <Typography variant="body1">
+                                        {messages.primaryMessage}
+                                    </Typography>
+                                </Grid>
+                                {messages.logoMessage && (
+                                    <Grid item xs={12}>
+                                        <Typography variant="body2" color="textSecondary">
+                                            Logo Message
+                                        </Typography>
+                                        <Typography variant="body1">
+                                            {messages.logoMessage}
+                                        </Typography>
+                                    </Grid>
+                                )}
+                            </Grid>
+                        </Paper>
+                    </Grid>
+                </Grid>
+            </Box>
+        );
+    };
+
     return (
         <Dialog open={open} maxWidth={currentStep === 'event' ? "sm" : currentStep === 'csv' ? "lg" : "xl"} fullWidth>
             <DialogTitle>Bulk Gift Trees</DialogTitle>
@@ -619,12 +1015,53 @@ const CSRBulkGift: React.FC<CSRBulkGiftProps> = ({ groupId, logoUrl, open, onClo
                 {currentStep === 'event' && renderEventStep()}
                 {currentStep === 'csv' && renderCsvStep()}
                 {currentStep === 'card' && renderCardPreviewStep(messages)}
+                {!payLater && currentStep === 'giftType' && renderGiftTypeStep()}
+                {currentStep === 'summary' && renderSummaryStep()}
+                {!payLater && paymentStatus === 'pending' && (
+                    <Box sx={{ mt: 2 }}>
+                        <Alert severity="warning" sx={{ mb: 2 }}>
+                            Order ID: {giftRequestId}. Payment is required to complete the order!
+                        </Alert>
+                        {orderId && (
+                            <RazorpayComponent
+                                amount={totalAmount}
+                                orderId={orderId}
+                                user={{
+                                    key: 0,
+                                    id: 0,
+                                    name: userData[0]?.name || '',
+                                    user_id: '0',
+                                    phone: '',
+                                    email: userData[0]?.email || '',
+                                    communication_email: null,
+                                    birth_date: null,
+                                    created_at: new Date(),
+                                    updated_at: new Date()
+                                }}
+                                description={`Purchase of ${totalTrees} trees`}
+                                onPaymentDone={handlePaymentSuccess}
+                                onClose={handlePaymentFailure}
+                            />
+                        )}
+                    </Box>
+                )}
+                {!payLater && paymentStatus === 'success' && (
+                    <Alert severity="success" sx={{ mt: 2 }}>
+                        Payment successful! Gift Request ID: {giftRequestId}
+                    </Alert>
+                )}
+                {!payLater && paymentStatus === 'failed' && (
+                    <Alert severity="error" sx={{ mt: 2 }}>
+                        Payment failed. The request will not be fulfilled without successful payment.
+                        Please retry the payment or contact support if the issue persists.
+                    </Alert>
+                )}
             </DialogContent>
             <DialogActions>
-                <Button onClick={onClose} variant="outlined" color="error" sx={{ textTransform: "none" }}>
-                    Close
+                <Button onClick={handleClose} variant="outlined" color="error" sx={{ textTransform: "none" }}>
+                    {giftRequestId ? 'Close' : 'Cancel'}
                 </Button>
-                {currentStep === 'csv' && (
+                {!giftRequestId && currentStep === 'csv' && (
                     <Button
                         onClick={() => setCurrentStep('event')}
                         variant="contained"
@@ -634,35 +1071,37 @@ const CSRBulkGift: React.FC<CSRBulkGiftProps> = ({ groupId, logoUrl, open, onClo
                         Previous
                     </Button>
                 )}
-                {currentStep === 'card' && (
-                    <>
-                        <Button
-                            onClick={() => setCurrentStep('csv')}
-                            variant="contained"
-                            color="success"
-                            sx={{ textTransform: "none" }}
-                        >
-                            Previous
-                        </Button>
-                        <Button
-                            onClick={handleSubmit}
-                            variant="contained"
-                            color="success"
-                            sx={{ textTransform: "none" }}
-                            disabled={isSubmitting || !presentationId || !slideId}
-                        >
-                            {isSubmitting ? (
-                                <>
-                                    <CircularProgress size={20} color="inherit" sx={{ mr: 1 }} />
-                                    Submitting...
-                                </>
-                            ) : (
-                                'Submit'
-                            )}
-                        </Button>
-                    </>
+                {!giftRequestId && currentStep === 'card' && (
+                    <Button
+                        onClick={() => setCurrentStep('csv')}
+                        variant="contained"
+                        color="success"
+                        sx={{ textTransform: "none" }}
+                    >
+                        Previous
+                    </Button>
                 )}
-                {currentStep !== 'card' && (
+                {!payLater && !giftRequestId && currentStep === 'giftType' && (
+                    <Button
+                        onClick={() => setCurrentStep('card')}
+                        variant="contained"
+                        color="success"
+                        sx={{ textTransform: "none" }}
+                    >
+                        Previous
+                    </Button>
+                )}
+                {!giftRequestId && currentStep === 'summary' && (
+                    <Button
+                        onClick={() => payLater ? setCurrentStep('card') : setCurrentStep('giftType')}
+                        variant="contained"
+                        color="success"
+                        sx={{ textTransform: "none" }}
+                    >
+                        Previous
+                    </Button>
+                )}
+                {!giftRequestId && currentStep !== 'summary' && (
                     <Button
                         onClick={handleNext}
                         variant="contained"
@@ -670,10 +1109,39 @@ const CSRBulkGift: React.FC<CSRBulkGiftProps> = ({ groupId, logoUrl, open, onClo
                         sx={{ textTransform: "none" }}
                         disabled={
                             (currentStep === 'event' && !messages.eventType) ||
-                            (currentStep === 'csv' && (Object.keys(errorsMap).length > 0 || Object.keys(imageValidationErrors).length > 0 || data.length == 0))
+                            (currentStep === 'csv' && (Object.keys(errorsMap).length > 0 || Object.keys(imageValidationErrors).length > 0 || data.length == 0)) ||
+                            (currentStep === 'card' && (!presentationId || !slideId))
                         }
                     >
                         Next
+                    </Button>
+                )}
+                {!giftRequestId && currentStep === 'summary' && (
+                    <Button
+                        onClick={handleNext}
+                        variant="contained"
+                        color="success"
+                        sx={{ textTransform: "none" }}
+                        disabled={isSubmitting}
+                    >
+                        {isSubmitting ? (
+                            <>
+                                <CircularProgress size={20} color="inherit" sx={{ mr: 1 }} />
+                                {payLater ? 'Submitting...' : (giftType === 'new' ? 'Processing Payment...' : 'Submitting...')}
+                            </>
+                        ) : (
+                            payLater ? 'Submit' : (giftType === 'new' ? 'Proceed to Payment' : 'Submit')
+                        )}
+                    </Button>
+                )}
+                {!payLater && paymentStatus === 'failed' && (
+                    <Button
+                        onClick={handleRetryPayment}
+                        variant="contained"
+                        color="success"
+                        sx={{ textTransform: "none" }}
+                    >
+                        Retry Payment
                     </Button>
                 )}
             </DialogActions>

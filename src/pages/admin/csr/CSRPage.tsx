@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import CSRInventory from "./CSRInventory";
 import { useAuth } from "../auth/auth";
 import { SinglePageDrawer } from "./SinglePageDrawer";
-import { NaturePeople, Settings, CardGiftcard, VolunteerActivism } from "@mui/icons-material";
+import { NaturePeople, Settings, CardGiftcard, VolunteerActivism, History } from "@mui/icons-material";
 import { createStyles, makeStyles } from "@mui/styles";
 import {
     Box,
@@ -21,6 +21,7 @@ import { Group } from "../../../types/Group";
 import CSRGiftRequests from "./CSRGiftRequests";
 import CSRHeader from "./CSRHeader";
 import CSRDonations from "./CSRDonations";
+import CSRGiftHistory from "./CSRGiftHistory";
 
 type BirthdayData = {
     hasBirthday: boolean;
@@ -131,28 +132,35 @@ const CSRPage: React.FC = () => {
         {
             displayName: "Green Tribute Wall",
             logo: NaturePeople,
-            key: 5, // Changed from number to string for consistency
+            key: 0, // Changed from number to string for consistency
             display: true,
             onClick: () => setActiveTab("greenTributeWall")
         },
         {
-            displayName: 'Orders',
+            displayName: 'Pre-Purchase',
             logo: CardGiftcard,
-            key: 6,
+            key: 1,
             display: true,
-            onClick: () => setActiveTab("orders")
+            onClick: () => setActiveTab("prePurchase")
+        },
+        {
+            displayName: 'Gift History',
+            logo: History,
+            key: 2,
+            display: true,
+            onClick: () => setActiveTab("giftHistory")
         },
         {
             displayName: 'Donations',
             logo: VolunteerActivism,
-            key: 8,
+            key: 3,
             display: true,
             onClick: () => setActiveTab("donations")
         },
         {
-            displayName: "Settings",
+            displayName: "Corporate Settings",
             logo: Settings,
-            key: 7,
+            key: 4,
             display: true,
             onClick: () => setActiveTab("Setting-Details")
         },
@@ -170,7 +178,7 @@ const CSRPage: React.FC = () => {
                 <NotFound text={status.message} />
             ) : (
                 <div className={classes.box}>
-                    <Box sx={{ display: "flex", position: "relative" }}>
+                    <Box sx={{ display: "flex", position: "relative", height: "100vh", overflow: "hidden" }}>
                         <SinglePageDrawer pages={items} setLogoutLoading={setLogoutLoading} />
 
                         {/* === Bottom Left Stack: Birthday + Avatar === */}
@@ -181,79 +189,30 @@ const CSRPage: React.FC = () => {
                                 left: 16,
                                 zIndex: 1200,
                                 display: "flex",
-                                flexDirection: "column-reverse", // avatar at bottom, birthday on top
+                                flexDirection: "column-reverse",
                                 alignItems: "flex-start",
-                                gap: 2, // separation between boxes
+                                gap: 2,
                             }}
                         >
-
-                            {/* Birthday Box (above avatar) */}
-                            {/* <Box
-                                sx={{
-                                    display: "flex",
-                                    flexDirection: "column",
-                                    gap: 1,
-                                    backgroundColor: "#A8B6A9",
-                                    borderRadius: 2,
-                                    px: 2,
-                                    py: 2,
-                                    boxShadow: 3,
-                                    border: "1px solid rgba(0,0,0,0.1)",
-                                    minWidth: 150,
-                                }}
-                            >
-                                <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
-                                    <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
-                                        Upcoming Events
-                                    </Typography>
-                                    <NotificationsNoneIcon sx={{ color: "#336B43" }} />
-                                </Box>
-                                <Divider sx={{ width: "100%" }} />
-
-                                {birthdayData?.upcomingBirthdays?.length ? (
-                                    <Stack spacing={1} sx={{ maxHeight: 120, overflowY: "auto" }}>
-                                        {birthdayData.upcomingBirthdays.map((b) => (
-                                            <Box
-                                                key={b.id}
-                                                sx={{ display: "flex", alignItems: "center", gap: 1 }}
-                                            >
-                                                <Avatar
-                                                    sx={{
-                                                        width: 28,
-                                                        height: 28,
-                                                        bgcolor: "#336B43",
-                                                        fontSize: 12,
-                                                    }}
-                                                >
-                                                    {getInitials(b.name)}
-                                                </Avatar>
-                                                <Box>
-                                                    <Typography fontSize={12} fontWeight={500}>
-                                                        {b.name}
-                                                    </Typography>
-                                                    <Typography fontSize={11} color="gray">
-                                                        <EventIcon sx={{ fontSize: 14, mr: 0.5 }} />
-                                                        {new Date(b.upcoming_date).toLocaleDateString()}
-                                                    </Typography>
-                                                </Box>
-                                            </Box>
-                                        ))}
-                                    </Stack>
-                                ) : (
-                                    <Typography fontSize={12} color="gray">
-                                        No Events soon.
-                                    </Typography>
-                                )}
-                            </Box> */}
                         </Box>
 
-
-                        <Box sx={{ flex: 1 }}>
-                            <CSRHeader groupId={groupId} onGroupChange={group => { setCurrentGroup(group) }} />
-                            {activeTab === "greenTributeWall" && currentGroup && <CSRInventory selectedGroup={currentGroup}/>}
-                            {activeTab === "orders" && currentGroup && <CSRGiftRequests selectedGroup={currentGroup} groupId={currentGroup.id}/>}
-                            {activeTab === "donations" && currentGroup && <CSRDonations selectedGroup={currentGroup} />}
-                            {activeTab === "Setting-Details" && currentGroup && <CSRSettings group={currentGroup} onGroupChange={group => { setCurrentGroup(group) }}/>}
+                        <Box 
+                            sx={{ 
+                                flex: 1,
+                                overflow: "auto",
+                                height: "100vh",
+                                position: "relative",
+                                width: { xs: "100%", md: "80%" },
+                            }}
+                        >
+                            <CSRHeader groupId={groupId} onGroupChange={group => { setCurrentGroup(prev => prev ? prev : group) }} />
+                            <Box sx={{ p: 2 }}>
+                                {activeTab === "greenTributeWall" && currentGroup && <CSRInventory selectedGroup={currentGroup}/>}
+                                {activeTab === "prePurchase" && currentGroup && <CSRGiftRequests selectedGroup={currentGroup} groupId={currentGroup.id}/>}
+                                {activeTab === "giftHistory" && currentGroup && <CSRGiftHistory selectedGroup={currentGroup} groupId={currentGroup.id} />}
+                                {activeTab === "donations" && currentGroup && <CSRDonations selectedGroup={currentGroup} />}
+                                {activeTab === "Setting-Details" && currentGroup && <CSRSettings group={currentGroup} onGroupChange={group => { setCurrentGroup(group) }}/>}
+                            </Box>
                         </Box>
                     </Box>
                 </div>
@@ -265,12 +224,12 @@ const CSRPage: React.FC = () => {
 const useStyles = makeStyles((theme: any) =>
     createStyles({
         box: {
-            overflow: "auto",
             width: "100%",
             position: "relative",
             backgroundColor: "#B1BFB5",
             minHeight: "100vh",
             height: "100%",
+            overflow: "hidden", // Prevent double scrollbars
         },
         bg: {
             width: "100%",
