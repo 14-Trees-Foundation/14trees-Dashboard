@@ -41,7 +41,6 @@ export const Login = () => {
   let from = location.state?.from?.pathname + location.state?.from?.search || "/admin";
 
   const handlePostAuth = (user, token, tokenId, redirectPath = "/admin") => {
-    localStorage.setItem("loginInfo", JSON.stringify({ tokenId }));
     let permissions = [];
     let roles = [];
     if (user.roles && (user.roles.includes("admin") || user.roles.includes("super-admin"))) {
@@ -110,6 +109,7 @@ export const Login = () => {
         }
       );
       if (res.status === 201 && res.data.user.roles) {
+        localStorage.setItem("loginInfo", JSON.stringify(response));
         handlePostAuth(res.data.user, res.data.token, response.tokenId);
       }
     } catch (error) {
