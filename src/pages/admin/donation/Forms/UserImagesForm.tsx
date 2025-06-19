@@ -11,7 +11,7 @@ interface UserImagesFormProps {
     onValidationChange?: (isValid: boolean, isUploaded: boolean, error: string) => void;
 }
 
-const UserImagesForm: React.FC<UserImagesFormProps> = ({ requestId }) => {
+const UserImagesForm: React.FC<UserImagesFormProps> = ({ requestId, onUpload }) => {
     const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
     const [uploading, setUploading] = useState(false);
     const [uploadProgress, setUploadProgress] = useState<number | null>(null);
@@ -36,6 +36,15 @@ const UserImagesForm: React.FC<UserImagesFormProps> = ({ requestId }) => {
         for (const file of selectedFiles) {
             await awsUtils.uploadFileToS3('gift-request', file, requestId, setUploadProgress);
         }
+
+        let urls: string[] = [];
+        setUploading(true);
+        for (const file of selectedFiles) {
+            const url = await awsUtils.uploadFileToS3('gift-request', file, requestId, setUploadProgress);
+            urls.push(url);
+        }
+        
+        onUpload?.(urls);
         setUploading(false);
         setSelectedFiles([]);
         toast.success('User images uploaded successfully!');
