@@ -24,18 +24,24 @@ interface GiftCardRequestInfoProps {
 const GiftCardRequestInfo: React.FC<GiftCardRequestInfoProps> = ({ open, onClose, data }) => {
 
     const [users, setUsers] = useState<GiftCardUser[]>([]);
+    const [recipients, setRecipients] = useState<any[]>([]);
     const [page, setPage] = useState(0);
     const [pageSize, setPageSize] = useState(10);
+    const [totalRecipients, setTotalRecipients] = useState(0);
 
     useEffect(() => {
-        const getGiftCards = async () => {
+        const fetchData = async () => {
             const apiClient = new ApiClient();
             const resp = await apiClient.getBookedGiftTrees(data.id, 0, -1);
             setUsers(resp.results.filter(item => item.sapling_id));
+
+            const recipientsResp = await apiClient.getGiftRequestUsers(data.id);
+            setRecipients(recipientsResp);
+            setTotalRecipients(recipientsResp.length);
         }
 
-        if (open) getGiftCards();
-    }, [open, data])
+        if (open) fetchData();
+    }, [open, data]);
 
     const columns: any[] = [
         {
@@ -102,7 +108,77 @@ const GiftCardRequestInfo: React.FC<GiftCardRequestInfoProps> = ({ open, onClose
                 </Button>
             </div>)
         },
-    ]
+    ];
+
+    const RecipientColumns: any[] = [
+        {
+            dataIndex: "recipient_name",
+            key: "recipient_name",
+            title: "Recipient Name",
+            align: "center",
+            width: 200,
+        },
+        {
+            dataIndex: "recipient_email",
+            key: "recipient_email",
+            title: "Recipient Email",
+            align: "center",
+            width: 200,
+        },
+        {
+            dataIndex: "assignee_name",
+            key: "assignee_name",
+            title: "Assignee Name",
+            align: "center",
+            width: 200,
+        },
+        {
+            dataIndex: "assignee_email",
+            key: "assignee_email",
+            title: "Assignee Email",
+            align: "center",
+            width: 200,
+        },
+        {
+            dataIndex: "gifted_trees",
+            key: "gifted_trees",
+            title: "Tree Count",
+            align: "center",
+            width: 150,
+        },
+        {
+            dataIndex: "mail_sent",
+            key: "recipient_email_status",
+            title: "Recipient Email Status",
+            align: "center",
+            width: 200,
+            render: (value: any, record: any) => {
+                const usersCount = parseInt(record.users_count || "0");
+                const mailedCount = parseInt(record.mailed_count || "0");
+
+                if (usersCount > 0 && usersCount === mailedCount) {
+                    return "Sent";
+                }
+                return "Not Sent";
+            }
+        },
+        {
+            dataIndex: "assignee_mail_sent",
+            key: "assignee_email_status",
+            title: "Assignee Email Status",
+            align: "center",
+            width: 200,
+            render: (value: any, record: any) => {
+                const usersCount = parseInt(record.users_count || "0");
+                const mailedAssigneeCount = parseInt(record.mailed_assignee_count || "0");
+
+                if (usersCount > 0 && usersCount === mailedAssigneeCount) {
+                    return "Sent";
+                }
+                return "Not Sent";
+            }
+        },
+    ];
 
     const getStatus = (status: string) => {
         if (status === 'pending_plot_selection') {
@@ -209,8 +285,33 @@ const GiftCardRequestInfo: React.FC<GiftCardRequestInfoProps> = ({ open, onClose
                 </Box>
 
                 <Divider />
-                
-                {users.length > 0 && <div>
+
+                {/* Recipients Table */}
+                {recipients.length > 0 && (
+                    <Box mt={2} mb={2}>
+                        <Typography variant="h6" gutterBottom>Recipients</Typography>
+                        <GeneralTable
+                            loading={false}
+                            columns={RecipientColumns}
+                            rows={recipients}
+                            totalRecords={totalRecipients}
+                            page={page + 1}
+                            pageSize={pageSize}
+                            onPaginationChange={(newPage: number, newPageSize: number) => {
+                                setPage(newPage - 1);
+                                setPageSize(newPageSize);
+                            }}
+                            onDownload={async () => recipients}
+                            footer
+                            tableName='Recipient'
+                        />
+                    </Box>
+                )}
+
+                <Divider />
+
+                {/* Trees Assigned Table */}
+                {users.length > 0 && (
                     <Box mt={2} mb={2}>
                         <Typography>Total trees assigned: {data.assigned}</Typography>
                         <GeneralTable
@@ -226,8 +327,8 @@ const GiftCardRequestInfo: React.FC<GiftCardRequestInfoProps> = ({ open, onClose
                             tableName='Gift Request Users'
                         />
                     </Box>
-                    <Divider />
-                </div>}
+                )}
+                <Divider />
 
                 {/* Extra */}
                 <Box mt={2} mb={2}>
