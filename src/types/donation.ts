@@ -29,7 +29,7 @@ export interface Donation {
   tags?: string[] | null;
   booked?: number;
   assigned?: number;
-  status: 'UserSubmitted' | 'OrderFulfilled';
+  status: 'PendingPayment' |'Paid' | 'OrderFulfilled';
   mail_status: string[];
   mail_error: string | null;
   visit_date: Date | null;
