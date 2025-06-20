@@ -31,6 +31,7 @@ import AssignTrees from "./Forms/AssignTrees/AssignTrees";
 import MapTrees from "./Forms/MapTrees/MapTrees";
 import AutoProcessConfirmationModal from "./components/AutoProcessConfirmationModal";
 import donationActionTypes from "../../../redux/actionTypes/donationActionTypes";
+import './components/DonationPayment.css';
 
 export const DonationComponent = () => {
 
@@ -506,32 +507,40 @@ export const DonationComponent = () => {
         {(Number(record.booked) < (record.pledged || 0)) && <Menu.Item key="20" onClick={() => { setSelectedDonation(record); setPlotSelectionModalOpen(true); }} icon={<Landscape />}>
           Select Plots
         </Menu.Item>}
-        <Menu.Item key="21" onClick={() => { setSelectedDonation(record); setEmailConfirmationModal(true); }} icon={<Email />}>
-          Send Emails
-        </Menu.Item>
-        <Menu.Item key="22" onClick={() => { setSelectedDonation(record); setReserveTreesModalOpen(true); }} icon={<Landscape />}>
-          Reserve Trees
-        </Menu.Item>
-        <Menu.Item key="23" onClick={() => { setSelectedDonation(record); setAssignTreesModalOpen(true); }} icon={<AssignmentInd />}>
-          Assign Trees
-        </Menu.Item>
-        {record.visit_date && <Menu.Item key="24" onClick={() => { setSelectedDonation(record); setMapTreesOpen(true); }} icon={<AssignmentInd />}>
-          Map Visit Trees
-        </Menu.Item>}
-        {record.donation_method === 'trees' && record.trees_count > (record.assigned || 0) && <Menu.Item key="25" onClick={() => { setSelectedDonation(record); setPrsConfirm(true); }} icon={<AutoMode />}>
-          Auto Process
-        </Menu.Item>}
-        {!record.processed_by && (
-          <Menu.Item
-            key="pick"
-            onClick={() => handlePickDonation(record.id)}
-            icon={<AssignmentInd />}
-          >
-            Pick This Up
-          </Menu.Item>
-        )}
-
-      </Menu.ItemGroup>
+        </Menu.ItemGroup>
+      {record.status !== 'PendingPayment' && (
+        <>
+          <Menu.ItemGroup>
+            {(Number(record.booked) < (record.pledged || 0)) && <Menu.Item key="20" onClick={() => { setSelectedDonation(record); setPlotSelectionModalOpen(true); }} icon={<Landscape />}>
+              Select Plots
+            </Menu.Item>}
+            <Menu.Item key="21" onClick={() => { setSelectedDonation(record); setEmailConfirmationModal(true); }} icon={<Email />}>
+              Send Emails
+            </Menu.Item>
+            <Menu.Item key="22" onClick={() => { setSelectedDonation(record); setReserveTreesModalOpen(true); }} icon={<Landscape />}>
+              Reserve Trees
+            </Menu.Item>
+            <Menu.Item key="23" onClick={() => { setSelectedDonation(record); setAssignTreesModalOpen(true); }} icon={<AssignmentInd />}>
+              Assign Trees
+            </Menu.Item>
+            {record.visit_date && <Menu.Item key="24" onClick={() => { setSelectedDonation(record); setMapTreesOpen(true); }} icon={<AssignmentInd />}>
+              Map Visit Trees
+            </Menu.Item>}
+            {record.donation_method === 'trees' && record.trees_count > (record.assigned || 0) && <Menu.Item key="25" onClick={() => { setSelectedDonation(record); setPrsConfirm(true); }} icon={<AutoMode />}>
+              Auto Process
+            </Menu.Item>}
+            {!record.processed_by && (
+              <Menu.Item
+                key="pick"
+                onClick={() => handlePickDonation(record.id)}
+                icon={<AssignmentInd />}
+              >
+                Pick This Up
+              </Menu.Item>
+            )}
+          </Menu.ItemGroup>
+        </>
+      )}
     </Menu>
   );
 
@@ -639,30 +648,33 @@ export const DonationComponent = () => {
       render: (status) => {
         // Format the status for display
         switch (status) {
-          case 'UserSubmitted':
-            return 'Submitted';
+          case 'PendingPayment':
+            return 'Pending Payment';
+          case 'Paid':
+            return 'Paid';
           case 'OrderFulfilled':
             return 'Fulfilled';
           default:
-            return 'Submitted'; // Default to UserSubmitted if not set
+            return 'Paid';
         }
       },
-      ...getColumnSelectedItemFilter({ dataIndex: 'status', filters, handleSetFilters, options: ['UserSubmitted', 'OrderFulfilled'] }),
+      ...getColumnSelectedItemFilter({ dataIndex: 'status', filters, handleSetFilters,  options: ['PendingPayment', 'Paid', 'OrderFulfilled'] }),
     },
-    {
-      dataIndex: "sponsorship_type",
-      key: "Sponosorship Type",
-      title: "Sponsorship Type",
-      align: "center",
-      width: 150,
-      ...getColumnSelectedItemFilter({ dataIndex: 'sponsorship_type', filters, handleSetFilters, options: ['Unverified', 'Pledged', 'Promotional', 'Unsponsored Visit', 'Donation Received'] })
-    },
+//    {
+//      dataIndex: "sponsorship_type",
+//      key: "Sponosorship Type",
+//      title: "Sponsorship Type",
+//      align: "center",
+//      width: 150,
+//      ...getColumnSelectedItemFilter({ dataIndex: 'sponsorship_type', filters, handleSetFilters, options: ['Unverified', 'Pledged', 'Promotional', 'Unsponsored Visit', 'Donation Received'] })
+//    },
     {
       dataIndex: "donation_receipt_number",
       key: "Donation Receipt No.",
       title: "Donation Receipt No.",
       align: "center",
       width: 200,
+      render: (value, record) => record.status === 'PendingPayment' ? '-' : value,
       ...getColumnSearchProps('donation_receipt_number', filters, handleSetFilters)
     },
     {
@@ -740,6 +752,7 @@ export const DonationComponent = () => {
             onDownload={handleDownloadDonations}
             footer
             tableName="Donations"
+            rowClassName={(record) => record.status === 'PendingPayment' ? 'pending-payment-row' : ''}
           />
         </Box>
 
