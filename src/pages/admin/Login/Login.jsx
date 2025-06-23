@@ -7,7 +7,7 @@ import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
 import { createStyles, makeStyles } from "@mui/styles";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
-import { GoogleLogin } from "react-google-login";
+import { GoogleOAuthProvider, GoogleLogin } from '@react-oauth/google';
 import Backdrop from "@mui/material/Backdrop";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -76,6 +76,7 @@ export const Login = () => {
           const apiClient = new ApiClient();
           const res = await apiClient.authenticateToken(token);
           if (res.user && res.token) {
+            localStorage.setItem("loginInfo", JSON.stringify({ token: res.token, expires_at: res.expires_at, name: res.user?.name }));
             handlePostAuth(res.user, res.token, token, redirect);
           } else {
             toast.error("User not authorized! Contact Admin");
@@ -95,12 +96,13 @@ export const Login = () => {
     handleUrlParams();
   }, [location.search]);
 
-  const responseGoogle = async (response) => {
+  const responseGoogle = async (credentialResponse) => {
+    // credentialResponse.credential is the JWT
     try {
       let res = await Axios.post(
         "/auth/google",
         JSON.stringify({
-          token: response.tokenId,
+          token: credentialResponse.credential,
         }),
         {
           headers: {
@@ -109,12 +111,16 @@ export const Login = () => {
         }
       );
       if (res.status === 201 && res.data.user.roles) {
-        localStorage.setItem("loginInfo", JSON.stringify(response));
-        handlePostAuth(res.data.user, res.data.token, response.tokenId);
+        localStorage.setItem("loginInfo", JSON.stringify({ token: res.data.token, expires_at: res.data.expires_at, name: res.data.user?.name }));
+        handlePostAuth(res.data.user, res.data.token, credentialResponse.credential);
+      } else {
+        toast.error("User not authorized! Contact Admin");
       }
     } catch (error) {
-      if (error.response.status === 404) {
+      if (error.response && error.response.status === 404) {
         toast.error("User not Found! Contact Admin");
+      } else {
+        toast.error("Google authentication failed!");
       }
     }
   };
@@ -182,82 +188,75 @@ export const Login = () => {
   };
 
   return (
-    <div className={classes.box}>
-      <img
-        alt="bg"
-        src={bg}
-        className={classes.bg}
-        style={{ height: "100vh" }}
-      />
-      <div className={classes.overlay} style={{ height: "100vh" }}>
-        <Backdrop className={classes.backdrop} open={openBackdrop}>
-          <Spinner text={"Logging you in..."} />
-        </Backdrop>
-        <ToastContainer />
-        <Grid style={{ marginTop: "10%" }}>
-          <Paper elevation={10} style={paperStyle}>
-            <Grid align="center">
-              <Avatar style={avatarStyle}>
-                <LockOutlinedIcon />
-              </Avatar>
-              <h2>Sign Up</h2>
-            </Grid>
-            <TextField
-              style={textStyle}
-              label="Name"
-              placeholder="Enter Name"
-              fullWidth
-              required
-              onChange={(e) => handleValueChange(e.target.value, "name")}
-            />
-            <TextField
-              style={textStyle}
-              label="Email ID"
-              placeholder="Enter email ID"
-              fullWidth
-              required
-              onChange={(e) => handleValueChange(e.target.value, "email")}
-            />
-            <TextField
-              style={textStyle}
-              label="Contact"
-              placeholder="Enter Phone"
-              fullWidth
-              required
-              onChange={(e) => handleValueChange(e.target.value, "phone")}
-            />
-            <Button
-              type="submit"
-              color="primary"
-              variant="contained"
-              style={btnstyle}
-              fullWidth
-              onClick={handleSubmit}
-            >
-              Sign Up
-            </Button>
-            <div
-              style={{ width: "100%", textAlign: "center", paddingTop: "24px" }}
-            >
-              <GoogleLogin
-                clientId={import.meta.env.VITE_APP_CLIENT_ID}
-                buttonText="Log in with Google"
-                onSuccess={responseGoogle}
-                onFailure={responseGoogle}
-                cookiePolicy={"single_host_origin"}
+    <GoogleOAuthProvider clientId={import.meta.env.VITE_APP_CLIENT_ID}>
+      <div className={classes.box}>
+        <img
+          alt="bg"
+          src={bg}
+          className={classes.bg}
+          style={{ height: "100vh" }}
+        />
+        <div className={classes.overlay} style={{ height: "100vh" }}>
+          <Backdrop className={classes.backdrop} open={openBackdrop}>
+            <Spinner text={"Logging you in..."} />
+          </Backdrop>
+          <ToastContainer />
+          <Grid style={{ marginTop: "10%" }}>
+            <Paper elevation={10} style={paperStyle}>
+              <Grid align="center">
+                <Avatar style={avatarStyle}>
+                  <LockOutlinedIcon />
+                </Avatar>
+                <h2>Sign Up</h2>
+              </Grid>
+              <TextField
+                style={textStyle}
+                label="Name"
+                placeholder="Enter Name"
+                fullWidth
+                required
+                onChange={(e) => handleValueChange(e.target.value, "name")}
               />
-            </div>
-            {/* <div style={{width: '100%', textAlign:'center', paddingTop: '24px'}}>
-                            <GoogleLogout
-                                clientId={import.meta.env.VITE_APP_CLIENT_ID}
-                                buttonText="Log out"
-                                onLogoutSuccess={onLogoutSuccess}
-                            />
-                        </div> */}
-          </Paper>
-        </Grid>
+              <TextField
+                style={textStyle}
+                label="Email ID"
+                placeholder="Enter email ID"
+                fullWidth
+                required
+                onChange={(e) => handleValueChange(e.target.value, "email")}
+              />
+              <TextField
+                style={textStyle}
+                label="Contact"
+                placeholder="Enter Phone"
+                fullWidth
+                required
+                onChange={(e) => handleValueChange(e.target.value, "phone")}
+              />
+              <Button
+                type="submit"
+                color="primary"
+                variant="contained"
+                style={btnstyle}
+                fullWidth
+                onClick={handleSubmit}
+              >
+                Sign Up
+              </Button>
+              <div
+                style={{ width: "100%", textAlign: "center", paddingTop: "24px" }}
+              >
+                <GoogleLogin
+                  onSuccess={responseGoogle}
+                  onError={() => toast.error("Google login failed!")}
+                  useOneTap
+                />
+              </div>
+            </Paper>
+          </Grid>
+        </div>
       </div>
-    </div>
+    </GoogleOAuthProvider>
   );
 };
 

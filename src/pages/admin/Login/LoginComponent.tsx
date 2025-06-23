@@ -52,7 +52,7 @@ export const LoginComponent = () => {
         }
       );
       if (res.status === 201 && res.data.user.roles) {
-        localStorage.setItem("loginInfo", JSON.stringify(response));
+        localStorage.setItem("loginInfo", JSON.stringify({ token: res.data.token, expires_at: res.data.expires_at, name: res.data.user?.name }));
         let permissions: string[] = [];
         let roles: string[] = [];
         if (res.data.user.roles) {

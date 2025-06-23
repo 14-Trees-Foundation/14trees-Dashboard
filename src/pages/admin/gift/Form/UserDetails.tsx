@@ -268,8 +268,8 @@ export const BulkUserForm: FC<BulkUserFormProps> = ({ requestId, treeCount, user
                 parsedUser.assignee_communication_email = parsedUser.recipient_communication_email
               }
 
-              if (!parsedUser.recipient_email) parsedUser.recipient_email = parsedUser.recipient_name.split(" ").join('.') + "@14trees"
-              if (!parsedUser.assignee_email) parsedUser.assignee_email = parsedUser.assignee_name.split(" ").join('.') + "@14trees"
+              if (!parsedUser.recipient_email) parsedUser.recipient_email = parsedUser.recipient_name.split(" ").join('.') + ".donor" + "@14trees"
+              if (!parsedUser.assignee_email) parsedUser.assignee_email = parsedUser.assignee_name.split(" ").join('.') + ".donor" + "@14trees"
               if (parsedUser.image) parsedUser.image_url = awsUtils.getS3UrlForKey('cards' + "/" + requestId + '/' + user[imageNameField])
 
               parsedUsers.push(parsedUser);
