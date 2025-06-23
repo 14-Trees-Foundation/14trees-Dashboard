@@ -477,23 +477,30 @@ const GiftTrees: FC = () => {
 
     }
 
-    const handleSendEmails = async (emailSponsor: boolean, emailReceiver: boolean, emailAssignee: boolean, testMails: string[], sponsorCC: string[], receiverCC: string[], eventType: string, attachCard: boolean) => {
+    const handleSendEmails = async ( emailSponsor: boolean, emailReceiver: boolean, emailAssignee: boolean, testMails: string[], sponsorCC: string[], receiverCC: string[], eventType: string, attachCard: boolean ) => {
         const giftCardRequestId = selectedGiftCard?.id
         if (testMails.length === 0) handleEmailModalClose();
         else setTestingMail(true);
-
+    
         if (!giftCardRequestId) return;
         const apiClient = new ApiClient();
         try {
-            await apiClient.sendEmailToGiftRequestUsers(giftCardRequestId, emailSponsor, emailReceiver, emailAssignee, eventType, attachCard, sponsorCC, receiverCC, testMails);
-            toast.success("Emails sent successfully!")
+            const message = await apiClient.sendEmailToGiftRequestUsers( giftCardRequestId, emailSponsor, emailReceiver, emailAssignee, eventType, attachCard, sponsorCC, receiverCC, testMails );
+            const lowerMsg = message.toLowerCase();
+            if (
+                lowerMsg.includes("already sent")
+            ) {
+                toast.error(message);
+            } else {
+                toast.success(message || "Emails sent successfully!");
+            }
         } catch (error: any) {
-            toast.error(error.message)
+            toast.error(error.message || "Failed to send emails.");
         }
-
+    
         setTestingMail(false);
-    }
-
+    }    
+    
     const handleEmailModalClose = () => {
         setEmailConfirmationModal(false);
         setSelectedGiftCard(null);

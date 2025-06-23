@@ -2300,16 +2300,18 @@ class ApiClient {
         }
     }
 
-    async sendEmailToGiftRequestUsers(gift_card_request_id: number, email_sponsor: boolean, email_receiver: boolean, email_assignee: boolean, event_type: string, attach_card: boolean, sponsor_cc_mails?: string[], receiver_cc_mails?: string[], test_mails?: string[]): Promise<void> {
+    async sendEmailToGiftRequestUsers( gift_card_request_id: number, email_sponsor: boolean, email_receiver: boolean, email_assignee: boolean, event_type: string, attach_card: boolean, sponsor_cc_mails?: string[], receiver_cc_mails?: string[], test_mails?: string[] ): Promise<string> {
         try {
-            const resp = await this.api.post<void>(`/gift-cards/email`, { attach_card, email_sponsor, email_receiver, email_assignee, event_type, sponsor_cc_mails, receiver_cc_mails, test_mails, gift_card_request_id });
+            const resp = await this.api.post<{ message: string }>(`/gift-cards/email`, { attach_card, email_sponsor, email_receiver, email_assignee, event_type, sponsor_cc_mails, receiver_cc_mails, test_mails, gift_card_request_id });
+
+            return resp.data?.message || 'Emails sent successfully!';
         } catch (error: any) {
-            if (error.response) {
+            if (error.response && error.response.data && error.response.data.message) {
                 throw new Error(error.response.data.message);
             }
             throw new Error('Failed to send emails to users');
         }
-    }
+    }  
 
     async updateAlbumImagesForGiftRequest(gift_card_request_id: number, album_id?: number): Promise<void> {
         try {
