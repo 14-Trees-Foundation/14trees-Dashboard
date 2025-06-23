@@ -143,7 +143,7 @@ const SingleUserForm: FC<SingleUserFormProps> = ({ maxTrees, imageUrls, value, o
 
         const data = { ...user };
         if (data.recipient_email.trim() === '') {
-            data.recipient_email = data.recipient_name.toLocaleLowerCase().split(" ").join('.') + "@14trees"
+            data.recipient_email = data.recipient_name.toLocaleLowerCase().split(" ").join('.') + ".donor" + "@14trees"
         }
 
         if (!showAssignedFields || !data.assignee_name) {
@@ -152,7 +152,7 @@ const SingleUserForm: FC<SingleUserFormProps> = ({ maxTrees, imageUrls, value, o
             data.assignee_name = data.recipient_name
             data.assignee_communication_email = data.recipient_communication_email
         } else if (showAssignedFields && data.assignee_email.trim() === '') {
-            data.assignee_email = data.assignee_name.toLocaleLowerCase().split(" ").join('.') + "@14trees"
+            data.assignee_email = data.assignee_name.toLocaleLowerCase().split(" ").join('.') + ".donor" + "@14trees"
         }
 
         onSubmit(data);

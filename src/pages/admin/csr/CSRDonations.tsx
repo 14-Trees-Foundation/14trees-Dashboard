@@ -28,7 +28,7 @@ const CSRDonations: React.FC<CSRDonationsProps> = ({ selectedGroup }) => {
     const dispatch = useAppDispatch();
     const { getDonations } = bindActionCreators(donationActionCreators, dispatch);
 
-    const userName = localStorage.getItem("userName") || "Guest";
+    const userName = localStorage.getItem("userName");
     const userEmail = localStorage.getItem("userEmail");
 
     const [page, setPage] = useState(0);
@@ -174,11 +174,11 @@ const CSRDonations: React.FC<CSRDonationsProps> = ({ selectedGroup }) => {
 
             item.recipient_email = item.recipient_email?.trim() 
                 ? item.recipient_email?.trim()
-                : String(item.recipient_name).toLocaleLowerCase().split(" ").join(".") + "@14trees"
+                : String(item.recipient_name).toLocaleLowerCase().split(" ").join(".") + (userName ? userName.toLowerCase().replaceAll(" ", "") : '') + "@14trees"
 
             item.assignee_email = item.assignee_email?.trim() 
                 ? item.assignee_email?.trim()
-                : String(item.recipient_name).toLocaleLowerCase().split(" ").join(".") + "@14trees"
+                : String(item.recipient_name).toLocaleLowerCase().split(" ").join(".") + (userName ? userName.toLowerCase().replaceAll(" ", "") : '') + "@14trees"
 
             return recipient
         })
@@ -321,7 +321,7 @@ const CSRDonations: React.FC<CSRDonationsProps> = ({ selectedGroup }) => {
                     corporateName={selectedGroup.name}
                     corporateLogo={selectedGroup.logo_url ?? undefined}
                     groupId={selectedGroup.id}
-                    userName={userName}
+                    userName={userName || ""}
                     userEmail={userEmail || ""}
                 />
             )}
@@ -350,7 +350,7 @@ const CSRDonations: React.FC<CSRDonationsProps> = ({ selectedGroup }) => {
                     type="donation"
                     requestId={selectedDonation.request_id}
                     totalAmount={selectedDonation.amount_donated}
-                    userName={userName}
+                    userName={userName || ""}
                     userEmail={userEmail || ""}
                     onPaymentSuccess={handlePaymentSuccess}
                     donationId={selectedDonation.id}
