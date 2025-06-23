@@ -444,7 +444,7 @@ const DonationInfo: React.FC<DonationInfoProps> = ({ open, onClose, data }) => {
           </Typography>
           <Typography sx={{ mb: 1 }}>
               <strong>Request Status:</strong>
-               <Chip size="small" label={data.status === 'UserSubmitted' ? 'Submitted' : 'Fulfilled'} sx={{ ml: 1, bgcolor: '#2e7d32', color: 'white' }} />
+               <Chip size="small" label={data.status === 'Paid' ? 'Submitted' : 'Fulfilled'} sx={{ ml: 1, bgcolor: '#2e7d32', color: 'white' }} />
           </Typography>
             </Box>
           </Paper>
