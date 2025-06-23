@@ -8,7 +8,7 @@ export const RequireAuth = ({ children }) => {
   let auth = useAuth();
   const now = Date.now(); // Unix timestamp in milliseconds
 
-  if (user !== null && now < loginInfo.expires_at) {
+  if (loginInfo !== null && now < loginInfo.expires_at) {
     auth.signedin = true;
     auth.user = loginInfo.name;
     auth.token = loginInfo.token;
