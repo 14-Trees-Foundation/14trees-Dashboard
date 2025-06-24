@@ -142,9 +142,17 @@ const PaymentComponent: React.FC<PaymentProps> = ({ initialAmount, paymentId, am
     const getPayment = async (paymentId: number) => {
         try {
             const apiClient = new ApiClient();
-            const payment = await apiClient.getPayment(paymentId)
-            setPayment(payment);
-
+            const payment = await apiClient.getPayment(paymentId);
+            if (payment.order_id) {
+                const razorpayDetails = await apiClient.getPaymentsForOrder(payment.order_id);
+                setPayment({
+                    ...payment,
+                    razorpay_history: razorpayDetails
+                });
+            } else {
+                setPayment(payment);
+            }
+    
             setAmount(payment.amount);
             setDonorType(payment.donor_type);
             setPanNumber(payment.pan_number ? payment.pan_number : '');
@@ -278,16 +286,23 @@ const PaymentComponent: React.FC<PaymentProps> = ({ initialAmount, paymentId, am
 
     const mergedHistory = [
         ...(payment?.payment_history || []),
-        ...(payment?.razorpay_history?.map((item, idx) => ({
-            ...item,
-            id: `razorpay-${idx}`,
-            amount_received: item.amount, // mimic amount_received structure
-            payment_date: item.created_at,
-            payment_received_date: item.created_at,
-            payment_method: item.method,
-            payment_proof: null,
-            status: item.status
-        })) || [])
+        ...(payment?.razorpay_history?.map((item, idx) => {
+            const paymentDate = typeof item.created_at === 'number' 
+                 ? new Date(item.created_at * 1000).toISOString()
+                 : new Date().toISOString();
+            
+            return {
+                ...item,
+                id: `razorpay-${idx}`,
+                amount: item.amount,
+                amount_received: item.amount,
+                payment_date: paymentDate,
+                payment_received_date: paymentDate,
+                payment_method: item.method,
+                payment_proof: null,
+                status: item.status === 'captured' ? 'validated' : item.status
+            };
+        }) || [])
     ];
 
 
