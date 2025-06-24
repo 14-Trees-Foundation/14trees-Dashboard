@@ -117,7 +117,7 @@ const EmailConfirmationModal: React.FC<EmailConfirmationModalProps> = ({ donorMa
         setIsConfirmLoading(true);
         try {
             const apiClient = new ApiClient();
-            await apiClient.sendEmailForDonation(
+            const response = await apiClient.sendEmailForDonation(
                 parseInt(donation_id),
                 [],
                 sponsor_cc_mails,
@@ -128,11 +128,21 @@ const EmailConfirmationModal: React.FC<EmailConfirmationModalProps> = ({ donorMa
                 email_recipient,
                 email_assignee
             );
-            toast.success("Processor for sending email has started. You can check email status for individual in view summary after some time!");
+
+            if (response.data?.message) {
+                toast.error(response.data.message);
+            } else {
+                toast.success("Processor for sending email has started. You can check email status for individuals in view summary after some time!");
+            }
+    
             resetState();
             onClose(); // Close modal only on successful confirmation
-        } catch (error) {
-            toast.error('Failed to send emails. Please try again.');
+        } catch (error: any) {
+            if (error.response?.data?.message) {
+                toast.info(error.response.data.message);
+            } else {
+                toast.error('Failed to send emails. Please try again.');
+            }
         } finally {
             setIsConfirmLoading(false);
         }
