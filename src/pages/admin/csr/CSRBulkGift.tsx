@@ -684,7 +684,7 @@ const CSRBulkGift: React.FC<CSRBulkGiftProps> = ({ groupId, logoUrl, open, onClo
                         <Table size="small" stickyHeader>
                             <TableHead>
                                 <TableRow>
-                                    <TableCell></TableCell>
+                                    <TableCell width="50px"></TableCell>
                                     {(inputMethod === 'csv' ? headers : [
                                         "Recipient Name",
                                         "Recipient Email",
@@ -695,9 +695,26 @@ const CSRBulkGift: React.FC<CSRBulkGiftProps> = ({ groupId, logoUrl, open, onClo
                                         "Occation Name",
                                         "Gifted By",
                                         "Gifted On",
-                                    ]).map((header, index) => (
-                                        <TableCell key={index}>{header}</TableCell>
-                                    ))}
+                                    ]).map((header, index) => {
+                                        const isDateField = header === "Gifted On" || header === "Recipient DoB (optional)";
+
+                                        return (
+                                            <TableCell key={index} sx={{ minWidth: '180px' }}>
+                                                <div style={{ display: 'flex', flexDirection: 'column' }}>
+                                                    <span>{header}</span>
+                                                    {isDateField && (
+                                                        <span style={{
+                                                            fontSize: '0.75rem',
+                                                            color: 'inherit',
+                                                            marginTop: '2px'
+                                                        }}>
+                                                            (YYYY-MM-DD)
+                                                        </span>
+                                                    )}
+                                                </div>
+                                            </TableCell>
+                                        );
+                                    })}
                                     <TableCell>Image Preview</TableCell>
                                 </TableRow>
                             </TableHead>
