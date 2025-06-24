@@ -26,6 +26,9 @@ import {
     FormGroup,
     FormControlLabel,
     Radio,
+    Tab,
+    Tabs,
+    RadioGroup,
 } from "@mui/material";
 import Papa from "papaparse";
 import { Close as CloseIcon, Done, Image as ImageIcon } from "@mui/icons-material";
@@ -36,6 +39,7 @@ import CardDetails from "../gift/Form/CardDetailsForm";
 import ApiClient from "../../../api/apiClient/apiClient";
 import { toast } from "react-toastify";
 import RazorpayComponent from "../../../components/RazorpayComponent";
+import ManualUserAdd, { ManualUser } from './components/ManualUserAdd';
 
 interface CSRBulkGiftProps {
     groupId: number
@@ -43,7 +47,6 @@ interface CSRBulkGiftProps {
     open: boolean
     onClose: () => void
     onSubmit: () => void
-    payLater?: boolean
 }
 
 interface Messages {
@@ -70,13 +73,13 @@ const OPTIONAL_HEADERS = [
     "Gifted On",
 ];
 
-const CSRBulkGift: React.FC<CSRBulkGiftProps> = ({ groupId, logoUrl, open, onClose, onSubmit, payLater = false }) => {
+const CSRBulkGift: React.FC<CSRBulkGiftProps> = ({ groupId, logoUrl, open, onClose, onSubmit }) => {
     const [data, setData] = useState<string[][]>([]);
     const [headers, setHeaders] = useState<string[]>([]);
     const [errorsMap, setErrorsMap] = useState<Record<number, string[]>>({});
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(10);
-    const [currentStep, setCurrentStep] = useState<'event' | 'csv' | 'card' | 'giftType' | 'summary'>('event');
+    const [currentStep, setCurrentStep] = useState<'event' | 'csv' | 'card' | 'giftType' | 'summary' | 'paymentChoice'>('event');
     const [headerErrors, setHeaderErrors] = useState<string[]>([]);
     const [requestId, setRequestId] = useState<string>(getUniqueRequestId());
     const [imageUrls, setImageUrls] = useState<string[]>([]);
@@ -111,6 +114,12 @@ const CSRBulkGift: React.FC<CSRBulkGiftProps> = ({ groupId, logoUrl, open, onClo
     const userName = localStorage.getItem("userName");
     const userEmail = localStorage.getItem("userEmail");
 
+    const [inputMethod, setInputMethod] = useState<'csv' | 'manual'>('csv');
+    const [manualUsers, setManualUsers] = useState<ManualUser[]>([]);
+
+    const [paymentOption, setPaymentOption] = useState<'payNow' | 'payLater'>('payNow');
+    const [showRazorpay, setShowRazorpay] = useState(false);
+
     useEffect(() => {
         const userData = prepareUserData();
         const giftedBy = userData.length > 0 ? userData[0].gifted_by : undefined;
@@ -122,6 +131,14 @@ const CSRBulkGift: React.FC<CSRBulkGiftProps> = ({ groupId, logoUrl, open, onClo
             }))
         }
     }, [data, messages])
+
+    useEffect(() => {
+        if (paymentStatus === 'pending' && orderId) {
+            setShowRazorpay(true);
+        } else {
+            setShowRazorpay(false);
+        }
+    }, [paymentStatus, orderId]);
 
     const validateHeaders = (headers: string[]): string[] => {
         const errors: string[] = [];
@@ -378,26 +395,22 @@ const CSRBulkGift: React.FC<CSRBulkGiftProps> = ({ groupId, logoUrl, open, onClo
             }
         } else if (currentStep === 'card') {
             if (presentationId && slideId) {
-                if (payLater) {
-                    setCurrentStep('summary');
-                } else {
-                    setCurrentStep('giftType');
-                }
+                setCurrentStep('giftType');
             }
         } else if (currentStep === 'giftType') {
             setCurrentStep('summary');
         } else if (currentStep === 'summary') {
-            if (payLater) {
-                handlePurchaseNewTrees(true);
-            } else if (giftType === 'existing') {
+            if (giftType === 'existing') {
                 handleSubmit();
             } else {
-                handlePurchaseNewTrees(false);
+                handlePurchaseNewTrees();
             }
+        } else if (currentStep === 'paymentChoice') {
+            // No-op, handled by payment buttons
         }
     };
 
-    const handlePurchaseNewTrees = async (isPayLater: boolean = false) => {
+    const handlePurchaseNewTrees = async () => {
         try {
             setIsSubmitting(true);
             const apiClient = new ApiClient();
@@ -434,7 +447,7 @@ const CSRBulkGift: React.FC<CSRBulkGiftProps> = ({ groupId, logoUrl, open, onClo
                 messages.eventType || "3",
                 messages.eventName,
                 messages.plantedBy,
-                ["Corporate", isPayLater ? "PayLater" : "GiftAndPay"],
+                ["Corporate", "PayLater"],
                 users,
                 messages.logoMessage,
                 messages.primaryMessage
@@ -448,13 +461,7 @@ const CSRBulkGift: React.FC<CSRBulkGiftProps> = ({ groupId, logoUrl, open, onClo
                 setGiftRequestId(response.gift_request.id.toString());
             }
 
-            if (isPayLater) {
-                toast.success("Gift request created successfully!");
-                onSubmit();
-                onClose();
-            } else {
-                setPaymentStatus('pending');
-            }
+            setCurrentStep('paymentChoice'); // Move to payment choice step
         } catch (error: any) {
             toast.error(error.message || "Failed to create gift card request");
             setPaymentStatus('failed');
@@ -506,6 +513,19 @@ const CSRBulkGift: React.FC<CSRBulkGiftProps> = ({ groupId, logoUrl, open, onClo
     };
 
     const prepareUserData = () => {
+        if (inputMethod === 'manual') {
+            return manualUsers.map(user => ({
+                trees_count: Number(user.trees_count),
+                name: user.name,
+                email: user.email,
+                communication_email: user.communication_email,
+                birth_date: user.birth_date,
+                profile_image_url: user.image_name ? imagePreviews[user.image_name] : '',
+                event_name: user.event_name,
+                gifted_by: user.gifted_by,
+                gifted_on: user.gifted_on,
+            }));
+        }
         const imageNameIndex = headers.findIndex(header => header === "Image Name (optional)");
         const nameIndex = headers.findIndex(header => header === "Recipient Name");
         const emailIndex = headers.findIndex(header => header === "Recipient Email");
@@ -619,19 +639,37 @@ const CSRBulkGift: React.FC<CSRBulkGiftProps> = ({ groupId, logoUrl, open, onClo
 
     const renderCsvStep = () => (
         <Box>
-            <Box gap={2} mb={2}>
-                <Typography>You can upload recipient details by using a CSV file. To get started, download the sample CSV file from <a style={{ color: 'blue', textDecoration: 'underline', cursor: 'pointer' }} onClick={downloadGoogleSheet}>this</a> link, fill in the required recipient details, and then upload the completed CSV file.</Typography>
-                <Typography mt={2}>You can optionally upload recipient or assignee images below to personalize the dashboard. If you upload images, ensure that the exact file name of each image is specified in the 'Image Name' column in the CSV file. If no image is uploaded, leave the 'Image Name' column blank.</Typography>
-
-                <Box mt={2} display="flex" flexDirection="column" gap={2} alignItems="center" justifyContent="center">
-                    <UserImagesForm requestId={requestId} onUpload={handleImageUpload} />
-                    <Button variant="contained" sx={{ mt: 2 }} color="success" component="label">
-                        Upload CSV
-                        <input type="file" accept=".csv" hidden onChange={handleFileUpload} ref={fileInputRef}  />
-                    </Button>
+            <Tabs
+                value={inputMethod}
+                onChange={(_, v) => setInputMethod(v)}
+                sx={{ mb: 2, width: '100%', '.MuiTabs-flexContainer': { justifyContent: 'center' } }}
+                variant="fullWidth"
+            >
+                <Tab label="Upload via CSV" value="csv" sx={{ fontWeight: 600, fontSize: 16 }} />
+                <Tab label="Add User Manually" value="manual" sx={{ fontWeight: 600, fontSize: 16 }} />
+            </Tabs>
+            {inputMethod === 'csv' && (
+                <Box gap={2} mb={2}>
+                    <Typography>You can upload recipient details by using a CSV file. To get started, download the sample CSV file from <a style={{ color: 'blue', textDecoration: 'underline', cursor: 'pointer' }} onClick={downloadGoogleSheet}>this</a> link, fill in the required recipient details, and then upload the completed CSV file.</Typography>
+                    <Typography mt={2}>You can optionally upload recipient or assignee images below to personalize the dashboard. If you upload images, ensure that the exact file name of each image is specified in the 'Image Name' column in the CSV file. If no image is uploaded, leave the 'Image Name' column blank.</Typography>
+                    <Box mt={2} display="flex" flexDirection="column" gap={2} alignItems="center" justifyContent="center">
+                        <UserImagesForm requestId={requestId} onUpload={handleImageUpload} />
+                        <Button variant="contained" sx={{ mt: 2 }} color="success" component="label">
+                            Upload CSV
+                            <input type="file" accept=".csv" hidden onChange={handleFileUpload} ref={fileInputRef}  />
+                        </Button>
+                    </Box>
                 </Box>
-            </Box>
-
+            )}
+            {inputMethod === 'manual' && (
+                <ManualUserAdd
+                    users={manualUsers}
+                    onChange={setManualUsers}
+                    eventType={messages.eventType}
+                    imagePreviews={imagePreviews}
+                    onImageUpload={handleManualImageUpload}
+                />
+            )}
             {headerErrors.length > 0 && (
                 <Box sx={{ mt: 2, mb: 2 }}>
                     <Typography color="error" variant="subtitle2">CSV Header Validation Errors:</Typography>
@@ -640,31 +678,58 @@ const CSRBulkGift: React.FC<CSRBulkGiftProps> = ({ groupId, logoUrl, open, onClo
                     ))}
                 </Box>
             )}
-
-            {data.length > 0 ? (
+            {(inputMethod === 'csv' && data.length > 0) && (
                 <>
                     <TableContainer component={Paper} sx={{ maxHeight: 400 }}>
                         <Table size="small" stickyHeader>
                             <TableHead>
                                 <TableRow>
                                     <TableCell></TableCell>
-                                    {headers.map((header, index) => (
+                                    {(inputMethod === 'csv' ? headers : [
+                                        "Recipient Name",
+                                        "Recipient Email",
+                                        "Recipient Communication Email (optional)",
+                                        "Recipient DoB (optional)",
+                                        "Number of trees to assign",
+                                        "Image Name (optional)",
+                                        "Occation Name",
+                                        "Gifted By",
+                                        "Gifted On",
+                                    ]).map((header, index) => (
                                         <TableCell key={index}>{header}</TableCell>
                                     ))}
                                     <TableCell>Image Preview</TableCell>
                                 </TableRow>
                             </TableHead>
                             <TableBody>
-                                {data
-                                    .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                                {(inputMethod === 'csv' ? data : manualUsers.map(user => [
+                                    user.name,
+                                    user.email,
+                                    user.communication_email,
+                                    user.birth_date,
+                                    user.trees_count.toString(),
+                                    user.image_name,
+                                    user.event_name,
+                                    user.gifted_by,
+                                    user.gifted_on,
+                                ])).slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                                     .map((row, rowIndex) => {
                                         const actualIndex = rowIndex + page * rowsPerPage;
-                                        const errors = errorsMap[actualIndex];
-                                        const imageError = imageValidationErrors[actualIndex];
-                                        const hasError = errors?.length > 0 || imageError;
-                                        const imageNameIndex = headers.findIndex(header => header === "Image Name (optional)");
+                                        const errors = inputMethod === 'csv' ? errorsMap[actualIndex] : undefined;
+                                        const imageError = inputMethod === 'csv' ? imageValidationErrors[actualIndex] : undefined;
+                                        const hasError = inputMethod === 'csv' ? (Array.isArray(errors) ? errors.length > 0 : false) || imageError : false;
+                                        const imageNameIndex = (inputMethod === 'csv' ? headers : [
+                                            "Recipient Name",
+                                            "Recipient Email",
+                                            "Recipient Communication Email (optional)",
+                                            "Recipient DoB (optional)",
+                                            "Number of trees to assign",
+                                            "Image Name (optional)",
+                                            "Occation Name",
+                                            "Gifted By",
+                                            "Gifted On",
+                                        ]).findIndex(header => header === "Image Name (optional)");
                                         const imageName = row[imageNameIndex]?.trim();
-
                                         return (
                                             <TableRow
                                                 key={rowIndex}
@@ -673,16 +738,18 @@ const CSRBulkGift: React.FC<CSRBulkGiftProps> = ({ groupId, logoUrl, open, onClo
                                                 }}
                                             >
                                                 <TableCell>
-                                                    {hasError ? (
-                                                        <Tooltip
-                                                            title={[
-                                                                ...(errors || []),
-                                                                ...(imageError ? [imageError] : [])
-                                                            ].join(", ")}
-                                                            arrow
-                                                        >
-                                                            <CloseIcon color="error" fontSize="small" />
-                                                        </Tooltip>
+                                                    {inputMethod === 'csv' ? (
+                                                        hasError ? (
+                                                            <Tooltip
+                                                                title={[
+                                                                    ...(Array.isArray(errors) ? errors : []),
+                                                                    ...(imageError ? [imageError] : [])
+                                                                ].join(", ")}
+                                                                arrow
+                                                            >
+                                                                <CloseIcon color="error" fontSize="small" />
+                                                            </Tooltip>
+                                                        ) : <Done color="success" fontSize="small" />
                                                     ) : <Done color="success" fontSize="small" />}
                                                 </TableCell>
                                                 {row.map((cell, cellIndex) => (
@@ -712,17 +779,13 @@ const CSRBulkGift: React.FC<CSRBulkGiftProps> = ({ groupId, logoUrl, open, onClo
                     <TablePagination
                         rowsPerPageOptions={[5, 10, 25, 50, 100]}
                         component="div"
-                        count={data.length}
+                        count={inputMethod === 'csv' ? data.length : manualUsers.length}
                         rowsPerPage={rowsPerPage}
                         page={page}
                         onPageChange={handleChangePage}
                         onRowsPerPageChange={handleChangeRowsPerPage}
                     />
                 </>
-            ) : (
-                <Typography variant="body2" color="textSecondary">
-                    No data to display.
-                </Typography>
             )}
         </Box>
     );
@@ -1008,6 +1071,89 @@ const CSRBulkGift: React.FC<CSRBulkGiftProps> = ({ groupId, logoUrl, open, onClo
         );
     };
 
+    const handleManualImageUpload = async (file: File): Promise<string> => {
+        try {
+            const formData = new FormData();
+            formData.append('file', file);
+            formData.append('request_id', requestId);
+
+            const response = await fetch('/api/upload', {
+                method: 'POST',
+                body: formData,
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to upload image');
+            }
+
+            const data = await response.json();
+            const imageUrl = data.url;
+            const imageName = file.name;
+
+            // Update imageUrls and imagePreviews
+            setImageUrls(prev => [...prev, imageUrl]);
+            setImagePreviews(prev => ({
+                ...prev,
+                [imageName]: imageUrl
+            }));
+
+            return imageName;
+        } catch (error) {
+            console.error('Error uploading image:', error);
+            throw error;
+        }
+    };
+
+    const handlePayLater = async () => {
+        if (!giftRequestId) return;
+        setIsSubmitting(true);
+        try {
+            const apiClient = new ApiClient();
+            const pdfUrl = await apiClient.sendFundRequestInMail(Number(giftRequestId));
+            toast.success('Fund request sent to billing email.');
+        } catch (error: any) {
+            toast.error(error.message || 'Failed to send fund request.');
+        } finally {
+            setIsSubmitting(false);
+            setPaymentStatus('idle');
+        }
+    };
+
+    // Handler for pay now
+    const handleProceedToPay = () => {
+        setPaymentStatus('pending');
+    };
+
+    const renderPaymentChoiceStep = () => (
+        <Box>
+            <Typography variant="h6" gutterBottom>Choose Payment Option</Typography>
+            <RadioGroup
+                value={paymentOption}
+                onChange={e => setPaymentOption(e.target.value as 'payNow' | 'payLater')}
+            >
+                <FormControlLabel value="payNow" control={<Radio color="success" />} label="Pay Now" />
+                <FormControlLabel value="payLater" control={<Radio color="success" />} label="Send Fund Request to Billing Email (Pay Later)" />
+            </RadioGroup>
+            {paymentOption === 'payNow' ? (
+                <Typography sx={{ mt: 2 }}>
+                    You will be redirected to Razorpay to complete your payment securely.
+                </Typography>
+            ) : (
+                <Typography sx={{ mt: 2 }}>
+                    A fund request will be sent to your billing email. You can complete the payment later via bank transfer.
+                </Typography>
+            )}
+            <Box sx={{ mt: 3, display: 'flex', justifyContent: 'flex-end', gap: 2 }}>
+                <Button onClick={() => { setCurrentStep('summary'); setPaymentStatus('idle'); }} color="error" variant="outlined">Back</Button>
+                {paymentOption === 'payNow' ? (
+                    <Button onClick={handleProceedToPay} style={{ textTransform: 'none' }} color="success" variant="contained">Proceed to Pay</Button>
+                ) : (
+                    <Button onClick={handlePayLater} style={{ textTransform: 'none' }} color="success" variant="contained">Get Fund Request</Button>
+                )}
+            </Box>
+        </Box>
+    );
+
     return (
         <Dialog open={open} maxWidth={currentStep === 'event' ? "sm" : currentStep === 'csv' ? "lg" : "xl"} fullWidth>
             <DialogTitle>Bulk Gift Trees</DialogTitle>
@@ -1015,42 +1161,34 @@ const CSRBulkGift: React.FC<CSRBulkGiftProps> = ({ groupId, logoUrl, open, onClo
                 {currentStep === 'event' && renderEventStep()}
                 {currentStep === 'csv' && renderCsvStep()}
                 {currentStep === 'card' && renderCardPreviewStep(messages)}
-                {!payLater && currentStep === 'giftType' && renderGiftTypeStep()}
+                {currentStep === 'giftType' && renderGiftTypeStep()}
                 {currentStep === 'summary' && renderSummaryStep()}
-                {!payLater && paymentStatus === 'pending' && (
+                {currentStep === 'paymentChoice' && renderPaymentChoiceStep()}
+                {/* Razorpay Dialog */}
+                {showRazorpay && orderId && (
                     <Box sx={{ mt: 2 }}>
                         <Alert severity="warning" sx={{ mb: 2 }}>
                             Order ID: {giftRequestId}. Payment is required to complete the order!
                         </Alert>
-                        {orderId && (
-                            <RazorpayComponent
-                                amount={totalAmount}
-                                orderId={orderId}
-                                user={{
-                                    key: 0,
-                                    id: 0,
-                                    name: userData[0]?.name || '',
-                                    user_id: '0',
-                                    phone: '',
-                                    email: userData[0]?.email || '',
-                                    communication_email: null,
-                                    birth_date: null,
-                                    created_at: new Date(),
-                                    updated_at: new Date()
-                                }}
-                                description={`Purchase of ${totalTrees} trees`}
-                                onPaymentDone={handlePaymentSuccess}
-                                onClose={handlePaymentFailure}
-                            />
-                        )}
+                        <RazorpayComponent
+                            amount={totalAmount}
+                            orderId={orderId}
+                            user={{
+                                name: userName || '',
+                                email: userEmail || '',
+                            } as any}
+                            description={`Purchase of ${totalTrees} trees`}
+                            onPaymentDone={handlePaymentSuccess}
+                            onClose={handlePaymentFailure}
+                        />
                     </Box>
                 )}
-                {!payLater && paymentStatus === 'success' && (
+                {paymentStatus === 'success' && (
                     <Alert severity="success" sx={{ mt: 2 }}>
                         Payment successful! Gift Request ID: {giftRequestId}
                     </Alert>
                 )}
-                {!payLater && paymentStatus === 'failed' && (
+                {paymentStatus === 'failed' && (
                     <Alert severity="error" sx={{ mt: 2 }}>
                         Payment failed. The request will not be fulfilled without successful payment.
                         Please retry the payment or contact support if the issue persists.
@@ -1081,7 +1219,7 @@ const CSRBulkGift: React.FC<CSRBulkGiftProps> = ({ groupId, logoUrl, open, onClo
                         Previous
                     </Button>
                 )}
-                {!payLater && !giftRequestId && currentStep === 'giftType' && (
+                {!giftRequestId && currentStep === 'giftType' && (
                     <Button
                         onClick={() => setCurrentStep('card')}
                         variant="contained"
@@ -1093,7 +1231,7 @@ const CSRBulkGift: React.FC<CSRBulkGiftProps> = ({ groupId, logoUrl, open, onClo
                 )}
                 {!giftRequestId && currentStep === 'summary' && (
                     <Button
-                        onClick={() => payLater ? setCurrentStep('card') : setCurrentStep('giftType')}
+                        onClick={() => setCurrentStep('giftType')}
                         variant="contained"
                         color="success"
                         sx={{ textTransform: "none" }}
@@ -1101,7 +1239,7 @@ const CSRBulkGift: React.FC<CSRBulkGiftProps> = ({ groupId, logoUrl, open, onClo
                         Previous
                     </Button>
                 )}
-                {!giftRequestId && currentStep !== 'summary' && (
+                {!giftRequestId && currentStep !== 'summary' && currentStep !== 'paymentChoice' && (
                     <Button
                         onClick={handleNext}
                         variant="contained"
@@ -1109,7 +1247,7 @@ const CSRBulkGift: React.FC<CSRBulkGiftProps> = ({ groupId, logoUrl, open, onClo
                         sx={{ textTransform: "none" }}
                         disabled={
                             (currentStep === 'event' && !messages.eventType) ||
-                            (currentStep === 'csv' && (Object.keys(errorsMap).length > 0 || Object.keys(imageValidationErrors).length > 0 || data.length == 0)) ||
+                            (currentStep === 'csv' && (Object.keys(errorsMap).length > 0 || Object.keys(imageValidationErrors).length > 0 || (inputMethod==='csv' && data.length == 0) || (inputMethod==='manual' && manualUsers.length == 0))) ||
                             (currentStep === 'card' && (!presentationId || !slideId))
                         }
                     >
@@ -1127,14 +1265,14 @@ const CSRBulkGift: React.FC<CSRBulkGiftProps> = ({ groupId, logoUrl, open, onClo
                         {isSubmitting ? (
                             <>
                                 <CircularProgress size={20} color="inherit" sx={{ mr: 1 }} />
-                                {payLater ? 'Submitting...' : (giftType === 'new' ? 'Processing Payment...' : 'Submitting...')}
+                                'Submitting...'
                             </>
                         ) : (
-                            payLater ? 'Submit' : (giftType === 'new' ? 'Proceed to Payment' : 'Submit')
+                            'Submit'
                         )}
                     </Button>
                 )}
-                {!payLater && paymentStatus === 'failed' && (
+                {paymentStatus === 'failed' && (
                     <Button
                         onClick={handleRetryPayment}
                         variant="contained"
