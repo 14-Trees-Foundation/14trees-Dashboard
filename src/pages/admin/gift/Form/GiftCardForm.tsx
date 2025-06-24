@@ -244,6 +244,7 @@ const GiftCardsForm: FC<GiftCardsFormProps> = ({ loading, setLoading, step, logg
                 onChange={messages => { setMessages(messages) }}
                 onPresentationId={(presentationId: string, slideId: string) => { setPresentationId(presentationId); setSlideId(slideId); }}
                 userName={users.length > 0 ? users[0].recipient_name : undefined}
+                assigneeName={users.length > 0 ? users[0].assignee_name : undefined}
             />,
         },
     ]
