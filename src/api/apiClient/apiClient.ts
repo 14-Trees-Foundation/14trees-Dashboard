@@ -2347,6 +2347,18 @@ class ApiClient {
         }
     }
 
+    async sendFundRequestInMail(giftCardRequestId: number): Promise<string> {
+        try {
+            const resp = await this.api.post<{ pdf_url: string }>(`/gift-cards/requests/send-fund-request/${giftCardRequestId}`);
+            return resp.data.pdf_url;
+        } catch (error: any) {
+            if (error.response) {
+                throw new Error(error.response.data.message);
+            }
+            throw new Error('Failed to send fund request for your request!');
+        }
+    }
+
     async getGiftTransactions(offset: number, limit: number, type: 'group' | 'user', id: number, search?: string): Promise<PaginatedResponse<GiftRedeemTransaction>> {
         try {
             const resp = await this.api.get<PaginatedResponse<GiftRedeemTransaction>>(`/gift-cards/transactions/${id}?type=${type}&offset=${offset}&limit=${limit}` + (search ? `&search=${search}` : ''));
