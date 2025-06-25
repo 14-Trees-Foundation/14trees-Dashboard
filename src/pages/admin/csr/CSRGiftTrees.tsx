@@ -47,7 +47,6 @@ const CSRGiftTrees: React.FC<CSRGiftTreesProps> = ({ groupId, selectedGroup }) =
     const [imageViewModalOpen, setImageViewModalOpen] = useState(false);
     const [imageViewModalImageUrl, setImageViewModalImageUrl] = useState('');
     const [bulkGifting, setBulkGifting] = useState(false);
-    const [payLater, setPayLater] = useState(false);
 
     const gridRef = useRef<GiftTreesGridHandle>(null);
 
@@ -101,14 +100,6 @@ const CSRGiftTrees: React.FC<CSRGiftTreesProps> = ({ groupId, selectedGroup }) =
                 <Typography variant={isMobile ? "h5" : "h4"} ml={1} mr={2}>
                     Green Tribute Wall
                 </Typography>
-                <Button
-                    variant="contained"
-                    color="success"
-                    onClick={() => { setBulkGifting(true); setPayLater(true) }}
-                    style={{ textTransform: 'none' }}
-                >
-                    Gift & Pay Later
-                </Button>
             </Box>
 
             <Typography
@@ -194,7 +185,7 @@ const CSRGiftTrees: React.FC<CSRGiftTreesProps> = ({ groupId, selectedGroup }) =
                 }}
             />
 
-            {bulkGifting && <CSRBulkGift groupId={groupId} logoUrl={selectedGroup.logo_url} payLater={payLater} open={bulkGifting} onClose={() => { setBulkGifting(false); }} onSubmit={() => { setRefreshTrigger(prev => prev + 1); }} />}
+            {bulkGifting && <CSRBulkGift groupId={groupId} logoUrl={selectedGroup.logo_url} open={bulkGifting} onClose={() => { setBulkGifting(false); }} onSubmit={() => { setRefreshTrigger(prev => prev + 1); }} />}
 
             {giftDialogVisible && selectedGiftTree && (
                 <RedeemGiftTreeDialog

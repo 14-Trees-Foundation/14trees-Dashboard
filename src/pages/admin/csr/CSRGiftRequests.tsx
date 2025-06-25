@@ -276,29 +276,6 @@ const CSRGiftRequests: React.FC<CSRGiftRequestsProps> = ({ groupId, selectedGrou
             render: getHumanReadableDate,
             ...getColumnDateFilter({ dataIndex: 'created_at', filters, handleSetFilters, label: 'Created' })
         },
-        {
-            key: "action",
-            title: "Action",
-            align: "center",
-            width: 120,
-            fixed: 'right',
-            render: (_, record) => (
-                record.amount_received !== record.total_amount && (
-                    <Button
-                        variant="contained"
-                        color="success"
-                        size="small"
-                        startIcon={<PaymentIcon />}
-                        onClick={() => {
-                            setSelectedGiftCard(record);
-                            setPaymentDialogOpen(true);
-                        }}
-                    >
-                        Pay
-                    </Button>
-                )
-            ),
-        },
     ]
 
     return (

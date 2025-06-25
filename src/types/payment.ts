@@ -25,7 +25,7 @@ export type Payment = {
     order_id: string | null;
     created_at: string;
     updated_at: string;
-}
+}  
 
 export type PaymentsDataState = {
     totalPayments: number,
