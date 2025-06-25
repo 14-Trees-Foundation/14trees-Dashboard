@@ -47,6 +47,7 @@ const TableSummary = (plots: Plot[], selectedPlotIds: number[], totalColumns: nu
 
 interface PlotSelectionProps {
     giftCardRequestId: number
+    totalTrees: number
     requiredTrees: number
     plots: Plot[]
     onPlotsChange: (plots: Plot[]) => void
@@ -60,7 +61,7 @@ interface PlotSelectionProps {
 
 }
 
-const PlotSelection: FC<PlotSelectionProps> = ({ giftCardRequestId, requiredTrees, plots, onPlotsChange, onTreeSelection, bookNonGiftable, onBookNonGiftableChange, diversify, onDiversifyChange, bookAllHabits, onBookAllHabitsChange }) => {
+const PlotSelection: FC<PlotSelectionProps> = ({ giftCardRequestId, totalTrees, requiredTrees, plots, onPlotsChange, onTreeSelection, bookNonGiftable, onBookNonGiftableChange, diversify, onDiversifyChange, bookAllHabits, onBookAllHabitsChange }) => {
 
     const [page, setPage] = useState(0);
     const [loading, setLoading] = useState(false);
@@ -379,7 +380,7 @@ const PlotSelection: FC<PlotSelectionProps> = ({ giftCardRequestId, requiredTree
             <Box style={{
                 marginBottom: 20
             }}>
-                <Typography variant='subtitle1'>Total Trees Requested: <strong>{treesCount}</strong></Typography>
+                <Typography variant='subtitle1'>Total Trees Requested: <strong>{totalTrees}</strong></Typography>
                 {selectedTrees.length === 0 && <Box>
                     <Typography variant='subtitle1'>Remaining tree count for plot selection: <strong>{
                         Math.max(treesCount - plots
