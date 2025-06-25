@@ -32,7 +32,8 @@ export interface Donation {
   status: 'PendingPayment' |'Paid' | 'OrderFulfilled';
   mail_status: string[];
   mail_error: string | null;
-  mail_sent: boolean;
+  mailed_count: number;
+  users_count: number;
   visit_date: Date | null;
   amount_donated: number | null; 
   amount_received: number; 

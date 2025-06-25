@@ -625,7 +625,7 @@ export const DonationComponent = () => {
     //   render: (value) => value ? value : '-',
     // },
     {
-      dataIndex: "mail_sent",
+      dataIndex: "mailed_count",
       key: "Email Status",
       title: "Email Status",
       align: "center",
@@ -637,7 +637,7 @@ export const DonationComponent = () => {
           statusMessages.push("Mail sent to Sponsor");
         }
     
-        if (record.mail_sent === true) {
+        if (Number(record.mailed_count) && record.mailed_count === record.users_count) {
           statusMessages.push("Mail sent to Recipient");
         }
     
