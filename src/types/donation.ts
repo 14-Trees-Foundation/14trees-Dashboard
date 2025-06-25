@@ -33,6 +33,8 @@ export interface Donation {
   prs_status: 'Pending Tree Reservation' | 'Pending Assignment' | 'Completed';
   mail_status: string[];
   mail_error: string | null;
+  mailed_count: number;
+  users_count: number;
   visit_date: Date | null;
   amount_donated: number | null; 
   amount_received: number; 

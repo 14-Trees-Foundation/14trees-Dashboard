@@ -625,6 +625,26 @@ export const DonationComponent = () => {
     //   render: (value) => value ? value : '-',
     // },
     {
+      dataIndex: "mailed_count",
+      key: "Email Status",
+      title: "Email Status",
+      align: "center",
+      width: 200,
+      render: (value, record: any, index) => {
+        const statusMessages: string[] = [];
+    
+        if (record.mail_status?.includes("DashboardsSent")) {
+          statusMessages.push("Mail sent to Sponsor");
+        }
+    
+        if (Number(record.mailed_count) && record.mailed_count === record.users_count) {
+          statusMessages.push("Mail sent to Recipient");
+        }
+    
+        return statusMessages.join(", ") || "-";
+      }
+    },    
+    {
       dataIndex: "contribution_options",
       key: "Contribution",
       title: "Additional Contribution",
