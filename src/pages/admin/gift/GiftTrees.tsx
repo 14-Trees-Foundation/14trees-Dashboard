@@ -1180,6 +1180,7 @@ const GiftTrees: FC = () => {
                     {selectedGiftCard && <PlotSelection
                         giftCardRequestId={selectedGiftCard.id}
                         onTreeSelection={(trees: any[]) => { setSelectedTrees(trees); }}
+                        totalTrees={selectedGiftCard.no_of_cards}
                         requiredTrees={selectedGiftCard.no_of_cards - Number(selectedGiftCard.booked)}
                         plots={selectedPlots}
                         onPlotsChange={plots => setSelectedPlots(plots)}
