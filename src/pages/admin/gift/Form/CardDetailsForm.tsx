@@ -35,11 +35,12 @@ interface CardDetailsProps {
     saplingId?: string | null
     plantType?: string | null
     userName?: string | null
+    assigneeName?: string | null
     treesCount?: number
     isPersonal?: boolean
 }
 
-const CardDetails: FC<CardDetailsProps> = ({ logo_url, request_id, presentationId, slideId, messages, saplingId, plantType, userName, onChange, onPresentationId, treesCount, isPersonal }) => {
+const CardDetails: FC<CardDetailsProps> = ({ logo_url, request_id, presentationId, slideId, messages, saplingId, plantType, userName, assigneeName, onChange, onPresentationId, treesCount, isPersonal }) => {
 
     const theme = useTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down('md'));
@@ -53,8 +54,10 @@ const CardDetails: FC<CardDetailsProps> = ({ logo_url, request_id, presentationI
         saplingId: undefined as string | null | undefined,
         plantType: undefined as string | null | undefined,
         userName: undefined as string | null | undefined,
+        assigneeName: undefined as string | null | undefined,
         giftedBy: undefined as string | null | undefined,
         treesCount: undefined as number | undefined,
+        eventType: undefined as string | null | undefined,
     })
     const [msgError, setMsgError] = useState<string>("");
 
@@ -65,7 +68,7 @@ const CardDetails: FC<CardDetailsProps> = ({ logo_url, request_id, presentationI
 
         setLoading(true);
         const apiClient = new ApiClient();
-        await apiClient.updateGiftCardTemplate(slideIdRef.current, recordRef.current.primary, recordRef.current.logo, logoRef.current.logoUrl, giftRef.current.saplingId, giftRef.current.userName, giftRef.current.giftedBy,  giftRef.current.treesCount);
+        await apiClient.updateGiftCardTemplate(slideIdRef.current, recordRef.current.primary, recordRef.current.logo, logoRef.current.logoUrl, giftRef.current.saplingId, giftRef.current.userName, giftRef.current.giftedBy,  giftRef.current.treesCount, giftRef.current.assigneeName, giftRef.current.eventType);
         setIframeSrc(
             `https://docs.google.com/presentation/d/${presentationIdIdRef.current}/embed?rm=minimal&slide=id.${slideIdRef.current}&timestamp=${new Date().getTime()}`
         );
@@ -109,8 +112,8 @@ const CardDetails: FC<CardDetailsProps> = ({ logo_url, request_id, presentationI
     }, [logo_url])
 
     useEffect(() => {
-        giftRef.current = { userName, saplingId, plantType, treesCount, giftedBy: messages.plantedBy }
-    }, [userName, saplingId, plantType, treesCount, messages])
+        giftRef.current = { userName, assigneeName, saplingId, plantType, treesCount, giftedBy: messages.plantedBy, eventType: messages.eventType }
+    }, [userName, assigneeName, saplingId, plantType, treesCount, messages])
 
     useEffect(() => {
         const eventMessage = messages.eventType === "2" ? defaultMessages.memorial : messages.eventType === "1" ? defaultMessages.birthday : messages.eventType === "4" ? defaultMessages.wedding : messages.eventType === "5" ? defaultMessages.anniversary : messages.eventType === "6" ? defaultMessages.festival : messages.eventType === "7" ? defaultMessages.retirement : defaultMessages.primary;

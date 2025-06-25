@@ -30,6 +30,7 @@ export interface Donation {
   booked?: number;
   assigned?: number;
   status: 'PendingPayment' |'Paid' | 'OrderFulfilled';
+  prs_status: 'Pending Tree Reservation' | 'Pending Assignment' | 'Completed';
   mail_status: string[];
   mail_error: string | null;
   visit_date: Date | null;

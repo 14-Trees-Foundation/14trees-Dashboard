@@ -660,14 +660,14 @@ export const DonationComponent = () => {
       },
       ...getColumnSelectedItemFilter({ dataIndex: 'status', filters, handleSetFilters,  options: ['PendingPayment', 'Paid', 'OrderFulfilled'] }),
     },
-//    {
-//      dataIndex: "sponsorship_type",
-//      key: "Sponosorship Type",
-//      title: "Sponsorship Type",
-//      align: "center",
-//      width: 150,
-//      ...getColumnSelectedItemFilter({ dataIndex: 'sponsorship_type', filters, handleSetFilters, options: ['Unverified', 'Pledged', 'Promotional', 'Unsponsored Visit', 'Donation Received'] })
-//    },
+    {
+      dataIndex: "prs_status",
+      key: "Processing Status",
+      title: "Processing Status",
+      align: "center",
+      width: 150,
+      ...getColumnSelectedItemFilter({ dataIndex: 'prs_status', filters, handleSetFilters, options: ['Pending Tree Reservation', 'Pending Assignment', 'Completed'] })
+    },
     {
       dataIndex: "donation_receipt_number",
       key: "Donation Receipt No.",
