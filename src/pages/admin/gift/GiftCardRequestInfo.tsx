@@ -148,34 +148,22 @@ const GiftCardRequestInfo: React.FC<GiftCardRequestInfoProps> = ({ open, onClose
         },
         {
             dataIndex: "mail_sent",
-            key: "recipient_email_status",
+            key: "Recipient Email Status",
             title: "Recipient Email Status",
             align: "center",
             width: 200,
-            render: (value: any, record: any) => {
-                const usersCount = parseInt(record.users_count || "0");
-                const mailedCount = parseInt(record.mailed_count || "0");
-
-                if (usersCount > 0 && usersCount === mailedCount) {
-                    return "Sent";
-                }
-                return "Not Sent";
+            render: (value: any) => {
+                return value ? "Sent" : "Not Sent";
             }
         },
         {
-            dataIndex: "assignee_mail_sent",
-            key: "assignee_email_status",
+            dataIndex: "mail_sent_assignee",
+            key: "Assignee Email Status",
             title: "Assignee Email Status",
             align: "center",
             width: 200,
-            render: (value: any, record: any) => {
-                const usersCount = parseInt(record.users_count || "0");
-                const mailedAssigneeCount = parseInt(record.mailed_assignee_count || "0");
-
-                if (usersCount > 0 && usersCount === mailedAssigneeCount) {
-                    return "Sent";
-                }
-                return "Not Sent";
+            render: (value: any) => {
+                return value ? "Sent" : "Not Sent";
             }
         },
     ];
