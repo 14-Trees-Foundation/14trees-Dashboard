@@ -22,21 +22,10 @@ export type Payment = {
     pan_number: string | null;
     consent: boolean;
     payment_history?: PaymentHistory[];
-    razorpay_history?: RazorpayHistory[];
     order_id: string | null;
     created_at: string;
     updated_at: string;
-}
-
-export type RazorpayHistory = {
-    transaction_id?: string;
-    status: string;
-    method: string;
-    amount: number;
-    fee: number;
-    created_at: string;
-  };
-  
+}  
 
 export type PaymentsDataState = {
     totalPayments: number,
