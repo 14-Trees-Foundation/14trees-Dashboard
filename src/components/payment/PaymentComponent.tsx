@@ -57,6 +57,7 @@ const PaymentComponent: React.FC<PaymentProps> = ({ initialAmount, paymentId, am
     const [panNumber, setPanNumber] = useState('');
     const [consent, setConsent] = useState(false);
     const [payment, setPayment] = useState<Payment | null>(null);
+    const [rpPayments, setRpPayments] = useState<any[]>([]);
 
     const [paymentProof, setPaymentProof] = useState<File | null>(null);
     const [paymentMethod, setPaymentMethod] = useState<string | undefined>();
@@ -91,22 +92,42 @@ const PaymentComponent: React.FC<PaymentProps> = ({ initialAmount, paymentId, am
     const [donationDate, setDonationDate] = useState('');
 
     useEffect(() => {
-        const handler = setTimeout(() =>{ 
+        const handler = setTimeout(() => {
             setAmountReceived(ar ? ar : 0);
             setDonationReceiptNumber(donationReceipt ? donationReceipt : '');
             setDonationDate(dt ? dt : '');
             setSponosrshipType(st ? st : 'Unverified')
         }, 300);
 
-        return () =>{ clearTimeout(handler); }
-    }, [donationReceipt, st, ar, dt]) 
+        return () => { clearTimeout(handler); }
+    }, [donationReceipt, st, ar, dt])
 
     useEffect(() => {
-        let paid = 0, verified = 0;
-        if (payment && payment.payment_history && payment.payment_history.length > 0) {
-            paid = payment.payment_history.map(item => item.amount).reduce((prev, curr) => prev + curr, 0);
-            verified = payment.payment_history.filter(item => item.status === 'validated').map(item => item.amount_received).reduce((prev, curr) => prev + curr, 0);
+        let paid = 0;
+        let verified = 0;
 
+        if (payment) {
+            // Back transfer using bank details
+            const dbPayments = payment.payment_history || [];
+            paid += dbPayments
+                .map(item => item.amount)
+                .reduce((prev, curr) => prev + curr, 0);
+
+            verified += dbPayments
+                .filter(item => item.status === 'validated')
+                .map(item => item.amount_received)
+                .reduce((prev, curr) => prev + curr, 0);
+
+            // 2. From Razorpay payment history (in paise → convert to rupees)
+            paid += rpPayments
+                .filter(item => item.status !== 'failed')
+                .map(item => item.amount)
+                .reduce((prev, curr) => prev + curr, 0) / 100;
+
+            verified += rpPayments
+                .filter(item => item.status === 'captured')
+                .map(item => item.amount)
+                .reduce((prev, curr) => prev + curr, 0) / 100;
         }
 
         setAmountData({
@@ -115,15 +136,19 @@ const PaymentComponent: React.FC<PaymentProps> = ({ initialAmount, paymentId, am
             verifiedAmount: verified,
         });
 
-        setPayingAmount(amount - paid);
-    }, [payment, amount])
+        setPayingAmount(amount - paid > 0 ? amount - paid : 0);
+    }, [payment, rpPayments, amount]);
 
     const getPayment = async (paymentId: number) => {
         try {
             const apiClient = new ApiClient();
-            const payment = await apiClient.getPayment(paymentId)
+            const payment = await apiClient.getPayment(paymentId);
             setPayment(payment);
-
+            if (payment.order_id) {
+                const razorpayDetails = await apiClient.getPaymentsForOrder(payment.order_id);
+                setRpPayments(razorpayDetails);
+            }
+    
             setAmount(payment.amount);
             setDonorType(payment.donor_type);
             setPanNumber(payment.pan_number ? payment.pan_number : '');
@@ -255,6 +280,28 @@ const PaymentComponent: React.FC<PaymentProps> = ({ initialAmount, paymentId, am
         }
     }
 
+    const mergedHistory = [
+        ...(payment?.payment_history || []),
+        ...(rpPayments?.map((item, idx) => {
+            const paymentDate = typeof item.created_at === 'number' 
+                 ? new Date(item.created_at * 1000).toISOString()
+                 : new Date().toISOString();
+            
+            return {
+                ...item,
+                id: `razorpay-${idx}`,
+                amount: item.amount,
+                amount_received: item.amount,
+                payment_date: paymentDate,
+                payment_received_date: paymentDate,
+                payment_method: item.method,
+                payment_proof: null,
+                status: item.status === 'captured' ? 'validated' : item.status
+            };
+        }) || [])
+    ];
+
+
     const columns: any[] = [
         {
             dataIndex: "amount",
@@ -262,6 +309,7 @@ const PaymentComponent: React.FC<PaymentProps> = ({ initialAmount, paymentId, am
             title: "Amount paid",
             align: "center",
             width: 100,
+            render: (value: any) => (Number(value) / 100).toLocaleString('en-IN')
         },
         {
             dataIndex: "payment_method",
@@ -309,6 +357,7 @@ const PaymentComponent: React.FC<PaymentProps> = ({ initialAmount, paymentId, am
             title: "Amount received",
             align: "center",
             width: 150,
+            render: (value: any) => (Number(value) / 100).toLocaleString('en-IN')
         },
         {
             dataIndex: "status",
@@ -562,13 +611,13 @@ const PaymentComponent: React.FC<PaymentProps> = ({ initialAmount, paymentId, am
                 <Typography variant="h6" mb={1}>Payment History</Typography>
                 <GeneralTable
                     loading={false}
-                    rows={payment?.payment_history ? payment.payment_history.slice(page * pageSize, page * pageSize + pageSize) : []}
+                    rows={mergedHistory.slice(page * pageSize, page * pageSize + pageSize)}
                     columns={columns}
-                    totalRecords={payment?.payment_history ? payment.payment_history.length : 0}
+                    totalRecords={mergedHistory.length}
                     page={page}
                     pageSize={pageSize}
                     onPaginationChange={handlePaginationChange}
-                    onDownload={async () => { return payment?.payment_history || [] }}
+                    onDownload={async () => mergedHistory}
                     tableName="Payment History"
                 />
             </Box>

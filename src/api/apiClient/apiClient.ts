@@ -1607,7 +1607,7 @@ class ApiClient {
     async sendEmailForDonation(donation_id: number, test_mails: string[], sponsor_cc_mails: string[] = [], recipient_cc_mails: string[] = [], assignee_cc_mails: string[] = [],
         event_type: string = 'default', email_sponsor: boolean = true, email_recipient: boolean = false, email_assignee: boolean = false) {
         try {
-            await this.api.post<void>(`/donations/emails/send`, { donation_id, test_mails, sponsor_cc_mails, recipient_cc_mails, assignee_cc_mails, event_type, email_sponsor, email_recipient, email_assignee });
+            return await this.api.post(`/donations/emails/send`, { donation_id, test_mails, sponsor_cc_mails, recipient_cc_mails, assignee_cc_mails, event_type, email_sponsor, email_recipient, email_assignee });
         } catch (error: any) {
             if (error.response?.data?.message) {
                 throw new Error(error.response.data.message);
@@ -2205,9 +2205,9 @@ class ApiClient {
         }
     }
 
-    async updateGiftCardTemplate(slide_id: string, primary_message: string, logo_message: string, logo?: string | null, sapling_id?: string | null, user_name?: string | null, gifted_by?: string | null, trees_count?: number): Promise<void> {
+    async updateGiftCardTemplate(slide_id: string, primary_message: string, logo_message: string, logo?: string | null, sapling_id?: string | null, user_name?: string | null, gifted_by?: string | null, trees_count?: number, assignee_name?: string | null, event_type?: string | null): Promise<void> {
         try {
-            await this.api.post<any>(`/gift-cards/update-template`, { slide_id, primary_message, logo_message, logo, sapling_id, user_name, gifted_by, trees_count });
+            await this.api.post<any>(`/gift-cards/update-template`, { slide_id, primary_message, logo_message, logo, sapling_id, user_name, gifted_by, trees_count, event_type, assignee_name });
         } catch (error: any) {
             if (error.response) {
                 throw new Error(error.response.data.message);
@@ -2345,6 +2345,18 @@ class ApiClient {
                 throw new Error(error.response.data.message);
             }
             throw new Error('Failed to generate fund request for gift request!');
+        }
+    }
+
+    async sendFundRequestInMail(giftCardRequestId: number): Promise<string> {
+        try {
+            const resp = await this.api.post<{ pdf_url: string }>(`/gift-cards/requests/send-fund-request/${giftCardRequestId}`);
+            return resp.data.pdf_url;
+        } catch (error: any) {
+            if (error.response) {
+                throw new Error(error.response.data.message);
+            }
+            throw new Error('Failed to send fund request for your request!');
         }
     }
 
