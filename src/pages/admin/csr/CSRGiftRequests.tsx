@@ -57,14 +57,6 @@ const CSRGiftRequests: React.FC<CSRGiftRequestsProps> = ({ groupId, selectedGrou
     }, []);
 
     useEffect(() => {
-        const handler = setTimeout(() => {
-            getGiftCardData();
-        }, 300)
-
-        return () => { clearTimeout(handler) };
-    }, [filters, orderBy, groupId]);
-
-    useEffect(() => {
 
         if (giftCardsData.loading) return;
         
@@ -95,45 +87,23 @@ const CSRGiftRequests: React.FC<CSRGiftRequestsProps> = ({ groupId, selectedGrou
         const statusFilterIndex = filtersData.findIndex(item => item.columnField === 'status');
         if (statusFilterIndex !== -1) {
             const statusFilter = filtersData[statusFilterIndex];
-            const statusConditions: GridFilterItem[] = [];
+            const statuses: string[] = [];
             
             if ((statusFilter.value as string[]).includes('Pending Tree Allocation')) {
-                statusConditions.push({
-                    columnField: 'status',
-                    operatorValue: 'equals',
-                    value: 'pending_plot_selection'
-                });
+                statuses.push('pending_plot_selection');
             }
             
             if ((statusFilter.value as string[]).includes('Trees Allocated')) {
-                statusConditions.push(
-                    {
-                        columnField: 'status',
-                        operatorValue: 'equals',
-                        value: 'pending_assignment'
-                    },
-                    {
-                        columnField: 'status',
-                        operatorValue: 'equals',
-                        value: 'completed'
-                    }
-                );
+                statuses.push( 'pending_assignment', 'completed');
             }
 
-            filtersData = [
-                ...filtersData.filter(item => item.columnField !== 'status'),
-                ...statusConditions
-            ];
+            filtersData[statusFilterIndex].value = statuses;
         }
-        filtersData.forEach((item) => {
-            if (item.columnField === 'validation_errors' || item.columnField === 'notes') {
-                item.operatorValue = (item.value as string[]).includes('Yes') ? 'isNotEmpty' : 'isEmpty';
-            }
-        });
     
         return [
-            ...filtersData, {columnField: 'group_id', operatorValue: 'equals', value: groupId, },
-                            { columnField: 'tags', operatorValue: 'contains', value: ['PrePurchased'], }
+            ...filtersData, 
+            {columnField: 'group_id', operatorValue: 'equals', value: groupId, },
+            { columnField: 'tags', operatorValue: 'contains', value: ['PrePurchased'], }
         ];
     };
 
@@ -147,7 +117,7 @@ const CSRGiftRequests: React.FC<CSRGiftRequestsProps> = ({ groupId, selectedGrou
     useEffect(() => {
         const handler = setTimeout(() => {
             getGiftCardData();
-        }, 300);
+        }, 500);
 
         return () => clearTimeout(handler);
     }, [filters, orderBy, groupId, page, pageSize]);
