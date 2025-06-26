@@ -64,6 +64,7 @@ interface RedeemGiftTreeDialogProps {
     open: boolean
     onClose: () => void
     onSubmit: () => void
+    availableTrees: number,
     giftMultiple?: boolean
     userId?: number,
     groupId?: number,
@@ -82,6 +83,7 @@ interface RedeemGiftTreeDialogProps {
 const RedeemGiftTreeDialog: React.FC<RedeemGiftTreeDialogProps> = ({ 
     tree, 
     open, 
+    availableTrees,
     giftMultiple, 
     userId,
     groupId, 
@@ -98,6 +100,7 @@ const RedeemGiftTreeDialog: React.FC<RedeemGiftTreeDialogProps> = ({
         email: '',
         phone: '',
         communication_email: '',
+        trees_count: '',
     });
 
     const [initialFormData, setInitialFormData] = useState({
@@ -240,6 +243,19 @@ const RedeemGiftTreeDialog: React.FC<RedeemGiftTreeDialogProps> = ({
         return isValid;
     }
 
+    const validateTreesCount = (count: number) => {
+        if (isNaN(count)) {
+            setErrors({ ...errors, trees_count: `Please provide number of trees to gift` });
+            return false;
+        } else if (count > availableTrees) {
+            setErrors({ ...errors, trees_count: `Cannot gift more than ${availableTrees} trees. Only ${availableTrees} trees available.` });
+            return false;
+        } else {
+            setErrors({ ...errors, trees_count: '' });
+            return true;
+        }
+    }
+
     const handleInputChange = (event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
 
         let value = event.target.value;
@@ -335,6 +351,12 @@ const RedeemGiftTreeDialog: React.FC<RedeemGiftTreeDialogProps> = ({
     };
 
     const handleSubmit = async () => {
+
+        if (availableTrees < treesCount) {
+            toast.error(`Not enough trees available for gifting. You opted to gift ${treesCount} trees but there is only ${availableTrees} available in inventory.`);
+            return;
+        }
+
         try {
             setLoading(true);
             let profileImageUrl: string | null = null;
@@ -407,6 +429,7 @@ const RedeemGiftTreeDialog: React.FC<RedeemGiftTreeDialogProps> = ({
 
     const handleNumberChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const value = Math.max(1, parseInt(event.target.value, 10));
+        validateTreesCount(value);
         setTreesCount(value);
     };
 
@@ -511,6 +534,8 @@ const RedeemGiftTreeDialog: React.FC<RedeemGiftTreeDialogProps> = ({
                                             onChange={handleNumberChange}
                                             inputProps={{ min: 1 }}
                                             type="number"
+                                            error={!!errors.trees_count}
+                                            helperText={errors.trees_count}
                                             fullWidth
                                         />
                                     </Grid>}
@@ -656,6 +681,7 @@ const RedeemGiftTreeDialog: React.FC<RedeemGiftTreeDialogProps> = ({
                     {step === 0 && <Button
                         variant="contained" color="success" type="submit"
                         style={{ textTransform: 'none' }}
+                        disabled={!!errors.name || !!errors.phone || !!errors.email || !!errors.trees_count}
                     >{isEditMode ? "Preview Updated Gift Card" : "Preview Gift Card"}</Button>}
                     {step === 1 && <Button
                         variant="contained" color="success"

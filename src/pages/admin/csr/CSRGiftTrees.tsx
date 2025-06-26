@@ -36,6 +36,7 @@ const CSRGiftTrees: React.FC<CSRGiftTreesProps> = ({ groupId, selectedGroup }) =
 
     const [giftDialogVisible, setGiftDialogVisible] = useState(false);
     const [selectedGiftTree, setSelectedGiftTree] = useState<Tree | null>(null);
+    const [availableTrees, setAvailableTrees] = useState(0);
     const [giftMultiple, setGiftMultiple] = useState(false);
     const [filter, setFilter] = useState<'gifted' | 'non-gifted' | 'all'>('all');
     const [searchUser, setSeachUser] = useState('');
@@ -112,6 +113,7 @@ const CSRGiftTrees: React.FC<CSRGiftTreesProps> = ({ groupId, selectedGroup }) =
 
             <GiftAnalytics
                 groupId={groupId}
+                onTreesChange={value => { setAvailableTrees(value) }}
                 onGiftMultiple={handleMultiTreesGift}
                 onBulkGifting={() => { setBulkGifting(true) }}
                 refreshTrigger={refreshTrigger}
@@ -189,11 +191,12 @@ const CSRGiftTrees: React.FC<CSRGiftTreesProps> = ({ groupId, selectedGroup }) =
                 }}
             />
 
-            {bulkGifting && <CSRBulkGift groupId={groupId} logoUrl={selectedGroup.logo_url} open={bulkGifting} onClose={() => { setBulkGifting(false); }} onSubmit={() => { setRefreshTrigger(prev => prev + 1); }} />}
+            {bulkGifting && <CSRBulkGift groupId={groupId} logoUrl={selectedGroup.logo_url} availableTrees={availableTrees} open={bulkGifting} onClose={() => { setBulkGifting(false); }} onSubmit={() => { setRefreshTrigger(prev => prev + 1); }} />}
 
             {giftDialogVisible && selectedGiftTree && (
                 <RedeemGiftTreeDialog
                     open={giftDialogVisible}
+                    availableTrees={availableTrees}
                     onClose={() => {
                         setGiftDialogVisible(false);
                         setGiftMultiple(false);

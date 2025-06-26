@@ -24,6 +24,7 @@ const GiftTrees: React.FC<GiftTreesProps> = ({ userId }) => {
     const [filter, setFilter] = useState<'gifted' | 'non-gifted' | 'all'>('all');
     const [searchUser, setSeachUser] = useState('');
     const [isLoading, setIsLoading] = useState(false);
+    const [availableTrees, setAvailableTrees] = useState(0);
 
     const [summaryOpen, setSummaryOpen] = useState(false);
     const [selectedTrn, setSelectedTrn] = useState<GiftRedeemTransaction | null>(null);
@@ -100,6 +101,7 @@ const GiftTrees: React.FC<GiftTreesProps> = ({ userId }) => {
 
             <GiftAnalytics 
                 userId={userId}
+                onTreesChange={value => setAvailableTrees(value)}
                 onGiftMultiple={handleMultiTreesGift}
                 refreshTrigger={refreshTrigger}
                 isLoading={isLoading}
@@ -174,6 +176,7 @@ const GiftTrees: React.FC<GiftTreesProps> = ({ userId }) => {
 
             {selectedGiftTree && <RedeemGiftTreeDialog
                 open={giftDialogVisible}
+                availableTrees={availableTrees}
                 onClose={() => { setGiftDialogVisible(false); setGiftMultiple(false); setSelectedGiftTree(null); }}
                 onSubmit={() => { 
                     setGiftDialogVisible(false); 
