@@ -2704,6 +2704,23 @@ class ApiClient {
         }
     }
 
+    async updateViewUsers(view_id: number, users: any[]): Promise<View> {
+        try {
+            const response = await this.api.post<View>(`/view/users`, { view_id, users }, {
+                headers: {
+                    "x-access-token": this.token,
+                    "content-type": "application/json",
+                }
+            });
+            return response.data;
+        } catch (error: any) {
+            if (error.response) {
+                throw new Error(error.response.data.message);
+            }
+            throw new Error('Failed to update permission details');
+        }
+    }
+
     async addViewUsers(view_id: number, users: any[]): Promise<View> {
         try {
             const response = await this.api.post<View>(`/view/addUsers`, { view_id, users }, {
