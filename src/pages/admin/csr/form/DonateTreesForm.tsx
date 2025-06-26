@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { Box, Button, Dialog, DialogTitle, DialogContent, DialogActions, Alert, Snackbar, LinearProgress, Typography } from "@mui/material";
+import { useRef, useState } from "react";
+import { Box, Button, Dialog, DialogTitle, DialogContent, DialogActions, Alert, Snackbar, LinearProgress, Typography, Tabs, Tab } from "@mui/material";
 import { Steps } from 'antd';
 import { LoadingButton } from '@mui/lab';
 import TreesCount from "./components/TreesCount";
@@ -9,8 +9,9 @@ import RazorpayComponent from "../../../../components/RazorpayComponent";
 import PaymentQRInfo from "../../../../components/PaymentQRInfo";
 import ApiClient from "../../../../api/apiClient/apiClient";
 import { AWSUtils } from "../../../../helpers/aws";
-import { GiftCard } from "../../../../types/gift_card";
-import CSVUploadSection from "../components/DonationCSV"
+import CSVUploadSection from "../components/DonationCSV";
+import ManualDonationAdd from "../components/DonationManual";
+import { getUniqueRequestId } from "../../../../helpers/utils";
 
 const apiClient = new ApiClient();
 const awsUtils = new AWSUtils();
@@ -42,25 +43,61 @@ const DonationTreesForm: React.FC<Props> = ({
     const [treesCount, setTreesCount] = useState<number>(14);
     const [loading, setLoading] = useState(false);
     const [orderId, setOrderId] = useState<string>('');
-    const [donationId, setDonationId] = useState<string>(''); // Changed from giftRequestId
-    const [donationData, setDonationData] = useState<any>(null);
+    const [donationId, setDonationId] = useState<string>('');
     const [donationRequest, setDonationRequest] = useState<any>(null);
     const [paymentStatus, setPaymentStatus] = useState<PaymentStatus>('idle');
     const [recipients, setRecipients] = useState<any[]>([]);
+    const [manualDonation, setManualDonation] = useState<any[]>([]);
+    const [manualDonationErrors, setManualDonationErrors] = useState<Record<string, string>>({});
+    const [isUploading, setIsUploading] = useState(false);
+    const fileInputRef = useRef<HTMLInputElement>(null);
+    const [inputMethod, setInputMethod] = useState<'csv' | 'manual'>('csv');
     const [error, setError] = useState<string>('');
     const [uploadProgress, setUploadProgress] = useState(0);
     const [paymentProof, setPaymentProof] = useState<File | null>(null);
     const [uploadedFileUrl, setUploadedFileUrl] = useState<string>('');
+    const [requestId, setRequestId] = useState<string>(getUniqueRequestId());
+    const [imageUrls, setImageUrls] = useState<string[]>([]);
     const [csvValidation, setCsvValidation] = useState({
         isValid: true,
         isUploaded: false,
         error: ''
     });
+    const [imagePreviews, setImagePreviews] = useState<Record<string, string>>({});
     const RAZORPAY_LIMIT = 500000;
     const TREE_PRICE = 1500;
 
     const totalAmount = treesCount * TREE_PRICE;
     const isAboveLimit = totalAmount > RAZORPAY_LIMIT;
+
+    const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+      
+        const date = new Date().toISOString().split("T")[0];
+        try {
+          setIsUploading(true);
+          const awsService = new AWSUtils();
+          const imageUrl = await awsService.uploadFileToS3("gift-request", file, date);
+          setManualDonation(prev => [
+            ...prev,
+            {
+              image_file: file,
+              profile_image: imageUrl,
+            }
+          ]);
+      
+          setManualDonationErrors(prev => ({ ...prev, image_file: '' }));
+        } catch (error) {
+          console.error('Failed to upload image:', error);
+          setManualDonationErrors(prev => ({ ...prev, image_file: 'Failed to upload image' }));
+        } finally {
+          setIsUploading(false);
+          if (fileInputRef.current) {
+            fileInputRef.current.value = '';
+          }
+        }
+      };
 
     const steps = [
         {
@@ -76,23 +113,41 @@ const DonationTreesForm: React.FC<Props> = ({
             ),
         },
         {
-            title: 'Upload CSV',
+            title: 'Recipient Details',
             content: (
                 <Box sx={{ p: 2 }}>
-                    <CSVUploadSection
-                        onValidationChange={(isValid, isUploaded, error) => {
-                            setCsvValidation({
-                                isValid,
-                                isUploaded,
-                                error
-                            });
-                        }}
-                        onRecipientsChange={(recipients) => {
-                            setRecipients(recipients);
-                        }}
-                        totalTreesSelected={treesCount}
-                    />
-
+                    <Tabs
+                        value={inputMethod}
+                        onChange={(_, v) => setInputMethod(v)}
+                        sx={{ mb: 2, '.MuiTabs-flexContainer': { justifyContent: 'center' } }}
+                        variant="fullWidth"
+                    >
+                        <Tab label="Upload CSV" value="csv" sx={{ fontWeight: 600, fontSize: 16 }} />
+                        <Tab label="Add Manually" value="manual" sx={{ fontWeight: 600, fontSize: 16 }} />
+                    </Tabs>
+                    
+                    {inputMethod === 'csv' ? (
+                        <CSVUploadSection
+                            onValidationChange={(isValid, isUploaded, error) => {
+                                setCsvValidation({
+                                    isValid,
+                                    isUploaded,
+                                    error
+                                });
+                            }}
+                            onRecipientsChange={(recipients) => {
+                                setRecipients(recipients);
+                            }}
+                            totalTreesSelected={treesCount}
+                        />
+                    ) : (
+                        <ManualDonationAdd
+                            donations={manualDonation}
+                            onChange={setManualDonation}
+                            imagePreviews={imagePreviews}
+                            onImageUpload={handleImageUpload}
+                        />
+                    )}
                 </Box>
             ),
         },
@@ -112,7 +167,6 @@ const DonationTreesForm: React.FC<Props> = ({
     ];
 
     const handleNext = () => {
-        // If we're moving to the CSV upload step, reset validation
         if (currentStep === 0) {
             setCsvValidation({
                 isValid: true,
@@ -142,6 +196,29 @@ const DonationTreesForm: React.FC<Props> = ({
             setLoading(true);
             setError('');
     
+            // Prepare recipients based on input method
+            const donationRecipients = inputMethod === 'csv' 
+                ? recipients.map(r => ({
+                    recipient_name: r.name,
+                    recipient_email: r.email,
+                    recipient_phone: r.phone,
+                    assignee_name: r.assigneeName || r.name,
+                    assignee_email: r.assigneeEmail || r.email,
+                    assignee_phone: r.assigneePhone || r.email,
+                    trees_count: r.trees_count || 1,
+                    image_url: r.image_url,
+                }))
+                : manualDonation.map(d => ({
+                    recipient_name: d.name,
+                    recipient_email: d.email,
+                    recipient_phone: d.phone,
+                    assignee_name: d.assigneeName || d.name,
+                    assignee_email: d.assigneeEmail || d.email,
+                    assignee_phone: d.assigneePhone || d.email,
+                    trees_count: d.trees_count || 1,
+                    image_url: d.profile_image,
+                }));
+    
             // Prepare the exact payload structure expected by backend
             const response = await apiClient.createDonationV2(
                 user.name,
@@ -150,18 +227,9 @@ const DonationTreesForm: React.FC<Props> = ({
                 totalAmount,
                 undefined,
                 ["Corporate"],
-                recipients?.length ? recipients.map(r => ({
-                  recipient_name: r.name,
-                  recipient_email: r.email,
-                  recipient_phone: r.phone,
-                  assignee_name: r.assigneeName || r.name,
-                  assignee_email: r.assigneeEmail || r.email,
-                  assignee_phone: r.assigneePhone || r.email,
-                  trees_count: r.trees_count ||  1,
-                  image_url: r.image_url,
-                })) : undefined,
+                donationRecipients.length ? donationRecipients : undefined,
                 groupId ? groupId.toString() : undefined
-              );
+            );
     
             // Handle response
             if (response.order_id) {
@@ -268,11 +336,14 @@ const DonationTreesForm: React.FC<Props> = ({
 
     // Determine if Next button should be disabled
     const isNextDisabled = () => {
-        const disabled = currentStep === 1 
-            ? (!csvValidation.isUploaded || !csvValidation.isValid)
-            : false;
-
-        return disabled;
+        if (currentStep === 1) {
+            if (inputMethod === 'csv') {
+                return !csvValidation.isUploaded || !csvValidation.isValid;
+            } else {
+                return manualDonation.length === 0;
+            }
+        }
+        return false;
     };
 
     return (
