@@ -131,12 +131,16 @@ const CSRGiftTrees: React.FC<CSRGiftTreesProps> = ({ groupId, selectedGroup }) =
                     label="Search trees by giftee's name"
                     value={searchUser}
                     onChange={(e) => { setSeachUser(e.target.value) }}
+                    disabled={filter === 'non-gifted'}
                     fullWidth
                     size="small"
                     sx={{
                         maxWidth: isMobile ? '100%' : '500px',
                         m: isMobile ? 0 : 1,
-                        mb: isMobile ? 2 : 1
+                        mb: isMobile ? 2 : 1,
+                        '& .MuiInputBase-root.Mui-disabled': {
+                            backgroundColor: theme.palette.action.disabledBackground,
+                        }
                     }}
                 />
                 <FormControl component="fieldset" sx={{ width: isMobile ? '100%' : 'auto' }}>
@@ -149,7 +153,7 @@ const CSRGiftTrees: React.FC<CSRGiftTreesProps> = ({ groupId, selectedGroup }) =
                     >
                         <FormControlLabel
                             value="non-gifted"
-                            control={<Radio color="success" checked={filter === 'non-gifted'} onChange={() => { setFilter('non-gifted') }} />}
+                            control={<Radio color="success" checked={filter === 'non-gifted'} onChange={() => { setFilter('non-gifted'); setSeachUser(''); }} />}
                             label="Show Available Trees"
                             labelPlacement="end"
                             sx={{ mr: 1 }}
