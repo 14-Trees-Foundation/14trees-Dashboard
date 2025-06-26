@@ -25,6 +25,7 @@ const useStyles = makeStyles((theme) =>
 interface GiftAnalyticsProps {
     userId?: number;
     groupId?: number;
+    onTreesChange?: (availableTrees: number) => void;
     onGiftMultiple: () => void;
     onBulkGifting?: () => void;
     refreshTrigger?: number;
@@ -36,6 +37,7 @@ const GiftAnalytics: React.FC<GiftAnalyticsProps> = ({
     groupId,
     onGiftMultiple,
     onBulkGifting,
+    onTreesChange,
     refreshTrigger = 0,
     isLoading = false
 }) => {
@@ -64,6 +66,9 @@ const GiftAnalytics: React.FC<GiftAnalyticsProps> = ({
             }
 
             setAnalytics(analyticsData);
+            const availableTrees = Number(analyticsData?.total_trees) - Number(analyticsData?.gifted_trees) || 0;
+            onTreesChange?.(availableTrees);
+            
         } catch (error: any) {
             toast.error(error.message || "Failed to load analytics data");
         } finally {
@@ -133,72 +138,70 @@ const GiftAnalytics: React.FC<GiftAnalyticsProps> = ({
                 </div>
             </Box>
 
-            {canGiftMore &&
-                <Box
-                    style={{
-                        display: 'flex',
-                        flexDirection: 'column',
-                        justifyContent: 'center',
-                        alignItems: 'center',
-                        marginTop: isMobile ? 16 : 10,
-                    }}
-                >
-                    <Box sx={{
-                        display: 'flex',
-                        flexDirection: isMobile ? 'column' : 'row',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        width: isMobile ? '96%' : 'auto',
-                        gap: 2
-                    }}>
-                        <Button
-                            variant="contained"
-                            color="success"
-                            onClick={onGiftMultiple}
-                            style={{
-                                textTransform: 'none',
-                                margin: isMobile ? '8px 0 0 0' : '10px 5px 0 0',
-                                padding: isMobile ? '8px 16px' : '6px 16px',
-                                fontSize: isMobile ? '0.85rem' : 'inherit',
-                                width: isMobile ? '96%' : 'auto'
-                            }}
-                            startIcon={isLoading ? <CircularProgress size={20} color="inherit" /> : <CardGiftcard />}
-                            disabled={!canGiftMore || isLoading}
-                            size={isMobile ? "small" : "medium"}
-                        >
-                            {isLoading ? "Loading Trees..." : "Gift Trees Now!"}
-                        </Button>
-                        {onBulkGifting && <Typography style={{
+            <Box
+                style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    marginTop: isMobile ? 16 : 10,
+                }}
+            >
+                <Box sx={{
+                    display: 'flex',
+                    flexDirection: isMobile ? 'column' : 'row',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    width: isMobile ? '96%' : 'auto',
+                    gap: 2
+                }}>
+                    <Button
+                        variant="contained"
+                        color="success"
+                        onClick={onGiftMultiple}
+                        style={{
                             textTransform: 'none',
                             margin: isMobile ? '8px 0 0 0' : '10px 5px 0 0',
                             padding: isMobile ? '8px 16px' : '6px 16px',
                             fontSize: isMobile ? '0.85rem' : 'inherit',
-                            width: isMobile ? '96%' : 'auto',
-                            textAlign: 'center'
-                        }}>OR</Typography>}
-                        {onBulkGifting && <Button
-                            variant="contained"
-                            color="success"
-                            onClick={onBulkGifting}
-                            style={{
-                                textTransform: 'none',
-                                margin: isMobile ? '8px 0 0 0' : '10px 5px 0 0',
-                                padding: isMobile ? '8px 16px' : '6px 16px',
-                                fontSize: isMobile ? '0.85rem' : 'inherit',
-                                width: isMobile ? '96%' : 'auto'
-                            }}
-                            startIcon={<CardGiftcard />}
-                            disabled={!canGiftMore || isLoading}
-                            size={isMobile ? "small" : "medium"}
-                        >
-                            {"Gift in Bulk!"}
-                        </Button>}
-                    </Box>
-                    <Typography mt={1} variant={isMobile ? 'caption' : 'subtitle2'}>
-                        (from your remaining stock of {availableTrees} trees)
-                    </Typography>
+                            width: isMobile ? '96%' : 'auto'
+                        }}
+                        startIcon={isLoading ? <CircularProgress size={20} color="inherit" /> : <CardGiftcard />}
+                        disabled={!canGiftMore || isLoading}
+                        size={isMobile ? "small" : "medium"}
+                    >
+                        {isLoading ? "Loading Trees..." : "Gift Trees Now!"}
+                    </Button>
+                    {onBulkGifting && <Typography style={{
+                        textTransform: 'none',
+                        margin: isMobile ? '8px 0 0 0' : '10px 5px 0 0',
+                        padding: isMobile ? '8px 16px' : '6px 16px',
+                        fontSize: isMobile ? '0.85rem' : 'inherit',
+                        width: isMobile ? '96%' : 'auto',
+                        textAlign: 'center'
+                    }}>OR</Typography>}
+                    {onBulkGifting && <Button
+                        variant="contained"
+                        color="success"
+                        onClick={onBulkGifting}
+                        style={{
+                            textTransform: 'none',
+                            margin: isMobile ? '8px 0 0 0' : '10px 5px 0 0',
+                            padding: isMobile ? '8px 16px' : '6px 16px',
+                            fontSize: isMobile ? '0.85rem' : 'inherit',
+                            width: isMobile ? '96%' : 'auto'
+                        }}
+                        startIcon={<CardGiftcard />}
+                        disabled={isLoading}
+                        size={isMobile ? "small" : "medium"}
+                    >
+                        {"Gift in Bulk!"}
+                    </Button>}
                 </Box>
-            }
+                {canGiftMore && <Typography mt={1} variant={isMobile ? 'caption' : 'subtitle2'}>
+                    (from your remaining stock of {availableTrees} trees)
+                </Typography>}
+            </Box>
         </>
     );
 };

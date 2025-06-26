@@ -1,6 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { Box, Button, Grid, TextField, Typography, Avatar, IconButton, Tooltip, Paper, TableContainer, Table, TableHead, TableBody, TableRow, TableCell } from '@mui/material';
 import { Delete as DeleteIcon, Image as ImageIcon, AddPhotoAlternate, Edit as EditIcon } from '@mui/icons-material';
+import { AWSUtils } from '../../../../helpers/aws';
 
 export interface ManualUser {
     name: string;
@@ -10,6 +11,7 @@ export interface ManualUser {
     trees_count: number;
     image_file?: File;
     image_name?: string;
+    profile_image?: string;
     event_name: string;
     gifted_by: string;
     gifted_on: string;
@@ -20,7 +22,6 @@ interface ManualUserAddProps {
     onChange: (users: ManualUser[]) => void;
     eventType: string | undefined;
     imagePreviews?: Record<string, string>;
-    onImageUpload: (file: File) => Promise<string>;
 }
 
 const defaultUser = (): ManualUser => ({
@@ -38,11 +39,9 @@ const ManualUserAdd: React.FC<ManualUserAddProps> = ({
     users, 
     onChange, 
     eventType,
-    imagePreviews = {},
-    onImageUpload
 }) => {
     const [manualUser, setManualUser] = useState<ManualUser>(defaultUser());
-    const [manualUserErrors, setManualUserErrors] = useState<string[]>([]);
+    const [manualUserErrors, setManualUserErrors] = useState<Record<string, string>>({});
     const fileInputRef = useRef<HTMLInputElement>(null);
     const [isUploading, setIsUploading] = useState(false);
     const [editIndex, setEditIndex] = useState<number | null>(null);
@@ -60,17 +59,20 @@ const ManualUserAdd: React.FC<ManualUserAddProps> = ({
         const file = e.target.files?.[0];
         if (!file) return;
 
+        const date = new Date().toISOString().split("T")[0];
         try {
             setIsUploading(true);
-            const imageName = await onImageUpload(file);
+            const awsService = new AWSUtils();
+            const imageUrl = await awsService.uploadFileToS3("gift-request", file, date);
             setManualUser({
                 ...manualUser,
                 image_file: file,
-                image_name: imageName
+                profile_image: imageUrl
             });
+            setManualUserErrors(prev => ({ ...prev, image_file: '' }));
         } catch (error) {
             console.error('Failed to upload image:', error);
-            setManualUserErrors(prev => [...prev, 'Failed to upload image']);
+            setManualUserErrors(prev => ({ ...prev, image_file: 'Failed to upload image' }));
         } finally {
             setIsUploading(false);
             if (fileInputRef.current) {
@@ -80,32 +82,40 @@ const ManualUserAdd: React.FC<ManualUserAddProps> = ({
     };
 
     const validateManualUser = () => {
-        const errors: string[] = [];
+        const errors: Record<string, string> = {};
         const isValidEmail = (value: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
         const isValidDate = (value: string) => /^\d{4}-\d{2}-\d{2}$/.test(value) && !isNaN(Date.parse(value));
-        
-        if (!manualUser.name.trim()) errors.push("Recipient Name is required");
-        if (!manualUser.email.trim()) errors.push("Recipient Email is required");
-        if (!isValidEmail(manualUser.email)) errors.push("Invalid Recipient Email format");
-        if (manualUser.communication_email && !isValidEmail(manualUser.communication_email)) errors.push("Invalid Communication Email format");
-        if (manualUser.birth_date && !isValidDate(manualUser.birth_date)) errors.push("Invalid Date of Birth format (YYYY-MM-DD)");
-        if (!manualUser.trees_count || isNaN(Number(manualUser.trees_count)) || Number(manualUser.trees_count) <= 0) errors.push("Number of trees must be a positive number");
-        
+
+        if (!manualUser.name.trim()) errors.name = "Recipient Name is required";
+        if (manualUser.email.trim() && !isValidEmail(manualUser.email)) errors.email = "Invalid Recipient Email format";
+        if (manualUser.communication_email && !isValidEmail(manualUser.communication_email)) errors.communication_email = "Invalid Communication Email format";
+        if (manualUser.birth_date && !isValidDate(manualUser.birth_date)) errors.birth_date = "Invalid Date of Birth format (YYYY-MM-DD)";
+        if (!manualUser.trees_count || isNaN(Number(manualUser.trees_count)) || Number(manualUser.trees_count) <= 0) errors.trees_count = "Number of trees must be a positive number";
+
         if (showEventFields) {
-            if (!manualUser.event_name.trim()) errors.push("Occasion Name is required");
-            if (!manualUser.gifted_by.trim()) errors.push("Gifted By is required");
-            if (!manualUser.gifted_on.trim()) errors.push("Gifted On is required");
-            if (manualUser.gifted_on && !isValidDate(manualUser.gifted_on)) errors.push("Invalid Gifted On date format (YYYY-MM-DD)");
+            if (manualUser.gifted_on && !isValidDate(manualUser.gifted_on)) errors.gifted_on = "Invalid Gifted On date format (YYYY-MM-DD)";
         }
-        
+
         return errors;
     };
 
     const handleManualUserSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         const errors = validateManualUser();
+
+        // Duplicate check (case-insensitive, trimmed)
+        const normalizedName = manualUser.name.trim().toLowerCase();
+        const normalizedEmail = manualUser.email.trim().toLowerCase();
+        const duplicate = users.some((u, idx) => {
+            if (editIndex !== null && idx === editIndex) return false; // skip self when editing
+            return u.name.trim().toLowerCase() === normalizedName && u.email.trim().toLowerCase() === normalizedEmail;
+        });
+        if (duplicate) {
+            errors.duplicate = 'A recipient with this name and email already exists.';
+        }
+
         setManualUserErrors(errors);
-        if (errors.length === 0) {
+        if (Object.keys(errors).length === 0) {
             if (editIndex !== null) {
                 // Update existing user
                 const updatedUsers = users.map((u, idx) => idx === editIndex ? manualUser : u);
@@ -116,14 +126,14 @@ const ManualUserAdd: React.FC<ManualUserAddProps> = ({
                 onChange([...users, manualUser]);
             }
             setManualUser(defaultUser());
-            setManualUserErrors([]);
+            setManualUserErrors({});
         }
     };
 
     const handleEditUser = (idx: number) => {
         setManualUser(users[idx]);
         setEditIndex(idx);
-        setManualUserErrors([]);
+        setManualUserErrors({});
     };
 
     const handleRemoveUser = (idx: number) => {
@@ -145,7 +155,7 @@ const ManualUserAdd: React.FC<ManualUserAddProps> = ({
                             <TextField fullWidth label="Recipient Name" name="name" value={manualUser.name} onChange={handleManualUserChange} required />
                         </Grid>
                         <Grid item xs={12} sm={12} md={6}>
-                            <TextField fullWidth label="Recipient Email" name="email" value={manualUser.email} onChange={handleManualUserChange} required />
+                            <TextField fullWidth label="Recipient Email" name="email" value={manualUser.email} onChange={handleManualUserChange} />
                         </Grid>
                         <Grid item xs={12} sm={12} md={6}>
                             <TextField fullWidth label="Communication Email" name="communication_email" value={manualUser.communication_email} onChange={handleManualUserChange} />
@@ -158,50 +168,68 @@ const ManualUserAdd: React.FC<ManualUserAddProps> = ({
                         </Grid>
                         <Grid item xs={12} sm={12} md={6}>
                             <Box display="flex" alignItems="center" gap={2}>
-                                <Button
-                                    variant="outlined"
-                                    component="label"
-                                    startIcon={<AddPhotoAlternate />}
-                                    disabled={isUploading}
-                                    fullWidth
-                                    sx={{ minWidth: 0 }}
-                                >
-                                    {isUploading ? 'Uploading...' : 'Upload Image'}
-                                    <input
-                                        type="file"
-                                        hidden
-                                        accept="image/*"
-                                        onChange={handleImageUpload}
-                                        ref={fileInputRef}
-                                    />
-                                </Button>
-                                {manualUser.image_name && imagePreviews[manualUser.image_name] && (
-                                    <Avatar
-                                        src={imagePreviews[manualUser.image_name]}
-                                        alt={manualUser.image_name}
-                                        sx={{ width: 40, height: 40 }}
-                                    />
+                                {manualUser.profile_image ? (
+                                    <>
+                                        <Avatar
+                                            src={manualUser.profile_image}
+                                            alt={manualUser.image_name || 'Uploaded image'}
+                                            sx={{ width: 56, height: 56, mr: 1 }}
+                                        />
+                                        <Button
+                                            variant="outlined"
+                                            color="error"
+                                            onClick={() => {
+                                                setManualUser({
+                                                    ...manualUser,
+                                                    profile_image: undefined,
+                                                    image_file: undefined,
+                                                    image_name: undefined,
+                                                });
+                                                if (fileInputRef.current) fileInputRef.current.value = '';
+                                            }}
+                                        >
+                                            Remove
+                                        </Button>
+                                    </>
+                                ) : (
+                                    <Button
+                                        variant="outlined"
+                                        component="label"
+                                        startIcon={<AddPhotoAlternate />}
+                                        disabled={isUploading}
+                                        fullWidth
+                                        sx={{ minWidth: 0 }}
+                                    >
+                                        {isUploading ? 'Uploading...' : 'Upload Image'}
+                                        <input
+                                            type="file"
+                                            hidden
+                                            accept="image/*"
+                                            onChange={handleImageUpload}
+                                            ref={fileInputRef}
+                                        />
+                                    </Button>
                                 )}
                             </Box>
                         </Grid>
                         {showEventFields && (
                             <>
                                 <Grid item xs={12} sm={12} md={6}>
-                                    <TextField fullWidth label="Occasion Name" name="event_name" value={manualUser.event_name} onChange={handleManualUserChange} required />
+                                    <TextField fullWidth label="Occasion Name" name="event_name" value={manualUser.event_name} onChange={handleManualUserChange} />
                                 </Grid>
                                 <Grid item xs={12} sm={12} md={6}>
-                                    <TextField fullWidth label="Gifted By" name="gifted_by" value={manualUser.gifted_by} onChange={handleManualUserChange} required />
+                                    <TextField fullWidth label="Gifted By" name="gifted_by" value={manualUser.gifted_by} onChange={handleManualUserChange} />
                                 </Grid>
                                 <Grid item xs={12} sm={12} md={6}>
-                                    <TextField fullWidth label="Gifted On" name="gifted_on" value={manualUser.gifted_on} onChange={handleManualUserChange} type="date" required InputLabelProps={{ shrink: true }} />
+                                    <TextField fullWidth label="Gifted On" name="gifted_on" value={manualUser.gifted_on} onChange={handleManualUserChange} type="date" InputLabelProps={{ shrink: true }} />
                                 </Grid>
                             </>
                         )}
-                        {manualUserErrors.length > 0 && (
+                        {Object.keys(manualUserErrors).length > 0 && (
                             <Grid item xs={12}>
                                 <Box sx={{ mt: 1 }}>
-                                    {manualUserErrors.map((err, idx) => (
-                                        <Typography key={idx} color="error" variant="body2">• {err}</Typography>
+                                    {Object.entries(manualUserErrors).filter(([_, error]) => error).map(([field, error]) => (
+                                        <Typography key={field} color="error" variant="body2">• {error}</Typography>
                                     ))}
                                 </Box>
                             </Grid>
@@ -242,20 +270,20 @@ const ManualUserAdd: React.FC<ManualUserAddProps> = ({
                                 {users.map((user, idx) => (
                                     <TableRow key={idx} selected={editIndex === idx}>
                                         <TableCell>{user.name}</TableCell>
-                                        <TableCell>{user.email}</TableCell>
+                                        <TableCell>{user.email || "-"}</TableCell>
                                         <TableCell>{user.communication_email || '-'}</TableCell>
                                         <TableCell>{user.birth_date || '-'}</TableCell>
                                         <TableCell>{user.trees_count}</TableCell>
                                         <TableCell>
-                                            {user.image_name && imagePreviews[user.image_name] ? (
-                                                <Avatar src={imagePreviews[user.image_name]} alt={user.image_name} sx={{ width: 32, height: 32 }} />
+                                            {user.profile_image ? (
+                                                <Avatar src={user.profile_image} alt={user.image_name} sx={{ width: 32, height: 32 }} />
                                             ) : user.image_name ? (
                                                 <Tooltip title="Image not found"><ImageIcon color="error" /></Tooltip>
-                                            ) : null}
+                                            ) : "-"}
                                         </TableCell>
-                                        {showEventFields && <TableCell>{user.event_name}</TableCell>}
-                                        {showEventFields && <TableCell>{user.gifted_by}</TableCell>}
-                                        {showEventFields && <TableCell>{user.gifted_on}</TableCell>}
+                                        {showEventFields && <TableCell>{user.event_name} || "-"</TableCell>}
+                                        {showEventFields && <TableCell>{user.gifted_by} || "-"</TableCell>}
+                                        {showEventFields && <TableCell>{user.gifted_on} || "-"</TableCell>}
                                         <TableCell>
                                             <Tooltip title="Edit"><IconButton onClick={() => handleEditUser(idx)} size="small"><EditIcon fontSize="small" /></IconButton></Tooltip>
                                             <Tooltip title="Delete"><IconButton onClick={() => handleRemoveUser(idx)} size="small" color="error"><DeleteIcon fontSize="small" /></IconButton></Tooltip>
