@@ -12,6 +12,7 @@ import { LoadingButton } from "@mui/lab";
 interface CSRSharePageDialogProps {
     groupId?: number
     groupName?: string
+    onUsersAdded?: () => void;
     style?: React.CSSProperties;
     disabled?: boolean;
 }
@@ -22,7 +23,7 @@ interface UserOption {
     email: string;
 }
 
-const CSRSharePageDialog: FC<CSRSharePageDialogProps> = ({ groupId, groupName, style, disabled = false }) => {
+const CSRSharePageDialog: FC<CSRSharePageDialogProps> = ({ groupId, groupName, onUsersAdded, style, disabled = false }) => {
     const dispatch = useAppDispatch();
     const { searchUsers } = bindActionCreators(userActionCreators, dispatch);
 
@@ -144,18 +145,26 @@ const CSRSharePageDialog: FC<CSRSharePageDialogProps> = ({ groupId, groupName, s
                     const data = { ...viewDetails, name: viewName };
                     await apiClient.updateView(data);
                 }
-                const viewData = await apiClient.updateViewUsers(viewDetails.id, allUsers);
+                const viewData = await apiClient.addViewUsers(viewDetails.id, allUsers);
                 setViewDetails(viewData);
+                if (onUsersAdded) {
+                    onUsersAdded();
+                }
             } else {
                 const path = '/csr/dashboard/' + groupId;
                 const viewData = await apiClient.createNewView(viewName, path, allUsers);
                 setViewDetails(viewData);
+                if (onUsersAdded) {
+                    onUsersAdded();
+                }
             }
-
+            toast.success("View permissions updated successfully");
+            setOpen(false);
         } catch (error: any) {
             toast.error(error.message);
+        } finally {
+            setLoadingButton(false);
         }
-        setLoadingButton(false);
     }
 
     return (

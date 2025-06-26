@@ -2704,9 +2704,9 @@ class ApiClient {
         }
     }
 
-    async updateViewUsers(view_id: number, users: any[]): Promise<View> {
+    async addViewUsers(view_id: number, users: any[]): Promise<View> {
         try {
-            const response = await this.api.post<View>(`/view/users`, { view_id, users }, {
+            const response = await this.api.post<View>(`/view/addUsers`, { view_id, users }, {
                 headers: {
                     "x-access-token": this.token,
                     "content-type": "application/json",
@@ -2717,7 +2717,24 @@ class ApiClient {
             if (error.response) {
                 throw new Error(error.response.data.message);
             }
-            throw new Error('Failed to update permission details');
+            throw new Error('Failed to add users to view');
+        }
+    }
+    
+    async deleteViewUsers(view_id: number, users: any[]): Promise<View> {
+        try {
+            const response = await this.api.post<View>(`/view/deleteUsers`, { view_id, users }, {
+                headers: {
+                    "x-access-token": this.token,
+                    "content-type": "application/json",
+                }
+            });
+            return response.data;
+        } catch (error: any) {
+            if (error.response) {
+                throw new Error(error.response.data.message);
+            }
+            throw new Error('Failed to remove users from view');
         }
     }
 

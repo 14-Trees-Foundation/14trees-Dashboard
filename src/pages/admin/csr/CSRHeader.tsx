@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Box, Divider, Typography, useMediaQuery, useTheme, Button } from "@mui/material";
+import { Box, Divider, Typography, useMediaQuery, useTheme, Button, Avatar } from "@mui/material";
 import { AutocompleteWithPagination } from "../../../components/AutoComplete";
 import { useAppDispatch, useAppSelector } from "../../../redux/store/hooks";
 import { bindActionCreators } from "@reduxjs/toolkit";
@@ -86,41 +86,63 @@ const CSRHeader: React.FC<Props> = ({ groupId, onGroupChange }) => {
                 style={{
                     display: "flex",
                     justifyContent: "space-between",
-                    margin: isMobile ? '10px 10px 0 10px' : undefined,
-                    padding: '0px 8px'
+                    margin: isMobile ? '12px 16px 0' : '12px 24px 0',
+                    padding: '0px 8px',
+                    alignItems: 'center'
                 }}
-            >
-                <Typography variant={isMobile ? "h5" : "h3"} style={{ marginTop: '5px', marginBottom: '5px' }}>
-                    {selectedGroup ? `${selectedGroup.name}'s` : 'Corporate'} Dashboard
-                </Typography>
+            > <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginRight: '24px' }}>
+                    {selectedGroup?.logo_url && (
+                        <Avatar
+                            src={selectedGroup.logo_url}
+                            alt={`${selectedGroup.name} logo`}
+                            sx={{
+                                width: 50,
+                                height: 50,
+                                backgroundColor: 'transparent',
+                                '& img': {
+                                    objectFit: 'contain'
+                                }
+                            }}
+                            variant="square"
+                        />
+                    )}
+                    <Typography variant={isMobile ? "h6" : "h4"} style={{ margin: 0, lineHeight: 1.2 }}>
+                        {selectedGroup ? `Climate Action Dashboard for ${selectedGroup.name}` : 'Corporate Climate Action Dashboard'}
+                    </Typography>
+                </div>
                 <div
-                   style={{
-                     display: "flex",
-                      justifyContent: "space-between",
-                      alignItems: 'center'
+                    style={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: 'center'
                     }}
                 >
                     {!groupId && (
-                        <AutocompleteWithPagination
-                            label="Select a corporate group"
-                            options={groupsList}
-                            getOptionLabel={(option) => option?.name || ''}
-                            onChange={(event, newValue) => {
-                                setSelectedGroup(newValue);
-                                onGroupChange(newValue);
-                            }}
-                            onInputChange={(event) => {
-                                const { value } = event.target;
-                                setGroupPage(0);
-                                setGroupNameInput(value);
-                            }}
-                            setPage={setGroupPage}
-                            size="small"
-                            value={selectedGroup}
-                        />
+                        <>
+                            <AutocompleteWithPagination
+                                label="Select a corporate group"
+                                options={groupsList}
+                                getOptionLabel={(option) => option?.name || ''}
+                                onChange={(event, newValue) => {
+                                    setSelectedGroup(newValue);
+                                    onGroupChange(newValue);
+                                }}
+                                onInputChange={(event) => {
+                                    const { value } = event.target;
+                                    setGroupPage(0);
+                                    setGroupNameInput(value);
+                                }}
+                                setPage={setGroupPage}
+                                size="small"
+                                value={selectedGroup}
+                            />
+                            <CSRSharePageDialog
+                                groupId={selectedGroup?.id}
+                                groupName={selectedGroup?.name}
+                                style={{ marginLeft: 10 }}
+                            />
+                        </>
                     )}
-
-                    <CSRSharePageDialog groupId={selectedGroup?.id} groupName={selectedGroup?.name} style={{ marginLeft: 10 }} />
                 </div>
             </div>
             <Divider sx={{ backgroundColor: "black", marginBottom: '15px', mx: 1 }} />
