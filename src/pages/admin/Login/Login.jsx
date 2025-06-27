@@ -116,7 +116,7 @@ export const Login = () => {
         if (user?.roles && (user.roles?.includes("admin") || user.roles?.includes("super-admin"))) {
           from = "/admin"
         } else if (res.data.path && res.data.view_id) {
-          from = path + "?v=" + view_id 
+          from = res.data.path + "?v=" + res.data.view_id 
         } else {
           toast.error("User not authorized! Contact Admin");
           return;
