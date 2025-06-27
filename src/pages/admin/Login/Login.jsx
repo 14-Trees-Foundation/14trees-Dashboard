@@ -112,7 +112,7 @@ export const Login = () => {
       );
       if (res.status === 201 && res.data.user.roles) {
         localStorage.setItem("loginInfo", JSON.stringify({ token: res.data.token, expires_at: res.data.expires_at, name: res.data.user?.name }));
-        if (res.data.user && res.dara.user.roles && (data.user.roles.includes("admin") || data.user.roles.includes("super-admin"))) {
+        if (res.data.user && res.data.user.roles && (res.data.user.roles.includes("admin") || res.data.user.roles.includes("super-admin"))) {
           from = "/admin"
         } else if (res.data.path && res.data.view_id) {
           from = path + "?v=" + view_id 
