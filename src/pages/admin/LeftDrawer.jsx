@@ -17,7 +17,6 @@ import CorporateFareIcon from "@mui/icons-material/CorporateFare";
 import TourIcon from "@mui/icons-material/TourOutlined";
 import logo from "../../assets/logo_white_small.png";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { useAuth } from "./auth/auth";
 import VolunteerActivismIcon from "@mui/icons-material/VolunteerActivism";
 import MapIcon from "@mui/icons-material/Map";
 import FestivalIcon from "@mui/icons-material/Festival";
@@ -31,116 +30,124 @@ export const AdminLeftDrawer = () => {
   const classes = useStyles();
   const location = useLocation();
   const navigate = useNavigate();
-  const auth = useAuth();
+  const [isAdmin, setIsAdmin] = useState(false);
   const [expanded, setExpanded] = useState(null);
 
   useEffect(() => {
-    if (auth.roles.includes(UserRoles.User)) {
-      navigate("/tree-cards");
+    const roles = localStorage.getItem("roles") || '[]';
+    try {
+      const rolesArr = JSON.parse(roles);
+      const admin = rolesArr.includes(UserRoles.Admin) || rolesArr.includes(UserRoles.SuperAdmin)
+      setIsAdmin(admin)
+      if (!admin) {
+        navigate("/tree-cards");
+      }
+    } catch (error) {
+      navigate("/login");
     }
-  }, [auth]);
+  }, []);
 
   const pages = [
     {
       displayName: "Home",
       logo: LeaderBoardOutlined,
-      display: true,
+      display: isAdmin,
       path: "home",
     },
     {
       displayName: "Sites",
       logo: MapIcon,
-      display: true,
+      display: isAdmin,
       path: "sites",
     },
     {
       displayName: "Plots",
       logo: LandscapeIcon,
-      display: true,
+      display: isAdmin,
       path: "plots",
     },
     {
       displayName: "Trees",
       logo: ForestOutlined,
-      display: true,
+      display: isAdmin,
       path: "trees",
     },
     {
-      divider: true,
+      divider: isAdmin,
     },
     {
       displayName: "Plant Types",
       logo: GrassTwoToneIcon,
-      display: true,
+      display: isAdmin,
       path: "plant-types",
     },
     {
       displayName: "Ponds",
       logo: OpacityOutlined,
-      display: true,
+      display: isAdmin,
       path: "ponds",
     },
     {
       displayName: "People",
       logo: AccountCircleOutlined,
-      display: true,
+      display: isAdmin,
       path: "people",
     },
     {
       displayName: "People Groups",
       logo: CorporateFareIcon,
-      display: true,
+      display: isAdmin,
       path: "people-group",
     },
     {
-      divider: true,
+      divider: isAdmin,
     },
     {
       displayName: "Visits",
       logo: TourIcon,
-      display: true,
+      display: isAdmin,
       path: "visits",
     },
     {
       displayName: "Events",
       logo: FestivalIcon,
-      display: true,
+      display: isAdmin,
       path: "events",
     },
     {
       displayName: "Site Inventory",
       logo: Inventory,
-      display: true,
+      display: isAdmin,
       path: "site-inventory",
     },
     {
       displayName: "GC Inventory",
       logo: Inventory,
-      display: true,
+      display: isAdmin,
       path: "gc-inventory",
     },
     {
       displayName: "Campaigns",
       logo: Campaign,
-      display: auth.signedin,
+      display: isAdmin,
       path: "campaigns",
     },
     {
       displayName: "Tree Cards",
       logo: CardGiftcard,
-      display: auth.signedin,
+      display: isAdmin,
       path: "tree-cards",
     },
     {
       displayName: "Donations",
       logo: VolunteerActivismIcon,
-      display: true,
+      display: isAdmin,
       path: "donations",
     },
     {
       displayName: "Corporate Dashboard",
       logo: Analytics,
-      display: true,
+      display: isAdmin,
       path: "corporate-dashboard",
     },
     // {
