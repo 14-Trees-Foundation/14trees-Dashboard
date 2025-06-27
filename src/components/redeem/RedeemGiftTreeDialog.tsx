@@ -1,4 +1,4 @@
-import { Autocomplete, Avatar, Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, Grid, TextField, Typography, useMediaQuery, useTheme } from "@mui/material"
+import { Autocomplete, Avatar, Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, Grid, TextField, Typography, useMediaQuery, useTheme, FormControl, FormGroup, FormControlLabel, Radio, RadioGroup, Alert } from "@mui/material"
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import ApiClient from "../../api/apiClient/apiClient";
@@ -10,6 +10,7 @@ import treePlanting from "../../assets/planting_illustration.jpg";
 import { makeStyles } from "@mui/styles";
 import { LoadingButton } from "@mui/lab";
 import { GiftRedeemTransaction } from "../../types/gift_redeem_transaction";
+import RazorpayComponent from "../../components/RazorpayComponent";
 
 const EventTypes = [
     {
@@ -148,6 +149,29 @@ const RedeemGiftTreeDialog: React.FC<RedeemGiftTreeDialogProps> = ({
     const [treesCount, setTreesCount] = useState(1);
     const [loading, setLoading] = useState(false);
     const [isEditMode, setIsEditMode] = useState(false);
+    const [showGiftTypeDialog, setShowGiftTypeDialog] = useState(false);
+
+    // New state for gift type and payment flow
+    const [giftType, setGiftType] = useState<'existing' | 'new'>('existing');
+    const [paymentOption, setPaymentOption] = useState<'payNow' | 'payLater'>('payNow');
+    const [paymentStatus, setPaymentStatus] = useState<'idle' | 'pending' | 'success' | 'failed'>('idle');
+    const [orderId, setOrderId] = useState<string>('');
+    const [giftRequestId, setGiftRequestId] = useState<string>('');
+    const [totalAmount, setTotalAmount] = useState<number>(0);
+    const [showRazorpay, setShowRazorpay] = useState(false);
+
+    useEffect(() => {
+        const totalRequestedTrees = treesCount;
+        setTotalAmount(totalRequestedTrees * 2000);
+    }, [treesCount]);
+
+    useEffect(() => {
+        if (paymentStatus === 'pending' && orderId) {
+            setShowRazorpay(true);
+        } else {
+            setShowRazorpay(false);
+        }
+    }, [paymentStatus, orderId]);
 
     useEffect(() => {
         // Initialize form with existing transaction data if in edit mode
@@ -170,7 +194,7 @@ const RedeemGiftTreeDialog: React.FC<RedeemGiftTreeDialogProps> = ({
             
             setFormData(newFormData);
             setInitialFormData(newFormData);
-            
+
             // Set event type
             if (existingTransaction.occasion_type) {
                 const eventType = EventTypes.find(et => et.value === existingTransaction.occasion_type);
@@ -178,7 +202,7 @@ const RedeemGiftTreeDialog: React.FC<RedeemGiftTreeDialogProps> = ({
                     setSelectedEventType(eventType);
                 }
             }
-            
+
             // Set messages
             const newMessages = {
                 primaryMessage: existingTransaction.primary_message || '',
@@ -190,7 +214,7 @@ const RedeemGiftTreeDialog: React.FC<RedeemGiftTreeDialogProps> = ({
             
             setMessages(newMessages);
             setInitialMessages(newMessages);
-            
+
             // Set trees count if applicable
             if (existingTransaction.trees_count) {
                 setTreesCount(existingTransaction.trees_count);
@@ -247,9 +271,6 @@ const RedeemGiftTreeDialog: React.FC<RedeemGiftTreeDialogProps> = ({
         if (isNaN(count)) {
             setErrors({ ...errors, trees_count: `Please provide number of trees to gift` });
             return false;
-        } else if (count > availableTrees) {
-            setErrors({ ...errors, trees_count: `Cannot gift more than ${availableTrees} trees. Only ${availableTrees} trees available.` });
-            return false;
         } else {
             setErrors({ ...errors, trees_count: '' });
             return true;
@@ -299,7 +320,7 @@ const RedeemGiftTreeDialog: React.FC<RedeemGiftTreeDialogProps> = ({
     const getChangedFields = () => {
         const mask: string[] = [];
         const data: Record<string, any> = {};
-        
+
         // Check form data changes
         if (formData.name !== initialFormData.name) {
             mask.push('name');
@@ -335,7 +356,7 @@ const RedeemGiftTreeDialog: React.FC<RedeemGiftTreeDialogProps> = ({
             mask.push('gifted_on');
             data.gifted_on = formData.gifted_on + 'T00:00:00Z';
         }
-        
+
         // Check message changes
         if (messages.primaryMessage !== initialMessages.primaryMessage) {
             mask.push('primary_message');
@@ -351,7 +372,14 @@ const RedeemGiftTreeDialog: React.FC<RedeemGiftTreeDialogProps> = ({
     };
 
     const handleSubmit = async () => {
+        if (giftType === 'existing') {
+            await handleRedeemFromInventory();
+        } else {
+            await handlePurchaseNewTrees();
+        }
+    };
 
+    const handleRedeemFromInventory = async () => {
         if (availableTrees < treesCount) {
             toast.error(`Not enough trees available for gifting. You opted to gift ${treesCount} trees but there is only ${availableTrees} available in inventory.`);
             return;
@@ -369,7 +397,6 @@ const RedeemGiftTreeDialog: React.FC<RedeemGiftTreeDialogProps> = ({
             const apiClient = new ApiClient();
 
             if (isEditMode && existingTransaction) {
-                // Update existing transaction
                 const { mask, data } = getChangedFields();
                 
                 if (mask.length === 0) {
@@ -379,7 +406,6 @@ const RedeemGiftTreeDialog: React.FC<RedeemGiftTreeDialogProps> = ({
                     return;
                 }
                 
-                // If profile image was changed
                 if (profileImage) {
                     mask.push('profile_image_url');
                     data.profile_image_url = profileImageUrl;
@@ -388,7 +414,6 @@ const RedeemGiftTreeDialog: React.FC<RedeemGiftTreeDialogProps> = ({
                 await apiClient.updateTransaction(existingTransaction.id, mask, data);
                 toast.success("Transaction updated successfully!");
             } else {
-                // Create new transaction
                 const data: any = {
                     ...formData,
                     email: formData.email || formData.name.trim().split(' ').join('.').toLowerCase() + '@14trees',
@@ -415,6 +440,113 @@ const RedeemGiftTreeDialog: React.FC<RedeemGiftTreeDialogProps> = ({
         }
     };
 
+    const handlePurchaseNewTrees = async () => {
+        try {
+            setLoading(true);
+            let profileImageUrl: string | null = null;
+            
+            if (profileImage) {
+                const awsUtils = new AWSUtils();
+                profileImageUrl = await awsUtils.uploadFileToS3("gift-request", profileImage, tree.requestId);
+            }
+
+            const apiClient = new ApiClient();
+            const data: any = {
+                ...formData,
+                email: formData.email || formData.name.trim().split(' ').join('.').toLowerCase() + '@14trees',
+            };
+
+            const entityType = userId ? 'user' : 'group';
+            const entityId = userId || groupId || 0;
+
+            const response = await apiClient.createGiftCardRequestV2(
+                entityId,
+                formData.name,
+                formData.email || formData.name.trim().split(' ').join('.').toLowerCase() + '@14trees',
+                treesCount,
+                formData.event_type || "3",
+                formData.event_name,
+                formData.gifted_by,
+                ["Corporate", "PayLater"],
+                [{
+                    recipient_name: formData.name,
+                    recipient_email: formData.email || formData.name.trim().split(' ').join('.').toLowerCase() + '@14trees',
+                    recipient_communication_email: formData.communication_email || null,
+                    gifted_trees: treesCount,
+                    image_url: profileImageUrl,
+                    assignee_name: formData.name,
+                    assignee_email: formData.email || formData.name.trim().split(' ').join('.').toLowerCase() + '@14trees',
+                    assignee_communication_email: formData.communication_email || null,
+                    gifted_on: formData.gifted_on,
+                    gifted_by: formData.gifted_by,
+                    event_name: formData.event_name,
+                }],
+                messages.logoMessage,
+                messages.primaryMessage
+            );
+
+            if (response.order_id) {
+                setOrderId(response.order_id);
+            }
+            if (response.gift_request?.id) {
+                setGiftRequestId(response.gift_request.id.toString());
+            }
+
+            setStep(2); // Move to payment choice step
+        } catch (error: any) {
+            toast.error(error.message || "Failed to create gift card request");
+            setPaymentStatus('failed');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handlePaymentSuccess = async () => {
+        try {
+            setPaymentStatus('success');
+            setLoading(true);
+            const apiClient = new ApiClient();
+            await apiClient.paymentSuccessForGiftRequest(Number(giftRequestId), true);
+            toast.success("Payment successful! Gift cards will be created shortly.");
+            onSubmit();
+            onClose();
+        } catch (error: any) {
+            toast.error('Payment successful but failed to update status. Please contact support.');
+            setPaymentStatus('failed');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handlePaymentFailure = () => {
+        setPaymentStatus('failed');
+        toast.error('Payment failed. Please try again later or contact support.');
+    };
+
+    const handleRetryPayment = () => {
+        setPaymentStatus('pending');
+    };
+
+    const handlePayLater = async () => {
+        if (!giftRequestId) return;
+        setLoading(true);
+        try {
+            const apiClient = new ApiClient();
+            const pdfUrl = await apiClient.sendFundRequestInMail(Number(giftRequestId));
+            toast.success('Fund request sent to billing email.');
+            onClose();
+        } catch (error: any) {
+            toast.error(error.message || 'Failed to send fund request.');
+        } finally {
+            setLoading(false);
+            setPaymentStatus('idle');
+        }
+    };
+
+    const handleProceedToPay = () => {
+        setPaymentStatus('pending');
+    };
+
     const handleEventTypeSelection = (e: any, item: { value: string, label: string } | null) => {
         setFormData(prev => ({
             ...prev,
@@ -433,274 +565,404 @@ const RedeemGiftTreeDialog: React.FC<RedeemGiftTreeDialogProps> = ({
         setTreesCount(value);
     };
 
+    const handlePreviewNext = () => {
+        setShowGiftTypeDialog(true);
+    };
+
+    const handleGiftTypeSelection = (type: 'existing' | 'new') => {
+        setGiftType(type);
+        setShowGiftTypeDialog(false);
+        if (type === 'existing') {
+            handleRedeemFromInventory();
+        } else {
+            handlePurchaseNewTrees();
+        }
+    };
+
+    const renderGiftTypeDialog = () => (
+        <Dialog open={showGiftTypeDialog} onClose={() => setShowGiftTypeDialog(false)}>
+            <DialogTitle>Choose Gift Type</DialogTitle>
+            <DialogContent>
+                <Typography variant="body1" gutterBottom>
+                    Would you like to gift trees from your existing inventory or purchase new trees?
+                </Typography>
+                <FormControl component="fieldset" sx={{ mt: 2 }}>
+                    <FormGroup>
+                        <FormControlLabel
+                            control={
+                                <Radio
+                                    checked={giftType === 'existing'}
+                                    onChange={() => setGiftType('existing')}
+                                    color="success"
+                                    disabled={treesCount > availableTrees}
+                                />
+                            }
+                            label="Gift from Existing Inventory"
+                        />
+                        {treesCount > availableTrees && (
+                            <Typography color="error" variant="body2" sx={{ mt: 1 }}>
+                                Not enough trees available in inventory. You requested {treesCount}, but only {availableTrees} are available.
+                            </Typography>
+                        )}
+                        <FormControlLabel
+                            control={
+                                <Radio
+                                    checked={giftType === 'new'}
+                                    onChange={() => setGiftType('new')}
+                                    color="success"
+                                />
+                            }
+                            label="Purchase New Trees"
+                        />
+                    </FormGroup>
+                </FormControl>
+            </DialogContent>
+            <DialogActions>
+                <Button onClick={() => setShowGiftTypeDialog(false)} color="error">
+                    Cancel
+                </Button>
+                <Button 
+                    onClick={() => handleGiftTypeSelection(giftType)} 
+                    color="success" 
+                    variant="contained"
+                >
+                    Continue
+                </Button>
+            </DialogActions>
+        </Dialog>
+    );
+
+    const renderPaymentChoiceStep = () => (
+        <Box>
+            <Typography variant="h6" gutterBottom>Choose Payment Option</Typography>
+            <RadioGroup
+                value={paymentOption}
+                onChange={e => setPaymentOption(e.target.value as 'payNow' | 'payLater')}
+            >
+                <FormControlLabel value="payNow" control={<Radio color="success" />} label="Pay Now" />
+                <FormControlLabel value="payLater" control={<Radio color="success" />} label="Send Fund Request to Billing Email (Pay Later)" />
+            </RadioGroup>
+            {paymentOption === 'payNow' ? (
+                <Typography sx={{ mt: 2 }}>
+                    You will be redirected to Razorpay to complete your payment securely.
+                </Typography>
+            ) : (
+                <Typography sx={{ mt: 2 }}>
+                    A fund request will be sent to your billing email. You can complete the payment later via bank transfer.
+                </Typography>
+            )}
+        </Box>
+    );
+
     const dialogTitle = isEditMode 
         ? "✏️ Edit Gift Details" 
         : `🌳 Gift ${giftMultiple ? 'Trees' : 'a Tree'}`;
 
-    const submitButtonText = isEditMode 
-        ? "Update Gift" 
-        : "Gift";
-
     return (
-        <Dialog open={open} fullWidth maxWidth='xl'>
-            <DialogTitle>{dialogTitle}</DialogTitle>
-            <form onSubmit={handleRedeemGiftTreeDialog}>
-                <DialogContent dividers>
-                    <Box
-                        hidden={step !== 0}
-                    >
-                        <Box
-                            sx={{
-                                maxWidth: '100%',
-                                display: 'flex',
-                                flexDirection: isMobile ? 'column' : 'row',
-                                justifyContent: 'space-between',
-                                position: 'relative',
-                            }}
-                            className={classes.backgroundImage}
-                        >
-                            {!isMobile && (
-                                <Box 
-                                    component={'img'} 
-                                    src={treePlanting} 
-                                    sx={{ 
-                                        maxWidth: '45%', 
-                                        height: 'auto', 
-                                        zIndex: 1, 
-                                        borderRadius: 2, 
-                                        boxShadow: '0.3em 0.3em 1em rgba(12, 123, 115, 0.8)' 
-                                    }}
-                                />
-                            )}
-                            <Box sx={{ 
-                                display: 'flex', 
-                                justifyContent: 'center', 
-                                alignItems: 'center', 
-                                margin: 'auto', 
-                                padding: isMobile ? '0px' : '0px 0px 10px 30px',
-                                width: isMobile ? '100%' : 'auto'
-                            }}>
-                                <Grid container rowSpacing={2} columnSpacing={1}>
-                                    <Grid item xs={12}>
-                                        <TextField
-                                            name="name"
-                                            label="Recipient Name"
-                                            required
-                                            value={formData.name}
-                                            onChange={handleInputChange}
-                                            error={!!errors.name}
-                                            helperText={errors.name}
-                                            fullWidth
-                                        />
-                                    </Grid>
-                                    <Grid item xs={12}>
-                                        <TextField
-                                            name="email"
-                                            label="Recipient Email"
-                                            value={formData.email}
-                                            onChange={handleInputChange}
-                                            error={!!errors.email}
-                                            helperText={errors.email ? errors.email : formData.email ? "will be used to send gift notification" : formData.communication_email ? "Recipient will use communication email for updates" : "Optional - for sending gift notification"}
-                                            fullWidth
-                                        />
-                                    </Grid>
-                                    <Grid item xs={12}>
-                                        <TextField
-                                            name="communication_email"
-                                            label="Communication Email"
-                                            value={formData.communication_email}
-                                            onChange={handleInputChange}
-                                            error={!!errors.communication_email}
-                                            helperText={errors.communication_email ? "Will be used for notifications" : "Optional - alternative email for notifications"}
-                                            fullWidth
-                                        />
-                                    </Grid>
-                                    <Grid item xs={12}>
-                                        <TextField
-                                            name="phone"
-                                            label="Recipient Phone (optional)"
-                                            value={formData.phone}
-                                            onChange={handleInputChange}
-                                            error={!!errors.phone}
-                                            helperText={errors.phone}
-                                            fullWidth
-                                        />
-                                    </Grid>
-                                    {giftMultiple && !isEditMode && <Grid item xs={12} sm={6}>
-                                        <TextField
-                                            name="trees_count"
-                                            label="Number of Trees"
-                                            value={treesCount}
-                                            onChange={handleNumberChange}
-                                            inputProps={{ min: 1 }}
-                                            type="number"
-                                            error={!!errors.trees_count}
-                                            helperText={errors.trees_count}
-                                            fullWidth
-                                        />
-                                    </Grid>}
-                                    <Grid item xs={12} sm={giftMultiple && !isEditMode ? 6 : 12}>
-                                        <div style={{ 
-                                            display: 'flex', 
-                                            alignItems: 'center', 
-                                            marginBottom: 16,
-                                            // flexDirection: isMobile ? 'column' : 'row',
-                                            gap: isMobile ? '10px' : '0'
-                                        }}>
-                                            <Avatar
-                                                src={profileImage ? URL.createObjectURL(profileImage) : undefined}
-                                                alt="User"
-                                                sx={{ 
-                                                    width: 80, 
-                                                    height: 80, 
-                                                    marginRight: isMobile ? 0 : 2,
-                                                    marginBottom: isMobile ? 1 : 0
-                                                }}
+        <>
+            <Dialog open={open} fullWidth maxWidth='xl'>
+                <DialogTitle>{dialogTitle}</DialogTitle>
+                <form onSubmit={handleRedeemGiftTreeDialog}>
+                    <DialogContent dividers>
+                        <Box hidden={step !== 0}>
+                            <Box
+                                sx={{
+                                    maxWidth: '100%',
+                                    display: 'flex',
+                                    flexDirection: isMobile ? 'column' : 'row',
+                                    justifyContent: 'space-between',
+                                    position: 'relative',
+                                }}
+                                className={classes.backgroundImage}
+                            >
+                                {!isMobile && (
+                                    <Box 
+                                        component={'img'} 
+                                        src={treePlanting} 
+                                        sx={{ 
+                                            maxWidth: '45%', 
+                                            height: 'auto', 
+                                            zIndex: 1, 
+                                            borderRadius: 2, 
+                                            boxShadow: '0.3em 0.3em 1em rgba(12, 123, 115, 0.8)' 
+                                        }}
+                                    />
+                                )}
+                                <Box sx={{ 
+                                    display: 'flex', 
+                                    justifyContent: 'center', 
+                                    alignItems: 'center', 
+                                    margin: 'auto', 
+                                    padding: isMobile ? '0px' : '0px 0px 10px 30px',
+                                    width: isMobile ? '100%' : 'auto'
+                                }}>
+                                    <Grid container rowSpacing={2} columnSpacing={1}>
+                                        <Grid item xs={12}>
+                                            <TextField
+                                                name="name"
+                                                label="Recipient Name"
+                                                required
+                                                value={formData.name}
+                                                onChange={handleInputChange}
+                                                error={!!errors.name}
+                                                helperText={errors.name}
+                                                fullWidth
                                             />
-                                            <Box sx={{
-                                                display: 'flex',
-                                                flexDirection: isMobile ? 'column' : 'row',
+                                        </Grid>
+                                        <Grid item xs={12}>
+                                            <TextField
+                                                name="email"
+                                                label="Recipient Email"
+                                                value={formData.email}
+                                                onChange={handleInputChange}
+                                                error={!!errors.email}
+                                                helperText={errors.email ? errors.email : formData.email ? "will be used to send gift notification" : formData.communication_email ? "Recipient will use communication email for updates" : "Optional - for sending gift notification"}
+                                                fullWidth
+                                            />
+                                        </Grid>
+                                        <Grid item xs={12}>
+                                            <TextField
+                                                name="communication_email"
+                                                label="Communication Email"
+                                                value={formData.communication_email}
+                                                onChange={handleInputChange}
+                                                error={!!errors.communication_email}
+                                                helperText={errors.communication_email ? "Will be used for notifications" : "Optional - alternative email for notifications"}
+                                                fullWidth
+                                            />
+                                        </Grid>
+                                        <Grid item xs={12}>
+                                            <TextField
+                                                name="phone"
+                                                label="Recipient Phone (optional)"
+                                                value={formData.phone}
+                                                onChange={handleInputChange}
+                                                error={!!errors.phone}
+                                                helperText={errors.phone}
+                                                fullWidth
+                                            />
+                                        </Grid>
+                                        {giftMultiple && !isEditMode && <Grid item xs={12} sm={6}>
+                                            <TextField
+                                                name="trees_count"
+                                                label="Number of Trees"
+                                                value={treesCount}
+                                                onChange={handleNumberChange}
+                                                inputProps={{ min: 1 }}
+                                                type="number"
+                                                error={!!errors.trees_count}
+                                                helperText={errors.trees_count}
+                                                fullWidth
+                                            />
+                                        </Grid>}
+                                        <Grid item xs={12} sm={giftMultiple && !isEditMode ? 6 : 12}>
+                                            <div style={{ 
+                                                display: 'flex', 
+                                                alignItems: 'center', 
+                                                marginBottom: 16,
                                                 gap: isMobile ? '10px' : '0'
                                             }}>
-                                                <Button variant="outlined" component="label" color='success'
-                                                    sx={{
+                                                <Avatar
+                                                    src={profileImage ? URL.createObjectURL(profileImage) : undefined}
+                                                    alt="User"
+                                                    sx={{ 
+                                                        width: 80, 
+                                                        height: 80, 
                                                         marginRight: isMobile ? 0 : 2,
-                                                        textTransform: 'none',
-                                                        backgroundColor: "white",
-                                                        "&:hover": {
-                                                            backgroundColor: "white", // Hover background color
-                                                        },
+                                                        marginBottom: isMobile ? 1 : 0
                                                     }}
-                                                >
-                                                    Add Recipient Pic
-                                                    <input
-                                                        value={''}
-                                                        type="file"
-                                                        hidden
-                                                        accept="image/*"
-                                                        onChange={handleImageChange}
-                                                    />
-                                                </Button>
-                                                {profileImage &&
-                                                    <Button variant="outlined" component="label" color='error'
+                                                />
+                                                <Box sx={{
+                                                    display: 'flex',
+                                                    flexDirection: isMobile ? 'column' : 'row',
+                                                    gap: isMobile ? '10px' : '0'
+                                                }}>
+                                                    <Button variant="outlined" component="label" color='success'
                                                         sx={{
+                                                            marginRight: isMobile ? 0 : 2,
                                                             textTransform: 'none',
                                                             backgroundColor: "white",
                                                             "&:hover": {
-                                                                backgroundColor: "white", // Hover background color
+                                                                backgroundColor: "white",
                                                             },
                                                         }}
-                                                        onClick={() => { setProfileImage(null) }}
                                                     >
-                                                        Remove Image
-                                                    </Button>}
-                                            </Box>
-                                        </div>
-                                        <Typography fontSize={10}>Recipient image will be used to create more personalised dashboard, but it is not required to redeem the tree.</Typography>
+                                                        Add Recipient Pic
+                                                        <input
+                                                            value={''}
+                                                            type="file"
+                                                            hidden
+                                                            accept="image/*"
+                                                            onChange={handleImageChange}
+                                                        />
+                                                    </Button>
+                                                    {profileImage &&
+                                                        <Button variant="outlined" component="label" color='error'
+                                                            sx={{
+                                                                textTransform: 'none',
+                                                                backgroundColor: "white",
+                                                                "&:hover": {
+                                                                    backgroundColor: "white",
+                                                                },
+                                                            }}
+                                                            onClick={() => { setProfileImage(null) }}
+                                                        >
+                                                            Remove Image
+                                                        </Button>}
+                                                </Box>
+                                            </div>
+                                            <Typography fontSize={10}>Recipient image will be used to create more personalised dashboard, but it is not required to redeem the tree.</Typography>
+                                        </Grid>
+                                        <Grid item xs={12} sm={6}>
+                                            <Autocomplete
+                                                fullWidth
+                                                value={selectedEventType}
+                                                options={EventTypes}
+                                                getOptionLabel={option => option.label}
+                                                onChange={handleEventTypeSelection}
+                                                renderInput={(params) => (
+                                                    <TextField
+                                                        {...params}
+                                                        name="event_type"
+                                                        label='Occasion Type'
+                                                    />
+                                                )}
+                                            />
+                                        </Grid>
+                                        <Grid item xs={12} sm={6}>
+                                            <TextField
+                                                fullWidth
+                                                label="Occasion Name"
+                                                name="event_name"
+                                                value={formData.event_name}
+                                                onChange={handleInputChange}
+                                            />
+                                        </Grid>
+                                        <Grid item xs={12} sm={6}>
+                                            <TextField
+                                                fullWidth
+                                                label="Gifted By"
+                                                name="gifted_by"
+                                                value={formData.gifted_by}
+                                                onChange={handleInputChange}
+                                            />
+                                        </Grid>
+                                        <Grid item xs={12} sm={6}>
+                                            <TextField
+                                                fullWidth
+                                                label="Gifted on"
+                                                name="gifted_on"
+                                                value={formData.gifted_on}
+                                                type="date"
+                                                onChange={handleInputChange}
+                                            />
+                                        </Grid>
                                     </Grid>
-                                    <Grid item xs={12} sm={6}>
-                                        <Autocomplete
-                                            fullWidth
-                                            value={selectedEventType}
-                                            options={EventTypes}
-                                            getOptionLabel={option => option.label}
-                                            onChange={handleEventTypeSelection}
-                                            renderInput={(params) => (
-                                                <TextField
-                                                    {...params}
-                                                    name="event_type"
-                                                    label='Occasion Type'
-                                                />
-                                            )}
-                                        />
-                                    </Grid>
-                                    <Grid item xs={12} sm={6}>
-                                        <TextField
-                                            fullWidth
-                                            label="Occasion Name"
-                                            name="event_name"
-                                            value={formData.event_name}
-                                            onChange={handleInputChange}
-                                        />
-                                    </Grid>
-                                    <Grid item xs={12} sm={6}>
-                                        <TextField
-                                            fullWidth
-                                            label="Gifted By"
-                                            name="gifted_by"
-                                            value={formData.gifted_by}
-                                            onChange={handleInputChange}
-                                        />
-                                    </Grid>
-                                    <Grid item xs={12} sm={6}>
-                                        <TextField
-                                            fullWidth
-                                            label="Gifted on"
-                                            name="gifted_on"
-                                            value={formData.gifted_on}
-                                            type="date"
-                                            onChange={handleInputChange}
-                                        />
-                                    </Grid>
-                                </Grid>
+                                </Box>
                             </Box>
                         </Box>
-                    </Box>
-                    <Box hidden={step !== 1} sx={{ maxWidth: '100%' }}>
-                        <CardDetails
-                            request_id={tree.requestId}
-                            presentationId={presentationId}
-                            slideId={slideId}
-                            messages={messages}
-                            onChange={(messages) => { setMessages(messages) }}
-                            onPresentationId={(presentationId: string, slideId: string) => { setPresentationId(presentationId); setSlideId(slideId); }}
-                            saplingId={!giftMultiple ? tree.saplingId : '000000'}
-                            plantType={!giftMultiple ? tree.plantType : undefined}
-                            userName={formData.name.trim() ? formData.name.trim() : undefined}
-                            logo_url={tree.logoUrl}
-                            treesCount={treesCount}
-                            isPersonal={userId ? true : false}
-                        />
-                    </Box>
-                </DialogContent>
-                <DialogActions sx={{ 
-                    flexDirection: isMobile ? 'column' : 'row',
-                    alignItems: 'stretch',
-                    justifyContent: isMobile ? 'center' : 'flex-end',
-                    '& > button': {
-                        margin: isMobile ? '5px 0' : undefined,
-                        width: isMobile ? '100%' : undefined
-                    },
-                    '& >:not(:first-of-type)': {
-                        marginLeft: isMobile ? 0 : 1
-                    }
-                }}>
-                    <Button onClick={onClose} color="error" variant="outlined">
-                        Cancel
-                    </Button>
-                    {step === 0 && <Button
-                        variant="contained" color="success" type="submit"
-                        style={{ textTransform: 'none' }}
-                        disabled={!!errors.name || !!errors.phone || !!errors.email || !!errors.trees_count}
-                    >{isEditMode ? "Preview Updated Gift Card" : "Preview Gift Card"}</Button>}
-                    {step === 1 && <Button
-                        variant="contained" color="success"
-                        onClick={() => { setStep(0); }} style={{ textTransform: 'none' }}
-                    >
-                        Go Back
-                    </Button>}
-                    {step === 1 && <LoadingButton
-                        loading={loading}
-                        color="success" variant="contained"
-                        disabled={!!errors.name || !!errors.phone || !!errors.email}
-                        startIcon={isEditMode ? <Edit /> : <CardGiftcard />}
-                        onClick={handleSubmit}
-                    >
-                        {submitButtonText}
-                    </LoadingButton>}
-                </DialogActions>
-            </form>
-        </Dialog>
+                        <Box hidden={step !== 1} sx={{ maxWidth: '100%' }}>
+                            <CardDetails
+                                request_id={tree.requestId}
+                                presentationId={presentationId}
+                                slideId={slideId}
+                                messages={messages}
+                                onChange={(messages) => { setMessages(messages) }}
+                                onPresentationId={(presentationId: string, slideId: string) => { setPresentationId(presentationId); setSlideId(slideId); }}
+                                saplingId={!giftMultiple ? tree.saplingId : '000000'}
+                                plantType={!giftMultiple ? tree.plantType : undefined}
+                                userName={formData.name.trim() ? formData.name.trim() : undefined}
+                                logo_url={tree.logoUrl}
+                                treesCount={treesCount}
+                                isPersonal={userId ? true : false}
+                            />
+                        </Box>
+                        <Box hidden={step !== 2}>
+                            {renderPaymentChoiceStep()}
+                            {showRazorpay && orderId && (
+                                <Box sx={{ mt: 2 }}>
+                                    <Alert severity="warning" sx={{ mb: 2 }}>
+                                        Order ID: {giftRequestId}. Payment is required to complete the order!
+                                    </Alert>
+                                    <RazorpayComponent
+                                        amount={totalAmount}
+                                        orderId={orderId}
+                                        user={{
+                                            name: formData.name || '',
+                                            email: formData.email || '',
+                                        } as any}
+                                        description={`Purchase of ${treesCount} trees`}
+                                        onPaymentDone={handlePaymentSuccess}
+                                        onClose={handlePaymentFailure}
+                                    />
+                                </Box>
+                            )}
+                            {paymentStatus === 'success' && (
+                                <Alert severity="success" sx={{ mt: 2 }}>
+                                    Payment successful! Gift Request ID: {giftRequestId}
+                                </Alert>
+                            )}
+                            {paymentStatus === 'failed' && (
+                                <Alert severity="error" sx={{ mt: 2 }}>
+                                    Payment failed. The request will not be fulfilled without successful payment.
+                                    Please retry the payment or contact support if the issue persists.
+                                </Alert>
+                            )}
+                        </Box>
+                    </DialogContent>
+                    <DialogActions sx={{ 
+                        flexDirection: isMobile ? 'column' : 'row',
+                        alignItems: 'stretch',
+                        justifyContent: isMobile ? 'center' : 'flex-end',
+                        '& > button': {
+                            margin: isMobile ? '5px 0' : undefined,
+                            width: isMobile ? '100%' : undefined
+                        },
+                        '& >:not(:first-of-type)': {
+                            marginLeft: isMobile ? 0 : 1
+                        }
+                    }}>
+                        <Button onClick={onClose} color="error" variant="outlined">
+                            Cancel
+                        </Button>
+                        {step === 0 && <Button
+                            variant="contained" color="success" type="submit"
+                            style={{ textTransform: 'none' }}
+                            disabled={!!errors.name || !!errors.phone || !!errors.email || !!errors.trees_count}
+                        >Next</Button>}
+                        {step === 1 && <Button
+                            variant="contained" color="success"
+                            onClick={() => { setStep(0); }} style={{ textTransform: 'none' }}
+                        >
+                            Go Back
+                        </Button>}
+                        {step === 1 && <LoadingButton
+                            loading={loading}
+                            color="success" variant="contained"
+                            disabled={!!errors.name || !!errors.phone || !!errors.email}
+                            onClick={handlePreviewNext}
+                        >
+                            Next
+                        </LoadingButton>}
+                        {step === 2 && paymentOption === 'payNow' && <LoadingButton
+                            loading={loading}
+                            color="success" variant="contained"
+                            onClick={handleProceedToPay}
+                        >
+                            Proceed to Pay
+                        </LoadingButton>}
+                        {step === 2 && paymentOption === 'payLater' && <LoadingButton
+                            loading={loading}
+                            color="success" variant="contained"
+                            onClick={handlePayLater}
+                        >
+                            Get Fund Request
+                        </LoadingButton>}
+                    </DialogActions>
+                </form>
+            </Dialog>
+            {renderGiftTypeDialog()}
+        </>
     );
 };
 

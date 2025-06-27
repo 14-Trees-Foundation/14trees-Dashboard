@@ -1115,6 +1115,7 @@ const CSRBulkGift: React.FC<CSRBulkGiftProps> = ({ groupId, logoUrl, open, onClo
             const apiClient = new ApiClient();
             const pdfUrl = await apiClient.sendFundRequestInMail(Number(giftRequestId));
             toast.success('Fund request sent to billing email.');
+            onClose();
         } catch (error: any) {
             toast.error(error.message || 'Failed to send fund request.');
         } finally {
@@ -1147,14 +1148,6 @@ const CSRBulkGift: React.FC<CSRBulkGiftProps> = ({ groupId, logoUrl, open, onClo
                     A fund request will be sent to your billing email. You can complete the payment later via bank transfer.
                 </Typography>
             )}
-            <Box sx={{ mt: 3, display: 'flex', justifyContent: 'flex-end', gap: 2 }}>
-                <Button onClick={() => { setCurrentStep('summary'); setPaymentStatus('idle'); }} color="error" variant="outlined">Back</Button>
-                {paymentOption === 'payNow' ? (
-                    <Button onClick={handleProceedToPay} style={{ textTransform: 'none' }} color="success" variant="contained">Proceed to Pay</Button>
-                ) : (
-                    <Button onClick={handlePayLater} style={{ textTransform: 'none' }} color="success" variant="contained">Get Fund Request</Button>
-                )}
-            </Box>
         </Box>
     );
 
@@ -1203,6 +1196,31 @@ const CSRBulkGift: React.FC<CSRBulkGiftProps> = ({ groupId, logoUrl, open, onClo
                 <Button onClick={handleClose} variant="outlined" color="error" sx={{ textTransform: "none" }}>
                     {giftRequestId ? 'Close' : 'Cancel'}
                 </Button>
+
+                {/* Payment action buttons */}
+                {currentStep === 'paymentChoice' && (
+                    paymentOption === 'payNow' ? (
+                        <Button
+                            onClick={handleProceedToPay}
+                            style={{ textTransform: 'none' }}
+                            color="success"
+                            variant="contained"
+                        >
+                            Proceed to Pay
+                        </Button>
+                    ) : (
+                        <Button
+                            onClick={handlePayLater}
+                            style={{ textTransform: 'none' }}
+                            color="success"
+                            variant="contained"
+                        >
+                            Get Fund Request
+                        </Button>
+                    )
+                )}
+
+                {/* Other step navigation buttons */}
                 {!giftRequestId && currentStep === 'csv' && (
                     <Button
                         onClick={() => setCurrentStep('event')}
