@@ -1,4 +1,4 @@
-import { Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, Typography } from "@mui/material"
+import { Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, Typography, TextField } from "@mui/material"
 import { GiftCardUser } from "../../../../types/gift_card";
 import { useEffect, useState } from "react";
 import ApiClient from "../../../../api/apiClient/apiClient";
@@ -7,6 +7,7 @@ import { GridFilterItem } from "@mui/x-data-grid";
 import { TableColumnsType } from "antd";
 import getColumnSearchProps from "../../../../components/Filter";
 import GeneralTable from "../../../../components/GenTable";
+import FilterListIcon from '@mui/icons-material/FilterList';
 
 interface BookedTreesProps {
     giftCardRequestId: number
@@ -26,13 +27,17 @@ const BookedTrees: React.FC<BookedTreesProps> = ({ giftCardRequestId, visible, o
     const [existingBookedTrees, setExistingBookedTrees] = useState<GiftCardUser[]>([]);
     const [unMapConfirmation, setUnMapConfirmation] = useState(false);
     const [unMapAllConfirmation, setUnMapAllConfirmation] = useState(false);
+    const [filterValue, setFilterValue] = useState('');
+    const [filteredData, setFilteredData] = useState<GiftCardUser[]>([]);
 
     const getBookedTrees = async (giftRequestId: number) => {
         setLoading(true);
         try {
             const apiClient = new ApiClient();
             const bookedTreesResp = await apiClient.getBookedGiftTrees(giftRequestId, 0, -1);
-            setExistingBookedTrees(bookedTreesResp.results.map(item => ({ ...item, key: item.id })));
+            const data = bookedTreesResp.results.map(item => ({ ...item, key: item.id }))
+            setExistingBookedTrees(data);
+            setFilteredData(data);
         } catch (error: any) {
             toast.error(error.message);
         }
@@ -43,10 +48,30 @@ const BookedTrees: React.FC<BookedTreesProps> = ({ giftCardRequestId, visible, o
         getBookedTrees(giftCardRequestId);
     }, [giftCardRequestId])
 
-    const handleSetFilters = (filters: Record<string, GridFilterItem>) => {
-        setPage(0);
-        setFilters(filters);
-    }
+    const applyFilters = () => {
+        if (!filterValue.trim()) {
+            setFilteredData(existingBookedTrees);
+            return;
+        }
+
+        const searchTerms = filterValue.split(',').map(term => term.trim().toLowerCase()).slice(0, 5);
+        
+        const filtered = existingBookedTrees.filter(item => {
+            const itemValue = String(item.sapling_id).toLowerCase();
+            return searchTerms.some(term => itemValue.includes(term));
+        });
+
+        setFilteredData(filtered);
+    };
+
+    const handleApplyFilter = () => {
+        applyFilters();
+    };
+
+    const handleResetFilter = () => {
+        setFilterValue('');
+        setFilteredData(existingBookedTrees);
+    };
 
     const columns: TableColumnsType<GiftCardUser> = [
         {
@@ -56,6 +81,37 @@ const BookedTrees: React.FC<BookedTreesProps> = ({ giftCardRequestId, visible, o
             align: "center",
             width: 120,
             // ...getColumnSearchProps('sapling_id', filters, handleSetFilters)
+            filterDropdown: () => (
+                <Box sx={{ p: 2, width: 250 }}>
+                    <TextField
+                        value={filterValue}
+                        onChange={(e) => setFilterValue(e.target.value)}
+                        placeholder="Search sapling IDs"
+                        fullWidth
+                        size="small"
+                        sx={{ mb: 2 }}
+                    />
+                    
+                    <Box display="flex" justifyContent="space-between">
+                        <Button 
+                            variant="outlined" 
+                            size="small" 
+                            onClick={handleResetFilter}
+                        >
+                            Reset
+                        </Button>
+                        <Button 
+                            variant="contained" 
+                            size="small" 
+                            onClick={handleApplyFilter}
+                            sx={{ ml: 1 }}
+                        >
+                            Apply
+                        </Button>
+                    </Box>
+                </Box>
+            ),
+            render: text => text,
         },
         {
             dataIndex: "plant_type",
@@ -113,6 +169,14 @@ const BookedTrees: React.FC<BookedTreesProps> = ({ giftCardRequestId, visible, o
         }
     }
 
+    // Filter data based on search text
+  //  const filteredData = existingBookedTrees.filter(item => {
+  //      if (searchedColumn === 'sapling_id' && searchText) {
+  //          return String(item.sapling_id).toLowerCase().includes(searchText.toLowerCase());
+  //      }
+ //       return true;
+ //   });
+
     return (
         <Box
             hidden={existingBookedTrees.length > 0 ? false : !visible}
@@ -141,9 +205,9 @@ const BookedTrees: React.FC<BookedTreesProps> = ({ giftCardRequestId, visible, o
             </Box>
             <GeneralTable
                 loading={loading}
-                rows={existingBookedTrees.slice(page * pageSize, (page + 1) * pageSize)}
+                rows={filteredData.slice(page * pageSize, (page + 1) * pageSize)}
                 columns={columns}
-                totalRecords={existingBookedTrees.length}
+                totalRecords={filteredData.length}
                 page={page}
                 pageSize={pageSize}
                 onSelectionChanges={handleSelectionChanges}

@@ -1190,6 +1190,7 @@ const GiftTrees: FC = () => {
                         onDiversifyChange={(value) => { setDiversify(value) }}
                         bookAllHabits={bookAllHabits}
                         onBookAllHabitsChange={(value) => { setBookAllHabits(value) }}
+                        requestType={selectedGiftCard.request_type ?? undefined} 
                     />}
                 </DialogContent>
                 <DialogActions>
