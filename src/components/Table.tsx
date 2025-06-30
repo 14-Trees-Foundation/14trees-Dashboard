@@ -84,7 +84,12 @@ function TableComponent({ loading, dataSource, columns, totalRecords, tableName,
 
     const [download, setDownload] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
-    const [checkedList, setCheckedList] = useState(columns?.filter(item => !item.hidden)?.map((item) => item.key) ?? []);
+    const [checkedList, setCheckedList] = useState<string[]>(() => {
+        const savedColumns = localStorage.getItem(`tableColumns-${tableName}`);
+        return savedColumns 
+          ? JSON.parse(savedColumns) 
+          : columns?.filter(item => !item.hidden)?.map((item) => item.key) ?? [];
+      });
     const [open, setOpen] = useState(false);
     const [tableCols, setTableCols] = useState<any[]>([]);
     const [showLabels, setShowLabels] = useState(false);
@@ -178,6 +183,7 @@ function TableComponent({ loading, dataSource, columns, totalRecords, tableName,
 
     const handleColumnsSelection = (key: string) => {
         const newSelected = checkedList.includes(key) ? checkedList.filter((item) => item !== key) : [...checkedList, key];
+        localStorage.setItem(`tableColumns-${tableName}`, JSON.stringify(newSelected));
         setCheckedList(newSelected);
     }
 
