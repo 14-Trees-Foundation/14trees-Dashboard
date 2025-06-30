@@ -238,7 +238,7 @@ class ApiClient {
 
 
     async getPlotsByType(type: 'donation' | 'gift', filters?: any[], order_by?: any[]): Promise<PaginatedResponse<Plot>> {
-        const url = `/auto-process/getPlot`;
+        const url = `/auto-process/getPlots`;
 
         try {
             const response = await this.api.post<PaginatedResponse<Plot>>(url, { filters, order_by }, {
@@ -248,6 +248,28 @@ class ApiClient {
         } catch (error: any) {
             console.error('Error fetching plots by type:', error);
             throw new Error(`Failed to fetch ${type} plots: ${error.message}`);
+        }
+    }
+
+    async removeAutoProcessPlots(data: { plot_ids: number[]; type: 'donation' | 'gift' }): Promise<any> {
+        const url = `/auto-process/removePlots`;
+        try {
+            const response = await this.api.delete(url, { data });
+            return response.data;
+        } catch (error: any) {
+            console.error('Failed to remove auto-processing plots:', error);
+            throw new Error(`Failed to remove plots: ${error.message}`);
+        }
+    }
+
+    async removeAllAutoProcessPlots(data: { type: 'donation' | 'gift' }): Promise<any> {
+        const url = `/auto-process/removeAllPlots`;
+        try {
+            const response = await this.api.delete(url, { data });
+            return response.data;
+        } catch (error: any) {
+            console.error('Failed to remove all auto-processing plots:', error);
+            throw new Error(`Failed to remove all plots: ${error.message}`);
         }
     }
 

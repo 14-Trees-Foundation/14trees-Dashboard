@@ -181,9 +181,9 @@ const GiftTrees: FC = () => {
         setPersonalCount(personal);
     }, [giftCards]);
 
-    console.log("Gift Cards:", giftCards);
-    console.log("Corporate Count:", corporateCount);
-    console.log("Personal Count:", personalCount);
+    // console.log("Gift Cards:", giftCards);
+    // console.log("Corporate Count:", corporateCount);
+    // console.log("Personal Count:", personalCount);
 
 
     const getFilters = (filters: any) => {
@@ -1007,7 +1007,7 @@ const GiftTrees: FC = () => {
             align: "center",
             width: 120,
             render: (value) => value && value.length > 0 ? (
-                <Tooltip title={<div>{getValidationErrors(value).map(item => (<p>{item}</p>))}</div>}>
+                <Tooltip title={<div>{getValidationErrors(value).map((item, index) => (<p key={index}>{item}</p>))}</div>}>
                     <IconButton>
                         <ErrorOutline color="error" />
                     </IconButton>
