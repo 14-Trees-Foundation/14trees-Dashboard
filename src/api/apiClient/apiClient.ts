@@ -239,7 +239,7 @@ class ApiClient {
 
 
     async getPlotsByType(type: 'donation' | 'gift', filters?: any[], order_by?: any[]): Promise<PaginatedResponse<Plot>> {
-        const url = `/auto-process/getPlot`;
+        const url = `/auto-process/getPlots`;
 
         try {
             const response = await this.api.post<PaginatedResponse<Plot>>(url, { filters, order_by }, {
@@ -249,6 +249,28 @@ class ApiClient {
         } catch (error: any) {
             console.error('Error fetching plots by type:', error);
             throw new Error(`Failed to fetch ${type} plots: ${error.message}`);
+        }
+    }
+
+    async removeAutoProcessPlots(data: { plot_ids: number[]; type: 'donation' | 'gift' }): Promise<any> {
+        const url = `/auto-process/removePlots`;
+        try {
+            const response = await this.api.delete(url, { data });
+            return response.data;
+        } catch (error: any) {
+            console.error('Failed to remove auto-processing plots:', error);
+            throw new Error(`Failed to remove plots: ${error.message}`);
+        }
+    }
+
+    async removeAllAutoProcessPlots(data: { type: 'donation' | 'gift' }): Promise<any> {
+        const url = `/auto-process/removeAllPlots`;
+        try {
+            const response = await this.api.delete(url, { data });
+            return response.data;
+        } catch (error: any) {
+            console.error('Failed to remove all auto-processing plots:', error);
+            throw new Error(`Failed to remove all plots: ${error.message}`);
         }
     }
 
@@ -2719,6 +2741,40 @@ class ApiClient {
                 throw new Error(error.response.data.message);
             }
             throw new Error('Failed to update permission details');
+        }
+    }
+
+    async addViewUsers(view_id: number, users: any[]): Promise<View> {
+        try {
+            const response = await this.api.post<View>(`/view/addUsers`, { view_id, users }, {
+                headers: {
+                    "x-access-token": this.token,
+                    "content-type": "application/json",
+                }
+            });
+            return response.data;
+        } catch (error: any) {
+            if (error.response) {
+                throw new Error(error.response.data.message);
+            }
+            throw new Error('Failed to add users to view');
+        }
+    }
+    
+    async deleteViewUsers(view_id: number, users: any[]): Promise<View> {
+        try {
+            const response = await this.api.post<View>(`/view/deleteUsers`, { view_id, users }, {
+                headers: {
+                    "x-access-token": this.token,
+                    "content-type": "application/json",
+                }
+            });
+            return response.data;
+        } catch (error: any) {
+            if (error.response) {
+                throw new Error(error.response.data.message);
+            }
+            throw new Error('Failed to remove users from view');
         }
     }
 

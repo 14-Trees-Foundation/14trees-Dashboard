@@ -45,6 +45,7 @@ interface CSRBulkGiftProps {
     groupId: number
     logoUrl: string | null
     open: boolean
+    availableTrees: number
     onClose: () => void
     onSubmit: () => void
 }
@@ -73,7 +74,7 @@ const OPTIONAL_HEADERS = [
     "Gifted On",
 ];
 
-const CSRBulkGift: React.FC<CSRBulkGiftProps> = ({ groupId, logoUrl, open, onClose, onSubmit }) => {
+const CSRBulkGift: React.FC<CSRBulkGiftProps> = ({ groupId, logoUrl, open, onClose, onSubmit, availableTrees }) => {
     const [data, setData] = useState<string[][]>([]);
     const [headers, setHeaders] = useState<string[]>([]);
     const [errorsMap, setErrorsMap] = useState<Record<number, string[]>>({});
@@ -109,7 +110,6 @@ const CSRBulkGift: React.FC<CSRBulkGiftProps> = ({ groupId, logoUrl, open, onClo
     const [giftRequestId, setGiftRequestId] = useState<string>('');
     const [totalAmount, setTotalAmount] = useState<number>(0);
     const [totalTrees, setTotalTrees] = useState<number>(0);
-    const [userData, setUserData] = useState<any[]>([]);
 
     const userName = localStorage.getItem("userName");
     const userEmail = localStorage.getItem("userEmail");
@@ -418,7 +418,6 @@ const CSRBulkGift: React.FC<CSRBulkGiftProps> = ({ groupId, logoUrl, open, onClo
             const treesCount = preparedUserData.reduce((sum, user) => sum + user.trees_count, 0);
             setTotalTrees(treesCount);
             setTotalAmount(treesCount * 2000); // Assuming each tree costs 2000
-            setUserData(preparedUserData);
 
             const userData = prepareUserData();
             const users = userData.map(item => {
@@ -556,12 +555,29 @@ const CSRBulkGift: React.FC<CSRBulkGiftProps> = ({ groupId, logoUrl, open, onClo
         });
     };
 
+    useEffect(() => {
+        const totalRequestedTrees = prepareUserData().reduce((sum, user) => sum + Number(user.trees_count || 0), 0);
+        setGiftType(totalRequestedTrees <= availableTrees ? "existing" : "new")
+        setTotalTrees(totalRequestedTrees)
+    }, [inputMethod, data, manualUsers, messages])
+
+
     const handleSubmit = async () => {
         try {
             setIsSubmitting(true);
             const apiClient = new ApiClient();
 
             const userData = prepareUserData();
+
+            const treesCount = userData
+                .map(item => item.trees_count)
+                .reduce((prev, curr) => prev + curr, 0)
+
+            if (treesCount > availableTrees) {
+                toast.error(`Cannot gift more than ${availableTrees} trees. Only ${availableTrees} trees available.`);
+                setIsSubmitting(false);
+                return;
+            }
 
             await apiClient.bulkRedeemGiftCardTemplate(
                 'group',
@@ -646,7 +662,7 @@ const CSRBulkGift: React.FC<CSRBulkGiftProps> = ({ groupId, logoUrl, open, onClo
                 variant="fullWidth"
             >
                 <Tab label="Upload via CSV" value="csv" sx={{ fontWeight: 600, fontSize: 16 }} />
-                <Tab label="Add User Manually" value="manual" sx={{ fontWeight: 600, fontSize: 16 }} />
+                <Tab label="Add Recipients Manually" value="manual" sx={{ fontWeight: 600, fontSize: 16 }} />
             </Tabs>
             {inputMethod === 'csv' && (
                 <Box gap={2} mb={2}>
@@ -666,8 +682,6 @@ const CSRBulkGift: React.FC<CSRBulkGiftProps> = ({ groupId, logoUrl, open, onClo
                     users={manualUsers}
                     onChange={setManualUsers}
                     eventType={messages.eventType}
-                    imagePreviews={imagePreviews}
-                    onImageUpload={handleManualImageUpload}
                 />
             )}
             {headerErrors.length > 0 && (
@@ -823,10 +837,16 @@ const CSRBulkGift: React.FC<CSRBulkGiftProps> = ({ groupId, logoUrl, open, onClo
                                 checked={giftType === 'existing'}
                                 onChange={() => setGiftType('existing')}
                                 color="success"
+                                disabled={totalTrees > availableTrees}
                             />
                         }
                         label="Gift from Existing Inventory"
                     />
+                    {totalTrees > availableTrees && (
+                        <Typography color="error" variant="body2" sx={{ mt: 1 }}>
+                            Not enough trees available in inventory. You requested {totalTrees}, but only {availableTrees} are available.
+                        </Typography>
+                    )}
                     <FormControlLabel
                         control={
                             <Radio
@@ -1086,39 +1106,6 @@ const CSRBulkGift: React.FC<CSRBulkGiftProps> = ({ groupId, logoUrl, open, onClo
                 </Grid>
             </Box>
         );
-    };
-
-    const handleManualImageUpload = async (file: File): Promise<string> => {
-        try {
-            const formData = new FormData();
-            formData.append('file', file);
-            formData.append('request_id', requestId);
-
-            const response = await fetch('/api/upload', {
-                method: 'POST',
-                body: formData,
-            });
-
-            if (!response.ok) {
-                throw new Error('Failed to upload image');
-            }
-
-            const data = await response.json();
-            const imageUrl = data.url;
-            const imageName = file.name;
-
-            // Update imageUrls and imagePreviews
-            setImageUrls(prev => [...prev, imageUrl]);
-            setImagePreviews(prev => ({
-                ...prev,
-                [imageName]: imageUrl
-            }));
-
-            return imageName;
-        } catch (error) {
-            console.error('Error uploading image:', error);
-            throw error;
-        }
     };
 
     const handlePayLater = async () => {

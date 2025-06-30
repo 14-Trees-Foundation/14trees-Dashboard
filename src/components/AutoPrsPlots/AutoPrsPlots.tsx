@@ -1,11 +1,13 @@
-import { Box, Typography, Button } from "@mui/material";
+import { Box, Typography, Button, IconButton, Tooltip } from "@mui/material";
 import getColumnSearchProps, { getSortableHeader } from "../Filter";
 import { useState, useEffect } from "react";
 import { GridFilterItem } from "@mui/x-data-grid";
 import { Plot } from "../../types/plot";
 import GeneralTable from "../GenTable";
 import ApiClient from "../../api/apiClient/apiClient";
-import AddPlotsDialog from "./AddPlotsDialog"
+import AddPlotsDialog from "./AddPlotsDialog";
+import RemovePlotsDialog from "./RemovePlotsDialog";
+import DeleteIcon from '@mui/icons-material/Delete';
 
 interface Props {
     type: "donate" | "gift-trees";
@@ -18,7 +20,8 @@ const AutoPrsPlots: React.FC<Props> = ({ type }) => {
     const [page, setPage] = useState(0);
     const [pageSize, setPageSize] = useState(10);
     const [filters, setFilters] = useState<Record<string, GridFilterItem>>({});
-    const [dialogOpen, setDialogOpen] = useState(false)
+    const [dialogOpen, setDialogOpen] = useState(false);
+    const [removeDialogOpen, setRemoveDialogOpen] = useState(false);
     const [orderBy, setOrderBy] = useState<
         { column: string; order: "ASC" | "DESC" }[]
     >([]);
@@ -77,6 +80,20 @@ const AutoPrsPlots: React.FC<Props> = ({ type }) => {
             fetchPlotData();
         } catch (error) {
             console.error("Failed to add plots:", error);
+            throw error;
+        }
+    };
+
+    const handleRemovePlots = async (plotIds: string[]) => {
+        try {
+            const apiClient = new ApiClient();
+            await apiClient.removeAutoProcessPlots({
+                plot_ids: plotIds.map(id => Number(id)),
+                type: type === "donate" ? "donation" : "gift"
+            });
+            fetchPlotData();
+        } catch (error) {
+            console.error("Failed to remove plots:", error);
             throw error;
         }
     };
@@ -214,6 +231,26 @@ const AutoPrsPlots: React.FC<Props> = ({ type }) => {
             align: "right",
             width: 150,
         },
+        {
+            dataIndex: "action",
+            key: "action",
+            title: "Actions",
+            align: "center",
+            width: 120,
+            render: (_: any, record: Plot) => (
+                <Box display="flex" gap={1} justifyContent="center">
+                    <Tooltip title="Remove this plot">
+                        <IconButton
+                            color="error"
+                            size="small"
+                            onClick={() => handleRemovePlots([String(record.id)])}
+                        >
+                            <DeleteIcon />
+                        </IconButton>
+                    </Tooltip>
+                </Box>
+            ),
+        },
     ];
 
     const titleText =
@@ -227,13 +264,24 @@ const AutoPrsPlots: React.FC<Props> = ({ type }) => {
                 <Typography variant="h5" sx={{ fontWeight: 500 }}>
                     {titleText}
                 </Typography>
-                <Button
-                    variant="contained"
-                    color="success"
-                    onClick={() => setDialogOpen(true)}
-                >
-                    Add Plots
-                </Button>
+                <Box sx={{ display: 'flex', gap: 1 }}>
+                    <Button
+                        variant="contained"
+                        color="success"
+                        onClick={() => setDialogOpen(true)}
+                    >
+                        Add Plots
+                    </Button>
+                    <Button
+                        variant="outlined"
+                        color="error"
+                        startIcon={<DeleteIcon />}
+                        onClick={() => setRemoveDialogOpen(true)}
+                        disabled={tableRows.length === 0}
+                    >
+                        Remove Plots
+                    </Button>
+                </Box>
             </Box>
             <GeneralTable
                 loading={loading}
@@ -252,6 +300,13 @@ const AutoPrsPlots: React.FC<Props> = ({ type }) => {
                 onClose={() => setDialogOpen(false)}
                 type={type}
                 onAddPlots={handleAddPlots}
+            />
+            <RemovePlotsDialog
+                open={removeDialogOpen}
+                onClose={() => setRemoveDialogOpen(false)}
+                type={type}
+                currentPlots={tableRows}
+                onRemovePlots={handleRemovePlots}
             />
         </Box>
     );

@@ -387,7 +387,7 @@ const GiftCardsForm: FC<GiftCardsFormProps> = ({ loading, setLoading, step, logg
                 )}
 
                 {steps.map((step, index) => (
-                    <div hidden={currentStep !== index}>
+                    <div key={index} hidden={currentStep !== index}>
                         <div
                             style={{
                                 padding: 10,

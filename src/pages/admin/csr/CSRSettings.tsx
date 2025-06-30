@@ -1,11 +1,12 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
     Box,
     Avatar,
     IconButton,
     Card,
     Typography,
-    Divider
+    Divider,
+    Button
 } from "@mui/material";
 import { useTheme, useMediaQuery } from "@mui/material";
 import EditIcon from '@mui/icons-material/Edit';
@@ -14,10 +15,27 @@ import EditOrganizationDialog from "./EditOrganizationDialog";
 import ApiClient from "../../../api/apiClient/apiClient";
 import { Group } from "../../../types/Group";
 import { AWSUtils } from "../../../helpers/aws";
+import GeneralTable from "../../../components/GenTable";
+import { TableColumnsType } from "antd";
+import CSRSharePageDialog from "./CSRSharePageDialog";
+import {
+    Dialog,
+    DialogTitle,
+    DialogContent,
+    DialogActions,
+} from '@mui/material';
 
 type Props = {
     group: Group;
     onGroupChange: (group: Group) => void;
+}
+
+type View = {
+    users?: Array<{
+        id: number;
+        name: string;
+        email: string;
+    }>;
 }
 
 const CSRSettings: React.FC<Props> = ({ group, onGroupChange }) => {
@@ -25,9 +43,32 @@ const CSRSettings: React.FC<Props> = ({ group, onGroupChange }) => {
     const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
     const [editOrgDialogOpen, setEditOrgDialogOpen] = useState(false);
+    const [page, setPage] = useState(1);
+    const [pageSize, setPageSize] = useState(10);
+    const [users, setUsers] = useState<any[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+    const [userToDelete, setUserToDelete] = useState<number | null>(null);
 
-    const userName = localStorage.getItem("userName") || "";
-    const userEmail = localStorage.getItem("userEmail");
+    const fetchUsers = async () => {
+        try {
+            setLoading(true);
+            const apiClient = new ApiClient();
+            const view = await apiClient.getViewDetails(`/csr/dashboard/${group.id}`);
+            if (view?.users) {
+                setUsers(view.users);
+            }
+        } catch (error) {
+            toast.error("Failed to fetch users");
+            console.error(error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        fetchUsers();
+    }, [group.id]);
 
     const handleSaveOrganization = async (
         updatedData: { name: string; address: string; logo_url: string | null, billing_email: string; },
@@ -61,6 +102,37 @@ const CSRSettings: React.FC<Props> = ({ group, onGroupChange }) => {
         }
     };
 
+    const handleRemoveUserClick = (userId: number) => {
+        setUserToDelete(userId);
+        setDeleteDialogOpen(true);
+    };
+
+    const confirmRemoveUser = async () => {
+        if (!userToDelete) return;
+        
+        try {
+            const apiClient = new ApiClient();
+            const viewPath = `/csr/dashboard/${group.id}`;
+            const view = await apiClient.getViewDetails(viewPath);
+            
+            if (view?.id) {
+                await apiClient.deleteViewUsers(view.id, [{ id: userToDelete }]);
+                toast.success("User removed successfully");
+                fetchUsers(); // Refresh the user list
+            }
+        } catch (error) {
+            toast.error("Failed to remove user");
+            console.error(error);
+        } finally {
+            setDeleteDialogOpen(false);
+            setUserToDelete(null);
+        }
+    };
+
+    const handleUsersAdded = () => {
+        fetchUsers();
+    };
+
     const summaryCardStyle = {
         width: "100%",
         minHeight: "170px",
@@ -74,6 +146,40 @@ const CSRSettings: React.FC<Props> = ({ group, onGroupChange }) => {
             transform: "scale(1.03)"
         }
     };
+
+    const userColumns: TableColumnsType<any> = [
+        {
+            title: 'Name',
+            dataIndex: 'name',
+            key: 'name',
+            align: 'center' as const,
+            render: (text: string) => <Typography variant="body1">{text}</Typography>,
+        },
+        {
+            title: 'Email',
+            dataIndex: 'email',
+            key: 'email',
+            align: 'center' as const,
+            render: (email: string) => <Typography variant="body1">{email}</Typography>,
+        },
+        {
+            title: 'Actions',
+            key: 'actions',
+            align: 'center' as const,
+            render: (_: any, record: any) => (
+                <Box display="flex" justifyContent="center">
+                    <Button
+                        variant="outlined"
+                        color="error"
+                        size="small"
+                        onClick={() => handleRemoveUserClick(record.id)}
+                    >
+                        Remove
+                    </Button>
+                </Box>
+            ),
+        },
+    ];
 
     return (
         <Box mt={3} id="Setting-Details" sx={{ px: isMobile ? 1 : 2 }}>
@@ -147,56 +253,38 @@ const CSRSettings: React.FC<Props> = ({ group, onGroupChange }) => {
 
             <Divider sx={{ my: 4 }} />
 
-            {/* User Details */}
-            <Box sx={{
-                display: 'flex',
-                justifyContent: 'flex-start',
-                width: '100%',
-            }}>
-                <Card
-                    sx={{
-                        width: isMobile ? "100%" : "calc(60% + 20%)",
-                        minHeight: "110px",
-                        borderRadius: "12px",
-                        padding: "12px 20px",
-                        margin: "15px 0",
-                        background: "linear-gradient(145deg, #9faca3, #bdccc2)",
-                        boxShadow: "5px 5px 10px #9eaaa1, -5px -5px 10px #c4d4c9",
-                        transition: "transform 0.3s ease",
-                        '&:hover': {
-                            transform: "scale(1.02)"
-                        },
-                        display: 'flex',
-                        alignItems: 'center',
+            {/* Onboarded Users Table */}
+            <Box sx={{ mb: 4 }}>
+                <Box sx={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    mb: 2
+                }}>
+                    <Typography variant="h6" sx={{ fontWeight: 600 }}>
+                        Onboarded Users
+                    </Typography>
+                    <CSRSharePageDialog
+                        groupId={group.id}
+                        groupName={group.name}
+                        onUsersAdded={handleUsersAdded}
+                    />
+                </Box>
+                <GeneralTable
+                    rows={users}
+                    columns={userColumns}
+                    totalRecords={users.length}
+                    onDownload={async () => users}
+                    page={page}
+                    pageSize={pageSize}
+                    onPaginationChange={(newPage, newPageSize) => {
+                        setPage(newPage);
+                        setPageSize(newPageSize);
                     }}
-                >
-                    <Box sx={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: 2,
-                        width: '100%',
-                        justifyContent: 'flex-start'
-                    }}>
-                        <Avatar
-                            alt="User Avatar"
-                            sx={{
-                                width: 48,
-                                height: 48,
-                                backgroundColor: theme.palette.primary.main,
-                            }}
-                        >
-                            {userName?.[0]}
-                        </Avatar>
-                        <Box>
-                            <Typography variant="subtitle1" color="#000" sx={{ fontWeight: 500 }}>
-                                {userName}
-                            </Typography>
-                            <Typography variant="subtitle2" color="#000">
-                                {userEmail}
-                            </Typography>
-                        </Box>
-                    </Box>
-                </Card>
+                    footer={false}
+                    tableName="onboarded-users"
+                    loading={loading}
+                />
             </Box>
 
             <EditOrganizationDialog
@@ -210,6 +298,34 @@ const CSRSettings: React.FC<Props> = ({ group, onGroupChange }) => {
                 }}
                 onSave={handleSaveOrganization}
             />
+
+            {/* Delete Confirmation Dialog */}
+            <Dialog
+                open={deleteDialogOpen}
+                onClose={() => setDeleteDialogOpen(false)}
+                aria-labelledby="alert-dialog-title"
+                aria-describedby="alert-dialog-description"
+            >
+                <DialogTitle id="alert-dialog-title">
+                    Confirm Removal
+                </DialogTitle>
+                <DialogContent>
+                    <Typography variant="body1">
+                        Are you sure you want to remove this user?
+                    </Typography>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={() => setDeleteDialogOpen(false)} variant="outlined" color="error">Cancel</Button>
+                    <Button 
+                        onClick={confirmRemoveUser}
+                        variant="contained"
+                        color="success" 
+                        autoFocus
+                    >
+                        Yes
+                    </Button>
+                </DialogActions>
+            </Dialog>
         </Box>
     );
 };

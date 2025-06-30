@@ -440,6 +440,7 @@ const GiftTransactionSummary: React.FC<Props> = ({ transaction, onTransactionUpd
             {editDialogOpen && <RedeemGiftTreeDialog
                 open={editDialogOpen}
                 onClose={() => setEditDialogOpen(false)}
+                availableTrees={transaction.trees_count || 0}
                 onSubmit={() => {
                     setEditDialogOpen(false);
                     toast.success("Transaction details updated successfully");

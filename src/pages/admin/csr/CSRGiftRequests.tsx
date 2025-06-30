@@ -57,14 +57,6 @@ const CSRGiftRequests: React.FC<CSRGiftRequestsProps> = ({ groupId, selectedGrou
     }, []);
 
     useEffect(() => {
-        const handler = setTimeout(() => {
-            getGiftCardData();
-        }, 300)
-
-        return () => { clearTimeout(handler) };
-    }, [filters, orderBy, groupId]);
-
-    useEffect(() => {
 
         if (giftCardsData.loading) return;
         
@@ -91,40 +83,33 @@ const CSRGiftRequests: React.FC<CSRGiftRequestsProps> = ({ groupId, selectedGrou
     }, [pageSize, page, giftCardsData]);
 
     const getFilters = (filters: any, groupId: number) => {
-        const filtersData = JSON.parse(JSON.stringify(Object.values(filters))) as GridFilterItem[];
-        filtersData.forEach((item) => {
-            if (item.columnField === 'status') {
-                const items: string[] = [];
-                if ((item.value as string[]).includes('Pending')) {
-                    items.push('pending_plot_selection');
-                }
-                if ((item.value as string[]).includes('Completed')) {
-                    items.push('pending_assignment');
-                    items.push('completed');
-                }
-                item.value = items;
-            } else if (item.columnField === 'validation_errors' || item.columnField === 'notes') {
-                item.operatorValue = (item.value as string[]).includes('Yes') ? 'isNotEmpty' : 'isEmpty';
+        let filtersData = JSON.parse(JSON.stringify(Object.values(filters))) as GridFilterItem[];
+        const statusFilterIndex = filtersData.findIndex(item => item.columnField === 'status');
+        if (statusFilterIndex !== -1) {
+            const statusFilter = filtersData[statusFilterIndex];
+            const statuses: string[] = [];
+            
+            if ((statusFilter.value as string[]).includes('Pending Tree Allocation')) {
+                statuses.push('pending_plot_selection');
             }
-        });
+            
+            if ((statusFilter.value as string[]).includes('Trees Allocated')) {
+                statuses.push( 'pending_assignment', 'completed');
+            }
 
-        filtersData.push({
-            columnField: 'group_id',
-            operatorValue: 'equals',
-            value: groupId,
-        });
-
-        return filtersData;
+            filtersData[statusFilterIndex].value = statuses;
+        }
+    
+        return [
+            ...filtersData, 
+            {columnField: 'group_id', operatorValue: 'equals', value: groupId, },
+            { columnField: 'tags', operatorValue: 'contains', value: ['PrePurchased'], }
+        ];
     };
+
 
     const getGiftCardData = async () => {
         const filtersData = getFilters(filters, groupId);
-    
-        filtersData.push({
-            columnField: 'tags',
-            operatorValue: 'contains',
-            value: ['PrePurchased'],
-        });
     
         getGiftCards(page * pageSize, pageSize, filtersData, orderBy);
     };
@@ -132,7 +117,7 @@ const CSRGiftRequests: React.FC<CSRGiftRequestsProps> = ({ groupId, selectedGrou
     useEffect(() => {
         const handler = setTimeout(() => {
             getGiftCardData();
-        }, 300);
+        }, 500);
 
         return () => clearTimeout(handler);
     }, [filters, orderBy, groupId, page, pageSize]);
@@ -169,7 +154,7 @@ const CSRGiftRequests: React.FC<CSRGiftRequestsProps> = ({ groupId, selectedGrou
     };
 
     const getStatus = (card: GiftCard) => {
-        return card.status === 'pending_plot_selection' ? 'Pending' : 'Completed';
+        return card.status === 'pending_plot_selection' ? 'Pending Tree Allocation' : 'Trees Allocated';
     };
 
     const handleSortingChange = (sorter: any) => {
@@ -241,7 +226,7 @@ const CSRGiftRequests: React.FC<CSRGiftRequestsProps> = ({ groupId, selectedGrou
             align: "center",
             width: 150,
             render: (value, record, index) => getStatus(record),
-            ...getColumnSelectedItemFilter({ dataIndex: 'status', filters, handleSetFilters, options: ['Pending', 'Completed'] })
+            ...getColumnSelectedItemFilter({ dataIndex: 'status', filters, handleSetFilters, options: ['Pending Tree Allocation', 'Trees Allocated'] })
         },
         {
             dataIndex: "total_amount",

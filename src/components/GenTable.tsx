@@ -149,11 +149,11 @@ function GeneralTable({ loading, rows, columns, totalRecords, page, pageSize = 1
         setCheckedList(newSelected);
     }
 
-    const items: MenuProps['items'] = columns?.map((column: any) => {
+    const items: MenuProps['items'] = columns?.map((column: any, index: number) => {
         const title = typeof column.title === 'string' ? column.title : column.key;
         return {
             key: column.dataIndex,
-            label: <Checkbox checked={checkedList.includes(column.key)} onChange={() => handleColumnsSelection(column.key)}>{title}</Checkbox>
+            label: <Checkbox key={`checkbox-${column.key}-${index}`} checked={checkedList.includes(column.key)} onChange={() => handleColumnsSelection(column.key)}>{title}</Checkbox>
         }
     })
 

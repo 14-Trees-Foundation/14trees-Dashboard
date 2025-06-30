@@ -36,6 +36,7 @@ const CSRGiftTrees: React.FC<CSRGiftTreesProps> = ({ groupId, selectedGroup }) =
 
     const [giftDialogVisible, setGiftDialogVisible] = useState(false);
     const [selectedGiftTree, setSelectedGiftTree] = useState<Tree | null>(null);
+    const [availableTrees, setAvailableTrees] = useState(0);
     const [giftMultiple, setGiftMultiple] = useState(false);
     const [filter, setFilter] = useState<'gifted' | 'non-gifted' | 'all'>('all');
     const [searchUser, setSeachUser] = useState('');
@@ -112,6 +113,7 @@ const CSRGiftTrees: React.FC<CSRGiftTreesProps> = ({ groupId, selectedGroup }) =
 
             <GiftAnalytics
                 groupId={groupId}
+                onTreesChange={value => { setAvailableTrees(value) }}
                 onGiftMultiple={handleMultiTreesGift}
                 onBulkGifting={() => { setBulkGifting(true) }}
                 refreshTrigger={refreshTrigger}
@@ -131,12 +133,16 @@ const CSRGiftTrees: React.FC<CSRGiftTreesProps> = ({ groupId, selectedGroup }) =
                     label="Search trees by giftee's name"
                     value={searchUser}
                     onChange={(e) => { setSeachUser(e.target.value) }}
+                    disabled={filter === 'non-gifted'}
                     fullWidth
                     size="small"
                     sx={{
                         maxWidth: isMobile ? '100%' : '500px',
                         m: isMobile ? 0 : 1,
-                        mb: isMobile ? 2 : 1
+                        mb: isMobile ? 2 : 1,
+                        '& .MuiInputBase-root.Mui-disabled': {
+                            backgroundColor: theme.palette.action.disabledBackground,
+                        }
                     }}
                 />
                 <FormControl component="fieldset" sx={{ width: isMobile ? '100%' : 'auto' }}>
@@ -149,7 +155,7 @@ const CSRGiftTrees: React.FC<CSRGiftTreesProps> = ({ groupId, selectedGroup }) =
                     >
                         <FormControlLabel
                             value="non-gifted"
-                            control={<Radio color="success" checked={filter === 'non-gifted'} onChange={() => { setFilter('non-gifted') }} />}
+                            control={<Radio color="success" checked={filter === 'non-gifted'} onChange={() => { setFilter('non-gifted'); setSeachUser(''); }} />}
                             label="Show Available Trees"
                             labelPlacement="end"
                             sx={{ mr: 1 }}
@@ -185,11 +191,12 @@ const CSRGiftTrees: React.FC<CSRGiftTreesProps> = ({ groupId, selectedGroup }) =
                 }}
             />
 
-            {bulkGifting && <CSRBulkGift groupId={groupId} logoUrl={selectedGroup.logo_url} open={bulkGifting} onClose={() => { setBulkGifting(false); }} onSubmit={() => { setRefreshTrigger(prev => prev + 1); }} />}
+            {bulkGifting && <CSRBulkGift groupId={groupId} logoUrl={selectedGroup.logo_url} availableTrees={availableTrees} open={bulkGifting} onClose={() => { setBulkGifting(false); }} onSubmit={() => { setRefreshTrigger(prev => prev + 1); }} />}
 
             {giftDialogVisible && selectedGiftTree && (
                 <RedeemGiftTreeDialog
                     open={giftDialogVisible}
+                    availableTrees={availableTrees}
                     onClose={() => {
                         setGiftDialogVisible(false);
                         setGiftMultiple(false);
