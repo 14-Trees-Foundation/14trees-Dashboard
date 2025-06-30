@@ -58,10 +58,11 @@ interface PlotSelectionProps {
     onDiversifyChange: (value: boolean) => void
     bookAllHabits: boolean
     onBookAllHabitsChange: (value: boolean) => void
+    requestType?: string
 
 }
 
-const PlotSelection: FC<PlotSelectionProps> = ({ giftCardRequestId, totalTrees, requiredTrees, plots, onPlotsChange, onTreeSelection, bookNonGiftable, onBookNonGiftableChange, diversify, onDiversifyChange, bookAllHabits, onBookAllHabitsChange }) => {
+const PlotSelection: FC<PlotSelectionProps> = ({ giftCardRequestId, totalTrees, requiredTrees, plots, onPlotsChange, onTreeSelection, bookNonGiftable, onBookNonGiftableChange, diversify, onDiversifyChange, bookAllHabits, onBookAllHabitsChange, requestType }) => {
 
     const [page, setPage] = useState(0);
     const [loading, setLoading] = useState(false);
@@ -350,6 +351,12 @@ const PlotSelection: FC<PlotSelectionProps> = ({ giftCardRequestId, totalTrees, 
         setPageSize2(pageSize);
     }
 
+    useEffect(() => {
+        if (requestType === "Visit") {
+          onBookNonGiftableChange(true);
+        }
+      }, [requestType]);
+
     const treeColumns: TableColumnsType<any> = [
         {
             dataIndex: "sapling_id",
@@ -487,7 +494,8 @@ const PlotSelection: FC<PlotSelectionProps> = ({ giftCardRequestId, totalTrees, 
                             onClick={() => { setTreeSelectionModal(true); }}
                         >Select Manually</Button>
                     </Box>
-                    {selectedTrees.length === 0 && <Box
+                    {selectedTrees.length === 0 && (
+                     <Box
                         mt={2}
                         display="flex"
                         alignItems="center"
@@ -498,14 +506,19 @@ const PlotSelection: FC<PlotSelectionProps> = ({ giftCardRequestId, totalTrees, 
                             color="success"
                             value={bookNonGiftable ? "yes" : "no"}
                             exclusive
-                            onChange={(e, value) => { onBookNonGiftableChange(value === "yes" ? true : false); }}
-                            aria-label="Platform"
+                            onChange={(e, value) => {
+                                    if (value !== null) {
+                                        onBookNonGiftableChange(value === "yes");
+                                    }
+                                }}
+                            aria-label="Book Non Giftable"
                             size="small"
                         >
                             <ToggleButton value="yes">Yes</ToggleButton>
                             <ToggleButton value="no">No</ToggleButton>
                         </ToggleButtonGroup>
-                    </Box>}
+                    </Box>
+                    )}
                     {selectedTrees.length === 0 && <Box
                         mt={2}
                         display="flex"
@@ -551,7 +564,7 @@ const PlotSelection: FC<PlotSelectionProps> = ({ giftCardRequestId, totalTrees, 
             {!treeSelectionModal && selectedTrees.length > 0 && <Box mt={5}>
                 <Typography variant="h6" mb={1}>Below trees will be reserved for gift request after submission:</Typography>
                 <GeneralTable
-                    rows={selectedTrees.slice(page2*pageSize, (page2 + 1)*pageSize2)}
+                    rows={selectedTrees.slice(page2 * pageSize, (page2 + 1) * pageSize2)}
                     columns={treeColumns}
                     totalRecords={selectedTrees.length}
                     page={page2}
