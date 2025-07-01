@@ -120,9 +120,9 @@ function App() {
           <Route
             path="/tree-cards"
             element={
-              // <RequireAuth>
-              <User />
-              // </RequireAuth>
+              <RequireAuth>
+                <User />
+              </RequireAuth>
             }
           >
           </Route>
@@ -144,13 +144,13 @@ function App() {
             ></Route>
           </Route>
           <Route path="/ww/group" element={<WW />}>
-            <Route 
-              path=":group_id" 
-              element={ 
+            <Route
+              path=":group_id"
+              element={
                 <RequireAuth>
                   <GiftTrees />
                 </RequireAuth>
-              } 
+              }
             ></Route>
           </Route>
           <Route path="/events" element={<Events />}>
@@ -163,7 +163,7 @@ function App() {
               <RequireAuth>
                 <Test />
               </RequireAuth>
-            } 
+            }
           />
           <Route
             path="/csr/dashboard/:groupId"
@@ -171,7 +171,7 @@ function App() {
               <RequireAuth>
                 <CSRPage />
               </RequireAuth>
-            } 
+            }
           />
           <Route
             path="/personal/dashboard/:userId"
@@ -179,7 +179,7 @@ function App() {
               <RequireAuth>
                 <GiftDashboard />
               </RequireAuth>
-            } 
+            }
           />
         </Routes>
       </Layout>
