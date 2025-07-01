@@ -33,6 +33,7 @@ export const AdminLeftDrawer = () => {
   const navigate = useNavigate();
   const auth = useAuth();
   const [expanded, setExpanded] = useState(null);
+  const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
     // Check if we should bypass auth
