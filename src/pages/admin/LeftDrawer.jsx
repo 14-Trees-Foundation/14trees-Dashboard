@@ -35,7 +35,26 @@ export const AdminLeftDrawer = () => {
   const [expanded, setExpanded] = useState(null);
 
   useEffect(() => {
-    auth.signin("User", "user@example.com", 0, ["all"], ["super-admin"], "", () => {});
+    // Check if we should bypass auth
+    const bypassAuth = import.meta.env.VITE_BYPASS_AUTH === 'true';
+    
+    if (bypassAuth) {
+      // If bypassing auth, assume admin role
+      setIsAdmin(true);
+      return;
+    }
+    
+    const roles = localStorage.getItem("roles") || '[]';
+    try {
+      const rolesArr = JSON.parse(roles);
+      const admin = rolesArr.includes(UserRoles.Admin) || rolesArr.includes(UserRoles.SuperAdmin)
+      setIsAdmin(admin)
+      if (!admin) {
+        navigate("/tree-cards");
+      }
+    } catch (error) {
+      navigate("/login");
+    }
   }, []);
 
   useEffect(() => {

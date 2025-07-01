@@ -17,11 +17,23 @@ export const TreeLogCumulative = () => {
   const theme = useTheme();
   let treeByDate = useRecoilValue(treeLoggedByDate);
   let cumTree = 0;
-  treeByDate = [...treeByDate].reverse();
-  const data = treeByDate.map(({ _id, count }) => ({
-    date: _id,
-    total_tree: (cumTree += count),
-  }));
+  
+  // Ensure treeByDate is an array
+  const treeArray = Array.isArray(treeByDate) ? treeByDate : [];
+  
+  // Only reverse and map if we have data
+  const reversedData = [...treeArray].reverse();
+  
+  const data = reversedData.map(item => {
+    // Ensure _id and count exist and are valid
+    const id = item && item._id ? item._id : 'unknown';
+    const count = item && typeof item.count === 'number' ? item.count : 0;
+    
+    return {
+      date: id,
+      total_tree: (cumTree += count),
+    };
+  });
   return (
     <div
       style={{
