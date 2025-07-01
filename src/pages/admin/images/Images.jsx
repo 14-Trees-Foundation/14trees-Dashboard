@@ -1,7 +1,7 @@
 import { Box, Divider, Typography } from "@mui/material";
-import { TabsUnstyled } from "@mui/base";
+import { Tabs } from "@mui/base";
 
-import { Tab, TabsList, TabPanel } from "../../../components/CustomTabs";
+import { CustomTab as Tab, CustomTabsList as TabsList, CustomTabPanel as TabPanel } from "../../../components/CustomTabs";
 import { AddMemories } from "./components/AddMemories";
 
 export const Images = () => {
@@ -18,14 +18,14 @@ export const Images = () => {
       </div>
       <Divider sx={{ backgroundColor: "#ffffff" }} />
       <Box sx={{ p: 3 }}>
-        <TabsUnstyled defaultValue={0}>
+        <Tabs defaultValue={0}>
           <TabsList>
             <Tab>Add Memories</Tab>
           </TabsList>
           <TabPanel value={0}>
             <AddMemories />
           </TabPanel>
-        </TabsUnstyled>
+        </Tabs>
       </Box>
     </>
   );
