@@ -1,8 +1,8 @@
 import * as React from "react";
-import { TabsUnstyled } from "@mui/base";
+import { Tabs } from "@mui/base";
 import { useSetRecoilState } from "recoil";
 
-import { Tab, TabsList, TabPanel } from "../../../components/CustomTabs";
+import { CustomTab as Tab, CustomTabsList as TabsList, CustomTabPanel as TabPanel } from "../../../components/CustomTabs";
 import { Spinner } from "../../../components/Spinner";
 import Axios from "../../../api/local";
 import { AssignTree } from "./components/AssignTree";
@@ -62,7 +62,7 @@ export const Forms = () => {
     return <Spinner text={"Fetching Tree Data!"} />;
   } else {
     return (
-      <TabsUnstyled defaultValue={0}>
+      <Tabs defaultValue={0}>
         <div style={{ margin: "16px" }}>
           <TabsList>
             {/* <Tab>Map Trees</Tab> */}
@@ -141,7 +141,7 @@ export const Forms = () => {
         <TabPanel value={4}>
           <AddTree />
         </TabPanel>
-      </TabsUnstyled>
+      </Tabs>
     );
   }
 };

@@ -8,10 +8,10 @@ import {
   Autocomplete,
   TextField
 } from "@mui/material";
-import { TabsUnstyled } from "@mui/base";
+import { Tabs } from "@mui/base";
 import { useRecoilValue, useSetRecoilState, useRecoilState } from "recoil";
 
-import { Tab, TabsList, TabPanel } from "../../../components/CustomTabs";
+import { CustomTab as Tab, CustomTabsList as TabsList, CustomTabPanel as TabPanel } from "../../../components/CustomTabs";
 import * as Axios from "../../../api/local";
 import {
   searchTreeData,
@@ -139,7 +139,7 @@ export const Trees = () => {
           </div>
         </div>
         <Box sx={{ p: 3 }}>
-          <TabsUnstyled defaultValue={0}>
+          <Tabs defaultValue={0}>
             <TabsList>
               <Tab>Overall Summary</Tab>
               <Tab>{selectedPlotName}</Tab>
@@ -150,7 +150,7 @@ export const Trees = () => {
             <TabPanel value={1}>
               <Plotwise />
             </TabPanel>
-          </TabsUnstyled>
+          </Tabs>
           <Grid container spacing={3}>
             {Object.keys(searchTree).length > 0 && (
               <Grid item xs={12}>
