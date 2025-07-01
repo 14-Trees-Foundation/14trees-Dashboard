@@ -152,7 +152,7 @@ function GeneralTable({ loading, rows, columns, totalRecords, page, pageSize = 1
     const items: MenuProps['items'] = columns?.map((column: any, index: number) => {
         const title = typeof column.title === 'string' ? column.title : column.key;
         return {
-            key: column.dataIndex,
+            key: `${column.dataIndex || column.key}-${index}`,
             label: <Checkbox key={`checkbox-${column.key}-${index}`} checked={checkedList.includes(column.key)} onChange={() => handleColumnsSelection(column.key)}>{title}</Checkbox>
         }
     })
@@ -182,6 +182,7 @@ function GeneralTable({ loading, rows, columns, totalRecords, page, pageSize = 1
                 width: '100%'
             }}
             dataSource={rows}
+            rowKey={(record) => record.id || record.key || JSON.stringify(record)}
             columns={tableCols.map((col, index) => ({
                 ...col,
                 onHeaderCell: (column: any) => ({

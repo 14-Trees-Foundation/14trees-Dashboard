@@ -1,10 +1,11 @@
-export type GiftRequestType = 'Gift Cards' | 'Normal Assignment' | 'Promotion' | 'Test'
+export type GiftRequestType = 'Gift Cards' | 'Normal Assignment' | 'Promotion' | 'Test' | 'Visit'
 export type SponsorshipType = 'Unverified' | 'Pledged' | 'Promotional' | 'Unsponsored Visit' | 'Donation Received'
 
 export const GiftRequestType_CARDS_REQUEST: GiftRequestType = 'Gift Cards'
 export const GiftRequestType_NORAML_ASSIGNMENT: GiftRequestType = 'Normal Assignment'
 export const GiftRequestType_PROMOTION: GiftRequestType = 'Promotion'
 export const GiftRequestType_TEST: GiftRequestType = 'Test'
+export const GiftRequestType_VISIT: GiftRequestType = 'Visit'
 
 export type GiftCard = {
     key: number;

@@ -1,8 +1,5 @@
 import { styled } from "@mui/system";
-import TabsListUnstyled from "@mui/base/TabsListUnstyled";
-import TabPanelUnstyled from "@mui/base/TabPanelUnstyled";
-import { buttonUnstyledClasses } from "@mui/base/ButtonUnstyled";
-import TabUnstyled, { tabUnstyledClasses } from "@mui/base/TabUnstyled";
+import { TabsListUnstyled, TabPanelUnstyled, TabUnstyled, tabUnstyledClasses, buttonUnstyledClasses } from "@mui/base";
 
 export const Tab = styled(TabUnstyled)`
   color: #1f3625;

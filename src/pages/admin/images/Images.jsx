@@ -1,5 +1,5 @@
 import { Box, Divider, Typography } from "@mui/material";
-import TabsUnstyled from "@mui/base/TabsUnstyled";
+import { TabsUnstyled } from "@mui/base";
 
 import { Tab, TabsList, TabPanel } from "../../../components/CustomTabs";
 import { AddMemories } from "./components/AddMemories";

@@ -257,7 +257,7 @@ export const AdminHome = () => {
       }}
       >
         {adminSummary?.landTypeCounts && Object.entries(adminSummary.landTypeCounts).map(([key, value]) => (
-          <div className={classes.card}>
+          <div key={key} className={classes.card}>
             <Box sx={{ paddingTop: "10px" }}>
               <ParkTwoToneIcon fontSize="large" style={{ color: "#1F3625" }} />
               <Typography variant="h3" color="#fff" sx={{ pt: 1, pb: 1 }}>
