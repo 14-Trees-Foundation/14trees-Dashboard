@@ -32,7 +32,7 @@ const treeByPlots = atom({
 
 const treeLoggedByDate = atom({
   key: "treebydate",
-  default: {},
+  default: [],
 });
 
 const treeLogByPlotDate = atom({

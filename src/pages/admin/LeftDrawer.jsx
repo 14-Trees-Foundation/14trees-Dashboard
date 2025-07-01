@@ -34,6 +34,15 @@ export const AdminLeftDrawer = () => {
   const [expanded, setExpanded] = useState(null);
 
   useEffect(() => {
+    // Check if we should bypass auth
+    const bypassAuth = import.meta.env.VITE_BYPASS_AUTH === 'true';
+    
+    if (bypassAuth) {
+      // If bypassing auth, assume admin role
+      setIsAdmin(true);
+      return;
+    }
+    
     const roles = localStorage.getItem("roles") || '[]';
     try {
       const rolesArr = JSON.parse(roles);

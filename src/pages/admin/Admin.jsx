@@ -43,11 +43,18 @@ export const AdminLayout = () => {
       // Fetch tree data
       const treesResponse = await Axios.default.get(`/trees/loggedbydate`);
       if (treesResponse.status === 200) {
-        const formattedData = treesResponse.data.map(element => ({
-          ...element,
-          _id: element._id.substring(0, 10)
-        }));
-        setTreeLoggedByDate(formattedData);
+        // Check if the response data is an array
+        if (Array.isArray(treesResponse.data)) {
+          const formattedData = treesResponse.data.map(element => ({
+            ...element,
+            _id: element._id.substring(0, 10)
+          }));
+          setTreeLoggedByDate(formattedData);
+        } else {
+          // Handle case where data is not an array
+          console.warn("Tree logged by date data is not an array:", treesResponse.data);
+          setTreeLoggedByDate([]); // Set to empty array as fallback
+        }
       }
 
     
