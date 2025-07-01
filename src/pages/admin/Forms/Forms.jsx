@@ -1,5 +1,5 @@
 import * as React from "react";
-import TabsUnstyled from "@mui/base/TabsUnstyled";
+import { TabsUnstyled } from "@mui/base";
 import { useSetRecoilState } from "recoil";
 
 import { Tab, TabsList, TabPanel } from "../../../components/CustomTabs";

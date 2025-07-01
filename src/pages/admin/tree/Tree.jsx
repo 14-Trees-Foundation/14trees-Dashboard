@@ -8,7 +8,7 @@ import {
   Autocomplete,
   TextField
 } from "@mui/material";
-import TabsUnstyled from "@mui/base/TabsUnstyled";
+import { TabsUnstyled } from "@mui/base";
 import { useRecoilValue, useSetRecoilState, useRecoilState } from "recoil";
 
 import { Tab, TabsList, TabPanel } from "../../../components/CustomTabs";

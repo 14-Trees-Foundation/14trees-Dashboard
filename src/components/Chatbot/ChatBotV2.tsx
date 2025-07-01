@@ -1,10 +1,11 @@
+
 import ChatBot, { Button, Params } from "react-chatbotify";
 import HtmlRenderer, { HtmlRendererBlock } from "@rcb-plugins/html-renderer";
 import ApiClient from "../../api/apiClient/apiClient";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import { marked } from 'marked'
 import { AWSUtils } from "../../helpers/aws";
-import { setupResizableDiv } from "./resizableHandler";
+// import { setupResizableDiv } from "./resizableHandler";
 import path from "path";
 
 
@@ -57,16 +58,38 @@ const ChatbotV2 = () => {
             timestamp: new Date()
         }
     ]);
+    
+    // Use ref to track if component is mounted
+    const isMountedRef = useRef(true);
 
     useEffect(() => {
-        setTimeout(() => {
-            setupResizableDiv();
-        }, 5000)
+        // Set up cleanup for the timeout
+        const timeoutId = setTimeout(() => {
+            if (isMountedRef.current) {
+                // setupResizableDiv(); // Commented out since the function doesn't exist
+            }
+        }, 5000);
+
+        // Cleanup function
+        return () => {
+            clearTimeout(timeoutId);
+            isMountedRef.current = false;
+        };
     }, []);
 
-    const getBotResponse = async (userInput: string, history: Message[]): Promise<string> => {
+    const getBotResponse = useCallback(async (userInput: string, history: Message[]): Promise<string> => {
+        if (!isMountedRef.current) {
+            return ""; // Return early if component is unmounted
+        }
+        
         const apiClient = new ApiClient();
         const resp = await apiClient.serveUserQuery(userInput, history);
+        
+        // Check again after async operation
+        if (!isMountedRef.current) {
+            return resp.text_output;
+        }
+        
         console.log(resp.sponsor_details);
         if (resp.sponsor_details) {
             if (resp.sponsor_details.name) {
@@ -82,22 +105,27 @@ const ChatbotV2 = () => {
             }
         }
         return resp.text_output;
-    };
+    }, []);
     // const helpOptions = ["Quickstart", "API Docs", "Examples", "Github", "Discord"];
-    const handleUpload = async (params: Params) => {
-        if (!params.files || params.files.length === 0) return;
+    const handleUpload = useCallback(async (params: Params) => {
+        if (!params.files || params.files.length === 0 || !isMountedRef.current) return;
 
         const awsUtils = new AWSUtils();
         const date = new Date(new Date().toDateString()).getTime()
         for (const file of params.files) {
+            if (!isMountedRef.current) break; // Stop if component unmounted
             const uploadPromise = awsUtils.uploadFileToS3('gift-request', file, 'images/' + date); // your S3 upload function
             uploadedFiles.push(uploadPromise);
         }
 
-        await Promise.all(uploadedFiles);
-    }
+        if (isMountedRef.current) {
+            await Promise.all(uploadedFiles);
+        }
+    }, []);
 
-    const handleInitialMessage = () => {
+    const handleInitialMessage = useCallback(() => {
+        if (!isMountedRef.current) return "";
+        
         const userName = localStorage.getItem("userName");
         // const userEmail = localStorage.getItem("userEmail");
 
@@ -109,7 +137,7 @@ const ChatbotV2 = () => {
 
 
         return marked(defaultMessage.replace(" USER_NAME", userName ? " " + userName : ""));
-    }
+    }, []);
 
     const flow = {
         start: {
@@ -129,16 +157,22 @@ const ChatbotV2 = () => {
         } as HtmlRendererBlock,
         name: {
             message: (params: Params) => {
-                localStorage.setItem("userName", params.userInput);
-                return handleInitialMessage();
+                if (isMountedRef.current) {
+                    localStorage.setItem("userName", params.userInput);
+                    return handleInitialMessage();
+                }
+                return "";
             },
             path: "email",
             renderHtml: ["BOT", "USER"],
         } as HtmlRendererBlock,
         email: {
             message: (params: Params) => {
-                localStorage.setItem("userEmail", params.userInput);
-                return handleInitialMessage();
+                if (isMountedRef.current) {
+                    localStorage.setItem("userEmail", params.userInput);
+                    return handleInitialMessage();
+                }
+                return "";
             },
             path: "user",
             renderHtml: ["BOT", "USER"],
@@ -154,7 +188,7 @@ const ChatbotV2 = () => {
                     userInput += '  \n\n' + "Image urls:\n" + strings.join("  \n");
                 }
 
-                if (isFirstChat) {
+                if (isFirstChat && isMountedRef.current) {
                     setIsFirstChat(false);
                     const userName = localStorage.getItem("userName");
                     const userEmail = localStorage.getItem("userEmail");
@@ -169,12 +203,19 @@ const ChatbotV2 = () => {
                     timestamp: new Date()
                 };
 
-                setMessages(prev => {
-                    history = prev;
-                    return [...prev, userMessage]
-                })
+                if (isMountedRef.current) {
+                    setMessages(prev => {
+                        history = prev;
+                        return [...prev, userMessage]
+                    })
+                }
 
                 const resp = await getBotResponse(userInput, history);
+                
+                if (!isMountedRef.current) {
+                    return marked(resp); // Return early if component is unmounted
+                }
+                
                 const botResponse: Message = {
                     id: Date.now().toString(),
                     text: resp,
@@ -182,7 +223,9 @@ const ChatbotV2 = () => {
                     timestamp: new Date()
                 };
 
-                setMessages(prev => [...prev, botResponse]);
+                if (isMountedRef.current) {
+                    setMessages(prev => [...prev, botResponse]);
+                }
 
                 if (resp.includes("Your tree gifting request has been successfully created")) {
                     await params.showToast("🎉 Your gift request was created successfully!", 3000);
@@ -209,10 +252,17 @@ const ChatbotV2 = () => {
                     default:
                         return "user";
                 }
-                await params.injectMessage("Sit tight! I'll send you right there!");
-                setTimeout(() => {
-                    window.location.pathname = path;
-                }, 800);
+                if (isMountedRef.current) {
+                    await params.injectMessage("Sit tight! I'll send you right there!");
+                    const timeoutId = setTimeout(() => {
+                        if (isMountedRef.current) {
+                            window.location.pathname = path;
+                        }
+                    }, 800);
+                    
+                    // Store timeout ID for potential cleanup (though navigation will happen)
+                    // This is more for completeness
+                }
                 return "end";
             },
         },

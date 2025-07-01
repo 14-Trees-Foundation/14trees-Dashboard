@@ -6,7 +6,7 @@ import { User } from "../../../types/user";
 import { Group } from "../../../types/Group";
 import ApiClient from "../../../api/apiClient/apiClient";
 import { ToastContainer, toast } from "react-toastify";
-import { GiftCard, GiftRequestType_CARDS_REQUEST, GiftRequestType_NORAML_ASSIGNMENT, GiftRequestUser, SponsorshipType } from "../../../types/gift_card";
+import { GiftCard, GiftRequestType_CARDS_REQUEST, GiftRequestType_NORAML_ASSIGNMENT, GiftRequestType_VISIT, GiftRequestUser, SponsorshipType } from "../../../types/gift_card";
 import getColumnSearchProps, { getColumnDateFilter, getColumnNumericFilter, getColumnSelectedItemFilter, getSortIcon } from "../../../components/Filter";
 import { GridFilterItem } from "@mui/x-data-grid";
 import * as giftCardActionCreators from "../../../redux/actions/giftCardActions";
@@ -835,7 +835,7 @@ const GiftTrees: FC = () => {
             </Menu.ItemGroup>}
             {!auth.roles.includes(UserRoles.User) && <Menu.Divider style={{ backgroundColor: '#ccc' }} />}
             {!auth.roles.includes(UserRoles.User) && <Menu.ItemGroup>
-                <Menu.Item key="40" onClick={() => { setBookNonGiftable(record.request_type === GiftRequestType_NORAML_ASSIGNMENT ? true : false); setSelectedGiftCard(record); setPlotModal(true); }} icon={<Landscape />}>
+                <Menu.Item key="40" onClick={() => { setBookNonGiftable(record.request_type === GiftRequestType_NORAML_ASSIGNMENT || record.request_type === 'Visit' ? true : false); setSelectedGiftCard(record); setPlotModal(true); }} icon={<Landscape />}>
                     Reserve Trees
                 </Menu.Item>
                 <Menu.Item key="41" onClick={() => { setSelectedGiftCard(record); setAutoAssignModal(true); }} icon={<AssignmentInd />}>
@@ -943,7 +943,7 @@ const GiftTrees: FC = () => {
             title: "Request Type",
             align: "center",
             width: 200,
-            ...getColumnSelectedItemFilter({ dataIndex: 'request_type', filters, handleSetFilters, options: ['Gift Cards', 'Normal Assignment', 'Test', 'Promotion'] })
+            ...getColumnSelectedItemFilter({ dataIndex: 'request_type', filters, handleSetFilters, options: ['Gift Cards', 'Normal Assignment', 'Test', 'Promotion', 'Visit'] })
         },
         {
             dataIndex: "processed_by_name",
