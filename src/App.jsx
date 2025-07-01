@@ -91,9 +91,9 @@ function App() {
           <Route
             path="/admin"
             element={
-              // <RequireAuth>
-              <AdminLayout />
-              // </RequireAuth>
+              <RequireAuth>
+                <AdminLayout />
+              </RequireAuth>
             }
           >
             <Route index element={<AdminHome />} /> {/* Default route */}
@@ -121,9 +121,9 @@ function App() {
           <Route
             path="/tree-cards"
             element={
-              // <RequireAuth>
-              <User />
-              // </RequireAuth>
+              <RequireAuth>
+                <User />
+              </RequireAuth>
             }
           >
           </Route>
@@ -138,9 +138,9 @@ function App() {
             <Route
               path=":email"
               element={
-                // <RequireAuth>
-                <GiftTrees />
-                // </RequireAuth>
+                <RequireAuth>
+                  <GiftTrees />
+                </RequireAuth>
               }
             ></Route>
           </Route>
@@ -148,9 +148,9 @@ function App() {
             <Route
               path=":group_id"
               element={
-                // <RequireAuth>
-                <GiftTrees />
-                // </RequireAuth>
+                <RequireAuth>
+                  <GiftTrees />
+                </RequireAuth>
               }
             ></Route>
           </Route>
@@ -161,25 +161,25 @@ function App() {
           <Route
             path="/test"
             element={
-              // <RequireAuth>
-              <Test />
-              // </RequireAuth>
+              <RequireAuth>
+                <Test />
+              </RequireAuth>
             }
           />
           <Route
             path="/csr/dashboard/:groupId"
             element={
-              // <RequireAuth>
-              <CSRPage />
-              // </RequireAuth>
+              <RequireAuth>
+                <CSRPage />
+              </RequireAuth>
             }
           />
           <Route
             path="/personal/dashboard/:userId"
             element={
-              // <RequireAuth>
-              <GiftDashboard />
-              // </RequireAuth>
+              <RequireAuth>
+                <GiftDashboard />
+              </RequireAuth>
             }
           />
         </Routes>

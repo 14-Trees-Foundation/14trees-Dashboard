@@ -3,12 +3,19 @@ import { useLocation, Navigate } from "react-router-dom";
 import { useAuth } from "./auth";
 
 export const RequireAuth = ({ children }) => {
+  // Check if we should bypass auth
+  const bypassAuth = import.meta.env.VITE_BYPASS_AUTH === 'true';
+
+  if (bypassAuth) {
+    return children;
+  }
+
   const loginInfo = JSON.parse(localStorage.getItem("loginInfo"));
   const permissions = JSON.parse(localStorage.getItem("permissions"));
   let auth = useAuth();
   const now = Date.now(); // Unix timestamp in milliseconds
 
-  if (user !== null && now < loginInfo.expires_at) {
+  if (loginInfo !== null && now < loginInfo.expires_at) {
     auth.signedin = true;
     auth.user = loginInfo.name;
     auth.token = loginInfo.token;
