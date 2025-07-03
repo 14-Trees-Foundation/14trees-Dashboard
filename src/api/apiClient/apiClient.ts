@@ -2009,8 +2009,13 @@ class ApiClient {
             const formData = new FormData();
             for (const [key, value] of Object.entries(request)) {
                 if (value) {
-                    if (Array.isArray(value)) value.forEach(item => formData.append(key, item.toString()))
-                    else formData.append(key, value.toString());
+                    if (Array.isArray(value)) {
+                        // Convert arrays to comma-separated strings for backend compatibility
+                        const commaSeparated = value.filter(item => item).join(',');
+                        if (commaSeparated) formData.append(key, commaSeparated);
+                    } else {
+                        formData.append(key, value.toString());
+                    }
                 }
             }
 

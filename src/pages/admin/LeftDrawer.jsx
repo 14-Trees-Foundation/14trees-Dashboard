@@ -139,13 +139,13 @@ export const AdminLeftDrawer = () => {
     {
       displayName: "Campaigns",
       logo: Campaign,
-      display: isAdmin,
+      display: auth.signedin || import.meta.env.VITE_BYPASS_AUTH === 'true',
       path: "campaigns",
     },
     {
       displayName: "Tree Cards",
       logo: CardGiftcard,
-      display: isAdmin,
+      display: auth.signedin || import.meta.env.VITE_BYPASS_AUTH === 'true',
       path: "tree-cards",
     },
     {

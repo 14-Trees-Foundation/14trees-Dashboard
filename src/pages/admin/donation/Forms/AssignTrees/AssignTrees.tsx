@@ -450,7 +450,7 @@ const AssignTrees: React.FC<AssignTreesProps> = ({ donationId, donation, open, o
                             label={
                                 <>
                                     <Typography variant="body1">
-                                        Automatically assign trees to donation recipients
+                                        Automatically assign trees to recipients
                                     </Typography>
                                     <Typography variant="body2">
                                         This will automatically assign {totalTrees} {totalTrees > 1 ? 'trees' : 'tree'} to donation recipients based on the donation recipients' needs.
