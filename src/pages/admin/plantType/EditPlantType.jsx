@@ -80,7 +80,9 @@ function EditTreeType({
   ));
 
   const { getRootProps, getInputProps } = useDropzone({
-    accept: "image/*",
+    accept: {
+      'image/*': ['.jpeg', '.jpg', '.png', '.gif', '.webp']
+    },
     maxFiles: 10,
     onDrop: (acceptedFiles) => {
       setFiles(
