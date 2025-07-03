@@ -138,13 +138,13 @@ export const AdminLeftDrawer = () => {
     {
       displayName: "Campaigns",
       logo: Campaign,
-      display: auth.signedin || import.meta.env.VITE_BYPASS_AUTH === 'true',
+      display: true, // Show to all users who can access the admin panel
       path: "campaigns",
     },
     {
       displayName: "Tree Cards",
       logo: CardGiftcard,
-      display: auth.signedin || import.meta.env.VITE_BYPASS_AUTH === 'true',
+      display: true, // Show to all users who can access the admin panel
       path: "tree-cards",
     },
     {
