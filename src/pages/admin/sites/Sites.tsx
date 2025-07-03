@@ -65,7 +65,7 @@ export const SitesComponent = () => {
 const sitesData = useAppSelector((state: RootState) => state.sitesData);
 if (sitesData) {
   sitesList = Object.values(sitesData.sites);
-  sitesList = sitesList.sort((a, b) => b.id - a.id);
+  // Sites are now sorted by updated_at DESC from the backend
 }
 
 const handlePaginationChange = (page: number, pageSize: number) => {
