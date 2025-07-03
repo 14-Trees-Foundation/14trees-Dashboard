@@ -252,7 +252,9 @@ const StepForm = ({ open, handleClose, useCase, data, submitFunction }) => {
   };
 
   const { getRootProps, getInputProps } = useDropzone({
-    accept: ".kml",
+    accept: {
+      'application/vnd.google-earth.kml+xml': ['.kml']
+    },
     maxFiles: 1,
     onDrop: (acceptedFiles) => {
       setFile(acceptedFiles.length === 1 ? acceptedFiles[0] : null);
