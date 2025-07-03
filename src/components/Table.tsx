@@ -17,7 +17,7 @@ const TableColoring = ( { labels }: { labels: TableColoringLabels[] }) => {
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
             {
                 labels.map(item => (
-                    <div style={{ display: 'flex', alignItems: 'center', marginRight: '10px' }}>
+                    <div key={item.className} style={{ display: 'flex', alignItems: 'center', marginRight: '10px' }}>
                         <div style={{ height: '15px', width: '15px', borderRadius: '2px', marginRight: '5px' }} className={item.className}></div>
                         <p>{item.label}</p>
                     </div>
