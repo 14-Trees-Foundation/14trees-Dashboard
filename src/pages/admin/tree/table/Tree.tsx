@@ -223,6 +223,7 @@ export const TreeNew = () => {
             title: "habitat",
             width: 250,
             align: 'center',
+            filteredValue: filters['habit']?.value || null,
             ...getColumnSelectedItemFilter({ dataIndex: 'habit', filters, handleSetFilters, options: ['Tree', 'Herb', 'Shrub', 'Climber'] })
         },
         {
@@ -241,6 +242,7 @@ export const TreeNew = () => {
             width: 200,
             align: 'center',
             render: value => value ? value?.join(", ") : '',
+            filteredValue: filters['tags']?.value || null,
             ...getColumnSelectedItemFilter({ dataIndex: 'tags', filters, handleSetFilters, options: tags })
         },
         {
@@ -291,6 +293,7 @@ export const TreeNew = () => {
             align: 'center',
             hidden: true,
             render: value => value ? getHumanReadableDate(value) : '',
+            filteredValue: filters['mapped_at']?.value || null,
             ...getColumnDateFilter({dataIndex: 'mapped_at', filters, handleSetFilters, label: 'Reserved'})
         },
         {
@@ -301,6 +304,7 @@ export const TreeNew = () => {
             align: 'center',
             hidden: true,
             render: value => value ? getHumanReadableDate(value) : '',
+            filteredValue: filters['assigned_at']?.value || null,
             ...getColumnDateFilter({dataIndex: 'assigned_at', filters, handleSetFilters, label: 'Assigned'})
         },
         {
@@ -311,7 +315,57 @@ export const TreeNew = () => {
             align: 'center',
             hidden: true,
             render: value => value ? getHumanReadableDate(value) : '',
+            filteredValue: filters['created_at']?.value || null,
             ...getColumnDateFilter({dataIndex: 'created_at', filters, handleSetFilters, label: 'Uploaded'})
+        },
+        {
+            dataIndex: "tree_status",
+            key: "tree_status",
+            title: "Tree Health",
+            width: 150,
+            align: 'center',
+            render: (value, record) => (
+                <span
+                    style={{
+                        color: value === 'dead' ? '#ff0000' : value === 'lost' ? '#ff8c00' : '#008000',
+                        fontWeight: value === 'dead' || value === 'lost' ? 'bold' : 'normal',
+                        backgroundColor: value === 'dead' ? '#ffebee' : value === 'lost' ? '#fff3e0' : '#e8f5e8',
+                        padding: '4px 8px',
+                        borderRadius: '4px',
+                        textTransform: 'uppercase',
+                        fontSize: '12px'
+                    }}
+                >
+                    {value || 'healthy'}
+                </span>
+            ),
+            filteredValue: filters['tree_status']?.value || null,
+            ...getColumnSelectedItemFilter({ 
+                dataIndex: 'tree_status', 
+                filters, 
+                handleSetFilters, 
+                options: ['healthy', 'dead', 'lost'] 
+            })
+        },
+        {
+            dataIndex: "deleted_at",
+            key: "deleted_at",
+            title: "Deleted On",
+            width: 200,
+            align: 'center',
+            render: (value, record) => (
+                <span
+                    style={{
+                        color: value ? '#d32f2f' : '#666',
+                        fontWeight: value ? 'bold' : 'normal',
+                        fontSize: '12px'
+                    }}
+                >
+                    {value ? getHumanReadableDate(value) : '-'}
+                </span>
+            ),
+            filteredValue: filters['deleted_at']?.value || null,
+            ...getColumnDateFilter({dataIndex: 'deleted_at', filters, handleSetFilters, label: 'Deleted'})
         },
         {
             dataIndex: "action",
@@ -557,8 +611,23 @@ export const TreeNew = () => {
                     setPageSize={setPageSize}
                     handleSelectionChanges={handleSelectionChanges}
                     setSrNoPage={setSrNoPage}
-                    rowClassName={(record, index) => { return record.habit === 'Tree' ? 'bg-green' : record.habit === 'Shrub' ? 'bg-cyan' : record.habit === 'Herb' ? 'bg-yellow' : 'bg-red' }}
-                    tableRowColoringLabels={[{ className: 'bg-green', label: 'Tree' }, { className: 'bg-cyan', label: 'Shrub' }, { className: 'bg-yellow', label: 'Herb' }, { className: 'bg-red', label: 'Unknown' }]}
+                    rowClassName={(record, index) => { 
+                        // Priority: Dead trees get red background, deleted trees get gray background
+                        if (record.tree_status === 'dead') return 'bg-dead-tree';
+                        if (record.deleted_at !== null && record.deleted_at !== undefined) return 'bg-deleted-tree';
+                        if (record.tree_status === 'lost') return 'bg-lost-tree';
+                        // Default habitat-based coloring for healthy/active trees
+                        return record.habit === 'Tree' ? 'bg-green' : record.habit === 'Shrub' ? 'bg-cyan' : record.habit === 'Herb' ? 'bg-yellow' : 'bg-red';
+                    }}
+                    tableRowColoringLabels={[
+                        { className: 'bg-dead-tree', label: 'Dead Tree' }, 
+                        { className: 'bg-deleted-tree', label: 'Deleted Tree' }, 
+                        { className: 'bg-lost-tree', label: 'Lost Tree' }, 
+                        { className: 'bg-green', label: 'Tree' }, 
+                        { className: 'bg-cyan', label: 'Shrub' }, 
+                        { className: 'bg-yellow', label: 'Herb' }, 
+                        { className: 'bg-red', label: 'Unknown' }
+                    ]}
                     tableName="Trees"
                 />
             </Box>
