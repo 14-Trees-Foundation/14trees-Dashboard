@@ -17,7 +17,7 @@ export const NotFound = ({ text = '' }) => {
         <br></br>
         Please check if you are on right Trail!
       </Grid>
-      <Grid xs={12} className={classes.btn}>
+      <Grid item xs={12} className={classes.btn}>
         <Button
           variant="contained"
           color="secondary"

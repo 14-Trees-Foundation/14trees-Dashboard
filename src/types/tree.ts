@@ -25,6 +25,7 @@ export type Tree = {
     created_at: Date,
     updated_at: Date,
     tree_status: string,
+    deleted_at: Date | null,
 
     plant_type?: string,
     habit?: string,

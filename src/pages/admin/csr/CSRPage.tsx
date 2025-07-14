@@ -65,6 +65,15 @@ const CSRPage: React.FC = () => {
     };
 
     useEffect(() => {
+        // Check if we should bypass auth
+        const bypassAuth = import.meta.env.VITE_BYPASS_AUTH === 'true';
+        
+        if (bypassAuth) {
+            setStatus({ code: 200, message: '' });
+            setLoading(false);
+            return;
+        }
+
         const roles: string[] = JSON.parse(localStorage.getItem('roles') || '[]');
         const userId = localStorage.getItem('userId') ? Number(localStorage.getItem("userId")) : 0;
 
