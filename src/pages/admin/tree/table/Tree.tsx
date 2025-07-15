@@ -39,6 +39,7 @@ import { toast } from "react-toastify";
 import ApiClient from "../../../../api/apiClient/apiClient";
 import { Order } from "../../../../types/common";
 import { getHumanReadableDate } from "../../../../helpers/utils";
+import TreeSearch from "../components/TreeSearch";
 
 export const TreeNew = () => {
     const dispatch = useAppDispatch();
@@ -199,6 +200,7 @@ export const TreeNew = () => {
             title: "Sr. No.",
             width: 100,
             align: 'center',
+            filteredValue: null,
             render: (value, record, index) => `${index + 1 + srNoPage * pageSize}.`,
         },
         {
@@ -207,6 +209,7 @@ export const TreeNew = () => {
             title: "Sapling ID",
             width: 150,
             align: 'center',
+            filteredValue: filters['sapling_id']?.value || null,
             ...getColumnSearchProps('sapling_id', filters, handleSetFilters, true)
         },
         {
@@ -215,6 +218,7 @@ export const TreeNew = () => {
             title: "Plant Type",
             width: 250,
             align: 'center',
+            filteredValue: filters['plant_type']?.value || null,
             ...getColumnSearchProps('plant_type', filters, handleSetFilters)
         },
         {
@@ -233,6 +237,7 @@ export const TreeNew = () => {
             width: 350,
             align: 'center',
             render: (value, record, index) => record?.plot,
+            filteredValue: filters['plot']?.value || null,
             ...getColumnSearchProps('plot', filters, handleSetFilters)
         },
         {
@@ -251,6 +256,7 @@ export const TreeNew = () => {
             title: "Reserved for (Individual)",
             width: 250,
             align: 'center',
+            filteredValue: filters['mapped_user_name']?.value || null,
             ...getColumnSearchProps('mapped_user_name', filters, handleSetFilters)
         },
         {
@@ -259,6 +265,7 @@ export const TreeNew = () => {
             title: "Reserved for (Group)",
             width: 250,
             align: 'center',
+            filteredValue: filters['mapped_group_name']?.value || null,
             ...getColumnSearchProps('mapped_group_name', filters, handleSetFilters)
         },
         {
@@ -267,6 +274,7 @@ export const TreeNew = () => {
             title: "Sponsored By (Individual)",
             width: 250,
             align: 'center',
+            filteredValue: filters['sponsor_user_name']?.value || null,
             ...getColumnSearchProps('sponsor_user_name', filters, handleSetFilters)
         },
         {
@@ -275,6 +283,7 @@ export const TreeNew = () => {
             title: "Sponsored By (Group)",
             width: 250,
             align: 'center',
+            filteredValue: filters['sponsor_group_name']?.value || null,
             ...getColumnSearchProps('sponsor_group_name', filters, handleSetFilters)
         },
         {
@@ -283,6 +292,7 @@ export const TreeNew = () => {
             title: "Assigned To",
             width: 250,
             align: 'center',
+            filteredValue: filters['assigned_to_name']?.value || null,
             ...getColumnSearchProps('assigned_to_name', filters, handleSetFilters)
         },
         {
@@ -373,6 +383,7 @@ export const TreeNew = () => {
             title: "Actions",
             width: 300,
             align: "center",
+            filteredValue: null,
             render: (value, record, index) => (
                 <div
                     style={{
@@ -557,46 +568,48 @@ export const TreeNew = () => {
                 }}
             >
                 <Typography variant="h4" style={{ marginTop: '5px' }}>Trees</Typography>
-                <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '5px', marginTop: '5px' }}>
-                    <div style={{ display: "flex", justifyContent: "space-between" }}>
-                        <AutocompleteWithPagination
-                            loading={plotsLoading}
-                            label="Select a Plot"
-                            options={plotsList}
-                            getOptionLabel={(option) => option.name}
-                            onChange={(event, newValue) => {
-                                if (newValue !== null) {
-                                    const newFilters = {
-                                        ...filters,
-                                        "plot_id": {
-                                            columnField: "plot_id",
-                                            value: newValue.id,
-                                            operatorValue: 'equals'
-                                        }
-                                    }
-                                    setFilters(newFilters);
+                <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'flex-start', marginBottom: '5px', marginTop: '5px', gap: '10px' }}>
+                    <TreeSearch
+                        onSearch={(saplingIds) => {
+                            const newFilters = {
+                                ...filters,
+                                "sapling_id": {
+                                    columnField: "sapling_id",
+                                    value: saplingIds,
+                                    operatorValue: 'isAnyOf'
                                 }
-                            }}
-                            onInputChange={(event) => {
-                                const { value } = event.target;
-                                setPlotPage(0);
-                                setPlotName(value);
-                            }}
-                            setPage={setPlotPage}
-
-                        />
-                    </div>
-                    {/* <Button variant="contained" color={isAssignTrees ? 'success' : 'error'} style={{ marginLeft: '10px' }} onClick={handleAssignUnAssign}
+                            };
+                            setFilters(newFilters);
+                        }}
+                        onClear={() => {
+                            const newFilters = { ...filters };
+                            delete newFilters["sapling_id"];
+                            setFilters(newFilters);
+                        }}
+                    />
+                    {/* <Button variant="contained" color={isAssignTrees ? 'success' : 'error'} onClick={handleAssignUnAssign}
                         disabled={disabledAUButton}
                         >{(isAssignTrees) ? "Assign Trees" : "Unassign Trees"}</Button> */}
                     <AssignTreeModal open={isAssignTreeModalOpen} handleClose={() => { setIsAssignTreeModalOpen(false) }} onSubmit={handleAssignTrees} searchUsers={searchUsers} />
-                    <Button variant="contained" color={isMapTrees ? 'success' : 'error'} style={{ marginLeft: '10px' }} onClick={handleMapUnMap}
+                    <Button 
+                        variant="contained" 
+                        color={isMapTrees ? 'success' : 'error'} 
+                        onClick={handleMapUnMap}
                         disabled={disabledMapUnMapButton}
-                    >{(isMapTrees) ? "Reserve Trees" : "Unreserve Trees"}</Button>
+                        sx={{ height: 'fit-content' }}
+                    >
+                        {(isMapTrees) ? "Reserve Trees" : "Unreserve Trees"}
+                    </Button>
                     {/* <UserModal open={isUserModalOpen} handleClose={() => { setIsUserModalOpen(false) }} onSubmit={handleMapTrees} searchUser={searchUsers} /> */}
-                    <Button variant="contained" color='success' style={{ marginLeft: '10px' }} onClick={() => setChangePlotModal(true)}
+                    <Button 
+                        variant="contained" 
+                        color='success' 
+                        onClick={() => setChangePlotModal(true)}
                         disabled={selectedTreeIds.length === 0}
-                    >Change Plot</Button>
+                        sx={{ height: 'fit-content' }}
+                    >
+                        Change Plot
+                    </Button>
                 </div>
             </div>
             <Divider sx={{ backgroundColor: "black", marginBottom: '15px' }} />
