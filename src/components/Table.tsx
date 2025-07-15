@@ -1,6 +1,5 @@
-import { Settings } from '@mui/icons-material';
-import { Button, Divider, FormControlLabel, IconButton } from '@mui/material';
-import { Checkbox, Dropdown, MenuProps, Table, TableColumnsType } from 'antd';
+import { Button, Divider, FormControlLabel, Checkbox } from '@mui/material';
+import { Table, TableColumnsType } from 'antd';
 import { AnyObject } from 'antd/es/_util/type';
 import { TableRowSelection } from 'antd/es/table/interface';
 import { ReactElement, useEffect, useState } from 'react';
@@ -8,6 +7,7 @@ import { toast } from 'react-toastify';
 import { Resizable } from "react-resizable";
 import './GenTable.css'
 import { unparse } from 'papaparse';
+import ColumnPreferences from './ColumnPreferences';
 
 interface TableColoringLabels { className: string, label: string }
 
@@ -85,9 +85,9 @@ function TableComponent({ loading, dataSource, columns, totalRecords, tableName,
     const [download, setDownload] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [checkedList, setCheckedList] = useState(columns?.filter(item => !item.hidden)?.map((item) => item.key) ?? []);
-    const [open, setOpen] = useState(false);
     const [tableCols, setTableCols] = useState<any[]>([]);
     const [showLabels, setShowLabels] = useState(false);
+    const [visibleColumns, setVisibleColumns] = useState<string[]>([]);
 
     let rowSelection: TableRowSelection<AnyObject> | undefined;
     if (handleSelectionChanges) {
@@ -154,11 +154,18 @@ function TableComponent({ loading, dataSource, columns, totalRecords, tableName,
     }, [loading]);
 
     useEffect(() => {
+        // Use visibleColumns from ColumnPreferences if available, otherwise fall back to checkedList
+        const columnsToShow = visibleColumns.length > 0 ? visibleColumns : checkedList;
         setTableCols(columns?.map((item: any) => ({
             ...item,
-            hidden: !checkedList.includes(item.key as string),
+            hidden: !columnsToShow.includes(item.key as string),
         })) ?? []);
-    }, [columns, checkedList]);
+    }, [columns, checkedList, visibleColumns]);
+
+    const handleColumnVisibilityChange = (newVisibleColumns: string[]) => {
+        setVisibleColumns(newVisibleColumns);
+        setCheckedList(newVisibleColumns);
+    };
 
     const handlePageChange = (page: number, pageSize: number) => {
         if (dataSource && page * pageSize > dataSource.length) {
@@ -172,22 +179,7 @@ function TableComponent({ loading, dataSource, columns, totalRecords, tableName,
         }
     }
 
-    const handleOpenChange = (flag: boolean, info: { source: 'menu' | 'trigger' }) => {
-        if (info.source === 'trigger') setOpen(flag);
-    };
 
-    const handleColumnsSelection = (key: string) => {
-        const newSelected = checkedList.includes(key) ? checkedList.filter((item) => item !== key) : [...checkedList, key];
-        setCheckedList(newSelected);
-    }
-
-    const items: MenuProps['items'] = columns?.map((column: any) => {
-        const title = typeof column.title === 'string' ? column.title : column.key;
-        return {
-            key: column.key,
-            label: <Checkbox checked={checkedList.includes(column.key)} onChange={() => handleColumnsSelection(column.key)}>{title}</Checkbox>
-        }
-    })
 
     const components = {
         header: {
@@ -249,15 +241,11 @@ function TableComponent({ loading, dataSource, columns, totalRecords, tableName,
                         <TableColoring  labels={tableRowColoringLabels} />
                     </div>}
                     <div style={{ display: 'flex', alignSelf: 'flex-end', justifyContent: 'flex-end' }}>
-                        <Dropdown
-                            menu={{ items }}
-                            placement="bottomLeft"
-                            open={open}
-                            onOpenChange={handleOpenChange}
-                            trigger={['click']}
-                        >
-                            <IconButton sx={{ marginLeft: 'auto' }}><Settings /></IconButton>
-                        </Dropdown>
+                        <ColumnPreferences
+                            columns={columns || []}
+                            tableName={tableName || 'table'}
+                            onColumnVisibilityChange={handleColumnVisibilityChange}
+                        />
                         <Divider orientation="vertical" flexItem sx={{ backgroundColor: "black", marginRight: '10px', }} />
                         <div style={{ marginRight: '10px', display: 'flex', alignItems: 'center' }}><strong>Export table data in a csv file:</strong></div>
                         <Button
