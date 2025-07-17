@@ -16,6 +16,7 @@ import {
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import ImageIcon from "@mui/icons-material/Image";
+import DashboardIcon from "@mui/icons-material/Dashboard";
 import { type Tree } from "../../../../types/tree";
 import * as treeActionCreators from "../../../../redux/actions/treeActions";
 import * as userTreesActionCreators from "../../../../redux/actions/userTreeActions";
@@ -38,7 +39,7 @@ import MapTreesModal from "./MapTreesModal";
 import { toast } from "react-toastify";
 import ApiClient from "../../../../api/apiClient/apiClient";
 import { Order } from "../../../../types/common";
-import { getHumanReadableDate } from "../../../../helpers/utils";
+import { getHumanReadableDate, getDashboardUrl } from "../../../../helpers/utils";
 import TreeSearch from "../components/TreeSearch";
 
 export const TreeNew = () => {
@@ -296,6 +297,60 @@ export const TreeNew = () => {
             ...getColumnSearchProps('assigned_to_name', filters, handleSetFilters)
         },
         {
+            dataIndex: "association_type",
+            key: "association_type",
+            title: "Association Type",
+            width: 180,
+            align: 'center',
+            render: (value, record) => {
+                if (!value) return '-';
+                
+                const getColor = (type: string) => {
+                    switch (type) {
+                        case 'Gift Cards': return '#4caf50';
+                        case 'Normal Assignment': return '#9c27b0';
+                        case 'Visit': return '#ff9800';
+                        case 'Donation': return '#2196f3';
+                        default: return '#666';
+                    }
+                };
+
+                return (
+                    <span
+                        style={{
+                            color: getColor(value),
+                            fontWeight: 'bold',
+                            backgroundColor: `${getColor(value)}20`,
+                            padding: '4px 8px',
+                            borderRadius: '4px',
+                            fontSize: '12px'
+                        }}
+                    >
+                        {value}
+                    </span>
+                );
+            },
+            filteredValue: filters['association_type']?.value || null,
+            ...getColumnSelectedItemFilter({ 
+                dataIndex: 'association_type', 
+                filters, 
+                handleSetFilters, 
+                options: ['Gift Cards', 'Normal Assignment', 'Visit', 'Donation'] 
+            })
+        },
+        {
+            dataIndex: "request_id",
+            key: "request_id",
+            title: "Association Request ID",
+            width: 120,
+            align: 'center',
+            render: (value, record) => {
+                return value ? value.toString() : '-';
+            },
+            filteredValue: filters['request_id']?.value || null,
+            ...getColumnSearchProps('request_id', filters, handleSetFilters, true)
+        },
+        {
             dataIndex: "mapped_at",
             key: "Reserved on",
             title: getSortableHeader("Reserved on", "mapped_at"),
@@ -381,7 +436,7 @@ export const TreeNew = () => {
             dataIndex: "action",
             key: "action",
             title: "Actions",
-            width: 300,
+            width: 350,
             align: "center",
             filteredValue: null,
             render: (value, record, index) => (
@@ -391,6 +446,21 @@ export const TreeNew = () => {
                         justifyContent: "center",
                         alignItems: "center",
                     }}>
+                    {/* Dashboard button - only show if tree is assigned to someone */}
+                    {record.assigned_to && (
+                        <Button
+                            variant="outlined"
+                            color="primary"
+                            style={{ margin: "0 5px" }}
+                            onClick={() => {
+                                const dashboardUrl = getDashboardUrl(record.sapling_id);
+                                window.open(dashboardUrl, '_blank');
+                            }}
+                            title="View in Dashboard"
+                        >
+                            <DashboardIcon />
+                        </Button>
+                    )}
                     <Button
                         variant="outlined"
                         style={{ margin: "0 5px" }}
