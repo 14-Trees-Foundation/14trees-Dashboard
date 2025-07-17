@@ -1,13 +1,13 @@
 import { Autocomplete, Box, Button, Divider, Grid, TextField, Typography } from "@mui/material";
 import { FC, useEffect, useState } from "react";
-import { AutocompleteWithPagination } from "../../../../components/AutoComplete";
-import { Group } from "../../../../types/Group";
-import { useAppDispatch, useAppSelector } from "../../../../redux/store/hooks";
+import { AutocompleteWithPagination } from "../../../../../components/AutoComplete";
+import { Group } from "../../../../../types/Group";
+import { useAppDispatch, useAppSelector } from "../../../../../redux/store/hooks";
 import { bindActionCreators } from "@reduxjs/toolkit";
-import * as groupActionCreators from '../../../../redux/actions/groupActions'
-import ApiClient from "../../../../api/apiClient/apiClient";
-import { organizationTypes } from "../../organization/organizationType";
-import ImagePicker from "../../../../components/ImagePicker";
+import * as groupActionCreators from '../../../../../redux/actions/groupActions'
+import ApiClient from "../../../../../api/apiClient/apiClient";
+import { organizationTypes } from "../../../organization/organizationType";
+import ImagePicker from "../../../../../components/ImagePicker";
 
 interface SponsorGroupFormProps {
     logo: File | string | null,

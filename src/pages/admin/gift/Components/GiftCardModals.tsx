@@ -4,13 +4,13 @@ import { GiftCard, GiftRequestUser } from '../../../../types/gift_card';
 import { Plot } from '../../../../types/plot';
 import PlotSelection from '../Components/PlotSelection';
 import EmailConfirmationModal from './EmailConfirmationModal';
-import EditUserDetailsModal from './EditUserDetailsModal';
+import EditUserDetailsModal from './user/EditUserDetailsModal';
 import AlbumImageInput from '../../../../components/AlbumImageInput';
-import GiftCardRequestInfo from './GiftCardRequestInfo';
-import GiftRequestNotes from './Notes';
+import GiftCardRequestInfo from './summary/GiftCardRequestInfo';
+import GiftRequestNotesModal from './GiftRequestNotesModal';
 import TagComponent from './TagComponent';
 import PaymentComponent from '../../../../components/payment/PaymentComponent';
-import AssignTrees from './AssignTrees';
+import AssignTrees from './actions/AssignTrees';
 import AutoProcessConfirmationModal from '../Components/AutoProcessConfirmationModal';
 import GiftCardCreationModal from '../Components/GiftCardCreationModal';
 
@@ -294,7 +294,7 @@ export const GiftCardModals: React.FC<GiftCardModalsProps> = ({
             />
 
             {/* Notes Modal */}
-            <GiftRequestNotes
+            <GiftRequestNotesModal
                 open={notesModal}
                 handleClose={() => { setNotesModal(false) }}
                 onSave={handleNotesSave}

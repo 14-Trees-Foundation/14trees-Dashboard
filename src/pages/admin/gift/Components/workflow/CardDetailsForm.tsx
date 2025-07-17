@@ -1,6 +1,6 @@
 import { FC, useEffect, useRef, useState } from "react";
 import { Box, Button, CircularProgress, TextField, Typography, useMediaQuery, useTheme } from "@mui/material";
-import ApiClient from "../../../../api/apiClient/apiClient";
+import ApiClient from "../../../../../api/apiClient/apiClient";
 
 const prefixMessage = "Dear {recipient},\n\n"
 const secondaryMessage = 'We invite you to visit 14 Trees and firsthand experience the growth and contribution of your tree towards a greener future.';
