@@ -218,7 +218,7 @@ const GiftTrees: FC = () => {
 
     const getGiftCardData = async () => {
         // check if user logged in
-        if (!authRef.current?.signedin) return;
+        if (!authRef.current?.signedin && import.meta.env.VITE_BYPASS_AUTH !== 'true') return;
 
         const filtersData = getFilters(filters);
 
@@ -1099,7 +1099,7 @@ const GiftTrees: FC = () => {
                     padding: "4px 12px",
                 }}
             >
-                <Typography variant="h4" style={{ marginTop: '5px' }}>Tree Cards</Typography>
+                <Typography variant="h4" style={{ marginTop: '5px' }}>Tree Cards (Old)</Typography>
                 <div
                     style={{
                         display: "flex",
@@ -1119,7 +1119,7 @@ const GiftTrees: FC = () => {
             </div>
             <Divider sx={{ backgroundColor: "black", marginBottom: '15px' }} />
 
-            {auth.signedin && <Box sx={{ height: 840, width: "100%" }}>
+            {(auth.signedin || import.meta.env.VITE_BYPASS_AUTH === 'true') && <Box sx={{ height: 840, width: "100%" }}>
                 <GeneralTable
                     loading={giftCardsData.loading}
                     rows={tableRows}
@@ -1139,7 +1139,7 @@ const GiftTrees: FC = () => {
                 />
             </Box>}
 
-            {!auth.signedin &&
+            {!auth.signedin && import.meta.env.VITE_BYPASS_AUTH !== 'true' &&
                 <Box
                     display="flex"
                     justifyContent="center"
