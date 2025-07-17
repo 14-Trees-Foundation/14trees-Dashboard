@@ -29,3 +29,4 @@ yarn-error.log*
 .env.development
 14trees-Dashboard.code-workspace
 .env
+docs/sites

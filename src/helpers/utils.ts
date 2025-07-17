@@ -46,6 +46,24 @@ export const getUniqueRequestId = () => {
     return Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
 }
 
+/**
+ * Generate dashboard URL for a given sapling ID
+ * Uses environment variable for base URL with fallback to production
+ */
+export const getDashboardUrl = (saplingId: string): string => {
+    const dashboardBaseUrl = import.meta.env.VITE_DASHBOARD_BASE_URL || 'https://dashboard.14trees.org';
+    return `${dashboardBaseUrl}/profile/${saplingId}`;
+};
+
+/**
+ * Generate any external URL based on environment configuration
+ * Useful for creating links to different parts of the application ecosystem
+ */
+export const getExternalUrl = (baseUrlEnvVar: string, fallbackUrl: string, path: string): string => {
+    const baseUrl = import.meta.env[baseUrlEnvVar] || fallbackUrl;
+    return `${baseUrl}${path}`;
+};
+
 export const convertFileToBase64 = (file: File): Promise<string> => {
     return new Promise((resolve, reject) => {
         const reader = new FileReader();

@@ -194,11 +194,6 @@ const ColumnPreferences: React.FC<ColumnPreferencesProps> = ({
                             const columnKey = column.key as string;
                             const columnTitle = getColumnTitle(column);
                             
-                            // Skip action columns and sr no columns
-                            if (columnKey === 'action' || columnKey === 'srNo') {
-                                return null;
-                            }
-
                             return (
                                 <FormControlLabel
                                     key={columnKey}
@@ -225,7 +220,7 @@ const ColumnPreferences: React.FC<ColumnPreferencesProps> = ({
                     <Divider sx={{ mt: 2, mb: 1 }} />
                     
                     <Typography variant="caption" color="textSecondary">
-                        {tempVisibleColumns.length} of {columns?.filter(col => col.key !== 'action' && col.key !== 'srNo').length || 0} columns selected
+                        {tempVisibleColumns.length} of {columns?.length || 0} columns selected
                     </Typography>
                 </DialogContent>
 
