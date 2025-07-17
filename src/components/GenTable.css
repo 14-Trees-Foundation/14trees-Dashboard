@@ -87,3 +87,96 @@
 .bg-lost-tree.ant-table-row-selected > .ant-table-cell {
     background-color: #ffe0b2 !important;
 }
+
+/* Sticky column styles - prevent other columns from showing behind */
+.ant-table-cell-fix-left {
+    z-index: 2 !important;
+    position: sticky !important;
+    background-color: #ffffff !important; /* Default white background */
+}
+
+.ant-table-thead .ant-table-cell-fix-left {
+    z-index: 3 !important;
+    background-color: rgb(177 192 180) !important; /* Header background */
+}
+
+/* Ensure sticky columns have solid background to prevent text bleeding through */
+.ant-table-tbody .ant-table-cell-fix-left {
+    background-color: rgb(177 192 180) !important; /* Solid white background for body cells */
+}
+
+/* Add a pseudo-element to create an additional background layer */
+.ant-table-cell-fix-left::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgb(177 192 180);
+    z-index: -1;
+}
+
+/* More specific targeting for Ant Design table structure */
+.ant-table-wrapper .ant-table-cell-fix-left {
+    background-color: rgb(177 192 180) !important;
+    z-index: 10 !important;
+}
+
+.ant-table-wrapper .ant-table-thead .ant-table-cell-fix-left {
+    background-color: #afbcb0 !important;
+    z-index: 11 !important;
+}
+
+/* Ensure the sticky column content is above everything */
+.ant-table-wrapper .ant-table-cell-fix-left * {
+    position: relative;
+    z-index: 1;
+}
+
+/* For rows with specific background classes, ensure sticky column matches */
+.bg-dead-tree .ant-table-cell-fix-left {
+    background-color: #ffebee !important;
+}
+
+.bg-deleted-tree .ant-table-cell-fix-left {
+    background-color: #f5f5f5 !important;
+}
+
+.bg-lost-tree .ant-table-cell-fix-left {
+    background-color: #fff3e0 !important;
+}
+
+.bg-green .ant-table-cell-fix-left {
+    background-color: #bee6bf !important;
+}
+
+.bg-cyan .ant-table-cell-fix-left {
+    background-color: #c2dcda !important;
+}
+
+.bg-yellow .ant-table-cell-fix-left {
+    background-color: #ecf5c8 !important;
+}
+
+.bg-red .ant-table-cell-fix-left {
+    background-color: #fd7b7b6b !important;
+}
+
+/* For selected rows */
+.ant-table-row-selected .ant-table-cell-fix-left {
+    background-color: #e6f7ff !important;
+}
+
+/* For selected rows with specific background classes */
+.bg-dead-tree.ant-table-row-selected .ant-table-cell-fix-left {
+    background-color: #ffcdd2 !important;
+}
+
+.bg-deleted-tree.ant-table-row-selected .ant-table-cell-fix-left {
+    background-color: #e0e0e0 !important;
+}
+
+.bg-lost-tree.ant-table-row-selected .ant-table-cell-fix-left {
+    background-color: #ffe0b2 !important;
+}
