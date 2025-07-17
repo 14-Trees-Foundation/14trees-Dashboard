@@ -156,6 +156,12 @@ export const AdminLeftDrawer = () => {
       path: "tree-cards",
     },
     {
+      displayName: "Tree Cards (Old)",
+      logo: CardGiftcard,
+      display: true, // Show to all users who can access the admin panel
+      path: "tree-cards-old",
+    },
+    {
       displayName: "Donations",
       logo: VolunteerActivismIcon,
       display: true,

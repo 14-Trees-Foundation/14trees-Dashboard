@@ -6,7 +6,7 @@ import { UserLeftDrawer } from "./LeftDrawer";
 import {
   adminNavIndex,
 } from "../../store/adminAtoms";
-import GiftTrees from "../admin/gift/GiftTrees"
+import GiftTrees from "../admin/gift/GiftTreesRefactored"
 
 export const User = () => {
   const classes = useStyles();

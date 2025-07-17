@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { GridFilterItem } from "@mui/x-data-grid";
-import { Dropdown, Menu, TableColumnsType } from "antd";
+import { Dropdown, MenuProps, TableColumnsType } from "antd";
 import { Donation } from "../../../types/donation";
 import getColumnSearchProps, { getColumnDateFilter, getColumnSelectedItemFilter, getSortableHeader } from "../../../components/Filter";
 
@@ -486,63 +486,85 @@ export const DonationComponent = () => {
     }
   };
 
-  const getActionsMenu = (record: Donation) => (
-    <Menu>
-      <Menu.ItemGroup>
-        <Menu.Item key="00" onClick={() => { handleViewSummary(record); }} icon={<Wysiwyg />}>
-          View Summary
-        </Menu.Item>
-        <Menu.Item key="01" onClick={() => { handleEditModalOpen(record); }} icon={<Edit />}>
-          Edit Request
-        </Menu.Item>
-        <Menu.Item key="02" onClick={() => { handleTagModalOpen(record); }} icon={<LocalOffer />}>
-          Tag Request
-        </Menu.Item>
-        <Menu.Item key="03" danger onClick={() => { setIsDeleteAltOpen(true); setSelectedDonation(record); }} icon={<Delete />}>
-          Delete Request
-        </Menu.Item>
-      </Menu.ItemGroup>
-      <Menu.Divider style={{ backgroundColor: '#ccc' }} />
-      <Menu.ItemGroup>
-        {(Number(record.booked) < (record.pledged || 0)) && <Menu.Item key="20" onClick={() => { setSelectedDonation(record); setPlotSelectionModalOpen(true); }} icon={<Landscape />}>
-          Select Plots
-        </Menu.Item>}
-        </Menu.ItemGroup>
-      {record.status !== 'PendingPayment' && (
-        <>
-          <Menu.ItemGroup>
-            {(Number(record.booked) < (record.pledged || 0)) && <Menu.Item key="20" onClick={() => { setSelectedDonation(record); setPlotSelectionModalOpen(true); }} icon={<Landscape />}>
-              Select Plots
-            </Menu.Item>}
-            <Menu.Item key="21" onClick={() => { setSelectedDonation(record); setEmailConfirmationModal(true); }} icon={<Email />}>
-              Send Emails
-            </Menu.Item>
-            <Menu.Item key="22" onClick={() => { setSelectedDonation(record); setReserveTreesModalOpen(true); }} icon={<Landscape />}>
-              Reserve Trees
-            </Menu.Item>
-            <Menu.Item key="23" onClick={() => { setSelectedDonation(record); setAssignTreesModalOpen(true); }} icon={<AssignmentInd />}>
-              Assign Trees
-            </Menu.Item>
-            {record.visit_date && <Menu.Item key="24" onClick={() => { setSelectedDonation(record); setMapTreesOpen(true); }} icon={<AssignmentInd />}>
-              Map Visit Trees
-            </Menu.Item>}
-            {record.donation_method === 'trees' && record.trees_count > (record.assigned || 0) && <Menu.Item key="25" onClick={() => { setSelectedDonation(record); setPrsConfirm(true); }} icon={<AutoMode />}>
-              Auto Process
-            </Menu.Item>}
-            {!record.processed_by && (
-              <Menu.Item
-                key="pick"
-                onClick={() => handlePickDonation(record.id)}
-                icon={<AssignmentInd />}
-              >
-                Pick This Up
-              </Menu.Item>
-            )}
-          </Menu.ItemGroup>
-        </>
-      )}
-    </Menu>
-  );
+  const getActionsMenu = (record: Donation): MenuProps => {
+    const items: MenuProps['items'] = [
+      // First group
+      {
+        key: "00",
+        label: "View Summary",
+        icon: <Wysiwyg />,
+        onClick: () => handleViewSummary(record)
+      },
+      {
+        key: "01",
+        label: "Edit Request",
+        icon: <Edit />,
+        onClick: () => handleEditModalOpen(record)
+      },
+      {
+        key: "02",
+        label: "Tag Request",
+        icon: <LocalOffer />,
+        onClick: () => handleTagModalOpen(record)
+      },
+      {
+        key: "03",
+        label: "Delete Request",
+        icon: <Delete />,
+        danger: true,
+        onClick: () => { setIsDeleteAltOpen(true); setSelectedDonation(record); }
+      },
+      { type: 'divider' },
+      
+      // Second group - conditional items based on status
+      ...(record.status !== 'PendingPayment' ? [
+        ...(Number(record.booked) < (record.pledged || 0) ? [{
+          key: "20",
+          label: "Select Plots",
+          icon: <Landscape />,
+          onClick: () => { setSelectedDonation(record); setPlotSelectionModalOpen(true); }
+        }] : []),
+        {
+          key: "21",
+          label: "Send Emails",
+          icon: <Email />,
+          onClick: () => { setSelectedDonation(record); setEmailConfirmationModal(true); }
+        },
+        {
+          key: "22",
+          label: "Reserve Trees",
+          icon: <Landscape />,
+          onClick: () => { setSelectedDonation(record); setReserveTreesModalOpen(true); }
+        },
+        {
+          key: "23",
+          label: "Assign Trees",
+          icon: <AssignmentInd />,
+          onClick: () => { setSelectedDonation(record); setAssignTreesModalOpen(true); }
+        },
+        ...(record.visit_date ? [{
+          key: "24",
+          label: "Map Visit Trees",
+          icon: <AssignmentInd />,
+          onClick: () => { setSelectedDonation(record); setMapTreesOpen(true); }
+        }] : []),
+        ...(record.donation_method === 'trees' && record.trees_count > (record.assigned || 0) ? [{
+          key: "25",
+          label: "Auto Process",
+          icon: <AutoMode />,
+          onClick: () => { setSelectedDonation(record); setPrsConfirm(true); }
+        }] : []),
+        ...(!record.processed_by ? [{
+          key: "pick",
+          label: "Pick This Up",
+          icon: <AssignmentInd />,
+          onClick: () => handlePickDonation(record.id)
+        }] : [])
+      ] : [])
+    ];
+
+    return { items };
+  };
 
   const columns: TableColumnsType<Donation> = [
     {
@@ -558,7 +580,7 @@ export const DonationComponent = () => {
             justifyContent: "center",
             alignItems: "center",
           }}>
-          <Dropdown overlay={getActionsMenu(record)} trigger={['click']}>
+          <Dropdown menu={getActionsMenu(record)} trigger={['click']}>
             <Button
               variant='outlined'
               color='success'
