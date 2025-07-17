@@ -16,7 +16,7 @@ import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { PlantationInfoTab } from './components/PlantationInfoTab';
 import { RecipientDetailsTab } from './components/RecipientDetailsTab';
 import { SponsorDetailsTab } from './components/SponsorDetailsTab';
-import CardDetails from '../../gift/Components/CardDetailsForm';
+import CardDetails from '../../gift/Components/workflow/CardDetailsForm';
 import  ApiClient  from '../../../../api/apiClient/apiClient'; 
 
 interface TreeSponsorshipFormProps {

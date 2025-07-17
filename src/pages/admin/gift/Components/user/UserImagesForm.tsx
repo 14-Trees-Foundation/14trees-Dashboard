@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { Box, Button, Tooltip, Typography } from '@mui/material';
-import { AWSUtils } from '../../../../helpers/aws';
+import { AWSUtils } from '../../../../../helpers/aws';
 import { toast } from 'react-toastify';
 import { List } from '@mui/icons-material';
 

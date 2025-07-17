@@ -3,14 +3,14 @@ import { Modal, Box, TextField, Button, Typography } from '@mui/material';
 
 const MAX_CHARS = 1000;
 
-interface GiftRequestNotesProps {
+interface GiftRequestNotesModalProps {
     open: boolean
     initialText?: string
     handleClose: () => void
     onSave: (text: string) => void
 }
 
-const GiftRequestNotes: React.FC<GiftRequestNotesProps> = ({ open, handleClose, initialText, onSave }) => {
+const GiftRequestNotesModal: React.FC<GiftRequestNotesModalProps> = ({ open, handleClose, initialText, onSave }) => {
   const [text, setText] = useState(initialText || '');
 
   useEffect(() => {
@@ -46,7 +46,7 @@ const GiftRequestNotes: React.FC<GiftRequestNotesProps> = ({ open, handleClose, 
         }}
       >
         <Typography id="edit-modal-title" variant="h6" component="h2" sx={{ mb: 2 }}>
-            Tree card request notes
+            Notes
         </Typography>
         <TextField
           fullWidth
@@ -75,4 +75,4 @@ const GiftRequestNotes: React.FC<GiftRequestNotesProps> = ({ open, handleClose, 
   );
 };
 
-export default GiftRequestNotes;
+export default GiftRequestNotesModal;

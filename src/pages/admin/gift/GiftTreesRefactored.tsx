@@ -3,7 +3,7 @@ import { Box, Button, Divider, Typography } from "@mui/material";
 import { ToastContainer } from "react-toastify";
 import { useAuth } from "../auth/auth";
 import { LoginComponent } from "../Login/LoginComponent";
-import GiftCardsForm from "./Components/GiftCardForm";
+import GiftCardsForm from "./Components/workflow/GiftCardForm";
 import GeneralTable from "../../../components/GenTable";
 import AutoPrsPlots from "../../../components/AutoPrsPlots/AutoPrsPlots";
 import GiftTreesChart from "./Components/GiftTreesChart";

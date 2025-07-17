@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
-import { Group } from "../../../../types/Group";
-import { User } from "../../../../types/user";
-import SponsorUserForm from "./SponsorUser";
+import { Group } from "../../../../../types/Group";
+import { User } from "../../../../../types/user";
+import SponsorUserForm from "../user/SponsorUser";
 import { ToggleButton, ToggleButtonGroup, Typography } from "@mui/material";
-import SponsorGroupForm from "./SponsorGroup";
+import SponsorGroupForm from "../user/SponsorGroup";
 
 
 interface SponsorDetailsFormProps {

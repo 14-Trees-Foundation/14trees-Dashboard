@@ -23,7 +23,7 @@ const TagComponent: React.FC<TagComponentProps> = ({ defaultTags, tags, open, on
 
     return (
         <Dialog open={open} fullWidth maxWidth="md">
-            <DialogTitle>Tag tree cards request</DialogTitle>
+            <DialogTitle>Tag request</DialogTitle>
             <DialogContent dividers>
                 <Box mt={2}>
                     <Typography mb={1}>You can tag the tree card request by selecting existing tags from the list below or adding new ones.</Typography>

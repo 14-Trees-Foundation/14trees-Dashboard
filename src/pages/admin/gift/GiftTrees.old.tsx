@@ -1,7 +1,7 @@
 import { Badge, Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, Divider, IconButton, Tooltip, Typography } from "@mui/material";
 import { FC, useEffect, useRef, useState } from "react";
 import GiftTreesChart from "./Components/GiftTreesChart";
-import GiftCardsForm from "./Components/GiftCardForm";
+import GiftCardsForm from "./Components/workflow/GiftCardForm";
 import { User } from "../../../types/user";
 import { Group } from "../../../types/Group";
 import ApiClient from "../../../api/apiClient/apiClient";
@@ -18,11 +18,11 @@ import { AssignmentInd, AssuredWorkload, AutoMode, CardGiftcard, Collections, De
 import PlotSelection from "./Components/PlotSelection";
 import { Plot } from "../../../types/plot";
 import giftCardActionTypes from "../../../redux/actionTypes/giftCardActionTypes";
-import GiftCardRequestInfo from "./Components/GiftCardRequestInfo";
-import GiftRequestNotes from "./Components/Notes";
+import GiftCardRequestInfo from "./Components/summary/GiftCardRequestInfo";
+import GiftRequestNotesModal from "./Components/GiftRequestNotesModal";
 import AlbumImageInput from "../../../components/AlbumImageInput";
 import EmailConfirmationModal from "./Components/EmailConfirmationModal";
-import EditUserDetailsModal from "./Components/EditUserDetailsModal";
+import EditUserDetailsModal from "./Components/user/EditUserDetailsModal";
 import { getHumanReadableDate, getUniqueRequestId } from "../../../helpers/utils";
 import PaymentComponent from "../../../components/payment/PaymentComponent";
 import AutoPrsPlots from "../../../components/AutoPrsPlots/AutoPrsPlots"
@@ -30,7 +30,7 @@ import { useAuth } from "../auth/auth";
 import { Order, UserRoles } from "../../../types/common";
 import { LoginComponent } from "../Login/LoginComponent";
 import TagComponent from "./Components/TagComponent";
-import AssignTrees from "./Components/AssignTrees";
+import AssignTrees from "./Components/actions/AssignTrees";
 import GiftCardCreationModal from "./Components/GiftCardCreationModal";
 import GeneralTable from "../../../components/GenTable";
 import AutoProcessConfirmationModal from "./Components/AutoProcessConfirmationModal";
@@ -1284,7 +1284,7 @@ const GiftTrees: FC = () => {
                 data={selectedGiftCard}
             />
 
-            <GiftRequestNotes
+            <GiftRequestNotesModal
                 open={notesModal}
                 handleClose={() => { setNotesModal(false) }}
                 onSave={handleNotesSave}
