@@ -1,6 +1,6 @@
 import { Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, Typography } from "@mui/material"
 import getColumnSearchProps, { getColumnSelectedItemFilter } from "../../../../components/Filter"
-import { useEffect, useState } from "react"
+import { useEffect, useState, useRef } from "react"
 import { GridFilterItem } from "@mui/x-data-grid"
 import ApiClient from "../../../../api/apiClient/apiClient"
 import { toast } from "react-toastify"
@@ -16,6 +16,7 @@ interface TreeSelectionComponentProps {
 
 const TreeSelectionComponent: React.FC<TreeSelectionComponentProps> = ({ plotIds, max, open, onClose, onSubmit }) => {
 
+    const isMountedRef = useRef(true);
     const [treesData, setTreesData] = useState<Record<number, any>>({})
     const [total, setTotal] = useState(0)
     const [page, setPage] = useState(0);
@@ -29,6 +30,13 @@ const TreeSelectionComponent: React.FC<TreeSelectionComponentProps> = ({ plotIds
     const [tags, setTags] = useState<string[]>([]);
     const [selectedTrees, setSelectedTrees] = useState<any[]>([])
 
+    // Cleanup function to set mounted ref to false when component unmounts
+    useEffect(() => {
+        return () => {
+            isMountedRef.current = false;
+        };
+    }, []);
+
     const handleSetFilters = (filters: Record<string, GridFilterItem>) => {
         setPage(0);
         setFilters(filters);
@@ -36,6 +44,7 @@ const TreeSelectionComponent: React.FC<TreeSelectionComponentProps> = ({ plotIds
 
     const getTrees = async (plotIds: number[]) => {
         const apiClient = new ApiClient();
+        if (!isMountedRef.current) return;
         setLoading(true);
         if (plotIds.length > 0) {
             const filtersData: any[] = [{
@@ -45,19 +54,28 @@ const TreeSelectionComponent: React.FC<TreeSelectionComponentProps> = ({ plotIds
             }]
 
             filtersData.push(...Object.values(filters));
-            const treesResp = await apiClient.getGiftAbleTrees(page * pageSize, pageSize, filtersData);
-            setTotal(Number(treesResp.total));
+            try {
+                const treesResp = await apiClient.getGiftAbleTrees(page * pageSize, pageSize, filtersData);
+                
+                if (!isMountedRef.current) return;
+                
+                setTotal(Number(treesResp.total));
 
-            setTreesData(prev => {
+                setTreesData(prev => {
 
-                const newTrees = { ...prev };
-                for (let i = 0; i < treesResp.results.length; i++) {
-                    newTrees[treesResp.offset + i] = treesResp.results[i];
-                }
+                    const newTrees = { ...prev };
+                    for (let i = 0; i < treesResp.results.length; i++) {
+                        newTrees[treesResp.offset + i] = treesResp.results[i];
+                    }
 
-                return newTrees;
-            });
+                    return newTrees;
+                });
+            } catch (error) {
+                if (!isMountedRef.current) return;
+                // Handle error if needed
+            }
         }
+        if (!isMountedRef.current) return;
         setLoading(false);
     }
 
@@ -68,6 +86,8 @@ const TreeSelectionComponent: React.FC<TreeSelectionComponentProps> = ({ plotIds
 
     useEffect(() => {
         const handler = setTimeout(() => {
+            if (!isMountedRef.current) return;
+            
             const records: any[] = [];
             const maxLength = Math.min((page + 1) * pageSize, total);
             for (let i = page * pageSize; i < maxLength; i++) {
@@ -92,6 +112,7 @@ const TreeSelectionComponent: React.FC<TreeSelectionComponentProps> = ({ plotIds
 
     useEffect(() => {
         const handler = setTimeout(() => {
+            if (!isMountedRef.current) return;
             getTrees(plotIds);
         }, 300)
 
@@ -106,8 +127,10 @@ const TreeSelectionComponent: React.FC<TreeSelectionComponentProps> = ({ plotIds
             try {
                 const apiClient = new ApiClient();
                 const tagsResp = await apiClient.getPlantTypeTags();
+                if (!isMountedRef.current) return;
                 setTags(tagsResp.results)
             } catch (error: any) {
+                if (!isMountedRef.current) return;
                 toast.error(error.message);
             }
         }

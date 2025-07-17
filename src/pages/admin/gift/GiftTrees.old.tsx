@@ -1,4 +1,4 @@
-import { Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, Divider, Typography } from "@mui/material";
+import { Badge, Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, Divider, IconButton, Tooltip, Typography } from "@mui/material";
 import { FC, useEffect, useRef, useState } from "react";
 import GiftTreesChart from "./GiftTreesChart";
 import GiftCardsForm from "./Form/GiftCardForm";
@@ -7,11 +7,14 @@ import { Group } from "../../../types/Group";
 import ApiClient from "../../../api/apiClient/apiClient";
 import { ToastContainer, toast } from "react-toastify";
 import { GiftCard, GiftRequestType_CARDS_REQUEST, GiftRequestType_NORAML_ASSIGNMENT, GiftRequestType_VISIT, GiftRequestUser, SponsorshipType } from "../../../types/gift_card";
+import getColumnSearchProps, { getColumnDateFilter, getColumnNumericFilter, getColumnSelectedItemFilter, getSortIcon } from "../../../components/Filter";
 import { GridFilterItem } from "@mui/x-data-grid";
 import * as giftCardActionCreators from "../../../redux/actions/giftCardActions";
 import { useAppDispatch, useAppSelector } from "../../../redux/store/hooks";
 import { bindActionCreators } from "@reduxjs/toolkit";
 import { RootState } from "../../../redux/store/store";
+import { Dropdown, Menu, Table, TableColumnsType } from "antd";
+import { AssignmentInd, AssuredWorkload, AutoMode, CardGiftcard, Collections, Delete, Description, Download, Edit, Email, ErrorOutline, FileCopy, Landscape, LocalOffer, ManageAccounts, MenuOutlined, NotesOutlined, Photo, Slideshow, Wysiwyg } from "@mui/icons-material";
 import PlotSelection from "./Form/PlotSelection";
 import { Plot } from "../../../types/plot";
 import giftCardActionTypes from "../../../redux/actionTypes/giftCardActionTypes";
@@ -20,7 +23,7 @@ import GiftRequestNotes from "./Form/Notes";
 import AlbumImageInput from "../../../components/AlbumImageInput";
 import EmailConfirmationModal from "./Form/EmailConfirmationModal";
 import EditUserDetailsModal from "./Form/EditUserDetailsModal";
-import { getUniqueRequestId } from "../../../helpers/utils";
+import { getHumanReadableDate, getUniqueRequestId } from "../../../helpers/utils";
 import PaymentComponent from "../../../components/payment/PaymentComponent";
 import AutoPrsPlots from "../../../components/AutoPrsPlots/AutoPrsPlots"
 import { useAuth } from "../auth/auth";
@@ -31,11 +34,30 @@ import AssignTrees from "./Form/AssignTrees";
 import GiftCardCreationModal from "./Components/GiftCardCreationModal";
 import GeneralTable from "../../../components/GenTable";
 import AutoProcessConfirmationModal from "./Components/AutoProcessConfirmationModal";
-import { createTableColumns, pendingPlotSelection } from "./config/tableColumns";
-import { createActionsMenu } from "./config/actionsMenu";
-import TableSummary from "./components/TableSummary";
 
+const pendingPlotSelection = 'Pending Plot & Tree(s) Reservation';
 
+const TableSummary = (giftRequests: GiftCard[], selectedGiftRequestIds: number[], totalColumns: number) => {
+
+    const calculateSum = (data: (number | undefined)[]) => {
+        return data.reduce((a, b) => (a ?? 0) + (b ?? 0), 0);
+    }
+
+    return (
+        <Table.Summary fixed='bottom'>
+            <Table.Summary.Row style={{ backgroundColor: 'rgba(172, 252, 172, 0.2)' }}>
+                <Table.Summary.Cell align="center" index={1} colSpan={5}>
+                    <strong>Total</strong>
+                </Table.Summary.Cell>
+                <Table.Summary.Cell align="center" index={5} colSpan={1}>{calculateSum(giftRequests.filter((giftRequest) => selectedGiftRequestIds.includes(giftRequest.id)).map((giftRequest) => giftRequest.no_of_cards))}</Table.Summary.Cell>
+                <Table.Summary.Cell align="center" index={8} colSpan={9}></Table.Summary.Cell>
+                <Table.Summary.Cell align="center" index={15} colSpan={1}>{calculateSum(giftRequests.filter((giftRequest) => selectedGiftRequestIds.includes(giftRequest.id)).map((giftRequest: any) => giftRequest.total_amount))}</Table.Summary.Cell>
+                <Table.Summary.Cell align="center" index={16} colSpan={1}>{calculateSum(giftRequests.filter((giftRequest) => selectedGiftRequestIds.includes(giftRequest.id)).map((giftRequest) => giftRequest.amount_received))}</Table.Summary.Cell>
+                <Table.Summary.Cell align="center" index={13} colSpan={3}></Table.Summary.Cell>
+            </Table.Summary.Row>
+        </Table.Summary>
+    )
+}
 
 const GiftTrees: FC = () => {
     const dispatch = useAppDispatch();
@@ -195,8 +217,8 @@ const GiftTrees: FC = () => {
     }
 
     const getGiftCardData = async () => {
-        // check if user logged in (skip if VITE_BYPASS_AUTH is enabled)
-        if (!authRef.current?.signedin && import.meta.env.VITE_BYPASS_AUTH !== 'true') return;
+        // check if user logged in
+        if (!authRef.current?.signedin) return;
 
         const filtersData = getFilters(filters);
 
@@ -645,7 +667,25 @@ const GiftTrees: FC = () => {
         }
     }
 
+    const getStatus = (card: GiftCard) => {
+        if (card.status === 'pending_plot_selection') {
+            return pendingPlotSelection;
+        } else if (card.status === 'pending_assignment') {
+            return 'Pending assignment';
+        } else if (card.status === 'pending_gift_cards') {
+            return 'Pending Tree cards creation';
+        } else {
+            return 'Completed';
+        }
+    }
 
+    const getValidationErrors = (errorValues: string[]) => {
+        let errors = []
+        if (errorValues.includes('MISSING_LOGO')) errors.push('Missing Company Logo');
+        if (errorValues.includes('MISSING_USER_DETAILS')) errors.push('Missing user details for assignment');
+
+        return errors;
+    }
 
     const handleSortingChange = (sorter: any) => {
         let newOrder = [...orderBy];
@@ -693,7 +733,13 @@ const GiftTrees: FC = () => {
         }
     }
 
-
+    const getSortableHeader = (header: string, key: string) => {
+        return (
+            <div style={{ display: "flex", alignItems: "center", justifyContent: 'space-between' }}>
+                {header} {getSortIcon(key, orderBy.find((item) => item.column === key)?.order, handleSortingChange)}
+            </div>
+        )
+    }
 
     const handlePickGiftRequest = async (giftCardId: number) => {
         try {
@@ -716,48 +762,332 @@ const GiftTrees: FC = () => {
         }
     };
 
+    const getActionsMenu = (record: GiftCard) => (
+        <Menu>
+            <Menu.ItemGroup>
+                <Menu.Item key="50" onClick={() => { handleModalOpenEdit(record, 0); }} icon={<Wysiwyg />}>
+                    Edit Dashboard Details
+                </Menu.Item>
+                {record.request_type !== 'Visit' && record.request_type !== 'Normal Assignment' && <Menu.Item key="51" onClick={() => { handleModalOpenEdit(record, 4); }} icon={<CardGiftcard />}>
+                    Edit Card Messaging
+                </Menu.Item>}
+                <Menu.Item key="52" onClick={() => { handleModalOpenEdit(record, 1); }} icon={<AssuredWorkload />}>
+                    View/Make Payments
+                </Menu.Item>
+                <Menu.Item key="53" onClick={() => { handleModalOpenEdit(record, 2); }} icon={<ManageAccounts />}>
+                    Add/Edit Recipient Details
+                </Menu.Item>
+            </Menu.ItemGroup>
+            <Menu.Divider style={{ backgroundColor: '#ccc' }} />
+            <Menu.ItemGroup>
+                <Menu.Item key="00" onClick={() => { setSelectedGiftCard(record); setInfoModal(true); }} icon={<Wysiwyg />}>
+                    View Summary
+                </Menu.Item>
+                <Menu.Item key="01" onClick={() => { handleModalOpenEdit(record); }} icon={<Edit />}>
+                    Edit Request
+                </Menu.Item>
+                <Menu.Item key="02" onClick={() => { handleTagModalOpen(record); }} icon={<LocalOffer />}>
+                    Tag Request
+                </Menu.Item>
+                <Menu.Item key="03" onClick={() => { handleCloneGiftCardRequest(record); }} icon={<FileCopy />}>
+                    Clone Request
+                </Menu.Item>
+                {!auth.roles.includes(UserRoles.User) &&
+                    <Menu.Item key="04" danger onClick={() => { setDeleteModal(true); setSelectedGiftCard(record); }} icon={<Delete />}>
+                        Delete Request
+                    </Menu.Item>
+                }
+            </Menu.ItemGroup>
+            <Menu.Divider style={{ backgroundColor: '#ccc' }} />
+            <Menu.ItemGroup>
+                <Menu.Item key="10" onClick={() => { handleAlbumModalOpen(record); }} icon={<Collections />}>
+                    Update memories
+                </Menu.Item>
+                {(record.validation_errors === null || !record.validation_errors.includes('MISSING_USER_DETAILS')) &&
+                    <Menu.Item key="11" onClick={() => { setSelectedGiftCard(record); setUserDetailsEditModal(true); }} icon={<ManageAccounts />}>
+                        Edit Recipient Details
+                    </Menu.Item>
+                }
+            </Menu.ItemGroup>
+            {(record.status === 'completed' || record.status === 'pending_gift_cards' || record.booked > 0) && <Menu.Divider style={{ backgroundColor: '#ccc' }} />}
+            {(record.status === 'completed' || record.status === 'pending_gift_cards' || record.booked > 0) &&
+                <Menu.ItemGroup>
+                    {record.booked > 0 &&
+                        <Menu.Item key="20" onClick={() => { handleGenerateGiftCards(record.id) }} icon={<CardGiftcard />}>
+                            Generate Gift Cards
+                        </Menu.Item>
+                    }
+                    {Number(record.assigned) > 0 &&
+                        <Menu.Item key="21" onClick={() => { setSelectedGiftCard(record); setEmailConfirmationModal(true); }} icon={<Email />}>
+                            Send Emails
+                        </Menu.Item>
+                    }
+                </Menu.ItemGroup>
+            }
+            {(record.presentation_id || record.presentation_ids.length > 0) && <Menu.Divider style={{ backgroundColor: '#ccc' }} />}
+            {(record.presentation_id || record.presentation_ids.length > 0) && <Menu.ItemGroup>
+                {record.presentation_id && <Menu.Item key="30" onClick={() => { handleDownloadCards(record.id, record.user_name + '_' + record.no_of_cards, 'zip') }} icon={<Download />}>
+                    Download Tree Cards
+                </Menu.Item>}
+                <Menu.Item key="31" onClick={() => { window.open('https://docs.google.com/presentation/d/' + (record.presentation_id ? record.presentation_id : record.presentation_ids[0])); }} icon={<Slideshow />}>
+                    Tree Cards Slide
+                </Menu.Item>
+                <Menu.Item key="32" onClick={() => { handleUpdateGiftCardImagess(record.id) }} icon={<Photo />}>
+                    Update Cards Images
+                </Menu.Item>
+            </Menu.ItemGroup>}
+            {!auth.roles.includes(UserRoles.User) && <Menu.Divider style={{ backgroundColor: '#ccc' }} />}
+            {!auth.roles.includes(UserRoles.User) && <Menu.ItemGroup>
+                <Menu.Item key="40" onClick={() => { setBookNonGiftable(record.request_type === GiftRequestType_NORAML_ASSIGNMENT || record.request_type === 'Visit' ? true : false); setSelectedGiftCard(record); setPlotModal(true); }} icon={<Landscape />}>
+                    Reserve Trees
+                </Menu.Item>
+                <Menu.Item key="41" onClick={() => { setSelectedGiftCard(record); setAutoAssignModal(true); }} icon={<AssignmentInd />}>
+                    Assign Trees
+                </Menu.Item>
+                {record.no_of_cards > (record.assigned || 0) && <Menu.Item key="25" onClick={() => { setSelectedGiftCard(record); setPrsConfirm(true); }} icon={<AutoMode />}>
+                    Auto Process
+                </Menu.Item>}
+                <Menu.Item key="42" onClick={() => { handlePaymentModalOpen(record); }} icon={<AssuredWorkload />}>
+                    Payment Details
+                </Menu.Item>
+                {record.group_id && <Menu.Item key="43" onClick={() => { handleDownloadFundRequest(record.id); }} icon={<Description />}>
+                    Fund Request
+                </Menu.Item>}
+                {!record.processed_by && (
+                    <Menu.Item
+                        key="pick"
+                        onClick={() => handlePickGiftRequest(record.id)}
+                        icon={<AssignmentInd />}
+                    >
+                        Pick This Up
+                    </Menu.Item>
+                )}
+            </Menu.ItemGroup>}
+        </Menu>
+    );
 
+    const columns: TableColumnsType<GiftCard> = [
+        {
+            dataIndex: "action",
+            key: "action",
+            title: "Actions",
+            width: 100,
+            align: "center",
+            render: (value, record, index) => (
+                <div
+                    style={{
+                        display: "flex",
+                        justifyContent: "center",
+                        alignItems: "center",
+                    }}>
+                    <Dropdown overlay={getActionsMenu(record)} trigger={['click']}>
+                        <Button
+                            variant='outlined'
+                            color='success'
+                            style={{ margin: "0 5px" }}
+                        >
+                            <MenuOutlined />
+                        </Button>
+                    </Dropdown>
+                </div>
+            ),
+        },
+        {
+            dataIndex: "id",
+            key: "Req. No.",
+            title: "Req. No.",
+            align: "right",
+            width: 130,
+            ...getColumnNumericFilter({ dataIndex: 'id', filters, handleSetFilters, label: 'Req. No.' })
+        },
+        {
+            dataIndex: "user_name",
+            key: "Sponsor",
+            title: "Sponsor",
+            align: "center",
+            width: 200,
+            ...getColumnSearchProps('user_name', filters, handleSetFilters)
+        },
+        {
+            dataIndex: "group_name",
+            key: "Sponsorship (Corporate/Personal)",
+            title: "Sponsorship (Corporate/Personal)",
+            align: "center",
+            width: 200,
+            render: (value: string) => value ? value : 'Personal',
+            ...getColumnSearchProps('group_name', filters, handleSetFilters)
+        },
+        {
+            dataIndex: "no_of_cards",
+            key: "# Trees",
+            title: getSortableHeader("# Trees", 'no_of_cards'),
+            align: "center",
+            width: 100,
+        },
+        {
+            dataIndex: "created_by_name",
+            key: "Created by",
+            title: "Created by",
+            align: "center",
+            width: 200,
+            ...getColumnSearchProps('created_by_name', filters, handleSetFilters)
+        },
+        {
+            dataIndex: "recipient_name",
+            key: "Recipient Name",
+            title: "Recipient Name",
+            align: "center",
+            width: 200,
+            ...getColumnSearchProps('recipient_name', filters, handleSetFilters)
+        },
+        {
+            dataIndex: "request_type",
+            key: "Request Type",
+            title: "Request Type",
+            align: "center",
+            width: 200,
+            ...getColumnSelectedItemFilter({ dataIndex: 'request_type', filters, handleSetFilters, options: ['Gift Cards', 'Normal Assignment', 'Test', 'Promotion', 'Visit'] })
+        },
+        {
+            dataIndex: "processed_by_name",
+            key: "processed_by",
+            title: "Processed By",
+            align: "center",
+            width: 150,
+            render: (value, record) => {
+                if (!value) return 'Pending';
+                return record.processed_by_name || `User ${value}`;
+            },
+            ...getColumnSearchProps('processed_by_name', filters, handleSetFilters)
+        },
+        {
+            dataIndex: "tags",
+            key: "Tags",
+            title: "Tags",
+            align: "center",
+            width: 200,
+            render: value => value?.join(", ") || '',
+            ...getColumnSelectedItemFilter({ dataIndex: 'tags', filters, handleSetFilters, options: tags })
+        },
+        {
+            dataIndex: "status",
+            key: "Status",
+            title: "Status",
+            align: "center",
+            width: 150,
+            render: (value, record, index) => getStatus(record),
+            ...getColumnSelectedItemFilter({ dataIndex: 'status', filters, handleSetFilters, options: [pendingPlotSelection, 'Pending assignment', 'Completed'] })
+        },
+        {
+            dataIndex: "mail_sent",
+            key: "Email Status",
+            title: "Email Status",
+            align: "center",
+            width: 200,
+            render: (value, record: any, index) => {
+                const usersCount = parseInt(record.users_count || "0");
+                const mailedCount = parseInt(record.mailed_count || "0");
+                const mailedAssigneeCount = parseInt(record.mailed_assignee_count || "0");
+        
+                const statusMessages: string[] = [];
+                if (record.mail_sent) {
+                    statusMessages.push("Mail Sent to Sponsor");
+                }
+                if (usersCount > 0 && usersCount === mailedCount) {
+                    statusMessages.push("Mail Sent to Recipient");
+                }
+                if (usersCount > 0 && usersCount === mailedAssigneeCount) {
+                    statusMessages.push("Mail Sent to Assignee");
+                }
 
-    // Create handlers object for actions menu
-    const actionHandlers = {
-        handleModalOpenEdit,
-        setSelectedGiftCard,
-        setInfoModal,
-        handleTagModalOpen,
-        handleCloneGiftCardRequest,
-        setDeleteModal,
-        handleAlbumModalOpen,
-        setUserDetailsEditModal,
-        handleGenerateGiftCards,
-        setEmailConfirmationModal,
-        handleDownloadCards,
-        handleUpdateGiftCardImagess,
-        setBookNonGiftable,
-        setPlotModal,
-        setAutoAssignModal,
-        setPrsConfirm,
-        handlePaymentModalOpen,
-        handleDownloadFundRequest,
-        handlePickGiftRequest
-    };
-
-    const getActionsMenu = (record: GiftCard) => createActionsMenu({ 
-        record, 
-        auth, 
-        handlers: actionHandlers 
-    });
-
-    const columns = createTableColumns({
-        filters,
-        handleSetFilters,
-        orderBy,
-        handleSortingChange,
-        tags,
-        getActionsMenu,
-        setSelectedGiftCard,
-        setNotesModal
-    });
-
+                return statusMessages.join(", ");
+            }
+        },
+        {
+            dataIndex: "validation_errors",
+            key: "Validation Errors",
+            title: "Validation Errors",
+            align: "center",
+            width: 120,
+            render: (value) => value && value.length > 0 ? (
+                <Tooltip title={<div>{getValidationErrors(value).map((item, index) => (<p key={index}>{item}</p>))}</div>}>
+                    <IconButton>
+                        <ErrorOutline color="error" />
+                    </IconButton>
+                </Tooltip>
+            ) : '',
+            ...getColumnSelectedItemFilter({ dataIndex: 'validation_errors', filters, handleSetFilters, options: ['Yes', 'No'] }),
+        },
+        {
+            dataIndex: "sponsorship_type",
+            key: "Sponosorship Type",
+            title: "Sponsorship Type",
+            align: "center",
+            width: 150,
+            ...getColumnSelectedItemFilter({ dataIndex: 'sponsorship_type', filters, handleSetFilters, options: ['Unverified', 'Pledged', 'Promotional', 'Unsponsored Visit', 'Donation Received'] })
+        },
+        {
+            dataIndex: "donation_receipt_number",
+            key: "Donation Receipt No.",
+            title: "Donation Receipt No.",
+            align: "center",
+            width: 200,
+            ...getColumnSearchProps('donation_receipt_number', filters, handleSetFilters)
+        },
+        {
+            dataIndex: "donation_date",
+            key: "Donation Date",
+            title: "Donation Date",
+            align: "center",
+            width: 200,
+            ...getColumnDateFilter({ dataIndex: 'donation_date', filters, handleSetFilters, label: 'Received' })
+        },
+        {
+            dataIndex: "total_amount",
+            key: "Total Amount",
+            title: getSortableHeader("Total Amount", 'total_amount'),
+            align: "center",
+            width: 150,
+        },
+        {
+            dataIndex: "amount_received",
+            key: "Amount Received",
+            title: "Amount Received",
+            align: "center",
+            width: 200,
+        },
+        {
+            dataIndex: "payment_status",
+            key: "Payment Status",
+            title: "Payment Status",
+            align: "center",
+            width: 150,
+        },
+        {
+            dataIndex: "notes",
+            key: "Notes",
+            title: "Notes",
+            align: "center",
+            width: 100,
+            render: (value, record) => (
+                <IconButton onClick={() => { setSelectedGiftCard(record); setNotesModal(true); }}>
+                    <Badge variant="dot" color="success" invisible={(!value || value.trim() === '') ? true : false}>
+                        <NotesOutlined />
+                    </Badge>
+                </IconButton>
+            ),
+            ...getColumnSelectedItemFilter({ dataIndex: 'notes', filters, handleSetFilters, options: ['Yes', 'No'] })
+        },
+        {
+            dataIndex: "created_at",
+            key: "Created on",
+            title: "Created on",
+            align: "center",
+            width: 200,
+            render: getHumanReadableDate,
+            ...getColumnDateFilter({ dataIndex: 'created_at', filters, handleSetFilters, label: 'Created' })
+        },
+    ]
 
     return (
         <div>
@@ -789,7 +1119,7 @@ const GiftTrees: FC = () => {
             </div>
             <Divider sx={{ backgroundColor: "black", marginBottom: '15px' }} />
 
-            {(auth.signedin || import.meta.env.VITE_BYPASS_AUTH === 'true') && <Box sx={{ height: 840, width: "100%" }}>
+            {auth.signedin && <Box sx={{ height: 840, width: "100%" }}>
                 <GeneralTable
                     loading={giftCardsData.loading}
                     rows={tableRows}
@@ -802,18 +1132,14 @@ const GiftTrees: FC = () => {
                     onSelectionChanges={handleSelectionChanges}
                     summary={(totalColumns: number) => {
                         if (totalColumns < 5) return undefined;
-                        return <TableSummary 
-                            giftRequests={tableRows} 
-                            selectedGiftRequestIds={selectedGiftRequestIds} 
-                            totalColumns={totalColumns} 
-                        />
+                        return TableSummary(tableRows, selectedGiftRequestIds, totalColumns)
                     }}
                     footer
                     tableName="Tree Cards"
                 />
             </Box>}
 
-            {!auth.signedin && import.meta.env.VITE_BYPASS_AUTH !== 'true' &&
+            {!auth.signedin &&
                 <Box
                     display="flex"
                     justifyContent="center"
