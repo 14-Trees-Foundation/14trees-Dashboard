@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
     Dialog,
     DialogTitle,
@@ -35,6 +35,14 @@ const ColumnPreferences: React.FC<ColumnPreferencesProps> = ({
 
     const storageKey = `column-preferences-${tableName}`;
 
+    // Use ref to store callback to avoid dependency issues
+    const onColumnVisibilityChangeRef = useRef(onColumnVisibilityChange);
+
+    // Update ref when callback changes
+    useEffect(() => {
+        onColumnVisibilityChangeRef.current = onColumnVisibilityChange;
+    }, [onColumnVisibilityChange]);
+
     // Get default visible columns (columns that are not hidden by default)
     const getDefaultVisibleColumns = (): string[] => {
         return columns
@@ -68,11 +76,16 @@ const ColumnPreferences: React.FC<ColumnPreferencesProps> = ({
         }
     };
 
-    // Initialize preferences
+
+
+    // Initialize preferences only when columns change
     useEffect(() => {
         const visibleColumns = loadPreferences();
         setCurrentVisibleColumns(visibleColumns);
-        onColumnVisibilityChange(visibleColumns);
+        setTempVisibleColumns(visibleColumns);
+        
+        // Call callback only on initial load
+        onColumnVisibilityChangeRef.current(visibleColumns);
     }, [columns]);
 
     const handleOpen = () => {
@@ -97,7 +110,10 @@ const ColumnPreferences: React.FC<ColumnPreferencesProps> = ({
     const handleSave = () => {
         setCurrentVisibleColumns(tempVisibleColumns);
         savePreferences(tempVisibleColumns);
-        onColumnVisibilityChange(tempVisibleColumns);
+        
+        // Call callback using ref
+        onColumnVisibilityChangeRef.current(tempVisibleColumns);
+        
         setOpen(false);
     };
 
@@ -119,6 +135,8 @@ const ColumnPreferences: React.FC<ColumnPreferencesProps> = ({
     const handleDeselectAll = () => {
         setTempVisibleColumns([]);
     };
+
+
 
     // Get column title for display
     const getColumnTitle = (column: any): string => {

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import Box from "@mui/material/Box";
 import {
     GridFilterItem,
@@ -84,10 +84,16 @@ export const TreeNew = () => {
     const [changePlotModal, setChangePlotModal] = useState<boolean>(false);
     const [tags, setTags] = useState<string[]>([]);
 
+
     const handleSetFilters = (filters: Record<string, GridFilterItem>) => {
         setPage(0);
         setFilters(filters);
     }
+
+    const getColumnFixed = (columnKey: string): 'left' | 'right' | undefined => {
+        if (columnKey === 'sapling_id') return 'left';
+        return undefined;
+    };
 
     useEffect(() => {
         const getTags = async () => {
@@ -210,6 +216,7 @@ export const TreeNew = () => {
             title: "Sapling ID",
             width: 150,
             align: 'center',
+            fixed: getColumnFixed('sapling_id'),
             filteredValue: filters['sapling_id']?.value || null,
             ...getColumnSearchProps('sapling_id', filters, handleSetFilters, true)
         },
@@ -309,7 +316,7 @@ export const TreeNew = () => {
                     switch (type) {
                         case 'Gift Cards': return '#4caf50';
                         case 'Normal Assignment': return '#9c27b0';
-                        case 'Visit': return '#ff9800';
+                        case 'Visit': return '#1976d2';
                         case 'Donation': return '#2196f3';
                         default: return '#666';
                     }

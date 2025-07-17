@@ -2,7 +2,7 @@ import { Button, Divider, FormControlLabel, Checkbox } from '@mui/material';
 import { Table, TableColumnsType } from 'antd';
 import { AnyObject } from 'antd/es/_util/type';
 import { TableRowSelection } from 'antd/es/table/interface';
-import { ReactElement, useEffect, useState } from 'react';
+import { ReactElement, useEffect, useState, useCallback } from 'react';
 import { toast } from 'react-toastify';
 import { Resizable } from "react-resizable";
 import './GenTable.css'
@@ -43,6 +43,7 @@ interface TableComponentProps {
         ReactElement
     tableRowColoringLabels?: TableColoringLabels[]
     rowClassName?: (record: any, index: number) => string
+
 }
 
 const ResizableTitle = (props: any) => {
@@ -162,10 +163,10 @@ function TableComponent({ loading, dataSource, columns, totalRecords, tableName,
         })) ?? []);
     }, [columns, checkedList, visibleColumns]);
 
-    const handleColumnVisibilityChange = (newVisibleColumns: string[]) => {
+    const handleColumnVisibilityChange = useCallback((newVisibleColumns: string[]) => {
         setVisibleColumns(newVisibleColumns);
         setCheckedList(newVisibleColumns);
-    };
+    }, []);
 
     const handlePageChange = (page: number, pageSize: number) => {
         if (dataSource && page * pageSize > dataSource.length) {
@@ -221,7 +222,7 @@ function TableComponent({ loading, dataSource, columns, totalRecords, tableName,
             components={components}
             rowSelection={rowSelection}
             rowClassName={ showLabels && tableRowColoringLabels && tableRowColoringLabels.length > 0 ? rowClassName : undefined}
-            scroll={{ y: 550 }}
+            scroll={{ y: 550, x: 'max-content' }}
             footer={() => (
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                     {tableRowColoringLabels && tableRowColoringLabels.length > 0 && <div style={{ display: 'flex', alignSelf: 'flex-start' }}>
