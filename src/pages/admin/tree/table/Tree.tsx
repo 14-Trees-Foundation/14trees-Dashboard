@@ -304,6 +304,15 @@ export const TreeNew = () => {
             ...getColumnSearchProps('assigned_to_name', filters, handleSetFilters)
         },
         {
+            dataIndex: "planted_by",
+            key: "planted_by",
+            title: "Planted By",
+            width: 250,
+            align: 'center',
+            filteredValue: filters['planted_by']?.value || null,
+            ...getColumnSearchProps('planted_by', filters, handleSetFilters)
+        },
+        {
             dataIndex: "association_type",
             key: "association_type",
             title: "Association Type",
