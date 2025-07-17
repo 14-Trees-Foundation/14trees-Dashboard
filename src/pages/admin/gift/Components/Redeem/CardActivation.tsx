@@ -1,12 +1,12 @@
 import { Box, Button, Grid, TextField, Typography } from "@mui/material";
 import { FC, useEffect, useRef, useState } from "react";
-import { User } from "../../../../types/user";
-import { useAppDispatch, useAppSelector } from "../../../../redux/store/hooks";
+import { User } from "../../../../../types/user";
+import { useAppDispatch, useAppSelector } from "../../../../../redux/store/hooks";
 import { bindActionCreators } from "@reduxjs/toolkit";
-import * as userActionCreators from '../../../../redux/actions/userActions';
-import { AutocompleteWithPagination } from "../../../../components/AutoComplete";
-import ApiClient from "../../../../api/apiClient/apiClient";
-import { GiftCardUser } from "../../../../types/gift_card";
+import * as userActionCreators from '../../../../../redux/actions/userActions';
+import { AutocompleteWithPagination } from "../../../../../components/AutoComplete";
+import ApiClient from "../../../../../api/apiClient/apiClient";
+import { GiftCardUser } from "../../../../../types/gift_card";
 
 interface CardActivationProps {
     giftCardUser: GiftCardUser

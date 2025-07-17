@@ -25,7 +25,7 @@ import PlotSelection from "./Forms/PlotSelection";
 import EmailConfirmationModal from "./components/EmailConfirmationModal";
 import DonationInfo from "./DonationInfo";
 import DonationTrees from "./Forms/DonationTrees";
-import TagComponent from "../gift/Form/TagComponent";
+import TagComponent from "../gift/Components/TagComponent";
 import { Order } from "../../../types/common";
 import AssignTrees from "./Forms/AssignTrees/AssignTrees";
 import MapTrees from "./Forms/MapTrees/MapTrees";

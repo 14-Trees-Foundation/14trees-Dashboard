@@ -4,7 +4,7 @@ import { toast } from "react-toastify";
 import ApiClient from "../../api/apiClient/apiClient";
 import { AWSUtils } from "../../helpers/aws";
 import { CardGiftcard, Email, Edit } from "@mui/icons-material";
-import CardDetails from "../../pages/admin/gift/Form/CardDetailsForm";
+import CardDetails from "../../pages/admin/gift/Components/CardDetailsForm";
 import leafsPoster from "../../assets/leafs.jpg";
 import treePlanting from "../../assets/planting_illustration.jpg";
 import { makeStyles } from "@mui/styles";

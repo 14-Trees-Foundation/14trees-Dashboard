@@ -2,18 +2,18 @@
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Divider, Typography } from "@mui/material";
 import { FC, useEffect, useState } from "react";
 import { ToastContainer, toast } from "react-toastify";
-import { useAppDispatch, useAppSelector } from "../../../../redux/store/hooks";
+import { useAppDispatch, useAppSelector } from "../../../../../redux/store/hooks";
 import { bindActionCreators } from "@reduxjs/toolkit";
-import * as giftCardActionCreators from "../../../../redux/actions/giftCardActions";
-import { GiftCard, GiftCardUser } from "../../../../types/gift_card";
-import { RootState } from "../../../../redux/store/store";
+import * as giftCardActionCreators from "../../../../../redux/actions/giftCardActions";
+import { GiftCard, GiftCardUser } from "../../../../../types/gift_card";
+import { RootState } from "../../../../../redux/store/store";
 import { TableColumnsType } from "antd";
 import { CardGiftcardOutlined } from "@mui/icons-material";
-import TableComponent from "../../../../components/Table";
+import TableComponent from "../../../../../components/Table";
 import CardActivation from "./CardActivation";
 import axios from "axios";
-import { User } from "../../../../types/user";
-import { getGiftCards } from "../../../../redux/actions/giftCardActions";
+import { User } from "../../../../../types/user";
+import { getGiftCards } from "../../../../../redux/actions/giftCardActions";
 
 const GiftCards: FC = () => {
     const userId = 6428;

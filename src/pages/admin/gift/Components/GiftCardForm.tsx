@@ -13,8 +13,8 @@ import { AWSUtils } from "../../../../helpers/aws";
 import PaymentForm from "../../../../components/payment/PaymentForm";
 import { Payment } from "../../../../types/payment";
 import DashboardDetails from "./DashboardDetailsForm";
-import SponsorDetailsForm from "./SponsorDetailsForm";
-import PlantationInfo from "./PlantationInfo";
+import SponsorDetailsForm from "../Components/SponsorDetailsForm";
+import PlantationInfo from "../Components/PlantationInfo";
 import { LoadingButton } from "@mui/lab";
 
 interface GiftCardsFormProps {
@@ -312,130 +312,92 @@ const GiftCardsForm: FC<GiftCardsFormProps> = ({ loading, setLoading, step, logg
         setUser(null);
         setGroup(null);
         setSponsor(null);
+        setCreatedBy(null);
         setTreeCount(100);
-        setGiftRequestType('Gift Cards');
         setFile(null);
         setUsers([]);
         setLogo(null);
-        setMessages({ primaryMessage: "", eventName: "", plantedBy: "", logoMessage: "", eventType: undefined });
+        setLogoString(null);
+        setMessages({ primaryMessage: "", eventName: "", eventType: undefined, plantedBy: "", logoMessage: "" });
+        setGiftedOn(new Date().toISOString().slice(0, 10));
         setPresentationId(null);
         setSlideId(null);
-        setPayment(null);
+        setCategory("Public");
+        setGiftRequestType("Gift Cards");
+        setGrove(null);
         setConsent(false);
-        setGiftedOn(new Date().toISOString().slice(0, 10));
+        setPayment(null);
+        setAmount(0);
+        setDonorType("Indian Citizen");
+        setPanNumber(null);
     }
 
-    const handleNext = () => {
-        let nextStep = currentStep;
-        switch (currentStep) {
-            case 0:
-                if (treeCount === 0) toast.error("Please provide number of trees to gift");
-                else nextStep = giftRequestType === 'Visit' ? 2 : 1;
-                break;
-            case 1:
-                nextStep = currentStep + 1;
-                break;
-            case 2:
-                nextStep = 3;
-                break;
-            case 3:
-                nextStep = 4;
-                break;
-            case 4:
-                if (messages.primaryMessage === "") toast.error("Please provide gift card details");
-                break;
-            default:
-                break;
-        }
+    const next = () => {
+        setCurrentStep(currentStep + 1);
+    };
 
-        setCurrentStep(nextStep);
-    }
+    const prev = () => {
+        setCurrentStep(currentStep - 1);
+    };
 
-    const handlePrevious = () => {
-        const step = giftRequestType === 'Visit' && currentStep == 2
-                        ? 0
-                        : currentStep - 1; 
-
-        setCurrentStep(step);
-    }
-
+    const isLastStep = currentStep === formSteps.length - 1;
+    const isFirstStep = currentStep === 0;
 
     return (
         <div>
             <Dialog
                 open={open}
+                onClose={handleClose}
                 fullWidth
-                maxWidth='xl'
+                maxWidth="lg"
+                PaperProps={{
+                    style: {
+                        minHeight: '80vh',
+                        maxHeight: '90vh',
+                    },
+                }}
             >
-                <DialogTitle style={{ textAlign: "center" }}>{giftCardRequest ? "Edit Request" : "New Request"}</DialogTitle>
-                {currentStep < steps.length && (
-                    <>
-                        <div
-                            style={{
-                                padding: "0 40px",
-                                display: "flex",
-                                alignItems: "center",
-                                justifyContent: "space-between",
-                            }}
-                        >
-                            <Steps
-                                current={currentStep}
-                                items={formSteps}
-                            />
-                        </div>
-                    </>
-                )}
+                <DialogTitle>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <span>Gift Card Request</span>
+                        <Button onClick={handleClose} color="inherit">
+                            ✕
+                        </Button>
+                    </div>
+                </DialogTitle>
 
-                {steps.map((step, index) => (
-                    <div key={index} hidden={currentStep !== index}>
-                        <div
-                            style={{
-                                padding: 10,
-                                margin: 10,
-                                marginTop: 40,
-                                display: "flex",
-                                justifyContent: "center",
-                            }}
-                        >
-                            {step.content}
+                <div style={{ padding: '20px' }}>
+                    <Steps current={currentStep} items={formSteps} />
+
+                    <div style={{ marginTop: '20px', minHeight: '400px' }}>
+                        {formSteps[currentStep]?.content}
+                    </div>
+
+                    <div style={{ marginTop: '20px', display: 'flex', justifyContent: 'space-between' }}>
+                        <div>
+                            {!isFirstStep && (
+                                <Button onClick={prev} style={{ marginRight: '8px' }}>
+                                    Previous
+                                </Button>
+                            )}
+                        </div>
+                        <div>
+                            {!isLastStep && (
+                                <Button type="primary" onClick={next}>
+                                    Next
+                                </Button>
+                            )}
+                            {isLastStep && (
+                                <LoadingButton
+                                    loading={loading}
+                                    variant="contained"
+                                    onClick={handleSubmit}
+                                >
+                                    Submit
+                                </LoadingButton>
+                            )}
                         </div>
                     </div>
-                ))}
-
-                <div style={{
-                    padding: "10px 40px",
-                    margin: 10,
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                }}>
-                    {currentStep > 0 && <Button
-                        onClick={handlePrevious}
-                        variant="outlined"
-                        color="success"
-                    >Previous</Button>}
-                    <div style={{ display: 'flex', flexGrow: 1 }}></div>
-
-                    <Button
-                        onClick={handleCloseForm}
-                        variant="outlined"
-                        color="error"
-                        style={{ alignSelf: 'right', marginRight: 10 }}
-                    >Cancel</Button>
-                    {currentStep < formSteps.length - 1 && <Button
-                        onClick={handleNext}
-                        variant="contained"
-                        color="success"
-                        style={{ alignSelf: 'right' }}
-                    >Next</Button>}
-
-                    {currentStep === formSteps.length - 1 && <LoadingButton
-                        loading={loading}
-                        onClick={handleSubmit}
-                        variant="contained"
-                        color="success"
-                        style={{ alignSelf: 'right' }}
-                    >Finish</LoadingButton>}
                 </div>
             </Dialog>
         </div>

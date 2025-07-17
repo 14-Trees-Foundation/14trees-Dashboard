@@ -12,7 +12,7 @@ import { GridFilterItem } from "@mui/x-data-grid";
 import GeneralTable from "../../../../components/GenTable";
 import ApiClient from "../../../../api/apiClient/apiClient";
 import { RootState } from "../../../../redux/store/store";
-import TreeSelectionComponent from "./TreeSelectionComponent";
+import TreeSelectionComponent from "../Components/TreeSelectionComponent";
 import BookedTrees from "../Components/BookedTrees";
 
 const calculateUnion = (plantTypes: (string[] | undefined)[]) => {

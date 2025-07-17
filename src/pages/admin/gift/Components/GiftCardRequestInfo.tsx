@@ -10,10 +10,10 @@ import {
     Box,
     Link,
 } from '@mui/material';
-import GeneralTable from '../../../components/GenTable';
-import ApiClient from '../../../api/apiClient/apiClient';
-import { GiftCardUser } from '../../../types/gift_card';
-import { getHumanReadableDate } from '../../../helpers/utils';
+import GeneralTable from '../../../../components/GenTable';
+import ApiClient from '../../../../api/apiClient/apiClient';
+import { GiftCardUser } from '../../../../types/gift_card';
+import { getHumanReadableDate } from '../../../../helpers/utils';
 
 interface GiftCardRequestInfoProps {
     open: boolean
