@@ -29,7 +29,7 @@ const CSRGiftRequests: React.FC<CSRGiftRequestsProps> = ({ groupId, selectedGrou
     const { getGiftCards } = bindActionCreators(giftCardActionCreators, dispatch);
 
     const userName = localStorage.getItem("userName") || "Guest";
-    const userEmail = localStorage.getItem("userEmail");
+    const userEmail = localStorage.getItem("userEmail") || "local@test.com";
 
     const [page, setPage] = useState(0);
     const [pageSize, setPageSize] = useState(10);
@@ -84,6 +84,8 @@ const CSRGiftRequests: React.FC<CSRGiftRequestsProps> = ({ groupId, selectedGrou
 
     const getFilters = (filters: any, groupId: number) => {
         let filtersData = JSON.parse(JSON.stringify(Object.values(filters))) as GridFilterItem[];
+        
+        // Handle status filter
         const statusFilterIndex = filtersData.findIndex(item => item.columnField === 'status');
         if (statusFilterIndex !== -1) {
             const statusFilter = filtersData[statusFilterIndex];
@@ -99,11 +101,37 @@ const CSRGiftRequests: React.FC<CSRGiftRequestsProps> = ({ groupId, selectedGrou
 
             filtersData[statusFilterIndex].value = statuses;
         }
+
+        // Handle payment status filter
+        const paymentStatusFilterIndex = filtersData.findIndex(item => item.columnField === 'payment_status_new');
+        if (paymentStatusFilterIndex !== -1) {
+            const paymentStatusFilter = filtersData[paymentStatusFilterIndex];
+            const paymentTags: string[] = [];
+            
+            if ((paymentStatusFilter.value as string[]).includes('Payment Completed')) {
+                paymentTags.push('PaymentCompleted');
+            }
+            
+            if ((paymentStatusFilter.value as string[]).includes('Payment Failed')) {
+                paymentTags.push('PaymentFailed');
+            }
+            
+            if ((paymentStatusFilter.value as string[]).includes('Incomplete Payment')) {
+                paymentTags.push('IncompletePayment');
+            }
+
+            // Replace the payment status filter with a tags filter
+            filtersData[paymentStatusFilterIndex] = {
+                columnField: 'tags',
+                operatorValue: 'contains',
+                value: paymentTags
+            };
+        }
     
         return [
             ...filtersData, 
             {columnField: 'group_id', operatorValue: 'equals', value: groupId, },
-            { columnField: 'tags', operatorValue: 'contains', value: ['PrePurchased'], }
+            { columnField: 'tags', operatorValue: 'contains', value: ['PrePurchaseMethod'], }
         ];
     };
 
@@ -155,6 +183,17 @@ const CSRGiftRequests: React.FC<CSRGiftRequestsProps> = ({ groupId, selectedGrou
 
     const getStatus = (card: GiftCard) => {
         return card.status === 'pending_plot_selection' ? 'Pending Tree Allocation' : 'Trees Allocated';
+    };
+
+    const getPaymentStatus = (card: GiftCard) => {
+        if (card.tags?.includes('PaymentCompleted')) {
+            return 'Payment Completed';
+        } else if (card.tags?.includes('PaymentFailed')) {
+            return 'Payment Failed';
+        } else if (card.tags?.includes('IncompletePayment')) {
+            return 'Incomplete Payment';
+        }
+        return 'Unknown';
     };
 
     const handleSortingChange = (sorter: any) => {
@@ -247,10 +286,25 @@ const CSRGiftRequests: React.FC<CSRGiftRequestsProps> = ({ groupId, selectedGrou
         },
         {
             dataIndex: "payment_status",
+            key: "Payment Status (Old)",
+            title: "Payment Status (Old)",
+            align: "center",
+            width: 150,
+            hidden: true,
+        },
+        {
+            dataIndex: "tags",
             key: "Payment Status",
             title: "Payment Status",
             align: "center",
             width: 150,
+            render: (value, record, index) => getPaymentStatus(record),
+            ...getColumnSelectedItemFilter({ 
+                dataIndex: 'payment_status_new', 
+                filters, 
+                handleSetFilters, 
+                options: ['Payment Completed', 'Payment Failed', 'Incomplete Payment'] 
+            })
         },
         {
             dataIndex: "created_at",
@@ -305,7 +359,7 @@ const CSRGiftRequests: React.FC<CSRGiftRequestsProps> = ({ groupId, selectedGrou
                     corporateLogo={selectedGroup.logo_url ?? undefined}
                     groupId={selectedGroup.id}
                     userName={userName}
-                    userEmail={userEmail || ""}
+                    userEmail={userEmail}
                 />
             )}
 
@@ -322,7 +376,7 @@ const CSRGiftRequests: React.FC<CSRGiftRequestsProps> = ({ groupId, selectedGrou
                     requestId={selectedGiftCard.request_id}
                     totalAmount={selectedGiftCard.total_amount}
                     userName={userName}
-                    userEmail={userEmail || ""}
+                    userEmail={userEmail}
                     onPaymentSuccess={handlePaymentSuccess}
                 />
             )}

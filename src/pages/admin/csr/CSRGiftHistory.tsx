@@ -29,7 +29,7 @@ const CSRGiftHistory: React.FC<CSRGiftHistoryProps> = ({ groupId, selectedGroup 
     const { getGiftCards } = bindActionCreators(giftCardActionCreators, dispatch);
 
     const userName = localStorage.getItem("userName") || "Guest";
-    const userEmail = localStorage.getItem("userEmail");
+    const userEmail = localStorage.getItem("userEmail") || "local@test.com";
 
     const [page, setPage] = useState(0);
     const [pageSize, setPageSize] = useState(10);

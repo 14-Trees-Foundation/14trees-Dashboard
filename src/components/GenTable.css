@@ -180,3 +180,21 @@
 .bg-lost-tree.ant-table-row-selected .ant-table-cell-fix-left {
     background-color: #ffe0b2 !important;
 }
+
+/* Payment failed row styles */
+.payment-failed-row {
+    background-color: #ffebee !important;
+    border-left: 4px solid #f44336 !important;
+}
+
+.payment-failed-row.ant-table-row-selected > .ant-table-cell {
+    background-color: #ffcdd2 !important;
+}
+
+.payment-failed-row .ant-table-cell-fix-left {
+    background-color: #ffebee !important;
+}
+
+.payment-failed-row.ant-table-row-selected .ant-table-cell-fix-left {
+    background-color: #ffcdd2 !important;
+}

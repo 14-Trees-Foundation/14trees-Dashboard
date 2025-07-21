@@ -12,7 +12,7 @@ import ImageViewModal from "../../../../../components/ImageViewModal";
 import CSVUploadForm from "../user/components/CSVUploadForm";
 import WebScrapingModal from "../user/components/WebScrapingModal";
 import BulkUserTable from "../user/components/BulkUserTable";
-import { isValidEmail, isValidPhone, generateDefaultEmail } from "../user/components/ValidationUtils";
+import { isValidEmail, isValidPhone, generateDefaultEmail, isValidTreeId, validateUser } from "../user/components/ValidationUtils";
 
 interface User {
   key: string;
@@ -29,6 +29,7 @@ interface User {
   image_url?: string;
   relation?: string;
   gifted_trees: number;
+  tree_id?: string; // New field for Visit type
   error?: boolean;
   editable?: boolean;
 }
@@ -47,12 +48,19 @@ const CSV_FIELD_MAPPING = {
   relation: 'Relation with person'
 };
 
+// Enhanced CSV field mapping for Visit type
+const CSV_FIELD_MAPPING_VISIT = {
+  ...CSV_FIELD_MAPPING,
+  treeId: 'Tree ID' // New field for Visit type
+};
+
 interface BulkUserFormProps {
   requestId: string | null;
   treeCount: number,
   users: User[];
   onUsersChange: (users: User[]) => void;
   onFileChange: (file: File | null) => void;
+  requestType?: 'Gift Request' | 'Visit'; // New prop for request type
 }
 
 export const BulkUserForm: FC<BulkUserFormProps> = ({ 
@@ -60,7 +68,8 @@ export const BulkUserForm: FC<BulkUserFormProps> = ({
   treeCount, 
   users, 
   onUsersChange, 
-  onFileChange 
+  onFileChange,
+  requestType = 'Gift Request'
 }) => {
   const [imageUrls, setImageUrls] = useState<string[]>([]);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
@@ -126,31 +135,44 @@ export const BulkUserForm: FC<BulkUserFormProps> = ({
       Papa.parse(file, {
         header: true,
         complete: async (results: any) => {
+          console.log('CSV Parse Results:', results);
+          console.log('Request Type:', requestType);
+          
           const parsedUsers: User[] = [];
+          
+          // Choose field mapping based on request type
+          const fieldMapping = requestType === 'Visit' ? CSV_FIELD_MAPPING_VISIT : CSV_FIELD_MAPPING;
+          console.log('Field Mapping:', fieldMapping);
 
           for (let i = 0; i < results.data.length; i++) {
             const user = results.data[i];
 
-            if (user[CSV_FIELD_MAPPING.recipientName]) {
+            if (user[fieldMapping.recipientName]) {
               const parsedUser: User = {
                 key: getUniqueRequestId(),
-                recipient_name: (user[CSV_FIELD_MAPPING.recipientName] as string).trim(),
-                recipient_phone: (user[CSV_FIELD_MAPPING.recipientPhone] as string).trim(),
-                recipient_email: (user[CSV_FIELD_MAPPING.recipientEmail] as string).trim(),
-                recipient_communication_email: (user[CSV_FIELD_MAPPING.recipientCommEmail] as string).trim(),
-                assignee_name: (user[CSV_FIELD_MAPPING.assigneeName] as string).trim(),
-                assignee_phone: (user[CSV_FIELD_MAPPING.assigneePhone] as string).trim(),
-                assignee_email: (user[CSV_FIELD_MAPPING.assigneeEmail] as string).trim(),
-                assignee_communication_email: (user[CSV_FIELD_MAPPING.assigneeCommEmail] as string).trim(),
-                image_name: user[CSV_FIELD_MAPPING.imageName] ? user[CSV_FIELD_MAPPING.imageName] : undefined,
-                relation: user[CSV_FIELD_MAPPING.relation] ? user[CSV_FIELD_MAPPING.relation] : undefined,
-                gifted_trees: user[CSV_FIELD_MAPPING.count] ? user[CSV_FIELD_MAPPING.count] : 1,
-                image: user[CSV_FIELD_MAPPING.imageName] !== ''
-                  ? await awsUtils.checkIfPublicFileExists('cards' + "/" + requestId + '/' + user[CSV_FIELD_MAPPING.imageName])
+                recipient_name: (user[fieldMapping.recipientName] as string).trim(),
+                recipient_phone: (user[fieldMapping.recipientPhone] as string).trim(),
+                recipient_email: (user[fieldMapping.recipientEmail] as string).trim(),
+                recipient_communication_email: (user[fieldMapping.recipientCommEmail] as string).trim(),
+                assignee_name: (user[fieldMapping.assigneeName] as string).trim(),
+                assignee_phone: (user[fieldMapping.assigneePhone] as string).trim(),
+                assignee_email: (user[fieldMapping.assigneeEmail] as string).trim(),
+                assignee_communication_email: (user[fieldMapping.assigneeCommEmail] as string).trim(),
+                image_name: user[fieldMapping.imageName] ? user[fieldMapping.imageName] : undefined,
+                relation: user[fieldMapping.relation] ? user[fieldMapping.relation] : undefined,
+                gifted_trees: user[fieldMapping.count] ? user[fieldMapping.count] : 1,
+                image: user[fieldMapping.imageName] !== ''
+                  ? await awsUtils.checkIfPublicFileExists('cards' + "/" + requestId + '/' + user[fieldMapping.imageName])
                   : undefined,
                 error: false,
                 editable: false,
               };
+
+              // Add tree_id for Visit type
+              if (requestType === 'Visit' && fieldMapping.treeId) {
+                parsedUser.tree_id = user[fieldMapping.treeId] ? (user[fieldMapping.treeId] as string).trim() : undefined;
+                console.log(`User ${parsedUser.recipient_name} - Tree ID: ${parsedUser.tree_id}`);
+              }
 
               if (!(user[CSV_FIELD_MAPPING.assigneeName] as string).trim()) {
                 parsedUser.assignee_name = parsedUser.recipient_name;
@@ -175,8 +197,9 @@ export const BulkUserForm: FC<BulkUserFormProps> = ({
 
           const usersList = parsedUsers.map(user => ({
             ...user,
-            error: !isValidEmail(user.recipient_email) || !isValidPhone(user.recipient_phone) || user.image === false
+            error: !validateUser(user, requestType) || user.image === false
           }));
+          console.log('Final Parsed Users:', usersList);
           onUsersChange(usersList);
         },
         error: () => {
@@ -290,6 +313,7 @@ export const BulkUserForm: FC<BulkUserFormProps> = ({
         onImageSelection={handleImageSelection}
         selectedUser={selectedUser}
         setSelectedUser={setSelectedUser}
+        requestType={requestType}
       />
 
       <Box mt={2} display="flex" alignItems="center">
@@ -329,7 +353,7 @@ export const BulkUserForm: FC<BulkUserFormProps> = ({
       <Dialog open={csvModal} fullWidth maxWidth="md">
         <DialogTitle>Bulk upload recipient details using csv file</DialogTitle>
         <DialogContent dividers>
-          <CSVUploadForm onFileChange={handleFileChange} requestId={requestId} />
+          <CSVUploadForm onFileChange={handleFileChange} requestId={requestId} requestType={requestType} />
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setCsvModal(false)} variant="outlined" color="error">
