@@ -24,6 +24,7 @@ interface User {
   image_url?: string;
   relation?: string;
   gifted_trees: number;
+  tree_id?: string; // New field for Visit type
   error?: boolean;
   editable?: boolean;
 }
@@ -39,6 +40,7 @@ interface BulkUserTableProps {
   onImageSelection: (imageUrl: string) => void;
   selectedUser: User | null;
   setSelectedUser: (user: User | null) => void;
+  requestType?: 'Gift Request' | 'Visit'; // New prop for request type
 }
 
 const BulkUserTable: FC<BulkUserTableProps> = ({
@@ -51,7 +53,8 @@ const BulkUserTable: FC<BulkUserTableProps> = ({
   onUserAdd,
   onImageSelection,
   selectedUser,
-  setSelectedUser
+  setSelectedUser,
+  requestType = 'Gift Request'
 }) => {
   const [page, setPage] = useState(0);
   const [pageSize, setPageSize] = useState(5);
@@ -86,6 +89,8 @@ const BulkUserTable: FC<BulkUserTableProps> = ({
         });
       } else if (filter.columnField === 'error' && filter.value && filter.value.length > 0) {
         filteredUsers = filteredUsers.filter(item => filter.value.includes(item.error ? 'Yes' : 'No'));
+      } else if ((filter.columnField === 'tree_id') && filter.value) {
+        filteredUsers = filteredUsers.filter(item => item.tree_id?.includes(filter.value));
       }
     }
 
@@ -196,6 +201,15 @@ const BulkUserTable: FC<BulkUserTableProps> = ({
       width: 180,
       align: "center",
     },
+    ...(requestType === 'Visit' ? [{
+      dataIndex: "tree_id",
+      key: "tree_id",
+      title: "Tree ID",
+      width: 150,
+      align: "center" as const,
+      render: (value: string) => value || 'Not Provided',
+      ...getColumnSearchProps('tree_id', filters, handleSetFilters),
+    }] : []),
     {
       dataIndex: "error",
       key: "error",

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Box, Button, Typography, CircularProgress, useMediaQuery, useTheme } from "@mui/material";
-import { CardGiftcard, Forest, GrassTwoTone, NaturePeople } from "@mui/icons-material";
+import { CardGiftcard, Forest, GrassTwoTone, NaturePeople, HourglassEmpty } from "@mui/icons-material";
 import { createStyles, makeStyles } from "@mui/styles";
 import ApiClient from "../../api/apiClient/apiClient";
 import { toast } from "react-toastify";
@@ -87,6 +87,7 @@ const GiftAnalytics: React.FC<GiftAnalyticsProps> = ({
     if (!analytics) return null;
 
     const availableTrees = Number(analytics?.total_trees) - Number(analytics?.gifted_trees) || 0;
+    const treesYetToAllocate = Number(analytics?.trees_yet_to_allocate) || 0;
     const canGiftMore = analytics?.total_trees !== analytics?.gifted_trees;
 
     return (
@@ -133,6 +134,17 @@ const GiftAnalytics: React.FC<GiftAnalyticsProps> = ({
                         </Typography>
                         <Typography variant={isMobile ? "caption" : "subtitle2"} color="#1f3625">
                             Available Giftable Inventory
+                        </Typography>
+                    </Box>
+                </div>
+                <div className={classes.analyticsCard} style={{ margin: isMobile ? '4px' : '20px' }}>
+                    <Box sx={{ paddingTop: "10px" }}>
+                        <HourglassEmpty fontSize="large" style={{ color: "#FF8C00" }} />
+                        <Typography variant={isMobile ? "h4" : "h3"} color="#fff" sx={{ pt: 1, pb: 1 }}>
+                            {treesYetToAllocate}
+                        </Typography>
+                        <Typography variant={isMobile ? "caption" : "subtitle2"} color="#1f3625">
+                            Trees Yet to be Allocated
                         </Typography>
                     </Box>
                 </div>

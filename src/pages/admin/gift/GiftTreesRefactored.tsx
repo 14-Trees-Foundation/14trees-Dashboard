@@ -151,6 +151,13 @@ const GiftTrees: React.FC = () => {
         state.setSelectedGiftRequestIds(giftRequestIds);
     };
 
+    const getRowClassName = (record: any, index: number) => {
+        if (record.tags?.includes('PaymentFailed')) {
+            return 'payment-failed-row';
+        }
+        return '';
+    };
+
     return (
         <div>
             <ToastContainer />
@@ -187,6 +194,7 @@ const GiftTrees: React.FC = () => {
                         }}
                         onDownload={dataHook.getAllGiftCardsData}
                         onSelectionChanges={handleSelectionChanges}
+                        rowClassName={getRowClassName}
                         summary={(totalColumns: number) => {
                             if (totalColumns < 5) return undefined;
                             return (

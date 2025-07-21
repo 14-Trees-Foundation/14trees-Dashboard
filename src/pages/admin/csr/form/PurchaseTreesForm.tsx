@@ -107,7 +107,7 @@ const PurchaseTreesForm: React.FC<Props> = ({
                 "3", // event type (General)
                 "", // event name
                 corporateName,
-                ["Corporate", "PrePurchased"],
+                ["Corporate", "IncompletePayment", "PrePurchaseMethod"],
             );
 
             if (response.order_id) {
@@ -131,6 +131,14 @@ const PurchaseTreesForm: React.FC<Props> = ({
             setPaymentStatus('success');
             setLoading(true);
             await apiClient.paymentSuccessForGiftRequest(Number(giftRequestId), true);
+            
+            // Update tags to reflect successful payment
+            if (giftRequest) {
+                await apiClient.pathGiftCard(giftRequest.id, 
+                    { tags: ['Corporate', 'PaymentCompleted', 'PrePurchaseMethod'] }, 
+                    ['tags']
+                );
+            }
         } catch (error: any) {
             setError('Payment successful but failed to update status. Please contact support.');
             setPaymentStatus('failed');
@@ -140,9 +148,21 @@ const PurchaseTreesForm: React.FC<Props> = ({
         onSuccess?.(); 
     };
 
-    const handlePaymentFailure = () => {
+    const handlePaymentFailure = async () => {
         setPaymentStatus('failed');
         setError('Payment failed. Please try again later or contact support.');
+        
+        // Update tags to reflect failed payment
+        if (giftRequest) {
+            try {
+                await apiClient.pathGiftCard(giftRequest.id, 
+                    { tags: ['Corporate', 'PaymentFailed', 'PrePurchaseMethod'] }, 
+                    ['tags']
+                );
+            } catch (error: any) {
+                console.error('Failed to update tags for payment failure:', error);
+            }
+        }
     };
 
     const handleRetryPayment = () => {
@@ -155,9 +175,12 @@ const PurchaseTreesForm: React.FC<Props> = ({
             setError('Payment is mandatory to complete the order. The request will not be fulfilled without payment.');
             if (giftRequest) {
                 try {
-                    await apiClient.pathGiftCard(giftRequest.id, { tags: ['Corporate', 'PayLater'] }, ['tags']);
+                    await apiClient.pathGiftCard(giftRequest.id, 
+                        { tags: ['Corporate', 'PaymentFailed', 'PrePurchaseMethod'] }, 
+                        ['tags']
+                    );
                 } catch (error: any) {
-                    setError('Failed to update your request to Pay Later');
+                    setError('Failed to update your request status');
                 }
             }
         }
@@ -196,6 +219,12 @@ const PurchaseTreesForm: React.FC<Props> = ({
                 totalAmount,
                 "Net Banking",
                 fileUrl
+            );
+
+            // Update tags to reflect successful payment
+            await apiClient.pathGiftCard(giftRequest.id, 
+                { tags: ['Corporate', 'PaymentCompleted', 'PrePurchaseMethod'] }, 
+                ['tags']
             );
 
             setPaymentStatus('success');

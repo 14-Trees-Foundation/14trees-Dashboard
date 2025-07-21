@@ -73,6 +73,7 @@ export const createFormSteps = ({
                     users={formState.users} 
                     onUsersChange={(users) => updateFormState({ users })} 
                     onFileChange={(file) => updateFormState({ file })} 
+                    requestType={formState.giftRequestType}
                 />
             ),
             onClick: () => setCurrentStep(2),

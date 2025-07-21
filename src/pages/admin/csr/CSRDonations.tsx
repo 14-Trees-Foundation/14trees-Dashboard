@@ -28,8 +28,8 @@ const CSRDonations: React.FC<CSRDonationsProps> = ({ selectedGroup }) => {
     const dispatch = useAppDispatch();
     const { getDonations } = bindActionCreators(donationActionCreators, dispatch);
 
-    const userName = localStorage.getItem("userName");
-    const userEmail = localStorage.getItem("userEmail");
+    const userName = localStorage.getItem("userName") || "Guest";
+    const userEmail = localStorage.getItem("userEmail") || "local@test.com";
 
     const [page, setPage] = useState(0);
     const [pageSize, setPageSize] = useState(10);

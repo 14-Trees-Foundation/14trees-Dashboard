@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import { Box, Button, Dialog, DialogTitle, DialogContent, DialogActions, Alert, Snackbar, LinearProgress, Typography, Tabs, Tab } from "@mui/material";
 import { Steps } from 'antd';
 import { LoadingButton } from '@mui/lab';
@@ -51,7 +51,8 @@ const DonationTreesForm: React.FC<Props> = ({
     const [manualDonationErrors, setManualDonationErrors] = useState<Record<string, string>>({});
     const [isUploading, setIsUploading] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
-    const [inputMethod, setInputMethod] = useState<'csv' | 'manual'>('csv');
+    const isMountedRef = useRef(true);
+    const [inputMethod, setInputMethod] = useState<'csv' | 'manual' | 'skip'>('csv');
     const [error, setError] = useState<string>('');
     const [uploadProgress, setUploadProgress] = useState(0);
     const [paymentProof, setPaymentProof] = useState<File | null>(null);
@@ -70,15 +71,64 @@ const DonationTreesForm: React.FC<Props> = ({
     const totalAmount = treesCount * TREE_PRICE;
     const isAboveLimit = totalAmount > RAZORPAY_LIMIT;
 
+    // Cleanup effect to prevent memory leaks
+    useEffect(() => {
+        isMountedRef.current = true;
+        return () => {
+            isMountedRef.current = false;
+        };
+    }, []);
+
+    // Safe callback for upload progress that checks if component is mounted
+    const safeSetUploadProgress = (progress: number) => {
+        if (isMountedRef.current) {
+            setUploadProgress(progress);
+        }
+    };
+
+    // Safe callbacks for child components
+    const safeOnValidationChange = (isValid: boolean, isUploaded: boolean, error: string) => {
+        if (isMountedRef.current) {
+            setCsvValidation({ isValid, isUploaded, error });
+        }
+    };
+
+    const safeOnRecipientsChange = (recipients: any[]) => {
+        if (isMountedRef.current) {
+            setRecipients(recipients);
+        }
+    };
+
+    const safeSetPaymentProof = (file: File | null) => {
+        if (isMountedRef.current) {
+            setPaymentProof(file);
+        }
+    };
+
+    const safeSetError = (errorMessage: string) => {
+        if (isMountedRef.current) {
+            setError(errorMessage);
+        }
+    };
+
+    const safeSetManualDonation = (donations: any[]) => {
+        if (isMountedRef.current) {
+            setManualDonation(donations);
+        }
+    };
+
     const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (!file) return;
       
         const date = new Date().toISOString().split("T")[0];
         try {
+          if (!isMountedRef.current) return;
           setIsUploading(true);
           const awsService = new AWSUtils();
           const imageUrl = await awsService.uploadFileToS3("gift-request", file, date);
+          
+          if (!isMountedRef.current) return;
           setManualDonation(prev => [
             ...prev,
             {
@@ -90,9 +140,12 @@ const DonationTreesForm: React.FC<Props> = ({
           setManualDonationErrors(prev => ({ ...prev, image_file: '' }));
         } catch (error) {
           console.error('Failed to upload image:', error);
+          if (!isMountedRef.current) return;
           setManualDonationErrors(prev => ({ ...prev, image_file: 'Failed to upload image' }));
         } finally {
-          setIsUploading(false);
+          if (isMountedRef.current) {
+            setIsUploading(false);
+          }
           if (fileInputRef.current) {
             fileInputRef.current.value = '';
           }
@@ -124,29 +177,38 @@ const DonationTreesForm: React.FC<Props> = ({
                     >
                         <Tab label="Upload CSV" value="csv" sx={{ fontWeight: 600, fontSize: 16 }} />
                         <Tab label="Add Manually" value="manual" sx={{ fontWeight: 600, fontSize: 16 }} />
+                        <Tab label="Skip (Assign Later)" value="skip" sx={{ fontWeight: 600, fontSize: 16 }} />
                     </Tabs>
                     
                     {inputMethod === 'csv' ? (
                         <CSVUploadSection
-                            onValidationChange={(isValid, isUploaded, error) => {
-                                setCsvValidation({
-                                    isValid,
-                                    isUploaded,
-                                    error
-                                });
-                            }}
-                            onRecipientsChange={(recipients) => {
-                                setRecipients(recipients);
-                            }}
+                            onValidationChange={safeOnValidationChange}
+                            onRecipientsChange={safeOnRecipientsChange}
                             totalTreesSelected={treesCount}
                         />
-                    ) : (
+                    ) : inputMethod === 'manual' ? (
                         <ManualDonationAdd
                             donations={manualDonation}
-                            onChange={setManualDonation}
+                            onChange={safeSetManualDonation}
                             imagePreviews={imagePreviews}
                             onImageUpload={handleImageUpload}
                         />
+                    ) : (
+                        <Box sx={{ textAlign: 'center', py: 4 }}>
+                            <Typography variant="h6" gutterBottom>
+                                Skip Recipient Assignment
+                            </Typography>
+                            <Typography variant="body1" color="text.secondary" sx={{ mb: 2 }}>
+                                You can proceed to payment without assigning recipients now. 
+                                Recipients can be assigned later at the donation level.
+                            </Typography>
+                            <Alert severity="info" sx={{ mt: 2 }}>
+                                <Typography variant="body2">
+                                    <strong>Note:</strong> This donation will be created without specific recipients. 
+                                    You can assign recipients to individual trees later through the donation management interface.
+                                </Typography>
+                            </Alert>
+                        </Box>
                     )}
                 </Box>
             ),
@@ -154,14 +216,23 @@ const DonationTreesForm: React.FC<Props> = ({
         {
             title: 'Summary',
             content: (
-                <DonationSummary
-                    treesCount={treesCount}
-                    corporateName={corporateName}
-                    corporateLogo={corporateLogo}
-                    userName={userName}
-                    userEmail={userEmail}
-                    treePrice={TREE_PRICE}
-                />
+                <Box>
+                    <DonationSummary
+                        treesCount={treesCount}
+                        corporateName={corporateName}
+                        corporateLogo={corporateLogo}
+                        userName={userName}
+                        userEmail={userEmail}
+                        treePrice={TREE_PRICE}
+                    />
+                    {inputMethod === 'skip' && (
+                        <Alert severity="info" sx={{ mt: 2, mx: 2 }}>
+                            <Typography variant="body2">
+                                <strong>Recipients:</strong> No recipients assigned. Recipients can be assigned later at the donation level.
+                            </Typography>
+                        </Alert>
+                    )}
+                </Box>
             ),
         },
     ];
@@ -174,6 +245,11 @@ const DonationTreesForm: React.FC<Props> = ({
                 error: ''
             });
         }
+        // Reset recipients and manual donation when moving to next step
+        if (currentStep === 1 && inputMethod === 'skip') {
+            setRecipients([]);
+            setManualDonation([]);
+        }
         setCurrentStep((prev) => prev + 1);
     };
 
@@ -183,7 +259,7 @@ const DonationTreesForm: React.FC<Props> = ({
 
     const handleSubmit = async () => {
         // Validate required fields
-        if (!user?.name || !userEmail) {
+        if (!userName || !userEmail) {
             setError('Logged-in user name and email are required');
             return;
         }
@@ -193,12 +269,16 @@ const DonationTreesForm: React.FC<Props> = ({
         }
     
         try {
+            if (!isMountedRef.current) return;
             setLoading(true);
             setError('');
     
             // Prepare recipients based on input method
-            const donationRecipients = inputMethod === 'csv' 
-                ? recipients.map(r => ({
+            let donationRecipients;
+            if (inputMethod === 'skip') {
+                donationRecipients = undefined; // No recipients when skipping
+            } else if (inputMethod === 'csv') {
+                donationRecipients = recipients.map(r => ({
                     recipient_name: r.name,
                     recipient_email: r.email,
                     recipient_phone: r.phone,
@@ -207,8 +287,9 @@ const DonationTreesForm: React.FC<Props> = ({
                     assignee_phone: r.assigneePhone || r.email,
                     trees_count: r.trees_count || 1,
                     image_url: r.image_url,
-                }))
-                : manualDonation.map(d => ({
+                }));
+            } else {
+                donationRecipients = manualDonation.map(d => ({
                     recipient_name: d.name,
                     recipient_email: d.email,
                     recipient_phone: d.phone,
@@ -218,20 +299,22 @@ const DonationTreesForm: React.FC<Props> = ({
                     trees_count: d.trees_count || 1,
                     image_url: d.profile_image,
                 }));
+            }
     
             // Prepare the exact payload structure expected by backend
             const response = await apiClient.createDonationV2(
-                user.name,
+                userName,
                 userEmail,
                 treesCount,
                 totalAmount,
                 undefined,
                 ["Corporate"],
-                donationRecipients.length ? donationRecipients : undefined,
+                donationRecipients && donationRecipients.length ? donationRecipients : undefined,
                 groupId ? groupId.toString() : undefined
             );
     
             // Handle response
+            if (!isMountedRef.current) return;
             if (response.order_id) {
                 setOrderId(response.order_id);
             }
@@ -242,14 +325,18 @@ const DonationTreesForm: React.FC<Props> = ({
             setPaymentStatus('pending');
         } catch (error: any) {
             console.error('Error creating donation:', error);
+            if (!isMountedRef.current) return;
             setError(error.message || 'Failed to create donation. Please try again.');
         } finally {
-            setLoading(false);
+            if (isMountedRef.current) {
+                setLoading(false);
+            }
         }
     };
 
     const handlePaymentSuccess = async () => {
         try {
+            if (!isMountedRef.current) return;
             setPaymentStatus('success');
             setLoading(true);
 
@@ -258,12 +345,16 @@ const DonationTreesForm: React.FC<Props> = ({
                 true
             );
 
+            if (!isMountedRef.current) return;
             onSuccess?.();
         } catch (error: any) {
+            if (!isMountedRef.current) return;
             setError(error.message || 'Payment successful but failed to update status. Please contact support.');
             setPaymentStatus('failed');
         } finally {
-            setLoading(false);
+            if (isMountedRef.current) {
+                setLoading(false);
+            }
         }
     };
 
@@ -296,6 +387,7 @@ const DonationTreesForm: React.FC<Props> = ({
         }
 
         try {
+            if (!isMountedRef.current) return;
             setLoading(true);
             setError('');
 
@@ -304,9 +396,10 @@ const DonationTreesForm: React.FC<Props> = ({
                 "donation-request",
                 paymentProof,
                 `cards/${donationRequest.request_id}/payment_proof`,
-                setUploadProgress
+                safeSetUploadProgress
             );
 
+            if (!isMountedRef.current) return;
             setUploadedFileUrl(fileUrl);
 
             // Create payment history
@@ -317,14 +410,18 @@ const DonationTreesForm: React.FC<Props> = ({
                 fileUrl
             );
 
+            if (!isMountedRef.current) return;
             setPaymentStatus('success');
             onSuccess?.();
         } catch (error) {
             console.error('Error processing bank transfer:', error);
+            if (!isMountedRef.current) return;
             setError('Failed to process payment proof. Please try again.');
             setPaymentStatus('failed');
         } finally {
-            setLoading(false);
+            if (isMountedRef.current) {
+                setLoading(false);
+            }
         }
     };
 
@@ -339,8 +436,10 @@ const DonationTreesForm: React.FC<Props> = ({
         if (currentStep === 1) {
             if (inputMethod === 'csv') {
                 return !csvValidation.isUploaded || !csvValidation.isValid;
-            } else {
+            } else if (inputMethod === 'manual') {
                 return manualDonation.length === 0;
+            } else if (inputMethod === 'skip') {
+                return false; // Allow proceeding when skipping
             }
         }
         return false;
@@ -378,8 +477,8 @@ const DonationTreesForm: React.FC<Props> = ({
                                     </Typography>
                                     <FileUploadField
                                         value={paymentProof}
-                                        onChange={setPaymentProof}
-                                        onUploadProgress={setUploadProgress}
+                                        onChange={safeSetPaymentProof}
+                                        onUploadProgress={safeSetUploadProgress}
                                         uploadedFileUrl={uploadedFileUrl}
                                         disabled={loading}
                                     />
@@ -471,9 +570,9 @@ const DonationTreesForm: React.FC<Props> = ({
             <Snackbar
                 open={!!error}
                 autoHideDuration={6000}
-                onClose={() => setError('')}
+                onClose={() => safeSetError('')}
             >
-                <Alert onClose={() => setError('')} severity="warning" sx={{ width: '100%' }}>
+                <Alert onClose={() => safeSetError('')} severity="warning" sx={{ width: '100%' }}>
                     {error}
                 </Alert>
             </Snackbar>

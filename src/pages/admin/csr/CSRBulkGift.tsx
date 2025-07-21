@@ -111,8 +111,8 @@ const CSRBulkGift: React.FC<CSRBulkGiftProps> = ({ groupId, logoUrl, open, onClo
     const [totalAmount, setTotalAmount] = useState<number>(0);
     const [totalTrees, setTotalTrees] = useState<number>(0);
 
-    const userName = localStorage.getItem("userName");
-    const userEmail = localStorage.getItem("userEmail");
+    const userName = localStorage.getItem("userName") || "Guest";
+    const userEmail = localStorage.getItem("userEmail") || "local@test.com";
 
     const [inputMethod, setInputMethod] = useState<'csv' | 'manual'>('csv');
     const [manualUsers, setManualUsers] = useState<ManualUser[]>([]);
