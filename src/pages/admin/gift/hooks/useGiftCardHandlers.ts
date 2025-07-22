@@ -349,7 +349,8 @@ export const useGiftCardHandlers = (props: UseGiftCardHandlersProps) => {
                 selectedGiftCard.category,
                 selectedGiftCard.grove,
                 selectedGiftCard.request_type ?? GiftRequestType_CARDS_REQUEST,
-                selectedGiftCard.gifted_on
+                selectedGiftCard.gifted_on,
+                selectedGiftCard.group_id
             );
             toast.success("Tree card request updated successfully");
             dispatch({
@@ -532,7 +533,8 @@ export const useGiftCardHandlers = (props: UseGiftCardHandlersProps) => {
                 selectedPaymentGR.category,
                 selectedPaymentGR.grove,
                 selectedPaymentGR.request_type ?? GiftRequestType_CARDS_REQUEST,
-                selectedPaymentGR.gifted_on
+                selectedPaymentGR.gifted_on,
+                selectedPaymentGR.group_id
             );
             dispatch({
                 type: giftCardActionTypes.UPDATE_GIFT_CARD_SUCCEEDED,
