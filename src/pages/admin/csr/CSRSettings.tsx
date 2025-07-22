@@ -262,7 +262,7 @@ const CSRSettings: React.FC<Props> = ({ group, onGroupChange }) => {
                     mb: 2
                 }}>
                     <Typography variant="h6" sx={{ fontWeight: 600 }}>
-                        Onboarded Users
+                        Manage access to this dashboard
                     </Typography>
                     <CSRSharePageDialog
                         groupId={group.id}

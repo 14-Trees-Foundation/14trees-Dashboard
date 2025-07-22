@@ -5,8 +5,10 @@ import { useAppDispatch, useAppSelector } from "../../../redux/store/hooks";
 import { bindActionCreators } from "@reduxjs/toolkit";
 import { Group } from "../../../types/Group";
 import * as groupActionCreators from '../../../redux/actions/groupActions';
-import { ToastContainer } from "react-toastify";
+import { ToastContainer, toast } from "react-toastify";
 import CSRSharePageDialog from "./CSRSharePageDialog";
+import { Link } from "@mui/icons-material";
+import ApiClient from "../../../api/apiClient/apiClient";
 
 type Props = {
     groupId: any
@@ -25,6 +27,7 @@ const CSRHeader: React.FC<Props> = ({ groupId, onGroupChange }) => {
     const [groupPage, setGroupPage] = useState(0);
     const [selectedGroup, setSelectedGroup] = useState<Group | null>(null);
     const [groupNameInput, setGroupNameInput] = useState("");
+    const [viewDetails, setViewDetails] = useState<any>(null);
 
     useEffect(() => {
         const handler = setTimeout(() => {
@@ -78,6 +81,37 @@ const CSRHeader: React.FC<Props> = ({ groupId, onGroupChange }) => {
         }
     }, [groupsList, groupId]);
 
+    // Fetch view details when selected group changes
+    useEffect(() => {
+        const fetchViewDetails = async () => {
+            if (!selectedGroup?.id) {
+                setViewDetails(null);
+                return;
+            }
+            try {
+                const path = '/csr/dashboard/' + selectedGroup.id;
+                const apiClient = new ApiClient();
+                const viewDetails = await apiClient.getViewDetails(path);
+                setViewDetails(viewDetails);
+            } catch (error) {
+                console.error('Error fetching view details:', error);
+                setViewDetails(null);
+            }
+        };
+
+        const handler = setTimeout(fetchViewDetails, 300);
+        return () => clearTimeout(handler);
+    }, [selectedGroup?.id]);
+
+    const handleOpenLink = () => {
+        if (!selectedGroup?.id) {
+            toast.error("Please select a group first");
+            return;
+        }
+        
+        const link = `${window.location.origin}/csr/dashboard/${selectedGroup.id}${viewDetails?.view_id ? `?v=${viewDetails.view_id}` : ''}`;
+        window.open(link, '_blank');
+    };
 
     return (
         <Box>
@@ -136,11 +170,22 @@ const CSRHeader: React.FC<Props> = ({ groupId, onGroupChange }) => {
                                 size="small"
                                 value={selectedGroup}
                             />
-                            <CSRSharePageDialog
-                                groupId={selectedGroup?.id}
-                                groupName={selectedGroup?.name}
-                                style={{ marginLeft: 10 }}
-                            />
+                            <Box sx={{ display: 'flex', gap: 1, ml: 1 }}>
+                                <CSRSharePageDialog
+                                    groupId={selectedGroup?.id}
+                                    groupName={selectedGroup?.name}
+                                />
+                                <Button
+                                    variant="outlined"
+                                    color="success"
+                                    onClick={handleOpenLink}
+                                    disabled={!selectedGroup?.id}
+                                    startIcon={<Link />}
+                                    sx={{ textTransform: 'none' }}
+                                >
+                                    Link
+                                </Button>
+                            </Box>
                         </>
                     )}
                 </div>
