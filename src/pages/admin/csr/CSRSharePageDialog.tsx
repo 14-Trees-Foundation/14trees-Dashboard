@@ -176,7 +176,7 @@ const CSRSharePageDialog: FC<CSRSharePageDialogProps> = ({ groupId, groupName, o
                 disabled={!groupId}
                 startIcon={<PersonAdd />}
             >
-                Share
+                Add Users
             </Button>
 
             <Dialog open={open} fullWidth maxWidth='lg'>
@@ -198,6 +198,7 @@ const CSRSharePageDialog: FC<CSRSharePageDialogProps> = ({ groupId, groupName, o
                             label="Page Name"
                             value={viewName}
                             fullWidth
+                            disabled
                             onChange={(e) => { setViewName(e.target.value) }}
                         />
                     </Box>
