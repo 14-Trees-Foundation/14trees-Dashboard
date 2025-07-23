@@ -319,6 +319,20 @@ const GiftTransactionSummary: React.FC<Props> = ({ transaction, onTransactionUpd
                                         <strong>Gifted On:</strong> {new Date(transaction.gifted_on).toLocaleDateString()}
                                     </Typography>
                                 </Grid>
+                                {transaction.gift_type_display && (
+                                    <Grid item xs={12} sm={6}>
+                                        <Typography variant="body1">
+                                            <strong>Gift Type:</strong> {transaction.gift_type_display}
+                                        </Typography>
+                                    </Grid>
+                                )}
+                                {transaction.source_request_identifier && (
+                                    <Grid item xs={12} sm={6}>
+                                        <Typography variant="body1">
+                                            <strong>Reference Request ID:</strong> {transaction.source_request_identifier}
+                                        </Typography>
+                                    </Grid>
+                                )}
                             </Grid>
                         </Box>
                     </Grid>

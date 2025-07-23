@@ -38,6 +38,7 @@ interface GiftTreesGridProps {
     groupId?: number;
     filter: 'gifted' | 'non-gifted' | 'all';
     searchUser: string;
+    sourceTypeFilter?: 'all' | 'fresh_request' | 'pre_purchased';
     onSelectTree: (tree: Tree) => void;
     onSelectTransaction: (transaction: GiftRedeemTransaction) => void;
     onImageView: (imageUrl: string) => void;
@@ -48,6 +49,7 @@ const GiftTreesGrid = forwardRef<GiftTreesGridHandle, GiftTreesGridProps>(({
     userId,
     groupId,
     filter,
+    sourceTypeFilter = 'all',
     searchUser,
     onSelectTree,
     onSelectTransaction,
@@ -110,6 +112,12 @@ const GiftTreesGrid = forwardRef<GiftTreesGridHandle, GiftTreesGridProps>(({
 
         setTreesList(filteredData);
     }, [trees, filter]);
+
+    // Create filtered transactions list based on source type
+    const filteredTransactions = Object.values(transactions).filter(trn => {
+        if (sourceTypeFilter === 'all') return true;
+        return trn.gift_source_type === sourceTypeFilter;
+    });
 
     // Fetch transactions when in gifted mode
     useEffect(() => {
@@ -387,7 +395,7 @@ const GiftTreesGrid = forwardRef<GiftTreesGridHandle, GiftTreesGridProps>(({
                 ))}
 
                 {/* Gifted trees transactions */}
-                {filter === 'gifted' && Object.values(transactions).map((trn) => (
+                {filter === 'gifted' && filteredTransactions.map((trn) => (
                     <Grid 
                         item 
                         xs={12} 
@@ -463,6 +471,8 @@ const GiftTreesGrid = forwardRef<GiftTreesGridHandle, GiftTreesGridProps>(({
                                 padding: isMobile ? '8px 4px' : undefined,
                                 overflow: 'hidden'
                             }}>
+
+
                                 {trn.recipient_name && 
                                     <Typography 
                                         variant={isMobile ? "body2" : "body1"} 
