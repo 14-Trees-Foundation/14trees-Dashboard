@@ -1,136 +1,104 @@
-import { Box, Button, Typography, RadioGroup, FormControlLabel, Radio } from "@mui/material";
+import { Box, Typography, RadioGroup, FormControlLabel, Radio, Chip, Card, CardContent, Grid } from "@mui/material";
+import { createStyles, makeStyles } from "@mui/styles";
 import { useEffect, useState } from "react";
 import ApiClient from "../../../api/apiClient/apiClient";
-import { toast } from "react-toastify";
-import { GiftCard } from "../../../types/gift_card";
-import getColumnSearchProps, { getColumnDateFilter, getColumnSelectedItemFilter, getSortIcon } from "../../../components/Filter";
+import { GiftRedeemTransaction } from "../../../types/gift_redeem_transaction";
+import getColumnSearchProps, { getColumnDateFilter, getSortIcon } from "../../../components/Filter";
 import { GridFilterItem } from "@mui/x-data-grid";
-import * as giftCardActionCreators from "../../../redux/actions/giftCardActions";
-import { useAppDispatch, useAppSelector } from "../../../redux/store/hooks";
-import { bindActionCreators } from "@reduxjs/toolkit";
-import { RootState } from "../../../redux/store/store";
 import { TableColumnsType } from "antd";
 import { getHumanReadableDate } from "../../../helpers/utils";
 import { Order } from "../../../types/common";
 import GeneralTable from "../../../components/GenTable";
 import { Group } from "../../../types/Group";
-import PaymentIcon from '@mui/icons-material/Payment';
-import PaymentDialog from "./components/PaymentDialog";
+
+const useStyles = makeStyles((theme) =>
+    createStyles({
+        analyticsCard: {
+            width: "100%",
+            maxWidth: "300px",
+            minHeight: "120px",
+            borderRadius: "15px",
+            textAlign: "center",
+            padding: "16px",
+            margin: "8px",
+            background: "linear-gradient(145deg, #9faca3, #bdccc2)",
+            boxShadow: "7px 7px 14px #9eaaa1,-7px -7px 14px #c4d4c9",
+        },
+    })
+);
 
 interface CSRGiftHistoryProps {
     groupId: number;
     selectedGroup: Group;
 }
 
-type OrderType = 'all' | 'prepaid' | 'paylater';
+type SourceTypeFilter = 'all' | 'fresh_request' | 'pre_purchased';
 
 const CSRGiftHistory: React.FC<CSRGiftHistoryProps> = ({ groupId, selectedGroup }) => {
-    const dispatch = useAppDispatch();
-    const { getGiftCards } = bindActionCreators(giftCardActionCreators, dispatch);
-
-    const userName = localStorage.getItem("userName") || "Guest";
-    const userEmail = localStorage.getItem("userEmail") || "local@test.com";
-
+    const classes = useStyles();
     const [page, setPage] = useState(0);
     const [pageSize, setPageSize] = useState(10);
     const [filters, setFilters] = useState<Record<string, GridFilterItem>>({});
     const [orderBy, setOrderBy] = useState<Order[]>([]);
-    const [tableRows, setTableRows] = useState<GiftCard[]>([]);
-    const [paymentDialogOpen, setPaymentDialogOpen] = useState(false);
-    const [selectedGiftCard, setSelectedGiftCard] = useState<GiftCard | null>(null);
-    const [orderType, setOrderType] = useState<OrderType>('all');
-
-    const giftCardsData = useAppSelector((state: RootState) => state.giftCardsData);
+    const [tableRows, setTableRows] = useState<GiftRedeemTransaction[]>([]);
+    const [sourceTypeFilter, setSourceTypeFilter] = useState<SourceTypeFilter>('all');
+    const [loading, setLoading] = useState(false);
+    const [totalRecords, setTotalRecords] = useState(0);
+    const [allTransactions, setAllTransactions] = useState<GiftRedeemTransaction[]>([]);
 
     useEffect(() => {
         const handler = setTimeout(() => {
             setPage(0);
-            getGiftCardData();
-        }, 300)
+            getTransactionData();
+        }, 300);
 
         return () => { clearTimeout(handler) };
-    }, [filters, orderBy, orderType, groupId]);
+    }, [filters, orderBy, sourceTypeFilter, groupId]);
 
     useEffect(() => {
-        if (giftCardsData.loading) return;
-        
-        const handler = setTimeout(() => {
-            const records: GiftCard[] = [];
-            const maxLength = Math.min((page + 1) * pageSize, giftCardsData.totalGiftCards);
-            for (let i = page * pageSize; i < maxLength; i++) {
-                if (Object.hasOwn(giftCardsData.paginationMapping, i)) {
-                    const id = giftCardsData.paginationMapping[i];
-                    const record = giftCardsData.giftCards[id];
-                    if (record) {
-                        records.push(record);
-                    }
-                } else {
-                    getGiftCardData();
-                    break;
-                }
+        getTransactionData();
+    }, [page, pageSize]);
+
+    const getTransactionData = async () => {
+        setLoading(true);
+        try {
+            const apiClient = new ApiClient();
+            
+            // Always fetch all transactions to enable proper filtering
+            let transactionsToUse = allTransactions;
+            if (allTransactions.length === 0) {
+                const allResponse = await apiClient.getGiftTransactions(0, -1, 'group', groupId);
+                setAllTransactions(allResponse.results);
+                transactionsToUse = allResponse.results;
             }
-
-            setTableRows(records);
-        }, 300)
-
-        return () => { clearTimeout(handler) };
-    }, [pageSize, page, giftCardsData]);
-
-    const getFilters = (filters: any, groupId: number, tags: string[]) => {
-        const filtersData = JSON.parse(JSON.stringify(Object.values(filters))) as GridFilterItem[];
-        filtersData.forEach((item) => {
-            if (item.columnField === 'status') {
-                const items: string[] = [];
-                if ((item.value as string[]).includes('Pending Fulfillment')) {
-                    items.push('pending_plot_selection');
-                }
-                if ((item.value as string[]).includes('Completed')) {
-                    items.push('completed');
-                }
-                item.value = items;
-            } else if (item.columnField === 'validation_errors' || item.columnField === 'notes') {
-                item.operatorValue = (item.value as string[]).includes('Yes') ? 'isNotEmpty' : 'isEmpty';
+            
+            // Filter by source type first
+            let filteredTransactions = transactionsToUse;
+            if (sourceTypeFilter !== 'all') {
+                filteredTransactions = transactionsToUse.filter(transaction => 
+                    transaction.gift_source_type === sourceTypeFilter
+                );
             }
-        });
-
-        filtersData.push({
-            columnField: 'group_id',
-            operatorValue: 'equals',
-            value: groupId,
-        });
-
-        if (tags.length > 0) {
-            filtersData.push({
-                columnField: 'tags',
-                operatorValue: 'isAnyOf',
-                value: tags,
-            });
+            
+            // Apply pagination to filtered results
+            const startIndex = page * pageSize;
+            const endIndex = startIndex + pageSize;
+            const paginatedTransactions = filteredTransactions.slice(startIndex, endIndex);
+            
+            setTableRows(paginatedTransactions);
+            setTotalRecords(filteredTransactions.length);
+        } catch (error) {
+            console.error('Error fetching transactions:', error);
+            setTableRows([]);
+            setTotalRecords(0);
+        } finally {
+            setLoading(false);
         }
-
-        return filtersData;
-    };
-
-    const getGiftCardData = async () => {
-        let tags: string[] = [];
-        if (orderType === 'prepaid') {
-            tags = ['GiftAndPay'];
-        } else if (orderType === 'paylater') {
-            tags = ['PayLater'];
-        } else if (orderType === 'all') {
-            tags = ['GiftAndPay', 'PayLater'];
-        }
-
-        const filtersData = getFilters(filters, groupId, tags);
-        getGiftCards(page * pageSize, pageSize, filtersData, orderBy);
     };
 
     const handleSetFilters = (filters: Record<string, GridFilterItem>) => {
         setPage(0);
         setFilters(filters);
-    };
-
-    const getStatus = (card: GiftCard) => {
-        return card.status === 'completed' ? 'Completed' : 'Pending Fulfillment';
     };
 
     const handleSortingChange = (sorter: any) => {
@@ -158,181 +126,268 @@ const CSRGiftHistory: React.FC<CSRGiftHistoryProps> = ({ groupId, selectedGroup 
         </div>
     );
 
-    const getAllGiftCardsData = async () => {
-        let tags: string[] = [];
-        if (orderType === 'prepaid') {
-            tags = ['GiftAndPay'];
-        } else if (orderType === 'paylater') {
-            tags = ['PayLater'];
+    const getAllTransactionData = async () => {
+        // Use the already fetched transactions if available
+        let transactionsToUse = allTransactions;
+        if (allTransactions.length === 0) {
+            const apiClient = new ApiClient();
+            const response = await apiClient.getGiftTransactions(0, -1, 'group', groupId);
+            transactionsToUse = response.results;
         }
-        const filtersData = getFilters(filters, groupId, tags);
-        const apiClient = new ApiClient();
-        const resp = await apiClient.getGiftCards(0, -1, filtersData, orderBy);
-        return resp.results;
+        
+        // Filter by source type if not 'all'
+        if (sourceTypeFilter !== 'all') {
+            return transactionsToUse.filter(transaction => 
+                transaction.gift_source_type === sourceTypeFilter
+            );
+        }
+        
+        return transactionsToUse;
     };
 
-    const handlePaymentSuccess = () => {
-        setPaymentDialogOpen(false);
-        getGiftCardData();
-        toast.success('Payment successful!');
+    const getStatistics = () => {
+        const freshRequestCount = allTransactions.filter(t => t.gift_source_type === 'fresh_request').length;
+        const prePurchasedCount = allTransactions.filter(t => t.gift_source_type === 'pre_purchased').length;
+        const totalCount = allTransactions.length;
+        
+        // Fix: Convert to number explicitly to avoid string concatenation
+        const totalTrees = allTransactions.reduce((sum, t) => sum + Number(t.trees_count || 1), 0);
+        const freshRequestTrees = allTransactions
+            .filter(t => t.gift_source_type === 'fresh_request')
+            .reduce((sum, t) => sum + Number(t.trees_count || 1), 0);
+        const prePurchasedTrees = allTransactions
+            .filter(t => t.gift_source_type === 'pre_purchased')
+            .reduce((sum, t) => sum + Number(t.trees_count || 1), 0);
+
+        return {
+            totalCount,
+            freshRequestCount,
+            prePurchasedCount,
+            totalTrees,
+            freshRequestTrees,
+            prePurchasedTrees,
+            freshRequestPercentage: totalCount > 0 ? Math.round((freshRequestCount / totalCount) * 100) : 0,
+            prePurchasedPercentage: totalCount > 0 ? Math.round((prePurchasedCount / totalCount) * 100) : 0,
+        };
     };
 
-    const getColumns = (): TableColumnsType<GiftCard> => {
-        const baseColumns: TableColumnsType<GiftCard> = [
+    const getSourceTypeChip = (transaction: GiftRedeemTransaction) => {
+        if (transaction.gift_source_type === 'fresh_request') {
+            return (
+                <Chip
+                    label="🎁 Direct Request"
+                    size="small"
+                    sx={{
+                        backgroundColor: '#e8f5e8',
+                        color: '#2e7d32',
+                        border: '1px solid #4caf50',
+                        fontWeight: 500
+                    }}
+                />
+            );
+        } else if (transaction.gift_source_type === 'pre_purchased') {
+            return (
+                <Chip
+                    label="🌳 Pre-Purchased"
+                    size="small"
+                    sx={{
+                        backgroundColor: '#e3f2fd',
+                        color: '#1565c0',
+                        border: '1px solid #2196f3',
+                        fontWeight: 500
+                    }}
+                />
+            );
+        } else {
+            // For transactions without source type, show a neutral chip
+            return (
+                <Chip
+                    label="📋 Other"
+                    size="small"
+                    sx={{
+                        backgroundColor: '#f5f5f5',
+                        color: '#616161',
+                        border: '1px solid #9e9e9e',
+                        fontWeight: 500
+                    }}
+                />
+            );
+        }
+    };
+
+    const getColumns = (): TableColumnsType<GiftRedeemTransaction> => {
+        const columns: TableColumnsType<GiftRedeemTransaction> = [
             {
                 dataIndex: "id",
-                key: "Req. No.",
-                title: "Req. No.",
+                key: "Transaction ID",
+                title: "Transaction ID",
                 align: "right",
-                width: 100,
+                width: 120,
                 fixed: 'left',
             },
             {
-                dataIndex: "no_of_cards",
+                dataIndex: "gift_source_type",
+                key: "Source Type",
+                title: "Source Type",
+                align: "center",
+                width: 160,
+                render: (value, record) => getSourceTypeChip(record),
+            },
+            {
+                dataIndex: "recipient_name",
+                key: "Recipient",
+                title: "Recipient",
+                align: "left",
+                width: 200,
+                ...getColumnSearchProps('recipient_name', filters, handleSetFilters)
+            },
+            {
+                dataIndex: "trees_count",
                 key: "# Trees",
-                title: getSortableHeader("# Trees", 'no_of_cards'),
+                title: getSortableHeader("# Trees", 'trees_count'),
                 align: "center",
                 width: 100,
+                render: (value: number) => Number(value) || 1,
             },
             {
-                dataIndex: "created_by_name",
-                key: "Created by",
-                title: "Created by",
-                align: "center",
+                dataIndex: "occasion_name",
+                key: "Occasion",
+                title: "Occasion",
+                align: "left",
                 width: 200,
-                ...getColumnSearchProps('created_by_name', filters, handleSetFilters)
+                render: (value: string) => value || '-',
+                ...getColumnSearchProps('occasion_name', filters, handleSetFilters)
             },
             {
-                dataIndex: "status",
-                key: "Status",
-                title: "Status",
-                align: "center",
-                width: 150,
-                render: (value, record, index) => getStatus(record),
-                ...getColumnSelectedItemFilter({ 
-                    dataIndex: 'status', 
-                    filters, 
-                    handleSetFilters, 
-                    options: ['Pending Fulfillment', 'Completed'] 
-                })
-            },
-            {
-                dataIndex: "total_amount",
-                key: "Total Amount",
-                title: getSortableHeader("Total Amount", 'total_amount'),
-                align: "center",
-                width: 150,
-                render: (value: number) => new Intl.NumberFormat('en-IN').format(value)
-            },
-            {
-                dataIndex: "amount_received",
-                key: "Amount Received",
-                title: "Amount Received",
-                align: "center",
+                dataIndex: "gifted_by",
+                key: "Gifted By",
+                title: "Gifted By",
+                align: "left",
                 width: 200,
-                hidden: true,
-                render: (value: number) => new Intl.NumberFormat('en-IN').format(value)
+                render: (value: string) => value || '-',
+                ...getColumnSearchProps('gifted_by', filters, handleSetFilters)
             },
             {
-                dataIndex: "payment_status",
-                key: "Payment Status",
-                title: "Payment Status",
+                dataIndex: "source_request_identifier",
+                key: "Source Request",
+                title: "Source Request",
                 align: "center",
                 width: 150,
+                render: (value: string) => value || '-',
+            },
+            {
+                dataIndex: "gifted_on",
+                key: "Gifted On",
+                title: getSortableHeader("Gifted On", 'gifted_on'),
+                align: "center",
+                width: 150,
+                render: (value: string) => getHumanReadableDate(value),
+                ...getColumnDateFilter({ dataIndex: 'gifted_on', filters, handleSetFilters, label: 'Gifted' })
             },
             {
                 dataIndex: "created_at",
-                key: "Created on",
-                title: "Created on",
+                key: "Created On",
+                title: getSortableHeader("Created On", 'created_at'),
                 align: "center",
-                width: 200,
+                width: 150,
                 render: getHumanReadableDate,
                 ...getColumnDateFilter({ dataIndex: 'created_at', filters, handleSetFilters, label: 'Created' })
             },
         ];
 
-        // Only add the actions column for Pay-Later or All views
-        if (orderType !== 'prepaid') {
-            baseColumns.push({
-                key: "action",
-                title: "Action",
-                align: "center",
-                width: 120,
-                fixed: 'right',
-                render: (_, record) => (
-                    record.amount_received !== record.total_amount && record.tags?.includes('PayLater') && (
-                        <Button
-                            variant="contained"
-                            color="success"
-                            size="small"
-                            startIcon={<PaymentIcon />}
-                            onClick={() => {
-                                setSelectedGiftCard(record);
-                                setPaymentDialogOpen(true);
-                            }}
-                        >
-                            Pay
-                        </Button>
-                    )
-                ),
-            });
-        }
-
-        return baseColumns;
+        return columns;
     };
 
+    const stats = getStatistics();
+
     return (
-        <Box p={2} id="green-gift-history">
+        <Box p={2} id="gift-transaction-history">
             <Box sx={{
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'space-between',
                 mb: 3,
             }}>
-                <Typography variant="h5">Gift Orders</Typography>
+                <Typography variant="h5">Gift Transaction History</Typography>
                 <RadioGroup
                     row
-                    value={orderType}
-                    onChange={(e) => setOrderType(e.target.value as OrderType)}
+                    value={sourceTypeFilter}
+                    onChange={(e) => setSourceTypeFilter(e.target.value as SourceTypeFilter)}
                 >
-                    <FormControlLabel value="prepaid" control={<Radio />} label="On The Go" />
-                    <FormControlLabel value="paylater" control={<Radio />} label="Pay Later" />
+                    <FormControlLabel value="fresh_request" control={<Radio />} label="Direct Request" />
+                    <FormControlLabel value="pre_purchased" control={<Radio />} label="Pre-Purchase" />
                     <FormControlLabel value="all" control={<Radio />} label="All" />
                 </RadioGroup>
             </Box>
 
-            <Box sx={{ height: 400, width: "100%", mb: 4 }}>
+            {/* Summary Statistics */}
+            <Box style={{
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                flexWrap: 'wrap',
+                gap: '16px',
+                padding: '0 8px',
+                overflow: 'auto',
+                marginBottom: '24px'
+            }}>
+                <div className={classes.analyticsCard}>
+                    <Box sx={{ paddingTop: "10px" }}>
+                        <Typography variant="subtitle2" color="#1f3625" sx={{ mb: 1 }}>
+                            Total Transactions
+                        </Typography>
+                        <Typography variant="h3" color="#fff" sx={{ pt: 1, pb: 1 }}>
+                            {stats.totalCount}
+                        </Typography>
+                        <Typography variant="caption" color="#1f3625">
+                            {stats.totalTrees} trees gifted
+                        </Typography>
+                    </Box>
+                </div>
+                
+                <div className={classes.analyticsCard}>
+                    <Box sx={{ paddingTop: "10px" }}>
+                        <Typography variant="subtitle2" color="#1f3625" sx={{ mb: 1 }}>
+                            🎁 Direct Request
+                        </Typography>
+                        <Typography variant="h3" color="#fff" sx={{ pt: 1, pb: 1 }}>
+                            {stats.freshRequestCount}
+                        </Typography>
+                        <Typography variant="caption" color="#1f3625">
+                            {stats.freshRequestPercentage}% • {stats.freshRequestTrees} trees
+                        </Typography>
+                    </Box>
+                </div>
+                
+                <div className={classes.analyticsCard}>
+                    <Box sx={{ paddingTop: "10px" }}>
+                        <Typography variant="subtitle2" color="#1f3625" sx={{ mb: 1 }}>
+                            🌳 Pre-Purchased
+                        </Typography>
+                        <Typography variant="h3" color="#fff" sx={{ pt: 1, pb: 1 }}>
+                            {stats.prePurchasedCount}
+                        </Typography>
+                        <Typography variant="caption" color="#1f3625">
+                            {stats.prePurchasedPercentage}% • {stats.prePurchasedTrees} trees
+                        </Typography>
+                    </Box>
+                </div>
+            </Box>
+
+            <Box sx={{ height: 600, width: "100%", mb: 4 }}>
                 <GeneralTable
-                    loading={giftCardsData.loading}
+                    loading={loading}
                     rows={tableRows}
                     columns={getColumns()}
-                    totalRecords={giftCardsData.totalGiftCards}
+                    totalRecords={totalRecords}
                     page={page}
                     pageSize={pageSize}
                     onPaginationChange={(page: number, pageSize: number) => { setPage(page - 1); setPageSize(pageSize); }}
-                    onDownload={getAllGiftCardsData}
+                    onDownload={getAllTransactionData}
                     footer
-                    tableName="Gift Orders"
+                    tableName="Gift Transactions"
                 />
             </Box>
-
-            {selectedGiftCard && (
-                <PaymentDialog
-                    open={paymentDialogOpen}
-                    onClose={() => {
-                        setPaymentDialogOpen(false);
-                        setSelectedGiftCard(null);
-                    }}
-                    type="gift"
-                    paymentId={selectedGiftCard.payment_id!}
-                    giftRequestId={selectedGiftCard.id}
-                    requestId={selectedGiftCard.request_id}
-                    totalAmount={selectedGiftCard.total_amount}
-                    userName={userName}
-                    userEmail={userEmail || ""}
-                    onPaymentSuccess={handlePaymentSuccess}
-                />
-            )}
         </Box>
     );
 };

@@ -40,6 +40,7 @@ const CSRGiftTrees: React.FC<CSRGiftTreesProps> = ({ groupId, selectedGroup }) =
     const [giftMultiple, setGiftMultiple] = useState(false);
     const [filter, setFilter] = useState<'gifted' | 'non-gifted' | 'all'>('all');
     const [searchUser, setSeachUser] = useState('');
+    const [sourceTypeFilter, setSourceTypeFilter] = useState<'all' | 'fresh_request' | 'pre_purchased'>('all');
     const [isLoading, setIsLoading] = useState(false);
 
     const [summaryOpen, setSummaryOpen] = useState(false);
@@ -177,11 +178,97 @@ const CSRGiftTrees: React.FC<CSRGiftTreesProps> = ({ groupId, selectedGroup }) =
                 </FormControl>
             </Box>
 
+            {/* Transaction Source Type Filter - Only show for gifted trees */}
+            {filter === 'gifted' && (
+                <Box sx={{
+                    mt: 2,
+                    paddingX: 1,
+                    display: 'flex',
+                    flexDirection: isMobile ? 'column' : 'row',
+                    alignItems: isMobile ? 'stretch' : 'center',
+                    gap: 2
+                }}>
+                    <Typography variant="body2" sx={{ 
+                        minWidth: 'fit-content',
+                        color: 'text.secondary',
+                        fontWeight: 500
+                    }}>
+                        Filter by Source Type:
+                    </Typography>
+                    <FormControl component="fieldset" sx={{ width: isMobile ? '100%' : 'auto' }}>
+                        <FormGroup
+                            aria-label="source-type"
+                            row={!isMobile}
+                            sx={{
+                                gap: 1,
+                                justifyContent: isMobile ? 'flex-start' : 'space-between'
+                            }}
+                        >
+                            <FormControlLabel
+                                value="all"
+                                control={<Radio 
+                                    color="success" 
+                                    size="small"
+                                    checked={sourceTypeFilter === 'all'} 
+                                    onChange={() => setSourceTypeFilter('all')} 
+                                />}
+                                label="All Types"
+                                labelPlacement="end"
+                                sx={{ 
+                                    mr: 1,
+                                    '& .MuiFormControlLabel-label': {
+                                        fontSize: isMobile ? '0.875rem' : '1rem'
+                                    }
+                                }}
+                            />
+                            <FormControlLabel
+                                value="fresh_request"
+                                control={<Radio 
+                                    color="success" 
+                                    size="small"
+                                    checked={sourceTypeFilter === 'fresh_request'} 
+                                    onChange={() => setSourceTypeFilter('fresh_request')} 
+                                />}
+                                label="🎁 Direct Request"
+                                labelPlacement="end"
+                                sx={{ 
+                                    mr: 1,
+                                    '& .MuiFormControlLabel-label': {
+                                        fontSize: isMobile ? '0.875rem' : '1rem',
+                                        color: '#2e7d32'
+                                    }
+                                }}
+                            />
+                            <FormControlLabel
+                                value="pre_purchased"
+                                control={<Radio 
+                                    color="success" 
+                                    size="small"
+                                    checked={sourceTypeFilter === 'pre_purchased'} 
+                                    onChange={() => setSourceTypeFilter('pre_purchased')} 
+                                />}
+                                label="🌳 Pre-Purchased"
+                                labelPlacement="end"
+                                sx={{ 
+                                    mr: 1,
+                                    '& .MuiFormControlLabel-label': {
+                                        fontSize: isMobile ? '0.875rem' : '1rem',
+                                        color: '#1565c0'
+                                    }
+                                }}
+                            />
+
+                        </FormGroup>
+                    </FormControl>
+                </Box>
+            )}
+
             <GiftTreesGrid
                 ref={gridRef}
                 groupId={groupId}
                 filter={filter}
                 searchUser={searchUser}
+                sourceTypeFilter={sourceTypeFilter}
                 refreshTrigger={refreshTrigger}
                 onSelectTree={handleSelectTree}
                 onSelectTransaction={handleSelectTransaction}
