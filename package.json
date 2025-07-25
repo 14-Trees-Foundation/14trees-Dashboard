@@ -35,7 +35,9 @@
     "chart.js": "^4.4.8",
     "date-fns": "^2.23.0",
     "dotenv": "^10.0.0",
+    "fdir": "^6.4.6",
     "file-saver": "^2.0.5",
+    "file-selector": "^0.6.0",
     "final-form": "^4.20.4",
     "gsap": "^3.11.0",
     "jszip": "^3.10.1",
@@ -76,6 +78,7 @@
     "recoil": "^0.4.1",
     "sass": "^1.35.1",
     "slick-carousel": "^1.8.1",
+    "tinyglobby": "^0.2.14",
     "vite": "^6.3.3",
     "vite-tsconfig-paths": "^5.1.4",
     "web-vitals": "^1.0.1"

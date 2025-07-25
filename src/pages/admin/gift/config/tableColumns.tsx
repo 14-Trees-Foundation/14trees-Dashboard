@@ -92,6 +92,8 @@ export const createTableColumns = ({
             title: "Req. No.",
             align: "right",
             width: 130,
+            fixed: 'left',
+            filteredValue: filters['id']?.value || null,
             ...getColumnNumericFilter({ dataIndex: 'id', filters, handleSetFilters, label: 'Req. No.' })
         },
         {
@@ -100,6 +102,8 @@ export const createTableColumns = ({
             title: "Sponsor",
             align: "center",
             width: 200,
+            fixed: 'left',
+            filteredValue: filters['user_name']?.value || null,
             ...getColumnSearchProps('user_name', filters, handleSetFilters)
         },
         {
@@ -109,67 +113,24 @@ export const createTableColumns = ({
             align: "center",
             width: 200,
             render: (value: string) => value ? value : 'Personal',
+            filteredValue: filters['group_name']?.value || null,
             ...getColumnSearchProps('group_name', filters, handleSetFilters)
         },
         {
-            dataIndex: "no_of_cards",
-            key: "# Trees",
-            title: getSortableHeader("# Trees", 'no_of_cards'),
-            align: "center",
-            width: 100,
-        },
-        {
-            dataIndex: "created_by_name",
-            key: "Created by",
-            title: "Created by",
-            align: "center",
-            width: 200,
-            ...getColumnSearchProps('created_by_name', filters, handleSetFilters)
-        },
-        {
-            dataIndex: "recipient_name",
-            key: "Recipient Name",
-            title: "Recipient Name",
-            align: "center",
-            width: 200,
-            ...getColumnSearchProps('recipient_name', filters, handleSetFilters)
-        },
-        {
-            dataIndex: "request_type",
-            key: "Request Type",
-            title: "Request Type",
-            align: "center",
-            width: 200,
-            ...getColumnSelectedItemFilter({ dataIndex: 'request_type', filters, handleSetFilters, options: ['Gift Cards', 'Normal Assignment', 'Test', 'Promotion', 'Visit'] })
-        },
-        {
-            dataIndex: "processed_by_name",
-            key: "processed_by",
-            title: "Processed By",
+            dataIndex: "payment_status",
+            key: "Payment Status",
+            title: "Payment Status",
             align: "center",
             width: 150,
-            render: (value, record) => {
-                if (!value) return 'Pending';
-                return record.processed_by_name || `User ${value}`;
-            },
-            ...getColumnSearchProps('processed_by_name', filters, handleSetFilters)
-        },
-        {
-            dataIndex: "tags",
-            key: "Tags",
-            title: "Tags",
-            align: "center",
-            width: 200,
-            render: value => value?.join(", ") || '',
-            ...getColumnSelectedItemFilter({ dataIndex: 'tags', filters, handleSetFilters, options: tags })
         },
         {
             dataIndex: "status",
             key: "Status",
-            title: "Status",
+            title: "Processing Status",
             align: "center",
             width: 150,
             render: (value, record, index) => getStatus(record),
+            filteredValue: filters['status']?.value || null,
             ...getColumnSelectedItemFilter({ dataIndex: 'status', filters, handleSetFilters, options: [pendingPlotSelection, 'Pending assignment', 'Completed'] })
         },
         {
@@ -198,6 +159,64 @@ export const createTableColumns = ({
             }
         },
         {
+            dataIndex: "no_of_cards",
+            key: "# Trees",
+            title: getSortableHeader("# Trees", 'no_of_cards'),
+            align: "center",
+            width: 100,
+        },
+        {
+            dataIndex: "created_by_name",
+            key: "Created by",
+            title: "Created by",
+            align: "center",
+            width: 200,
+            filteredValue: filters['created_by_name']?.value || null,
+            ...getColumnSearchProps('created_by_name', filters, handleSetFilters)
+        },
+        {
+            dataIndex: "recipient_name",
+            key: "Recipient Name",
+            title: "Recipient Name",
+            align: "center",
+            width: 200,
+            filteredValue: filters['recipient_name']?.value || null,
+            ...getColumnSearchProps('recipient_name', filters, handleSetFilters)
+        },
+        {
+            dataIndex: "request_type",
+            key: "Request Type",
+            title: "Request Type",
+            align: "center",
+            width: 200,
+            filteredValue: filters['request_type']?.value || null,
+            ...getColumnSelectedItemFilter({ dataIndex: 'request_type', filters, handleSetFilters, options: ['Gift Cards', 'Normal Assignment', 'Test', 'Promotion', 'Visit'] })
+        },
+        {
+            dataIndex: "processed_by_name",
+            key: "processed_by",
+            title: "Picked up by",
+            align: "center",
+            width: 150,
+            render: (value, record) => {
+                if (!value) return 'Pending';
+                return record.processed_by_name || `User ${value}`;
+            },
+            filteredValue: filters['processed_by_name']?.value || null,
+            ...getColumnSearchProps('processed_by_name', filters, handleSetFilters)
+        },
+        {
+            dataIndex: "tags",
+            key: "Tags",
+            title: "Tags",
+            align: "center",
+            width: 200,
+            render: value => value?.join(", ") || '',
+            filteredValue: filters['tags']?.value || null,
+            ...getColumnSelectedItemFilter({ dataIndex: 'tags', filters, handleSetFilters, options: tags })
+        },
+
+        {
             dataIndex: "validation_errors",
             key: "Validation Errors",
             title: "Validation Errors",
@@ -210,6 +229,7 @@ export const createTableColumns = ({
                     </IconButton>
                 </Tooltip>
             ) : '',
+            filteredValue: filters['validation_errors']?.value || null,
             ...getColumnSelectedItemFilter({ dataIndex: 'validation_errors', filters, handleSetFilters, options: ['Yes', 'No'] }),
         },
         {
@@ -218,6 +238,7 @@ export const createTableColumns = ({
             title: "Sponsorship Type",
             align: "center",
             width: 150,
+            filteredValue: filters['sponsorship_type']?.value || null,
             ...getColumnSelectedItemFilter({ dataIndex: 'sponsorship_type', filters, handleSetFilters, options: ['Unverified', 'Pledged', 'Promotional', 'Unsponsored Visit', 'Donation Received'] })
         },
         {
@@ -226,6 +247,7 @@ export const createTableColumns = ({
             title: "Donation Receipt No.",
             align: "center",
             width: 200,
+            filteredValue: filters['donation_receipt_number']?.value || null,
             ...getColumnSearchProps('donation_receipt_number', filters, handleSetFilters)
         },
         {
@@ -234,6 +256,7 @@ export const createTableColumns = ({
             title: "Donation Date",
             align: "center",
             width: 200,
+            filteredValue: filters['donation_date']?.value || null,
             ...getColumnDateFilter({ dataIndex: 'donation_date', filters, handleSetFilters, label: 'Received' })
         },
         {
@@ -250,13 +273,7 @@ export const createTableColumns = ({
             align: "center",
             width: 200,
         },
-        {
-            dataIndex: "payment_status",
-            key: "Payment Status",
-            title: "Payment Status",
-            align: "center",
-            width: 150,
-        },
+
         {
             dataIndex: "notes",
             key: "Notes",
@@ -270,6 +287,7 @@ export const createTableColumns = ({
                     </Badge>
                 </IconButton>
             ),
+            filteredValue: filters['notes']?.value || null,
             ...getColumnSelectedItemFilter({ dataIndex: 'notes', filters, handleSetFilters, options: ['Yes', 'No'] })
         },
         {
@@ -279,6 +297,7 @@ export const createTableColumns = ({
             align: "center",
             width: 200,
             render: getHumanReadableDate,
+            filteredValue: filters['created_at']?.value || null,
             ...getColumnDateFilter({ dataIndex: 'created_at', filters, handleSetFilters, label: 'Created' })
         },
     ];

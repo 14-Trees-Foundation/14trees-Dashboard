@@ -341,7 +341,7 @@ const DonationForm: React.FC<DonationFormProps> = ({ donation, open, requestId, 
                 )}
 
                 {steps.map((step, index) => (
-                    <div hidden={currentStep !== index}>
+                    <div key={step.key} hidden={currentStep !== index}>
                         <div
                             style={{
                                 padding: 10,

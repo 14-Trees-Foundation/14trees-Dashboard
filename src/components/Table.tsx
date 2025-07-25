@@ -43,7 +43,8 @@ interface TableComponentProps {
         ReactElement
     tableRowColoringLabels?: TableColoringLabels[]
     rowClassName?: (record: any, index: number) => string
-
+    pageSize?: number
+    currentPage?: number
 }
 
 const ResizableTitle = (props: any) => {
@@ -81,7 +82,7 @@ const ResizableTitle = (props: any) => {
     );
 };
 
-function TableComponent({ loading, dataSource, columns, totalRecords, tableName, tableRowColoringLabels, fetchAllData, setPageSize, setPage, handleSelectionChanges, setSrNoPage, isExpandable, expandableFunction, rowClassName }: TableComponentProps) {
+function TableComponent({ loading, dataSource, columns, totalRecords, tableName, tableRowColoringLabels, fetchAllData, setPageSize, setPage, handleSelectionChanges, setSrNoPage, isExpandable, expandableFunction, rowClassName, pageSize = 10, currentPage = 0 }: TableComponentProps) {
 
     const [download, setDownload] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
@@ -168,14 +169,16 @@ function TableComponent({ loading, dataSource, columns, totalRecords, tableName,
         setCheckedList(newVisibleColumns);
     }, []);
 
-    const handlePageChange = (page: number, pageSize: number) => {
-        if (dataSource && page * pageSize > dataSource.length) {
-            const pageNo = Math.floor(dataSource.length / pageSize);
+    const handlePageChange = (page: number, newPageSize?: number) => {
+        const actualPageSize = newPageSize || pageSize;
+        if (dataSource && page * actualPageSize > dataSource.length) {
+            const pageNo = Math.floor(dataSource.length / actualPageSize);
             setPage(pageNo);
-            setPageSize(pageSize);
+            if (newPageSize) setPageSize(newPageSize);
             setSrNoPage && setSrNoPage(pageNo);
         } else {
-            setPageSize(pageSize);
+            if (newPageSize) setPageSize(newPageSize);
+            setPage(page - 1);
             setSrNoPage && setSrNoPage(page - 1);
         }
     }
@@ -214,9 +217,12 @@ function TableComponent({ loading, dataSource, columns, totalRecords, tableName,
             expandable={isExpandable ? expandable : undefined}
             pagination={{
                 position: ['bottomRight'],
-                defaultCurrent: 1,
+                current: currentPage + 1,
                 total: totalRecords,
+                pageSize: pageSize,
+                pageSizeOptions: [5, 10, 20, 50, 100],
                 simple: true,
+                showSizeChanger: true,
                 onChange: handlePageChange,
             }}
             components={components}

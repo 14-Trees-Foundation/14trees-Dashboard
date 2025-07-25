@@ -180,7 +180,7 @@ export const TreeList = ({ onTreeSelect }) => {
               mapped.map((tree) => {
                 return (
                   <Chip
-                    key={tree.sapling_id}
+                    key={`mapped-${tree.sapling_id}`}
                     label={tree.sapling_id}
                     style={{
                       color: tree.assigned_to ? "#fff" : "#3C79BC",
@@ -241,7 +241,7 @@ export const TreeList = ({ onTreeSelect }) => {
               unMapped.map((tree) => {
                 return (
                   <Chip
-                    key={tree.spaling_id}
+                    key={`unmapped-${tree.sapling_id}`}
                     label={tree.sapling_id}
                     style={{
                       color: tree.assigned_to ? "#fff" : "#1f3625",

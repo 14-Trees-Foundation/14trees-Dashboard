@@ -43,6 +43,8 @@ export interface Donation {
   donation_receipt_number: string | null;
   processed_by: number | null;
   processed_by_name?: string;
+  order_id?: string | null;
+  notes?: string | null;
 }
 
 export type DonationUser = {
