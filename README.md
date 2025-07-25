@@ -1,5 +1,17 @@
 # 14 Trees Dashboard Frontend
 
+## Environment Endpoints
+
+### Development
+- **User Website**: https://feature-front-page--14trees-next.netlify.app/
+- **Dashboard**: https://next--14trees-dashboard.netlify.app/
+
+### Production
+- **User Website**: http://14trees.org/
+- **Dashboard**: https://dashboard.14trees.org/
+
+## Setup
+
 Set the environment variables:
 - `VITE_APP_API_MAP_KEY`
 - `VITE_APP_CLIENT_ID`
