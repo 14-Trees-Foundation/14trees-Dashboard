@@ -710,6 +710,8 @@ export const TreeNew = () => {
                     setPageSize={setPageSize}
                     handleSelectionChanges={handleSelectionChanges}
                     setSrNoPage={setSrNoPage}
+                    pageSize={pageSize}
+                    currentPage={page}
                     rowClassName={(record, index) => { 
                         // Priority: Dead trees get red background, deleted trees get gray background
                         if (record.tree_status === 'dead') return 'bg-dead-tree';

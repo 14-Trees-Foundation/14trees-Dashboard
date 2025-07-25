@@ -198,3 +198,22 @@
 .payment-failed-row.ant-table-row-selected .ant-table-cell-fix-left {
     background-color: #ffcdd2 !important;
 }
+
+/* Sequence ordering column styles */
+.sequence-ordering-column {
+    padding: 4px !important;
+}
+
+.sequence-ordering-column .MuiIconButton-root {
+    padding: 2px;
+    margin: 1px 0;
+}
+
+/* Ensure multiple sticky columns work together */
+.ant-table-cell-fix-left:nth-child(1) {
+    z-index: 12 !important;
+}
+
+.ant-table-cell-fix-left:nth-child(2) {
+    z-index: 11 !important;
+}

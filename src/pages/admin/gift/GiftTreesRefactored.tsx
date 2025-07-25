@@ -180,7 +180,7 @@ const GiftTrees: React.FC = () => {
 
             {/* Main Content */}
             {(auth.signedin || import.meta.env.VITE_BYPASS_AUTH === 'true') && (
-                <Box sx={{ height: 840, width: "100%" }}>
+                <Box id="tree-cards-table" sx={{ height: 840, width: "100%", scrollMarginTop: '20px' }}>
                     <GeneralTable
                         loading={dataHook.giftCardsData.loading}
                         rows={state.tableRows}
@@ -302,10 +302,10 @@ const GiftTrees: React.FC = () => {
 
             {/* Footer Content */}
             <Divider sx={{ my: 4, backgroundColor: 'transparent' }} />
-            <Box sx={{ minHeight: 540 }}>
+            <Box id="tree-cards-auto-processing" sx={{ minHeight: 540, scrollMarginTop: '20px' }}>
                 <AutoPrsPlots type="gift-trees" />
             </Box>
-            <div style={{ marginTop: '20px' }}>
+            <div id="tree-cards-sponsorship" style={{ marginTop: '20px', scrollMarginTop: '20px' }}>
                 <h2>Sponsorship Distribution</h2>
                 <GiftTreesChart 
                     corporateCount={state.corporateCount} 

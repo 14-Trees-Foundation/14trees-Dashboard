@@ -272,6 +272,7 @@ export const PlotComponent = () => {
       title: "Name",
       align: "center",
       width: 300,
+      fixed: "left",
       ...getColumnSearchProps('name', filters, handleSetFilters)
     },
     {
@@ -280,6 +281,7 @@ export const PlotComponent = () => {
       title: "Plot Label",
       align: "center",
       width: 150,
+      fixed: "left",
       ...getColumnSearchProps('label', filters, handleSetFilters)
     },
     {

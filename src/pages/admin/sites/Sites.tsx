@@ -205,6 +205,7 @@ const getAllSitesData = async () => {
       title: "Name (Marathi)",
       width: 220,
       align: "center",
+      fixed: "left",
       ...getColumnSearchProps("name_marathi", filters, handleSetFilters),
     },
     {
@@ -213,6 +214,7 @@ const getAllSitesData = async () => {
       title: "Name (English)",
       width: 220,
       align: "center",
+      fixed: "left",
       ...getColumnSearchProps("name_english", filters, handleSetFilters),
     },
     {

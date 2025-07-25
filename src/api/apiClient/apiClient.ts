@@ -274,6 +274,17 @@ class ApiClient {
         }
     }
 
+    async updateAutoProcessPlotSequences(data: { plot_sequences: { id: number; sequence: number }[]; type: 'donation' | 'gift' }): Promise<any> {
+        const url = `/auto-process/updateSequences`;
+        try {
+            const response = await this.api.put(url, data);
+            return response.data;
+        } catch (error: any) {
+            console.error('Failed to update auto-processing plot sequences:', error);
+            throw new Error(`Failed to update plot sequences: ${error.message}`);
+        }
+    }
+
 
     async searchPlots(searchStr: string): Promise<Plot[]> {
         const url = `/plots/${searchStr}`;
@@ -317,6 +328,8 @@ class ApiClient {
             throw new Error('Failed to update coordinates');
         }
     }
+
+
 
     async deletePlot(data: Plot): Promise<number> {
         try {
@@ -1414,6 +1427,24 @@ class ApiClient {
                 throw new Error(error.response.data.message);
             }
             throw new Error('Failed to update donation');
+        }
+    }
+
+    async updateDonationNotes(donationId: number, notes: string): Promise<Donation> {
+        try {
+            const payload = {
+                updateFields: ['notes'],
+                data: { notes }
+            };
+
+            const response = await this.api.put<Donation>(`/donations/requests/${donationId}`, payload);
+            return response.data;
+        } catch (error: any) {
+            console.error("Update donation notes error:", error);
+            if (error.response?.data?.message) {
+                throw new Error(error.response.data.message);
+            }
+            throw new Error('Failed to update donation notes');
         }
     }
 

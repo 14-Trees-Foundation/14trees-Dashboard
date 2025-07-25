@@ -110,6 +110,7 @@ export const PlantTypeComponent = () => {
             title: "Plant Type ID",
             width: 170,
             align: "center",
+            fixed: "left",
             ...getColumnSearchProps('plant_type_id', filters, handleSetFilters)
         },
         {
@@ -118,6 +119,7 @@ export const PlantTypeComponent = () => {
             title: "Name",
             width: 250,
             align: "center",
+            fixed: "left",
             ...getColumnSearchProps('name', filters, handleSetFilters)
         },
         {

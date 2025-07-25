@@ -1,12 +1,13 @@
-import { Settings } from '@mui/icons-material';
-import { Button, Divider, IconButton } from '@mui/material';
-import { Checkbox, Dropdown, MenuProps, Table, TableColumnsType } from 'antd';
+import { Settings, KeyboardArrowUp, KeyboardArrowDown } from '@mui/icons-material';
+import { Button, Divider, IconButton, Tooltip } from '@mui/material';
+import { Table, TableColumnsType } from 'antd';
 import { AnyObject } from 'antd/es/_util/type';
 import { TableRowSelection } from 'antd/es/table/interface';
 import { unparse } from 'papaparse';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef, useCallback } from 'react';
 import { toast } from 'react-toastify';
 import { Resizable } from "react-resizable";
+import ColumnPreferences from './ColumnPreferences';
 import './GenTable.css'
 
 interface GeneralTableProps {
@@ -27,6 +28,12 @@ interface GeneralTableProps {
     expandable?: {
         render: (record: any) => React.ReactNode
         isExpandable: (record: any) => boolean
+    }
+    sequenceOrdering?: {
+        enabled: boolean
+        onMoveUp: (record: any, index: number) => void
+        onMoveDown: (record: any, index: number) => void
+        sequenceField?: string
     }
 }
 
@@ -64,11 +71,19 @@ const ResizableTitle = (props: any) => {
     );
 };
 
-function GeneralTable({ loading, rows, columns, totalRecords, page, pageSize = 10, footer, fullHeight, tableName, onDownload, onSelectionChanges, onPaginationChange, summary, rowClassName, expandable }: GeneralTableProps) {
+function GeneralTable({ loading, rows, columns, totalRecords, page, pageSize = 10, footer, fullHeight, tableName, onDownload, onSelectionChanges, onPaginationChange, summary, rowClassName, expandable, sequenceOrdering }: GeneralTableProps) {
 
     const [checkedList, setCheckedList] = useState(columns?.filter(item => !item.hidden)?.map((item) => item.key) ?? []);
-    const [open, setOpen] = useState(false);
     const [tableCols, setTableCols] = useState<any[]>([]);
+    const [visibleColumns, setVisibleColumns] = useState<string[]>([]);
+    const isMountedRef = useRef(true);
+
+    // Cleanup effect to prevent memory leaks
+    useEffect(() => {
+        return () => {
+            isMountedRef.current = false;
+        };
+    }, []);
 
     let rowSelection: TableRowSelection<AnyObject> | undefined;
     if (onSelectionChanges) {
@@ -105,11 +120,19 @@ function GeneralTable({ loading, rows, columns, totalRecords, page, pageSize = 1
         if (rows?.length !== totalRecords) {
             try {
                 dataSource = await onDownload();
+                // Check if component is still mounted before proceeding
+                if (!isMountedRef.current) return;
             } catch (error: any) {
-                toast.error(error.message);
+                // Only show error if component is still mounted
+                if (isMountedRef.current) {
+                    toast.error(error.message);
+                }
                 return; 
             }
         }
+
+        // Check if component is still mounted before processing data
+        if (!isMountedRef.current) return;
 
         const data = dataSource.map((item) => {
             const row: any = {}
@@ -126,36 +149,78 @@ function GeneralTable({ loading, rows, columns, totalRecords, page, pageSize = 1
         })
 
         await handleDownload(data);
-        toast.success('File downloaded successfully!');
+        // Only show success message if component is still mounted
+        if (isMountedRef.current) {
+            toast.success('File downloaded successfully!');
+        }
     }
 
-    useEffect(() => {
-        setTableCols(columns?.map((item: any) => ({
-            ...item,
-            hidden: !checkedList.includes(item.key as string),
-        })) ?? []);
-    }, [columns, checkedList]);
+    const handleColumnVisibilityChange = useCallback((newVisibleColumns: string[]) => {
+        setVisibleColumns(newVisibleColumns);
+        setCheckedList(newVisibleColumns);
+    }, []);
 
     useEffect(() => {
-        setCheckedList(columns?.filter(item => !item.hidden)?.map((item) => item.key) ?? []);
+        // Use visibleColumns from ColumnPreferences if available, otherwise fall back to checkedList
+        const columnsToShow = visibleColumns.length > 0 ? visibleColumns : checkedList;
+        let processedColumns = columns?.map((item: any) => ({
+            ...item,
+            hidden: !columnsToShow.includes(item.key as string),
+        })) ?? [];
+
+        // Add sequence ordering column if enabled
+        if (sequenceOrdering?.enabled) {
+            const sequenceColumn = {
+                dataIndex: 'sequence_order',
+                key: 'sequence_order',
+                title: 'Order',
+                align: 'center' as const,
+                width: 100,
+                fixed: 'left' as const,
+                className: 'sequence-ordering-column',
+                render: (_: any, record: any, index: number) => (
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                        <Tooltip title="Move up">
+                            <IconButton
+                                size="small"
+                                onClick={() => sequenceOrdering.onMoveUp(record, index)}
+                                disabled={index === 0}
+                                style={{ padding: '2px' }}
+                            >
+                                <KeyboardArrowUp fontSize="small" />
+                            </IconButton>
+                        </Tooltip>
+                        <Tooltip title="Move down">
+                            <IconButton
+                                size="small"
+                                onClick={() => sequenceOrdering.onMoveDown(record, index)}
+                                disabled={!rows || index === rows.length - 1}
+                                style={{ padding: '2px' }}
+                            >
+                                <KeyboardArrowDown fontSize="small" />
+                            </IconButton>
+                        </Tooltip>
+                    </div>
+                ),
+                hidden: false
+            };
+            processedColumns = [sequenceColumn, ...processedColumns];
+        }
+
+        // Only update state if component is still mounted
+        if (isMountedRef.current) {
+            setTableCols(processedColumns);
+        }
+    }, [columns, checkedList, visibleColumns, sequenceOrdering, rows]);
+
+    useEffect(() => {
+        // Only update state if component is still mounted
+        if (isMountedRef.current) {
+            setCheckedList(columns?.filter(item => !item.hidden)?.map((item) => item.key) ?? []);
+        }
     }, [columns]);
 
-    const handleOpenChange = (flag: boolean, info: { source: 'menu' | 'trigger' }) => {
-        if (info.source === 'trigger') setOpen(flag);
-    };
 
-    const handleColumnsSelection = (key: string) => {
-        const newSelected = checkedList.includes(key) ? checkedList.filter((item) => item !== key) : [...checkedList, key];
-        setCheckedList(newSelected);
-    }
-
-    const items: MenuProps['items'] = columns?.map((column: any, index: number) => {
-        const title = typeof column.title === 'string' ? column.title : column.key;
-        return {
-            key: `${column.dataIndex || column.key}-${index}`,
-            label: <Checkbox key={`checkbox-${column.key}-${index}`} checked={checkedList.includes(column.key)} onChange={() => handleColumnsSelection(column.key)}>{title}</Checkbox>
-        }
-    })
 
     const components = {
         header: {
@@ -164,14 +229,17 @@ function GeneralTable({ loading, rows, columns, totalRecords, page, pageSize = 1
     };
 
     const handleResize = (index: number) => (e: any, info: { size: any }) => {
-        setTableCols(prev => {
-            const nextColumns = [...prev];
-            nextColumns[index] = {
-                ...nextColumns[index],
-                width: info.size.width
-            };
-            return nextColumns as any[];
-        });
+        // Only update state if component is still mounted
+        if (isMountedRef.current) {
+            setTableCols(prev => {
+                const nextColumns = [...prev];
+                nextColumns[index] = {
+                    ...nextColumns[index],
+                    width: info.size.width
+                };
+                return nextColumns as any[];
+            });
+        }
     };
 
     return (
@@ -206,15 +274,11 @@ function GeneralTable({ loading, rows, columns, totalRecords, page, pageSize = 1
             scroll={!fullHeight ? { y: 550 } : undefined}
             footer={footer ? () => (
                 <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-                    <Dropdown
-                        menu={{ items }}
-                        placement="bottomLeft"
-                        open={open}
-                        onOpenChange={handleOpenChange}
-                        trigger={['click']}
-                    >
-                        <IconButton sx={{ marginLeft: 'auto' }}><Settings /></IconButton>
-                    </Dropdown>
+                    <ColumnPreferences
+                        columns={columns || []}
+                        tableName={tableName || 'table'}
+                        onColumnVisibilityChange={handleColumnVisibilityChange}
+                    />
                     <Divider orientation="vertical" flexItem sx={{ backgroundColor: "black", marginRight: '10px', }} />
                     <div style={{ marginRight: '10px', display: 'flex', alignItems: 'center' }}><strong>Export table data in a csv file:</strong></div>
                     <Button
