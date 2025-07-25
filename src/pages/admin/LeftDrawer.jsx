@@ -63,11 +63,11 @@ export const AdminLeftDrawer = () => {
     }
   }, []);
 
-  useEffect(() => {
-    if (auth.roles.includes(UserRoles.User)) {
-      navigate("/tree-cards");
-    }
-  }, [auth]);
+  // useEffect(() => {
+  //   if (auth.roles.includes(UserRoles.User)) {
+  //     navigate("/tree-cards");
+  //   }
+  // }, [auth]);
 
   const pages = [
     {
