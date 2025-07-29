@@ -22,6 +22,7 @@ import { Order } from '../../types/common';
 import { View } from '../../types/viewPermission';
 import { GiftRedeemTransaction } from '../../types/gift_redeem_transaction';
 import { Campaign } from '../../types/campaign';
+import { SortOrder } from 'antd/es/table/interface';
 import { GridFilterItem } from '@mui/x-data-grid';
 
 
@@ -159,7 +160,7 @@ class ApiClient {
 
     async getTreeCountsForPlantTypes(offset: number, limit: number, filters?: any[], orderBy?: any[]): Promise<PaginatedResponse<any>> {
         try {
-            const resp = await this.api.post<PaginatedResponse<any>>(`/plant-types/states`, { offset, limit, filters, order_by: orderBy });
+            const resp = await this.api.post<PaginatedResponse<any>>(`/plant-types/states?offset=${offset}&limit=${limit}`, { filters, order_by: orderBy });
             return resp.data;
         } catch (error: any) {
             if (error?.response?.data?.message) {
@@ -768,7 +769,7 @@ class ApiClient {
         }
     }
 
-    async checkGroupBirthdays(groupId: number): Promise<BirthdayResponse> {
+    async checkGroupBirthdays(groupId: number): Promise<any> {
         try {
             const response = await this.api.get(`/users/birthday/notifications?group_id=${groupId}`);
             return response.data;
@@ -876,8 +877,8 @@ class ApiClient {
             Object.entries(data).forEach(([key, value]) => {
                 if (key === "tags" && value) {
                     (value as any)?.forEach((tag: string) => { formData.append("tags", tag) });
-                } else if (key === "location") {
-
+                } else if (key === "memory_images" && value) {
+                    (value as string[]).forEach((image: string) => { formData.append("memory_images", image) });
                 } else if (key != 'image' && key !== "location") {
                     const strValue = value as any
                     formData.append(key, strValue);
@@ -2481,7 +2482,7 @@ class ApiClient {
             const response = await this.api.get<{ url: string }>(`/utils/signedPutUrl?type=${type}&key=${key}`);
             return response.data.url;
         } catch (error: any) {
-            if (error.response) {
+            if (error.response?.data?.message) {
                 throw new Error(error.response.data.message);
             }
             throw new Error('Failed to generate gift cards');
@@ -2505,7 +2506,7 @@ class ApiClient {
             const response = await this.api.get<{ urls: string[] }>(`/utils/s3keys/${request_id}`);
             return response.data.urls;
         } catch (error: any) {
-            if (error.response) {
+            if (error.response?.data?.message) {
                 throw new Error(error.response.data.message);
             }
             throw new Error('Failed to get images');
@@ -2554,7 +2555,7 @@ class ApiClient {
 
     async createPaymentHistory(payment_id: number, amount: number, payment_method: string, payment_proof: string | null) {
         try {
-            const response = await this.api.post<PaymentHistory>(`/payments/history`, { payment_id, amount, payment_method, payment_proof });
+            const response = await this.api.post<PaymentHistory>(`/payments/history`, { payment_id, amount, payment_method, payment_proof});
             return response.data;
         } catch (error: any) {
             if (error.response) {
@@ -2819,10 +2820,10 @@ class ApiClient {
 
     async createCampaign(name: string, c_key: string, description?: string): Promise<Campaign> {
         try {
-            const response = await this.api.post<Campaign>(`/campaigns`, {
-                name,
-                c_key,
-                description
+            const response = await this.api.post<Campaign>(`/campaigns`, { 
+                name, 
+                c_key, 
+                description 
             });
             return response.data;
         } catch (error: any) {
@@ -2839,7 +2840,7 @@ class ApiClient {
                 updateFields,
                 data: updateData
             };
-
+            
             const response = await this.api.put<Campaign>(`/campaigns/update/${id}`, payload);
             return response.data;
         } catch (error: any) {
@@ -2852,7 +2853,7 @@ class ApiClient {
 
     async getCampaigns(offset: number, limit: number, filters?: any[], orderBy?: any[]): Promise<{ results: Campaign[], total: number, offset: number }> {
         const url = `/campaigns/list/get?offset=${offset}&limit=${limit}`;
-
+    
         try {
             const response = await this.api.post<{ results: Campaign[], total: number, offset: number }>(url, {
                 filters: filters || [],

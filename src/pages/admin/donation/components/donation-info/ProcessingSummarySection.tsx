@@ -29,7 +29,7 @@ const ProcessingSummarySection: React.FC<ProcessingSummarySectionProps> = ({
       sx={{ p: 2, mb: 2, borderRadius: 2, border: `1px solid ${theme.palette.divider}` }}
     >
       <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-        <AssessmentOutlined sx={{ color: '#2e7d32' }} /> Donation Processing Summary
+        <AssessmentOutlined sx={{ color: '#2e7d32' }} /> Processing Summary
       </Typography>
       <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
         

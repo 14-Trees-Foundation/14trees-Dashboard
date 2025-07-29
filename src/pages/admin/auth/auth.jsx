@@ -14,6 +14,7 @@ export const AuthProvider = ({ children }) => {
     setUser(name);
     localStorage.setItem("userName", name);
     localStorage.setItem("userEmail", email);
+    localStorage.setItem("userId", userId);
     setUserId(userId);
     setPermissions(perm);
     setRoles(roles)

@@ -42,6 +42,29 @@ export function getHumanReadableDateTime(dateStr: string | number) {
     return isValidDate ? moment(date).format('MMMM DD, YYYY hh:mm') : '';
 }
 
+export function getFormattedDateTimeIST(dateStr: string | number) {
+    const date = new Date(dateStr);
+    const isValidDate = !isNaN(date.getDate()) && date.getTime() > 0;
+    
+    if (!isValidDate) return '';
+    
+    // Convert to IST using toLocaleString with proper formatting
+    const istDateString = date.toLocaleString("en-CA", {
+        timeZone: "Asia/Kolkata",
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        hour12: false
+    });
+    
+    // The en-CA locale gives us YYYY-MM-DD, HH:MM:SS format
+    // Replace the comma and space with just a space to get: YYYY-MM-DD HH:MM:SS
+    return istDateString.replace(', ', ' ');
+}
+
 export const getUniqueRequestId = () => {
     return Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
 }

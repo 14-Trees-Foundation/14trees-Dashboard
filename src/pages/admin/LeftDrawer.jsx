@@ -19,7 +19,6 @@ import CorporateFareIcon from "@mui/icons-material/CorporateFare";
 import TourIcon from "@mui/icons-material/TourOutlined";
 import logo from "../../assets/logo_white_small.png";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { useAuth } from "./auth/auth";
 import VolunteerActivismIcon from "@mui/icons-material/VolunteerActivism";
 import MapIcon from "@mui/icons-material/Map";
 import FestivalIcon from "@mui/icons-material/Festival";
@@ -63,89 +62,83 @@ export const AdminLeftDrawer = () => {
     }
   }, []);
 
-  // useEffect(() => {
-  //   if (auth.roles.includes(UserRoles.User)) {
-  //     navigate("/tree-cards");
-  //   }
-  // }, [auth]);
-
   const pages = [
     {
       displayName: "Home",
       logo: LeaderBoardOutlined,
-      display: true,
+      display: isAdmin,
       path: "home",
     },
     {
       displayName: "Sites",
       logo: MapIcon,
-      display: true,
+      display: isAdmin,
       path: "sites",
     },
     {
       displayName: "Plots",
       logo: LandscapeIcon,
-      display: true,
+      display: isAdmin,
       path: "plots",
     },
     {
       displayName: "Trees",
       logo: ForestOutlined,
-      display: true,
+      display: isAdmin,
       path: "trees",
     },
     {
-      divider: true,
+      divider: isAdmin,
     },
     {
       displayName: "Plant Types",
       logo: GrassTwoToneIcon,
-      display: true,
+      display: isAdmin,
       path: "plant-types",
     },
     {
       displayName: "Ponds",
       logo: OpacityOutlined,
-      display: true,
+      display: isAdmin,
       path: "ponds",
     },
     {
       displayName: "People",
       logo: AccountCircleOutlined,
-      display: true,
+      display: isAdmin,
       path: "people",
     },
     {
       displayName: "People Groups",
       logo: CorporateFareIcon,
-      display: true,
+      display: isAdmin,
       path: "people-group",
     },
     {
-      divider: true,
+      divider: isAdmin,
     },
     {
       displayName: "Visits",
       logo: TourIcon,
-      display: true,
+      display: isAdmin,
       path: "visits",
     },
     {
       displayName: "Events",
       logo: FestivalIcon,
-      display: true,
+      display: isAdmin,
       path: "events",
     },
     {
       displayName: "Site Inventory",
       logo: Inventory,
-      display: true,
+      display: isAdmin,
       path: "site-inventory",
     },
     {
       displayName: "GC Inventory",
       logo: Inventory,
-      display: true,
+      display: isAdmin,
       path: "gc-inventory",
     },
     {
@@ -169,13 +162,13 @@ export const AdminLeftDrawer = () => {
     {
       displayName: "Donations",
       logo: VolunteerActivismIcon,
-      display: true,
+      display: isAdmin,
       path: "donations",
     },
     {
       displayName: "Corporate Dashboard",
       logo: Analytics,
-      display: true,
+      display: isAdmin,
       path: "corporate-dashboard",
     },
     // {

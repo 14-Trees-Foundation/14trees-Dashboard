@@ -105,11 +105,11 @@ const CardActivation: FC<CardActivationProps> = ({ giftCardUser, onUserChange })
             }
         }
 
-        if (giftCardUser?.user_id) {
-            getUser(giftCardUser.user_id);
+        if ((giftCardUser as any)?.user_id) {
+            getUser((giftCardUser as any).user_id);
             setRecord(prev => ({
                 ...prev,
-                NAME: giftCardUser.user_name || '',
+                NAME: (giftCardUser as any).user_name || '',
                 SAPLING: giftCardUser.sapling_id || '',
             }))
         }

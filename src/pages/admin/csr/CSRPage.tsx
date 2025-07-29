@@ -54,11 +54,6 @@ const CSRPage: React.FC = () => {
 
     let auth = useAuth();
 
-    useEffect(() => {
-        auth.signin("User", "user@example.com", 13124, ["all"], ["super-admin"], "", () => { });
-        localStorage.setItem("userId", "13124");
-    }, []);
-
     const handleScroll = (id: string) => {
         const element = document.getElementById(id);
         if (element) {
@@ -93,11 +88,7 @@ const CSRPage: React.FC = () => {
             try {
                 const viewId = searchParams.get("v") || "";
                 const apiClient = new ApiClient();
-                const resp = await apiClient.verifyViewAccess(
-                    viewId,
-                    auth.userId,
-                    location.pathname
-                );
+                const resp = await apiClient.verifyViewAccess(viewId, userId, location.pathname);
                 setStatus(resp);
             } catch (error: any) {
                 toast.error(error.message);
@@ -107,8 +98,9 @@ const CSRPage: React.FC = () => {
 
         return () => {
             clearTimeout(intervalId);
-        };
-    }, [auth, location]);
+        }
+
+    }, [location])
 
     const items = [
         // {

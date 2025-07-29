@@ -74,8 +74,7 @@ const UserForm: React.FC<UserFormProps> = ({ open, user, onClose }) => {
         }
     }
 
-    const handleSubmit = (event: any) => {
-        event.preventDefault();
+    const handleSubmit = () => {
 
         const userData = {
             ...formData,
@@ -137,10 +136,6 @@ const UserForm: React.FC<UserFormProps> = ({ open, user, onClose }) => {
         <Dialog
             open={open}
             onClose={handleClose}
-            PaperProps={{
-                //component: 'form',
-                onSubmit: handleSubmit,
-            }}
             maxWidth='md'
         >
             <DialogTitle>{user ? 'Edit User' : 'Add User'}</DialogTitle>
@@ -218,7 +213,7 @@ const UserForm: React.FC<UserFormProps> = ({ open, user, onClose }) => {
             </DialogContent>
             <DialogActions>
                 <Button variant="outlined" color="error" onClick={handleClose}>Cancel</Button>
-                <Button variant="contained" color="success" type="submit" disabled={helpersText ? true : false}>Submit</Button>
+                <Button variant="contained" color="success" type="submit" disabled={helpersText ? true : false} onClick={handleSubmit}>Submit</Button>
             </DialogActions>
         </Dialog>
     );

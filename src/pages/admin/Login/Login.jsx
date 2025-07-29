@@ -38,12 +38,12 @@ export const Login = () => {
   const textStyle = { margin: "8px auto" };
   const btnstyle = { margin: "8px 0" };
 
-  let from = location.state?.from?.pathname || "/admin";
+  let from = location.state?.from?.pathname + location.state?.from?.search || "/admin";
 
   const handlePostAuth = (user, token, tokenId, redirectPath = "/admin") => {
     let permissions = [];
     let roles = [];
-    if (user.roles && user.roles.includes("admin")) {
+    if (user.roles && (user.roles.includes("admin") || user.roles.includes("super-admin"))) {
       permissions = ["all"]
       roles = user.roles;
     }
@@ -112,11 +112,21 @@ export const Login = () => {
       );
       if (res.status === 201 && res.data.user.roles) {
         localStorage.setItem("loginInfo", JSON.stringify({ token: res.data.token, expires_at: res.data.expires_at, name: res.data.user?.name }));
-        handlePostAuth(res.data.user, res.data.token, credentialResponse.credential);
+        const user = res.data?.user;
+        if (user?.roles && (user.roles?.includes("admin") || user.roles?.includes("super-admin"))) {
+          from = "/admin"
+        } else if (res.data.path && res.data.view_id) {
+          from = res.data.path + "?v=" + res.data.view_id 
+        } else {
+          toast.error("User not authorized! Contact Admin");
+          return;
+        }
+        handlePostAuth(res.data.user, res.data.token, credentialResponse.credential, from);
       } else {
         toast.error("User not authorized! Contact Admin");
       }
     } catch (error) {
+      console.error(error)
       if (error.response && error.response.status === 404) {
         toast.error("User not Found! Contact Admin");
       } else {

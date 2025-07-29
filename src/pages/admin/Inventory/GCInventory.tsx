@@ -194,11 +194,10 @@ const GCInventory: FC = () => {
             </Box> */}
 
             <Box
+                className={"no-scrollbar"}
                 style={{
                     height: '85vh',
                     overflowY: 'scroll',
-                    scrollbarWidth: 'none', // For Firefox
-                   // '&::-webkit-scrollbar': { display: 'none' } // For Chrome, Safari
                 }}
             >
                 <TagStats

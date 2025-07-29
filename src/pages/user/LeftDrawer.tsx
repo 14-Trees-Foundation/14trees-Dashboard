@@ -26,10 +26,6 @@ export const UserLeftDrawer = () => {
   const [subIndex, setSubIndex] = useState(null);
   const [expanded, setExpanded] = useState(null);
 
-  // useEffect(() => {
-  //   auth.signin("Dhruvin", 6428, [], ["user"], "", () => { })
-  // }, [])
-
   useEffect(() => {
       if (auth.roles.includes(UserRoles.SuperAdmin) || auth.roles.includes(UserRoles.Admin)) {
         navigate("/admin");

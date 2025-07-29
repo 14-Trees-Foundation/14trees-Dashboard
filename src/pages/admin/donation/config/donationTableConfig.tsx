@@ -1,7 +1,7 @@
 import React from "react";
 import { MenuProps, TableColumnsType } from "antd";
 import { Dropdown } from "antd";
-import { Badge, Button, IconButton } from "@mui/material";
+import { Badge, Button, IconButton, Chip, Box } from "@mui/material";
 import { 
   AssignmentInd, 
   AutoMode, 
@@ -253,19 +253,38 @@ export const getDonationColumns = (
       key: "Email Status",
       title: "Email Status",
       align: "center",
-      width: 200,
+      width: 280,
       render: (value, record: any, index) => {
-        const statusMessages: string[] = [];
-    
-        if (record.mail_status?.includes("DashboardsSent")) {
-          statusMessages.push("Mail sent to Sponsor");
+        // Show "Not Applicable" for pending payment donations
+        if (record.status === 'PendingPayment') {
+          return 'Not Applicable';
         }
-    
-        if (Number(record.mailed_count) && record.mailed_count === record.users_count) {
-          statusMessages.push("Mail sent to Recipient");
-        }
-    
-        return statusMessages.join(", ") || "-";
+
+        const emailStatuses = ['AckSent', 'SponsorCompletionSent', 'RecipientCompletionSent'];
+        
+        return (
+          <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5, justifyContent: 'center' }}>
+            {emailStatuses.map(status => (
+              <Chip 
+                key={status}
+                size="small" 
+                label={status} 
+                className="email-status-chip"
+                style={{
+                  backgroundColor: record.mail_status?.includes(status) ? '#2e7d32' : 'rgb(237, 129, 7)',
+                  color: 'black',
+                  fontWeight: 500,
+                  fontSize: '0.7rem'
+                }}
+                sx={{ 
+                  '& .MuiChip-label': {
+                    color: 'black !important'
+                  }
+                }} 
+              />
+            ))}
+          </Box>
+        );
       },
       filteredValue: filters['email_status']?.value || null,
       ...getColumnSelectedItemFilter({ 
@@ -273,12 +292,31 @@ export const getDonationColumns = (
         filters, 
         handleSetFilters, 
         options: [
-          'Mail sent to Sponsor',
-          'Mail sent to Recipient', 
-          'Mail sent to Sponsor, Mail sent to Recipient',
-          '-'
+          'AckSent',
+          'SponsorCompletionSent',
+          'RecipientCompletionSent'
         ] 
       })
+    },
+    {
+      dataIndex: "trees_count",
+      key: "Pledged Trees",
+      title: getSortableHeader("Pledged Trees", 'trees_count', orderBy, handleSortingChange),
+      align: "center",
+      width: 100,
+    },
+    {
+      dataIndex: "processed_by_name",
+      key: "processed_by",
+      title: "Picked up by",
+      align: "center",
+      width: 150,
+      render: (value, record) => {
+        if (!value) return 'Pending';
+        return record.processed_by_name || `User ${value}`;
+      },
+      filteredValue: filters['processed_by_name']?.value || null,
+      ...getColumnSearchProps('processed_by_name', filters, handleSetFilters)
     },
     {
       dataIndex: "category",
@@ -293,13 +331,6 @@ export const getDonationColumns = (
         handleSetFilters, 
         options: ['Foundation', 'Public'] 
       })
-    },
-    {
-      dataIndex: "trees_count",
-      key: "Pledged Trees",
-      title: getSortableHeader("Pledged Trees", 'trees_count', orderBy, handleSortingChange),
-      align: "center",
-      width: 100,
     },
     {
       dataIndex: "amount_donated",
@@ -342,19 +373,6 @@ export const getDonationColumns = (
       render: (value, record) => record.status === 'PendingPayment' ? '-' : (value || '-'),
       filteredValue: filters['order_id']?.value || null,
       ...getColumnSearchProps('order_id', filters, handleSetFilters)
-    },
-    {
-      dataIndex: "processed_by_name",
-      key: "processed_by",
-      title: "Picked up by",
-      align: "center",
-      width: 150,
-      render: (value, record) => {
-        if (!value) return 'Pending';
-        return record.processed_by_name || `User ${value}`;
-      },
-      filteredValue: filters['processed_by_name']?.value || null,
-      ...getColumnSearchProps('processed_by_name', filters, handleSetFilters)
     },
     {
       dataIndex: "created_at",

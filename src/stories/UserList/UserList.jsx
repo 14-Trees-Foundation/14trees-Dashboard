@@ -30,8 +30,8 @@ export const UserList = () => {
       <div>
         <div className={classes.header}>
           <div className={classes.itemlong}>Name</div>
-          <div className={classes.itemshort}>Trees Assigned</div>
           <div className={classes.itemshort}>Trees Sponsored</div>
+          <div className={classes.itemshort}>Trees Assigned</div>
           <div className={classes.itemshort}></div>
           <div className={classes.itemshort}></div>
         </div>
@@ -48,8 +48,8 @@ export const UserList = () => {
                 sx={{ width: 40, height: 40 }}
               />
               <div className={classes.itemlong}>{i.name}</div>
-              <div className={classes.itemshort}>{i.assigned_trees.length}</div>
               <div className={classes.itemshort}>{i.sponsored_trees}</div>
+              <div className={classes.itemshort}>{i.assigned_trees.length}</div>
               <div className={classes.itemshort}>
                 {i.sponsored_trees > 0 && <Button
                   variant="outlined"

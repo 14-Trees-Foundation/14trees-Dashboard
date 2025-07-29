@@ -78,7 +78,7 @@ const MobileImagePopup = ({ images, onClose }: MobileImagePopupProps) => {
   const handlers = useSwipeable({
     onSwipedLeft: next,
     onSwipedRight: prev,
-    //preventDefaultTouchmoveEvent: true,
+    // preventDefaultTouchmoveEvent: true,
     trackMouse: true,
   });
 

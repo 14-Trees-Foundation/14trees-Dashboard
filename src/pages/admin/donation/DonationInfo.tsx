@@ -21,7 +21,7 @@ import {
 } from '@mui/icons-material';
 
 import { Payment, PaymentHistory } from '../../../types/payment';
-import { getHumanReadableDate } from '../../../helpers/utils';
+import { getHumanReadableDate, getFormattedDateTimeIST } from '../../../helpers/utils';
 import DonationInfoSidebar from './components/donation-info/DonationInfoSidebar';
 import ProcessingSummarySection from './components/donation-info/ProcessingSummarySection';
 import DonationDetailsSection from './components/donation-info/DonationDetailsSection';
@@ -351,7 +351,7 @@ const DonationInfo: React.FC<DonationInfoProps> = ({ open, onClose, data }) => {
           />
 
           {/* Donation Trees Section */}
-          <Box ref={(el) => { sectionRefs.current['donation-trees'] = el; }} sx={{ mb: 3 }}>
+          <Box ref={(el) => { sectionRefs.current['donation-trees'] = el; }}>
             <DonationTrees donationId={data.id} />
           </Box>
 
@@ -448,10 +448,10 @@ const DonationInfo: React.FC<DonationInfoProps> = ({ open, onClose, data }) => {
             </Typography>
             <Box sx={{ ml: 4 }}>
               <Typography variant="body2" color="textSecondary" sx={{ mb: 1 }}>
-                <strong>Created At:</strong> {format(new Date(data.created_at), 'yyyy-MM-dd HH:mm:ss')}
+                <strong>Created At:</strong> {getFormattedDateTimeIST(data.created_at)} IST
               </Typography>
               <Typography variant="body2" color="textSecondary">
-                <strong>Updated At:</strong> {format(new Date(data.updated_at), 'yyyy-MM-dd HH:mm:ss')}
+                <strong>Updated At:</strong> {getFormattedDateTimeIST(data.updated_at)} IST
               </Typography>
             </Box>
           </Box>

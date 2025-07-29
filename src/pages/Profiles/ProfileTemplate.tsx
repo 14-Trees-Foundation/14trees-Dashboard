@@ -1,8 +1,8 @@
 import { FC } from "react";
 import { Box, Divider, Drawer } from "@mui/material";
 import logo from "../../assets/logo_white_small.png";
-import { useRecoilState, useSetRecoilState } from "recoil";
-import { activitiesData, navIndex } from "../../store/atoms";
+import { atom, useRecoilState, useSetRecoilState } from "recoil";
+import { navIndex } from "../../store/atoms";
 import { createStyles, makeStyles } from "@mui/styles";
 import { RightDrawer } from "../../components/RightDrawer";
 
@@ -14,7 +14,10 @@ interface ProfileTemplateProps {
 const ProfileTemplate: FC<ProfileTemplateProps> = ({ title, children }) => {
 
     const [index, setIndex] = useRecoilState(navIndex);
-    const setActivities = useSetRecoilState(activitiesData);
+    const setActivities = useSetRecoilState(atom({
+      key: "activities",
+      default: [] as any[],
+    }));
     const classes = useStyles();
 
     const onClickNav = (value: any) => {
@@ -84,7 +87,7 @@ const ProfileTemplate: FC<ProfileTemplateProps> = ({ title, children }) => {
         }
     ]
 
-    //setActivities(activities);
+    setActivities(activities);
 
     return (
         <Box style={{ display: "flex" }} >
