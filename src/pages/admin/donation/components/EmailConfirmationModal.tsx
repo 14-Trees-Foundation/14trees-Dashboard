@@ -132,7 +132,7 @@ const EmailConfirmationModal: React.FC<EmailConfirmationModalProps> = ({ donorMa
             if (response.data?.message) {
                 toast.error(response.data.message);
             } else {
-                toast.success("Processor for sending email has started. You can check email status for individuals in view summary after some time!");
+                toast.success("Email sending initiated. Check status in View Summary.");
             }
     
             resetState();

@@ -154,12 +154,6 @@ export const AdminLeftDrawer = () => {
       path: "tree-cards",
     },
     {
-      displayName: "Tree Cards (Old)",
-      logo: CardGiftcard,
-      display: true, // Show to all users who can access the admin panel
-      path: "tree-cards-old",
-    },
-    {
       displayName: "Donations",
       logo: VolunteerActivismIcon,
       display: isAdmin,
@@ -642,6 +636,7 @@ const useStyles = makeStyles((theme) =>
       paddingLeft: "10px",
       borderLeft: "2px solid rgba(255, 255, 255, 0.2)",
       marginTop: "5px",
+      marginBottom: "15px",
     },
     subItem: {
       cursor: "pointer",
