@@ -454,7 +454,7 @@ const DonationTrees: FC<DonationTreesProps> = ({ open, onClose, donation }) => {
       title: "Name",
       align: "center",
       width: 300,
-      ...getColumnSearchProps('name', filters, handleSetFilters)
+      ...getColumnSearchProps('name', filters, handleSetFilters, true)
     },
     {
       dataIndex: "total",
@@ -522,7 +522,7 @@ const DonationTrees: FC<DonationTreesProps> = ({ open, onClose, donation }) => {
       title: "Site Name",
       align: "center",
       width: 300,
-      ...getColumnSearchProps('site_name', filters, handleSetFilters)
+      ...getColumnSearchProps('site_name', filters, handleSetFilters, true)
     },
     {
       dataIndex: "tags",
@@ -549,7 +549,7 @@ const DonationTrees: FC<DonationTreesProps> = ({ open, onClose, donation }) => {
       title: "Sapling ID",
       align: "center",
       width: 150,
-      ...getColumnSearchProps('sapling_id', treeFilters, handleSetTreeFilters)
+      ...getColumnSearchProps('sapling_id', treeFilters, handleSetTreeFilters, true)
     },
     {
       dataIndex: "plant_type",
@@ -557,7 +557,7 @@ const DonationTrees: FC<DonationTreesProps> = ({ open, onClose, donation }) => {
       title: "Plant Type",
       align: "center",
       width: 200,
-      ...getColumnSearchProps('plant_type', treeFilters, handleSetTreeFilters)
+      ...getColumnSearchProps('plant_type', treeFilters, handleSetTreeFilters, true)
     },
     {
       dataIndex: "plot",
@@ -565,7 +565,7 @@ const DonationTrees: FC<DonationTreesProps> = ({ open, onClose, donation }) => {
       title: "Plot Name",
       align: "center",
       width: 200,
-      ...getColumnSearchProps('plot', treeFilters, handleSetTreeFilters)
+      ...getColumnSearchProps('plot', treeFilters, handleSetTreeFilters, true)
     },
     {
       dataIndex: "site_name",
@@ -573,7 +573,7 @@ const DonationTrees: FC<DonationTreesProps> = ({ open, onClose, donation }) => {
       title: "Site Name",
       align: "center",
       width: 200,
-      ...getColumnSearchProps('site_name', treeFilters, handleSetTreeFilters)
+      ...getColumnSearchProps('site_name', treeFilters, handleSetTreeFilters, true)
     },
     {
       title: "Action",
@@ -605,7 +605,7 @@ const DonationTrees: FC<DonationTreesProps> = ({ open, onClose, donation }) => {
       title: "Sapling ID",
       align: "center",
       width: 150,
-      ...getColumnSearchProps('sapling_id', reservedTreesFilters, handleSetReservedTreesFilters)
+      ...getColumnSearchProps('sapling_id', reservedTreesFilters, handleSetReservedTreesFilters, true)
     },
     {
       dataIndex: "plant_type",
@@ -613,7 +613,7 @@ const DonationTrees: FC<DonationTreesProps> = ({ open, onClose, donation }) => {
       title: "Plant Type",
       align: "center",
       width: 200,
-      ...getColumnSearchProps('plant_type', reservedTreesFilters, handleSetReservedTreesFilters)
+      ...getColumnSearchProps('plant_type', reservedTreesFilters, handleSetReservedTreesFilters, true)
     },
     {
       dataIndex: "plot",
@@ -621,7 +621,7 @@ const DonationTrees: FC<DonationTreesProps> = ({ open, onClose, donation }) => {
       title: "Plot Name",
       align: "center",
       width: 200,
-      ...getColumnSearchProps('plot', reservedTreesFilters, handleSetReservedTreesFilters)
+      ...getColumnSearchProps('plot', reservedTreesFilters, handleSetReservedTreesFilters, true)
     },
     {
       dataIndex: "site_name",
@@ -629,7 +629,7 @@ const DonationTrees: FC<DonationTreesProps> = ({ open, onClose, donation }) => {
       title: "Site Name",
       align: "center",
       width: 200,
-      ...getColumnSearchProps('site_name', reservedTreesFilters, handleSetReservedTreesFilters)
+      ...getColumnSearchProps('site_name', reservedTreesFilters, handleSetReservedTreesFilters, true)
     }
   ];
 

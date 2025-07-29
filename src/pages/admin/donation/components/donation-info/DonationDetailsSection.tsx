@@ -46,18 +46,28 @@ const DonationDetailsSection: React.FC<DonationDetailsSectionProps> = ({
               <Typography component="span"><strong>Trees Count:</strong></Typography>
               <Chip size="small" label={data.trees_count} sx={{ bgcolor: '#2e7d32', color: 'white' }} />
             </Box>
-            <Typography sx={{ mb: 1 }}>
-              <strong>Visit Date:</strong> {data.visit_date 
-                ? format(new Date(data.visit_date), 'PPP')
-                : 'Not scheduled'}
-            </Typography>
+            {data.preference === 'adopt_trees' && (
+              <Typography sx={{ mb: 1 }}>
+                <strong>Visit Date:</strong> {data.visit_date 
+                  ? format(new Date(data.visit_date), 'PPP')
+                  : 'Not scheduled'}
+              </Typography>
+            )}
           </>
         ) : (
           <Typography sx={{ mb: 1 }}><strong>Amount Donated:</strong> ₹{data.amount_donated || 'N/A'}</Typography>
         )}
 
         <Typography>
-          <strong>Additional Contribution:</strong> {data.contribution_options ? (Array.isArray(data.contribution_options) ? data.contribution_options.join(', ') : String(data.contribution_options).replace(/([a-z])([A-Z])/g, '$1 $2').split(/\s+|(?=[A-Z])/).filter(Boolean).join(', ')) : 'N/A'}
+          <strong>Additional Contribution:</strong> {
+            data.contribution_options && 
+            (Array.isArray(data.contribution_options) ? data.contribution_options.length > 0 : String(data.contribution_options).trim() !== '') 
+              ? (Array.isArray(data.contribution_options) 
+                  ? data.contribution_options.join(', ') 
+                  : String(data.contribution_options).replace(/([a-z])([A-Z])/g, '$1 $2').split(/\s+|(?=[A-Z])/).filter(Boolean).join(', ')
+                ) 
+              : 'N/A'
+          }
         </Typography>
       </Box>
     </Paper>

@@ -1,0 +1,431 @@
+
+.accessible-plot {
+    background-color: rgba(172, 252, 172, 0.2);
+}
+
+.accessible-plot.ant-table-row-selected > .ant-table-cell {
+    background-color: rgba(172, 252, 172, 0.2) !important; /* Keep the same background color on selection */
+}
+
+.inaccessible-plot {
+    background-color: rgba(255, 156, 156, 0.2);
+}
+
+.inaccessible-plot.ant-table-row-selected > .ant-table-cell {
+    background-color: rgba(255, 156, 156, 0.2) !important;
+}
+
+.moderately-accessible-plot {
+    background-color: rgba(255, 219, 153, 0.2);
+}
+
+.moderately-accessible-plot.ant-table-row-selected > .ant-table-cell {
+    background-color: rgba(255, 219, 153, 0.2) !important;
+}
+
+.ant-table-filter-dropdown {
+    background-color: white !important;
+}
+
+.pending-item {
+    background-color: rgba(255, 156, 156, 0.2);
+}
+
+.ant-dropdown {
+    z-index: 10000 !important; /* Set a high z-index value */
+}
+
+.orange-column {
+    background-color: #ffeedad4;
+}
+
+.bg-green {
+    background-color: #bee6bf;
+}
+
+.bg-cyan {
+    background-color: #c2dcda;
+}
+
+.bg-yellow {
+    background-color: #ecf5c8;
+}
+
+.bg-red {
+    background-color: #fd7b7b6b;
+}
+
+.bg-orange {
+    background-color: #ffeedad4;
+}
+
+/* Tree status specific styles */
+.bg-dead-tree {
+    background-color: #ffebee !important;
+    border-left: 4px solid #f44336 !important;
+}
+
+.bg-dead-tree.ant-table-row-selected > .ant-table-cell {
+    background-color: #ffcdd2 !important;
+}
+
+.bg-deleted-tree {
+    background-color: #f5f5f5 !important;
+    border-left: 4px solid #9e9e9e !important;
+    opacity: 0.7;
+}
+
+.bg-deleted-tree.ant-table-row-selected > .ant-table-cell {
+    background-color: #e0e0e0 !important;
+}
+
+.bg-lost-tree {
+    background-color: #fff3e0 !important;
+    border-left: 4px solid #ff9800 !important;
+}
+
+.bg-lost-tree.ant-table-row-selected > .ant-table-cell {
+    background-color: #ffe0b2 !important;
+}
+
+/* Sticky column styles - prevent other columns from showing behind */
+.ant-table-cell-fix-left {
+    z-index: 100 !important;
+    position: sticky !important;
+    background-color: #ffffff !important; /* Default white background */
+    isolation: isolate !important; /* Create new stacking context */
+}
+
+.ant-table-thead .ant-table-cell-fix-left {
+    z-index: 102 !important;
+    background-color: rgb(177 192 180) !important; /* Header background */
+}
+
+/* Ensure sticky columns have solid background to prevent text bleeding through */
+.ant-table-tbody .ant-table-cell-fix-left {
+    background-color: rgb(177 192 180) !important; /* Solid white background for body cells */
+    z-index: 101 !important;
+}
+
+/* Add a pseudo-element to create an additional background layer */
+.ant-table-cell-fix-left::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgb(177 192 180);
+    z-index: -1;
+}
+
+/* More specific targeting for Ant Design table structure */
+.ant-table-wrapper .ant-table-cell-fix-left {
+    background-color: rgb(177 192 180) !important;
+    z-index: 100 !important;
+    isolation: isolate !important;
+}
+
+.ant-table-wrapper .ant-table-thead .ant-table-cell-fix-left {
+    background-color: #afbcb0 !important;
+    z-index: 102 !important;
+}
+
+.ant-table-wrapper .ant-table-tbody .ant-table-cell-fix-left {
+    background-color: rgb(177 192 180) !important;
+    z-index: 101 !important;
+}
+
+/* Ensure the sticky column content is above everything */
+.ant-table-wrapper .ant-table-cell-fix-left * {
+    position: relative;
+    z-index: 10 !important;
+}
+
+/* Ensure non-sticky columns have lower z-index */
+.ant-table-wrapper .ant-table-cell:not(.ant-table-cell-fix-left) {
+    z-index: 1 !important;
+}
+
+.ant-table-wrapper .ant-table-cell:not(.ant-table-cell-fix-left) * {
+    z-index: 1 !important;
+}
+
+/* For rows with specific background classes, ensure sticky column matches */
+.bg-dead-tree .ant-table-cell-fix-left {
+    background-color: #ffebee !important;
+}
+
+.bg-deleted-tree .ant-table-cell-fix-left {
+    background-color: #f5f5f5 !important;
+}
+
+.bg-lost-tree .ant-table-cell-fix-left {
+    background-color: #fff3e0 !important;
+}
+
+.bg-green .ant-table-cell-fix-left {
+    background-color: #bee6bf !important;
+}
+
+.bg-cyan .ant-table-cell-fix-left {
+    background-color: #c2dcda !important;
+}
+
+.bg-yellow .ant-table-cell-fix-left {
+    background-color: #ecf5c8 !important;
+}
+
+.bg-red .ant-table-cell-fix-left {
+    background-color: #fd7b7b6b !important;
+}
+
+.bg-orange .ant-table-cell-fix-left {
+    background-color: #ffeedad4 !important;
+}
+
+/* For selected rows */
+.ant-table-row-selected .ant-table-cell-fix-left {
+    background-color: #e6f7ff !important;
+}
+
+/* For selected rows with specific background classes */
+.bg-dead-tree.ant-table-row-selected .ant-table-cell-fix-left {
+    background-color: #ffcdd2 !important;
+}
+
+.bg-deleted-tree.ant-table-row-selected .ant-table-cell-fix-left {
+    background-color: #e0e0e0 !important;
+}
+
+.bg-lost-tree.ant-table-row-selected .ant-table-cell-fix-left {
+    background-color: #ffe0b2 !important;
+}
+
+/* Payment failed row styles */
+.payment-failed-row {
+    background-color: #ffebee !important;
+    border-left: 4px solid #f44336 !important;
+}
+
+.payment-failed-row.ant-table-row-selected > .ant-table-cell {
+    background-color: #ffcdd2 !important;
+}
+
+.payment-failed-row .ant-table-cell-fix-left {
+    background-color: #ffebee !important;
+}
+
+.payment-failed-row.ant-table-row-selected .ant-table-cell-fix-left {
+    background-color: #ffcdd2 !important;
+}
+
+/* Pending payment row styles - OVERRIDE general sticky column background */
+.ant-table-tbody .pending-payment-row .ant-table-cell-fix-left,
+.ant-table-wrapper .ant-table-tbody .pending-payment-row .ant-table-cell-fix-left,
+.pending-payment-row .ant-table-cell-fix-left {
+    background-color: rgba(255, 165, 0, 0.1) !important;
+    z-index: 101 !important;
+}
+
+.ant-table-tbody .pending-payment-row.ant-table-row-selected .ant-table-cell-fix-left,
+.ant-table-wrapper .ant-table-tbody .pending-payment-row.ant-table-row-selected .ant-table-cell-fix-left,
+.pending-payment-row.ant-table-row-selected .ant-table-cell-fix-left {
+    background-color: rgba(255, 165, 0, 0.2) !important;
+    z-index: 101 !important;
+}
+
+/* Override the pseudo-element background for pending payment rows */
+.ant-table-tbody .pending-payment-row .ant-table-cell-fix-left::before,
+.ant-table-wrapper .ant-table-tbody .pending-payment-row .ant-table-cell-fix-left::before,
+.pending-payment-row .ant-table-cell-fix-left::before {
+    background-color: rgba(255, 165, 0, 0.1) !important;
+}
+
+/* Ensure pending payment row sticky column content is above everything */
+.pending-payment-row .ant-table-cell-fix-left * {
+    position: relative;
+    z-index: 10 !important;
+}
+
+/* Handle hover states for pending payment rows - ULTRA SPECIFIC WITH ORANGE BACKGROUND */
+.ant-table-tbody .pending-payment-row:hover .ant-table-cell-fix-left,
+.ant-table-wrapper .ant-table-tbody .pending-payment-row:hover .ant-table-cell-fix-left,
+.pending-payment-row:hover .ant-table-cell-fix-left {
+    background-color: rgba(255, 165, 0, 0.15) !important; /* Slightly more opaque on hover */
+    z-index: 999 !important;
+    position: sticky !important;
+    isolation: isolate !important;
+}
+
+.pending-payment-row:hover .ant-table-cell-fix-left * {
+    position: relative !important;
+    z-index: 50 !important;
+}
+
+/* More specific targeting for Ant Design hover states */
+.ant-table-tbody > tr.pending-payment-row:hover > td.ant-table-cell-fix-left {
+    background-color: rgba(255, 165, 0, 0.15) !important;
+    z-index: 999 !important;
+    position: sticky !important;
+    isolation: isolate !important;
+}
+
+.ant-table-tbody > tr.pending-payment-row:hover > td.ant-table-cell-fix-left * {
+    position: relative !important;
+    z-index: 50 !important;
+}
+
+/* Ultra specific wrapper targeting for hover */
+.ant-table-wrapper .ant-table-tbody > tr.pending-payment-row:hover > td.ant-table-cell-fix-left {
+    background-color: rgba(255, 165, 0, 0.15) !important;
+    z-index: 999 !important;
+    position: sticky !important;
+    isolation: isolate !important;
+}
+
+.ant-table-wrapper .ant-table-tbody > tr.pending-payment-row:hover > td.ant-table-cell-fix-left * {
+    position: relative !important;
+    z-index: 50 !important;
+}
+
+/* Override hover pseudo-elements */
+.ant-table-tbody .pending-payment-row:hover .ant-table-cell-fix-left::before,
+.ant-table-wrapper .ant-table-tbody .pending-payment-row:hover .ant-table-cell-fix-left::before,
+.pending-payment-row:hover .ant-table-cell-fix-left::before {
+    background-color: rgba(255, 165, 0, 0.15) !important;
+}
+
+/* Ensure non-sticky columns on pending payment hover rows have lower z-index */
+.ant-table-tbody > tr.pending-payment-row:hover > td:not(.ant-table-cell-fix-left) {
+    z-index: 1 !important;
+}
+
+.ant-table-tbody > tr.pending-payment-row:hover > td:not(.ant-table-cell-fix-left) * {
+    z-index: 1 !important;
+}
+
+/* Additional ultra-specific targeting */
+.ant-table-wrapper .ant-table-tbody > tr.pending-payment-row:hover > td:not(.ant-table-cell-fix-left) {
+    z-index: 1 !important;
+}
+
+.ant-table-wrapper .ant-table-tbody > tr.pending-payment-row:hover > td:not(.ant-table-cell-fix-left) * {
+    z-index: 1 !important;
+}
+
+/* Force stacking context and prevent any transform interference */
+.pending-payment-row:hover .ant-table-cell-fix-left {
+    transform: translateZ(0) !important;
+    will-change: auto !important;
+    contain: layout style paint !important;
+}
+
+/* Ensure the entire hovered row respects z-index hierarchy */
+.ant-table-tbody > tr.pending-payment-row:hover {
+    position: relative !important;
+    z-index: 1 !important;
+}
+
+.ant-table-tbody > tr.pending-payment-row:hover > td.ant-table-cell-fix-left {
+    z-index: 999 !important;
+    position: sticky !important;
+    transform: translateZ(0) !important;
+}
+
+/* CRITICAL: Maintain z-index during scroll events and all interactions */
+.ant-table-scroll .ant-table-tbody > tr.pending-payment-row:hover > td.ant-table-cell-fix-left {
+    z-index: 999 !important;
+    position: sticky !important;
+    transform: translateZ(0) !important;
+    isolation: isolate !important;
+}
+
+.ant-table-scroll .ant-table-tbody > tr.pending-payment-row:hover > td.ant-table-cell-fix-left * {
+    position: relative !important;
+    z-index: 50 !important;
+}
+
+/* Target the scrollable container specifically */
+.ant-table-body .ant-table-tbody > tr.pending-payment-row:hover > td.ant-table-cell-fix-left {
+    z-index: 999 !important;
+    position: sticky !important;
+    transform: translateZ(0) !important;
+    isolation: isolate !important;
+}
+
+.ant-table-body .ant-table-tbody > tr.pending-payment-row:hover > td.ant-table-cell-fix-left * {
+    position: relative !important;
+    z-index: 50 !important;
+}
+
+/* Force z-index during any scroll state */
+.ant-table-wrapper[data-scroll="true"] .ant-table-tbody > tr.pending-payment-row:hover > td.ant-table-cell-fix-left,
+.ant-table-wrapper .ant-table-scroll .ant-table-tbody > tr.pending-payment-row:hover > td.ant-table-cell-fix-left,
+.ant-table-container .ant-table-tbody > tr.pending-payment-row:hover > td.ant-table-cell-fix-left {
+    z-index: 999 !important;
+    position: sticky !important;
+    transform: translateZ(0) !important;
+    isolation: isolate !important;
+    background-color: rgba(255, 165, 0, 0.1) !important;
+}
+
+/* Ensure content within sticky columns during scroll maintains high z-index */
+.ant-table-wrapper[data-scroll="true"] .ant-table-tbody > tr.pending-payment-row:hover > td.ant-table-cell-fix-left *,
+.ant-table-wrapper .ant-table-scroll .ant-table-tbody > tr.pending-payment-row:hover > td.ant-table-cell-fix-left *,
+.ant-table-container .ant-table-tbody > tr.pending-payment-row:hover > td.ant-table-cell-fix-left * {
+    position: relative !important;
+    z-index: 50 !important;
+}
+
+/* NUCLEAR OPTION: Force z-index on ALL possible scroll states and hover combinations */
+.pending-payment-row:hover td.ant-table-cell-fix-left,
+tr.pending-payment-row:hover td.ant-table-cell-fix-left,
+tbody tr.pending-payment-row:hover td.ant-table-cell-fix-left,
+.ant-table tbody tr.pending-payment-row:hover td.ant-table-cell-fix-left,
+.ant-table-tbody tr.pending-payment-row:hover td.ant-table-cell-fix-left,
+.ant-table-wrapper tbody tr.pending-payment-row:hover td.ant-table-cell-fix-left,
+.ant-table-wrapper .ant-table tbody tr.pending-payment-row:hover td.ant-table-cell-fix-left,
+.ant-table-wrapper .ant-table-tbody tr.pending-payment-row:hover td.ant-table-cell-fix-left {
+    z-index: 999 !important;
+    position: sticky !important;
+    transform: translateZ(0) !important;
+    isolation: isolate !important;
+    background-color: rgba(255, 165, 0, 0.1) !important;
+}
+
+/* Force content z-index for ALL possible combinations */
+.pending-payment-row:hover td.ant-table-cell-fix-left *,
+tr.pending-payment-row:hover td.ant-table-cell-fix-left *,
+tbody tr.pending-payment-row:hover td.ant-table-cell-fix-left *,
+.ant-table tbody tr.pending-payment-row:hover td.ant-table-cell-fix-left *,
+.ant-table-tbody tr.pending-payment-row:hover td.ant-table-cell-fix-left *,
+.ant-table-wrapper tbody tr.pending-payment-row:hover td.ant-table-cell-fix-left *,
+.ant-table-wrapper .ant-table tbody tr.pending-payment-row:hover td.ant-table-cell-fix-left *,
+.ant-table-wrapper .ant-table-tbody tr.pending-payment-row:hover td.ant-table-cell-fix-left * {
+    position: relative !important;
+    z-index: 50 !important;
+}
+
+/* Sequence ordering column styles */
+.sequence-ordering-column {
+    padding: 4px !important;
+}
+
+.sequence-ordering-column .MuiIconButton-root {
+    padding: 2px;
+    margin: 1px 0;
+}
+
+/* Ensure multiple sticky columns work together */
+.ant-table-cell-fix-left:nth-child(1) {
+    z-index: 105 !important;
+}
+
+.ant-table-cell-fix-left:nth-child(2) {
+    z-index: 104 !important;
+}
+
+.ant-table-cell-fix-left:nth-child(3) {
+    z-index: 103 !important;
+}

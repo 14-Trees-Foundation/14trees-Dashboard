@@ -139,7 +139,10 @@ function GeneralTable({ loading, rows, columns, totalRecords, page, pageSize = 1
             columns?.forEach((column: any) => {
                 const title = typeof column.title === 'string' ? column.title : column.key;
                 if (column.dataIndex === 'srNo' || column.dataIndex === 'action') return;
-                if (column.render) {
+                if (column.exportValue) {
+                    // Use exportValue function if available
+                    row[title] = column.exportValue(item[column.dataIndex], item, 0);
+                } else if (column.render) {
                     const value = column.render(item[column.dataIndex], item, 0);
                     row[title] = value?.props?.children ? value.props.children : value;
                 }

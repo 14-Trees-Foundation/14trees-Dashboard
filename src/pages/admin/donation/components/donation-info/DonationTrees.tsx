@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { Box, Button } from '@mui/material';
+import { Box, Button, Typography, Paper, useTheme } from '@mui/material';
+import { NatureOutlined } from '@mui/icons-material';
 import { DonationTree } from '../../../../../types/donation';
 import ApiClient from '../../../../../api/apiClient/apiClient';
 import GeneralTable from '../../../../../components/GenTable';
@@ -12,7 +13,7 @@ interface DonationTreesProps {
 }
 
 const DonationTrees: React.FC<DonationTreesProps> = ({ donationId }) => {
-
+  const theme = useTheme();
   const [loading, setLoading] = useState(false);
   const [page, setPage] = useState(0);
   const [pageSize, setPageSize] = useState(10);
@@ -178,27 +179,40 @@ const DonationTrees: React.FC<DonationTreesProps> = ({ donationId }) => {
             Dashboard
           </Button>
         </a>
-      )
+      ),
+      exportValue: (saplingId: string, record: any) => {
+        return record.assignee_name ? `${import.meta.env.VITE_DASHBOARD_BASE_URL}/profile/${saplingId}` : '';
+      }
     }
   ]
 
-  return totalRecords === 0 && Object.values(filters).length === 0 ? (
-    null
-  ) : (
-    <Box sx={{ mb: 3 }}>
-      <GeneralTable
-        loading={loading}
-        columns={columns}
-        totalRecords={totalRecords}
-        rows={tableRows}
-        page={page}
-        pageSize={pageSize}
-        onPaginationChange={handlePaginationChange}
-        onDownload={handleDownload}
-        tableName='Donation Trees'
-        footer
-      />
-    </Box>
+  return (
+    <Paper 
+      elevation={1} 
+      sx={{ p: 3, mb: 3, borderRadius: 2, border: `1px solid ${theme.palette.divider}` }}
+    >
+      <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+        <NatureOutlined sx={{ color: '#2e7d32' }} /> Trees Reserved/Assigned
+      </Typography>
+      {totalRecords === 0 && Object.values(filters).length === 0 ? (
+        <Typography variant="body2" color="text.secondary" sx={{ py: 2 }}>
+          No trees have been reserved or assigned for this donation yet.
+        </Typography>
+      ) : (
+        <GeneralTable
+          loading={loading}
+          columns={columns}
+          totalRecords={totalRecords}
+          rows={tableRows}
+          page={page}
+          pageSize={pageSize}
+          onPaginationChange={handlePaginationChange}
+          onDownload={handleDownload}
+          tableName='Donation Trees'
+          footer
+        />
+      )}
+    </Paper>
   );
 }
 
