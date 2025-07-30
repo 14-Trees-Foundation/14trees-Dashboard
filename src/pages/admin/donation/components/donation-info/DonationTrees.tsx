@@ -192,7 +192,7 @@ const DonationTrees: React.FC<DonationTreesProps> = ({ donationId }) => {
       sx={{ p: 3, mb: 3, borderRadius: 2, border: `1px solid ${theme.palette.divider}` }}
     >
       <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-        <NatureOutlined sx={{ color: '#2e7d32' }} /> Trees Reserved/Assigned
+        <NatureOutlined sx={{ color: '#2e7d32' }} /> Donation Trees
       </Typography>
       {totalRecords === 0 && Object.values(filters).length === 0 ? (
         <Typography variant="body2" color="text.secondary" sx={{ py: 2 }}>

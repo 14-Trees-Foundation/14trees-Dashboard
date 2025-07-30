@@ -264,25 +264,32 @@ export const getDonationColumns = (
         
         return (
           <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5, justifyContent: 'center' }}>
-            {emailStatuses.map(status => (
-              <Chip 
-                key={status}
-                size="small" 
-                label={status} 
-                className="email-status-chip"
-                style={{
-                  backgroundColor: record.mail_status?.includes(status) ? '#2e7d32' : 'rgb(237, 129, 7)',
-                  color: 'black',
-                  fontWeight: 500,
-                  fontSize: '0.7rem'
-                }}
-                sx={{ 
-                  '& .MuiChip-label': {
-                    color: 'black !important'
-                  }
-                }} 
-              />
-            ))}
+            {emailStatuses.map(status => {
+              // For SponsorCompletionSent, check for DashboardsSent tag instead
+              const isStatusActive = status === 'SponsorCompletionSent' 
+                ? record.mail_status?.includes('DashboardsSent')
+                : record.mail_status?.includes(status);
+              
+              return (
+                <Chip 
+                  key={status}
+                  size="small" 
+                  label={status} 
+                  className="email-status-chip"
+                  style={{
+                    backgroundColor: isStatusActive ? '#2e7d32' : 'rgb(237, 129, 7)',
+                    color: 'black',
+                    fontWeight: 500,
+                    fontSize: '0.7rem'
+                  }}
+                  sx={{ 
+                    '& .MuiChip-label': {
+                      color: 'black !important'
+                    }
+                  }} 
+                />
+              );
+            })}
           </Box>
         );
       },
