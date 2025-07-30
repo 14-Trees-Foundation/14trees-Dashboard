@@ -29,9 +29,10 @@ import TableComponent from "../../../../components/Table";
 import CombineUserForm from "./CombineUserForm";
 import { toast } from "react-toastify";
 import ApiClient from "../../../../api/apiClient/apiClient";
-import { AccountBalance, Forest } from "@mui/icons-material";
+import { AccountBalance, Forest, Share } from "@mui/icons-material";
 import UserForm from "./UserForm";
 import GeneralTable from "../../../../components/GenTable";
+import PersonalDashboardShareDialog from "../components/PersonalDashboardShareDialog";
 
 export const User1 = () => {
   const dispatch = useAppDispatch();
@@ -158,7 +159,7 @@ export const User1 = () => {
       dataIndex: "action",
       key: "action",
       title: "Actions",
-      width: 300,
+      width: 400,
       align: "center",
       render: (value, record, index) => (
         <div
@@ -212,6 +213,13 @@ export const User1 = () => {
           >
             <AccountCircleRoundedIcon />
           </Button>
+          <PersonalDashboardShareDialog 
+            user={record}
+            onUsersAdded={() => {
+              // Optionally refresh data or show success message
+              toast.success(`Personal dashboard access updated for ${record.name}`);
+            }}
+          />
           <Button
             variant="outlined"
             style={{ margin: "0 5px" }}
