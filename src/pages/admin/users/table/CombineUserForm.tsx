@@ -1,4 +1,4 @@
-import { Box, Chip, ToggleButton, ToggleButtonGroup, Typography } from "@mui/material"
+import { Box, Chip, ToggleButton, ToggleButtonGroup, Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from "@mui/material"
 import { useAppDispatch, useAppSelector } from "../../../../redux/store/hooks";
 import { bindActionCreators } from "@reduxjs/toolkit";
 import { useEffect, useState } from "react";
@@ -93,6 +93,105 @@ const CombineUserForm: React.FC<CombineUserFormProps> = ({ primaryUser, secondar
         }
     }
 
+    const renderUserComparison = () => {
+        if (!treesCount1 || !treesCount2) return null;
+
+        const metrics = [
+            // Trees
+            { category: 'Trees', label: 'Reserved Trees', key: 'trees.mapped_trees' },
+            { category: 'Trees', label: 'Assigned Trees', key: 'trees.assigned_trees' },
+            { category: 'Trees', label: 'Sponsored Trees', key: 'trees.sponsored_trees' },
+            { category: 'Trees', label: 'Gifted Trees', key: 'trees.gifted_trees' },
+            { category: 'Trees', label: 'Received Gift Trees', key: 'trees.received_gift_trees' },
+            
+            // Donations
+            { category: 'Donations', label: 'As Donor', key: 'donations.as_donor' },
+            { category: 'Donations', label: 'As Processor', key: 'donations.as_processor' },
+            { category: 'Donations', label: 'As Creator', key: 'donations.as_creator' },
+            
+            // Donation Users
+            { category: 'Donation Users', label: 'As Assignee', key: 'donation_users.as_assignee' },
+            { category: 'Donation Users', label: 'As Recipient', key: 'donation_users.as_recipient' },
+            
+            // Gift Cards
+            { category: 'Gift Cards', label: 'Gifted To', key: 'gift_cards.gifted_to' },
+            { category: 'Gift Cards', label: 'Assigned To', key: 'gift_cards.assigned_to' },
+            
+            // Gift Card Requests
+            { category: 'Gift Card Requests', label: 'As User', key: 'gift_card_requests.as_user' },
+            { category: 'Gift Card Requests', label: 'As Sponsor', key: 'gift_card_requests.as_sponsor' },
+            { category: 'Gift Card Requests', label: 'As Creator', key: 'gift_card_requests.as_creator' },
+            { category: 'Gift Card Requests', label: 'As Processor', key: 'gift_card_requests.as_processor' },
+            
+            // Gift Request Users
+            { category: 'Gift Request Users', label: 'As Recipient', key: 'gift_request_users.as_recipient' },
+            { category: 'Gift Request Users', label: 'As Assignee', key: 'gift_request_users.as_assignee' },
+            
+            // Gift Redeem Transactions
+            { category: 'Gift Redeem Transactions', label: 'As Recipient', key: 'gift_redeem_transactions.as_recipient' },
+            { category: 'Gift Redeem Transactions', label: 'As Creator', key: 'gift_redeem_transactions.as_creator' },
+            
+            // User Relations
+            { category: 'User Relations', label: 'As Primary', key: 'user_relations.as_primary' },
+            { category: 'User Relations', label: 'As Secondary', key: 'user_relations.as_secondary' },
+            
+            // Other
+            { category: 'Other', label: 'User Groups', key: 'user_groups' },
+            { category: 'Other', label: 'Visit Users', key: 'visit_users' },
+            { category: 'Other', label: 'Albums', key: 'albums' },
+            { category: 'Other', label: 'Events Assigned By', key: 'events_assigned_by' },
+            { category: 'Other', label: 'Total Relationships', key: 'total_relationships' },
+        ];
+
+        const getValue = (obj: any, path: string) => {
+            return path.split('.').reduce((o, p) => o && o[p], obj) || 0;
+        };
+
+        return (
+            <TableContainer component={Paper} sx={{ mt: 2 }}>
+                <Table size="small">
+                    <TableHead>
+                        <TableRow>
+                            <TableCell><strong>Category</strong></TableCell>
+                            <TableCell><strong>Metric</strong></TableCell>
+                            <TableCell align="center"><strong>Primary User</strong></TableCell>
+                            <TableCell align="center"><strong>Secondary User</strong></TableCell>
+                        </TableRow>
+                    </TableHead>
+                    <TableBody>
+                        {metrics.map((metric, index) => {
+                            const secondaryValue = getValue(treesCount2, metric.key);
+                            const hasSecondaryData = secondaryValue > 0;
+                            
+                            return (
+                                <TableRow 
+                                    key={index} 
+                                    sx={{ 
+                                        // Default alternating row colors (only when no secondary data)
+                                        ...(!hasSecondaryData && {
+                                            '&:nth-of-type(odd)': { backgroundColor: 'action.hover' }
+                                        }),
+                                        // Highlight rows with secondary user data
+                                        ...(hasSecondaryData && {
+                                            backgroundColor: 'warning.light',
+                                            '&:hover': { backgroundColor: 'warning.main' },
+                                            '& .MuiTableCell-root': { fontWeight: 'bold' }
+                                        })
+                                    }}
+                                >
+                                    <TableCell>{metric.category}</TableCell>
+                                    <TableCell>{metric.label}</TableCell>
+                                    <TableCell align="center">{getValue(treesCount1, metric.key)}</TableCell>
+                                    <TableCell align="center">{secondaryValue}</TableCell>
+                                </TableRow>
+                            );
+                        })}
+                    </TableBody>
+                </Table>
+            </TableContainer>
+        );
+    };
+
     return (
         <Box
             sx={{
@@ -113,16 +212,6 @@ const CombineUserForm: React.FC<CombineUserFormProps> = ({ primaryUser, secondar
                     fullWidth
                     size="medium"
                 />
-                {treesCount1 && <Box display="flex">
-                    <Chip
-                        label={`Reserved trees: ${treesCount1.mapped_trees}`}
-                        sx={{ margin: 0.5 }}
-                    />
-                    <Chip
-                        label={`Assigned trees: ${treesCount1.assigned_trees}`}
-                        sx={{ margin: 0.5 }}
-                    />
-                </Box>}
             </Box>
             <Box mt={2}>
                 <Typography>Select secondary user</Typography>
@@ -136,19 +225,13 @@ const CombineUserForm: React.FC<CombineUserFormProps> = ({ primaryUser, secondar
                     fullWidth
                     size="medium"
                 />
-                {treesCount2 && <Box display="flex">
-                    <Chip
-                        label={`Reserved trees: ${treesCount2.mapped_trees}`}
-                        sx={{ margin: 0.5 }}
-                    />
-                    <Chip
-                        label={`Assigned trees: ${treesCount2.assigned_trees}`}
-                        sx={{ margin: 0.5 }}
-                    />
-                </Box>}
             </Box>
+            
+            {/* Render user comparison table */}
+            {renderUserComparison()}
+
             <Box
-                mt={2}
+                mt={3}
                 display="flex"
                 alignItems="center"
                 justifyContent="space-between"
