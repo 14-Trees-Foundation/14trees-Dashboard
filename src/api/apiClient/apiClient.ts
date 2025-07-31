@@ -1046,6 +1046,17 @@ class ApiClient {
         }
     }
 
+    async getGroupsCountForGroup(groupId: number) {
+        let url = `/groups/count/${groupId}`;
+        try {
+            let result = await this.api.get<any>(url);
+            return result.data;
+        } catch (error: any) {
+            if (error.response?.data?.message) throw new Error(error.response.data.message);
+            throw new Error('Failed to get comprehensive count for group');
+        }
+    }
+
     async getCSRTreesLoggedByYear(groupId?: number): Promise<any[]> {
         const url = `/trees/corporate-stats/tree-logged?group_id=${groupId}`;
         try {

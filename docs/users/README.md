@@ -89,6 +89,12 @@ Users can have **5 different relationships** with trees:
 - **Relationship**: Events assigned by the user
 - **Impact**: User's administrative activities and event management
 
+### 6. Self-Serve Dashboard Access 📊
+
+#### View Permissions
+- **Relationship**: User's access permissions to Self-Serve Dashboards
+- **Impact**: User's ability to access specific dashboard views and analytics
+
 ## User Impact Analysis
 
 ### High Impact Operations
@@ -102,10 +108,11 @@ When performing operations like **user merging** or **user deletion**, the follo
 4. **User Groups** - Affects organizational structure and permissions
 5. **Albums** - Affects user-generated content
 6. **Events** - Affects administrative records
+7. **View Permissions** - Affects Self-Serve Dashboard access
 
 ### Low Impact Operations
-7. **Visit Users** - Affects historical tracking
-8. **User Relations** - Affects relationship mapping
+8. **Visit Users** - Affects historical tracking
+9. **User Relations** - Affects relationship mapping
 
 ## API Endpoint for User Impact Assessment
 
@@ -163,7 +170,8 @@ GET /api/trees/count/user/18009
   "visit_users": 12,
   "albums": 4,
   "events_assigned_by": 0,
-  "total_relationships": 102
+  "view_permissions": 3,
+  "total_relationships": 105
 }
 ```
 
@@ -183,6 +191,7 @@ GET /api/trees/count/user/18009
 | `visit_users` | Visit participation | Understand engagement level |
 | `albums` | Content creation | Track user-generated content |
 | `events_assigned_by` | Event management | Track administrative activities |
+| `view_permissions` | Self-Serve Dashboard access | Track dashboard permissions |
 | `total_relationships` | Sum of all relationships | Overall system impact assessment |
 
 ## Best Practices for User Operations
@@ -218,6 +227,6 @@ GET /api/trees/count/user/18009
 
 ## Conclusion
 
-The User entity is deeply integrated into the 14Trees system with **13+ different relationship types** across multiple modules. Any user management operation requires careful consideration of all these relationships to maintain data integrity and system functionality.
+The User entity is deeply integrated into the 14Trees system with **14+ different relationship types** across multiple modules. Any user management operation requires careful consideration of all these relationships to maintain data integrity and system functionality.
 
 Use the `/api/trees/count/user/:user_id` endpoint to assess the full impact of user operations before executing them. This comprehensive view helps ensure that no critical relationships are overlooked during user management activities.

@@ -1,4 +1,4 @@
-import { Box, Chip, ToggleButton, ToggleButtonGroup, Typography } from "@mui/material"
+import { Box, Chip, ToggleButton, ToggleButtonGroup, Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from "@mui/material"
 import { useAppDispatch, useAppSelector } from "../../../redux/store/hooks";
 import { bindActionCreators } from "@reduxjs/toolkit";
 import { useEffect, useState } from "react";
@@ -24,8 +24,8 @@ const CombineGroupForm: React.FC<CombineGroupFormProps> = ({ primaryGroup, secon
 
     const [groupSearchQuery, setGroupSearchQuery] = useState('');
     const [groupSearchQuery2, setGroupSearchQuery2] = useState('');
-    const [treesCount1, setTreesCount1] = useState<any>(null)
-    const [treesCount2, setTreesCount2] = useState<any>(null)
+    const [groupsCount1, setGroupsCount1] = useState<any>(null)
+    const [groupsCount2, setGroupsCount2] = useState<any>(null)
 
     let groups: Group[] = [];
     const groupsData = useAppSelector((state) => state.searchGroupsData);
@@ -56,10 +56,10 @@ const CombineGroupForm: React.FC<CombineGroupFormProps> = ({ primaryGroup, secon
     useEffect(() => {
         const handler = setTimeout(async () => {
             if (primaryGroup) {
-                const data = await getTreeCountForGroup(primaryGroup.id);
-                setTreesCount1(data?.map((item: any) => item.booked)?.reduce((prev: number, curr: number) => prev + curr, 0));
+                const data = await getGroupsCountForGroup(primaryGroup.id);
+                setGroupsCount1(data);
             } else {
-                setTreesCount1(null);
+                setGroupsCount1(null);
             }
         }, 300)
 
@@ -71,10 +71,10 @@ const CombineGroupForm: React.FC<CombineGroupFormProps> = ({ primaryGroup, secon
     useEffect(() => {
         const handler = setTimeout(async () => {
             if (secondaryGroup) {
-                const data = await getTreeCountForGroup(secondaryGroup.id);
-                setTreesCount2(data?.map((item: any) => item.booked)?.reduce((prev: number, curr: number) => prev + curr, 0));
+                const data = await getGroupsCountForGroup(secondaryGroup.id);
+                setGroupsCount2(data);
             } else {
-                setTreesCount2(null);
+                setGroupsCount2(null);
             }
         }, 300)
 
@@ -83,15 +83,85 @@ const CombineGroupForm: React.FC<CombineGroupFormProps> = ({ primaryGroup, secon
         }
     }, [secondaryGroup]);
 
-    const getTreeCountForGroup = async (groupId: number) => {
+    const getGroupsCountForGroup = async (groupId: number) => {
         try {
             const apiClient = new ApiClient();
-            const resp = apiClient.getTreeCountForCorporate(groupId);
+            const resp = await apiClient.getGroupsCountForGroup(groupId);
             return resp;
         } catch (error: any) {
             toast.error(error.message);
         }
     }
+
+    const renderGroupComparison = () => {
+        if (!groupsCount1 || !groupsCount2) return null;
+
+        const metrics = [
+            // Trees
+            { category: 'Trees', label: 'Mapped Trees', key: 'trees.mapped_trees' },
+            { category: 'Trees', label: 'Sponsored Trees', key: 'trees.sponsored_trees' },
+            
+            // Gift Cards & Donations
+            { category: 'Gift Cards', label: 'Gift Card Requests', key: 'gift_card_requests' },
+            { category: 'Donations', label: 'Donations', key: 'donations' },
+            { category: 'Gift Transactions', label: 'Gift Redeem Transactions', key: 'gift_redeem_transactions' },
+            
+            // Group Management
+            { category: 'Members', label: 'Group Members', key: 'group_members' },
+            { category: 'Activities', label: 'Visits', key: 'visits' },
+            
+            // Total
+            { category: 'Summary', label: 'Total Relationships', key: 'total_relationships' },
+        ];
+
+        const getValue = (obj: any, path: string) => {
+            return path.split('.').reduce((o, p) => o && o[p], obj) || 0;
+        };
+
+        return (
+            <TableContainer component={Paper} sx={{ mt: 2 }}>
+                <Table size="small">
+                    <TableHead>
+                        <TableRow>
+                            <TableCell><strong>Category</strong></TableCell>
+                            <TableCell><strong>Metric</strong></TableCell>
+                            <TableCell align="center"><strong>Primary Group</strong></TableCell>
+                            <TableCell align="center"><strong>Secondary Group</strong></TableCell>
+                        </TableRow>
+                    </TableHead>
+                    <TableBody>
+                        {metrics.map((metric, index) => {
+                            const secondaryValue = getValue(groupsCount2, metric.key);
+                            const hasSecondaryData = secondaryValue > 0;
+                            
+                            return (
+                                <TableRow 
+                                    key={index} 
+                                    sx={{ 
+                                        // Default alternating row colors (only when no secondary data)
+                                        ...(!hasSecondaryData && {
+                                            '&:nth-of-type(odd)': { backgroundColor: 'action.hover' }
+                                        }),
+                                        // Highlight rows with secondary group data
+                                        ...(hasSecondaryData && {
+                                            backgroundColor: 'warning.light',
+                                            '&:hover': { backgroundColor: 'warning.main' },
+                                            '& .MuiTableCell-root': { fontWeight: 'bold' }
+                                        })
+                                    }}
+                                >
+                                    <TableCell>{metric.category}</TableCell>
+                                    <TableCell>{metric.label}</TableCell>
+                                    <TableCell align="center">{getValue(groupsCount1, metric.key)}</TableCell>
+                                    <TableCell align="center">{secondaryValue}</TableCell>
+                                </TableRow>
+                            );
+                        })}
+                    </TableBody>
+                </Table>
+            </TableContainer>
+        );
+    };
 
     return (
         <Box
@@ -113,12 +183,6 @@ const CombineGroupForm: React.FC<CombineGroupFormProps> = ({ primaryGroup, secon
                     fullWidth
                     size="medium"
                 />
-                {treesCount1 && <Box display="flex">
-                    <Chip
-                        label={`Reserved trees: ${treesCount1}`}
-                        sx={{ margin: 0.5 }}
-                    />
-                </Box>}
             </Box>
             <Box mt={2}>
                 <Typography>Select secondary group</Typography>
@@ -132,13 +196,10 @@ const CombineGroupForm: React.FC<CombineGroupFormProps> = ({ primaryGroup, secon
                     fullWidth
                     size="medium"
                 />
-                {treesCount2 && <Box display="flex">
-                    <Chip
-                        label={`Reserved trees: ${treesCount2}`}
-                        sx={{ margin: 0.5 }}
-                    />
-                </Box>}
             </Box>
+            
+            {/* Render group comparison table */}
+            {renderGroupComparison()}
             <Box
                 mt={2}
                 display="flex"

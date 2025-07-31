@@ -25,6 +25,7 @@ interface GeneralTableProps {
     footer?: boolean
     fullHeight?: boolean
     tableName?: string
+    scroll?: { x?: number, y?: number }
     expandable?: {
         render: (record: any) => React.ReactNode
         isExpandable: (record: any) => boolean
@@ -71,7 +72,7 @@ const ResizableTitle = (props: any) => {
     );
 };
 
-function GeneralTable({ loading, rows, columns, totalRecords, page, pageSize = 10, footer, fullHeight, tableName, onDownload, onSelectionChanges, onPaginationChange, summary, rowClassName, expandable, sequenceOrdering }: GeneralTableProps) {
+function GeneralTable({ loading, rows, columns, totalRecords, page, pageSize = 10, footer, fullHeight, tableName, scroll, onDownload, onSelectionChanges, onPaginationChange, summary, rowClassName, expandable, sequenceOrdering }: GeneralTableProps) {
 
     const [checkedList, setCheckedList] = useState(columns?.filter(item => !item.hidden)?.map((item) => item.key) ?? []);
     const [tableCols, setTableCols] = useState<any[]>([]);
@@ -274,7 +275,7 @@ function GeneralTable({ loading, rows, columns, totalRecords, page, pageSize = 1
             components={components}
             rowClassName={rowClassName}
             rowSelection={rowSelection}
-            scroll={!fullHeight ? { y: 550 } : undefined}
+            scroll={scroll || (!fullHeight ? { y: 550 } : undefined)}
             footer={footer ? () => (
                 <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
                     <ColumnPreferences

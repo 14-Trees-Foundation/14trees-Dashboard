@@ -9,12 +9,15 @@ import { PersonAdd, Link as LinkIcon } from "@mui/icons-material";
 import { toast } from "react-toastify";
 import { LoadingButton } from "@mui/lab";
 import { User } from "../../../../types/user";
+import { UserRoles } from "../../../../types/common";
 
 interface PersonalDashboardShareDialogProps {
     user: User;
     onUsersAdded?: () => void;
     style?: React.CSSProperties;
     disabled?: boolean;
+    open: boolean;
+    onClose: () => void;
 }
 
 interface UserOption {
@@ -23,12 +26,11 @@ interface UserOption {
     email: string;
 }
 
-const PersonalDashboardShareDialog: FC<PersonalDashboardShareDialogProps> = ({ user, onUsersAdded, style, disabled = false }) => {
+const PersonalDashboardShareDialog: FC<PersonalDashboardShareDialogProps> = ({ user, onUsersAdded, style, disabled = false, open, onClose }) => {
     const dispatch = useAppDispatch();
     const { searchUsers } = bindActionCreators(userActionCreators, dispatch);
 
     const [loadingButton, setLoadingButton] = useState(false);
-    const [open, setOpen] = useState(false);
     const [viewDetails, setViewDetails] = useState<View | null>(null);
     const [selectedUsers, setSelectedUsers] = useState<{ id: number, name: string, email: string }[]>([]);
     const [searchStr, setSearchStr] = useState('');
@@ -37,6 +39,19 @@ const PersonalDashboardShareDialog: FC<PersonalDashboardShareDialogProps> = ({ u
     const [newUserName, setNewUserName] = useState('');
     const [newUserEmail, setNewUserEmail] = useState('');
     const [isValidEmail, setIsValidEmail] = useState(false);
+
+    // Handle open prop changes
+    useEffect(() => {
+        if (open) {
+            // Initialize dialog when opened
+            setSelectedUsers([]);
+            setSearchStr('');
+            setViewName(user.name ? `${user.name}'s Personal Dashboard` : "Personal Dashboard");
+            setShowNameInput(false);
+            setNewUserName('');
+            setNewUserEmail('');
+        }
+    }, [open, user.name]);
 
     useEffect(() => {
         const handler = setTimeout(async () => {
@@ -76,7 +91,8 @@ const PersonalDashboardShareDialog: FC<PersonalDashboardShareDialogProps> = ({ u
         const handler = setTimeout(() => {
             if (viewDetails) {
                 setViewName(viewDetails.name);
-                setSelectedUsers(viewDetails.users ?? []);
+                // Don't populate selectedUsers with existing users - they show in "Currently shared with"
+                // selectedUsers should only contain NEW users being added
             } else {
                 setSelectedUsers([]);
                 setViewName(user.name + "'s Personal Dashboard");
@@ -91,16 +107,6 @@ const PersonalDashboardShareDialog: FC<PersonalDashboardShareDialogProps> = ({ u
     if (usersData) {
         usersList = Object.values(usersData.users);
     }
-
-    const handleOpen = () => {
-        setOpen(true);
-        setSelectedUsers([]);
-        setSearchStr('');
-        setViewName(user.name ? `${user.name}'s Personal Dashboard` : "Personal Dashboard");
-        setShowNameInput(false);
-        setNewUserName('');
-        setNewUserEmail('');
-    };
 
     const handleUserDelete = (userId: number) => {
         setSelectedUsers(selectedUsers.filter(user => user.id !== userId));
@@ -126,22 +132,54 @@ const PersonalDashboardShareDialog: FC<PersonalDashboardShareDialogProps> = ({ u
 
             const newUsers = validUsers.filter(user => user.id === -1);
             const createdUsers = await Promise.all(
-                newUsers.map(user => apiClient.createUser({
-                    name: user.name.trim(),
-                    email: user.email.trim(),
-                    key: 0,
-                    id: 0,
-                    user_id: "",
-                    phone: "",
-                    communication_email: null,
-                    birth_date: null,
-                    created_at: new Date(),
-                    updated_at: new Date()
-                }))
+                newUsers.map(async user => {
+                    const newUser = await apiClient.createUser({
+                        name: user.name.trim(),
+                        email: user.email.trim(),
+                        key: 0,
+                        id: 0,
+                        user_id: "",
+                        phone: "",
+                        communication_email: null,
+                        birth_date: null,
+                        created_at: new Date(),
+                        updated_at: new Date(),
+                        roles: []
+                    });
+                    
+                    // Check if user has role, if not set to 'user' role
+                    if (!newUser.roles || 
+                        (!newUser.roles.includes(UserRoles.User) && !newUser.roles.includes(UserRoles.Admin))) {
+                        const updatedUser = await apiClient.updateUser({
+                            ...newUser,
+                            roles: [UserRoles.User]
+                        });
+                        return updatedUser;
+                    }
+                    
+                    return newUser;
+                })
+            );
+
+            // Check and update roles for existing users being added
+            const existingUsers = validUsers.filter(user => user.id !== -1);
+            const existingUsersWithRoles = await Promise.all(
+                existingUsers.map(async user => {
+                    // Check if user has proper role, if not set to 'user' role
+                    if (!user.roles || 
+                        (!user.roles.includes(UserRoles.User) && !user.roles.includes(UserRoles.Admin))) {
+                        const updatedUser = await apiClient.updateUser({
+                            ...user,
+                            roles: [UserRoles.User]
+                        });
+                        return updatedUser;
+                    }
+                    return user;
+                })
             );
 
             const allUsers = [
-                ...validUsers.filter(user => user.id !== -1),
+                ...existingUsersWithRoles,
                 ...createdUsers
             ];
 
@@ -164,7 +202,7 @@ const PersonalDashboardShareDialog: FC<PersonalDashboardShareDialogProps> = ({ u
                 }
             }
             toast.success("Personal dashboard sharing permissions updated successfully");
-            setOpen(false);
+            onClose();
         } catch (error: any) {
             toast.error(error.message);
         } finally {
@@ -178,18 +216,6 @@ const PersonalDashboardShareDialog: FC<PersonalDashboardShareDialogProps> = ({ u
 
     return (
         <Box style={style}>
-            <Button
-                variant="outlined"
-                color="info"
-                onClick={handleOpen}
-                disabled={disabled}
-                // startIcon={<PersonAdd />}
-                style={{ margin: "0 5px" }}
-                size="small"
-            >
-                Share Dashboard
-            </Button>
-
             <Dialog open={open} fullWidth maxWidth='lg'>
                 <DialogTitle>Share Personal Dashboard - {user.name}</DialogTitle>
                 <DialogContent dividers>
@@ -216,9 +242,29 @@ const PersonalDashboardShareDialog: FC<PersonalDashboardShareDialogProps> = ({ u
                         />
                     </Box>
 
+                    {/* Show already shared users */}
+                    {viewDetails && viewDetails.users && viewDetails.users.length > 0 && (
+                        <Box mt={3}>
+                            <Typography variant="body1" gutterBottom>
+                                Currently shared with ({viewDetails.users.length} users)
+                            </Typography>
+                            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5, mb: 2 }}>
+                                {viewDetails.users.map((user) => (
+                                    <Chip
+                                        key={user.id}
+                                        label={user.name ? `${user.name} (${user.email})` : user.email}
+                                        color="primary"
+                                        variant="outlined"
+                                        size="small"
+                                    />
+                                ))}
+                            </Box>
+                        </Box>
+                    )}
+
                     <Box mt={3}>
                         <Typography variant="body1" gutterBottom>
-                            Share with users
+                            Share with additional users
                         </Typography>
 
                         <Autocomplete
@@ -252,15 +298,28 @@ const PersonalDashboardShareDialog: FC<PersonalDashboardShareDialogProps> = ({ u
                                 if (typeof newValue === 'string') {
                                     // Don't do anything for string input - handled by the "Add new User" link
                                 } else {
-                                    // Existing user selected - add directly to selectedUsers
-                                    if (!selectedUsers.some(user => user.id === newValue.id)) {
+                                    // Check if user is already in the existing shared users list
+                                    const isAlreadyShared = viewDetails?.users?.some(existingUser => 
+                                        existingUser.id === newValue.id || existingUser.email === newValue.email
+                                    );
+                                    
+                                    // Check if user is already in the selectedUsers list
+                                    const isAlreadySelected = selectedUsers.some(user => 
+                                        user.id === newValue.id || user.email === newValue.email
+                                    );
+
+                                    if (isAlreadyShared) {
+                                        // Show a message that user is already shared
+                                        alert(`${newValue.name || newValue.email} is already shared with this dashboard`);
+                                    } else if (!isAlreadySelected) {
+                                        // Add user to selectedUsers
                                         setSelectedUsers([...selectedUsers, {
                                             id: newValue.id || -1,
                                             name: newValue.name,
                                             email: newValue.email
                                         }]);
-                                        setSearchStr(''); // Clear the search string
                                     }
+                                    setSearchStr(''); // Clear the search string
                                 }
                             }}
                             renderInput={(params) => (
@@ -357,22 +416,29 @@ const PersonalDashboardShareDialog: FC<PersonalDashboardShareDialogProps> = ({ u
                             </Box>
                         )}
 
-                        <Box sx={{ mt: 2, display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-                            {selectedUsers.map((user) => (
-                                <Chip
-                                    key={user.id}
-                                    label={user.name ? `${user.name} (${user.email})` : user.email}
-                                    onDelete={() => handleUserDelete(user.id)}
-                                    color="secondary"
-                                    sx={{ marginRight: 0.5 }}
-                                />
-                            ))}
-                        </Box>
+                        {selectedUsers.length > 0 && (
+                            <Box sx={{ mt: 2 }}>
+                                <Typography variant="body2" gutterBottom color="text.secondary">
+                                    Users to be added:
+                                </Typography>
+                                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                                    {selectedUsers.map((user) => (
+                                        <Chip
+                                            key={user.id}
+                                            label={user.name ? `${user.name} (${user.email})` : user.email}
+                                            onDelete={() => handleUserDelete(user.id)}
+                                            color="secondary"
+                                            sx={{ marginRight: 0.5 }}
+                                        />
+                                    ))}
+                                </Box>
+                            </Box>
+                        )}
                     </Box>
                 </DialogContent>
                 <DialogActions>
                     <Button
-                        onClick={() => setOpen(false)}
+                        onClick={onClose}
                         color="error"
                         variant="outlined"
                         sx={{ mr: 2 }}

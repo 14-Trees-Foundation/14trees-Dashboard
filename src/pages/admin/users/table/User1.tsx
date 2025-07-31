@@ -10,6 +10,12 @@ import {
   DialogTitle,
   Divider,
   Typography,
+  Link,
+  IconButton,
+  Menu,
+  MenuItem,
+  ListItemIcon,
+  ListItemText,
 } from "@mui/material";
 import AddUser from "./AddUser";
 import EditIcon from "@mui/icons-material/Edit";
@@ -29,7 +35,7 @@ import TableComponent from "../../../../components/Table";
 import CombineUserForm from "./CombineUserForm";
 import { toast } from "react-toastify";
 import ApiClient from "../../../../api/apiClient/apiClient";
-import { AccountBalance, Forest, Share } from "@mui/icons-material";
+import { AccountBalance, Forest, Share, MoreVert, Dashboard } from "@mui/icons-material";
 import UserForm from "./UserForm";
 import GeneralTable from "../../../../components/GenTable";
 import PersonalDashboardShareDialog from "../components/PersonalDashboardShareDialog";
@@ -54,11 +60,21 @@ export const User1 = () => {
   const [pageSize, setPageSize] = useState(10);
   const [filters, setFilters] = useState<Record<string, GridFilterItem>>({});
   const [tableRows, setTableRows] = useState<User[]>([]);
+  const [userTreeCounts, setUserTreeCounts] = useState<Record<number, {
+    mapped_trees: number;
+    sponsored_trees: number;
+    assigned_trees: number;
+    gifted_trees: number;
+    received_gift_trees: number;
+  }>>({});
 
   const [userCombineModal, setUserCombineModal] = useState(false);
   const [primaryUser, setPrimaryUser] = useState<User | null>(null);
   const [secondaryUser, setSecondaryUser] = useState<User | null>(null);
   const [deleteSecondary, setDeleteSecondary] = useState(true);
+  const [menuAnchorEl, setMenuAnchorEl] = useState<null | HTMLElement>(null);
+  const [selectedMenuUser, setSelectedMenuUser] = useState<User | null>(null);
+  const [shareDialogOpen, setShareDialogOpen] = useState(false);
 
   let usersList: User[] = [];
   const usersData = useAppSelector((state: RootState) => state.usersData);
@@ -101,6 +117,11 @@ export const User1 = () => {
       }
 
       setTableRows(records);
+      
+      // Fetch tree counts for the current page users
+      if (records.length > 0) {
+        fetchTreeCountsForUsers(records);
+      }
     }, 500)
 
     return () => {
@@ -117,6 +138,46 @@ export const User1 = () => {
     }, 1000);
   };
 
+  const fetchTreeCountsForUsers = async (users: User[]) => {
+    const apiClient = new ApiClient();
+    const counts: Record<number, {
+      mapped_trees: number;
+      sponsored_trees: number;
+      assigned_trees: number;
+      gifted_trees: number;
+      received_gift_trees: number;
+    }> = {};
+    
+    try {
+      await Promise.all(
+        users.map(async (user) => {
+          try {
+            const result = await apiClient.getTreesCountForUser(user.id);
+            counts[user.id] = {
+              mapped_trees: result?.trees?.mapped_trees || 0,
+              sponsored_trees: result?.trees?.sponsored_trees || 0,
+              assigned_trees: result?.trees?.assigned_trees || 0,
+              gifted_trees: result?.trees?.gifted_trees || 0,
+              received_gift_trees: result?.trees?.received_gift_trees || 0,
+            };
+          } catch (error) {
+            console.error(`Failed to fetch tree count for user ${user.id}`, error);
+            counts[user.id] = {
+              mapped_trees: 0,
+              sponsored_trees: 0,
+              assigned_trees: 0,
+              gifted_trees: 0,
+              received_gift_trees: 0,
+            };
+          }
+        })
+      );
+      setUserTreeCounts(prev => ({ ...prev, ...counts }));
+    } catch (error) {
+      console.error('Error fetching tree counts:', error);
+    }
+  };
+
   const columns: TableColumnsType<User> = [
     {
       dataIndex: "name",
@@ -124,6 +185,7 @@ export const User1 = () => {
       title: "Name",
       align: "center",
       width: 150,
+      fixed: 'left',
       ...getColumnSearchProps('name', filters, handleSetFilters)
     },
     {
@@ -132,6 +194,7 @@ export const User1 = () => {
       title: "Email",
       align: "center",
       width: 200,
+      fixed: 'left',
       ...getColumnSearchProps('email', filters, handleSetFilters)
     },
     {
@@ -147,7 +210,7 @@ export const User1 = () => {
       key: "phone",
       title: "Phone",
       align: "center",
-      width: 100,
+      width: 120,
       render: (value: string) => {
         if (!value || value === "0") return "-";
         if (value.endsWith('.0')) return value.slice(0, -2);
@@ -156,23 +219,18 @@ export const User1 = () => {
       ...getColumnSearchProps('phone', filters, handleSetFilters)
     },
     {
-      dataIndex: "action",
-      key: "action",
-      title: "Actions",
-      width: 400,
+      key: "sponsor_dashboard",
+      title: "Sponsor Dashboard",
+      width: 100,
       align: "center",
-      render: (value, record, index) => (
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-          }}>
-          <Button
-            variant="outlined"
-            color="success"
-            style={{ margin: "0 5px" }}
-            onClick={() => {
+      render: (value, record, index) => {
+        const treeCounts = userTreeCounts[record.id];
+        const sponsoredCount = treeCounts?.sponsored_trees || 0;
+        return (
+          <Link
+            href="#"
+            onClick={(e) => {
+              e.preventDefault();
               const { hostname, host } = window.location;
               if (hostname === "localhost" || hostname === "127.0.0.1") {
                 window.open("http://" + host + "/dashboard/" + record.id);
@@ -180,14 +238,34 @@ export const User1 = () => {
                 window.open("https://" + hostname + "/dashboard/" + record.id);
               }
             }}
+            style={{ 
+              textDecoration: 'none',
+              color: '#1976d2',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '4px'
+            }}
           >
-            <Forest />
-          </Button>
-          <Button
-            variant="outlined"
-            color="success"
-            style={{ margin: "0 5px" }}
-            onClick={() => {
+            <Forest fontSize="small" />
+            {sponsoredCount}
+          </Link>
+        );
+      },
+    },
+    {
+      key: "reserved_trees",
+      title: "Reserved Trees",
+      width: 100,
+      align: "center",
+      render: (value, record, index) => {
+        const treeCounts = userTreeCounts[record.id];
+        const mappedCount = treeCounts?.mapped_trees || 0;
+        return (
+          <Link
+            href="#"
+            onClick={(e) => {
+              e.preventDefault();
               const { hostname, host } = window.location;
               if (hostname === "localhost" || hostname === "127.0.0.1") {
                 window.open("http://" + host + "/ww/" + record.email);
@@ -195,14 +273,34 @@ export const User1 = () => {
                 window.open("https://" + hostname + "/ww/" + record.email);
               }
             }}
+            style={{ 
+              textDecoration: 'none',
+              color: '#1976d2',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '4px'
+            }}
           >
-            <AccountBalance />
-          </Button>
-          <Button
-            variant="outlined"
-            color="success"
-            style={{ margin: "0 5px" }}
-            onClick={() => {
+            <AccountBalance fontSize="small" />
+            {mappedCount}
+          </Link>
+        );
+      },
+    },
+    {
+      key: "profile_dashboard",
+      title: "Profile Dashboard",
+      width: 100,
+      align: "center",
+      render: (value, record, index) => {
+        const treeCounts = userTreeCounts[record.id];
+        const assignedCount = treeCounts?.assigned_trees || 0;
+        return (
+          <Link
+            href="#"
+            onClick={(e) => {
+              e.preventDefault();
               const { hostname, host } = window.location;
               if (hostname === "localhost" || hostname === "127.0.0.1") {
                 window.open("http://" + host + "/profile/user/" + record.id);
@@ -210,33 +308,68 @@ export const User1 = () => {
                 window.open("https://" + hostname + "/profile/user/" + record.id);
               }
             }}
-          >
-            <AccountCircleRoundedIcon />
-          </Button>
-          <PersonalDashboardShareDialog 
-            user={record}
-            onUsersAdded={() => {
-              // Optionally refresh data or show success message
-              toast.success(`Personal dashboard access updated for ${record.name}`);
+            style={{ 
+              textDecoration: 'none',
+              color: '#1976d2',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '4px'
             }}
-          />
-          <Button
-            variant="outlined"
-            style={{ margin: "0 5px" }}
-            onClick={() => {
-              setSelectedEditRow(record);
-              setOpen(true);
-            }}>
-            <EditIcon />
-          </Button>
-          <Button
-            variant="outlined"
-            color="error"
-            style={{ margin: "0 5px" }}
-            onClick={() => handleDelete(record)}>
-            <DeleteIcon />
-          </Button>
-        </div>
+          >
+            <AccountCircleRoundedIcon fontSize="small" />
+            {assignedCount}
+          </Link>
+        );
+      },
+    },
+    {
+      key: "self_serve_dashboard",
+      title: "Self-Serve Portal",
+      width: 100,
+      align: "center",
+      render: (value, record, index) => {
+        const treeCounts = userTreeCounts[record.id];
+        const totalTrees = (treeCounts?.mapped_trees || 0) + (treeCounts?.sponsored_trees || 0) + (treeCounts?.assigned_trees || 0);
+        return (
+          <Link
+            href="#"
+            onClick={(e) => {
+              e.preventDefault();
+              const { hostname, host } = window.location;
+              if (hostname === "localhost" || hostname === "127.0.0.1") {
+                window.open("http://" + host + "/personal/dashboard/" + record.id);
+              } else {
+                window.open("https://" + hostname + "/personal/dashboard/" + record.id);
+              }
+            }}
+            style={{ 
+              textDecoration: 'none',
+              color: '#1976d2',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '4px'
+            }}
+          >
+            <Dashboard fontSize="small" />
+            {totalTrees}
+          </Link>
+        );
+      },
+    },
+    {
+      key: "actions",
+      title: "Actions",
+      width: 80,
+      align: "center",
+      render: (value, record, index) => (
+        <IconButton
+          size="small"
+          onClick={(e) => handleMenuOpen(e, record)}
+        >
+          <MoreVert />
+        </IconButton>
       ),
     },
   ];
@@ -298,6 +431,42 @@ export const User1 = () => {
 
     handleCancelCombineUser();
   }
+
+  const handleMenuOpen = (event: React.MouseEvent<HTMLElement>, user: User) => {
+    setMenuAnchorEl(event.currentTarget);
+    setSelectedMenuUser(user);
+  };
+
+  const handleMenuClose = () => {
+    setMenuAnchorEl(null);
+    // Don't clear selectedMenuUser here - let individual handlers manage it
+  };
+
+  const handleEditFromMenu = () => {
+    if (selectedMenuUser) {
+      setSelectedEditRow(selectedMenuUser);
+      setOpen(true);
+    }
+    handleMenuClose();
+    setSelectedMenuUser(null); // Clear after handling
+  };
+
+  const handleDeleteFromMenu = () => {
+    if (selectedMenuUser) {
+      handleDelete(selectedMenuUser);
+    }
+    handleMenuClose();
+    setSelectedMenuUser(null); // Clear after handling
+  };
+
+  const handleShareFromMenu = () => {
+    handleMenuClose();
+    // Add a small delay to ensure menu closes before dialog opens
+    setTimeout(() => {
+      setShareDialogOpen(true);
+    }, 100);
+    // Don't clear selectedMenuUser here - it's needed for the dialog
+  };
 
   return (
     <>
@@ -363,6 +532,7 @@ export const User1 = () => {
           onDownload={getAllUsersData}
           footer
           tableName="Users"
+          scroll={{ x: 1200 }}
         />
       </Box >
 
@@ -443,6 +613,55 @@ export const User1 = () => {
           setOpen(false);
         }}
       />
+
+      <Menu
+        anchorEl={menuAnchorEl}
+        open={Boolean(menuAnchorEl)}
+        onClose={() => {
+          handleMenuClose();
+          // Clear selectedMenuUser only if share dialog is not open
+          if (!shareDialogOpen) {
+            setSelectedMenuUser(null);
+          }
+        }}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+        transformOrigin={{ vertical: 'top', horizontal: 'right' }}
+      >
+        <MenuItem onClick={handleEditFromMenu}>
+          <ListItemIcon>
+            <EditIcon fontSize="small" />
+          </ListItemIcon>
+          <ListItemText>Edit</ListItemText>
+        </MenuItem>
+        <MenuItem onClick={handleDeleteFromMenu}>
+          <ListItemIcon>
+            <DeleteIcon fontSize="small" />
+          </ListItemIcon>
+          <ListItemText>Delete</ListItemText>
+        </MenuItem>
+        <MenuItem onClick={handleShareFromMenu}>
+          <ListItemIcon>
+            <Share fontSize="small" />
+          </ListItemIcon>
+          <ListItemText>Manage Self-Serve Portal</ListItemText>
+        </MenuItem>
+      </Menu>
+
+      {selectedMenuUser && (
+        <PersonalDashboardShareDialog 
+          user={selectedMenuUser}
+          open={shareDialogOpen}
+          onClose={() => {
+            setShareDialogOpen(false);
+            setSelectedMenuUser(null);
+          }}
+          onUsersAdded={() => {
+            toast.success(`Personal dashboard access updated for ${selectedMenuUser.name}`);
+            setShareDialogOpen(false);
+            setSelectedMenuUser(null);
+          }}
+        />
+      )}
     </>
   );
 };
