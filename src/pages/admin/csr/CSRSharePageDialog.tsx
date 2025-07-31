@@ -5,9 +5,11 @@ import { View } from "../../../types/viewPermission";
 import ApiClient from "../../../api/apiClient/apiClient";
 import { useAppDispatch, useAppSelector } from "../../../redux/store/hooks";
 import * as userActionCreators from '../../../redux/actions/userActions';
-import { PersonAdd } from "@mui/icons-material";
+import { PersonAdd, Link as LinkIcon } from "@mui/icons-material";
 import { toast } from "react-toastify";
 import { LoadingButton } from "@mui/lab";
+import { User } from "../../../types/user";
+import { UserRoles } from "../../../types/common";
 
 interface CSRSharePageDialogProps {
     groupId?: number
@@ -71,7 +73,8 @@ const CSRSharePageDialog: FC<CSRSharePageDialogProps> = ({ groupId, groupName, o
         const handler = setTimeout(() => {
             if (viewDetails) {
                 setViewName(viewDetails.name);
-                setSelectedUsers(viewDetails.users ?? []);
+                // Don't populate selectedUsers with existing users - they show in "Currently shared with"
+                // selectedUsers should only contain NEW users being added
             } else {
                 setSelectedUsers([]);
                 setViewName(groupName + " Dashboard");
@@ -89,6 +92,7 @@ const CSRSharePageDialog: FC<CSRSharePageDialogProps> = ({ groupId, groupName, o
 
     const handleOpen = () => {
         setOpen(true);
+        // Clear selectedUsers - this should only contain NEW users being added
         setSelectedUsers([]);
         setSearchStr('');
         setViewName(groupName ? `${groupName} Dashboard` : "");
@@ -121,22 +125,54 @@ const CSRSharePageDialog: FC<CSRSharePageDialogProps> = ({ groupId, groupName, o
 
             const newUsers = validUsers.filter(user => user.id === -1);
             const createdUsers = await Promise.all(
-                newUsers.map(user => apiClient.createUser({
-                    name: user.name.trim(),
-                    email: user.email.trim(),
-                    key: 0,
-                    id: 0,
-                    user_id: "",
-                    phone: "",
-                    communication_email: null,
-                    birth_date: null,
-                    created_at: new Date(),
-                    updated_at: new Date()
-                }))
+                newUsers.map(async user => {
+                    const newUser = await apiClient.createUser({
+                        name: user.name.trim(),
+                        email: user.email.trim(),
+                        key: 0,
+                        id: 0,
+                        user_id: "",
+                        phone: "",
+                        communication_email: null,
+                        birth_date: null,
+                        created_at: new Date(),
+                        updated_at: new Date(),
+                        roles: []
+                    });
+                    
+                    // Check if user has role, if not set to 'user' role
+                    if (!newUser.roles || 
+                        (!newUser.roles.includes(UserRoles.User) && !newUser.roles.includes(UserRoles.Admin))) {
+                        const updatedUser = await apiClient.updateUser({
+                            ...newUser,
+                            roles: [UserRoles.User]
+                        });
+                        return updatedUser;
+                    }
+                    
+                    return newUser;
+                })
+            );
+
+            // Check and update roles for existing users being added
+            const existingUsers = validUsers.filter(user => user.id !== -1);
+            const existingUsersWithRoles = await Promise.all(
+                existingUsers.map(async user => {
+                    // Check if user has proper role, if not set to 'user' role
+                    if (!user.roles || 
+                        (!user.roles.includes(UserRoles.User) && !user.roles.includes(UserRoles.Admin))) {
+                        const updatedUser = await apiClient.updateUser({
+                            ...user,
+                            roles: [UserRoles.User]
+                        });
+                        return updatedUser;
+                    }
+                    return user;
+                })
             );
 
             const allUsers = [
-                ...validUsers.filter(user => user.id !== -1),
+                ...existingUsersWithRoles,
                 ...createdUsers
             ];
 
@@ -203,9 +239,29 @@ const CSRSharePageDialog: FC<CSRSharePageDialogProps> = ({ groupId, groupName, o
                         />
                     </Box>
 
+                    {/* Show already shared users */}
+                    {viewDetails && viewDetails.users && viewDetails.users.length > 0 && (
+                        <Box mt={3}>
+                            <Typography variant="body1" gutterBottom>
+                                Currently shared with ({viewDetails.users.length} users)
+                            </Typography>
+                            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5, mb: 2 }}>
+                                {viewDetails.users.map((user) => (
+                                    <Chip
+                                        key={user.id}
+                                        label={user.name ? `${user.name} (${user.email})` : user.email}
+                                        color="primary"
+                                        variant="outlined"
+                                        size="small"
+                                    />
+                                ))}
+                            </Box>
+                        </Box>
+                    )}
+
                     <Box mt={3}>
                         <Typography variant="body1" gutterBottom>
-                            Share with users
+                            Share with additional users
                         </Typography>
 
                         <Autocomplete
@@ -239,15 +295,28 @@ const CSRSharePageDialog: FC<CSRSharePageDialogProps> = ({ groupId, groupName, o
                                 if (typeof newValue === 'string') {
                                     // Don't do anything for string input - handled by the "Add new User" link
                                 } else {
-                                    // Existing user selected - add directly to selectedUsers
-                                    if (!selectedUsers.some(user => user.id === newValue.id)) {
+                                    // Check if user is already in the existing shared users list
+                                    const isAlreadyShared = viewDetails?.users?.some(existingUser => 
+                                        existingUser.id === newValue.id || existingUser.email === newValue.email
+                                    );
+                                    
+                                    // Check if user is already in the selectedUsers list
+                                    const isAlreadySelected = selectedUsers.some(user => 
+                                        user.id === newValue.id || user.email === newValue.email
+                                    );
+
+                                    if (isAlreadyShared) {
+                                        // Show a message that user is already shared
+                                        alert(`${newValue.name || newValue.email} is already shared with this dashboard`);
+                                    } else if (!isAlreadySelected) {
+                                        // Add user to selectedUsers
                                         setSelectedUsers([...selectedUsers, {
                                             id: newValue.id || -1,
                                             name: newValue.name,
                                             email: newValue.email
                                         }]);
-                                        setSearchStr(''); // Clear the search string
                                     }
+                                    setSearchStr(''); // Clear the search string
                                 }
                             }}
                             renderInput={(params) => (
@@ -344,17 +413,24 @@ const CSRSharePageDialog: FC<CSRSharePageDialogProps> = ({ groupId, groupName, o
                             </Box>
                         )}
 
-                        <Box sx={{ mt: 2, display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-                            {selectedUsers.map((user) => (
-                                <Chip
-                                    key={user.id}
-                                    label={user.name ? `${user.name} (${user.email})` : user.email}
-                                    onDelete={() => handleUserDelete(user.id)}
-                                    color="secondary"
-                                    sx={{ marginRight: 0.5 }}
-                                />
-                            ))}
-                        </Box>
+                        {selectedUsers.length > 0 && (
+                            <Box sx={{ mt: 2 }}>
+                                <Typography variant="body2" gutterBottom color="text.secondary">
+                                    Users to be added:
+                                </Typography>
+                                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                                    {selectedUsers.map((user) => (
+                                        <Chip
+                                            key={user.id}
+                                            label={user.name ? `${user.name} (${user.email})` : user.email}
+                                            onDelete={() => handleUserDelete(user.id)}
+                                            color="secondary"
+                                            sx={{ marginRight: 0.5 }}
+                                        />
+                                    ))}
+                                </Box>
+                            </Box>
+                        )}
                     </Box>
                 </DialogContent>
                 <DialogActions>
@@ -370,7 +446,7 @@ const CSRSharePageDialog: FC<CSRSharePageDialogProps> = ({ groupId, groupName, o
                         color="success"
                         variant="outlined"
                         sx={{ mr: 2, textTransform: 'none' }}
-                        startIcon={<Link />}
+                        startIcon={<LinkIcon />}
                         disabled={!viewDetails}
                         onClick={handleCopyLink}
                     >

@@ -10,6 +10,7 @@ export type User = {
     birth_date: string | null,
     created_at: Date,
     updated_at: Date,
+    roles?: string[],
 };
 
 export type UsersDataState = {

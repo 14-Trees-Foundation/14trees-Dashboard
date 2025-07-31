@@ -136,11 +136,12 @@ const CombineUserForm: React.FC<CombineUserFormProps> = ({ primaryUser, secondar
             { category: 'User Relations', label: 'As Secondary', key: 'user_relations.as_secondary' },
             
             // Other
-            { category: 'Other', label: 'User Groups', key: 'user_groups' },
-            { category: 'Other', label: 'Visit Users', key: 'visit_users' },
+            { category: 'Membership', label: 'User Groups', key: 'user_groups' },
+            { category: 'Visits', label: 'Visit Users', key: 'visit_users' },
             { category: 'Other', label: 'Albums', key: 'albums' },
             { category: 'Other', label: 'Events Assigned By', key: 'events_assigned_by' },
-            { category: 'Other', label: 'Total Relationships', key: 'total_relationships' },
+            { category: 'Self-Serve Portal', label: 'View Permissions', key: 'view_permissions' },
+            { category: 'Summary', label: 'Total Relationships', key: 'total_relationships' },
         ];
 
         const getValue = (obj: any, path: string) => {
