@@ -11,6 +11,7 @@ export type User = {
     created_at: Date,
     updated_at: Date,
     roles?: string[],
+    pin?: string,
 };
 
 export type UsersDataState = {
