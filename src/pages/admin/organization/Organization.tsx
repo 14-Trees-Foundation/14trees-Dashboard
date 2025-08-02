@@ -14,7 +14,6 @@ import {
   Typography,
 } from "@mui/material";
 import AddOrganization from "./AddOrganization";
-import ParkIcon from '@mui/icons-material/Park';
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import GroupIcon from '@mui/icons-material/Group';
@@ -34,12 +33,13 @@ import { organizationTypes } from "./organizationType";
 import { GridFilterItem } from "@mui/x-data-grid";
 import getColumnSearchProps, { getColumnSelectedItemFilter } from "../../../components/Filter";
 import { toast, ToastContainer } from "react-toastify";
-import { AccountBalance } from "@mui/icons-material";
+import { AccountBalance, Dashboard, Forest } from "@mui/icons-material";
 import ApiClient from "../../../api/apiClient/apiClient";
 import CombineGroupForm from "./CombineGroupForm";
 import { LoadingButton } from "@mui/lab";
 import { Order } from "../../../types/common";
 import { getSortIcon } from "../../../components/Filter";
+import { Link } from "@mui/material";
 
 export const OrganizationComponent = () => {
   const dispatch = useAppDispatch();
@@ -72,6 +72,13 @@ export const OrganizationComponent = () => {
   const [secondaryGroup, setSecondaryGroup] = useState<Group | null>(null);
   const [deleteSecondary, setDeleteSecondary] = useState(true);
   const [merging, setMerging] = useState(false);
+  const [groupTreeCounts, setGroupTreeCounts] = useState<Record<number, {
+    mapped_trees: number;
+    sponsored_trees: number;
+    assigned_trees: number;
+    gifted_trees: number;
+    received_gift_trees: number;
+  }>>({});
 
 
   const handlePaginationChange = (page: number, pageSize: number) => {
@@ -142,6 +149,11 @@ export const OrganizationComponent = () => {
     }
 
     setTableRows(records);
+    
+    // Fetch tree counts for the current page groups
+    if (records.length > 0) {
+      fetchTreeCountsForGroups(records);
+    }
   }, 500)
 
   return () => {
@@ -158,6 +170,46 @@ export const OrganizationComponent = () => {
   });
 
   getGroups(page * pageSize, pageSize, dataFilters, orderBy);
+ };
+
+ const fetchTreeCountsForGroups = async (groups: Group[]) => {
+  const apiClient = new ApiClient();
+  const counts: Record<number, {
+    mapped_trees: number;
+    sponsored_trees: number;
+    assigned_trees: number;
+    gifted_trees: number;
+    received_gift_trees: number;
+  }> = {};
+  
+  try {
+    await Promise.all(
+      groups.map(async (group) => {
+        try {
+          const result = await apiClient.getGroupsCountForGroup(group.id);
+          counts[group.id] = {
+            mapped_trees: result?.trees?.mapped_trees || 0,
+            sponsored_trees: result?.trees?.sponsored_trees || 0,
+            assigned_trees: result?.trees?.assigned_trees || 0,
+            gifted_trees: result?.trees?.gifted_trees || 0,
+            received_gift_trees: result?.trees?.received_gift_trees || 0,
+          };
+        } catch (error) {
+          console.error(`Failed to fetch tree count for group ${group.id}`, error);
+          counts[group.id] = {
+            mapped_trees: 0,
+            sponsored_trees: 0,
+            assigned_trees: 0,
+            gifted_trees: 0,
+            received_gift_trees: 0,
+          };
+        }
+      })
+    );
+    setGroupTreeCounts(prev => ({ ...prev, ...counts }));
+  } catch (error) {
+    console.error('Error fetching tree counts:', error);
+  }
  };
 
  const getAllGroupsData = async () => {
@@ -180,19 +232,12 @@ export const OrganizationComponent = () => {
 
   const columns: TableColumnsType<Group> = [
     {
-      dataIndex: "srNo",
-      key: "srNo",
-      title: "Sr. No.",
-      width: 100,
-      align: 'center',
-      render: (value, record, index) => `${index + 1 + srNoPage * pageSize}.`,
-    },
-    {
       dataIndex: "name",
       key: "name",
       title: "Name",
       width: 250,
       align: 'center',
+      fixed: 'left',
       ...getColumnSearchProps('name', filters, handleSetFilters)
     },
     {
@@ -212,34 +257,53 @@ export const OrganizationComponent = () => {
       align: 'center',
     },
     {
-      dataIndex: "reserved_trees",
-      key: "reserved_trees",
-      title: getSortableHeader("Reserved Trees", "reserved_trees"),
-      width: 150,
-      align: 'center',
-      render: (value) => value || '0',
-    },
-    {
-      dataIndex: "sponsored_trees",
-      key: "sponsored_trees",
-      title: getSortableHeader("Sponsored Trees", "sponsored_trees"),
-      width: 150,
-      align: 'center',
-      render: (value) => value || '0',
-    },
-    {
-      dataIndex: "action",
-      key: "action",
-      title: "Action",
-      width: 400,
+      key: "sponsor_dashboard",
+      title: "Sponsor Dashboard",
+      width: 120,
       align: "center",
-      render: (value, record, index) => (
-        <div style={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
-          <Button
-            variant="outlined"
-            color="success"
-            style={{ margin: "0 5px" }}
-            onClick={() => {
+      render: (value, record, index) => {
+        const treeCounts = groupTreeCounts[record.id];
+        const sponsoredCount = treeCounts?.sponsored_trees || 0;
+        return (
+          <Link
+            href="#"
+            onClick={(e) => {
+              e.preventDefault();
+              const { hostname, host } = window.location;
+              if (hostname === "localhost" || hostname === "127.0.0.1") {
+                window.open("http://" + host + "/group/" + record.id);
+              } else {
+                window.open("https://" + hostname + "/group/" + record.id);
+              }
+            }}
+            style={{ 
+              textDecoration: 'none',
+              color: '#1976d2',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '4px'
+            }}
+          >
+            <Forest fontSize="small" />
+            {sponsoredCount}
+          </Link>
+        );
+      },
+    },
+    {
+      key: "reserved_trees",
+      title: "Reserved Trees",
+      width: 120,
+      align: "center",
+      render: (value, record, index) => {
+        const treeCounts = groupTreeCounts[record.id];
+        const mappedCount = treeCounts?.mapped_trees || 0;
+        return (
+          <Link
+            href="#"
+            onClick={(e) => {
+              e.preventDefault();
               const { hostname, host } = window.location;
               if (hostname === "localhost" || hostname === "127.0.0.1") {
                 window.open("http://" + host + "/ww/group/" + record.id);
@@ -247,25 +311,65 @@ export const OrganizationComponent = () => {
                 window.open("https://" + hostname + "/ww/group/" + record.id);
               }
             }}
-          >
-            <AccountBalance />
-          </Button>
-          <Button
-            variant="outlined"
-            color="success"
-            style={{ margin: "0 5px" }}
-            onClick={() => {
-              const { hostname, host } = window.location;
-              const url = `/group/${record.id}`; 
-              if (hostname === "localhost" || hostname === "127.0.0.1") {
-                window.open(`http://${host}${url}`);
-              } else {
-                window.open(`https://${hostname}${url}`);
-              }
+            style={{ 
+              textDecoration: 'none',
+              color: '#1976d2',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '4px'
             }}
           >
-            <ParkIcon />
-          </Button>
+            <AccountBalance fontSize="small" />
+            {mappedCount}
+          </Link>
+        );
+      },
+    },
+
+    {
+      key: "self_serve_dashboard",
+      title: "Self-Serve Portal",
+      width: 120,
+      align: "center",
+      render: (value, record, index) => {
+        const treeCounts = groupTreeCounts[record.id];
+        const totalTrees = (treeCounts?.mapped_trees || 0) + (treeCounts?.sponsored_trees || 0) + (treeCounts?.assigned_trees || 0);
+        return (
+          <Link
+            href="#"
+            onClick={(e) => {
+              e.preventDefault();
+              const { hostname, host } = window.location;
+              if (hostname === "localhost" || hostname === "127.0.0.1") {
+                window.open("http://" + host + "/csr/dashboard/" + record.id);
+              } else {
+                window.open("https://" + hostname + "/csr/dashboard/" + record.id);
+              }
+            }}
+            style={{ 
+              textDecoration: 'none',
+              color: '#1976d2',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '4px'
+            }}
+          >
+            <Dashboard fontSize="small" />
+            {totalTrees}
+          </Link>
+        );
+      },
+    },
+    {
+      dataIndex: "action",
+      key: "action",
+      title: "Action",
+      width: 200,
+      align: "center",
+      render: (value, record, index) => (
+        <div style={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
           <Button
             color="success"
             variant="outlined"

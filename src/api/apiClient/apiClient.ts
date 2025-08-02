@@ -2998,6 +2998,77 @@ class ApiClient {
             throw new Error('Failed to connect with our AI bot!');
         }
     }
+
+    /**
+     * Admin Role Management
+     */
+    async grantAdminRole(userId: number): Promise<{ message: string, user: { id: number, name: string, email: string, roles: string[] } }> {
+        try {
+            const response = await this.api.post(`/admin/users/${userId}/grant-admin`, {}, {
+                headers: {
+                    "x-access-token": this.token,
+                    "content-type": "application/json",
+                }
+            });
+            return response.data;
+        } catch (error: any) {
+            if (error.response) {
+                throw new Error(error.response.data.error || error.response.data.message);
+            }
+            throw new Error('Failed to grant admin role');
+        }
+    }
+
+    async revokeAdminRole(userId: number): Promise<{ message: string, user: { id: number, name: string, email: string, roles: string[] } }> {
+        try {
+            const response = await this.api.post(`/admin/users/${userId}/revoke-admin`, {}, {
+                headers: {
+                    "x-access-token": this.token,
+                    "content-type": "application/json",
+                }
+            });
+            return response.data;
+        } catch (error: any) {
+            if (error.response) {
+                throw new Error(error.response.data.error || error.response.data.message);
+            }
+            throw new Error('Failed to revoke admin role');
+        }
+    }
+
+    async updateUserRoles(userId: number, roles: string[]): Promise<{ message: string, user: { id: number, name: string, email: string, roles: string[] } }> {
+        try {
+            const response = await this.api.put(`/admin/users/${userId}/roles`, { roles }, {
+                headers: {
+                    "x-access-token": this.token,
+                    "content-type": "application/json",
+                }
+            });
+            return response.data;
+        } catch (error: any) {
+            if (error.response) {
+                throw new Error(error.response.data.error || error.response.data.message);
+            }
+            throw new Error('Failed to update user roles');
+        }
+    }
+
+    async getUserRoles(userId: number): Promise<{ user: { id: number, name: string, email: string, roles: string[] } }> {
+        try {
+            const response = await this.api.get(`/admin/users/${userId}/roles`, {
+                headers: {
+                    "x-access-token": this.token,
+                    "content-type": "application/json",
+                }
+            });
+            return response.data;
+        } catch (error: any) {
+            if (error.response) {
+                throw new Error(error.response.data.error || error.response.data.message);
+            }
+            throw new Error('Failed to get user roles');
+        }
+    }
 }
 
 

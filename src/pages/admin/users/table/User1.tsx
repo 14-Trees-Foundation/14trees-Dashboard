@@ -35,7 +35,7 @@ import TableComponent from "../../../../components/Table";
 import CombineUserForm from "./CombineUserForm";
 import { toast } from "react-toastify";
 import ApiClient from "../../../../api/apiClient/apiClient";
-import { AccountBalance, Forest, Share, MoreVert, Dashboard } from "@mui/icons-material";
+import { AccountBalance, Forest, Share, MoreVert, Dashboard, AdminPanelSettings, PersonRemove, Person, PhoneAndroid } from "@mui/icons-material";
 import UserForm from "./UserForm";
 import GeneralTable from "../../../../components/GenTable";
 import PersonalDashboardShareDialog from "../components/PersonalDashboardShareDialog";
@@ -75,6 +75,10 @@ export const User1 = () => {
   const [menuAnchorEl, setMenuAnchorEl] = useState<null | HTMLElement>(null);
   const [selectedMenuUser, setSelectedMenuUser] = useState<User | null>(null);
   const [shareDialogOpen, setShareDialogOpen] = useState(false);
+  const [mobileAccessDialogOpen, setMobileAccessDialogOpen] = useState(false);
+  const [mobileNumber, setMobileNumber] = useState('');
+  const [pin, setPin] = useState('');
+  const [selectedMobileRole, setSelectedMobileRole] = useState<'admin' | 'treelogging'>('treelogging');
 
   let usersList: User[] = [];
   const usersData = useAppSelector((state: RootState) => state.usersData);
@@ -359,6 +363,95 @@ export const User1 = () => {
       },
     },
     {
+      dataIndex: "roles",
+      key: "roles",
+      title: "Dashboard Roles",
+      width: 120,
+      align: "center",
+      render: (value, record, index) => {
+        const roles = record.roles || [];
+        const isAdmin = roles.includes('admin');
+        return (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+            {roles.length === 0 ? (
+              <span style={{ color: '#666', fontSize: '12px' }}>No roles</span>
+            ) : (
+              roles.map((role, idx) => (
+                <span
+                  key={idx}
+                  style={{
+                    fontSize: '11px',
+                    padding: '2px 6px',
+                    borderRadius: '4px',
+                    backgroundColor: role === 'admin' ? '#ff5722' : role === 'treelogging' ? '#2196f3' : '#4caf50',
+                    color: 'white',
+                    textAlign: 'center',
+                    textTransform: 'capitalize'
+                  }}
+                >
+                  {role}
+                </span>
+              ))
+            )}
+          </div>
+        );
+      },
+      ...getColumnSearchProps('roles', filters, handleSetFilters)
+    },
+    {
+      dataIndex: "pin",
+      key: "mobile_access",
+      title: "Mobile Roles",
+      width: 120,
+      align: "center",
+      render: (value, record, index) => {
+        const hasAccess = hasMobileAccess(record);
+        const roles = record.roles || [];
+        const mobileRoles = roles.filter(role => role === 'admin' || role === 'treelogging');
+        
+        return (
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '2px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+              <PhoneAndroid 
+                fontSize="small" 
+                style={{ 
+                  color: hasAccess ? '#4caf50' : '#ccc' 
+                }} 
+              />
+              <span style={{ 
+                fontSize: '12px',
+                color: hasAccess ? '#4caf50' : '#666',
+                fontWeight: hasAccess ? 'bold' : 'normal'
+              }}>
+                {hasAccess ? 'Enabled' : 'Disabled'}
+              </span>
+            </div>
+            {hasAccess && mobileRoles.length > 0 && (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '1px' }}>
+                {mobileRoles.map((role, idx) => (
+                  <span
+                    key={idx}
+                    style={{
+                      fontSize: '10px',
+                      padding: '1px 4px',
+                      borderRadius: '3px',
+                      backgroundColor: role === 'admin' ? '#ff5722' : '#2196f3',
+                      color: 'white',
+                      textAlign: 'center',
+                      textTransform: 'capitalize'
+                    }}
+                  >
+                    {role}
+                  </span>
+                ))}
+              </div>
+            )}
+          </div>
+        );
+      },
+      ...getColumnSearchProps('pin', filters, handleSetFilters)
+    },
+    {
       key: "actions",
       title: "Actions",
       width: 80,
@@ -466,6 +559,172 @@ export const User1 = () => {
       setShareDialogOpen(true);
     }, 100);
     // Don't clear selectedMenuUser here - it's needed for the dialog
+  };
+
+  const handleGrantAdminRole = async () => {
+    if (!selectedMenuUser) return;
+    
+    try {
+      const apiClient = new ApiClient();
+      const result = await apiClient.grantAdminRole(selectedMenuUser.id);
+      toast.success(result.message);
+      
+      // Refresh the user data to show updated roles
+      getUserData();
+    } catch (error: any) {
+      toast.error(error.message);
+    }
+    
+    handleMenuClose();
+    setSelectedMenuUser(null);
+  };
+
+  const handleRevokeAdminRole = async () => {
+    if (!selectedMenuUser) return;
+    
+    try {
+      const apiClient = new ApiClient();
+      const result = await apiClient.revokeAdminRole(selectedMenuUser.id);
+      toast.success(result.message);
+      
+      // Refresh the user data to show updated roles
+      getUserData();
+    } catch (error: any) {
+      toast.error(error.message);
+    }
+    
+    handleMenuClose();
+    setSelectedMenuUser(null);
+  };
+
+  const isUserAdmin = (user: User): boolean => {
+    return user.roles && user.roles.includes('admin');
+  };
+
+  const hasUserRole = (user: User): boolean => {
+    return user.roles && user.roles.includes('user');
+  };
+
+  const hasTreeloggingRole = (user: User): boolean => {
+    return user.roles && user.roles.includes('treelogging');
+  };
+
+  const hasNoRoles = (user: User): boolean => {
+    return !user.roles || user.roles.length === 0;
+  };
+
+  const hasMobileAccess = (user: User): boolean => {
+    return user.phone && user.pin && user.phone !== "0";
+  };
+
+  const handleGrantUserRole = async () => {
+    if (!selectedMenuUser) return;
+    
+    try {
+      const apiClient = new ApiClient();
+      const currentRoles = selectedMenuUser.roles || [];
+      const newRoles = currentRoles.includes('user') ? currentRoles : [...currentRoles, 'user'];
+      
+      const result = await apiClient.updateUserRoles(selectedMenuUser.id, newRoles);
+      toast.success('User role granted successfully');
+      
+      // Refresh the user data to show updated roles
+      getUserData();
+    } catch (error: any) {
+      toast.error(error.message);
+    }
+    
+    handleMenuClose();
+    setSelectedMenuUser(null);
+  };
+
+  const handleGrantTreeloggingRole = async () => {
+    if (!selectedMenuUser) return;
+    
+    try {
+      const apiClient = new ApiClient();
+      const currentRoles = selectedMenuUser.roles || [];
+      const newRoles = currentRoles.includes('treelogging') ? currentRoles : [...currentRoles, 'treelogging'];
+      
+      const result = await apiClient.updateUserRoles(selectedMenuUser.id, newRoles);
+      toast.success('Tree logging role granted successfully');
+      
+      // Refresh the user data to show updated roles
+      getUserData();
+    } catch (error: any) {
+      toast.error(error.message);
+    }
+    
+    handleMenuClose();
+    setSelectedMenuUser(null);
+  };
+
+  const handleMobileAccessFromMenu = () => {
+    if (!selectedMenuUser) return;
+    
+    // Pre-fill mobile number if available
+    setMobileNumber(selectedMenuUser.phone || '');
+    setPin('');
+    
+    // Set default mobile role based on user's current roles
+    const roles = selectedMenuUser.roles || [];
+    if (roles.includes('admin')) {
+      setSelectedMobileRole('admin');
+    } else {
+      setSelectedMobileRole('treelogging');
+    }
+    
+    setMobileAccessDialogOpen(true);
+    handleMenuClose();
+  };
+
+  const handleGrantMobileAccess = async () => {
+    if (!selectedMenuUser) return;
+    
+    if (!mobileNumber || !pin) {
+      toast.error('Mobile number and PIN are required');
+      return;
+    }
+
+    if (pin.length !== 4 || !/^\d{4}$/.test(pin)) {
+      toast.error('PIN must be exactly 4 digits');
+      return;
+    }
+    
+    try {
+      const apiClient = new ApiClient();
+      
+      // Ensure the user has the selected mobile role
+      const currentRoles = selectedMenuUser.roles || [];
+      let updatedRoles = [...currentRoles];
+      
+      // Add the selected mobile role if not already present
+      if (!updatedRoles.includes(selectedMobileRole)) {
+        updatedRoles.push(selectedMobileRole);
+      }
+      
+      // Update user with mobile number, PIN, and roles
+      const updatedUser = {
+        ...selectedMenuUser,
+        phone: mobileNumber,
+        pin: pin,
+        roles: updatedRoles
+      };
+      
+      await apiClient.updateUser(updatedUser);
+      const isUpdate = hasMobileAccess(selectedMenuUser);
+      toast.success(isUpdate ? 'Mobile access updated successfully' : 'Mobile access granted successfully');
+      
+      // Refresh the user data
+      getUserData();
+      setMobileAccessDialogOpen(false);
+      setSelectedMenuUser(null);
+      setMobileNumber('');
+      setPin('');
+      setSelectedMobileRole('treelogging');
+    } catch (error: any) {
+      toast.error(error.message);
+    }
   };
 
   return (
@@ -645,6 +904,57 @@ export const User1 = () => {
           </ListItemIcon>
           <ListItemText>Manage Self-Serve Portal</ListItemText>
         </MenuItem>
+        <MenuItem onClick={handleMobileAccessFromMenu}>
+          <ListItemIcon>
+            <PhoneAndroid fontSize="small" />
+          </ListItemIcon>
+          <ListItemText>
+            {selectedMenuUser && hasMobileAccess(selectedMenuUser)
+              ? "Update Mobile Access" 
+              : "Grant Mobile Access"
+            }
+          </ListItemText>
+        </MenuItem>
+        {selectedMenuUser && hasNoRoles(selectedMenuUser) && (
+          <>
+            <MenuItem onClick={handleGrantUserRole}>
+              <ListItemIcon>
+                <Person fontSize="small" />
+              </ListItemIcon>
+              <ListItemText>Grant User Role</ListItemText>
+            </MenuItem>
+            <MenuItem onClick={handleGrantAdminRole}>
+              <ListItemIcon>
+                <AdminPanelSettings fontSize="small" />
+              </ListItemIcon>
+              <ListItemText>Grant Admin Role</ListItemText>
+            </MenuItem>
+          </>
+        )}
+        {selectedMenuUser && hasUserRole(selectedMenuUser) && !isUserAdmin(selectedMenuUser) && (
+          <MenuItem onClick={handleGrantAdminRole}>
+            <ListItemIcon>
+              <AdminPanelSettings fontSize="small" />
+            </ListItemIcon>
+            <ListItemText>Grant Admin Role</ListItemText>
+          </MenuItem>
+        )}
+        {selectedMenuUser && isUserAdmin(selectedMenuUser) && (
+          <MenuItem onClick={handleRevokeAdminRole}>
+            <ListItemIcon>
+              <PersonRemove fontSize="small" />
+            </ListItemIcon>
+            <ListItemText>Revoke Admin Role</ListItemText>
+          </MenuItem>
+        )}
+        {selectedMenuUser && isUserAdmin(selectedMenuUser) && !hasUserRole(selectedMenuUser) && (
+          <MenuItem onClick={handleGrantUserRole}>
+            <ListItemIcon>
+              <Person fontSize="small" />
+            </ListItemIcon>
+            <ListItemText>Grant User Role</ListItemText>
+          </MenuItem>
+        )}
       </Menu>
 
       {selectedMenuUser && (
@@ -662,6 +972,110 @@ export const User1 = () => {
           }}
         />
       )}
+
+      {/* Mobile Access Dialog */}
+      <Dialog 
+        open={mobileAccessDialogOpen} 
+        onClose={() => {
+          setMobileAccessDialogOpen(false);
+          setSelectedMenuUser(null);
+          setMobileNumber('');
+          setPin('');
+          setSelectedMobileRole('treelogging');
+        }}
+        maxWidth="sm"
+        fullWidth
+      >
+        <DialogTitle>
+          {selectedMenuUser && hasMobileAccess(selectedMenuUser)
+            ? "Update Mobile Access" 
+            : "Grant Mobile Access"
+          }
+          {selectedMenuUser && (
+            <Typography variant="subtitle2" color="textSecondary">
+              User: {selectedMenuUser.name} ({selectedMenuUser.email})
+            </Typography>
+          )}
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Enter the mobile number, 4-digit PIN, and select the mobile role to grant mobile application access to this user.
+          </DialogContentText>
+          <Box sx={{ mt: 2 }}>
+            <Typography variant="body2" sx={{ mb: 1 }}>Mobile Number:</Typography>
+            <input
+              type="tel"
+              value={mobileNumber}
+              onChange={(e) => setMobileNumber(e.target.value)}
+              placeholder="Enter mobile number"
+              style={{
+                width: '100%',
+                padding: '12px',
+                border: '1px solid #ccc',
+                borderRadius: '4px',
+                fontSize: '16px',
+                marginBottom: '16px'
+              }}
+            />
+            <Typography variant="body2" sx={{ mb: 1 }}>4-Digit PIN:</Typography>
+            <input
+              type="password"
+              value={pin}
+              onChange={(e) => {
+                const value = e.target.value.replace(/\D/g, '').slice(0, 4);
+                setPin(value);
+              }}
+              placeholder="Enter 4-digit PIN"
+              maxLength={4}
+              style={{
+                width: '100%',
+                padding: '12px',
+                border: '1px solid #ccc',
+                borderRadius: '4px',
+                fontSize: '16px',
+                letterSpacing: '2px',
+                marginBottom: '16px'
+              }}
+            />
+            <Typography variant="body2" sx={{ mb: 1 }}>Mobile Role:</Typography>
+            <select
+              value={selectedMobileRole}
+              onChange={(e) => setSelectedMobileRole(e.target.value as 'admin' | 'treelogging')}
+              style={{
+                width: '100%',
+                padding: '12px',
+                border: '1px solid #ccc',
+                borderRadius: '4px',
+                fontSize: '16px',
+                backgroundColor: 'white'
+              }}
+            >
+              <option value="treelogging">Tree Logging</option>
+              <option value="admin">Admin</option>
+            </select>
+          </Box>
+        </DialogContent>
+        <DialogActions>
+          <Button 
+            onClick={() => {
+              setMobileAccessDialogOpen(false);
+              setSelectedMenuUser(null);
+              setMobileNumber('');
+              setPin('');
+              setSelectedMobileRole('treelogging');
+            }}
+          >
+            Cancel
+          </Button>
+          <Button 
+            onClick={handleGrantMobileAccess}
+            variant="contained"
+            disabled={!mobileNumber || pin.length !== 4}
+          >
+            {selectedMenuUser && hasMobileAccess(selectedMenuUser) ? "Update Access" : "Grant Access"}
+          </Button>
+        </DialogActions>
+      </Dialog>
     </>
   );
 };
