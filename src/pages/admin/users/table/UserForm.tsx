@@ -1,4 +1,4 @@
-import { Autocomplete, Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, Grid, TextField, Typography } from "@mui/material";
+import { Autocomplete, Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, Grid, TextField, Typography, FormControl, InputLabel, Select, MenuItem, Checkbox, FormControlLabel, FormGroup, FormLabel, Divider } from "@mui/material";
 import { User } from "../../../../types/user";
 import React from "react";
 import { useAppDispatch, useAppSelector } from "../../../../redux/store/hooks";
@@ -26,16 +26,42 @@ const UserForm: React.FC<UserFormProps> = ({ open, user, onClose }) => {
         email: '',
         communication_email: '',
         birth_date: '',
+        roles: [] as string[],
+        pin: '',
+        enableMobileAccess: false,
+        mobileRole: 'treelogging' as 'admin' | 'treelogging',
     });
 
     React.useEffect(() => {
         if (user) {
+            const hasPin = user.pin && user.pin.length > 0;
+            const hasMobileAccess = user.phone && user.pin && user.phone !== "0";
+            const roles = user.roles || [];
+            const mobileRole = roles.includes('admin') ? 'admin' : 'treelogging';
+            
             setFormData({
                 name: user.name,
                 phone: user.phone ?? '',
                 email: user.email,
                 communication_email: user.communication_email ?? '',
                 birth_date: user.birth_date ?? '',
+                roles: roles,
+                pin: user.pin ?? '',
+                enableMobileAccess: hasMobileAccess,
+                mobileRole: mobileRole,
+            });
+        } else {
+            // Reset form for new user
+            setFormData({
+                name: '',
+                phone: '',
+                email: '',
+                communication_email: '',
+                birth_date: '',
+                roles: [],
+                pin: '',
+                enableMobileAccess: false,
+                mobileRole: 'treelogging',
             });
         }
     }, [user]);
@@ -50,17 +76,52 @@ const UserForm: React.FC<UserFormProps> = ({ open, user, onClose }) => {
         setFormData({ ...formData, [event.target.name]: event.target.value });
     };
 
+    const handleRoleChange = (role: string) => {
+        const currentRoles = formData.roles;
+        const updatedRoles = currentRoles.includes(role)
+            ? currentRoles.filter(r => r !== role)
+            : [...currentRoles, role];
+        setFormData({ ...formData, roles: updatedRoles });
+    };
+
+    const handleMobileAccessChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const enabled = event.target.checked;
+        setFormData({ 
+            ...formData, 
+            enableMobileAccess: enabled,
+            pin: enabled ? formData.pin : '' // Clear PIN if mobile access is disabled
+        });
+    };
+
+    const handlePinChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const value = event.target.value.replace(/\D/g, '').slice(0, 4);
+        setFormData({ ...formData, pin: value });
+    };
+
+    const handleMobileRoleChange = (event: any) => {
+        setFormData({ ...formData, mobileRole: event.target.value });
+    };
+
     const handleEmailChange = (event: any, value: string) => {
         let isSet = false;
         usersList.forEach((user) => {
             if (`${user.name} (${user.email})` === value) {
                 isSet = true;
+                const hasPin = user.pin && user.pin.length > 0;
+                const hasMobileAccess = user.phone && user.pin && user.phone !== "0";
+                const roles = user.roles || [];
+                const mobileRole = roles.includes('admin') ? 'admin' : 'treelogging';
+                
                 setFormData({
                     'email': user.email,
                     'name': user.name,
                     'communication_email': user.communication_email ?? '',
                     'phone': user.phone ?? '',
                     'birth_date': user.birth_date ?? '',
+                    'roles': roles,
+                    'pin': user.pin ?? '',
+                    'enableMobileAccess': hasMobileAccess,
+                    'mobileRole': mobileRole,
                 })
             }
         })
@@ -75,28 +136,41 @@ const UserForm: React.FC<UserFormProps> = ({ open, user, onClose }) => {
     }
 
     const handleSubmit = () => {
+        // Prepare roles array
+        let finalRoles = [...formData.roles];
+        
+        // If mobile access is enabled, ensure the selected mobile role is included
+        if (formData.enableMobileAccess && formData.mobileRole) {
+            if (!finalRoles.includes(formData.mobileRole)) {
+                finalRoles.push(formData.mobileRole);
+            }
+        }
 
-        const userData = {
-            ...formData,
-            birth_date: formData.birth_date.trim() === '' ? null : formData.birth_date,
+        // Prepare the user data for API
+        const apiUserData = {
+            name: formData.name,
+            phone: formData.phone,
             email: formData.email.trim() === '' 
                     ? formData.name.toLocaleLowerCase().replaceAll(" ", '.') + "@14trees" 
                     : formData.email,
             communication_email: formData.communication_email.trim() === '' 
                     ? null
                     : formData.communication_email,
-        }
+            birth_date: formData.birth_date.trim() === '' ? null : formData.birth_date,
+            roles: finalRoles.length > 0 ? finalRoles : [],
+            pin: formData.enableMobileAccess && formData.pin ? formData.pin : null,
+        };
 
         if (user) {
             // update user
             const updatedData = {
                 ...user,
-                ...userData,
+                ...apiUserData,
             }
 
             updateUser(updatedData);
         } else {
-            createUser(userData as any);
+            createUser(apiUserData as any);
         }
         
         handleClose();
@@ -109,6 +183,10 @@ const UserForm: React.FC<UserFormProps> = ({ open, user, onClose }) => {
             email: '',
             communication_email: '',
             birth_date: '',
+            roles: [],
+            pin: '',
+            enableMobileAccess: false,
+            mobileRole: 'treelogging',
         });
         onClose();
     };
@@ -209,11 +287,110 @@ const UserForm: React.FC<UserFormProps> = ({ open, user, onClose }) => {
                     <Grid item xs={12}>
                         <TextField name="birth_date" label="Date of Birth" type="date" value={formData.birth_date ? formData.birth_date.substring(0, 10) : ''} onChange={handleChange} InputLabelProps={{ shrink: true }} fullWidth />
                     </Grid>
+                    
+                    <Grid item xs={12}>
+                        <Divider sx={{ my: 2 }} />
+                        <Typography variant="h6" gutterBottom>
+                            Dashboard Roles
+                        </Typography>
+                        <FormGroup row>
+                            <FormControlLabel
+                                control={
+                                    <Checkbox
+                                        checked={formData.roles.includes('user')}
+                                        onChange={() => handleRoleChange('user')}
+                                    />
+                                }
+                                label="User"
+                            />
+                            <FormControlLabel
+                                control={
+                                    <Checkbox
+                                        checked={formData.roles.includes('admin')}
+                                        onChange={() => handleRoleChange('admin')}
+                                    />
+                                }
+                                label="Admin"
+                            />
+                            <FormControlLabel
+                                control={
+                                    <Checkbox
+                                        checked={formData.roles.includes('treelogging')}
+                                        onChange={() => handleRoleChange('treelogging')}
+                                    />
+                                }
+                                label="Tree Logging"
+                            />
+                        </FormGroup>
+                    </Grid>
+
+                    <Grid item xs={12}>
+                        <Divider sx={{ my: 2 }} />
+                        <Typography variant="h6" gutterBottom>
+                            Mobile Access
+                        </Typography>
+                        <FormControlLabel
+                            control={
+                                <Checkbox
+                                    checked={formData.enableMobileAccess}
+                                    onChange={handleMobileAccessChange}
+                                />
+                            }
+                            label="Enable Mobile Application Access"
+                        />
+                        
+                        {formData.enableMobileAccess && (
+                            <Box sx={{ mt: 2 }}>
+                                <Grid container spacing={2}>
+                                    <Grid item xs={12} sm={6}>
+                                        <TextField
+                                            label="4-Digit PIN"
+                                            type="password"
+                                            value={formData.pin}
+                                            onChange={handlePinChange}
+                                            placeholder="Enter 4-digit PIN"
+                                            inputProps={{ maxLength: 4 }}
+                                            fullWidth
+                                            helperText="Required for mobile access"
+                                            error={formData.enableMobileAccess && formData.pin.length !== 4}
+                                        />
+                                    </Grid>
+                                    <Grid item xs={12} sm={6}>
+                                        <FormControl fullWidth>
+                                            <InputLabel>Mobile Role</InputLabel>
+                                            <Select
+                                                value={formData.mobileRole}
+                                                onChange={handleMobileRoleChange}
+                                                label="Mobile Role"
+                                            >
+                                                <MenuItem value="treelogging">Tree Logging</MenuItem>
+                                                <MenuItem value="admin">Admin</MenuItem>
+                                            </Select>
+                                        </FormControl>
+                                    </Grid>
+                                </Grid>
+                                <Typography variant="caption" color="textSecondary" sx={{ mt: 1, display: 'block' }}>
+                                    Mobile access requires a phone number and 4-digit PIN. The selected mobile role will be automatically added to dashboard roles.
+                                </Typography>
+                            </Box>
+                        )}
+                    </Grid>
                 </Grid>
             </DialogContent>
             <DialogActions>
                 <Button variant="outlined" color="error" onClick={handleClose}>Cancel</Button>
-                <Button variant="contained" color="success" type="submit" disabled={helpersText ? true : false} onClick={handleSubmit}>Submit</Button>
+                <Button 
+                    variant="contained" 
+                    color="success" 
+                    type="submit" 
+                    disabled={
+                        helpersText ? true : 
+                        (formData.enableMobileAccess && (!formData.phone || formData.pin.length !== 4))
+                    } 
+                    onClick={handleSubmit}
+                >
+                    Submit
+                </Button>
             </DialogActions>
         </Dialog>
     );
