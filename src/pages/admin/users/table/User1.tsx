@@ -21,6 +21,7 @@ import AddUser from "./AddUser";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { type User } from "../../../../types/user";
+import { UserRoles } from "../../../../types/common";
 import * as userActionCreators from "../../../../redux/actions/userActions";
 import { bindActionCreators } from "redux";
 import { useAppDispatch, useAppSelector } from "../../../../redux/store/hooks";
@@ -29,7 +30,7 @@ import EditUser from "./EditUser";
 import AddBulkUser from "./AddBulkUser";
 import AccountCircleRoundedIcon from '@mui/icons-material/AccountCircleRounded';
 import type { TableColumnsType } from 'antd';
-import getColumnSearchProps from "../../../../components/Filter";
+import getColumnSearchProps, { getColumnSelectedItemFilter } from "../../../../components/Filter";
 import { getFormattedDate } from "../../../../helpers/utils";
 import TableComponent from "../../../../components/Table";
 import CombineUserForm from "./CombineUserForm";
@@ -396,7 +397,12 @@ export const User1 = () => {
           </div>
         );
       },
-      ...getColumnSearchProps('roles', filters, handleSetFilters)
+      ...getColumnSelectedItemFilter({
+        dataIndex: 'roles',
+        filters,
+        handleSetFilters,
+        options: Object.values(UserRoles)
+      })
     },
     {
       dataIndex: "pin",
@@ -449,7 +455,12 @@ export const User1 = () => {
           </div>
         );
       },
-      ...getColumnSearchProps('pin', filters, handleSetFilters)
+      ...getColumnSelectedItemFilter({
+        dataIndex: 'roles',
+        filters,
+        handleSetFilters,
+        options: [UserRoles.Admin, UserRoles.TreeLogger]
+      })
     },
     {
       key: "actions",
