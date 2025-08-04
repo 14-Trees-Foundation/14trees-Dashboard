@@ -129,47 +129,33 @@ const Campaigns: React.FC = () => {
 
     const columns: TableColumnsType<any> = [
         {
-            title: "Actions",
-            key: "actions",
-            align: "center",
-            width: 120,
-            render: (_, record) => (
-                <>
-                    <IconButton onClick={() => handleEditClick(record)} color="primary" size="small" aria-label="edit">
-                        <Edit fontSize="small" />
-                    </IconButton>
-                    <IconButton
-                        onClick={() => handleOpenCampaignPage(record)}
-                        color="secondary"
-                        size="small"
-                        aria-label="open campaign page"
-                        sx={{ ml: 1 }}
-                    >
-                        <OpenInNew fontSize="small" />
-                    </IconButton>
-                </>
-            ),
-        },
-        {
-            dataIndex: "c_key",
-            key: "Campaign Key",
-            title: "Campaign Key",
-            align: "center",
-            width: 200,
-            ...getColumnSearchProps("c_key", filters, handleSetFilters),
-        },
-        {
             dataIndex: "name",
-            key: "Name",
-            title: "Name",
+            key: "Campaign Name",
+            title: "Campaign Name",
             align: "center",
             width: 200,
             ...getColumnSearchProps("name", filters, handleSetFilters),
         },
         {
+            title: "Campaign Progress Tracker",
+            key: "campaign_progress_tracker",
+            align: "center",
+            width: 120,
+            render: (_, record) => (
+                <IconButton
+                    onClick={() => handleOpenCampaignPage(record)}
+                    color="secondary"
+                    size="small"
+                    aria-label="open campaign page"
+                >
+                    <OpenInNew fontSize="small" />
+                </IconButton>
+            ),
+        },
+        {
             dataIndex: "description",
-            key: "Description",
-            title: "Description",
+            key: "Display Text",
+            title: "Display Text",
             align: "center",
             width: 150,
             render: (value: string) => (
@@ -179,6 +165,14 @@ const Campaigns: React.FC = () => {
                     </Badge>
                 </IconButton>
             ),
+        },
+        {
+            dataIndex: "created_by",
+            key: "Created By",
+            title: "Created By",
+            align: "center",
+            width: 150,
+            ...getColumnSearchProps("created_by", filters, handleSetFilters),
         },
         {
             dataIndex: "created_at",
@@ -193,6 +187,25 @@ const Campaigns: React.FC = () => {
                 handleSetFilters,
                 label: "Created At",
             }),
+        },
+        {
+            dataIndex: "c_key",
+            key: "Campaign Key",
+            title: "Campaign Key",
+            align: "center",
+            width: 200,
+            ...getColumnSearchProps("c_key", filters, handleSetFilters),
+        },
+        {
+            title: "Actions",
+            key: "actions",
+            align: "center",
+            width: 80,
+            render: (_, record) => (
+                <IconButton onClick={() => handleEditClick(record)} color="primary" size="small" aria-label="edit">
+                    <Edit fontSize="small" />
+                </IconButton>
+            ),
         },
     ];
 

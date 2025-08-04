@@ -76,6 +76,7 @@
     "react-transition-group": "^4.4.2",
     "recharts": "^2.1.8",
     "recoil": "^0.4.1",
+    "rifm": "^0.12.1",
     "sass": "^1.35.1",
     "slick-carousel": "^1.8.1",
     "tinyglobby": "^0.2.14",

@@ -152,65 +152,13 @@ export const VisitsComponent = () => {
 
   const columns: TableColumnsType<Visit> = [
     {
-      dataIndex: "action",
-      key: "action",
-      title: "Actions",
-      width: 250,
-      align: "center",
-      render: (value, record, index) => (
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-          }}
-        >
-          <Button
-            color="success"
-            variant="outlined"
-            style={{ margin: "0 5px" }}
-            onClick={() => {
-              setSelectedVisit(record);
-            }}>
-            <GroupIcon />
-          </Button>
-          <Button
-            variant="outlined"
-            style={{ margin: "0 5px" }}
-            onClick={() => {
-              setEditModal(true);
-              setSelectedEditRow(record);
-            }}
-          >
-            <EditIcon />
-          </Button>
-          <Button
-            variant="outlined"
-            color="error"
-            style={{ margin: "0 5px" }}
-            onClick={() => handleDeleteVisit(record)}
-          >
-            <DeleteIcon />
-          </Button>
-        </div>
-      ),
-    },
-    {
       dataIndex: "visit_name",
       key: "visit_name",
       title: "Visit Name",
       width: 320,
       align: "center",
+      fixed: 'left',
       ...getColumnSearchProps("visit_name", filters, handleSetFilters),
-    },
-    {
-      dataIndex: "visit_type",
-      key: "visit_type",
-      title: "Visit Type",
-      width: 220,
-      align: "center",
-      render: getVisitType,
-      ...getColumnSelectedItemFilter({dataIndex: "visit_type", filters, handleSetFilters, options: VisitTypeList.map(item => item.id)}),
     },
     {
       dataIndex: "visit_date",
@@ -220,6 +168,15 @@ export const VisitsComponent = () => {
       align: "center",
       render: getHumanReadableDate,
       ...getColumnDateFilter({dataIndex: "visit_date", filters, handleSetFilters, label: 'Visits' }),
+    },
+    {
+      dataIndex: "visit_type",
+      key: "visit_type",
+      title: "Visit Type",
+      width: 220,
+      align: "center",
+      render: getVisitType,
+      ...getColumnSelectedItemFilter({dataIndex: "visit_type", filters, handleSetFilters, options: VisitTypeList.map(item => item.id)}),
     },
     {
       dataIndex: "site_name",
@@ -269,6 +226,50 @@ export const VisitsComponent = () => {
             disabled={!(value?.length)}
           >
             <Collections /> {value?.length || '0'}
+          </Button>
+        </div>
+      ),
+    },
+    {
+      dataIndex: "action",
+      key: "action",
+      title: "Actions",
+      width: 250,
+      align: "center",
+      render: (value, record, index) => (
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
+          <Button
+            color="success"
+            variant="outlined"
+            style={{ margin: "0 5px" }}
+            onClick={() => {
+              setSelectedVisit(record);
+            }}>
+            <GroupIcon />
+          </Button>
+          <Button
+            variant="outlined"
+            style={{ margin: "0 5px" }}
+            onClick={() => {
+              setEditModal(true);
+              setSelectedEditRow(record);
+            }}
+          >
+            <EditIcon />
+          </Button>
+          <Button
+            variant="outlined"
+            color="error"
+            style={{ margin: "0 5px" }}
+            onClick={() => handleDeleteVisit(record)}
+          >
+            <DeleteIcon />
           </Button>
         </div>
       ),
