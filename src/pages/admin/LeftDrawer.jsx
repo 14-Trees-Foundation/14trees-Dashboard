@@ -118,16 +118,40 @@ export const AdminLeftDrawer = () => {
       divider: isAdmin,
     },
     {
-      displayName: "Visits",
-      logo: TourIcon,
+      displayName: "Tree Cards",
+      logo: CardGiftcard,
+      display: true, // Show to all users who can access the admin panel
+      path: "tree-cards",
+    },
+    {
+      displayName: "Donations",
+      logo: VolunteerActivismIcon,
       display: isAdmin,
-      path: "visits",
+      path: "donations",
+    },
+    {
+      divider: isAdmin,
     },
     {
       displayName: "Events",
       logo: FestivalIcon,
       display: isAdmin,
       path: "events",
+    },
+    {
+      displayName: "Campaigns",
+      logo: Campaign,
+      display: true, // Show to all users who can access the admin panel
+      path: "campaigns",
+    },
+    {
+      displayName: "Visits",
+      logo: TourIcon,
+      display: isAdmin,
+      path: "visits",
+    },
+    {
+      divider: isAdmin,
     },
     {
       displayName: "Site Inventory",
@@ -140,24 +164,6 @@ export const AdminLeftDrawer = () => {
       logo: Inventory,
       display: isAdmin,
       path: "gc-inventory",
-    },
-    {
-      displayName: "Campaigns",
-      logo: Campaign,
-      display: true, // Show to all users who can access the admin panel
-      path: "campaigns",
-    },
-    {
-      displayName: "Tree Cards",
-      logo: CardGiftcard,
-      display: true, // Show to all users who can access the admin panel
-      path: "tree-cards",
-    },
-    {
-      displayName: "Donations",
-      logo: VolunteerActivismIcon,
-      display: isAdmin,
-      path: "donations",
     },
     {
       displayName: "Corporate Dashboard",

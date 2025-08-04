@@ -7,7 +7,14 @@ import {
   Modal,
   TextField,
   Typography,
+  Paper,
+  Divider,
+  Chip,
+  CircularProgress,
 } from "@mui/material";
+import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers';
+import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
+import { format, parseISO, startOfMonth, endOfMonth, addDays, isSameDay } from 'date-fns';
 import { VisitTypeList } from "../../../types/visits";
 import * as groupActionCreators from "../../../redux/actions/groupActions";
 import * as siteActionCreators from "../../../redux/actions/siteActions";
@@ -21,16 +28,14 @@ const style = {
   top: "50%",
   left: "50%",
   transform: "translate(-50%, -50%)",
-  minWidth: 400,
-  maxWidth: 600,
-  height: 300,
-  overflow: "auto",
-  scrollbarWidth: "thin",
+  width: "90vw",
+  maxWidth: 1000,
+  maxHeight: "90vh",
   bgcolor: "background.paper",
   border: "2px solid #000",
   boxShadow: 24,
   borderRadius: "10px",
-  p: 4,
+  p: 3,
 };
 
 const VisitForm = ({ mode, open, handleClose, onSubmit, visit = null }) => {
@@ -44,10 +49,16 @@ const VisitForm = ({ mode, open, handleClose, onSubmit, visit = null }) => {
   const [siteNameInput, setSiteNameInput] = useState("");
   const [sitesLoading, setSitesLoading] = useState(false);
   const [selectedSite, setSelectedSite] = useState(null);
+  
+  // Calendar-related state
+  const [calendarVisits, setCalendarVisits] = useState([]);
+  const [calendarSiteFilter, setCalendarSiteFilter] = useState(null);
+  const [calendarLoading, setCalendarLoading] = useState(false);
+  const [calendarDate, setCalendarDate] = useState(new Date());
 
   const [formData, setFormData] = useState({
     visit_name: '',
-    visit_date: '',
+    visit_date: new Date(),
     visit_type: null,
     group_id: null,
     site_id: null,
@@ -93,11 +104,37 @@ const VisitForm = ({ mode, open, handleClose, onSubmit, visit = null }) => {
     }
   }
 
+  // Calendar-specific functions
+  const getCalendarVisits = async (startDate, endDate, siteFilter = null) => {
+    setCalendarLoading(true);
+    const apiClient = new ApiClient();
+    try {
+      const filters = [
+        { columnField: 'visit_date', operatorValue: 'greaterThanOrEqual', value: format(startDate, 'yyyy-MM-dd') },
+        { columnField: 'visit_date', operatorValue: 'lessThanOrEqual', value: format(endDate, 'yyyy-MM-dd') }
+      ];
+      
+      if (siteFilter) {
+        filters.push({ columnField: 'site_id', operatorValue: 'equals', value: siteFilter.id });
+      }
+      
+      const response = await apiClient.getVisits(0, -1, filters);
+      setCalendarVisits(response.results || []);
+    } catch (error) {
+      console.error('Error fetching calendar visits:', error);
+      setCalendarVisits([]);
+    } finally {
+      setCalendarLoading(false);
+    }
+  };
+
+
+
   useEffect(() => {
     if (visit) {
       setFormData({
         visit_name: visit.visit_name,
-        visit_date: visit.visit_date,
+        visit_date: visit.visit_date ? parseISO(visit.visit_date) : new Date(),
         visit_type: VisitTypeList.find((visitType) => visitType.id === visit.visit_type),
         group_id: visit.group_id,
         site_id: visit.site_id,
@@ -119,6 +156,24 @@ const VisitForm = ({ mode, open, handleClose, onSubmit, visit = null }) => {
     if (searchStr.length > 2) getGroups(0, 20, [{ columnField: 'name', operatorValue: 'contains', value: searchStr }]);
   }, [searchStr])
 
+  // Load calendar visits when modal opens or calendar date changes
+  useEffect(() => {
+    if (open) {
+      const startDate = startOfMonth(calendarDate);
+      const endDate = addDays(endOfMonth(calendarDate), 30); // Show next 30 days beyond month end
+      getCalendarVisits(startDate, endDate, calendarSiteFilter);
+    }
+  }, [open, calendarDate, calendarSiteFilter])
+
+  // Reset calendar state when modal closes
+  useEffect(() => {
+    if (!open) {
+      setCalendarVisits([]);
+      setCalendarSiteFilter(null);
+      setCalendarDate(new Date());
+    }
+  }, [open])
+
   const handleChange = (event) => {
     const { name, value } = event.target;
     setFormData((prevState) => {
@@ -132,7 +187,7 @@ const VisitForm = ({ mode, open, handleClose, onSubmit, visit = null }) => {
     data = {
       ...data,
       visit_name: formData.visit_name,
-      visit_date: formData.visit_date,
+      visit_date: format(formData.visit_date, 'yyyy-MM-dd'),
       visit_type: formData.visit_type.id,
       group_id: formData.visit_type.id === 'corporate' ? formData.group_id : null,
       site_id: formData.site_id
@@ -141,11 +196,13 @@ const VisitForm = ({ mode, open, handleClose, onSubmit, visit = null }) => {
     onSubmit(data);
     setFormData({
       visit_name: '',
-      visit_date: '',
+      visit_date: new Date(),
       visit_type: null,
       group_id: null,
       site_id: null,
     });
+    setSelectedGroup(null);
+    setSelectedSite(null);
 
     handleClose();
   };
@@ -181,121 +238,273 @@ const VisitForm = ({ mode, open, handleClose, onSubmit, visit = null }) => {
         aria-describedby="modal-modal-description"
       >
         <Box sx={style}>
-          <Typography variant="h6" align="center" sx={{ marginBottom: "8px" }}>
+          <Typography variant="h5" align="center" sx={{ marginBottom: 3 }}>
             {mode === 'add' ? 'Add Visit' : 'Edit Visit'}
           </Typography>
-          <form onSubmit={handleSubmit}>
-            <Grid container rowSpacing={2} columnSpacing={1}>
-              <Grid item xs={12}>
-                <TextField
-                  required
-                  name="visit_name"
-                  label="Visit Name"
-                  value={formData.visit_name}
-                  onChange={handleChange}
-                  fullWidth
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <Autocomplete
-                  fullWidth
-                  name="visit_type"
-                  disablePortal
-                  options={VisitTypeList}
-                  value={formData.visit_type}
-                  renderInput={(params) => (
-                    <TextField {...params} label="Visit Type" required />
-                  )}
-                  onChange={(event, value) => {
-                    if (VisitTypeList.includes(value))
-                      setFormData((prevState) => ({
-                        ...prevState,
-                        visit_type: value,
-                      }));
-                  }}
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  required
-                  fullWidth
-                  InputLabelProps={{ shrink: true }}
-                  name="visit_date"
-                  label="Visit Date"
-                  type="date"
-                  value={formData.visit_date}
-                  onChange={handleChange}
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <AutocompleteWithPagination
-                  required
-                  name="site"
-                  label="Select a Site"
-                  options={sitesList}
-                  getOptionLabel={(option) => option.name_english}
-                  isOptionEqualToValue={(option, value) => {
-                    return option.id === value.id;
-                  }}
-                  onChange={(event, newValue) => {
-                    setFormData((prevState) => {
-                      return {
-                        ...prevState,
-                        ["site_id"]: newValue?.id || null,
-                      };
-                    });
+          
+          <Grid container spacing={3}>
+            {/* Left side - Calendar */}
+            <Grid item xs={12} md={5}>
+              <Paper elevation={2} sx={{ p: 2, height: 'fit-content' }}>
+                <Typography variant="h6" sx={{ mb: 2, textAlign: 'center' }}>
+                  Select Visit Date
+                </Typography>
+                
+                {/* Site Filter for Calendar */}
+                <Box sx={{ mb: 2 }}>
+                  <Box sx={{ display: 'flex', gap: 1, alignItems: 'flex-end' }}>
+                    <AutocompleteWithPagination
+                      label="Filter by Site (Optional)"
+                      options={sitesList}
+                      getOptionLabel={(option) => option.name_english}
+                      onChange={(event, newValue) => {
+                        setCalendarSiteFilter(newValue);
+                      }}
+                      onInputChange={(event) => {
+                        const { value } = event.target;
+                        setSitePageNo(0);
+                        setSiteNameInput(value);
+                      }}
+                      setPage={setSitePageNo}
+                      loading={sitesLoading}
+                      value={calendarSiteFilter}
+                      fullWidth
+                      size="small"
+                    />
+                    {calendarSiteFilter && (
+                      <Button
+                        size="small"
+                        onClick={() => setCalendarSiteFilter(null)}
+                        sx={{ minWidth: 'auto', px: 1 }}
+                      >
+                        Clear
+                      </Button>
+                    )}
+                  </Box>
+                </Box>
 
-                    setSelectedSite(selectedSite);
-                  }}
-                  onInputChange={(event) => {
-                    const { value } = event.target;
-                    setSitePageNo(0);
-                    setSiteNameInput(value);
-                    handleChange(event);
-                  }}
-                  setPage={setSitePageNo}
-                  loading={sitesLoading}
-                  value={selectedSite}
-                  fullWidth
-                  size="medium"
-                />
-              </Grid>
-              {(formData.visit_type && formData.visit_type.id === 'corporate') && <Grid item xs={12}>
-                <Autocomplete
-                  fullWidth
-                  name="group_id"
-                  disablePortal
-                  options={groupList}
-                  getOptionLabel={(option) => option.name}
-                  value={selectedGroup}
-                  renderInput={(params) => (
-                    <TextField {...params} label="Select Group" onChange={(e) => setSearchStr(e.target.value)} required />
-                  )}
-                  onChange={(event, value) => {
-                    if (value) {
+                {/* Legend */}
+                <Box sx={{ mb: 2, display: 'flex', justifyContent: 'center', gap: 2 }}>
+                  <Chip
+                    size="small"
+                    label="Has Visits"
+                    color="primary"
+                    variant="filled"
+                    sx={{ fontSize: '0.7rem' }}
+                  />
+                  <Typography variant="caption" color="text.secondary">
+                    Hover dates to see visit details
+                  </Typography>
+                </Box>
+
+                <LocalizationProvider dateAdapter={AdapterDateFns}>
+                  <DatePicker
+                    value={formData.visit_date}
+                    onChange={(newValue) => {
                       setFormData((prevState) => ({
                         ...prevState,
-                        group_id: value.id,
+                        visit_date: newValue,
                       }));
-                      setSelectedGroup(value);
-                    }
-                  }}
-                />
-              </Grid>}
-              <Grid
-                item
-                xs={12}
-                sx={{ display: "flex", justifyContent: "center" }}
-              >
-                <Button variant="outlined" color="error" onClick={handleClose} sx={{ marginRight: "8px" }}>
-                  Cancel
-                </Button>
-                <Button variant="contained" type="submit" color="success">
-                  Submit
-                </Button>
-              </Grid>
+                    }}
+                    renderInput={(params) => (
+                      <TextField
+                        {...params}
+                        fullWidth
+                        label="Select Visit Date"
+                        margin="normal"
+                      />
+                    )}
+                  />
+                </LocalizationProvider>
+                
+                {/* Scheduled Visits Display */}
+                <Box sx={{ mt: 2 }}>
+                  <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 'bold' }}>
+                    Scheduled Visits This Month
+                  </Typography>
+                  {calendarLoading ? (
+                    <Box sx={{ display: 'flex', justifyContent: 'center', p: 2 }}>
+                      <CircularProgress size={24} />
+                    </Box>
+                  ) : (
+                    <Box sx={{ maxHeight: 200, overflowY: 'auto' }}>
+                      {calendarVisits.length === 0 ? (
+                        <Typography variant="body2" color="text.secondary" sx={{ fontStyle: 'italic', textAlign: 'center', py: 2 }}>
+                          {calendarSiteFilter ? 
+                            `No visits scheduled for ${calendarSiteFilter.name_english}` : 
+                            'No visits scheduled this month'
+                          }
+                        </Typography>
+                      ) : (
+                        calendarVisits.map((visit, index) => (
+                          <Box 
+                            key={index}
+                            sx={{ 
+                              p: 1.5, 
+                              mb: 1, 
+                              border: '1px solid #e0e0e0', 
+                              borderRadius: 1,
+                              backgroundColor: isSameDay(parseISO(visit.visit_date), formData.visit_date) ? 'primary.light' : 'background.paper'
+                            }}
+                          >
+                            <Typography variant="body2" sx={{ fontWeight: 'bold' }}>
+                              {visit.visit_name}
+                            </Typography>
+                            <Typography variant="caption" color="text.secondary">
+                              {format(parseISO(visit.visit_date), 'MMM dd, yyyy')} • {visit.site_name}
+                            </Typography>
+                            {visit.group_name && (
+                              <Typography variant="caption" color="text.secondary" display="block">
+                                Group: {visit.group_name}
+                              </Typography>
+                            )}
+                          </Box>
+                        ))
+                      )}
+                    </Box>
+                  )}
+                </Box>
+                
+                <Typography variant="body2" sx={{ mt: 1, textAlign: 'center', color: 'text.secondary' }}>
+                  Selected: {format(formData.visit_date, 'MMMM dd, yyyy')}
+                </Typography>
+                
+                {calendarSiteFilter && (
+                  <Typography variant="caption" sx={{ mt: 1, textAlign: 'center', color: 'primary.main', display: 'block' }}>
+                    Showing visits for: {calendarSiteFilter.name_english}
+                  </Typography>
+                )}
+              </Paper>
             </Grid>
-          </form>
+
+            {/* Right side - Form Fields */}
+            <Grid item xs={12} md={7}>
+              <form onSubmit={handleSubmit}>
+                <Grid container spacing={2.5}>
+                  <Grid item xs={12}>
+                    <TextField
+                      required
+                      name="visit_name"
+                      label="Visit Name"
+                      value={formData.visit_name}
+                      onChange={handleChange}
+                      fullWidth
+                      size="medium"
+                    />
+                  </Grid>
+                  
+                  <Grid item xs={12}>
+                    <Autocomplete
+                      fullWidth
+                      name="visit_type"
+                      disablePortal
+                      options={VisitTypeList}
+                      value={formData.visit_type}
+                      renderInput={(params) => (
+                        <TextField {...params} label="Visit Type" required size="medium" />
+                      )}
+                      onChange={(event, value) => {
+                        if (VisitTypeList.includes(value))
+                          setFormData((prevState) => ({
+                            ...prevState,
+                            visit_type: value,
+                          }));
+                      }}
+                    />
+                  </Grid>
+                  
+                  <Grid item xs={12}>
+                    <AutocompleteWithPagination
+                      required
+                      label="Select a Site"
+                      options={sitesList}
+                      getOptionLabel={(option) => option.name_english}
+                      onChange={(event, newValue) => {
+                        setFormData((prevState) => {
+                          return {
+                            ...prevState,
+                            ["site_id"]: newValue?.id || null,
+                          };
+                        });
+                        setSelectedSite(newValue);
+                      }}
+                      onInputChange={(event) => {
+                        const { value } = event.target;
+                        setSitePageNo(0);
+                        setSiteNameInput(value);
+                        handleChange(event);
+                      }}
+                      setPage={setSitePageNo}
+                      loading={sitesLoading}
+                      value={selectedSite}
+                      fullWidth
+                      size="medium"
+                    />
+                  </Grid>
+                  
+                  {(formData.visit_type && formData.visit_type.id === 'corporate') && (
+                    <Grid item xs={12}>
+                      <Autocomplete
+                        fullWidth
+                        name="group_id"
+                        disablePortal
+                        options={groupList}
+                        getOptionLabel={(option) => option.name}
+                        value={selectedGroup}
+                        renderInput={(params) => (
+                          <TextField 
+                            {...params} 
+                            label="Select Group" 
+                            onChange={(e) => setSearchStr(e.target.value)} 
+                            required 
+                            size="medium"
+                          />
+                        )}
+                        onChange={(event, value) => {
+                          if (value) {
+                            setFormData((prevState) => ({
+                              ...prevState,
+                              group_id: value.id,
+                            }));
+                            setSelectedGroup(value);
+                          }
+                        }}
+                      />
+                    </Grid>
+                  )}
+
+                  <Grid item xs={12}>
+                    <Divider sx={{ my: 1 }} />
+                  </Grid>
+                  
+                  <Grid
+                    item
+                    xs={12}
+                    sx={{ display: "flex", justifyContent: "center", gap: 2 }}
+                  >
+                    <Button 
+                      variant="outlined" 
+                      color="error" 
+                      onClick={handleClose} 
+                      size="large"
+                      sx={{ minWidth: 120 }}
+                    >
+                      Cancel
+                    </Button>
+                    <Button 
+                      variant="contained" 
+                      type="submit" 
+                      color="success"
+                      size="large"
+                      sx={{ minWidth: 120 }}
+                    >
+                      Submit
+                    </Button>
+                  </Grid>
+                </Grid>
+              </form>
+            </Grid>
+          </Grid>
         </Box>
       </Modal>
     </div>

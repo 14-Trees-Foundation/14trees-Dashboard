@@ -1,3 +1,4 @@
+import { useEffect, useCallback, useState } from "react";
 import { createStyles, makeStyles } from "@mui/styles";
 import { Typography, Box, Grid } from "@mui/material";
 import ParkTwoToneIcon from "@mui/icons-material/ParkTwoTone";
@@ -9,15 +10,74 @@ import CardGiftcardIcon from '@mui/icons-material/CardGiftcard';
 import PersonIcon from '@mui/icons-material/Person';
 import BusinessIcon from '@mui/icons-material/Business';
 import NatureIcon from '@mui/icons-material/Nature';
-import { useRecoilValue } from "recoil";
+import { useRecoilValue, useSetRecoilState } from "recoil";
+import { useNavigate } from "react-router-dom";
 
-import { summary } from "../../../store/adminAtoms";
+import { summary, treeLoggedByDate } from "../../../store/adminAtoms";
 import { TreeLogCumulative } from "./TreeLogCumulative";
 import { Apartment, Flag, HolidayVillage, HowToReg, LocationCity, OpacityTwoTone } from "@mui/icons-material";
+import { Spinner } from "../../../components/Spinner";
+import * as Axios from "../../../api/local";
 
 export const AdminHome = () => {
   const adminSummary = useRecoilValue(summary);
+  const setSummary = useSetRecoilState(summary);
+  const setTreeLoggedByDate = useSetRecoilState(treeLoggedByDate);
+  const [loading, setLoading] = useState(false);
+  const token = JSON.parse(localStorage.getItem("token"));
+  const navigate = useNavigate();
   const classes = useStyles();
+
+  const fetchData = useCallback(async () => {
+    // Check if data already exists to avoid unnecessary API calls
+    if (adminSummary && Object.keys(adminSummary).length !== 0) return;
+
+    setLoading(true);
+    try {
+      // Fetch summary data
+      const summaryResponse = await Axios.default.get(`/analytics/summary`, {
+        headers: {
+          "x-access-token": token,
+          "content-type": "application/json",
+        },
+      });
+      if (summaryResponse.status === 200) {
+        setSummary(summaryResponse.data);
+      }
+
+      // Fetch tree data
+      const treesResponse = await Axios.default.get(`/trees/loggedbydate`);
+      if (treesResponse.status === 200) {
+        // Check if the response data is an array
+        if (Array.isArray(treesResponse.data)) {
+          const formattedData = treesResponse.data.map(element => ({
+            ...element,
+            _id: element._id.substring(0, 10)
+          }));
+          setTreeLoggedByDate(formattedData);
+        } else {
+          // Handle case where data is not an array
+          console.warn("Tree logged by date data is not an array:", treesResponse.data);
+          setTreeLoggedByDate([]); // Set to empty array as fallback
+        }
+      }
+    } catch (error) {
+      if (error.response?.status === 500) {
+        navigate("/login");
+      }
+      console.error("Error fetching admin home data:", error);
+    } finally {
+      setLoading(false);
+    }
+  }, [adminSummary, setSummary, setTreeLoggedByDate, token, navigate]);
+
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
+
+  if (loading) {
+    return <Spinner />;
+  }
   return (
     <div>
       <Typography sx={{ p: 3, pb: 1 }} variant="h5">
