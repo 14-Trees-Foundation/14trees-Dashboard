@@ -1,12 +1,14 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Box, Typography, Divider, useMediaQuery } from "@mui/material";
 import logo from "../../../assets/icon_round.png";
 import { createStyles, makeStyles } from "@mui/styles";
 import { Event, EventMessage } from "../../../types/event";
+import { EventImage } from "../../../types/eventImage";
 import EventMemories from "./EventMemories";
 import EventTrees from "./EventTrees";
 import EventMessages from "./EventMessages";
 import EventImgMsg from "./EventImgMsg";
+import ApiClient from "../../../api/apiClient/apiClient";
 
 interface EventDashboardProps {
     event: Event;
@@ -64,6 +66,41 @@ const useStyles = makeStyles((theme: any) =>
 const EventDashboard: React.FC<EventDashboardProps> = ({ event, eventMessages }) => {
     const classes = useStyles();
     const isMobile = useMediaQuery("(max-width:600px)");
+    const [apiEventImages, setApiEventImages] = useState<string[]>([]);
+    const [isLoadingImages, setIsLoadingImages] = useState<boolean>(true);
+    const [allEventImages, setAllEventImages] = useState<string[]>([]);
+
+    const apiClient = new ApiClient();
+
+    useEffect(() => {
+        const fetchEventImages = async () => {
+            try {
+                setIsLoadingImages(true);
+                const images: EventImage[] = await apiClient.events.getEventImages(event.id);
+                // Sort images by sequence and extract URLs
+                const imageUrls = images
+                    .sort((a, b) => a.sequence - b.sequence)
+                    .map(img => img.image_url);
+                setApiEventImages(imageUrls);
+            } catch (error) {
+                console.error('Failed to fetch event images:', error);
+                setApiEventImages([]);
+            } finally {
+                setIsLoadingImages(false);
+            }
+        };
+
+        fetchEventImages();
+    }, [event.id]);
+
+    // Combine images from both sources when either changes
+    useEffect(() => {
+        const legacyImages = event.memories || [];
+        const combinedImages = [...legacyImages, ...apiEventImages];
+        // Remove duplicates in case the same image exists in both sources
+        const uniqueImages = Array.from(new Set(combinedImages));
+        setAllEventImages(uniqueImages);
+    }, [event.memories, apiEventImages]);
 
     return (
         <Box
@@ -126,7 +163,7 @@ const EventDashboard: React.FC<EventDashboardProps> = ({ event, eventMessages })
                 )}
 
                 {/* Event Memories */}
-                {event.memories && event.memories.length > 0 && (
+                {!isLoadingImages && allEventImages.length > 0 && (
                     <>
                         <Box sx={{ mt: isMobile ? 3 : 5 }}>
                             <Typography
@@ -143,7 +180,7 @@ const EventDashboard: React.FC<EventDashboardProps> = ({ event, eventMessages })
                                     height: isMobile ? "250px" : "420px",
                                 }}
                             >
-                                <EventMemories imageUrls={event.memories} />
+                                <EventMemories imageUrls={allEventImages} />
                             </Box>
                         </Box>
                         <Divider sx={{ width: "100%", mt: 2 }} />

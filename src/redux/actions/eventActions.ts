@@ -10,7 +10,7 @@ export const getEvents = (offset: number, limit: number, filters?: any[]) => {
     dispatch({
       type: eventActionTypes.GET_EVENTS_REQUESTED,
     });
-    apiClient.getEvents(offset, limit, filters).then(
+    apiClient.events.getEvents(offset, limit, filters).then(
       (value: PaginatedResponse<Event>) => {
         console.log("Response in action: ", value);
         for (let i = 0; i < value.results.length; i++) {
@@ -40,12 +40,12 @@ export const getEvents = (offset: number, limit: number, filters?: any[]) => {
     dispatch({
       type: eventActionTypes.DELETE_EVENTS_REQUESTED,
     });
-    apiClient.deleteEvent(data).then(
-      (id: number) => {
+    apiClient.events.deleteEvent(data.id).then(
+      () => {
         toast.success("Event deleted successfully");
         dispatch({
           type: eventActionTypes.DELETE_EVENTS_SUCCEEDED,
-          payload: id,
+          payload: data.id,
         });
       },
       (error: any) => {
@@ -66,7 +66,7 @@ export const getEvents = (offset: number, limit: number, filters?: any[]) => {
         dispatch({
             type: eventActionTypes.UPDATE_EVENTS_REQUESTED,
         });
-         apiClient.updateEvent(data).then(
+         apiClient.events.updateEvent(data).then(
             (value: Event) => {
                 toast.success("Event updated successfully");
                 dispatch({
