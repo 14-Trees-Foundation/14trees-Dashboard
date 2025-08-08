@@ -86,7 +86,7 @@ const TreeTable: React.FC<TreeTableProps> = ({
       title: "Sapling ID",
       align: "center" as const,
       width: 120,
-      ...getColumnSearchProps('sapling_id', filters, handleSetFilters)
+      ...getColumnSearchProps('sapling_id', filters, handleSetFilters, true)
     },
     {
       dataIndex: "plant_type",
