@@ -10,6 +10,7 @@ export const useTreeData = ({
   includeAllHabitats = false,
   filters: filtersProp,
   pageSize,
+  refreshTrigger: externalRefreshTrigger = 0,
 }: UseTreeDataProps) => {
   const isMountedRef = useRef(true);
   const [treesData, setTreesData] = useState<Record<number, Tree>>({});
@@ -121,7 +122,7 @@ export const useTreeData = ({
     }, 300);
 
     return () => clearTimeout(handler);
-  }, [plotIds, treeScope, includeNonGiftable, includeAllHabitats, filters, page, pageSize, refreshTrigger, fetchTrees]);
+  }, [plotIds, treeScope, includeNonGiftable, includeAllHabitats, filters, page, pageSize, refreshTrigger, externalRefreshTrigger, fetchTrees]);
 
   const handlePaginationChange = useCallback((newPage: number, newPageSize: number) => {
     setPage(newPage - 1);

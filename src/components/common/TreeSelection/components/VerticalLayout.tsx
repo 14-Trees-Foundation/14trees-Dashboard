@@ -11,11 +11,14 @@ interface VerticalLayoutProps {
   selectedTrees: Tree[];
   onTreesChange: (trees: Tree[]) => Promise<void>;
   onDissociateTree: (treeId: number) => Promise<void>;
+  onRemoveAll?: () => Promise<void>;
   treeScope?: 'giftable' | 'all';
   presetType?: keyof typeof import('../utils/presets').TREE_SELECTION_PRESETS;
   associatedTreesTitle?: string;
   availableTreesTitle?: string;
   emptyMessage?: string;
+  removeButtonLabel?: string;
+  removeAllButtonLabel?: string;
 }
 
 const VerticalLayout: React.FC<VerticalLayoutProps> = ({
@@ -24,11 +27,14 @@ const VerticalLayout: React.FC<VerticalLayoutProps> = ({
   selectedTrees,
   onTreesChange,
   onDissociateTree,
+  onRemoveAll,
   treeScope = 'all',
   presetType = 'EVENT_ASSOCIATION',
   associatedTreesTitle = 'Associated Trees',
   availableTreesTitle = 'Available Trees',
   emptyMessage = 'No trees associated yet. Use the tree selection section below to associate trees.',
+  removeButtonLabel = 'Remove',
+  removeAllButtonLabel = 'Remove All',
 }) => {
   return (
     <Box sx={{ 
@@ -42,60 +48,55 @@ const VerticalLayout: React.FC<VerticalLayoutProps> = ({
         minHeight: '300px',
         maxHeight: '50%',
         borderBottom: '1px solid #e0e0e0', 
-        p: 2,
         display: 'flex',
         flexDirection: 'column',
         overflow: 'hidden'
       }}>
-        <Typography variant="h6" gutterBottom>
-          {associatedTreesTitle} ({associatedTrees.length})
-        </Typography>
-        
         {loading ? (
           <Box display="flex" justifyContent="center" p={2}>
             <CircularProgress />
           </Box>
         ) : associatedTrees.length === 0 ? (
-          <Alert severity="info">
-            {emptyMessage}
-          </Alert>
-        ) : (
-          <Box sx={{ 
-            flex: 1, 
-            overflow: 'hidden',
-            '& .MuiDataGrid-root': {
-              border: 'none',
-            }
-          }}>
-            <TreeTable
-              title=""
-              trees={associatedTrees}
-              selectedTrees={[]} // Not applicable for associated trees view
-              loading={false}
-              total={associatedTrees.length}
-              page={0}
-              pageSize={associatedTrees.length}
-              mode="immediate"
-              emptyMessage={emptyMessage}
-              tags={[]}
-              filters={{}}
-              onFiltersChange={() => {}}
-              showBulkActions={false}
-              isSelectedTable={false}
-              hideTitle={true}
-              customActions={(tree) => (
-                <Button
-                  size="small"
-                  color="error"
-                  variant="outlined"
-                  onClick={() => onDissociateTree(tree.id)}
-                  disabled={loading}
-                >
-                  Remove
-                </Button>
-              )}
-            />
+          <Box p={2}>
+            <Typography variant="h6" gutterBottom>
+              {associatedTreesTitle} (0)
+            </Typography>
+            <Alert severity="info">
+              {emptyMessage}
+            </Alert>
           </Box>
+        ) : (
+          <TreeTable
+            title={associatedTreesTitle}
+            trees={associatedTrees}
+            selectedTrees={[]} // Not applicable for associated trees view
+            loading={false}
+            total={associatedTrees.length}
+            page={0}
+            pageSize={associatedTrees.length}
+            mode="immediate"
+            emptyMessage={emptyMessage}
+            tags={[]}
+            filters={{}}
+            onFiltersChange={() => {}}
+            showBulkActions={true}
+            isSelectedTable={true}
+            hideTitle={false}
+            onRemoveAll={onRemoveAll}
+            scrollHeight="auto"
+            removeAllButtonLabel={removeAllButtonLabel}
+            customActions={(tree) => (
+              <Button
+                size="small"
+                color="error"
+                variant="outlined"
+                onClick={() => onDissociateTree(tree.id)}
+                disabled={loading}
+              >
+                {removeButtonLabel}
+              </Button>
+            )}
+          />
         )}
       </Box>
 
@@ -108,9 +109,6 @@ const VerticalLayout: React.FC<VerticalLayoutProps> = ({
         flexDirection: 'column',
         overflow: 'hidden'
       }}>
-        <Typography variant="h6" gutterBottom>
-          {availableTreesTitle}
-        </Typography>
         <Box sx={{ 
           flex: 1,
           overflow: 'hidden',
@@ -126,12 +124,12 @@ const VerticalLayout: React.FC<VerticalLayoutProps> = ({
             selectedTrees={selectedTrees}
             onSelectedTreesChange={onTreesChange}
             associatedTrees={associatedTrees}
-            title=""
+            title={availableTreesTitle}
             layout="dialog"
             showSelectedTable={false} // Don't show selected table
             sideLayout={false} // Show only the main tree grid
             showAssociationStatus={true} // Show association status in the grid
-            hideTableTitle={true} // Hide the table's own title since we have section headers
+            hideTableTitle={false} // Show the table title with buttons
           />
         </Box>
       </Box>

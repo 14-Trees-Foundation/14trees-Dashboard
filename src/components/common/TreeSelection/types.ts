@@ -57,6 +57,7 @@ export interface TreeSelectionProps {
   // Association Mode (for events)
   associatedTrees?: Tree[];
   associationMode?: boolean;
+  refreshTrigger?: number; // Increment this to trigger data refresh
   
   // Advanced Filtering
   enableAdvancedFilters?: boolean;
@@ -66,6 +67,13 @@ export interface TreeSelectionProps {
   customColumns?: any[];
   customActions?: (tree: Tree) => React.ReactNode;
   hideDefaultActions?: boolean;
+  
+  // Button Labels
+  selectButtonLabel?: string;
+  selectAllButtonLabel?: string;
+  selectAllPageButtonLabel?: string;
+  removeButtonLabel?: string;
+  removeAllButtonLabel?: string;
 }
 
 export interface TreeApiConfig {
@@ -96,6 +104,7 @@ export interface UseTreeDataProps {
   includeAllHabitats?: boolean;
   filters: Record<string, GridFilterItem>;
   pageSize: number;
+  refreshTrigger?: number;
 }
 
 export interface UseTreeSelectionProps {

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import { Box, Grid, useTheme, useMediaQuery } from '@mui/material';
 import { TreeSelectionProps } from './types';
 import { useTreeData } from './hooks/useTreeData';
@@ -6,6 +6,7 @@ import { useTreeFilters } from './hooks/useTreeFilters';
 import { useTreeSelection } from './hooks/useTreeSelection';
 import TreeSelectionModal from './components/TreeSelectionModal';
 import TreeTable from './components/TreeTable';
+import { treeApiService } from './utils/treeApi';
 
 const TreeSelectionComponent: React.FC<TreeSelectionProps> = ({
   open,
@@ -32,6 +33,13 @@ const TreeSelectionComponent: React.FC<TreeSelectionProps> = ({
   hideTableTitle = false,
   customActions,
   hideDefaultActions = false,
+  refreshTrigger = 0,
+  // Button Labels
+  selectButtonLabel = 'Select',
+  selectAllButtonLabel = 'Select All',
+  selectAllPageButtonLabel = 'Select All on Page',
+  removeButtonLabel = 'Remove',
+  removeAllButtonLabel = 'Remove All',
 }) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
@@ -67,6 +75,7 @@ const TreeSelectionComponent: React.FC<TreeSelectionProps> = ({
     includeAllHabitats,
     filters,
     pageSize,
+    refreshTrigger,
   });
 
   const {
@@ -75,6 +84,7 @@ const TreeSelectionComponent: React.FC<TreeSelectionProps> = ({
     handleTreeSelect,
     handleTreeRemove,
     handleSelectAll,
+    handleSelectAllFiltered,
     handleDeselectAll,
     getSelectionStats,
   } = useTreeSelection({
@@ -96,6 +106,52 @@ const TreeSelectionComponent: React.FC<TreeSelectionProps> = ({
   const handleSelectAllWrapper = () => {
     handleSelectAll(trees);
   };
+
+  const handleSelectAllFilteredWrapper = useCallback(async () => {
+    try {
+      const filtersData: any[] = [];
+      
+      // Add plot filter if plotIds are provided
+      if (plotIds.length > 0) {
+        filtersData.push({
+          columnField: 'plot_id',
+          operatorValue: 'isAnyOf',
+          value: plotIds
+        });
+      }
+
+      // Add other filters
+      filtersData.push(...Object.values(filters));
+
+      // Fetch all filtered trees
+      const response = await treeApiService.fetchAllFilteredTrees(
+        filtersData,
+        {
+          scope: treeScope,
+          includeNonGiftable,
+          includeAllHabitats,
+        },
+        500
+      );
+
+      // Apply custom filters if provided
+      let allFilteredTrees = response.results;
+      if (customFilters && customFilters.length > 0) {
+        allFilteredTrees = applyCustomFilters(allFilteredTrees);
+      }
+
+      // Filter out already associated trees in association mode
+      if (associationMode) {
+        allFilteredTrees = allFilteredTrees.filter(tree => 
+          !associatedTrees.some(assoc => assoc.id === tree.id)
+        );
+      }
+
+      handleSelectAllFiltered(allFilteredTrees);
+    } catch (error) {
+      console.error('Error fetching all filtered trees:', error);
+    }
+  }, [plotIds, filters, treeScope, includeNonGiftable, includeAllHabitats, customFilters, associationMode, associatedTrees, handleSelectAllFiltered]);
 
   const handleSubmit = () => {
     onSubmit?.(selectedTrees);
@@ -138,6 +194,12 @@ const TreeSelectionComponent: React.FC<TreeSelectionProps> = ({
   // Apply custom filters
   availableTrees = applyCustomFilters(availableTrees);
 
+  // Calculate the correct total for available trees
+  // In association mode, we need to subtract associated trees from the total
+  const availableTotal = associationMode 
+    ? Math.max(0, total - associatedTrees.length)
+    : total;
+
   // Convert filters to the format expected by the table columns
   const filtersRecord = Object.fromEntries(
     Object.entries(filters).map(([key, value]) => [key, value])
@@ -158,13 +220,14 @@ const TreeSelectionComponent: React.FC<TreeSelectionProps> = ({
                 selectedTrees={selectedTrees}
                 associatedTrees={associatedTrees}
                 loading={loading}
-                total={total}
+                total={availableTotal}
                 page={page}
                 pageSize={pageSize}
                 onPaginationChange={handlePaginationChange}
                 onTreeSelect={handleTreeSelectWrapper}
                 onTreeRemove={handleTreeRemoveWrapper}
                 onSelectAll={handleSelectAllWrapper}
+                onSelectAllFiltered={handleSelectAllFilteredWrapper}
                 onDeselectAll={handleDeselectAll}
                 onViewDetails={handleViewDetails}
                 mode={mode}
@@ -178,6 +241,9 @@ const TreeSelectionComponent: React.FC<TreeSelectionProps> = ({
                 hideTitle={hideTableTitle}
                 customActions={customActions}
                 hideDefaultActions={hideDefaultActions}
+                selectButtonLabel={selectButtonLabel}
+                selectAllButtonLabel={selectAllButtonLabel}
+                selectAllPageButtonLabel={selectAllPageButtonLabel}
               />
             </Grid>
 
@@ -205,6 +271,8 @@ const TreeSelectionComponent: React.FC<TreeSelectionProps> = ({
                   hideTitle={hideTableTitle}
                   customActions={customActions}
                   hideDefaultActions={hideDefaultActions}
+                  removeButtonLabel={removeButtonLabel}
+                  removeAllButtonLabel={removeAllButtonLabel}
                 />
               </Grid>
             )}
@@ -218,13 +286,14 @@ const TreeSelectionComponent: React.FC<TreeSelectionProps> = ({
               selectedTrees={selectedTrees}
               associatedTrees={associatedTrees}
               loading={loading}
-              total={total}
+              total={availableTotal}
               page={page}
               pageSize={pageSize}
               onPaginationChange={handlePaginationChange}
               onTreeSelect={handleTreeSelectWrapper}
               onTreeRemove={handleTreeRemoveWrapper}
               onSelectAll={handleSelectAllWrapper}
+              onSelectAllFiltered={handleSelectAllFilteredWrapper}
               onDeselectAll={handleDeselectAll}
               onViewDetails={handleViewDetails}
               mode={mode}
@@ -238,6 +307,9 @@ const TreeSelectionComponent: React.FC<TreeSelectionProps> = ({
               hideTitle={hideTableTitle}
               customActions={customActions}
               hideDefaultActions={hideDefaultActions}
+              selectButtonLabel={selectButtonLabel}
+              selectAllButtonLabel={selectAllButtonLabel}
+              selectAllPageButtonLabel={selectAllPageButtonLabel}
             />
 
             {showSelectedTable && selectedTrees.length > 0 && (
@@ -263,6 +335,8 @@ const TreeSelectionComponent: React.FC<TreeSelectionProps> = ({
                   hideTitle={hideTableTitle}
                   customActions={customActions}
                   hideDefaultActions={hideDefaultActions}
+                  removeButtonLabel={removeButtonLabel}
+                  removeAllButtonLabel={removeAllButtonLabel}
                 />
               </Box>
             )}

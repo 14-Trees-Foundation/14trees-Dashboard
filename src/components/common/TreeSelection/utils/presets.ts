@@ -32,6 +32,11 @@ export const TREE_SELECTION_PRESETS = {
     sideLayout: true,
     enableAdvancedFilters: true,
     title: 'Associate Trees with Event',
+    selectButtonLabel: 'Associate',
+    selectAllButtonLabel: 'Associate All',
+    selectAllPageButtonLabel: 'Associate All on Page',
+    removeButtonLabel: 'Dissociate',
+    removeAllButtonLabel: 'Dissociate All',
   },
 } as const;
 

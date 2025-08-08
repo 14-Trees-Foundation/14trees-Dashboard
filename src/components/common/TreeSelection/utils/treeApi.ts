@@ -1,5 +1,7 @@
 import ApiClient from "../../../../api/apiClient/apiClient";
 import { TreeApiConfig, TreeApiResponse } from "../types";
+import { Tree as GlobalTree } from "../../../../types/tree";
+import { Tree as UnifiedTree } from "../types";
 
 export class TreeApiService {
   private apiClient: ApiClient;
@@ -8,6 +10,21 @@ export class TreeApiService {
     this.apiClient = new ApiClient();
   }
 
+  // Convert GlobalTree to UnifiedTree format
+  private convertToUnifiedTree = (tree: GlobalTree): UnifiedTree => ({
+    id: tree.id,
+    sapling_id: tree.sapling_id,
+    plant_type: tree.plant_type || '',
+    plot: tree.plot || '',
+    plot_name: tree.site_name || tree.plot || '',
+    plot_id: tree.plot_id,
+    status: tree.tree_status || 'Unknown',
+    tags: tree.tags || [],
+    assigned_to: tree.assigned_to_name,
+    planted_date: tree.created_at?.toString(),
+    tree_id: tree.id,
+  });
+
   async fetchTrees(
     offset: number,
     limit: number,
@@ -15,22 +32,45 @@ export class TreeApiService {
     config: TreeApiConfig
   ): Promise<TreeApiResponse> {
     try {
+      let response;
       switch (config.scope) {
         case 'giftable':
-          return await this.apiClient.getGiftAbleTrees(
+          response = await this.apiClient.getGiftAbleTrees(
             offset,
             limit,
             filters,
             config.includeNonGiftable || false,
             config.includeAllHabitats || false
           );
+          break;
         case 'all':
-          return await this.apiClient.getTrees(offset, limit, filters);
+          response = await this.apiClient.getTrees(offset, limit, filters);
+          break;
         default:
           throw new Error(`Unsupported tree scope: ${config.scope}`);
       }
+
+      // Convert GlobalTree[] to UnifiedTree[]
+      return {
+        results: response.results.map(this.convertToUnifiedTree),
+        total: response.total,
+        offset: response.offset,
+      };
     } catch (error) {
       console.error('Error fetching trees:', error);
+      throw error;
+    }
+  }
+
+  async fetchAllFilteredTrees(
+    filters: any[],
+    config: TreeApiConfig,
+    maxLimit: number = 500
+  ): Promise<TreeApiResponse> {
+    try {
+      return await this.fetchTrees(0, maxLimit, filters, config);
+    } catch (error) {
+      console.error('Error fetching all filtered trees:', error);
       throw error;
     }
   }

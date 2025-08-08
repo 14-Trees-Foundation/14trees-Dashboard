@@ -1,5 +1,5 @@
 import React, { useCallback } from 'react';
-import { Box, Button, Typography, Chip } from '@mui/material';
+import { Box, Button, Typography, Chip, Tooltip } from '@mui/material';
 import GeneralTable from '../../../GenTable';
 import getColumnSearchProps, { getColumnSelectedItemFilter } from '../../../Filter';
 import { Tree } from '../types';
@@ -17,7 +17,9 @@ interface TreeTableProps {
   onTreeSelect?: (tree: Tree) => void;
   onTreeRemove?: (tree: Tree) => void;
   onSelectAll?: () => void;
+  onSelectAllFiltered?: () => void;
   onDeselectAll?: () => void;
+  onRemoveAll?: () => void;
   onViewDetails?: (tree: Tree) => void;
   mode?: 'batch' | 'immediate';
   maxSelection?: number;
@@ -30,6 +32,13 @@ interface TreeTableProps {
   hideTitle?: boolean;
   customActions?: (tree: Tree) => React.ReactNode;
   hideDefaultActions?: boolean;
+  scrollHeight?: number | 'auto';
+  // Button Labels
+  selectButtonLabel?: string;
+  selectAllButtonLabel?: string;
+  selectAllPageButtonLabel?: string;
+  removeButtonLabel?: string;
+  removeAllButtonLabel?: string;
 }
 
 const TreeTable: React.FC<TreeTableProps> = ({
@@ -45,7 +54,9 @@ const TreeTable: React.FC<TreeTableProps> = ({
   onTreeSelect,
   onTreeRemove,
   onSelectAll,
+  onSelectAllFiltered,
   onDeselectAll,
+  onRemoveAll,
   onViewDetails,
   mode = 'batch',
   maxSelection,
@@ -58,6 +69,13 @@ const TreeTable: React.FC<TreeTableProps> = ({
   hideTitle = false,
   customActions,
   hideDefaultActions = false,
+  scrollHeight = 400,
+  // Button Labels
+  selectButtonLabel = 'Select',
+  selectAllButtonLabel = 'Select All',
+  selectAllPageButtonLabel = 'Select All on Page',
+  removeButtonLabel = 'Remove',
+  removeAllButtonLabel = 'Remove All',
 }) => {
   const handleSetFilters = useCallback((newFilters: Record<string, any>) => {
     onFiltersChange?.(newFilters);
@@ -138,7 +156,7 @@ const TreeTable: React.FC<TreeTableProps> = ({
               size="small"
               onClick={() => onTreeRemove?.(record)}
             >
-              Remove
+              {removeButtonLabel}
             </Button>
           ) : (
             <Button
@@ -148,7 +166,7 @@ const TreeTable: React.FC<TreeTableProps> = ({
               disabled={selectedTrees.findIndex(item => item.id === record.id) !== -1 || !canSelectMore()}
               onClick={() => onTreeSelect?.(record)}
             >
-              Select
+              {selectButtonLabel}
             </Button>
           )
         ) : null}
@@ -167,68 +185,105 @@ const TreeTable: React.FC<TreeTableProps> = ({
       {!hideTitle && (
         <Box sx={{ p: 2, pb: 1 }}>
           <Box display="flex" justifyContent="space-between" alignItems="center" mb={1}>
-            <Typography variant="h6" component="div">
-              {title}
-              {total > 0 && (
-                <Chip
-                  label={`${total} total`}
+            <Box display="flex" alignItems="center">
+              <Typography variant="h6" component="div">
+                {title}
+                {total > 0 && (
+                  <Chip
+                    label={`${total} total`}
+                    size="small"
+                    sx={{ ml: 1 }}
+                    variant="outlined"
+                  />
+                )}
+              </Typography>
+            </Box>
+            
+            <Box display="flex" alignItems="center" gap={1}>
+              {/* Action buttons in title area */}
+              {showBulkActions && !isSelectedTable && trees.length > 0 && (
+                <>
+                  {mode === 'batch' && (
+                    <>
+                      <Button
+                        size="small"
+                        onClick={onSelectAll}
+                        disabled={loading || !canSelectMore()}
+                        variant="outlined"
+                        color="primary"
+                      >
+                        {selectAllPageButtonLabel}
+                      </Button>
+                      
+                      <Button
+                        size="small"
+                        onClick={onDeselectAll}
+                        disabled={loading || selectedTrees.length === 0}
+                        variant="outlined"
+                        color="error"
+                      >
+                        Clear All Selected
+                      </Button>
+                    </>
+                  )}
+                  
+                  {/* Select All Filtered Button - Available in both modes */}
+                  {total < 500 ? (
+                    <Button
+                      size="small"
+                      onClick={onSelectAllFiltered}
+                      disabled={loading || !canSelectMore()}
+                      variant="outlined"
+                      color="primary"
+                    >
+                      {selectAllButtonLabel} ({total})
+                    </Button>
+                  ) : (
+                    <Tooltip title="Select All is only available when filtered results are less than 500 trees. Apply filters to reduce the number of trees.">
+                      <span>
+                        <Button
+                          size="small"
+                          disabled={true}
+                          variant="outlined"
+                          color="primary"
+                        >
+                          {selectAllButtonLabel} ({total})
+                        </Button>
+                      </span>
+                    </Tooltip>
+                  )}
+                </>
+              )}
+              
+              {/* Remove All button for selected/associated trees */}
+              {showBulkActions && isSelectedTable && trees.length > 0 && (
+                <Button
                   size="small"
-                  sx={{ ml: 1 }}
+                  onClick={onRemoveAll || onDeselectAll}
+                  disabled={loading || trees.length === 0}
                   variant="outlined"
+                  color="error"
+                >
+                  {removeAllButtonLabel}
+                </Button>
+              )}
+              
+              {mode === 'batch' && !isSelectedTable && (
+                <Chip
+                  label={`${getSelectionStats()} selected`}
+                  color="primary"
+                  size="small"
                 />
               )}
-            </Typography>
-            
-            {mode === 'batch' && (
-              <Chip
-                label={`${getSelectionStats()} selected`}
-                color="primary"
-                size="small"
-              />
-            )}
+            </Box>
           </Box>
 
-          {/* Bulk Actions for available trees */}
-          {showBulkActions && !isSelectedTable && mode === 'batch' && trees.length > 0 && (
-            <Box display="flex" gap={1} flexWrap="wrap" mb={1}>
-              <Button
-                size="small"
-                onClick={onSelectAll}
-                disabled={loading || !canSelectMore()}
-                variant="outlined"
-                color="primary"
-              >
-                Select All on Page
-              </Button>
-              <Button
-                size="small"
-                onClick={onDeselectAll}
-                disabled={loading || selectedTrees.length === 0}
-                variant="outlined"
-                color="error"
-              >
-                Clear All Selected
-              </Button>
-              {maxSelection && (
-                <Typography variant="caption" component="span" sx={{ alignSelf: 'center', ml: 1 }}>
-                  Max: {maxSelection} trees
-                </Typography>
-              )}
-            </Box>
-          )}
-
-          {/* Bulk Actions for selected trees */}
-          {showBulkActions && isSelectedTable && mode === 'batch' && selectedTrees.length > 0 && (
-            <Box display="flex" gap={1} flexWrap="wrap" mb={1}>
-              <Button
-                size="small"
-                onClick={onDeselectAll}
-                disabled={loading || selectedTrees.length === 0}
-                variant="outlined"
-                color="error"
-              >
-                Remove All
-              </Button>
+          {/* Max selection info */}
+          {maxSelection && !isSelectedTable && (
+            <Box mb={1}>
+              <Typography variant="caption" component="span" color="text.secondary">
+                Max: {maxSelection} trees
+              </Typography>
             </Box>
           )}
         </Box>
@@ -246,7 +301,7 @@ const TreeTable: React.FC<TreeTableProps> = ({
           onPaginationChange={handlePagination}
           onDownload={async () => trees}
           tableName={title.replace(/\s+/g, '_')}
-          scroll={{ y: 400 }}
+          scroll={scrollHeight === 'auto' ? undefined : { y: scrollHeight }}
           footer={false}
         />
       </Box>

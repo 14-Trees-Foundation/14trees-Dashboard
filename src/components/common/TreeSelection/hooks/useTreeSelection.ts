@@ -75,6 +75,42 @@ export const useTreeSelection = ({
     }
   }, [selectedTrees, onSelectedTreesChange, maxSelection, isTreeSelected]);
 
+  const handleSelectAllFiltered = useCallback((allFilteredTrees: Tree[]) => {
+    if (!maxSelection) {
+      // No limit, select all filtered trees
+      const newSelection = [...selectedTrees];
+      allFilteredTrees.forEach(tree => {
+        if (!isTreeSelected(tree)) {
+          newSelection.push({ ...tree, tree_id: tree.id });
+        }
+      });
+      onSelectedTreesChange(newSelection);
+      toast.success(`Selected ${allFilteredTrees.filter(tree => !isTreeSelected(tree)).length} trees`);
+      return;
+    }
+
+    // With limit, select up to the maximum
+    const remainingSlots = maxSelection - selectedTrees.length;
+    if (remainingSlots <= 0) {
+      toast.warning(`Already selected maximum ${maxSelection} trees`);
+      return;
+    }
+
+    const treesToAdd = allFilteredTrees
+      .filter(tree => !isTreeSelected(tree))
+      .slice(0, remainingSlots)
+      .map(tree => ({ ...tree, tree_id: tree.id }));
+
+    const newSelection = [...selectedTrees, ...treesToAdd];
+    onSelectedTreesChange(newSelection);
+
+    if (treesToAdd.length < allFilteredTrees.filter(tree => !isTreeSelected(tree)).length) {
+      toast.info(`Selected ${treesToAdd.length} trees (maximum ${maxSelection} reached)`);
+    } else {
+      toast.success(`Selected ${treesToAdd.length} trees`);
+    }
+  }, [selectedTrees, onSelectedTreesChange, maxSelection, isTreeSelected]);
+
   const handleDeselectAll = useCallback(() => {
     onSelectedTreesChange([]);
   }, [onSelectedTreesChange]);
@@ -121,6 +157,7 @@ export const useTreeSelection = ({
     handleTreeSelect,
     handleTreeRemove,
     handleSelectAll,
+    handleSelectAllFiltered,
     handleDeselectAll,
     handleBulkSelect,
     getSelectionStats,

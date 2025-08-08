@@ -16,24 +16,43 @@ interface AssociatedTreesListProps {
   loading: boolean;
   associatedTrees: Tree[];
   onDissociateTree: (treeId: number) => Promise<void>;
+  onRemoveAll?: () => Promise<void>;
   title?: string;
   emptyMessage?: string;
+  removeButtonLabel?: string;
+  removeAllButtonLabel?: string;
 }
 
 const AssociatedTreesList: React.FC<AssociatedTreesListProps> = ({
   loading,
   associatedTrees,
   onDissociateTree,
+  onRemoveAll,
   title = 'Associated Trees',
   emptyMessage = 'No trees associated yet. Use the tree selection panel to associate trees.',
+  removeButtonLabel = 'Remove',
+  removeAllButtonLabel = 'Remove All',
 }) => {
   const theme = useTheme();
 
   return (
     <Box p={2} sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
-      <Typography variant="h6" gutterBottom>
-        {title} ({associatedTrees.length})
-      </Typography>
+      <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
+        <Typography variant="h6">
+          {title} ({associatedTrees.length})
+        </Typography>
+        {onRemoveAll && associatedTrees.length > 0 && (
+          <Button
+            size="small"
+            onClick={onRemoveAll}
+            disabled={loading}
+            variant="outlined"
+            color="error"
+          >
+            {removeAllButtonLabel}
+          </Button>
+        )}
+      </Box>
       
       {loading ? (
         <Box display="flex" justifyContent="center" p={2}>
@@ -94,7 +113,7 @@ const AssociatedTreesList: React.FC<AssociatedTreesListProps> = ({
                   onClick={() => onDissociateTree(tree.id)}
                   disabled={loading}
                 >
-                  Remove
+                  {removeButtonLabel}
                 </Button>
               </ListItem>
             ))}

@@ -38,6 +38,8 @@ const EventTreeAssociation: React.FC<EventTreeAssociationProps> = ({
     selectedTrees,
     handleTreesChange,
     handleDissociateTree,
+    handleRemoveAll,
+    refreshTrigger,
   } = useEventTreeAssociation({ eventId, open });
 
   return (
@@ -91,8 +93,11 @@ const EventTreeAssociation: React.FC<EventTreeAssociationProps> = ({
             selectedTrees={selectedTrees}
             onTreesChange={handleTreesChange}
             onDissociateTree={handleDissociateTree}
+            onRemoveAll={handleRemoveAll}
             associatedTreesTitle="Associated Trees"
             emptyMessage="No trees associated with this event yet. Use the tree selection panel to associate trees."
+            removeButtonLabel="Dissociate"
+            removeAllButtonLabel="Dissociate All"
           />
         ) : (
           <VerticalLayout
@@ -101,9 +106,12 @@ const EventTreeAssociation: React.FC<EventTreeAssociationProps> = ({
             selectedTrees={selectedTrees}
             onTreesChange={handleTreesChange}
             onDissociateTree={handleDissociateTree}
+            onRemoveAll={handleRemoveAll}
             associatedTreesTitle="Associated Trees"
             availableTreesTitle="Available Trees"
             emptyMessage="No trees associated with this event yet. Use the tree selection section below to associate trees."
+            removeButtonLabel="Dissociate"
+            removeAllButtonLabel="Dissociate All"
           />
         )}
       </DialogContent>

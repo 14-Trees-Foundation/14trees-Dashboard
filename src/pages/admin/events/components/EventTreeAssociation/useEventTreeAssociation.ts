@@ -13,6 +13,7 @@ export const useEventTreeAssociation = ({ eventId, open }: UseEventTreeAssociati
   const [loading, setLoading] = useState(false);
   const [associatedTrees, setAssociatedTrees] = useState<Tree[]>([]);
   const [selectedTrees, setSelectedTrees] = useState<UnifiedTree[]>([]);
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
   const apiClient = new ApiClient();
 
   // Load associated trees when dialog opens
@@ -91,8 +92,9 @@ export const useEventTreeAssociation = ({ eventId, open }: UseEventTreeAssociati
         toast.success(`${deselected.length} tree${deselected.length !== 1 ? 's' : ''} dissociated successfully!`);
       }
 
-      // Refresh associated trees
+      // Refresh associated trees and trigger tree data refresh
       await loadAssociatedTrees();
+      setRefreshTrigger(prev => prev + 1);
     } catch (error: any) {
       console.error('Failed to update tree associations:', error);
       toast.error(`Failed to update tree associations: ${error.message}`);
@@ -115,11 +117,42 @@ export const useEventTreeAssociation = ({ eventId, open }: UseEventTreeAssociati
       // Remove from selected trees if it was selected
       setSelectedTrees(prev => prev.filter(t => t.id !== treeId));
       
-      // Refresh associated trees
+      // Refresh associated trees and trigger tree data refresh
       await loadAssociatedTrees();
+      setRefreshTrigger(prev => prev + 1);
     } catch (error: any) {
       console.error('Failed to dissociate tree:', error);
       toast.error(`Failed to dissociate tree: ${error.message}`);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleRemoveAll = async () => {
+    if (!eventId) {
+      toast.error('Cannot remove all trees: Event ID is missing');
+      return;
+    }
+
+    if (associatedTrees.length === 0) {
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const treeIds = associatedTrees.map(tree => tree.id);
+      await apiClient.events.dissociateTreesFromEvent(eventId, treeIds);
+      toast.success(`${associatedTrees.length} tree${associatedTrees.length !== 1 ? 's' : ''} removed successfully!`);
+      
+      // Clear selected trees
+      setSelectedTrees([]);
+      
+      // Refresh associated trees and trigger tree data refresh
+      await loadAssociatedTrees();
+      setRefreshTrigger(prev => prev + 1);
+    } catch (error: any) {
+      console.error('Failed to remove all trees:', error);
+      toast.error(`Failed to remove all trees: ${error.message}`);
     } finally {
       setLoading(false);
     }
@@ -131,6 +164,8 @@ export const useEventTreeAssociation = ({ eventId, open }: UseEventTreeAssociati
     selectedTrees,
     handleTreesChange,
     handleDissociateTree,
+    handleRemoveAll,
+    refreshTrigger,
     loadAssociatedTrees
   };
 };

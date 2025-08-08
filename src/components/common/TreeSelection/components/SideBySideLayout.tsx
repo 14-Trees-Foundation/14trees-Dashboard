@@ -11,10 +11,13 @@ interface SideBySideLayoutProps {
   selectedTrees: Tree[];
   onTreesChange: (trees: Tree[]) => Promise<void>;
   onDissociateTree: (treeId: number) => Promise<void>;
+  onRemoveAll?: () => Promise<void>;
   treeScope?: 'giftable' | 'all';
   presetType?: keyof typeof import('../utils/presets').TREE_SELECTION_PRESETS;
   associatedTreesTitle?: string;
   emptyMessage?: string;
+  removeButtonLabel?: string;
+  removeAllButtonLabel?: string;
 }
 
 const SideBySideLayout: React.FC<SideBySideLayoutProps> = ({
@@ -23,10 +26,13 @@ const SideBySideLayout: React.FC<SideBySideLayoutProps> = ({
   selectedTrees,
   onTreesChange,
   onDissociateTree,
+  onRemoveAll,
   treeScope = 'all',
   presetType = 'EVENT_ASSOCIATION',
   associatedTreesTitle = 'Associated Trees',
   emptyMessage = 'No trees associated yet. Use the tree selection panel to associate trees.',
+  removeButtonLabel = 'Remove',
+  removeAllButtonLabel = 'Remove All',
 }) => {
   const theme = useTheme();
 
@@ -38,8 +44,11 @@ const SideBySideLayout: React.FC<SideBySideLayoutProps> = ({
           loading={loading}
           associatedTrees={associatedTrees}
           onDissociateTree={onDissociateTree}
+          onRemoveAll={onRemoveAll}
           title={associatedTreesTitle}
           emptyMessage={emptyMessage}
+          removeButtonLabel={removeButtonLabel}
+          removeAllButtonLabel={removeAllButtonLabel}
         />
       </Grid>
 
