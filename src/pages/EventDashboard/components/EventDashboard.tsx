@@ -198,7 +198,11 @@ const EventDashboard: React.FC<EventDashboardProps> = ({ event, eventMessages })
                         {event.type === "2" ? "Memorial Trees" : "Event Trees"}
                     </Typography>
                     <Box sx={{ maxWidth: "100%" }}>
-                        <EventTrees eventId={event.id} eventType={event.type} />
+                        <EventTrees 
+                            eventId={event.id} 
+                            eventType={event.type} 
+                            defaultViewMode={event.default_tree_view_mode || 'profile'}
+                        />
                     </Box>
                 </Box>
             </Box>

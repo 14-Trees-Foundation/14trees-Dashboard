@@ -21,6 +21,7 @@ export const useEventForm = (mode, existingEvent) => {
                 site_id: existingEvent.site_id || '',
                 message: existingEvent.message || '',
                 tags: existingEvent.tags || '',
+                default_tree_view_mode: existingEvent.default_tree_view_mode || 'profile',
                 // Load existing images and memories from the event
                 images: existingEvent.images || [],
                 memories: existingEvent.memories || [],
@@ -35,6 +36,7 @@ export const useEventForm = (mode, existingEvent) => {
             site_id: '',
             message: '',
             tags: '',
+            default_tree_view_mode: 'profile',
             images: [],
             memories: [],
         };

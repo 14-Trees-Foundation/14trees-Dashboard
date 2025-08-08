@@ -10,10 +10,11 @@ import { Search } from "@mui/icons-material";
 interface EventTreesProps {
     eventId: number,
     eventType: string,
+    defaultViewMode?: 'illustrations' | 'profile',
 }
 
 
-const EventTrees: React.FC<EventTreesProps> = ({ eventId, eventType }) => {
+const EventTrees: React.FC<EventTreesProps> = ({ eventId, eventType, defaultViewMode = 'profile' }) => {
 
     const isMobile = useMediaQuery("(max-width:600px)");
     const [loading, setLoading] = useState(false);
@@ -21,7 +22,7 @@ const EventTrees: React.FC<EventTreesProps> = ({ eventId, eventType }) => {
     const [page, setPage] = useState(0);
     const [pageSize, setPageSize] = useState(20);
     const [total, setTotal] = useState(20);
-    const [imageMode, setImageMode] = useState(false);
+    const [imageMode, setImageMode] = useState(defaultViewMode === 'illustrations');
     const [searchStr, setSearchStr] = useState('');
 
     useEffect(() => {

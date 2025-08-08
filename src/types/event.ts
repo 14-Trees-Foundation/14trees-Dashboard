@@ -17,6 +17,7 @@ export type Event = {
   message: string | null,
   event_location: EventLocation,
   link: string,
+  default_tree_view_mode?: 'illustrations' | 'profile',
 };
 
 export type EventMessage = {
