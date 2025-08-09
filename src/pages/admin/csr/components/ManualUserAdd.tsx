@@ -281,9 +281,9 @@ const ManualUserAdd: React.FC<ManualUserAddProps> = ({
                                                 <Tooltip title="Image not found"><ImageIcon color="error" /></Tooltip>
                                             ) : "-"}
                                         </TableCell>
-                                        {showEventFields && <TableCell>{user.event_name} || "-"</TableCell>}
-                                        {showEventFields && <TableCell>{user.gifted_by} || "-"</TableCell>}
-                                        {showEventFields && <TableCell>{user.gifted_on} || "-"</TableCell>}
+                                        {showEventFields && <TableCell>{user.event_name || "-"}</TableCell>}
+                                        {showEventFields && <TableCell>{user.gifted_by || "-"}</TableCell>}
+                                        {showEventFields && <TableCell>{user.gifted_on || "-"}</TableCell>}
                                         <TableCell>
                                             <Tooltip title="Edit"><IconButton onClick={() => handleEditUser(idx)} size="small"><EditIcon fontSize="small" /></IconButton></Tooltip>
                                             <Tooltip title="Delete"><IconButton onClick={() => handleRemoveUser(idx)} size="small" color="error"><DeleteIcon fontSize="small" /></IconButton></Tooltip>
