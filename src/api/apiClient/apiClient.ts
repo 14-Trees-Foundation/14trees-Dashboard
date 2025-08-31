@@ -24,6 +24,7 @@ import { GiftRedeemTransaction } from '../../types/gift_redeem_transaction';
 import { Campaign } from '../../types/campaign';
 import { SortOrder } from 'antd/es/table/interface';
 import { GridFilterItem } from '@mui/x-data-grid';
+import EventsApiClient from '../events/eventsApiClient';
 
 
 class ApiClient {
@@ -1816,35 +1817,7 @@ class ApiClient {
         }
     }
 
-    /*
-        Model- Event : CRUD Operations/Apis for Event
-    */
 
-    async getEvents(offset: number, limit: number, filters?: any[]): Promise<PaginatedResponse<Event>> {
-        const url = `/events/get?offset=${offset}&limit=${limit}`;
-        try {
-            const response = await this.api.post<PaginatedResponse<Event>>(url, { filters: filters });
-            return response.data;
-        } catch (error: any) {
-            if (error.response?.data?.message) {
-                throw new Error(error.response.data.message);
-            }
-            throw new Error("Faield fetch events");
-        }
-    }
-
-    async getEventMessages(event_link: string): Promise<EventMessage[]> {
-        const url = `/events/messages/${event_link}`;
-        try {
-            const response = await this.api.get<EventMessage[]>(url);
-            return response.data;
-        } catch (error: any) {
-            if (error.response?.data?.message) {
-                throw new Error(error.response.data.message);
-            }
-            throw new Error("Faield fetch event messages");
-        }
-    }
 
 
     /*
@@ -3068,6 +3041,11 @@ class ApiClient {
             }
             throw new Error('Failed to get user roles');
         }
+    }
+
+    // ===== EVENTS API DELEGATION =====
+    get events() {
+        return new EventsApiClient();
     }
 }
 

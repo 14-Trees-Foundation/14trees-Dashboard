@@ -41,7 +41,7 @@ import { Ponds } from "./pages/admin/Ponds/Ponds";
 import { Users } from "./pages/admin/users/Users";
 import { OrganizationComponent } from "./pages/admin/organization/Organization";
 import { VisitsComponent } from "./pages/admin/visits/Visits";
-import { EventsComponent } from "./pages/admin/events/Events";
+import { EventsPage } from "./pages/admin/events/EventsPage";
 import SiteInventory from "./pages/admin/Inventory/SiteInventory";
 
 import GiftTreesComponent from "./pages/admin/gift/GiftTreesRefactored";
@@ -106,7 +106,7 @@ function App() {
             <Route path="people" element={<Users />} />
             <Route path="people-group" element={<OrganizationComponent />} />
             <Route path="visits" element={<VisitsComponent />} />
-            <Route path="events" element={<EventsComponent />} />
+            <Route path="events" element={<EventsPage />} />
             <Route path="site-inventory" element={<SiteInventory />} />
             <Route path="gc-inventory" element={<GCInventory />} />
             <Route path="campaigns" element={<Campaigns />}></Route>

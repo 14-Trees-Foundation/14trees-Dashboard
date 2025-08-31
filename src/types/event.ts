@@ -17,6 +17,7 @@ export type Event = {
   message: string | null,
   event_location: EventLocation,
   link: string,
+  default_tree_view_mode?: 'illustrations' | 'profile',
 };
 
 export type EventMessage = {
@@ -26,9 +27,22 @@ export type EventMessage = {
   user_name: string;
   event_id: number;
   message: string;
+  sequence: number;
   created_at: string;
   updated_at: string;
 };
+
+export interface EventMessageCreationAttributes {
+  event_id: number;
+  message: string;
+  user_id: number; // Required - messenger must be specified
+  sequence?: number; // Optional - will be auto-assigned if not provided
+}
+
+export interface MessageSequenceUpdate {
+  id: number;
+  sequence: number;
+}
 
 export type EventPaginationResponse = {
   total: number,

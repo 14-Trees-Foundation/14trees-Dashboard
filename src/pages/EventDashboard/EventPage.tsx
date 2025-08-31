@@ -16,9 +16,9 @@ async function getEventDetails(linkId: string) {
     try {
         const apiClient = new ApiClient();
 
-        const eventMessages = await apiClient.getEventMessages(linkId);
+        const eventMessages = await apiClient.events.getEventMessages(linkId);
 
-        const resp = await apiClient.getEvents(0, 1, [
+        const resp = await apiClient.events.getEvents(0, 1, [
             { columnField: 'link', operatorValue: 'equals', value: linkId },
         ])
 
