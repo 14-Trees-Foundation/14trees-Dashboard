@@ -139,7 +139,7 @@ const DonationTrees: FC<DonationTreesProps> = ({ open, onClose, donation }) => {
     try {
       const apiClient = new ApiClient();
       const filtersData = Object.values(treeFilters);
-      const response = await apiClient.getGiftAbleTrees(treePage * treePageSize, treePageSize, filtersData);
+      const response = await apiClient.getGiftAbleTrees(treePage * treePageSize, treePageSize, filtersData, true, true);
       setTreeTotal(response.total);
       setTreeTableRows(response.results.map(tree => ({
         ...tree,
