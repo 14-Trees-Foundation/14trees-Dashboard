@@ -136,9 +136,14 @@ const PlotSelection: FC<PlotSelectionProps> = ({
 
     useEffect(() => {
         getPlotData();
-    }, [filters, orderBy]);
+    }, [filters, orderBy, page, pageSize]);
 
     useEffect(() => {
+        console.log("PlotSelection Page useEffect getting invoked with: pageSize, page, plotsData: ", pageSize, page, plotsData);
+        if (!plotsData || !plotsData.totalPlots) {
+            setTableRows([]);
+            return;
+        }
         setLoading(true);
         const records: Plot[] = [];
         const maxLength = Math.min((page + 1) * pageSize, plotsData.totalPlots);
@@ -150,7 +155,6 @@ const PlotSelection: FC<PlotSelectionProps> = ({
                     records.push(record);
                 }
             } else {
-                getPlotData();
                 break;
             }
         }
