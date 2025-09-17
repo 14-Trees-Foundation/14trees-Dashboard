@@ -105,32 +105,34 @@ export const PlotComponent = () => {
   };
 
   const plotsData = useAppSelector((state: RootState) => state.plotsData);
+  const lastFetchRef = useRef<string>("");
 
   useEffect(() => {
     getPlotData();
-  }, [filters, orderBy]);
+  }, [filters, orderBy, page, pageSize]);
 
   useEffect(() => {
+    if (!plotsData || !plotsData.totalPlots) {
+      setTableRows([]);
+      return;
+    }
     const records: Plot[] = [];
     const maxLength = Math.min((page + 1) * pageSize, plotsData.totalPlots);
     for (let i = page * pageSize; i < maxLength; i++) {
       if (Object.hasOwn(plotsData.paginationMapping, i)) {
         const id = plotsData.paginationMapping[i];
         const record = plotsData.plots[id];
-        if (record) {
-          records.push(record);
-        }
+        if (record) records.push(record);
       } else {
-        getPlotData();
+        // Missing items for this page; wait for fetch effect to populate
         break;
       }
     }
-
     setTableRows(records);
   }, [pageSize, page, plotsData]);
 
   const getPlotData = async () => {
-    setLoading(true);
+    // Build request payload and de-duplicate identical in-flight requests
     let filtersData = JSON.parse(JSON.stringify(Object.values(filters))) as GridFilterItem[];
 
     const accessibilityIdx = filtersData.findIndex(item => item.columnField === 'accessibility_status');
@@ -149,6 +151,16 @@ export const PlotComponent = () => {
       })
     }
 
+    const reqKey = JSON.stringify({
+      offset: page * pageSize,
+      limit: pageSize,
+      filters: filtersData,
+      orderBy: orderBy,
+    });
+    if (lastFetchRef.current === reqKey) return; // prevent duplicate calls with same params
+    lastFetchRef.current = reqKey;
+
+    setLoading(true);
     getPlots(page * pageSize, pageSize, filtersData, orderBy);
     setTimeout(async () => {
       setLoading(false);
