@@ -108,6 +108,7 @@ const EventDashboard: React.FC<EventDashboardProps> = ({ event, eventMessages })
             sx={isMobile ? {
                 width: "100vw",
                 overflow: "hidden",
+                paddingTop: "16px",
             } : undefined}
         >
             {/* Header */}
@@ -115,7 +116,7 @@ const EventDashboard: React.FC<EventDashboardProps> = ({ event, eventMessages })
                 sx={{
                     position: "relative",
                     width: "100%",
-                    padding: isMobile ? "4px" : "10px",
+                    padding: isMobile ? "16px 8px 12px" : "10px",
                     display: 'flex',
                     justifyContent: isMobile ? 'center' : 'flex-start'
                 }}
@@ -127,6 +128,8 @@ const EventDashboard: React.FC<EventDashboardProps> = ({ event, eventMessages })
                     color={"#323232"}
                     flexWrap={"wrap"}
                     textAlign={isMobile ? "center" : "left"}
+                    // sx={{ px: isMobile ? 1.5 : 0 }}
+                    // sx={{ mx: isMobile ? 0.8 : 0 }} 
                 >
                     {event.name} Dashboard
                 </Typography>
