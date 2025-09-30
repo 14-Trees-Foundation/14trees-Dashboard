@@ -39,12 +39,28 @@ async function getEventDetails(linkId: string) {
     }
 }
 
+const DEFAULT_BACKGROUND_COLOR = "rgb(114 143 121 / 48%)";
+
+const BACKGROUND_COLOR_BY_LINK_ID: Record<string, string> = {
+    "jjaqyf4c": "#962424",
+};
+
+const DEFAULT_SHOW_DRAWER = true;
+
+const SHOW_DRAWER_BY_LINK_ID: Record<string, boolean> = {
+    "jjaqyf4c": false,
+};
+
 const EventPage: React.FC = () => {
 
     const { linkId } = useParams();
     const classes = useStyles();
     const isMobile = useMediaQuery("(max-width:600px)");
     const [loading, setLoading] = useState(true);
+    const backgroundColor = linkId && BACKGROUND_COLOR_BY_LINK_ID[linkId]
+        ? BACKGROUND_COLOR_BY_LINK_ID[linkId]
+        : DEFAULT_BACKGROUND_COLOR;
+    const shouldShowDrawer = !isMobile && ((linkId ? SHOW_DRAWER_BY_LINK_ID[linkId] : undefined) ?? DEFAULT_SHOW_DRAWER);
     const [event, setEvent] = useState<Event | null>(null);
     const [eventMessages, setEventMessages] = useState<EventMessage[]>([]);
     const [index, setIndex] = useRecoilState(navIndex);
@@ -116,17 +132,19 @@ const EventPage: React.FC = () => {
         : event === null
             ? <NotFound />
             : (
-                <Box style={{ display: "flex", backgroundColor: 'rgb(114 143 121 / 48%)' }} >
-                    {!isMobile && <Drawer
-                        className={classes.mdrawer}
-                        variant="persistent"
-                        anchor="left"
-                        open={true}
-                    >
-                        <Divider />
-                        <img className={classes.logo} alt={"logo"} src={logo} />
-                        {menuitem()}
-                    </Drawer>}
+                <Box style={{ display: "flex", backgroundColor }} >
+                    {shouldShowDrawer && (
+                        <Drawer
+                            className={classes.mdrawer}
+                            variant="persistent"
+                            anchor="left"
+                            open={true}
+                        >
+                            <Divider />
+                            <img className={classes.logo} alt={"logo"} src={logo} />
+                            {menuitem()}
+                        </Drawer>
+                    )}
                     <Box style={{ padding: isMobile ? 0 : 10, flexGrow: 1 }}>
                         {mainBox()}
                     </Box>

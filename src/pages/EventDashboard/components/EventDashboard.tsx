@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Box, Typography, Divider, useMediaQuery } from "@mui/material";
 import logo from "../../../assets/icon_round.png";
+import loriFayzanDashboardImage from "../../../assets/event-dashboard/Lori_Fayzan_Dashboard.jpg";
 import { createStyles, makeStyles } from "@mui/styles";
 import { Event, EventMessage } from "../../../types/event";
 import { EventImage } from "../../../types/eventImage";
@@ -14,6 +15,33 @@ interface EventDashboardProps {
     event: Event;
     eventMessages: EventMessage[];
 }
+
+interface EventDashboardLinkConfig {
+    showFeaturedImage?: boolean;
+    featuredImageSrc?: string;
+    featuredImageAlt?: string;
+    featuredImageWrapperSx?: Record<string, any>;
+    featuredImageStyles?: React.CSSProperties;
+    hideHeader?: boolean;
+    memoriesHeadingText?: string;
+    memoriesHeadingColor?: string;
+    memoriesHeadingAlign?: React.CSSProperties["textAlign"];
+    treesHeadingText?: string;
+    treesHeadingColor?: string;
+}
+
+const EVENT_DASHBOARD_CONFIG_BY_LINK_ID: Record<string, EventDashboardLinkConfig> = {
+    "jjaqyf4c": {
+        showFeaturedImage: true,
+        featuredImageSrc: loriFayzanDashboardImage,
+        hideHeader: true,
+        memoriesHeadingText: "We’re planting 7 types of native trees",
+        memoriesHeadingColor: "#EC7544",
+        memoriesHeadingAlign: "center",
+        treesHeadingText: "Find your family tree!",
+        treesHeadingColor: "#EC7544",
+    },
+};
 
 const useStyles = makeStyles((theme: any) =>
     createStyles({
@@ -61,6 +89,13 @@ const useStyles = makeStyles((theme: any) =>
             boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
             backgroundColor: "white",
         },
+        featuredImage: {
+            width: "100%",
+            maxWidth: "960px",
+            borderRadius: "24px",
+            objectFit: "cover",
+            boxShadow: "0 10px 30px rgba(0, 0, 0, 0.15)",
+        },
     }))
 
 const EventDashboard: React.FC<EventDashboardProps> = ({ event, eventMessages }) => {
@@ -71,6 +106,21 @@ const EventDashboard: React.FC<EventDashboardProps> = ({ event, eventMessages })
     const [allEventImages, setAllEventImages] = useState<string[]>([]);
 
     const apiClient = new ApiClient();
+    const linkConfig = EVENT_DASHBOARD_CONFIG_BY_LINK_ID[event.link ?? ""] ?? {};
+    const shouldRenderFeaturedImage = Boolean(linkConfig.showFeaturedImage && linkConfig.featuredImageSrc);
+    const featuredImageWrapperSx = {
+        display: "flex",
+        justifyContent: "center",
+        padding: isMobile ? "8px 8px 0" : "16px 16px 0",
+        ...(linkConfig.featuredImageWrapperSx ?? {}),
+    };
+    const featuredImageAlt = linkConfig.featuredImageAlt ?? `${event.name} featured`;
+    const memoriesHeadingText = linkConfig.memoriesHeadingText ?? (event.type === "2" ? "Memories" : "Event Memories");
+    const memoriesHeadingColor = linkConfig.memoriesHeadingColor;
+    const memoriesHeadingAlign = linkConfig.memoriesHeadingAlign ?? (isMobile ? "center" : "left");
+    const treesHeadingText = linkConfig.treesHeadingText ?? (event.type === "2" ? "Memorial Trees" : "Event Trees");
+    const treesHeadingColor = linkConfig.treesHeadingColor;
+    const shouldHideHeader = linkConfig.hideHeader ?? false;
 
     useEffect(() => {
         const fetchEventImages = async () => {
@@ -111,30 +161,41 @@ const EventDashboard: React.FC<EventDashboardProps> = ({ event, eventMessages })
                 paddingTop: "16px",
             } : undefined}
         >
-            {/* Header */}
-            <Box
-                sx={{
-                    position: "relative",
-                    width: "100%",
-                    padding: isMobile ? "16px 8px 12px" : "10px",
-                    display: 'flex',
-                    justifyContent: isMobile ? 'center' : 'flex-start'
-                }}
-            >
-                <img src={logo} alt={logo} className={classes.img} />
-                <Typography
-                    mb={1}
-                    variant={isMobile ? "h5" : "h4"}
-                    color={"#323232"}
-                    flexWrap={"wrap"}
-                    textAlign={isMobile ? "center" : "left"}
-                    // sx={{ px: isMobile ? 1.5 : 0 }}
-                    // sx={{ mx: isMobile ? 0.8 : 0 }} 
-                >
-                    {event.name} Dashboard
-                </Typography>
-            </Box>
-            <Divider />
+            {shouldRenderFeaturedImage && (
+                <Box sx={featuredImageWrapperSx}>
+                    <img
+                        src={linkConfig.featuredImageSrc}
+                        alt={featuredImageAlt}
+                        className={classes.featuredImage}
+                        style={linkConfig.featuredImageStyles}
+                    />
+                </Box>
+            )}
+            {!shouldHideHeader && (
+                <>
+                    <Box
+                        sx={{
+                            position: "relative",
+                            width: "100%",
+                            padding: isMobile ? "16px 8px 12px" : "10px",
+                            display: "flex",
+                            justifyContent: isMobile ? "center" : "flex-start",
+                        }}
+                    >
+                        <img src={logo} alt={logo} className={classes.img} />
+                        <Typography
+                            mb={1}
+                            variant={isMobile ? "h5" : "h4"}
+                            color={"#323232"}
+                            flexWrap={"wrap"}
+                            textAlign={isMobile ? "center" : "left"}
+                        >
+                            {event.name} Dashboard
+                        </Typography>
+                    </Box>
+                    <Divider />
+                </>
+            )}
 
             {/* Scrollable Content */}
             <Box className={classes.content}>
@@ -173,14 +234,19 @@ const EventDashboard: React.FC<EventDashboardProps> = ({ event, eventMessages })
                                 variant={isMobile ? "h6" : "h5"}
                                 fontWeight={500}
                                 gutterBottom
-                                textAlign={isMobile ? "center" : "left"}
+                                textAlign={memoriesHeadingAlign}
+                                color={memoriesHeadingColor}
                             >
-                                {event.type === "2" ? "" : "Event"} Memories
+                                {/* {event.type === "2" ? "" : "Event"} Memories */}
+                                {memoriesHeadingText}
                             </Typography>
                             <Box
                                 sx={{
                                     overflow: "hidden",
                                     height: isMobile ? "250px" : "420px",
+                                    display: "flex",
+                                    justifyContent: "center",
+                                    alignItems: "center",
                                 }}
                             >
                                 <EventMemories imageUrls={allEventImages} />
@@ -197,12 +263,15 @@ const EventDashboard: React.FC<EventDashboardProps> = ({ event, eventMessages })
                         fontWeight={500}
                         gutterBottom
                         textAlign={isMobile ? "center" : "left"}
+                        color={treesHeadingColor}
                     >
-                        {event.type === "2" ? "Memorial Trees" : "Event Trees"}
+                        {/* {event.type === "2" ? "Memorial Trees" : "Event Trees"} */}
+                        {treesHeadingText}
                     </Typography>
                     <Box sx={{ maxWidth: "100%" }}>
                         <EventTrees 
                             eventId={event.id} 
+                            eventLinkId={event.link}
                             eventType={event.type} 
                             defaultViewMode={event.default_tree_view_mode || 'profile'}
                         />

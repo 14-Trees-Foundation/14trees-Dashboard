@@ -1,7 +1,7 @@
-import { Box, Button, FormControl, FormControlLabel, FormGroup, IconButton, InputBase, Paper, Radio, useMediaQuery } from "@mui/material"
-import CardGrid from "../../../components/CardGrid";
+import { Box, FormControl, FormControlLabel, FormGroup, IconButton, InputBase, Paper, Radio, useMediaQuery } from "@mui/material"
+import CardGrid, { CardGridTheme } from "../../../components/CardGrid";
 import { Tree } from "../../../types/tree";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { toast } from "react-toastify";
 import ApiClient from "../../../api/apiClient/apiClient";
 import { LoadingButton } from "@mui/lab";
@@ -9,12 +9,41 @@ import { Search } from "@mui/icons-material";
 
 interface EventTreesProps {
     eventId: number,
+    eventLinkId?: string,
     eventType: string,
     defaultViewMode?: 'illustrations' | 'profile',
 }
 
+interface EventTreesLinkConfig {
+    formControlColor?: string;
+    loadingButtonSx?: Record<string, unknown>;
+    loadingButtonColor?: "inherit" | "primary" | "secondary" | "success" | "info" | "warning" | "error";
+    cardTheme?: CardGridTheme;
+}
 
-const EventTrees: React.FC<EventTreesProps> = ({ eventId, eventType, defaultViewMode = 'profile' }) => {
+const DEFAULT_FORM_CONTROL_COLOR = "success";
+const DEFAULT_LOADING_BUTTON_COLOR: EventTreesLinkConfig["loadingButtonColor"] = "success";
+const DEFAULT_THEME_COLOR = "#3f5344";
+
+const EVENT_TREES_CONFIG_BY_LINK_ID: Record<string, EventTreesLinkConfig> = {
+    "jjaqyf4c": {
+        formControlColor: "#EC7544",
+        loadingButtonSx: {
+            backgroundcolor: "#EC7544",
+            "&:hover": { backgroundColor: "#EC7544" },
+        },
+        loadingButtonColor: undefined,
+        cardTheme: {
+            // coverBackgroundColor: "#EC7544",
+            // contentBackgroundColor: "#EC7544",
+            // nameColor: "#ffffff",
+            // typeColor: "#ffffff",
+            // linkColor: "#ffffff",
+        },
+    },
+};
+
+const EventTrees: React.FC<EventTreesProps> = ({ eventId, eventLinkId, eventType, defaultViewMode = 'profile' }) => {
 
     const isMobile = useMediaQuery("(max-width:600px)");
     const [loading, setLoading] = useState(false);
@@ -24,6 +53,22 @@ const EventTrees: React.FC<EventTreesProps> = ({ eventId, eventType, defaultView
     const [total, setTotal] = useState(20);
     const [imageMode, setImageMode] = useState(defaultViewMode === 'illustrations');
     const [searchStr, setSearchStr] = useState('');
+
+    const linkIdKey = eventLinkId ?? "";
+    const linkConfig = EVENT_TREES_CONFIG_BY_LINK_ID[linkIdKey] ?? {};
+    const formControlColorOverride = linkConfig.formControlColor;
+    const formControlColor = formControlColorOverride ?? DEFAULT_THEME_COLOR;
+    const radioColorProp = formControlColorOverride ? undefined : DEFAULT_FORM_CONTROL_COLOR;
+    const radioSx = formControlColorOverride
+        ? { color: formControlColor, '&.Mui-checked': { color: formControlColor } }
+        : undefined;
+    const labelSx = formControlColorOverride ? { color: formControlColor } : undefined;
+    const loadingButtonColor = linkConfig.loadingButtonColor ?? DEFAULT_LOADING_BUTTON_COLOR;
+    const loadingButtonSx = linkConfig.loadingButtonSx;
+
+    const cardGridTheme: CardGridTheme | undefined = useMemo(() => {
+        return linkConfig.cardTheme;
+    }, [linkConfig]);
 
     useEffect(() => {
         setPage(0);
@@ -80,15 +125,31 @@ const EventTrees: React.FC<EventTreesProps> = ({ eventId, eventType, defaultView
                     <FormGroup aria-label="position" row>
                         <FormControlLabel
                             value="illustrations"
-                            control={<Radio color="success" checked={imageMode} onChange={() => { setImageMode(true) }} />}
+                            control={
+                                <Radio
+                                    color={radioColorProp}
+                                    sx={radioSx}
+                                    checked={imageMode}
+                                    onChange={() => { setImageMode(true) }}
+                                />
+                            }
                             label={eventType === "2" ? "Blossoms of Legacy" : "Illustrations"}
                             labelPlacement="end"
+                            sx={labelSx}
                         />
                         <FormControlLabel
                             value="profile"
-                            control={<Radio color="success" checked={!imageMode} onChange={() => { setImageMode(false) }} />}
+                            control={
+                                <Radio
+                                    color={radioColorProp}
+                                    sx={radioSx}
+                                    checked={!imageMode}
+                                    onChange={() => { setImageMode(false) }}
+                                />
+                            }
                             label={eventType === "2" ? "Guardians of Memory" : "Profile Images"}
                             labelPlacement="end"
+                            sx={labelSx}
                         />
                     </FormGroup>
                 </FormControl>
@@ -111,6 +172,7 @@ const EventTrees: React.FC<EventTreesProps> = ({ eventId, eventType, defaultView
             <CardGrid
                 loading={loading}
                 padding="24px 0 24px 0"
+                cardTheme={cardGridTheme}
                 cards={trees.map((tree: any) => {
                     let location: string = ''
                     const { hostname, host } = window.location;
@@ -139,8 +201,9 @@ const EventTrees: React.FC<EventTreesProps> = ({ eventId, eventType, defaultView
                 <LoadingButton
                     loading={loading}
                     variant="contained"
-                    color="success"
+                    color={loadingButtonColor}
                     onClick={() => { setPage(prev => prev + 1) }}
+                    {...loadingButtonSx}
                 >
                     Load More Trees
                 </LoadingButton>

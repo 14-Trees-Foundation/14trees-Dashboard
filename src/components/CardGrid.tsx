@@ -16,15 +16,31 @@ type CardData = {
     dashboardLink: string;
 };
 
+export type CardGridTheme = {
+    coverBackgroundColor?: string;
+    contentBackgroundColor?: string;
+    nameColor?: string;
+    typeColor?: string;
+    linkColor?: string;
+};
+
 interface CardGridProps {
     loading?: boolean
     cards: CardData[]
     padding?: number | string
+    cardTheme?: CardGridTheme
 }
 
-const CardGrid: React.FC<CardGridProps> = ({ cards, loading, padding = 3 }) => {
+const CardGrid: React.FC<CardGridProps> = ({ cards, loading, padding = 3, cardTheme }) => {
 
     const classes = useStyle();
+    const {
+        coverBackgroundColor,
+        contentBackgroundColor,
+        nameColor,
+        typeColor,
+        linkColor,
+    } = cardTheme ?? {};
 
     return !loading && cards.length === 0 ? (
         <Box height='60vh' display="flex" alignItems="center" justifyContent="center">
@@ -37,21 +53,48 @@ const CardGrid: React.FC<CardGridProps> = ({ cards, loading, padding = 3 }) => {
                     <Card
                         hoverable
                         className={classes.customCard}
-                        style={{ 
-                            backgroundColor: '#b7edc47a', 
-                            border: 'none', 
-                            overflow: 'hidden', 
+                        style={{
+                            backgroundColor: '#b7edc47a',
+                            border: 'none',
+                            overflow: 'hidden',
                             borderRadius: '20px',
                             transition: 'background-color 0.3s',
                         }}
                         onClick={() => { window.open(card.dashboardLink) }}
-                        cover={<img height={240} alt={card.type} src={card.image} style={{ backgroundColor: 'white', width: '100%', objectFit: 'contain' }} />}
+                        cover={
+                            <img
+                                height={240}
+                                alt={card.type}
+                                src={card.image}
+                                style={{
+                                    backgroundColor: coverBackgroundColor ?? 'white',
+                                    width: '100%',
+                                    objectFit: 'contain',
+                                }}
+                            />
+                        }
                     >
-                        <div style={{ width: "100%", zIndex: 10 }}>
-                            <Typography variant="h6" gutterBottom noWrap>
+                        <div
+                            style={{
+                                width: "100%",
+                                zIndex: 10,
+                                backgroundColor: contentBackgroundColor,
+                            }}
+                        >
+                            <Typography
+                                variant="h6"
+                                gutterBottom
+                                noWrap
+                                sx={nameColor ? { color: nameColor } : undefined}
+                            >
                                 {card.name}
                             </Typography>
-                            <Typography variant="body2" color="text.secondary" noWrap>
+                            <Typography
+                                variant="body2"
+                                color={typeColor ? undefined : "text.secondary"}
+                                noWrap
+                                sx={typeColor ? { color: typeColor } : undefined}
+                            >
                                 {card.type}
                             </Typography>
                             <Typography
@@ -60,12 +103,12 @@ const CardGrid: React.FC<CardGridProps> = ({ cards, loading, padding = 3 }) => {
                                 target="_blank"
                                 sx={{
                                     mt: 1,
-                                    color: '#3f5344',
+                                    color: linkColor ?? '#3f5344',
                                     textTransform: 'none',
-                                    fontSize: '0.875rem', // Smaller button text
-                                    display: 'inline-flex', // Align text and icon
-                                    alignItems: 'center', // Center text and icon vertically
-                                    textDecoration: 'none', // Remove underline
+                                    fontSize: '0.875rem',
+                                    display: 'inline-flex',
+                                    alignItems: 'center',
+                                    textDecoration: 'none',
                                 }}
                             >
                                 Go to Dashboard <OpenInNew sx={{ ml: 1 }} fontSize='inherit' />
