@@ -236,6 +236,7 @@ const EventDashboard: React.FC<EventDashboardProps> = ({ event, eventMessages })
                                 gutterBottom
                                 textAlign={memoriesHeadingAlign}
                                 color={memoriesHeadingColor}
+                                marginBottom={isMobile ? "1rem" : "2rem"}
                             >
                                 {/* {event.type === "2" ? "" : "Event"} Memories */}
                                 {memoriesHeadingText}
