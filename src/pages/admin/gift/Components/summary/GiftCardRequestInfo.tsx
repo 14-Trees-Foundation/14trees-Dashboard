@@ -14,6 +14,8 @@ import GeneralTable from '../../../../../components/GenTable';
 import ApiClient from '../../../../../api/apiClient/apiClient';
 import { GiftCardUser } from '../../../../../types/gift_card';
 import { getHumanReadableDate } from '../../../../../helpers/utils';
+import getColumnSearchProps from '../../../../../components/Filter';
+import { GridFilterItem } from '@mui/x-data-grid';
 
 interface GiftCardRequestInfoProps {
     open: boolean
@@ -23,25 +25,80 @@ interface GiftCardRequestInfoProps {
 
 const GiftCardRequestInfo: React.FC<GiftCardRequestInfoProps> = ({ open, onClose, data }) => {
 
-    const [users, setUsers] = useState<GiftCardUser[]>([]);
+    // server-side booked trees (replaces previous client-side users list)
+    const [bookedRows, setBookedRows] = useState<any[]>([]);
+    const [bookedTotal, setBookedTotal] = useState<number>(0);
+    const [bookedLoading, setBookedLoading] = useState<boolean>(false);
+    const [bookedPage, setBookedPage] = useState<number>(0);
+    const [bookedPageSize, setBookedPageSize] = useState<number>(10);
     const [recipients, setRecipients] = useState<any[]>([]);
     const [page, setPage] = useState(0);
     const [pageSize, setPageSize] = useState(10);
     const [totalRecipients, setTotalRecipients] = useState(0);
+    const [filters, setFilters] = useState<Record<string, GridFilterItem>>({});
+    const [filtersVersion, setFiltersVersion] = useState<number>(0);
 
     useEffect(() => {
         const fetchData = async () => {
             const apiClient = new ApiClient();
-            const resp = await apiClient.getBookedGiftTrees(data.id, 0, -1);
-            setUsers(resp.results.filter(item => item.sapling_id));
 
-            const recipientsResp = await apiClient.getGiftRequestUsers(data.id);
-            setRecipients(recipientsResp);
-            setTotalRecipients(recipientsResp.length);
+            try {
+                // Use GET-only endpoint that accepts filters serialized into query params
+                const resp = await apiClient.getBookedGiftTreesWithQueryFilters(data.id, 0, 10, []);
+                setBookedRows(resp.results.map((r: any) => ({ ...r, key: r.id })));
+                setBookedTotal(Number(resp.total || resp.results.length));
+            } catch (error: any) {
+                console.error('Failed to fetch booked trees (GET):', error?.message || error);
+            }
+
+            try {
+                const recipientsResp = await apiClient.getGiftRequestUsers(data.id);
+                setRecipients(recipientsResp);
+                setTotalRecipients(recipientsResp.length);
+            } catch (e) {
+                console.error('Failed to fetch recipients', e);
+            }
         }
 
         if (open) fetchData();
     }, [open, data]);
+
+    // when filters change we trigger server-side fetch
+    const handleSetFilters = (newFilters: Record<string, GridFilterItem>) => {
+        setFilters(newFilters);
+        setBookedPage(0);
+        // bump version to ensure the effect runs even if bookedPage was already 0
+        setFiltersVersion(v => v + 1);
+    };
+
+    const getFiltersData = (filtersObj: Record<string, GridFilterItem>) => {
+        return JSON.parse(JSON.stringify(Object.values(filtersObj)));
+    }
+
+    const fetchBookedTrees = async (offset: number, limit: number) => {
+        setBookedLoading(true);
+        try {
+            const apiClient = new ApiClient();
+            // Only use GET endpoint; serialize filters into query params
+            const resp = await apiClient.getBookedGiftTreesWithQueryFilters(data.id, offset, limit, getFiltersData(filters));
+            setBookedRows(resp.results.map((r: any) => ({ ...r, key: r.id })));
+            setBookedTotal(Number(resp.total || resp.results.length));
+        } catch (error: any) {
+            console.error('Failed to fetch booked trees', error?.message || error);
+            setBookedRows([]);
+            setBookedTotal(0);
+        }
+        setBookedLoading(false);
+    }
+
+    useEffect(() => {
+        if (!open) return;
+        const handler = setTimeout(() => {
+            fetchBookedTrees(bookedPage * bookedPageSize, bookedPageSize);
+        }, 200);
+
+        return () => clearTimeout(handler);
+    }, [open, data?.id, bookedPage, bookedPageSize, filters, filtersVersion]);
 
     const columns: any[] = [
         {
@@ -49,7 +106,8 @@ const GiftCardRequestInfo: React.FC<GiftCardRequestInfoProps> = ({ open, onClose
             key: "sapling_id",
             title: "Sapling ID",
             align: "center",
-            width: 100,
+            width: 150,
+            ...getColumnSearchProps('sapling_id', filters, handleSetFilters)
         },
         {
             dataIndex: "plant_type",
@@ -57,6 +115,14 @@ const GiftCardRequestInfo: React.FC<GiftCardRequestInfoProps> = ({ open, onClose
             title: "Tree Name",
             align: "center",
             width: 200,
+        },
+        {
+            dataIndex: "plot_name",
+            key: "plot_name",
+            title: "Plot Name",
+            align: "center",
+            width: 220,
+            ...getColumnSearchProps('plot_name', filters, handleSetFilters)
         },
         {
             dataIndex: "scientific_name",
@@ -298,24 +364,31 @@ const GiftCardRequestInfo: React.FC<GiftCardRequestInfoProps> = ({ open, onClose
 
                 <Divider />
 
-                {/* Trees Assigned Table */}
-                {users.length > 0 && (
-                    <Box mt={2} mb={2}>
-                        <Typography>Total trees assigned: {data.assigned}</Typography>
-                        <GeneralTable
-                            loading={false}
-                            columns={columns}
-                            rows={users}
-                            totalRecords={users.length}
-                            page={page}
-                            pageSize={pageSize}
-                            onPaginationChange={(page: number, pageSize: number) => { setPage(page - 1); setPageSize(pageSize); }}
-                            onDownload={async () => users}
-                            footer
-                            tableName='Gift Request Users'
-                        />
-                    </Box>
-                )}
+                {/* Trees Assigned Table (server-side) */}
+                <Box mt={2} mb={2}>
+                    <Typography>Total trees assigned: {data.assigned}</Typography>
+                    <GeneralTable
+                        loading={bookedLoading}
+                        columns={columns}
+                        rows={bookedRows}
+                        totalRecords={bookedTotal}
+                        page={bookedPage + 1}
+                        pageSize={bookedPageSize}
+                        onPaginationChange={(newPage: number, newPageSize: number) => { setBookedPage(newPage - 1); setBookedPageSize(newPageSize); }}
+                        onDownload={async () => {
+                            const apiClient = new ApiClient();
+                            try {
+                                const resp = await apiClient.getBookedGiftTreesWithQueryFilters(data.id, 0, bookedTotal || 0, getFiltersData(filters));
+                                return resp.results;
+                            } catch (e: any) {
+                                console.error('Download failed (GET):', e?.message || e);
+                                return bookedRows;
+                            }
+                        }}
+                        footer
+                        tableName='Gift Request Users'
+                    />
+                </Box>
                 <Divider />
 
                 {/* Extra */}
