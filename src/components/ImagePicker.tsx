@@ -1,5 +1,6 @@
 import React, { useState, useRef, useCallback, useEffect } from 'react';
 import { Button, IconButton } from '@mui/material';
+import { toast } from 'react-toastify';
 import CloseIcon from '@mui/icons-material/Close';
 import ReactCrop, { Crop } from 'react-image-crop';
 import 'react-image-crop/dist/ReactCrop.css';
@@ -9,9 +10,11 @@ interface ImagePickerProps {
     onChange: (file: File | null) => void;
     width?: number;
     height?: number;
+    // when true, only accept PNG files; default false
+    restrictToPng?: boolean;
 }
 
-const ImagePicker: React.FC<ImagePickerProps> = ({ image, onChange, width, height }) => {
+const ImagePicker: React.FC<ImagePickerProps> = ({ image, onChange, width, height, restrictToPng = false }) => {
     const [imagePreview, setImagePreview] = useState<string | null>(null);
     const [crop, setCrop] = useState<Crop>({ unit: '%', width: width || 50, aspect: width && height ? width / height : 1, x: 0, y: 0, height: height || 50 });
     const [completedCrop, setCompletedCrop] = useState<Crop | null>(null);
@@ -29,7 +32,20 @@ const ImagePicker: React.FC<ImagePickerProps> = ({ image, onChange, width, heigh
         }
     }, [image]);
 
+    const isPngFile = (file: File) => {
+        if (!file) return false;
+        if (!restrictToPng) return true; // allow any if not restricting
+        const mimeOk = file.type === 'image/png';
+        const extOk = /\.png$/i.test(file.name);
+        return mimeOk || extOk;
+    };
+
     const handleImageUpload = (file: File) => {
+        // Validate PNG only
+        if (!isPngFile(file)) {
+            toast.error('Only PNG images are allowed. Please upload a .png file.');
+            return;
+        }
         const reader = new FileReader();
         reader.onloadend = () => {
             setImagePreview(reader.result as string);
@@ -40,6 +56,10 @@ const ImagePicker: React.FC<ImagePickerProps> = ({ image, onChange, width, heigh
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (file) {
+            if (!isPngFile(file)) {
+                toast.error('Only PNG images are allowed. Please upload a .png file.');
+                return;
+            }
             onChange(file);
             handleImageUpload(file);
         }
@@ -49,6 +69,11 @@ const ImagePicker: React.FC<ImagePickerProps> = ({ image, onChange, width, heigh
         e.preventDefault();
         const file = e.dataTransfer.files?.[0];
         if (file) {
+            if (!isPngFile(file)) {
+                toast.error('Only PNG images are allowed. Please upload a .png file.');
+                return;
+            }
+            onChange(file);
             handleImageUpload(file);
         }
     };
@@ -175,7 +200,7 @@ const ImagePicker: React.FC<ImagePickerProps> = ({ image, onChange, width, heigh
             )}
             <input
                 type="file"
-                accept="image/*"
+                accept={restrictToPng ? 'image/png' : 'image/*'}
                 ref={fileInputRef}
                 style={{ display: 'none' }}
                 onChange={handleFileChange}

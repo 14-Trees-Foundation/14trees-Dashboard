@@ -77,6 +77,7 @@ function EditUser({ row, openeditModal, handleClose, editSubmit }) {
             <ImagePicker
               image={logo ?? formData.logo_url}
               onChange={file => setLogo(file)}
+              restrictToPng={true}
             />
           </Box>
         </DialogContent>
