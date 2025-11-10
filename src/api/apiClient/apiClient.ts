@@ -783,6 +783,51 @@ class ApiClient {
     }
 
     /*
+        Model- Audit Report: Operations/Apis for audit report
+    */
+
+    async getAuditReport(
+        offset: number = 0,
+        limit: number = 25,
+        filters?: any[],
+        startDate?: string,
+        endDate?: string,
+        userId?: number,
+        plotId?: number,
+        siteId?: number,
+        search?: string,
+        sortBy?: string,
+        sortDir?: string
+    ): Promise<PaginatedResponse<any>> {
+        const url = `/audit-report`;
+        
+        const body: any = {
+            offset,
+            limit
+        };
+        
+        if (startDate) body.startDate = startDate;
+        if (endDate) body.endDate = endDate;
+        if (userId) body.userId = userId;
+        if (plotId) body.plotId = plotId;
+        if (siteId) body.siteId = siteId;
+        if (search) body.search = search;
+        if (sortBy) body.sortBy = sortBy;
+        if (sortDir) body.sortDir = sortDir;
+        if (filters) body.filters = filters;
+
+        try {
+            const response = await this.api.post<PaginatedResponse<any>>(url, body);
+            return response.data;
+        } catch (error: any) {
+            if (error.response) {
+                throw new Error(error.response.data.message);
+            }
+            throw new Error(`Failed to fetch audit report: ${error.message}`);
+        }
+    }
+
+    /*
         Model- OnsiteStaff: CRUD Operations/Apis for Onsite staff
     */
 

@@ -22,7 +22,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import VolunteerActivismIcon from "@mui/icons-material/VolunteerActivism";
 import MapIcon from "@mui/icons-material/Map";
 import FestivalIcon from "@mui/icons-material/Festival";
-import { Analytics, CardGiftcard, Inventory, Campaign } from "@mui/icons-material";
+import { Analytics, CardGiftcard, Inventory, Campaign, Assessment } from "@mui/icons-material";
 import { UserRoles } from "../../types/common";
 import { PAGE_SUB_SECTIONS, getSubSectionsForPage } from "../../config/pageSubSections";
 
@@ -113,6 +113,12 @@ export const AdminLeftDrawer = () => {
       logo: CorporateFareIcon,
       display: isAdmin,
       path: "people-group",
+    },
+    {
+      displayName: "Audit Report",
+      logo: Assessment,
+      display: isAdmin,
+      path: "audit-report",
     },
     {
       divider: isAdmin,

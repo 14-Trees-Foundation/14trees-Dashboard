@@ -40,6 +40,7 @@ import { PlantTypeComponent } from "./pages/admin/plantType/PlantType";
 import { Ponds } from "./pages/admin/Ponds/Ponds";
 import { Users } from "./pages/admin/users/Users";
 import { OrganizationComponent } from "./pages/admin/organization/Organization";
+import { AuditReport } from "./pages/admin/auditReport/AuditReport";
 import { VisitsComponent } from "./pages/admin/visits/Visits";
 import { EventsPage } from "./pages/admin/events/EventsPage";
 import SiteInventory from "./pages/admin/Inventory/SiteInventory";
@@ -105,6 +106,7 @@ function App() {
             <Route path="ponds" element={<Ponds />} />
             <Route path="people" element={<Users />} />
             <Route path="people-group" element={<OrganizationComponent />} />
+            <Route path="audit-report" element={<AuditReport />} />
             <Route path="visits" element={<VisitsComponent />} />
             <Route path="events" element={<EventsPage />} />
             <Route path="site-inventory" element={<SiteInventory />} />
