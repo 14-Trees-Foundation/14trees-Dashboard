@@ -6,9 +6,9 @@ import type { TableColumnsType } from 'antd';
 import getColumnSearchProps, { getColumnDateFilter, getSortIcon } from "../../../components/Filter";
 import { getFormattedDate } from "../../../helpers/utils";
 import GeneralTable from "../../../components/GenTable";
-import ApiClient from "../../../api/apiClient/apiClient";
-import { AuditReportRow, AuditReportResponse } from "../../../types/auditReport";
+import { AuditReportRow } from "../../../types/auditReport";
 import { Order } from "../../../types/common";
+import { fetchFieldAuditReport } from "./auditReportService";
 
 export const AuditReport = () => {
   const [loading, setLoading] = useState(false);
@@ -61,24 +61,16 @@ export const AuditReport = () => {
   }, [filters, page, pageSize, orderBy]);
 
   const getAuditReportData = async () => {
-    const apiClient = new ApiClient();
     let filtersData = Object.values(filters);
     setLoading(true);
     try {
-      // Extract sortBy and sortDir from orderBy
       const sortBy = orderBy.length > 0 ? orderBy[0].column : undefined;
       const sortDir = orderBy.length > 0 ? orderBy[0].order?.toLowerCase() : undefined;
 
-      const response: AuditReportResponse = await apiClient.getAuditReport(
+      const response = await fetchFieldAuditReport(
         page * pageSize,
         pageSize,
         filtersData,
-        undefined, // startDate
-        undefined, // endDate
-        undefined, // userId
-        undefined, // plotId
-        undefined, // siteId
-        undefined, // search
         sortBy,
         sortDir
       );
@@ -94,23 +86,15 @@ export const AuditReport = () => {
   };
 
   const getAllAuditReportData = async () => {
-    const apiClient = new ApiClient();
     let filtersData = Object.values(filters);
     try {
-      // Extract sortBy and sortDir from orderBy
       const sortBy = orderBy.length > 0 ? orderBy[0].column : undefined;
       const sortDir = orderBy.length > 0 ? orderBy[0].order?.toLowerCase() : undefined;
 
-      const response: AuditReportResponse = await apiClient.getAuditReport(
+      const response = await fetchFieldAuditReport(
         0,
         totalRecords,
         filtersData,
-        undefined, // startDate
-        undefined, // endDate
-        undefined, // userId
-        undefined, // plotId
-        undefined, // siteId
-        undefined, // search
         sortBy,
         sortDir
       );
@@ -179,7 +163,7 @@ export const AuditReport = () => {
           padding: "4px 12px",
         }}
       >
-        <Typography variant="h4" style={{ marginTop: '5px' }}>Audit Report</Typography>
+        <Typography variant="h4" style={{ marginTop: '5px' }}>Field Audit Reports</Typography>
       </div>
       <Divider sx={{ backgroundColor: "black", marginBottom: '15px' }} />
       <Box sx={{ height: 840, width: "100%" }}>
@@ -193,7 +177,7 @@ export const AuditReport = () => {
           onPaginationChange={handlePaginationChange}
           onDownload={getAllAuditReportData}
           footer
-          tableName="Audit Report"
+          tableName="Field Audit Reports"
           scroll={{ x: 1000 }}
         />
       </Box>

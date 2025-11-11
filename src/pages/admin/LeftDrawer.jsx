@@ -115,9 +115,9 @@ export const AdminLeftDrawer = () => {
       path: "people-group",
     },
     {
-      displayName: "Audit Report",
+      displayName: "Field Audit Reports",
       logo: Assessment,
-      display: isAdmin,
+      display: true,
       path: "audit-report",
     },
     {
