@@ -1,4 +1,4 @@
-export type AuditReportRow = {
+export type UserPlotTreesAuditRow = {
     user_id: number;
     user_name: string;
     plot_id: number;
@@ -9,8 +9,8 @@ export type AuditReportRow = {
     trees_audited: number;
 };
 
-export type AuditReportResponse = {
+export type UserPlotTreesAuditResponse = {
     offset: number;
     total: number;
-    results: AuditReportRow[];
+    results: UserPlotTreesAuditRow[];
 };

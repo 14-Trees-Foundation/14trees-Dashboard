@@ -1,14 +1,14 @@
 import ApiClient from "../../../api/apiClient/apiClient";
-import { AuditReportResponse } from "../../../types/auditReport";
+import { UserPlotTreesAuditResponse } from "../../../types/onsiteReports";
 import { GridFilterItem } from "@mui/x-data-grid";
 
-export const fetchOnsiteTreeAuditReport = async (
+export const fetchTreesAuditReport = async (
   offset: number,
   limit: number,
   filters: GridFilterItem[],
   sortBy?: string,
   sortDir?: string
-): Promise<AuditReportResponse> => {
+): Promise<UserPlotTreesAuditResponse> => {
   const apiClient = new ApiClient();
   
   try {
@@ -21,7 +21,7 @@ export const fetchOnsiteTreeAuditReport = async (
     );
     return response;
   } catch (error) {
-    console.error("Failed to fetch onsite tree audit report:", error);
+    console.error("Failed to fetch trees audit report:", error);
     throw error;
   }
 };

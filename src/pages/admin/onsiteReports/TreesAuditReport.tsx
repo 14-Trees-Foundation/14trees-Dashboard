@@ -6,17 +6,17 @@ import type { TableColumnsType } from 'antd';
 import getColumnSearchProps, { getColumnDateFilter, getSortIcon } from "../../../components/Filter";
 import { getFormattedDate } from "../../../helpers/utils";
 import GeneralTable from "../../../components/GenTable";
-import { AuditReportRow } from "../../../types/auditReport";
+import { UserPlotTreesAuditRow } from "../../../types/onsiteReports";
 import { Order } from "../../../types/common";
-import { fetchOnsiteTreeAuditReport } from "./auditReportService";
+import { fetchTreesAuditReport } from "./treeAuditReportService";
 
-export const OnsiteTreeAuditReports = () => {
+export const TreesAuditReport = () => {
   const [loading, setLoading] = useState(false);
   const [page, setPage] = useState(0);
   const [pageSize, setPageSize] = useState(10);
   const [filters, setFilters] = useState<Record<string, GridFilterItem>>({});
   const [orderBy, setOrderBy] = useState<Order[]>([]);
-  const [tableRows, setTableRows] = useState<AuditReportRow[]>([]);
+  const [tableRows, setTableRows] = useState<UserPlotTreesAuditRow[]>([]);
   const [totalRecords, setTotalRecords] = useState(0);
 
   const handlePaginationChange = (page: number, pageSize: number) => {
@@ -57,17 +57,17 @@ export const OnsiteTreeAuditReports = () => {
   };
 
   useEffect(() => {
-    getOnsiteTreeAuditReportData();
+    getTreesAuditReportData();
   }, [filters, page, pageSize, orderBy]);
 
-  const getOnsiteTreeAuditReportData = async () => {
+  const getTreesAuditReportData = async () => {
     let filtersData = Object.values(filters);
     setLoading(true);
     try {
       const sortBy = orderBy.length > 0 ? orderBy[0].column : undefined;
       const sortDir = orderBy.length > 0 ? orderBy[0].order?.toLowerCase() : undefined;
 
-      const response = await fetchOnsiteTreeAuditReport(
+      const response = await fetchTreesAuditReport(
         page * pageSize,
         pageSize,
         filtersData,
@@ -77,7 +77,7 @@ export const OnsiteTreeAuditReports = () => {
       setTableRows(response.results || []);
       setTotalRecords(response.total || 0);
     } catch (error) {
-      console.error("Failed to fetch onsite tree audit report:", error);
+      console.error("Failed to fetch trees audit report:", error);
       setTableRows([]);
       setTotalRecords(0);
     } finally {
@@ -85,13 +85,13 @@ export const OnsiteTreeAuditReports = () => {
     }
   };
 
-  const getAllOnsiteTreeAuditReportData = async () => {
+  const getAllTreesAuditReportData = async () => {
     let filtersData = Object.values(filters);
     try {
       const sortBy = orderBy.length > 0 ? orderBy[0].column : undefined;
       const sortDir = orderBy.length > 0 ? orderBy[0].order?.toLowerCase() : undefined;
 
-      const response = await fetchOnsiteTreeAuditReport(
+      const response = await fetchTreesAuditReport(
         0,
         totalRecords,
         filtersData,
@@ -100,12 +100,12 @@ export const OnsiteTreeAuditReports = () => {
       );
       return response.results || [];
     } catch (error) {
-      console.error("Failed to fetch all onsite tree audit report data:", error);
+      console.error("Failed to fetch all trees audit report data:", error);
       return [];
     }
   };
 
-  const columns: TableColumnsType<AuditReportRow> = [
+  const columns: TableColumnsType<UserPlotTreesAuditRow> = [
     {
       dataIndex: "audit_date",
       key: "audit_date",
@@ -175,9 +175,9 @@ export const OnsiteTreeAuditReports = () => {
           page={page}
           pageSize={pageSize}
           onPaginationChange={handlePaginationChange}
-          onDownload={getAllOnsiteTreeAuditReportData}
+          onDownload={getAllTreesAuditReportData}
           footer
-          tableName="Onsite Tree Reports"
+          tableName="Trees Audit Report"
           scroll={{ x: 1000 }}
         />
       </Box>
@@ -185,4 +185,4 @@ export const OnsiteTreeAuditReports = () => {
   );
 };
 
-export default OnsiteTreeAuditReports;
+export default TreesAuditReport;

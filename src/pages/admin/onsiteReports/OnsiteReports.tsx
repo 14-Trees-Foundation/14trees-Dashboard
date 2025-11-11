@@ -1,8 +1,8 @@
 import Box from "@mui/material/Box";
 import { Typography, Divider } from "@mui/material";
-import OnsiteTreeAuditReports from "./OnsiteTreeAuditReports";
+import TreesAuditReport from "./TreesAuditReport";
 
-export const OnsiteAuditReports = () => {
+export const OnsiteReports = () => {
   return (
     <Box>
       <div
@@ -12,12 +12,12 @@ export const OnsiteAuditReports = () => {
           padding: "4px 12px",
         }}
       >
-        <Typography variant="h4" style={{ marginTop: '5px' }}>Onsite Audit Reports</Typography>
+        <Typography variant="h4" style={{ marginTop: '5px' }}>Onsite Reports</Typography>
       </div>
       <Divider sx={{ backgroundColor: "black", marginBottom: '15px' }} />
-      <OnsiteTreeAuditReports />
+      <TreesAuditReport />
     </Box>
   );
 };
 
-export default OnsiteAuditReports;
+export default OnsiteReports;

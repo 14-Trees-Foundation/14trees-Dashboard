@@ -40,7 +40,7 @@ import { PlantTypeComponent } from "./pages/admin/plantType/PlantType";
 import { Ponds } from "./pages/admin/Ponds/Ponds";
 import { Users } from "./pages/admin/users/Users";
 import { OrganizationComponent } from "./pages/admin/organization/Organization";
-import { OnsiteAuditReports } from "./pages/admin/auditReport/OnsiteAuditReports";
+import { OnsiteReports } from "./pages/admin/onsiteReports/OnsiteReports";
 import { VisitsComponent } from "./pages/admin/visits/Visits";
 import { EventsPage } from "./pages/admin/events/EventsPage";
 import SiteInventory from "./pages/admin/Inventory/SiteInventory";
@@ -106,7 +106,7 @@ function App() {
             <Route path="ponds" element={<Ponds />} />
             <Route path="people" element={<Users />} />
             <Route path="people-group" element={<OrganizationComponent />} />
-            <Route path="onsite-audit-reports" element={<OnsiteAuditReports />} />
+            <Route path="onsite-reports" element={<OnsiteReports />} />
             <Route path="visits" element={<VisitsComponent />} />
             <Route path="events" element={<EventsPage />} />
             <Route path="site-inventory" element={<SiteInventory />} />
