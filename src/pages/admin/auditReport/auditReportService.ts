@@ -2,7 +2,7 @@ import ApiClient from "../../../api/apiClient/apiClient";
 import { AuditReportResponse } from "../../../types/auditReport";
 import { GridFilterItem } from "@mui/x-data-grid";
 
-export const fetchFieldAuditReport = async (
+export const fetchOnsiteTreeAuditReport = async (
   offset: number,
   limit: number,
   filters: GridFilterItem[],
@@ -12,7 +12,7 @@ export const fetchFieldAuditReport = async (
   const apiClient = new ApiClient();
   
   try {
-    const response = await apiClient.getAuditReport(
+    const response = await apiClient.getOnsiteTreeAuditReport(
       offset,
       limit,
       filters,
@@ -21,7 +21,7 @@ export const fetchFieldAuditReport = async (
     );
     return response;
   } catch (error) {
-    console.error("Failed to fetch audit report:", error);
+    console.error("Failed to fetch onsite tree audit report:", error);
     throw error;
   }
 };

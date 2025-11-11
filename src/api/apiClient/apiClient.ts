@@ -786,7 +786,7 @@ class ApiClient {
         Model- Audit Report: Operations/Apis for audit report
     */
 
-    async getAuditReport(
+    async getOnsiteTreeAuditReport(
         offset: number = 0,
         limit: number = 25,
         filters?: any[],

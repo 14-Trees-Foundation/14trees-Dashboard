@@ -1,16 +1,16 @@
 import { useEffect, useState } from "react";
 import Box from "@mui/material/Box";
-import { GridFilterItem } from "@mui/x-data-grid";
 import { Typography, Divider } from "@mui/material";
+import { GridFilterItem } from "@mui/x-data-grid";
 import type { TableColumnsType } from 'antd';
 import getColumnSearchProps, { getColumnDateFilter, getSortIcon } from "../../../components/Filter";
 import { getFormattedDate } from "../../../helpers/utils";
 import GeneralTable from "../../../components/GenTable";
 import { AuditReportRow } from "../../../types/auditReport";
 import { Order } from "../../../types/common";
-import { fetchFieldAuditReport } from "./auditReportService";
+import { fetchOnsiteTreeAuditReport } from "./auditReportService";
 
-export const AuditReport = () => {
+export const OnsiteTreeAuditReports = () => {
   const [loading, setLoading] = useState(false);
   const [page, setPage] = useState(0);
   const [pageSize, setPageSize] = useState(10);
@@ -57,17 +57,17 @@ export const AuditReport = () => {
   };
 
   useEffect(() => {
-    getAuditReportData();
+    getOnsiteTreeAuditReportData();
   }, [filters, page, pageSize, orderBy]);
 
-  const getAuditReportData = async () => {
+  const getOnsiteTreeAuditReportData = async () => {
     let filtersData = Object.values(filters);
     setLoading(true);
     try {
       const sortBy = orderBy.length > 0 ? orderBy[0].column : undefined;
       const sortDir = orderBy.length > 0 ? orderBy[0].order?.toLowerCase() : undefined;
 
-      const response = await fetchFieldAuditReport(
+      const response = await fetchOnsiteTreeAuditReport(
         page * pageSize,
         pageSize,
         filtersData,
@@ -77,7 +77,7 @@ export const AuditReport = () => {
       setTableRows(response.results || []);
       setTotalRecords(response.total || 0);
     } catch (error) {
-      console.error("Failed to fetch audit report:", error);
+      console.error("Failed to fetch onsite tree audit report:", error);
       setTableRows([]);
       setTotalRecords(0);
     } finally {
@@ -85,13 +85,13 @@ export const AuditReport = () => {
     }
   };
 
-  const getAllAuditReportData = async () => {
+  const getAllOnsiteTreeAuditReportData = async () => {
     let filtersData = Object.values(filters);
     try {
       const sortBy = orderBy.length > 0 ? orderBy[0].column : undefined;
       const sortDir = orderBy.length > 0 ? orderBy[0].order?.toLowerCase() : undefined;
 
-      const response = await fetchFieldAuditReport(
+      const response = await fetchOnsiteTreeAuditReport(
         0,
         totalRecords,
         filtersData,
@@ -100,7 +100,7 @@ export const AuditReport = () => {
       );
       return response.results || [];
     } catch (error) {
-      console.error("Failed to fetch all audit report data:", error);
+      console.error("Failed to fetch all onsite tree audit report data:", error);
       return [];
     }
   };
@@ -163,7 +163,7 @@ export const AuditReport = () => {
           padding: "4px 12px",
         }}
       >
-        <Typography variant="h4" style={{ marginTop: '5px' }}>Field Audit Reports</Typography>
+        <Typography variant="h6" style={{ marginTop: '5px' }}>Tree Audit Reports</Typography>
       </div>
       <Divider sx={{ backgroundColor: "black", marginBottom: '15px' }} />
       <Box sx={{ height: 840, width: "100%" }}>
@@ -175,9 +175,9 @@ export const AuditReport = () => {
           page={page}
           pageSize={pageSize}
           onPaginationChange={handlePaginationChange}
-          onDownload={getAllAuditReportData}
+          onDownload={getAllOnsiteTreeAuditReportData}
           footer
-          tableName="Field Audit Reports"
+          tableName="Onsite Tree Reports"
           scroll={{ x: 1000 }}
         />
       </Box>
@@ -185,4 +185,4 @@ export const AuditReport = () => {
   );
 };
 
-export default AuditReport;
+export default OnsiteTreeAuditReports;

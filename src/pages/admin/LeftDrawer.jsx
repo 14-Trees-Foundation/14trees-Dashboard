@@ -115,10 +115,10 @@ export const AdminLeftDrawer = () => {
       path: "people-group",
     },
     {
-      displayName: "Field Audit Reports",
+      displayName: "Onsite Audit Reports",
       logo: Assessment,
-      display: true,
-      path: "audit-report",
+      display: isAdmin,
+      path: "onsite-audit-reports",
     },
     {
       divider: isAdmin,
