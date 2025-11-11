@@ -783,6 +783,39 @@ class ApiClient {
     }
 
     /*
+        Model- Audit Report: Operations/Apis for audit report
+    */
+
+    async getOnsiteTreeAuditReport(
+        offset: number = 0,
+        limit: number = 25,
+        filters?: any[],
+        sortBy?: string,
+        sortDir?: string
+    ): Promise<PaginatedResponse<any>> {
+        const url = `/tree-snapshots/onsite-audit-report`;
+        
+        const body: any = {
+            offset,
+            limit
+        };
+        
+        if (sortBy) body.sortBy = sortBy;
+        if (sortDir) body.sortDir = sortDir;
+        if (filters && filters.length > 0) body.filters = filters;
+
+        try {
+            const response = await this.api.post<PaginatedResponse<any>>(url, body);
+            return response.data;
+        } catch (error: any) {
+            if (error.response) {
+                throw new Error(error.response.data.message);
+            }
+            throw new Error(`Failed to fetch audit report: ${error.message}`);
+        }
+    }
+
+    /*
         Model- OnsiteStaff: CRUD Operations/Apis for Onsite staff
     */
 
