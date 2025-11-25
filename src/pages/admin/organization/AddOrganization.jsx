@@ -79,6 +79,7 @@ const AddOrganization = ({ open, groupType, handleClose, createOrganization }) =
                                 <ImagePicker
                                     image={logo}
                                     onChange={file => setLogo(file)}
+                                    restrictToPng={true}
                                 />
                             </Grid>
                             <Grid item xs={12}>
