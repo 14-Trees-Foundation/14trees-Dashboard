@@ -184,7 +184,7 @@ const EventTrees: React.FC<EventTreesProps> = ({ eventId, eventLinkId, eventType
 
                     return {
                         id: tree.id,
-                        name: tree.planted_by ? tree.planted_by : tree.assigned_to_name,
+                        name: tree.assigned_to_name ? tree.assigned_to_name: tree.planted_by,
                         type: tree.plant_type,
                         dashboardLink: location,
                         image: imageMode

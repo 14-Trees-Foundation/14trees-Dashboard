@@ -143,9 +143,14 @@ export const LeftDrawer = () => {
                   onClick={handleDrawerOpen}
                 />
                 <div className={classes.username} ref={userNameRef}>
-                  {selUserInfo.event_type && selUserInfo.event_type === "2"
-                    ? "Memorial Dashboard"
-                    : `${username}'s Dashboard`}
+                  {selUserInfo.event_type && selUserInfo.event_type === "2" ? (
+                    (() => {
+                      const isSpecial = String(selUserInfo.sapling_id) === "365446" && Number(selUserInfo.assigned_to_id) === 23891;
+                      return isSpecial ? 'Celebration of Life' : 'Memorial Dashboard';
+                    })()
+                  ) : (
+                    `${username}'s Dashboard`
+                  )}
                 </div>
                 <div className={classes.buttonContainer}>
                   {username.length <= 8 && <Button

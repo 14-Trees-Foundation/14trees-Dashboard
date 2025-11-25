@@ -137,7 +137,7 @@ export const UserInfo = () => {
               ) : (
                 <div className={classes.label}>Name</div>
               )}
-              <div className={classes.data}>{selUserInfo.assigned_to}</div>
+              <div className={classes.data}>{(selUserInfo.assigned_to && selUserInfo.assigned_to !== "") ? selUserInfo.assigned_to : selUserInfo.planted_by}</div>
               <>
                 {(selUserInfo.gifted_by_name ||
                   (selUserInfo.gifted_by_user !== undefined &&
@@ -178,7 +178,7 @@ export const UserInfo = () => {
                           marginBottom: "8px",
                         }}
                       >
-                        {selUserInfo.planted_by}
+                        {selUserInfo.assigned_to}
                       </div>
                     </>
                   )}
