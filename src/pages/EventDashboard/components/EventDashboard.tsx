@@ -173,10 +173,10 @@ const EventDashboard: React.FC<EventDashboardProps> = ({ event, eventMessages })
       },
     };
     
-    // Get theme or fallback to red
-    const currentTheme = event.theme_color && themeConfigs[event.theme_color] 
-        ? themeConfigs[event.theme_color] 
-        : themeConfigs.red;
+    // Get theme or fallback to green
+    const currentTheme = event.theme_color && themeConfigs[event.theme_color]
+      ? themeConfigs[event.theme_color]
+      : themeConfigs.green;
     
     // Legacy fallback for events without theme_color
     const weddingTheme = {
