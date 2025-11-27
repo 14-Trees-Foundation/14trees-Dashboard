@@ -36,13 +36,13 @@ class EventsApiClient {
     }
   }
 
-  async createEvent(eventData: Partial<Event>, images?: File[]): Promise<Event> {
+  async createEvent(eventData: Partial<Event>, images?: File[], eventPoster?: File | null): Promise<Event> {
     try {
       // Convert tags string to array format expected by backend
       let tagsArray: string[] = [];
       if (eventData.tags && typeof eventData.tags === 'string') {
         // Split by comma and trim whitespace
-        tagsArray = eventData.tags.split(',').map(tag => tag.trim()).filter(tag => tag.length > 0);
+        tagsArray = (eventData.tags as any).split(',').map((tag: string) => tag.trim()).filter((tag: string) => tag.length > 0);
       } else if (Array.isArray(eventData.tags)) {
         tagsArray = eventData.tags;
       }
@@ -50,60 +50,67 @@ class EventsApiClient {
       // Use provided link or generate a unique link for the event (as expected by repository queries)
       const link = eventData.link || Math.random().toString(36).slice(2, 10);
 
-      // If images are provided, use multipart form data
-      if (images && images.length > 0) {
+      // If images or eventPoster are provided, use multipart form data
+      if ((images && images.length > 0) || eventPoster) {
         const formData = new FormData();
         
         // Add event data fields - ensure all required fields are present
         formData.append('name', eventData.name || '');
         formData.append('type', (eventData.type || '').toString());
-        formData.append('event_date', eventData.event_date || '');
+        formData.append('event_date', eventData.event_date ? eventData.event_date.toString() : '');
+        // Keep existing event_location (onsite/offsite) as-is
         formData.append('event_location', eventData.event_location || 'onsite');
+        // Optional detailed location picked via map
+        if ((eventData as any).location) {
+          formData.append('location', JSON.stringify((eventData as any).location));
+        }
         formData.append('link', link);
         formData.append('assigned_by', (eventData.assigned_by || 1).toString());
         
         // Add optional fields only if they have values
         if (eventData.description) formData.append('description', eventData.description);
         if (eventData.message) formData.append('message', eventData.message);
-        if (eventData.site_id && eventData.site_id !== '') {
+        if ((eventData as any).theme_color) formData.append('theme_color', (eventData as any).theme_color);
+        if (eventData.site_id) {
           formData.append('site_id', eventData.site_id.toString());
         }
         
-        // Add tags as JSON string if present
-        if (tagsArray.length > 0) {
-          formData.append('tags', JSON.stringify(tagsArray));
-        }
+        // Always append tags as JSON string (may be empty array)
+        formData.append('tags', JSON.stringify(tagsArray));
         
-        // Add images
-        images.forEach((image) => {
-          formData.append('images', image);
-        });
+        // Add images if present
+        if (images && images.length > 0) {
+          images.forEach((image) => {
+            formData.append('images', image);
+          });
+        }
 
-        console.log('Creating event with multipart form data including images');
-        console.log('Form data fields:', {
-          name: eventData.name,
-          type: eventData.type,
-          event_date: eventData.event_date,
-          assigned_by: eventData.assigned_by || 1,
-          imagesCount: images.length
-        });
+        // Add event poster if present
+        if (eventPoster) {
+          formData.append('event_poster', eventPoster);
+        }
+
+        // Multipart submission prepared with form data, images and optional poster
 
         // Don't set Content-Type header - let axios set it automatically with boundary
         const response = await this.api.post<Event>('/events/', formData);
         return response.data;
       } else {
         // No images, use regular JSON payload
-        const payload = {
+        const payload: any = {
           name: eventData.name,
           type: parseInt(eventData.type as string), // Ensure type is number
           event_date: eventData.event_date,
           event_location: eventData.event_location || 'onsite',
+          // Include optional detailed location object if present
+          ...( (eventData as any).location ? { location: (eventData as any).location } : {} ),
           description: eventData.description,
           tags: tagsArray,
           message: eventData.message,
+          theme_color: (eventData as any).theme_color,
           link: link,
           assigned_by: eventData.assigned_by || 1,
-          site_id: eventData.site_id && eventData.site_id !== '' ? eventData.site_id : null,
+          site_id: eventData.site_id || null,
         };
 
         // Remove undefined values to avoid backend issues
@@ -113,7 +120,7 @@ class EventsApiClient {
           }
         });
 
-        console.log('Creating event with JSON payload (no images):', payload);
+        // JSON submission (no images/poster in request body)
 
         const response = await this.api.post<Event>('/events/', payload);
         return response.data;
@@ -145,8 +152,10 @@ class EventsApiClient {
         }
       });
 
-      // If we have new files, use multipart form data
-      if (newFiles.length > 0) {
+      // Check if there's a new event poster File as well
+      const hasNewPoster = eventData.event_poster && eventData.event_poster instanceof File;
+      // If we have new files or a new poster file, use multipart form data
+      if (newFiles.length > 0 || hasNewPoster) {
         const formData = new FormData();
         
         // Add event data fields
@@ -160,30 +169,37 @@ class EventsApiClient {
         if (eventData.message) formData.append('message', eventData.message);
         if (eventData.link) formData.append('link', eventData.link);
         
-        // Add tags as JSON string if present
+        // Normalize tags into array and always append (may be empty)
+        let updateTagsArray: string[] = [];
         if (eventData.tags) {
-          const tagsArray = Array.isArray(eventData.tags) ? eventData.tags : 
-            typeof eventData.tags === 'string' ? eventData.tags.split(',').map(t => t.trim()) : [];
-          if (tagsArray.length > 0) {
-            formData.append('tags', JSON.stringify(tagsArray));
+          if (Array.isArray(eventData.tags)) {
+            updateTagsArray = eventData.tags;
+          } else if (typeof eventData.tags === 'string') {
+            const raw = (eventData.tags as string).split(',');
+            for (let i = 0; i < raw.length; i++) {
+              const t = raw[i];
+              if (t && t.trim().length > 0) updateTagsArray.push(t.trim());
+            }
           }
         }
+        formData.append('tags', JSON.stringify(updateTagsArray));
         
         // Add existing images as JSON string
         if (existingImages.length > 0) {
           formData.append('existingImages', JSON.stringify(existingImages));
         }
         
+        // Add event poster if a new File object is provided (single file)
+        if (eventData.event_poster && eventData.event_poster instanceof File) {
+          formData.append('event_poster', eventData.event_poster);
+        }
+
         // Add new image files
         newFiles.forEach((file) => {
           formData.append('images', file);
         });
 
-        console.log('Updating event with multipart form data:', {
-          eventId: eventData.id,
-          existingImagesCount: existingImages.length,
-          newFilesCount: newFiles.length
-        });
+        // Multipart update with existing image references and newly uploaded files
 
         const response = await this.api.put<Event>(`/events/${eventData.id}`, formData);
         return response.data;
@@ -194,8 +210,22 @@ class EventsApiClient {
           images: eventData.type === '2' ? null : existingImages.length > 0 ? existingImages : null,
           memories: eventData.type === '2' ? existingImages.length > 0 ? existingImages : null : null,
         };
+        // Ensure payload.tags is always an array
+        let payloadTagsArray: string[] = [];
+        if (payload.tags) {
+          if (Array.isArray(payload.tags)) {
+            payloadTagsArray = payload.tags;
+          } else if (typeof payload.tags === 'string') {
+            const raw = (payload.tags as string).split(',');
+            for (let i = 0; i < raw.length; i++) {
+              const t = raw[i];
+              if (t && t.trim().length > 0) payloadTagsArray.push(t.trim());
+            }
+          }
+        }
+        payload.tags = payloadTagsArray;
 
-        console.log('Updating event with JSON payload (no new files)');
+        // JSON update (no new files)
 
         const response = await this.api.put<Event>(`/events/${eventData.id}`, payload);
         return response.data;

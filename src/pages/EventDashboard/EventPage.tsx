@@ -133,7 +133,7 @@ const EventPage: React.FC = () => {
             ? <NotFound />
             : (
                 <Box style={{ display: "flex", backgroundColor }} >
-                    {shouldShowDrawer && (
+                    {shouldShowDrawer && event?.type !== "5" && (
                         <Drawer
                             className={classes.mdrawer}
                             variant="persistent"

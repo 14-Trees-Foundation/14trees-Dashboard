@@ -50,7 +50,16 @@ const AddUpdateEventModal = ({
         { value: '1', label: 'Regular Event' },
         { value: '2', label: 'Memorial Event' },
         { value: '3', label: 'Corporate Event' },
-        { value: '4', label: 'Community Event' }
+        { value: '4', label: 'Community Event' },
+        { value: '5', label: 'Wedding' }
+    ];
+
+    const themeColorOptions = [
+        { value: 'yellow', label: 'Yellow' },
+        { value: 'red', label: 'Red' },
+        { value: 'green', label: 'Green' },
+        { value: 'blue', label: 'Blue' },
+        { value: 'pink', label: 'Pink' },
     ];
 
     const locationOptions = [
@@ -94,9 +103,25 @@ const AddUpdateEventModal = ({
             }
 
             // Prepare form data for submission - convert empty site_id to null
+            // Normalize tags: accept comma-separated string or array, trim and dedupe
+            const normalizeTags = (tagsVal) => {
+                if (!tagsVal) return [];
+                if (Array.isArray(tagsVal)) {
+                    return Array.from(new Set(tagsVal.map(t => String(t).trim()).filter(Boolean)));
+                }
+                const cleaned = String(tagsVal)
+                    // remove any surrounding or inline braces/brackets and quotes
+                    .replace(/[\{\}\[\]\"\']/g, '')
+                    .split(',')
+                    .map(t => t.trim())
+                    .filter(Boolean);
+                return Array.from(new Set(cleaned));
+            };
+
             const submissionData = {
                 ...formData,
-                site_id: formData.site_id === '' ? null : formData.site_id
+                site_id: formData.site_id === '' ? null : formData.site_id,
+                tags: normalizeTags(formData.tags)
             };
 
             // Call the callback function with prepared form data
@@ -156,6 +181,7 @@ const AddUpdateEventModal = ({
                                 isEditMode={isEditMode}
                                 eventTypes={eventTypes}
                                 locationOptions={locationOptions}
+                                themeColorOptions={themeColorOptions}
                             />
 
                             <Grid item xs={12}>

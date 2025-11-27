@@ -1,5 +1,7 @@
 
 type EventLocation = 'onsite' | 'offsite'
+type EventLocationPoint = { lat: number; lng: number; address?: string }
+type EventThemeColor = 'yellow' | 'red' | 'green' | 'blue' | 'pink'
 
 export type Event = {
   id: number,
@@ -16,6 +18,9 @@ export type Event = {
   images: string[] | null,
   message: string | null,
   event_location: EventLocation,
+  theme_color?: EventThemeColor,
+  event_poster?: string | null,
+  location?: EventLocationPoint | null,
   link: string,
   default_tree_view_mode?: 'illustrations' | 'profile',
 };

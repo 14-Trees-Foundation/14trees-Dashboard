@@ -8,6 +8,18 @@ export const useEventForm = (mode, existingEvent) => {
         return date.toISOString().split('T')[0]; // Extract YYYY-MM-DD
     };
 
+    // Sanitize tags for text input display
+    const sanitizeTagsForInput = (raw) => {
+        if (!raw) return '';
+        if (Array.isArray(raw)) return raw.join(', ');
+        return String(raw)
+            .replace(/[\{\}\[\]\"\']/g, '')
+            .split(',')
+            .map(s => s.trim())
+            .filter(Boolean)
+            .join(', ');
+    };
+
     // Initialize form data based on mode
     const getInitialFormData = () => {
         if (mode === 'edit' && existingEvent) {
@@ -17,14 +29,17 @@ export const useEventForm = (mode, existingEvent) => {
                 name: existingEvent.name || '',
                 event_date: formatDateForInput(existingEvent.event_date) || '',
                 event_location: existingEvent.event_location || '',
+                location: existingEvent.location || null,
+                theme_color: existingEvent.theme_color || '',
                 assigned_by: existingEvent.assigned_by || '',
                 site_id: existingEvent.site_id || '',
                 message: existingEvent.message || '',
-                tags: existingEvent.tags || '',
+                tags: sanitizeTagsForInput(existingEvent.tags || ''),
                 default_tree_view_mode: existingEvent.default_tree_view_mode || 'profile',
                 // Load existing images and memories from the event
                 images: existingEvent.images || [],
                 memories: existingEvent.memories || [],
+                event_poster: existingEvent.event_poster || null,
             };
         }
         return {
@@ -32,6 +47,8 @@ export const useEventForm = (mode, existingEvent) => {
             name: '',
             event_date: '',
             event_location: '',
+            location: null,
+            theme_color: '',
             assigned_by: '',
             site_id: '',
             message: '',
@@ -39,6 +56,7 @@ export const useEventForm = (mode, existingEvent) => {
             default_tree_view_mode: 'profile',
             images: [],
             memories: [],
+            event_poster: null,
         };
     };
 

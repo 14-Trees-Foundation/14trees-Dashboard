@@ -34,22 +34,21 @@ export const useEventsApi = () => {
     const memories = formData.memories || [];
     const filesToUpload = formData.type === '2' ? memories : images;
     
-    console.log('API Hook - Creating event with files:', {
-      eventType: formData.type,
-      imagesCount: images.length,
-      memoriesCount: memories.length,
-      filesToUploadCount: filesToUpload.length
-    });
+    // Extract event poster if present
+    const eventPoster = formData.event_poster;
+    
+    // Prepare files for create: images/memories and optional poster
     
     // Create a clean event data object without the File arrays
     const eventDataForCreation = {
       ...formData,
       images: null, // Clear images array for event creation (files will be passed separately)
-      memories: undefined // Clear memories array for event creation
+      memories: undefined, // Clear memories array for event creation
+      event_poster: undefined // Clear event_poster for event creation (will be passed separately)
     };
     
     // Create the event with images - API client will handle multipart form data
-    const newEvent = await apiClient.events.createEvent(eventDataForCreation, filesToUpload);
+    const newEvent = await apiClient.events.createEvent(eventDataForCreation, filesToUpload, eventPoster);
     
     toast.success('Event created successfully!');
     return newEvent;
