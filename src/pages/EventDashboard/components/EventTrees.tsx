@@ -20,6 +20,7 @@ interface EventTreesProps {
     eventType: string,
     defaultViewMode?: 'illustrations' | 'profile',
     currentTheme?: ThemeConfig,
+    onTotalChange?: (total: number) => void,
 }
 
 interface EventTreesLinkConfig {
@@ -51,7 +52,7 @@ const EVENT_TREES_CONFIG_BY_LINK_ID: Record<string, EventTreesLinkConfig> = {
     },
 };
 
-const EventTrees: React.FC<EventTreesProps> = ({ eventId, eventLinkId, eventType, defaultViewMode = 'profile', currentTheme }) => {
+const EventTrees: React.FC<EventTreesProps> = ({ eventId, eventLinkId, eventType, defaultViewMode = 'profile', currentTheme, onTotalChange }) => {
 
     const isMobile = useMediaQuery("(max-width:600px)");
     const isTablet = useMediaQuery("(max-width:900px)");
@@ -110,6 +111,9 @@ const EventTrees: React.FC<EventTreesProps> = ({ eventId, eventLinkId, eventType
             else setTrees(prev => [...prev, ...treesResp.results]);
 
             setTotal(treesResp.total);
+            if (typeof onTotalChange === 'function') {
+                onTotalChange(treesResp.total);
+            }
         } catch (error: any) {
             toast.error(error.message);
         }
@@ -216,6 +220,7 @@ const EventTrees: React.FC<EventTreesProps> = ({ eventId, eventLinkId, eventType
                                     opacity: 0.9,
                                 },
                             }}
+                            onClick={() => { window.open('https://www.14trees.org/plant-memory', '_blank', 'noopener,noreferrer'); }}
                         >
                             Gift a Tree!
                         </Button>
@@ -229,30 +234,20 @@ const EventTrees: React.FC<EventTreesProps> = ({ eventId, eventLinkId, eventType
                             <FormControlLabel
                                 value="illustrations"
                                 control={
-                                    <Radio
-                                        color={radioColorProp}
-                                        sx={radioSx}
-                                        checked={imageMode}
-                                        onChange={() => { setImageMode(true) }}
-                                    />
+                                    <Radio sx={radioSx} checked={imageMode} onChange={() => setImageMode(true)} />
                                 }
-                                label={eventType === "2" ? "Blossoms of Legacy" : "Illustrations"}
+                                label="Illustrations"
                                 labelPlacement="end"
-                                sx={{ ...labelSx, color: '#ffffff' }}
+                                sx={labelSx}
                             />
                             <FormControlLabel
                                 value="profile"
                                 control={
-                                    <Radio
-                                        color={radioColorProp}
-                                        sx={radioSx}
-                                        checked={!imageMode}
-                                        onChange={() => { setImageMode(false) }}
-                                    />
+                                    <Radio sx={radioSx} checked={!imageMode} onChange={() => setImageMode(false)} />
                                 }
                                 label={eventType === "2" ? "Guardians of Memory" : "Profile Images"}
                                 labelPlacement="end"
-                                sx={{ ...labelSx, color: '#ffffff' }}
+                                sx={labelSx}
                             />
                         </FormGroup>
                     </FormControl>

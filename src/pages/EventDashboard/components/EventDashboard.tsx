@@ -120,6 +120,7 @@ const EventDashboard: React.FC<EventDashboardProps> = ({ event, eventMessages })
     const [apiEventImages, setApiEventImages] = useState<string[]>([]);
     const [isLoadingImages, setIsLoadingImages] = useState<boolean>(true);
     const [allEventImages, setAllEventImages] = useState<string[]>([]);
+    const [totalTrees, setTotalTrees] = useState<number | null>(null);
 
     const apiClient = new ApiClient();
     const linkConfig = EVENT_DASHBOARD_CONFIG_BY_LINK_ID[event.link ?? ""] ?? {};
@@ -245,13 +246,13 @@ const EventDashboard: React.FC<EventDashboardProps> = ({ event, eventMessages })
           >
 
             {/* Header: Logo box, vertical divider, then Name (sticky) */}
-            <Box sx={{ 
+              <Box sx={{ 
               display: 'flex', 
               flexDirection: isMobile ? 'column' : 'row',
               justifyContent: isMobile ? 'center' : 'flex-start', 
               alignItems: 'center', 
               gap: isMobile ? 2 : 3,
-              padding: isMobile ? '16px 12px' : '14px 40px',
+              padding: isMobile ? '16px 12px' : '14px 24px',
               position: 'sticky',
               top: 0,
               zIndex: 10,
@@ -267,15 +268,20 @@ const EventDashboard: React.FC<EventDashboardProps> = ({ event, eventMessages })
                 justifyContent: 'center',
                 flexShrink: 0,
               }}>
-                <Box 
-                  component="img" 
-                  src={logoTree} 
-                  alt="grove logo" 
-                  sx={{ 
-                    width: '80%', 
-                    height: '80%', 
+                <Box
+                  component="img"
+                  src={logoTree}
+                  alt="grove logo"
+                  onClick={() => window.open('https://www.14trees.org/', '_blank', 'noopener')}
+                  sx={{
+                    width: '80%',
+                    height: '80%',
                     objectFit: 'contain',
-                  }} 
+                    cursor: 'pointer',
+                    display: 'block'
+                  }}
+                  role="link"
+                  aria-label="14 Trees website"
                 />
               </Box>
 
@@ -426,12 +432,12 @@ const EventDashboard: React.FC<EventDashboardProps> = ({ event, eventMessages })
                     justifyContent: 'center',
                   }}
                 >
-                  {!isLoadingImages && memoryImages.length > 0 ? (
-                    <EventMemories imageUrls={memoryImages} />
-                  ) : (
+                  {isLoadingImages ? (
                     <Typography variant="body2" sx={{ color: currentTheme.textColor }}>
-                      {isLoadingImages ? 'Loading images...' : 'No images available'}
+                      Loading images...
                     </Typography>
+                  ) : (
+                    <EventMemories imageUrls={memoryImages} />
                   )}
                 </Box>
               </Box>
@@ -560,7 +566,7 @@ const EventDashboard: React.FC<EventDashboardProps> = ({ event, eventMessages })
                   variant={isMobile ? 'h6' : 'h4'}
                   sx={{ color: currentTheme.textAreaBg, fontFamily: 'serif', fontWeight: 700, textAlign: 'center', mb: 2 }}
                 >
-                  {`150 Trees Planted in this grove`}
+                  {`${(totalTrees ?? 150)} Trees Planted in this grove`}
                 </Typography>
 
                 <Box
@@ -618,6 +624,7 @@ const EventDashboard: React.FC<EventDashboardProps> = ({ event, eventMessages })
                   eventType={event.type}
                   defaultViewMode={event.default_tree_view_mode || "profile"}
                   currentTheme={currentTheme}
+                  onTotalChange={(t) => setTotalTrees(t)}
                 />
               </Box>
             </Box>
