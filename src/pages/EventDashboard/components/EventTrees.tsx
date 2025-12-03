@@ -153,7 +153,7 @@ const EventTrees: React.FC<EventTreesProps> = ({ eventId, eventLinkId, eventType
                         fullWidth={isMobile}
                         value={searchStr}
                         onChange={(e) => { setSearchStr(e.target.value) }}
-                        placeholder="SEARCH BAR with everyone's names"
+                        placeholder="Search by name..."
                         variant="outlined"
                         InputProps={{
                             startAdornment: (
@@ -187,7 +187,7 @@ const EventTrees: React.FC<EventTreesProps> = ({ eventId, eventLinkId, eventType
                         flexDirection: isMobile ? 'column' : 'row',
                         gap: 2,
                     }}>
-                        <Button
+                        {/* <Button
                             variant="contained"
                             sx={{
                                 backgroundColor: currentTheme?.textColor || '#A33128',
@@ -204,7 +204,7 @@ const EventTrees: React.FC<EventTreesProps> = ({ eventId, eventLinkId, eventType
                             }}
                         >
                             Add your blessing
-                        </Button>
+                        </Button> */}
                         <Button
                             variant="contained"
                             sx={{

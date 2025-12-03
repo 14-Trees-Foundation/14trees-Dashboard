@@ -1,16 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { Box, Typography, Divider, useMediaQuery, Grid, Card, CardContent } from "@mui/material";
 import { Carousel } from "antd";
-import logo from "../../../assets/logo_white_small.png";
 import loriFayzanDashboardImage from "../../../assets/event-dashboard/Lori_Fayzan_Dashboard.jpg";
 import { createStyles, makeStyles } from "@mui/styles";
 // Tree species images (replace these paths with your actual asset imports)
-import pimpalImg from "../../../assets/image 10.png";
-import arjunImg from "../../../assets/image 7.png";
-import peepalImg from "../../../assets/image 10.png";
-import bargadImg from "../../../assets/image 7.png";
-import neemImg from "../../../assets/image 10.png";
-import background from "../../../assets/background.png";
 import logoTree from "../../../assets/logoTree.png";
 import { Event, EventMessage } from "../../../types/event";
 import { EventImage } from "../../../types/eventImage";
@@ -19,6 +12,7 @@ import EventTrees from "./EventTrees";
 import EventMessages from "./EventMessages";
 import EventImgMsg from "./EventImgMsg";
 import ApiClient from "../../../api/apiClient/apiClient";
+import background from "../../../assets/background.png";
 
 interface EventDashboardProps {
     event: Event;
@@ -122,8 +116,8 @@ const EventDashboard: React.FC<EventDashboardProps> = ({ event, eventMessages })
     const [isLoadingImages, setIsLoadingImages] = useState<boolean>(true);
     const [allEventImages, setAllEventImages] = useState<string[]>([]);
     const [totalTrees, setTotalTrees] = useState<number | null>(null);
-    const [speciesTotal, setSpeciesTotal] = useState<number | null>(null);
-    const [speciesFromApi, setSpeciesFromApi] = useState<Array<{ label: string; illustration?: string }>>([]);
+    const [eventTreeTypesCount, setEventTreeTypesCount] = useState<number | null>(null);
+    const [eventTreeTypes, setEventTreeTypes] = useState<Array<{ label: string; illustration?: string }>>([]);
 
     const apiClient = new ApiClient();
     const linkConfig = EVENT_DASHBOARD_CONFIG_BY_LINK_ID[event.link ?? ""] ?? {};
@@ -141,7 +135,7 @@ const EventDashboard: React.FC<EventDashboardProps> = ({ event, eventMessages })
     const treesHeadingText = linkConfig.treesHeadingText ?? (event.type === "2" ? "Memorial Trees" : "Event Trees");
     const treesHeadingColor = linkConfig.treesHeadingColor;
     const shouldHideHeader = linkConfig.hideHeader ?? false;
-    const isType5 = event.type === "5";
+    const isWeddingType = event.type === "5";
     
     // Helper to render backend message preserving \r and \n as line breaks
     const renderMessageWithLineBreaks = (msg: string) => {
@@ -238,18 +232,18 @@ const EventDashboard: React.FC<EventDashboardProps> = ({ event, eventMessages })
     useEffect(() => {
       const fetchTreeTypes = async () => {
         try {
-          const data = await apiClient.getTreeTypes(0, 20, [
+          const data = await apiClient.getTreeTypes(0, 500, [
             { columnField: 'event_id', operatorValue: 'equals', value: event.id }
           ]);
           const total = Number(data.total ?? 0);
-          setSpeciesTotal(isNaN(total) ? null : total);
+          setEventTreeTypesCount(isNaN(total) ? null : total);
           const results: any[] = Array.isArray(data.results) ? data.results : [];
           const mapped = results.map(r => ({ label: String(r.plant_type || ''), illustration: r.illustration_s3_path || undefined }));
-          setSpeciesFromApi(mapped);
+          setEventTreeTypes(mapped);
         } catch (e) {
           console.error('Species fetch error', e);
-          setSpeciesTotal(null);
-          setSpeciesFromApi([]);
+          setEventTreeTypesCount(null);
+          setEventTreeTypes([]);
         }
       };
       fetchTreeTypes();
@@ -260,19 +254,11 @@ const EventDashboard: React.FC<EventDashboardProps> = ({ event, eventMessages })
       ? allEventImages.filter((url) => url !== event.event_poster)
       : allEventImages;
 
-    // Species data for cards (imported assets)
-    const defaultSpecies = [
-      { src: pimpalImg, label: 'Pimpal' },
-      { src: arjunImg, label: 'Arjun' },
-      { src: peepalImg, label: 'Peepal' },
-      { src: bargadImg, label: 'Bargad' },
-      { src: neemImg, label: 'Neem' },
-    ];
     // Build species list: only API items with images; if less than 4, fill with local defaults to reach 4
     // Validate image URLs by preloading; exclude broken images to avoid blank cards
     const [validatedSpeciesImages, setValidatedSpeciesImages] = useState<Array<{ src: string; label: string }>>([]);
     useEffect(() => {
-      const items: Array<{ src: string; label: string }> = speciesFromApi
+      const items: Array<{ src: string; label: string }> = eventTreeTypes
         .filter(s => Boolean(s.illustration))
         .map(s => ({ src: s.illustration as string, label: s.label }));
       if (items.length === 0) {
@@ -292,20 +278,20 @@ const EventDashboard: React.FC<EventDashboardProps> = ({ event, eventMessages })
         setValidatedSpeciesImages(filtered);
       });
       return () => { isCancelled = true; };
-    }, [speciesFromApi]);
+    }, [eventTreeTypes]);
 
     const species: Array<{ src: string; label: string }> = (() => {
       const filled: Array<{ src: string; label: string }> = [...validatedSpeciesImages];
       let i = 0;
-      while (filled.length < 4) {
-        const next = defaultSpecies[i % defaultSpecies.length];
-        filled.push({ src: next.src, label: next.label });
-        i++;
-      }
+      // while (filled.length < 4) {
+      //   const next = defaultSpecies[i % defaultSpecies.length];
+      //   filled.push({ src: next.src, label: next.label });
+      //   i++;
+      // }
       return filled;
     })();
 
-    if (isType5) {
+    if (isWeddingType) {
         return (
           <Box
             p={0}
@@ -695,7 +681,7 @@ const EventDashboard: React.FC<EventDashboardProps> = ({ event, eventMessages })
 
                 <Typography variant={isMobile ? 'h6' : 'h4'}
                   sx={{ color: currentTheme.textAreaBg, fontFamily: 'serif', fontWeight: 700, textAlign: 'center', mb: 2 }}>
-                  {(speciesTotal)} Tree Species native to the region
+                  {(eventTreeTypesCount)} Tree Species native to the region
                 </Typography>
               </Box>
             </Box>

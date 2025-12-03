@@ -94,19 +94,6 @@ function EditTreeType({
           })
         )
       ]);
-      // // setFiles(
-      // //
-      //   acceptedFiles.map((file) =>
-      //     Object.assign(file, {
-      //       preview: URL.createObjectURL(file),
-      //     })
-      //   )
-      // );
-
-      // setFormData((prevFormData) => ({
-      //   ...prevFormData,
-      //   images: [...(prevFormData.images || []), acceptedFiles],
-      // }));
     },
     onDropRejected: (rejectedFiles) => {
       // toast.error("Only 10 images allowed!");
