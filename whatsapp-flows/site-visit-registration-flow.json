@@ -1,0 +1,373 @@
+{
+  "version": "6.3",
+  "data_api_version": "3.0",
+  "routing_model": {
+    "SITE_VISIT_WELCOME": ["SITE_VISIT_SELECT"],
+    "SITE_VISIT_SELECT": ["SITE_VISIT_REGISTRANT_DETAILS"],
+    "SITE_VISIT_REGISTRANT_DETAILS": ["SITE_VISIT_CONFIRM"],
+    "SITE_VISIT_CONFIRM": ["SITE_VISIT_SUBMITTED"],
+    "SITE_VISIT_SUBMITTED": []
+  },
+  "screens": [
+    {
+      "id": "SITE_VISIT_WELCOME",
+      "title": "Site Visit Registration",
+      "data": {},
+      "layout": {
+        "type": "SingleColumnLayout",
+        "children": [
+          {
+            "type": "TextSubheading",
+            "text": "Register for an upcoming visit"
+          },
+          {
+            "type": "TextBody",
+            "text": "Choose a scheduled visit, share your contact details, and confirm your reservation."
+          },
+          {
+            "type": "Footer",
+            "label": "Start",
+            "on-click-action": {
+              "name": "navigate",
+              "next": {
+                "type": "screen",
+                "name": "SITE_VISIT_SELECT"
+              },
+              "payload": {}
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "SITE_VISIT_SELECT",
+      "title": "Upcoming Site Visits",
+      "data": {
+        "upcoming_visits": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          },
+          "__example__": [
+            {
+              "visit_id": "VISIT-001",
+              "visit_name": "Nursery Operations Walkthrough",
+              "site_id": "SITE-NAI-01",
+              "site_name": "Nairobi Eco Nursery",
+              "visit_date": "2024-07-08",
+              "visit_type": "corporate"
+            }
+          ]
+        }
+      },
+      "layout": {
+        "type": "SingleColumnLayout",
+        "children": [
+          {
+            "type": "TextBody",
+            "text": "Pick the site visit you would like to attend."
+          },
+          {
+            "type": "RadioButtonsGroup",
+            "required": true,
+            "label": "Choose an upcoming site visit:",
+            "name": "selected_visit_id",
+            "data-source": [
+              {
+                "id": "VISIT-001",
+                "title": "Nursery Operations Walkthrough",
+                "description": "`Site: Nairobi Eco Nursery\nDate: 2024-07-08\nVisit type: Corporate`"
+              },
+              {
+                "id": "VISIT-002",
+                "title": "Community Planting Day",
+                "description": "Site: Kajado Reforestation Plot\nDate: 2024-07-12\nVisit type: Family"
+              },
+              {
+                "id": "VISIT-003",
+                "title": "Sawmill & Workshop Tour",
+                "description": "Site: Kakamega Wood Hub\nDate: 2024-07-15\nVisit type: Corporate"
+              },
+              {
+                "id": "VISIT-004",
+                "title": "Mangrove Restoration Briefing",
+                "description": "Site: Mombasa Coastline Project\nDate: 2024-07-19\nVisit type: Corporate"
+              },
+              {
+                "id": "VISIT-005",
+                "title": "Family Eco Walk",
+                "description": "Site: Limuru Learning Forest\nDate: 2024-07-21\nVisit type: Family"
+              }
+            ]
+          },
+          {
+            "type": "Footer",
+            "label": "Continue",
+            "on-click-action": {
+              "name": "data_exchange",
+              "payload": {
+                "selected_visit_id": "${form.selected_visit_id}"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "SITE_VISIT_REGISTRANT_DETAILS",
+      "title": "Your Details",
+      "data": {
+        "selected_visit_id": {
+          "type": "string",
+          "__example__": "VISIT-001"
+        }
+      },
+      "layout": {
+        "type": "SingleColumnLayout",
+        "children": [
+          {
+            "type": "TextBody",
+            "text": "You selected:",
+            "visible": "`${screen.SITE_VISIT_SELECT.form.selected_visit_id} != ''`"
+          },
+          {
+            "type": "TextBody",
+            "text": "Nursery Operations Walkthrough — Nairobi Eco Nursery on 2024-07-08 (Corporate)",
+            "visible": "`${screen.SITE_VISIT_SELECT.form.selected_visit_id} == 'VISIT-001'`"
+          },
+          {
+            "type": "TextBody",
+            "text": "Community Planting Day — Kajado Reforestation Plot on 2024-07-12 (Family)",
+            "visible": "`${screen.SITE_VISIT_SELECT.form.selected_visit_id} == 'VISIT-002'`"
+          },
+          {
+            "type": "TextBody",
+            "text": "Sawmill & Workshop Tour — Kakamega Wood Hub on 2024-07-15 (Corporate)",
+            "visible": "`${screen.SITE_VISIT_SELECT.form.selected_visit_id} == 'VISIT-003'`"
+          },
+          {
+            "type": "TextBody",
+            "text": "Mangrove Restoration Briefing — Mombasa Coastline Project on 2024-07-19 (Corporate)",
+            "visible": "`${screen.SITE_VISIT_SELECT.form.selected_visit_id} == 'VISIT-004'`"
+          },
+          {
+            "type": "TextBody",
+            "text": "Family Eco Walk — Limuru Learning Forest on 2024-07-21 (Family)",
+            "visible": "`${screen.SITE_VISIT_SELECT.form.selected_visit_id} == 'VISIT-005'`"
+          },
+          {
+            "type": "TextBody",
+            "text": "Tell us who will attend so we can confirm the reservation."
+          },
+          {
+            "type": "TextInput",
+            "required": true,
+            "input-type": "text",
+            "label": "Full name",
+            "name": "visitor_name"
+          },
+          {
+            "type": "TextInput",
+            "required": true,
+            "input-type": "email",
+            "label": "Email address",
+            "name": "visitor_email"
+          },
+          {
+            "type": "Footer",
+            "label": "Continue",
+            "on-click-action": {
+              "name": "data_exchange",
+              "payload": {
+                "selected_visit_id": "${screen.SITE_VISIT_SELECT.form.selected_visit_id}",
+                "visitor_name": "${form.visitor_name}",
+                "visitor_email": "${form.visitor_email}"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "SITE_VISIT_CONFIRM",
+      "title": "Confirm Registration",
+      "data": {
+        "selected_visit_id": {
+          "type": "string",
+          "__example__": "VISIT-001"
+        },
+        "visitor_name": {
+          "type": "string",
+          "__example__": "Jane Doe"
+        },
+        "visitor_email": {
+          "type": "string",
+          "__example__": "jane@example.com"
+        }
+      },
+      "layout": {
+        "type": "SingleColumnLayout",
+        "children": [
+          {
+            "type": "TextBody",
+            "text": "Review the details below before submitting."
+          },
+          {
+            "type": "TextSubheading",
+            "text": "Selected visit"
+          },
+          {
+            "type": "TextBody",
+            "text": "Nursery Operations Walkthrough",
+            "visible": "`${screen.SITE_VISIT_SELECT.form.selected_visit_id} == 'VISIT-001'`"
+          },
+          {
+            "type": "TextBody",
+            "text": "Site: Nairobi Eco Nursery",
+            "visible": "`${screen.SITE_VISIT_SELECT.form.selected_visit_id} == 'VISIT-001'`"
+          },
+          {
+            "type": "TextBody",
+            "text": "Date: 2024-07-08",
+            "visible": "`${screen.SITE_VISIT_SELECT.form.selected_visit_id} == 'VISIT-001'`"
+          },
+          {
+            "type": "TextBody",
+            "text": "Visit type: Corporate",
+            "visible": "`${screen.SITE_VISIT_SELECT.form.selected_visit_id} == 'VISIT-001'`"
+          },
+          {
+            "type": "TextBody",
+            "text": "Community Planting Day",
+            "visible": "`${screen.SITE_VISIT_SELECT.form.selected_visit_id} == 'VISIT-002'`"
+          },
+          {
+            "type": "TextBody",
+            "text": "Site: Kajado Reforestation Plot",
+            "visible": "`${screen.SITE_VISIT_SELECT.form.selected_visit_id} == 'VISIT-002'`"
+          },
+          {
+            "type": "TextBody",
+            "text": "Date: 2024-07-12",
+            "visible": "`${screen.SITE_VISIT_SELECT.form.selected_visit_id} == 'VISIT-002'`"
+          },
+          {
+            "type": "TextBody",
+            "text": "Visit type: Family",
+            "visible": "`${screen.SITE_VISIT_SELECT.form.selected_visit_id} == 'VISIT-002'`"
+          },
+          {
+            "type": "TextBody",
+            "text": "Sawmill & Workshop Tour",
+            "visible": "`${screen.SITE_VISIT_SELECT.form.selected_visit_id} == 'VISIT-003'`"
+          },
+          {
+            "type": "TextBody",
+            "text": "Site: Kakamega Wood Hub",
+            "visible": "`${screen.SITE_VISIT_SELECT.form.selected_visit_id} == 'VISIT-003'`"
+          },
+          {
+            "type": "TextBody",
+            "text": "Date: 2024-07-15",
+            "visible": "`${screen.SITE_VISIT_SELECT.form.selected_visit_id} == 'VISIT-003'`"
+          },
+          {
+            "type": "TextBody",
+            "text": "Visit type: Corporate",
+            "visible": "`${screen.SITE_VISIT_SELECT.form.selected_visit_id} == 'VISIT-003'`"
+          },
+          {
+            "type": "TextBody",
+            "text": "Mangrove Restoration Briefing",
+            "visible": "`${screen.SITE_VISIT_SELECT.form.selected_visit_id} == 'VISIT-004'`"
+          },
+          {
+            "type": "TextBody",
+            "text": "Site: Mombasa Coastline Project",
+            "visible": "`${screen.SITE_VISIT_SELECT.form.selected_visit_id} == 'VISIT-004'`"
+          },
+          {
+            "type": "TextBody",
+            "text": "Date: 2024-07-19",
+            "visible": "`${screen.SITE_VISIT_SELECT.form.selected_visit_id} == 'VISIT-004'`"
+          },
+          {
+            "type": "TextBody",
+            "text": "Visit type: Corporate",
+            "visible": "`${screen.SITE_VISIT_SELECT.form.selected_visit_id} == 'VISIT-004'`"
+          },
+          {
+            "type": "TextBody",
+            "text": "Family Eco Walk",
+            "visible": "`${screen.SITE_VISIT_SELECT.form.selected_visit_id} == 'VISIT-005'`"
+          },
+          {
+            "type": "TextBody",
+            "text": "Site: Limuru Learning Forest",
+            "visible": "`${screen.SITE_VISIT_SELECT.form.selected_visit_id} == 'VISIT-005'`"
+          },
+          {
+            "type": "TextBody",
+            "text": "Date: 2024-07-21",
+            "visible": "`${screen.SITE_VISIT_SELECT.form.selected_visit_id} == 'VISIT-005'`"
+          },
+          {
+            "type": "TextBody",
+            "text": "Visit type: Family",
+            "visible": "`${screen.SITE_VISIT_SELECT.form.selected_visit_id} == 'VISIT-005'`"
+          },
+          {
+            "type": "TextSubheading",
+            "text": "Attendee"
+          },
+          {
+            "type": "TextBody",
+            "text": "Name: ${screen.SITE_VISIT_REGISTRANT_DETAILS.form.visitor_name}"
+          },
+          {
+            "type": "TextBody",
+            "text": "Email: ${screen.SITE_VISIT_REGISTRANT_DETAILS.form.visitor_email}"
+          },
+          {
+            "type": "Footer",
+            "label": "Submit Registration",
+            "on-click-action": {
+              "name": "data_exchange",
+              "payload": {
+                "visit_id": "${screen.SITE_VISIT_SELECT.form.selected_visit_id}",
+                "visitor_name": "${screen.SITE_VISIT_REGISTRANT_DETAILS.form.visitor_name}",
+                "visitor_email": "${screen.SITE_VISIT_REGISTRANT_DETAILS.form.visitor_email}"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "SITE_VISIT_SUBMITTED",
+      "title": "Registration Submitted",
+      "terminal": true,
+      "data": {},
+      "layout": {
+        "type": "SingleColumnLayout",
+        "children": [
+          {
+            "type": "TextBody",
+            "text": "✅ Your site visit registration has been received."
+          },
+          {
+            "type": "TextBody",
+            "text": "We will reach out by email with confirmation and any next steps."
+          },
+          {
+            "type": "Footer",
+            "label": "Close",
+            "on-click-action": {
+              "name": "complete"
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

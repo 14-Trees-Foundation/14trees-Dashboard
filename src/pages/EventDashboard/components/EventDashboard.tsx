@@ -140,6 +140,17 @@ const EventDashboard: React.FC<EventDashboardProps> = ({ event, eventMessages })
     const shouldHideHeader = linkConfig.hideHeader ?? false;
     const isType5 = event.type === "5";
     
+    // Helper to render backend message preserving \r and \n as line breaks
+    const renderMessageWithLineBreaks = (msg: string) => {
+        const lines = msg.split(/\r\n|\n|\r/);
+        return lines.map((line, idx) => (
+            <span key={idx}>
+                {line}
+                {idx < lines.length - 1 && <br />}
+            </span>
+        ));
+    };
+    
     // Theme configuration based on theme_color
     const themeConfigs = {
         red: {
@@ -208,8 +219,13 @@ const EventDashboard: React.FC<EventDashboardProps> = ({ event, eventMessages })
 
     // Combine images from both sources when either changes
     useEffect(() => {
-        const legacyImages = event.memories || [];
-        const combinedImages = [...legacyImages, ...apiEventImages];
+        // const legacyImages = event.memories || [];
+        let legacyImages = [
+          6, 1, 3, 5, 4, 8, 9, 1, 11, 12, 13, 14, 15, 23, 16, 17, 18, 19, 20, 21, 22,
+        ].map((number) => {
+          return `https://14treesplants.s3.ap-south-1.amazonaws.com/memories/memory${number}.jpg`;
+        });
+        const combinedImages = [ ...apiEventImages, ...legacyImages];
         // Remove duplicates in case the same image exists in both sources
         const uniqueImages = Array.from(new Set(combinedImages));
         setAllEventImages(uniqueImages);
@@ -413,7 +429,7 @@ const EventDashboard: React.FC<EventDashboardProps> = ({ event, eventMessages })
                           letterSpacing: 0,
                         }}
                       >
-                        {event.message}
+                        {renderMessageWithLineBreaks(event.message)}
                       </Typography>
                     </Box>
                   )}
