@@ -50,6 +50,7 @@ const AddTreeType = ({ open, handleClose, createPlantType }) => {
   const [enSearchStr, setEnSearchStr] = useState('');
   const [mrSearchStr, setMrSearchStr] = useState('');
   const [files, setFiles] = useState([]);
+  const [infoCardFile, setInfoCardFile] = useState(null);
 
   useEffect(() => {
     const timeoutId = setTimeout(() => {
@@ -139,7 +140,7 @@ const AddTreeType = ({ open, handleClose, createPlantType }) => {
   const handleSubmit = (event) => {
     event.preventDefault();
     console.log("data of form: ", formData);
-    createPlantType(formData, files);
+    createPlantType(formData, files, infoCardFile);
     handleClose();
   };
 
@@ -171,6 +172,23 @@ const AddTreeType = ({ open, handleClose, createPlantType }) => {
       // toast.error("Only 10 images allowed!");
     },
   });
+
+  const handleInfoCardChange = (e) => {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      // add preview and a custom fieldname so backend/client code can distinguish this file
+      const fileWithMeta = Object.assign(file, {
+        preview: URL.createObjectURL(file),
+        fieldname: "info_card",
+      });
+
+      setInfoCardFile(fileWithMeta);
+      // setFiles((prevFiles) => [...prevFiles, fileWithMeta]);
+    } else {
+      setInfoCardFile(null);
+    }
+    
+  };
 
   return (
     <div>
@@ -405,6 +423,13 @@ const AddTreeType = ({ open, handleClose, createPlantType }) => {
                   </section>
                 </div>
                 <div className={classes.prevcontainer}>{thumbs}</div>
+              </Grid>
+              <Grid item xs={12}>
+                <div>
+                  <label>Info Card (single image)</label>
+                  <input type="file" accept="image/*" onChange={handleInfoCardChange} />
+                  {infoCardFile && <div>Info Card Image: {infoCardFile.name}</div>}
+                </div>
               </Grid>
 
               <Grid

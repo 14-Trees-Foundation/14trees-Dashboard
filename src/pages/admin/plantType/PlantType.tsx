@@ -281,8 +281,8 @@ export const PlantTypeComponent = () => {
     }
   };
 
-    const handleCreatePlantTypeData = (formData: PlantType, files: Blob[]) => {
-        createPlantType(formData, files);
+    const handleCreatePlantTypeData = (formData: PlantType, files: Blob[], info_card_file: Blob) => {
+        createPlantType(formData, files, info_card_file);
     };
 
     const handleDeletePlantType = (row: PlantType) => {
@@ -290,8 +290,8 @@ export const PlantTypeComponent = () => {
         setSelectedItem(row);
     };
 
-    const handleEditSubmit = (formData: PlantType) => {
-        updatePlantType(formData);
+    const handleEditSubmit = (formData: PlantType, files: Blob[], info_card_file: Blob) => {
+        updatePlantType(formData, files, info_card_file);
     };
 
     const handleCloseEditModal = () => {
