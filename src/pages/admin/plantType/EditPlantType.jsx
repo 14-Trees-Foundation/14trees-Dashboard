@@ -37,6 +37,7 @@ function EditTreeType({
   };
 
   const [formData, setFormData] = useState(row);
+  const [infoCardFile, setInfoCardFile] = useState(null);
 
   const classes = useStyles();
 
@@ -67,7 +68,7 @@ function EditTreeType({
 
   const handleEditSubmit = (event) => {
     event.preventDefault();
-    editSubmit(formData);
+    editSubmit(formData, files, infoCardFile);
     handleCloseEditModal(false);
   };
   const [files, setFiles] = useState([]);
@@ -85,23 +86,37 @@ function EditTreeType({
     },
     maxFiles: 10,
     onDrop: (acceptedFiles) => {
-      setFiles(
-        acceptedFiles.map((file) =>
+      setFiles(prevFiles => [
+        ...prevFiles,
+        ...acceptedFiles.map((file) =>
           Object.assign(file, {
             preview: URL.createObjectURL(file),
           })
         )
-      );
-
-      setFormData((prevFormData) => ({
-        ...prevFormData,
-        images: [...(prevFormData.images || []), acceptedFiles],
-      }));
+      ]);
     },
     onDropRejected: (rejectedFiles) => {
       // toast.error("Only 10 images allowed!");
     },
   });
+
+  const handleInfoCardChange = (e) => {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      // add preview and a custom fieldname so backend/client code can distinguish this file
+      const fileWithMeta = Object.assign(file, {
+        preview: URL.createObjectURL(file),
+        fieldname: "info_card",
+      });
+
+      setInfoCardFile(fileWithMeta);
+      // setFiles((prevFiles) => [...prevFiles, fileWithMeta]);
+    } else {
+      setInfoCardFile(null);
+    }
+    
+  };
+
 
   return (
     <div>
@@ -260,6 +275,13 @@ function EditTreeType({
                   </section>
                 </div>
                 <div className={classes.prevcontainer}>{thumbs}</div>
+              </Grid>
+              <Grid item xs={12}>
+                <div>
+                  <label>Info Card (single image)</label>
+                  <input type="file" accept="image/*" onChange={handleInfoCardChange} />
+                  {infoCardFile && <div>Info Card Image: {infoCardFile.name}</div>}
+                </div>
               </Grid>
 
               <Grid

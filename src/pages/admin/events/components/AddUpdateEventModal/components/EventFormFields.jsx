@@ -10,13 +10,15 @@ import {
     Typography,
     Divider,
 } from '@mui/material';
+import LocationPicker from '../../../../../../components/LocationPicker';
 
 const EventFormFields = ({ 
     formData, 
     handleChange, 
     isEditMode,
     eventTypes,
-    locationOptions 
+    locationOptions,
+    themeColorOptions
 }) => {
     return (
         <>
@@ -78,12 +80,12 @@ const EventFormFields = ({
 
             <Grid item xs={12}>
                 <FormControl fullWidth required={!isEditMode}>
-                    <InputLabel>Event Location</InputLabel>
+                    <InputLabel>Location Type</InputLabel>
                     <Select
                         name="event_location"
                         value={formData.event_location}
                         onChange={handleChange}
-                        label="Event Location"
+                        label="Location Type"
                     >
                         {locationOptions.map((location) => (
                             <MenuItem key={location.value} value={location.value}>
@@ -91,6 +93,51 @@ const EventFormFields = ({
                             </MenuItem>
                         ))}
                     </Select>
+                    <FormHelperText>
+                        Choose whether the event is onsite or offsite
+                    </FormHelperText>
+                </FormControl>
+            </Grid>
+
+            {/* Optional: detailed location search + map (not required) */}
+            <Grid item xs={12}>
+                <LocationPicker
+                    value={formData.location ? [formData.location] : []}
+                    onChange={(locations) => {
+                        // store single selected location object (or null)
+                        const locationObj = Array.isArray(locations) && locations.length > 0 ? locations[0] : null;
+                        handleChange({
+                            target: {
+                                name: 'location',
+                                value: locationObj
+                            }
+                        });
+                    }}
+                    label="Location (optional)"
+                    helperText="Search area and pick a point on the map (optional)"
+                    required={false}
+                    maxLocations={1}
+                />
+            </Grid>
+
+            <Grid item xs={12}>
+                <FormControl fullWidth>
+                    <InputLabel>Event Theme Color</InputLabel>
+                    <Select
+                        name="theme_color"
+                        value={formData.theme_color || ''}
+                        onChange={handleChange}
+                        label="Event Theme Color"
+                    >
+                        {themeColorOptions.map((color) => (
+                            <MenuItem key={color.value} value={color.value}>
+                                {color.label}
+                            </MenuItem>
+                        ))}
+                    </Select>
+                    <FormHelperText>
+                        Optional: Choose a theme color for the event page
+                    </FormHelperText>
                 </FormControl>
             </Grid>
 

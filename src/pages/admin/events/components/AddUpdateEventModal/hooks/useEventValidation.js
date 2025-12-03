@@ -13,7 +13,7 @@ export const useEventValidation = () => {
                 'name': 'Event Name',
                 'type': 'Event Type',
                 'event_date': 'Event Date',
-                'event_location': 'Event Location',
+                'event_location': 'Event Location (coordinates)',
                 'assigned_by': 'Organiser/Point of Contact'
             };
             const friendlyFieldNames = missingFields.map(field => fieldNames[field] || field);
@@ -22,6 +22,8 @@ export const useEventValidation = () => {
                 error: `Please fill in the following required fields: ${friendlyFieldNames.join(', ')}`
             };
         }
+
+        // 'location' (map-picked point) is optional; no extra validation needed
 
         return { isValid: true, error: null };
     };

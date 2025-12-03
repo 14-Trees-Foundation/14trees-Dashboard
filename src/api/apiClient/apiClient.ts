@@ -83,7 +83,7 @@ class ApiClient {
         }
     }
 
-    async createPlantType(data: PlantType, files: Blob[]): Promise<PlantType> {
+    async createPlantType(data: PlantType, files: Blob[], info_card?: Blob): Promise<PlantType> {
         try {
             const formData = new FormData();
             if (files) {
@@ -98,6 +98,9 @@ class ApiClient {
                     formData.append(key, strValue);
                 }
             });
+            if (info_card) {
+                formData.append("info_card", info_card);
+            };
             const response = await this.api.post<PlantType>(`/plant-types/`, formData);
 
             return response.data;
@@ -107,19 +110,36 @@ class ApiClient {
         }
     }
 
-    async updatePlantType(data: PlantType, file?: Blob): Promise<PlantType> {
+    async updatePlantType(data: PlantType, files?: Blob[], info_card?: Blob): Promise<PlantType> {
         try {
             const formData = new FormData();
-            if (file) {
-                formData.append("files", file);
+            if (files) {
+                files.forEach((file) => {
+                    formData.append("files", file);
+                });
             }
             Object.entries(data).forEach(([key, value]) => {
-                if (key != 'image') {
-                    const strValue = value as string
-                    formData.append(key, strValue);
+                if (value !== null && value !== undefined){
+                    if (Array.isArray(value)) {
+                        value.forEach((item) => {
+                            formData.append(`${key}[]`, item);
+                        })
+                    } else if (typeof value === 'object'){
+                        formData.append(key, JSON.stringify(value))
+                    } else{
+                        const strValue = value as string
+                        formData.append(key, strValue);
+                    }
+                    
                 }
+                
             });
-            const response = await this.api.put<PlantType>(`/plant-types/${data.id}`, data);
+            if (info_card) {
+                formData.append("info_card", info_card);
+            };
+            
+            
+            const response = await this.api.put<PlantType>(`/plant-types/${data.id}`, formData);
             return response.data;
         } catch (error) {
             console.error(error)
@@ -872,6 +892,18 @@ class ApiClient {
         } catch (error: any) {
             console.error(error)
             throw new Error(`Failed to fetch Trees: ${error.message}`);
+        }
+    }
+
+    // Tree types aggregation for an event (species with counts)
+    async getTreeTypes(offset: number, limit: number, filters?: any[]): Promise<PaginatedResponse<any>> {
+        const url = `/trees/get/treetypes?offset=${offset}&limit=${limit}`;
+        try {
+            const response = await this.api.post<PaginatedResponse<any>>(url, { filters: filters });
+            return response.data;
+        } catch (error: any) {
+            console.error(error)
+            throw new Error(`Failed to fetch tree types: ${error.message}`);
         }
     }
 

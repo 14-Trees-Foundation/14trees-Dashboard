@@ -1,0 +1,263 @@
+{
+  "version": "6.3",
+  "data_api_version": "3.0",
+  "routing_model": {
+    "SITE_VISIT_FEEDBACK_INTRO": ["SITE_VISIT_FEEDBACK_FORM"],
+    "SITE_VISIT_FEEDBACK_FORM": ["SITE_VISIT_FEEDBACK_SUMMARY"],
+    "SITE_VISIT_FEEDBACK_SUMMARY": ["SITE_VISIT_FEEDBACK_SUBMITTED"],
+    "SITE_VISIT_FEEDBACK_SUBMITTED": []
+  },
+  "screens": [
+    {
+      "id": "SITE_VISIT_FEEDBACK_INTRO",
+      "title": "Site Visit Feedback",
+      "data": {
+        "last_visit": {
+          "type": "object",
+          "properties": {
+            "visit_id": { "type": "string", "__example__": "VISIT-003" },
+            "visit_name": { "type": "string", "__example__": "Sawmill & Workshop Tour" },
+            "site_id": { "type": "string", "__example__": "SITE-KAK-02" },
+            "site_name": { "type": "string", "__example__": "Kakamega Wood Hub" },
+            "visit_date": { "type": "string", "__example__": "2024-06-20" },
+            "visit_type": { "type": "string", "__example__": "corporate" }
+          }
+        }
+      },
+      "layout": {
+        "type": "SingleColumnLayout",
+        "children": [
+          {
+            "type": "TextSubheading",
+            "text": "Thank you for visiting!"
+          },
+          {
+            "type": "TextBody",
+            "text": "We would love to hear how your last site visit went."
+          },
+          {
+            "type": "TextSubheading",
+            "text": "Your most recent visit"
+          },
+          {
+            "type": "TextBody",
+            "text": "Visit: ${data.last_visit.visit_name}"
+          },
+          {
+            "type": "TextBody",
+            "text": "Site: ${data.last_visit.site_name}"
+          },
+          {
+            "type": "TextBody",
+            "text": "Date: ${data.last_visit.visit_date}"
+          },
+          {
+            "type": "TextBody",
+            "text": "Visit type: Corporate",
+            "visible": "`${data.last_visit.visit_type} == 'corporate'`"
+          },
+          {
+            "type": "TextBody",
+            "text": "Visit type: Family",
+            "visible": "`${data.last_visit.visit_type} == 'family'`"
+          },
+          {
+            "type": "Footer",
+            "label": "Share Feedback",
+            "on-click-action": {
+              "name": "navigate",
+              "next": {
+                "type": "screen",
+                "name": "SITE_VISIT_FEEDBACK_FORM"
+              },
+              "payload": {
+                "last_visit": {
+                  "visit_id": "VISIT-003",
+                  "visit_name": "Sawmill & Workshop Tour",
+                  "site_id": "SITE-KAK-02",
+                  "site_name": "Kakamega Wood Hub",
+                  "visit_date": "2024-06-20",
+                  "visit_type": "corporate"
+                }
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "SITE_VISIT_FEEDBACK_FORM",
+      "title": "Share Your Feedback",
+      "data": {
+        "last_visit": {
+          "type": "object",
+          "__example__": {
+            "visit_id": "VISIT-003",
+            "visit_name": "Sawmill & Workshop Tour",
+            "site_id": "SITE-KAK-02",
+            "site_name": "Kakamega Wood Hub",
+            "visit_date": "2024-06-20",
+            "visit_type": "corporate"
+          }
+        }
+      },
+      "layout": {
+        "type": "SingleColumnLayout",
+        "children": [
+          {
+            "type": "TextBody",
+            "text": "Sawmill & Workshop Tour — Kakamega Wood Hub on 2024-06-20 (Corporate)",
+            "visible": "`${screen.SITE_VISIT_FEEDBACK_INTRO.next.payload.last_visit.visit_id} == 'VISIT-003'`"
+          },
+          {
+            "type": "RadioButtonsGroup",
+            "required": true,
+            "label": "Overall, how satisfied were you with the visit?",
+            "name": "satisfaction_rating",
+            "data-source": [
+              { "id": "5", "title": "5 — Excellent" },
+              { "id": "4", "title": "4 — Good" },
+              { "id": "3", "title": "3 — Okay" },
+              { "id": "2", "title": "2 — Needs improvement" },
+              { "id": "1", "title": "1 — Poor" }
+            ]
+          },
+          {
+            "type": "TextArea",
+            "label": "What went well?",
+            "name": "positive_feedback",
+            "placeholder": "Optional",
+            "max-length": 500
+          },
+          {
+            "type": "TextArea",
+            "label": "What could be improved?",
+            "name": "improvement_feedback",
+            "placeholder": "Optional",
+            "max-length": 500
+          },
+          {
+            "type": "Footer",
+            "label": "Continue",
+            "on-click-action": {
+              "name": "data_exchange",
+              "payload": {
+                "visit_id": "VISIT-003",
+                "visit_name": "Sawmill & Workshop Tour",
+                "site_name": "Kakamega Wood Hub",
+                "visit_date": "2024-06-20",
+                "visit_type": "corporate",
+                "satisfaction_rating": "${form.satisfaction_rating}",
+                "positive_feedback": "${form.positive_feedback}",
+                "improvement_feedback": "${form.improvement_feedback}"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "SITE_VISIT_FEEDBACK_SUMMARY",
+      "title": "Review Feedback",
+      "data": {
+        "visit_name": { "type": "string", "__example__": "Sawmill & Workshop Tour" },
+        "site_name": { "type": "string", "__example__": "Kakamega Wood Hub" },
+        "visit_date": { "type": "string", "__example__": "2024-06-20" },
+        "visit_type": { "type": "string", "__example__": "corporate" },
+        "satisfaction_rating": { "type": "string", "__example__": "5" },
+        "positive_feedback": { "type": "string", "__example__": "Great host!" },
+        "improvement_feedback": { "type": "string", "__example__": "More time on the tour" }
+      },
+      "layout": {
+        "type": "SingleColumnLayout",
+        "children": [
+          {
+            "type": "TextBody",
+            "text": "Please confirm the feedback before submitting."
+          },
+          {
+            "type": "TextSubheading",
+            "text": "Visit details"
+          },
+          {
+            "type": "TextBody",
+            "text": "Visit: Sawmill & Workshop Tour"
+          },
+          {
+            "type": "TextBody",
+            "text": "Site: Kakamega Wood Hub"
+          },
+          {
+            "type": "TextBody",
+            "text": "Date: 2024-06-20"
+          },
+          {
+            "type": "TextBody",
+            "text": "Visit type: Corporate"
+          },
+          {
+            "type": "TextSubheading",
+            "text": "Your feedback"
+          },
+          {
+            "type": "TextBody",
+            "text": "Satisfaction rating: ${screen.SITE_VISIT_FEEDBACK_FORM.form.satisfaction_rating}"
+          },
+          {
+            "type": "TextBody",
+            "text": "What went well: ${screen.SITE_VISIT_FEEDBACK_FORM.form.positive_feedback}",
+            "visible": "`${screen.SITE_VISIT_FEEDBACK_FORM.form.positive_feedback} != ''`"
+          },
+          {
+            "type": "TextBody",
+            "text": "What could improve: ${screen.SITE_VISIT_FEEDBACK_FORM.form.improvement_feedback}",
+            "visible": "`${screen.SITE_VISIT_FEEDBACK_FORM.form.improvement_feedback} != ''`"
+          },
+          {
+            "type": "Footer",
+            "label": "Submit Feedback",
+            "on-click-action": {
+              "name": "data_exchange",
+              "payload": {
+                "visit_id": "VISIT-003",
+                "visit_name": "Sawmill & Workshop Tour",
+                "site_name": "Kakamega Wood Hub",
+                "visit_date": "2024-06-20",
+                "visit_type": "corporate",
+                "satisfaction_rating": "${screen.SITE_VISIT_FEEDBACK_FORM.form.satisfaction_rating}",
+                "positive_feedback": "${screen.SITE_VISIT_FEEDBACK_FORM.form.positive_feedback}",
+                "improvement_feedback": "${screen.SITE_VISIT_FEEDBACK_FORM.form.improvement_feedback}"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "SITE_VISIT_FEEDBACK_SUBMITTED",
+      "title": "Feedback Received",
+      "terminal": true,
+      "data": {},
+      "layout": {
+        "type": "SingleColumnLayout",
+        "children": [
+          {
+            "type": "TextBody",
+            "text": "✅ Thanks for sharing your site visit feedback."
+          },
+          {
+            "type": "TextBody",
+            "text": "Your input helps us keep improving every visit."
+          },
+          {
+            "type": "Footer",
+            "label": "Close",
+            "on-click-action": {
+              "name": "complete"
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

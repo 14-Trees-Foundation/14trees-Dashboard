@@ -63,13 +63,13 @@ export const searchPlantTypes = (searchStr: string) => {
     }
 };
 
-export const createPlantType = (record: PlantType, files?: Blob[]) => {
+export const createPlantType = (record: PlantType, files?: Blob[], info_card_file?:Blob) => {
     const apiClient = new ApiClient();
     return (dispatch: any) => {
         dispatch({
             type: plantTypeActionTypes.CREATE_PLANT_TYPE_REQUESTED,
         });
-        apiClient.createPlantType(record, files?files:[]).then(
+        apiClient.createPlantType(record, files?files:[],info_card_file).then(
             (value: PlantType) => {
                 toast.success(`Successfully created plant type!`);
                 dispatch({
@@ -88,13 +88,13 @@ export const createPlantType = (record: PlantType, files?: Blob[]) => {
     };
 };
 
-export const updatePlantType = (record: PlantType, file?: Blob) => {
+export const updatePlantType = (record: PlantType, files?: Blob[], info_card_file?:Blob) => {
     const apiClient = new ApiClient();
     return (dispatch: any) => {
         dispatch({
             type: plantTypeActionTypes.UPDATE_PLANT_TYPE_REQUESTED,
         });
-        apiClient.updatePlantType(record, file).then(
+        apiClient.updatePlantType(record, files?files:[],info_card_file).then(
             (value: PlantType) => {
                 toast.success(`Successfully updated plant type!`);
                 dispatch({

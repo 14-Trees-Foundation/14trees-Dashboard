@@ -3,6 +3,12 @@
   src: local('HelveticaNowDisplay'), url(./fonts/HelveticaNowDisplay-Regular.ttf) format('truetype');
 }
 
+/* Ensure Google Places Autocomplete dropdown renders above modals */
+.pac-container {
+  z-index: 9999 !important;
+}
+
+
 body {
   font-family: HelveticaNowDisplay;
   font-weight: 400;

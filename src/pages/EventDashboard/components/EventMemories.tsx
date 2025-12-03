@@ -10,6 +10,12 @@ interface ImageCarouselProps {
 }
 
 const ImageCarousel: React.FC<ImageCarouselProps> = ({ imageUrls }) => {
+    // Default images used when no event memories are provided
+    // Using local assets already present in the repo (static imports)
+    const defaultImages: string[] = [
+    ];
+
+    const effectiveImageUrls: string[] = Array.isArray(imageUrls) && imageUrls.length > 0 ? imageUrls : defaultImages;
     const isMobile = useMediaQuery("(max-width:600px)");
 
     const carouselRef = useRef<CarouselRef | null>(null);
@@ -88,17 +94,22 @@ const ImageCarousel: React.FC<ImageCarouselProps> = ({ imageUrls }) => {
         </button>
     );
 
+    // chunk images into pairs so each carousel slide shows 2 images side-by-side
+    const chunks: Array<Array<string | null>> = [];
+    for (let i = 0; i < effectiveImageUrls.length; i += 2) {
+        const first = effectiveImageUrls[i] ?? null;
+        const second = effectiveImageUrls[i + 1] ?? null;
+        chunks.push([first, second]);
+    }
+
     return (
         <div
             style={{
                 width: "100%",
-                maxWidth: isMobile ? "96vw" : "80vw", // Full width for mobile, 80vw for larger screens
-                height: isMobile ? "250px" : "420px", // Adjust height for mobile
+                maxWidth: isMobile ? "96vw" : "80vw",
+                height: isMobile ? "250px" : "420px",
                 overflow: "hidden",
                 position: "relative",
-                // margin: "0 auto",
-                // display: "flex",
-                // justifyContent: "center",
             }}
         >
             <Carousel
@@ -110,37 +121,67 @@ const ImageCarousel: React.FC<ImageCarouselProps> = ({ imageUrls }) => {
                 nextArrow={nextArrow}
                 style={{ width: "100%", height: "100%" }}
             >
-                {imageUrls.map((url, index) => (
-                    <div key={index}>
+                {chunks.map((pair, chunkIndex) => (
+                    <div key={chunkIndex}>
                         <div
                             style={{
                                 display: "flex",
-                                justifyContent: "center",
-                                alignItems: "center",
                                 height: "100%",
                                 width: "100%",
-                                cursor: "zoom-in",
-                            }}
-                            onClick={() => openLightbox(index)}
-                            // onMouseEnter={() => !isMobile && openLightbox(index)}
-                            role="button"
-                            tabIndex={0}
-                            onKeyDown={(event) => {
-                                if (event.key === "Enter" || event.key === " ") {
-                                    event.preventDefault();
-                                    openLightbox(index);
-                                }
+                                gap: "17px",
                             }}
                         >
-                            <img
-                                src={url}
-                                alt={`Slide ${index}`}
-                                style={{
-                                    height: isMobile ? "230px" : "400px",
-                                    width: 'auto',
-                                    objectFit: "contain",
-                                }}
-                            />
+                            {pair.map((url, pos) => {
+                                const originalIndex = chunkIndex * 2 + pos;
+                                return (
+                                    <div
+                                        key={pos}
+                                        style={{
+                                            flex: "1 1 0",
+                                            display: "flex",
+                                            alignItems: "center",
+                                            justifyContent: "center",
+                                            cursor: url ? "zoom-in" : "default",
+                                        }}
+                                        onClick={() => url && openLightbox(originalIndex)}
+                                        role={url ? "button" : undefined}
+                                        tabIndex={url ? 0 : -1}
+                                        onKeyDown={(event) => {
+                                            if (url && (event.key === "Enter" || event.key === " ")) {
+                                                event.preventDefault();
+                                                openLightbox(originalIndex);
+                                            }
+                                        }}
+                                    >
+                                        {url ? (
+                                            <div
+                                                style={{
+                                                    width: "100%",
+                                                    height: isMobile ? 230 : 400,
+                                                    overflow: "hidden",
+                                                    borderRadius: 8,
+                                                    display: "flex",
+                                                    alignItems: "center",
+                                                    justifyContent: "center",
+                                                }}
+                                            >
+                                                <img
+                                                    src={url}
+                                                    alt={`Slide ${originalIndex}`}
+                                                    style={{
+                                                        height: "100%",
+                                                        width: "100%",
+                                                        objectFit: "cover",
+                                                        display: "block",
+                                                    }}
+                                                />
+                                            </div>
+                                        ) : (
+                                            <div style={{ width: "100%", height: isMobile ? 230 : 400 }} />
+                                        )}
+                                    </div>
+                                );
+                            })}
                         </div>
                     </div>
                 ))}
@@ -187,7 +228,7 @@ const ImageCarousel: React.FC<ImageCarouselProps> = ({ imageUrls }) => {
                         }}
                     >
                         <img
-                            src={imageUrls[activeImageIndex]}
+                            src={effectiveImageUrls[activeImageIndex]}
                             alt={`Expanded slide ${activeImageIndex}`}
                             style={{
                                 maxWidth: "100%",

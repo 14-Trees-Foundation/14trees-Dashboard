@@ -1,4 +1,4 @@
-import { Box, FormControl, FormControlLabel, FormGroup, IconButton, InputBase, Paper, Radio, useMediaQuery } from "@mui/material"
+import { Box, FormControl, FormControlLabel, FormGroup, IconButton, InputBase, Paper, Radio, useMediaQuery, Button, TextField } from "@mui/material"
 import CardGrid, { CardGridTheme } from "../../../components/CardGrid";
 import { Tree } from "../../../types/tree";
 import { useEffect, useMemo, useState } from "react";
@@ -7,11 +7,20 @@ import ApiClient from "../../../api/apiClient/apiClient";
 import { LoadingButton } from "@mui/lab";
 import { Search } from "@mui/icons-material";
 
+interface ThemeConfig {
+    gradient: string;
+    textAreaBg: string;
+    textColor: string;
+    logoColor: string;
+}
+
 interface EventTreesProps {
     eventId: number,
     eventLinkId?: string,
     eventType: string,
     defaultViewMode?: 'illustrations' | 'profile',
+    currentTheme?: ThemeConfig,
+    onTotalChange?: (total: number) => void,
 }
 
 interface EventTreesLinkConfig {
@@ -43,9 +52,10 @@ const EVENT_TREES_CONFIG_BY_LINK_ID: Record<string, EventTreesLinkConfig> = {
     },
 };
 
-const EventTrees: React.FC<EventTreesProps> = ({ eventId, eventLinkId, eventType, defaultViewMode = 'profile' }) => {
+const EventTrees: React.FC<EventTreesProps> = ({ eventId, eventLinkId, eventType, defaultViewMode = 'profile', currentTheme, onTotalChange }) => {
 
     const isMobile = useMediaQuery("(max-width:600px)");
+    const isTablet = useMediaQuery("(max-width:900px)");
     const [loading, setLoading] = useState(false);
     const [trees, setTrees] = useState<Tree[]>([]);
     const [page, setPage] = useState(0);
@@ -101,6 +111,9 @@ const EventTrees: React.FC<EventTreesProps> = ({ eventId, eventLinkId, eventType
             else setTrees(prev => [...prev, ...treesResp.results]);
 
             setTotal(treesResp.total);
+            if (typeof onTotalChange === 'function') {
+                onTotalChange(treesResp.total);
+            }
         } catch (error: any) {
             toast.error(error.message);
         }
@@ -119,95 +132,181 @@ const EventTrees: React.FC<EventTreesProps> = ({ eventId, eventLinkId, eventType
     }, [page, pageSize, eventId, searchStr])
 
     return (
-        <Box sx={{ width: '100%' }}>
-            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: isMobile ? 'flex-start' : 'space-between', flexWrap: 'wrap' }}>
-                <FormControl component="fieldset">
-                    <FormGroup aria-label="position" row>
-                        <FormControlLabel
-                            value="illustrations"
-                            control={
-                                <Radio
-                                    color={radioColorProp}
-                                    sx={radioSx}
-                                    checked={imageMode}
-                                    onChange={() => { setImageMode(true) }}
-                                />
-                            }
-                            label={eventType === "2" ? "Blossoms of Legacy" : "Illustrations"}
-                            labelPlacement="end"
-                            sx={labelSx}
-                        />
-                        <FormControlLabel
-                            value="profile"
-                            control={
-                                <Radio
-                                    color={radioColorProp}
-                                    sx={radioSx}
-                                    checked={!imageMode}
-                                    onChange={() => { setImageMode(false) }}
-                                />
-                            }
-                            label={eventType === "2" ? "Guardians of Memory" : "Profile Images"}
-                            labelPlacement="end"
-                            sx={labelSx}
-                        />
-                    </FormGroup>
-                </FormControl>
-                <Paper
-                    component="div"
-                    sx={{ p: '2px 4px', display: 'flex', alignItems: 'center', width: 400, backgroundColor: '#e3e3e3bf' }}
-                >
-                    <IconButton sx={{ p: '10px' }} aria-label="search">
-                        <Search />
-                    </IconButton>
-                    <InputBase
+        <Box sx={{ 
+            width: '100%',
+            py: isMobile ? 2 : 4,
+            px: isMobile ? 1 : 3,
+        }}>
+            {/* Container with max-width */}
+            <Box sx={{ maxWidth: '1400px', margin: '0 auto' }}>
+                {/* Top toolbar: Search bar + Buttons */}
+                <Box sx={{ 
+                    display: 'flex', 
+                    flexDirection: isMobile ? 'column' : 'row',
+                    alignItems: isMobile ? 'stretch' : 'center',
+                    justifyContent: 'space-between',
+                    gap: 2,
+                    mb: 3,
+                }}>
+                    {/* Search bar */}
+                    <TextField
+                        fullWidth={isMobile}
                         value={searchStr}
                         onChange={(e) => { setSearchStr(e.target.value) }}
-                        sx={{ ml: 1, flex: 1 }}
-                        placeholder="Search name"
-                        inputProps={{ 'aria-label': 'search friends & family members' }}
+                        placeholder="Search by name..."
+                        variant="outlined"
+                        InputProps={{
+                            startAdornment: (
+                                <IconButton sx={{ p: '10px' }} aria-label="search">
+                                    <Search />
+                                </IconButton>
+                            ),
+                        }}
+                        sx={{ 
+                            flex: isMobile ? 'none' : 1,
+                            maxWidth: isMobile ? '100%' : '500px',
+                            '& .MuiOutlinedInput-root': {
+                                backgroundColor: '#f5f5f0',
+                                borderRadius: '28px',
+                                '& fieldset': {
+                                    borderColor: 'transparent',
+                                },
+                                '&:hover fieldset': {
+                                    borderColor: 'rgba(0,0,0,0.1)',
+                                },
+                                '&.Mui-focused fieldset': {
+                                    borderColor: currentTheme?.textColor || '#A33128',
+                                },
+                            },
+                        }}
                     />
-                </Paper>
-            </Box>
-            <CardGrid
-                loading={loading}
-                padding="24px 0 24px 0"
-                cardTheme={cardGridTheme}
-                cards={trees.map((tree: any) => {
-                    let location: string = ''
-                    const { hostname, host } = window.location;
-                    if (hostname === "localhost" || hostname === "127.0.0.1") {
-                        location = "http://" + host + "/profile/" + tree.sapling_id
-                    } else {
-                        location = "https://" + hostname + "/profile/" + tree.sapling_id
-                    }
 
-                    return {
-                        id: tree.id,
-                        name: tree.assigned_to_name ? tree.assigned_to_name: tree.planted_by,
-                        type: tree.plant_type,
-                        dashboardLink: location,
-                        image: imageMode
-                            ? tree.illustration_s3_path
-                                ? tree.illustration_s3_path
-                                : tree.image
-                            : tree.user_tree_image
-                                ? tree.user_tree_image
-                                : tree.image
-                    }
-                })}
-            />
-            {trees.length < total && <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-                <LoadingButton
-                    loading={loading}
-                    variant="contained"
-                    color={loadingButtonColor}
-                    onClick={() => { setPage(prev => prev + 1) }}
-                    {...loadingButtonSx}
-                >
-                    Load More Trees
-                </LoadingButton>
-            </div>}
+                    {/* Buttons */}
+                    <Box sx={{ 
+                        display: 'flex', 
+                        flexDirection: isMobile ? 'column' : 'row',
+                        gap: 2,
+                    }}>
+                        {/* <Button
+                            variant="contained"
+                            sx={{
+                                backgroundColor: currentTheme?.textColor || '#A33128',
+                                color: '#ffffff',
+                                borderRadius: '28px',
+                                px: 3,
+                                py: 1.2,
+                                textTransform: 'none',
+                                fontWeight: 600,
+                                '&:hover': {
+                                    backgroundColor: currentTheme?.textColor || '#A33128',
+                                    opacity: 0.9,
+                                },
+                            }}
+                        >
+                            Add your blessing
+                        </Button> */}
+                        <Button
+                            variant="contained"
+                            sx={{
+                                backgroundColor: currentTheme?.textColor || '#A33128',
+                                color: '#ffffff',
+                                borderRadius: '28px',
+                                px: 3,
+                                py: 1.2,
+                                textTransform: 'none',
+                                fontWeight: 600,
+                                '&:hover': {
+                                    backgroundColor: currentTheme?.textColor || '#A33128',
+                                    opacity: 0.9,
+                                },
+                            }}
+                            onClick={() => { window.open('https://www.14trees.org/plant-memory', '_blank', 'noopener,noreferrer'); }}
+                        >
+                            Gift a Tree!
+                        </Button>
+                    </Box>
+                </Box>
+
+                {/* View mode toggle (illustrations vs profile) */}
+                <Box sx={{ display: 'flex', justifyContent: 'center', mb: 2 }}>
+                    <FormControl component="fieldset">
+                        <FormGroup aria-label="position" row>
+                            <FormControlLabel
+                                value="illustrations"
+                                control={
+                                    <Radio sx={radioSx} checked={imageMode} onChange={() => setImageMode(true)} />
+                                }
+                                label="Illustrations"
+                                labelPlacement="end"
+                                sx={labelSx}
+                            />
+                            <FormControlLabel
+                                value="profile"
+                                control={
+                                    <Radio sx={radioSx} checked={!imageMode} onChange={() => setImageMode(false)} />
+                                }
+                                label={eventType === "2" ? "Guardians of Memory" : "Profile Images"}
+                                labelPlacement="end"
+                                sx={labelSx}
+                            />
+                        </FormGroup>
+                    </FormControl>
+                </Box>
+
+                {/* Cards grid container */}
+                <Box>
+                    <CardGrid
+                        loading={loading}
+                        padding="24px 0 24px 0"
+                        cardTheme={cardGridTheme}
+                        cards={trees.map((tree: any) => {
+                            let location: string = ''
+                            const { hostname, host } = window.location;
+                            if (hostname === "localhost" || hostname === "127.0.0.1") {
+                                location = "http://" + host + "/profile/" + tree.sapling_id
+                            } else {
+                                location = "https://" + hostname + "/profile/" + tree.sapling_id
+                            }
+
+                            return {
+                                id: tree.id,
+                                name: tree.assigned_to_name ? tree.assigned_to_name: tree.planted_by,
+                                type: tree.plant_type,
+                                dashboardLink: location,
+                                image: imageMode
+                                    ? tree.illustration_s3_path
+                                        ? tree.illustration_s3_path
+                                        : tree.image
+                                    : tree.user_tree_image
+                                        ? tree.user_tree_image
+                                        : tree.image
+                            }
+                        })}
+                    />
+                    {trees.length < total && <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginTop: '16px' }}>
+                        <LoadingButton
+                            loading={loading}
+                            variant="contained"
+                            sx={{
+                                backgroundColor: currentTheme?.textColor || '#A33128',
+                                color: '#ffffff',
+                                borderRadius: '28px',
+                                px: 4,
+                                py: 1.5,
+                                textTransform: 'none',
+                                fontWeight: 600,
+                                '&:hover': {
+                                    backgroundColor: currentTheme?.textColor || '#A33128',
+                                    opacity: 0.9,
+                                },
+                            }}
+                            onClick={() => { setPage(prev => prev + 1) }}
+                        >
+                            Load More Trees
+                        </LoadingButton>
+                    </div>}
+                </Box>
+            </Box>
         </Box>
     )
 }

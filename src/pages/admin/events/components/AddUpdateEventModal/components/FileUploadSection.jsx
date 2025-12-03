@@ -16,6 +16,7 @@ const FileUploadSection = ({
     isSubmitting 
 }) => {
     const [imagePreviews, setImagePreviews] = useState([]);
+    const [posterPreview, setPosterPreview] = useState(null);
 
     // Utility function to format file sizes
     const formatFileSize = (bytes) => {
@@ -24,6 +25,36 @@ const FileUploadSection = ({
         const sizes = ['Bytes', 'KB', 'MB', 'GB'];
         const i = Math.floor(Math.log(bytes) / Math.log(k));
         return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    };
+
+    const handlePosterUpload = (event) => {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        // Clean up old preview URL
+        if (posterPreview && posterPreview.url && !posterPreview.isExisting) {
+            URL.revokeObjectURL(posterPreview.url);
+        }
+
+        // Create preview
+        const preview = {
+            file: file,
+            url: URL.createObjectURL(file),
+            name: file.name,
+            size: file.size,
+            isExisting: false
+        };
+
+        setPosterPreview(preview);
+        updateFormData({ event_poster: file });
+    };
+
+    const removePoster = () => {
+        if (posterPreview && posterPreview.url && !posterPreview.isExisting) {
+            URL.revokeObjectURL(posterPreview.url);
+        }
+        setPosterPreview(null);
+        updateFormData({ event_poster: null });
     };
 
     const handleFileUpload = (event, fieldName) => {
@@ -136,6 +167,17 @@ const FileUploadSection = ({
         }
     }, [formData.images, formData.memories, formData.type]);
 
+    // Initialize poster preview from existing data (for edit mode)
+    useEffect(() => {
+        if (formData.event_poster && typeof formData.event_poster === 'string' && !posterPreview) {
+            setPosterPreview({
+                url: formData.event_poster,
+                name: 'Existing Poster',
+                isExisting: true
+            });
+        }
+    }, [formData.event_poster]);
+
     // Cleanup effect to prevent memory leaks
     useEffect(() => {
         return () => {
@@ -145,11 +187,74 @@ const FileUploadSection = ({
                     URL.revokeObjectURL(preview.url);
                 }
             });
+            // Clean up poster preview
+            if (posterPreview && posterPreview.url && !posterPreview.isExisting) {
+                URL.revokeObjectURL(posterPreview.url);
+            }
         };
-    }, [imagePreviews]);
+    }, [imagePreviews, posterPreview]);
 
     return (
         <>
+            {/* Event Poster Upload Section */}
+            <Grid item xs={12}>
+                <Typography variant="subtitle2" sx={{ mb: 1 }}>
+                    Event Poster (Optional)
+                </Typography>
+                <Button
+                    variant="outlined"
+                    component="label"
+                    startIcon={<CloudUpload />}
+                    fullWidth
+                    sx={{ mb: 2 }}
+                    disabled={isSubmitting}
+                >
+                    Upload Event Poster
+                    <input
+                        type="file"
+                        hidden
+                        accept="image/*"
+                        onChange={handlePosterUpload}
+                    />
+                </Button>
+
+                {/* Poster Preview */}
+                {posterPreview && (
+                    <Card sx={{ position: 'relative', mb: 2 }}>
+                        <CardMedia
+                            component="img"
+                            height="200"
+                            image={posterPreview.url}
+                            alt={posterPreview.name}
+                            sx={{ objectFit: 'contain', bgcolor: '#f5f5f5' }}
+                        />
+                        <IconButton
+                            size="small"
+                            sx={{
+                                position: 'absolute',
+                                top: 8,
+                                right: 8,
+                                bgcolor: 'rgba(255, 255, 255, 0.8)',
+                                '&:hover': { bgcolor: 'rgba(255, 255, 255, 0.9)' }
+                            }}
+                            onClick={removePoster}
+                        >
+                            <Close fontSize="small" />
+                        </IconButton>
+                        <Box sx={{ p: 1, bgcolor: 'rgba(0, 0, 0, 0.7)', color: 'white' }}>
+                            <Typography variant="caption" noWrap>
+                                {posterPreview.name}
+                            </Typography>
+                            {posterPreview.size && (
+                                <Typography variant="caption" display="block">
+                                    {formatFileSize(posterPreview.size)}
+                                </Typography>
+                            )}
+                        </Box>
+                    </Card>
+                )}
+            </Grid>
+
             {/* File Upload Section */}
             <Grid item xs={12}>
                 <Typography variant="subtitle2" sx={{ mb: 1 }}>
