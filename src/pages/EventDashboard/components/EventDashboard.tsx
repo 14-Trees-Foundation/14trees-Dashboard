@@ -3,6 +3,7 @@ import { Box, Typography, Divider, useMediaQuery, Grid, Card, CardContent } from
 import { Carousel } from "antd";
 import loriFayzanDashboardImage from "../../../assets/event-dashboard/Lori_Fayzan_Dashboard.jpg";
 import { createStyles, makeStyles } from "@mui/styles";
+import logo from "../../../assets/logo_white_small.png";
 // Tree species images (replace these paths with your actual asset imports)
 import logoTree from "../../../assets/logoTree.png";
 import { Event, EventMessage } from "../../../types/event";
