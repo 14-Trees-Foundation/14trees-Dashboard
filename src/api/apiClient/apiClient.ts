@@ -895,6 +895,18 @@ class ApiClient {
         }
     }
 
+    // Tree types aggregation for an event (species with counts)
+    async getTreeTypes(offset: number, limit: number, filters?: any[]): Promise<PaginatedResponse<any>> {
+        const url = `/trees/get/treetypes?offset=${offset}&limit=${limit}`;
+        try {
+            const response = await this.api.post<PaginatedResponse<any>>(url, { filters: filters });
+            return response.data;
+        } catch (error: any) {
+            console.error(error)
+            throw new Error(`Failed to fetch tree types: ${error.message}`);
+        }
+    }
+
     async createTree(data: Tree, file?: Blob): Promise<Tree> {
         try {
             const formData = new FormData();

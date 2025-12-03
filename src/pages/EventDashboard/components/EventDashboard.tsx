@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Box, Typography, Divider, useMediaQuery, Grid, Card, CardContent } from "@mui/material";
+import { Carousel } from "antd";
 import logo from "../../../assets/logo_white_small.png";
 import loriFayzanDashboardImage from "../../../assets/event-dashboard/Lori_Fayzan_Dashboard.jpg";
 import { createStyles, makeStyles } from "@mui/styles";
@@ -121,6 +122,8 @@ const EventDashboard: React.FC<EventDashboardProps> = ({ event, eventMessages })
     const [isLoadingImages, setIsLoadingImages] = useState<boolean>(true);
     const [allEventImages, setAllEventImages] = useState<string[]>([]);
     const [totalTrees, setTotalTrees] = useState<number | null>(null);
+    const [speciesTotal, setSpeciesTotal] = useState<number | null>(null);
+    const [speciesFromApi, setSpeciesFromApi] = useState<Array<{ label: string; illustration?: string }>>([]);
 
     const apiClient = new ApiClient();
     const linkConfig = EVENT_DASHBOARD_CONFIG_BY_LINK_ID[event.link ?? ""] ?? {};
@@ -231,19 +234,76 @@ const EventDashboard: React.FC<EventDashboardProps> = ({ event, eventMessages })
         setAllEventImages(uniqueImages);
     }, [event.memories, apiEventImages]);
 
+    // Fetch tree types (species) with counts for this event using ApiClient base URL
+    useEffect(() => {
+      const fetchTreeTypes = async () => {
+        try {
+          const data = await apiClient.getTreeTypes(0, 20, [
+            { columnField: 'event_id', operatorValue: 'equals', value: event.id }
+          ]);
+          const total = Number(data.total ?? 0);
+          setSpeciesTotal(isNaN(total) ? null : total);
+          const results: any[] = Array.isArray(data.results) ? data.results : [];
+          const mapped = results.map(r => ({ label: String(r.plant_type || ''), illustration: r.illustration_s3_path || undefined }));
+          setSpeciesFromApi(mapped);
+        } catch (e) {
+          console.error('Species fetch error', e);
+          setSpeciesTotal(null);
+          setSpeciesFromApi([]);
+        }
+      };
+      fetchTreeTypes();
+    }, [event.id]);
+
     // Images to show in carousels: exclude event poster if present
     const memoryImages = (event.event_poster && allEventImages.length > 0)
       ? allEventImages.filter((url) => url !== event.event_poster)
       : allEventImages;
 
     // Species data for cards (imported assets)
-    const species = [
+    const defaultSpecies = [
       { src: pimpalImg, label: 'Pimpal' },
       { src: arjunImg, label: 'Arjun' },
       { src: peepalImg, label: 'Peepal' },
       { src: bargadImg, label: 'Bargad' },
       { src: neemImg, label: 'Neem' },
     ];
+    // Build species list: only API items with images; if less than 4, fill with local defaults to reach 4
+    // Validate image URLs by preloading; exclude broken images to avoid blank cards
+    const [validatedSpeciesImages, setValidatedSpeciesImages] = useState<Array<{ src: string; label: string }>>([]);
+    useEffect(() => {
+      const items: Array<{ src: string; label: string }> = speciesFromApi
+        .filter(s => Boolean(s.illustration))
+        .map(s => ({ src: s.illustration as string, label: s.label }));
+      if (items.length === 0) {
+        setValidatedSpeciesImages([]);
+        return;
+      }
+      let isCancelled = false;
+      const preload = (url: string) => new Promise<boolean>((resolve) => {
+        const img = new Image();
+        img.onload = () => resolve(true);
+        img.onerror = () => resolve(false);
+        img.src = url;
+      });
+      Promise.all(items.map(i => preload(i.src))).then(results => {
+        if (isCancelled) return;
+        const filtered = items.filter((_, idx) => results[idx]);
+        setValidatedSpeciesImages(filtered);
+      });
+      return () => { isCancelled = true; };
+    }, [speciesFromApi]);
+
+    const species: Array<{ src: string; label: string }> = (() => {
+      const filled: Array<{ src: string; label: string }> = [...validatedSpeciesImages];
+      let i = 0;
+      while (filled.length < 4) {
+        const next = defaultSpecies[i % defaultSpecies.length];
+        filled.push({ src: next.src, label: next.label });
+        i++;
+      }
+      return filled;
+    })();
 
     if (isType5) {
         return (
@@ -301,7 +361,7 @@ const EventDashboard: React.FC<EventDashboardProps> = ({ event, eventMessages })
                 />
               </Box>
 
-              {/* Vertical divider - hidden on mobile */}
+              {/* Vertical divider */}
               {!isMobile && (
                 <Box sx={{ 
                   width: 3, 
@@ -312,7 +372,7 @@ const EventDashboard: React.FC<EventDashboardProps> = ({ event, eventMessages })
                 }} />
               )}
 
-              {/* Title text - two lines */}
+              {/* Title text */}
               <Box sx={{ 
                 display: 'flex',
                 flexDirection: 'column',
@@ -585,39 +645,57 @@ const EventDashboard: React.FC<EventDashboardProps> = ({ event, eventMessages })
                   {`${(totalTrees ?? 150)} Trees Planted in this grove`}
                 </Typography>
 
-                <Box
-                  sx={{
-                    display: { xs: 'flex', sm: 'grid' },
-                    gridTemplateColumns: { sm: 'repeat(3, 1fr)', md: 'repeat(5, 1fr)' },
-                    gap: 2,
-                    overflowX: { xs: 'auto', sm: 'visible' },
-                    pb: 1,
-                    '&::-webkit-scrollbar': { display: { xs: 'block', sm: 'none' } },
-                  }}
-                >
-                  {species.map((sp, idx) => (
-                    <Card
-                      key={idx}
-                      sx={{
-                        minWidth: { xs: 220, sm: 'auto' },
-                        height: { xs: 180, sm: '50vh' },
-                        borderRadius: 3,
-                        boxShadow: '0 8px 20px rgba(0,0,0,0.12)',
-                        flex: '0 0 auto',
-                        backgroundImage: `url(${sp.src})`,
-                        backgroundSize: 'cover',
-                        backgroundPosition: 'center',
-                        display: 'flex',
-                        alignItems: 'flex-end',
-                      }}
-                    >
-                    </Card>
-                  ))}
+                <Box sx={{ width: '100%' }}>
+                  {(() => {
+                    const tilesPerSlide = 4;
+                    const slides: Array<Array<{ src?: string; label: string }>> = [];
+                    for (let i = 0; i < species.length; i += tilesPerSlide) {
+                      const chunk = species.slice(i, i + tilesPerSlide);
+                      // If the last chunk has fewer than 4 items, fill from the beginning
+                      if (chunk.length < tilesPerSlide) {
+                        const needed = tilesPerSlide - chunk.length;
+                        const fillers = species.slice(0, needed);
+                        slides.push([...chunk, ...fillers]);
+                      } else {
+                        slides.push(chunk);
+                      }
+                    }
+                    const autoplayEnabled = validatedSpeciesImages.length >= tilesPerSlide;
+                    return (
+                      <Carousel autoplay={autoplayEnabled} dots style={{ width: '100%' }}>
+                        {slides.map((slide, sIdx) => (
+                          <div key={sIdx}>
+                            <Box sx={{
+                              display: 'grid',
+                              gridTemplateColumns: { xs: 'repeat(2, 1fr)', sm: 'repeat(4, 1fr)' },
+                              gap: 2,
+                            }}>
+                              {slide.map((sp, idx) => (
+                                <Card
+                                  key={idx}
+                                  sx={{
+                                    height: { xs: 160, sm: '55vh' },
+                                    borderRadius: 3,
+                                    boxShadow: '0 8px 20px rgba(0,0,0,0.12)',
+                                    backgroundImage: `url(${sp.src ?? defaultSpecies[(sIdx * tilesPerSlide + idx) % defaultSpecies.length].src})`,
+                                    backgroundSize: 'cover',
+                                    backgroundPosition: 'center',
+                                    display: 'flex',
+                                    alignItems: 'flex-end',
+                                  }}
+                                />
+                              ))}
+                            </Box>
+                          </div>
+                        ))}
+                      </Carousel>
+                    );
+                  })()}
                 </Box>
 
                 <Typography variant={isMobile ? 'h6' : 'h4'}
                   sx={{ color: currentTheme.textAreaBg, fontFamily: 'serif', fontWeight: 700, textAlign: 'center', mb: 2 }}>
-                  7 Tree Species native to the region
+                  {(speciesTotal)} Tree Species native to the region
                 </Typography>
               </Box>
             </Box>
