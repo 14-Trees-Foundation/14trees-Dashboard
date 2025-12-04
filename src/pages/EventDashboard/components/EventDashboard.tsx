@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Box, Typography, Divider, useMediaQuery, Grid, Card, CardContent } from "@mui/material";
+import { Box, Typography, Divider, useMediaQuery, Grid, Card, CardContent, Tooltip } from "@mui/material";
 import { Carousel } from "antd";
 import loriFayzanDashboardImage from "../../../assets/event-dashboard/Lori_Fayzan_Dashboard.jpg";
 import { createStyles, makeStyles } from "@mui/styles";
@@ -246,7 +246,7 @@ const EventDashboard: React.FC<EventDashboardProps> = ({ event, eventMessages })
           const total = Number(data.total ?? 0);
           setEventTreeTypesCount(isNaN(total) ? null : total);
           const results: any[] = Array.isArray(data.results) ? data.results : [];
-          const mapped = results.map(r => ({ label: String(r.plant_type || ''), illustration: r.illustration_s3_path || undefined }));
+          const mapped = results.map(r => ({ label: String(r.plant_type || ''), illustration: r.info_card_s3_path || undefined }));
           setEventTreeTypes(mapped);
         } catch (e) {
           console.error('Species fetch error', e);
@@ -877,40 +877,42 @@ const EventDashboard: React.FC<EventDashboardProps> = ({ event, eventMessages })
                 })()}
 
                 {/* Add blessing button - left aligned on desktop, centered on mobile */}
-                <Box sx={{ mt: 3, display: 'flex', justifyContent: isMobile ? 'center' : 'flex-start' }}>
-                  <Box
-                    role="button"
-                    aria-label="Add your blessing"
-                    onClick={() => setIsBlessingModalOpen(true)}
-                    sx={{
-                      width: { xs: '90%', md: 308 },
-                      height: { xs: 48, md: 60 },
-                      px: { xs: 2, md: '44px' },
-                      py: { xs: '11px', md: '11px' },
-                      gap: '10px',
-                      borderRadius: '12px',
-                      backgroundColor: '#ffffff',
-                      color: currentTheme.textColor,
-                      boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
-                      cursor: 'pointer',
-                      fontFamily: { xs: 'inherit', md: '"DM Serif Text", serif' },
-                      fontWeight: { xs: 600, md: 400 },
-                      textAlign: 'center',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      fontSize: { xs: '14px', md: '28px' },
-                      lineHeight: { xs: 'normal', md: '100%' },
-                      letterSpacing: '0%',
-                      transition: 'all 0.2s',
-                      '&:hover': {
-                        boxShadow: '0 6px 16px rgba(0,0,0,0.2)',
-                        transform: 'translateY(-2px)'
-                      }
-                    }}
-                  >
-                    Add your blessing!
-                  </Box>
+                <Box sx={{ mt: 3, display: 'flex', justifyContent: 'center' }}>
+                  <Tooltip title="Adding blessings is allowed only within 7 days of the event.">
+                    <Box
+                      role="button"
+                      aria-label="Add your blessing"
+                      onClick={() => setIsBlessingModalOpen(true)}
+                      sx={{
+                        width: { xs: '90%', md: 348 },
+                        height: { xs: 48, md: 60 },
+                        px: { xs: 2, md: '44px' },
+                        py: { xs: '11px', md: '11px' },
+                        gap: '10px',
+                        borderRadius: '12px',
+                        backgroundColor: '#ffffff',
+                        color: currentTheme.textColor,
+                        boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+                        cursor: 'pointer',
+                        fontFamily: { xs: 'inherit', md: '"DM Serif Text", serif' },
+                        fontWeight: { xs: 600, md: 400 },
+                        textAlign: 'center',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        fontSize: { xs: '14px', md: '28px' },
+                        lineHeight: { xs: 'normal', md: '100%' },
+                        letterSpacing: '0%',
+                        transition: 'all 0.2s',
+                        '&:hover': {
+                          boxShadow: '0 6px 16px rgba(0,0,0,0.2)',
+                          transform: 'translateY(-2px)'
+                        }
+                      }}
+                    >
+                      Bless the bride and groom!
+                    </Box>
+                  </Tooltip>
                 </Box>
 
                 {/* Blessing popup modal */}
