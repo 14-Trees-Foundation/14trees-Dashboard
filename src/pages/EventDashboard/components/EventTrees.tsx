@@ -133,7 +133,7 @@ const EventTrees: React.FC<EventTreesProps> = ({ eventId, eventLinkId, eventType
 
     return (
         <Box sx={{ 
-            width: '100%',
+            width: isMobile ? '95%' : '100%',
             py: isMobile ? 2 : 4,
             px: isMobile ? 1 : 3,
         }}>

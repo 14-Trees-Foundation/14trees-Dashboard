@@ -6,6 +6,8 @@ import { createStyles, makeStyles } from "@mui/styles";
 import logo from "../../../assets/logo_white_small.png";
 // Tree species images (replace these paths with your actual asset imports)
 import logoTree from "../../../assets/logoTree.png";
+import speciesImg1 from "../../../assets/planting_illustration.jpg";
+import speciesImg2 from "../../../assets/neem.png";
 import { Event, EventMessage } from "../../../types/event";
 import { EventImage } from "../../../types/eventImage";
 import EventMemories from "./EventMemories";
@@ -255,7 +257,15 @@ const EventDashboard: React.FC<EventDashboardProps> = ({ event, eventMessages })
       ? allEventImages.filter((url) => url !== event.event_poster)
       : allEventImages;
 
-    // Build species list: only API items with images; if less than 4, fill with local defaults to reach 4
+    // Default species images for fallbacks
+    const defaultSpecies: Array<{ src: string; label: string }> = [
+      { src: speciesImg1, label: 'Species' },
+      { src: speciesImg2, label: 'Species' },
+      { src: speciesImg1, label: 'Species' },
+      { src: speciesImg2, label: 'Species' },
+    ];
+
+    // Build species list: only API items with images; fallback to defaults if empty
     // Validate image URLs by preloading; exclude broken images to avoid blank cards
     const [validatedSpeciesImages, setValidatedSpeciesImages] = useState<Array<{ src: string; label: string }>>([]);
     useEffect(() => {
@@ -282,14 +292,8 @@ const EventDashboard: React.FC<EventDashboardProps> = ({ event, eventMessages })
     }, [eventTreeTypes]);
 
     const species: Array<{ src: string; label: string }> = (() => {
-      const filled: Array<{ src: string; label: string }> = [...validatedSpeciesImages];
-      let i = 0;
-      // while (filled.length < 4) {
-      //   const next = defaultSpecies[i % defaultSpecies.length];
-      //   filled.push({ src: next.src, label: next.label });
-      //   i++;
-      // }
-      return filled;
+      const base = validatedSpeciesImages.length > 0 ? validatedSpeciesImages : defaultSpecies;
+      return base;
     })();
 
     if (isWeddingType) {
@@ -308,22 +312,22 @@ const EventDashboard: React.FC<EventDashboardProps> = ({ event, eventMessages })
             }}
           >
 
-            {/* Header: Logo box, vertical divider, then Name (sticky) */}
+            {/* Header: Logo + Name inline (sticky) */}
               <Box sx={{ 
               display: 'flex', 
-              flexDirection: isMobile ? 'column' : 'row',
-              justifyContent: isMobile ? 'center' : 'flex-start', 
+              flexDirection: 'row',
+              justifyContent: 'flex-start', 
               alignItems: 'center', 
-              gap: isMobile ? 2 : 3,
-              padding: isMobile ? '16px 12px' : '14px 24px',
+              gap: isMobile ? 1.5 : 3,
+              padding: isMobile ? '10px 12px' : '14px 24px',
               position: 'sticky',
               top: 0,
               zIndex: 10,
             }}>
               {/* Logo box with theme background */}
               <Box sx={{ 
-                width: isMobile ? 100 : 110, 
-                height: isMobile ? 100 : 110, 
+                width: isMobile ? 72 : 110, 
+                height: isMobile ? 72 : 110, 
                 backgroundColor: currentTheme.gradient.split(',')[0].split('(')[1].trim(),
                 borderRadius: 2,
                 display: 'flex',
@@ -367,15 +371,15 @@ const EventDashboard: React.FC<EventDashboardProps> = ({ event, eventMessages })
                 alignItems: isMobile ? 'center' : 'flex-start',
               }}>
                 <Typography 
-                  variant={isMobile ? 'h5' : 'h4'} 
+                  variant={isMobile ? 'h6' : 'h4'} 
                   sx={{ 
                     color: currentTheme.textColor,
                     fontFamily: '"Scotch Text", Georgia, serif',
                     fontWeight: 500,
                     fontStyle: 'normal',
-                    fontSize: { xs: '32px', sm: '40px', md: '54.7px' },
+                    fontSize: { xs: '26px', sm: '40px', md: '54.7px' },
                     lineHeight: '100%',
-                    textAlign: isMobile ? 'center' : 'left',
+                    textAlign: 'left',
                   }}
                 >
                   {event.name}
@@ -408,11 +412,11 @@ const EventDashboard: React.FC<EventDashboardProps> = ({ event, eventMessages })
                   position: 'relative',
                 }}
               >
-                {/* Background area - optional image (provide via linkConfig.posterBackgroundSrc or linkConfig.featuredImageSrc) */}
+                {/* Background area - ensure visible height on mobile */}
                 <Box
                   sx={{
                     width: '100%',
-                    height: isMobile ? "auto" : "100%",
+                    height: isMobile ? 280 : '100%',
                     borderRadius: 4,
                     overflow: 'hidden',
                     position: 'relative',
@@ -539,7 +543,7 @@ const EventDashboard: React.FC<EventDashboardProps> = ({ event, eventMessages })
                       height="100%"
                       frameBorder="0"
                       style={{ border: 0 }}
-                      src={`https://maps.google.com/maps?q=${event.location.lat},${event.location.lng}&t=&z=15&ie=UTF8&iwloc=&output=embed`}
+                      src={`https://maps.google.com/maps?q=${event.location.lat},${event.location.lng}&t=k&z=15&ie=UTF8&iwloc=&output=embed`}
                       allowFullScreen
                     />
                   </Box>
@@ -551,7 +555,7 @@ const EventDashboard: React.FC<EventDashboardProps> = ({ event, eventMessages })
               {/* About Section */}
               <Box
                 sx={{
-                  width: isMobile ? "100%" : (event.location && event.location.lat && event.location.lng ? "50%" : "100%"),
+                  width: isMobile ? "92%" : (event.location && event.location.lat && event.location.lng ? "50%" : "100%"),
                   backgroundColor: currentTheme.textAreaBg,
                   borderRadius: 3,
                   padding: isMobile ? 2 : "4rem 3rem",
@@ -624,7 +628,7 @@ const EventDashboard: React.FC<EventDashboardProps> = ({ event, eventMessages })
 
             {/* Species cards section: title, responsive cards, subtitle */}
             <Box sx={{ width: '100%', display: 'flex', justifyContent: 'center', mt: 4 }}>
-              <Box sx={{ width: isMobile ? '100%' : '90%', px: isMobile ? 1 : 0 }}>
+              <Box sx={{ width: isMobile ? '95%' : '90%', px: isMobile ? 1 : 0 }}>
                 <Typography
                   variant={isMobile ? 'h6' : 'h4'}
                   sx={{ color: currentTheme.textAreaBg, fontFamily: 'serif', fontWeight: 700, textAlign: 'center', mb: 2 }}
@@ -634,7 +638,7 @@ const EventDashboard: React.FC<EventDashboardProps> = ({ event, eventMessages })
 
                 <Box sx={{ width: '100%' }}>
                   {(() => {
-                    const tilesPerSlide = 4;
+                    const tilesPerSlide = isMobile ? 1 : 4;
                     const slides: Array<Array<{ src?: string; label: string }>> = [];
                     for (let i = 0; i < species.length; i += tilesPerSlide) {
                       const chunk = species.slice(i, i + tilesPerSlide);
@@ -654,17 +658,17 @@ const EventDashboard: React.FC<EventDashboardProps> = ({ event, eventMessages })
                           <div key={sIdx}>
                             <Box sx={{
                               display: 'grid',
-                              gridTemplateColumns: { xs: 'repeat(2, 1fr)', sm: 'repeat(4, 1fr)' },
+                              gridTemplateColumns: { xs: 'repeat(1, 1fr)', sm: 'repeat(4, 1fr)' },
                               gap: 2,
                             }}>
                               {slide.map((sp, idx) => (
                                 <Card
                                   key={idx}
                                   sx={{
-                                    height: { xs: 160, sm: '55vh' },
+                                    height: { xs: 220, sm: '55vh' },
                                     borderRadius: 3,
                                     boxShadow: '0 8px 20px rgba(0,0,0,0.12)',
-                                    backgroundImage: `url(${sp.src ?? defaultSpecies[(sIdx * tilesPerSlide + idx) % defaultSpecies.length].src})`,
+                                    backgroundImage: `url(${sp.src})`,
                                     backgroundSize: 'cover',
                                     backgroundPosition: 'center',
                                     display: 'flex',
