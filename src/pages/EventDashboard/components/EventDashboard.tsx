@@ -308,6 +308,20 @@ const EventDashboard: React.FC<EventDashboardProps> = ({ event, eventMessages })
     const [newBlessingText, setNewBlessingText] = useState<string>("");
     const [newBlessingName, setNewBlessingName] = useState<string>("");
 
+    // Image lightbox state
+    const [imageLightboxOpen, setImageLightboxOpen] = useState<boolean>(false);
+    const [lightboxImageUrl, setLightboxImageUrl] = useState<string>("");
+
+    const openImageLightbox = (url: string) => {
+      setLightboxImageUrl(url);
+      setImageLightboxOpen(true);
+    };
+
+    const closeImageLightbox = () => {
+      setImageLightboxOpen(false);
+      setLightboxImageUrl("");
+    };
+
     // Fetch blessings for the event via getEventMessages
     useEffect(() => {
       const fetchBlessings = async () => {
@@ -467,6 +481,11 @@ const EventDashboard: React.FC<EventDashboardProps> = ({ event, eventMessages })
               >
                 {/* Background area - ensure visible height on mobile */}
                 <Box
+                  onClick={() => {
+                    if (event?.event_poster) {
+                      openImageLightbox(event.event_poster);
+                    }
+                  }}
                   sx={{
                     width: '100%',
                     height: isMobile ? 280 : '100%',
@@ -479,7 +498,12 @@ const EventDashboard: React.FC<EventDashboardProps> = ({ event, eventMessages })
                     backgroundRepeat: 'no-repeat',
                     display: 'flex',
                     alignItems: 'center',
-                    justifyContent: 'center'
+                    justifyContent: 'center',
+                    cursor: event?.event_poster ? 'pointer' : 'default',
+                    transition: 'transform 0.2s ease',
+                    '&:hover': {
+                      transform: event?.event_poster ? 'scale(1.02)' : 'none',
+                    },
                   }}
                 >
                   </Box>
@@ -707,7 +731,7 @@ const EventDashboard: React.FC<EventDashboardProps> = ({ event, eventMessages })
                     }
                     const autoplayEnabled = validatedSpeciesImages.length >= tilesPerSlide;
                     return (
-                      <Carousel autoplay={autoplayEnabled} dots style={{ width: '100%' }}>
+                      <Carousel autoplay={autoplayEnabled} autoplaySpeed={5000} arrows dots style={{ width: '100%' }}>
                         {slides.map((slide, sIdx) => (
                           <div key={sIdx}>
                             <Box sx={{
@@ -718,15 +742,24 @@ const EventDashboard: React.FC<EventDashboardProps> = ({ event, eventMessages })
                               {slide.map((sp, idx) => (
                                 <Card
                                   key={idx}
+                                  onClick={() => sp.src && openImageLightbox(sp.src)}
                                   sx={{
                                     height: { xs: 220, sm: '55vh' },
-                                    borderRadius: 3,
+                                    borderRadius: 4,
                                     boxShadow: '0 8px 20px rgba(0,0,0,0.12)',
                                     backgroundImage: `url(${sp.src})`,
                                     backgroundSize: 'cover',
                                     backgroundPosition: 'center',
                                     display: 'flex',
                                     alignItems: 'flex-end',
+                                    cursor: 'pointer',
+                                    overflow: 'hidden',
+                                    transition: 'all 0.2s ease',
+                                    '&:hover': {
+                                      transform: 'scale(1.03)',
+                                      borderRadius: 4,
+                                      boxShadow: '0 12px 28px rgba(0,0,0,0.18)',
+                                    },
                                   }}
                                 />
                               ))}
@@ -748,23 +781,23 @@ const EventDashboard: React.FC<EventDashboardProps> = ({ event, eventMessages })
             {/* Blessings Section */}
             <Box sx={{ width: '100%', display: 'flex', justifyContent: 'center', mt: 4 }}>
               <Box sx={{ width: isMobile ? '100%' : '90%', px: isMobile ? '20px' : 0 }}>
-                {/* Blessings carousel: 3 cards on desktop, 1 on mobile */}
-                {(() => {
+                {/* Section Heading - always show */}
+          
+                {/* Blessings carousel: only show if blessings exist */}
+                {blessings.length > 0 && (() => {
                   type BlessingT = { id: number; user_name: string; message: string; created_at?: string };
                   const chunkSize = isMobile ? 1 : 3;
-                  const chunks: Array<Array<BlessingT | null>> = [];
-                  for (let i = 0; i < blessings.length || i === 0; i += chunkSize) {
-                    const group: Array<BlessingT | null> = blessings.slice(i, i + chunkSize) as Array<BlessingT>;
-                    while (group.length < chunkSize) group.push(null);
+                  const chunks: Array<Array<BlessingT>> = [];
+                  for (let i = 0; i < blessings.length; i += chunkSize) {
+                    const group = blessings.slice(i, i + chunkSize);
                     chunks.push(group);
-                    if (blessings.length === 0) break;
                   }
 
                   return (
-                    <Carousel dots arrows style={{ width: '95%', margin: '0 auto' }}>
+                    <Carousel dots arrows style={{ width: '100%', margin: '0 auto', marginBottom: '24px' }}>
                       {chunks.map((group, slideIdx) => (
                         <div key={`blessings-slide-${slideIdx}`}>
-                          <Grid container spacing={1.25} sx={{ alignItems: 'stretch', justifyContent: 'center' }}>
+                          <Grid container spacing={1.25} sx={{ alignItems: 'stretch', justifyContent: 'flex-start' }}>
                               {group.map((item, idx) => (
                                 <Grid item xs={12} sm={6} md={4} key={`bl-card-${slideIdx}-${idx}`}>
                                   <Card sx={{
@@ -783,10 +816,10 @@ const EventDashboard: React.FC<EventDashboardProps> = ({ event, eventMessages })
                                   <CardContent sx={{ p: isMobile ? 2.5 : 3.5, flex: 1, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
                                     <Box sx={{ 
                                       height: '100%', 
-                                      overflowY: item ? 'auto' : 'hidden', 
+                                      overflowY: 'auto',
                                       display: 'flex', 
-                                      alignItems: item ? 'flex-start' : 'center', 
-                                      justifyContent: item ? 'flex-start' : 'center',
+                                      alignItems: 'flex-start',
+                                      justifyContent: 'flex-start',
                                       scrollbarWidth: 'thin',
                                       scrollbarColor: `${currentTheme.textColor}30 transparent`,
                                       '&::-webkit-scrollbar': {
@@ -814,7 +847,7 @@ const EventDashboard: React.FC<EventDashboardProps> = ({ event, eventMessages })
                                         >
                                           Loading blessings...
                                         </Typography>
-                                      ) : item ? (
+                                      ) : (
                                         <Box sx={{
                                           color: currentTheme.textColor,
                                           borderRadius: 2,
@@ -844,23 +877,6 @@ const EventDashboard: React.FC<EventDashboardProps> = ({ event, eventMessages })
                                             }}
                                           >
                                             {item.message}
-                                          </Typography>
-                                        </Box>
-                                      ) : (
-                                        <Box sx={{
-                                          border: '1px dashed rgba(0,0,0,0.15)',
-                                          borderRadius: 2,
-                                          height: '100%',
-                                          display: 'flex',
-                                          alignItems: 'center',
-                                          justifyContent: 'center',
-                                          color: currentTheme.textColor
-                                        }}>
-                                          <Typography 
-                                            variant={isMobile ? 'body2' : 'body1'}
-                                            sx={{ fontSize: isMobile ? '14px' : '16px' }}
-                                          >
-                                            No blessing added
                                           </Typography>
                                         </Box>
                                       )}
@@ -1140,6 +1156,64 @@ const EventDashboard: React.FC<EventDashboardProps> = ({ event, eventMessages })
                   onTotalChange={(t) => setTotalTrees(t)}
                 />
               </Box>
+            </Box>
+          </Box>
+
+          {/* Image Lightbox Dialog */}
+          <Box
+            component="div"
+            sx={{
+              display: imageLightboxOpen ? 'block' : 'none',
+              position: 'fixed',
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              backgroundColor: 'rgba(0,0,0,0.9)',
+              zIndex: 9999,
+              cursor: 'pointer',
+            }}
+            onClick={closeImageLightbox}
+          >
+            <Box
+              sx={{
+                position: 'absolute',
+                top: 16,
+                right: 16,
+                zIndex: 10000,
+                color: '#fff',
+                fontSize: '32px',
+                cursor: 'pointer',
+                '&:hover': {
+                  color: '#ccc',
+                },
+              }}
+              onClick={closeImageLightbox}
+            >
+              ✕
+            </Box>
+            <Box
+              sx={{
+                width: '100%',
+                height: '100%',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                padding: 2,
+              }}
+            >
+              <Box
+                component="img"
+                src={lightboxImageUrl}
+                alt="Enlarged view"
+                sx={{
+                  maxWidth: '95%',
+                  maxHeight: '95%',
+                  objectFit: 'contain',
+                  borderRadius: 2,
+                }}
+                onClick={(e: React.MouseEvent) => e.stopPropagation()}
+              />
             </Box>
           </Box>
           </>
