@@ -714,7 +714,7 @@ const EventDashboard: React.FC<EventDashboardProps> = ({ event, eventMessages })
                   {`${(totalTrees ?? 150)} Trees Planted in this grove`}
                 </Typography>
 
-                <Box sx={{ width: '100%' }}>
+                <Box sx={{ width: '100%', px: { xs: 0, md: 0 } }}>
                   {(() => {
                     const tilesPerSlide = isMobile ? 1 : 4;
                     const slides: Array<Array<{ src?: string; label: string }>> = [];
@@ -738,6 +738,7 @@ const EventDashboard: React.FC<EventDashboardProps> = ({ event, eventMessages })
                               display: 'grid',
                               gridTemplateColumns: { xs: 'repeat(1, 1fr)', sm: 'repeat(4, 1fr)' },
                               gap: 2,
+                              px: { xs: '15px', sm: 0 },
                             }}>
                               {slide.map((sp, idx) => (
                                 <Card
@@ -780,7 +781,7 @@ const EventDashboard: React.FC<EventDashboardProps> = ({ event, eventMessages })
 
             {/* Blessings Section */}
             <Box sx={{ width: '100%', display: 'flex', justifyContent: 'center', mt: 4 }}>
-              <Box sx={{ width: isMobile ? '100%' : '90%', px: isMobile ? '20px' : 0 }}>
+              <Box sx={{ width: isMobile ? '100%' : '90%', px: { xs: '0', md: 0 } }}>
                 {/* Section Heading - always show */}
           
                 {/* Blessings carousel: only show if blessings exist */}
@@ -794,10 +795,19 @@ const EventDashboard: React.FC<EventDashboardProps> = ({ event, eventMessages })
                   }
 
                   return (
-                    <Carousel dots arrows style={{ width: '100%', margin: '0 auto', marginBottom: '24px' }}>
-                      {chunks.map((group, slideIdx) => (
-                        <div key={`blessings-slide-${slideIdx}`}>
-                          <Grid container spacing={1.25} sx={{ alignItems: 'stretch', justifyContent: 'flex-start' }}>
+                    <>
+                      <style>{`
+                        @media (max-width: 600px) {
+                          .ant-carousel .slick-prev,
+                          .ant-carousel .slick-next {
+                            top: 40% !important;
+                          }
+                        }
+                      `}</style>
+                      <Carousel dots arrows style={{ width: '100%', margin: '0 auto', marginBottom: isMobile ? '12px' : '24px' }}>
+                        {chunks.map((group, slideIdx) => (
+                          <div key={`blessings-slide-${slideIdx}`}>
+                            <Grid container spacing={1.25} sx={{ alignItems: 'stretch', justifyContent: 'flex-start', px: { xs: '15px', sm: 0 } }}>
                               {group.map((item, idx) => (
                                 <Grid item xs={12} sm={6} md={4} key={`bl-card-${slideIdx}-${idx}`}>
                                   <Card sx={{
@@ -889,11 +899,12 @@ const EventDashboard: React.FC<EventDashboardProps> = ({ event, eventMessages })
                           </div>
                         ))}
                       </Carousel>
+                    </>
                   );
                 })()}
 
                 {/* Add blessing button - left aligned on desktop, centered on mobile */}
-                <Box sx={{ mt: 3, display: 'flex', justifyContent: 'center' }}>
+                <Box sx={{ mt: { xs: 1.5, md: 3 }, display: 'flex', justifyContent: 'center' }}>
                   <Tooltip title="Adding blessings is allowed only within 7 days of the event.">
                     <Box
                       role="button"
@@ -902,10 +913,10 @@ const EventDashboard: React.FC<EventDashboardProps> = ({ event, eventMessages })
                       sx={{
                         width: { xs: '90%', md: 348 },
                         height: { xs: 48, md: 60 },
-                        px: { xs: 2, md: '44px' },
-                        py: { xs: '11px', md: '11px' },
+                        px: { md: '44px' },
+                        py: { md: '11px' },
                         gap: '10px',
-                        borderRadius: '12px',
+                        borderRadius: '28px',
                         backgroundColor: '#ffffff',
                         color: currentTheme.textColor,
                         boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
@@ -916,7 +927,7 @@ const EventDashboard: React.FC<EventDashboardProps> = ({ event, eventMessages })
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        fontSize: { xs: '14px', md: '28px' },
+                        fontSize: { xs: '16px', md: '28px' },
                         lineHeight: { xs: 'normal', md: '100%' },
                         letterSpacing: '0%',
                         transition: 'all 0.2s',

@@ -149,6 +149,29 @@ const EventTrees: React.FC<EventTreesProps> = ({ eventId, eventLinkId, eventType
                     gap: 2,
                     mb: 3,
                 }}>
+                    {/* Gift a Tree Button - shown first on mobile */}
+                    {isMobile && (
+                        <Button
+                            variant="contained"
+                            sx={{
+                                backgroundColor: currentTheme?.textColor || '#A33128',
+                                color: '#ffffff',
+                                borderRadius: '28px',
+                                px: 3,
+                                py: 1.2,
+                                textTransform: 'none',
+                                fontWeight: 600,
+                                '&:hover': {
+                                    backgroundColor: currentTheme?.textColor || '#A33128',
+                                    opacity: 0.9,
+                                },
+                            }}
+                            onClick={() => { window.open('https://www.14trees.org/plant-memory', '_blank', 'noopener,noreferrer'); }}
+                        >
+                            Gift a Tree!
+                        </Button>
+                    )}
+
                     {/* Search bar */}
                     <TextField
                         fullWidth={isMobile}
@@ -182,30 +205,8 @@ const EventTrees: React.FC<EventTreesProps> = ({ eventId, eventLinkId, eventType
                         }}
                     />
 
-                    {/* Buttons */}
-                    <Box sx={{ 
-                        display: 'flex', 
-                        flexDirection: isMobile ? 'column' : 'row',
-                        gap: 2,
-                    }}>
-                        {/* <Button
-                            variant="contained"
-                            sx={{
-                                backgroundColor: currentTheme?.textColor || '#A33128',
-                                color: '#ffffff',
-                                borderRadius: '28px',
-                                px: 3,
-                                py: 1.2,
-                                textTransform: 'none',
-                                fontWeight: 600,
-                                '&:hover': {
-                                    backgroundColor: currentTheme?.textColor || '#A33128',
-                                    opacity: 0.9,
-                                },
-                            }}
-                        >
-                            Add your blessing
-                        </Button> */}
+                    {/* Gift a Tree Button - shown after search on desktop */}
+                    {!isMobile && (
                         <Button
                             variant="contained"
                             sx={{
@@ -225,7 +226,7 @@ const EventTrees: React.FC<EventTreesProps> = ({ eventId, eventLinkId, eventType
                         >
                             Gift a Tree!
                         </Button>
-                    </Box>
+                    )}
                 </Box>
 
                 {/* View mode toggle (illustrations vs profile) - hidden for wedding events */}
