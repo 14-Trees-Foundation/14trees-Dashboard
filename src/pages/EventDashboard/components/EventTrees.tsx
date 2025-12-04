@@ -133,12 +133,13 @@ const EventTrees: React.FC<EventTreesProps> = ({ eventId, eventLinkId, eventType
 
     return (
         <Box sx={{ 
-            width: '100%',
+            width: isMobile ? '95%' : '92%',
+            margin: '0 auto',
             py: isMobile ? 2 : 4,
             px: isMobile ? 1 : 3,
         }}>
             {/* Container with max-width */}
-            <Box sx={{ maxWidth: '1400px', margin: '0 auto' }}>
+            <Box sx={{ maxWidth: '100%', margin: '0 auto' }}>
                 {/* Top toolbar: Search bar + Buttons */}
                 <Box sx={{ 
                     display: 'flex', 

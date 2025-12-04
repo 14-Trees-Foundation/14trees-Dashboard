@@ -357,10 +357,11 @@ class EventsApiClient {
     }
   }
 
-  async createEventMessage(eventId: number, message: string, userId?: number): Promise<EventMessage> {
+  async createEventMessage(eventId: number, message: string, userName?: string, userId?: number): Promise<EventMessage> {
     try {
       const payload = {
         message,
+        user_name: userName,
         userId: userId || null
       };
       const response = await this.api.post<EventMessage>(`/events/${eventId}/messages`, payload);

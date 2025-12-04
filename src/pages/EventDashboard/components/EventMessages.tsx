@@ -83,6 +83,26 @@ const EventMessages: React.FC<EventMessagesProps> = ({ messages }) => {
                                     padding: 2,
                                     marginLeft: 1,
                                     borderRadius: '20px',
+                                    overflow: 'auto',
+                                    scrollbarWidth: 'thin',
+                                    scrollbarColor: 'rgba(0,0,0,0.2) transparent',
+                                    '&::-webkit-scrollbar': {
+                                        width: '1px',
+                                    },
+                                    '&::-webkit-scrollbar-track': {
+                                        background: 'transparent',
+                                    },
+                                    '&::-webkit-scrollbar-thumb': {
+                                        background: 'transparent',
+                                        borderRadius: '10px',
+                                        transition: 'background 0.3s ease',
+                                    },
+                                    '&:hover::-webkit-scrollbar-thumb': {
+                                        background: 'rgba(0,0,0,0.2)',
+                                    },
+                                    '&::-webkit-scrollbar-thumb:hover': {
+                                        background: 'rgba(0,0,0,0.4)',
+                                    },
                                 }}
                                 onClick={() => handleOpen(t)}
                             >
@@ -117,7 +137,30 @@ const EventMessages: React.FC<EventMessagesProps> = ({ messages }) => {
                     },
                 }}
             >
-                <DialogContent dividers>
+                <DialogContent 
+                    dividers
+                    sx={{
+                        scrollbarWidth: 'thin',
+                        scrollbarColor: 'rgba(0,0,0,0.2) transparent',
+                        '&::-webkit-scrollbar': {
+                            width: '1px',
+                        },
+                        '&::-webkit-scrollbar-track': {
+                            background: 'transparent',
+                        },
+                        '&::-webkit-scrollbar-thumb': {
+                            background: 'transparent',
+                            borderRadius: '10px',
+                            transition: 'background 0.3s ease',
+                        },
+                        '&:hover::-webkit-scrollbar-thumb': {
+                            background: 'rgba(0,0,0,0.2)',
+                        },
+                        '&::-webkit-scrollbar-thumb:hover': {
+                            background: 'rgba(0,0,0,0.4)',
+                        },
+                    }}
+                >
                     <DialogContentText color='black' style={{ whiteSpace: 'pre-wrap' }}>{selectedEventMessage?.message}</DialogContentText>
                     <Box mt={2} textAlign="right">
                         <Typography variant="subtitle2">

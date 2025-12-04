@@ -145,7 +145,7 @@ const EventPage: React.FC = () => {
                             {menuitem()}
                         </Drawer>
                     )}
-                    <Box style={{ padding: isMobile ? 0 : 10, flexGrow: 1 }}>
+                    <Box style={{ padding: isMobile ? 0 : 0, flexGrow: 1 }}>
                         {mainBox()}
                     </Box>
                     {/* <RightDrawer showWhatsNew={true}/> */}

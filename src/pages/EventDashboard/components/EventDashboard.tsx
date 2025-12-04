@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from "react";
-import { Box, Typography, Divider, useMediaQuery, Grid, Card, CardContent } from "@mui/material";
+import { Box, Typography, Divider, useMediaQuery, Grid, Card, CardContent, Tooltip } from "@mui/material";
 import { Carousel } from "antd";
 import loriFayzanDashboardImage from "../../../assets/event-dashboard/Lori_Fayzan_Dashboard.jpg";
 import { createStyles, makeStyles } from "@mui/styles";
 import logo from "../../../assets/logo_white_small.png";
 // Tree species images (replace these paths with your actual asset imports)
 import logoTree from "../../../assets/logoTree.png";
+import speciesImg1 from "../../../assets/planting_illustration.jpg";
+import speciesImg2 from "../../../assets/neem.png";
 import { Event, EventMessage } from "../../../types/event";
 import { EventImage } from "../../../types/eventImage";
 import EventMemories from "./EventMemories";
@@ -156,30 +158,35 @@ const EventDashboard: React.FC<EventDashboardProps> = ({ event, eventMessages })
             textAreaBg: '#F4DCD8',
             textColor: '#79221B',
             logoColor: '#FFD53F',
+            navColor: '#C4392E',
         },
         yellow: {
             gradient: 'linear-gradient(180deg, #F6B02C 0%, #ED6B11 100%)',
             textAreaBg: '#F1E8DB',
             textColor: '#A33128',
             logoColor: '#A33128',
+            navColor: '#F6B02C',
         },
         green: {
             gradient: 'linear-gradient(180deg, #4CA60F 0%, #183C11 100%)',
             textAreaBg: '#E0F6D1',
             textColor: '#183C11',
             logoColor: '#E0F6D1',
+            navColor: '#4CA60F',
         },
       blue: {
         gradient: 'linear-gradient(180deg, #5E82DB 0%, #361777 100%)',
         textAreaBg: '#C1D1F9',
         textColor: '#3E2C8B',
         logoColor: '#D7E3FF',
+        navColor: '#5E82DB',
       },
       pink: {
         gradient: 'linear-gradient(180deg, #B04EBB 0%, #C24144 100%)',
         textAreaBg: '#F7CFFB',
         textColor: '#520E57',
         logoColor: '#FDE7FF',
+        navColor: '#B04EBB',
       },
     };
     
@@ -239,7 +246,7 @@ const EventDashboard: React.FC<EventDashboardProps> = ({ event, eventMessages })
           const total = Number(data.total ?? 0);
           setEventTreeTypesCount(isNaN(total) ? null : total);
           const results: any[] = Array.isArray(data.results) ? data.results : [];
-          const mapped = results.map(r => ({ label: String(r.plant_type || ''), illustration: r.illustration_s3_path || undefined }));
+          const mapped = results.map(r => ({ label: String(r.plant_type || ''), illustration: r.info_card_s3_path || undefined }));
           setEventTreeTypes(mapped);
         } catch (e) {
           console.error('Species fetch error', e);
@@ -255,7 +262,15 @@ const EventDashboard: React.FC<EventDashboardProps> = ({ event, eventMessages })
       ? allEventImages.filter((url) => url !== event.event_poster)
       : allEventImages;
 
-    // Build species list: only API items with images; if less than 4, fill with local defaults to reach 4
+    // Default species images for fallbacks
+    const defaultSpecies: Array<{ src: string; label: string }> = [
+      { src: speciesImg1, label: 'Species' },
+      { src: speciesImg2, label: 'Species' },
+      { src: speciesImg1, label: 'Species' },
+      { src: speciesImg2, label: 'Species' },
+    ];
+
+    // Build species list: only API items with images; fallback to defaults if empty
     // Validate image URLs by preloading; exclude broken images to avoid blank cards
     const [validatedSpeciesImages, setValidatedSpeciesImages] = useState<Array<{ src: string; label: string }>>([]);
     useEffect(() => {
@@ -282,48 +297,73 @@ const EventDashboard: React.FC<EventDashboardProps> = ({ event, eventMessages })
     }, [eventTreeTypes]);
 
     const species: Array<{ src: string; label: string }> = (() => {
-      const filled: Array<{ src: string; label: string }> = [...validatedSpeciesImages];
-      let i = 0;
-      // while (filled.length < 4) {
-      //   const next = defaultSpecies[i % defaultSpecies.length];
-      //   filled.push({ src: next.src, label: next.label });
-      //   i++;
-      // }
-      return filled;
+      const base = validatedSpeciesImages.length > 0 ? validatedSpeciesImages : defaultSpecies;
+      return base;
     })();
+
+    // Blessings state
+    const [blessings, setBlessings] = useState<Array<{ id: number; user_name: string; message: string; created_at?: string }>>([]);
+    const [isBlessingsLoading, setIsBlessingsLoading] = useState<boolean>(false);
+    const [isBlessingModalOpen, setIsBlessingModalOpen] = useState<boolean>(false);
+    const [newBlessingText, setNewBlessingText] = useState<string>("");
+    const [newBlessingName, setNewBlessingName] = useState<string>("");
+
+    // Fetch blessings for the event via getEventMessages
+    useEffect(() => {
+      const fetchBlessings = async () => {
+        try {
+          setIsBlessingsLoading(true);
+          const messages = await apiClient.events.getEventMessages(event.link || String(event.id));
+          setBlessings(messages || []);
+        } catch (err) {
+          console.error('Failed to fetch blessings', err);
+        } finally {
+          setIsBlessingsLoading(false);
+        }
+      };
+      fetchBlessings();
+    }, [event.id, event.link]);
+
+    const addBlessing = async () => {
+      const text = newBlessingText.trim();
+      const name = newBlessingName.trim();
+      if (!text || !name) return;
+      const words = text.split(/\s+/).filter(Boolean);
+      if (words.length > 150) return;
+      try {
+        const data = await apiClient.events.createEventMessage(event.id, text, name);
+        if (data && data.id) {
+          // Optimistically prepend
+          setBlessings(prev => [{ id: data.id, user_name: data.user_name, message: data.message, created_at: data.created_at }, ...prev]);
+          setNewBlessingText("");
+          setNewBlessingName("");
+          setIsBlessingModalOpen(false);
+        }
+      } catch (err) {
+        console.error('Failed to add blessing', err);
+      }
+    };
 
     if (isWeddingType) {
         return (
-          <Box
-            p={0}
-            sx={{
-              width: "100%",
-              maxWidth: '100vw',
-              margin: "0",
-              background: currentTheme.gradient,
-              minHeight: isMobile ? '100%' : '100vh',
-              position: 'relative',
-              overflowX: 'hidden',
-              boxSizing: 'border-box'
-            }}
-          >
-
-            {/* Header: Logo box, vertical divider, then Name (sticky) */}
-              <Box sx={{ 
+          <>
+            {/* Header: Logo + Name inline (sticky) - outside main container */}
+            <Box sx={{ 
               display: 'flex', 
-              flexDirection: isMobile ? 'column' : 'row',
-              justifyContent: isMobile ? 'center' : 'flex-start', 
+              flexDirection: 'row',
+              justifyContent: 'flex-start', 
               alignItems: 'center', 
-              gap: isMobile ? 2 : 3,
-              padding: isMobile ? '16px 12px' : '14px 24px',
+              gap: isMobile ? 1.5 : 3,
+              padding: isMobile ? '10px 20px' : '14px 24px',
               position: 'sticky',
               top: 0,
-              zIndex: 10,
+              zIndex: 1000,
+              background: currentTheme.navColor
             }}>
               {/* Logo box with theme background */}
               <Box sx={{ 
-                width: isMobile ? 100 : 110, 
-                height: isMobile ? 100 : 110, 
+                width: isMobile ? 72 : 110, 
+                height: isMobile ? 72 : 110, 
                 backgroundColor: currentTheme.gradient.split(',')[0].split('(')[1].trim(),
                 borderRadius: 2,
                 display: 'flex',
@@ -339,6 +379,9 @@ const EventDashboard: React.FC<EventDashboardProps> = ({ event, eventMessages })
                   sx={{
                     width: '80%',
                     height: '80%',
+                    position: 'relative',
+                    left: isMobile ? '5px' : '20px',
+                    bottom: isMobile ? '5px' : '8px',
                     objectFit: 'contain',
                     cursor: 'pointer',
                     display: 'block'
@@ -367,21 +410,34 @@ const EventDashboard: React.FC<EventDashboardProps> = ({ event, eventMessages })
                 alignItems: isMobile ? 'center' : 'flex-start',
               }}>
                 <Typography 
-                  variant={isMobile ? 'h5' : 'h4'} 
+                  variant={isMobile ? 'h6' : 'h4'} 
                   sx={{ 
                     color: currentTheme.textColor,
                     fontFamily: '"Scotch Text", Georgia, serif',
                     fontWeight: 500,
                     fontStyle: 'normal',
-                    fontSize: { xs: '32px', sm: '40px', md: '54.7px' },
+                    fontSize: { xs: '26px', sm: '40px', md: '54.7px' },
                     lineHeight: '100%',
-                    textAlign: isMobile ? 'center' : 'left',
+                    textAlign: 'left',
                   }}
                 >
                   {event.name}
                 </Typography>
               </Box>
             </Box>
+
+          <Box
+            p={0}
+            sx={{
+              width: "100%",
+              maxWidth: '100vw',
+              margin: "0",
+              background: currentTheme.gradient,
+              minHeight: isMobile ? '100%' : '100vh',
+              overflowX: 'hidden',
+              boxSizing: 'border-box'
+            }}
+          >
             
             <Box
               sx={{
@@ -389,8 +445,9 @@ const EventDashboard: React.FC<EventDashboardProps> = ({ event, eventMessages })
                 flexDirection: isMobile ? "column" : "row",
                 gap: isMobile ? 2 : 5,
                 alignItems: "stretch",
-                padding: isMobile ? "8px" : "40px",
-                width: '100%',
+                padding: isMobile ? "8px 20px" : "40px",
+                width: isMobile ? '100%' : '95%',
+                margin: "0 auto",
                 maxWidth: '100%',
                 boxSizing: 'border-box'
               }}
@@ -408,11 +465,11 @@ const EventDashboard: React.FC<EventDashboardProps> = ({ event, eventMessages })
                   position: 'relative',
                 }}
               >
-                {/* Background area - optional image (provide via linkConfig.posterBackgroundSrc or linkConfig.featuredImageSrc) */}
+                {/* Background area - ensure visible height on mobile */}
                 <Box
                   sx={{
                     width: '100%',
-                    height: isMobile ? "auto" : "100%",
+                    height: isMobile ? 280 : '100%',
                     borderRadius: 4,
                     overflow: 'hidden',
                     position: 'relative',
@@ -510,9 +567,13 @@ const EventDashboard: React.FC<EventDashboardProps> = ({ event, eventMessages })
             <Box
               sx={{
                 display: "flex",
+                margin: "auto",
+                width: isMobile ? "100%" : "90%",
+                maxWidth: '100%',
+                justifyContent: "space-between",
                 flexDirection: isMobile ? "column" : "row",
                 gap: isMobile ? 2 : 4,
-                padding: isMobile ? "8px" : "16px 40px",
+                padding: isMobile ? "8px 20px" : "16px 40px",
                 marginBottom: 3,
               }}
             >
@@ -520,7 +581,7 @@ const EventDashboard: React.FC<EventDashboardProps> = ({ event, eventMessages })
               {event.location && event.location.lat && event.location.lng && (
                 <Box
                   sx={{
-                    width: isMobile ? "100%" : "50%",
+                    width: isMobile ? "90%" : "50%",
                     display: "flex",
                     flexDirection: "column",
                   }}
@@ -539,7 +600,7 @@ const EventDashboard: React.FC<EventDashboardProps> = ({ event, eventMessages })
                       height="100%"
                       frameBorder="0"
                       style={{ border: 0 }}
-                      src={`https://maps.google.com/maps?q=${event.location.lat},${event.location.lng}&t=&z=15&ie=UTF8&iwloc=&output=embed`}
+                      src={`https://maps.google.com/maps?q=${event.location.lat},${event.location.lng}&t=k&z=15&ie=UTF8&iwloc=&output=embed`}
                       allowFullScreen
                     />
                   </Box>
@@ -551,7 +612,7 @@ const EventDashboard: React.FC<EventDashboardProps> = ({ event, eventMessages })
               {/* About Section */}
               <Box
                 sx={{
-                  width: isMobile ? "100%" : (event.location && event.location.lat && event.location.lng ? "50%" : "100%"),
+                  width: isMobile ? "82%" : (event.location && event.location.lat && event.location.lng ? "50%" : "100%"),
                   backgroundColor: currentTheme.textAreaBg,
                   borderRadius: 3,
                   padding: isMobile ? 2 : "4rem 3rem",
@@ -599,21 +660,18 @@ const EventDashboard: React.FC<EventDashboardProps> = ({ event, eventMessages })
                         <Box sx={{ position: 'absolute', left: 0, top: '50%', transform: 'translate(-50%, -50%)', width: 14, height: 14, borderRadius: '50%', bgcolor: '#ffffff', boxShadow: '0 2px 6px rgba(0,0,0,0.12)' }} />
                         {/* Right endpoint */}
                         <Box sx={{ position: 'absolute', right: 0, top: '50%', transform: 'translate(50%, -50%)', width: 14, height: 14, borderRadius: '50%', bgcolor: '#ffffff', boxShadow: '0 2px 6px rgba(0,0,0,0.12)' }} />
-                        {/* Middle marker */}
-                        <Box sx={{ position: 'absolute', left: '50%', top: '50%', transform: 'translate(-50%, -50%)', width: 18, height: 18, borderRadius: '50%', bgcolor: currentTheme.textColor || '#8c1f1f', border: '2px solid white' }} />
+                        {/* Marker at beginning */}
+                        <Box sx={{ position: 'absolute', left: 0, top: '50%', transform: 'translate(-50%, -50%)', width: 18, height: 18, borderRadius: '50%', bgcolor: currentTheme.textColor || '#8c1f1f', border: '2px solid white' }} />
                       </Box>
 
-                      {/* Age text below */}
+                      {/* Planting date text below */}
                       {(() => {
                         const eventDate = new Date(event.event_date as any);
-                        const now = new Date();
-                        let years = now.getFullYear() - eventDate.getFullYear();
-                        const m = now.getMonth() - eventDate.getMonth();
-                        if (m < 0 || (m === 0 && now.getDate() < eventDate.getDate())) years--;
-                        if (years < 0) years = 0;
+                        const formatted = eventDate.toLocaleDateString('en-IN', { year: 'numeric', month: 'long', day: 'numeric' });
                         return (
-                          <Typography sx={{ mt: 2, color: '#ffffff', textAlign: 'center', fontWeight: 600 }}>
-                            {`Your grove is ${years} year${years === 1 ? '' : 's'} old`}
+                          <Typography sx={{ mt: 2, color: '#ffffff',
+                          fontSize: isMobile ? '13px' : '24px', textAlign: 'center', fontWeight: 600 }}>
+                            {`This grove was planted on ${formatted}`}
                           </Typography>
                         );
                       })()}
@@ -624,7 +682,7 @@ const EventDashboard: React.FC<EventDashboardProps> = ({ event, eventMessages })
 
             {/* Species cards section: title, responsive cards, subtitle */}
             <Box sx={{ width: '100%', display: 'flex', justifyContent: 'center', mt: 4 }}>
-              <Box sx={{ width: isMobile ? '100%' : '90%', px: isMobile ? 1 : 0 }}>
+              <Box sx={{ width: isMobile ? '100%' : '90%', px: isMobile ? 0 : 0 }}>
                 <Typography
                   variant={isMobile ? 'h6' : 'h4'}
                   sx={{ color: currentTheme.textAreaBg, fontFamily: 'serif', fontWeight: 700, textAlign: 'center', mb: 2 }}
@@ -634,7 +692,7 @@ const EventDashboard: React.FC<EventDashboardProps> = ({ event, eventMessages })
 
                 <Box sx={{ width: '100%' }}>
                   {(() => {
-                    const tilesPerSlide = 4;
+                    const tilesPerSlide = isMobile ? 1 : 4;
                     const slides: Array<Array<{ src?: string; label: string }>> = [];
                     for (let i = 0; i < species.length; i += tilesPerSlide) {
                       const chunk = species.slice(i, i + tilesPerSlide);
@@ -654,17 +712,17 @@ const EventDashboard: React.FC<EventDashboardProps> = ({ event, eventMessages })
                           <div key={sIdx}>
                             <Box sx={{
                               display: 'grid',
-                              gridTemplateColumns: { xs: 'repeat(2, 1fr)', sm: 'repeat(4, 1fr)' },
+                              gridTemplateColumns: { xs: 'repeat(1, 1fr)', sm: 'repeat(4, 1fr)' },
                               gap: 2,
                             }}>
                               {slide.map((sp, idx) => (
                                 <Card
                                   key={idx}
                                   sx={{
-                                    height: { xs: 160, sm: '55vh' },
+                                    height: { xs: 220, sm: '55vh' },
                                     borderRadius: 3,
                                     boxShadow: '0 8px 20px rgba(0,0,0,0.12)',
-                                    backgroundImage: `url(${sp.src ?? defaultSpecies[(sIdx * tilesPerSlide + idx) % defaultSpecies.length].src})`,
+                                    backgroundImage: `url(${sp.src})`,
                                     backgroundSize: 'cover',
                                     backgroundPosition: 'center',
                                     display: 'flex',
@@ -684,6 +742,380 @@ const EventDashboard: React.FC<EventDashboardProps> = ({ event, eventMessages })
                   sx={{ color: currentTheme.textAreaBg, fontFamily: 'serif', fontWeight: 700, textAlign: 'center', mb: 2 }}>
                   {(eventTreeTypesCount)} Tree Species native to the region
                 </Typography>
+              </Box>
+            </Box>
+
+            {/* Blessings Section */}
+            <Box sx={{ width: '100%', display: 'flex', justifyContent: 'center', mt: 4 }}>
+              <Box sx={{ width: isMobile ? '100%' : '90%', px: isMobile ? '20px' : 0 }}>
+                {/* Blessings carousel: 3 cards on desktop, 1 on mobile */}
+                {(() => {
+                  type BlessingT = { id: number; user_name: string; message: string; created_at?: string };
+                  const chunkSize = isMobile ? 1 : 3;
+                  const chunks: Array<Array<BlessingT | null>> = [];
+                  for (let i = 0; i < blessings.length || i === 0; i += chunkSize) {
+                    const group: Array<BlessingT | null> = blessings.slice(i, i + chunkSize) as Array<BlessingT>;
+                    while (group.length < chunkSize) group.push(null);
+                    chunks.push(group);
+                    if (blessings.length === 0) break;
+                  }
+
+                  return (
+                    <Carousel dots arrows style={{ width: '95%', margin: '0 auto' }}>
+                      {chunks.map((group, slideIdx) => (
+                        <div key={`blessings-slide-${slideIdx}`}>
+                          <Grid container spacing={1.25} sx={{ alignItems: 'stretch', justifyContent: 'center' }}>
+                              {group.map((item, idx) => (
+                                <Grid item xs={12} sm={6} md={4} key={`bl-card-${slideIdx}-${idx}`}>
+                                  <Card sx={{
+                                    borderRadius: '12px',
+                                    boxShadow: '0 8px 20px rgba(0,0,0,0.12)',
+                                    backgroundColor: currentTheme.textAreaBg,
+                                    color: currentTheme.textColor,
+                                    width: { xs: '100%' },
+                                    minHeight: { xs: 280, md: 354 },
+                                    maxHeight: { xs: 400, md: 354 },
+                                    opacity: 1,
+                                    display: 'flex',
+                                    flexDirection: 'column',
+                                    margin: '0 auto'
+                                  }}>
+                                  <CardContent sx={{ p: isMobile ? 2.5 : 3.5, flex: 1, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
+                                    <Box sx={{ 
+                                      height: '100%', 
+                                      overflowY: item ? 'auto' : 'hidden', 
+                                      display: 'flex', 
+                                      alignItems: item ? 'flex-start' : 'center', 
+                                      justifyContent: item ? 'flex-start' : 'center',
+                                      scrollbarWidth: 'thin',
+                                      scrollbarColor: `${currentTheme.textColor}30 transparent`,
+                                      '&::-webkit-scrollbar': {
+                                        width: '2px',
+                                      },
+                                      '&::-webkit-scrollbar-track': {
+                                        background: 'transparent',
+                                      },
+                                      '&::-webkit-scrollbar-thumb': {
+                                        background: 'transparent',
+                                        borderRadius: '10px',
+                                        transition: 'background 0.3s ease',
+                                      },
+                                      '&:hover::-webkit-scrollbar-thumb': {
+                                        background: `${currentTheme.textColor}30`,
+                                      },
+                                      '&::-webkit-scrollbar-thumb:hover': {
+                                        background: `${currentTheme.textColor}60`,
+                                      },
+                                    }}>
+                                      {isBlessingsLoading ? (
+                                        <Typography 
+                                          variant={isMobile ? 'body2' : 'body1'} 
+                                          sx={{ color: currentTheme.textColor, textAlign: 'center', fontSize: isMobile ? '14px' : '16px' }}
+                                        >
+                                          Loading blessings...
+                                        </Typography>
+                                      ) : item ? (
+                                        <Box sx={{
+                                          color: currentTheme.textColor,
+                                          borderRadius: 2,
+                                          boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
+                                          p: 2,
+                                          width: '100%'
+                                        }}>
+                                          <Typography 
+                                            variant="subtitle2" 
+                                            sx={{ 
+                                              color: currentTheme.textColor, 
+                                              fontSize: isMobile ? '13px' : '22px',
+                                              fontWeight: 600,
+                                              mb: 1
+                                            }}
+                                          >
+                                            {item.user_name}
+                                          </Typography>
+                                          <Typography 
+                                            variant={isMobile ? 'body2' : 'body1'} 
+                                            sx={{ 
+                                              color: currentTheme.textColor, 
+                                              fontSize: isMobile ? '14px' : '20px',
+                                              lineHeight: 1.6,
+                                              wordBreak: 'break-word',
+                                              whiteSpace: 'pre-wrap'
+                                            }}
+                                          >
+                                            {item.message}
+                                          </Typography>
+                                        </Box>
+                                      ) : (
+                                        <Box sx={{
+                                          border: '1px dashed rgba(0,0,0,0.15)',
+                                          borderRadius: 2,
+                                          height: '100%',
+                                          display: 'flex',
+                                          alignItems: 'center',
+                                          justifyContent: 'center',
+                                          color: currentTheme.textColor
+                                        }}>
+                                          <Typography 
+                                            variant={isMobile ? 'body2' : 'body1'}
+                                            sx={{ fontSize: isMobile ? '14px' : '16px' }}
+                                          >
+                                            No blessing added
+                                          </Typography>
+                                        </Box>
+                                      )}
+                                    </Box>
+                                  </CardContent>
+                                </Card>
+                              </Grid>
+                            ))}
+                            </Grid>
+                          </div>
+                        ))}
+                      </Carousel>
+                  );
+                })()}
+
+                {/* Add blessing button - left aligned on desktop, centered on mobile */}
+                <Box sx={{ mt: 3, display: 'flex', justifyContent: 'center' }}>
+                  <Tooltip title="Adding blessings is allowed only within 7 days of the event.">
+                    <Box
+                      role="button"
+                      aria-label="Add your blessing"
+                      onClick={() => setIsBlessingModalOpen(true)}
+                      sx={{
+                        width: { xs: '90%', md: 348 },
+                        height: { xs: 48, md: 60 },
+                        px: { xs: 2, md: '44px' },
+                        py: { xs: '11px', md: '11px' },
+                        gap: '10px',
+                        borderRadius: '12px',
+                        backgroundColor: '#ffffff',
+                        color: currentTheme.textColor,
+                        boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+                        cursor: 'pointer',
+                        fontFamily: { xs: 'inherit', md: '"DM Serif Text", serif' },
+                        fontWeight: { xs: 600, md: 400 },
+                        textAlign: 'center',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        fontSize: { xs: '14px', md: '28px' },
+                        lineHeight: { xs: 'normal', md: '100%' },
+                        letterSpacing: '0%',
+                        transition: 'all 0.2s',
+                        '&:hover': {
+                          boxShadow: '0 6px 16px rgba(0,0,0,0.2)',
+                          transform: 'translateY(-2px)'
+                        }
+                      }}
+                    >
+                      Bless the bride and groom!
+                    </Box>
+                  </Tooltip>
+                </Box>
+
+                {/* Blessing popup modal */}
+                {isBlessingModalOpen && (
+                  <Box
+                    aria-label="Add blessing dialog"
+                    sx={{
+                      position: 'fixed',
+                      inset: 0,
+                      zIndex: 1200,
+                      backgroundColor: 'rgba(0,0,0,0.5)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      p: { xs: 1, sm: 2 },
+                      backdropFilter: 'blur(4px)'
+                    }}
+                    onClick={() => { setIsBlessingModalOpen(false); setNewBlessingText(''); }}
+                  >
+                    <Box
+                      sx={{
+                        width: { xs: '95%', sm: '85%', md: '700px', lg: '800px' },
+                        maxWidth: '95vw',
+                        backgroundColor: currentTheme.textAreaBg,
+                        borderRadius: '16px',
+                        p: { xs: 2.5, sm: 3, md: 4 },
+                        boxShadow: '0 12px 40px rgba(0,0,0,0.3)',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        maxHeight: '90vh',
+                        overflow: 'auto'
+                      }}
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <Typography 
+                        variant={isMobile ? 'h5' : 'h4'} 
+                        sx={{ 
+                          color: currentTheme.textColor, 
+                          textAlign: 'center', 
+                          fontWeight: 700,
+                          mb: 1,
+                          fontFamily: 'serif',
+                          fontSize: { xs: '1.5rem', sm: '1.75rem', md: '2rem' }
+                        }}
+                      >
+                        Add your message
+                      </Typography>
+                      <Typography 
+                        variant="body2" 
+                        sx={{ 
+                          color: currentTheme.textColor, 
+                          textAlign: 'center', 
+                          display: 'block', 
+                          mb: { xs: 2, md: 3 },
+                          opacity: 0.8,
+                          fontSize: { xs: '0.875rem', md: '1rem' }
+                        }}
+                      >
+                        Share your blessings and good wishes (max 150 words)
+                      </Typography>
+                      <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%', gap: 2 }}>
+                        <input
+                          type="text"
+                          aria-label="Your name"
+                          value={newBlessingName}
+                          onChange={(e) => setNewBlessingName(e.target.value)}
+                          placeholder="Your name"
+                          style={{
+                            width: '100%',
+                            maxWidth: '100%',
+                            height: 48,
+                            borderRadius: 12,
+                            padding: '0 16px',
+                            border: '2px solid rgba(0,0,0,0.12)',
+                            fontSize: isMobile ? '14px' : '16px',
+                            fontFamily: 'inherit',
+                            outline: 'none',
+                            backgroundColor: '#ffffff',
+                            boxSizing: 'border-box'
+                          }}
+                        />
+                        <textarea
+                          aria-label="Blessing message"
+                          value={newBlessingText}
+                          onChange={(e) => setNewBlessingText(e.target.value)}
+                          placeholder="Write your blessing here..."
+                          className="custom-scrollbar"
+                          style={{
+                            width: '100%',
+                            maxWidth: '100%',
+                            minHeight: isMobile ? 180 : 220,
+                            borderRadius: 12,
+                            padding: 16,
+                            border: '2px solid rgba(0,0,0,0.12)',
+                            fontSize: isMobile ? '14px' : '16px',
+                            fontFamily: 'inherit',
+                            resize: 'vertical',
+                            outline: 'none',
+                            backgroundColor: '#ffffff',
+                            boxSizing: 'border-box',
+                            scrollbarWidth: 'thin',
+                            scrollbarColor: `${currentTheme.textColor}30 transparent`
+                          }}
+                        />
+                        <style>{`
+                          .custom-scrollbar::-webkit-scrollbar {
+                            width: 2px;
+                          }
+                          .custom-scrollbar::-webkit-scrollbar-track {
+                            background: transparent;
+                          }
+                          .custom-scrollbar::-webkit-scrollbar-thumb {
+                            background: transparent;
+                            border-radius: 10px;
+                            transition: background 0.3s ease;
+                          }
+                          .custom-scrollbar:hover::-webkit-scrollbar-thumb {
+                            background: ${currentTheme.textColor}30;
+                          }
+                          .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+                            background: ${currentTheme.textColor}60;
+                          }
+                        `}</style>
+                        {(() => {
+                          const wordCount = newBlessingText.trim().split(/\s+/).filter(Boolean).length;
+                          const isOverLimit = wordCount > 150;
+                          return (
+                            <Typography 
+                              variant="caption" 
+                              sx={{ 
+                                color: isOverLimit ? '#d32f2f' : currentTheme.textColor, 
+                                textAlign: 'right', 
+                                mt: 1,
+                                fontWeight: isOverLimit ? 600 : 400,
+                                width: '100%',
+                                fontSize: { xs: '0.75rem', md: '0.875rem' }
+                              }}
+                            >
+                              {wordCount} / 150 words {isOverLimit && '(Limit exceeded)'}
+                            </Typography>
+                          );
+                        })()}
+                        <Box sx={{ 
+                          display: 'flex', 
+                          justifyContent: { xs: 'center', sm: 'flex-end' }, 
+                          gap: { xs: 1.5, sm: 2 }, 
+                          mt: { xs: 2, md: 3 },
+                          width: '100%',
+                          flexWrap: 'wrap'
+                        }}>
+                          <Box
+                            role="button"
+                            aria-label="Cancel"
+                            onClick={() => { setIsBlessingModalOpen(false); setNewBlessingText(''); setNewBlessingName(''); }}
+                            sx={{ 
+                              color: currentTheme.textColor, 
+                              cursor: 'pointer', 
+                              px: { xs: 2.5, sm: 3 }, 
+                              py: { xs: 1.25, sm: 1.5 },
+                              borderRadius: '12px',
+                              border: `2px solid ${currentTheme.textColor}`,
+                              fontWeight: 600,
+                              fontSize: { xs: '14px', md: '16px' },
+                              transition: 'all 0.2s',
+                              '&:hover': {
+                                backgroundColor: 'rgba(0,0,0,0.05)'
+                              },
+                              minWidth: { xs: '100px', sm: '120px' },
+                              textAlign: 'center'
+                            }}
+                          >
+                            Cancel
+                          </Box>
+                          <Box
+                            role="button"
+                            aria-label="Submit blessing"
+                            onClick={addBlessing}
+                            sx={{
+                              backgroundColor: '#ffffff',
+                              color: currentTheme.textColor,
+                              boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+                              borderRadius: '12px',
+                              px: { xs: 2.5, sm: 3, md: 4 },
+                              py: { xs: 1.25, sm: 1.5 },
+                              fontWeight: 600,
+                              fontSize: { xs: '14px', md: '16px' },
+                              cursor: 'pointer',
+                              transition: 'all 0.2s',
+                              '&:hover': {
+                                boxShadow: '0 6px 16px rgba(0,0,0,0.2)',
+                                transform: 'translateY(-1px)'
+                              },
+                              minWidth: { xs: '100px', sm: '140px' },
+                              textAlign: 'center'
+                            }}
+                          >
+                            Submit Blessing
+                          </Box>
+                        </Box>
+                      </Box>
+                    </Box>
+                  </Box>
+                )}
               </Box>
             </Box>
 
@@ -710,6 +1142,7 @@ const EventDashboard: React.FC<EventDashboardProps> = ({ event, eventMessages })
               </Box>
             </Box>
           </Box>
+          </>
         );
     }
 

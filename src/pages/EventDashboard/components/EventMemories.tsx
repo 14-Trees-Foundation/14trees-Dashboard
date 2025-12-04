@@ -4,6 +4,10 @@ import type { CarouselRef } from "antd/es/carousel";
 import { LeftOutlined, RightOutlined } from "@ant-design/icons";
 import { useMediaQuery, Dialog, IconButton, Box } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
+import plantingIllustration from "../../../assets/planting_illustration.jpg";
+import aranyaPoster from "../../../assets/ARANYA_poster.jpg";
+import neemImg from "../../../assets/neem.png";
+import bgImg from "../../../assets/bg.png";
 
 interface ImageCarouselProps {
     imageUrls: string[];
@@ -13,6 +17,10 @@ const ImageCarousel: React.FC<ImageCarouselProps> = ({ imageUrls }) => {
     // Default images used when no event memories are provided
     // Using local assets already present in the repo (static imports)
     const defaultImages: string[] = [
+        plantingIllustration,
+        aranyaPoster,
+        neemImg,
+        bgImg,
     ];
 
     const effectiveImageUrls: string[] = Array.isArray(imageUrls) && imageUrls.length > 0 ? imageUrls : defaultImages;
@@ -115,6 +123,8 @@ const ImageCarousel: React.FC<ImageCarouselProps> = ({ imageUrls }) => {
             <Carousel
                 ref={carouselRef}
                 autoplay
+                autoplaySpeed={5000}
+                speed={600}
                 arrows
                 dots
                 prevArrow={prevArrow}
