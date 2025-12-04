@@ -228,7 +228,8 @@ const EventTrees: React.FC<EventTreesProps> = ({ eventId, eventLinkId, eventType
                     </Box>
                 </Box>
 
-                {/* View mode toggle (illustrations vs profile) */}
+                {/* View mode toggle (illustrations vs profile) - hidden for wedding events */}
+                {eventType !== "5" && (
                 <Box sx={{ display: 'flex', justifyContent: 'center', mb: 2 }}>
                     <FormControl component="fieldset">
                         <FormGroup aria-label="position" row>
@@ -253,6 +254,7 @@ const EventTrees: React.FC<EventTreesProps> = ({ eventId, eventLinkId, eventType
                         </FormGroup>
                     </FormControl>
                 </Box>
+                )}
 
                 {/* Cards grid container */}
                 <Box>
