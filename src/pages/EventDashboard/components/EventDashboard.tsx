@@ -1,11 +1,11 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState, useRef } from 'react';
 import { Box, Typography, Divider, useMediaQuery, Grid, Card, CardContent, Tooltip } from "@mui/material";
 import { Carousel } from "antd";
 import loriFayzanDashboardImage from "../../../assets/event-dashboard/Lori_Fayzan_Dashboard.jpg";
 import { createStyles, makeStyles } from "@mui/styles";
 import logo from "../../../assets/logo_white_small.png";
 // Tree species images (replace these paths with your actual asset imports)
-import logoTree from "../../../assets/logoTree.png";
+import creamLogo from "../../../assets/14T_cream_logo.png";
 import speciesImg1 from "../../../assets/planting_illustration.jpg";
 import speciesImg2 from "../../../assets/neem.png";
 import { Event, EventMessage } from "../../../types/event";
@@ -16,6 +16,8 @@ import EventMessages from "./EventMessages";
 import EventImgMsg from "./EventImgMsg";
 import ApiClient from "../../../api/apiClient/apiClient";
 import background from "../../../assets/background.png";
+import posterSrc from "../../../assets/aayushi_wedding_landing_page_poster.jpg";
+import posterMobileSrc from "../../../assets/aayushi_wedding_landing_page_poster_phone.png";
 
 interface EventDashboardProps {
     event: Event;
@@ -359,9 +361,62 @@ const EventDashboard: React.FC<EventDashboardProps> = ({ event, eventMessages })
       }
     };
 
+    const [showPoster, setShowPoster] = useState(true);
+    const mainContentRef = useRef<HTMLDivElement | null>(null);
+ 
+    useEffect(() => {
+       // prevent background scrolling while poster is visible
+       document.body.style.overflow = showPoster ? 'hidden' : '';
+       return () => { document.body.style.overflow = ''; };
+     }, [showPoster]);
+ 
+     const handlePosterClick = () => {
+      // Start smooth scroll to the main content; keep poster visible until the target is in view.
+      if (!mainContentRef.current) {
+        // fallback: scroll one viewport and hide when reached
+        window.scrollTo({ top: window.innerHeight, behavior: 'smooth' });
+        const onScroll = () => {
+          if (window.scrollY >= window.innerHeight - 8) {
+            setShowPoster(false);
+            window.removeEventListener('scroll', onScroll);
+          }
+        };
+        window.addEventListener('scroll', onScroll);
+        // safety timeout in case scroll events don't fire
+        setTimeout(() => {
+          setShowPoster(false);
+          window.removeEventListener('scroll', onScroll);
+        }, 1600);
+        return;
+      }
+
+      // If mainContentRef exists, observe it and hide the poster only after it becomes visible.
+      const target = mainContentRef.current;
+      // If already visible, hide immediately.
+      const rect = target.getBoundingClientRect();
+      if (rect.top >= 0 && rect.top < window.innerHeight) {
+        setShowPoster(false);
+        return;
+      }
+
+      const obs = new IntersectionObserver((entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting && entry.intersectionRatio > 0.5) {
+            setShowPoster(false);
+            obs.disconnect();
+            break;
+          }
+        }
+      }, { threshold: [0.5] });
+
+      obs.observe(target);
+      target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+     };
+ 
     if (isWeddingType) {
         return (
           <>
+          
             {/* Header: Logo + Name inline (sticky) - outside main container */}
             <Box sx={{ 
               display: 'flex', 
@@ -388,7 +443,7 @@ const EventDashboard: React.FC<EventDashboardProps> = ({ event, eventMessages })
               }}>
                 <Box
                   component="img"
-                  src={logoTree}
+                  src={creamLogo}
                   alt="grove logo"
                   onClick={() => window.open('https://www.14trees.org/', '_blank', 'noopener')}
                   sx={{
@@ -411,7 +466,7 @@ const EventDashboard: React.FC<EventDashboardProps> = ({ event, eventMessages })
                 <Box sx={{ 
                   width: 3, 
                   height: 80, 
-                  backgroundColor: currentTheme.textColor, 
+                  backgroundColor: '#E5DBB8', 
                   borderRadius: 1,
                   mx: 1,
                 }} />
@@ -443,11 +498,14 @@ const EventDashboard: React.FC<EventDashboardProps> = ({ event, eventMessages })
             </Box>
 
           <Box
+            ref={mainContentRef}
             p={0}
             sx={{
               width: "100%",
               maxWidth: '100vw',
               margin: "0",
+              // paddingLeft: 30,
+              paddingX: isMobile ? 0: 16,
               background: currentTheme.gradient,
               minHeight: isMobile ? '100%' : '100vh',
               overflowX: 'hidden',
@@ -554,7 +612,7 @@ const EventDashboard: React.FC<EventDashboardProps> = ({ event, eventMessages })
                         width: '100%',
                         maxWidth: '100%',
                         boxSizing: 'border-box',
-                        padding: isMobile ? 2 : '3rem 3rem',
+                        padding: isMobile ? 2 : '0.5rem 1rem',
                         maxHeight: 260,
                         overflowY: 'auto',
                       }}>
@@ -565,7 +623,7 @@ const EventDashboard: React.FC<EventDashboardProps> = ({ event, eventMessages })
                           fontFamily: '"Noto Sans", sans-serif',
                           fontWeight: 400,
                           fontStyle: 'normal',
-                          fontSize: { xs: '18px', md: '24px' },
+                          fontSize: { xs: '18px', md: '18px' },
                           lineHeight: '100%',
                           letterSpacing: 0,
                         }}
@@ -662,7 +720,7 @@ const EventDashboard: React.FC<EventDashboardProps> = ({ event, eventMessages })
                           fontFamily: '"Noto Sans", sans-serif',
                           fontWeight: 400,
                           fontStyle: 'normal',
-                          fontSize: { xs: '18px', md: '24px' },
+                          fontSize: { xs: '18px', md: '18px' },
                           lineHeight: '100%',
                           letterSpacing: 0,
                   }}
@@ -1164,7 +1222,7 @@ const EventDashboard: React.FC<EventDashboardProps> = ({ event, eventMessages })
                               textAlign: 'center'
                             }}
                           >
-                            Submit Blessing
+                            Submit
                           </Box>
                         </Box>
                       </Box>
@@ -1255,7 +1313,52 @@ const EventDashboard: React.FC<EventDashboardProps> = ({ event, eventMessages })
               />
             </Box>
           </Box>
-          </>
+
+          { showPoster && (
+            <div
+              onClick={handlePosterClick}
+              role="button"
+              aria-label="Open event"
+              style={{
+                position: 'fixed',
+                inset: 0,
+                width: '100vw',
+                height: '100vh',
+                backgroundImage: `url(${isMobile?posterMobileSrc: posterSrc})`,
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
+                backgroundRepeat: 'no-repeat',
+                zIndex: 9999,
+                cursor: 'pointer',
+                transition: 'opacity 400ms ease',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                flexDirection: 'column'
+              }}
+              aria-hidden="true"
+              id="landing-poster-overlay"
+            >
+              {/* Down arrow hint */}
+              <div style={{
+                width: 64,
+                height: 64,
+                borderRadius: 999,
+                background: 'rgba(255,255,255,0.9)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                boxShadow: '0 6px 18px rgba(0,0,0,0.2)',
+                marginTop: 'auto',
+                marginBottom: 48
+              }}>
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                  <path d="M12 5v14M19 12l-7 7-7-7" stroke="#1f1f1f" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+              </div>
+            </div>
+          ) }
+        </>
         );
     }
 
