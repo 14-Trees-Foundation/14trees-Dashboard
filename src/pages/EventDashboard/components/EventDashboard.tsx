@@ -833,7 +833,7 @@ const EventDashboard: React.FC<EventDashboardProps> = ({ event, eventMessages })
                                     alt={sp.label}
                                     sx={{
                                       width: '100%',
-                                      height: { xs: 520, sm: '55vh' }, // force full height so image covers the card
+                                      // height: { xs: 520, sm: '55vh' }, // force full height so image covers the card
                                       maxHeight: { xs: 920, sm: '55vh' },
                                       objectFit: 'cover',            // fill the container (no left/right whitespace)
                                       objectPosition: 'center',
