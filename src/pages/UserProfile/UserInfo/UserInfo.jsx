@@ -86,6 +86,12 @@ export const UserInfo = () => {
 
   const treeDoneWidth = (userinfo.user_trees.length / 14) * 100;
 
+  // build event link if event_id exists
+  const eventLink =
+    selUserInfo && selUserInfo.event_link
+      ? `${window.location.origin}/events/${selUserInfo.event_link}`
+      : null;
+  
   if (open) {
     return (
       <div>
@@ -190,7 +196,18 @@ export const UserInfo = () => {
                         className={classes.data}
                         style={{ fontStyle: "italic", fontSize: "15px" }}
                       >
-                        {selUserInfo.description}
+                        {eventLink ? (
+                          <a
+                            href={eventLink}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className={classes.eventLink}
+                          >
+                            {selUserInfo.description}
+                          </a>
+                        ) : (
+                          selUserInfo.description
+                        )}
                       </div>
                     </div>
                   )}
@@ -366,6 +383,14 @@ const useStyles = makeStyles((theme) =>
       "&:hover": {
         transform: "scale(1.05)", // Slightly scale up the image
         boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)", // Add shadow
+      },
+    },
+    eventLink: {
+      color: "#1F3625",
+      textDecoration: "underline",
+      cursor: "pointer",
+      "&:hover": {
+        textDecoration: "none",
       },
     },
   })

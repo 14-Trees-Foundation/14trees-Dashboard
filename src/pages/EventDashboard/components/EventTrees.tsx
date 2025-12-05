@@ -107,12 +107,24 @@ const EventTrees: React.FC<EventTreesProps> = ({ eventId, eventLinkId, eventType
             const apiClient = new ApiClient();
             const treesResp = await apiClient.getTrees(offset, limit, filteredData)
 
+            // Ensure results are sorted by assigned_to_name (ascending). Fallback to planted_by or empty string.
+            if (Array.isArray(treesResp.results)) {
+                treesResp.results.sort((a: any, b: any) => {
+                    const nameA = (a.assigned_to_name ?? a.planted_by ?? "").toString().toLowerCase();
+                    const nameB = (b.assigned_to_name ?? b.planted_by ?? "").toString().toLowerCase();
+                    if (nameA < nameB) return -1;
+                    if (nameA > nameB) return 1;
+                    return 0;
+                });
+            }
+
             if (offset === 0) setTrees(treesResp.results);
             else setTrees(prev => [...prev, ...treesResp.results]);
 
             setTotal(treesResp.total);
             if (typeof onTotalChange === 'function') {
-                onTotalChange(treesResp.total);
+                //setting total only when no search is applied - can be changed later
+                if(searchStr.trim() === '')  onTotalChange(treesResp.total);
             }
         } catch (error: any) {
             toast.error(error.message);

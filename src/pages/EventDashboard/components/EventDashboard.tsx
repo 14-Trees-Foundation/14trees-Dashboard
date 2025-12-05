@@ -154,11 +154,11 @@ const EventDashboard: React.FC<EventDashboardProps> = ({ event, eventMessages })
     // Theme configuration based on theme_color
     const themeConfigs = {
         red: {
-            gradient: 'linear-gradient(180deg, #C4392E 0%, #79221B 100%)',
+            gradient: 'linear-gradient(180deg, #A03336 0%, #7E1F37 100%)',
             textAreaBg: '#F4DCD8',
-            textColor: '#79221B',
+            textColor: '#79221B', 
             logoColor: '#FFD53F',
-            navColor: '#C4392E',
+            navColor: '#611E1F',
         },
         yellow: {
             gradient: 'linear-gradient(180deg, #F6B02C 0%, #ED6B11 100%)',
@@ -230,7 +230,8 @@ const EventDashboard: React.FC<EventDashboardProps> = ({ event, eventMessages })
         ].map((number) => {
           return `https://14treesplants.s3.ap-south-1.amazonaws.com/memories/memory${number}.jpg`;
         });
-        const combinedImages = [ ...apiEventImages, ...legacyImages];
+        // const combinedImages = [ ...apiEventImages, ...legacyImages];
+        const combinedImages = [ ...apiEventImages];
         // Remove duplicates in case the same image exists in both sources
         const uniqueImages = Array.from(new Set(combinedImages));
         setAllEventImages(uniqueImages);
@@ -426,7 +427,8 @@ const EventDashboard: React.FC<EventDashboardProps> = ({ event, eventMessages })
                 <Typography 
                   variant={isMobile ? 'h6' : 'h4'} 
                   sx={{ 
-                    color: currentTheme.textColor,
+                    // color: currentTheme.textColor,
+                    color: '#E5DBB8',
                     fontFamily: '"Scotch Text", Georgia, serif',
                     fontWeight: 500,
                     fontStyle: 'normal',
@@ -488,25 +490,36 @@ const EventDashboard: React.FC<EventDashboardProps> = ({ event, eventMessages })
                   }}
                   sx={{
                     width: '100%',
-                    height: isMobile ? 280 : '100%',
+                    // let the image control its height on mobile (keeps intrinsic aspect ratio)
+                    height: isMobile ? 'auto' : '100%',
                     borderRadius: 4,
                     overflow: 'hidden',
                     position: 'relative',
-                    backgroundImage: `url(${event?.event_poster || background})`,
-                    backgroundSize: 'cover',
-                    backgroundPosition: 'center',
-                    backgroundRepeat: 'no-repeat',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
                     cursor: event?.event_poster ? 'pointer' : 'default',
                     transition: 'transform 0.2s ease',
-                    '&:hover': {
-                      transform: event?.event_poster ? 'scale(1.02)' : 'none',
-                    },
                   }}
                 >
-                  </Box>
+                  <Box
+                    component="img"
+                    src={event?.event_poster || background}
+                    alt={event?.name ?? 'event poster'}
+                    sx={{
+                      width: '100%',
+                      height: isMobile ? 'auto' : '100%', // auto on mobile preserves aspect ratio
+                      display: 'block',
+                      objectFit: isMobile ? 'contain' : 'cover', // contain on mobile avoids cropping; cover on desktop preserves fill
+                      objectPosition: 'center',
+                    }}
+                    onClick={(e: React.MouseEvent) => {
+                      // Prevent duplicate event propagation when clicking the img itself
+                      e.stopPropagation();
+                      if (event?.event_poster) openImageLightbox(event.event_poster);
+                    }}
+                  />
+                </Box>
               </Box>
 
               {/* Message + carousel column (60%) */}
@@ -679,13 +692,13 @@ const EventDashboard: React.FC<EventDashboardProps> = ({ event, eventMessages })
                   <Box sx={{ width: isMobile ? '92%' : '90%', px: 2, py: 2, borderRadius: 2 }}>
                     <Box sx={{ position: 'relative', width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                       {/* Line */}
-                      <Box sx={{ width: '100%', height: 4, bgcolor: '#ffffff', borderRadius: 2, position: 'relative' }}>
+                      <Box sx={{ width: '100%', height: 4, bgcolor: '#E5DBB8', borderRadius: 2, position: 'relative' }}>
                         {/* Left endpoint */}
-                        <Box sx={{ position: 'absolute', left: 0, top: '50%', transform: 'translate(-50%, -50%)', width: 14, height: 14, borderRadius: '50%', bgcolor: '#ffffff', boxShadow: '0 2px 6px rgba(0,0,0,0.12)' }} />
+                        <Box sx={{ position: 'absolute', left: 0, top: '50%', transform: 'translate(-50%, -50%)', width: 14, height: 14, borderRadius: '50%', bgcolor: '#E5DBB8', boxShadow: '0 2px 6px rgba(0,0,0,0.12)' }} />
                         {/* Right endpoint */}
-                        <Box sx={{ position: 'absolute', right: 0, top: '50%', transform: 'translate(50%, -50%)', width: 14, height: 14, borderRadius: '50%', bgcolor: '#ffffff', boxShadow: '0 2px 6px rgba(0,0,0,0.12)' }} />
+                        <Box sx={{ position: 'absolute', right: 0, top: '50%', transform: 'translate(50%, -50%)', width: 14, height: 14, borderRadius: '50%', bgcolor: '#E5DBB8', boxShadow: '0 2px 6px rgba(0,0,0,0.12)' }} />
                         {/* Marker at beginning */}
-                        <Box sx={{ position: 'absolute', left: 0, top: '50%', transform: 'translate(-50%, -50%)', width: 18, height: 18, borderRadius: '50%', bgcolor: currentTheme.textColor || '#8c1f1f', border: '2px solid white' }} />
+                        <Box sx={{ position: 'absolute', left: 0, top: '50%', transform: 'translate(-50%, -50%)', width: 18, height: 18, borderRadius: '50%', bgcolor: '#E5DBB8', border: '2px solid white' }} />
                       </Box>
 
                       {/* Planting date text below */}
@@ -693,7 +706,7 @@ const EventDashboard: React.FC<EventDashboardProps> = ({ event, eventMessages })
                         const eventDate = new Date(event.event_date as any);
                         const formatted = eventDate.toLocaleDateString('en-IN', { year: 'numeric', month: 'long', day: 'numeric' });
                         return (
-                          <Typography sx={{ mt: 2, color: '#ffffff',
+                          <Typography sx={{ mt: 2, color: '#E5DBB8',
                           fontSize: isMobile ? '13px' : '24px', textAlign: 'center', fontWeight: 600 }}>
                             {`This grove was planted on ${formatted}`}
                           </Typography>
@@ -707,12 +720,6 @@ const EventDashboard: React.FC<EventDashboardProps> = ({ event, eventMessages })
             {/* Species cards section: title, responsive cards, subtitle */}
             <Box sx={{ width: '100%', display: 'flex', justifyContent: 'center', mt: 4 }}>
               <Box sx={{ width: isMobile ? '100%' : '90%', px: isMobile ? 0 : 0 }}>
-                <Typography
-                  variant={isMobile ? 'h6' : 'h4'}
-                  sx={{ color: currentTheme.textAreaBg, fontFamily: 'serif', fontWeight: 700, textAlign: 'center', mb: 2 }}
-                >
-                  {`${(totalTrees ?? 150)} Trees Planted in this grove`}
-                </Typography>
 
                 <Box sx={{ width: '100%', px: { xs: 0, md: 0 } }}>
                   {(() => {
@@ -745,24 +752,38 @@ const EventDashboard: React.FC<EventDashboardProps> = ({ event, eventMessages })
                                   key={idx}
                                   onClick={() => sp.src && openImageLightbox(sp.src)}
                                   sx={{
-                                    height: { xs: 220, sm: '55vh' },
                                     borderRadius: 4,
                                     boxShadow: '0 8px 20px rgba(0,0,0,0.12)',
-                                    backgroundImage: `url(${sp.src})`,
-                                    backgroundSize: 'cover',
-                                    backgroundPosition: 'center',
-                                    display: 'flex',
-                                    alignItems: 'flex-end',
                                     cursor: 'pointer',
                                     overflow: 'hidden',
                                     transition: 'all 0.2s ease',
-                                    '&:hover': {
-                                      transform: 'scale(1.03)',
-                                      borderRadius: 4,
-                                      boxShadow: '0 12px 28px rgba(0,0,0,0.18)',
-                                    },
+                                    // '&:hover': {
+                                    //   transform: 'scale(1.03)',
+                                    //   boxShadow: '0 12px 28px rgba(0,0,0,0.18)',
+                                    // },
+                                    // keep a reasonable max height on mobile but allow natural image height
+                                    maxHeight: { xs: 520, sm: '55vh' },
+                                    display: 'flex',
+                                    alignItems: 'stretch',
+                                    p: 0,                        // remove inner padding so image can span full card
+                                    backgroundColor: 'transparent' // avoid white card background showing through
                                   }}
-                                />
+                                >
+                                  <Box
+                                    component="img"
+                                    src={sp.src}
+                                    alt={sp.label}
+                                    sx={{
+                                      width: '100%',
+                                      height: { xs: 520, sm: '55vh' }, // force full height so image covers the card
+                                      maxHeight: { xs: 920, sm: '55vh' },
+                                      objectFit: 'cover',            // fill the container (no left/right whitespace)
+                                      objectPosition: 'center',
+                                      display: 'block',
+                                      backgroundColor: 'transparent'
+                                    }}
+                                  />
+                                </Card>
                               ))}
                             </Box>
                           </div>
@@ -772,9 +793,15 @@ const EventDashboard: React.FC<EventDashboardProps> = ({ event, eventMessages })
                   })()}
                 </Box>
 
+                <Typography
+                  variant={isMobile ? 'h6' : 'h4'}
+                  sx={{ color: '#E5DBB8', fontFamily: '"Scotch Text", Georgia, serif', fontWeight: 700, textAlign: 'center', mb: 2, mt: 4 }}
+                >
+                  {`${(totalTrees ?? 150)} Trees planted in this grove`}
+                </Typography>
                 <Typography variant={isMobile ? 'h6' : 'h4'}
-                  sx={{ color: currentTheme.textAreaBg, fontFamily: 'serif', fontWeight: 700, textAlign: 'center', mb: 2 }}>
-                  {(eventTreeTypesCount)} Tree Species native to the region
+                  sx={{ color: '#E5DBB8', fontFamily: '"Scotch Text", Georgia, serif', fontWeight: 700, textAlign: 'center', mb: 2 }}>
+                  {(eventTreeTypesCount)} Tree species native to the region
                 </Typography>
               </Box>
             </Box>
@@ -921,7 +948,8 @@ const EventDashboard: React.FC<EventDashboardProps> = ({ event, eventMessages })
                         color: currentTheme.textColor,
                         boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
                         cursor: 'pointer',
-                        fontFamily: { xs: 'inherit', md: '"DM Serif Text", serif' },
+                        // fontFamily: { xs: 'inherit', md: '"DM Serif Text", serif' },
+                        fontFamily: '"Scotch Text", Georgia, serif',
                         fontWeight: { xs: 600, md: 400 },
                         textAlign: 'center',
                         display: 'flex',
@@ -1080,7 +1108,7 @@ const EventDashboard: React.FC<EventDashboardProps> = ({ event, eventMessages })
                             >
                               {wordCount} / 150 words {isOverLimit && '(Limit exceeded)'}
                             </Typography>
-                          );
+                        );
                         })()}
                         <Box sx={{ 
                           display: 'flex', 
