@@ -36,7 +36,7 @@ const AssociatedTreesList: React.FC<AssociatedTreesListProps> = ({
   const theme = useTheme();
 
   return (
-    <Box p={2} sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+    <Box p={2} sx={{ display: 'flex', flexDirection: 'column' }}>
       <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
         <Typography variant="h6">
           {title} ({associatedTrees.length})
@@ -63,16 +63,24 @@ const AssociatedTreesList: React.FC<AssociatedTreesListProps> = ({
           {emptyMessage}
         </Alert>
       ) : (
-        <Box sx={{ flexGrow: 1, overflow: 'auto' }}>
-          <List dense>
+        <Box sx={{ maxHeight: '65vh', overflow: 'auto' }}>
+          <List 
+            dense 
+            sx={{ 
+              border: `1px solid ${theme.palette.divider}`,
+              borderRadius: 1,
+              backgroundColor: theme.palette.background.default,
+            }}
+          >
             {associatedTrees.map((tree) => (
               <ListItem 
                 key={tree.id}
                 sx={{
-                  border: `1px solid ${theme.palette.divider}`,
-                  borderRadius: 1,
-                  mb: 1,
+                  borderBottom: `1px solid ${theme.palette.divider}`,
                   backgroundColor: theme.palette.background.paper,
+                  '&:last-child': {
+                    borderBottom: 'none'
+                  }
                 }}
               >
                 <ListItemText
