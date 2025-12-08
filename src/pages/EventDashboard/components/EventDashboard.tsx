@@ -1365,11 +1365,12 @@ const EventDashboard: React.FC<EventDashboardProps> = ({ event, eventMessages })
     return (
         <Box
             p={isMobile ? 0 : 2}
-            sx={isMobile ? {
-                width: "100vw",
-                overflow: "hidden",
-                paddingTop: "16px",
-            } : undefined}
+            sx={{
+                width: isMobile ? "100vw" : "100%",
+                height: "100vh",
+                overflow: "auto",
+                paddingTop: isMobile ? "16px" : undefined,
+            }}
         >
             {shouldRenderFeaturedImage && (
                 <Box sx={featuredImageWrapperSx}>
@@ -1386,7 +1387,7 @@ const EventDashboard: React.FC<EventDashboardProps> = ({ event, eventMessages })
                     <Box
                         sx={{
                             position: "relative",
-                            width: "100%",
+                            width: "95%",
                             padding: isMobile ? "16px 8px 12px" : "10px",
                             display: "flex",
                             justifyContent: isMobile ? "center" : "flex-start",
@@ -1408,7 +1409,7 @@ const EventDashboard: React.FC<EventDashboardProps> = ({ event, eventMessages })
             )}
 
             {/* Scrollable Content */}
-            <Box className={classes.content}>
+            <Box className={classes.content} sx={{ height: 'auto', overflow: 'visible' }}>
                 {/* Event Message */}
                 {event.message && (
                     <EventImgMsg imageUrls={event.images} message={event.message} />
