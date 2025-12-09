@@ -7,6 +7,7 @@ export type UserPlotTreesAuditRow = {
     site_name: string;
     audit_date: string; // YYYY-MM-DD
     trees_audited: number;
+    trees_added: number;
 };
 
 export type UserPlotTreesAuditResponse = {
