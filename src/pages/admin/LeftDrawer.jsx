@@ -25,6 +25,7 @@ import FestivalIcon from "@mui/icons-material/Festival";
 import { Analytics, CardGiftcard, Inventory, Campaign, Assessment } from "@mui/icons-material";
 import { UserRoles } from "../../types/common";
 import { PAGE_SUB_SECTIONS, getSubSectionsForPage } from "../../config/pageSubSections";
+import VersionDisplay from "../../components/VersionDisplay";
 
 export const AdminLeftDrawer = () => {
   const theme = useTheme();
@@ -474,7 +475,8 @@ export const AdminLeftDrawer = () => {
             onClick={() => navigate("/")}
             style={{ cursor: "pointer" }}
           />
-          {menuitem()}
+          />          {menuitem()}
+          <VersionDisplay />
           {/* Resize Handle for Mobile */}
           <div
             className={classes.resizeHandle}
@@ -511,6 +513,7 @@ export const AdminLeftDrawer = () => {
           style={{ cursor: "pointer" }}
         />
         {menuitem()}
+        <VersionDisplay />
         {/* Resize Handle */}
         <div
           className={classes.resizeHandle}
