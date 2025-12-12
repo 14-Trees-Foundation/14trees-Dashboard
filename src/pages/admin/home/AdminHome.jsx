@@ -109,7 +109,7 @@ export const AdminHome = () => {
   const MetricCard = ({ icon, value, label, color, progress, progressLabel, trend, delay = 0 }) => (
     <Grow in={true} timeout={1000 + delay}>
       <Card className={classes.enhancedCard} 
-           style={{ background: `linear-gradient(135deg, ${color}20, ${color}40)` }}>
+           style={{ background: `linear-gradient(135deg, ${color}20, ${color}40)`, borderRadius: '20px' }}>
         <CardContent className={classes.cardContent}>
           <Box className={classes.iconContainer} style={{ color }}>
             {icon}
@@ -152,13 +152,12 @@ export const AdminHome = () => {
 
   return (
     <div>
-      <Typography sx={{ p: 3, pb: 1 }} variant="h4" className={classes.pageTitle}>
-        📊 Dashboard Overview
-      </Typography>
-      
       <Grid container spacing={3} sx={{ p: 2 }}>
         {/* Main Metrics Row */}
         <Grid item xs={12}>
+          <Typography variant="h5" sx={{ mb: 2, color: '#2E7D32', fontWeight: 600 }}>
+            📊 Summary
+          </Typography>
           <Grid container spacing={2}>
             <Grid item xs={12} sm={6} md={2.4}>
               <MetricCard
@@ -261,8 +260,6 @@ export const AdminHome = () => {
                 value={adminSummary.totalGiftRequests || "0"}
                 label="Total Gift Requests"
                 color="#9C27B0"
-                progress={adminSummary.totalGiftRequests && adminSummary.totalGiftedTrees ? Math.round((adminSummary.totalGiftedTrees / (adminSummary.totalGiftRequests || 1)) * 100) : 0}
-                progressLabel={adminSummary.totalGiftRequests && adminSummary.totalGiftedTrees ? `${Math.round((adminSummary.totalGiftedTrees / (adminSummary.totalGiftRequests || 1)) * 100)}% fulfilled` : undefined}
                 delay={1800}
               />
             </Grid>
@@ -391,7 +388,7 @@ const useStyles = makeStyles((theme) =>
     enhancedCard: {
       minHeight: '180px',
       height: 'auto',
-      borderRadius: '18px',
+      borderRadius: '20px',
       backdropFilter: 'blur(10px)',
       border: '1px solid rgba(255,255,255,0.2)',
       boxShadow: 'inset 7px 7px 14px rgba(0,0,0,0.1), inset -7px -7px 14px rgba(255,255,255,0.3), 0 4px 12px rgba(0,0,0,0.1)',
