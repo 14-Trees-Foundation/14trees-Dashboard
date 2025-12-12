@@ -14,6 +14,9 @@ import {Provider} from 'react-redux';
 import { store } from "./redux/store/store";
 import { ConfigProvider } from 'antd'
 
+// Import i18n configuration
+import "./i18n";
+
 if (import.meta.env.VITE_USE_MOCK_SERVER === "true") {
   makeServer({
     environment: "development",

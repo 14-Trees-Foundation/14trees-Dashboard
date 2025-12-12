@@ -3,10 +3,13 @@ import logo from "../assets/logo_white_small.png";
 import Button from "@mui/material/Button";
 import { createStyles, makeStyles } from "@mui/styles";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
+import LanguageSwitcher from "./LanguageSwitcher";
 
 export const AppBar = () => {
   const navigate = useNavigate();
   const classes = UseStyle();
+  const { t } = useTranslation();
 
   return (
     <Fragment>
@@ -29,6 +32,9 @@ export const AppBar = () => {
             >
               Visitor Form
             </Button> */}
+            <div style={{ marginRight: "16px" }}>
+              <LanguageSwitcher variant="compact" />
+            </div>
             <Button
               variant="contained"
               color="primary"
@@ -36,7 +42,7 @@ export const AppBar = () => {
               style={{ marginRight: "2%" }}
               onClick={() => navigate("/admin")}
             >
-              Admin
+              {t('navigation.admin')}
             </Button>
           </div>
         </nav>

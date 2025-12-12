@@ -12,6 +12,7 @@ import BusinessIcon from '@mui/icons-material/Business';
 import NatureIcon from '@mui/icons-material/Nature';
 import { useRecoilValue, useSetRecoilState } from "recoil";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 
 import { summary, treeLoggedByDate } from "../../../store/adminAtoms";
 import { TreeLogCumulative } from "./TreeLogCumulative";
@@ -27,6 +28,7 @@ export const AdminHome = () => {
   const token = JSON.parse(localStorage.getItem("token"));
   const navigate = useNavigate();
   const classes = useStyles();
+  const { t } = useTranslation();
 
   const fetchData = useCallback(async () => {
     // Check if data already exists to avoid unnecessary API calls
@@ -156,14 +158,14 @@ export const AdminHome = () => {
         {/* Main Metrics Row */}
         <Grid item xs={12}>
           <Typography variant="h5" sx={{ mb: 2, color: '#2E7D32', fontWeight: 600 }}>
-            📊 Summary
+            📊 {t('adminHome.summary')}
           </Typography>
           <Grid container spacing={2}>
             <Grid item xs={12} sm={6} md={2.4}>
               <MetricCard
                 icon={<ParkTwoToneIcon fontSize="large" />}
                 value={adminSummary.treeCount}
-                label="Total Trees"
+                label={t('adminHome.totalTrees')}
                 color="#1F3625"
                 delay={0}
               />
@@ -173,7 +175,7 @@ export const AdminHome = () => {
               <MetricCard
                 icon={<GrassTwoToneIcon fontSize="large" />}
                 value={adminSummary.plantTypeCount}
-                label="Plant Types"
+                label={t('adminHome.plantTypes')}
                 color="#F94F25"
                 delay={200}
               />
@@ -182,10 +184,10 @@ export const AdminHome = () => {
               <MetricCard
                 icon={<HowToReg fontSize="large" />}
                 value={adminSummary.bookedTreeCount}
-                label="Booked Trees"
+                label={t('adminHome.bookedTrees')}
                 color="#6166B8"
                 progress={adminSummary.treeCount ? Math.round((adminSummary.bookedTreeCount / adminSummary.treeCount) * 100) : 0}
-                progressLabel={adminSummary.treeCount ? `${Math.round((adminSummary.bookedTreeCount / adminSummary.treeCount) * 100)}% of total trees` : undefined}
+                progressLabel={adminSummary.treeCount ? `${Math.round((adminSummary.bookedTreeCount / adminSummary.treeCount) * 100)}% ${t('adminHome.ofTotalTrees')}` : undefined}
                 delay={400}
               />
             </Grid>
@@ -193,10 +195,10 @@ export const AdminHome = () => {
               <MetricCard
                 icon={<AssignmentIndTwoToneIcon fontSize="large" />}
                 value={adminSummary.assignedTreeCount}
-                label="Assigned Trees"
+                label={t('adminHome.assignedTrees')}
                 color="#9C27B0"
                 progress={adminSummary.treeCount ? Math.round((adminSummary.assignedTreeCount / adminSummary.treeCount) * 100) : 0}
-                progressLabel={adminSummary.treeCount ? `${Math.round((adminSummary.assignedTreeCount / adminSummary.treeCount) * 100)}% of total trees` : undefined}
+                progressLabel={adminSummary.treeCount ? `${Math.round((adminSummary.assignedTreeCount / adminSummary.treeCount) * 100)}% ${t('adminHome.ofTotalTrees')}` : undefined}
                 delay={600}
               />
             </Grid>
@@ -204,7 +206,7 @@ export const AdminHome = () => {
               <MetricCard
                 icon={<PermIdentityTwoToneIcon fontSize="large" />}
                 value={adminSummary.userCount}
-                label="Unique Profiles"
+                label={t('adminHome.uniqueProfiles')}
                 color="#C72542"
                 delay={800}
               />
@@ -214,14 +216,14 @@ export const AdminHome = () => {
         {/* Gift & Donation Metrics */}
         <Grid item xs={12}>
           <Typography variant="h5" sx={{ mb: 2, color: '#2E7D32', fontWeight: 600 }}>
-            🎁 Gift & Donation Tracking
+            🎁 {t('adminHome.giftDonationTracking')}
           </Typography>
           <Grid container spacing={2}>
             <Grid item xs={12} sm={6} md={2}>
               <MetricCard
                 icon={<CardGiftcardIcon fontSize="large" />}
                 value={adminSummary.personalGiftRequestsCount || "0"}
-                label="Personal Gift Requests"
+                label={t('adminHome.personalGiftRequests')}
                 color="#E91E63"
                 delay={1000}
               />
@@ -230,7 +232,7 @@ export const AdminHome = () => {
               <MetricCard
                 icon={<PersonIcon fontSize="large" />}
                 value={adminSummary.personalGiftedTreesCount || "0"}
-                label="Personal Gifted Trees"
+                label={t('adminHome.personalGiftedTrees')}
                 color="#00ACC1"
                 delay={1200}
               />
@@ -239,7 +241,7 @@ export const AdminHome = () => {
               <MetricCard
                 icon={<CardGiftcardIcon fontSize="large" />}
                 value={adminSummary.corporateGiftRequestsCount || "0"}
-                label="Corporate Gift Requests"
+                label={t('adminHome.corporateGiftRequests')}
                 color="#FF5722"
                 delay={1400}
               />
@@ -249,7 +251,7 @@ export const AdminHome = () => {
               <MetricCard
                 icon={<BusinessIcon fontSize="large" />}
                 value={adminSummary.corporateGiftedTreesCount || "0"}
-                label="Corporate Gifted Trees"
+                label={t('adminHome.corporateGiftedTrees')}
                 color="#3F51B5"
                 delay={1600}
               />
@@ -258,7 +260,7 @@ export const AdminHome = () => {
               <MetricCard
                 icon={<CardGiftcardIcon fontSize="large" />}
                 value={adminSummary.totalGiftRequests || "0"}
-                label="Total Gift Requests"
+                label={t('adminHome.totalGiftRequests')}
                 color="#9C27B0"
                 delay={1800}
               />
@@ -267,7 +269,7 @@ export const AdminHome = () => {
               <MetricCard
                 icon={<NatureIcon fontSize="large" />}
                 value={adminSummary.totalGiftedTrees || "0"}
-                label="Total Gifted Trees"
+                label={t('adminHome.totalGiftedTrees')}
                 color="#4CAF50"
                 delay={2000}
               />
@@ -278,14 +280,14 @@ export const AdminHome = () => {
         {/* Geographic Coverage */}
         <Grid item xs={12}>
           <Typography variant="h5" sx={{ mb: 2, color: '#1565C0', fontWeight: 600 }}>
-            🌍 Geographic Coverage
+            🌍 {t('adminHome.geographicCoverage')}
           </Typography>
           <Grid container spacing={2}>
             <Grid item xs={12} sm={6} md={2}>
               <MetricCard
                 icon={<Flag fontSize="large" />}
                 value={adminSummary.sitesCount}
-                label="Sites"
+                label={t('adminHome.sites')}
                 color="#53ad7a"
                 delay={2200}
               />
@@ -294,7 +296,7 @@ export const AdminHome = () => {
               <MetricCard
                 icon={<TerrainTwoToneIcon fontSize="large" />}
                 value={adminSummary.plotCount}
-                label="Total Plots"
+                label={t('adminHome.totalPlots')}
                 color="#573D1C"
                 delay={2400}
               />
@@ -303,7 +305,7 @@ export const AdminHome = () => {
               <MetricCard
                 icon={<OpacityTwoTone fontSize="large" />}
                 value={adminSummary.pondCount}
-                label="Total Ponds"
+                label={t('adminHome.totalPonds')}
                 color="#3C79BC"
                 delay={2600}
               />
@@ -312,7 +314,7 @@ export const AdminHome = () => {
               <MetricCard
                 icon={<LocationCity fontSize="large" />}
                 value={adminSummary.districtsCount}
-                label="Districts"
+                label={t('adminHome.districts')}
                 color="#078085"
                 delay={2800}
               />
@@ -321,7 +323,7 @@ export const AdminHome = () => {
               <MetricCard
                 icon={<Apartment fontSize="large" />}
                 value={adminSummary.talukasCount}
-                label="Talukas"
+                label={t('adminHome.talukas')}
                 color="#607D8B"
                 delay={3000}
               />
@@ -330,7 +332,7 @@ export const AdminHome = () => {
               <MetricCard
                 icon={<HolidayVillage fontSize="large" />}
                 value={adminSummary.villagesCount}
-                label="Villages"
+                label={t('adminHome.villages')}
                 color="#795548"
                 delay={3200}
               />
@@ -341,7 +343,7 @@ export const AdminHome = () => {
         {adminSummary?.landTypeCounts && Object.keys(adminSummary.landTypeCounts).length > 0 && (
           <Grid item xs={12}>
             <Typography variant="h5" sx={{ mb: 2, color: '#388E3C', fontWeight: 600 }}>
-              🌱 Land Type Distribution
+              🌱 {t('adminHome.landTypeDistribution')}
             </Typography>
             <Grid container spacing={2}>
               {Object.entries(adminSummary.landTypeCounts).map(([key, value], index) => (
@@ -349,7 +351,7 @@ export const AdminHome = () => {
                   <MetricCard
                     icon={<ParkTwoToneIcon fontSize="large" />}
                     value={value}
-                    label={key}
+                    label={t(`adminHome.landTypes.${key}`, key)}
                     color={['#1F3625', '#2E7D32', '#388E3C', '#4CAF50', '#66BB6A', '#81C784'][index % 6]}
                     delay={3400 + (index * 200)}
                   />
@@ -364,7 +366,7 @@ export const AdminHome = () => {
           <Card className={classes.chartContainer}>
             <CardContent>
               <Typography variant="h5" sx={{ mb: 2, color: '#1565C0', fontWeight: 600 }}>
-                📈 Tree Growth Analytics
+                📈 {t('adminHome.treeGrowthAnalytics')}
               </Typography>
               <TreeLogCumulative />
             </CardContent>

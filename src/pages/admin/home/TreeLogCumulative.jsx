@@ -9,12 +9,14 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
+import { useTranslation } from "react-i18next";
 
 import { treeLoggedByDate } from "../../../store/adminAtoms";
 import { Typography } from "@mui/material";
 
 export const TreeLogCumulative = () => {
   const theme = useTheme();
+  const { t } = useTranslation();
   let treeByDate = useRecoilValue(treeLoggedByDate);
   let cumTree = 0;
   
@@ -43,7 +45,7 @@ export const TreeLogCumulative = () => {
     >
       <div style={{ display: "flex", justifyContent: "space-between" }}>
         <Typography variant="h6" gutterBottom>
-          Cumulative tree count
+          {t('adminHome.cumulativeTreeCount')}
         </Typography>
       </div>
       <ResponsiveContainer height={480}>

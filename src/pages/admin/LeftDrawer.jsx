@@ -26,6 +26,8 @@ import { Analytics, CardGiftcard, Inventory, Campaign, Assessment } from "@mui/i
 import { UserRoles } from "../../types/common";
 import { PAGE_SUB_SECTIONS, getSubSectionsForPage } from "../../config/pageSubSections";
 import VersionDisplay from "../../components/VersionDisplay";
+import LanguageSwitcher from "../../components/LanguageSwitcher";
+import { useTranslation } from "react-i18next";
 
 export const AdminLeftDrawer = () => {
   const theme = useTheme();
@@ -39,6 +41,7 @@ export const AdminLeftDrawer = () => {
   const [drawerWidth, setDrawerWidth] = useState(200); // Default width
   const [isResizing, setIsResizing] = useState(false);
   const classes = useStyles();
+  const { t } = useTranslation();
 
   useEffect(() => {
     // Check if we should bypass auth
@@ -65,25 +68,25 @@ export const AdminLeftDrawer = () => {
 
   const pages = [
     {
-      displayName: "Home",
+      displayName: t('common.home'),
       logo: LeaderBoardOutlined,
       display: isAdmin,
       path: "home",
     },
     {
-      displayName: "Sites",
+      displayName: t('navigation.sites'),
       logo: MapIcon,
       display: isAdmin,
       path: "sites",
     },
     {
-      displayName: "Plots",
+      displayName: t('navigation.plots'),
       logo: LandscapeIcon,
       display: isAdmin,
       path: "plots",
     },
     {
-      displayName: "Trees",
+      displayName: t('trees.trees'),
       logo: ForestOutlined,
       display: isAdmin,
       path: "trees",
@@ -446,6 +449,9 @@ export const AdminLeftDrawer = () => {
             <div className={classes.header}>
               <MenuIcon onClick={() => setOpen(true)} />
             </div>
+            <div style={{ marginLeft: 'auto', marginRight: '16px' }}>
+              <LanguageSwitcher variant="compact" showIcon={false} />
+            </div>
           </Toolbar>
         </AppBar>
         <Drawer
@@ -476,6 +482,9 @@ export const AdminLeftDrawer = () => {
             style={{ cursor: "pointer" }}
           />
           {menuitem()}
+          <div style={{ padding: '16px' }}>
+            <LanguageSwitcher variant="dropdown" />
+          </div>
           <VersionDisplay />
           {/* Resize Handle for Mobile */}
           <div
@@ -513,6 +522,9 @@ export const AdminLeftDrawer = () => {
           style={{ cursor: "pointer" }}
         />
         {menuitem()}
+        <div style={{ padding: '16px' }}>
+          <LanguageSwitcher variant="dropdown" />
+        </div>
         <VersionDisplay />
         {/* Resize Handle */}
         <div
