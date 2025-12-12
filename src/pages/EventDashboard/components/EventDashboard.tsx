@@ -1314,7 +1314,7 @@ const EventDashboard: React.FC<EventDashboardProps> = ({ event, eventMessages })
             </Box>
           </Box>
 
-          { showPoster && (
+          { showPoster && event.id==8245 && (
             <div
               onClick={handlePosterClick}
               role="button"
