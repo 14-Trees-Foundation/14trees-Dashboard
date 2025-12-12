@@ -4,7 +4,7 @@ import { Table, TableColumnsType } from 'antd';
 import { AnyObject } from 'antd/es/_util/type';
 import { TableRowSelection } from 'antd/es/table/interface';
 import { unparse } from 'papaparse';
-import { useEffect, useState, useRef, useCallback } from 'react';
+import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { toast } from 'react-toastify';
 import { Resizable } from "react-resizable";
 import ColumnPreferences from './ColumnPreferences';
@@ -143,11 +143,55 @@ function GeneralTable({ loading, rows, columns, totalRecords, page, pageSize = 1
                 if (column.exportValue) {
                     // Use exportValue function if available
                     row[title] = column.exportValue(item[column.dataIndex], item, 0);
+                } else if (column.dataIndex && item[column.dataIndex] !== undefined) {
+                    // Use the raw data value directly for better CSV export
+                    let value = item[column.dataIndex];
+                    
+                    // Special handling for dates
+                    if (value instanceof Date || (typeof value === 'string' && value.match(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/))) {
+                        try {
+                            const date = new Date(value);
+                            const day = date.getDate().toString().padStart(2, '0');
+                            const month = (date.getMonth() + 1).toString().padStart(2, '0');
+                            const year = date.getFullYear();
+                            value = `${month}-${day}-${year}`;
+                        } catch (e) {
+                            // If date parsing fails, keep original value
+                        }
+                    }
+                    
+                    // Handle arrays
+                    if (Array.isArray(value)) {
+                        value = value.join(', ');
+                    }
+                    
+                    row[title] = value;
                 } else if (column.render) {
+                    // Fallback to render function for columns without dataIndex
                     const value = column.render(item[column.dataIndex], item, 0);
-                    row[title] = value?.props?.children ? value.props.children : value;
+                    // Try to extract meaningful text from React elements
+                    if (React.isValidElement(value)) {
+                        // If it's a React element, try to extract text content
+                        if (value.props?.children !== undefined) {
+                            if (typeof value.props.children === 'string' || typeof value.props.children === 'number') {
+                                row[title] = value.props.children;
+                            } else if (Array.isArray(value.props.children)) {
+                                // Handle cases where children is an array
+                                row[title] = value.props.children.filter(child => 
+                                    typeof child === 'string' || typeof child === 'number'
+                                ).join(' ');
+                            } else {
+                                row[title] = 'N/A';
+                            }
+                        } else {
+                            row[title] = 'N/A';
+                        }
+                    } else {
+                        row[title] = value || 'N/A';
+                    }
+                } else {
+                    row[title] = item[column.key] || 'N/A';
                 }
-                else row[title] = item[column.dataIndex];
             })
             return row
         })

@@ -224,6 +224,26 @@ export const User1 = () => {
       ...getColumnSearchProps('phone', filters, handleSetFilters)
     },
     {
+      dataIndex: "created_at",
+      key: "created_at",
+      title: "Created Date (MM-DD-YYYY)",
+      align: "center",
+      width: 150,
+      render: getFormattedDate,
+      exportValue: (value: string | Date) => {
+        if (!value) return 'N/A';
+        try {
+          const date = new Date(value);
+          const day = date.getDate().toString().padStart(2, '0');
+          const month = (date.getMonth() + 1).toString().padStart(2, '0');
+          const year = date.getFullYear();
+          return `${month}-${day}-${year}`;
+        } catch (e) {
+          return 'Invalid Date';
+        }
+      }
+    },
+    {
       key: "sponsor_dashboard",
       title: "Sponsor Dashboard",
       width: 100,
@@ -396,6 +416,10 @@ export const User1 = () => {
             )}
           </div>
         );
+      },
+      exportValue: (value: string[]) => {
+        if (!value || !Array.isArray(value) || value.length === 0) return 'No roles';
+        return value.join(', ');
       },
       ...getColumnSelectedItemFilter({
         dataIndex: 'roles',
