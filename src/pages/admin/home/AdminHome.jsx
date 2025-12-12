@@ -1,6 +1,6 @@
 import { useEffect, useCallback, useState } from "react";
 import { createStyles, makeStyles } from "@mui/styles";
-import { Typography, Box, Grid } from "@mui/material";
+import { Typography, Box, Grid, Card, CardContent, LinearProgress, Tooltip, Fade, Grow } from "@mui/material";
 import ParkTwoToneIcon from "@mui/icons-material/ParkTwoTone";
 import GrassTwoToneIcon from "@mui/icons-material/GrassTwoTone";
 import PermIdentityTwoToneIcon from "@mui/icons-material/PermIdentityTwoTone";
@@ -78,271 +78,300 @@ export const AdminHome = () => {
   if (loading) {
     return <Spinner />;
   }
+  // Animated counter component
+  const AnimatedCounter = ({ value, duration = 2000, suffix = '' }) => {
+    const [displayValue, setDisplayValue] = useState(0);
+    
+    useEffect(() => {
+      if (!value) return;
+      
+      let start = 0;
+      const end = parseInt(value) || 0;
+      const increment = end / (duration / 16); // 60fps
+      
+      const timer = setInterval(() => {
+        start += increment;
+        if (start >= end) {
+          setDisplayValue(end);
+          clearInterval(timer);
+        } else {
+          setDisplayValue(Math.floor(start));
+        }
+      }, 16);
+      
+      return () => clearInterval(timer);
+    }, [value, duration]);
+    
+    return `${displayValue.toLocaleString()}${suffix}`;
+  };
+  
+  // Enhanced metric card component
+  const MetricCard = ({ icon, value, label, color, progress, progressLabel, trend, delay = 0 }) => (
+    <Grow in={true} timeout={1000 + delay}>
+      <Card className={classes.enhancedCard} 
+           style={{ background: `linear-gradient(135deg, ${color}20, ${color}40)` }}>
+        <CardContent className={classes.cardContent}>
+          <Box className={classes.iconContainer} style={{ color }}>
+            {icon}
+          </Box>
+          <Typography variant="h3" className={classes.metricValue}>
+            <AnimatedCounter value={value} />
+          </Typography>
+          <Typography variant="subtitle2" className={classes.metricLabel}>
+            {label}
+          </Typography>
+          {progress !== undefined && (
+            <>
+              <LinearProgress 
+                variant="determinate" 
+                value={progress} 
+                className={classes.progressBar}
+                sx={{ 
+                  backgroundColor: `${color}30`,
+                  '& .MuiLinearProgress-bar': {
+                    backgroundColor: color
+                  }
+                }}
+              />
+              {progressLabel && (
+                <Typography variant="caption" className={classes.progressLabel}>
+                  {progressLabel}
+                </Typography>
+              )}
+            </>
+          )}
+          {trend && (
+            <Typography variant="caption" className={classes.trendIndicator} style={{ color }}>
+              {trend > 0 ? '↗' : trend < 0 ? '↘' : '→'} {Math.abs(trend)}%
+            </Typography>
+          )}
+        </CardContent>
+      </Card>
+    </Grow>
+  );
+
   return (
     <div>
-      <Typography sx={{ p: 3, pb: 1 }} variant="h5">
-        Summary
+      <Typography sx={{ p: 3, pb: 1 }} variant="h4" className={classes.pageTitle}>
+        📊 Dashboard Overview
       </Typography>
-      <Box style={{
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center'
-      }}>
-        <div className={classes.card}>
-          <Box sx={{ paddingTop: "10px" }}>
-            <ParkTwoToneIcon fontSize="large" style={{ color: "#1F3625" }} />
-            <Typography variant="h3" color="#fff" sx={{ pt: 1, pb: 1 }}>
-              {adminSummary.treeCount}
-            </Typography>
-            <Typography color="#1f3625" variant="subtitle2">
-              Trees
-            </Typography>
-          </Box>
-        </div>
-
-        <div className={classes.card}>
-          <Box sx={{ paddingTop: "10px" }}>
-            <GrassTwoToneIcon fontSize="large" style={{ color: "#F94F25" }} />
-            <Typography variant="h3" color="#fff" sx={{ pt: 1, pb: 1 }}>
-              {adminSummary.plantTypeCount}
-            </Typography>
-            <Typography variant="subtitle2" color="#1f3625">
-              Plant Types
-            </Typography>
-          </Box>
-        </div>
-
-        <div className={classes.card}>
-          <Box sx={{ paddingTop: "10px" }}>
-            <HowToReg
-              fontSize="large"
-              style={{ color: "#6166B8" }}
-            />
-            <Typography variant="h3" color="#fff" sx={{ pt: 1, pb: 1 }}>
-              {adminSummary.bookedTreeCount}
-            </Typography>
-            <Typography variant="subtitle2" color="#1f3625">
-              Booked Trees
-            </Typography>
-          </Box>
-        </div>
-
-        <div className={classes.card}>
-          <Box sx={{ paddingTop: "10px" }}>
-            <AssignmentIndTwoToneIcon
-              fontSize="large"
-              style={{ color: "#6166B8" }}
-            />
-            <Typography variant="h3" color="#fff" sx={{ pt: 1, pb: 1 }}>
-              {adminSummary.assignedTreeCount}
-            </Typography>
-            <Typography variant="subtitle2" color="#1f3625">
-              Assigned Trees
-            </Typography>
-          </Box>
-        </div>
-
-        <div className={classes.card}>
-          <Box sx={{ paddingTop: "10px" }}>
-            <PermIdentityTwoToneIcon
-              fontSize="large"
-              style={{ color: "#C72542" }}
-            />
-            <Typography variant="h3" color="#fff" sx={{ pt: 1, pb: 1 }}>
-              {adminSummary.userCount}
-            </Typography>
-            <Typography variant="subtitle2" color="#1f3625">
-              Unique Profiles
-            </Typography>
-          </Box>
-        </div>
-      </Box>
-      <Box style={{
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center'
-      }}>
-        <div className={classes.card}>
-          <Box sx={{ paddingTop: "10px" }}>
-            <CardGiftcardIcon fontSize="large" style={{ color: "#E91E63" }} />
-            <Typography variant="h3" color="#fff" sx={{ pt: 1, pb: 1 }}>
-              {adminSummary.personalGiftRequestsCount || "0"}
-            </Typography>
-            <Typography variant="subtitle2" color="#1f3625">
-              Personal Gift Requests
-            </Typography>
-          </Box>
-        </div>
-
-        <div className={classes.card}>
-          <Box sx={{ paddingTop: "10px" }}>
-            <PersonIcon fontSize="large" style={{ color: "#00ACC1" }} />
-            <Typography variant="h3" color="#fff" sx={{ pt: 1, pb: 1 }}>
-              {adminSummary.personalGiftedTreesCount || "0"}
-            </Typography>
-            <Typography variant="subtitle2" color="#1f3625">
-              Personal Gifted Trees
-            </Typography>
-          </Box>
-        </div>
-
-        <div className={classes.card}>
-          <Box sx={{ paddingTop: "10px" }}>
-            <CardGiftcardIcon fontSize="large" style={{ color: "#E91E63" }} />
-            <Typography variant="h3" color="#fff" sx={{ pt: 1, pb: 1 }}>
-              {adminSummary.corporateGiftRequestsCount || "0"}
-            </Typography>
-            <Typography variant="subtitle2" color="#1f3625">
-              Corporate Gift Requests
-            </Typography>
-          </Box>
-        </div>
-
-        <div className={classes.card}>
-          <Box sx={{ paddingTop: "10px" }}>
-            <BusinessIcon fontSize="large" style={{ color: "#00ACC1" }} />
-            <Typography variant="h3" color="#fff" sx={{ pt: 1, pb: 1 }}>
-              {adminSummary.corporateGiftedTreesCount || "0"}
-            </Typography>
-            <Typography variant="subtitle2" color="#1f3625">
-              Corporate Gifted Trees
-            </Typography>
-          </Box>
-        </div>
-        <div className={classes.card}>
-         <Box sx={{ paddingTop: "10px" }}>
-           <CardGiftcardIcon fontSize="large" style={{ color: "#9C27B0" }} />
-           <Typography variant="h3" color="#fff" sx={{ pt: 1, pb: 1 }}>
-             {adminSummary.totalGiftRequests || "0"}
-           </Typography>
-         <Typography variant="subtitle2" color="#1f3625">
-            Total Gift Requests
-         </Typography>
-        </Box>
-       </div>
-       <div className={classes.card}>
-       <Box sx={{ paddingTop: "10px" }}>
-        <NatureIcon fontSize="large" style={{ color: "#4CAF50" }} />
-        <Typography variant="h3" color="#fff" sx={{ pt: 1, pb: 1 }}>
-           {adminSummary.totalGiftedTrees || "0"}
-        </Typography>
-        <Typography variant="subtitle2" color="#1f3625">
-           Total Gifted Trees
-        </Typography>
-       </Box>
-      </div>
-      </Box>
-
-      <Box style={{
-        display: 'flex',
-        justifyContent: 'space-evenly',
-        alignItems: 'center'
-      }}
-      >
-        <div className={classes.card}>
-          <Box sx={{ paddingTop: "10px" }}>
-            <Flag fontSize="large" style={{ color: "#53ad7a" }} />
-            <Typography variant="h3" color="#fff" sx={{ pt: 1, pb: 1 }}>
-              {adminSummary.sitesCount}
-            </Typography>
-            <Typography variant="subtitle2" color="#1f3625">
-              Sites
-            </Typography>
-          </Box>
-        </div>
-        <div className={classes.card}>
-          <Box sx={{ paddingTop: "10px" }}>
-            <TerrainTwoToneIcon
-              fontSize="large"
-              style={{ color: "#573D1C" }}
-            />
-            <Typography variant="h3" color="#fff" sx={{ pt: 1, pb: 1 }}>
-              {adminSummary.plotCount}
-            </Typography>
-            <Typography variant="subtitle2" color="#1f3625">
-              Total Plots
-            </Typography>
-          </Box>
-        </div>
-        <div className={classes.card}>
-          <Box sx={{ paddingTop: "10px" }}>
-            <OpacityTwoTone fontSize="large" style={{ color: "#3C79BC" }} />
-            <Typography variant="h3" color="#fff" sx={{ pt: 1, pb: 1 }}>
-              {adminSummary.pondCount}
-            </Typography>
-            <Typography variant="subtitle2" color="#1f3625">
-              Total Ponds
-            </Typography>
-          </Box>
-        </div>
-        <div className={classes.card}>
-          <Box sx={{ paddingTop: "10px" }}>
-            <LocationCity fontSize="large" style={{ color: "#078085" }} />
-            <Typography variant="h3" color="#fff" sx={{ pt: 1, pb: 1 }}>
-              {adminSummary.districtsCount}
-            </Typography>
-            <Typography variant="subtitle2" color="#1f3625">
-              Districts
-            </Typography>
-          </Box>
-        </div>
-        <div className={classes.card}>
-          <Box sx={{ paddingTop: "10px" }}>
-            <Apartment fontSize="large" style={{ color: "#078085" }} />
-            <Typography variant="h3" color="#fff" sx={{ pt: 1, pb: 1 }}>
-              {adminSummary.talukasCount}
-            </Typography>
-            <Typography variant="subtitle2" color="#1f3625">
-              Talukas
-            </Typography>
-          </Box>
-        </div>
-        <div className={classes.card}>
-          <Box sx={{ paddingTop: "10px" }}>
-            <HolidayVillage fontSize="large" style={{ color: "#078085" }} />
-            <Typography variant="h3" color="#fff" sx={{ pt: 1, pb: 1 }}>
-              {adminSummary.villagesCount}
-            </Typography>
-            <Typography variant="subtitle2" color="#1f3625">
-              Villages
-            </Typography>
-          </Box>
-        </div>
-      </Box>
-      <Box style={{
-        display: 'flex',
-        flexWrap: 'wrap',
-        justifyContent: 'center',
-        alignItems: 'center'
-      }}
-      >
-        {adminSummary?.landTypeCounts && Object.entries(adminSummary.landTypeCounts).map(([key, value]) => (
-          <div key={key} className={classes.card}>
-            <Box sx={{ paddingTop: "10px" }}>
-              <ParkTwoToneIcon fontSize="large" style={{ color: "#1F3625" }} />
-              <Typography variant="h3" color="#fff" sx={{ pt: 1, pb: 1 }}>
-                {value}
-              </Typography>
-              <Typography variant="subtitle2" color="#1f3625">
-                {key}
-              </Typography>
-            </Box>
-          </div>)
-        )}
-      </Box>
-      <Grid container>
+      
+      <Grid container spacing={3} sx={{ p: 2 }}>
+        {/* Main Metrics Row */}
         <Grid item xs={12}>
-          <Box
-            sx={{
-              background: "linear-gradient(145deg, #9faca3, #bdccc2)",
-              p: 2,
-              m: 2,
-              borderRadius: 3,
-              boxShadow: "14px 14px 19px #9eaaa1,-14px -14px 19px #c4d4c9",
-            }}
-          >
-            {<TreeLogCumulative />}
-          </Box>
+          <Grid container spacing={2}>
+            <Grid item xs={12} sm={6} md={2.4}>
+              <MetricCard
+                icon={<ParkTwoToneIcon fontSize="large" />}
+                value={adminSummary.treeCount}
+                label="Total Trees"
+                color="#1F3625"
+                delay={0}
+              />
+            </Grid>
+
+            <Grid item xs={12} sm={6} md={2.4}>
+              <MetricCard
+                icon={<GrassTwoToneIcon fontSize="large" />}
+                value={adminSummary.plantTypeCount}
+                label="Plant Types"
+                color="#F94F25"
+                delay={200}
+              />
+            </Grid>
+            <Grid item xs={12} sm={6} md={2.4}>
+              <MetricCard
+                icon={<HowToReg fontSize="large" />}
+                value={adminSummary.bookedTreeCount}
+                label="Booked Trees"
+                color="#6166B8"
+                progress={adminSummary.treeCount ? Math.round((adminSummary.bookedTreeCount / adminSummary.treeCount) * 100) : 0}
+                progressLabel={adminSummary.treeCount ? `${Math.round((adminSummary.bookedTreeCount / adminSummary.treeCount) * 100)}% of total trees` : undefined}
+                delay={400}
+              />
+            </Grid>
+            <Grid item xs={12} sm={6} md={2.4}>
+              <MetricCard
+                icon={<AssignmentIndTwoToneIcon fontSize="large" />}
+                value={adminSummary.assignedTreeCount}
+                label="Assigned Trees"
+                color="#9C27B0"
+                progress={adminSummary.treeCount ? Math.round((adminSummary.assignedTreeCount / adminSummary.treeCount) * 100) : 0}
+                progressLabel={adminSummary.treeCount ? `${Math.round((adminSummary.assignedTreeCount / adminSummary.treeCount) * 100)}% of total trees` : undefined}
+                delay={600}
+              />
+            </Grid>
+            <Grid item xs={12} sm={6} md={2.4}>
+              <MetricCard
+                icon={<PermIdentityTwoToneIcon fontSize="large" />}
+                value={adminSummary.userCount}
+                label="Unique Profiles"
+                color="#C72542"
+                delay={800}
+              />
+            </Grid>
+          </Grid>
+        </Grid>
+        {/* Gift & Donation Metrics */}
+        <Grid item xs={12}>
+          <Typography variant="h5" sx={{ mb: 2, color: '#2E7D32', fontWeight: 600 }}>
+            🎁 Gift & Donation Tracking
+          </Typography>
+          <Grid container spacing={2}>
+            <Grid item xs={12} sm={6} md={2}>
+              <MetricCard
+                icon={<CardGiftcardIcon fontSize="large" />}
+                value={adminSummary.personalGiftRequestsCount || "0"}
+                label="Personal Gift Requests"
+                color="#E91E63"
+                delay={1000}
+              />
+            </Grid>
+            <Grid item xs={12} sm={6} md={2}>
+              <MetricCard
+                icon={<PersonIcon fontSize="large" />}
+                value={adminSummary.personalGiftedTreesCount || "0"}
+                label="Personal Gifted Trees"
+                color="#00ACC1"
+                delay={1200}
+              />
+            </Grid>
+            <Grid item xs={12} sm={6} md={2}>
+              <MetricCard
+                icon={<CardGiftcardIcon fontSize="large" />}
+                value={adminSummary.corporateGiftRequestsCount || "0"}
+                label="Corporate Gift Requests"
+                color="#FF5722"
+                delay={1400}
+              />
+            </Grid>
+
+            <Grid item xs={12} sm={6} md={2}>
+              <MetricCard
+                icon={<BusinessIcon fontSize="large" />}
+                value={adminSummary.corporateGiftedTreesCount || "0"}
+                label="Corporate Gifted Trees"
+                color="#3F51B5"
+                delay={1600}
+              />
+            </Grid>
+            <Grid item xs={12} sm={6} md={2}>
+              <MetricCard
+                icon={<CardGiftcardIcon fontSize="large" />}
+                value={adminSummary.totalGiftRequests || "0"}
+                label="Total Gift Requests"
+                color="#9C27B0"
+                progress={adminSummary.totalGiftRequests && adminSummary.totalGiftedTrees ? Math.round((adminSummary.totalGiftedTrees / (adminSummary.totalGiftRequests || 1)) * 100) : 0}
+                progressLabel={adminSummary.totalGiftRequests && adminSummary.totalGiftedTrees ? `${Math.round((adminSummary.totalGiftedTrees / (adminSummary.totalGiftRequests || 1)) * 100)}% fulfilled` : undefined}
+                delay={1800}
+              />
+            </Grid>
+            <Grid item xs={12} sm={6} md={2}>
+              <MetricCard
+                icon={<NatureIcon fontSize="large" />}
+                value={adminSummary.totalGiftedTrees || "0"}
+                label="Total Gifted Trees"
+                color="#4CAF50"
+                delay={2000}
+              />
+            </Grid>
+          </Grid>
+        </Grid>
+
+        {/* Geographic Coverage */}
+        <Grid item xs={12}>
+          <Typography variant="h5" sx={{ mb: 2, color: '#1565C0', fontWeight: 600 }}>
+            🌍 Geographic Coverage
+          </Typography>
+          <Grid container spacing={2}>
+            <Grid item xs={12} sm={6} md={2}>
+              <MetricCard
+                icon={<Flag fontSize="large" />}
+                value={adminSummary.sitesCount}
+                label="Sites"
+                color="#53ad7a"
+                delay={2200}
+              />
+            </Grid>
+            <Grid item xs={12} sm={6} md={2}>
+              <MetricCard
+                icon={<TerrainTwoToneIcon fontSize="large" />}
+                value={adminSummary.plotCount}
+                label="Total Plots"
+                color="#573D1C"
+                delay={2400}
+              />
+            </Grid>
+            <Grid item xs={12} sm={6} md={2}>
+              <MetricCard
+                icon={<OpacityTwoTone fontSize="large" />}
+                value={adminSummary.pondCount}
+                label="Total Ponds"
+                color="#3C79BC"
+                delay={2600}
+              />
+            </Grid>
+            <Grid item xs={12} sm={6} md={2}>
+              <MetricCard
+                icon={<LocationCity fontSize="large" />}
+                value={adminSummary.districtsCount}
+                label="Districts"
+                color="#078085"
+                delay={2800}
+              />
+            </Grid>
+            <Grid item xs={12} sm={6} md={2}>
+              <MetricCard
+                icon={<Apartment fontSize="large" />}
+                value={adminSummary.talukasCount}
+                label="Talukas"
+                color="#607D8B"
+                delay={3000}
+              />
+            </Grid>
+            <Grid item xs={12} sm={6} md={2}>
+              <MetricCard
+                icon={<HolidayVillage fontSize="large" />}
+                value={adminSummary.villagesCount}
+                label="Villages"
+                color="#795548"
+                delay={3200}
+              />
+            </Grid>
+          </Grid>
+        </Grid>
+        {/* Land Type Distribution */}
+        {adminSummary?.landTypeCounts && Object.keys(adminSummary.landTypeCounts).length > 0 && (
+          <Grid item xs={12}>
+            <Typography variant="h5" sx={{ mb: 2, color: '#388E3C', fontWeight: 600 }}>
+              🌱 Land Type Distribution
+            </Typography>
+            <Grid container spacing={2}>
+              {Object.entries(adminSummary.landTypeCounts).map(([key, value], index) => (
+                <Grid item xs={12} sm={6} md={3} lg={2} key={key}>
+                  <MetricCard
+                    icon={<ParkTwoToneIcon fontSize="large" />}
+                    value={value}
+                    label={key}
+                    color={['#1F3625', '#2E7D32', '#388E3C', '#4CAF50', '#66BB6A', '#81C784'][index % 6]}
+                    delay={3400 + (index * 200)}
+                  />
+                </Grid>
+              ))}
+            </Grid>
+          </Grid>
+        )}
+        
+        {/* Tree Growth Analytics */}
+        <Grid item xs={12}>
+          <Card className={classes.chartContainer}>
+            <CardContent>
+              <Typography variant="h5" sx={{ mb: 2, color: '#1565C0', fontWeight: 600 }}>
+                📈 Tree Growth Analytics
+              </Typography>
+              <TreeLogCumulative />
+            </CardContent>
+          </Card>
         </Grid>
       </Grid>
     </div>
@@ -351,6 +380,102 @@ export const AdminHome = () => {
 
 const useStyles = makeStyles((theme) =>
   createStyles({
+    pageTitle: {
+      background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+      backgroundClip: 'text',
+      WebkitBackgroundClip: 'text',
+      WebkitTextFillColor: 'transparent',
+      fontWeight: 700,
+      textAlign: 'center'
+    },
+    enhancedCard: {
+      minHeight: '180px',
+      height: 'auto',
+      borderRadius: '18px',
+      backdropFilter: 'blur(10px)',
+      border: '1px solid rgba(255,255,255,0.2)',
+      boxShadow: 'inset 7px 7px 14px rgba(0,0,0,0.1), inset -7px -7px 14px rgba(255,255,255,0.3), 0 4px 12px rgba(0,0,0,0.1)',
+      transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+      cursor: 'pointer',
+      position: 'relative',
+      overflow: 'hidden',
+      '&::before': {
+        content: '""',
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        background: 'linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%)',
+        borderRadius: '18px',
+        zIndex: 1
+      },
+      '&:hover': {
+        transform: 'translateY(-8px) scale(1.02)',
+        boxShadow: '0 20px 40px rgba(0,0,0,0.15), 0 10px 20px rgba(0,0,0,0.1)',
+        '& $iconContainer': {
+          transform: 'scale(1.1) rotate(5deg)'
+        }
+      }
+    },
+    cardContent: {
+      minHeight: '180px',
+      display: 'flex',
+      flexDirection: 'column',
+      justifyContent: 'center',
+      alignItems: 'center',
+      padding: '14px !important',
+      paddingBottom: '18px !important',
+      position: 'relative',
+      zIndex: 2
+    },
+    iconContainer: {
+      marginBottom: '8px',
+      transition: 'all 0.3s ease',
+      filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.2))'
+    },
+    metricValue: {
+      fontSize: '2.2rem !important',
+      fontWeight: '700 !important',
+      color: '#2c3e50 !important',
+      marginBottom: '6px !important',
+      textShadow: '0 2px 4px rgba(0,0,0,0.1)'
+    },
+    metricLabel: {
+      fontSize: '0.9rem !important',
+      fontWeight: '600 !important',
+      color: '#34495e !important',
+      textAlign: 'center',
+      marginBottom: '6px !important'
+    },
+    progressBar: {
+      width: '100%',
+      height: '6px !important',
+      borderRadius: '3px',
+      marginBottom: '8px'
+    },
+    progressLabel: {
+      fontSize: '0.7rem !important',
+      fontWeight: '500 !important',
+      color: '#666 !important',
+      textAlign: 'center',
+      marginTop: '2px',
+      lineHeight: '1.2 !important'
+    },
+    trendIndicator: {
+      fontSize: '0.75rem !important',
+      fontWeight: '600 !important',
+      display: 'flex',
+      alignItems: 'center',
+      gap: '4px'
+    },
+    chartContainer: {
+      borderRadius: '20px',
+      background: 'linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)',
+      boxShadow: '0 10px 30px rgba(0,0,0,0.1)',
+      border: '1px solid rgba(255,255,255,0.3)'
+    },
+    // Legacy card style for compatibility
     card: {
       width: "100%",
       maxWidth: "180px",
@@ -361,7 +486,6 @@ const useStyles = makeStyles((theme) =>
       padding: "16px",
       margin: "15px",
       background: "linear-gradient(145deg, #9faca3, #bdccc2)",
-      // boxShadow: '0px 0px 20px rgba(0, 0, 0, 0.15)',
       boxShadow: "7px 7px 14px #9eaaa1,-7px -7px 14px #c4d4c9",
     },
   })

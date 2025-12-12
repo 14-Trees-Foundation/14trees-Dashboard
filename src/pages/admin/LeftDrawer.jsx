@@ -475,7 +475,7 @@ export const AdminLeftDrawer = () => {
             onClick={() => navigate("/")}
             style={{ cursor: "pointer" }}
           />
-          />          {menuitem()}
+          {menuitem()}
           <VersionDisplay />
           {/* Resize Handle for Mobile */}
           <div
