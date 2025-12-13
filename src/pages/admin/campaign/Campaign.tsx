@@ -11,8 +11,10 @@ import getColumnSearchProps, { getColumnDateFilter } from "../../../components/F
 import { Edit, OpenInNew, NotesOutlined } from "@mui/icons-material";
 import EditCampaign from "./EditCampaign";
 import AddCampaignDialog from "./AddCampaign";
+import { useTranslation } from "react-i18next";
 
 const Campaigns: React.FC = () => {
+    const { t } = useTranslation();
     const [loading, setLoading] = useState(false);
     const [page, setPage] = useState(0);
     const [pageSize, setPageSize] = useState(10);
@@ -214,7 +216,7 @@ const Campaigns: React.FC = () => {
             <ToastContainer />
             <div style={{ display: "flex", justifyContent: "space-between", padding: "4px 12px" }}>
                 <Typography variant="h4" style={{ marginTop: "5px" }}>
-                    Campaigns
+                    {t('campaigns.title')}
                 </Typography>
                 <Button
                     variant="contained"
@@ -222,7 +224,7 @@ const Campaigns: React.FC = () => {
                     style={{ marginLeft: "10px", textTransform: 'none' }}
                     onClick={() => setAddModalOpen(true)}
                 >
-                    Add campaign
+                    {t('campaigns.addCampaign')}
                 </Button>
             </div>
             <Divider sx={{ backgroundColor: "black", marginBottom: "15px" }} />
@@ -238,7 +240,7 @@ const Campaigns: React.FC = () => {
                     onPaginationChange={handlePaginationChange}
                     onDownload={handleDownloadCampaigns}
                     footer
-                    tableName="Campaigns"
+                    tableName={t('campaigns.title')}
                 />
             </Box>
 

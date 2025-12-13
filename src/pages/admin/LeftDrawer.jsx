@@ -86,7 +86,7 @@ export const AdminLeftDrawer = () => {
       path: "plots",
     },
     {
-      displayName: t('trees.trees'),
+      displayName: t('navigation.trees'),
       logo: ForestOutlined,
       display: isAdmin,
       path: "trees",
@@ -95,31 +95,31 @@ export const AdminLeftDrawer = () => {
       divider: isAdmin,
     },
     {
-      displayName: "Plant Types",
+      displayName: t('navigation.plantTypes'),
       logo: GrassTwoToneIcon,
       display: isAdmin,
       path: "plant-types",
     },
     {
-      displayName: "Ponds",
+      displayName: t('navigation.ponds'),
       logo: OpacityOutlined,
       display: isAdmin,
       path: "ponds",
     },
     {
-      displayName: "People",
+      displayName: t('navigation.people'),
       logo: AccountCircleOutlined,
       display: isAdmin,
       path: "people",
     },
     {
-      displayName: "People Groups",
+      displayName: t('navigation.peopleGroups'),
       logo: CorporateFareIcon,
       display: isAdmin,
       path: "people-group",
     },
     {
-      displayName: "Onsite Reports",
+      displayName: t('navigation.onsiteReports'),
       logo: Assessment,
       display: isAdmin,
       path: "onsite-reports",
@@ -128,13 +128,13 @@ export const AdminLeftDrawer = () => {
       divider: isAdmin,
     },
     {
-      displayName: "Tree Cards",
+      displayName: t('navigation.treeCards'),
       logo: CardGiftcard,
       display: true, // Show to all users who can access the admin panel
       path: "tree-cards",
     },
     {
-      displayName: "Donations",
+      displayName: t('navigation.donations'),
       logo: VolunteerActivismIcon,
       display: isAdmin,
       path: "donations",
@@ -143,19 +143,19 @@ export const AdminLeftDrawer = () => {
       divider: isAdmin,
     },
     {
-      displayName: "Events",
+      displayName: t('navigation.events'),
       logo: FestivalIcon,
       display: isAdmin,
       path: "events",
     },
     {
-      displayName: "Campaigns",
+      displayName: t('navigation.campaigns'),
       logo: Campaign,
       display: true, // Show to all users who can access the admin panel
       path: "campaigns",
     },
     {
-      displayName: "Visits",
+      displayName: t('navigation.visits'),
       logo: TourIcon,
       display: isAdmin,
       path: "visits",
@@ -164,19 +164,19 @@ export const AdminLeftDrawer = () => {
       divider: isAdmin,
     },
     {
-      displayName: "Site Inventory",
+      displayName: t('navigation.siteInventory'),
       logo: Inventory,
       display: isAdmin,
       path: "site-inventory",
     },
     {
-      displayName: "GC Inventory",
+      displayName: t('navigation.gcInventory'),
       logo: Inventory,
       display: isAdmin,
       path: "gc-inventory",
     },
     {
-      displayName: "Corporate Dashboard",
+      displayName: t('navigation.corporateDashboard'),
       logo: Analytics,
       display: isAdmin,
       path: "corporate-dashboard",

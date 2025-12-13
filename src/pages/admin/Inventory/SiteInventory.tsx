@@ -12,9 +12,11 @@ import { Table, TableColumnType } from "antd";
 import { ColumnType, TableRowSelection } from "antd/es/table/interface";
 import './inventory.css'
 import InventoryStats from "./InventoryStats";
+import { useTranslation } from "react-i18next";
 
 const SiteInventory: FC = () => {
 
+    const { t } = useTranslation();
     const [sitePage, setSitePage] = useState(0);
     const [siteNameInput, setSiteNameInput] = useState("");
     const [selectedSite, setSelectedSite] = useState<Site | null>(null);
@@ -266,7 +268,7 @@ const SiteInventory: FC = () => {
 
     return (
         <Box>
-            <Typography variant="h4" sx={{ marginBottom: 1 }}>Inventory Management</Typography>
+            <Typography variant="h4" sx={{ marginBottom: 1 }}>{t('inventory.siteInventory.title')}</Typography>
             <Divider sx={{ backgroundColor: "black", marginBottom: 3 }} />
             <InventoryStats />
             <AutocompleteWithPagination

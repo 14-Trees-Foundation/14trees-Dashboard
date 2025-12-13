@@ -26,20 +26,59 @@
     "login": "Login",
     "welcome": "Welcome",
     "actions": "Actions",
-    "messages": "Messages"
+    "messages": "Messages",
+    "export": "Export",
+    "exportTableData": "Export table data in a csv file:",
+    "tableHeaders": {
+      "name": "Name",
+      "email": "Email",
+      "phone": "Phone",
+      "date": "Date",
+      "type": "Type",
+      "status": "Status",
+      "actions": "Actions",
+      "location": "Location",
+      "description": "Description",
+      "category": "Category",
+      "quantity": "Quantity",
+      "assignedTo": "Assigned To",
+      "saplingId": "Sapling Id",
+      "plantDate": "Plant Date",
+      "image": "Image",
+      "treeType": "Tree Type",
+      "plotName": "Plot Name",
+      "siteName": "Site Name"
+    },
+    "confirmations": {
+      "confirmDelete": "Confirm Delete",
+      "deleteConfirmation": "Do you want to delete",
+      "changePlot": "Change Plot"
+    }
   },
   "navigation": {
     "trees": "Trees",
     "users": "Users",
     "events": "Events",
-    "organizations": "Organizations",
     "visits": "Visits",
     "reports": "Reports",
     "admin": "Admin",
     "inventory": "Inventory",
     "gifts": "Gifts",
     "sites": "Sites",
-    "plots": "Plots"
+    "plots": "Plots",
+    "plantTypes": "Plant Types",
+    "ponds": "Ponds",
+    "people": "People",
+    "peopleGroups": "People Groups",
+    "onsiteReports": "Onsite Reports",
+    "treeCards": "Tree Cards",
+    "donations": "Donations",
+    "campaigns": "Campaigns",
+    "siteInventory": "Site Inventory",
+    "gcInventory": "GC Inventory",
+    "corporateDashboard": "Corporate Dashboard",
+    "nextTree": "Next Tree",
+    "prevTree": "Prev Tree"
   },
   "forms": {
     "name": "Name",
@@ -61,22 +100,6 @@
     "invalidPhone": "Please enter a valid phone number",
     "sampleForm": "Sample Form Example"
   },
-  "trees": {
-    "tree": "Tree",
-    "trees": "Trees",
-    "plantedOn": "Planted On",
-    "treeType": "Tree Type",
-    "location": "Location",
-    "status": "Status",
-    "assignedTo": "Assigned To",
-    "plantTree": "Plant Tree",
-    "assignTree": "Assign Tree",
-    "treeProfile": "Tree Profile",
-    "totalTrees": "Total Trees",
-    "treesPlanted": "Trees Planted",
-    "survival": "Survival Rate",
-    "growth": "Growth Status"
-  },
   "users": {
     "user": "User",
     "users": "Users",
@@ -90,43 +113,6 @@
     "activeUsers": "Active Users",
     "userType": "User Type",
     "registrationDate": "Registration Date"
-  },
-  "events": {
-    "event": "Event",
-    "events": "Events",
-    "eventName": "Event Name",
-    "eventType": "Event Type",
-    "eventDate": "Event Date",
-    "eventLocation": "Event Location",
-    "participants": "Participants",
-    "organizer": "Organizer",
-    "createEvent": "Create Event",
-    "upcomingEvents": "Upcoming Events",
-    "pastEvents": "Past Events",
-    "totalEvents": "Total Events"
-  },
-  "organizations": {
-    "organization": "Organization",
-    "organizations": "Organizations",
-    "orgName": "Organization Name",
-    "orgType": "Organization Type",
-    "contactPerson": "Contact Person",
-    "partnership": "Partnership",
-    "addOrganization": "Add Organization",
-    "totalOrganizations": "Total Organizations",
-    "activePartnerships": "Active Partnerships"
-  },
-  "visits": {
-    "visit": "Visit",
-    "visits": "Visits",
-    "visitor": "Visitor",
-    "visitDate": "Visit Date",
-    "visitPurpose": "Visit Purpose",
-    "visitStatus": "Visit Status",
-    "scheduleVisit": "Schedule Visit",
-    "totalVisits": "Total Visits",
-    "pendingVisits": "Pending Visits",
-    "completedVisits": "Completed Visits"
   },
   "gifts": {
     "gift": "Gift",
@@ -217,5 +203,303 @@
       "School": "School",
       "Cremation": "Cremation"
     }
+  },
+  "sites": {
+    "sites": "Sites",
+    "addSite": "Add Site",
+    "syncNotionSites": "Sync Notion Sites",
+    "confirmDelete": "Confirm Delete",
+    "deleteConfirmation": "Do you want to delete '{siteName}'?",
+    "nameMarathi": "Name (Marathi)",
+    "nameEnglish": "Name (English)",
+    "owner": "Owner",
+    "serviceType": "Service Type",
+    "landType": "Land Type",
+    "siteType": "Site Type",
+    "district": "District",
+    "taluka": "Taluka",
+    "village": "Village",
+    "areaAcres": "Area (Acres)",
+    "kmlFile": "Kml File",
+    "lengthKm": "Length (Km)",
+    "tags": "Tags",
+    "groveType": "Grove Type",
+    "download": "Download",
+    "notAvailable": "Not Available"
+  },
+  "plots": {
+    "plots": "Plots",
+    "addPlot": "Add Plot",
+    "updateCoordinates": "Update Coordinates",
+    "assignToSite": "Assign to Site",
+    "unreserveTrees": "Unreserve Trees",
+    "confirmDelete": "Confirm Delete",
+    "deleteConfirmation": "Do you want to delete '{plotName}'?",
+    "selectSite": "Select a Site",
+    "selectSiteDescription": "Selected plots will be assigned to this site.",
+    "assign": "Assign",
+    "includeDeadLostTrees": "Include Dead/Lost Trees",
+    "trees": "Trees",
+    "shrubs": "Shrubs",
+    "herbs": "Herbs",
+    "total": "Total",
+    "actions": "Actions",
+    "name": "Name",
+    "plotLabel": "Plot Label",
+    "accessibility": "Accessibility",
+    "gatNo": "Gat No.",
+    "tags": "Tags",
+    "siteName": "Site Name",
+    "areaAcres": "Area (acres)",
+    "noOfPits": "No. of Pits",
+    "totalTrees": "Total Trees",
+    "bookedTrees": "Booked Trees",
+    "assignedTrees": "Assigned Trees",
+    "unfundedInventoryAssigned": "Unfunded Inventory (Assigned)",
+    "unfundedInventoryUnassigned": "Unfunded Inventory (Unassigned)",
+    "giftableInventory": "Giftable Inventory",
+    "accessible": "Accessible",
+    "inaccessible": "Inaccessible",
+    "moderatelyAccessible": "Moderately Accessible"
+  },
+  "trees": {
+    "title": "Trees",
+    "tree": "Tree",
+    "trees": "Trees",
+    "plantedOn": "Planted On",
+    "treeType": "Tree Type",
+    "location": "Location",
+    "status": "Status",
+    "assignedTo": "Assigned To",
+    "plantTree": "Plant Tree",
+    "assignTree": "Assign Tree",
+    "treeProfile": "Tree Profile",
+    "totalTrees": "Total Trees",
+    "treesPlanted": "Trees Planted",
+    "survival": "Survival Rate",
+    "growth": "Growth Status",
+    "tableHeaders": {
+      "srNo": "Sr. No.",
+      "saplingId": "Sapling ID",
+      "plantType": "Plant Type",
+      "habitat": "Habitat",
+      "plot": "Plot",
+      "tags": "Tags",
+      "reservedForIndividual": "Reserved for (Individual)",
+      "reservedForGroup": "Reserved for (Group)",
+      "sponsoredByIndividual": "Sponsored By (Individual)",
+      "sponsoredByGroup": "Sponsored By (Group)",
+      "plantedBy": "Planted By",
+      "associationType": "Association Type",
+      "associationRequestId": "Association Request ID",
+      "reservedOn": "Reserved on",
+      "assignedOn": "Assigned on",
+      "uploadedOn": "Uploaded on",
+      "treeHealth": "Tree Health",
+      "deletedOn": "Deleted On"
+    },
+    "dialogs": {
+      "timeline": "Timeline For Sapling",
+      "confirmOperation": "Confirm",
+      "doYouWantTo": "Do you want to",
+      "treesWithSaplingIds": "trees with the sapling ids",
+      "confirmDelete": "Confirm Delete",
+      "doYouWantToDelete": "Do you want to delete tree with the sapling id",
+      "selectSite": "Select a Site",
+      "thisActionWillChange": "This action will change plot for selected Trees.",
+      "selectPlot": "Select a Plot",
+      "cancel": "Cancel",
+      "yes": "Yes",
+      "changePlot": "Change Plot"
+    },
+    "export": {
+      "button": "Export",
+      "title": "Export Trees",
+      "description": "Download trees data as CSV file",
+      "filename": "trees_data"
+    },
+    "tableName": "Trees",
+    "statusLabels": {
+      "deadTree": "Dead Tree",
+      "deletedTree": "Deleted Tree",
+      "lostTree": "Lost Tree",
+      "tree": "Tree",
+      "shrub": "Shrub",
+      "herb": "Herb",
+      "unknown": "Unknown"
+    },
+    "search": {
+      "placeholder": "Enter sapling ID(s)",
+      "clear": "Clear",
+      "search": "Search",
+      "tooltip": "Separate multiple IDs with comma, space, or new line",
+      "idsDetected": "sapling ID(s) detected:",
+      "more": "more"
+    },
+    "actions": {
+      "reserveTrees": "Reserve Trees",
+      "unreserveTrees": "Unreserve Trees",
+      "changePlot": "Change Plot"
+    }
+  },
+  "plantTypes": {
+    "title": "Plant Types",
+    "addPlantType": "Add Plant type",
+    "addPlantTypeCardTemplate": "Add Plant Type Card Template",
+    "confirmDelete": "Confirm Delete",
+    "deleteConfirmation": "Do you want to delete",
+    "tableHeaders": {
+      "srNo": "Sr. No.",
+      "plantTypeId": "Plant Type ID",
+      "englishName": "Name (English)",
+      "commonNameEnglish": "Common Name in English",
+      "commonNameMarathi": "Common Name in Marathi",
+      "scientificName": "Scientific Name",
+      "knownAs": "Known As",
+      "tags": "Tags",
+      "use": "Use",
+      "images": "Images",
+      "habit": "Habit"
+    }
+  },
+  "ponds": {
+    "title": "Ponds",
+    "addPond": "Add Pond",
+    "confirmDelete": "Confirm Delete",
+    "deleteConfirmation": "Do you want to delete",
+    "tableHeaders": {
+      "siteName": "Site Name",
+      "lengthFt": "Length (Ft)",
+      "widthFt": "Width (Ft)",
+      "depthFt": "Depth (Ft)",
+      "pondCapacity": "Pond Capacity",
+      "createdAt": "Created At"
+    }
+  },
+  "people": {
+    "title": "People",
+    "tableHeaders": {
+      "communicationEmail": "Communication Email",
+      "createdDate": "Created Date (MM-DD-YYYY)",
+      "sponsorDashboard": "Sponsor Dashboard",
+      "reservedTrees": "Reserved Trees",
+      "profileDashboard": "Profile Dashboard",
+      "selfServePortal": "Self-Serve Portal",
+      "dashboardRoles": "Dashboard Roles",
+      "mobileRoles": "Mobile Roles",
+      "actions": "Actions"
+    }
+  },
+  "peopleGroups": {
+    "title": "Group People",
+    "addGroup": "+ADD",
+    "mergeGroups": "Merge Groups",
+    "confirmDelete": "Confirm Delete",
+    "deleteConfirmation": "Do you want to delete",
+    "merge": "Merge",
+    "tableHeaders": {
+      "sponsorDashboard": "Sponsor Dashboard",
+      "reservedTrees": "Reserved Trees",
+      "selfServePortal": "Self-Serve Portal",
+      "action": "Action"
+    }
+  },
+  "onsiteReports": {
+    "title": "Onsite Reports",
+    "treeAuditReports": "Tree Audit Reports",
+    "tableHeaders": {
+      "auditDate": "Audit Date",
+      "fieldStaff": "Field Staff",
+      "treesAudited": "Trees Audited"
+    }
+  },
+  "events": {
+    "title": "Events",
+    "addEvent": "Add Event",
+    "confirmDelete": "Confirm Delete",
+    "deleteConfirmation": "Do you want to delete",
+    "event": "Event",
+    "events": "Events",
+    "eventName": "Event Name",
+    "eventType": "Event Type",
+    "eventDate": "Event Date",
+    "eventLocation": "Event Location",
+    "participants": "Participants",
+    "organizer": "Organizer",
+    "createEvent": "Create Event",
+    "upcomingEvents": "Upcoming Events",
+    "pastEvents": "Past Events",
+    "totalEvents": "Total Events",
+    "tableHeaders": {
+    }
+  },
+  "campaigns": {
+    "title": "Campaigns",
+    "addCampaign": "Add Campaign",
+    "confirmDelete": "Confirm Delete",
+    "deleteConfirmation": "Do you want to delete",
+    "tableHeaders": {
+      "startDate": "Start Date",
+      "endDate": "End Date"
+    }
+  },
+  "visits": {
+    "title": "Visits",
+    "addVisit": "Add Visit",
+    "confirmDelete": "Confirm Delete",
+    "deleteConfirmation": "Do you want to delete",
+    "tableHeaders": {
+      "visitor": "Visitor",
+      "site": "Site",
+      "purpose": "Purpose"
+    }
+  },
+  "inventory": {
+    "siteInventory": {
+      "title": "Site Inventory",
+      "tableHeaders": {
+        "item": "Item"
+      }
+    },
+    "gcInventory": {
+      "title": "GC Inventory",
+      "tableHeaders": {
+        "item": "Item"
+      }
+    }
+  },
+  "corporateDashboard": {
+    "title": "Corporate Dashboard",
+    "analytics": "Analytics",
+    "reports": "Reports"
+  },
+  "giftTrees": {
+    "searchLabel": "Search trees by giftee's name",
+    "showAvailableTrees": "Show Available Trees",
+    "showGiftedTrees": "Show Gifted Trees",
+    "showAllTrees": "Show All",
+    "errorFetching": "Error fetching available trees",
+    "unknownError": "Unknown error"
+  },
+  "manualUser": {
+    "updateUser": "Update User",
+    "addUser": "Add User",
+    "cancel": "Cancel"
+  },
+  "album": {
+    "removeUnwantedImage": "Remove any unwanted image",
+    "onlyTenImagesAllowed": "Only 10 images allowed!"
+  },
+  "errors": {
+    "errorLoadingUserData": "Error loading user data",
+    "errorLoadingGroupData": "Error loading group data, but you can continue editing",
+    "paymentFailed": "Payment failed",
+    "paymentFailedTryAgain": "Payment failed. Please try again later or contact support.",
+    "paymentFailedNotFulfilled": "Payment failed. The request will not be fulfilled without successful payment."
+  },
+  "paymentStatus": {
+    "paymentCompleted": "Payment Completed",
+    "paymentFailed": "Payment Failed",
+    "incompletePayment": "Incomplete Payment"
   }
 }

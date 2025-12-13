@@ -26,20 +26,59 @@
     "login": "लॉगिन",
     "welcome": "स्वागत है",
     "actions": "कार्य",
-    "messages": "संदेश"
+    "messages": "संदेश",
+    "export": "एक्सपोर्ट",
+    "exportTableData": "तालिका डेटा को CSV फाइल में एक्सपोर्ट करें:",
+    "tableHeaders": {
+      "name": "नाम",
+      "email": "ईमेल",
+      "phone": "फोन",
+      "date": "तारीख",
+      "type": "प्रकार",
+      "status": "स्थिति",
+      "actions": "क्रियाएं",
+      "location": "स्थान",
+      "description": "विवरण",
+      "category": "श्रेणी",
+      "quantity": "मात्रा",
+      "assignedTo": "को सौंपा गया",
+      "saplingId": "पौधा आईडी",
+      "plantDate": "रोपण की तारीख",
+      "image": "चित्र",
+      "treeType": "पेड़ का प्रकार",
+      "plotName": "प्लॉट नाम",
+      "siteName": "साइट नाम"
+    },
+    "confirmations": {
+      "confirmDelete": "हटाने की पुष्टि करें",
+      "deleteConfirmation": "क्या आप हटाना चाहते हैं",
+      "changePlot": "प्लॉट बदलें"
+    }
   },
   "navigation": {
     "trees": "पेड़",
     "users": "उपयोगकर्ता",
     "events": "कार्यक्रम",
-    "organizations": "संगठन",
     "visits": "यात्राएं",
     "reports": "रिपोर्ट",
     "admin": "एडमिन",
     "inventory": "इन्वेंटरी",
     "gifts": "उपहार",
     "sites": "साइट्स",
-    "plots": "प्लॉट्स"
+    "plots": "प्लॉट्स",
+    "plantTypes": "पौधे के प्रकार",
+    "ponds": "तालाब",
+    "people": "लोग",
+    "peopleGroups": "लोगों के समूह",
+    "onsiteReports": "साइट रिपोर्ट",
+    "treeCards": "ट्री कार्ड",
+    "donations": "दान",
+    "campaigns": "अभियान",
+    "siteInventory": "साइट इन्वेंटरी",
+    "gcInventory": "जीसी इन्वेंटरी",
+    "corporateDashboard": "कॉर्पोरेट डैशबोर्ड",
+    "nextTree": "अगला पेड़",
+    "prevTree": "पिछला पेड़"
   },
   "forms": {
     "name": "नाम",
@@ -60,22 +99,6 @@
     "invalidEmail": "कृपया एक वैध ईमेल पता दर्ज करें",
     "invalidPhone": "कृपया एक वैध फोन नंबर दर्ज करें",
     "sampleForm": "नमूना फॉर्म उदाहरण"
-  },
-  "trees": {
-    "tree": "पेड़",
-    "trees": "पेड़",
-    "plantedOn": "लगाया गया",
-    "treeType": "पेड़ का प्रकार",
-    "location": "स्थान",
-    "status": "स्थिति",
-    "assignedTo": "सौंपा गया",
-    "plantTree": "पेड़ लगाएं",
-    "assignTree": "पेड़ असाइन करें",
-    "treeProfile": "पेड़ की प्रोफाइल",
-    "totalTrees": "कुल पेड़",
-    "treesPlanted": "लगाए गए पेड़",
-    "survival": "जीवित रहने की दर",
-    "growth": "वृद्धि की स्थिति"
   },
   "users": {
     "user": "उपयोगकर्ता",
@@ -205,6 +228,321 @@
     "landTypeDistribution": "भूमि प्रकार वितरण",
     "treeGrowthAnalytics": "पेड़ विकास विश्लेषण",
     "cumulativeTreeCount": "संचयी पेड़ गिनती",
-    "ofTotalTrees": "कुल पेड़ों का"
+    "ofTotalTrees": "कुल पेड़ों में से",
+    "landTypes": {
+      "Farm": "खेत",
+      "Roadside": "सड़क किनारे",
+      "Temple": "मंदिर",
+      "Barren": "बंजर भूमि",
+      "Premises": "परिसर",
+      "Gairan": "गैरान",
+      "Forest": "वन",
+      "School": "विद्यालय",
+      "Cremation": "श्मशान"
+    }
+  },
+  "sites": {
+    "sites": "साइट्स",
+    "addSite": "साइट जोड़ें",
+    "syncNotionSites": "नोशन साइट्स सिंक करें",
+    "confirmDelete": "डिलीट की पुष्टि करें",
+    "deleteConfirmation": "क्या आप '{siteName}' को हटाना चाहते हैं?",
+    "nameMarathi": "नाम (मराठी)",
+    "nameEnglish": "नाम (अंग्रेजी)",
+    "owner": "मालिक",
+    "serviceType": "सेवा प्रकार",
+    "landType": "भूमि प्रकार",
+    "siteType": "साइट प्रकार",
+    "district": "जिला",
+    "taluka": "तालुका",
+    "village": "गांव",
+    "areaAcres": "क्षेत्रफल (एकड़)",
+    "kmlFile": "केएमएल फाइल",
+    "lengthKm": "लंबाई (किमी)",
+    "tags": "टैग",
+    "groveType": "ग्रोव प्रकार",
+    "download": "डाउनलोड",
+    "notAvailable": "उपलब्ध नहीं"
+  },
+  "plots": {
+    "plots": "प्लॉट्स",
+    "addPlot": "प्लॉट जोड़ें",
+    "updateCoordinates": "कोऑर्डिनेट अपडेट करें",
+    "assignToSite": "साइट को असाइन करें",
+    "unreserveTrees": "पेड़ों को अनरिज़र्व करें",
+    "confirmDelete": "डिलीट की पुष्टि करें",
+    "deleteConfirmation": "क्या आप '{plotName}' को हटाना चाहते हैं?",
+    "selectSite": "एक साइट चुनें",
+    "selectSiteDescription": "चयनित प्लॉट्स इस साइट को असाइन किए जाएंगे।",
+    "assign": "असाइन करें",
+    "includeDeadLostTrees": "मृत/खोए हुए पेड़ शामिल करें",
+    "trees": "पेड़",
+    "shrubs": "झाड़ियां",
+    "herbs": "जड़ी-बूटी",
+    "total": "कुल",
+    "actions": "कार्य",
+    "name": "नाम",
+    "plotLabel": "प्लॉट लेबल",
+    "accessibility": "पहुंच",
+    "gatNo": "गट नंबर",
+    "tags": "टैग",
+    "siteName": "साइट का नाम",
+    "areaAcres": "क्षेत्रफल (एकड़)",
+    "noOfPits": "गड्ढों की संख्या",
+    "totalTrees": "कुल पेड़",
+    "bookedTrees": "बुक किए गए पेड़",
+    "assignedTrees": "असाइन किए गए पेड़",
+    "unfundedInventoryAssigned": "अनफंडेड इन्वेंटरी (असाइन्ड)",
+    "unfundedInventoryUnassigned": "अनफंडेड इन्वेंटरी (अनअसाइन्ड)",
+    "giftableInventory": "उपहार योग्य इन्वेंटरी",
+    "accessible": "उपलब्ध",
+    "inaccessible": "अनुपलब्ध",
+    "moderatelyAccessible": "मध्यम पहुंच"
+  },
+  "trees": {
+    "title": "पेड़",
+    "tree": "पेड़",
+    "trees": "पेड़",
+    "plantedOn": "लगाया गया",
+    "treeType": "पेड़ का प्रकार",
+    "location": "स्थान",
+    "status": "स्थिति",
+    "assignedTo": "सौंपा गया",
+    "plantTree": "पेड़ लगाएं",
+    "assignTree": "पेड़ असाइन करें",
+    "treeProfile": "पेड़ की प्रोफाइल",
+    "totalTrees": "कुल पेड़",
+    "treesPlanted": "लगाए गए पेड़",
+    "survival": "जीवित रहने की दर",
+    "growth": "वृद्धि की स्थिति",
+    "tableHeaders": {
+      "srNo": "क्रम संख्या",
+      "saplingId": "पौधा आईडी",
+      "plantType": "पौधे का प्रकार",
+      "habitat": "आवास",
+      "plot": "प्लॉट",
+      "tags": "टैग",
+      "reservedForIndividual": "आरक्षित (व्यक्तिगत)",
+      "reservedForGroup": "आरक्षित (समूह)",
+      "sponsoredByIndividual": "प्रायोजित (व्यक्तिगत)",
+      "sponsoredByGroup": "प्रायोजित (समूह)",
+      "assignedTo": "असाइन किया गया",
+      "plantedBy": "द्वारा लगाया गया",
+      "associationType": "संघ प्रकार",
+      "associationRequestId": "संघ अनुरोध आईडी",
+      "reservedOn": "आरक्षित तिथि",
+      "assignedOn": "असाइन तिथि",
+      "uploadedOn": "अपलोड तिथि",
+      "treeHealth": "पेड़ का स्वास्थ्य",
+      "deletedOn": "हटाने की तिथि",
+      "actions": "कार्य"
+    },
+    "dialogs": {
+      "timeline": "पौधा टाइमलाइन",
+      "confirmOperation": "पुष्टि करें",
+      "doYouWantTo": "क्या आप चाहते हैं",
+      "treesWithSaplingIds": "पौधा आईडी के साथ पेड़",
+      "confirmDelete": "हटाने की पुष्टि करें",
+      "doYouWantToDelete": "क्या आप इस पौधा आईडी के साथ पेड़ को हटाना चाहते हैं",
+      "selectSite": "एक साइट चुनें",
+      "thisActionWillChange": "यह क्रिया चयनित पेड़ों के लिए प्लॉट बदल देगी।",
+      "selectPlot": "एक प्लॉट चुनें",
+      "cancel": "रद्द करें",
+      "yes": "हां",
+      "changePlot": "प्लॉट बदलें"
+    },
+    "export": {
+      "button": "निर्यात",
+      "title": "पेड़ निर्यात करें",
+      "description": "पेड़ डेटा को CSV फाइल के रूप में डाउनलोड करें",
+      "filename": "trees_data"
+    },
+    "tableName": "पेड़",
+    "statusLabels": {
+      "deadTree": "मृत पेड़",
+      "deletedTree": "हटाया गया पेड़",
+      "lostTree": "खोया हुआ पेड़",
+      "tree": "पेड़",
+      "shrub": "झाड़ी",
+      "herb": "जड़ी बूटी",
+      "unknown": "अज्ञात"
+    },
+    "search": {
+      "placeholder": "पौधा आईडी दर्ज करें",
+      "clear": "साफ करें",
+      "search": "खोजें",
+      "tooltip": "कई आईडी को कॉमा, स्पेस, या नई लाइन से अलग करें",
+      "idsDetected": "पौधा आईडी मिली:",
+      "more": "और"
+    },
+    "actions": {
+      "reserveTrees": "पेड़ आरक्षित करें",
+      "unreserveTrees": "पेड़ आरक्षण हटाएं",
+      "changePlot": "भूखंड बदलें"
+    }
+  },
+  "plantTypes": {
+    "title": "पौधे के प्रकार",
+    "addPlantType": "पौधे का प्रकार जोड़ें",
+    "addPlantTypeCardTemplate": "पौधे के प्रकार का कार्ड टेम्प्लेट जोड़ें",
+    "confirmDelete": "हटाने की पुष्टि करें",
+    "deleteConfirmation": "क्या आप हटाना चाहते हैं",
+    "tableHeaders": {
+      "srNo": "क्र. संख्या",
+      "plantTypeId": "पौधे प्रकार आईडी",
+      "englishName": "नाम (अंग्रेजी)",
+      "commonNameEnglish": "अंग्रेजी में सामान्य नाम",
+      "commonNameMarathi": "मराठी में सामान्य नाम",
+      "scientificName": "वैज्ञानिक नाम",
+      "knownAs": "के रूप में जाना जाता है",
+      "tags": "टैग",
+      "use": "उपयोग",
+      "images": "छवियां",
+      "habit": "आदत"
+    }
+  },
+  "ponds": {
+    "title": "तालाब",
+    "addPond": "तालाब जोड़ें",
+    "confirmDelete": "हटाने की पुष्टि करें",
+    "deleteConfirmation": "क्या आप हटाना चाहते हैं",
+    "tableHeaders": {
+      "lengthFt": "लंबाई (फीट)",
+      "widthFt": "चौड़ाई (फीट)",
+      "depthFt": "गहराई (फीट)",
+      "pondCapacity": "तालाब क्षमता",
+      "createdAt": "बनाया गया"
+    }
+  },
+  "people": {
+    "title": "लोग",
+    "tableHeaders": {
+      "communicationEmail": "संचार ईमेल",
+      "createdDate": "निर्माण तिथि (MM-DD-YYYY)",
+      "sponsorDashboard": "प्रायोजक डैशबोर्ड",
+      "reservedTrees": "आरक्षित पेड़",
+      "profileDashboard": "प्रोफाइल डैशबोर्ड",
+      "selfServePortal": "स्व-सेवा पोर्टल",
+      "dashboardRoles": "डैशबोर्ड भूमिकाएं",
+      "mobileRoles": "मोबाइल भूमिकाएं"
+    }
+  },
+  "peopleGroups": {
+    "title": "समूहिक लोग",
+    "addGroup": "+जोड़ें",
+    "mergeGroups": "समूह मिलाएं",
+    "confirmDelete": "हटाने की पुष्टि करें",
+    "deleteConfirmation": "क्या आप हटाना चाहते हैं",
+    "merge": "मिलान",
+    "tableHeaders": {
+      "sponsorDashboard": "प्रायोजक डैशबोर्ड",
+      "reservedTrees": "आरक्षित पेड़",
+      "selfServePortal": "स्वयं सेवा पोर्टल",
+      "action": "कार्य"
+    }
+  },
+  "onsiteReports": {
+    "title": "ऑनसाइट रिपोर्ट्स",
+    "treeAuditReports": "पेड़ ऑडिट रिपोर्ट्स",
+    "tableHeaders": {
+      "auditDate": "ऑडिट की तारीख",
+      "fieldStaff": "फील्ड स्टाफ",
+      "plotName": "प्लॉट का नाम",
+      "siteName": "साइट का नाम",
+      "treesAudited": "ऑडिट किए गए पेड़"
+    }
+  },
+  "events": {
+    "title": "इवेंट्स",
+    "addEvent": "इवेंट जोड़ें",
+    "confirmDelete": "हटाने की पुष्टि करें",
+    "deleteConfirmation": "क्या आप हटाना चाहते हैं",
+    "event": "कार्यक्रम",
+    "events": "कार्यक्रम",
+    "eventName": "कार्यक्रम का नाम",
+    "eventType": "कार्यक्रम का प्रकार",
+    "eventDate": "कार्यक्रम की तारीख",
+    "eventLocation": "कार्यक्रम का स्थान",
+    "participants": "प्रतिभागी",
+    "organizer": "आयोजक",
+    "createEvent": "कार्यक्रम बनाएं",
+    "upcomingEvents": "आने वाले कार्यक्रम",
+    "pastEvents": "पिछले कार्यक्रम",
+    "totalEvents": "कुल कार्यक्रम",
+    "tableHeaders": {
+    }
+  },
+  "campaigns": {
+    "title": "अभियान",
+    "addCampaign": "अभियान जोड़ें",
+    "confirmDelete": "हटाने की पुष्टि करें",
+    "deleteConfirmation": "क्या आप हटाना चाहते हैं",
+    "tableHeaders": {
+      "name": "नाम",
+      "description": "विवरण",
+      "startDate": "शुरूआती की तारीख",
+      "endDate": "समाप्ति की तारीख",
+      "status": "स्थिति",
+      "actions": "क्रियाएं"
+    }
+  },
+  "visits": {
+    "title": "भेंटें",
+    "addVisit": "भेंट जोड़ें",
+    "confirmDelete": "हटाने की पुष्टि करें",
+    "deleteConfirmation": "क्या आप हटाना चाहते हैं",
+    "tableHeaders": {
+      "visitor": "आगंतुक",
+      "site": "साइट",
+      "purpose": "उद्देश्य"
+    }
+  },
+  "inventory": {
+    "siteInventory": {
+      "title": "साइट इन्वेंटरी",
+      "tableHeaders": {
+        "item": "वस्तु"
+      }
+    },
+    "gcInventory": {
+      "title": "GC इन्वेंटरी",
+      "tableHeaders": {
+        "item": "वस्तु"
+      }
+    }
+  },
+  "corporateDashboard": {
+    "title": "कॉर्पोरेट डैशबोर्ड",
+    "analytics": "विश्लेषण",
+    "reports": "रिपोर्ट्स"
+  },
+  "giftTrees": {
+    "searchLabel": "उपहार प्राप्तकर्ता के नाम से पेड़ खोजें",
+    "showAvailableTrees": "उपलब्ध पेड़ दिखाएं",
+    "showGiftedTrees": "उपहार में दिए गए पेड़ दिखाएं",
+    "showAllTrees": "सभी दिखाएं",
+    "errorFetching": "उपलब्ध पेड़ प्राप्त करने में त्रुटि",
+    "unknownError": "अज्ञात त्रुटि"
+  },
+  "manualUser": {
+    "updateUser": "उपयोगकर्ता अपडेट करें",
+    "addUser": "उपयोगकर्ता जोड़ें",
+    "cancel": "रद्द करें"
+  },
+  "album": {
+    "removeUnwantedImage": "अवांछित चित्र हटाएं",
+    "onlyTenImagesAllowed": "केवल 10 चित्रों की अनुमति है!"
+  },
+  "errors": {
+    "errorLoadingUserData": "उपयोगकर्ता डेटा लोड करने में त्रुटि",
+    "errorLoadingGroupData": "समूह डेटा लोड करने में त्रुटि, लेकिन आप संपादन जारी रख सकते हैं",
+    "paymentFailed": "भुगतान असफल",
+    "paymentFailedTryAgain": "भुगतान असफल। कृपया बाद में पुनः प्रयास करें या समर्थन से संपर्क करें।",
+    "paymentFailedNotFulfilled": "भुगतान असफल। सफल भुगतान के बिना अनुरोध पूरा नहीं होगा।"
+  },
+  "paymentStatus": {
+    "paymentCompleted": "भुगतान पूरा",
+    "paymentFailed": "भुगतान असफल",
+    "incompletePayment": "अपूर्ण भुगतान"
   }
 }

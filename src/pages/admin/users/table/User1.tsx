@@ -40,8 +40,10 @@ import { AccountBalance, Forest, Share, MoreVert, Dashboard, AdminPanelSettings,
 import UserForm from "./UserForm";
 import GeneralTable from "../../../../components/GenTable";
 import PersonalDashboardShareDialog from "../components/PersonalDashboardShareDialog";
+import { useTranslation } from "react-i18next";
 
 export const User1 = () => {
+  const { t } = useTranslation();
   const dispatch = useAppDispatch();
   const { getUsers, searchUsers, createUser, createBulkUsers, updateUser, deleteUser } =
     bindActionCreators(userActionCreators, dispatch);
@@ -187,7 +189,7 @@ export const User1 = () => {
     {
       dataIndex: "name",
       key: "name",
-      title: "Name",
+      title: t('common.tableHeaders.name'),
       align: "center",
       width: 150,
       fixed: 'left',
@@ -196,7 +198,7 @@ export const User1 = () => {
     {
       dataIndex: "email",
       key: "email",
-      title: "Email",
+      title: t('common.tableHeaders.email'),
       align: "center",
       width: 200,
       fixed: 'left',
@@ -205,7 +207,7 @@ export const User1 = () => {
     {
       dataIndex: "communication_email",
       key: "communication_email",
-      title: "Communication Email",
+      title: t('people.tableHeaders.communicationEmail'),
       align: "center",
       width: 200,
       ...getColumnSearchProps('communication_email', filters, handleSetFilters)
@@ -213,7 +215,7 @@ export const User1 = () => {
     {
       dataIndex: "phone",
       key: "phone",
-      title: "Phone",
+      title: t('common.tableHeaders.phone'),
       align: "center",
       width: 120,
       render: (value: string) => {
@@ -226,7 +228,7 @@ export const User1 = () => {
     {
       dataIndex: "created_at",
       key: "created_at",
-      title: "Created Date (MM-DD-YYYY)",
+      title: t('people.tableHeaders.createdDate'),
       align: "center",
       width: 150,
       render: getFormattedDate,
@@ -245,7 +247,7 @@ export const User1 = () => {
     },
     {
       key: "sponsor_dashboard",
-      title: "Sponsor Dashboard",
+      title: t('people.tableHeaders.sponsorDashboard'),
       width: 100,
       align: "center",
       render: (value, record, index) => {
@@ -280,7 +282,7 @@ export const User1 = () => {
     },
     {
       key: "reserved_trees",
-      title: "Reserved Trees",
+      title: t('people.tableHeaders.reservedTrees'),
       width: 100,
       align: "center",
       render: (value, record, index) => {
@@ -315,7 +317,7 @@ export const User1 = () => {
     },
     {
       key: "profile_dashboard",
-      title: "Profile Dashboard",
+      title: t('people.tableHeaders.profileDashboard'),
       width: 100,
       align: "center",
       render: (value, record, index) => {
@@ -350,7 +352,7 @@ export const User1 = () => {
     },
     {
       key: "self_serve_dashboard",
-      title: "Self-Serve Portal",
+      title: t('people.tableHeaders.selfServePortal'),
       width: 100,
       align: "center",
       render: (value, record, index) => {
@@ -386,7 +388,7 @@ export const User1 = () => {
     {
       dataIndex: "roles",
       key: "roles",
-      title: "Dashboard Roles",
+      title: t('people.tableHeaders.dashboardRoles'),
       width: 120,
       align: "center",
       render: (value, record, index) => {
@@ -431,7 +433,7 @@ export const User1 = () => {
     {
       dataIndex: "pin",
       key: "mobile_access",
-      title: "Mobile Roles",
+      title: t('people.tableHeaders.mobileRoles'),
       width: 120,
       align: "center",
       render: (value, record, index) => {
@@ -488,7 +490,7 @@ export const User1 = () => {
     },
     {
       key: "actions",
-      title: "Actions",
+      title: t('common.tableHeaders.actions'),
       width: 80,
       align: "center",
       render: (value, record, index) => (
@@ -771,7 +773,7 @@ export const User1 = () => {
           padding: "4px 12px",
         }}
       >
-        <Typography variant="h4" style={{ marginTop: '5px' }}>People</Typography>
+        <Typography variant="h4" style={{ marginTop: '5px' }}>{t('people.title')}</Typography>
         <div
           style={{
             display: "flex",
@@ -825,7 +827,7 @@ export const User1 = () => {
           onPaginationChange={handlePaginationChange}
           onDownload={getAllUsersData}
           footer
-          tableName="Users"
+          tableName={t('people.title')}
           scroll={{ x: 1200 }}
         />
       </Box >

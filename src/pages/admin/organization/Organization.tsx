@@ -40,8 +40,10 @@ import { LoadingButton } from "@mui/lab";
 import { Order } from "../../../types/common";
 import { getSortIcon } from "../../../components/Filter";
 import { Link } from "@mui/material";
+import { useTranslation } from "react-i18next";
 
 export const OrganizationComponent = () => {
+  const { t } = useTranslation();
   const dispatch = useAppDispatch();
   const {
     getGroups,
@@ -234,7 +236,7 @@ export const OrganizationComponent = () => {
     {
       dataIndex: "name",
       key: "name",
-      title: "Name",
+      title: t('common.tableHeaders.name'),
       width: 250,
       align: 'center',
       fixed: 'left',
@@ -243,7 +245,7 @@ export const OrganizationComponent = () => {
     {
       dataIndex: "type",
       key: "type",
-      title: "Type",
+      title: t('common.tableHeaders.type'),
       width: 150,
       align: 'center',
       render: (value) => value ? value.toString().toUpperCase() : '',
@@ -252,13 +254,13 @@ export const OrganizationComponent = () => {
     {
       dataIndex: "description",
       key: "description",
-      title: "Description",
+      title: t('common.tableHeaders.description'),
       width: 450,
       align: 'center',
     },
     {
       key: "sponsor_dashboard",
-      title: "Sponsor Dashboard",
+      title: t('peopleGroups.tableHeaders.sponsorDashboard'),
       width: 120,
       align: "center",
       render: (value, record, index) => {
@@ -293,7 +295,7 @@ export const OrganizationComponent = () => {
     },
     {
       key: "reserved_trees",
-      title: "Reserved Trees",
+      title: t('peopleGroups.tableHeaders.reservedTrees'),
       width: 120,
       align: "center",
       render: (value, record, index) => {
@@ -329,7 +331,7 @@ export const OrganizationComponent = () => {
 
     {
       key: "self_serve_dashboard",
-      title: "Self-Serve Portal",
+      title: t('peopleGroups.tableHeaders.selfServePortal'),
       width: 120,
       align: "center",
       render: (value, record, index) => {
@@ -365,7 +367,7 @@ export const OrganizationComponent = () => {
     {
       dataIndex: "action",
       key: "action",
-      title: "Action",
+      title: t('peopleGroups.tableHeaders.action'),
       width: 200,
       align: "center",
       render: (value, record, index) => (
@@ -446,7 +448,7 @@ export const OrganizationComponent = () => {
       <ToastContainer />
       <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: "20px" }}></div>
       <div style={{ display: "flex", justifyContent: "space-between", padding: "4px 12px" }}>
-        <Typography variant="h4" style={{ marginTop: '5px' }}>Group People</Typography>
+        <Typography variant="h4" style={{ marginTop: '5px' }}>{t('peopleGroups.title')}</Typography>
         <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: "5px", marginTop: "5px" }}>
           <Button 
             style={{ marginLeft: "10px" }} 
@@ -467,7 +469,7 @@ export const OrganizationComponent = () => {
             style={{ marginLeft: "10px" }}
             onClick={handleClick}
           >
-            +ADD
+            {t('peopleGroups.addGroup')}
           </Button>
           <Button
             variant="contained"
@@ -475,7 +477,7 @@ export const OrganizationComponent = () => {
             style={{ marginLeft: "10px", textTransform: 'none' }}
             onClick={() => { setGroupCombineModal(true); }}
           >
-            Merge Groups
+            {t('peopleGroups.mergeGroups')}
           </Button>
           <Menu
             id="simple-menu"
@@ -510,20 +512,20 @@ export const OrganizationComponent = () => {
         onPaginationChange={handlePaginationChange}
         onDownload={getAllGroupsData}
         footer
-        tableName="Groups"
+        tableName={t('peopleGroups.title')}
         />
       </Box>
       <Divider style={{ marginBottom: "20px" }} />
       {selectedOrg && <OrganizationUsers selectedOrg={selectedOrg} />}
 
       <Dialog open={openDeleteModal} onClose={() => setOpenDeleteModal(false)}>
-        <DialogTitle>Confirm Delete</DialogTitle>
+        <DialogTitle>{t('common.confirmations.confirmDelete')}</DialogTitle>
         <DialogContent>
-          <DialogContentText>Do you want to delete {selectedItem?.name}?</DialogContentText>
+          <DialogContentText>{t('common.confirmations.deleteConfirmation')} {selectedItem?.name}?</DialogContentText>
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setOpenDeleteModal(false)} color="error" variant="outlined">
-            Cancel
+            {t('common.cancel')}
           </Button>
           <Button
             onClick={() => {
@@ -536,7 +538,7 @@ export const OrganizationComponent = () => {
             variant="contained"
             autoFocus
           >
-            Yes
+            {t('common.yes')}
           </Button>
         </DialogActions>
       </Dialog>
@@ -557,7 +559,7 @@ export const OrganizationComponent = () => {
         </DialogContent>
         <DialogActions>
           <Button variant="outlined" onClick={handleCancelCombineGroup} color="error">
-            Cancel
+            {t('common.cancel')}
           </Button>
           <LoadingButton
             loading={merging}
@@ -565,7 +567,7 @@ export const OrganizationComponent = () => {
             variant="contained"
             color="success"
           >
-            Merge
+            {t('peopleGroups.merge')}
           </LoadingButton>
         </DialogActions>
       </Dialog>

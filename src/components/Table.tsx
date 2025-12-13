@@ -8,6 +8,7 @@ import { Resizable } from "react-resizable";
 import './GenTable.css'
 import { unparse } from 'papaparse';
 import ColumnPreferences from './ColumnPreferences';
+import { useTranslation } from 'react-i18next';
 
 interface TableColoringLabels { className: string, label: string }
 
@@ -83,6 +84,7 @@ const ResizableTitle = (props: any) => {
 };
 
 function TableComponent({ loading, dataSource, columns, totalRecords, tableName, tableRowColoringLabels, fetchAllData, setPageSize, setPage, handleSelectionChanges, setSrNoPage, isExpandable, expandableFunction, rowClassName, pageSize = 10, currentPage = 0 }: TableComponentProps) {
+    const { t } = useTranslation();
 
     const [download, setDownload] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
@@ -254,7 +256,7 @@ function TableComponent({ loading, dataSource, columns, totalRecords, tableName,
                             onColumnVisibilityChange={handleColumnVisibilityChange}
                         />
                         <Divider orientation="vertical" flexItem sx={{ backgroundColor: "black", marginRight: '10px', }} />
-                        <div style={{ marginRight: '10px', display: 'flex', alignItems: 'center' }}><strong>Export table data in a csv file:</strong></div>
+                        <div style={{ marginRight: '10px', display: 'flex', alignItems: 'center' }}><strong>{t('common.exportTableData')}</strong></div>
                         <Button
                             color="success"
                             variant='contained'
@@ -265,7 +267,7 @@ function TableComponent({ loading, dataSource, columns, totalRecords, tableName,
                                     fetchAllData();
                                     setDownload(true);
                                 }
-                            }}>Export</Button>
+                            }}>{t('common.export')}</Button>
                         <div></div>
                     </div>
                 </div>

@@ -1,4 +1,5 @@
 import { Fragment } from "react";
+import { useTranslation } from 'react-i18next';
 import { createStyles, makeStyles } from "@mui/styles";
 import KeyboardArrowLeftIcon from "@mui/icons-material/KeyboardArrowLeft";
 import KeyboardArrowRightIcon from "@mui/icons-material/KeyboardArrowRight";
@@ -17,6 +18,7 @@ const UseStyle = makeStyles((theme) =>
 );
 
 export const Navigator = ({ activeStep, maxSteps, handleBack, handleNext }) => {
+  const { t } = useTranslation();
   const classes = UseStyle();
 
   const onClickPrev = () => {
@@ -33,7 +35,7 @@ export const Navigator = ({ activeStep, maxSteps, handleBack, handleNext }) => {
         <Fragment>
           <span></span>
           <div className={classes.keybtn} onClick={onClickNext}>
-            <span>Next Tree</span>
+            <span>{t('navigation.nextTree')}</span>
             <KeyboardArrowRightIcon fontSize={"large"} />
           </div>
         </Fragment>
@@ -42,10 +44,10 @@ export const Navigator = ({ activeStep, maxSteps, handleBack, handleNext }) => {
         <Fragment>
           <div className={classes.keybtn} onClick={onClickPrev}>
             <KeyboardArrowLeftIcon fontSize={"large"} />
-            <span>Prev Tree</span>
+            <span>{t('navigation.prevTree')}</span>
           </div>
           <div className={classes.keybtn} onClick={onClickNext}>
-            <span>Next Tree</span>
+            <span>{t('navigation.nextTree')}</span>
             <KeyboardArrowRightIcon fontSize={"large"} />
           </div>
         </Fragment>
@@ -54,7 +56,7 @@ export const Navigator = ({ activeStep, maxSteps, handleBack, handleNext }) => {
         <Fragment>
           <div className={classes.keybtn} onClick={onClickPrev}>
             <KeyboardArrowLeftIcon fontSize={"large"} />
-            <span>Prev Tree</span>
+            <span>{t('navigation.prevTree')}</span>
           </div>
         </Fragment>
       )}

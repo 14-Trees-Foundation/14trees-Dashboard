@@ -9,6 +9,7 @@ import { ToastContainer, toast } from "react-toastify";
 import CSRSharePageDialog from "./CSRSharePageDialog";
 import { Link } from "@mui/icons-material";
 import ApiClient from "../../../api/apiClient/apiClient";
+import { useTranslation } from "react-i18next";
 
 type Props = {
     groupId: any
@@ -17,6 +18,7 @@ type Props = {
 
 const CSRHeader: React.FC<Props> = ({ groupId, onGroupChange }) => {
 
+    const { t } = useTranslation();
     const theme = useTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
@@ -141,7 +143,7 @@ const CSRHeader: React.FC<Props> = ({ groupId, onGroupChange }) => {
                         />
                     )}
                     <Typography variant={isMobile ? "h6" : "h4"} style={{ margin: 0, lineHeight: 1.2 }}>
-                        {selectedGroup ? `Climate Action Dashboard for ${selectedGroup.name}` : 'Corporate Climate Action Dashboard'}
+                        {selectedGroup ? `Climate Action Dashboard for ${selectedGroup.name}` : t('corporateDashboard.title')}
                     </Typography>
                 </div>
                 <div

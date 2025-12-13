@@ -9,6 +9,7 @@ import './inventory.css'
 import PlantTypeStats from "./PlantTypeStats"
 import PlantTypePlotStats from "./PlantTypePlotStats";
 import { toast } from "react-toastify";
+import { useTranslation } from "react-i18next";
 
 interface SiteLocation {
     district: string;
@@ -37,6 +38,7 @@ const getSiteServiceTypeEnum = (serviceType: string): string | null => {
 
 const GCInventory: FC = () => {
 
+    const { t } = useTranslation();
     const [districts, setDistricts] = useState<SiteLocation[]>([]);
     const [selectedDistricts, setSelectedDistricts] = useState<string[]>([]);
     const [selectedTalukas, setSelectedTalukas] = useState<string[]>([]);
@@ -94,7 +96,7 @@ const GCInventory: FC = () => {
 
     return (
         <Box>
-            <Typography variant="h4" sx={{ marginBottom: 1 }}>Gifting Inventory</Typography>
+            <Typography variant="h4" sx={{ marginBottom: 1 }}>{t('inventory.gcInventory.title')}</Typography>
             <Divider sx={{ backgroundColor: "black", marginBottom: 3 }} />
 
             {/* <Box style={{

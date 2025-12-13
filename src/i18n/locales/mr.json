@@ -26,20 +26,59 @@
     "login": "लॉगिन",
     "welcome": "स्वागत आहे",
     "actions": "कृती",
-    "messages": "संदेश"
+    "messages": "संदेश",
+    "export": "एक्सपोर्ट",
+    "exportTableData": "तक्त्याचा डेटा CSV फाइलमध्ये एक्सपोर्ट करा:",
+    "tableHeaders": {
+      "name": "नाव",
+      "email": "ईमेल",
+      "phone": "फोन",
+      "date": "तारीख",
+      "type": "प्रकार",
+      "status": "स्थिती",
+      "actions": "क्रिया",
+      "location": "ठिकाण",
+      "description": "वर्णन",
+      "category": "श्रेणी",
+      "quantity": "प्रमाण",
+      "assignedTo": "ला नियुक्त केले",
+      "saplingId": "रोप आयडी",
+      "plantDate": "रोपणीची तारीख",
+      "image": "प्रतिमा",
+      "treeType": "झाडाचा प्रकार",
+      "plotName": "प्लॉट नाव",
+      "siteName": "साइट नाव"
+    },
+    "confirmations": {
+      "confirmDelete": "हटवण्याची पुष्टी करा",
+      "deleteConfirmation": "तुम्हाला हटवायचे आहे का",
+      "changePlot": "प्लॉट बदला"
+    }
   },
   "navigation": {
     "trees": "झाडे",
     "users": "वापरकर्ते",
     "events": "कार्यक्रम",
-    "organizations": "संस्था",
     "visits": "भेटी",
     "reports": "अहवाल",
     "admin": "अॅडमिन",
     "inventory": "इन्व्हेंटरी",
     "gifts": "भेटवस्तू",
     "sites": "साइट्स",
-    "plots": "प्लॉट्स"
+    "plots": "प्लॉट्स",
+    "plantTypes": "झाडांचे प्रकार",
+    "ponds": "तलाव",
+    "people": "लोक",
+    "peopleGroups": "लोकांचे गट",
+    "onsiteReports": "साइट अहवाल",
+    "treeCards": "ट्री कार्ड्स",
+    "donations": "देणगी",
+    "campaigns": "मोहिमा",
+    "siteInventory": "साइट इन्व्हेंटरी",
+    "gcInventory": "जीसी इन्व्हेंटरी",
+    "corporateDashboard": "कॉर्पोरेट डॅशबोर्ड",
+    "nextTree": "पुढील झाड",
+    "prevTree": "मागील झाड"
   },
   "forms": {
     "name": "नाव",
@@ -61,22 +100,6 @@
     "invalidPhone": "कृपया वैध फोन नंबर टाका",
     "sampleForm": "नमुना फॉर्म उदाहरण"
   },
-  "trees": {
-    "tree": "झाड",
-    "trees": "झाडे",
-    "plantedOn": "लावले गेले",
-    "treeType": "झाडाचा प्रकार",
-    "location": "ठिकाण",
-    "status": "स्थिती",
-    "assignedTo": "नियुक्त केलेले",
-    "plantTree": "झाड लावा",
-    "assignTree": "झाड असाइन करा",
-    "treeProfile": "झाडाची प्रोफाइल",
-    "totalTrees": "एकूण झाडे",
-    "treesPlanted": "लावलेली झाडे",
-    "survival": "जिवंत राहण्याचे दर",
-    "growth": "वाढीची स्थिती"
-  },
   "users": {
     "user": "वापरकर्ता",
     "users": "वापरकर्ते",
@@ -90,43 +113,6 @@
     "activeUsers": "सक्रिय वापरकर्ते",
     "userType": "वापरकर्ता प्रकार",
     "registrationDate": "नोंदणी तारीख"
-  },
-  "events": {
-    "event": "कार्यक्रम",
-    "events": "कार्यक्रम",
-    "eventName": "कार्यक्रमाचे नाव",
-    "eventType": "कार्यक्रमाचा प्रकार",
-    "eventDate": "कार्यक्रमाची तारीख",
-    "eventLocation": "कार्यक्रमाचे ठिकाण",
-    "participants": "सहभागी",
-    "organizer": "आयोजक",
-    "createEvent": "कार्यक्रम तयार करा",
-    "upcomingEvents": "येणारे कार्यक्रम",
-    "pastEvents": "मागील कार्यक्रम",
-    "totalEvents": "एकूण कार्यक्रम"
-  },
-  "organizations": {
-    "organization": "संस्था",
-    "organizations": "संस्था",
-    "orgName": "संस्थेचे नाव",
-    "orgType": "संस्थेचा प्रकार",
-    "contactPerson": "संपर्क व्यक्ती",
-    "partnership": "भागीदारी",
-    "addOrganization": "संस्था जोडा",
-    "totalOrganizations": "एकूण संस्था",
-    "activePartnerships": "सक्रिय भागीदारी"
-  },
-  "visits": {
-    "visit": "भेट",
-    "visits": "भेटी",
-    "visitor": "अभ्यागत",
-    "visitDate": "भेटीची तारीख",
-    "visitPurpose": "भेटीचा उद्देश",
-    "visitStatus": "भेटीची स्थिती",
-    "scheduleVisit": "भेट नियोजित करा",
-    "totalVisits": "एकूण भेटी",
-    "pendingVisits": "प्रलंबित भेटी",
-    "completedVisits": "पूर्ण भेटी"
   },
   "gifts": {
     "gift": "भेटवस्तू",
@@ -202,7 +188,7 @@
     "districts": "जिल्हे",
     "talukas": "तालुके",
     "villages": "गावे",
-    "landTypeDistribution": "जमिनीचे प्रकार वितरण",
+    "landTypeDistribution": "जमीनीचे प्रकार वितरण",
     "treeGrowthAnalytics": "झाड वाढ विश्लेषण",
     "cumulativeTreeCount": "एकत्रित झाड संख्या",
     "ofTotalTrees": "एकूण झाडांपैकी",
@@ -217,5 +203,312 @@
       "School": "शाळा",
       "Cremation": "स्मशान"
     }
+  },
+  "sites": {
+    "sites": "साइट्स",
+    "addSite": "साइट जोडा",
+    "syncNotionSites": "नोशन साइट्स सिंक करा",
+    "confirmDelete": "हटवण्याची पुष्टी करा",
+    "deleteConfirmation": "तुम्हाला '{siteName}' हटवायचे आहे का?",
+    "nameMarathi": "नाव (मराठी)",
+    "nameEnglish": "नाव (इंग्रजी)",
+    "owner": "मालक",
+    "serviceType": "सेवा प्रकार",
+    "landType": "जमिनीचा प्रकार",
+    "siteType": "साइट प्रकार",
+    "district": "जिल्हा",
+    "taluka": "तालुका",
+    "village": "गाव",
+    "areaAcres": "क्षेत्रफळ (एकर)",
+    "kmlFile": "केएमएल फाइल",
+    "lengthKm": "लांबी (किमी)",
+    "tags": "टॅग्स",
+    "groveType": "ग्रोव्ह प्रकार",
+    "download": "डाउनलोड",
+    "notAvailable": "उपलब्ध नाही"
+  },
+  "plots": {
+    "plots": "प्लॉट्स",
+    "addPlot": "प्लॉट जोडा",
+    "updateCoordinates": "निर्देशांक अपडेट करा",
+    "assignToSite": "साइटला नियुक्त करा",
+    "unreserveTrees": "झाडे अनरिझर्व्ह करा",
+    "confirmDelete": "हटवण्याची पुष्टी करा",
+    "deleteConfirmation": "तुम्हाला '{plotName}' हटवायचे आहे का?",
+    "selectSite": "एक साइट निवडा",
+    "selectSiteDescription": "निवडलेले प्लॉट्स या साइटला नियुक्त केले जातील.",
+    "assign": "नियुक्त करा",
+    "includeDeadLostTrees": "मृत/हरवलेली झाडे समाविष्ट करा",
+    "trees": "झाडे",
+    "shrubs": "झुडुपे",
+    "herbs": "औषधी वनस्पती",
+    "total": "एकूण",
+    "actions": "कृती",
+    "name": "नाव",
+    "plotLabel": "प्लॉट लेबल",
+    "accessibility": "प्रवेशयोग्यता",
+    "gatNo": "गट क्रमांक",
+    "tags": "टॅग्स",
+    "siteName": "साइटचे नाव",
+    "areaAcres": "क्षेत्रफळ (एकर)",
+    "noOfPits": "खड्ड्यांची संख्या",
+    "totalTrees": "एकूण झाडे",
+    "bookedTrees": "बुक केलेली झाडे",
+    "assignedTrees": "नियुक्त झाडे",
+    "unfundedInventoryAssigned": "अनफंडेड इन्व्हेंटरी (नियुक्त)",
+    "unfundedInventoryUnassigned": "अनफंडेड इन्व्हेंटरी (अनियुक्त)",
+    "giftableInventory": "भेटवस्तू इन्व्हेंटरी",
+    "accessible": "प्रवेशयोग्य",
+    "inaccessible": "अप्रवेशयोग्य",
+    "moderatelyAccessible": "मध्यम प्रवेशयोग्य"
+  },
+  "trees": {
+    "title": "झाडे",
+    "tree": "झाड",
+    "trees": "झाडे",
+    "plantedOn": "लावले",
+    "treeType": "झाडाचा प्रकार",
+    "location": "स्थान",
+    "status": "स्थिती",
+    "assignedTo": "ला नियुक्त केले",
+    "plantTree": "झाड लावा",
+    "assignTree": "झाड नियुक्त करा",
+    "treeProfile": "झाडाचे प्रोफाइल",
+    "totalTrees": "एकूण झाडे",
+    "treesPlanted": "लावलेली झाडे",
+    "survival": "जगण्याचे प्रमाण",
+    "growth": "वाढीची स्थिती",
+    "tableHeaders": {
+      "srNo": "अ. क्र.",
+      "saplingId": "रोप आयडी",
+      "plantType": "रोपाचा प्रकार",
+      "habitat": "निवासस्थान",
+      "plot": "प्लॉट",
+      "tags": "टॅग",
+      "reservedForIndividual": "राखून ठेवलेले (व्यक्तिगत)",
+      "reservedForGroup": "राखून ठेवलेले (गट)",
+      "sponsoredByIndividual": "प्रायोजित (व्यक्तिगत)",
+      "sponsoredByGroup": "प्रायोजित (गट)",
+      "assignedTo": "ला नियुक्त केले",
+      "plantedBy": "द्वारे लावले",
+      "associationType": "संघ प्रकार",
+      "associationRequestId": "संघ विनंती आयडी",
+      "reservedOn": "राखून ठेवण्याची तारीख",
+      "assignedOn": "नियुक्त केल्याची तारीख",
+      "uploadedOn": "अपलोड केल्याची तारीख",
+      "treeHealth": "झाडाचे आरोग्य",
+      "deletedOn": "हटवण्याची तारीख",
+      "actions": "कृती"
+    },
+    "dialogs": {
+      "timeline": "रोप टाइमलाइन",
+      "confirmOperation": "पुष्टी करा",
+      "doYouWantTo": "तुम्हाला हवे आहे",
+      "treesWithSaplingIds": "रोप आयडी असलेली झाडे",
+      "confirmDelete": "हटवण्याची पुष्टी करा",
+      "doYouWantToDelete": "तुम्हाला या रोप आयडी असलेले झाड हटवायचे आहे का",
+      "selectSite": "साइट निवडा",
+      "thisActionWillChange": "ही क्रिया निवडलेल्या झाडांसाठी प्लॉट बदलेल.",
+      "selectPlot": "प्लॉट निवडा",
+      "cancel": "रद्द करा",
+      "yes": "होय",
+      "changePlot": "प्लॉट बदला"
+    },
+    "export": {
+      "button": "निर्यात",
+      "title": "झाडे निर्यात करा",
+      "description": "झाडे डेटा CSV फाइल म्हणून डाउनलोड करा",
+      "filename": "trees_data"
+    },
+    "tableName": "झाडे",
+    "statusLabels": {
+      "deadTree": "मेलेले झाड",
+      "deletedTree": "हटवलेले झाड",
+      "lostTree": "हरवलेले झाड",
+      "tree": "झाड",
+      "shrub": "झुडूप",
+      "herb": "औषधी वनस्पती",
+      "unknown": "अज्ञात"
+    },
+    "search": {
+      "placeholder": "रोप आयडी टाका",
+      "clear": "साफ करा",
+      "search": "शोधा",
+      "tooltip": "अनेक आयडी कॉमा, स्पेस, किंवा नवीन लाइनने वेगळे करा",
+      "idsDetected": "रोप आयडी सापडली:",
+      "more": "आणखी"
+    },
+    "actions": {
+      "reserveTrees": "झाडे राखीव ठेवा",
+      "unreserveTrees": "झाडे आरक्षण रद्द करा",
+      "changePlot": "प्लॉट बदला"
+    }
+  },
+  "plantTypes": {
+    "title": "वनस्पती प्रकार",
+    "addPlantType": "वनस्पती प्रकार जोडा",
+    "addPlantTypeCardTemplate": "वनस्पती प्रकार कार्ड टेम्प्लेट जोडा",
+    "confirmDelete": "हटवण्याची पुष्टी करा",
+    "deleteConfirmation": "तुम्हाला हटवायचे आहे का",
+    "tableHeaders": {
+      "srNo": "अ. क्र.",
+      "plantTypeId": "वनस्पती प्रकार आयडी",
+      "englishName": "नाव (इंग्रजी)",
+      "commonNameEnglish": "इंग्रजीतील सामान्य नाव",
+      "commonNameMarathi": "मराठीतील सामान्य नाव",
+      "scientificName": "वैज्ञानिक नाव",
+      "knownAs": "म्हणून ओळखले जाते",
+      "tags": "टॅग",
+      "use": "वापर",
+      "images": "प्रतिमा",
+      "habit": "सवय"
+    }
+  },
+  "ponds": {
+    "title": "तलाव",
+    "addPond": "तलाव जोडा",
+    "confirmDelete": "हटवण्याची पुष्टी करा",
+    "deleteConfirmation": "तुम्हाला हटवायचे आहे का",
+    "tableHeaders": {
+      "lengthFt": "लांबी (फूट)",
+      "widthFt": "रुंदी (फूट)",
+      "depthFt": "खोली (फूट)",
+      "pondCapacity": "तलाव क्षमता",
+      "createdAt": "तयार केले"
+    }
+  },
+  "people": {
+    "title": "लोक",
+    "tableHeaders": {
+      "name": "नाव",
+      "email": "ईमेल",
+      "communicationEmail": "संवाद ईमेल",
+      "phone": "फोन",
+      "createdDate": "तयार केलेली तारीख (MM-DD-YYYY)",
+      "sponsorDashboard": "प्रायोजक डॅशबोर्ड",
+      "reservedTrees": "आरक्षित झाडे",
+      "profileDashboard": "प्रोफाइल डॅशबोर्ड",
+      "selfServePortal": "सेल्फ-सर्व्ह पोर्टल",
+      "dashboardRoles": "डॅशबोर्ड भूमिका",
+      "mobileRoles": "मोबाइल भूमिका",
+      "actions": "क्रिया"
+    }
+  },
+  "peopleGroups": {
+    "title": "गटातील लोक",
+    "addGroup": "+जोडा",
+    "mergeGroups": "गट एकत्र करा",
+    "confirmDelete": "हटवण्याची पुष्टी करा",
+    "deleteConfirmation": "तुम्हाला हटवायचे आहे का",
+    "merge": "एकत्रीकरण",
+    "tableHeaders": {
+      "name": "नाव",
+      "type": "प्रकार",
+      "description": "वर्णन",
+      "sponsorDashboard": "प्रायोजक डॅशबोर्ड",
+      "reservedTrees": "आरक्षित झाडे",
+      "selfServePortal": "सेल्फ-सर्व्ह पोर्टल",
+      "action": "क्रिया"
+    }
+  },
+  "onsiteReports": {
+    "title": "ऑनसाइट रिपोर्ट्स",
+    "treeAuditReports": "झाड ऑडिट रिपोर्ट्स",
+    "tableHeaders": {
+      "auditDate": "ऑडिट दिनांक",
+      "fieldStaff": "फील्ड स्टाफ",
+      "plotName": "प्लॉट चे नाव",
+      "siteName": "साइटचे नाव",
+      "treesAudited": "ऑडिट केलेली झाडे"
+    }
+  },
+  "events": {
+    "title": "इव्हेंट्स",
+    "addEvent": "इव्हेंट जोडा",
+    "confirmDelete": "हटवण्याची पुष्टी करा",
+    "deleteConfirmation": "तुम्हाला हटवायचे आहे का",
+    "event": "कार्यक्रम",
+    "events": "कार्यक्रम",
+    "eventName": "कार्यक्रमाचे नाव",
+    "eventType": "कार्यक्रमाचा प्रकार",
+    "eventDate": "कार्यक्रमाची तारीख",
+    "eventLocation": "कार्यक्रमाचे ठिकाण",
+    "participants": "सहभागी",
+    "organizer": "आयोजक",
+    "createEvent": "कार्यक्रम तयार करा",
+    "upcomingEvents": "येणारे कार्यक्रम",
+    "pastEvents": "मागील कार्यक्रम",
+    "totalEvents": "एकूण कार्यक्रम",
+    "tableHeaders": {
+    }
+  },
+  "campaigns": {
+    "title": "मोहिम",
+    "addCampaign": "मोहिम जोडा",
+    "confirmDelete": "हटवण्याची पुष्टी करा",
+    "deleteConfirmation": "तुम्हाला हटवायचे आहे का",
+    "tableHeaders": {
+      "startDate": "प्रारंभ तारीख",
+      "endDate": "समाप्ती तारीख"
+    }
+  },
+  "visits": {
+    "title": "भेटी",
+    "addVisit": "भेट जोडा",
+    "confirmDelete": "हटवण्याची पुष्टी करा",
+    "deleteConfirmation": "तुम्हाला हटवायचे आहे का",
+    "tableHeaders": {
+      "visitor": "भेटी देणारा",
+      "site": "साइट",
+      "purpose": "उद्देश"
+    }
+  },
+  "inventory": {
+    "siteInventory": {
+      "title": "साइट इन्व्हेंटरी",
+      "tableHeaders": {
+        "item": "वस्तू"
+      }
+    },
+    "gcInventory": {
+      "title": "GC इन्व्हेंटरी",
+      "tableHeaders": {
+        "item": "वस्तू"
+      }
+    }
+  },
+  "corporateDashboard": {
+    "title": "कॉर्पोरेट डॅशबोर्ड",
+    "analytics": "विश्लेषण",
+    "reports": "अहवाल"
+  },
+  "giftTrees": {
+    "searchLabel": "भेट घेणाऱ्याच्या नावाने झाडे शोधा",
+    "showAvailableTrees": "उपलब्ध झाडे दाखवा",
+    "showGiftedTrees": "भेट दिलेली झाडे दाखवा",
+    "showAllTrees": "सर्व दाखवा",
+    "errorFetching": "उपलब्ध झाडे मिळवण्यात त्रुटी",
+    "unknownError": "अज्ञात त्रुटी"
+  },
+  "manualUser": {
+    "updateUser": "वापरकर्ता अपडेट करा",
+    "addUser": "वापरकर्ता जोडा",
+    "cancel": "रद्द करा"
+  },
+  "album": {
+    "removeUnwantedImage": "अनावश्यक प्रतिमा काढा",
+    "onlyTenImagesAllowed": "फक्त 10 प्रतिमांना परवानगी आहे!"
+  },
+  "errors": {
+    "errorLoadingUserData": "वापरकर्ता डेटा लोड करण्यात त्रुटी",
+    "errorLoadingGroupData": "गट डेटा लोड करण्यात त्रुटी, पण तुम्ही संपादन सुरू ठेवू शकता",
+    "paymentFailed": "पेमेंट अयशस्वी",
+    "paymentFailedTryAgain": "पेमेंट अयशस्वी. कृपया पुन्हा प्रयत्न करा किंवा समर्थनाशी संपर्क करा.",
+    "paymentFailedNotFulfilled": "पेमेंट अयशस्वी. यशस्वी पेमेंट शिवाय विनंती पूर्ण होणार नाही."
+  },
+  "paymentStatus": {
+    "paymentCompleted": "पेमेंट पूर्ण",
+    "paymentFailed": "पेमेंट अयशस्वी",
+    "incompletePayment": "अपूर्ण पेमेंट"
   }
 }

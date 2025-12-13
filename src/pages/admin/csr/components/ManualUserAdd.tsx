@@ -1,4 +1,5 @@
 import React, { useState, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Box, Button, Grid, TextField, Typography, Avatar, IconButton, Tooltip, Paper, TableContainer, Table, TableHead, TableBody, TableRow, TableCell } from '@mui/material';
 import { Delete as DeleteIcon, Image as ImageIcon, AddPhotoAlternate, Edit as EditIcon } from '@mui/icons-material';
 import { AWSUtils } from '../../../../helpers/aws';
@@ -40,6 +41,7 @@ const ManualUserAdd: React.FC<ManualUserAddProps> = ({
     onChange, 
     eventType,
 }) => {
+    const { t } = useTranslation();
     const [manualUser, setManualUser] = useState<ManualUser>(defaultUser());
     const [manualUserErrors, setManualUserErrors] = useState<Record<string, string>>({});
     const fileInputRef = useRef<HTMLInputElement>(null);
@@ -236,11 +238,11 @@ const ManualUserAdd: React.FC<ManualUserAddProps> = ({
                         )}
                         <Grid item xs={12} display="flex" justifyContent="center" gap={2}>
                             <Button type="submit" variant="contained" color="success">
-                                {editIndex !== null ? 'Update User' : 'Add User'}
+                                {editIndex !== null ? t('manualUser.updateUser') : t('manualUser.addUser')}
                             </Button>
                             {editIndex !== null && (
                                 <Button onClick={() => { setManualUser(defaultUser()); setEditIndex(null); }} variant="outlined" color="error">
-                                    Cancel
+                                    {t('manualUser.cancel')}
                                 </Button>
                             )}
                         </Grid>

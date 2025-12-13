@@ -1,4 +1,5 @@
 import { useState, useRef, useCallback } from "react";
+import { useTranslation } from 'react-i18next';
 import {
     Box,
     Button,
@@ -31,6 +32,7 @@ interface CSRGiftTreesProps {
 }
 
 const CSRGiftTrees: React.FC<CSRGiftTreesProps> = ({ groupId, selectedGroup }) => {
+    const { t } = useTranslation();
     const theme = useTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
@@ -64,7 +66,7 @@ const CSRGiftTrees: React.FC<CSRGiftTreesProps> = ({ groupId, selectedGroup }) =
                 }
             }
         } catch (error: any) {
-            toast.error("Error fetching available trees: " + (error.message || "Unknown error"));
+            toast.error(t('giftTrees.errorFetching') + ": " + (error.message || t('giftTrees.unknownError')));
         } finally {
             setIsLoading(false);
         }
@@ -131,7 +133,7 @@ const CSRGiftTrees: React.FC<CSRGiftTreesProps> = ({ groupId, selectedGroup }) =
                 gap: 2
             }}>
                 <TextField
-                    label="Search trees by giftee's name"
+                    label={t('giftTrees.searchLabel')}
                     value={searchUser}
                     onChange={(e) => { setSeachUser(e.target.value) }}
                     disabled={filter === 'non-gifted'}
@@ -157,14 +159,14 @@ const CSRGiftTrees: React.FC<CSRGiftTreesProps> = ({ groupId, selectedGroup }) =
                         <FormControlLabel
                             value="non-gifted"
                             control={<Radio color="success" checked={filter === 'non-gifted'} onChange={() => { setFilter('non-gifted'); setSeachUser(''); }} />}
-                            label="Show Available Trees"
+                            label={t('giftTrees.showAvailableTrees')}
                             labelPlacement="end"
                             sx={{ mr: 1 }}
                         />
                         <FormControlLabel
                             value="gifted"
                             control={<Radio color="success" checked={filter === 'gifted'} onChange={() => { setFilter('gifted') }} />}
-                            label="Show Gifted Trees"
+                            label={t('giftTrees.showGiftedTrees')}
                             labelPlacement="end"
                             sx={{ mr: 1 }}
                         />

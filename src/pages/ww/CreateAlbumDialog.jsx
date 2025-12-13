@@ -1,4 +1,5 @@
 import * as React from "react";
+import { useTranslation } from 'react-i18next';
 import {
   Button,
   Dialog,
@@ -18,6 +19,7 @@ const Transition = React.forwardRef(function Transition(props, ref) {
 });
 
 export const CreateAlbumDialog = (props) => {
+  const { t } = useTranslation();
   const { open, onClose, formData } = props;
   const [files, setFiles] = React.useState([]);
   const classes = useStyles();
@@ -37,7 +39,7 @@ export const CreateAlbumDialog = (props) => {
       );
     },
     onDropRejected: (rejectedFiles) => {
-      toast.error("Only 10 images allowed!");
+      toast.error(t('album.onlyTenImagesAllowed'));
     },
   });
 

@@ -37,12 +37,15 @@ import Timeline from "./timeline";
 import { TreeImage } from "../../../../types/tree_snapshots";
 import MapTreesModal from "./MapTreesModal";
 import { toast } from "react-toastify";
+import { useTranslation } from "react-i18next";
 import ApiClient from "../../../../api/apiClient/apiClient";
 import { Order } from "../../../../types/common";
 import { getHumanReadableDate, getDashboardUrl } from "../../../../helpers/utils";
 import TreeSearch from "../components/TreeSearch";
 
 export const TreeNew = () => {
+    const { t } = useTranslation();
+    
     const dispatch = useAppDispatch();
     const { getTrees, updateTree, deleteTree, changeTreesPlot }
         = bindActionCreators(treeActionCreators, dispatch);
@@ -204,7 +207,7 @@ export const TreeNew = () => {
         {
             dataIndex: "srNo",
             key: "srNo",
-            title: "Sr. No.",
+            title: t('trees.tableHeaders.srNo'),
             width: 100,
             align: 'center',
             filteredValue: null,
@@ -213,7 +216,7 @@ export const TreeNew = () => {
         {
             dataIndex: "sapling_id",
             key: "sapling_id",
-            title: "Sapling ID",
+            title: t('trees.tableHeaders.saplingId'),
             width: 150,
             align: 'center',
             fixed: getColumnFixed('sapling_id'),
@@ -223,7 +226,7 @@ export const TreeNew = () => {
         {
             dataIndex: "plant_type",
             key: "plant_type",
-            title: "Plant Type",
+            title: t('trees.tableHeaders.plantType'),
             width: 250,
             align: 'center',
             filteredValue: filters['plant_type']?.value || null,
@@ -232,7 +235,7 @@ export const TreeNew = () => {
         {
             dataIndex: "habit",
             key: "habit",
-            title: "habitat",
+            title: t('trees.tableHeaders.habitat'),
             width: 250,
             align: 'center',
             filteredValue: filters['habit']?.value || null,
@@ -241,7 +244,7 @@ export const TreeNew = () => {
         {
             dataIndex: "plot",
             key: "plot",
-            title: "Plot",
+            title: t('trees.tableHeaders.plot'),
             width: 350,
             align: 'center',
             render: (value, record, index) => record?.plot,
@@ -251,7 +254,7 @@ export const TreeNew = () => {
         {
             dataIndex: "tags",
             key: "tags",
-            title: "Tags",
+            title: t('trees.tableHeaders.tags'),
             width: 200,
             align: 'center',
             render: value => value ? value?.join(", ") : '',
@@ -261,7 +264,7 @@ export const TreeNew = () => {
         {
             dataIndex: "mapped_user_name",
             key: "mapped_user_name",
-            title: "Reserved for (Individual)",
+            title: t('trees.tableHeaders.reservedForIndividual'),
             width: 250,
             align: 'center',
             filteredValue: filters['mapped_user_name']?.value || null,
@@ -270,7 +273,7 @@ export const TreeNew = () => {
         {
             dataIndex: "mapped_group_name",
             key: "mapped_group_name",
-            title: "Reserved for (Group)",
+            title: t('trees.tableHeaders.reservedForGroup'),
             width: 250,
             align: 'center',
             filteredValue: filters['mapped_group_name']?.value || null,
@@ -279,7 +282,7 @@ export const TreeNew = () => {
         {
             dataIndex: "sponsor_user_name",
             key: "sponsor_user_name",
-            title: "Sponsored By (Individual)",
+            title: t('trees.tableHeaders.sponsoredByIndividual'),
             width: 250,
             align: 'center',
             filteredValue: filters['sponsor_user_name']?.value || null,
@@ -288,7 +291,7 @@ export const TreeNew = () => {
         {
             dataIndex: "sponsor_group_name",
             key: "sponsor_group_name",
-            title: "Sponsored By (Group)",
+            title: t('trees.tableHeaders.sponsoredByGroup'),
             width: 250,
             align: 'center',
             filteredValue: filters['sponsor_group_name']?.value || null,
@@ -297,7 +300,7 @@ export const TreeNew = () => {
         {
             dataIndex: "assigned_to_name",
             key: "assigned_to_name",
-            title: "Assigned To",
+            title: t('common.tableHeaders.assignedTo'),
             width: 250,
             align: 'center',
             filteredValue: filters['assigned_to_name']?.value || null,
@@ -306,7 +309,7 @@ export const TreeNew = () => {
         {
             dataIndex: "planted_by",
             key: "planted_by",
-            title: "Planted By",
+            title: t('trees.tableHeaders.plantedBy'),
             width: 250,
             align: 'center',
             filteredValue: filters['planted_by']?.value || null,
@@ -315,7 +318,7 @@ export const TreeNew = () => {
         {
             dataIndex: "association_type",
             key: "association_type",
-            title: "Association Type",
+            title: t('trees.tableHeaders.associationType'),
             width: 180,
             align: 'center',
             render: (value, record) => {
@@ -357,7 +360,7 @@ export const TreeNew = () => {
         {
             dataIndex: "request_id",
             key: "request_id",
-            title: "Association Request ID",
+            title: t('trees.tableHeaders.associationRequestId'),
             width: 120,
             align: 'center',
             render: (value, record) => {
@@ -369,7 +372,7 @@ export const TreeNew = () => {
         {
             dataIndex: "mapped_at",
             key: "Reserved on",
-            title: getSortableHeader("Reserved on", "mapped_at"),
+            title: getSortableHeader(t('trees.tableHeaders.reservedOn'), "mapped_at"),
             width: 250,
             align: 'center',
             hidden: true,
@@ -380,7 +383,7 @@ export const TreeNew = () => {
         {
             dataIndex: "assigned_at",
             key: "Assigned on",
-            title: getSortableHeader("Assigned on", "assigned_at"),
+            title: getSortableHeader(t('trees.tableHeaders.assignedOn'), "assigned_at"),
             width: 250,
             align: 'center',
             hidden: true,
@@ -391,7 +394,7 @@ export const TreeNew = () => {
         {
             dataIndex: "created_at",
             key: "Uploaded on",
-            title: getSortableHeader("Uploaded on", "created_at"),
+            title: getSortableHeader(t('trees.tableHeaders.uploadedOn'), "created_at"),
             width: 250,
             align: 'center',
             hidden: true,
@@ -402,7 +405,7 @@ export const TreeNew = () => {
         {
             dataIndex: "tree_status",
             key: "tree_status",
-            title: "Tree Health",
+            title: t('trees.tableHeaders.treeHealth'),
             width: 150,
             align: 'center',
             render: (value, record) => (
@@ -431,7 +434,7 @@ export const TreeNew = () => {
         {
             dataIndex: "deleted_at",
             key: "deleted_at",
-            title: "Deleted On",
+            title: t('trees.tableHeaders.deletedOn'),
             width: 200,
             align: 'center',
             render: (value, record) => (
@@ -446,12 +449,12 @@ export const TreeNew = () => {
                 </span>
             ),
             filteredValue: filters['deleted_at']?.value || null,
-            ...getColumnDateFilter({dataIndex: 'deleted_at', filters, handleSetFilters, label: 'Deleted'})
+            ...getColumnDateFilter({dataIndex: 'deleted_at', filters, handleSetFilters, label: t('trees.tableHeaders.deletedOn')})
         },
         {
             dataIndex: "action",
             key: "action",
-            title: "Actions",
+            title: t('common.tableHeaders.actions'),
             width: 350,
             align: "center",
             filteredValue: null,
@@ -653,7 +656,7 @@ export const TreeNew = () => {
                     padding: "4px 12px",
                 }}
             >
-                <Typography variant="h4" style={{ marginTop: '5px' }}>Trees</Typography>
+                <Typography variant="h4" style={{ marginTop: '5px' }}>{t('trees.title')}</Typography>
                 <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'flex-start', marginBottom: '5px', marginTop: '5px', gap: '10px' }}>
                     <TreeSearch
                         onSearch={(saplingIds) => {
@@ -684,7 +687,7 @@ export const TreeNew = () => {
                         disabled={disabledMapUnMapButton}
                         sx={{ height: 'fit-content' }}
                     >
-                        {(isMapTrees) ? "Reserve Trees" : "Unreserve Trees"}
+                        {(isMapTrees) ? t('trees.actions.reserveTrees') : t('trees.actions.unreserveTrees')}
                     </Button>
                     {/* <UserModal open={isUserModalOpen} handleClose={() => { setIsUserModalOpen(false) }} onSubmit={handleMapTrees} searchUser={searchUsers} /> */}
                     <Button 
@@ -694,7 +697,7 @@ export const TreeNew = () => {
                         disabled={selectedTreeIds.length === 0}
                         sx={{ height: 'fit-content' }}
                     >
-                        Change Plot
+                        {t('trees.actions.changePlot')}
                     </Button>
                 </div>
             </div>
@@ -721,20 +724,20 @@ export const TreeNew = () => {
                         return record.habit === 'Tree' ? 'bg-green' : record.habit === 'Shrub' ? 'bg-cyan' : record.habit === 'Herb' ? 'bg-yellow' : 'bg-red';
                     }}
                     tableRowColoringLabels={[
-                        { className: 'bg-dead-tree', label: 'Dead Tree' }, 
-                        { className: 'bg-deleted-tree', label: 'Deleted Tree' }, 
-                        { className: 'bg-lost-tree', label: 'Lost Tree' }, 
-                        { className: 'bg-green', label: 'Tree' }, 
-                        { className: 'bg-cyan', label: 'Shrub' }, 
-                        { className: 'bg-yellow', label: 'Herb' }, 
-                        { className: 'bg-red', label: 'Unknown' }
+                        { className: 'bg-dead-tree', label: t('trees.statusLabels.deadTree') }, 
+                        { className: 'bg-deleted-tree', label: t('trees.statusLabels.deletedTree') }, 
+                        { className: 'bg-lost-tree', label: t('trees.statusLabels.lostTree') }, 
+                        { className: 'bg-green', label: t('trees.statusLabels.tree') }, 
+                        { className: 'bg-cyan', label: t('trees.statusLabels.shrub') }, 
+                        { className: 'bg-yellow', label: t('trees.statusLabels.herb') }, 
+                        { className: 'bg-red', label: t('trees.statusLabels.unknown') }
                     ]}
-                    tableName="Trees"
+                    tableName={t('trees.tableName')}
                 />
             </Box>
 
             <Dialog open={selectedTreeForTimeline !== null} onClose={() => setSelectedTreeForTimeline(null)} PaperProps={{ sx: { width: '80%', maxWidth: '80%', maxHeight: '80%' } }}>
-                <DialogTitle>Timeline For Sapling {selectedTreeForTimeline?.sapling_id}</DialogTitle>
+                <DialogTitle>{t('trees.dialogs.timeline')} {selectedTreeForTimeline?.sapling_id}</DialogTitle>
                 <DialogContent>
                     <Timeline created_at={selectedTreeForTimeline?.created_at as any} items={treeImages.map(image => ({ date: image.image_date.toString(), status: image.tree_status, image: image.image }))} />
                 </DialogContent>
@@ -756,16 +759,16 @@ export const TreeNew = () => {
             />
 
             <Dialog open={openConfirmation} onClose={() => setOpenConfirmation(false)}>
-                <DialogTitle>Confirm {operation}</DialogTitle>
+                <DialogTitle>{t('trees.dialogs.confirmOperation')} {operation}</DialogTitle>
                 <DialogContent>
                     <DialogContentText>
-                        Do you want to {operation} trees with the sapling ids '
+                        {t('trees.dialogs.doYouWantTo')} {operation} {t('trees.dialogs.treesWithSaplingIds')} '
                         {saplingIds.join(", ")}'?
                     </DialogContentText>
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={() => setOpenConfirmation(false)} color="primary">
-                        Cancel
+                        {t('trees.dialogs.cancel')}
                     </Button>
                     <Button
                         onClick={() => {
@@ -775,22 +778,22 @@ export const TreeNew = () => {
                         }}
                         color="primary"
                         autoFocus>
-                        Yes
+                        {t('trees.dialogs.yes')}
                     </Button>
                 </DialogActions>
             </Dialog>
 
             <Dialog open={openDeleteModal} onClose={() => setOpenDeleteModal(false)}>
-                <DialogTitle>Confirm Delete</DialogTitle>
+                <DialogTitle>{t('trees.dialogs.confirmDelete')}</DialogTitle>
                 <DialogContent>
                     <DialogContentText>
-                        Do you want to delete tree with the sapling id '
+                        {t('trees.dialogs.doYouWantToDelete')} '
                         {deleteRow?.sapling_id}'?
                     </DialogContentText>
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={() => setOpenDeleteModal(false)} color="primary">
-                        Cancel
+                        {t('trees.dialogs.cancel')}
                     </Button>
                     <Button
                         onClick={() => {
@@ -799,20 +802,20 @@ export const TreeNew = () => {
                         }}
                         color="primary"
                         autoFocus>
-                        Yes
+                        {t('trees.dialogs.yes')}
                     </Button>
                 </DialogActions>
             </Dialog>
 
             <Dialog open={changePlotModal} onClose={() => setChangePlotModal(false)} >
-                <DialogTitle>Select a Site</DialogTitle>
+                <DialogTitle>{t('trees.dialogs.selectSite')}</DialogTitle>
                 <DialogContent sx={{ width: 500 }}>
                     <DialogContentText>
-                        This action will change plot for selected Trees.
+                        {t('trees.dialogs.thisActionWillChange')}
                     </DialogContentText>
                     <div style={{ width: 500, marginTop: 5 }}>
                         <AutocompleteWithPagination
-                            label="Select a Plot"
+                            label={t('trees.dialogs.selectPlot')}
                             options={plotsList}
                             getOptionLabel={(option) => option?.name || ''}
                             onChange={(event, newValue) => {
@@ -837,7 +840,7 @@ export const TreeNew = () => {
                         variant="outlined"
                         onClick={() => setChangePlotModal(false)}
                     >
-                        Cancel
+                        {t('trees.dialogs.cancel')}
                     </Button>
                     <Button
                         onClick={() => {
@@ -849,7 +852,7 @@ export const TreeNew = () => {
                         autoFocus
                         disabled={selectedPlot === null}
                     >
-                        Change Plot
+                        {t('trees.dialogs.changePlot')}
                     </Button>
                 </DialogActions>
             </Dialog>

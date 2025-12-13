@@ -33,12 +33,13 @@ import { Site } from "../../../types/site";
 import UpdateCoords from "./UpdateCoords";
 import ApiClient from "../../../api/apiClient/apiClient";
 import GeneralTable from "../../../components/GenTable";
+import { useTranslation } from "react-i18next";
 
 function getColumn(field: string, treeHabitat: string) {
   return field + (treeHabitat ? "_" + treeHabitat : '')
 }
 
-const TableSummary = (plots: Plot[], selectedPlotIds: number[], totalColumns: number, treeHabitat: string) => {
+const TableSummary = (plots: Plot[], selectedPlotIds: number[], totalColumns: number, treeHabitat: string, t: any) => {
 
   const calculateSum = (data: (number | undefined)[]) => {
     return data.reduce((a, b) => (a ?? 0) + (b ?? 0), 0);
@@ -48,7 +49,7 @@ const TableSummary = (plots: Plot[], selectedPlotIds: number[], totalColumns: nu
     <Table.Summary fixed='bottom'>
       <Table.Summary.Row style={{ backgroundColor: 'rgba(172, 252, 172, 0.2)' }}>
         <Table.Summary.Cell align="right" index={totalColumns - 10} colSpan={totalColumns - 8}>
-          <strong>Total</strong>
+          <strong>{t('plots.total')}</strong>
         </Table.Summary.Cell>
         <Table.Summary.Cell align="right" index={totalColumns - 8} colSpan={1}>{calculateSum(plots.filter((plot) => selectedPlotIds.includes(plot.id)).map((plot) => plot.total))}</Table.Summary.Cell>
         <Table.Summary.Cell align="right" index={totalColumns - 7} colSpan={1}>{calculateSum(plots.filter((plot) => selectedPlotIds.includes(plot.id)).map((plot) => plot.tree_count))}</Table.Summary.Cell>
@@ -65,6 +66,7 @@ const TableSummary = (plots: Plot[], selectedPlotIds: number[], totalColumns: nu
 }
 
 export const PlotComponent = () => {
+  const { t } = useTranslation();
   const dispatch = useAppDispatch();
   const { getPlots, createPlot, updatePlot, deletePlot, assignPlotsToSite } = bindActionCreators(
     plotActionCreators,
@@ -204,10 +206,10 @@ export const PlotComponent = () => {
     });
   }
 
-  const accessibilityList = [
-    { value: "accessible", label: "Accessible" },
-    { value: "inaccessible", label: "Inaccessible" },
-    { value: "moderately_accessible", label: "Moderately Accessible" },
+  const accessibilityOptions = [
+    { value: "accessible", label: t('plots.accessible') },
+    { value: "inaccessible", label: t('plots.inaccessible') },
+    { value: "moderately_accessible", label: t('plots.moderatelyAccessible') },
   ];
 
   const handleSortingChange = (sorter: any) => {
@@ -248,7 +250,7 @@ export const PlotComponent = () => {
     {
       dataIndex: "action",
       key: "action",
-      title: "Actions",
+      title: t('plots.actions'),
       width: 150,
       align: "center",
       render: (value, record, index) => (
@@ -281,7 +283,7 @@ export const PlotComponent = () => {
     {
       dataIndex: "name",
       key: "name",
-      title: "Name",
+      title: t('plots.name'),
       align: "center",
       width: 300,
       fixed: "left",
@@ -290,7 +292,7 @@ export const PlotComponent = () => {
     {
       dataIndex: "label",
       key: "label",
-      title: "Plot Label",
+      title: t('plots.plotLabel'),
       align: "center",
       width: 150,
       fixed: "left",
@@ -299,23 +301,23 @@ export const PlotComponent = () => {
     {
       dataIndex: "accessibility_status",
       key: "accessibility_status",
-      title: "Accessibility",
+      title: t('plots.accessibility'),
       align: "center",
       width: 200,
-      render: (value) => value ? accessibilityList.find((item) => item.value === value)?.label : "Unknown",
-      ...getColumnSelectedItemFilter({ dataIndex: 'accessibility_status', filters, handleSetFilters, options: accessibilityList.map((item) => item.label).concat("Unknown") })
+      render: (value) => value ? accessibilityOptions.find((item) => item.value === value)?.label : "Unknown",
+      ...getColumnSelectedItemFilter({ dataIndex: 'accessibility_status', filters, handleSetFilters, options: accessibilityOptions.map((item) => item.label).concat("Unknown") })
     },
     {
       dataIndex: "gat",
       key: "gat",
-      title: "Gat No.",
+      title: t('plots.gatNo'),
       align: "center",
       width: 150,
     },
     {
       dataIndex: "tags",
       key: "tags",
-      title: "Tags",
+      title: t('plots.tags'),
       align: "center",
       width: 150,
       render: (tags) => tags ? tags.join(", ") : '',
@@ -324,7 +326,7 @@ export const PlotComponent = () => {
     {
       dataIndex: "site_name",
       key: "site_name",
-      title: "Site Name",
+      title: t('plots.siteName'),
       align: "center",
       width: 300,
       ...getColumnSearchProps('site_name', filters, handleSetFilters)
@@ -332,7 +334,7 @@ export const PlotComponent = () => {
     {
       dataIndex: "acres_area",
       key: "Area (acres)",
-      title: getSortableHeader("Area (acres)", 'acres_area'),
+      title: getSortableHeader(t('plots.areaAcres'), 'acres_area'),
       align: "right",
       width: 150,
       render: (value: number) => value ? value.toFixed(3) : 'Unknown', 
@@ -340,7 +342,7 @@ export const PlotComponent = () => {
     {
       dataIndex: "pit_count",
       key: "No. of Pits",
-      title: getSortableHeader("No. of Pits", 'pit_count'),
+      title: getSortableHeader(t('plots.noOfPits'), 'pit_count'),
       align: "right",
       width: 150,
       render: (value: number) => value >= 0 ? value : 'Unknown', 
@@ -348,7 +350,7 @@ export const PlotComponent = () => {
     {
       dataIndex: "total",
       key: "Total Trees",
-      title: getSortableHeader("Total Trees", 'total'),
+      title: getSortableHeader(t('plots.totalTrees'), 'total'),
       align: "right",
       width: 150,
       className: treeHabit === '' ? 'bg-orange' : undefined,
@@ -357,7 +359,7 @@ export const PlotComponent = () => {
     {
       dataIndex: "tree_count",
       key: "Trees",
-      title: getSortableHeader("Trees", 'tree_count'),
+      title: getSortableHeader(t('plots.trees'), 'tree_count'),
       align: "right",
       width: 150,
       className: treeHabit === 'trees' ? 'bg-green' : undefined,
@@ -365,7 +367,7 @@ export const PlotComponent = () => {
     {
       dataIndex: "shrub_count",
       key: "Shrubs",
-      title: getSortableHeader("Shrubs", 'shrub_count'),
+      title: getSortableHeader(t('plots.shrubs'), 'shrub_count'),
       align: "right",
       width: 150,
       className: treeHabit === 'shrubs' ? 'bg-cyan' : undefined,
@@ -373,7 +375,7 @@ export const PlotComponent = () => {
     {
       dataIndex: "herb_count",
       key: "Herbs",
-      title: getSortableHeader("Herbs", 'herb_count'),
+      title: getSortableHeader(t('plots.herbs'), 'herb_count'),
       align: "right",
       width: 150,
       className: treeHabit === 'herbs' ? 'bg-yellow' : undefined,
@@ -381,7 +383,7 @@ export const PlotComponent = () => {
     {
       dataIndex: getColumn("booked", treeHabit),
       key: "Booked Trees",
-      title: getSortableHeader("Booked Trees", getColumn("booked", treeHabit)),
+      title: getSortableHeader(t('plots.bookedTrees'), getColumn("booked", treeHabit)),
       align: "right",
       width: 150,
       className: getColumnClass(),
@@ -390,7 +392,7 @@ export const PlotComponent = () => {
     {
       dataIndex: getColumn("assigned", treeHabit),
       key: "Assigned Trees",
-      title: getSortableHeader("Assigned Trees", getColumn("assigned", treeHabit)),
+      title: getSortableHeader(t('plots.assignedTrees'), getColumn("assigned", treeHabit)),
       align: "right",
       width: 150,
       className: getColumnClass(),
@@ -399,7 +401,7 @@ export const PlotComponent = () => {
     {
       dataIndex: getColumn("unbooked_assigned", treeHabit),
       key: "Unfunded Inventory (Assigned)",
-      title: getSortableHeader("Unfunded Inventory (Assigned)", getColumn("unbooked_assigned", treeHabit)),
+      title: getSortableHeader(t('plots.unfundedInventoryAssigned'), getColumn("unbooked_assigned", treeHabit)),
       align: "right",
       width: 150,
       className: getColumnClass(),
@@ -407,7 +409,7 @@ export const PlotComponent = () => {
     {
       dataIndex: getColumn("available", treeHabit),
       key: "Unfunded Inventory (Unassigned)",
-      title: getSortableHeader("Unfunded Inventory (Unassigned)", getColumn("available", treeHabit)),
+      title: getSortableHeader(t('plots.unfundedInventoryUnassigned'), getColumn("available", treeHabit)),
       align: "right",
       width: 150,
       className: getColumnClass(),
@@ -416,7 +418,7 @@ export const PlotComponent = () => {
     {
       dataIndex: getColumn("card_available", treeHabit),
       key: "Giftable Inventory",
-      title: getSortableHeader("Giftable Inventory", getColumn("card_available", treeHabit)),
+      title: getSortableHeader(t('plots.giftableInventory'), getColumn("card_available", treeHabit)),
       align: "right",
       width: 150,
       className: getColumnClass(),
@@ -484,7 +486,7 @@ export const PlotComponent = () => {
           padding: "4px 12px",
         }}
       >
-        <Typography variant="h4" style={{ marginTop: '5px' }}>Plots</Typography>
+        <Typography variant="h4" style={{ marginTop: '5px' }}>{t('plots.plots')}</Typography>
         <div
           style={{
             display: "flex",
@@ -498,7 +500,7 @@ export const PlotComponent = () => {
             onClick={() => setUpdateCoords(true)}
             style={{ marginRight: "10px" }}
           >
-            Update Coordinates
+            {t('plots.updateCoordinates')}
           </Button>
           <Button
             variant="contained"
@@ -507,13 +509,13 @@ export const PlotComponent = () => {
             style={{ marginRight: "10px" }}
             disabled={selectedPlotIds.length === 0}
           >
-            Assign to Site
+            {t('plots.assignToSite')}
           </Button>
           <Button
             variant="contained"
             color="success"
             onClick={handleModalOpen}>
-            Add Plot
+            {t('plots.addPlot')}
           </Button>
           <AddPlot
             open={open}
@@ -534,7 +536,7 @@ export const PlotComponent = () => {
         >
           <Segmented<{ value: 'trees' | 'herbs' | 'shrubs' | '', label: string }>
             size="large"
-            options={[{ value: 'trees', label: 'Trees' }, { value: 'shrubs', label: 'Shrubs' }, { value: 'herbs', label: 'Herbs' }, { value: '', label: 'Total' }]}
+            options={[{ value: 'trees', label: t('plots.trees') }, { value: 'shrubs', label: t('plots.shrubs') }, { value: 'herbs', label: t('plots.herbs') }, { value: '', label: t('plots.total') }]}
             onChange={(item: any) => {
               setTreeHabit(item)
             }}
@@ -542,7 +544,7 @@ export const PlotComponent = () => {
           <FormControlLabel
             sx={{ ml: 2 }}
             control={<Checkbox checked={includeDeadLostTrees} onChange={() => setIncludeDeadLostTrees(!includeDeadLostTrees)} />}
-            label="Include Dead/Lost Trees"
+            label={t('plots.includeDeadLostTrees')}
           />
         </div>
         <GeneralTable
@@ -557,7 +559,7 @@ export const PlotComponent = () => {
           onDownload={handleDownload}
           summary={(totalColumns: number) => {
             if (totalColumns < 5) return undefined;
-            return TableSummary(tableRows, selectedPlotIds, totalColumns, treeHabit)
+            return TableSummary(tableRows, selectedPlotIds, totalColumns, treeHabit, t)
           }}
           footer
           tableName="Plots"
@@ -572,21 +574,21 @@ export const PlotComponent = () => {
           marginTop: 30,
         }}
       >
-        <Typography variant="h4">Unreserve Trees</Typography>
+        <Typography variant="h4">{t('plots.unreserveTrees')}</Typography>
       </div>
       <Divider sx={{ backgroundColor: "black", marginBottom: '15px' }} />
       <Forms />
 
       <Dialog open={openDeleteModal} onClose={() => setOpenDeleteModal(false)}>
-        <DialogTitle>Confirm Delete</DialogTitle>
+        <DialogTitle>{t('plots.confirmDelete')}</DialogTitle>
         <DialogContent>
           <DialogContentText>
-            Do you want to delete "{selectedItem?.name}"?
+            {t('plots.deleteConfirmation', { plotName: selectedItem?.name })}
           </DialogContentText>
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setOpenDeleteModal(false)}>
-            Cancel
+            {t('common.cancel')}
           </Button>
           <Button
             onClick={() => {
@@ -599,20 +601,20 @@ export const PlotComponent = () => {
             color="error"
             variant="outlined"
             autoFocus>
-            Yes
+            {t('common.yes')}
           </Button>
         </DialogActions>
       </Dialog>
 
       <Dialog open={selectSiteModal} onClose={() => setSelectSiteModal(false)} >
-        <DialogTitle>Select a Site</DialogTitle>
+        <DialogTitle>{t('plots.selectSite')}</DialogTitle>
         <DialogContent sx={{ width: 500 }}>
           <DialogContentText>
-            Selected plots will be assigned to this site.
+            {t('plots.selectSiteDescription')}
           </DialogContentText>
           <div style={{ width: 500, marginTop: 5 }}>
             <AutocompleteWithPagination
-              label="Select a Site"
+              label={t('plots.selectSite')}
               options={sitesList}
               getOptionLabel={(option) => option?.name_english || ''}
               onChange={(event, newValue) => {
@@ -637,7 +639,7 @@ export const PlotComponent = () => {
             variant="outlined"
             onClick={() => setSelectSiteModal(false)}
           >
-            Cancel
+            {t('common.cancel')}
           </Button>
           <Button
             onClick={() => {
@@ -649,7 +651,7 @@ export const PlotComponent = () => {
             autoFocus
             disabled={selectedSite === null}
           >
-            Assign
+            {t('plots.assign')}
           </Button>
         </DialogActions>
       </Dialog>

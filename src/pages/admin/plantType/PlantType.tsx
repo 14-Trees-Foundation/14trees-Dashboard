@@ -30,9 +30,11 @@ import { plantTypeHabitList } from "./habitList";
 import { PlotPlantTypes } from "./PlotPlantTypes";
 import PlantTypeTemplateForm from "./PlantTypeTemplateForm";
 import ApiClient from "../../../api/apiClient/apiClient";
+import { useTranslation } from "react-i18next";
 
 
 export const PlantTypeComponent = () => {
+    const { t } = useTranslation();
     const dispatch = useAppDispatch();
     const { getPlantTypes, createPlantType, updatePlantType, deletePlantType } =
         bindActionCreators(plantTypeActionCreators, dispatch);
@@ -66,7 +68,7 @@ export const PlantTypeComponent = () => {
         {
             dataIndex: "srNo",
             key: "srNo",
-            title: "Sr. No.",
+            title: t('plantTypes.tableHeaders.srNo'),
             width: 100,
             align: "center",
             render: (value, record, index) => `${index + 1 + srNoPage * pageSize}.`
@@ -74,7 +76,7 @@ export const PlantTypeComponent = () => {
         {
             dataIndex: "action",
             key: "action",
-            title: "Actions",
+            title: t('common.tableHeaders.actions'),
             align: "center",
             width: 160,
             render: (value, record, index) => (
@@ -107,7 +109,7 @@ export const PlantTypeComponent = () => {
         {
             dataIndex: "plant_type_id",
             key: "plant_type_id",
-            title: "Plant Type ID",
+            title: t('plantTypes.tableHeaders.plantTypeId'),
             width: 170,
             align: "center",
             fixed: "left",
@@ -116,7 +118,7 @@ export const PlantTypeComponent = () => {
         {
             dataIndex: "name",
             key: "name",
-            title: "Name",
+            title: t('common.tableHeaders.name'),
             width: 250,
             align: "center",
             fixed: "left",
@@ -125,7 +127,7 @@ export const PlantTypeComponent = () => {
         {
             dataIndex: "english_name",
             key: "english_name",
-            title: "Name (English)",
+            title: t('plantTypes.tableHeaders.englishName'),
             width: 250,
             align: "center",
             ...getColumnSearchProps('english_name', filters, handleSetFilters)
@@ -133,7 +135,7 @@ export const PlantTypeComponent = () => {
         {
             dataIndex: "common_name_in_english",
             key: "common_name_in_english",
-            title: "Common Name in English",
+            title: t('plantTypes.tableHeaders.commonNameEnglish'),
             width: 250,
             align: "center",
             ...getColumnSearchProps('common_name_in_english', filters, handleSetFilters)
@@ -141,7 +143,7 @@ export const PlantTypeComponent = () => {
         {
             dataIndex: "common_name_in_marathi",
             key: "common_name_in_marathi",
-            title: "Common Name in Marathi",
+            title: t('plantTypes.tableHeaders.commonNameMarathi'),
             width: 250,
             align: "center",
             ...getColumnSearchProps('common_name_in_marathi', filters, handleSetFilters)
@@ -149,7 +151,7 @@ export const PlantTypeComponent = () => {
         {
             dataIndex: "scientific_name",
             key: "scientific_name",
-            title: "Scientific Name",
+            title: t('plantTypes.tableHeaders.scientificName'),
             width: 250,
             align: "center",
             ...getColumnSearchProps('scientific_name', filters, handleSetFilters)
@@ -157,7 +159,7 @@ export const PlantTypeComponent = () => {
         {
             dataIndex: "known_as",
             key: "known_as",
-            title: "Known As",
+            title: t('plantTypes.tableHeaders.knownAs'),
             width: 250,
             align: "center",
             ...getColumnSearchProps('known_as', filters, handleSetFilters)
@@ -165,7 +167,7 @@ export const PlantTypeComponent = () => {
         {
             dataIndex: "category",
             key: "category",
-            title: "Category",
+            title: t('common.tableHeaders.category'),
             width: 250,
             align: "center",
             ...getColumnSearchProps('category', filters, handleSetFilters)
@@ -173,7 +175,7 @@ export const PlantTypeComponent = () => {
         {
             dataIndex: "tags",
             key: "tags",
-            title: "Tags",
+            title: t('plantTypes.tableHeaders.tags'),
             width: 250,
             align: "center",
             render: (tags) => tags ? tags.join(", ") : '',
@@ -182,7 +184,7 @@ export const PlantTypeComponent = () => {
         {
             dataIndex: "use",
             key: "use",
-            title: "Use",
+            title: t('plantTypes.tableHeaders.use'),
             width: 250,
             align: "center",
             ...getColumnSearchProps('use', filters, handleSetFilters)
@@ -190,7 +192,7 @@ export const PlantTypeComponent = () => {
         {
             dataIndex: "images",
             key: "images",
-            title: "Images",
+            title: t('plantTypes.tableHeaders.images'),
             width: 250,
             align: "center",
             render: (value) => {
@@ -217,7 +219,7 @@ export const PlantTypeComponent = () => {
         {
             dataIndex: "habit",
             key: "habit",
-            title: "Habit",
+            title: t('plantTypes.tableHeaders.habit'),
             width: 200,
             align: "center",
             ...getColumnSelectedItemFilter({ dataIndex: 'habit', filters, handleSetFilters, options: plantTypeHabitList })
@@ -309,7 +311,7 @@ export const PlantTypeComponent = () => {
                     padding: "4px 12px",
                 }}
             >
-                <Typography variant="h4" style={{ marginTop: '5px' }}>Plant Types</Typography>
+                <Typography variant="h4" style={{ marginTop: '5px' }}>{t('plantTypes.title')}</Typography>
                 <div
                     style={{
                         display: "flex",
@@ -323,10 +325,10 @@ export const PlantTypeComponent = () => {
                         onClick={() => { setAddTemplate(true); }}
                         style={{ textTransform: 'none', marginRight: '10px' }}
                     >
-                        Add Plant Type Card Template
+                        {t('plantTypes.addPlantTypeCardTemplate')}
                     </Button>
                     <Button variant="contained" color="success" onClick={handleModalOpen}>
-                        Add Plant type
+                        {t('plantTypes.addPlantType')}
                     </Button>
                     <AddPlantType
                         open={open}
@@ -347,7 +349,7 @@ export const PlantTypeComponent = () => {
               onPaginationChange={handlePaginationChange}
               onDownload={getAllPlantTypesData}
               footer
-              tableName="Plant Types"
+              tableName={t('plantTypes.title')}
                 />
             </Box>
 
@@ -355,15 +357,15 @@ export const PlantTypeComponent = () => {
             <PlotPlantTypes />
 
             <Dialog open={openDeleteModal} onClose={() => setOpenDeleteModal(false)}>
-                <DialogTitle>Confirm Delete</DialogTitle>
+                <DialogTitle>{t('common.confirmations.confirmDelete')}</DialogTitle>
                 <DialogContent>
                     <DialogContentText>
-                        Do you want to delete {selectedItem?.name}?
+                        {t('common.confirmations.deleteConfirmation')} {selectedItem?.name}?
                     </DialogContentText>
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={() => setOpenDeleteModal(false)} color="primary">
-                        Cancel
+                        {t('common.cancel')}
                     </Button>
                     <Button
                         onClick={() => {
@@ -376,7 +378,7 @@ export const PlantTypeComponent = () => {
                         color="error"
                         variant="outlined"
                         autoFocus>
-                        Yes
+                        {t('common.yes')}
                     </Button>
                 </DialogActions>
             </Dialog>

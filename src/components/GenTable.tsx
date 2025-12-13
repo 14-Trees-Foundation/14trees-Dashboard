@@ -8,6 +8,7 @@ import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { toast } from 'react-toastify';
 import { Resizable } from "react-resizable";
 import ColumnPreferences from './ColumnPreferences';
+import { useTranslation } from 'react-i18next';
 import './GenTable.css'
 
 interface GeneralTableProps {
@@ -73,6 +74,7 @@ const ResizableTitle = (props: any) => {
 };
 
 function GeneralTable({ loading, rows, columns, totalRecords, page, pageSize = 10, footer, fullHeight, tableName, scroll, onDownload, onSelectionChanges, onPaginationChange, summary, rowClassName, expandable, sequenceOrdering }: GeneralTableProps) {
+    const { t } = useTranslation();
 
     const [checkedList, setCheckedList] = useState(columns?.filter(item => !item.hidden)?.map((item) => item.key) ?? []);
     const [tableCols, setTableCols] = useState<any[]>([]);
@@ -328,11 +330,11 @@ function GeneralTable({ loading, rows, columns, totalRecords, page, pageSize = 1
                         onColumnVisibilityChange={handleColumnVisibilityChange}
                     />
                     <Divider orientation="vertical" flexItem sx={{ backgroundColor: "black", marginRight: '10px', }} />
-                    <div style={{ marginRight: '10px', display: 'flex', alignItems: 'center' }}><strong>Export table data in a csv file:</strong></div>
+                    <div style={{ marginRight: '10px', display: 'flex', alignItems: 'center' }}><strong>{t('common.exportTableData')}</strong></div>
                     <Button
                         color="success"
                         variant='contained'
-                        onClick={handleDataSourceParse}>Export</Button>
+                        onClick={handleDataSourceParse}>{t('common.export')}</Button>
                     <div></div>
                 </div>
             ) : undefined}

@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useTranslation } from 'react-i18next';
 import { User } from "../../../../types/user";
 import { toast } from "react-toastify";
 import { Button, Dialog, DialogTitle } from "@mui/material";
@@ -25,6 +26,7 @@ interface DonationFormProps {
 }
 
 const DonationForm: React.FC<DonationFormProps> = ({ donation, open, requestId, handleClose, onSubmit }) => {
+    const { t } = useTranslation();
 
     const [currentStep, setCurrentStep] = useState(0);
     const [user, setUser] = useState<User | null>(null);
@@ -69,7 +71,7 @@ const DonationForm: React.FC<DonationFormProps> = ({ donation, open, requestId, 
                 if (userResp.results.length === 1) setUser(userResp.results[0]);
             } catch (error) {
                 console.error("Failed to fetch user data:", error);
-                toast.error("Error loading user data");
+                toast.error(t('errors.errorLoadingUserData'));
             }
 
             if (donation.group_id) {
@@ -82,7 +84,7 @@ const DonationForm: React.FC<DonationFormProps> = ({ donation, open, requestId, 
                     }
                 } catch (error) {
                     console.error("Failed to fetch group data:", error);
-                    toast.error("Error loading group data, but you can continue editing");
+                    toast.error(t('errors.errorLoadingGroupData'));
                     // Set group to null so form can still work
                     setGroup(null);
                 }

@@ -29,6 +29,7 @@ import TableComponent from "../../../../components/Table";
 import GeneralTable from "../../../../components/GenTable";
 import ApiClient from "../../../../api/apiClient/apiClient";
 import getColumnSearchProps, { getColumnSelectedItemFilter } from "../../../../components/Filter";
+import { useTranslation } from "react-i18next";
 
 function getCapacity(pond: any) {
     return (
@@ -43,6 +44,7 @@ interface PondComponentInputProps {
 }
 
 export const PondComponent = ({ setSelectedPond }: PondComponentInputProps) => {
+    const { t } = useTranslation();
     const dispatch = useAppDispatch();
     const { getPonds, createPond, updatePond, deletePond } = bindActionCreators(
         pondActionCreators,
@@ -94,7 +96,7 @@ export const PondComponent = ({ setSelectedPond }: PondComponentInputProps) => {
         {
             dataIndex: "action",
             key: "action",
-            title: "Actions",
+            title: t('common.tableHeaders.actions'),
             width: 250,
             align: "center",
             render: (value, record, index )=> (
@@ -138,7 +140,7 @@ export const PondComponent = ({ setSelectedPond }: PondComponentInputProps) => {
         {
           dataIndex: "name",
           key: "name",
-          title: "Name",
+          title: t('common.tableHeaders.name'),
           align: "center",
           width: 300,
           ...getColumnSearchProps('name', filters, handleSetFilters)
@@ -146,7 +148,7 @@ export const PondComponent = ({ setSelectedPond }: PondComponentInputProps) => {
         {
             dataIndex: "type",
             key: "type",
-            title: "Type",
+            title: t('common.tableHeaders.type'),
             width: 150,
             align: "center",
             ...getColumnSelectedItemFilter({ dataIndex: 'type', filters, handleSetFilters, options: typesList }),
@@ -154,7 +156,7 @@ export const PondComponent = ({ setSelectedPond }: PondComponentInputProps) => {
         {
             dataIndex: "site_name",
             key: "site_name",
-            title: "Site Name",
+            title: t('ponds.tableHeaders.siteName'),
             width: 350,
             align: "center",
             ...getColumnSearchProps( 'site_name', filters, handleSetFilters ),
@@ -162,28 +164,28 @@ export const PondComponent = ({ setSelectedPond }: PondComponentInputProps) => {
         {
             dataIndex: "length_ft",
             key: "length_ft",
-            title: "Length (Ft)",
+            title: t('ponds.tableHeaders.lengthFt'),
             width: 150,
             align: "center",
         },
         {
             dataIndex: "width_ft",
             key: "width_ft",
-            title: "Width (Ft)",
+            title: t('ponds.tableHeaders.widthFt'),
             width: 150,
             align: "center",
         },
         {
             dataIndex: "depth_ft",
             key: "depth_ft",
-            title: "Depth (Ft)",
+            title: t('ponds.tableHeaders.depthFt'),
             width: 150,
             align: "center",
         },
         {
             dataIndex: "capacity",
             key: "capacity",
-            title: "Pond Capacity",
+            title: t('ponds.tableHeaders.pondCapacity'),
             width: 150,
             align: "center",
             render: (value, record, index) => getCapacity(record),
@@ -191,7 +193,7 @@ export const PondComponent = ({ setSelectedPond }: PondComponentInputProps) => {
         {
             dataIndex: "created_at",
             key: "created_at",
-            title: "Created At",
+            title: t('ponds.tableHeaders.createdAt'),
             width: 150,
             align: "center",
             render: getFormattedDate,
@@ -277,7 +279,7 @@ export const PondComponent = ({ setSelectedPond }: PondComponentInputProps) => {
                     padding: "4px 12px",
                 }}
             >
-                <Typography variant="h4" style={{ marginTop: '5px' }}>Ponds</Typography>
+                <Typography variant="h4" style={{ marginTop: '5px' }}>{t('ponds.title')}</Typography>
                 <div
                     style={{
                         display: "flex",
@@ -289,7 +291,7 @@ export const PondComponent = ({ setSelectedPond }: PondComponentInputProps) => {
                         variant="contained" 
                         color="success" 
                         onClick={handleModalOpen}>
-                        Add Pond
+                        {t('ponds.addPond')}
                     </Button>
                     <AddPond
                         open={open}
@@ -311,20 +313,20 @@ export const PondComponent = ({ setSelectedPond }: PondComponentInputProps) => {
               onPaginationChange={handlePaginationChange}
               onDownload={getAllPondsData}
               footer
-              tableName="Ponds"
+              tableName={t('ponds.title')}
                 />
             </Box>
 
             <Dialog open={openDeleteModal} onClose={() => setOpenDeleteModal(false)}>
-                <DialogTitle>Confirm Delete</DialogTitle>
+                <DialogTitle>{t('common.confirmations.confirmDelete')}</DialogTitle>
                 <DialogContent>
                     <DialogContentText>
-                        Do you want to delete "{selectedItem?.name}"?
+                        {t('common.confirmations.deleteConfirmation')} "{selectedItem?.name}"?
                     </DialogContentText>
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={() => setOpenDeleteModal(false)} color="primary">
-                        Cancel
+                        {t('common.cancel')}
                     </Button>
                     <Button
                         onClick={() => {
@@ -336,7 +338,7 @@ export const PondComponent = ({ setSelectedPond }: PondComponentInputProps) => {
                         }}
                         color="primary"
                         autoFocus>
-                        Yes
+                        {t('common.yes')}
                     </Button>
                 </DialogActions>
             </Dialog>

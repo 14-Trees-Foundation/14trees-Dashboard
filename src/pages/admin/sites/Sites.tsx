@@ -32,9 +32,11 @@ import { SiteMap } from "./components/SiteMap";
 import { getFormattedDate } from "../../../helpers/utils";
 import ApiClient from "../../../api/apiClient/apiClient";
 import { LoadingButton } from "@mui/lab";
+import { useTranslation } from "react-i18next";
 
 
 export const SitesComponent = () => {
+  const { t } = useTranslation();
   const dispatch = useAppDispatch();
   const { getSites, createSite, updateSite, deleteSite } = bindActionCreators(
     siteActionCreators,
@@ -202,7 +204,7 @@ const getAllSitesData = async () => {
     {
       dataIndex: "name_marathi",
       key: "name_marathi",
-      title: "Name (Marathi)",
+      title: t('sites.nameMarathi'),
       width: 220,
       align: "center",
       fixed: "left",
@@ -211,7 +213,7 @@ const getAllSitesData = async () => {
     {
       dataIndex: "name_english",
       key: "name_english",
-      title: "Name (English)",
+      title: t('sites.nameEnglish'),
       width: 220,
       align: "center",
       fixed: "left",
@@ -220,7 +222,7 @@ const getAllSitesData = async () => {
     {
       dataIndex: "owner",
       key: "owner",
-      title: "Owner",
+      title: t('sites.owner'),
       width: 180,
       align: "center",
       ...getColumnSearchProps("owner", filters, handleSetFilters),
@@ -228,7 +230,7 @@ const getAllSitesData = async () => {
     {
       dataIndex: "maintenance_type",
       key: "maintenance_type",
-      title: "Service Type",
+      title: t('sites.serviceType'),
       width: 180,
       align: "center",
       ...getColumnSearchProps("maintenance_type", filters, handleSetFilters),
@@ -237,7 +239,7 @@ const getAllSitesData = async () => {
     {
       dataIndex: "land_type",
       key: "land_type",
-      title: "Land Type",
+      title: t('sites.landType'),
       width: 150,
       align: "center",
       ...getColumnSearchProps("land_type", filters, handleSetFilters),
@@ -245,7 +247,7 @@ const getAllSitesData = async () => {
     {
       dataIndex: "category",
       key: "category",
-      title: "Site Type",
+      title: t('sites.siteType'),
       width: 150,
       align: "center",
       ...getColumnSelectedItemFilter({dataIndex: "category", filters, handleSetFilters, options: siteCategories}),
@@ -253,7 +255,7 @@ const getAllSitesData = async () => {
     {
       dataIndex: "district",
       key: "district",
-      title: "District",
+      title: t('sites.district'),
       width: 150,
       align: "center",
       ...getColumnSearchProps("district", filters, handleSetFilters),
@@ -261,7 +263,7 @@ const getAllSitesData = async () => {
     {
       dataIndex: "taluka",
       key: "taluka",
-      title: "Taluka",
+      title: t('sites.taluka'),
       width: 150,
       align: "center",
       ...getColumnSearchProps("taluka", filters, handleSetFilters),
@@ -269,7 +271,7 @@ const getAllSitesData = async () => {
     {
       dataIndex: "village",
       key: "village",
-      title: "Village",
+      title: t('sites.village'),
       width: 150,
       align: "center",
       ...getColumnSearchProps("village", filters, handleSetFilters),
@@ -277,39 +279,39 @@ const getAllSitesData = async () => {
     {
       dataIndex: "area_acres",
       key: "area_acres",
-      title: "Area (Acres)",
+      title: t('sites.areaAcres'),
       width: 150,
       align: "center",
     },
     {
       dataIndex: "kml_file_link",
       key: "kml_file_link",
-      title: "Kml File",
+      title: t('sites.kmlFile'),
       width: 150,
       align: "center",
       render: (value, record, index) => {
-        return value ? <Button variant="outlined" color="success"><a href={value} download={record.name_english + '.kml'} style={{ textTransform: 'none', color: 'inherit' }}>Download</a></Button> : 'Not Available'
+        return value ? <Button variant="outlined" color="success"><a href={value} download={record.name_english + '.kml'} style={{ textTransform: 'none', color: 'inherit' }}>{t('sites.download')}</a></Button> : t('sites.notAvailable')
       },
       ...getColumnSearchProps("kml_file_link", filters, handleSetFilters),
     },
     {
       dataIndex: "length_km",
       key: "length_km",
-      title: "Length (Km)",
+      title: t('sites.lengthKm'),
       width: 150,
       align: "center",
     },
     {
       dataIndex: "tags",
       key: "tags",
-      title: "Tags",
+      title: t('sites.tags'),
       width: 150,
       align: "center",
     },
     {
       dataIndex: "grove_type",
       key: "grove_type",
-      title: "Grove Type",
+      title: t('sites.groveType'),
       width: 180,
       align: "center",
     },
@@ -325,7 +327,7 @@ const getAllSitesData = async () => {
           padding: "4px 12px",
         }}
       >
-        <Typography variant="h4" style={{ marginTop: '5px' }}>Sites</Typography>
+        <Typography variant="h4" style={{ marginTop: '5px' }}>{t('sites.sites')}</Typography>
         <div
           style={{
             display: "flex",
@@ -342,10 +344,10 @@ const getAllSitesData = async () => {
             startIcon={<SaveIcon />}
             style={{ marginRight: "10px" }}
           >
-            Sync Notion Sites
+            {t('sites.syncNotionSites')}
           </LoadingButton>
           <Button disabled variant="contained" color="success" onClick={handleModalOpen}>
-            Add Site
+            {t('sites.addSite')}
           </Button>
           <AddSite
             open={open}
@@ -373,15 +375,15 @@ const getAllSitesData = async () => {
 
 
       <Dialog open={openDeleteModal} onClose={() => setOpenDeleteModal(false)}>
-        <DialogTitle>Confirm Delete</DialogTitle>
+        <DialogTitle>{t('sites.confirmDelete')}</DialogTitle>
         <DialogContent>
           <DialogContentText>
-            Do you want to delete '{selectedItem?.name_english}'?
+            {t('sites.deleteConfirmation', { siteName: selectedItem?.name_english })}
           </DialogContentText>
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setOpenDeleteModal(false)} color="primary">
-            Cancel
+            {t('common.cancel')}
           </Button>
           <Button
             onClick={() => {
@@ -393,7 +395,7 @@ const getAllSitesData = async () => {
             color="primary"
             autoFocus
           >
-            Yes
+            {t('common.yes')}
           </Button>
         </DialogActions>
       </Dialog>

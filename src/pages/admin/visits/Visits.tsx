@@ -42,9 +42,11 @@ import { getHumanReadableDate } from "../../../helpers/utils";
 import VisitForm from "./VisitForm";
 import ImageGridModal from "../../../components/ImagesGrid";
 import ApiClient from "../../../api/apiClient/apiClient";
+import { useTranslation } from "react-i18next";
 
 
 export const VisitsComponent = () => {
+  const { t } = useTranslation();
   const dispatch = useAppDispatch();
   const { getVisits, createVisit, updateVisit, deleteVisit } = bindActionCreators(
     visitActionCreators,
@@ -154,7 +156,7 @@ export const VisitsComponent = () => {
     {
       dataIndex: "visit_name",
       key: "visit_name",
-      title: "Visit Name",
+      title: t('visits.tableHeaders.visitor'),
       width: 320,
       align: "center",
       fixed: 'left',
@@ -163,7 +165,7 @@ export const VisitsComponent = () => {
     {
       dataIndex: "visit_date",
       key: "visit_date",
-      title: "Visit Date",
+      title: t('common.tableHeaders.date'),
       width: 220,
       align: "center",
       render: getHumanReadableDate,
@@ -172,7 +174,7 @@ export const VisitsComponent = () => {
     {
       dataIndex: "visit_type",
       key: "visit_type",
-      title: "Visit Type",
+      title: t('common.type'),
       width: 220,
       align: "center",
       render: getVisitType,
@@ -181,7 +183,7 @@ export const VisitsComponent = () => {
     {
       dataIndex: "site_name",
       key: "site_name",
-      title: "Site Name",
+      title: t('visits.tableHeaders.site'),
       width: 320,
       align: "center",
       ...getColumnSearchProps("site_name", filters, handleSetFilters),
@@ -233,7 +235,7 @@ export const VisitsComponent = () => {
     {
       dataIndex: "action",
       key: "action",
-      title: "Actions",
+      title: t('common.tableHeaders.actions'),
       width: 250,
       align: "center",
       render: (value, record, index) => (
@@ -286,7 +288,7 @@ export const VisitsComponent = () => {
           padding: "4px 12px",
         }}
       >
-        <Typography variant="h4" style={{ marginTop: '5px' }}>Visits</Typography>
+        <Typography variant="h4" style={{ marginTop: '5px' }}>{t('visits.title')}</Typography>
         <div
           style={{
             display: "flex",
@@ -295,7 +297,7 @@ export const VisitsComponent = () => {
             marginTop: "5px",
           }}>
           <Button variant="contained" color="success" onClick={handleModalOpen}>
-            Add Visit
+            {t('visits.addVisit')}
           </Button>
           <VisitForm
             mode={"add"}
@@ -319,7 +321,7 @@ export const VisitsComponent = () => {
          onPaginationChange={handlePaginationChange}
          onDownload={getAllVisitsData}
          footer
-         tableName="Visits"
+         tableName={t('visits.title')}
         />
       </Box>
       {selectedVisit && <VisitUsers selectedVisit={selectedVisit}/>}
@@ -331,15 +333,15 @@ export const VisitsComponent = () => {
       />}
 
       <Dialog open={openDeleteModal} onClose={() => setOpenDeleteModal(false)}>
-        <DialogTitle>Confirm Delete</DialogTitle>
+        <DialogTitle>{t('common.confirmations.confirmDelete')}</DialogTitle>
         <DialogContent>
           <DialogContentText>
-            Do you want to delete '{selectedItem?.visit_name}'?
+            {t('common.confirmations.deleteConfirmation')} {selectedItem?.visit_name}?
           </DialogContentText>
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setOpenDeleteModal(false)} color="primary">
-            Cancel
+            {t('common.cancel')}
           </Button>
           <Button
             onClick={() => {
@@ -351,7 +353,7 @@ export const VisitsComponent = () => {
             color="primary"
             autoFocus
           >
-            Yes
+            {t('common.yes')}
           </Button>
         </DialogActions>
       </Dialog>

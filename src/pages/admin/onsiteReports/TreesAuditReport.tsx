@@ -1,6 +1,7 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import Box from "@mui/material/Box";
 import { Typography, Divider } from "@mui/material";
+import { useTranslation } from "react-i18next";
 import { GridFilterItem } from "@mui/x-data-grid";
 import type { TableColumnsType } from 'antd';
 import getColumnSearchProps, { getColumnDateFilter, getSortIcon } from "../../../components/Filter";
@@ -11,6 +12,7 @@ import { Order } from "../../../types/common";
 import { fetchTreesAuditReport } from "./treeAuditReportService";
 
 export const TreesAuditReport = () => {
+  const { t } = useTranslation();
   const [loading, setLoading] = useState(false);
   const [page, setPage] = useState(0);
   const [pageSize, setPageSize] = useState(10);
@@ -109,7 +111,7 @@ export const TreesAuditReport = () => {
     {
       dataIndex: "audit_date",
       key: "audit_date",
-      title: getSortableHeader("Audit Date", "audit_date"),
+      title: getSortableHeader(t('onsiteReports.tableHeaders.auditDate'), "audit_date"),
       align: "center",
       width: 150,
       render: (value: string) => getFormattedDate(value),
@@ -119,7 +121,7 @@ export const TreesAuditReport = () => {
     {
       dataIndex: "user_name",
       key: "user_name",
-      title: "Field Staff",
+      title: t('onsiteReports.tableHeaders.fieldStaff'),
       align: "center",
       width: 200,
       filteredValue: filters['user_name']?.value || null,
@@ -128,7 +130,7 @@ export const TreesAuditReport = () => {
     {
       dataIndex: "plot_name",
       key: "plot_name",
-      title: "Plot Name",
+      title: t('common.tableHeaders.plotName'),
       align: "center",
       width: 200,
       filteredValue: filters['plot_name']?.value || null,
@@ -137,7 +139,7 @@ export const TreesAuditReport = () => {
     {
       dataIndex: "site_name",
       key: "site_name",
-      title: "Site Name",
+      title: t('common.tableHeaders.siteName'),
       align: "center",
       width: 200,
       filteredValue: filters['site_name']?.value || null,
@@ -146,7 +148,7 @@ export const TreesAuditReport = () => {
     {
       dataIndex: "trees_audited",
       key: "trees_audited",
-      title: getSortableHeader("Trees Audited", "trees_audited"),
+      title: getSortableHeader(t('onsiteReports.tableHeaders.treesAudited'), "trees_audited"),
       align: "center",
       width: 150,
       filteredValue: filters['trees_audited']?.value || null,
@@ -163,7 +165,7 @@ export const TreesAuditReport = () => {
           padding: "4px 12px",
         }}
       >
-        <Typography variant="h6" style={{ marginTop: '5px' }}>Tree Audit Reports</Typography>
+        <Typography variant="h6" style={{ marginTop: '5px' }}>{t('onsiteReports.treeAuditReports')}</Typography>
       </div>
       <Divider sx={{ backgroundColor: "black", marginBottom: '15px' }} />
       <Box sx={{ height: 840, width: "100%" }}>
@@ -177,7 +179,7 @@ export const TreesAuditReport = () => {
           onPaginationChange={handlePaginationChange}
           onDownload={getAllTreesAuditReportData}
           footer
-          tableName="Trees Audit Report"
+          tableName={t('onsiteReports.treeAuditReports')}
           scroll={{ x: 1000 }}
         />
       </Box>

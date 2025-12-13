@@ -12,7 +12,7 @@ import { makeServer } from "./mockServer/server";
 import { RecoilRoot } from "recoil";
 import {Provider} from 'react-redux';
 import { store } from "./redux/store/store";
-import { ConfigProvider } from 'antd'
+import { LocaleProvider } from './components/LocaleProvider';
 
 // Import i18n configuration
 import "./i18n";
@@ -25,51 +25,17 @@ if (import.meta.env.VITE_USE_MOCK_SERVER === "true") {
 
 ReactDOM.render(
   <React.StrictMode>
-    <ConfigProvider
-    theme={{
-      token: {
-        // Seed Token
-        colorPrimary: '#00b96b',
-        borderRadius: 5,
-
-        // Alias Token
-        colorBgContainer: '#B9C0AB1C',
-      },
-      components: {
-        Button: {
-          colorPrimary: '#000000',
-          colorBgContainer: '#9BC53D',
-          algorithm: true,
-          borderRadius: 4,
-        },
-        Select: {
-          colorPrimary: '#cef0d6',
-          algorithm: true,
-          borderRadius: 3
-        },
-        Input: {
-          colorPrimary: '#cef0d6',
-          algorithm: true,
-          borderRadius: 3
-        },
-        Segmented: {
-          itemActiveBg: '#e3e3e3bf',
-          itemSelectedBg: '#8fcf9f7a',
-          itemHoverBg: '#b7edc47a',
-        },
-      }
-    }}
-    >
-    <BrowserRouter future={{ v7_relativeSplatPath: true, v7_startTransition: true }}>
-      <ThemeProvider theme={theme}>
-        <RecoilRoot>
-        <Provider store={store}>
-          <App />
-          </Provider>
-        </RecoilRoot>
-      </ThemeProvider>
-    </BrowserRouter>
-    </ConfigProvider>
+    <LocaleProvider>
+      <BrowserRouter future={{ v7_relativeSplatPath: true, v7_startTransition: true }}>
+        <ThemeProvider theme={theme}>
+          <RecoilRoot>
+          <Provider store={store}>
+            <App />
+            </Provider>
+          </RecoilRoot>
+        </ThemeProvider>
+      </BrowserRouter>
+    </LocaleProvider>
   </React.StrictMode>,
   document.getElementById("root")
 );

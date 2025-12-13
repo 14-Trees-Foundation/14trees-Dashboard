@@ -1,10 +1,12 @@
 import { Typography, Button, Divider } from "@mui/material";
+import { useTranslation } from "react-i18next";
 
 interface EventHeaderProps {
   onAddEvent: () => void;
 }
 
 export const EventHeader = ({ onAddEvent }: EventHeaderProps) => {
+  const { t } = useTranslation();
   return (
     <>
       <div style={{
@@ -12,7 +14,7 @@ export const EventHeader = ({ onAddEvent }: EventHeaderProps) => {
         justifyContent: "space-between",
         padding: "4px 12px",
       }}>
-        <Typography variant="h4" style={{ marginTop: '5px' }}>Events</Typography>
+        <Typography variant="h4" style={{ marginTop: '5px' }}>{t('events.title')}</Typography>
         <div style={{
           display: "flex",
           justifyContent: "flex-end",
@@ -20,7 +22,7 @@ export const EventHeader = ({ onAddEvent }: EventHeaderProps) => {
           marginTop: "5px",
         }}>
           <Button variant="contained" color="success" onClick={onAddEvent}>
-            Add Event
+            {t('events.addEvent')}
           </Button>
         </div>
       </div>
