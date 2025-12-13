@@ -1,0 +1,92 @@
+{
+	"parser": "@typescript-eslint/parser",
+	"extends": [
+		"eslint:recommended",
+		"plugin:react/recommended",
+		"plugin:react-hooks/recommended",
+		"plugin:@typescript-eslint/recommended",
+		"airbnb",
+		"airbnb-typescript",
+		"prettier"
+	],
+	"root": true,
+	"env": {
+		"browser": true,
+		"node": true,
+		"es6": true
+	},
+	"plugins": ["react", "react-hooks", "@typescript-eslint", "prettier"],
+	"parserOptions": {
+		"ecmaVersion": 2020,
+		"sourceType": "module",
+		"project": "./tsconfig.json",
+		"ecmaFeatures": {
+			"jsx": true
+		}
+	},
+	"rules": {
+		"semi": "error",
+		"comma-dangle": "error",
+		"no-mixed-operators": "off",
+		"arrow-parens": ["error", "always"],
+		"arrow-body-style": [2, "always"],
+		"class-methods-use-this": 0,
+		"import/imports-first": 0,
+		"import/newline-after-import": 0,
+		"import/no-dynamic-require": 0,
+		"import/no-extraneous-dependencies": 0,
+		"import/no-unresolved": 2,
+		"import/no-webpack-loader-syntax": 0,
+		"import/prefer-default-export": 0,
+		"import/no-named-as-default": 0,
+		"prettier/prettier": "error",
+		"react/state-in-constructor": 2,
+		"react/no-unescaped-entities": "warn",
+		"react/destructuring-assignment": 0,
+		"no-use-before-define": "off",
+		"@typescript-eslint/no-use-before-define": "warn",
+		"react-hooks/exhaustive-deps": "warn",
+		"react/jsx-props-no-spreading": 0,
+		"react/jsx-filename-extension": [
+			1,
+			{
+				"extensions": [".js", ".jsx", ".ts", ".tsx"]
+			}
+		],
+		"no-param-reassign": [2, { "props": false }],
+		"react/prop-types": 0,
+		"react/require-default-props": 0,
+		"@typescript-eslint/no-explicit-any": "warn",
+		"@typescript-eslint/no-unused-vars": "warn",
+		"@typescript-eslint/no-shadow": "warn",
+		"no-console": "warn",
+		"no-plusplus": "off",
+		"object-curly-newline": [
+			"error",
+			{
+				"ObjectExpression": { "multiline": true, "minProperties": 1 },
+				"ObjectPattern": {
+					"multiline": true
+				},
+				"ExportDeclaration": {
+					"multiline": true,
+					"minProperties": 2
+				}
+			}
+		],
+		"react/function-component-definition": [
+			0,
+			{
+				"namedComponents": "arrow-function"
+			}
+		]
+	},
+	"settings": {
+		"react": {
+			"version": "detect"
+		},
+		"import/resolver": {
+			"typescript": {}
+		}
+	}
+}
