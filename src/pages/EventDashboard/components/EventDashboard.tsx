@@ -16,8 +16,6 @@ import EventMessages from "./EventMessages";
 import EventImgMsg from "./EventImgMsg";
 import ApiClient from "../../../api/apiClient/apiClient";
 import background from "../../../assets/background.png";
-import posterSrc from "../../../assets/aayushi_wedding_landing_page_poster.jpg";
-import posterMobileSrc from "../../../assets/aayushi_wedding_landing_page_poster_phone.png";
 
 interface EventDashboardProps {
     event: Event;
@@ -152,6 +150,18 @@ const EventDashboard: React.FC<EventDashboardProps> = ({ event, eventMessages })
             </span>
         ));
     };
+
+    const getLandingImage = (event_id: number) => {
+        switch (event_id) {
+            case 8245:
+                return  isMobile ? "https://14treesplants.s3.ap-south-1.amazonaws.com/events/landing_images/aayushi_wedding_landing_page_poster_phone.png" :
+                "https://14treesplants.s3.ap-south-1.amazonaws.com/events/landing_images/aayushi_wedding_landing_page_poster.jpg";
+            case 8251:
+                return "https://14treesplants.s3.ap-south-1.amazonaws.com/events/landing_images/jayasree_adhiraj_wedding_grove.jpg";
+            // default:
+            //     return "https://14treesplants.s3.ap-south-1.amazonaws.com/events/default.jpg";
+        }
+    }
     
     // Theme configuration based on theme_color
     const themeConfigs = {
@@ -362,7 +372,7 @@ const EventDashboard: React.FC<EventDashboardProps> = ({ event, eventMessages })
     };
 
     const [showPoster, setShowPoster] = useState(() => {
-      if (event.id === 8245) {
+      if (event.id === 8245 || event.id === 8251) {
         return true;
       }
       return false;
@@ -734,9 +744,9 @@ const EventDashboard: React.FC<EventDashboardProps> = ({ event, eventMessages })
                   <br /><br />
                   We believe that a forest can only stand the test of time if these three pillars are aligned.
                   <br /><br />
-                  We're thrilled to be a part of {event.name}'s celebrations! We've planted a tree for each participant attending this event.
+                  We're thrilled to create a grove for you celebrating your special day!
                   <br /><br />
-                  Do check below the tree that's planted for you!
+                  {/* Do check below the tree that's planted for you! */}
                 </Typography>
               </Box>
             </Box>
@@ -1329,7 +1339,7 @@ const EventDashboard: React.FC<EventDashboardProps> = ({ event, eventMessages })
                 inset: 0,
                 width: '100vw',
                 height: '100vh',
-                backgroundImage: `url(${isMobile?posterMobileSrc: posterSrc})`,
+                backgroundImage: `url(${getLandingImage(event.id)})`,
                 backgroundSize: 'cover',
                 backgroundPosition: 'center',
                 backgroundRepeat: 'no-repeat',
