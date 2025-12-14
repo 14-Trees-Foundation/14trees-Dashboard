@@ -361,7 +361,12 @@ const EventDashboard: React.FC<EventDashboardProps> = ({ event, eventMessages })
       }
     };
 
-    const [showPoster, setShowPoster] = useState(true);
+    const [showPoster, setShowPoster] = useState(() => {
+      if (event.id === 8245) {
+        return true;
+      }
+      return false;
+    });
     const mainContentRef = useRef<HTMLDivElement | null>(null);
  
     useEffect(() => {
@@ -1314,7 +1319,7 @@ const EventDashboard: React.FC<EventDashboardProps> = ({ event, eventMessages })
             </Box>
           </Box>
 
-          { showPoster && event.id==8245 && (
+          { showPoster && (
             <div
               onClick={handlePosterClick}
               role="button"
