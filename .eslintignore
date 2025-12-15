@@ -1,0 +1,12 @@
+node_modules
+dist
+build
+public
+
+# Ignore artifacts:
+*.html
+coverage
+.vite
+
+# Ignore config files
+vite.config.ts
