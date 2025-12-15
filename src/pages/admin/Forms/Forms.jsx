@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Tabs } from "@mui/base";
+import { Tabs } from "@mui/material";
 import { useSetRecoilState } from "recoil";
 
 import { CustomTab as Tab, CustomTabsList as TabsList, CustomTabPanel as TabPanel } from "../../../components/CustomTabs";

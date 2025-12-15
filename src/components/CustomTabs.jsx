@@ -1,5 +1,9 @@
 import { styled } from "@mui/system";
-import { TabsList, TabPanel, Tab, tabClasses, buttonClasses } from "@mui/base";
+import { Tab, Tabs } from "@mui/material";
+import { TabPanel } from "@mui/lab";
+
+const tabClasses = { selected: "Mui-selected" };
+const buttonClasses = { focusVisible: "Mui-focusVisible", disabled: "Mui-disabled" };
 
 export const CustomTab = styled(Tab)`
   color: #1f3625;
@@ -44,7 +48,7 @@ export const CustomTabPanel = styled(TabPanel)`
   font-size: 0.875rem;
 `;
 
-export const CustomTabsList = styled(TabsList)`
+export const CustomTabsList = styled(Tabs)`
   min-width: 220px;
   background: #b1bfb5;
   box-shadow: 7px 7px 10px #98a49c, -7px -7px 12px #cadace;
