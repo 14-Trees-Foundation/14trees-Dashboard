@@ -347,6 +347,14 @@ export const User1 = () => {
           </Link>
         );
       },
+      exportValue: (value, record) => {
+        const { hostname, host } = window.location;
+        if (hostname === "localhost" || hostname === "127.0.0.1") {
+          return `http://${host}/profile/user/${record.id}`;
+        } else {
+          return `https://${hostname}/profile/user/${record.id}`;
+        }
+      }
     },
     {
       key: "self_serve_dashboard",
