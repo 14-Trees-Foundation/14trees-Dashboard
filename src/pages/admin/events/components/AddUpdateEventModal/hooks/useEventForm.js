@@ -40,6 +40,8 @@ export const useEventForm = (mode, existingEvent) => {
                 images: existingEvent.images || [],
                 memories: existingEvent.memories || [],
                 event_poster: existingEvent.event_poster || null,
+                landing_image: null,
+                landing_image_s3_path: existingEvent.landing_image_s3_path || null,
             };
         }
         return {
@@ -57,6 +59,8 @@ export const useEventForm = (mode, existingEvent) => {
             images: [],
             memories: [],
             event_poster: null,
+            landing_image: null,
+            landing_image_s3_path: null,
         };
     };
 

@@ -162,6 +162,8 @@ const EventDashboard: React.FC<EventDashboardProps> = ({ event, eventMessages })
             //     return "https://14treesplants.s3.ap-south-1.amazonaws.com/events/default.jpg";
         }
     }
+  // Prefer the server-provided landing image if available, otherwise fall back to id-based mapping
+  const landingImageUrl = event.landing_image_s3_path ?? getLandingImage(event.id);
     
     // Theme configuration based on theme_color
     const themeConfigs = {
@@ -372,7 +374,7 @@ const EventDashboard: React.FC<EventDashboardProps> = ({ event, eventMessages })
     };
 
     const [showPoster, setShowPoster] = useState(() => {
-      if (event.id === 8245 || event.id === 8251) {
+      if (event.id === 8245 || event.id === 8251 || event.landing_image_s3_path!== null) {
         return true;
       }
       return false;
@@ -1334,12 +1336,12 @@ const EventDashboard: React.FC<EventDashboardProps> = ({ event, eventMessages })
               onClick={handlePosterClick}
               role="button"
               aria-label="Open event"
-              style={{
+                style={{
                 position: 'fixed',
                 inset: 0,
                 width: '100vw',
                 height: '100vh',
-                backgroundImage: `url(${getLandingImage(event.id)})`,
+                backgroundImage: `url(${landingImageUrl})`,
                 backgroundSize: 'cover',
                 backgroundPosition: 'center',
                 backgroundRepeat: 'no-repeat',

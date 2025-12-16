@@ -36,7 +36,7 @@ class EventsApiClient {
     }
   }
 
-  async createEvent(eventData: Partial<Event>, images?: File[], eventPoster?: File | null): Promise<Event> {
+  async createEvent(eventData: Partial<Event>, images?: File[], eventPoster?: File | null, landingImage?: File | null): Promise<Event> {
     try {
       // Convert tags string to array format expected by backend
       let tagsArray: string[] = [];
@@ -90,6 +90,11 @@ class EventsApiClient {
           formData.append('event_poster', eventPoster);
         }
 
+        // Add landing image if present
+        if (landingImage) {
+          formData.append('landing_image', landingImage);
+        }
+
         // Multipart submission prepared with form data, images and optional poster
 
         // Don't set Content-Type header - let axios set it automatically with boundary
@@ -135,7 +140,7 @@ class EventsApiClient {
 
   async updateEvent(eventData: any): Promise<Event> {
     try {
-      // Check if we have mixed image data (URLs and File objects)
+  // Check if we have mixed image data (URLs and File objects)
       const images = eventData.images || [];
       const memories = eventData.memories || [];
       const relevantImages = eventData.type === '2' ? memories : images;
@@ -154,8 +159,10 @@ class EventsApiClient {
 
       // Check if there's a new event poster File as well
       const hasNewPoster = eventData.event_poster && eventData.event_poster instanceof File;
+      // Check if there's a new landing image File as well
+      const hasNewLanding = eventData.landing_image && eventData.landing_image instanceof File;
       // If we have new files or a new poster file, use multipart form data
-      if (newFiles.length > 0 || hasNewPoster) {
+      if (newFiles.length > 0 || hasNewPoster || hasNewLanding) {
         const formData = new FormData();
         
         // Add event data fields
@@ -192,6 +199,11 @@ class EventsApiClient {
         // Add event poster if a new File object is provided (single file)
         if (eventData.event_poster && eventData.event_poster instanceof File) {
           formData.append('event_poster', eventData.event_poster);
+        }
+
+        // Add landing image if a new File object is provided
+        if (eventData.landing_image && eventData.landing_image instanceof File) {
+          formData.append('landing_image', eventData.landing_image);
         }
 
         // Add new image files
