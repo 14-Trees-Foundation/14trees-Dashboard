@@ -184,7 +184,7 @@ export const UserInfo = () => {
                           marginBottom: "8px",
                         }}
                       >
-                        {selUserInfo.assigned_to}
+                        {selUserInfo.planted_by}
                       </div>
                     </>
                   )}
