@@ -20,6 +20,7 @@ export type Event = {
   event_location: EventLocation,
   theme_color?: EventThemeColor,
   event_poster?: string | null,
+  landing_image_s3_path?: string | null,
   location?: EventLocationPoint | null,
   link: string,
   default_tree_view_mode?: 'illustrations' | 'profile',
