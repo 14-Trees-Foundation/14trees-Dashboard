@@ -19,6 +19,7 @@ const AddOrganization = ({ open, groupType, handleClose, createOrganization }) =
 
     const [formData, setFormData] = useState({
         name: '',
+        name_key: '',
         type: '',
         description: '',
         address: '',
@@ -32,10 +33,28 @@ const AddOrganization = ({ open, groupType, handleClose, createOrganization }) =
         }));
     }, [groupType]);
 
+    const slugify = (input) => {
+        if (!input) return '';
+        return input.toString().toLowerCase()
+            .normalize('NFKD')
+            .replace(/\p{Diacritic}/gu, '')
+            .replace(/[^a-z0-9]+/g, '-')
+            .replace(/-+/g, '-')
+            .replace(/(^-|-$)/g, '')
+            .slice(0, 64);
+    };
+
     const handleChange = (event) => {
-        setFormData({
-            ...formData,
-            [event.target.name]: event.target.value,
+        const { name, value } = event.target;
+        setFormData(prev => {
+            const next = { ...prev, [name]: value };
+            if (name === 'name') {
+                const prevSlug = slugify(prev.name || '');
+                if (!prev.name_key || prev.name_key === prevSlug) {
+                    next.name_key = slugify(value || '');
+                }
+            }
+            return next;
         });
     };
 
@@ -59,6 +78,9 @@ const AddOrganization = ({ open, groupType, handleClose, createOrganization }) =
                         <Grid container rowSpacing={2} columnSpacing={1} >
                             <Grid item xs={12}>
                                 <TextField name="name" label="Name" value={formData.name} onChange={handleChange} fullWidth/>
+                            </Grid>
+                            <Grid item xs={12}>
+                                <TextField name="name_key" label="URL key (name_key)" value={formData.name_key} onChange={handleChange} fullWidth helperText={'Used in public dashboard URL. Lowercase letters, numbers and hyphens.'} />
                             </Grid>
                             <Grid item xs={12}>
                             <Autocomplete

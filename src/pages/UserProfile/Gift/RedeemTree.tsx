@@ -26,7 +26,8 @@ const RedeemTree: React.FC<RedeemTreeProps> = ({ tree }) => {
         phone: '',
         email: '',
         birth_date: '',
-        gifted_by: '',
+        // pre-fill gifted_by with sponsor name when available
+        gifted_by: (tree as any)?.sponsor_name || '',
     });
     const [profileImage, setProfileImage] = useState<File | null>(null)
 
@@ -144,6 +145,7 @@ const RedeemTree: React.FC<RedeemTreeProps> = ({ tree }) => {
                             <Grid item xs={12}>
                                 <TextField
                                     name="name"
+                                    label="Recipient Name"
                                     placeholder="Recipient Name"
                                     required
                                     value={formData.name}
@@ -151,6 +153,10 @@ const RedeemTree: React.FC<RedeemTreeProps> = ({ tree }) => {
                                     error={!!errors.name}
                                     helperText={errors.name}
                                     fullWidth
+                                    InputLabelProps={{
+                                        shrink: !!formData.name,
+                                        sx: { bgcolor: 'white', color: 'black', px: 0.5, borderRadius: '4px' }
+                                    }}
                                     sx={{
                                         "& .MuiInputLabel-root": { color: "black" }, // Label color
                                         "& .MuiOutlinedInput-root": {
@@ -168,6 +174,7 @@ const RedeemTree: React.FC<RedeemTreeProps> = ({ tree }) => {
                             <Grid item xs={12}>
                                 <TextField
                                     name="email"
+                                    label="Recipient Email"
                                     placeholder="Recipient Email"
                                     required
                                     value={formData.email}
@@ -175,6 +182,10 @@ const RedeemTree: React.FC<RedeemTreeProps> = ({ tree }) => {
                                     error={!!errors.email}
                                     helperText={errors.email || "will be used to send gift notification"}
                                     fullWidth
+                                    InputLabelProps={{
+                                        shrink: !!formData.email,
+                                        sx: { bgcolor: 'white', color: 'black', px: 0.5, borderRadius: '4px' }
+                                    }}
                                     sx={{
                                         "& .MuiInputLabel-root": { color: "black" }, // Label color
                                         "& .MuiOutlinedInput-root": {
@@ -192,12 +203,17 @@ const RedeemTree: React.FC<RedeemTreeProps> = ({ tree }) => {
                             <Grid item xs={12}>
                                 <TextField
                                     name="phone"
+                                    label="Recipient Phone (optional)"
                                     placeholder="Recipient Phone (optional)"
                                     value={formData.phone}
                                     onChange={handleInputChange}
                                     error={!!errors.phone}
                                     helperText={errors.phone}
                                     fullWidth
+                                    InputLabelProps={{
+                                        shrink: !!formData.phone,
+                                        sx: { bgcolor: 'white', color: 'black', px: 0.5, borderRadius: '4px' }
+                                    }}
                                     sx={{
                                         "& .MuiInputLabel-root": { color: "black" }, // Label color
                                         "& .MuiOutlinedInput-root": {
@@ -257,10 +273,15 @@ const RedeemTree: React.FC<RedeemTreeProps> = ({ tree }) => {
                             <Grid item xs={12}>
                                 <TextField
                                     name="gifted_by"
+                                    label="Gifted by"
                                     placeholder="Gifted by"
                                     value={formData.gifted_by}
                                     onChange={handleInputChange}
                                     fullWidth
+                                    InputLabelProps={{
+                                        shrink: !!formData.gifted_by,
+                                        sx: { bgcolor: 'white', color: 'black', px: 0.5, borderRadius: '4px' }
+                                    }}
                                     sx={{
                                         "& .MuiInputLabel-root": { color: "black" }, // Label color
                                         "& .MuiOutlinedInput-root": {

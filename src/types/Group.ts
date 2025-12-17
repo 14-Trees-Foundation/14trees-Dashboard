@@ -3,6 +3,7 @@ export type Group = {
     key: number,
     id: number,
     name: string,
+  name_key?: string,
     type: string,
     description: string,
     logo_url: string | null,

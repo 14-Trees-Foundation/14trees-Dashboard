@@ -43,6 +43,15 @@ function EditUser({ row, openeditModal, handleClose, editSubmit }) {
             fullWidth
             margin="dense"
           />
+          <TextField
+            name="name_key"
+            label="URL key (name_key)"
+            value={formData.name_key || ''}
+            onChange={handleChange}
+            fullWidth
+            margin="dense"
+            helperText={'Used in public dashboard URL. Lowercase letters, numbers and hyphens.'}
+          />
           <Autocomplete
             fullWidth
             name="type"

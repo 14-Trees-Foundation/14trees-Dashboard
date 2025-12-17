@@ -456,6 +456,7 @@ class ApiClient {
             formData.append("type", data.type);
             formData.append("description", data.description);
             if (data.address) formData.append("address", data.address);
+            if ((data as any).name_key) formData.append("name_key", (data as any).name_key);
             if (data.logo_url) formData.append("logo_url", data.logo_url);
             if (logo) {
                 formData.append("logo", logo);
@@ -479,6 +480,7 @@ class ApiClient {
             if (data.description) formData.append("description", data.description);
             if (data.address) formData.append("address", data.address);
             if (data.billing_email) formData.append("billing_email", data.billing_email);
+            if ((data as any).name_key) formData.append("name_key", (data as any).name_key);
             if (data.logo_url) formData.append("logo_url", data.logo_url);
             formData.append("create_at", data.created_at as any);
             formData.append("updated_at", data.updated_at as any);
@@ -513,6 +515,16 @@ class ApiClient {
         } catch (error: any) {
             console.error(error)
             throw new Error(`Failed to fetch groups: ${error.message}`);
+        }
+    }
+
+    async getGroupByKey(nameKey: string): Promise<Group> {
+        try {
+            const response = await this.api.get<Group>(`/groups/by-key/${encodeURIComponent(nameKey)}`);
+            return response.data;
+        } catch (error) {
+            console.error('Failed to fetch group by key', error);
+            throw new Error('Group not found');
         }
     }
 
