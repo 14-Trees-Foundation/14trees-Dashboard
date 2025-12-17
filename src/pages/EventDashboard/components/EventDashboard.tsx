@@ -379,6 +379,7 @@ const EventDashboard: React.FC<EventDashboardProps> = ({ event, eventMessages })
       }
       return false;
     });
+    const [posterSliding, setPosterSliding] = useState(false);
     const mainContentRef = useRef<HTMLDivElement | null>(null);
  
     useEffect(() => {
@@ -388,46 +389,14 @@ const EventDashboard: React.FC<EventDashboardProps> = ({ event, eventMessages })
      }, [showPoster]);
  
      const handlePosterClick = () => {
-      // Start smooth scroll to the main content; keep poster visible until the target is in view.
-      if (!mainContentRef.current) {
-        // fallback: scroll one viewport and hide when reached
-        window.scrollTo({ top: window.innerHeight, behavior: 'smooth' });
-        const onScroll = () => {
-          if (window.scrollY >= window.innerHeight - 8) {
-            setShowPoster(false);
-            window.removeEventListener('scroll', onScroll);
-          }
-        };
-        window.addEventListener('scroll', onScroll);
-        // safety timeout in case scroll events don't fire
-        setTimeout(() => {
-          setShowPoster(false);
-          window.removeEventListener('scroll', onScroll);
-        }, 1600);
-        return;
-      }
-
-      // If mainContentRef exists, observe it and hide the poster only after it becomes visible.
-      const target = mainContentRef.current;
-      // If already visible, hide immediately.
-      const rect = target.getBoundingClientRect();
-      if (rect.top >= 0 && rect.top < window.innerHeight) {
+      // Trigger slide-up animation
+      setPosterSliding(true);
+      
+      // Remove poster after animation completes
+      setTimeout(() => {
         setShowPoster(false);
-        return;
-      }
-
-      const obs = new IntersectionObserver((entries) => {
-        for (const entry of entries) {
-          if (entry.isIntersecting && entry.intersectionRatio > 0.5) {
-            setShowPoster(false);
-            obs.disconnect();
-            break;
-          }
-        }
-      }, { threshold: [0.5] });
-
-      obs.observe(target);
-      target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        setPosterSliding(false);
+      }, 800); // Match animation duration
      };
  
     if (isWeddingType) {
@@ -1348,7 +1317,8 @@ const EventDashboard: React.FC<EventDashboardProps> = ({ event, eventMessages })
                 backgroundRepeat: 'no-repeat',
                 zIndex: 9999,
                 cursor: 'pointer',
-                transition: 'opacity 400ms ease',
+                transform: posterSliding ? 'translateY(-100%)' : 'translateY(0)',
+                transition: 'transform 800ms cubic-bezier(0.4, 0.0, 0.2, 1)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
