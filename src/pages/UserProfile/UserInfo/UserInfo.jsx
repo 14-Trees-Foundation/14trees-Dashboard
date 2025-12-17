@@ -155,7 +155,7 @@ export const UserInfo = () => {
                     !strEquals(selUserInfo.gifted_by_user, "ACM India Council") &&
                     selUserInfo.gifted_by)) && (
                   <>
-                    <div className={classes.label}>Gifted By</div>
+                    <div className={classes.label}>{selUserInfo.event_type && selUserInfo.event_type === "2" ? "Planted By" : "Gifted By"}</div>
                     <div
                       style={{
                         fontSize: "15px",
