@@ -1006,7 +1006,7 @@ const EventDashboard: React.FC<EventDashboardProps> = ({ event, eventMessages })
                 })()}
 
                 {/* Add blessing button - left aligned on desktop, centered on mobile */}
-                <Box sx={{ mt: { xs: 1.5, md: 3 }, display: 'flex', justifyContent: 'center' }}>
+                {event.id !== 8254 && ( <Box sx={{ mt: { xs: 1.5, md: 3 }, display: 'flex', justifyContent: 'center' }}>
                   <Tooltip title="Adding blessings is allowed only within 7 days of the event.">
                     <Box
                       role="button"
@@ -1044,6 +1044,7 @@ const EventDashboard: React.FC<EventDashboardProps> = ({ event, eventMessages })
                     </Box>
                   </Tooltip>
                 </Box>
+                )}
 
                 {/* Blessing popup modal */}
                 {isBlessingModalOpen && (
