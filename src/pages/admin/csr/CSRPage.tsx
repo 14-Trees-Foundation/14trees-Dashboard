@@ -41,6 +41,7 @@ const CSRPage: React.FC = () => {
     const [searchParams] = useSearchParams();
     const location = useLocation();
     const [loading, setLoading] = useState(true);
+    const [groupId, setGroupId] = useState<string | null>(null);
     const [status, setStatus] = useState<{ code: number; message: string }>({ code: 404, message: "", });
     const [logoutLoading, setLogoutLoading] = useState(false);
     const [birthdayData, setBirthdayData] = useState<BirthdayData | null>(null);
@@ -50,7 +51,7 @@ const CSRPage: React.FC = () => {
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
     const open = Boolean(anchorEl);
     const id = open ? "birthday-popover" : undefined;
-    const { groupId } = useParams();
+    let { groupId: groupIdInput, name_key } = useParams();
 
     let auth = useAuth();
 
@@ -64,6 +65,34 @@ const CSRPage: React.FC = () => {
         }
     };
 
+    useEffect(() => {
+        document.title = "Corporate Dashboard - 14 Trees";
+        console.log("groupId", groupIdInput);
+        console.log("name_key", name_key);
+
+        setGroupId(groupIdInput || null);
+
+        if (groupIdInput == null) {
+            const intervalId = setTimeout(async () => {
+                setLoading(true);
+                try {
+                    const apiClient = new ApiClient();
+                    const resp = await apiClient.getGroupByKey(name_key);
+                    setGroupId(resp?.id?.toString() || "");
+                    console.log("Response from getGroupByKey:", resp);
+                } catch (error: any) {
+                    toast.error(error.message);
+                }
+                setLoading(false);
+            }, 300);
+
+            return () => {
+                clearTimeout(intervalId);
+            }
+        }
+        
+
+    }, []);
     useEffect(() => {
         // Check if we should bypass auth
         const bypassAuth = import.meta.env.VITE_BYPASS_AUTH === 'true';
