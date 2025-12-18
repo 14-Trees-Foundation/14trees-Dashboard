@@ -27,7 +27,7 @@ const RedeemTree: React.FC<RedeemTreeProps> = ({ tree }) => {
         email: '',
         birth_date: '',
         // pre-fill gifted_by with sponsor name when available
-        gifted_by: (tree as any)?.sponsor_name || '',
+        gifted_by: (tree as any)?.gifted_by_name || '',
     });
     const [profileImage, setProfileImage] = useState<File | null>(null)
 
