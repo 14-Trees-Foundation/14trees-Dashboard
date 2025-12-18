@@ -163,7 +163,9 @@ const EventDashboard: React.FC<EventDashboardProps> = ({ event, eventMessages })
         }
     }
   // Prefer the server-provided landing image if available, otherwise fall back to id-based mapping
-  const landingImageUrl = event.landing_image_s3_path ?? getLandingImage(event.id);
+  const landingImageUrl = (isMobile && event.landing_image_mobile_s3_path) ? 
+                  event.landing_image_mobile_s3_path 
+                  : event.landing_image_s3_path ?? getLandingImage(event.id);
     
     // Theme configuration based on theme_color
     const themeConfigs = {
@@ -374,7 +376,7 @@ const EventDashboard: React.FC<EventDashboardProps> = ({ event, eventMessages })
     };
 
     const [showPoster, setShowPoster] = useState(() => {
-      if (event.id === 8245 || event.id === 8251 || event.landing_image_s3_path!== null) {
+      if (event.id === 8245 || event.id === 8251 || event.landing_image_s3_path!== null || event.landing_image_mobile_s3_path!== null) {
         return true;
       }
       return false;
@@ -752,7 +754,7 @@ const EventDashboard: React.FC<EventDashboardProps> = ({ event, eventMessages })
                         return (
                           <Typography sx={{ mt: 2, color: '#E5DBB8',
                           fontSize: isMobile ? '13px' : '24px', textAlign: 'center', fontWeight: 600 }}>
-                            {`This grove was planted on ${formatted}`}
+                            {`This grove was allocated on ${formatted}`}
                           </Typography>
                         );
                       })()}

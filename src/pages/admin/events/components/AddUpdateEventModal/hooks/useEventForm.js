@@ -42,6 +42,8 @@ export const useEventForm = (mode, existingEvent) => {
                 event_poster: existingEvent.event_poster || null,
                 landing_image: null,
                 landing_image_s3_path: existingEvent.landing_image_s3_path || null,
+                landing_image_mobile: null,
+                landing_image_mobile_s3_path: existingEvent.landing_image_mobile_s3_path || null,
             };
         }
         return {
@@ -61,6 +63,8 @@ export const useEventForm = (mode, existingEvent) => {
             event_poster: null,
             landing_image: null,
             landing_image_s3_path: null,
+            landing_image_mobile: null,
+            landing_image_mobile_s3_path: null,
         };
     };
 

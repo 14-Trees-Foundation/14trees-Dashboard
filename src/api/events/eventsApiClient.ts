@@ -36,7 +36,7 @@ class EventsApiClient {
     }
   }
 
-  async createEvent(eventData: Partial<Event>, images?: File[], eventPoster?: File | null, landingImage?: File | null): Promise<Event> {
+  async createEvent(eventData: Partial<Event>, images?: File[], eventPoster?: File | null, landingImage?: File | null, landingImageMobile?: File | null): Promise<Event> {
     try {
       // Convert tags string to array format expected by backend
       let tagsArray: string[] = [];
@@ -90,9 +90,12 @@ class EventsApiClient {
           formData.append('event_poster', eventPoster);
         }
 
-        // Add landing image if present
+        // Add landing images if present
         if (landingImage) {
           formData.append('landing_image', landingImage);
+        }
+        if (landingImageMobile) {
+          formData.append('landing_image_mobile', landingImageMobile);
         }
 
         // Multipart submission prepared with form data, images and optional poster
@@ -162,7 +165,10 @@ class EventsApiClient {
       // Check if there's a new landing image File as well
       const hasNewLanding = eventData.landing_image && eventData.landing_image instanceof File;
       // If we have new files or a new poster file, use multipart form data
-      if (newFiles.length > 0 || hasNewPoster || hasNewLanding) {
+      // Check if there's a new mobile landing image File as well
+      const hasNewLandingMobile = eventData.landing_image_mobile && eventData.landing_image_mobile instanceof File;
+
+      if (newFiles.length > 0 || hasNewPoster || hasNewLanding || hasNewLandingMobile) {
         const formData = new FormData();
         
         // Add event data fields
@@ -204,6 +210,11 @@ class EventsApiClient {
         // Add landing image if a new File object is provided
         if (eventData.landing_image && eventData.landing_image instanceof File) {
           formData.append('landing_image', eventData.landing_image);
+        }
+
+        // Add mobile landing image if a new File object is provided
+        if (eventData.landing_image_mobile && eventData.landing_image_mobile instanceof File) {
+          formData.append('landing_image_mobile', eventData.landing_image_mobile);
         }
 
         // Add new image files

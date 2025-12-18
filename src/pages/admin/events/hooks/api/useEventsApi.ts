@@ -36,8 +36,9 @@ export const useEventsApi = () => {
     
     // Extract event poster if present
     const eventPoster = formData.event_poster;
-  // Extract landing image if present
-  const landingImage = formData.landing_image;
+    // Extract landing images if present
+    const landingImage = formData.landing_image;
+    const landingImageMobile = formData.landing_image_mobile;
     
     // Prepare files for create: images/memories and optional poster
     
@@ -50,7 +51,7 @@ export const useEventsApi = () => {
     };
     
     // Create the event with images - API client will handle multipart form data
-  const newEvent = await apiClient.events.createEvent(eventDataForCreation, filesToUpload, eventPoster, landingImage);
+  const newEvent = await apiClient.events.createEvent(eventDataForCreation, filesToUpload, eventPoster, landingImage, landingImageMobile);
     
     toast.success('Event created successfully!');
     return newEvent;

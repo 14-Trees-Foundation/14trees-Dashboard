@@ -18,6 +18,7 @@ const FileUploadSection = ({
     const [imagePreviews, setImagePreviews] = useState([]);
     const [posterPreview, setPosterPreview] = useState(null);
     const [landingPreview, setLandingPreview] = useState(null);
+    const [landingMobilePreview, setLandingMobilePreview] = useState(null);
 
     // Utility function to format file sizes
     const formatFileSize = (bytes) => {
@@ -86,6 +87,36 @@ const FileUploadSection = ({
         }
         setLandingPreview(null);
         updateFormData({ landing_image: null, landing_image_s3_path: null });
+    };
+
+    const handleLandingMobileUpload = (event) => {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        // Clean up old preview URL
+        if (landingMobilePreview && landingMobilePreview.url && !landingMobilePreview.isExisting) {
+            URL.revokeObjectURL(landingMobilePreview.url);
+        }
+
+        const preview = {
+            file: file,
+            url: URL.createObjectURL(file),
+            name: file.name,
+            size: file.size,
+            isExisting: false
+        };
+
+        setLandingMobilePreview(preview);
+        // Store File object for upload and clear any existing s3 path
+        updateFormData({ landing_image_mobile: file, landing_image_mobile_s3_path: null });
+    };
+
+    const removeLandingMobile = () => {
+        if (landingMobilePreview && landingMobilePreview.url && !landingMobilePreview.isExisting) {
+            URL.revokeObjectURL(landingMobilePreview.url);
+        }
+        setLandingMobilePreview(null);
+        updateFormData({ landing_image_mobile: null, landing_image_mobile_s3_path: null });
     };
 
     const handleFileUpload = (event, fieldName) => {
@@ -215,6 +246,13 @@ const FileUploadSection = ({
             setLandingPreview({
                 url: formData.landing_image_s3_path,
                 name: 'Existing Landing Image',
+                isExisting: true
+            });
+        }
+        if (formData.landing_image_mobile_s3_path && !landingMobilePreview) {
+            setLandingMobilePreview({
+                url: formData.landing_image_mobile_s3_path,
+                name: 'Existing Landing Mobile Image',
                 isExisting: true
             });
         }
@@ -353,6 +391,65 @@ const FileUploadSection = ({
                             {landingPreview.size && (
                                 <Typography variant="caption" display="block">
                                     {formatFileSize(landingPreview.size)}
+                                </Typography>
+                            )}
+                        </Box>
+                    </Card>
+                )}
+            </Grid>
+
+            {/* Mobile Landing Image Upload Section */}
+            <Grid item xs={12}>
+                <Typography variant="subtitle2" sx={{ mb: 1 }}>
+                    Mobile Landing Image (Optional) — used on mobile viewports
+                </Typography>
+                <Button
+                    variant="outlined"
+                    component="label"
+                    startIcon={<CloudUpload />}
+                    fullWidth
+                    sx={{ mb: 2 }}
+                    disabled={isSubmitting}
+                >
+                    Upload Mobile Landing Image
+                    <input
+                        type="file"
+                        hidden
+                        accept="image/*"
+                        onChange={handleLandingMobileUpload}
+                    />
+                </Button>
+
+                {/* Mobile Landing Preview */}
+                {landingMobilePreview && (
+                    <Card sx={{ position: 'relative', mb: 2 }}>
+                        <CardMedia
+                            component="img"
+                            height="200"
+                            image={landingMobilePreview.url}
+                            alt={landingMobilePreview.name}
+                            sx={{ objectFit: 'cover', bgcolor: '#f5f5f5' }}
+                        />
+                        <IconButton
+                            size="small"
+                            sx={{
+                                position: 'absolute',
+                                top: 8,
+                                right: 8,
+                                bgcolor: 'rgba(255, 255, 255, 0.8)',
+                                '&:hover': { bgcolor: 'rgba(255, 255, 255, 0.9)' }
+                            }}
+                            onClick={removeLandingMobile}
+                        >
+                            <Close fontSize="small" />
+                        </IconButton>
+                        <Box sx={{ p: 1, bgcolor: 'rgba(0, 0, 0, 0.7)', color: 'white' }}>
+                            <Typography variant="caption" noWrap>
+                                {landingMobilePreview.name}
+                            </Typography>
+                            {landingMobilePreview.size && (
+                                <Typography variant="caption" display="block">
+                                    {formatFileSize(landingMobilePreview.size)}
                                 </Typography>
                             )}
                         </Box>

@@ -21,6 +21,7 @@ export type Event = {
   theme_color?: EventThemeColor,
   event_poster?: string | null,
   landing_image_s3_path?: string | null,
+  landing_image_mobile_s3_path?: string | null,
   location?: EventLocationPoint | null,
   link: string,
   default_tree_view_mode?: 'illustrations' | 'profile',
