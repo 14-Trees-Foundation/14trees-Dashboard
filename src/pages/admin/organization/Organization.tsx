@@ -334,7 +334,7 @@ export const OrganizationComponent = () => {
       align: "center",
       render: (value, record, index) => {
         const treeCounts = groupTreeCounts[record.id];
-        const totalTrees = (treeCounts?.mapped_trees || 0) + (treeCounts?.sponsored_trees || 0) + (treeCounts?.assigned_trees || 0);
+        const totalTrees = (treeCounts?.sponsored_trees || 0);
         return (
           <Link
             href="#"
@@ -362,6 +362,41 @@ export const OrganizationComponent = () => {
         );
       },
     },
+     {
+      key: "dashboard",
+      title: "Dashboard",
+      width: 120,
+      align: "center",
+      render: (value, record, index) => {
+        return (
+          <Link
+            href="#"
+            onClick={(e) => {
+              e.preventDefault();
+              const { hostname, host } = window.location;
+              if (hostname === "localhost" || hostname === "127.0.0.1") {
+                window.open("http://" + host + "/dashboard/" + record.name_key);
+              } else {
+                window.open("https://" + hostname + "/dashboard/" + record.name_key);
+              }
+            }}
+            style={{ 
+              textDecoration: 'underline',
+              color: '#1976d2',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '4px'
+            }}
+          >
+            {/* <Dashboard fontSize="small" /> */}
+            Dashboard
+            {/* {totalTrees} */}
+          </Link>
+        );
+      },
+    },
+
     {
       dataIndex: "action",
       key: "action",
