@@ -60,6 +60,7 @@ const AddUpdateEventModal = ({
         { value: 'green', label: 'Green' },
         { value: 'blue', label: 'Blue' },
         { value: 'pink', label: 'Pink' },
+        { value: 'white', label: 'White' },
     ];
 
     const locationOptions = [
