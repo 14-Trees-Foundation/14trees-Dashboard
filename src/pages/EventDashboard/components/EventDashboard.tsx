@@ -5,7 +5,7 @@ import loriFayzanDashboardImage from "../../../assets/event-dashboard/Lori_Fayza
 import { createStyles, makeStyles } from "@mui/styles";
 import logo from "../../../assets/logo_white_small.png";
 // Tree species images (replace these paths with your actual asset imports)
-import creamLogo from "../../../assets/14T_cream_logo.png";
+import transparentLogo from "../../../assets/transparent_logo.svg";
 import speciesImg1 from "../../../assets/planting_illustration.jpg";
 import speciesImg2 from "../../../assets/neem.png";
 import { Event, EventMessage } from "../../../types/event";
@@ -169,10 +169,17 @@ const EventDashboard: React.FC<EventDashboardProps> = ({ event, eventMessages })
     
     // Theme configuration based on theme_color
     const themeConfigs = {
+        white: {
+            gradient: 'linear-gradient(180deg, #FFFFFF 0%, #FFFFFF 100%)',
+            textAreaBg: '#FCDDB3',
+            textColor: '#454134', 
+            logoColor: '#454134',
+            navColor: '#FFFFFF',
+        },
         red: {
             gradient: 'linear-gradient(180deg, #A03336 0%, #7E1F37 100%)',
             textAreaBg: '#F4DCD8',
-            textColor: '#79221B', 
+            textColor: '#E5DBB8', 
             logoColor: '#FFD53F',
             navColor: '#611E1F',
         },
@@ -210,6 +217,8 @@ const EventDashboard: React.FC<EventDashboardProps> = ({ event, eventMessages })
     const currentTheme = event.theme_color && themeConfigs[event.theme_color]
       ? themeConfigs[event.theme_color]
       : themeConfigs.green;
+    // Determine logo/background color for the logo box. For white theme, use black background per request.
+    const logoBackgroundColor = (currentTheme.logoColor ?? (currentTheme.gradient?.split(',')[0].split('(')[1].trim()));
     
     // Legacy fallback for events without theme_color
     const weddingTheme = {
@@ -409,6 +418,7 @@ const EventDashboard: React.FC<EventDashboardProps> = ({ event, eventMessages })
             <Box sx={{ 
               display: 'flex', 
               flexDirection: 'row',
+              // flexWrap: 'wrap',
               justifyContent: 'flex-start', 
               alignItems: 'center', 
               gap: isMobile ? 1.5 : 3,
@@ -418,72 +428,103 @@ const EventDashboard: React.FC<EventDashboardProps> = ({ event, eventMessages })
               zIndex: 1000,
               background: currentTheme.navColor
             }}>
-              {/* Logo box with theme background */}
-              <Box sx={{ 
-                width: isMobile ? 72 : 110, 
-                height: isMobile ? 72 : 110, 
-                backgroundColor: currentTheme.gradient.split(',')[0].split('(')[1].trim(),
-                borderRadius: 2,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                flexShrink: 0,
-              }}>
-                <Box
-                  component="img"
-                  src={creamLogo}
-                  alt="grove logo"
-                  onClick={() => window.open('https://www.14trees.org/', '_blank', 'noopener')}
-                  sx={{
-                    width: '80%',
-                    height: '80%',
-                    position: 'relative',
-                    left: isMobile ? '5px' : '20px',
-                    bottom: isMobile ? '5px' : '8px',
-                    objectFit: 'contain',
-                    cursor: 'pointer',
-                    display: 'block'
-                  }}
-                  role="link"
-                  aria-label="14 Trees website"
-                />
-              </Box>
+              {/* <Box sx={{ flexBasis: '100%' }}> */}
 
-              {/* Vertical divider */}
-              {!isMobile && (
+                
+                {/* Logo box with theme background */}
                 <Box sx={{ 
-                  width: 3, 
-                  height: 80, 
-                  backgroundColor: '#E5DBB8', 
-                  borderRadius: 1,
-                  mx: 1,
-                }} />
-              )}
+                  width: isMobile ? 72 : 110, 
+                  height: isMobile ? 72 : 110, 
+                  backgroundColor: 'transparent',
+                  borderRadius: 2,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  flexShrink: 0,
+                }}>
+                  <Box
+                    onClick={() => window.open('https://www.14trees.org/', '_blank', 'noopener')}
+                    role="link"
+                    aria-label="14 Trees website"
+                    sx={{
+                      // marginTop: isMobile ? '0px' : '30px',
+                      width: '80%',
+                      height: '80%',
+                      position: 'relative',
+                      left: isMobile ? '5px' : '20px',
+                      bottom: isMobile ? '5px' : '8px',
+                      cursor: 'pointer',
+                      display: 'block',
+                      marginTop: '20px',
+                      // Use the SVG as a mask so we can tint the non-transparent parts via backgroundColor
+                      backgroundColor: logoBackgroundColor,
+                      WebkitMaskImage: `url(${transparentLogo})`,
+                      WebkitMaskRepeat: 'no-repeat',
+                      WebkitMaskSize: 'contain',
+                      WebkitMaskPosition: 'center',
+                      maskImage: `url(${transparentLogo})`,
+                      maskRepeat: 'no-repeat',
+                      maskSize: 'contain',
+                      maskPosition: 'center',
+                      // ensure background scales nicely
+                      backgroundRepeat: 'no-repeat',
+                      backgroundPosition: 'center',
+                      backgroundSize: 'contain',
+                    }}
+                  />
+                </Box>
 
-              {/* Title text */}
-              <Box sx={{ 
-                display: 'flex',
-                flexDirection: 'column',
-                justifyContent: 'center',
-                alignItems: isMobile ? 'center' : 'flex-start',
-              }}>
-                <Typography 
-                  variant={isMobile ? 'h6' : 'h4'} 
-                  sx={{ 
-                    // color: currentTheme.textColor,
-                    color: '#E5DBB8',
-                    fontFamily: '"Scotch Text", Georgia, serif',
-                    fontWeight: 500,
-                    fontStyle: 'normal',
-                    fontSize: { xs: '26px', sm: '40px', md: '54.7px' },
-                    lineHeight: '100%',
-                    textAlign: 'left',
-                  }}
-                >
-                  {event.name}
-                </Typography>
-              </Box>
+                {/* Vertical divider */}
+                {!isMobile && (
+                  <Box sx={{ 
+                    width: 3, 
+                    height: 80, 
+                    backgroundColor: currentTheme.logoColor, 
+                    borderRadius: 1,
+                    mx: 1,
+                  }} />
+                )}
+
+                {/* Title text */}
+                <Box sx={{ 
+                  display: 'flex',
+                  flexDirection: 'column',
+                  justifyContent: 'center',
+                  alignItems: isMobile ? 'center' : 'flex-start',
+                }}>
+                  <Typography 
+                    variant={isMobile ? 'h6' : 'h4'} 
+                    sx={{ 
+                      color: currentTheme.textColor,
+                      // color: '#E5DBB8',
+                      fontFamily: '"Scotch Text", Georgia, serif',
+                      fontWeight: 500,
+                      fontStyle: 'normal',
+                      fontSize: { xs: '26px', sm: '40px', md: '54.7px' },
+                      lineHeight: '100%',
+                      textAlign: 'left',
+                    }}
+                  >
+                    {event.name}
+                  </Typography>
+                </Box>
+
+              {/* </Box> */}
+              {/* Small divider below header only for white theme */}
+              {/* {event.theme_color === 'white' && (
+                 <Box sx={{ flexBasis: '100%' }}>
+                  <Divider sx={{ width: '100%', 
+                    height: 2, 
+                    bgcolor: '#E5DBB8', 
+                    borderRadius: 1,
+                    // position: 'sticky',
+                    // top: 100,
+                    zIndex: 1000,
+                  }} />
+                </Box>
+              )} */}
             </Box>
+
 
           <Box
             ref={mainContentRef}
