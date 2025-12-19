@@ -19,11 +19,11 @@ interface User {
   recipient_name: string;
   recipient_phone: string;
   recipient_email: string;
-  recipient_communication_email: string;
+  recipient_communication_email: string | null;
   assignee_name: string;
   assignee_phone: string;
   assignee_email: string;
-  assignee_communication_email: string;
+  assignee_communication_email: string | null;
   image?: boolean;
   image_name?: string;
   image_url?: string;
@@ -269,12 +269,12 @@ export const BulkUserForm: FC<BulkUserFormProps> = ({
       user.recipient_name = user.recipient_name.trim();
       user.recipient_phone = user.recipient_phone.trim();
       user.recipient_email = user.recipient_email.trim();
-      user.recipient_communication_email = user.recipient_communication_email.trim();
+      user.recipient_communication_email = user.recipient_communication_email?user.recipient_communication_email.trim():null;
       user.relation = user.relation?.trim();
       user.assignee_name = user.assignee_name?.trim();
       user.assignee_phone = user.assignee_phone?.trim();
       user.assignee_email = user.assignee_email?.trim();
-      user.assignee_communication_email = user.assignee_communication_email?.trim();
+      user.assignee_communication_email = user.assignee_communication_email?user.assignee_communication_email.trim():null;
       user.error = !isValidEmail(user.recipient_email) || !isValidPhone(user.recipient_phone) || user.recipient_name === '';
     }
 
