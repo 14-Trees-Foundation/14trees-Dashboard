@@ -528,6 +528,19 @@ class ApiClient {
         }
     }
 
+    async getGroupStats(groupId: number): Promise<any> {
+        try {
+            const response = await this.api.get<any>(`/trees/count/group/${groupId}`);
+            return response.data;
+        } catch (error: any) {
+            console.error('Failed to fetch group stats', error);
+            if (error?.response?.data?.message) {
+                throw new Error(error.response.data.message);
+            }
+            throw new Error('Failed to load group statistics');
+        }
+    }
+
     async mergeGroups(primary_group: number, secondary_group: number, delete_secondary: boolean): Promise<void> {
         try {
             await this.api.post<any>(`/groups/merge`, { primary_group, secondary_group, delete_secondary });

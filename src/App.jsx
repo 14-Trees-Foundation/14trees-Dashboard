@@ -54,6 +54,7 @@ import { CampaignsPage } from "./pages/admin/campaign/CampaignsPage";
 import { ReferralsPage } from "./pages/admin/campaign/ReferralsPage"
 import { ReferralUserPage } from "./pages/admin/campaign/ReferralUserPage"
 import CorpRegistration from "./pages/CorpRegistration";
+import GroupDashboard from "./pages/GroupDashboard/GroupDashboard";
 
 function App() {
   return (
@@ -179,11 +180,7 @@ function App() {
           />
           <Route
             path="/dashboard/:name_key"
-            element={
-              <RequireAuth>
-                <CSRPage />
-              </RequireAuth>
-            }
+            element={<GroupDashboard />}
           />
           <Route
             path="/personal/dashboard/:userId"
