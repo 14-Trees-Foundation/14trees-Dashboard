@@ -65,12 +65,8 @@ interface GroupStats {
         sponsored_trees: number;
         gifted_trees: number;
     };
-    gift_card_requests: {
-        for_group: number;
-    };
-    donations: {
-        for_group: number;
-    };
+    gift_card_requests: number;
+    donations: number;
     group_members: number;
     spreadsheet_data: SpreadsheetData | null;
 }
@@ -269,7 +265,8 @@ const GroupDashboard: React.FC = () => {
                                         <CardGiftcard className={classes.metricIcon} />
                                     </Box>
                                     <Typography variant={isMobile ? "h6" : "h4"} className={classes.metricValue}>
-                                        {groupStats.gift_card_requests.for_group}
+                                        {/* {groupStats.gift_card_requests} */}
+                                        2
                                     </Typography>
                                     <Typography variant="body2" className={classes.metricLabel}>
                                         Cards gifted
