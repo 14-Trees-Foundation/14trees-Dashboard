@@ -185,7 +185,8 @@ const GroupDashboard: React.FC = () => {
                         <Grid item xs={12} md={5}>
                             <Box className={classes.heroImageContainer}>
                                 <img
-                                    src="https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?w=800&h=600&fit=crop"
+                                    // src="https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?w=800&h=600&fit=crop"
+                                    src = "https://14treesplants.s3.ap-south-1.amazonaws.com/groups/Skoda_ai.png?w=800&h=600"
                                     alt="Partnership"
                                     className={classes.heroImage}
                                     onError={(e) => {
@@ -529,7 +530,7 @@ const useStyles = makeStyles((theme: any) =>
         heroImage: {
             width: "100%",
             height: "100%",
-            objectFit: "cover",
+            objectFit: "contain",
         },
         welcomeText: {
             display: "flex",
