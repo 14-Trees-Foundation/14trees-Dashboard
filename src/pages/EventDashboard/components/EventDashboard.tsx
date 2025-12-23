@@ -179,7 +179,7 @@ const EventDashboard: React.FC<EventDashboardProps> = ({ event, eventMessages })
         red: {
             gradient: 'linear-gradient(180deg, #A03336 0%, #7E1F37 100%)',
             textAreaBg: '#F4DCD8',
-            textColor: '#E5DBB8', 
+            textColor: '#79221B', 
             logoColor: '#FFD53F',
             navColor: '#611E1F',
         },
