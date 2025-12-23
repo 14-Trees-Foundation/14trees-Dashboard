@@ -170,7 +170,7 @@ const GroupDashboard: React.FC = () => {
                             className={classes.logo}
                         />
                         <Typography variant={isMobile ? "h6" : "h4"} className={classes.headerTitle}>
-                            Welcome to {groupInfo?.group_name || "Your"} Green Impact Dashboard
+                            Welcome to {groupInfo?.group_name || "Your"} Dashboard
                         </Typography>
                     </Box>
                 </div>
@@ -272,7 +272,7 @@ const GroupDashboard: React.FC = () => {
                                         {groupStats.gift_card_requests.for_group}
                                     </Typography>
                                     <Typography variant="body2" className={classes.metricLabel}>
-                                        Gift Cards
+                                        Cards gifted
                                     </Typography>
                                 </CardContent>
                             </Card>
@@ -409,10 +409,10 @@ const GroupDashboard: React.FC = () => {
                 {eventsData.length > 0 && (
                     <Box sx={{ mt: 4, mb: 3 }}>
                         <Typography variant={isMobile ? "h6" : "h5"} className={classes.sectionTitle}>
-                            Groves Sponsored
+                            Groves
                         </Typography>
                         <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-                            Your sponsored groves are creating lasting environmental impact in these communities.
+                            Groves are a great way to anchor memories in the trees planted. Here are the groves you’ve created in the forest.
                         </Typography>
                         <Grid container spacing={2}>
                             {eventsData.map((event, index) => (
