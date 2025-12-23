@@ -180,7 +180,7 @@ const EventDashboard: React.FC<EventDashboardProps> = ({ event, eventMessages })
             gradient: 'linear-gradient(180deg, #A03336 0%, #7E1F37 100%)',
             textAreaBg: '#F4DCD8',
             textColor: '#79221B', 
-            logoColor: '#FFD53F',
+            logoColor: '#E5DBB8',
             navColor: '#611E1F',
         },
         yellow: {
@@ -384,6 +384,13 @@ const EventDashboard: React.FC<EventDashboardProps> = ({ event, eventMessages })
       }
     };
 
+    const [showAddBlessing, setShowAddBlessing] = useState(() => {
+      if (event.id === 8254 || event.id === 8252 ) {
+        return false;
+      }
+      return true;
+    });
+
     const [showPoster, setShowPoster] = useState(() => {
       if (event.id === 8245 || event.id === 8251 || event.landing_image_s3_path!== null || event.landing_image_mobile_s3_path!== null) {
         return true;
@@ -495,7 +502,8 @@ const EventDashboard: React.FC<EventDashboardProps> = ({ event, eventMessages })
                   <Typography 
                     variant={isMobile ? 'h6' : 'h4'} 
                     sx={{ 
-                      color: currentTheme.textColor,
+                      // color: currentTheme.textColor,
+                      color: currentTheme.logoColor,
                       // color: '#E5DBB8',
                       fontFamily: '"Scotch Text", Georgia, serif',
                       fontWeight: 500,
@@ -1018,7 +1026,7 @@ const EventDashboard: React.FC<EventDashboardProps> = ({ event, eventMessages })
                 })()}
 
                 {/* Add blessing button - left aligned on desktop, centered on mobile */}
-                {event.id !== 8254 && ( <Box sx={{ mt: { xs: 1.5, md: 3 }, display: 'flex', justifyContent: 'center' }}>
+                {showAddBlessing && ( <Box sx={{ mt: { xs: 1.5, md: 3 }, display: 'flex', justifyContent: 'center' }}>
                   <Tooltip title="Adding blessings is allowed only within 7 days of the event.">
                     <Box
                       role="button"
