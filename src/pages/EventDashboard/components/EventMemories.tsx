@@ -68,39 +68,45 @@ const ImageCarousel: React.FC<ImageCarouselProps> = ({ imageUrls }) => {
         pointerEvents: "auto",
     };
 
-    const prevArrow = (
-        <button
-            type="button"
-            aria-label="Previous image"
-            className={arrowClassName}
-            style={{ ...arrowBaseStyle, left: isMobile ? 8 : 16 }}
-            onClick={(event) => {
-                event.stopPropagation();
-                if (carouselRef.current) {
-                    carouselRef.current.prev();
-                }
-            }}
-        >
-            <LeftOutlined />
-        </button>
-    );
+    const CustomPrevArrow = (props: any) => {
+        const { onClick } = props;
+        return (
+            <button
+                type="button"
+                aria-label="Previous image"
+                className={arrowClassName}
+                style={{ ...arrowBaseStyle, left: isMobile ? 8 : 16 }}
+                onClick={(event) => {
+                    event.stopPropagation();
+                    if (carouselRef.current) {
+                        carouselRef.current.prev();
+                    }
+                }}
+            >
+                <LeftOutlined />
+            </button>
+        );
+    };
 
-    const nextArrow = (
-        <button
-            type="button"
-            aria-label="Next image"
-            className={arrowClassName}
-            style={{ ...arrowBaseStyle, right: isMobile ? 8 : 16 }}
-            onClick={(event) => {
-                event.stopPropagation();
-                if (carouselRef.current) {
-                    carouselRef.current.next();
-                }
-            }}
-        >
-            <RightOutlined />
-        </button>
-    );
+    const CustomNextArrow = (props: any) => {
+        const { onClick } = props;
+        return (
+            <button
+                type="button"
+                aria-label="Next image"
+                className={arrowClassName}
+                style={{ ...arrowBaseStyle, right: isMobile ? 8 : 16 }}
+                onClick={(event) => {
+                    event.stopPropagation();
+                    if (carouselRef.current) {
+                        carouselRef.current.next();
+                    }
+                }}
+            >
+                <RightOutlined />
+            </button>
+        );
+    };
 
     // chunk images into pairs so each carousel slide shows 2 images side-by-side
     const chunks: Array<Array<string | null>> = [];
@@ -127,8 +133,8 @@ const ImageCarousel: React.FC<ImageCarouselProps> = ({ imageUrls }) => {
                 speed={600}
                 arrows
                 dots
-                prevArrow={prevArrow}
-                nextArrow={nextArrow}
+                prevArrow={<CustomPrevArrow />}
+                nextArrow={<CustomNextArrow />}
                 style={{ width: "100%", height: "100%" }}
             >
                 {chunks.map((pair, chunkIndex) => (
@@ -181,7 +187,7 @@ const ImageCarousel: React.FC<ImageCarouselProps> = ({ imageUrls }) => {
                                                     style={{
                                                         height: "100%",
                                                         width: "100%",
-                                                        objectFit: "cover",
+                                                        objectFit: "contain",
                                                         display: "block",
                                                     }}
                                                 />
