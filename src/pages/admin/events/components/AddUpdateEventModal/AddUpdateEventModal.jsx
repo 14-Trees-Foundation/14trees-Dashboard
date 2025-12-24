@@ -51,7 +51,8 @@ const AddUpdateEventModal = ({
         { value: '2', label: 'Memorial Event' },
         { value: '3', label: 'Corporate Event' },
         { value: '4', label: 'Community Event' },
-        { value: '5', label: 'Wedding Event' }
+        { value: '5', label: 'Wedding Event' },
+        { value: '6', label: 'Alumni Event' }
     ];
 
     const themeColorOptions = [

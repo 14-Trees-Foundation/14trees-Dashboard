@@ -5,7 +5,6 @@ import loriFayzanDashboardImage from "../../../assets/event-dashboard/Lori_Fayza
 import { createStyles, makeStyles } from "@mui/styles";
 import logo from "../../../assets/logo_white_small.png";
 // Tree species images (replace these paths with your actual asset imports)
-import transparentLogo from "../../../assets/transparent_logo.svg";
 import speciesImg1 from "../../../assets/planting_illustration.jpg";
 import speciesImg2 from "../../../assets/neem.png";
 import { Event, EventMessage } from "../../../types/event";
@@ -15,6 +14,9 @@ import EventTrees from "./EventTrees";
 import EventMessages from "./EventMessages";
 import EventImgMsg from "./EventImgMsg";
 import EventBlessings from "./EventBlessings";
+import EventTreeSpecies from "./EventTreeSpecies";
+import EventHeader from "./EventHeader";
+import EventPosterMessageMemories from "./EventPosterMessageMemories";
 import ApiClient from "../../../api/apiClient/apiClient";
 import background from "../../../assets/background.png";
 
@@ -139,7 +141,7 @@ const EventDashboard: React.FC<EventDashboardProps> = ({ event, eventMessages })
     const treesHeadingText = linkConfig.treesHeadingText ?? (event.type === "2" ? "Memorial Trees" : "Event Trees");
     const treesHeadingColor = linkConfig.treesHeadingColor;
     const shouldHideHeader = linkConfig.hideHeader ?? false;
-    const isWeddingType = event.type === "5";
+    const isNewEventType = event.type === "5" || event.type === "6"; // New event types for wedding and alumni events
     
     // Helper to render backend message preserving \r and \n as line breaks
     const renderMessageWithLineBreaks = (msg: string) => {
@@ -369,121 +371,16 @@ const EventDashboard: React.FC<EventDashboardProps> = ({ event, eventMessages })
       }, 800); // Match animation duration
      };
  
-    if (isWeddingType) {
+    if (isNewEventType) {
         return (
           <>
-          
+
             {/* Header: Logo + Name inline (sticky) - outside main container */}
-            <Box sx={{ 
-              display: 'flex', 
-              flexDirection: 'row',
-              // flexWrap: 'wrap',
-              justifyContent: 'flex-start', 
-              alignItems: 'center', 
-              gap: isMobile ? 1.5 : 3,
-              padding: isMobile ? '10px 20px' : '14px 24px',
-              position: 'sticky',
-              top: 0,
-              zIndex: 1000,
-              background: currentTheme.navColor
-            }}>
-              {/* <Box sx={{ flexBasis: '100%' }}> */}
-
-                
-                {/* Logo box with theme background */}
-                <Box sx={{ 
-                  width: isMobile ? 72 : 110, 
-                  height: isMobile ? 72 : 110, 
-                  backgroundColor: 'transparent',
-                  borderRadius: 2,
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  flexShrink: 0,
-                }}>
-                  <Box
-                    onClick={() => window.open('https://www.14trees.org/', '_blank', 'noopener')}
-                    role="link"
-                    aria-label="14 Trees website"
-                    sx={{
-                      // marginTop: isMobile ? '0px' : '30px',
-                      width: '80%',
-                      height: '80%',
-                      position: 'relative',
-                      left: isMobile ? '5px' : '20px',
-                      bottom: isMobile ? '5px' : '8px',
-                      cursor: 'pointer',
-                      display: 'block',
-                      marginTop: '20px',
-                      // Use the SVG as a mask so we can tint the non-transparent parts via backgroundColor
-                      backgroundColor: logoBackgroundColor,
-                      WebkitMaskImage: `url(${transparentLogo})`,
-                      WebkitMaskRepeat: 'no-repeat',
-                      WebkitMaskSize: 'contain',
-                      WebkitMaskPosition: 'center',
-                      maskImage: `url(${transparentLogo})`,
-                      maskRepeat: 'no-repeat',
-                      maskSize: 'contain',
-                      maskPosition: 'center',
-                      // ensure background scales nicely
-                      backgroundRepeat: 'no-repeat',
-                      backgroundPosition: 'center',
-                      backgroundSize: 'contain',
-                    }}
-                  />
-                </Box>
-
-                {/* Vertical divider */}
-                {!isMobile && (
-                  <Box sx={{ 
-                    width: 3, 
-                    height: 80, 
-                    backgroundColor: currentTheme.logoColor, 
-                    borderRadius: 1,
-                    mx: 1,
-                  }} />
-                )}
-
-                {/* Title text */}
-                <Box sx={{ 
-                  display: 'flex',
-                  flexDirection: 'column',
-                  justifyContent: 'center',
-                  alignItems: isMobile ? 'center' : 'flex-start',
-                }}>
-                  <Typography 
-                    variant={isMobile ? 'h6' : 'h4'} 
-                    sx={{ 
-                      // color: currentTheme.textColor,
-                      color: currentTheme.logoColor,
-                      // color: '#E5DBB8',
-                      fontFamily: '"Scotch Text", Georgia, serif',
-                      fontWeight: 500,
-                      fontStyle: 'normal',
-                      fontSize: { xs: '26px', sm: '40px', md: '54.7px' },
-                      lineHeight: '100%',
-                      textAlign: 'left',
-                    }}
-                  >
-                    {event.name}
-                  </Typography>
-                </Box>
-
-              {/* </Box> */}
-              {/* Small divider below header only for white theme */}
-              {/* {event.theme_color === 'white' && (
-                 <Box sx={{ flexBasis: '100%' }}>
-                  <Divider sx={{ width: '100%', 
-                    height: 2, 
-                    bgcolor: '#E5DBB8', 
-                    borderRadius: 1,
-                    // position: 'sticky',
-                    // top: 100,
-                    zIndex: 1000,
-                  }} />
-                </Box>
-              )} */}
-            </Box>
+            <EventHeader
+              eventName={event.name}
+              currentTheme={currentTheme}
+              logoBackgroundColor={logoBackgroundColor}
+            />
 
 
           <Box
@@ -501,151 +398,17 @@ const EventDashboard: React.FC<EventDashboardProps> = ({ event, eventMessages })
               boxSizing: 'border-box'
             }}
           >
-            
-            <Box
-              sx={{
-                display: "flex",
-                flexDirection: isMobile ? "column" : "row",
-                gap: isMobile ? 2 : 5,
-                alignItems: "stretch",
-                padding: isMobile ? "8px 20px" : "40px",
-                width: isMobile ? '100%' : '95%',
-                margin: "0 auto",
-                maxWidth: '100%',
-                boxSizing: 'border-box'
-              }}
-            >
-              {/* Image column (40%) - background image with poster positioned at left 40% top 30% */}
-              <Box
-                sx={{
-                  width: isMobile ? "100%" : "38%",
-                  maxWidth: '100%',
-                  minHeight: isMobile ? 300 : '80vh',
-                  display: "flex",
-                  flexDirection: "column",
-                  gap: 2,
-                  boxSizing: 'border-box',
-                  position: 'relative',
-                }}
-              >
-                {/* Background area - ensure visible height on mobile */}
-                <Box
-                  onClick={() => {
-                    if (event?.event_poster) {
-                      openImageLightbox(event.event_poster);
-                    }
-                  }}
-                  sx={{
-                    width: '100%',
-                    // let the image control its height on mobile (keeps intrinsic aspect ratio)
-                    height: isMobile ? 'auto' : '100%',
-                    borderRadius: 4,
-                    overflow: 'hidden',
-                    position: 'relative',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    cursor: event?.event_poster ? 'pointer' : 'default',
-                    transition: 'transform 0.2s ease',
-                  }}
-                >
-                  <Box
-                    component="img"
-                    src={event?.event_poster || background}
-                    alt={event?.name ?? 'event poster'}
-                    sx={{
-                      width: '100%',
-                      height: isMobile ? 'auto' : '100%', // auto on mobile preserves aspect ratio
-                      display: 'block',
-                      objectFit: isMobile ? 'contain' : 'cover', // contain on mobile avoids cropping; cover on desktop preserves fill
-                      objectPosition: 'center',
-                    }}
-                    onClick={(e: React.MouseEvent) => {
-                      // Prevent duplicate event propagation when clicking the img itself
-                      e.stopPropagation();
-                      if (event?.event_poster) openImageLightbox(event.event_poster);
-                    }}
-                  />
-                </Box>
-              </Box>
 
-              {/* Message + carousel column (60%) */}
-              <Box
-                sx={{
-                  width: isMobile ? "100%" : "60%",
-                  maxWidth: '100%',
-                  overflow: 'hidden',
-                  borderRadius: 3,
-                  display: "flex",
-                  flexDirection: "column",
-                  gap: 2,
-                  boxSizing: 'border-box'
-                }}
-              >
-                {/* Message area takes 50% of column height on desktop */}
-                <Box
-                  sx={{
-                    flex: isMobile ? "none" : "0 0 30%",
-                    minHeight: isMobile ? "auto" : "45%",
-                    width: '100%',
-                    maxWidth: '100%',
-                    boxSizing: 'border-box',
-                    backgroundColor: currentTheme.textAreaBg,
-                    borderRadius: 3,
-                    padding: 2,
-                  }}
-                >
-                  {event.message && (
-                    <Box sx={{
-                        height: "100%",
-                        width: '100%',
-                        maxWidth: '100%',
-                        boxSizing: 'border-box',
-                        padding: isMobile ? 2 : '0.5rem 1rem',
-                        maxHeight: 260,
-                        overflowY: 'auto',
-                      }}>
-                      <Typography
-                        variant="body1"
-                        sx={{
-                          color: currentTheme.textColor,
-                          fontFamily: '"Noto Sans", sans-serif',
-                          fontWeight: 400,
-                          fontStyle: 'normal',
-                          fontSize: { xs: '18px', md: '18px' },
-                          lineHeight: '100%',
-                          letterSpacing: 0,
-                        }}
-                      >
-                        {renderMessageWithLineBreaks(event.message)}
-                      </Typography>
-                    </Box>
-                  )}
-                </Box>
-
-                {/* Memories carousel under message */}
-                <Box
-                  sx={{
-                    flex: "1 1 auto",
-                    minHeight: isMobile ? "200px" : "auto",
-                    width: '100%',
-                    maxWidth: '100%',
-                    boxSizing: 'border-box',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                  }}
-                >
-                  {isLoadingImages ? (
-                    <Typography variant="body2" sx={{ color: currentTheme.textColor }}>
-                      Loading images...
-                    </Typography>
-                  ) : (
-                    <EventMemories imageUrls={memoryImages} />
-                  )}
-                </Box>
-              </Box>
-            </Box>
+            <EventPosterMessageMemories
+              eventPoster={event.event_poster}
+              eventName={event.name}
+              eventMessage={event.message}
+              memoryImages={memoryImages}
+              isLoadingImages={isLoadingImages}
+              currentTheme={currentTheme}
+              onImageClick={openImageLightbox}
+              renderMessageWithLineBreaks={renderMessageWithLineBreaks}
+            />
 
             {/* About and Map Section */}
             <Box
@@ -765,93 +528,14 @@ const EventDashboard: React.FC<EventDashboardProps> = ({ event, eventMessages })
               )}
 
             {/* Species cards section: title, responsive cards, subtitle */}
-            <Box sx={{ width: '100%', display: 'flex', justifyContent: 'center', mt: 4 }}>
-              <Box sx={{ width: isMobile ? '100%' : '90%', px: isMobile ? 0 : 0 }}>
-
-                <Box sx={{ width: '100%', px: { xs: 0, md: 0 } }}>
-                  {(() => {
-                    const tilesPerSlide = isMobile ? 1 : 4;
-                    const slides: Array<Array<{ src?: string; label: string }>> = [];
-                    for (let i = 0; i < species.length; i += tilesPerSlide) {
-                      const chunk = species.slice(i, i + tilesPerSlide);
-                      // If the last chunk has fewer than 4 items, fill from the beginning
-                      if (chunk.length < tilesPerSlide) {
-                        const needed = tilesPerSlide - chunk.length;
-                        const fillers = species.slice(0, needed);
-                        slides.push([...chunk, ...fillers]);
-                      } else {
-                        slides.push(chunk);
-                      }
-                    }
-                    const autoplayEnabled = validatedSpeciesImages.length >= tilesPerSlide;
-                    return (
-                      <Carousel autoplay={autoplayEnabled} autoplaySpeed={5000} arrows dots style={{ width: '100%' }}>
-                        {slides.map((slide, sIdx) => (
-                          <div key={sIdx}>
-                            <Box sx={{
-                              display: 'grid',
-                              gridTemplateColumns: { xs: 'repeat(1, 1fr)', sm: 'repeat(4, 1fr)' },
-                              gap: 2,
-                              px: { xs: '15px', sm: 0 },
-                            }}>
-                              {slide.map((sp, idx) => (
-                                <Card
-                                  key={idx}
-                                  onClick={() => sp.src && openImageLightbox(sp.src)}
-                                  sx={{
-                                    borderRadius: 4,
-                                    boxShadow: '0 8px 20px rgba(0,0,0,0.12)',
-                                    cursor: 'pointer',
-                                    overflow: 'hidden',
-                                    transition: 'all 0.2s ease',
-                                    // '&:hover': {
-                                    //   transform: 'scale(1.03)',
-                                    //   boxShadow: '0 12px 28px rgba(0,0,0,0.18)',
-                                    // },
-                                    // keep a reasonable max height on mobile but allow natural image height
-                                    maxHeight: { xs: 520, sm: '55vh' },
-                                    display: 'flex',
-                                    alignItems: 'stretch',
-                                    p: 0,                        // remove inner padding so image can span full card
-                                    backgroundColor: 'transparent' // avoid white card background showing through
-                                  }}
-                                >
-                                  <Box
-                                    component="img"
-                                    src={sp.src}
-                                    alt={sp.label}
-                                    sx={{
-                                      width: '100%',
-                                      // height: { xs: 520, sm: '55vh' }, // force full height so image covers the card
-                                      maxHeight: { xs: 920, sm: '55vh' },
-                                      objectFit: 'cover',            // fill the container (no left/right whitespace)
-                                      objectPosition: 'center',
-                                      display: 'block',
-                                      backgroundColor: 'transparent'
-                                    }}
-                                  />
-                                </Card>
-                              ))}
-                            </Box>
-                          </div>
-                        ))}
-                      </Carousel>
-                    );
-                  })()}
-                </Box>
-
-                <Typography
-                  variant={isMobile ? 'h6' : 'h4'}
-                  sx={{ color: '#E5DBB8', fontFamily: '"Scotch Text", Georgia, serif', fontWeight: 700, textAlign: 'center', mb: 2, mt: 4 }}
-                >
-                  {`${(totalTrees ?? 150)} Trees planted in this grove`}
-                </Typography>
-                <Typography variant={isMobile ? 'h6' : 'h4'}
-                  sx={{ color: '#E5DBB8', fontFamily: '"Scotch Text", Georgia, serif', fontWeight: 700, textAlign: 'center', mb: 2 }}>
-                  {(eventTreeTypesCount)} Tree species native to the region
-                </Typography>
-              </Box>
-            </Box>
+            <EventTreeSpecies
+              species={species}
+              totalTrees={totalTrees}
+              eventTreeTypesCount={eventTreeTypesCount}
+              validatedSpeciesImages={validatedSpeciesImages}
+              currentTheme={currentTheme}
+              onImageClick={openImageLightbox}
+            />
 
             {/* Blessings Section */}
             <EventBlessings
