@@ -25,6 +25,7 @@ export type Event = {
   location?: EventLocationPoint | null,
   link: string,
   default_tree_view_mode?: 'illustrations' | 'profile',
+  show_blessings?: boolean,
 };
 
 export type EventMessage = {

@@ -220,11 +220,6 @@ const EventDashboard: React.FC<EventDashboardProps> = ({ event, eventMessages })
     // Determine logo/background color for the logo box. For white theme, use black background per request.
     const logoBackgroundColor = (currentTheme.logoColor ?? (currentTheme.gradient?.split(',')[0].split('(')[1].trim()));
     
-    // Legacy fallback for events without theme_color
-    const weddingTheme = {
-        primary: '#E53935', // red
-        secondary: '#FFD54F' // yellow
-    };
 
     useEffect(() => {
         const fetchEventImages = async () => {
@@ -385,10 +380,9 @@ const EventDashboard: React.FC<EventDashboardProps> = ({ event, eventMessages })
     };
 
     const [showAddBlessing, setShowAddBlessing] = useState(() => {
-      if (event.id === 8254 || event.id === 8252 ) {
-        return false;
-      }
-      return true;
+      // Check the show_blessings flag from the event object
+      // Default to true if not specified for backwards compatibility
+      return event.show_blessings !== false;
     });
 
     const [showPoster, setShowPoster] = useState(() => {

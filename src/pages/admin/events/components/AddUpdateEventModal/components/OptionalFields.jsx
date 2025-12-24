@@ -9,6 +9,8 @@ import {
     Select,
     MenuItem,
     FormHelperText,
+    FormControlLabel,
+    Checkbox,
 } from '@mui/material';
 
 const OptionalFields = ({ formData, handleChange }) => {
@@ -60,10 +62,31 @@ const OptionalFields = ({ formData, handleChange }) => {
                         <MenuItem value="illustrations">Illustrations</MenuItem>
                     </Select>
                     <FormHelperText>
-                        Choose the default view mode for trees in the event dashboard. 
+                        Choose the default view mode for trees in the event dashboard.
                         Visitors can still switch between modes manually.
                     </FormHelperText>
                 </FormControl>
+            </Grid>
+
+            <Grid item xs={12}>
+                <FormControlLabel
+                    control={
+                        <Checkbox
+                            name="show_blessings"
+                            checked={formData.show_blessings !== false}
+                            onChange={(e) => handleChange({
+                                target: {
+                                    name: 'show_blessings',
+                                    value: e.target.checked
+                                }
+                            })}
+                        />
+                    }
+                    label="Show Blessings Section"
+                />
+                <FormHelperText>
+                    When enabled, visitors will see the "Add Blessings" section on the event dashboard.
+                </FormHelperText>
             </Grid>
         </>
     );
