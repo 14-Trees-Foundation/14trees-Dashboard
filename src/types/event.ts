@@ -26,6 +26,8 @@ export type Event = {
   link: string,
   default_tree_view_mode?: 'illustrations' | 'profile',
   show_blessings?: boolean,
+  total_views?: number,
+  unique_views?: number,
 };
 
 export type EventMessage = {

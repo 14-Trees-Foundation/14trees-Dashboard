@@ -68,6 +68,22 @@ export const EventsTable = ({
       ...getColumnSearchProps('tags', filters, onSetFilters)
     },
     {
+      dataIndex: "total_views",
+      key: "total_views",
+      title: "Total Views",
+      width: 100,
+      align: "center",
+      render: (views: number) => views || 0
+    },
+    {
+      dataIndex: "unique_views",
+      key: "unique_views",
+      title: "Unique Views",
+      width: 110,
+      align: "center",
+      render: (views: number) => views || 0
+    },
+    {
       dataIndex: "link",
       key: "link",
       title: "Event Dashboard",
@@ -98,7 +114,7 @@ export const EventsTable = ({
       title: "Action",
       width: 80,
       align: "center",
-      render: (value, record, index) => (
+      render: (_value, record) => (
         <EventTableActions
           event={record}
           onMenuOpen={onMenuOpen}

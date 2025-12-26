@@ -55,8 +55,15 @@ import { ReferralsPage } from "./pages/admin/campaign/ReferralsPage"
 import { ReferralUserPage } from "./pages/admin/campaign/ReferralUserPage"
 import CorpRegistration from "./pages/CorpRegistration";
 import GroupDashboard from "./pages/GroupDashboard/GroupDashboard";
+import { getOrCreateVisitorId } from "./helpers/visitorTracking";
+import { useEffect } from "react";
 
 function App() {
+  // Initialize visitor ID when app loads
+  useEffect(() => {
+    getOrCreateVisitorId();
+  }, []);
+
   return (
     <AuthProvider>
       <Layout>
