@@ -181,7 +181,7 @@ const AddCampaignDialog: React.FC<AddCampaignDialogProps> = ({ open, handleClose
                                                     helperText="e.g., Sia Domkundwar of Glowback"
                                                 />
 
-                                                <TextField
+                                                {/* <TextField
                                                     label="From Email (optional)"
                                                     value={formData.email_config?.sponsor_email?.from_email || ''}
                                                     onChange={(e) => handleEmailConfigChange('from_email', e.target.value)}
@@ -197,7 +197,7 @@ const AddCampaignDialog: React.FC<AddCampaignDialogProps> = ({ open, handleClose
                                                     fullWidth
                                                     size="small"
                                                     helperText="e.g., hello@glowback.com"
-                                                />
+                                                /> */}
 
                                                 <TextField
                                                     label="Subject Template (Single Tree)"

@@ -161,7 +161,7 @@ const EditCampaign = ({ row, open, handleClose, onSubmit }: EditCampaignProps) =
                                                 helperText="e.g., Sia Domkundwar of Glowback"
                                             />
 
-                                            <TextField
+                                            {/* <TextField
                                                 label="From Email (optional)"
                                                 value={formData.email_config?.sponsor_email?.from_email || ''}
                                                 onChange={(e) => handleEmailConfigChange('from_email', e.target.value)}
@@ -177,7 +177,7 @@ const EditCampaign = ({ row, open, handleClose, onSubmit }: EditCampaignProps) =
                                                 fullWidth
                                                 size="small"
                                                 helperText="e.g., hello@glowback.com"
-                                            />
+                                            /> */}
 
                                             <TextField
                                                 label="Subject Template (Single Tree)"
