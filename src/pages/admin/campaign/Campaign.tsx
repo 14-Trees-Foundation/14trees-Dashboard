@@ -80,7 +80,7 @@ const Campaigns: React.FC = () => {
             const apiClient = new ApiClient();
             await apiClient.updateCampaign(
                 data.id,
-                ["name", "c_key", "description"],
+                ["name", "c_key", "description", "email_config"],
                 data
             );
             toast.success("Campaign updated successfully!");
@@ -91,13 +91,14 @@ const Campaigns: React.FC = () => {
         }
     };
 
-    const handleAddCampaign = async (campaignData: { c_key: string; name: string; description?: string }) => {
+    const handleAddCampaign = async (campaignData: { c_key: string; name: string; description?: string; email_config?: any }) => {
         try {
             const apiClient = new ApiClient();
             await apiClient.createCampaign(
                 campaignData.name,
                 campaignData.c_key,
-                campaignData.description
+                campaignData.description,
+                campaignData.email_config
             );
             toast.success("Campaign created successfully!");
             fetchCampaigns();
