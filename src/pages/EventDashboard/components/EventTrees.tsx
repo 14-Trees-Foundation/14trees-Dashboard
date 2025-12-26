@@ -162,7 +162,7 @@ const EventTrees: React.FC<EventTreesProps> = ({ eventId, eventLinkId, eventType
                     mb: 3,
                 }}>
                     {/* Gift a Tree Button - shown first on mobile */}
-                    {isMobile && (
+                    {/* {isMobile && (
                         <Button
                             variant="contained"
                             sx={{
@@ -182,7 +182,7 @@ const EventTrees: React.FC<EventTreesProps> = ({ eventId, eventLinkId, eventType
                         >
                             Gift a Tree!
                         </Button>
-                    )}
+                    )} */}
 
                     {/* Search bar */}
                     <TextField
@@ -218,7 +218,7 @@ const EventTrees: React.FC<EventTreesProps> = ({ eventId, eventLinkId, eventType
                     />
 
                     {/* Gift a Tree Button - shown after search on desktop */}
-                    {!isMobile && (
+                    {/* {!isMobile && (
                         <Button
                             variant="contained"
                             sx={{
@@ -238,7 +238,7 @@ const EventTrees: React.FC<EventTreesProps> = ({ eventId, eventLinkId, eventType
                         >
                             Gift a Tree!
                         </Button>
-                    )}
+                    )} */}
                 </Box>
 
                 {/* View mode toggle (illustrations vs profile) - hidden for wedding events */}
