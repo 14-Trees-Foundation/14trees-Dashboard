@@ -74,6 +74,12 @@ const EventPage: React.FC = () => {
             setEvent(event);
             setEventMessages(eventMessages);
             setLoading(false);
+
+            // Track the view after successfully loading event details
+            if (event) {
+                const apiClient = new ApiClient();
+                apiClient.events.trackEventView(linkId);
+            }
         }, 300)
 
         return () => {

@@ -25,6 +25,7 @@ import { Campaign } from '../../types/campaign';
 import { SortOrder } from 'antd/es/table/interface';
 import { GridFilterItem } from '@mui/x-data-grid';
 import EventsApiClient from '../events/eventsApiClient';
+import { getVisitorId } from '../../helpers/visitorTracking';
 
 
 class ApiClient {
@@ -33,13 +34,16 @@ class ApiClient {
 
     constructor() {
         const baseURL = import.meta.env.VITE_APP_BASE_URL;
-        const userId = localStorage.getItem("userId")
+        const userId = localStorage.getItem("userId");
+        const visitorId = getVisitorId();
+
         this.api = axios.create({
             baseURL: baseURL,
             headers: {
                 'Content-Type': 'application/json',
                 'Accept': 'application/json',
                 'x-user-id': userId ? userId : '',
+                'x-visitor-id': visitorId || '',
             },
         });
         const token = localStorage.getItem("token")

@@ -3,6 +3,7 @@ import { Event, EventMessage, EventMessageCreationAttributes, MessageSequenceUpd
 import { EventImage, ImageSequenceUpdate } from '../../types/eventImage';
 import { Tree } from '../../types/tree';
 import { PaginatedResponse } from '../../types/pagination';
+import { getVisitorId } from '../../helpers/visitorTracking';
 
 class EventsApiClient {
   private api: AxiosInstance;
@@ -10,13 +11,15 @@ class EventsApiClient {
   constructor() {
     const baseURL = import.meta.env.VITE_APP_BASE_URL;
     const userId = localStorage.getItem("userId");
-    
+    const visitorId = getVisitorId();
+
     this.api = axios.create({
       baseURL: baseURL,
       headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
         'x-user-id': userId ? userId : '',
+        'x-visitor-id': visitorId || '',
       },
     });
   }
@@ -445,6 +448,17 @@ class EventsApiClient {
         throw new Error(error.response.data.message);
       }
       throw new Error("Failed to fetch users");
+    }
+  }
+
+  // ===== ANALYTICS METHODS =====
+
+  async trackEventView(eventLink: string): Promise<void> {
+    try {
+      await this.api.post(`/events/track-view/${eventLink}`);
+    } catch (error: any) {
+      // Silently fail view tracking - don't disrupt user experience
+      console.warn("Failed to track event view:", error);
     }
   }
 }
