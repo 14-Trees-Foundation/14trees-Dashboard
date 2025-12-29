@@ -2912,12 +2912,13 @@ class ApiClient {
      * Campaign
      */
 
-    async createCampaign(name: string, c_key: string, description?: string): Promise<Campaign> {
+    async createCampaign(name: string, c_key: string, description?: string, email_config?: any): Promise<Campaign> {
         try {
-            const response = await this.api.post<Campaign>(`/campaigns`, { 
-                name, 
-                c_key, 
-                description 
+            const response = await this.api.post<Campaign>(`/campaigns`, {
+                name,
+                c_key,
+                description,
+                email_config
             });
             return response.data;
         } catch (error: any) {
@@ -3042,6 +3043,30 @@ class ApiClient {
                 }
             }
             throw new Error('Failed to fetch referral dashboard data');
+        }
+    }
+
+    async getCampaignEmailConfig(c_key: string): Promise<{ c_key: string; name: string; email_config: any }> {
+        try {
+            const response = await this.api.get(`/campaigns/${c_key}/email-config`);
+            return response.data;
+        } catch (error: any) {
+            if (error.response?.data?.message) {
+                throw new Error(error.response.data.message);
+            }
+            throw new Error('Failed to fetch campaign email configuration');
+        }
+    }
+
+    async updateCampaignEmailConfig(c_key: string, emailConfig: any): Promise<{ message: string; c_key: string; email_config: any }> {
+        try {
+            const response = await this.api.put(`/campaigns/${c_key}/email-config`, emailConfig);
+            return response.data;
+        } catch (error: any) {
+            if (error.response?.data?.message) {
+                throw new Error(error.response.data.message);
+            }
+            throw new Error('Failed to update campaign email configuration');
         }
     }
 
