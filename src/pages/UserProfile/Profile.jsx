@@ -133,9 +133,9 @@ export const Profile = ({ saplingId }) => {
                 onClick={() => {
                   const { hostname, host } = window.location;
                   if (hostname === "localhost" || hostname === "127.0.0.1") {
-                    window.open("http://" + host + "/dashboard/" + userId);
+                    window.open("http://" + host + "/sponsorship/" + userId);
                   } else {
-                    window.open("https://" + hostname + "/dashboard/" + userId);
+                    window.open("https://" + hostname + "/sponsorship/" + userId);
                   }
                 }}
                 startIcon={<NaturePeopleIcon />}

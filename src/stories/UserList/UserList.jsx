@@ -58,9 +58,9 @@ export const UserList = () => {
                   onClick={() => {
                     const { hostname, host } = window.location;
                     if (hostname === "localhost" || hostname === "127.0.0.1") {
-                      window.open("http://" + host + "/dashboard/" + i.id);
+                      window.open("http://" + host + "/sponsorship/" + i.id);
                     } else {
-                      window.open("https://" + hostname + "/dashboard/" + i.id);
+                      window.open("https://" + hostname + "/sponsorship/" + i.id);
                     }
                   }}
                 >
