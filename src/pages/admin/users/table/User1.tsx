@@ -185,6 +185,12 @@ export const User1 = () => {
 
   const columns: TableColumnsType<User> = [
     {
+      dataIndex: 'id',
+      key: 'id',
+      title: 'id',
+      hidden: true,
+    },
+    {
       dataIndex: "name",
       key: "name",
       title: "Name",
