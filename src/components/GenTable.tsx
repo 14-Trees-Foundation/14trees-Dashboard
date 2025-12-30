@@ -193,6 +193,10 @@ function GeneralTable({ loading, rows, columns, totalRecords, page, pageSize = 1
                     row[title] = item[column.key] || 'N/A';
                 }
             })
+            // Ensure `id` is always exported even if the column is hidden in the UI
+            if (item && (item.id !== undefined)) {
+                row['id'] = item.id;
+            }
             return row
         })
 
