@@ -258,9 +258,9 @@ export const User1 = () => {
               e.preventDefault();
               const { hostname, host } = window.location;
               if (hostname === "localhost" || hostname === "127.0.0.1") {
-                window.open("http://" + host + "/dashboard/" + record.id);
+                window.open("http://" + host + "/sponsorship/" + record.id);
               } else {
-                window.open("https://" + hostname + "/dashboard/" + record.id);
+                window.open("https://" + hostname + "/sponsorship/" + record.id);
               }
             }}
             style={{ 
