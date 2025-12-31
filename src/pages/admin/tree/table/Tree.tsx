@@ -268,6 +268,17 @@ export const TreeNew = () => {
             ...getColumnSearchProps('mapped_user_name', filters, handleSetFilters)
         },
         {
+            dataIndex: "mapped_user_email",
+            key: "mapped_user_email",
+            title: "Reserved for Email",
+            width: 250,
+            align: 'center',
+            hidden: true,
+            render: (value) => value || '-',
+            filteredValue: filters['mapped_user_email']?.value || null,
+            ...getColumnSearchProps('mapped_user_email', filters, handleSetFilters)
+        },
+        {
             dataIndex: "mapped_group_name",
             key: "mapped_group_name",
             title: "Reserved for (Group)",
@@ -286,6 +297,17 @@ export const TreeNew = () => {
             ...getColumnSearchProps('sponsor_user_name', filters, handleSetFilters)
         },
         {
+            dataIndex: "sponsor_user_email",
+            key: "sponsor_user_email",
+            title: "Sponsored By Email",
+            width: 250,
+            align: 'center',
+            hidden: true,
+            render: (value) => value || '-',
+            filteredValue: filters['sponsor_user_email']?.value || null,
+            ...getColumnSearchProps('sponsor_user_email', filters, handleSetFilters)
+        },
+        {
             dataIndex: "sponsor_group_name",
             key: "sponsor_group_name",
             title: "Sponsored By (Group)",
@@ -302,6 +324,17 @@ export const TreeNew = () => {
             align: 'center',
             filteredValue: filters['assigned_to_name']?.value || null,
             ...getColumnSearchProps('assigned_to_name', filters, handleSetFilters)
+        },
+        {
+            dataIndex: "assigned_to_email",
+            key: "assigned_to_email",
+            title: "Assigned To Email",
+            width: 250,
+            align: 'center',
+            hidden: true,
+            render: (value) => value || '-',
+            filteredValue: filters['assigned_to_email']?.value || null,
+            ...getColumnSearchProps('assigned_to_email', filters, handleSetFilters)
         },
         {
             dataIndex: "planted_by",
