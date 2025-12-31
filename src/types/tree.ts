@@ -32,13 +32,16 @@ export type Tree = {
     plot?: string,
     site_name?: string,
     mapped_user_name?: string,
+    mapped_user_email?: string,
     mapped_group_name?: string,
     sponsor_user_name?: string,
+    sponsor_user_email?: string,
     sponsor_group_name?: string,
     assigned_to_name?: string,
+    assigned_to_email?: string,
     illustration_s3_path?: string,
     template_image?: string,
-    
+
     // Association with Gift/Donation/Visit
     association_type?: string | null, // "Gift Cards" | "Normal Assignment" | "Visit" | "Donation"
     request_id?: number | null, // The corresponding request ID (gift_card_request.id or donation.id)
