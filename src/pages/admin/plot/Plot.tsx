@@ -527,6 +527,65 @@ export const PlotComponent = () => {
 			...getColumnSearchProps('site_name', filters, handleSetFilters),
 		},
 		{
+			dataIndex: 'site_village',
+			key: 'site_village',
+			title: 'Site Village',
+			align: 'center',
+			width: 200,
+			hidden: true,
+			render: (value) => {
+				return value || '-';
+			},
+			...getColumnSearchProps('site_village', filters, handleSetFilters),
+		},
+		{
+			dataIndex: 'site_district',
+			key: 'site_district',
+			title: 'Site District',
+			align: 'center',
+			width: 200,
+			hidden: true,
+			render: (value) => {
+				return value || '-';
+			},
+			...getColumnSearchProps('site_district', filters, handleSetFilters),
+		},
+		{
+			dataIndex: 'site_taluka',
+			key: 'site_taluka',
+			title: 'Site Taluka',
+			align: 'center',
+			width: 200,
+			hidden: true,
+			render: (value) => {
+				return value || '-';
+			},
+			...getColumnSearchProps('site_taluka', filters, handleSetFilters),
+		},
+		{
+			dataIndex: 'site_added_date',
+			key: 'site_added_date',
+			title: 'Site Added Date',
+			align: 'center',
+			width: 200,
+			hidden: true,
+			render: (value) => {
+				return value ? new Date(value).toLocaleDateString() : '-';
+			},
+		},
+		{
+			dataIndex: 'site_unique_id',
+			key: 'site_unique_id',
+			title: 'Site Unique ID',
+			align: 'center',
+			width: 200,
+			hidden: true,
+			render: (value) => {
+				return value || '-';
+			},
+			...getColumnSearchProps('site_unique_id', filters, handleSetFilters),
+		},
+		{
 			dataIndex: 'acres_area',
 			key: 'Area (acres)',
 			title: getSortableHeader('Area (acres)', 'acres_area'),

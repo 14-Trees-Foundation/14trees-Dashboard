@@ -49,6 +49,11 @@ export type Plot = {
     distinct_plants?: string[],
     site_id: string,
     site_name: string,
+    site_village?: string,
+    site_district?: string,
+    site_taluka?: string,
+    site_added_date?: Date,
+    site_unique_id?: string,
     created_at: Date,
     updated_at: Date,
 };
