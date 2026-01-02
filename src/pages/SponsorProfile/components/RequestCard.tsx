@@ -63,6 +63,10 @@ const RequestCard: React.FC<RequestCardProps> = ({ request, onClick }) => {
   return (
     <Card
       onClick={() => onClick(request)}
+      data-testid="request-card"
+      data-type={request.type}
+      data-event-name={request.eventName}
+      data-tree-count={request.treeCount}
       sx={{
         backgroundColor,
         cursor: 'pointer',
@@ -85,6 +89,7 @@ const RequestCard: React.FC<RequestCardProps> = ({ request, onClick }) => {
           {icon}
           <Typography
             variant="h6"
+            data-testid="card-event-name"
             sx={{
               ml: 1,
               fontWeight: 600,
@@ -102,18 +107,20 @@ const RequestCard: React.FC<RequestCardProps> = ({ request, onClick }) => {
           variant="body2"
           color="text.secondary"
           gutterBottom
+          data-testid="card-type"
         >
           Type: {request.type}
         </Typography>
 
         {request.type !== 'Miscellaneous' && (
-          <Typography variant="body2" color="text.secondary" gutterBottom>
+          <Typography variant="body2" color="text.secondary" gutterBottom data-testid="card-date">
             Date: {formatDate(request.date)}
           </Typography>
         )}
 
         <Typography
           variant="body1"
+          data-testid="card-tree-count"
           sx={{
             fontWeight: 500,
             mt: 1,

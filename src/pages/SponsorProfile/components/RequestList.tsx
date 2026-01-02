@@ -17,6 +17,7 @@ const RequestList: React.FC<RequestListProps> = ({ requests, onRequestClick, loa
         justifyContent="center"
         alignItems="center"
         minHeight="400px"
+        data-testid="loading-state"
       >
         <Typography variant="h6" color="text.secondary">
           Loading requests...
@@ -32,6 +33,7 @@ const RequestList: React.FC<RequestListProps> = ({ requests, onRequestClick, loa
         justifyContent="center"
         alignItems="center"
         minHeight="400px"
+        data-testid="empty-state"
       >
         <Typography variant="h6" color="text.secondary">
           No requests found
@@ -44,6 +46,7 @@ const RequestList: React.FC<RequestListProps> = ({ requests, onRequestClick, loa
     <Grid
       container
       spacing={2}
+      data-testid="request-grid"
       sx={{
         // Desktop: 3 columns (≥1200px)
         '@media (min-width: 1200px)': {
@@ -69,7 +72,7 @@ const RequestList: React.FC<RequestListProps> = ({ requests, onRequestClick, loa
       }}
     >
       {requests.map((request) => (
-        <Grid item key={`${request.type}-${request.id}`}>
+        <Grid item key={`${request.type}-${request.id}`} data-testid="request-card-wrapper">
           <RequestCard request={request} onClick={onRequestClick} />
         </Grid>
       ))}

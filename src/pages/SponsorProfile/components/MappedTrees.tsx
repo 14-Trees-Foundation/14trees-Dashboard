@@ -118,10 +118,10 @@ const MappedTrees: React.FC<MappedTreesProps> = ({ }) => {
 
 
     return (
-        <Box p={2}>
+        <Box p={2} data-testid="mapped-trees-container">
             {/* Header */}
             <Box mb={3}>
-                <Typography mb={1} variant="h4" color={"#323232"}>
+                <Typography mb={1} variant="h4" color={"#323232"} data-testid="dashboard-header">
                     {name}'s Dashboard
                 </Typography>
                 <Divider />
@@ -130,6 +130,7 @@ const MappedTrees: React.FC<MappedTreesProps> = ({ }) => {
             {/* Request List */}
             <Box
                 className="no-scrollbar"
+                data-testid="request-list-container"
                 sx={{
                     height: 'calc(100vh - 150px)',
                     overflowY: 'auto',
