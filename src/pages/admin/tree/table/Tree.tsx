@@ -400,6 +400,18 @@ export const TreeNew = () => {
             ...getColumnSearchProps('request_id', filters, handleSetFilters, true)
         },
         {
+            dataIndex: "description",
+            key: "description",
+            title: "Event Name",
+            width: 300,
+            align: 'center',
+            render: (value, record) => {
+                return value || '-';
+            },
+            filteredValue: filters['description']?.value || null,
+            ...getColumnSearchProps('description', filters, handleSetFilters)
+        },
+        {
             dataIndex: "mapped_at",
             key: "Reserved on",
             title: getSortableHeader("Reserved on", "mapped_at"),

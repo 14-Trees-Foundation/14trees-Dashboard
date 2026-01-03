@@ -45,6 +45,7 @@ export type Tree = {
     // Association with Gift/Donation/Visit
     association_type?: string | null, // "Gift Cards" | "Normal Assignment" | "Visit" | "Donation"
     request_id?: number | null, // The corresponding request ID (gift_card_request.id or donation.id)
+    description?: string | null, // Event name or description associated with the tree
 };
 
 export type CreateTreeRequest = {
