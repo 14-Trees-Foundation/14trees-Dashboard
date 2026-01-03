@@ -53,11 +53,11 @@ export const handleGiftCardFormSubmission = async ({
     setLoading(true);
 
     try {
-        // Update group logo if changed
-        if (formState.logoString && formState.group && formState.group.logo_url !== formState.logoString) {
-            await giftCardService.updateGroup({ 
-                ...formState.group, 
-                logo_url: formState.logoString 
+        // Update group logo only if group has no existing logo
+        if (formState.logoString && formState.group && !formState.group.logo_url) {
+            await giftCardService.updateGroup({
+                ...formState.group,
+                logo_url: formState.logoString
             });
         }
 
