@@ -1059,10 +1059,13 @@ class ApiClient {
         }
     }
 
-    async getMappedTreesForTheUser(userId: number, offset: number, limit: number): Promise<PaginatedResponse<Tree>> {
+    async getMappedTreesForTheUser(userId: number, offset: number, limit: number, filters?: any[]): Promise<PaginatedResponse<Tree>> {
         const url = `/trees/mapped/${userId}?offset=${offset}&limit=${limit}`;
         try {
-            const response = await this.api.get<PaginatedResponse<Tree>>(url);
+            // Send filters in request body via POST (backend updated to accept body filters)
+            const response = await this.api.post<PaginatedResponse<Tree>>(url, {
+                filters: filters || []
+            });
             return response.data;
         } catch (error: any) {
             if (error.response?.data?.message) {
@@ -1072,10 +1075,13 @@ class ApiClient {
         }
     }
 
-    async getMappedTreesForGroup(groupId: number, offset: number, limit: number): Promise<PaginatedResponse<Tree>> {
+    async getMappedTreesForGroup(groupId: number, offset: number, limit: number, filters?: any[]): Promise<PaginatedResponse<Tree>> {
         const url = `/trees/mapped/group/${groupId}?offset=${offset}&limit=${limit}`;
         try {
-            const response = await this.api.get<PaginatedResponse<Tree>>(url);
+            // Send filters in request body via POST (backend updated to accept body filters)
+            const response = await this.api.post<PaginatedResponse<Tree>>(url, {
+                filters: filters || []
+            });
             return response.data;
         } catch (error: any) {
             if (error.response?.data?.message) {

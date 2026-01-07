@@ -31,3 +31,12 @@ yarn-error.log*
 .env
 docs/sites
 docs/
+
+test-results
+playwright-report
+demo-results
+demo-reports
+e2e/logs
+e2e
+playwright-demo.config.ts
+playwright.config.ts

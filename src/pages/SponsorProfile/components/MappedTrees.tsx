@@ -1,10 +1,12 @@
-import { Box, Button, Checkbox, Divider, FormControl, FormControlLabel, FormGroup, IconButton, InputBase, Paper, Typography, ToggleButton, ToggleButtonGroup } from "@mui/material";
-import CardGrid from "../../../components/CardGrid";
+import { Box, Divider, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import ApiClient from "../../../api/apiClient/apiClient";
 import { useLocation, useParams } from "react-router-dom";
-import { Search } from "@mui/icons-material";
+import { RequestItem, mapGiftRequestToRequestItem, mapDonationToRequestItem, createMiscellaneousRequestItem } from "../types/requestItem";
+import RequestList from "./RequestList";
+import TreesModal from "./TreesModal";
+import SponsorHeroSection from "./SponsorHeroSection";
 
 interface MappedTreesProps {
 }
@@ -14,196 +16,175 @@ const MappedTrees: React.FC<MappedTreesProps> = ({ }) => {
 
     const location = useLocation();
     const isGroupView = location.pathname.includes('/group/');
-    console.log(location.pathname)
-    const [searchStr, setSearchStr] = useState('');
-    const [filteredTrees, setFilteredTrees] = useState<any[]>([]);
-    const [filter, setFilter] = useState<'default' | 'memorial' | 'all'>('default');
-    const [viewType, setViewType] = useState<'user' | 'group'>('user');
+
     const [loading, setLoading] = useState(false);
-    const [trees, setTrees] = useState<any[]>([]);
-    const [total, setTotal] = useState(0);
+    const [requests, setRequests] = useState<RequestItem[]>([]);
     const [name, setName] = useState('');
+    const [selectedRequest, setSelectedRequest] = useState<RequestItem | null>(null);
+    const [modalOpen, setModalOpen] = useState(false);
+    const [aggregateMetrics, setAggregateMetrics] = useState({
+        totalTrees: 0,
+        totalRequests: 0,
+    });
 
 
-    const getTrees = async (id: string, offset: number = 0) => {
+    const fetchRequests = async (userId: number, groupId?: number) => {
         try {
             setLoading(true);
             const apiClient = new ApiClient();
-            let response;
 
-            if (isGroupView) {
-                response = await apiClient.getMappedTreesForGroup(Number(id), offset, 200);
-                console.log("Group API Response:", response);
-            } else {
-                response = await apiClient.getMappedTreesForTheUser(Number(id), offset, 200);
-                console.log("User API Response:", response);
+            // Fetch gift card requests
+            const giftCardsFilters = isGroupView
+                ? [{ columnField: 'group_id', operatorValue: 'equals', value: groupId }]
+                : [{ columnField: 'user_id', operatorValue: 'equals', value: userId }];
+
+            const giftCardsResponse = await apiClient.getGiftCards(0, 1000, giftCardsFilters);
+
+            // Fetch donations
+            const donationsFilters = isGroupView
+                ? [{ columnField: 'group_id', operatorValue: 'equals', value: groupId }]
+                : [{ columnField: 'user_id', operatorValue: 'equals', value: userId }];
+
+            const donationsResponse = await apiClient.getDonations(0, 1000, donationsFilters);
+
+            // Fetch historical/miscellaneous trees count
+            const miscFilters: any[] = [
+                { columnField: 'donation_id', operatorValue: 'isNull' },
+                { columnField: 'gift_card_request_id', operatorValue: 'isNull' }
+            ];
+
+            const miscTreesResponse = isGroupView
+                ? await apiClient.getMappedTreesForGroup(groupId!, 0, 1, miscFilters)
+                : await apiClient.getMappedTreesForTheUser(userId, 0, 1, miscFilters);
+
+            // Map gift card requests to RequestItems (filter out Test/Promotion and 0 tree requests)
+            const giftRequestItems: RequestItem[] = giftCardsResponse.results
+                .map(request => mapGiftRequestToRequestItem(request))
+                .filter((item): item is RequestItem => item !== null && item.treeCount > 0);
+
+            // Map donations to RequestItems (filter out 0 tree donations)
+            const donationRequestItems: RequestItem[] = donationsResponse.results
+                .map(donation => mapDonationToRequestItem(donation))
+                .filter(item => item.treeCount > 0);
+
+            // Create miscellaneous item if there are historical trees
+            const miscCount = Number(miscTreesResponse.total);
+            const miscRequestItems: RequestItem[] = miscCount > 0
+                ? [createMiscellaneousRequestItem(miscCount)]
+                : [];
+
+            // Combine all requests and sort by date (newest first)
+            // Miscellaneous should always appear at the end
+            const allRequests = [...giftRequestItems, ...donationRequestItems];
+            allRequests.sort((a, b) => b.date.getTime() - a.date.getTime());
+
+            // Add miscellaneous at the end
+            if (miscRequestItems.length > 0) {
+                allRequests.push(...miscRequestItems);
             }
 
-            // Check if response and response.results are valid arrays
-            const name = isGroupView
-                ? (response as any).group_name || 'Group'
-                : (response as any).results?.[0]?.sponsor_user_name || 'User';
+            setRequests(allRequests);
 
-            setName(name);
-            setTotal(Number(response.total));
-            setTrees(prev => [...prev, ...response.results]);
+            // Calculate aggregate metrics
+            const totalTrees = allRequests.reduce((sum, req) => sum + req.treeCount, 0);
+            const totalRequests = allRequests.length;
+            setAggregateMetrics({ totalTrees, totalRequests });
+
+            // Set sponsor/group name from response
+            const sponsorName = isGroupView
+                ? (miscTreesResponse as any).group_name || 'Group'
+                : giftCardsResponse.results[0]?.user_name || donationsResponse.results[0]?.user_name || 'User';
+
+            setName(sponsorName);
 
         } catch (error: any) {
-            toast.error(error.message || "Something went wrong");
+            toast.error(error.message || "Failed to fetch requests");
         } finally {
             setLoading(false);
         }
-    }
+    };
 
 
-    /* const handleViewTypeChange = (
-         event: React.MouseEvent<HTMLElement>,
-         newViewType: 'user' | 'group',
-     ) => {
-         if (newViewType !== null) {
-             setViewType(newViewType);
-             setTrees([]); // Reset trees when switching views
-             if (userId) getTrees(userId); // Refetch data for new view type
-         }
-     }; */
+    const handleRequestClick = (request: RequestItem) => {
+        setSelectedRequest(request);
+        setModalOpen(true);
+    };
+
+    const handleModalClose = () => {
+        setModalOpen(false);
+        setSelectedRequest(null);
+    };
 
     useEffect(() => {
-
-        const handler = setTimeout(() => {
-            let filteredData: any[] = [];
-            if (filter === 'all') filteredData = trees;
-            else if (filter === 'memorial') filteredData = trees.filter(tree => tree.event_type === '2');
-            else filteredData = trees.filter(tree => tree.event_type !== '2');
-
-            if (searchStr.trim() !== '') {
-                filteredData = filteredData.filter(item => item.assigned_to_name?.toLowerCase()?.includes(searchStr.toLocaleLowerCase()));
+        if (id) {
+            const numericId = Number(id);
+            if (isGroupView) {
+                fetchRequests(0, numericId); // groupId
+            } else {
+                fetchRequests(numericId); // userId
             }
-
-            setFilteredTrees(filteredData)
-        }, 300);
-
-        return () => {
-            clearTimeout(handler);
         }
-    }, [searchStr, filter, trees])
-
-    useEffect(() => {
-        if (id) getTrees(id);
-    }, [id]);
+    }, [id, isGroupView]);
 
 
     return (
-        <Box p={1}>
-            <Box
-                sx={{
-                    position: 'relative',
-                    width: '100%',
-                }}
-            >
-                <Box
-                    sx={{
-                        p: -2,
-                        width: '100%',
-                        position: 'absolute',
-                        margin: '0 auto',
-                    }}
-                >
-                    <Typography mb={1} variant="h4" color={"#323232"}>
-                        {name}'s Dashboard
-                    </Typography>
-                    <Divider />
-                </Box>
+        <Box
+            p={2}
+            data-testid="mapped-trees-container"
+            sx={{
+                // Mobile: no padding to maximize space
+                '@media (max-width: 768px)': {
+                    padding: 1,
+                }
+            }}
+        >
+            {/* Header */}
+            <Box mb={3}>
+                <Typography mb={1} variant="h4" color={"#323232"} data-testid="dashboard-header">
+                    {name}'s Dashboard
+                </Typography>
+                <Divider />
             </Box>
-            <Box
-                mt={8}
-                display="flex"
-                alignItems="center"
-                justifyContent="space-between"
-            >
-                <FormControl component="fieldset">
-                    <FormGroup aria-label="position" row>
-                        <FormControlLabel
-                            value="default"
-                            control={<Checkbox checked={filter === 'default' || filter === 'all'} onChange={() => { setFilter('default') }} />}
-                            label="F&F Trees"
-                            labelPlacement="end"
-                        />
-                        <FormControlLabel
-                            value="memorial"
-                            control={<Checkbox checked={filter === 'memorial' || filter === 'all'} onChange={() => { setFilter('memorial') }} />}
-                            label="Memorial Trees"
-                            labelPlacement="end"
-                        />
-                        <FormControlLabel
-                            value="all"
-                            control={<Checkbox checked={filter === 'all'} onChange={() => { setFilter(prev => prev === 'all' ? 'default' : 'all') }} />}
-                            label="Show All"
-                            labelPlacement="end"
-                        />
-                    </FormGroup>
-                </FormControl>
-                <Paper
-                    component="div"
-                    sx={{ p: '2px 4px', display: 'flex', alignItems: 'center', width: 400, backgroundColor: '#e3e3e3bf' }}
-                >
-                    <IconButton sx={{ p: '10px' }} aria-label="search">
-                        <Search />
-                    </IconButton>
-                    <InputBase
-                        value={searchStr}
-                        onChange={(e) => { setSearchStr(e.target.value) }}
-                        sx={{ ml: 1, flex: 1 }}
-                        placeholder="Search name"
-                        inputProps={{ 'aria-label': 'search friends & family members' }}
-                    />
-                </Paper>
-            </Box>
-            <Box
-                mt={1}
-                padding="0 50px"
-                className={"no-scrollbar"}
-                style={{
-                    height: '83vh',
-                    overflowY: 'scroll',
-                }}
-            >
-                <CardGrid
-                    loading={loading}
-                    cards={filteredTrees.map(tree => {
-                        let location: string = ''
-                        const { hostname, host } = window.location;
-                        if (hostname === "localhost" || hostname === "127.0.0.1") {
-                            location = "http://" + host + "/profile/" + tree.sapling_id
-                        } else {
-                            location = "https://" + hostname + "/profile/" + tree.sapling_id
-                        }
 
-                        return {
-                            id: tree.id,
-                            name: tree.assigned_to_name,
-                            type: tree.plant_type,
-                            dashboardLink: location,
-                            image: tree.illustration_s3_path
-                                ? tree.illustration_s3_path
-                                : tree.image,
-                        }
-                    })}
+            {/* Hero Section with Aggregate Metrics */}
+            <Box sx={{ mb: 4 }}>
+                <SponsorHeroSection
+                    totalTrees={aggregateMetrics.totalTrees}
+                    totalRequests={aggregateMetrics.totalRequests}
+                    loading={loading}
+                    isGroupView={isGroupView}
                 />
-                {id && total > trees.length && <Box
-                    display="flex"
-                    alignItems="center"
-                    justifyContent="center"
-                >
-                    <Button
-                        variant="contained"
-                        color="success"
-                        disabled={loading}
-                        onClick={() => { getTrees(id, trees.length) }}
-                    >
-                        Load More
-                    </Button>
-                </Box>}
             </Box>
+
+            {/* Request List */}
+            <Box
+                className="no-scrollbar"
+                data-testid="request-list-container"
+                sx={{
+                    height: 'calc(100vh - 450px)', // Adjusted for hero section
+                    overflowY: 'auto',
+                    // Mobile: adjust height and padding
+                    '@media (max-width: 768px)': {
+                        height: 'calc(100vh - 350px)',
+                    }
+                }}
+            >
+                <RequestList
+                    requests={requests}
+                    onRequestClick={handleRequestClick}
+                    loading={loading}
+                    isGroupView={isGroupView}
+                />
+            </Box>
+
+            {/* Trees Modal */}
+            <TreesModal
+                open={modalOpen}
+                onClose={handleModalClose}
+                request={selectedRequest}
+                userId={isGroupView ? undefined : Number(id)}
+                groupId={isGroupView ? Number(id) : undefined}
+            />
         </Box>
     );
 }
