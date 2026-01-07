@@ -43,6 +43,8 @@ const TreesModal: React.FC<TreesModalProps> = ({ open, onClose, request, userId,
   const [filterMenuAnchor, setFilterMenuAnchor] = useState<null | HTMLElement>(null);
   const [imageType, setImageType] = useState<ImageType>('illustration');
 
+  const isGroupView = !!groupId;
+
   const formatDate = (date: Date) => {
     return new Intl.DateTimeFormat('en-US', {
       year: 'numeric',
@@ -227,7 +229,7 @@ const TreesModal: React.FC<TreesModalProps> = ({ open, onClose, request, userId,
           <Box
             display="flex"
             alignItems="center"
-            justifyContent="space-between"
+            justifyContent={isGroupView ? "flex-end" : "space-between"}
             sx={{
               flexDirection: 'row',
               gap: 2,
@@ -237,56 +239,58 @@ const TreesModal: React.FC<TreesModalProps> = ({ open, onClose, request, userId,
               }
             }}
           >
-            {/* Desktop: Show filters inline */}
-            <FormControl
-              component="fieldset"
-              sx={{
-                '@media (max-width: 768px)': {
-                  display: 'none',
-                }
-              }}
-            >
-              <FormGroup aria-label="position" row>
-                <FormControlLabel
-                  value="default"
-                  control={
-                    <Checkbox
-                      checked={filter === 'default' || filter === 'all'}
-                      onChange={() => { setFilter('default') }}
-                      sx={{ py: 0.5 }}
-                    />
+            {/* Desktop: Show filters inline - Hide for group view */}
+            {!isGroupView && (
+              <FormControl
+                component="fieldset"
+                sx={{
+                  '@media (max-width: 768px)': {
+                    display: 'none',
                   }
-                  label="F&F Trees"
-                  labelPlacement="end"
-                  sx={{ mr: 1 }}
-                />
-                <FormControlLabel
-                  value="memorial"
-                  control={
-                    <Checkbox
-                      checked={filter === 'memorial' || filter === 'all'}
-                      onChange={() => { setFilter('memorial') }}
-                      sx={{ py: 0.5 }}
-                    />
-                  }
-                  label="Memorial Trees"
-                  labelPlacement="end"
-                  sx={{ mr: 1 }}
-                />
-                <FormControlLabel
-                  value="all"
-                  control={
-                    <Checkbox
-                      checked={filter === 'all'}
-                      onChange={() => { setFilter(prev => prev === 'all' ? 'default' : 'all') }}
-                      sx={{ py: 0.5 }}
-                    />
-                  }
-                  label="Show All"
-                  labelPlacement="end"
-                />
-              </FormGroup>
-            </FormControl>
+                }}
+              >
+                <FormGroup aria-label="position" row>
+                  <FormControlLabel
+                    value="default"
+                    control={
+                      <Checkbox
+                        checked={filter === 'default' || filter === 'all'}
+                        onChange={() => { setFilter('default') }}
+                        sx={{ py: 0.5 }}
+                      />
+                    }
+                    label="F&F Trees"
+                    labelPlacement="end"
+                    sx={{ mr: 1 }}
+                  />
+                  <FormControlLabel
+                    value="memorial"
+                    control={
+                      <Checkbox
+                        checked={filter === 'memorial' || filter === 'all'}
+                        onChange={() => { setFilter('memorial') }}
+                        sx={{ py: 0.5 }}
+                      />
+                    }
+                    label="Memorial Trees"
+                    labelPlacement="end"
+                    sx={{ mr: 1 }}
+                  />
+                  <FormControlLabel
+                    value="all"
+                    control={
+                      <Checkbox
+                        checked={filter === 'all'}
+                        onChange={() => { setFilter(prev => prev === 'all' ? 'default' : 'all') }}
+                        sx={{ py: 0.5 }}
+                      />
+                    }
+                    label="Show All"
+                    labelPlacement="end"
+                  />
+                </FormGroup>
+              </FormControl>
+            )}
 
             <Paper
               component="div"
@@ -313,20 +317,22 @@ const TreesModal: React.FC<TreesModalProps> = ({ open, onClose, request, userId,
                 placeholder="Search name"
                 inputProps={{ 'aria-label': 'search friends & family members' }}
               />
-              {/* Mobile: Filter Menu Icon */}
-              <IconButton
-                sx={{
-                  p: '8px',
-                  display: 'none',
-                  '@media (max-width: 768px)': {
-                    display: 'block',
-                  }
-                }}
-                aria-label="filter options"
-                onClick={(e) => setFilterMenuAnchor(e.currentTarget)}
-              >
-                <FilterList />
-              </IconButton>
+              {/* Mobile: Filter Menu Icon - Hide for group view */}
+              {!isGroupView && (
+                <IconButton
+                  sx={{
+                    p: '8px',
+                    display: 'none',
+                    '@media (max-width: 768px)': {
+                      display: 'block',
+                    }
+                  }}
+                  aria-label="filter options"
+                  onClick={(e) => setFilterMenuAnchor(e.currentTarget)}
+                >
+                  <FilterList />
+                </IconButton>
+              )}
             </Paper>
           </Box>
 
@@ -391,40 +397,42 @@ const TreesModal: React.FC<TreesModalProps> = ({ open, onClose, request, userId,
           </Box>
         </Box>
 
-        {/* Filter Menu for Mobile */}
-        <Menu
-          anchorEl={filterMenuAnchor}
-          open={Boolean(filterMenuAnchor)}
-          onClose={() => setFilterMenuAnchor(null)}
-        >
-          <MenuItem
-            onClick={() => {
-              setFilter('default');
-              setFilterMenuAnchor(null);
-            }}
-            selected={filter === 'default'}
+        {/* Filter Menu for Mobile - Hide for group view */}
+        {!isGroupView && (
+          <Menu
+            anchorEl={filterMenuAnchor}
+            open={Boolean(filterMenuAnchor)}
+            onClose={() => setFilterMenuAnchor(null)}
           >
-            F&F Trees
-          </MenuItem>
-          <MenuItem
-            onClick={() => {
-              setFilter('memorial');
-              setFilterMenuAnchor(null);
-            }}
-            selected={filter === 'memorial'}
-          >
-            Memorial Trees
-          </MenuItem>
-          <MenuItem
-            onClick={() => {
-              setFilter('all');
-              setFilterMenuAnchor(null);
-            }}
-            selected={filter === 'all'}
-          >
-            Show All
-          </MenuItem>
-        </Menu>
+            <MenuItem
+              onClick={() => {
+                setFilter('default');
+                setFilterMenuAnchor(null);
+              }}
+              selected={filter === 'default'}
+            >
+              F&F Trees
+            </MenuItem>
+            <MenuItem
+              onClick={() => {
+                setFilter('memorial');
+                setFilterMenuAnchor(null);
+              }}
+              selected={filter === 'memorial'}
+            >
+              Memorial Trees
+            </MenuItem>
+            <MenuItem
+              onClick={() => {
+                setFilter('all');
+                setFilterMenuAnchor(null);
+              }}
+              selected={filter === 'all'}
+            >
+              Show All
+            </MenuItem>
+          </Menu>
+        )}
 
         {/* Trees Grid */}
         <Box
