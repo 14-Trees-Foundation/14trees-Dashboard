@@ -54,8 +54,8 @@ const TreesModal: React.FC<TreesModalProps> = ({ open, onClose, request, userId,
       // Build filters based on request type
       const filters: any[] = [];
 
-      if (request.type === 'Miscellaneous') {
-        // Historical sponsorships: donation_id IS NULL AND request_id IS NULL
+      if (request.type === 'Historical Sponsorships') {
+        // Historical sponsorships: donation_id IS NULL AND gift_card_request_id IS NULL
         filters.push(
           { columnField: 'donation_id', operatorValue: 'isNull' },
           { columnField: 'gift_card_request_id', operatorValue: 'isNull' }
@@ -68,7 +68,7 @@ const TreesModal: React.FC<TreesModalProps> = ({ open, onClose, request, userId,
           value: request.id
         });
       } else {
-        // Gift Cards, Normal Assignment, Visit - filter by gift_card_request_id
+        // Tree Gifts, Direct Sponsorship, Event Participation - filter by gift_card_request_id
         filters.push({
           columnField: 'gift_card_request_id',
           operatorValue: 'equals',
@@ -158,7 +158,7 @@ const TreesModal: React.FC<TreesModalProps> = ({ open, onClose, request, userId,
           <Typography variant="h5" fontWeight={600}>
             {request.type}
           </Typography>
-          {request.type !== 'Miscellaneous' && (
+          {request.type !== 'Historical Sponsorships' && (
             <Typography variant="body2" color="text.secondary">
               {request.eventName} • {formatDate(request.date)}
             </Typography>

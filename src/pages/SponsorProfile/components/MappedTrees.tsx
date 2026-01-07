@@ -6,6 +6,7 @@ import { useLocation, useParams } from "react-router-dom";
 import { RequestItem, mapGiftRequestToRequestItem, mapDonationToRequestItem, createMiscellaneousRequestItem } from "../types/requestItem";
 import RequestList from "./RequestList";
 import TreesModal from "./TreesModal";
+import SponsorHeroSection from "./SponsorHeroSection";
 
 interface MappedTreesProps {
 }
@@ -21,6 +22,10 @@ const MappedTrees: React.FC<MappedTreesProps> = ({ }) => {
     const [name, setName] = useState('');
     const [selectedRequest, setSelectedRequest] = useState<RequestItem | null>(null);
     const [modalOpen, setModalOpen] = useState(false);
+    const [aggregateMetrics, setAggregateMetrics] = useState({
+        totalTrees: 0,
+        totalRequests: 0,
+    });
 
 
     const fetchRequests = async (userId: number, groupId?: number) => {
@@ -80,6 +85,11 @@ const MappedTrees: React.FC<MappedTreesProps> = ({ }) => {
 
             setRequests(allRequests);
 
+            // Calculate aggregate metrics
+            const totalTrees = allRequests.reduce((sum, req) => sum + req.treeCount, 0);
+            const totalRequests = allRequests.length;
+            setAggregateMetrics({ totalTrees, totalRequests });
+
             // Set sponsor/group name from response
             const sponsorName = isGroupView
                 ? (miscTreesResponse as any).group_name || 'Group'
@@ -118,7 +128,16 @@ const MappedTrees: React.FC<MappedTreesProps> = ({ }) => {
 
 
     return (
-        <Box p={2} data-testid="mapped-trees-container">
+        <Box
+            p={2}
+            data-testid="mapped-trees-container"
+            sx={{
+                // Mobile: no padding to maximize space
+                '@media (max-width: 768px)': {
+                    padding: 1,
+                }
+            }}
+        >
             {/* Header */}
             <Box mb={3}>
                 <Typography mb={1} variant="h4" color={"#323232"} data-testid="dashboard-header">
@@ -127,17 +146,26 @@ const MappedTrees: React.FC<MappedTreesProps> = ({ }) => {
                 <Divider />
             </Box>
 
+            {/* Hero Section with Aggregate Metrics */}
+            <Box sx={{ mb: 4 }}>
+                <SponsorHeroSection
+                    totalTrees={aggregateMetrics.totalTrees}
+                    totalRequests={aggregateMetrics.totalRequests}
+                    loading={loading}
+                    isGroupView={isGroupView}
+                />
+            </Box>
+
             {/* Request List */}
             <Box
                 className="no-scrollbar"
                 data-testid="request-list-container"
                 sx={{
-                    height: 'calc(100vh - 150px)',
+                    height: 'calc(100vh - 450px)', // Adjusted for hero section
                     overflowY: 'auto',
-                    padding: '0 20px',
-                    // Mobile: reduce padding
+                    // Mobile: adjust height and padding
                     '@media (max-width: 768px)': {
-                        padding: '0 10px',
+                        height: 'calc(100vh - 350px)',
                     }
                 }}
             >
@@ -145,6 +173,7 @@ const MappedTrees: React.FC<MappedTreesProps> = ({ }) => {
                     requests={requests}
                     onRequestClick={handleRequestClick}
                     loading={loading}
+                    isGroupView={isGroupView}
                 />
             </Box>
 

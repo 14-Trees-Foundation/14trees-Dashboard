@@ -1,5 +1,5 @@
 import React from 'react';
-import { Card, CardContent, Typography, Box } from '@mui/material';
+import { Card, CardContent, Typography, Box, useTheme, alpha } from '@mui/material';
 import {
   CardGiftcard as GiftIcon,
   Park as TreeIcon,
@@ -14,43 +14,44 @@ interface RequestCardProps {
   onClick: (request: RequestItem) => void;
 }
 
-const getIconForType = (type: RequestType) => {
+const getIconForType = (type: RequestType, theme: any) => {
   switch (type) {
-    case 'Gift Cards':
-      return <GiftIcon sx={{ fontSize: 40 }} />;
-    case 'Normal Assignment':
-      return <TreeIcon sx={{ fontSize: 40 }} />;
-    case 'Visit':
-      return <VisitIcon sx={{ fontSize: 40 }} />;
+    case 'Tree Gifts':
+      return <GiftIcon sx={{ fontSize: 40, color: theme.palette.primary.main }} />;
+    case 'Direct Sponsorship':
+      return <TreeIcon sx={{ fontSize: 40, color: theme.palette.success.main }} />;
+    case 'Event Participation':
+      return <VisitIcon sx={{ fontSize: 40, color: theme.palette.secondary.main }} />;
     case 'Donation':
-      return <DonationIcon sx={{ fontSize: 40 }} />;
-    case 'Miscellaneous':
-      return <MiscIcon sx={{ fontSize: 40 }} />;
+      return <DonationIcon sx={{ fontSize: 40, color: theme.palette.error?.main || '#FF5722' }} />;
+    case 'Historical Sponsorships':
+      return <MiscIcon sx={{ fontSize: 40, color: theme.palette.text.secondary }} />;
     default:
-      return <TreeIcon sx={{ fontSize: 40 }} />;
+      return <TreeIcon sx={{ fontSize: 40, color: theme.palette.success.main }} />;
   }
 };
 
-const getColorForType = (type: RequestType) => {
+const getColorForType = (type: RequestType, theme: any) => {
   switch (type) {
-    case 'Gift Cards':
-      return '#E3F2FD'; // Light blue
-    case 'Normal Assignment':
-      return '#E8F5E9'; // Light green
-    case 'Visit':
-      return '#F3E5F5'; // Light purple
+    case 'Tree Gifts':
+      return '#E0E0E0'; // Gift cards - darker greyish background (not highlighted)
+    case 'Direct Sponsorship':
+      return alpha(theme.palette.success.main, 0.15); // Direct Sponsorship - highlighted with green tinted background
+    case 'Event Participation':
+      return alpha(theme.palette.secondary.main, 0.15); // Event Participation - highlighted with secondary color tinted background
     case 'Donation':
-      return '#FFF3E0'; // Light orange
-    case 'Miscellaneous':
-      return '#F5F5F5'; // Light grey
+      return alpha(theme.palette.error?.main || '#FF5722', 0.15); // Donation - highlighted with red/orange tinted background
+    case 'Historical Sponsorships':
+      return alpha(theme.palette.primary.main, 0.25); // Historical - highlighted with brighter blue tinted background
     default:
-      return '#F5F5F5';
+      return alpha(theme.palette.primary.main, 0.15);
   }
 };
 
 const RequestCard: React.FC<RequestCardProps> = ({ request, onClick }) => {
-  const backgroundColor = getColorForType(request.type);
-  const icon = getIconForType(request.type);
+  const theme = useTheme();
+  const backgroundColor = getColorForType(request.type, theme);
+  const icon = getIconForType(request.type, theme);
 
   const formatDate = (date: Date) => {
     return new Intl.DateTimeFormat('en-US', {
@@ -70,64 +71,126 @@ const RequestCard: React.FC<RequestCardProps> = ({ request, onClick }) => {
       sx={{
         backgroundColor,
         cursor: 'pointer',
-        minHeight: 120,
-        borderRadius: '12px',
+        height: '100%',
+        minHeight: 180,
+        borderRadius: theme.shape.borderRadius,
         transition: 'all 0.3s ease',
+        display: 'flex',
+        flexDirection: 'column',
         '&:hover': {
           transform: 'translateY(-4px)',
           boxShadow: 4,
         },
         // Mobile responsive
         '@media (max-width: 768px)': {
-          minHeight: 100,
+          minHeight: 160,
         }
       }}
       aria-label={`${request.type} - ${request.eventName} - ${request.treeCount} trees - ${formatDate(request.date)}`}
     >
-      <CardContent>
-        <Box display="flex" alignItems="center" mb={1}>
-          {icon}
-          <Typography
-            variant="h6"
-            data-testid="card-event-name"
+      <CardContent sx={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+        {/* Title Section - Fixed Height */}
+        <Box
+          display="flex"
+          justifyContent="space-between"
+          alignItems="flex-start"
+          mb={1}
+          sx={{
+            minHeight: 72,
+            // Mobile: smaller height
+            '@media (max-width: 768px)': {
+              minHeight: 60,
+            }
+          }}
+        >
+          {/* Left: Icon + Event Name */}
+          <Box display="flex" alignItems="flex-start" flex={1} minWidth={0}>
+            <Box sx={{ flexShrink: 0, mt: 0.5 }}>
+              {icon}
+            </Box>
+            <Typography
+              variant="h6"
+              data-testid="card-event-name"
+              sx={{
+                ml: 1,
+                fontWeight: 600,
+                overflow: 'hidden',
+                display: '-webkit-box',
+                WebkitLineClamp: 2,
+                WebkitBoxOrient: 'vertical',
+                lineHeight: 1.3,
+                // Mobile: smaller font
+                '@media (max-width: 768px)': {
+                  fontSize: '1rem',
+                }
+              }}
+            >
+              {request.eventName || 'N/A'}
+            </Typography>
+          </Box>
+
+          {/* Right: Photo Thumbnail - Always reserve space */}
+          <Box
             sx={{
-              ml: 1,
-              fontWeight: 600,
-              // Mobile: smaller font
+              width: 60,
+              height: 60,
+              ml: 2,
+              flexShrink: 0,
+              // Mobile: slightly smaller
               '@media (max-width: 768px)': {
-                fontSize: '1rem',
+                width: 50,
+                height: 50,
               }
             }}
           >
-            {request.eventName || 'N/A'}
-          </Typography>
+            {request.thumbnailPhoto && (
+              <Box
+                component="img"
+                src={request.thumbnailPhoto}
+                alt="Tree preview"
+                sx={{
+                  width: '100%',
+                  height: '100%',
+                  borderRadius: theme.shape.borderRadius / 1.5,
+                  objectFit: 'cover',
+                }}
+                onError={(e: any) => {
+                  // Hide image on error instead of showing broken image
+                  e.currentTarget.style.display = 'none';
+                }}
+              />
+            )}
+          </Box>
         </Box>
 
-        <Typography
-          variant="body2"
-          color="text.secondary"
-          gutterBottom
-          data-testid="card-type"
-        >
-          Type: {request.type}
-        </Typography>
-
-        {request.type !== 'Miscellaneous' && (
-          <Typography variant="body2" color="text.secondary" gutterBottom data-testid="card-date">
-            Date: {formatDate(request.date)}
+        {/* Details Section */}
+        <Box>
+          <Typography
+            variant="body2"
+            color="text.secondary"
+            gutterBottom
+            data-testid="card-type"
+          >
+            Type: {request.type}
           </Typography>
-        )}
 
-        <Typography
-          variant="body1"
-          data-testid="card-tree-count"
-          sx={{
-            fontWeight: 500,
-            mt: 1,
-          }}
-        >
-          Trees: {request.treeCount}
-        </Typography>
+          {request.type !== 'Historical Sponsorships' && (
+            <Typography variant="body2" color="text.secondary" gutterBottom data-testid="card-date">
+              Date: {formatDate(request.date)}
+            </Typography>
+          )}
+
+          <Typography
+            variant="body1"
+            data-testid="card-tree-count"
+            sx={{
+              fontWeight: 500,
+              mt: 1,
+            }}
+          >
+            Trees: {request.treeCount}
+          </Typography>
+        </Box>
       </CardContent>
     </Card>
   );

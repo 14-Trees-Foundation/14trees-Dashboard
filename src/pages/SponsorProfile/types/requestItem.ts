@@ -1,7 +1,7 @@
 import { GiftCard } from "../../../types/gift_card";
 import { Donation } from "../../../types/donation";
 
-export type RequestType = 'Gift Cards' | 'Normal Assignment' | 'Visit' | 'Donation' | 'Miscellaneous';
+export type RequestType = 'Tree Gifts' | 'Direct Sponsorship' | 'Event Participation' | 'Donation' | 'Historical Sponsorships';
 
 export interface RequestItem {
   id: string | number; // request_id or donation.id or 'miscellaneous'
@@ -10,6 +10,23 @@ export interface RequestItem {
   date: Date;
   treeCount: number; // Total count only (no progress tracking)
   rawData: GiftCard | Donation | null; // Original object for reference
+  thumbnailPhoto?: string; // URL of first tree's photo
+}
+
+/**
+ * Converts backend request_type to user-friendly RequestType
+ */
+function getRequestType(type: string): RequestType {
+  switch (type) {
+    case 'Gift Cards':
+      return 'Tree Gifts';
+    case 'Normal Assignment':
+      return 'Direct Sponsorship';
+    case 'Visit':
+      return 'Event Participation';
+    default:
+      return 'Tree Gifts'; // fallback
+  }
 }
 
 /**
@@ -24,11 +41,12 @@ export function mapGiftRequestToRequestItem(request: GiftCard): RequestItem | nu
 
   return {
     id: request.id,
-    type: request.request_type as RequestType,
+    type: getRequestType(request.request_type),
     eventName: request.event_name,
     date: new Date(request.created_at),
     treeCount: request.no_of_cards || 0,
-    rawData: request
+    rawData: request,
+    thumbnailPhoto: (request as any).first_tree_photo_url || undefined
   };
 }
 
@@ -42,7 +60,8 @@ export function mapDonationToRequestItem(donation: Donation): RequestItem {
     eventName: donation.event_name || 'General Donation',
     date: new Date(donation.donation_date || donation.created_at),
     treeCount: donation.trees_count || 0,
-    rawData: donation
+    rawData: donation,
+    thumbnailPhoto: (donation as any).first_tree_photo_url || undefined
   };
 }
 
@@ -52,8 +71,8 @@ export function mapDonationToRequestItem(donation: Donation): RequestItem {
 export function createMiscellaneousRequestItem(treeCount: number): RequestItem {
   return {
     id: 'miscellaneous',
-    type: 'Miscellaneous',
-    eventName: 'Miscellaneous',
+    type: 'Historical Sponsorships',
+    eventName: 'Legacy Trees',
     date: new Date(), // Not displayed - can use current date for sorting
     treeCount: treeCount,
     rawData: null
