@@ -141,7 +141,7 @@ const MappedTrees: React.FC<MappedTreesProps> = ({ }) => {
             {/* Header */}
             <Box mb={3}>
                 <Typography mb={1} variant="h4" color={"#323232"} data-testid="dashboard-header">
-                    {name}'s Dashboard
+                    {loading && !name ? 'Loading...' : `${name}'s Dashboard`}
                 </Typography>
                 <Divider />
             </Box>
