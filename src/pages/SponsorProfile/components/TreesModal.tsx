@@ -11,10 +11,11 @@ import {
   Checkbox,
   Paper,
   InputBase,
-  Button,
-  Divider
+  Menu,
+  MenuItem,
+  Button
 } from '@mui/material';
-import { Close as CloseIcon, Search } from '@mui/icons-material';
+import { Close as CloseIcon, Search, FilterList } from '@mui/icons-material';
 import { RequestItem } from '../types/requestItem';
 import ApiClient from '../../../api/apiClient/apiClient';
 import { toast } from 'react-toastify';
@@ -35,6 +36,7 @@ const TreesModal: React.FC<TreesModalProps> = ({ open, onClose, request, userId,
   const [loading, setLoading] = useState(false);
   const [searchStr, setSearchStr] = useState('');
   const [filter, setFilter] = useState<'default' | 'memorial' | 'all'>('default');
+  const [filterMenuAnchor, setFilterMenuAnchor] = useState<null | HTMLElement>(null);
 
   const formatDate = (date: Date) => {
     return new Intl.DateTimeFormat('en-US', {
@@ -141,29 +143,52 @@ const TreesModal: React.FC<TreesModalProps> = ({ open, onClose, request, userId,
           margin: 0,
           maxWidth: '100vw',
           maxHeight: '100vh',
+          backgroundColor: 'rgba(63, 83, 68, 0.95)', // Darker green background for padding areas
+          // Add horizontal padding for desktop
+          '@media (min-width: 768px)': {
+            paddingLeft: '10%',
+            paddingRight: '10%',
+          }
         }
       }}
     >
-      {/* Header */}
-      <Box
-        sx={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          p: 2,
-          borderBottom: '1px solid #e0e0e0'
-        }}
-      >
+      {/* Main Content Wrapper with rounded corners */}
+      <Box sx={{
+        borderRadius: 3,
+        overflow: 'hidden',
+        backgroundColor: '#FFFFFF',
+        mt: 3, // Top margin for spacing from dialog top
+        '@media (max-width: 768px)': {
+          mt: 0, // No top margin on mobile
+        }
+      }}>
+        {/* Header */}
+        <Box
+          sx={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            p: 2,
+            borderBottom: '1px solid #e0e0e0',
+            backgroundColor: 'rgba(156, 197, 61, 0.25)' // Darker, more vibrant green
+          }}
+        >
         <Box>
-          <Typography variant="h5" fontWeight={600}>
-            {request.type}
-          </Typography>
-          {request.type !== 'Historical Sponsorships' && (
-            <Typography variant="body2" color="text.secondary">
-              {request.eventName} • {formatDate(request.date)}
+          {request.type !== 'Historical Sponsorships' ? (
+            <>
+              <Typography variant="h5" fontWeight={600} color="text.primary">
+                {request.eventName}
+              </Typography>
+              <Typography variant="body1" color="text.secondary" mt={0.3}>
+                {request.type} • {formatDate(request.date)}
+              </Typography>
+            </>
+          ) : (
+            <Typography variant="h5" fontWeight={600} color="text.primary">
+              {request.type}
             </Typography>
           )}
-          <Typography variant="body1" color="text.primary" mt={0.5}>
+          <Typography variant="body2" color="text.secondary" mt={0.5}>
             Total Trees: {request.treeCount}
           </Typography>
         </Box>
@@ -172,99 +197,150 @@ const TreesModal: React.FC<TreesModalProps> = ({ open, onClose, request, userId,
         </IconButton>
       </Box>
 
-      <DialogContent sx={{ p: 2 }}>
-        {/* Filter Controls */}
-        <Box
-          display="flex"
-          alignItems="center"
-          justifyContent="space-between"
-          mb={2}
-          sx={{
-            flexDirection: 'row',
-            gap: 2,
-            // Mobile: stack vertically
-            '@media (max-width: 768px)': {
-              flexDirection: 'column',
-              alignItems: 'stretch',
-            }
-          }}
-        >
-          <FormControl component="fieldset">
-            <FormGroup
-              aria-label="position"
-              row
-              sx={{
-                // Mobile: stack checkboxes vertically
-                '@media (max-width: 768px)': {
-                  flexDirection: 'column',
-                }
-              }}
-            >
-              <FormControlLabel
-                value="default"
-                control={
-                  <Checkbox
-                    checked={filter === 'default' || filter === 'all'}
-                    onChange={() => { setFilter('default') }}
-                  />
-                }
-                label="F&F Trees"
-                labelPlacement="end"
-              />
-              <FormControlLabel
-                value="memorial"
-                control={
-                  <Checkbox
-                    checked={filter === 'memorial' || filter === 'all'}
-                    onChange={() => { setFilter('memorial') }}
-                  />
-                }
-                label="Memorial Trees"
-                labelPlacement="end"
-              />
-              <FormControlLabel
-                value="all"
-                control={
-                  <Checkbox
-                    checked={filter === 'all'}
-                    onChange={() => { setFilter(prev => prev === 'all' ? 'default' : 'all') }}
-                  />
-                }
-                label="Show All"
-                labelPlacement="end"
-              />
-            </FormGroup>
-          </FormControl>
-
-          <Paper
-            component="div"
+      <DialogContent sx={{ p: 0, backgroundColor: 'rgba(156, 197, 61, 0.25)' }}>
+        {/* Filter Controls Section */}
+        <Box sx={{ p: 2, pb: 1.5 }}>
+          <Box
+            display="flex"
+            alignItems="center"
+            justifyContent="space-between"
             sx={{
-              p: '2px 4px',
-              display: 'flex',
-              alignItems: 'center',
-              width: 400,
-              maxWidth: '100%',
-              backgroundColor: '#e3e3e3bf',
-              // Mobile: full width
+              flexDirection: 'row',
+              gap: 2,
+              // Mobile: horizontal layout with compact spacing
               '@media (max-width: 768px)': {
-                width: '100%',
+                gap: 1,
               }
             }}
           >
-            <IconButton sx={{ p: '10px' }} aria-label="search">
-              <Search />
-            </IconButton>
-            <InputBase
-              value={searchStr}
-              onChange={(e) => { setSearchStr(e.target.value) }}
-              sx={{ ml: 1, flex: 1 }}
-              placeholder="Search name"
-              inputProps={{ 'aria-label': 'search friends & family members' }}
-            />
-          </Paper>
+            {/* Desktop: Show filters inline */}
+            <FormControl
+              component="fieldset"
+              sx={{
+                '@media (max-width: 768px)': {
+                  display: 'none',
+                }
+              }}
+            >
+              <FormGroup aria-label="position" row>
+                <FormControlLabel
+                  value="default"
+                  control={
+                    <Checkbox
+                      checked={filter === 'default' || filter === 'all'}
+                      onChange={() => { setFilter('default') }}
+                      sx={{ py: 0.5 }}
+                    />
+                  }
+                  label="F&F Trees"
+                  labelPlacement="end"
+                  sx={{ mr: 1 }}
+                />
+                <FormControlLabel
+                  value="memorial"
+                  control={
+                    <Checkbox
+                      checked={filter === 'memorial' || filter === 'all'}
+                      onChange={() => { setFilter('memorial') }}
+                      sx={{ py: 0.5 }}
+                    />
+                  }
+                  label="Memorial Trees"
+                  labelPlacement="end"
+                  sx={{ mr: 1 }}
+                />
+                <FormControlLabel
+                  value="all"
+                  control={
+                    <Checkbox
+                      checked={filter === 'all'}
+                      onChange={() => { setFilter(prev => prev === 'all' ? 'default' : 'all') }}
+                      sx={{ py: 0.5 }}
+                    />
+                  }
+                  label="Show All"
+                  labelPlacement="end"
+                />
+              </FormGroup>
+            </FormControl>
+
+            <Paper
+              component="div"
+              sx={{
+                p: '2px 4px',
+                display: 'flex',
+                alignItems: 'center',
+                width: 400,
+                maxWidth: '100%',
+                backgroundColor: 'rgba(156, 197, 61, 0.12)', // Lighter green for search bar
+                // Mobile: take remaining space
+                '@media (max-width: 768px)': {
+                  flex: 1,
+                }
+              }}
+            >
+              <IconButton sx={{ p: '8px' }} aria-label="search">
+                <Search />
+              </IconButton>
+              <InputBase
+                value={searchStr}
+                onChange={(e) => { setSearchStr(e.target.value) }}
+                sx={{ ml: 1, flex: 1 }}
+                placeholder="Search name"
+                inputProps={{ 'aria-label': 'search friends & family members' }}
+              />
+              {/* Mobile: Filter Menu Icon */}
+              <IconButton
+                sx={{
+                  p: '8px',
+                  display: 'none',
+                  '@media (max-width: 768px)': {
+                    display: 'block',
+                  }
+                }}
+                aria-label="filter options"
+                onClick={(e) => setFilterMenuAnchor(e.currentTarget)}
+              >
+                <FilterList />
+              </IconButton>
+            </Paper>
+          </Box>
         </Box>
 
-        <Divider sx={{ mb: 2 }} />
+        {/* Filter Menu for Mobile */}
+        <Menu
+          anchorEl={filterMenuAnchor}
+          open={Boolean(filterMenuAnchor)}
+          onClose={() => setFilterMenuAnchor(null)}
+        >
+          <MenuItem
+            onClick={() => {
+              setFilter('default');
+              setFilterMenuAnchor(null);
+            }}
+            selected={filter === 'default'}
+          >
+            F&F Trees
+          </MenuItem>
+          <MenuItem
+            onClick={() => {
+              setFilter('memorial');
+              setFilterMenuAnchor(null);
+            }}
+            selected={filter === 'memorial'}
+          >
+            Memorial Trees
+          </MenuItem>
+          <MenuItem
+            onClick={() => {
+              setFilter('all');
+              setFilterMenuAnchor(null);
+            }}
+            selected={filter === 'all'}
+          >
+            Show All
+          </MenuItem>
+        </Menu>
 
         {/* Trees Grid */}
         <Box
@@ -272,6 +348,10 @@ const TreesModal: React.FC<TreesModalProps> = ({ open, onClose, request, userId,
           sx={{
             height: 'calc(100vh - 280px)',
             overflowY: 'scroll',
+            backgroundColor: '#F5F5F5', // Light grey background for trees grid (original color)
+            p: 2,
+            m: 2,
+            borderRadius: 1,
           }}
         >
           <CardGrid
@@ -317,6 +397,7 @@ const TreesModal: React.FC<TreesModalProps> = ({ open, onClose, request, userId,
           )}
         </Box>
       </DialogContent>
+      </Box>
     </Dialog>
   );
 };
