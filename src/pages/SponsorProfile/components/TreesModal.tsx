@@ -13,7 +13,9 @@ import {
   InputBase,
   Menu,
   MenuItem,
-  Button
+  Button,
+  ToggleButtonGroup,
+  ToggleButton
 } from '@mui/material';
 import { Close as CloseIcon, Search, FilterList } from '@mui/icons-material';
 import { RequestItem } from '../types/requestItem';
@@ -29,6 +31,8 @@ interface TreesModalProps {
   groupId?: number;
 }
 
+type ImageType = 'illustration' | 'user' | 'tree' | 'giftcard';
+
 const TreesModal: React.FC<TreesModalProps> = ({ open, onClose, request, userId, groupId }) => {
   const [trees, setTrees] = useState<any[]>([]);
   const [filteredTrees, setFilteredTrees] = useState<any[]>([]);
@@ -37,6 +41,7 @@ const TreesModal: React.FC<TreesModalProps> = ({ open, onClose, request, userId,
   const [searchStr, setSearchStr] = useState('');
   const [filter, setFilter] = useState<'default' | 'memorial' | 'all'>('default');
   const [filterMenuAnchor, setFilterMenuAnchor] = useState<null | HTMLElement>(null);
+  const [imageType, setImageType] = useState<ImageType>('illustration');
 
   const formatDate = (date: Date) => {
     return new Intl.DateTimeFormat('en-US', {
@@ -44,6 +49,24 @@ const TreesModal: React.FC<TreesModalProps> = ({ open, onClose, request, userId,
       month: 'short',
       day: 'numeric'
     }).format(date);
+  };
+
+  const getImageForType = (tree: any, type: ImageType): string => {
+    switch (type) {
+      case 'illustration':
+        return tree.illustration_s3_path || tree.image || '';
+      case 'user':
+        // User uploaded image for this specific tree
+        return tree.user_tree_image || tree.illustration_s3_path || tree.image || '';
+      case 'tree':
+        // Actual tree photo (image field is the primary tree photo)
+        return tree.image || tree.illustration_s3_path || '';
+      case 'giftcard':
+        // Gift card image from gift_cards table (joined via tree_id)
+        return tree.gift_card_image || tree.illustration_s3_path || tree.image || '';
+      default:
+        return tree.illustration_s3_path || tree.image || '';
+    }
   };
 
   const getTrees = async (offset: number = 0) => {
@@ -124,6 +147,7 @@ const TreesModal: React.FC<TreesModalProps> = ({ open, onClose, request, userId,
       setTrees([]);
       setSearchStr('');
       setFilter('default');
+      setImageType('illustration');
       getTrees(0);
     }
   }, [open, request]);
@@ -305,6 +329,66 @@ const TreesModal: React.FC<TreesModalProps> = ({ open, onClose, request, userId,
               </IconButton>
             </Paper>
           </Box>
+
+          {/* Image Type Toggle */}
+          <Box
+            sx={{
+              mt: 1.5,
+              display: 'flex',
+              justifyContent: 'center',
+            }}
+          >
+            <ToggleButtonGroup
+              value={imageType}
+              exclusive
+              onChange={(event, newValue) => {
+                if (newValue !== null) {
+                  setImageType(newValue);
+                }
+              }}
+              aria-label="image type"
+              size="small"
+              sx={{
+                backgroundColor: '#FFFFFF',
+                '& .MuiToggleButton-root': {
+                  px: 2,
+                  py: 0.5,
+                  fontSize: '0.875rem',
+                  textTransform: 'none',
+                  border: '1px solid rgba(156, 197, 61, 0.5)',
+                  '&.Mui-selected': {
+                    backgroundColor: 'rgba(156, 197, 61, 0.3)',
+                    color: 'text.primary',
+                    fontWeight: 600,
+                    '&:hover': {
+                      backgroundColor: 'rgba(156, 197, 61, 0.4)',
+                    }
+                  }
+                },
+                // Mobile: stack buttons or make smaller
+                '@media (max-width: 768px)': {
+                  flexWrap: 'wrap',
+                  '& .MuiToggleButton-root': {
+                    fontSize: '0.75rem',
+                    px: 1.5,
+                  }
+                }
+              }}
+            >
+              <ToggleButton value="illustration" aria-label="tree illustration">
+                Illustration
+              </ToggleButton>
+              <ToggleButton value="user" aria-label="user image">
+                User Image
+              </ToggleButton>
+              <ToggleButton value="tree" aria-label="tree image">
+                Tree Photo
+              </ToggleButton>
+              <ToggleButton value="giftcard" aria-label="gift card image">
+                Gift Card
+              </ToggleButton>
+            </ToggleButtonGroup>
+          </Box>
         </Box>
 
         {/* Filter Menu for Mobile */}
@@ -370,9 +454,7 @@ const TreesModal: React.FC<TreesModalProps> = ({ open, onClose, request, userId,
                 name: tree.assigned_to_name,
                 type: tree.plant_type,
                 dashboardLink: location,
-                image: tree.illustration_s3_path
-                  ? tree.illustration_s3_path
-                  : tree.image,
+                image: getImageForType(tree, imageType),
               };
             })}
           />

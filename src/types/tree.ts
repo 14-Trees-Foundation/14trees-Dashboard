@@ -41,6 +41,7 @@ export type Tree = {
     assigned_to_email?: string,
     illustration_s3_path?: string,
     template_image?: string,
+    gift_card_image?: string, // card_image_url from gift_cards table
 
     // Association with Gift/Donation/Visit
     association_type?: string | null, // "Gift Cards" | "Normal Assignment" | "Visit" | "Donation"

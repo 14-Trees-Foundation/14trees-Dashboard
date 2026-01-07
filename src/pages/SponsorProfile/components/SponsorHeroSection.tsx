@@ -1,6 +1,6 @@
 import React from 'react';
-import { Box, Grid, Typography, Skeleton, useTheme, alpha } from '@mui/material';
-import { Park, Co2, Event, Landscape } from '@mui/icons-material';
+import { Box, Grid, Typography, Skeleton, useTheme, alpha, Tooltip, IconButton } from '@mui/material';
+import { Park, Co2, Event, Landscape, InfoOutlined } from '@mui/icons-material';
 
 interface SponsorHeroSectionProps {
   totalTrees: number;
@@ -52,7 +52,8 @@ const SponsorHeroSection: React.FC<SponsorHeroSectionProps> = ({
 
   // Calculate CO2 if not provided: totalTrees * 0.2 tons/tree (10-year average)
   const calculatedCO2 = co2Offset !== undefined ? co2Offset : (totalTrees * 0.2);
-  const calculatedArea = areaRestored !== undefined ? areaRestored : (totalTrees * 0.002);
+  // Calculate area: ~330 trees per acre on average
+  const calculatedArea = areaRestored !== undefined ? areaRestored : (totalTrees / 330);
 
   if (loading) {
     return <SkeletonHeroSection />;
@@ -119,9 +120,20 @@ const SponsorHeroSection: React.FC<SponsorHeroSectionProps> = ({
               >
                 {calculatedCO2.toFixed(1)} tons
               </Typography>
-              <Typography variant="body1" color="text.secondary">
-                CO2 Offset (est.)
-              </Typography>
+              <Box display="flex" alignItems="center" gap={0.5}>
+                <Typography variant="body1" color="text.secondary">
+                  CO2 Offset (est.)
+                </Typography>
+                <Tooltip
+                  title="Calculated based on 0.2 tons of CO2 offset per tree over a 10-year average. This estimate includes carbon sequestration through photosynthesis and biomass growth."
+                  arrow
+                  placement="top"
+                >
+                  <IconButton size="small" sx={{ padding: 0.5 }}>
+                    <InfoOutlined sx={{ fontSize: 16, color: theme.palette.text.secondary }} />
+                  </IconButton>
+                </Tooltip>
+              </Box>
             </Box>
           </Box>
         </Grid>
