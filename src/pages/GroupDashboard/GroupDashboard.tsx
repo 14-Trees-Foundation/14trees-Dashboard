@@ -71,6 +71,15 @@ interface GroupStats {
     spreadsheet_data: SpreadsheetData | null;
 }
 
+// Map group IDs to their specific images
+const GROUP_IMAGES: Record<string, string> = {
+    "96": "https://14treesplants.s3.ap-south-1.amazonaws.com/groups/Skoda_ai.png",
+    "82": "https://14treesplants.s3.ap-south-1.amazonaws.com/groups/Yardi.png",
+    // Add more group-specific images here as needed
+};
+
+const DEFAULT_GROUP_IMAGE = "https://via.placeholder.com/800x600/4CAF50/FFFFFF?text=14+Trees+Partnership";
+
 const GroupDashboard: React.FC = () => {
     const theme = useTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down("md"));
@@ -181,12 +190,11 @@ const GroupDashboard: React.FC = () => {
                         <Grid item xs={12} md={5}>
                             <Box className={classes.heroImageContainer}>
                                 <img
-                                    // src="https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?w=800&h=600&fit=crop"
-                                    src = "https://14treesplants.s3.ap-south-1.amazonaws.com/groups/Skoda_ai.png?w=800&h=600"
+                                    src={groupId ? (GROUP_IMAGES[groupId] || DEFAULT_GROUP_IMAGE) : DEFAULT_GROUP_IMAGE}
                                     alt="Partnership"
                                     className={classes.heroImage}
                                     onError={(e) => {
-                                        (e.target as HTMLImageElement).src = "https://via.placeholder.com/800x600/4CAF50/FFFFFF?text=14+Trees+Partnership";
+                                        (e.target as HTMLImageElement).src = DEFAULT_GROUP_IMAGE;
                                     }}
                                 />
                             </Box>
