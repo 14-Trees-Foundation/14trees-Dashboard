@@ -80,6 +80,13 @@ const GROUP_IMAGES: Record<string, string> = {
 
 const DEFAULT_GROUP_IMAGE = "https://via.placeholder.com/800x600/4CAF50/FFFFFF?text=14+Trees+Partnership";
 
+// Map group IDs to their specific gift card counts
+const GROUP_GIFT_CARDS: Record<string, number> = {
+    "96": 2, // Skoda
+    "82": 0, // Yardi
+    // Add more group-specific gift card counts here as needed
+};
+
 const GroupDashboard: React.FC = () => {
     const theme = useTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down("md"));
@@ -273,8 +280,9 @@ const GroupDashboard: React.FC = () => {
                                         <CardGiftcard className={classes.metricIcon} />
                                     </Box>
                                     <Typography variant={isMobile ? "h6" : "h4"} className={classes.metricValue}>
-                                        {/* {groupStats.gift_card_requests} */}
-                                        2
+                                        {groupId && GROUP_GIFT_CARDS[groupId] !== undefined
+                                            ? GROUP_GIFT_CARDS[groupId]
+                                            : groupStats.gift_card_requests || 0}
                                     </Typography>
                                     <Typography variant="body2" className={classes.metricLabel}>
                                         Cards gifted
