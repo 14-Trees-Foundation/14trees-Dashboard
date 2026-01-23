@@ -24,15 +24,25 @@ const BookedTrees: React.FC<BookedTreesProps> = ({ giftCardRequestId, visible, o
     const [selectedIds, setSelectedIds] = useState<number[]>([]);
 
     const [existingBookedTrees, setExistingBookedTrees] = useState<GiftCardUser[]>([]);
+    const [totalBookedTrees, setTotalBookedTrees] = useState<number>(0);
     const [unMapConfirmation, setUnMapConfirmation] = useState(false);
     const [unMapAllConfirmation, setUnMapAllConfirmation] = useState(false);
+
+    const getFiltersData = (filtersObj: Record<string, GridFilterItem>) => {
+        return JSON.parse(JSON.stringify(Object.values(filtersObj)));
+    }
 
     const getBookedTrees = async (giftRequestId: number) => {
         setLoading(true);
         try {
             const apiClient = new ApiClient();
-            const bookedTreesResp = await apiClient.getBookedGiftTrees(giftRequestId, 0, -1);
+            const bookedTreesResp = await apiClient.getBookedGiftTreesWithQueryFilters(giftRequestId, 0, -1, getFiltersData(filters));
             setExistingBookedTrees(bookedTreesResp.results.map(item => ({ ...item, key: item.id })));
+
+            // If no filters applied, update the total count to track if there are any booked trees
+            if (Object.keys(filters).length === 0) {
+                setTotalBookedTrees(bookedTreesResp.total);
+            }
         } catch (error: any) {
             toast.error(error.message);
         }
@@ -41,7 +51,7 @@ const BookedTrees: React.FC<BookedTreesProps> = ({ giftCardRequestId, visible, o
 
     useEffect(() => {
         getBookedTrees(giftCardRequestId);
-    }, [giftCardRequestId])
+    }, [giftCardRequestId, filters])
 
     const handleSetFilters = (filters: Record<string, GridFilterItem>) => {
         setPage(0);
@@ -55,7 +65,7 @@ const BookedTrees: React.FC<BookedTreesProps> = ({ giftCardRequestId, visible, o
             title: "Sapling ID",
             align: "center",
             width: 120,
-            // ...getColumnSearchProps('sapling_id', filters, handleSetFilters)
+            ...getColumnSearchProps('sapling_id', filters, handleSetFilters, true)
         },
         {
             dataIndex: "plant_type",
@@ -63,7 +73,7 @@ const BookedTrees: React.FC<BookedTreesProps> = ({ giftCardRequestId, visible, o
             title: "Plant Type",
             align: "center",
             width: 200,
-            // ...getColumnSearchProps('plant_type', filters, handleSetFilters)
+            ...getColumnSearchProps('plant_type', filters, handleSetFilters, true)
         },
         {
             dataIndex: "recipient_name",
@@ -71,7 +81,7 @@ const BookedTrees: React.FC<BookedTreesProps> = ({ giftCardRequestId, visible, o
             title: "Recipient",
             align: "center",
             width: 200,
-            // ...getColumnSearchProps('recipient_name', filters, handleSetFilters)
+            ...getColumnSearchProps('recipient_name', filters, handleSetFilters, true)
         },
         {
             dataIndex: "assignee_name",
@@ -79,7 +89,7 @@ const BookedTrees: React.FC<BookedTreesProps> = ({ giftCardRequestId, visible, o
             title: "Assignee",
             align: "center",
             width: 200,
-            // ...getColumnSearchProps('assignee_name', filters, handleSetFilters)
+            ...getColumnSearchProps('assignee_name', filters, handleSetFilters, true)
         },
     ];
 
@@ -115,7 +125,7 @@ const BookedTrees: React.FC<BookedTreesProps> = ({ giftCardRequestId, visible, o
 
     return (
         <Box
-            hidden={existingBookedTrees.length > 0 ? false : !visible}
+            hidden={totalBookedTrees > 0 ? false : !visible}
         >
             <Box
                 display="flex"
