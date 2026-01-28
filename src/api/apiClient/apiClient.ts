@@ -2055,6 +2055,59 @@ class ApiClient {
         }
     }
 
+    async getGiftCardMonthOnMonthAnalytics(
+        dateField: 'created_at' | 'gifted_on' = 'created_at',
+        startDate?: string,
+        endDate?: string,
+        months?: number
+    ): Promise<{
+        summary: {
+            total_requests: number;
+            total_requests_corporate: number;
+            total_requests_personal: number;
+            total_trees: number;
+            total_trees_corporate: number;
+            total_trees_personal: number;
+        };
+        monthly: Array<{
+            month: string;
+            requests: number;
+            requests_corporate: number;
+            requests_personal: number;
+            trees: number;
+            trees_corporate: number;
+            trees_personal: number;
+        }>;
+        by_occasion: Array<{
+            event_type: string;
+            total_requests: number;
+            total_trees: number;
+            monthly: Array<{
+                month: string;
+                requests: number;
+                requests_corporate: number;
+                requests_personal: number;
+                trees: number;
+                trees_corporate: number;
+                trees_personal: number;
+            }>;
+        }>;
+    }> {
+        const params = new URLSearchParams();
+        params.append('dateField', dateField);
+        if (startDate) params.append('startDate', startDate);
+        if (endDate) params.append('endDate', endDate);
+        if (months) params.append('months', months.toString());
+
+        const url = `/gift-cards/analytics/month-on-month?${params.toString()}`;
+        try {
+            const response = await this.api.get(url);
+            return response.data;
+        } catch (error: any) {
+            throw new Error(`Failed to fetch gift card analytics: ${error.message}`);
+        }
+    }
+
     async createGiftCardRequestV2(group_id: number, sponsor_name: string, sponsor_email: string, no_of_cards: number, event_type: string, event_name: string, gifted_by?: string, tags?: string[], users?: any[], logo_message?: string, primary_message?: string): Promise<{ gift_request: GiftCard, order_id: string }> {
         try {
             const response = await this.api.post<{

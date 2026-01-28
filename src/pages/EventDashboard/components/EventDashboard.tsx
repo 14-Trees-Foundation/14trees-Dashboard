@@ -4,6 +4,7 @@ import { Carousel } from "antd";
 import loriFayzanDashboardImage from "../../../assets/event-dashboard/Lori_Fayzan_Dashboard.jpg";
 import { createStyles, makeStyles } from "@mui/styles";
 import logo from "../../../assets/logo_white_small.png";
+import greenSprihLogo from "../../../assets/GreenSprihLogo.png";
 // Tree species images (replace these paths with your actual asset imports)
 import speciesImg1 from "../../../assets/planting_illustration.jpg";
 import speciesImg2 from "../../../assets/neem.png";
@@ -708,7 +709,7 @@ const EventDashboard: React.FC<EventDashboardProps> = ({ event, eventMessages })
                             justifyContent: isMobile ? "center" : "flex-start",
                         }}
                     >
-                        <img src={logo} alt={logo} className={classes.img} />
+                        <img src={event.link === "ij5h8ow9" ? greenSprihLogo : logo} alt={event.link === "ij5h8ow9" ? "GreenSprih Logo" : "14Trees Logo"} className={classes.img} />
                         <Typography
                             mb={1}
                             variant={isMobile ? "h5" : "h4"}

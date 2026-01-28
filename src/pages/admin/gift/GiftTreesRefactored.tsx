@@ -6,13 +6,16 @@ import { LoginComponent } from "../Login/LoginComponent";
 import GiftCardsForm from "./Components/workflow/GiftCardForm";
 import GeneralTable from "../../../components/GenTable";
 import AutoPrsPlots from "../../../components/AutoPrsPlots/AutoPrsPlots";
-import GiftTreesChart from "./Components/GiftTreesChart";
+import GiftAnalyticsMetrics from "./Components/GiftAnalyticsMetrics";
+import GiftAnalyticsCharts from "./Components/GiftAnalyticsCharts";
+import GiftOccasionBreakdown from "./Components/GiftOccasionBreakdown";
 import TableSummary from "./Components/TableSummary";
 import { GiftCardModals } from "./Components/GiftCardModals";
 import { useGiftCardState } from "./hooks/useGiftCardState";
 import { useGiftCardData } from "./hooks/useGiftCardData";
 import { useGiftCardHandlers } from "./hooks/useGiftCardHandlers";
 import { useTableLogic } from "./hooks/useTableLogic";
+import { useGiftCardAnalytics } from "./hooks/useGiftCardAnalytics";
 import { GiftCardService } from "./services/giftCardService";
 import { User } from "../../../types/user";
 import { Group } from "../../../types/Group";
@@ -35,6 +38,17 @@ const GiftTrees: React.FC = () => {
         setCorporateCount: state.setCorporateCount,
         setPersonalCount: state.setPersonalCount,
     });
+
+    // Analytics hook
+    const {
+        dateField,
+        setDateField,
+        timePeriod,
+        setTimePeriod,
+        analyticsData,
+        loading: loadingAnalytics,
+        error: analyticsError
+    } = useGiftCardAnalytics();
 
     // Event handlers
     const handlers = useGiftCardHandlers({
@@ -302,16 +316,44 @@ const GiftTrees: React.FC = () => {
 
             {/* Footer Content */}
             <Divider sx={{ my: 4, backgroundColor: 'transparent' }} />
+            <div id="tree-cards-sponsorship" style={{ marginTop: '20px', scrollMarginTop: '20px' }}>
+                <Typography variant="h5" sx={{ fontWeight: 500, mb: 3 }}>
+                    Sponsorship Distribution Analytics
+                </Typography>
+
+                {/* Summary Metrics */}
+                <GiftAnalyticsMetrics
+                    data={analyticsData?.summary}
+                    loading={loadingAnalytics}
+                />
+
+                {/* Month-on-Month Trends */}
+                <Box sx={{ mt: 4 }}>
+                    <GiftAnalyticsCharts
+                        data={analyticsData}
+                        dateField={dateField}
+                        setDateField={setDateField}
+                        timePeriod={timePeriod}
+                        setTimePeriod={setTimePeriod}
+                        loading={loadingAnalytics}
+                    />
+                </Box>
+
+                {/* Occasion Type Breakdown */}
+                <Box sx={{ mt: 4 }}>
+                    <Typography variant="h6" sx={{ mb: 2 }}>
+                        By Occasion Type
+                    </Typography>
+                    <GiftOccasionBreakdown
+                        data={analyticsData?.by_occasion}
+                        loading={loadingAnalytics}
+                    />
+                </Box>
+            </div>
+            <Divider sx={{ my: 4, backgroundColor: 'transparent' }} />
             <Box id="tree-cards-auto-processing" sx={{ minHeight: 540, scrollMarginTop: '20px' }}>
                 <AutoPrsPlots type="gift-trees" />
             </Box>
-            <div id="tree-cards-sponsorship" style={{ marginTop: '20px', scrollMarginTop: '20px' }}>
-                <h2>Sponsorship Distribution</h2>
-                <GiftTreesChart 
-                    corporateCount={state.corporateCount} 
-                    personalCount={state.personalCount} 
-                />
-            </div>
         </div>
     );
 };
