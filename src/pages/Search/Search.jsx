@@ -240,42 +240,44 @@ export const Search = () => {
         <div className={classes.box}>
           <AppBar />
           <ToastContainer />
-          <img
-            alt="bg"
-            src={bg}
-            className={classes.bg}
-            style={{ height: "40vh" }}
-          />
-          <div className={classes.overlay} style={{ height: "40vh" }}>
-            <div className={classes.main} style={{ paddingTop: "4%" }}>
-              <div className={classes.header} style={{ marginTop: "0" }}>
-                <h1 className={classes.infoheader}>200+</h1>
-                <p className={classes.infodesc}>
-                  People employed from local community
-                </p>
+          <div style={{ position: "relative" }}>
+            <img
+              alt="bg"
+              src={bg}
+              className={classes.bg}
+              style={{ height: "40vh" }}
+            />
+            <div className={classes.overlay} style={{ height: "40vh" }}>
+              <div className={classes.main} style={{ paddingTop: "4%" }}>
+                <div className={classes.header} style={{ marginTop: "0" }}>
+                  <h1 className={classes.infoheader}>200+</h1>
+                  <p className={classes.infodesc}>
+                    People employed from local community
+                  </p>
+                </div>
               </div>
+            </div>
+          </div>
+          <div className={classes.result}>
+            <div className={classes.resultHeader}>
+              <div className={classes.compactSearchBarWrapper}>
+                <div className={classes.compactSearchBar}>
+                  <SearchBar searchSubmit={handleSearch} initialValue={key} compact={true} />
+                </div>
+                <div className={classes.resultsCount}>
+                  {results.total_results === 0 ? (
+                    "0 results"
+                  ) : (
+                    `${results.total_results} ${results.total_results === 1 ? 'result' : 'results'}`
+                  )}
+                </div>
+              </div>
+            </div>
+            {(selectedChips === "Individual" || selectedChips === "All") && (
               <div>
-                <div className={classes.inputBox}>
-                  <SearchBar searchSubmit={handleSearch} />
-                </div>
+                <UserList />
               </div>
-            </div>
-            <div className={classes.result}>
-              {results.total_results === 0 ? (
-                <div className={classes.resultsH}>
-                  0 Results Found for : {key}
-                </div>
-              ) : (
-                <div className={classes.resultsH}>
-                  Search Results for: {key}
-                </div>
-              )}
-              {(selectedChips === "Individual" || selectedChips === "All") && (
-                <div>
-                  <UserList />
-                </div>
-              )}
-            </div>
+            )}
           </div>
         </div>
       );
@@ -290,6 +292,8 @@ const UseStyle = makeStyles((theme) =>
       position: "relative",
       backgroundColor: "#e5e5e5",
       minHeight: "100vh",
+      display: "flex",
+      flexDirection: "column",
     },
     bg: {
       width: "100%",
@@ -376,26 +380,89 @@ const UseStyle = makeStyles((theme) =>
     individual: {
       marginTop: "10px",
     },
-    resultsH: {
-      fontSize: "16px",
+    resultHeader: {
+      display: "flex",
+      justifyContent: "flex-end",
+      marginBottom: "20px",
+      [theme.breakpoints.down("md")]: {
+        marginBottom: "16px",
+      },
+    },
+    compactSearchBarWrapper: {
+      display: "flex",
+      flexDirection: "column",
+      alignItems: "flex-end",
+      gap: "8px",
+      marginRight: "16px",
+      [theme.breakpoints.down("md")]: {
+        width: "100%",
+        alignItems: "flex-start",
+        marginRight: "0",
+      },
+      [theme.breakpoints.down("sm")]: {
+        gap: "4px",
+      },
+    },
+    resultsCount: {
+      fontSize: "12px",
       fontWeight: "400",
-      height: "36px",
-      paddingTop: "8px",
-      paddingLeft: "5px",
-      [theme.breakpoints.down("480")]: {
-        paddingTop: "4%",
-        paddingLeft: "4%",
+      color: "#666",
+      textAlign: "right",
+      fontStyle: "italic",
+      paddingRight: "6px",
+      [theme.breakpoints.down("md")]: {
+        textAlign: "left",
+        paddingLeft: "6px",
+        paddingRight: "0",
+      },
+      [theme.breakpoints.down("sm")]: {
+        fontSize: "11px",
+        paddingLeft: "3px",
       },
     },
     result: {
-      marginTop: "2%",
-      width: "65vw",
-      marginLeft: "18vw",
+      width: "calc(100% - 36vw)",
+      maxWidth: "1200px",
+      marginLeft: "auto",
+      marginRight: "auto",
+      marginTop: "-40px",
       backgroundColor: "#e5e5e5",
       borderRadius: "10px",
-      [theme.breakpoints.down("480")]: {
-        width: "90vw",
-        marginLeft: "5vw",
+      minHeight: "calc(60vh + 40px)",
+      paddingTop: "60px",
+      paddingBottom: "40px",
+      paddingLeft: "16px",
+      paddingRight: "16px",
+      position: "relative",
+      border: "5px solid #2e7d32",
+      margin: "20px auto -40px auto",
+      [theme.breakpoints.down("md")]: {
+        width: "calc(100% - 15vw)",
+      },
+      [theme.breakpoints.down("sm")]: {
+        width: "calc(100% - 16px)",
+        paddingTop: "40px",
+        paddingLeft: "8px",
+        paddingRight: "8px",
+        margin: "0 auto -40px auto",
+        border: "none",
+      },
+    },
+    compactSearchBar: {
+      maxWidth: "400px",
+      minWidth: "300px",
+      backgroundColor: "#ffffff",
+      borderRadius: "7px",
+      padding: "6px",
+      boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
+      [theme.breakpoints.down("md")]: {
+        maxWidth: "100%",
+        minWidth: "auto",
+        width: "100%",
+      },
+      [theme.breakpoints.down("sm")]: {
+        padding: "3px",
+        borderRadius: "5px",
       },
     },
     bottomContainer: {

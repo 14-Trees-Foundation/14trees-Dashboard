@@ -31,14 +31,14 @@ export const PAGE_SUB_SECTIONS: PageSubSectionConfig[] = [
         icon: TableChart,
       },
       {
-        displayName: "Auto Processing",
-        sectionId: "tree-cards-auto-processing",
-        icon: Settings,
-      },
-      {
         displayName: "Sponsorship Chart",
         sectionId: "tree-cards-sponsorship",
         icon: TrendingUp,
+      },
+      {
+        displayName: "Auto Processing",
+        sectionId: "tree-cards-auto-processing",
+        icon: Settings,
       }
     ]
   },
