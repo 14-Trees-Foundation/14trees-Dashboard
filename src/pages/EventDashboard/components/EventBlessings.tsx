@@ -231,7 +231,7 @@ const EventBlessings: React.FC<EventBlessingsProps> = ({
                                     }
                                 }}
                             >
-                                Bless the bride and groom!
+                                {eventLink === "fk2yvs0k" ? "Add your wishes!" : "Bless the bride and groom!"}
                             </Box>
                         </Tooltip>
                     </Box>
