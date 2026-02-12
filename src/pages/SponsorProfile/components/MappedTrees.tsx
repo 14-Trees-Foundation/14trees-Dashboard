@@ -4,7 +4,9 @@ import { toast } from "react-toastify";
 import ApiClient from "../../../api/apiClient/apiClient";
 import { useLocation, useParams } from "react-router-dom";
 import { RequestItem, mapGiftRequestToRequestItem, mapDonationToRequestItem, createMiscellaneousRequestItem } from "../types/requestItem";
+import { UserItem, createUserItem } from "../types/userItem";
 import RequestList from "./RequestList";
+import UserList from "./UserList";
 import TreesModal from "./TreesModal";
 import SponsorHeroSection from "./SponsorHeroSection";
 
@@ -19,7 +21,9 @@ const MappedTrees: React.FC<MappedTreesProps> = ({ }) => {
 
     const [loading, setLoading] = useState(false);
     const [requests, setRequests] = useState<RequestItem[]>([]);
+    const [users, setUsers] = useState<UserItem[]>([]);
     const [name, setName] = useState('');
+    const [groupType, setGroupType] = useState<string | null>(null);
     const [selectedRequest, setSelectedRequest] = useState<RequestItem | null>(null);
     const [modalOpen, setModalOpen] = useState(false);
     const [aggregateMetrics, setAggregateMetrics] = useState({
@@ -27,6 +31,86 @@ const MappedTrees: React.FC<MappedTreesProps> = ({ }) => {
         totalRequests: 0,
     });
 
+
+    const fetchGroupDetails = async (groupId: number) => {
+        try {
+            const apiClient = new ApiClient();
+            const filters = [{ columnField: 'id', operatorValue: 'equals', value: groupId }];
+            const groupResponse = await apiClient.getGroups(0, 1, filters);
+
+            if (groupResponse.results.length > 0) {
+                const group = groupResponse.results[0];
+                setGroupType(group.type);
+                setName(group.name);
+                return group.type;
+            }
+            return null;
+        } catch (error: any) {
+            console.error("Error fetching group details:", error);
+            toast.error(error.message || "Failed to fetch group details");
+            return null;
+        }
+    };
+
+    const fetchUsersForAlumniGroup = async (groupId: number) => {
+        try {
+            setLoading(true);
+            const apiClient = new ApiClient();
+
+            // Fetch all trees for this group
+            const treesResponse = await apiClient.getMappedTreesForGroup(groupId, 0, 10000, []);
+
+            // Aggregate trees by user
+            const userTreeMap = new Map<number, { name: string; email?: string; count: number; profilePhoto?: string }>();
+
+            treesResponse.results.forEach((tree) => {
+                if (tree.sponsored_by_user) {
+                    const userId = tree.sponsored_by_user;
+                    const userName = tree.sponsor_user_name || `User ${userId}`;
+                    const userEmail = tree.sponsor_user_email;
+
+                    // Check if this tree has a user holding tree photo (assigned_to === user_id and user_tree_image exists)
+                    const hasUserPhoto = tree.assigned_to === userId && tree.user_tree_image;
+                    const userPhoto = hasUserPhoto ? tree.user_tree_image : undefined;
+
+                    if (userTreeMap.has(userId)) {
+                        const userData = userTreeMap.get(userId)!;
+                        userData.count += 1;
+                        // Update profile photo if we found one and don't have one yet
+                        if (userPhoto && !userData.profilePhoto) {
+                            userData.profilePhoto = userPhoto;
+                        }
+                    } else {
+                        userTreeMap.set(userId, {
+                            name: userName,
+                            email: userEmail,
+                            count: 1,
+                            profilePhoto: userPhoto,
+                        });
+                    }
+                }
+            });
+
+            // Convert map to UserItem array and sort by tree count (descending)
+            const userItems: UserItem[] = Array.from(userTreeMap.entries())
+                .map(([userId, userData]) =>
+                    createUserItem(userId, userData.name, userData.count, userData.email, userData.profilePhoto)
+                )
+                .sort((a, b) => b.treeCount - a.treeCount);
+
+            setUsers(userItems);
+
+            // Calculate aggregate metrics
+            const totalTrees = userItems.reduce((sum, user) => sum + user.treeCount, 0);
+            const totalRequests = userItems.length;
+            setAggregateMetrics({ totalTrees, totalRequests });
+
+        } catch (error: any) {
+            toast.error(error.message || "Failed to fetch users for alumni group");
+        } finally {
+            setLoading(false);
+        }
+    };
 
     const fetchRequests = async (userId: number, groupId?: number) => {
         try {
@@ -116,14 +200,28 @@ const MappedTrees: React.FC<MappedTreesProps> = ({ }) => {
     };
 
     useEffect(() => {
-        if (id) {
-            const numericId = Number(id);
-            if (isGroupView) {
-                fetchRequests(0, numericId); // groupId
-            } else {
-                fetchRequests(numericId); // userId
+        const fetchData = async () => {
+            if (id) {
+                const numericId = Number(id);
+                if (isGroupView) {
+                    // Fetch group details first to check if it's an ALUMNI group
+                    const type = await fetchGroupDetails(numericId);
+
+                    if (type?.toUpperCase() === 'ALUMNI') {
+                        // For ALUMNI groups, show users instead of requests
+                        await fetchUsersForAlumniGroup(numericId);
+                    } else {
+                        // For regular groups, show requests
+                        await fetchRequests(0, numericId);
+                    }
+                } else {
+                    // For individual users, show requests
+                    await fetchRequests(numericId);
+                }
             }
-        }
+        };
+
+        fetchData();
     }, [id, isGroupView]);
 
 
@@ -156,10 +254,10 @@ const MappedTrees: React.FC<MappedTreesProps> = ({ }) => {
                 />
             </Box>
 
-            {/* Request List */}
+            {/* Request List or User List (for ALUMNI groups) */}
             <Box
                 className="no-scrollbar"
-                data-testid="request-list-container"
+                data-testid={isGroupView && groupType?.toUpperCase() === 'ALUMNI' ? "user-list-container" : "request-list-container"}
                 sx={{
                     height: 'calc(100vh - 450px)', // Adjusted for hero section
                     overflowY: 'auto',
@@ -169,12 +267,20 @@ const MappedTrees: React.FC<MappedTreesProps> = ({ }) => {
                     }
                 }}
             >
-                <RequestList
-                    requests={requests}
-                    onRequestClick={handleRequestClick}
-                    loading={loading}
-                    isGroupView={isGroupView}
-                />
+                {isGroupView && groupType?.toUpperCase() === 'ALUMNI' ? (
+                    <UserList
+                        users={users}
+                        loading={loading}
+                        isGroupView={isGroupView}
+                    />
+                ) : (
+                    <RequestList
+                        requests={requests}
+                        onRequestClick={handleRequestClick}
+                        loading={loading}
+                        isGroupView={isGroupView}
+                    />
+                )}
             </Box>
 
             {/* Trees Modal */}
