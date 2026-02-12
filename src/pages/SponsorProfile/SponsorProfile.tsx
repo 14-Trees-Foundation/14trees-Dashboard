@@ -1,5 +1,5 @@
 
-import { FC } from "react";
+import { FC, useEffect } from "react";
 import { Box, Divider, Drawer } from "@mui/material";
 import logo from "../../assets/logo_white_small.png";
 import { useRecoilState, useSetRecoilState } from "recoil";
@@ -83,7 +83,9 @@ const SponsorProfile: FC<SponsorProfileProps> = ({ }) => {
         }
     ]
 
-    setActivities(activities);
+    useEffect(() => {
+        setActivities(activities);
+    }, []);
 
     return (
         <Box style={{ display: "flex", backgroundColor: 'rgb(114 143 121 / 48%)', minHeight: '100vh' }} >
