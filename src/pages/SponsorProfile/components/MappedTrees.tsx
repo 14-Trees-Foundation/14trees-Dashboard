@@ -117,6 +117,19 @@ const MappedTrees: React.FC<MappedTreesProps> = ({ }) => {
             setLoading(true);
             const apiClient = new ApiClient();
 
+            // Fetch user details to get name (for individual user view)
+            if (!isGroupView && userId) {
+                try {
+                    const userFilters = [{ columnField: 'id', operatorValue: 'equals', value: userId }];
+                    const userResponse = await apiClient.getUsers(0, 1, userFilters);
+                    if (userResponse.results.length > 0) {
+                        setName(userResponse.results[0].name);
+                    }
+                } catch (error) {
+                    console.error('Failed to fetch user details:', error);
+                }
+            }
+
             // Fetch gift card requests
             const giftCardsFilters = isGroupView
                 ? [{ columnField: 'group_id', operatorValue: 'equals', value: groupId }]
@@ -174,12 +187,11 @@ const MappedTrees: React.FC<MappedTreesProps> = ({ }) => {
             const totalRequests = allRequests.length;
             setAggregateMetrics({ totalTrees, totalRequests });
 
-            // Set sponsor/group name from response
-            const sponsorName = isGroupView
-                ? (miscTreesResponse as any).group_name || 'Group'
-                : giftCardsResponse.results[0]?.user_name || donationsResponse.results[0]?.user_name || 'User';
-
-            setName(sponsorName);
+            // Set group name from response (user name is already set above)
+            if (isGroupView) {
+                const groupName = (miscTreesResponse as any).group_name || 'Group';
+                setName(groupName);
+            }
 
         } catch (error: any) {
             toast.error(error.message || "Failed to fetch requests");
