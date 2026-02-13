@@ -759,6 +759,19 @@ class ApiClient {
         }
     }
 
+    async getUsersProfilePhotos(userIds: number[]): Promise<{ [userId: number]: string | null }> {
+        const url = `/users/profile-photos`;
+        try {
+            const response = await this.api.post<{ profilePhotos: { [userId: number]: string | null } }>(url, { userIds });
+            return response.data.profilePhotos;
+        } catch (error: any) {
+            if (error.response) {
+                throw new Error(error.response.data.message || error.response.data.error);
+            }
+            throw new Error(`Failed to fetch user profile photos: ${error.message}`);
+        }
+    }
+
     async createUser(data: User): Promise<User> {
         try {
             const response = await this.api.post<User>(`/users/`, data);
