@@ -24,7 +24,7 @@ const getIconForType = (type: RequestType, theme: any) => {
       return <VisitIcon sx={{ fontSize: 40, color: theme.palette.secondary.main }} />;
     case 'Donation':
       return <DonationIcon sx={{ fontSize: 40, color: theme.palette.error?.main || '#FF5722' }} />;
-    case 'Historical Sponsorships':
+    case 'Origin Trees':
       return <MiscIcon sx={{ fontSize: 40, color: theme.palette.text.secondary }} />;
     default:
       return <TreeIcon sx={{ fontSize: 40, color: theme.palette.success.main }} />;
@@ -41,7 +41,7 @@ const getColorForType = (type: RequestType, theme: any) => {
       return alpha(theme.palette.secondary.main, 0.15); // Event Participation - highlighted with secondary color tinted background
     case 'Donation':
       return alpha(theme.palette.error?.main || '#FF5722', 0.15); // Donation - highlighted with red/orange tinted background
-    case 'Historical Sponsorships':
+    case 'Origin Trees':
       return alpha(theme.palette.primary.main, 0.25); // Historical - highlighted with brighter blue tinted background
     default:
       return alpha(theme.palette.primary.main, 0.15);
@@ -174,7 +174,7 @@ const RequestCard: React.FC<RequestCardProps> = ({ request, onClick }) => {
             Type: {request.type}
           </Typography>
 
-          {request.type !== 'Historical Sponsorships' && (
+          {request.type !== 'Origin Trees' && (
             <Typography variant="body2" color="text.secondary" gutterBottom data-testid="card-date">
               Date: {formatDate(request.date)}
             </Typography>

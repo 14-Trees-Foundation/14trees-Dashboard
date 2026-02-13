@@ -1,7 +1,7 @@
 import { GiftCard } from "../../../types/gift_card";
 import { Donation } from "../../../types/donation";
 
-export type RequestType = 'Tree Gifts' | 'Direct Sponsorship' | 'Event Participation' | 'Donation' | 'Historical Sponsorships';
+export type RequestType = 'Tree Gifts' | 'Direct Sponsorship' | 'Event Participation' | 'Donation' | 'Origin Trees';
 
 export interface RequestItem {
   id: string | number; // request_id or donation.id or 'miscellaneous'
@@ -71,7 +71,7 @@ export function mapDonationToRequestItem(donation: Donation): RequestItem {
 export function createMiscellaneousRequestItem(treeCount: number): RequestItem {
   return {
     id: 'miscellaneous',
-    type: 'Historical Sponsorships',
+    type: 'Origin Trees',
     eventName: 'Origin Grove',
     date: new Date(), // Not displayed - can use current date for sorting
     treeCount: treeCount,

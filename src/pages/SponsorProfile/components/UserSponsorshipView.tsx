@@ -3,6 +3,7 @@ import { useUserSponsorshipData } from "../hooks/useUserSponsorshipData";
 import { RequestItem } from "../types/requestItem";
 import SponsorHeroSection from "./SponsorHeroSection";
 import RequestList from "./RequestList";
+import TreesModal from "./TreesModal";
 
 interface UserSponsorshipViewProps {
     userId: number;
@@ -16,6 +17,11 @@ const UserSponsorshipView: React.FC<UserSponsorshipViewProps> = ({
     onRequestClick
 }) => {
     const { loading, requests, aggregateMetrics } = useUserSponsorshipData(userId);
+
+    // Check if there's only Origin Grove (Origin Trees) and nothing else
+    const showHistoricalTreesOnly = !loading &&
+        requests.length === 1 &&
+        requests[0].type === 'Origin Trees';
 
     return (
         <Box
@@ -45,25 +51,35 @@ const UserSponsorshipView: React.FC<UserSponsorshipViewProps> = ({
                 />
             </Box>
 
-            {/* Request List */}
-            <Box
-                className="no-scrollbar"
-                data-testid="request-list-container"
-                sx={{
-                    height: 'calc(100vh - 450px)',
-                    overflowY: 'auto',
-                    '@media (max-width: 768px)': {
-                        height: 'calc(100vh - 350px)',
-                    }
-                }}
-            >
-                <RequestList
-                    requests={requests}
-                    onRequestClick={onRequestClick}
-                    loading={loading}
-                    isGroupView={false}
+            {/* Show Historical Trees directly if it's the only request, otherwise show Request List */}
+            {showHistoricalTreesOnly ? (
+                <TreesModal
+                    open={true}
+                    onClose={() => {}}
+                    request={requests[0]}
+                    userId={userId}
+                    inline={true}
                 />
-            </Box>
+            ) : (
+                <Box
+                    className="no-scrollbar"
+                    data-testid="request-list-container"
+                    sx={{
+                        height: 'calc(100vh - 450px)',
+                        overflowY: 'auto',
+                        '@media (max-width: 768px)': {
+                            height: 'calc(100vh - 350px)',
+                        }
+                    }}
+                >
+                    <RequestList
+                        requests={requests}
+                        onRequestClick={onRequestClick}
+                        loading={loading}
+                        isGroupView={false}
+                    />
+                </Box>
+            )}
         </Box>
     );
 };
