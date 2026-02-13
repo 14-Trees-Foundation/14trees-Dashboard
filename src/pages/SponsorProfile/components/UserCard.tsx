@@ -118,8 +118,8 @@ const UserCard: React.FC<UserCardProps> = ({ user }) => {
           </Typography>
         )}
 
-        {/* Tree Count */}
-        <Typography
+        {/* Tree Count - Hidden as per user request */}
+        {/* <Typography
           variant="h5"
           data-testid="user-tree-count"
           sx={{
@@ -132,7 +132,7 @@ const UserCard: React.FC<UserCardProps> = ({ user }) => {
           }}
         >
           {user.treeCount} {user.treeCount === 1 ? 'Tree' : 'Trees'}
-        </Typography>
+        </Typography> */}
       </CardContent>
     </Card>
   );

@@ -69,27 +69,39 @@ const MappedTrees: React.FC<MappedTreesProps> = ({ }) => {
                     const userName = tree.sponsor_user_name || `User ${userId}`;
                     const userEmail = tree.sponsor_user_email;
 
-                    // Check if this tree has a user holding tree photo (assigned_to === user_id and user_tree_image exists)
-                    const hasUserPhoto = tree.assigned_to === userId && tree.user_tree_image;
-                    const userPhoto = hasUserPhoto ? tree.user_tree_image : undefined;
-
                     if (userTreeMap.has(userId)) {
                         const userData = userTreeMap.get(userId)!;
                         userData.count += 1;
-                        // Update profile photo if we found one and don't have one yet
-                        if (userPhoto && !userData.profilePhoto) {
-                            userData.profilePhoto = userPhoto;
-                        }
                     } else {
                         userTreeMap.set(userId, {
                             name: userName,
                             email: userEmail,
                             count: 1,
-                            profilePhoto: userPhoto,
+                            profilePhoto: undefined,
                         });
                     }
                 }
             });
+
+            // Fetch profile photos for all users in one batch API call
+            const userIds = Array.from(userTreeMap.keys());
+            if (userIds.length > 0) {
+                try {
+                    const profilePhotos = await apiClient.getUsersProfilePhotos(userIds);
+
+                    // Update user map with profile photos
+                    Object.entries(profilePhotos).forEach(([userIdStr, photoUrl]) => {
+                        const userId = Number(userIdStr);
+                        const userData = userTreeMap.get(userId);
+                        if (userData && photoUrl) {
+                            userData.profilePhoto = photoUrl;
+                        }
+                    });
+                } catch (error) {
+                    console.error('Failed to fetch user profile photos:', error);
+                    // Continue without photos if the batch fetch fails
+                }
+            }
 
             // Convert map to UserItem array and sort by tree count (descending)
             const userItems: UserItem[] = Array.from(userTreeMap.entries())

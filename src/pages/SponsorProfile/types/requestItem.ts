@@ -72,7 +72,7 @@ export function createMiscellaneousRequestItem(treeCount: number): RequestItem {
   return {
     id: 'miscellaneous',
     type: 'Historical Sponsorships',
-    eventName: 'Legacy Trees',
+    eventName: 'Origin Grove',
     date: new Date(), // Not displayed - can use current date for sorting
     treeCount: treeCount,
     rawData: null
