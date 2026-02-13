@@ -29,11 +29,12 @@ interface TreesModalProps {
   request: RequestItem | null;
   userId?: number;
   groupId?: number;
+  inline?: boolean; // When true, renders content inline instead of as modal
 }
 
 type ImageType = 'illustration' | 'user' | 'tree' | 'giftcard';
 
-const TreesModal: React.FC<TreesModalProps> = ({ open, onClose, request, userId, groupId }) => {
+const TreesModal: React.FC<TreesModalProps> = ({ open, onClose, request, userId, groupId, inline = false }) => {
   const [trees, setTrees] = useState<any[]>([]);
   const [filteredTrees, setFilteredTrees] = useState<any[]>([]);
   const [total, setTotal] = useState(0);
@@ -81,7 +82,7 @@ const TreesModal: React.FC<TreesModalProps> = ({ open, onClose, request, userId,
       // Build filters based on request type
       const filters: any[] = [];
 
-      if (request.type === 'Historical Sponsorships') {
+      if (request.type === 'Origin Trees') {
         // Historical sponsorships: donation_id IS NULL AND gift_card_request_id IS NULL
         filters.push(
           { columnField: 'donation_id', operatorValue: 'isNull' },
@@ -143,51 +144,30 @@ const TreesModal: React.FC<TreesModalProps> = ({ open, onClose, request, userId,
     };
   }, [searchStr, filter, trees]);
 
-  // Fetch trees when modal opens or request changes
+  // Fetch trees when modal opens or request changes (or immediately if inline)
   useEffect(() => {
-    if (open && request) {
+    if ((open || inline) && request) {
       setTrees([]);
       setSearchStr('');
       setFilter('default');
       setImageType('illustration');
       getTrees(0);
     }
-  }, [open, request]);
+  }, [open, inline, request]);
 
   if (!request) return null;
 
-  return (
-    <Dialog
-      open={open}
-      onClose={onClose}
-      maxWidth={false}
-      fullScreen
-      sx={{
-        '& .MuiDialog-paper': {
-          width: '100vw',
-          height: '100vh',
-          margin: 0,
-          maxWidth: '100vw',
-          maxHeight: '100vh',
-          backgroundColor: 'rgba(63, 83, 68, 0.95)', // Darker green background for padding areas
-          // Add horizontal padding for desktop
-          '@media (min-width: 768px)': {
-            paddingLeft: '10%',
-            paddingRight: '10%',
-          }
-        }
-      }}
-    >
-      {/* Main Content Wrapper with rounded corners */}
-      <Box sx={{
-        borderRadius: 3,
-        overflow: 'hidden',
-        backgroundColor: '#FFFFFF',
-        mt: 3, // Top margin for spacing from dialog top
-        '@media (max-width: 768px)': {
-          mt: 0, // No top margin on mobile
-        }
-      }}>
+  // Render content (used both in modal and inline)
+  const renderContent = () => (
+    <Box sx={{
+      borderRadius: inline ? 0 : 3,
+      overflow: 'hidden',
+      backgroundColor: '#FFFFFF',
+      mt: inline ? 0 : 3,
+      '@media (max-width: 768px)': {
+        mt: 0,
+      }
+    }}>
         {/* Header */}
         <Box
           sx={{
@@ -200,7 +180,7 @@ const TreesModal: React.FC<TreesModalProps> = ({ open, onClose, request, userId,
           }}
         >
         <Box>
-          {request.type !== 'Historical Sponsorships' ? (
+          {request.type !== 'Origin Trees' ? (
             <>
               <Typography variant="h5" fontWeight={600} color="text.primary">
                 {request.eventName}
@@ -218,9 +198,11 @@ const TreesModal: React.FC<TreesModalProps> = ({ open, onClose, request, userId,
             Total Trees: {request.treeCount}
           </Typography>
         </Box>
-        <IconButton onClick={onClose} aria-label="Close modal">
-          <CloseIcon />
-        </IconButton>
+        {!inline && (
+          <IconButton onClick={onClose} aria-label="Close modal">
+            <CloseIcon />
+          </IconButton>
+        )}
       </Box>
 
       <DialogContent sx={{ p: 0, backgroundColor: 'rgba(156, 197, 61, 0.25)' }}>
@@ -487,7 +469,36 @@ const TreesModal: React.FC<TreesModalProps> = ({ open, onClose, request, userId,
           )}
         </Box>
       </DialogContent>
-      </Box>
+    </Box>
+  );
+
+  // Return either inline content or wrapped in Dialog
+  if (inline) {
+    return renderContent();
+  }
+
+  return (
+    <Dialog
+      open={open}
+      onClose={onClose}
+      maxWidth={false}
+      fullScreen
+      sx={{
+        '& .MuiDialog-paper': {
+          width: '100vw',
+          height: '100vh',
+          margin: 0,
+          maxWidth: '100vw',
+          maxHeight: '100vh',
+          backgroundColor: 'rgba(63, 83, 68, 0.95)',
+          '@media (min-width: 768px)': {
+            paddingLeft: '10%',
+            paddingRight: '10%',
+          }
+        }
+      }}
+    >
+      {renderContent()}
     </Dialog>
   );
 };
