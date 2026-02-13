@@ -102,12 +102,26 @@ const SponsorProfile: FC<SponsorProfileProps> = ({ }) => {
             >
                 <Divider />
                 <img className={classes.logo} alt={"logo"} src={logo} />
-                {menuitem()}
+                {/* Profile button hidden as per user request */}
+                {/* {menuitem()} */}
             </Drawer>
             <Box style={{ padding: 10, flexGrow: 1 }}>
                 { mainBox() }
             </Box>
-            {/* <RightDrawer showWhatsNew={true}/> */}
+            <Drawer
+                className={classes.rdrawer}
+                variant="persistent"
+                anchor="right"
+                open={true}
+                sx={{
+                    '@media (max-width: 768px)': {
+                        display: 'none',
+                    }
+                }}
+            >
+                <Divider />
+                {/* Empty sidebar for symmetry */}
+            </Drawer>
         </Box>
     );
 }
@@ -135,6 +149,14 @@ const useStyles = makeStyles((theme: any) =>
         width: "15%",
         backgroundColor: "#3F5344",
         borderTopRightRadius: "10px",
+      },
+    },
+    rdrawer: {
+      width: "15%",
+      "& .MuiPaper-root": {
+        width: "15%",
+        backgroundColor: "#3F5344",
+        borderTopLeftRadius: "10px",
       },
     },
     itemlist: {

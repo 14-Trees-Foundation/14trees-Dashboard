@@ -50,11 +50,11 @@ const UserCard: React.FC<UserCardProps> = ({ user }) => {
               src={user.profilePhoto}
               alt={user.name}
               sx={{
-                width: 80,
-                height: 80,
+                width: 120,
+                height: 120,
                 '@media (max-width: 768px)': {
-                  width: 60,
-                  height: 60,
+                  width: 90,
+                  height: 90,
                 }
               }}
               onError={(e: any) => {
@@ -65,16 +65,16 @@ const UserCard: React.FC<UserCardProps> = ({ user }) => {
           ) : (
             <Avatar
               sx={{
-                width: 80,
-                height: 80,
+                width: 120,
+                height: 120,
                 bgcolor: theme.palette.primary.main,
                 '@media (max-width: 768px)': {
-                  width: 60,
-                  height: 60,
+                  width: 90,
+                  height: 90,
                 }
               }}
             >
-              <PersonIcon sx={{ fontSize: 48 }} />
+              <PersonIcon sx={{ fontSize: 64 }} />
             </Avatar>
           )}
         </Box>

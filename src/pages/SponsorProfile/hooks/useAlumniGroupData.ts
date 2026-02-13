@@ -72,12 +72,21 @@ export const useAlumniGroupData = (groupId: number): UseAlumniGroupDataResult =>
                     }
                 }
 
-                // Convert map to UserItem array and sort by tree count (descending)
+                // Convert map to UserItem array and sort by profile photo availability, then tree count
                 const userItems: UserItem[] = Array.from(userTreeMap.entries())
                     .map(([userId, userData]) =>
                         createUserItem(userId, userData.name, userData.count, userData.email, userData.profilePhoto)
                     )
-                    .sort((a, b) => b.treeCount - a.treeCount);
+                    .sort((a, b) => {
+                        // First priority: Users with photos come first
+                        const aHasPhoto = a.profilePhoto ? 1 : 0;
+                        const bHasPhoto = b.profilePhoto ? 1 : 0;
+                        if (bHasPhoto !== aHasPhoto) {
+                            return bHasPhoto - aHasPhoto;
+                        }
+                        // Second priority: Sort by tree count (descending)
+                        return b.treeCount - a.treeCount;
+                    });
 
                 setUsers(userItems);
 
