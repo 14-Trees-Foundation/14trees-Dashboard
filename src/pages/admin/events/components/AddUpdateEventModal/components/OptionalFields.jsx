@@ -88,6 +88,21 @@ const OptionalFields = ({ formData, handleChange }) => {
                     When enabled, visitors will see the "Add Blessings" section on the event dashboard.
                 </FormHelperText>
             </Grid>
+
+            <Grid item xs={12}>
+                <TextField
+                    name="blessings_cta_text"
+                    label="Blessings Button Text"
+                    value={formData.blessings_cta_text || ''}
+                    onChange={handleChange}
+                    fullWidth
+                    placeholder='Bless the bride and groom!'
+                    inputProps={{ maxLength: 100 }}
+                />
+                <FormHelperText>
+                    Custom label for the blessings CTA button. Leave blank to use the default text.
+                </FormHelperText>
+            </Grid>
         </>
     );
 };

@@ -249,6 +249,9 @@ const FileUploadSection = ({
                 isExisting: true
             });
         }
+    }, [formData.landing_image_s3_path]);
+
+    useEffect(() => {
         if (formData.landing_image_mobile_s3_path && !landingMobilePreview) {
             setLandingMobilePreview({
                 url: formData.landing_image_mobile_s3_path,
@@ -256,7 +259,7 @@ const FileUploadSection = ({
                 isExisting: true
             });
         }
-    }, [formData.landing_image_s3_path]);
+    }, [formData.landing_image_mobile_s3_path]);
 
     // Cleanup effect to prevent memory leaks
     useEffect(() => {
