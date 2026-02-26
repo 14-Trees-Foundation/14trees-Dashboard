@@ -8,6 +8,7 @@ interface EventBlessingsProps {
     eventLink: string | null;
     showAddBlessing: boolean;
     isMobile: boolean;
+    blessingsCtaText?: string | null;
     currentTheme: {
         gradient?: string;
         textAreaBg: string;
@@ -24,11 +25,14 @@ interface Blessing {
     created_at?: string;
 }
 
+const DEFAULT_BLESSINGS_CTA = "Bless the bride and groom!";
+
 const EventBlessings: React.FC<EventBlessingsProps> = ({
     eventId,
     eventLink,
     showAddBlessing,
     isMobile,
+    blessingsCtaText,
     currentTheme
 }) => {
     const [blessings, setBlessings] = useState<Blessing[]>([]);
@@ -231,7 +235,7 @@ const EventBlessings: React.FC<EventBlessingsProps> = ({
                                     }
                                 }}
                             >
-                                {eventLink === "fk2yvs0k" ? "Add your wishes!" : "Bless the bride and groom!"}
+                                {blessingsCtaText || DEFAULT_BLESSINGS_CTA}
                             </Box>
                         </Tooltip>
                     </Box>

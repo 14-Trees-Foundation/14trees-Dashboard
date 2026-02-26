@@ -346,12 +346,7 @@ const EventDashboard: React.FC<EventDashboardProps> = ({ event, eventMessages })
       return event.show_blessings !== false;
     });
 
-    const [showPoster, setShowPoster] = useState(() => {
-      if (event.id === 8245 || event.id === 8251 || event.landing_image_s3_path!== null || event.landing_image_mobile_s3_path!== null) {
-        return true;
-      }
-      return false;
-    });
+    const [showPoster, setShowPoster] = useState(() => Boolean(landingImageUrl));
     const [posterSliding, setPosterSliding] = useState(false);
     const mainContentRef = useRef<HTMLDivElement | null>(null);
  
@@ -401,9 +396,9 @@ const EventDashboard: React.FC<EventDashboardProps> = ({ event, eventMessages })
           >
 
             <EventPosterMessageMemories
-              eventPoster={event.event_poster}
+              eventPoster={event.event_poster ?? undefined}
               eventName={event.name}
-              eventMessage={event.message}
+              eventMessage={event.message ?? undefined}
               memoryImages={memoryImages}
               isLoadingImages={isLoadingImages}
               currentTheme={currentTheme}
@@ -544,6 +539,7 @@ const EventDashboard: React.FC<EventDashboardProps> = ({ event, eventMessages })
               eventLink={event.link}
               showAddBlessing={showAddBlessing}
               isMobile={isMobile}
+              blessingsCtaText={event.blessings_cta_text}
               currentTheme={currentTheme}
             />
 

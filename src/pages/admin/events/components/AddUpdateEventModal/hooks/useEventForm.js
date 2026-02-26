@@ -44,6 +44,7 @@ export const useEventForm = (mode, existingEvent) => {
                 landing_image_s3_path: existingEvent.landing_image_s3_path || null,
                 landing_image_mobile: null,
                 landing_image_mobile_s3_path: existingEvent.landing_image_mobile_s3_path || null,
+                blessings_cta_text: existingEvent.blessings_cta_text || '',
             };
         }
         return {
@@ -65,6 +66,7 @@ export const useEventForm = (mode, existingEvent) => {
             landing_image_s3_path: null,
             landing_image_mobile: null,
             landing_image_mobile_s3_path: null,
+            blessings_cta_text: '',
         };
     };
 
