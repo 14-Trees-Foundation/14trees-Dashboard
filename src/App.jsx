@@ -75,12 +75,7 @@ function App() {
 		const isTrackablePath =
 			pathname.startsWith('/profile/') || pathname.startsWith('/dashboard/');
 		const isDashboardDomain = hostname === 'localhost';
-		console.log('Tracking check:', {
-			hostname,
-			pathname,
-			isTrackablePath,
-			isDashboardDomain,
-		});
+
 		if (!isDashboardDomain || !isTrackablePath) {
 			return;
 		}
