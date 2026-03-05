@@ -74,7 +74,14 @@ function App() {
 
 		const isTrackablePath =
 			pathname.startsWith('/profile/') || pathname.startsWith('/dashboard/');
-		const isDashboardDomain = hostname === 'localhost';
+
+		// Allow tracking on localhost only in development, or on production domain
+		const isLocalhost = hostname === 'localhost' || hostname === '127.0.0.1';
+		const isDevelopment = process.env.NODE_ENV === 'development';
+		const isProduction =
+			hostname === 'dashboard.14trees.org' || hostname.includes('dashboard');
+
+		const isDashboardDomain = (isLocalhost && isDevelopment) || isProduction;
 
 		if (!isDashboardDomain || !isTrackablePath) {
 			return;

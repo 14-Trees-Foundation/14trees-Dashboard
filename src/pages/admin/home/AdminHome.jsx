@@ -418,108 +418,6 @@ export const AdminHome = () => {
 					</Grid>
 				</Grid>
 
-				{/* Public Dashboard Traffic */}
-				<Grid item xs={12}>
-					<Typography
-						variant="h5"
-						sx={{ mb: 2, color: '#0D47A1', fontWeight: 600 }}
-					>
-						🌐 Public Dashboard Traffic
-					</Typography>
-					<Grid container spacing={2}>
-						<Grid item xs={12} sm={6} md={3}>
-							<MetricCard
-								icon={<VisibilityIcon fontSize="large" />}
-								value={visitTotalHits}
-								label="Total Page Hits"
-								color="#1565C0"
-								delay={2100}
-							/>
-						</Grid>
-						<Grid item xs={12} sm={6} md={3}>
-							<MetricCard
-								icon={<AccountTreeIcon fontSize="large" />}
-								value={visitProfileHits}
-								label="Profile URL Hits"
-								color="#2E7D32"
-								delay={2200}
-							/>
-						</Grid>
-						<Grid item xs={12} sm={6} md={3}>
-							<MetricCard
-								icon={<DashboardIcon fontSize="large" />}
-								value={visitDashboardHits}
-								label="Dashboard URL Hits"
-								color="#6A1B9A"
-								delay={2300}
-							/>
-						</Grid>
-						<Grid item xs={12} sm={6} md={3}>
-							<MetricCard
-								icon={<LinkIcon fontSize="large" />}
-								value={visitTrackedUrls}
-								label="Unique URL Hits"
-								color="#EF6C00"
-								delay={2400}
-							/>
-						</Grid>
-					</Grid>
-
-					{topPublicUrls.length > 0 && (
-						<Card
-							sx={{
-								mt: 2,
-								borderRadius: '16px',
-								boxShadow: '0 8px 20px rgba(0,0,0,0.08)',
-							}}
-						>
-							<CardContent>
-								<Typography
-									variant="h6"
-									sx={{ mb: 1.5, color: '#37474F', fontWeight: 600 }}
-								>
-									Top Public URLs by Hits
-								</Typography>
-								{topPublicUrls.slice(0, 5).map((item, index) => {
-									const pathname = item.pathname || item.url || '--';
-									const hits = Number(item.hit_count ?? item.hits ?? 0);
-									return (
-										<Box
-											key={`${pathname}-${index}`}
-											sx={{
-												display: 'flex',
-												justifyContent: 'space-between',
-												py: 0.75,
-												borderBottom:
-													index < Math.min(topPublicUrls.length, 5) - 1
-														? '1px solid #ECEFF1'
-														: 'none',
-											}}
-										>
-											<Typography
-												variant="body2"
-												sx={{ color: '#455A64', wordBreak: 'break-all', pr: 2 }}
-											>
-												{pathname}
-											</Typography>
-											<Typography
-												variant="body2"
-												sx={{
-													color: '#0D47A1',
-													fontWeight: 700,
-													whiteSpace: 'nowrap',
-												}}
-											>
-												{hits.toLocaleString()}
-											</Typography>
-										</Box>
-									);
-								})}
-							</CardContent>
-						</Card>
-					)}
-				</Grid>
-
 				{/* Geographic Coverage */}
 				<Grid item xs={12}>
 					<Typography
@@ -635,6 +533,108 @@ export const AdminHome = () => {
 							<TreeLogCumulative />
 						</CardContent>
 					</Card>
+				</Grid>
+
+				{/* Public Dashboard Traffic */}
+				<Grid item xs={12}>
+					<Typography
+						variant="h5"
+						sx={{ mb: 2, color: '#0D47A1', fontWeight: 600 }}
+					>
+						🌐 Public Dashboard Traffic
+					</Typography>
+					<Grid container spacing={2}>
+						<Grid item xs={12} sm={6} md={1.5}>
+							<MetricCard
+								icon={<VisibilityIcon fontSize="large" />}
+								value={visitTotalHits}
+								label="Total Page Hits"
+								color="#1565C0"
+								delay={2100}
+							/>
+						</Grid>
+						<Grid item xs={12} sm={6} md={1.5}>
+							<MetricCard
+								icon={<AccountTreeIcon fontSize="large" />}
+								value={visitProfileHits}
+								label="Profile URL Hits"
+								color="#2E7D32"
+								delay={2200}
+							/>
+						</Grid>
+						<Grid item xs={12} sm={6} md={1.5}>
+							<MetricCard
+								icon={<DashboardIcon fontSize="large" />}
+								value={visitDashboardHits}
+								label="Dashboard URL Hits"
+								color="#6A1B9A"
+								delay={2300}
+							/>
+						</Grid>
+						<Grid item xs={12} sm={6} md={1.5}>
+							<MetricCard
+								icon={<LinkIcon fontSize="large" />}
+								value={visitTrackedUrls}
+								label="Unique URL Hits"
+								color="#EF6C00"
+								delay={2400}
+							/>
+						</Grid>
+					</Grid>
+
+					{topPublicUrls.length > 0 && (
+						<Card
+							sx={{
+								mt: 2,
+								borderRadius: '16px',
+								boxShadow: '0 8px 20px rgba(0,0,0,0.08)',
+							}}
+						>
+							<CardContent>
+								<Typography
+									variant="h6"
+									sx={{ mb: 1.5, color: '#37474F', fontWeight: 600 }}
+								>
+									Top Public URLs by Hits
+								</Typography>
+								{topPublicUrls.slice(0, 5).map((item, index) => {
+									const pathname = item.pathname || item.url || '--';
+									const hits = Number(item.hit_count ?? item.hits ?? 0);
+									return (
+										<Box
+											key={`${pathname}-${index}`}
+											sx={{
+												display: 'flex',
+												justifyContent: 'space-between',
+												py: 0.75,
+												borderBottom:
+													index < Math.min(topPublicUrls.length, 5) - 1
+														? '1px solid #ECEFF1'
+														: 'none',
+											}}
+										>
+											<Typography
+												variant="body2"
+												sx={{ color: '#455A64', wordBreak: 'break-all', pr: 2 }}
+											>
+												{pathname}
+											</Typography>
+											<Typography
+												variant="body2"
+												sx={{
+													color: '#0D47A1',
+													fontWeight: 700,
+													whiteSpace: 'nowrap',
+												}}
+											>
+												{hits.toLocaleString()}
+											</Typography>
+										</Box>
+									);
+								})}
+							</CardContent>
+						</Card>
+					)}
 				</Grid>
 			</Grid>
 		</div>
