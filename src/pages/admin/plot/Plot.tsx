@@ -607,8 +607,8 @@ export const PlotComponent = () => {
 		},
 		{
 			dataIndex: 'total',
-			key: 'Total Trees',
-			title: getSortableHeader('Total Trees', 'total'),
+			key: 'Total Plants',
+			title: getSortableHeader('Total Plants', 'total'),
 			align: 'right',
 			width: 150,
 			className: treeHabit === '' ? 'bg-orange' : undefined,
