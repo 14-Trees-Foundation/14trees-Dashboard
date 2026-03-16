@@ -1,217 +1,330 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import {
-    Box,
-    Card,
-    CardContent,
-    ToggleButton,
-    ToggleButtonGroup,
-    Typography,
-    Skeleton
+	Box,
+	Card,
+	CardContent,
+	Typography,
+	Skeleton,
+	FormControl,
+	InputLabel,
+	Select,
+	MenuItem,
+	IconButton,
+	ToggleButton,
+	ToggleButtonGroup,
 } from '@mui/material';
+import { SelectChangeEvent } from '@mui/material/Select';
+import FileDownloadOutlinedIcon from '@mui/icons-material/FileDownloadOutlined';
 import {
-    ResponsiveContainer,
-    ComposedChart,
-    Line,
-    Bar,
-    XAxis,
-    YAxis,
-    CartesianGrid,
-    Tooltip,
-    Legend
+	ResponsiveContainer,
+	ComposedChart,
+	Line,
+	Bar,
+	XAxis,
+	YAxis,
+	CartesianGrid,
+	Tooltip as RechartsTooltip,
+	Legend,
 } from 'recharts';
-import { DateFieldType, TimePeriodType, GiftCardAnalyticsData } from '../hooks/useGiftCardAnalytics';
+import { GiftCardMonthlyEntry } from '../../../../types/analytics';
+import { alpha } from '@mui/material/styles';
+import {
+	ANALYTICS_COLORS,
+	CHART_TOOLTIP,
+	LIGHT_ANALYTICS_COLORS,
+	LIGHT_CHART_TOOLTIP,
+} from '../../analytics/analyticsTheme';
 
 interface GiftAnalyticsChartsProps {
-    data: GiftCardAnalyticsData | null;
-    dateField: DateFieldType;
-    setDateField: (field: DateFieldType) => void;
-    timePeriod: TimePeriodType;
-    setTimePeriod: (period: TimePeriodType) => void;
-    loading: boolean;
+	data: {
+		monthly: GiftCardMonthlyEntry[];
+	} | null;
+	selectedYear: number;
+	onYearChange: (year: number) => void;
+	onExport?: () => void;
+	loading: boolean;
+	themeMode?: 'dark' | 'light';
+	onToggleTheme?: () => void;
 }
 
 const GiftAnalyticsCharts: React.FC<GiftAnalyticsChartsProps> = ({
-    data,
-    dateField,
-    setDateField,
-    timePeriod,
-    setTimePeriod,
-    loading
+	data,
+	selectedYear,
+	onYearChange,
+	onExport,
+	loading,
+	themeMode = 'dark',
+	onToggleTheme: _onToggleTheme,
 }) => {
-    // Transform data for chart
-    const chartData = useMemo(() => {
-        if (!data || !data.monthly) return [];
+	const [metric, setMetric] = useState<'requests' | 'trees'>('trees');
+	const currentYear = new Date().getFullYear();
+	const yearOptions = [currentYear, currentYear - 1, currentYear - 2];
 
-        return data.monthly.map(item => ({
-            month: item.month,
-            monthLabel: new Date(item.month + '-01').toLocaleDateString('en-US', {
-                month: 'short',
-                year: '2-digit'
-            }),
-            'Total Requests': item.requests,
-            'Corporate Requests': item.requests_corporate,
-            'Personal Requests': item.requests_personal,
-            'Total Trees': item.trees,
-            'Corporate Trees': item.trees_corporate,
-            'Personal Trees': item.trees_personal
-        }));
-    }, [data]);
+	const handleYearChange = (event: SelectChangeEvent<string>) => {
+		if (event.target.value) {
+			onYearChange(Number(event.target.value));
+		}
+	};
 
-    if (loading) {
-        return (
-            <Card>
-                <CardContent>
-                    <Skeleton variant="text" height={40} width="60%" sx={{ mb: 2 }} />
-                    <Skeleton variant="rectangular" height={400} />
-                </CardContent>
-            </Card>
-        );
-    }
+	// Transform data for chart
+	const chartData = useMemo(() => {
+		if (!data || !data.monthly) return [];
 
-    if (!data || chartData.length === 0) {
-        return (
-            <Card>
-                <CardContent>
-                    <Typography variant="h6" gutterBottom>
-                        Month-on-Month Trends
-                    </Typography>
-                    <Box sx={{ textAlign: 'center', py: 8 }}>
-                        <Typography color="text.secondary">
-                            No data available for the selected period
-                        </Typography>
-                    </Box>
-                </CardContent>
-            </Card>
-        );
-    }
+		return data.monthly.map((item) => {
+			const corporateTrees = item.corporate_trees ?? 0;
+			const personalTrees = item.personal_trees ?? 0;
+			const totalTrees = corporateTrees + personalTrees;
+			return {
+				month: item.month,
+				monthLabel: item.month_name,
+				'Corporate Requests': item.corporate,
+				'Personal Requests': item.personal,
+				'Total Requests': item.total ?? item.corporate + item.personal,
+				'Corporate Trees': corporateTrees,
+				'Personal Trees': personalTrees,
+				'Total Trees': totalTrees,
+			};
+		});
+	}, [data]);
 
-    return (
-        <Card>
-            <CardContent>
-                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3, flexWrap: 'wrap', gap: 2 }}>
-                    <Typography variant="h6">Month-on-Month Trends</Typography>
-                    <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
-                        <ToggleButtonGroup
-                            value={dateField}
-                            exclusive
-                            onChange={(e, value) => value && setDateField(value)}
-                            size="small"
-                            aria-label="date field"
-                        >
-                            <ToggleButton value="created_at" aria-label="created date">
-                                Created Date
-                            </ToggleButton>
-                            <ToggleButton value="gifted_on" aria-label="gifted date">
-                                Gifted Date
-                            </ToggleButton>
-                        </ToggleButtonGroup>
+	const colors =
+		themeMode === 'light' ? LIGHT_ANALYTICS_COLORS : ANALYTICS_COLORS;
+	const tooltipConfig =
+		themeMode === 'light' ? LIGHT_CHART_TOOLTIP : CHART_TOOLTIP;
+	const tooltipStyles = useMemo(
+		() => ({
+			backgroundColor: tooltipConfig.backgroundColor,
+			border: tooltipConfig.border,
+			borderRadius: tooltipConfig.borderRadius ?? 8,
+			color: tooltipConfig.bodyColor,
+			padding: tooltipConfig.padding,
+		}),
+		[tooltipConfig],
+	);
 
-                        <ToggleButtonGroup
-                            value={timePeriod}
-                            exclusive
-                            onChange={(e, value) => value && setTimePeriod(value)}
-                            size="small"
-                            aria-label="time period"
-                        >
-                            <ToggleButton value="6m" aria-label="6 months">
-                                6M
-                            </ToggleButton>
-                            <ToggleButton value="1y" aria-label="1 year">
-                                1Y
-                            </ToggleButton>
-                            <ToggleButton value="2y" aria-label="2 years">
-                                2Y
-                            </ToggleButton>
-                            <ToggleButton value="all" aria-label="all time">
-                                All
-                            </ToggleButton>
-                        </ToggleButtonGroup>
-                    </Box>
-                </Box>
+	if (loading) {
+		return (
+			<Card>
+				<CardContent>
+					<Skeleton
+						variant="text"
+						height={40}
+						width="60%"
+						sx={{ mb: 2, borderRadius: 2 }}
+					/>
+					<Skeleton
+						variant="rectangular"
+						height={400}
+						sx={{ borderRadius: 2 }}
+					/>
+				</CardContent>
+			</Card>
+		);
+	}
 
-                <ResponsiveContainer width="100%" height={400}>
-                    <ComposedChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 20 }}>
-                        <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" />
-                        <XAxis
-                            dataKey="monthLabel"
-                            tick={{ fontSize: 12 }}
-                            angle={-45}
-                            textAnchor="end"
-                            height={80}
-                        />
-                        <YAxis
-                            yAxisId="left"
-                            label={{ value: 'Requests', angle: -90, position: 'insideLeft', style: { fontSize: 12 } }}
-                            tick={{ fontSize: 12 }}
-                        />
-                        <YAxis
-                            yAxisId="right"
-                            orientation="right"
-                            label={{ value: 'Trees', angle: 90, position: 'insideRight', style: { fontSize: 12 } }}
-                            tick={{ fontSize: 12 }}
-                        />
-                        <Tooltip
-                            contentStyle={{
-                                backgroundColor: 'rgba(255, 255, 255, 0.95)',
-                                border: '1px solid #ccc',
-                                borderRadius: 4
-                            }}
-                        />
-                        <Legend wrapperStyle={{ paddingTop: 20 }} />
+	if (!data || chartData.length === 0) {
+		return (
+			<Card>
+				<CardContent>
+					<Typography
+						variant="h6"
+						sx={{ fontWeight: 600, letterSpacing: '-0.01em' }}
+						gutterBottom
+					>
+						Month-on-Month Trends
+					</Typography>
+					<Box sx={{ textAlign: 'center', py: 8 }}>
+						<Typography color="text.secondary">
+							No data available for the selected period
+						</Typography>
+					</Box>
+				</CardContent>
+			</Card>
+		);
+	}
 
-                        {/* Requests Lines */}
-                        <Line
-                            yAxisId="left"
-                            type="monotone"
-                            dataKey="Total Requests"
-                            stroke="#1976d2"
-                            strokeWidth={3}
-                            dot={{ r: 4 }}
-                            activeDot={{ r: 6 }}
-                        />
-                        <Line
-                            yAxisId="left"
-                            type="monotone"
-                            dataKey="Corporate Requests"
-                            stroke="#2e7d32"
-                            strokeWidth={2}
-                            strokeDasharray="5 5"
-                            dot={{ r: 3 }}
-                        />
-                        <Line
-                            yAxisId="left"
-                            type="monotone"
-                            dataKey="Personal Requests"
-                            stroke="#ed6c02"
-                            strokeWidth={2}
-                            strokeDasharray="5 5"
-                            dot={{ r: 3 }}
-                        />
+	return (
+		<Card>
+			<CardContent>
+				<Box
+					sx={{
+						display: 'flex',
+						justifyContent: 'space-between',
+						alignItems: 'center',
+						mb: 3,
+						flexWrap: 'wrap',
+						gap: 2,
+					}}
+				>
+					<Typography
+						variant="h6"
+						sx={{ fontWeight: 600, letterSpacing: '-0.01em' }}
+					>
+						Month-on-Month Trends
+					</Typography>
+					<Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+						<ToggleButtonGroup
+							value={metric}
+							exclusive
+							size="small"
+							onChange={(_, value) => value && setMetric(value)}
+							aria-label="metric toggle"
+						>
+							<ToggleButton value="trees" aria-label="show trees">
+								Trees
+							</ToggleButton>
+							<ToggleButton value="requests" aria-label="show requests">
+								Requests
+							</ToggleButton>
+						</ToggleButtonGroup>
+						{onExport && (
+							<IconButton
+								size="small"
+								aria-label="export monthly trends"
+								onClick={onExport}
+								disabled={!data || !data.monthly || data.monthly.length === 0}
+							>
+								<FileDownloadOutlinedIcon fontSize="small" />
+							</IconButton>
+						)}
+						<FormControl size="small" sx={{ minWidth: 140 }}>
+							<InputLabel id="gift-analytics-year-label">Year</InputLabel>
+							<Select
+								labelId="gift-analytics-year-label"
+								label="Year"
+								value={selectedYear.toString()}
+								onChange={handleYearChange}
+							>
+								{yearOptions.map((year) => (
+									<MenuItem key={year} value={year.toString()}>
+										{year}
+									</MenuItem>
+								))}
+							</Select>
+						</FormControl>
+					</Box>
+				</Box>
 
-                        {/* Trees Bars */}
-                        <Bar
-                            yAxisId="right"
-                            dataKey="Corporate Trees"
-                            fill="#66bb6a"
-                            fillOpacity={0.7}
-                        />
-                        <Bar
-                            yAxisId="right"
-                            dataKey="Personal Trees"
-                            fill="#ffa726"
-                            fillOpacity={0.7}
-                        />
-                    </ComposedChart>
-                </ResponsiveContainer>
+				<ResponsiveContainer width="100%" height={400}>
+					<ComposedChart
+						data={chartData}
+						margin={{ top: 20, right: 30, left: 20, bottom: 20 }}
+					>
+						<CartesianGrid strokeDasharray="0" stroke={colors.chartGrid} />
+						<XAxis
+							dataKey="monthLabel"
+							tick={{ fontSize: 12, fill: colors.textMuted }}
+							angle={-45}
+							textAnchor="end"
+							height={80}
+							axisLine={{ stroke: colors.chartAxis }}
+							tickLine={false}
+						/>
+						{metric === 'requests' && (
+							<YAxis
+								yAxisId="left"
+								label={{
+									value: 'Requests',
+									angle: -90,
+									position: 'insideLeft',
+									style: { fontSize: 12 },
+								}}
+								tick={{ fontSize: 12, fill: colors.textMuted }}
+								axisLine={{ stroke: colors.chartAxis }}
+								tickLine={false}
+							/>
+						)}
+						{metric === 'trees' && (
+							<YAxis
+								yAxisId="right"
+								orientation="right"
+								label={{
+									value: 'Trees',
+									angle: 90,
+									position: 'insideRight',
+									style: { fontSize: 12 },
+								}}
+								tick={{ fontSize: 12, fill: colors.textMuted }}
+								axisLine={{ stroke: colors.chartAxis }}
+								tickLine={false}
+							/>
+						)}
+						<RechartsTooltip
+							contentStyle={tooltipStyles}
+							labelStyle={{ color: tooltipConfig.titleColor, fontWeight: 600 }}
+							cursor={{ fill: alpha(colors.accent, 0.08) }}
+						/>
+						<Legend
+							wrapperStyle={{ paddingTop: 20, color: colors.textMuted }}
+						/>
 
-                <Box sx={{ mt: 2, px: 2 }}>
-                    <Typography variant="caption" color="text.secondary">
-                        Lines represent gift card requests (left axis), bars represent trees gifted (right axis)
-                    </Typography>
-                </Box>
-            </CardContent>
-        </Card>
-    );
+						{metric === 'requests' && (
+							<>
+								<Line
+									yAxisId="left"
+									type="monotone"
+									dataKey="Corporate Requests"
+									stroke={colors.corporate}
+									strokeWidth={2.5}
+									strokeDasharray="5 5"
+									dot={{ r: 3 }}
+									animationDuration={800}
+								/>
+								<Line
+									yAxisId="left"
+									type="monotone"
+									dataKey="Personal Requests"
+									stroke={colors.personal}
+									strokeWidth={2.5}
+									strokeDasharray="5 5"
+									dot={{ r: 3 }}
+									animationDuration={800}
+								/>
+								<Line
+									yAxisId="left"
+									type="monotone"
+									dataKey="Total Requests"
+									stroke={alpha(colors.textOnDark, 0.85)}
+									strokeWidth={3}
+									dot={false}
+									animationDuration={800}
+								/>
+							</>
+						)}
+
+						{metric === 'trees' && (
+							<>
+								<Bar
+									yAxisId="right"
+									dataKey="Corporate Trees"
+									name="Corporate"
+									fill={colors.corporate}
+									stackId="trees"
+									animationDuration={800}
+								/>
+								<Bar
+									yAxisId="right"
+									dataKey="Personal Trees"
+									name="Personal"
+									fill={colors.personal}
+									stackId="trees"
+									animationDuration={800}
+								/>
+							</>
+						)}
+					</ComposedChart>
+				</ResponsiveContainer>
+
+				<Box sx={{ mt: 2, px: 2 }}>
+					<Typography variant="caption" color="text.secondary">
+						{metric === 'trees'
+							? 'Bars represent trees gifted by corporate and personal requests'
+							: 'Lines represent gift card requests by corporate and personal requesters'}
+					</Typography>
+				</Box>
+			</CardContent>
+		</Card>
+	);
 };
 
 export default GiftAnalyticsCharts;
