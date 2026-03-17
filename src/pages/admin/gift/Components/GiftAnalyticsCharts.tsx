@@ -21,7 +21,10 @@ import {
 	Tooltip as RechartsTooltip,
 	Legend,
 } from 'recharts';
-import { GiftCardMonthlyEntry } from '../../../../types/analytics';
+import {
+	GiftCardMonthlyEntry,
+	GiftCardYearlyEntry,
+} from '../../../../types/analytics';
 import { alpha } from '@mui/material/styles';
 import {
 	ANALYTICS_COLORS,
@@ -39,6 +42,41 @@ interface GiftAnalyticsChartsProps {
 	loading: boolean;
 	themeMode?: 'dark' | 'light';
 	granularity?: 'monthly' | 'quarterly' | 'yearly';
+	yearlyData?: GiftCardYearlyEntry[];
+	yearlyLoading?: boolean;
+}
+
+function groupToQuarterly(monthly: GiftCardMonthlyEntry[]): Array<{
+	label: string;
+	corporate: number;
+	personal: number;
+	total: number;
+	corporate_trees: number;
+	personal_trees: number;
+	total_trees: number;
+}> {
+	const quarters = [
+		{ label: 'Q1', months: [1, 2, 3] },
+		{ label: 'Q2', months: [4, 5, 6] },
+		{ label: 'Q3', months: [7, 8, 9] },
+		{ label: 'Q4', months: [10, 11, 12] },
+	];
+	return quarters.map((quarter) => {
+		const rows = monthly.filter((entry) =>
+			quarter.months.includes(entry.month),
+		);
+		const sum = (selector: (entry: GiftCardMonthlyEntry) => number) =>
+			rows.reduce((acc, entry) => acc + selector(entry), 0);
+		return {
+			label: quarter.label,
+			corporate: sum((entry) => entry.corporate),
+			personal: sum((entry) => entry.personal),
+			total: sum((entry) => entry.total ?? entry.corporate + entry.personal),
+			corporate_trees: sum((entry) => entry.corporate_trees ?? 0),
+			personal_trees: sum((entry) => entry.personal_trees ?? 0),
+			total_trees: sum((entry) => entry.total_trees ?? 0),
+		};
+	});
 }
 
 const GiftAnalyticsCharts: React.FC<GiftAnalyticsChartsProps> = ({
@@ -48,29 +86,42 @@ const GiftAnalyticsCharts: React.FC<GiftAnalyticsChartsProps> = ({
 	loading,
 	themeMode = 'dark',
 	granularity = 'monthly',
+	yearlyData = [],
+	yearlyLoading = false,
 }) => {
 	const [metric, setMetric] = useState<'requests' | 'trees'>('trees');
+	const monthlyData = data?.monthly ?? [];
 
-	// Transform data for chart
 	const chartData = useMemo(() => {
-		if (!data || !data.monthly) return [];
+		const isTrees = metric === 'trees';
+		if (granularity === 'yearly') {
+			return yearlyData.map((entry) => ({
+				label: String(entry.year),
+				corporate: isTrees ? entry.corporate_trees ?? 0 : entry.corporate,
+				personal: isTrees ? entry.personal_trees ?? 0 : entry.personal,
+				total: isTrees ? entry.total_trees ?? 0 : entry.total,
+			}));
+		}
 
-		return data.monthly.map((item) => {
-			const corporateTrees = item.corporate_trees ?? 0;
-			const personalTrees = item.personal_trees ?? 0;
-			const totalTrees = corporateTrees + personalTrees;
-			return {
-				month: item.month,
-				monthLabel: item.month_name,
-				'Corporate Requests': item.corporate,
-				'Personal Requests': item.personal,
-				'Total Requests': item.total ?? item.corporate + item.personal,
-				'Corporate Trees': corporateTrees,
-				'Personal Trees': personalTrees,
-				'Total Trees': totalTrees,
-			};
-		});
-	}, [data]);
+		if (granularity === 'quarterly') {
+			const quarters = groupToQuarterly(monthlyData);
+			return quarters.map((quarter) => ({
+				label: quarter.label,
+				corporate: isTrees ? quarter.corporate_trees ?? 0 : quarter.corporate,
+				personal: isTrees ? quarter.personal_trees ?? 0 : quarter.personal,
+				total: isTrees ? quarter.total_trees ?? 0 : quarter.total,
+			}));
+		}
+
+		return monthlyData.map((item) => ({
+			label: item.month_name,
+			corporate: isTrees ? item.corporate_trees ?? 0 : item.corporate,
+			personal: isTrees ? item.personal_trees ?? 0 : item.personal,
+			total: isTrees
+				? item.total_trees ?? 0
+				: item.total ?? item.corporate + item.personal,
+		}));
+	}, [granularity, metric, monthlyData, yearlyData]);
 
 	const colors =
 		themeMode === 'light' ? LIGHT_ANALYTICS_COLORS : ANALYTICS_COLORS;
@@ -87,8 +138,11 @@ const GiftAnalyticsCharts: React.FC<GiftAnalyticsChartsProps> = ({
 		[tooltipConfig],
 	);
 	const displayYear = selectedYear === 0 ? 'All time' : selectedYear.toString();
+	const isYearlyView = granularity === 'yearly';
+	const subtitleLabel = isYearlyView ? 'All years' : displayYear;
+	const showLoading = isYearlyView ? yearlyLoading : loading;
 
-	if (loading) {
+	if (showLoading) {
 		return (
 			<Card>
 				<CardContent>
@@ -108,7 +162,7 @@ const GiftAnalyticsCharts: React.FC<GiftAnalyticsChartsProps> = ({
 		);
 	}
 
-	if (!data || chartData.length === 0) {
+	if (chartData.length === 0) {
 		return (
 			<Card>
 				<CardContent>
@@ -150,7 +204,7 @@ const GiftAnalyticsCharts: React.FC<GiftAnalyticsChartsProps> = ({
 							Month-on-Month Trends
 						</Typography>
 						<Typography variant="body2" color="text.secondary">
-							{`${displayYear} · ${granularity}`}
+							{`${subtitleLabel} · ${granularity}`}
 						</Typography>
 					</Box>
 					<Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
@@ -187,7 +241,7 @@ const GiftAnalyticsCharts: React.FC<GiftAnalyticsChartsProps> = ({
 					>
 						<CartesianGrid strokeDasharray="0" stroke={colors.chartGrid} />
 						<XAxis
-							dataKey="monthLabel"
+							dataKey="label"
 							tick={{ fontSize: 12, fill: colors.textMuted }}
 							angle={-45}
 							textAnchor="end"
@@ -238,7 +292,8 @@ const GiftAnalyticsCharts: React.FC<GiftAnalyticsChartsProps> = ({
 								<Line
 									yAxisId="left"
 									type="monotone"
-									dataKey="Corporate Requests"
+									dataKey="corporate"
+									name="Corporate"
 									stroke={colors.corporate}
 									strokeWidth={2.5}
 									strokeDasharray="5 5"
@@ -248,7 +303,8 @@ const GiftAnalyticsCharts: React.FC<GiftAnalyticsChartsProps> = ({
 								<Line
 									yAxisId="left"
 									type="monotone"
-									dataKey="Personal Requests"
+									dataKey="personal"
+									name="Personal"
 									stroke={colors.personal}
 									strokeWidth={2.5}
 									strokeDasharray="5 5"
@@ -258,7 +314,8 @@ const GiftAnalyticsCharts: React.FC<GiftAnalyticsChartsProps> = ({
 								<Line
 									yAxisId="left"
 									type="monotone"
-									dataKey="Total Requests"
+									dataKey="total"
+									name="Total"
 									stroke={alpha(colors.textOnDark, 0.85)}
 									strokeWidth={3}
 									dot={false}
@@ -271,7 +328,7 @@ const GiftAnalyticsCharts: React.FC<GiftAnalyticsChartsProps> = ({
 							<>
 								<Bar
 									yAxisId="right"
-									dataKey="Corporate Trees"
+									dataKey="corporate"
 									name="Corporate"
 									fill={colors.corporate}
 									stackId="trees"
@@ -279,7 +336,7 @@ const GiftAnalyticsCharts: React.FC<GiftAnalyticsChartsProps> = ({
 								/>
 								<Bar
 									yAxisId="right"
-									dataKey="Personal Trees"
+									dataKey="personal"
 									name="Personal"
 									fill={colors.personal}
 									stackId="trees"

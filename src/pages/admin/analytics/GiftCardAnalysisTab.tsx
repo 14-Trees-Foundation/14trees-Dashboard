@@ -12,6 +12,7 @@ import {
 	useGiftCardTreeDistribution,
 	useGiftCardSources,
 	useGiftCardLeaderboard,
+	useGiftCardYearly,
 } from './hooks/useGiftCardAnalyticsV2';
 import { GiftCardMonthlyEntry } from '../../../types/analytics';
 import FileDownloadOutlinedIcon from '@mui/icons-material/FileDownloadOutlined';
@@ -200,6 +201,10 @@ const GiftCardAnalysisTab: React.FC<GiftCardAnalysisTabProps> = ({
 			selectedYear || undefined,
 			typeFilter !== 'all' ? typeFilter : undefined,
 		);
+	const { data: yearly, loading: yearlyLoading } = useGiftCardYearly(
+		typeFilter !== 'all' ? typeFilter : undefined,
+		sourceFilter !== 'all' ? sourceFilter : undefined,
+	);
 
 	return (
 		<Box
@@ -365,6 +370,8 @@ const GiftCardAnalysisTab: React.FC<GiftCardAnalysisTabProps> = ({
 					loading={monthlyLoading}
 					themeMode={themeMode}
 					granularity={granularity}
+					yearlyData={yearly ?? []}
+					yearlyLoading={yearlyLoading}
 				/>
 				<RequestSourceChart
 					data={sources}

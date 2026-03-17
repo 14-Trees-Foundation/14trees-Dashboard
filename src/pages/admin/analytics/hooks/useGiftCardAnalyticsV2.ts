@@ -8,6 +8,7 @@ import {
 	GiftCardSourcesResponse,
 	GiftCardSummaryKPIs,
 	GiftCardTreeDistribution,
+	GiftCardYearlyEntry,
 } from '../../../../types/analytics';
 
 type GiftCardRequestTypeFilter = 'all' | 'corporate' | 'personal';
@@ -58,6 +59,34 @@ export function useGiftCardMonthly(year?: number) {
 				setLoading(false);
 			});
 	}, [year]);
+
+	return { data, loading, error };
+}
+
+export function useGiftCardYearly(
+	type?: 'all' | 'corporate' | 'personal',
+	source?: 'all' | 'website' | 'manual',
+) {
+	const [data, setData] = useState<GiftCardYearlyEntry[] | null>(null);
+	const [loading, setLoading] = useState(true);
+	const [error, setError] = useState<string | null>(null);
+
+	useEffect(() => {
+		const apiClient = new ApiClient();
+
+		setLoading(true);
+		setError(null);
+		apiClient
+			.getGiftCardYearly(type, source)
+			.then((res) => {
+				setData(res);
+				setLoading(false);
+			})
+			.catch((err) => {
+				setError(err.message || 'Failed to load');
+				setLoading(false);
+			});
+	}, [type, source]);
 
 	return { data, loading, error };
 }

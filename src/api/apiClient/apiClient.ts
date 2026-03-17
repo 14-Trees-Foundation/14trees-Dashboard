@@ -37,6 +37,7 @@ import {
 	GiftCardSourcesResponse,
 	GiftCardSummaryKPIs,
 	GiftCardTreeDistribution,
+	GiftCardYearlyEntry,
 } from '../../types/analytics';
 import { SortOrder } from 'antd/es/table/interface';
 import { GridFilterItem } from '@mui/x-data-grid';
@@ -2715,6 +2716,33 @@ class ApiClient {
 		} catch (error: any) {
 			throw new Error(
 				`Failed to fetch gift card monthly analytics: ${error.message}`,
+			);
+		}
+	}
+
+	async getGiftCardYearly(
+		type?: 'all' | 'corporate' | 'personal',
+		source?: 'all' | 'website' | 'manual',
+	): Promise<GiftCardYearlyEntry[]> {
+		const params = new URLSearchParams();
+		if (type && type !== 'all') params.append('type', type);
+		if (source && source !== 'all') params.append('source', source);
+		const queryString = params.toString();
+		const url = `/analytics/giftcards/yearly${
+			queryString ? `?${queryString}` : ''
+		}`;
+
+		try {
+			const response = await this.api.get<GiftCardYearlyEntry[]>(url, {
+				headers: {
+					'x-access-token': this.token,
+					'content-type': 'application/json',
+				},
+			});
+			return response.data;
+		} catch (error: any) {
+			throw new Error(
+				`Failed to fetch gift card yearly analytics: ${error.message}`,
 			);
 		}
 	}

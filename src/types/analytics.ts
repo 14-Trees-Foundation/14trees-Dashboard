@@ -19,6 +19,16 @@ export interface GiftCardMonthlyEntry {
 	personal_trees: number;
 }
 
+export interface GiftCardYearlyEntry {
+	year: number;
+	corporate: number;
+	personal: number;
+	total: number;
+	corporate_trees: number;
+	personal_trees: number;
+	total_trees: number;
+}
+
 export interface GiftCardOccasionMonthlyEntry {
 	month: number;
 	month_name: string;
