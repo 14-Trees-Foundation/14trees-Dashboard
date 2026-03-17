@@ -361,6 +361,17 @@ const GiftCardAnalysisTab: React.FC<GiftCardAnalysisTabProps> = ({
 				loading={summaryLoading}
 			/>
 
+			<Box
+				sx={{
+					mt: 2,
+					'& > *': {
+						minHeight: 120,
+					},
+				}}
+			>
+				<AISummaryPanel year={selectedYear} themeMode={themeMode} />
+			</Box>
+
 			<Typography sx={sectionLabelSx}>Volume & sources</Typography>
 			<Box
 				sx={{
@@ -392,12 +403,13 @@ const GiftCardAnalysisTab: React.FC<GiftCardAnalysisTabProps> = ({
 			<Typography sx={sectionLabelSx}>Breakdown</Typography>
 			<Box
 				sx={{
-					display: 'grid',
-					gridTemplateColumns: { xs: '1fr', lg: '2fr 1fr' },
+					display: 'flex',
+					flexDirection: { xs: 'column', lg: 'row' },
 					gap: 2,
+					alignItems: 'stretch',
 				}}
 			>
-				<Box>
+				<Box sx={{ flex: { xs: '1 1 auto', lg: 2 }, width: '100%' }}>
 					<GiftOccasionBreakdown
 						data={occasions ?? undefined}
 						loading={occasionsLoading}
@@ -411,9 +423,11 @@ const GiftCardAnalysisTab: React.FC<GiftCardAnalysisTabProps> = ({
 				</Box>
 				<Box
 					sx={{
+						flex: { xs: '1 1 auto', lg: 1 },
+						width: '100%',
+						minWidth: 0,
 						display: 'flex',
 						flexDirection: 'column',
-						gap: 2,
 					}}
 				>
 					<TreeDistributionChart
@@ -423,7 +437,6 @@ const GiftCardAnalysisTab: React.FC<GiftCardAnalysisTabProps> = ({
 						year={selectedYear}
 						filterContext={yearOnlyContext}
 					/>
-					<AISummaryPanel year={selectedYear} themeMode={themeMode} />
 				</Box>
 			</Box>
 

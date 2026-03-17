@@ -140,8 +140,22 @@ const TreeDistributionChart: React.FC<TreeDistributionChartProps> = ({
 	};
 
 	return (
-		<Card sx={cardStyles}>
-			<CardContent>
+		<Card
+			sx={{
+				height: '100%',
+				display: 'flex',
+				flexDirection: 'column',
+				...cardStyles,
+			}}
+		>
+			<CardContent
+				sx={{
+					flex: 1,
+					display: 'flex',
+					flexDirection: 'column',
+					height: '100%',
+				}}
+			>
 				<Box
 					sx={{
 						display: 'flex',
