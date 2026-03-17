@@ -32,6 +32,11 @@ import {
 	LIGHT_ANALYTICS_COLORS,
 	LIGHT_CHART_TOOLTIP,
 } from '../../analytics/analyticsTheme';
+import {
+	arrayToCSV,
+	downloadCSV,
+	formatFilename,
+} from '../../../../utils/csvExport';
 
 interface GiftAnalyticsChartsProps {
 	data: {
@@ -44,6 +49,8 @@ interface GiftAnalyticsChartsProps {
 	granularity?: 'monthly' | 'quarterly' | 'yearly';
 	yearlyData?: GiftCardYearlyEntry[];
 	yearlyLoading?: boolean;
+	typeFilter?: 'all' | 'corporate' | 'personal';
+	sourceFilter?: 'all' | 'website' | 'manual';
 }
 
 function groupToQuarterly(monthly: GiftCardMonthlyEntry[]): Array<{
@@ -88,6 +95,8 @@ const GiftAnalyticsCharts: React.FC<GiftAnalyticsChartsProps> = ({
 	granularity = 'monthly',
 	yearlyData = [],
 	yearlyLoading = false,
+	typeFilter = 'all',
+	sourceFilter = 'all',
 }) => {
 	const [metric, setMetric] = useState<'requests' | 'trees'>('trees');
 	const monthlyData = data?.monthly ?? [];
@@ -141,6 +150,89 @@ const GiftAnalyticsCharts: React.FC<GiftAnalyticsChartsProps> = ({
 	const isYearlyView = granularity === 'yearly';
 	const subtitleLabel = isYearlyView ? 'All years' : displayYear;
 	const showLoading = isYearlyView ? yearlyLoading : loading;
+
+	const exportDataset = useMemo(() => {
+		if (granularity === 'yearly') {
+			if (!yearlyData.length) {
+				return null;
+			}
+			const headers = ['Year', 'Corporate', 'Personal', 'Total'];
+			const rows = yearlyData.map((entry) => [
+				entry.year,
+				entry.corporate ?? 0,
+				entry.personal ?? 0,
+				entry.total ?? (entry.corporate ?? 0) + (entry.personal ?? 0),
+			]);
+			return { headers, rows };
+		}
+
+		if (granularity === 'quarterly') {
+			if (!monthlyData.length) {
+				return null;
+			}
+			const quarters = groupToQuarterly(monthlyData);
+			const headers = ['Quarter', 'Corporate', 'Personal', 'Total'];
+			const rows = quarters.map((quarter) => [
+				quarter.label,
+				quarter.corporate,
+				quarter.personal,
+				quarter.total,
+			]);
+			return { headers, rows };
+		}
+
+		if (!monthlyData.length) {
+			return null;
+		}
+
+		const headers = [
+			'Month',
+			'Corporate',
+			'Personal',
+			'Total',
+			'Corporate Trees',
+			'Personal Trees',
+			'Total Trees',
+		];
+		const rows = monthlyData.map((item) => {
+			const corporateTrees = item.corporate_trees ?? 0;
+			const personalTrees = item.personal_trees ?? 0;
+			const totalTrees = item.total_trees ?? corporateTrees + personalTrees;
+			return [
+				item.month_name,
+				item.corporate,
+				item.personal,
+				item.total ?? item.corporate + item.personal,
+				corporateTrees,
+				personalTrees,
+				totalTrees,
+			];
+		});
+		return { headers, rows };
+	}, [granularity, monthlyData, yearlyData]);
+
+	const handleExport = () => {
+		if (!exportDataset) {
+			return;
+		}
+		const filename = formatFilename(
+			granularity === 'yearly'
+				? 'yearly_volume'
+				: granularity === 'quarterly'
+				? 'quarterly_volume'
+				: 'monthly_volume',
+			{
+				year: selectedYear,
+				type: typeFilter,
+				source: sourceFilter,
+			},
+		);
+		const csv = arrayToCSV(exportDataset.headers, exportDataset.rows);
+		downloadCSV(csv, filename);
+		onExport?.();
+	};
+
+	const exportDisabled = !exportDataset;
 
 	if (showLoading) {
 		return (
@@ -221,16 +313,14 @@ const GiftAnalyticsCharts: React.FC<GiftAnalyticsChartsProps> = ({
 								Requests
 							</ToggleButton>
 						</ToggleButtonGroup>
-						{onExport && (
-							<IconButton
-								size="small"
-								aria-label="export monthly trends"
-								onClick={onExport}
-								disabled={!data || !data.monthly || data.monthly.length === 0}
-							>
-								<FileDownloadOutlinedIcon fontSize="small" />
-							</IconButton>
-						)}
+						<IconButton
+							size="small"
+							aria-label="export monthly trends"
+							onClick={handleExport}
+							disabled={exportDisabled}
+						>
+							<FileDownloadOutlinedIcon fontSize="small" />
+						</IconButton>
 					</Box>
 				</Box>
 

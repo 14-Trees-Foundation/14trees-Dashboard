@@ -12,8 +12,12 @@ import {
 } from '../../../../types/analytics';
 
 type GiftCardRequestTypeFilter = 'all' | 'corporate' | 'personal';
+type GiftCardSourceFilter = 'all' | 'website' | 'manual';
 
-export function useGiftCardSummary(year?: number) {
+export function useGiftCardSummary(
+	year?: number,
+	source?: GiftCardSourceFilter,
+) {
 	const [data, setData] = useState<GiftCardSummaryKPIs | null>(null);
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState<string | null>(null);
@@ -24,7 +28,7 @@ export function useGiftCardSummary(year?: number) {
 		setLoading(true);
 		setError(null);
 		apiClient
-			.getGiftCardSummaryKPIs(year)
+			.getGiftCardSummaryKPIs(year, source)
 			.then((res) => {
 				setData(res);
 				setLoading(false);
@@ -33,12 +37,15 @@ export function useGiftCardSummary(year?: number) {
 				setError(err.message || 'Failed to load');
 				setLoading(false);
 			});
-	}, [year]);
+	}, [year, source]);
 
 	return { data, loading, error };
 }
 
-export function useGiftCardMonthly(year?: number) {
+export function useGiftCardMonthly(
+	year?: number,
+	source?: GiftCardSourceFilter,
+) {
 	const [data, setData] = useState<GiftCardMonthlyEntry[] | null>(null);
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState<string | null>(null);
@@ -49,7 +56,7 @@ export function useGiftCardMonthly(year?: number) {
 		setLoading(true);
 		setError(null);
 		apiClient
-			.getGiftCardMonthly(year)
+			.getGiftCardMonthly(year, source)
 			.then((res) => {
 				setData(res);
 				setLoading(false);
@@ -58,7 +65,7 @@ export function useGiftCardMonthly(year?: number) {
 				setError(err.message || 'Failed to load');
 				setLoading(false);
 			});
-	}, [year]);
+	}, [year, source]);
 
 	return { data, loading, error };
 }
@@ -93,6 +100,7 @@ export function useGiftCardYearly(
 
 export function useGiftCardOccasions(
 	type: 'all' | 'corporate' | 'personal' = 'all',
+	source?: GiftCardSourceFilter,
 ) {
 	const [data, setData] = useState<GiftCardOccasionsResponse | null>(null);
 	const [loading, setLoading] = useState(true);
@@ -104,7 +112,7 @@ export function useGiftCardOccasions(
 		setLoading(true);
 		setError(null);
 		apiClient
-			.getGiftCardOccasions(type)
+			.getGiftCardOccasions(type, source)
 			.then((res) => {
 				setData(res);
 				setLoading(false);
@@ -113,7 +121,7 @@ export function useGiftCardOccasions(
 				setError(err.message || 'Failed to load');
 				setLoading(false);
 			});
-	}, [type]);
+	}, [type, source]);
 
 	return { data, loading, error };
 }
@@ -121,6 +129,7 @@ export function useGiftCardOccasions(
 export function useGiftCardTreeDistribution(
 	year?: number,
 	type?: GiftCardRequestTypeFilter,
+	source?: GiftCardSourceFilter,
 ) {
 	const [data, setData] = useState<GiftCardTreeDistribution | null>(null);
 	const [loading, setLoading] = useState(true);
@@ -132,7 +141,7 @@ export function useGiftCardTreeDistribution(
 		setLoading(true);
 		setError(null);
 		apiClient
-			.getGiftCardTreeDistribution(year, type)
+			.getGiftCardTreeDistribution(year, type, source)
 			.then((res) => {
 				setData(res);
 				setLoading(false);
@@ -141,7 +150,7 @@ export function useGiftCardTreeDistribution(
 				setError(err.message || 'Failed to load');
 				setLoading(false);
 			});
-	}, [year, type]);
+	}, [year, type, source]);
 
 	return { data, loading, error };
 }
@@ -179,6 +188,7 @@ export function useGiftCardLeaderboard(
 	limit: number = 10,
 	year?: number,
 	type?: GiftCardRequestTypeFilter,
+	source?: GiftCardSourceFilter,
 ) {
 	const [data, setData] = useState<GiftCardLeaderboardEntry[] | null>(null);
 	const [loading, setLoading] = useState(true);
@@ -190,7 +200,7 @@ export function useGiftCardLeaderboard(
 		setLoading(true);
 		setError(null);
 		apiClient
-			.getGiftCardLeaderboard(sortBy, limit, year, type)
+			.getGiftCardLeaderboard(sortBy, limit, year, type, source)
 			.then((res) => {
 				setData(res);
 				setLoading(false);
@@ -199,7 +209,7 @@ export function useGiftCardLeaderboard(
 				setError(err.message || 'Failed to load');
 				setLoading(false);
 			});
-	}, [sortBy, limit, year, type]);
+	}, [sortBy, limit, year, type, source]);
 
 	return { data, loading, error };
 }

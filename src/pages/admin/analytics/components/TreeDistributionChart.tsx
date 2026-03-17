@@ -7,6 +7,7 @@ import {
 	ToggleButton,
 	ToggleButtonGroup,
 	Typography,
+	IconButton,
 } from '@mui/material';
 import { alpha } from '@mui/material/styles';
 import {
@@ -25,6 +26,12 @@ import {
 	LIGHT_ANALYTICS_COLORS,
 	LIGHT_CHART_TOOLTIP,
 } from '../analyticsTheme';
+import FileDownloadOutlinedIcon from '@mui/icons-material/FileDownloadOutlined';
+import {
+	arrayToCSV,
+	downloadCSV,
+	formatFilename,
+} from '../../../../utils/csvExport';
 
 interface TreeDistributionChartProps {
 	data: GiftCardTreeDistribution | null;
@@ -32,6 +39,7 @@ interface TreeDistributionChartProps {
 	themeMode?: 'dark' | 'light';
 	year: number;
 	filterContext?: string;
+	typeFilter?: 'all' | 'corporate' | 'personal';
 }
 
 const TreeDistributionChart: React.FC<TreeDistributionChartProps> = ({
@@ -40,6 +48,7 @@ const TreeDistributionChart: React.FC<TreeDistributionChartProps> = ({
 	themeMode = 'dark',
 	year,
 	filterContext,
+	typeFilter = 'all',
 }) => {
 	const [metric, setMetric] = useState<'trees' | 'requests'>('trees');
 	const isLightMode = themeMode === 'light';
@@ -95,6 +104,41 @@ const TreeDistributionChart: React.FC<TreeDistributionChartProps> = ({
 	const yearLabel = year === 0 ? 'All time' : `${year}`;
 	const contextLabel = filterContext || yearLabel;
 
+	const handleExport = () => {
+		if (!data) {
+			return;
+		}
+		const headers = [
+			'Bucket',
+			'Corporate Requests',
+			'Personal Requests',
+			'Total Requests',
+			'Corporate Trees',
+			'Personal Trees',
+			'Total Trees',
+		];
+		const rows = data.buckets.map((bucket, index) => {
+			const corporateRequests = data.corporate[index] ?? 0;
+			const personalRequests = data.personal[index] ?? 0;
+			const corporateTreesBucket = data.corporate_trees[index] ?? 0;
+			const personalTreesBucket = data.personal_trees[index] ?? 0;
+			return [
+				bucket,
+				corporateRequests,
+				personalRequests,
+				corporateRequests + personalRequests,
+				corporateTreesBucket,
+				personalTreesBucket,
+				corporateTreesBucket + personalTreesBucket,
+			];
+		});
+		const filename = formatFilename('tree_distribution', {
+			year,
+			type: typeFilter,
+		});
+		downloadCSV(arrayToCSV(headers, rows), filename);
+	};
+
 	return (
 		<Card sx={cardStyles}>
 			<CardContent>
@@ -126,15 +170,25 @@ const TreeDistributionChart: React.FC<TreeDistributionChartProps> = ({
 							{contextLabel}
 						</Typography>
 					</Box>
-					<ToggleButtonGroup
-						size="small"
-						value={metric}
-						exclusive
-						onChange={(_, value) => value && setMetric(value)}
-					>
-						<ToggleButton value="trees">Trees</ToggleButton>
-						<ToggleButton value="requests">Requests</ToggleButton>
-					</ToggleButtonGroup>
+					<Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+						<ToggleButtonGroup
+							size="small"
+							value={metric}
+							exclusive
+							onChange={(_, value) => value && setMetric(value)}
+						>
+							<ToggleButton value="trees">Trees</ToggleButton>
+							<ToggleButton value="requests">Requests</ToggleButton>
+						</ToggleButtonGroup>
+						<IconButton
+							aria-label="export tree distribution"
+							size="small"
+							onClick={handleExport}
+							disabled={!data}
+						>
+							<FileDownloadOutlinedIcon fontSize="small" />
+						</IconButton>
+					</Box>
 				</Box>
 
 				{loading ? (

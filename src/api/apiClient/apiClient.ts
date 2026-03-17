@@ -70,12 +70,16 @@ class ApiClient {
 		params: URLSearchParams,
 		year?: number,
 		type?: 'all' | 'corporate' | 'personal',
+		source?: 'all' | 'website' | 'manual',
 	) {
 		if (typeof year === 'number' && year > 0) {
 			params.append('year', year.toString());
 		}
 		if (type && type !== 'all') {
 			params.append('type', type);
+		}
+		if (source && source !== 'all') {
+			params.append('source', source);
 		}
 	}
 
@@ -2675,9 +2679,12 @@ class ApiClient {
 		}
 	}
 
-	async getGiftCardSummaryKPIs(year?: number): Promise<GiftCardSummaryKPIs> {
+	async getGiftCardSummaryKPIs(
+		year?: number,
+		source?: 'all' | 'website' | 'manual',
+	): Promise<GiftCardSummaryKPIs> {
 		const params = new URLSearchParams();
-		this.appendGiftCardAnalyticsFilters(params, year);
+		this.appendGiftCardAnalyticsFilters(params, year, undefined, source);
 		const queryString = params.toString();
 		const url = `/analytics/giftcards/summary${
 			queryString ? `?${queryString}` : ''
@@ -2697,9 +2704,13 @@ class ApiClient {
 		}
 	}
 
-	async getGiftCardMonthly(year?: number): Promise<GiftCardMonthlyEntry[]> {
+	async getGiftCardMonthly(
+		year?: number,
+		source?: 'all' | 'website' | 'manual',
+	): Promise<GiftCardMonthlyEntry[]> {
 		const params = new URLSearchParams();
 		if (year !== undefined) params.append('year', year.toString());
+		if (source && source !== 'all') params.append('source', source);
 		const queryString = params.toString();
 		const url = `/analytics/giftcards/monthly${
 			queryString ? `?${queryString}` : ''
@@ -2749,9 +2760,11 @@ class ApiClient {
 
 	async getGiftCardOccasions(
 		type?: 'all' | 'corporate' | 'personal',
+		source?: 'all' | 'website' | 'manual',
 	): Promise<GiftCardOccasionsResponse> {
 		const params = new URLSearchParams();
 		if (type !== undefined) params.append('type', type);
+		if (source && source !== 'all') params.append('source', source);
 		const queryString = params.toString();
 		const url = `/analytics/giftcards/occasions${
 			queryString ? `?${queryString}` : ''
@@ -2775,9 +2788,10 @@ class ApiClient {
 	async getGiftCardTreeDistribution(
 		year?: number,
 		type?: 'all' | 'corporate' | 'personal',
+		source?: 'all' | 'website' | 'manual',
 	): Promise<GiftCardTreeDistribution> {
 		const params = new URLSearchParams();
-		this.appendGiftCardAnalyticsFilters(params, year, type);
+		this.appendGiftCardAnalyticsFilters(params, year, type, source);
 		const queryString = params.toString();
 		const url = `/analytics/giftcards/tree-distribution${
 			queryString ? `?${queryString}` : ''
@@ -2825,11 +2839,12 @@ class ApiClient {
 		limit?: number,
 		year?: number,
 		type?: 'all' | 'corporate' | 'personal',
+		source?: 'all' | 'website' | 'manual',
 	): Promise<GiftCardLeaderboardEntry[]> {
 		const params = new URLSearchParams();
 		if (sortBy !== undefined) params.append('sortBy', sortBy);
 		if (limit !== undefined) params.append('limit', limit.toString());
-		this.appendGiftCardAnalyticsFilters(params, year, type);
+		this.appendGiftCardAnalyticsFilters(params, year, type, source);
 		const queryString = params.toString();
 		const url = `/analytics/giftcards/leaderboard${
 			queryString ? `?${queryString}` : ''

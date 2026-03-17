@@ -7,7 +7,9 @@ import {
 	ToggleButtonGroup,
 	ToggleButton,
 	Skeleton,
+	IconButton,
 } from '@mui/material';
+import FileDownloadOutlinedIcon from '@mui/icons-material/FileDownloadOutlined';
 import { alpha } from '@mui/material/styles';
 import {
 	ResponsiveContainer,
@@ -29,6 +31,11 @@ import {
 	LIGHT_ANALYTICS_COLORS,
 	LIGHT_CHART_TOOLTIP,
 } from '../analyticsTheme';
+import {
+	arrayToCSV,
+	downloadCSV,
+	formatFilename,
+} from '../../../../utils/csvExport';
 
 interface RequestSourceChartProps {
 	data: GiftCardSourcesResponse | null;
@@ -89,25 +96,93 @@ const RequestSourceChart: React.FC<RequestSourceChartProps> = ({
 			? (summary.manual_trees / summary.manual_requests).toFixed(1)
 			: '0.0';
 
+	const handleExport = () => {
+		if (!data) {
+			return;
+		}
+		const summaryHeaders = ['Source', 'Requests', 'Trees', 'Percentage'];
+		const summaryRows = [
+			[
+				'Website',
+				summary?.website_requests ?? 0,
+				summary?.website_trees ?? 0,
+				`${summary?.website_pct ?? 0}%`,
+			],
+			[
+				'Manual',
+				summary?.manual_requests ?? 0,
+				summary?.manual_trees ?? 0,
+				`${summary?.manual_pct ?? 0}%`,
+			],
+		];
+		const monthlyHeaders = [
+			'Year',
+			'Month',
+			'Website Requests',
+			'Manual Requests',
+			'Website Trees',
+			'Manual Trees',
+		];
+		const monthlyRows = (data.monthly ?? []).map((month) => [
+			month.year,
+			month.month_name,
+			month.website,
+			month.manual,
+			month.website_trees,
+			month.manual_trees,
+		]);
+		const summaryCSV = arrayToCSV(summaryHeaders, summaryRows);
+		const monthlyCSV =
+			monthlyRows.length > 0 ? arrayToCSV(monthlyHeaders, monthlyRows) : '';
+		const content = monthlyCSV ? `${summaryCSV}\n\n${monthlyCSV}` : summaryCSV;
+		const filename = formatFilename('request_sources', {
+			year,
+			type: typeFilter,
+		});
+		downloadCSV(content, filename);
+	};
+
 	return (
 		<Card sx={cardStyles}>
 			<CardContent>
-				<Typography
-					variant="h6"
+				<Box
 					sx={{
-						fontWeight: 600,
-						letterSpacing: '-0.01em',
-						color: titleColor,
+						display: 'flex',
+						justifyContent: 'space-between',
+						alignItems: 'flex-start',
+						gap: 1.5,
 						mb: 2,
 					}}
 				>
-					Request sources
-				</Typography>
-				{contextLabel && (
-					<Typography variant="body2" sx={{ color: subtitleColor, mb: 2 }}>
-						{contextLabel}
-					</Typography>
-				)}
+					<Box>
+						<Typography
+							variant="h6"
+							sx={{
+								fontWeight: 600,
+								letterSpacing: '-0.01em',
+								color: titleColor,
+							}}
+						>
+							Request sources
+						</Typography>
+						{contextLabel && (
+							<Typography
+								variant="body2"
+								sx={{ color: subtitleColor, mt: 0.5 }}
+							>
+								{contextLabel}
+							</Typography>
+						)}
+					</Box>
+					<IconButton
+						size="small"
+						aria-label="export request sources"
+						onClick={handleExport}
+						disabled={!data}
+					>
+						<FileDownloadOutlinedIcon fontSize="small" />
+					</IconButton>
+				</Box>
 				<Box sx={{ display: 'flex', gap: 3, flexWrap: 'wrap', mb: 3, mt: 1 }}>
 					<Box sx={{ flex: 1, minWidth: 140 }}>
 						<Typography

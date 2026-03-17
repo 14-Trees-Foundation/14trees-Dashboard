@@ -1,5 +1,12 @@
 import React, { useMemo, useState } from 'react';
-import { Box, Card, CardContent, Typography, Skeleton } from '@mui/material';
+import {
+	Box,
+	Card,
+	CardContent,
+	Typography,
+	Skeleton,
+	IconButton,
+} from '@mui/material';
 import {
 	ResponsiveContainer,
 	BarChart,
@@ -21,6 +28,12 @@ import {
 	LIGHT_ANALYTICS_COLORS,
 	LIGHT_CHART_TOOLTIP,
 } from '../../analytics/analyticsTheme';
+import FileDownloadOutlinedIcon from '@mui/icons-material/FileDownloadOutlined';
+import {
+	arrayToCSV,
+	downloadCSV,
+	formatFilename,
+} from '../../../../utils/csvExport';
 
 interface GiftOccasionBreakdownProps {
 	data?: {
@@ -31,6 +44,7 @@ interface GiftOccasionBreakdownProps {
 	type: 'all' | 'corporate' | 'personal';
 	themeMode?: 'dark' | 'light';
 	filterContext?: string;
+	onExport?: () => void;
 }
 
 // Event type mapping from database values to display names
@@ -102,6 +116,7 @@ const GiftOccasionBreakdown: React.FC<GiftOccasionBreakdownProps> = ({
 	type,
 	themeMode = 'dark',
 	filterContext,
+	onExport,
 }) => {
 	const [selectedOccasion, setSelectedOccasion] = useState<string | null>(null);
 	const isLightMode = themeMode === 'light';
@@ -156,10 +171,43 @@ const GiftOccasionBreakdown: React.FC<GiftOccasionBreakdownProps> = ({
 	const hasSelectedMonthlyData = selectedMonthlyData.some(
 		(entry) => entry.count > 0,
 	);
+	const monthLabels = [
+		'Jan',
+		'Feb',
+		'Mar',
+		'Apr',
+		'May',
+		'Jun',
+		'Jul',
+		'Aug',
+		'Sep',
+		'Oct',
+		'Nov',
+		'Dec',
+	];
+
+	const handleExport = () => {
+		if (!data || !data.occasions) {
+			return;
+		}
+		const headers = ['Occasion', 'Total Requests', ...monthLabels];
+		const rows = Object.entries(data.occasions).map(([occasionKey, count]) => {
+			const monthlyEntries = data.monthly_by_occasion?.[occasionKey] ?? [];
+			const monthlyCounts = monthLabels.map((_, index) => {
+				const entry = monthlyEntries.find((item) => item.month === index + 1);
+				return entry?.count ?? 0;
+			});
+			return [getEventTypeName(occasionKey), count, ...monthlyCounts];
+		});
+		const filename = formatFilename('occasions', { type });
+		const csv = arrayToCSV(headers, rows);
+		downloadCSV(csv, filename);
+		onExport?.();
+	};
 
 	if (loading) {
 		return (
-			<Card sx={{ height: '100%' }}>
+			<Card sx={{ alignSelf: 'flex-start' }}>
 				<CardContent>
 					<Skeleton
 						variant="text"
@@ -179,7 +227,7 @@ const GiftOccasionBreakdown: React.FC<GiftOccasionBreakdownProps> = ({
 
 	if (!data || !data.occasions || Object.keys(data.occasions).length === 0) {
 		return (
-			<Card sx={{ height: '100%' }}>
+			<Card>
 				<CardContent>
 					<Typography
 						variant="h6"
@@ -203,7 +251,7 @@ const GiftOccasionBreakdown: React.FC<GiftOccasionBreakdownProps> = ({
 	}
 
 	return (
-		<Card sx={{ height: '100%' }}>
+		<Card>
 			<CardContent>
 				<Box
 					sx={{
@@ -232,9 +280,17 @@ const GiftOccasionBreakdown: React.FC<GiftOccasionBreakdownProps> = ({
 							</Typography>
 						)}
 					</Box>
+					<IconButton
+						size="small"
+						aria-label="export occasions"
+						onClick={handleExport}
+						disabled={!data || !data.occasions}
+					>
+						<FileDownloadOutlinedIcon fontSize="small" />
+					</IconButton>
 				</Box>
 
-				<ResponsiveContainer width="100%" height={350}>
+				<ResponsiveContainer width="100%" height={260}>
 					<BarChart
 						data={chartData}
 						margin={{ top: 20, right: 30, left: 20, bottom: 80 }}

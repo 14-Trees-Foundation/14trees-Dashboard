@@ -16,6 +16,11 @@ import { alpha, useTheme } from '@mui/material/styles';
 import FileDownloadOutlinedIcon from '@mui/icons-material/FileDownloadOutlined';
 import { GiftCardLeaderboardEntry } from '../../../../types/analytics';
 import { ANALYTICS_COLORS, LIGHT_ANALYTICS_COLORS } from '../analyticsTheme';
+import {
+	arrayToCSV,
+	downloadCSV,
+	formatFilename,
+} from '../../../../utils/csvExport';
 
 interface RequesterLeaderboardProps {
 	data: GiftCardLeaderboardEntry[] | null;
@@ -23,7 +28,7 @@ interface RequesterLeaderboardProps {
 	sortBy: 'trees' | 'cards';
 	onSortChange: (sort: 'trees' | 'cards') => void;
 	onRowClick: (userId: number) => void;
-	onExport: () => void;
+	onExport?: () => void;
 	sectionLabel?: string;
 	typeFilter: 'all' | 'corporate' | 'personal';
 	year: number;
@@ -120,6 +125,55 @@ const RequesterLeaderboard: React.FC<RequesterLeaderboardProps> = ({
 	const contextLabel =
 		filterContext || [yearLabel, typeLabel].filter(Boolean).join(' · ');
 
+	const handleExport = () => {
+		if (!data || data.length === 0) {
+			return;
+		}
+		const headers = [
+			'Rank',
+			'Name',
+			'Type',
+			'Group',
+			'Total Requests',
+			'Total Trees',
+			'Fulfilled',
+			'Pending',
+			'Avg Trees/Request',
+			'First Request',
+			'Last Request',
+			'Occasions',
+		];
+		const formatDate = (value?: string) =>
+			value ? new Date(value).toLocaleDateString('en-GB') : '';
+		const rows = data.map((entry, index) => {
+			const displayName = getDisplayName(entry);
+			const averageTrees =
+				entry.total_requests > 0
+					? Math.round(entry.total_trees / entry.total_requests)
+					: 0;
+			return [
+				index + 1,
+				displayName,
+				entry.request_type,
+				entry.group_name ?? '',
+				entry.total_requests,
+				entry.total_trees,
+				entry.fulfilled_cards,
+				entry.pending_cards,
+				averageTrees,
+				formatDate(entry.first_request_at),
+				formatDate(entry.last_request_at),
+				(entry.occasion_types ?? []).join('; '),
+			];
+		});
+		const filename = formatFilename('top_requesters', {
+			year,
+			type: typeFilter,
+		});
+		downloadCSV(arrayToCSV(headers, rows), filename);
+		onExport?.();
+	};
+
 	return (
 		<Card>
 			<CardContent>
@@ -175,7 +229,7 @@ const RequesterLeaderboard: React.FC<RequesterLeaderboardProps> = ({
 						<IconButton
 							size="small"
 							aria-label="export leaderboard"
-							onClick={onExport}
+							onClick={handleExport}
 							disabled={!hasData}
 						>
 							<FileDownloadOutlinedIcon fontSize="small" />

@@ -15,7 +15,6 @@ import {
 	useGiftCardYearly,
 } from './hooks/useGiftCardAnalyticsV2';
 import { GiftCardMonthlyEntry } from '../../../types/analytics';
-import FileDownloadOutlinedIcon from '@mui/icons-material/FileDownloadOutlined';
 import RequesterLeaderboard from './components/RequesterLeaderboard';
 import RequesterProfileDrawer from './components/RequesterProfileDrawer';
 import TreeDistributionChart from './components/TreeDistributionChart';
@@ -144,7 +143,7 @@ const GiftCardAnalysisTab: React.FC<GiftCardAnalysisTabProps> = ({
 	);
 	const [selectedUserId, setSelectedUserId] = useState<number | null>(null);
 	const isDark = themeMode === 'dark';
-	const sectionSpacing = { xs: 3, md: 7 } as const;
+	const sectionSpacing = { xs: 2, md: 2 } as const;
 	const headingColor = isDark ? 'rgba(255,255,255,0.85)' : '#1f2937';
 	const descriptionColor = isDark ? 'rgba(255,255,255,0.45)' : '#4b5563';
 	const formatYearLabel = (year: number) =>
@@ -159,6 +158,7 @@ const GiftCardAnalysisTab: React.FC<GiftCardAnalysisTabProps> = ({
 		.join(' · ');
 	const typeFilterContext = [yearLabel, typeLabel].filter(Boolean).join(' · ');
 	const yearOnlyContext = yearLabel;
+	const sourceParam = sourceFilter !== 'all' ? sourceFilter : undefined;
 	const sectionLabelSx = {
 		fontSize: '10px',
 		fontWeight: 600,
@@ -166,7 +166,7 @@ const GiftCardAnalysisTab: React.FC<GiftCardAnalysisTabProps> = ({
 		letterSpacing: '0.08em',
 		color: isDark ? 'rgba(255,255,255,0.3)' : '#6b7280',
 		mb: 1.5,
-		mt: 3,
+		mt: 2,
 		display: 'flex',
 		alignItems: 'center',
 		gap: 1,
@@ -180,15 +180,21 @@ const GiftCardAnalysisTab: React.FC<GiftCardAnalysisTabProps> = ({
 
 	const { data: summary, loading: summaryLoading } = useGiftCardSummary(
 		selectedYear || undefined,
+		sourceParam,
 	);
-	const { data: monthly, loading: monthlyLoading } =
-		useGiftCardMonthly(selectedYear);
-	const { data: occasions, loading: occasionsLoading } =
-		useGiftCardOccasions(typeFilter);
+	const { data: monthly, loading: monthlyLoading } = useGiftCardMonthly(
+		selectedYear,
+		sourceParam,
+	);
+	const { data: occasions, loading: occasionsLoading } = useGiftCardOccasions(
+		typeFilter !== 'all' ? typeFilter : undefined,
+		sourceParam,
+	);
 	const { data: treeDistribution, loading: treeDistLoading } =
 		useGiftCardTreeDistribution(
 			selectedYear || undefined,
 			typeFilter !== 'all' ? typeFilter : undefined,
+			sourceParam,
 		);
 	const { data: sources, loading: sourcesLoading } = useGiftCardSources(
 		selectedYear || undefined,
@@ -200,10 +206,11 @@ const GiftCardAnalysisTab: React.FC<GiftCardAnalysisTabProps> = ({
 			10,
 			selectedYear || undefined,
 			typeFilter !== 'all' ? typeFilter : undefined,
+			sourceParam,
 		);
 	const { data: yearly, loading: yearlyLoading } = useGiftCardYearly(
 		typeFilter !== 'all' ? typeFilter : undefined,
-		sourceFilter !== 'all' ? sourceFilter : undefined,
+		sourceParam,
 	);
 
 	return (
@@ -360,7 +367,6 @@ const GiftCardAnalysisTab: React.FC<GiftCardAnalysisTabProps> = ({
 					display: 'grid',
 					gridTemplateColumns: { xs: '1fr', lg: '2fr 1fr' },
 					gap: 2,
-					mb: sectionSpacing,
 				}}
 			>
 				<GiftAnalyticsCharts
@@ -392,25 +398,22 @@ const GiftCardAnalysisTab: React.FC<GiftCardAnalysisTabProps> = ({
 				}}
 			>
 				<Box>
-					<Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 1 }}>
-						<IconButton
-							size="small"
-							aria-label="export occasions"
-							onClick={() => console.log('export occasions', typeFilter)}
-							disabled={!occasions}
-						>
-							<FileDownloadOutlinedIcon fontSize="small" />
-						</IconButton>
-					</Box>
 					<GiftOccasionBreakdown
 						data={occasions ?? undefined}
 						loading={occasionsLoading}
 						type={typeFilter}
 						filterContext={typeFilterContext}
 						themeMode={themeMode}
+						onExport={() => console.log('export occasions', typeFilter)}
 					/>
 				</Box>
-				<Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+				<Box
+					sx={{
+						display: 'flex',
+						flexDirection: 'column',
+						gap: 2,
+					}}
+				>
 					<TreeDistributionChart
 						data={treeDistribution}
 						loading={treeDistLoading}
@@ -422,7 +425,7 @@ const GiftCardAnalysisTab: React.FC<GiftCardAnalysisTabProps> = ({
 				</Box>
 			</Box>
 
-			<Box sx={{ mt: sectionSpacing, position: 'relative', zIndex: 0 }}>
+			<Box sx={{ mt: 2, position: 'relative', zIndex: 0 }}>
 				<RequesterLeaderboard
 					sectionLabel="Who's planting"
 					filterContext={typeFilterContext}

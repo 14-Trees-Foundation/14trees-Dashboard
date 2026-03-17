@@ -29,6 +29,11 @@ import {
 } from '../analyticsTheme';
 import { alpha, useTheme } from '@mui/material/styles';
 import { mapEventType } from '../../../../utils/eventTypes';
+import {
+	arrayToCSV,
+	downloadCSV,
+	formatFilename,
+} from '../../../../utils/csvExport';
 
 interface RequesterProfileDrawerProps {
 	userId: number | null;
@@ -213,6 +218,37 @@ const RequesterProfileDrawer: React.FC<RequesterProfileDrawerProps> = ({
 	const theme = useTheme();
 	const isLightMode = theme.palette.mode === 'light';
 	const palette = isLightMode ? LIGHT_ANALYTICS_COLORS : ANALYTICS_COLORS;
+
+	const handleExportHistory = () => {
+		if (!profile || profile.recent_history.length === 0) {
+			return;
+		}
+		const headers = [
+			'Request ID',
+			'Occasion',
+			'No of Cards',
+			'Status',
+			'Gifted On',
+			'Created At',
+		];
+		const rows = profile.recent_history.map((history) => [
+			history.request_id ?? history.id,
+			mapEventType(history.occasion ?? ''),
+			history.no_of_cards,
+			formatStatus(history.status ?? ''),
+			history.gifted_on
+				? new Date(history.gifted_on).toLocaleDateString('en-GB')
+				: '',
+			history.created_at
+				? new Date(history.created_at).toLocaleDateString('en-GB')
+				: '',
+		]);
+		const filename = formatFilename(
+			`${requesterDisplayName || 'requester'}_request_history`,
+			{},
+		);
+		downloadCSV(arrayToCSV(headers, rows), filename);
+	};
 
 	return (
 		<Drawer
@@ -453,8 +489,8 @@ const RequesterProfileDrawer: React.FC<RequesterProfileDrawerProps> = ({
 						size="small"
 						variant="outlined"
 						startIcon={<FileDownloadOutlinedIcon fontSize="small" />}
-						onClick={() => console.log('export profile', userId)}
-						disabled={userId === null}
+						onClick={handleExportHistory}
+						disabled={!profile || profile.recent_history.length === 0}
 						sx={{
 							color: isLightMode ? '#6b7280' : palette.accent,
 							borderColor: isLightMode ? '#eeebe4' : alpha(palette.accent, 0.4),
