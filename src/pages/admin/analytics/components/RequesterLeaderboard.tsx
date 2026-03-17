@@ -33,6 +33,7 @@ interface RequesterLeaderboardProps {
 	typeFilter: 'all' | 'corporate' | 'personal';
 	year: number;
 	filterContext?: string;
+	granularity?: 'monthly' | 'quarterly' | 'yearly';
 }
 
 const getInitials = (name: string): string => {
@@ -91,6 +92,7 @@ const RequesterLeaderboard: React.FC<RequesterLeaderboardProps> = ({
 	typeFilter,
 	year,
 	filterContext,
+	granularity = 'monthly',
 }) => {
 	const hasData = !!data && data.length > 0;
 	const theme = useTheme();
@@ -124,6 +126,15 @@ const RequesterLeaderboard: React.FC<RequesterLeaderboardProps> = ({
 			: null;
 	const contextLabel =
 		filterContext || [yearLabel, typeLabel].filter(Boolean).join(' · ');
+
+	const leaderboardSubtitle = useMemo(() => {
+		if (!contextLabel) {
+			return granularity === 'monthly' ? '' : 'Totals only';
+		}
+		return granularity === 'monthly'
+			? contextLabel
+			: `${contextLabel} · totals only`;
+	}, [contextLabel, granularity]);
 
 	const handleExport = () => {
 		if (!data || data.length === 0) {
@@ -214,14 +225,14 @@ const RequesterLeaderboard: React.FC<RequesterLeaderboardProps> = ({
 						>
 							Top requesters
 						</Typography>
-						{contextLabel && (
+						{leaderboardSubtitle && (
 							<Typography
 								variant="body2"
 								sx={{
 									color: isLightMode ? '#6b7280' : 'rgba(255,255,255,0.6)',
 								}}
 							>
-								{contextLabel}
+								{leaderboardSubtitle}
 							</Typography>
 						)}
 					</Box>

@@ -45,6 +45,8 @@ interface GiftOccasionBreakdownProps {
 	themeMode?: 'dark' | 'light';
 	filterContext?: string;
 	onExport?: () => void;
+	granularity?: 'monthly' | 'quarterly' | 'yearly';
+	year?: number;
 }
 
 // Event type mapping from database values to display names
@@ -78,6 +80,31 @@ const normalizeOccasionLabel = (occasion: string): string => {
 		return 'Unassigned';
 	return occasion;
 };
+
+const groupToQuarterly = (
+	monthly: GiftCardOccasionMonthlyEntry[],
+): Array<{ label: string; count: number }> =>
+	[
+		{ label: 'Q1', months: [1, 2, 3] },
+		{ label: 'Q2', months: [4, 5, 6] },
+		{ label: 'Q3', months: [7, 8, 9] },
+		{ label: 'Q4', months: [10, 11, 12] },
+	].map((quarter) => ({
+		label: quarter.label,
+		count: monthly
+			.filter((entry) => quarter.months.includes(entry.month))
+			.reduce((sum, entry) => sum + entry.count, 0),
+	}));
+
+const groupToYearly = (
+	monthly: GiftCardOccasionMonthlyEntry[],
+	yearLabel: number | string,
+): Array<{ label: string; count: number }> => [
+	{
+		label: String(yearLabel),
+		count: monthly.reduce((sum, entry) => sum + entry.count, 0),
+	},
+];
 
 const LIGHT_BADGE_MAP: Record<
 	string,
@@ -117,6 +144,8 @@ const GiftOccasionBreakdown: React.FC<GiftOccasionBreakdownProps> = ({
 	themeMode = 'dark',
 	filterContext,
 	onExport,
+	granularity = 'monthly',
+	year,
 }) => {
 	const [selectedOccasion, setSelectedOccasion] = useState<string | null>(null);
 	const isLightMode = themeMode === 'light';
@@ -161,16 +190,75 @@ const GiftOccasionBreakdown: React.FC<GiftOccasionBreakdownProps> = ({
 		[chartData, selectedOccasion],
 	);
 
-	const selectedMonthlyData = useMemo(() => {
+	const selectedOccasionMonthly = useMemo(() => {
 		if (!selectedOccasion || !data?.monthly_by_occasion) {
 			return [];
 		}
 		return data.monthly_by_occasion[selectedOccasion] ?? [];
 	}, [data, selectedOccasion]);
 
-	const hasSelectedMonthlyData = selectedMonthlyData.some(
-		(entry) => entry.count > 0,
-	);
+	const resolvedYearLabel: number | string = useMemo(() => {
+		if (typeof year === 'number') {
+			return year === 0 ? 'All time' : year;
+		}
+		return new Date().getFullYear();
+	}, [year]);
+
+	const drillDownData = useMemo(() => {
+		if (!selectedOccasion || !data) {
+			return [];
+		}
+		if (granularity === 'quarterly') {
+			return groupToQuarterly(selectedOccasionMonthly);
+		}
+		if (granularity === 'yearly') {
+			return groupToYearly(selectedOccasionMonthly, resolvedYearLabel);
+		}
+		return selectedOccasionMonthly.map((month) => ({
+			label: month.month_name,
+			count: month.count,
+		}));
+	}, [
+		data,
+		granularity,
+		resolvedYearLabel,
+		selectedOccasion,
+		selectedOccasionMonthly,
+	]);
+
+	const hasDrillDownData = drillDownData.some((entry) => entry.count > 0);
+
+	const drillDownHeading = useMemo(() => {
+		if (!selectedOccasion) {
+			return '';
+		}
+		const occasionName =
+			selectedOccasionEntry?.occasion ?? getEventTypeName(selectedOccasion);
+		if (!occasionName) {
+			return '';
+		}
+		if (granularity === 'quarterly') {
+			return `${occasionName} · ${String(resolvedYearLabel)} by quarter`;
+		}
+		if (granularity === 'yearly') {
+			return `${occasionName} · all years`;
+		}
+		if (drillDownData.length === 0) {
+			return `${occasionName} · no data`;
+		}
+		const peak = drillDownData.reduce((prev, current) =>
+			current.count > prev.count ? current : prev,
+		);
+		return `${occasionName} · peak ${
+			peak.label
+		}: ${peak.count.toLocaleString()}`;
+	}, [
+		drillDownData,
+		granularity,
+		resolvedYearLabel,
+		selectedOccasion,
+		selectedOccasionEntry,
+	]);
 	const monthLabels = [
 		'Jan',
 		'Feb',
@@ -468,10 +556,7 @@ const GiftOccasionBreakdown: React.FC<GiftOccasionBreakdownProps> = ({
 								fontWeight={500}
 								sx={{ color: colors.textOnDark }}
 							>
-								{`${
-									selectedOccasionEntry?.occasion ??
-									getEventTypeName(selectedOccasion)
-								} — month by month`}
+								{drillDownHeading}
 							</Typography>
 							<IconButton
 								size="small"
@@ -484,15 +569,15 @@ const GiftOccasionBreakdown: React.FC<GiftOccasionBreakdownProps> = ({
 							</IconButton>
 						</Box>
 
-						{hasSelectedMonthlyData ? (
+						{hasDrillDownData ? (
 							<ResponsiveContainer width="100%" height={180}>
-								<LineChart data={selectedMonthlyData}>
+								<LineChart data={drillDownData}>
 									<CartesianGrid
 										strokeDasharray="3 3"
 										stroke={colors.chartGrid}
 									/>
 									<XAxis
-										dataKey="month_name"
+										dataKey="label"
 										tick={{ fontSize: 12, fill: colors.textMuted }}
 										axisLine={{ stroke: colors.chartAxis }}
 										tickLine={false}
@@ -531,7 +616,7 @@ const GiftOccasionBreakdown: React.FC<GiftOccasionBreakdownProps> = ({
 							</ResponsiveContainer>
 						) : (
 							<Typography sx={{ color: colors.textMuted }}>
-								No monthly data available
+								No data available
 							</Typography>
 						)}
 					</Box>

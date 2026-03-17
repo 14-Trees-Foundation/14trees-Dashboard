@@ -404,6 +404,8 @@ const GiftCardAnalysisTab: React.FC<GiftCardAnalysisTabProps> = ({
 						type={typeFilter}
 						filterContext={typeFilterContext}
 						themeMode={themeMode}
+						granularity={granularity}
+						year={selectedYear}
 						onExport={() => console.log('export occasions', typeFilter)}
 					/>
 				</Box>
@@ -437,6 +439,7 @@ const GiftCardAnalysisTab: React.FC<GiftCardAnalysisTabProps> = ({
 					onExport={() => console.log('export leaderboard', leaderboardSort)}
 					typeFilter={typeFilter}
 					year={selectedYear}
+					granularity={granularity}
 				/>
 			</Box>
 
