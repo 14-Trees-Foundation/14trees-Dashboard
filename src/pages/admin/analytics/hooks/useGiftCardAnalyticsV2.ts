@@ -10,7 +10,9 @@ import {
 	GiftCardTreeDistribution,
 } from '../../../../types/analytics';
 
-export function useGiftCardSummary() {
+type GiftCardRequestTypeFilter = 'all' | 'corporate' | 'personal';
+
+export function useGiftCardSummary(year?: number) {
 	const [data, setData] = useState<GiftCardSummaryKPIs | null>(null);
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState<string | null>(null);
@@ -21,7 +23,7 @@ export function useGiftCardSummary() {
 		setLoading(true);
 		setError(null);
 		apiClient
-			.getGiftCardSummaryKPIs()
+			.getGiftCardSummaryKPIs(year)
 			.then((res) => {
 				setData(res);
 				setLoading(false);
@@ -30,7 +32,7 @@ export function useGiftCardSummary() {
 				setError(err.message || 'Failed to load');
 				setLoading(false);
 			});
-	}, []);
+	}, [year]);
 
 	return { data, loading, error };
 }
@@ -87,7 +89,10 @@ export function useGiftCardOccasions(
 	return { data, loading, error };
 }
 
-export function useGiftCardTreeDistribution() {
+export function useGiftCardTreeDistribution(
+	year?: number,
+	type?: GiftCardRequestTypeFilter,
+) {
 	const [data, setData] = useState<GiftCardTreeDistribution | null>(null);
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState<string | null>(null);
@@ -98,7 +103,7 @@ export function useGiftCardTreeDistribution() {
 		setLoading(true);
 		setError(null);
 		apiClient
-			.getGiftCardTreeDistribution()
+			.getGiftCardTreeDistribution(year, type)
 			.then((res) => {
 				setData(res);
 				setLoading(false);
@@ -107,12 +112,15 @@ export function useGiftCardTreeDistribution() {
 				setError(err.message || 'Failed to load');
 				setLoading(false);
 			});
-	}, []);
+	}, [year, type]);
 
 	return { data, loading, error };
 }
 
-export function useGiftCardSources() {
+export function useGiftCardSources(
+	year?: number,
+	type?: GiftCardRequestTypeFilter,
+) {
 	const [data, setData] = useState<GiftCardSourcesResponse | null>(null);
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState<string | null>(null);
@@ -123,7 +131,7 @@ export function useGiftCardSources() {
 		setLoading(true);
 		setError(null);
 		apiClient
-			.getGiftCardSources()
+			.getGiftCardSources(year, type)
 			.then((res) => {
 				setData(res);
 				setLoading(false);
@@ -132,7 +140,7 @@ export function useGiftCardSources() {
 				setError(err.message || 'Failed to load');
 				setLoading(false);
 			});
-	}, []);
+	}, [year, type]);
 
 	return { data, loading, error };
 }
@@ -140,6 +148,8 @@ export function useGiftCardSources() {
 export function useGiftCardLeaderboard(
 	sortBy: 'trees' | 'cards' = 'trees',
 	limit: number = 10,
+	year?: number,
+	type?: GiftCardRequestTypeFilter,
 ) {
 	const [data, setData] = useState<GiftCardLeaderboardEntry[] | null>(null);
 	const [loading, setLoading] = useState(true);
@@ -151,7 +161,7 @@ export function useGiftCardLeaderboard(
 		setLoading(true);
 		setError(null);
 		apiClient
-			.getGiftCardLeaderboard(sortBy, limit)
+			.getGiftCardLeaderboard(sortBy, limit, year, type)
 			.then((res) => {
 				setData(res);
 				setLoading(false);
@@ -160,7 +170,7 @@ export function useGiftCardLeaderboard(
 				setError(err.message || 'Failed to load');
 				setLoading(false);
 			});
-	}, [sortBy, limit]);
+	}, [sortBy, limit, year, type]);
 
 	return { data, loading, error };
 }

@@ -316,25 +316,25 @@ export const lightAnalyticsTheme = createTheme({
 	palette: {
 		mode: 'light',
 		background: {
-			default: '#e8ecf0',
+			default: '#f5f3ee',
 			paper: '#ffffff',
 		},
 		primary: {
-			main: '#4b83d4',
-			light: '#7eb3f5',
-			dark: '#2d5fa8',
+			main: '#2d5a2d',
+			light: '#8bc34a',
+			dark: '#1c3a1c',
 			contrastText: '#fff',
 		},
 		secondary: {
-			main: '#059669',
-			light: '#34d399',
-			dark: '#047857',
+			main: '#8bc34a',
+			light: '#c5e0a0',
+			dark: '#5a8a3a',
 			contrastText: '#fff',
 		},
 		success: {
-			main: '#059669',
-			light: '#34d399',
-			dark: '#047857',
+			main: '#16a34a',
+			light: '#4ade80',
+			dark: '#15803d',
 		},
 		warning: {
 			main: '#d97706',
@@ -347,11 +347,11 @@ export const lightAnalyticsTheme = createTheme({
 			dark: '#b91c1c',
 		},
 		text: {
-			primary: '#0f172a',
-			secondary: '#64748b',
-			disabled: '#94a3b8',
+			primary: '#1a1a1a',
+			secondary: '#6b7280',
+			disabled: '#9ca3af',
 		},
-		divider: '#dde1e7',
+		divider: '#eeebe4',
 	},
 	typography: {
 		fontFamily: 'Helvetica, Arial, Sans-Serif',
@@ -366,18 +366,19 @@ export const lightAnalyticsTheme = createTheme({
 			textTransform: 'uppercase',
 		},
 	},
-	shape: { borderRadius: 10 },
+	shape: { borderRadius: 16 },
 	shadows: lightAnalyticsShadows,
 	components: {
 		MuiCard: {
 			styleOverrides: {
 				root: {
 					backgroundImage: 'none',
-					border: '1px solid #dde1e7',
-					boxShadow: '0 1px 4px rgba(0,0,0,0.06)',
+					border: '1px solid #eeebe4',
+					boxShadow: '0 2px 12px rgba(0,0,0,0.06)',
+					borderRadius: '16px',
 					transition: 'box-shadow 0.2s ease',
 					'&:hover': {
-						boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+						boxShadow: '0 4px 20px rgba(0,0,0,0.09)',
 					},
 				},
 			},
@@ -400,7 +401,7 @@ export const lightAnalyticsTheme = createTheme({
 		},
 		MuiDivider: {
 			styleOverrides: {
-				root: { borderColor: '#dde1e7' },
+				root: { borderColor: '#eeebe4' },
 			},
 		},
 		MuiChip: {
@@ -409,29 +410,32 @@ export const lightAnalyticsTheme = createTheme({
 					fontSize: '0.68rem',
 					height: '22px',
 					fontWeight: 500,
+					borderRadius: '6px',
 				},
 			},
 		},
 		MuiToggleButton: {
 			styleOverrides: {
 				root: {
-					border: 'none',
-					borderRadius: '5px !important',
-					padding: '4px 12px',
+					border: '1px solid #d4d0c8',
+					borderRadius: '20px !important',
+					padding: '5px 16px',
 					fontSize: '0.7rem',
-					color: '#94a3b8',
+					color: '#6b7280',
+					backgroundColor: 'transparent',
 					'&.Mui-selected': {
 						backgroundColor: '#ffffff',
-						color: '#0f172a',
+						color: '#1a1a1a',
 						fontWeight: 500,
-						boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
+						border: '1px solid #1a1a1a',
+						boxShadow: 'none',
 						'&:hover': {
 							backgroundColor: '#ffffff',
 						},
 					},
 					'&:hover': {
-						backgroundColor: 'rgba(0,0,0,0.03)',
-						color: '#0f172a',
+						backgroundColor: 'rgba(26,26,26,0.04)',
+						color: '#1a1a1a',
 					},
 				},
 			},
@@ -439,28 +443,28 @@ export const lightAnalyticsTheme = createTheme({
 		MuiToggleButtonGroup: {
 			styleOverrides: {
 				root: {
-					backgroundColor: '#f1f5f9',
+					backgroundColor: 'transparent',
 					borderRadius: '7px',
-					padding: '2px',
-					gap: '1px',
-					border: '1px solid #e2e8f0',
+					padding: '0',
+					gap: '4px',
+					border: 'none',
 				},
 			},
 		},
 		MuiTableCell: {
 			styleOverrides: {
 				head: {
-					color: '#94a3b8',
+					color: '#9ca3af',
 					fontSize: '0.68rem',
 					textTransform: 'uppercase',
 					letterSpacing: '0.08em',
 					fontWeight: 500,
-					borderBottom: '1px solid #dde1e7',
-					backgroundColor: '#ffffff',
+					backgroundColor: 'transparent',
+					borderBottom: '1px solid #eeebe4',
 				},
 				body: {
-					color: '#334155',
-					borderBottom: '1px solid #f1f5f9',
+					color: '#1a1a1a',
+					borderBottom: '1px solid #f5f3ee',
 					fontSize: '0.8rem',
 				},
 			},
@@ -469,7 +473,7 @@ export const lightAnalyticsTheme = createTheme({
 			styleOverrides: {
 				root: {
 					'&:hover': {
-						backgroundColor: '#f8fafc',
+						backgroundColor: '#faf9f6',
 					},
 					'&:last-child td': { borderBottom: 'none' },
 				},
@@ -478,9 +482,9 @@ export const lightAnalyticsTheme = createTheme({
 		MuiLinearProgress: {
 			styleOverrides: {
 				root: {
-					backgroundColor: '#f1f5f9',
+					backgroundColor: '#f0ede6',
 					borderRadius: '2px',
-					height: '3px',
+					height: '4px',
 				},
 			},
 		},
@@ -489,7 +493,7 @@ export const lightAnalyticsTheme = createTheme({
 				paper: {
 					backgroundImage: 'none',
 					backgroundColor: '#ffffff',
-					borderLeft: '1px solid #dde1e7',
+					borderLeft: '1px solid #eeebe4',
 					boxShadow: '-4px 0 16px rgba(0,0,0,0.08)',
 				},
 			},
@@ -497,7 +501,7 @@ export const lightAnalyticsTheme = createTheme({
 		MuiSkeleton: {
 			styleOverrides: {
 				root: {
-					backgroundColor: '#f1f5f9',
+					backgroundColor: '#f0ede6',
 				},
 			},
 		},

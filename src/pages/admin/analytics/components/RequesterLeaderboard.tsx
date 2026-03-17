@@ -12,10 +12,10 @@ import {
 	ToggleButtonGroup,
 	Typography,
 } from '@mui/material';
-import { alpha } from '@mui/material/styles';
+import { alpha, useTheme } from '@mui/material/styles';
 import FileDownloadOutlinedIcon from '@mui/icons-material/FileDownloadOutlined';
 import { GiftCardLeaderboardEntry } from '../../../../types/analytics';
-import { ANALYTICS_COLORS } from '../analyticsTheme';
+import { ANALYTICS_COLORS, LIGHT_ANALYTICS_COLORS } from '../analyticsTheme';
 
 interface RequesterLeaderboardProps {
 	data: GiftCardLeaderboardEntry[] | null;
@@ -24,6 +24,10 @@ interface RequesterLeaderboardProps {
 	onSortChange: (sort: 'trees' | 'cards') => void;
 	onRowClick: (userId: number) => void;
 	onExport: () => void;
+	sectionLabel?: string;
+	typeFilter: 'all' | 'corporate' | 'personal';
+	year: number;
+	filterContext?: string;
 }
 
 const getInitials = (name: string): string => {
@@ -36,7 +40,23 @@ const getInitials = (name: string): string => {
 		.slice(0, 2);
 };
 
-const getAvatarStyles = (requestType: 'Corporate' | 'Personal') => {
+const getAvatarStyles = (
+	requestType: 'Corporate' | 'Personal',
+	isLightMode: boolean,
+) => {
+	if (isLightMode) {
+		return requestType === 'Corporate'
+			? {
+					bgcolor: '#f0fdf4',
+					color: '#15803d',
+					border: '1px solid #bbf7d0',
+			  }
+			: {
+					bgcolor: '#f5f3ee',
+					color: '#6b7280',
+					border: '1px solid #eeebe4',
+			  };
+	}
 	if (requestType === 'Corporate') {
 		return {
 			bgcolor: ANALYTICS_COLORS.corporate,
@@ -62,8 +82,15 @@ const RequesterLeaderboard: React.FC<RequesterLeaderboardProps> = ({
 	onSortChange,
 	onRowClick,
 	onExport,
+	sectionLabel,
+	typeFilter,
+	year,
+	filterContext,
 }) => {
 	const hasData = !!data && data.length > 0;
+	const theme = useTheme();
+	const isLightMode = theme.palette.mode === 'light';
+	const palette = isLightMode ? LIGHT_ANALYTICS_COLORS : ANALYTICS_COLORS;
 
 	const maxValue = useMemo(() => {
 		if (!data || data.length === 0) {
@@ -85,9 +112,33 @@ const RequesterLeaderboard: React.FC<RequesterLeaderboardProps> = ({
 		}
 	};
 
+	const yearLabel = year === 0 ? 'All time' : `${year}`;
+	const typeLabel =
+		typeFilter !== 'all'
+			? typeFilter.charAt(0).toUpperCase() + typeFilter.slice(1)
+			: null;
+	const contextLabel =
+		filterContext || [yearLabel, typeLabel].filter(Boolean).join(' · ');
+
 	return (
 		<Card>
 			<CardContent>
+				{sectionLabel && (
+					<Typography
+						variant="overline"
+						sx={{
+							display: 'block',
+							fontSize: '0.65rem',
+							letterSpacing: '0.1em',
+							fontWeight: 600,
+							textTransform: 'uppercase',
+							color: isLightMode ? '#6b7280' : 'rgba(255,255,255,0.45)',
+							mb: 1,
+						}}
+					>
+						{sectionLabel}
+					</Typography>
+				)}
 				<Box
 					sx={{
 						display: 'flex',
@@ -98,16 +149,28 @@ const RequesterLeaderboard: React.FC<RequesterLeaderboardProps> = ({
 						gap: 2,
 					}}
 				>
-					<Typography
-						variant="h6"
-						sx={{
-							fontWeight: 600,
-							letterSpacing: '-0.01em',
-							color: 'text.primary',
-						}}
-					>
-						Top requesters
-					</Typography>
+					<Box>
+						<Typography
+							variant="h6"
+							sx={{
+								fontWeight: 600,
+								letterSpacing: '-0.01em',
+								color: 'text.primary',
+							}}
+						>
+							Top requesters
+						</Typography>
+						{contextLabel && (
+							<Typography
+								variant="body2"
+								sx={{
+									color: isLightMode ? '#6b7280' : 'rgba(255,255,255,0.6)',
+								}}
+							>
+								{contextLabel}
+							</Typography>
+						)}
+					</Box>
 					<Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
 						<IconButton
 							size="small"
@@ -170,15 +233,19 @@ const RequesterLeaderboard: React.FC<RequesterLeaderboardProps> = ({
 							const progressSx =
 								entry.request_type === 'Corporate'
 									? {
-											bgcolor: alpha(ANALYTICS_COLORS.corporate, 0.15),
+											bgcolor: isLightMode
+												? '#f0ede6'
+												: alpha(palette.corporate, 0.15),
 											'& .MuiLinearProgress-bar': {
-												bgcolor: ANALYTICS_COLORS.corporate,
+												bgcolor: isLightMode ? '#2d5a2d' : palette.corporate,
 											},
 									  }
 									: {
-											bgcolor: alpha(ANALYTICS_COLORS.personal, 0.15),
+											bgcolor: isLightMode
+												? '#f5f3ee'
+												: alpha(palette.personal, 0.15),
 											'& .MuiLinearProgress-bar': {
-												bgcolor: ANALYTICS_COLORS.personal,
+												bgcolor: isLightMode ? '#8bc34a' : palette.personal,
 											},
 									  };
 							return (
@@ -190,15 +257,16 @@ const RequesterLeaderboard: React.FC<RequesterLeaderboardProps> = ({
 										gap: 2,
 										py: 1.5,
 										px: 1,
-										borderBottom: `1px solid ${alpha(
-											ANALYTICS_COLORS.accent,
-											0.1,
-										)}`,
+										borderBottom: `1px solid ${
+											isLightMode ? '#f0ede6' : alpha(palette.accent, 0.1)
+										}`,
 										cursor: 'pointer',
 										borderRadius: '8px',
 										transition: 'background-color 0.2s ease',
 										'&:hover': {
-											bgcolor: alpha(ANALYTICS_COLORS.accent, 0.08),
+											bgcolor: isLightMode
+												? '#faf9f6'
+												: alpha(palette.accent, 0.08),
 										},
 										'&:last-of-type': { borderBottom: 'none' },
 									}}
@@ -206,8 +274,10 @@ const RequesterLeaderboard: React.FC<RequesterLeaderboardProps> = ({
 								>
 									<Typography
 										variant="caption"
-										sx={{ minWidth: 20 }}
-										color="text.secondary"
+										sx={{
+											minWidth: 20,
+											color: isLightMode ? '#c5bfb3' : 'text.secondary',
+										}}
 									>
 										{index + 1}
 									</Typography>
@@ -216,7 +286,7 @@ const RequesterLeaderboard: React.FC<RequesterLeaderboardProps> = ({
 											width: 36,
 											height: 36,
 											fontSize: 13,
-											...getAvatarStyles(entry.request_type),
+											...getAvatarStyles(entry.request_type, isLightMode),
 										}}
 									>
 										{getInitials(displayName)}
@@ -226,11 +296,15 @@ const RequesterLeaderboard: React.FC<RequesterLeaderboardProps> = ({
 											variant="body2"
 											fontWeight={500}
 											noWrap
-											color="text.primary"
+											sx={{ color: isLightMode ? '#1a1a1a' : 'text.primary' }}
 										>
 											{displayName}
 										</Typography>
-										<Typography variant="caption" noWrap color="text.secondary">
+										<Typography
+											variant="caption"
+											noWrap
+											sx={{ color: isLightMode ? '#9ca3af' : 'text.secondary' }}
+										>
 											{entry.request_type === 'Corporate'
 												? 'Corporate'
 												: 'Personal'}
@@ -241,14 +315,16 @@ const RequesterLeaderboard: React.FC<RequesterLeaderboardProps> = ({
 										label={entry.request_type}
 										variant="outlined"
 										sx={{
-											borderColor:
+											borderColor: alpha(
 												entry.request_type === 'Corporate'
-													? alpha(ANALYTICS_COLORS.corporate, 0.5)
-													: alpha(ANALYTICS_COLORS.personal, 0.5),
+													? palette.corporate
+													: palette.personal,
+												isLightMode ? 0.4 : 0.5,
+											),
 											color:
 												entry.request_type === 'Corporate'
-													? ANALYTICS_COLORS.corporate
-													: ANALYTICS_COLORS.personal,
+													? palette.corporate
+													: palette.personal,
 											background: 'transparent',
 										}}
 									/>
@@ -276,7 +352,7 @@ const RequesterLeaderboard: React.FC<RequesterLeaderboardProps> = ({
 											sx={{
 												minWidth: 60,
 												textAlign: 'right',
-												color: ANALYTICS_COLORS.accent,
+												color: isLightMode ? '#2d5a2d' : palette.accent,
 											}}
 										>
 											{statValue.toLocaleString()}

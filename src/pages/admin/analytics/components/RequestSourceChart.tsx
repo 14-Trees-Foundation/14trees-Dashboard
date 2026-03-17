@@ -34,18 +34,40 @@ interface RequestSourceChartProps {
 	data: GiftCardSourcesResponse | null;
 	loading: boolean;
 	themeMode?: 'dark' | 'light';
+	year: number;
+	typeFilter: 'all' | 'corporate' | 'personal';
+	filterContext?: string;
 }
 
 const RequestSourceChart: React.FC<RequestSourceChartProps> = ({
 	data,
 	loading,
 	themeMode = 'dark',
+	year,
+	typeFilter,
+	filterContext,
 }) => {
 	const [metric, setMetric] = useState<'requests' | 'trees'>('requests');
-	const colors =
-		themeMode === 'light' ? LIGHT_ANALYTICS_COLORS : ANALYTICS_COLORS;
-	const tooltipConfig =
-		themeMode === 'light' ? LIGHT_CHART_TOOLTIP : CHART_TOOLTIP;
+	const isLightMode = themeMode === 'light';
+	const colors = isLightMode ? LIGHT_ANALYTICS_COLORS : ANALYTICS_COLORS;
+	const tooltipConfig = isLightMode ? LIGHT_CHART_TOOLTIP : CHART_TOOLTIP;
+	const titleColor = isLightMode ? '#1a1a1a' : 'text.primary';
+	const subtitleColor = isLightMode ? '#6b7280' : 'text.secondary';
+	const captionColor = isLightMode ? '#9ca3af' : 'text.secondary';
+	const cardStyles = isLightMode
+		? {
+				background: '#fffef8',
+				border: '1px solid #f0ede6',
+				boxShadow: '0px 25px 45px rgba(33, 33, 23, 0.12)',
+		  }
+		: {};
+	const yearLabel = year === 0 ? 'All time' : `${year}`;
+	const typeLabel =
+		typeFilter !== 'all'
+			? typeFilter.charAt(0).toUpperCase() + typeFilter.slice(1)
+			: null;
+	const contextLabel =
+		filterContext || [yearLabel, typeLabel].filter(Boolean).join(' · ');
 
 	const chartData = useMemo(
 		() =>
@@ -68,24 +90,29 @@ const RequestSourceChart: React.FC<RequestSourceChartProps> = ({
 			: '0.0';
 
 	return (
-		<Card>
+		<Card sx={cardStyles}>
 			<CardContent>
 				<Typography
 					variant="h6"
 					sx={{
 						fontWeight: 600,
 						letterSpacing: '-0.01em',
-						color: 'text.primary',
+						color: titleColor,
 						mb: 2,
 					}}
 				>
 					Request sources
 				</Typography>
+				{contextLabel && (
+					<Typography variant="body2" sx={{ color: subtitleColor, mb: 2 }}>
+						{contextLabel}
+					</Typography>
+				)}
 				<Box sx={{ display: 'flex', gap: 3, flexWrap: 'wrap', mb: 3, mt: 1 }}>
 					<Box sx={{ flex: 1, minWidth: 140 }}>
 						<Typography
 							variant="caption"
-							color="text.secondary"
+							sx={{ color: subtitleColor }}
 							display="block"
 						>
 							Website requests
@@ -98,11 +125,11 @@ const RequestSourceChart: React.FC<RequestSourceChartProps> = ({
 									<Typography
 										variant="h4"
 										fontWeight={600}
-										sx={{ color: colors.corporate }}
+										sx={{ color: isLightMode ? '#1c3a1c' : colors.corporate }}
 									>
 										{summary?.website_requests.toLocaleString()}
 									</Typography>
-									<Typography variant="body2" color="text.secondary">
+									<Typography variant="body2" sx={{ color: subtitleColor }}>
 										{summary?.website_pct}% of total
 									</Typography>
 								</>
@@ -111,7 +138,7 @@ const RequestSourceChart: React.FC<RequestSourceChartProps> = ({
 						{loading ? (
 							<Skeleton width={60} />
 						) : (
-							<Typography variant="caption" color="text.secondary">
+							<Typography variant="caption" sx={{ color: captionColor }}>
 								{summary?.website_trees.toLocaleString()} trees
 							</Typography>
 						)}
@@ -120,7 +147,7 @@ const RequestSourceChart: React.FC<RequestSourceChartProps> = ({
 					<Box sx={{ flex: 1, minWidth: 140 }}>
 						<Typography
 							variant="caption"
-							color="text.secondary"
+							sx={{ color: subtitleColor }}
 							display="block"
 						>
 							Manual requests
@@ -133,11 +160,11 @@ const RequestSourceChart: React.FC<RequestSourceChartProps> = ({
 									<Typography
 										variant="h4"
 										fontWeight={600}
-										sx={{ color: colors.personal }}
+										sx={{ color: isLightMode ? '#5a8a3a' : colors.personal }}
 									>
 										{summary?.manual_requests.toLocaleString()}
 									</Typography>
-									<Typography variant="body2" color="text.secondary">
+									<Typography variant="body2" sx={{ color: subtitleColor }}>
 										{summary?.manual_pct}% of total
 									</Typography>
 								</>
@@ -146,7 +173,7 @@ const RequestSourceChart: React.FC<RequestSourceChartProps> = ({
 						{loading ? (
 							<Skeleton width={60} />
 						) : (
-							<Typography variant="caption" color="text.secondary">
+							<Typography variant="caption" sx={{ color: captionColor }}>
 								{summary?.manual_trees.toLocaleString()} trees
 							</Typography>
 						)}
@@ -155,8 +182,7 @@ const RequestSourceChart: React.FC<RequestSourceChartProps> = ({
 					<Box sx={{ width: '100%', mt: 1 }}>
 						<Typography
 							variant="caption"
-							color="text.secondary"
-							sx={{ mb: 0.5 }}
+							sx={{ mb: 0.5, color: subtitleColor }}
 							display="block"
 						>
 							Request volume split
@@ -165,9 +191,9 @@ const RequestSourceChart: React.FC<RequestSourceChartProps> = ({
 							sx={{
 								display: 'flex',
 								height: 8,
-								borderRadius: 4,
+								borderRadius: 999,
 								overflow: 'hidden',
-								bgcolor: 'divider',
+								bgcolor: isLightMode ? '#f0ede6' : 'divider',
 							}}
 						>
 							<Box
@@ -196,7 +222,11 @@ const RequestSourceChart: React.FC<RequestSourceChartProps> = ({
 							mb: 1,
 						}}
 					>
-						<Typography variant="body2" fontWeight={500} color="text.primary">
+						<Typography
+							variant="body2"
+							fontWeight={500}
+							sx={{ color: titleColor }}
+						>
 							Monthly trend
 						</Typography>
 						<ToggleButtonGroup
@@ -220,7 +250,7 @@ const RequestSourceChart: React.FC<RequestSourceChartProps> = ({
 									bgcolor: colors.corporate,
 								}}
 							/>
-							<Typography variant="caption" color="text.secondary">
+							<Typography variant="caption" sx={{ color: subtitleColor }}>
 								Website
 							</Typography>
 						</Box>
@@ -233,7 +263,7 @@ const RequestSourceChart: React.FC<RequestSourceChartProps> = ({
 									bgcolor: colors.personal,
 								}}
 							/>
-							<Typography variant="caption" color="text.secondary">
+							<Typography variant="caption" sx={{ color: subtitleColor }}>
 								Manual
 							</Typography>
 						</Box>
@@ -246,7 +276,7 @@ const RequestSourceChart: React.FC<RequestSourceChartProps> = ({
 							sx={{ borderRadius: 2 }}
 						/>
 					) : chartData.length === 0 ? (
-						<Typography color="text.secondary" textAlign="center" py={3}>
+						<Typography sx={{ color: subtitleColor }} textAlign="center" py={3}>
 							No monthly data available
 						</Typography>
 					) : (
@@ -306,8 +336,7 @@ const RequestSourceChart: React.FC<RequestSourceChartProps> = ({
 				{!loading && summary && (
 					<Typography
 						variant="caption"
-						sx={{ mt: 1, display: 'block' }}
-						color="text.secondary"
+						sx={{ mt: 1, display: 'block', color: captionColor }}
 					>
 						{`Website avg ${avgWebsite} trees/request · Manual avg ${avgManual} trees/request`}
 					</Typography>

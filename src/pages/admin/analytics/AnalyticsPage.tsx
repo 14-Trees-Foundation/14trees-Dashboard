@@ -61,10 +61,13 @@ const AnalyticsContent: React.FC<AnalyticsContentProps> = ({
 			<Card
 				elevation={0}
 				sx={{
-					backgroundColor: theme.palette.background.paper,
-					border: `1px solid ${theme.palette.divider}`,
-					borderRadius: 2,
-					boxShadow: isLightMode ? '0 1px 4px rgba(0,0,0,0.06)' : 'none',
+					backgroundColor: isLightMode
+						? 'transparent'
+						: theme.palette.background.paper,
+					border: isLightMode ? 'none' : `1px solid ${theme.palette.divider}`,
+					borderBottom: isLightMode ? 'none' : undefined,
+					borderRadius: isLightMode ? 0 : 2,
+					boxShadow: 'none',
 					px: 3,
 					py: 2,
 					mb: 3,
@@ -84,13 +87,21 @@ const AnalyticsContent: React.FC<AnalyticsContentProps> = ({
 						<Box>
 							<Typography
 								variant="h4"
-								sx={{ mt: 1, mb: 1, color: 'text.primary', fontWeight: 600 }}
+								sx={{
+									mt: 1,
+									mb: 1,
+									fontWeight: 600,
+									color: isLightMode ? '#1a1a1a' : 'text.primary',
+								}}
 							>
 								Analytics
 							</Typography>
 							<Typography
 								variant="body2"
-								sx={{ mb: 1, color: 'text.secondary' }}
+								sx={{
+									mb: 1,
+									color: isLightMode ? '#9ca3af' : 'text.secondary',
+								}}
 							>
 								Dedicated analytics workspace. Gift card analysis is the default
 								tab and more analytics tabs can be added here later.
@@ -146,26 +157,33 @@ const AnalyticsContent: React.FC<AnalyticsContentProps> = ({
 						variant="scrollable"
 						scrollButtons="auto"
 						sx={{
+							borderBottom: isLightMode ? '1px solid #eeebe4' : 'none',
 							'& .MuiTabs-flexContainer': {
-								backgroundColor: theme.palette.background.paper,
-								borderRadius: '10px',
+								backgroundColor: isLightMode
+									? 'transparent'
+									: theme.palette.background.paper,
+								borderRadius: isLightMode ? 0 : '10px',
 							},
 							'& .MuiTab-root': {
-								color: isLightMode ? '#94a3b8' : 'rgba(255,255,255,0.4)',
+								color: isLightMode ? '#9ca3af' : 'rgba(255,255,255,0.4)',
 								fontSize: '0.72rem',
 								letterSpacing: '0.08em',
 								fontWeight: 500,
+								borderBottom: isLightMode ? '2px solid transparent' : 'none',
 							},
 							'& .MuiTab-root.Mui-selected': {
-								color: theme.palette.text.primary,
+								color: isLightMode ? '#1a1a1a' : theme.palette.text.primary,
+								borderBottomColor: isLightMode ? '#1a1a1a' : 'transparent',
 							},
 							'& .MuiTabs-indicator': {
-								background: isLightMode ? '#0f172a' : 'rgba(255,255,255,0.35)',
+								background: isLightMode ? '#1a1a1a' : 'rgba(255,255,255,0.35)',
+								height: isLightMode ? 0 : 2,
 							},
 						}}
 						TabIndicatorProps={{
 							sx: {
-								background: isLightMode ? '#0f172a' : 'rgba(255,255,255,0.35)',
+								background: isLightMode ? '#1a1a1a' : 'rgba(255,255,255,0.35)',
+								height: isLightMode ? 0 : 2,
 							},
 						}}
 					>

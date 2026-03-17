@@ -30,18 +30,30 @@ interface TreeDistributionChartProps {
 	data: GiftCardTreeDistribution | null;
 	loading: boolean;
 	themeMode?: 'dark' | 'light';
+	year: number;
+	filterContext?: string;
 }
 
 const TreeDistributionChart: React.FC<TreeDistributionChartProps> = ({
 	data,
 	loading,
 	themeMode = 'dark',
+	year,
+	filterContext,
 }) => {
 	const [metric, setMetric] = useState<'trees' | 'requests'>('trees');
-	const colors =
-		themeMode === 'light' ? LIGHT_ANALYTICS_COLORS : ANALYTICS_COLORS;
-	const tooltipConfig =
-		themeMode === 'light' ? LIGHT_CHART_TOOLTIP : CHART_TOOLTIP;
+	const isLightMode = themeMode === 'light';
+	const colors = isLightMode ? LIGHT_ANALYTICS_COLORS : ANALYTICS_COLORS;
+	const tooltipConfig = isLightMode ? LIGHT_CHART_TOOLTIP : CHART_TOOLTIP;
+	const titleColor = isLightMode ? '#1a1a1a' : 'text.primary';
+	const subtitleColor = isLightMode ? '#6b7280' : 'text.secondary';
+	const cardStyles = isLightMode
+		? {
+				background: '#fffef8',
+				border: '1px solid #f0ede6',
+				boxShadow: '0px 25px 45px rgba(33, 33, 23, 0.12)',
+		  }
+		: {};
 
 	const chartData = useMemo(() => {
 		if (!data) {
@@ -80,8 +92,11 @@ const TreeDistributionChart: React.FC<TreeDistributionChartProps> = ({
 			? (personalTrees / personalRequests).toFixed(1)
 			: '0.0';
 
+	const yearLabel = year === 0 ? 'All time' : `${year}`;
+	const contextLabel = filterContext || yearLabel;
+
 	return (
-		<Card>
+		<Card sx={cardStyles}>
 			<CardContent>
 				<Box
 					sx={{
@@ -99,13 +114,16 @@ const TreeDistributionChart: React.FC<TreeDistributionChartProps> = ({
 							sx={{
 								fontWeight: 600,
 								letterSpacing: '-0.01em',
-								color: 'text.primary',
+								color: titleColor,
 							}}
 						>
 							Trees per request
 						</Typography>
-						<Typography variant="body2" color="text.secondary">
+						<Typography variant="body2" sx={{ color: subtitleColor }}>
 							How many trees are in each request
+						</Typography>
+						<Typography variant="body2" sx={{ color: subtitleColor }}>
+							{contextLabel}
 						</Typography>
 					</Box>
 					<ToggleButtonGroup
@@ -186,7 +204,7 @@ const TreeDistributionChart: React.FC<TreeDistributionChartProps> = ({
 										bgcolor: colors.corporate,
 									}}
 								/>
-								<Typography variant="body2" color="text.secondary">
+								<Typography variant="body2" sx={{ color: subtitleColor }}>
 									Corporate
 								</Typography>
 							</Box>
@@ -199,13 +217,13 @@ const TreeDistributionChart: React.FC<TreeDistributionChartProps> = ({
 										bgcolor: colors.personal,
 									}}
 								/>
-								<Typography variant="body2" color="text.secondary">
+								<Typography variant="body2" sx={{ color: subtitleColor }}>
 									Personal
 								</Typography>
 							</Box>
 						</Box>
 
-						<Typography variant="body2" sx={{ mt: 2 }} color="text.secondary">
+						<Typography variant="body2" sx={{ mt: 2, color: subtitleColor }}>
 							{`Corporate avg: ${corporateAverage} trees/request · Personal avg: ${personalAverage} trees/request`}
 						</Typography>
 					</>

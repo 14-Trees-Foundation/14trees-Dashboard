@@ -5,15 +5,10 @@ import {
 	CardContent,
 	Typography,
 	Skeleton,
-	FormControl,
-	InputLabel,
-	Select,
-	MenuItem,
 	IconButton,
 	ToggleButton,
 	ToggleButtonGroup,
 } from '@mui/material';
-import { SelectChangeEvent } from '@mui/material/Select';
 import FileDownloadOutlinedIcon from '@mui/icons-material/FileDownloadOutlined';
 import {
 	ResponsiveContainer,
@@ -40,31 +35,21 @@ interface GiftAnalyticsChartsProps {
 		monthly: GiftCardMonthlyEntry[];
 	} | null;
 	selectedYear: number;
-	onYearChange: (year: number) => void;
 	onExport?: () => void;
 	loading: boolean;
 	themeMode?: 'dark' | 'light';
-	onToggleTheme?: () => void;
+	granularity?: 'monthly' | 'quarterly' | 'yearly';
 }
 
 const GiftAnalyticsCharts: React.FC<GiftAnalyticsChartsProps> = ({
 	data,
 	selectedYear,
-	onYearChange,
 	onExport,
 	loading,
 	themeMode = 'dark',
-	onToggleTheme: _onToggleTheme,
+	granularity = 'monthly',
 }) => {
 	const [metric, setMetric] = useState<'requests' | 'trees'>('trees');
-	const currentYear = new Date().getFullYear();
-	const yearOptions = [currentYear, currentYear - 1, currentYear - 2];
-
-	const handleYearChange = (event: SelectChangeEvent<string>) => {
-		if (event.target.value) {
-			onYearChange(Number(event.target.value));
-		}
-	};
 
 	// Transform data for chart
 	const chartData = useMemo(() => {
@@ -101,6 +86,7 @@ const GiftAnalyticsCharts: React.FC<GiftAnalyticsChartsProps> = ({
 		}),
 		[tooltipConfig],
 	);
+	const displayYear = selectedYear === 0 ? 'All time' : selectedYear.toString();
 
 	if (loading) {
 		return (
@@ -156,17 +142,21 @@ const GiftAnalyticsCharts: React.FC<GiftAnalyticsChartsProps> = ({
 						gap: 2,
 					}}
 				>
-					<Typography
-						variant="h6"
-						sx={{ fontWeight: 600, letterSpacing: '-0.01em' }}
-					>
-						Month-on-Month Trends
-					</Typography>
+					<Box>
+						<Typography
+							variant="h6"
+							sx={{ fontWeight: 600, letterSpacing: '-0.01em' }}
+						>
+							Month-on-Month Trends
+						</Typography>
+						<Typography variant="body2" color="text.secondary">
+							{`${displayYear} · ${granularity}`}
+						</Typography>
+					</Box>
 					<Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
 						<ToggleButtonGroup
 							value={metric}
 							exclusive
-							size="small"
 							onChange={(_, value) => value && setMetric(value)}
 							aria-label="metric toggle"
 						>
@@ -187,21 +177,6 @@ const GiftAnalyticsCharts: React.FC<GiftAnalyticsChartsProps> = ({
 								<FileDownloadOutlinedIcon fontSize="small" />
 							</IconButton>
 						)}
-						<FormControl size="small" sx={{ minWidth: 140 }}>
-							<InputLabel id="gift-analytics-year-label">Year</InputLabel>
-							<Select
-								labelId="gift-analytics-year-label"
-								label="Year"
-								value={selectedYear.toString()}
-								onChange={handleYearChange}
-							>
-								{yearOptions.map((year) => (
-									<MenuItem key={year} value={year.toString()}>
-										{year}
-									</MenuItem>
-								))}
-							</Select>
-						</FormControl>
 					</Box>
 				</Box>
 

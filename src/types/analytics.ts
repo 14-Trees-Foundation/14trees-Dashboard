@@ -93,3 +93,16 @@ export interface GiftCardRequesterProfile {
 	stats: GiftCardLeaderboardEntry;
 	recent_history: GiftCardRecentHistoryEntry[];
 }
+
+export type AISummaryInsightType = 'TREND' | 'HIGHLIGHT' | 'ACTION';
+
+export interface AISummaryInsight {
+	type: AISummaryInsightType;
+	text: string;
+}
+
+export interface AISummaryResponse {
+	insights: AISummaryInsight[];
+	fromCache: boolean;
+	generatedAt: Date;
+}

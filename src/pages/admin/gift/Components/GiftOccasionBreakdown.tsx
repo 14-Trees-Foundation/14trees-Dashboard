@@ -1,14 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import {
-	Box,
-	Card,
-	CardContent,
-	ToggleButton,
-	ToggleButtonGroup,
-	Typography,
-	Skeleton,
-	IconButton,
-} from '@mui/material';
+import { Box, Card, CardContent, Typography, Skeleton } from '@mui/material';
 import {
 	ResponsiveContainer,
 	BarChart,
@@ -38,8 +29,8 @@ interface GiftOccasionBreakdownProps {
 	};
 	loading: boolean;
 	type: 'all' | 'corporate' | 'personal';
-	onTypeChange: (type: 'all' | 'corporate' | 'personal') => void;
 	themeMode?: 'dark' | 'light';
+	filterContext?: string;
 }
 
 // Event type mapping from database values to display names
@@ -60,18 +51,68 @@ const getEventTypeName = (eventType: string): string => {
 	return EVENT_TYPE_MAP[eventType] || eventType;
 };
 
+const normalizeOccasionLabel = (occasion: string): string => {
+	if (!occasion) return 'Unassigned';
+	const lower = occasion.toLowerCase();
+	if (lower.includes('birthday')) return 'Birthday';
+	if (lower.includes('memorial')) return 'Memorial';
+	if (lower.includes('wedding')) return 'Wedding';
+	if (lower.includes('anniversary')) return 'Anniversary';
+	if (lower.includes('festival') || lower.includes('festive')) return 'Festive';
+	if (lower.includes('general')) return 'General';
+	if (lower.includes('unassigned') || lower.includes('not specified'))
+		return 'Unassigned';
+	return occasion;
+};
+
+const LIGHT_BADGE_MAP: Record<
+	string,
+	{ bg: string; border: string; pip: string }
+> = {
+	Birthday: { bg: '#fff7ed', border: '#fed7aa', pip: '#c2410c' },
+	Memorial: { bg: '#f3f4f6', border: '#e5e7eb', pip: '#374151' },
+	General: { bg: '#f5f3ee', border: '#eeebe4', pip: '#6b7280' },
+	Festive: { bg: '#fff7ed', border: '#fed7aa', pip: '#d97706' },
+	Wedding: { bg: '#fdf2f8', border: '#fbcfe8', pip: '#be185d' },
+	Anniversary: { bg: '#f0fdf4', border: '#bbf7d0', pip: '#15803d' },
+	Unassigned: { bg: '#f9fafb', border: '#f3f4f6', pip: '#9ca3af' },
+};
+
+const getOccasionColors = (occasion: string, isLight: boolean) => {
+	if (!isLight) {
+		return {
+			bg: alpha(ANALYTICS_COLORS.accent, 0.08),
+			border: alpha(ANALYTICS_COLORS.accent, 0.25),
+			pip: ANALYTICS_COLORS.accent,
+		};
+	}
+	const normalized = normalizeOccasionLabel(occasion);
+	return (
+		LIGHT_BADGE_MAP[normalized] ?? {
+			bg: '#f5f3ee',
+			border: '#eeebe4',
+			pip: '#6b7280',
+		}
+	);
+};
+
 const GiftOccasionBreakdown: React.FC<GiftOccasionBreakdownProps> = ({
 	data,
 	loading,
 	type,
-	onTypeChange,
 	themeMode = 'dark',
+	filterContext,
 }) => {
 	const [selectedOccasion, setSelectedOccasion] = useState<string | null>(null);
+	const isLightMode = themeMode === 'light';
 	const colors =
 		themeMode === 'light' ? LIGHT_ANALYTICS_COLORS : ANALYTICS_COLORS;
 	const tooltipConfig =
 		themeMode === 'light' ? LIGHT_CHART_TOOLTIP : CHART_TOOLTIP;
+	const subtitleColor = isLightMode ? '#6b7280' : 'rgba(255,255,255,0.55)';
+	const typeLabel =
+		type !== 'all' ? type.charAt(0).toUpperCase() + type.slice(1) : null;
+	const contextLabel = filterContext || typeLabel;
 	const occasionPalette = useMemo(
 		() => [
 			colors.corporate,
@@ -174,33 +215,23 @@ const GiftOccasionBreakdown: React.FC<GiftOccasionBreakdownProps> = ({
 						gap: 2,
 					}}
 				>
-					<Typography
-						variant="h6"
-						sx={{
-							fontWeight: 600,
-							letterSpacing: '-0.01em',
-							color: 'text.primary',
-						}}
-					>
-						By Occasion Type
-					</Typography>
-					<ToggleButtonGroup
-						value={type}
-						exclusive
-						onChange={(e, value) => value && onTypeChange(value)}
-						size="small"
-						aria-label="occasion type"
-					>
-						<ToggleButton value="all" aria-label="all types">
-							All
-						</ToggleButton>
-						<ToggleButton value="corporate" aria-label="corporate types">
-							Corporate
-						</ToggleButton>
-						<ToggleButton value="personal" aria-label="personal types">
-							Personal
-						</ToggleButton>
-					</ToggleButtonGroup>
+					<Box>
+						<Typography
+							variant="h6"
+							sx={{
+								fontWeight: 600,
+								letterSpacing: '-0.01em',
+								color: 'text.primary',
+							}}
+						>
+							By Occasion Type
+						</Typography>
+						{contextLabel && (
+							<Typography variant="body2" sx={{ color: subtitleColor }}>
+								{contextLabel}
+							</Typography>
+						)}
+					</Box>
 				</Box>
 
 				<ResponsiveContainer width="100%" height={350}>
@@ -258,6 +289,10 @@ const GiftOccasionBreakdown: React.FC<GiftOccasionBreakdownProps> = ({
 				>
 					{chartData.map((occasion) => {
 						const isSelected = selectedOccasion === occasion.rawEventType;
+						const badgeColors = getOccasionColors(
+							occasion.occasion,
+							isLightMode,
+						);
 						return (
 							<Box
 								key={occasion.rawEventType}
@@ -270,34 +305,81 @@ const GiftOccasionBreakdown: React.FC<GiftOccasionBreakdownProps> = ({
 								}
 								sx={{
 									p: 1.5,
-									borderRadius: '8px',
+									borderRadius: '12px',
 									cursor: 'pointer',
-									border: '1px solid',
-									borderColor: alpha(colors.accent, 0.25),
-									backgroundColor: alpha(colors.textOnDark, 0.04),
+									border: isLightMode
+										? `1px solid ${badgeColors.border}`
+										: '1px solid',
+									borderColor: isLightMode
+										? badgeColors.border
+										: alpha(colors.accent, 0.25),
+									backgroundColor: isLightMode
+										? badgeColors.bg
+										: alpha(colors.textOnDark, 0.04),
 									transition: 'all 0.2s ease',
-									'&:hover': {
-										backgroundColor: alpha(colors.accent, 0.12),
-										borderColor: alpha(colors.accent, 0.5),
-									},
-									...(isSelected && {
-										backgroundColor: alpha(colors.accent, 0.16),
-										border: `2px solid ${colors.accent}`,
-									}),
+									'&:hover': isLightMode
+										? {
+												boxShadow: '0 4px 12px rgba(0,0,0,0.08)',
+										  }
+										: {
+												backgroundColor: alpha(colors.accent, 0.12),
+												borderColor: alpha(colors.accent, 0.5),
+										  },
+									...(isSelected &&
+										(isLightMode
+											? {
+													border: '2px solid #1c3a1c',
+													boxShadow: '0 0 0 2px rgba(28,58,28,0.1)',
+											  }
+											: {
+													backgroundColor: alpha(colors.accent, 0.16),
+													border: `2px solid ${colors.accent}`,
+											  })),
 								}}
 							>
-								<Typography
-									variant="body2"
-									fontWeight={600}
-									sx={{ color: colors.accent }}
+								<Box
+									sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}
 								>
-									{occasion.occasion}
+									<Box
+										sx={{
+											width: 6,
+											height: 6,
+											borderRadius: '50%',
+											backgroundColor: badgeColors.pip,
+										}}
+									/>
+									<Typography
+										variant="caption"
+										sx={{
+											fontWeight: 600,
+											letterSpacing: '0.02em',
+											color: isLightMode ? '#9ca3af' : colors.accent,
+											textTransform: 'uppercase',
+										}}
+									>
+										{occasion.occasion}
+									</Typography>
+								</Box>
+								<Typography
+									variant="body1"
+									sx={{
+										fontWeight: 600,
+										color: isLightMode
+											? '#1a1a1a'
+											: alpha(colors.textOnDark, 0.85),
+									}}
+								>
+									{occasion.value.toLocaleString()}
 								</Typography>
 								<Typography
 									variant="caption"
-									sx={{ color: alpha(colors.textOnDark, 0.7) }}
+									sx={{
+										color: isLightMode
+											? '#9ca3af'
+											: alpha(colors.textOnDark, 0.7),
+									}}
 								>
-									{occasion.value.toLocaleString()} requests
+									requests
 								</Typography>
 							</Box>
 						);

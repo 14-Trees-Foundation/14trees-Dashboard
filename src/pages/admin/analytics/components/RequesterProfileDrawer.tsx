@@ -22,8 +22,13 @@ import CloseIcon from '@mui/icons-material/Close';
 import FileDownloadOutlinedIcon from '@mui/icons-material/FileDownloadOutlined';
 import { useRequesterProfile } from '../hooks/useGiftCardAnalyticsV2';
 import { GiftCardLeaderboardEntry } from '../../../../types/analytics';
-import { ANALYTICS_COLORS, analyticsLabelSx } from '../analyticsTheme';
-import { alpha } from '@mui/material/styles';
+import {
+	ANALYTICS_COLORS,
+	LIGHT_ANALYTICS_COLORS,
+	analyticsLabelSx,
+} from '../analyticsTheme';
+import { alpha, useTheme } from '@mui/material/styles';
+import { mapEventType } from '../../../../utils/eventTypes';
 
 interface RequesterProfileDrawerProps {
 	userId: number | null;
@@ -42,7 +47,29 @@ const getInitials = (name: string): string => {
 
 const getAvatarStyles = (
 	requestType: GiftCardLeaderboardEntry['request_type'] | undefined,
+	isLightMode: boolean,
 ) => {
+	if (isLightMode) {
+		if (requestType === 'Corporate') {
+			return {
+				bgcolor: '#f0fdf4',
+				color: '#15803d',
+				border: '1px solid #bbf7d0',
+			};
+		}
+		if (requestType === 'Personal') {
+			return {
+				bgcolor: '#f5f3ee',
+				color: '#6b7280',
+				border: '1px solid #eeebe4',
+			};
+		}
+		return {
+			bgcolor: '#f5f3ee',
+			color: '#6b7280',
+			border: '1px solid #eeebe4',
+		};
+	}
 	if (requestType === 'Corporate') {
 		return {
 			bgcolor: ANALYTICS_COLORS.corporate,
@@ -76,6 +103,82 @@ const formatStatus = (status: string): string => {
 	return status.replace(/_/g, ' ');
 };
 
+const normalizeOccasion = (occasion: string): string => {
+	if (!occasion) return 'Unassigned';
+	const lower = occasion.toLowerCase();
+	if (lower.includes('birthday')) return 'Birthday';
+	if (lower.includes('memorial')) return 'Memorial';
+	if (lower.includes('wedding')) return 'Wedding';
+	if (lower.includes('anniversary')) return 'Anniversary';
+	if (lower.includes('festival') || lower.includes('festive')) return 'Festive';
+	if (lower.includes('general')) return 'General';
+	if (lower.includes('unassigned') || lower.includes('not specified'))
+		return 'Unassigned';
+	return occasion;
+};
+
+const LIGHT_BADGE_MAP: Record<
+	string,
+	{ bg: string; border: string; text: string }
+> = {
+	Birthday: { bg: '#fff7ed', border: '#fed7aa', text: '#c2410c' },
+	Memorial: { bg: '#f3f4f6', border: '#e5e7eb', text: '#374151' },
+	General: { bg: '#f5f3ee', border: '#eeebe4', text: '#6b7280' },
+	Festive: { bg: '#fff7ed', border: '#fed7aa', text: '#d97706' },
+	Wedding: { bg: '#fdf2f8', border: '#fbcfe8', text: '#be185d' },
+	Anniversary: { bg: '#f0fdf4', border: '#bbf7d0', text: '#15803d' },
+	Unassigned: { bg: '#f9fafb', border: '#f3f4f6', text: '#9ca3af' },
+};
+
+const getOccasionBadge = (occasion: string, isLight: boolean) => {
+	if (!isLight) {
+		return {
+			bg: alpha(ANALYTICS_COLORS.accent, 0.1),
+			border: alpha(ANALYTICS_COLORS.accent, 0.3),
+			text: ANALYTICS_COLORS.accent,
+		};
+	}
+	const normalized = normalizeOccasion(occasion);
+	return (
+		LIGHT_BADGE_MAP[normalized] ?? {
+			bg: '#f5f3ee',
+			border: '#eeebe4',
+			text: '#6b7280',
+		}
+	);
+};
+
+const getStatusPill = (status: string, isLight: boolean) => {
+	if (!isLight) {
+		const isCompleted = status === 'completed';
+		return {
+			bg: 'transparent',
+			color: isCompleted ? ANALYTICS_COLORS.accent : ANALYTICS_COLORS.warning,
+			border: isCompleted
+				? alpha(ANALYTICS_COLORS.accent, 0.5)
+				: alpha(ANALYTICS_COLORS.warning, 0.5),
+		};
+	}
+	const normalized = status?.toLowerCase();
+	if (
+		normalized === 'completed' ||
+		normalized === 'fulfilled' ||
+		normalized === 'planted'
+	) {
+		return { bg: '#f0fdf4', color: '#15803d' };
+	}
+	if (normalized === 'pending') {
+		return { bg: '#fffbeb', color: '#b45309' };
+	}
+	if (normalized === 'growing') {
+		return { bg: '#f9fafb', color: '#374151' };
+	}
+	if (normalized === 'dispatched') {
+		return { bg: '#eff6ff', color: '#1d4ed8' };
+	}
+	return { bg: '#f9fafb', color: '#374151' };
+};
+
 const RequesterProfileDrawer: React.FC<RequesterProfileDrawerProps> = ({
 	userId,
 	onClose,
@@ -107,6 +210,9 @@ const RequesterProfileDrawer: React.FC<RequesterProfileDrawerProps> = ({
 		{ label: 'Requests', value: formatNumber(requester?.total_requests) },
 		{ label: 'Avg cards/req', value: avgCardsPerRequest },
 	];
+	const theme = useTheme();
+	const isLightMode = theme.palette.mode === 'light';
+	const palette = isLightMode ? LIGHT_ANALYTICS_COLORS : ANALYTICS_COLORS;
 
 	return (
 		<Drawer
@@ -116,8 +222,10 @@ const RequesterProfileDrawer: React.FC<RequesterProfileDrawerProps> = ({
 			PaperProps={{
 				sx: {
 					width: { xs: '100vw', sm: 400 },
-					background: ANALYTICS_COLORS.pageBg,
-					borderLeft: `1px solid ${alpha(ANALYTICS_COLORS.accent, 0.3)}`,
+					background: isLightMode ? '#ffffff' : palette.pageBg,
+					borderLeft: isLightMode
+						? '1px solid #eeebe4'
+						: `1px solid ${alpha(palette.accent, 0.3)}`,
 				},
 			}}
 		>
@@ -126,7 +234,7 @@ const RequesterProfileDrawer: React.FC<RequesterProfileDrawerProps> = ({
 					p: 3,
 					height: '100%',
 					overflowY: 'auto',
-					color: ANALYTICS_COLORS.textOnDark,
+					color: palette.textOnDark,
 				}}
 			>
 				<Box
@@ -145,7 +253,7 @@ const RequesterProfileDrawer: React.FC<RequesterProfileDrawerProps> = ({
 								sx={{
 									width: 48,
 									height: 48,
-									...getAvatarStyles(requester?.request_type),
+									...getAvatarStyles(requester?.request_type, isLightMode),
 								}}
 							>
 								{requester ? getInitials(requesterDisplayName) : ''}
@@ -161,7 +269,10 @@ const RequesterProfileDrawer: React.FC<RequesterProfileDrawerProps> = ({
 								<>
 									<Typography
 										variant="h6"
-										sx={{ mb: 0.5, color: ANALYTICS_COLORS.textOnDark }}
+										sx={{
+											mb: 0.5,
+											color: isLightMode ? '#1a1a1a' : palette.textOnDark,
+										}}
 									>
 										{requesterDisplayName}
 									</Typography>
@@ -173,12 +284,23 @@ const RequesterProfileDrawer: React.FC<RequesterProfileDrawerProps> = ({
 											sx={{
 												borderColor:
 													requester.request_type === 'Corporate'
-														? 'rgba(60, 121, 188, 0.5)'
-														: 'rgba(155, 197, 61, 0.5)',
+														? isLightMode
+															? '#bbf7d0'
+															: alpha(palette.corporate, 0.5)
+														: isLightMode
+														? '#eeebe4'
+														: alpha(palette.personal, 0.5),
 												color:
 													requester.request_type === 'Corporate'
-														? ANALYTICS_COLORS.corporate
-														: ANALYTICS_COLORS.personal,
+														? isLightMode
+															? '#2d5a2d'
+															: palette.corporate
+														: isLightMode
+														? '#8bc34a'
+														: palette.personal,
+												backgroundColor: isLightMode
+													? '#ffffff'
+													: 'transparent',
 											}}
 										/>
 									)}
@@ -191,8 +313,10 @@ const RequesterProfileDrawer: React.FC<RequesterProfileDrawerProps> = ({
 						size="small"
 						aria-label="close profile"
 						sx={{
-							color: alpha(ANALYTICS_COLORS.textOnDark, 0.6),
-							'&:hover': { color: ANALYTICS_COLORS.accent },
+							color: isLightMode ? '#9ca3af' : alpha(palette.textOnDark, 0.6),
+							'&:hover': {
+								color: isLightMode ? '#1a1a1a' : palette.accent,
+							},
 						}}
 					>
 						<CloseIcon fontSize="small" />
@@ -200,12 +324,15 @@ const RequesterProfileDrawer: React.FC<RequesterProfileDrawerProps> = ({
 				</Box>
 
 				<Divider
-					sx={{ mb: 3, borderColor: alpha(ANALYTICS_COLORS.accent, 0.2) }}
+					sx={{
+						mb: 3,
+						borderColor: isLightMode ? '#eeebe4' : alpha(palette.accent, 0.2),
+					}}
 				/>
 
 				<Typography
 					variant="h6"
-					sx={{ mb: 1.5, color: ANALYTICS_COLORS.textOnDark }}
+					sx={{ mb: 1.5, color: isLightMode ? '#1a1a1a' : palette.textOnDark }}
 				>
 					Overview
 				</Typography>
@@ -214,8 +341,12 @@ const RequesterProfileDrawer: React.FC<RequesterProfileDrawerProps> = ({
 						<Grid item xs={6} key={stat.label}>
 							<Card
 								sx={{
-									background: alpha(ANALYTICS_COLORS.accent, 0.08),
-									border: `1px solid ${alpha(ANALYTICS_COLORS.accent, 0.2)}`,
+									background: isLightMode
+										? '#faf9f6'
+										: alpha(palette.accent, 0.08),
+									border: isLightMode
+										? '1px solid #eeebe4'
+										: `1px solid ${alpha(palette.accent, 0.2)}`,
 									borderRadius: '8px',
 								}}
 							>
@@ -226,7 +357,9 @@ const RequesterProfileDrawer: React.FC<RequesterProfileDrawerProps> = ({
 										sx={{
 											...analyticsLabelSx,
 											fontSize: '0.7rem',
-											color: alpha(ANALYTICS_COLORS.textOnDark, 0.5),
+											color: isLightMode
+												? '#9ca3af'
+												: alpha(palette.textOnDark, 0.5),
 										}}
 									>
 										{stat.label}
@@ -237,7 +370,7 @@ const RequesterProfileDrawer: React.FC<RequesterProfileDrawerProps> = ({
 										<Typography
 											variant="h6"
 											fontWeight={600}
-											sx={{ color: ANALYTICS_COLORS.accent }}
+											sx={{ color: isLightMode ? '#1a1a1a' : palette.accent }}
 										>
 											{stat.value ?? '—'}
 										</Typography>
@@ -250,7 +383,7 @@ const RequesterProfileDrawer: React.FC<RequesterProfileDrawerProps> = ({
 
 				<Typography
 					variant="h6"
-					sx={{ mb: 1.5, color: ANALYTICS_COLORS.textOnDark }}
+					sx={{ mb: 1.5, color: isLightMode ? '#1a1a1a' : palette.textOnDark }}
 				>
 					Occasions
 				</Typography>
@@ -272,25 +405,30 @@ const RequesterProfileDrawer: React.FC<RequesterProfileDrawerProps> = ({
 						requester &&
 						requester.occasion_types &&
 						requester.occasion_types.length > 0 &&
-						requester.occasion_types.map((occasion) => (
-							<Chip
-								key={occasion}
-								label={occasion}
-								size="small"
-								variant="outlined"
-								sx={{
-									borderColor: alpha(ANALYTICS_COLORS.accent, 0.4),
-									color: ANALYTICS_COLORS.accent,
-								}}
-							/>
-						))}
+						requester.occasion_types.map((occasion) => {
+							const mappedOccasion = mapEventType(occasion);
+							const badge = getOccasionBadge(mappedOccasion, isLightMode);
+							return (
+								<Chip
+									key={occasion}
+									label={mappedOccasion}
+									size="small"
+									variant="outlined"
+									sx={{
+										borderColor: badge.border,
+										color: badge.text,
+										backgroundColor: badge.bg,
+									}}
+								/>
+							);
+						})}
 					{!loading &&
 						requester &&
 						(!requester.occasion_types ||
 							requester.occasion_types.length === 0) && (
 							<Typography
 								variant="body2"
-								sx={{ color: ANALYTICS_COLORS.textMuted }}
+								sx={{ color: isLightMode ? '#9ca3af' : palette.textMuted }}
 							>
 								No occasions recorded
 							</Typography>
@@ -305,7 +443,10 @@ const RequesterProfileDrawer: React.FC<RequesterProfileDrawerProps> = ({
 						mb: 1.5,
 					}}
 				>
-					<Typography variant="h6" sx={{ color: ANALYTICS_COLORS.textOnDark }}>
+					<Typography
+						variant="h6"
+						sx={{ color: isLightMode ? '#1a1a1a' : palette.textOnDark }}
+					>
 						Recent requests
 					</Typography>
 					<Button
@@ -315,11 +456,14 @@ const RequesterProfileDrawer: React.FC<RequesterProfileDrawerProps> = ({
 						onClick={() => console.log('export profile', userId)}
 						disabled={userId === null}
 						sx={{
-							color: ANALYTICS_COLORS.accent,
-							borderColor: alpha(ANALYTICS_COLORS.accent, 0.4),
+							color: isLightMode ? '#6b7280' : palette.accent,
+							borderColor: isLightMode ? '#eeebe4' : alpha(palette.accent, 0.4),
+							backgroundColor: isLightMode ? '#ffffff' : 'transparent',
 							'&:hover': {
-								borderColor: ANALYTICS_COLORS.accent,
-								background: alpha(ANALYTICS_COLORS.accent, 0.08),
+								borderColor: isLightMode ? '#d4d0c8' : palette.accent,
+								background: isLightMode
+									? '#faf9f6'
+									: alpha(palette.accent, 0.08),
 							},
 						}}
 					>
@@ -347,11 +491,12 @@ const RequesterProfileDrawer: React.FC<RequesterProfileDrawerProps> = ({
 								<TableRow>
 									<TableCell
 										sx={{
-											color: alpha(ANALYTICS_COLORS.textOnDark, 0.5),
-											borderBottom: `1px solid ${alpha(
-												ANALYTICS_COLORS.accent,
-												0.2,
-											)}`,
+											color: isLightMode
+												? '#9ca3af'
+												: alpha(palette.textOnDark, 0.5),
+											borderBottom: isLightMode
+												? '1px solid #eeebe4'
+												: `1px solid ${alpha(palette.accent, 0.2)}`,
 											fontSize: '0.7rem',
 											textTransform: 'uppercase',
 											letterSpacing: '0.08em',
@@ -361,11 +506,12 @@ const RequesterProfileDrawer: React.FC<RequesterProfileDrawerProps> = ({
 									</TableCell>
 									<TableCell
 										sx={{
-											color: alpha(ANALYTICS_COLORS.textOnDark, 0.5),
-											borderBottom: `1px solid ${alpha(
-												ANALYTICS_COLORS.accent,
-												0.2,
-											)}`,
+											color: isLightMode
+												? '#9ca3af'
+												: alpha(palette.textOnDark, 0.5),
+											borderBottom: isLightMode
+												? '1px solid #eeebe4'
+												: `1px solid ${alpha(palette.accent, 0.2)}`,
 											fontSize: '0.7rem',
 											textTransform: 'uppercase',
 											letterSpacing: '0.08em',
@@ -375,11 +521,12 @@ const RequesterProfileDrawer: React.FC<RequesterProfileDrawerProps> = ({
 									</TableCell>
 									<TableCell
 										sx={{
-											color: alpha(ANALYTICS_COLORS.textOnDark, 0.5),
-											borderBottom: `1px solid ${alpha(
-												ANALYTICS_COLORS.accent,
-												0.2,
-											)}`,
+											color: isLightMode
+												? '#9ca3af'
+												: alpha(palette.textOnDark, 0.5),
+											borderBottom: isLightMode
+												? '1px solid #eeebe4'
+												: `1px solid ${alpha(palette.accent, 0.2)}`,
 											fontSize: '0.7rem',
 											textTransform: 'uppercase',
 											letterSpacing: '0.08em',
@@ -389,11 +536,12 @@ const RequesterProfileDrawer: React.FC<RequesterProfileDrawerProps> = ({
 									</TableCell>
 									<TableCell
 										sx={{
-											color: alpha(ANALYTICS_COLORS.textOnDark, 0.5),
-											borderBottom: `1px solid ${alpha(
-												ANALYTICS_COLORS.accent,
-												0.2,
-											)}`,
+											color: isLightMode
+												? '#9ca3af'
+												: alpha(palette.textOnDark, 0.5),
+											borderBottom: isLightMode
+												? '1px solid #eeebe4'
+												: `1px solid ${alpha(palette.accent, 0.2)}`,
 											fontSize: '0.7rem',
 											textTransform: 'uppercase',
 											letterSpacing: '0.08em',
@@ -410,75 +558,86 @@ const RequesterProfileDrawer: React.FC<RequesterProfileDrawerProps> = ({
 										hover
 										sx={{
 											'&:hover': {
-												bgcolor: alpha(ANALYTICS_COLORS.accent, 0.06),
+												bgcolor: isLightMode
+													? '#faf9f6'
+													: alpha(palette.accent, 0.06),
 											},
 										}}
 									>
 										<TableCell
 											sx={{
-												borderBottom: `1px solid ${alpha(
-													ANALYTICS_COLORS.accent,
-													0.08,
-												)}`,
+												borderBottom: isLightMode
+													? '1px solid #f0ede6'
+													: `1px solid ${alpha(palette.accent, 0.08)}`,
 											}}
 										>
 											<Typography
 												variant="body2"
-												sx={{ color: ANALYTICS_COLORS.textOnDark }}
+												sx={{
+													color: isLightMode ? '#1a1a1a' : palette.textOnDark,
+												}}
 											>
-												{row.occasion ?? 'Unassigned'}
+												{mapEventType(row.occasion)}
 											</Typography>
 										</TableCell>
 										<TableCell
 											sx={{
-												borderBottom: `1px solid ${alpha(
-													ANALYTICS_COLORS.accent,
-													0.08,
-												)}`,
+												borderBottom: isLightMode
+													? '1px solid #f0ede6'
+													: `1px solid ${alpha(palette.accent, 0.08)}`,
 											}}
 										>
 											<Typography
 												variant="body2"
-												sx={{ color: ANALYTICS_COLORS.textOnDark }}
+												sx={{
+													color: isLightMode ? '#1a1a1a' : palette.textOnDark,
+												}}
 											>
 												{row.no_of_cards.toLocaleString()}
 											</Typography>
 										</TableCell>
 										<TableCell
 											sx={{
-												borderBottom: `1px solid ${alpha(
-													ANALYTICS_COLORS.accent,
-													0.08,
-												)}`,
+												borderBottom: isLightMode
+													? '1px solid #f0ede6'
+													: `1px solid ${alpha(palette.accent, 0.08)}`,
 											}}
 										>
-											<Chip
-												size="small"
-												label={formatStatus(row.status)}
-												variant="outlined"
-												sx={{
-													color:
-														row.status === 'completed'
-															? ANALYTICS_COLORS.accent
-															: ANALYTICS_COLORS.warning,
-													borderColor:
-														row.status === 'completed'
-															? alpha(ANALYTICS_COLORS.accent, 0.5)
-															: alpha(ANALYTICS_COLORS.warning, 0.5),
-												}}
-											/>
+											{(() => {
+												const pill = getStatusPill(
+													row.status ?? '',
+													isLightMode,
+												);
+												return (
+													<Chip
+														size="small"
+														label={formatStatus(row.status ?? '')}
+														variant="outlined"
+														sx={{
+															color: pill.color,
+															backgroundColor: isLightMode
+																? pill.bg
+																: 'transparent',
+															borderColor: isLightMode
+																? 'transparent'
+																: pill.border,
+														}}
+													/>
+												);
+											})()}
 										</TableCell>
 										<TableCell
 											sx={{
-												borderBottom: `1px solid ${alpha(
-													ANALYTICS_COLORS.accent,
-													0.08,
-												)}`,
+												borderBottom: isLightMode
+													? '1px solid #f0ede6'
+													: `1px solid ${alpha(palette.accent, 0.08)}`,
 											}}
 										>
 											<Typography
 												variant="body2"
-												sx={{ color: ANALYTICS_COLORS.textMuted }}
+												sx={{
+													color: isLightMode ? '#9ca3af' : palette.textMuted,
+												}}
 											>
 												{formatDate(row.created_at)}
 											</Typography>
@@ -491,7 +650,9 @@ const RequesterProfileDrawer: React.FC<RequesterProfileDrawerProps> = ({
 				)}
 
 				{!loading && recentHistory.length === 0 && (
-					<Typography sx={{ color: ANALYTICS_COLORS.textMuted }}>
+					<Typography
+						sx={{ color: isLightMode ? '#9ca3af' : palette.textMuted }}
+					>
 						No history found
 					</Typography>
 				)}

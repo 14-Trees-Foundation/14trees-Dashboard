@@ -11,6 +11,7 @@ interface MetricCardProps {
 		width: string;
 		color: string;
 	};
+	isHero?: boolean;
 }
 
 const MetricCard: React.FC<MetricCardProps> = ({
@@ -19,6 +20,7 @@ const MetricCard: React.FC<MetricCardProps> = ({
 	note,
 	decimals = 0,
 	indicator,
+	isHero = false,
 }) => {
 	const formattedValue = Number.isFinite(value)
 		? decimals > 0
@@ -27,9 +29,16 @@ const MetricCard: React.FC<MetricCardProps> = ({
 		: '0';
 
 	const theme = useTheme();
+	const heroCardStyles = isHero
+		? {
+				background: '#1c3a1c',
+				border: 'none',
+				boxShadow: '0 4px 20px rgba(28,58,28,0.25)',
+		  }
+		: {};
 
 	return (
-		<Card sx={{ height: '100%' }}>
+		<Card sx={{ height: '100%', ...heroCardStyles }}>
 			<CardContent sx={{ p: '18px 20px !important' }}>
 				<Typography
 					variant="body2"
@@ -39,7 +48,9 @@ const MetricCard: React.FC<MetricCardProps> = ({
 						letterSpacing: '0.08em',
 						mb: '8px',
 						fontWeight: 500,
-						color: theme.palette.text.secondary,
+						color: isHero
+							? 'rgba(255,255,255,0.6)'
+							: theme.palette.text.secondary,
 					}}
 				>
 					{title}
@@ -51,7 +62,7 @@ const MetricCard: React.FC<MetricCardProps> = ({
 						fontWeight: 300,
 						letterSpacing: '-0.02em',
 						lineHeight: 1.2,
-						color: theme.palette.text.primary,
+						color: isHero ? '#ffffff' : theme.palette.text.primary,
 					}}
 				>
 					{formattedValue}
@@ -62,7 +73,7 @@ const MetricCard: React.FC<MetricCardProps> = ({
 							fontSize: '0.7rem',
 							mt: '3px',
 						}}
-						color="text.secondary"
+						color={isHero ? 'rgba(255,255,255,0.5)' : 'text.secondary'}
 					>
 						{note}
 					</Typography>
@@ -72,7 +83,9 @@ const MetricCard: React.FC<MetricCardProps> = ({
 						height: '2px',
 						borderRadius: '1px',
 						mt: '14px',
-						backgroundColor: theme.palette.action.hover,
+						backgroundColor: isHero
+							? 'rgba(255,255,255,0.25)'
+							: theme.palette.action.hover,
 						overflow: 'hidden',
 					}}
 				>
@@ -102,11 +115,13 @@ interface GiftAnalyticsMetricsProps {
 		avg_trees_per_card: number;
 	};
 	loading: boolean;
+	themeMode?: 'light' | 'dark';
 }
 
 const GiftAnalyticsMetrics: React.FC<GiftAnalyticsMetricsProps> = ({
 	data,
 	loading,
+	themeMode,
 }) => {
 	const gridSx = {
 		display: 'grid',
@@ -150,13 +165,19 @@ const GiftAnalyticsMetrics: React.FC<GiftAnalyticsMetricsProps> = ({
 			: 0;
 
 	const theme = useTheme();
+	const isLight =
+		themeMode === 'light' || (!themeMode && theme.palette.mode === 'light');
 
 	const cards: MetricCardProps[] = [
 		{
 			title: 'Total Requests',
 			value: data.total_requests,
 			note: 'All gift card requests',
-			indicator: { width: '100%', color: theme.palette.divider },
+			indicator: {
+				width: '100%',
+				color: isLight ? 'rgba(139,195,74,0.6)' : theme.palette.divider,
+			},
+			isHero: isLight,
 		},
 		{
 			title: 'Total Trees',

@@ -65,6 +65,19 @@ class ApiClient {
 		this.token = token ? JSON.parse(token) : null;
 	}
 
+	private appendGiftCardAnalyticsFilters(
+		params: URLSearchParams,
+		year?: number,
+		type?: 'all' | 'corporate' | 'personal',
+	) {
+		if (typeof year === 'number' && year > 0) {
+			params.append('year', year.toString());
+		}
+		if (type && type !== 'all') {
+			params.append('type', type);
+		}
+	}
+
 	async authenticateToken(
 		token_id: string,
 	): Promise<{ user: User; token: string }> {
@@ -2661,17 +2674,20 @@ class ApiClient {
 		}
 	}
 
-	async getGiftCardSummaryKPIs(): Promise<GiftCardSummaryKPIs> {
+	async getGiftCardSummaryKPIs(year?: number): Promise<GiftCardSummaryKPIs> {
+		const params = new URLSearchParams();
+		this.appendGiftCardAnalyticsFilters(params, year);
+		const queryString = params.toString();
+		const url = `/analytics/giftcards/summary${
+			queryString ? `?${queryString}` : ''
+		}`;
 		try {
-			const response = await this.api.get<GiftCardSummaryKPIs>(
-				`/analytics/giftcards/summary`,
-				{
-					headers: {
-						'x-access-token': this.token,
-						'content-type': 'application/json',
-					},
+			const response = await this.api.get<GiftCardSummaryKPIs>(url, {
+				headers: {
+					'x-access-token': this.token,
+					'content-type': 'application/json',
 				},
-			);
+			});
 			return response.data;
 		} catch (error: any) {
 			throw new Error(
@@ -2728,17 +2744,23 @@ class ApiClient {
 		}
 	}
 
-	async getGiftCardTreeDistribution(): Promise<GiftCardTreeDistribution> {
+	async getGiftCardTreeDistribution(
+		year?: number,
+		type?: 'all' | 'corporate' | 'personal',
+	): Promise<GiftCardTreeDistribution> {
+		const params = new URLSearchParams();
+		this.appendGiftCardAnalyticsFilters(params, year, type);
+		const queryString = params.toString();
+		const url = `/analytics/giftcards/tree-distribution${
+			queryString ? `?${queryString}` : ''
+		}`;
 		try {
-			const response = await this.api.get<GiftCardTreeDistribution>(
-				`/analytics/giftcards/tree-distribution`,
-				{
-					headers: {
-						'x-access-token': this.token,
-						'content-type': 'application/json',
-					},
+			const response = await this.api.get<GiftCardTreeDistribution>(url, {
+				headers: {
+					'x-access-token': this.token,
+					'content-type': 'application/json',
 				},
-			);
+			});
 			return response.data;
 		} catch (error: any) {
 			throw new Error(
@@ -2747,17 +2769,23 @@ class ApiClient {
 		}
 	}
 
-	async getGiftCardSources(): Promise<GiftCardSourcesResponse> {
+	async getGiftCardSources(
+		year?: number,
+		type?: 'all' | 'corporate' | 'personal',
+	): Promise<GiftCardSourcesResponse> {
+		const params = new URLSearchParams();
+		this.appendGiftCardAnalyticsFilters(params, year, type);
+		const queryString = params.toString();
+		const url = `/analytics/giftcards/sources${
+			queryString ? `?${queryString}` : ''
+		}`;
 		try {
-			const response = await this.api.get<GiftCardSourcesResponse>(
-				`/analytics/giftcards/sources`,
-				{
-					headers: {
-						'x-access-token': this.token,
-						'content-type': 'application/json',
-					},
+			const response = await this.api.get<GiftCardSourcesResponse>(url, {
+				headers: {
+					'x-access-token': this.token,
+					'content-type': 'application/json',
 				},
-			);
+			});
 			return response.data;
 		} catch (error: any) {
 			throw new Error(`Failed to fetch gift card sources: ${error.message}`);
@@ -2767,10 +2795,13 @@ class ApiClient {
 	async getGiftCardLeaderboard(
 		sortBy?: 'trees' | 'cards',
 		limit?: number,
+		year?: number,
+		type?: 'all' | 'corporate' | 'personal',
 	): Promise<GiftCardLeaderboardEntry[]> {
 		const params = new URLSearchParams();
 		if (sortBy !== undefined) params.append('sortBy', sortBy);
 		if (limit !== undefined) params.append('limit', limit.toString());
+		this.appendGiftCardAnalyticsFilters(params, year, type);
 		const queryString = params.toString();
 		const url = `/analytics/giftcards/leaderboard${
 			queryString ? `?${queryString}` : ''
@@ -4428,6 +4459,73 @@ class ApiClient {
 				);
 			}
 			throw new Error('Failed to get user roles');
+		}
+	}
+
+	async streamAISummary(
+		year: number,
+		force: boolean,
+		onChunk: (text: string) => void,
+		onDone: () => void,
+		onError: (err: string) => void,
+	): Promise<void> {
+		const params = new URLSearchParams({ year: String(year) });
+		if (force) params.set('force', 'true');
+
+		const baseURL = this.api.defaults.baseURL ?? '';
+		const url = `${baseURL}/analytics/giftcards/ai-summary?${params.toString()}`;
+
+		try {
+			const response = await fetch(url, {
+				method: 'GET',
+				headers: {
+					'Content-Type': 'application/json',
+					'x-access-token': this.token ?? '',
+					'x-user-id': localStorage.getItem('userId') ?? '',
+				},
+			});
+			if (!response.ok || !response.body) {
+				onError(`Request failed: ${response.status}`);
+				return;
+			}
+
+			const reader = response.body.getReader();
+			const decoder = new TextDecoder();
+			let buffer = '';
+
+			while (true) {
+				const { done, value } = await reader.read();
+				if (done) break;
+
+				buffer += decoder.decode(value, { stream: true });
+				const lines = buffer.split('\n');
+				buffer = lines.pop() ?? '';
+
+				for (const line of lines) {
+					const trimmed = line.trim();
+					if (!trimmed.startsWith('data:')) continue;
+					const payload = trimmed.slice(5).trim();
+
+					if (payload === '[DONE]') {
+						onDone();
+						return;
+					}
+					if (payload === '[ERROR]') {
+						onError('AI summary stream error');
+						return;
+					}
+
+					try {
+						onChunk((JSON.parse(payload) as { text: string }).text);
+					} catch {
+						// ignore malformed SSE lines
+					}
+				}
+			}
+
+			onDone();
+		} catch (err) {
+			onError(err instanceof Error ? err.message : 'Unknown stream error');
 		}
 	}
 
