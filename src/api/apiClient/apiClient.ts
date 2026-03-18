@@ -21,7 +21,12 @@ import { PaginatedResponse } from '../../types/pagination';
 import { Event, EventMessage } from '../../types/event';
 import { Visit, BulkVisitUsersMappingResponse } from '../../types/visits';
 import { TreeImage } from '../../types/tree_snapshots';
-import { GiftCard, GiftCardUser, GiftRequestUser } from '../../types/gift_card';
+import {
+	GiftCard,
+	GiftCardUser,
+	GiftRequestUser,
+	PlotAutoBookRule,
+} from '../../types/gift_card';
 import { Tag } from '../../types/tag';
 import { EmailTemplate } from '../../types/email_template';
 import { Payment, PaymentHistory } from '../../types/payment';
@@ -3010,6 +3015,7 @@ class ApiClient {
 		book_non_giftable: boolean = false,
 		diversify: boolean = false,
 		book_all_habits: boolean = false,
+		plot_auto_book_rules?: PlotAutoBookRule[],
 	): Promise<void> {
 		try {
 			await this.api.post<any>(`/gift-cards/book`, {
@@ -3018,6 +3024,7 @@ class ApiClient {
 				book_non_giftable,
 				diversify,
 				book_all_habits,
+				plot_auto_book_rules,
 			});
 		} catch (error: any) {
 			if (error.response) {
@@ -4169,9 +4176,7 @@ class ApiClient {
 	/**
 	 * Admin Role Management
 	 */
-	async grantAdminRole(
-		userId: number,
-	): Promise<{
+	async grantAdminRole(userId: number): Promise<{
 		message: string;
 		user: { id: number; name: string; email: string; roles: string[] };
 	}> {
@@ -4197,9 +4202,7 @@ class ApiClient {
 		}
 	}
 
-	async revokeAdminRole(
-		userId: number,
-	): Promise<{
+	async revokeAdminRole(userId: number): Promise<{
 		message: string;
 		user: { id: number; name: string; email: string; roles: string[] };
 	}> {
@@ -4254,9 +4257,7 @@ class ApiClient {
 		}
 	}
 
-	async getUserRoles(
-		userId: number,
-	): Promise<{
+	async getUserRoles(userId: number): Promise<{
 		user: { id: number; name: string; email: string; roles: string[] };
 	}> {
 		try {
