@@ -58,7 +58,7 @@ const FilterDropdown: React.FC<FilterDropdownProps> = ({
 					fontWeight: 600,
 					textTransform: 'uppercase',
 					letterSpacing: '0.08em',
-					color: isDark ? 'rgba(255,255,255,0.4)' : '#6b7280',
+					color: isDark ? '#9ba39d' : '#6b7280',
 				}}
 			>
 				{label}
@@ -72,11 +72,9 @@ const FilterDropdown: React.FC<FilterDropdownProps> = ({
 				sx={{
 					fontSize: '13px',
 					fontWeight: 500,
-					color: isDark ? '#f0f4ee' : '#111827',
-					background: isDark ? 'rgba(255,255,255,0.06)' : '#f9f7f4',
-					border: isDark
-						? '1px solid rgba(255,255,255,0.12)'
-						: '1px solid #d4cfc8',
+					color: isDark ? '#e8ebe9' : '#111827',
+					background: isDark ? '#152018' : '#f9f7f4',
+					border: isDark ? '1px solid #2a3832' : '1px solid #d4cfc8',
 					borderRadius: '8px',
 					padding: '6px 28px 6px 10px',
 					cursor: 'pointer',
@@ -91,8 +89,8 @@ const FilterDropdown: React.FC<FilterDropdownProps> = ({
 					outline: 'none',
 					width: '100%',
 					'&:hover': {
-						borderColor: isDark ? 'rgba(255,255,255,0.25)' : '#9ca3af',
-						background: isDark ? 'rgba(255,255,255,0.1)' : '#f0ede6',
+						borderColor: isDark ? '#3a4a3d' : '#9ca3af',
+						background: isDark ? '#1f2f24' : '#f0ede6',
 					},
 					'& option': {
 						color: '#111827',
@@ -117,7 +115,7 @@ const FilterDivider: React.FC<{ themeMode: 'dark' | 'light' }> = ({
 		sx={{
 			width: '1px',
 			height: '36px',
-			background: themeMode === 'dark' ? 'rgba(255,255,255,0.08)' : '#e5e0d8',
+			background: themeMode === 'dark' ? '#2a3832' : '#e5e0d8',
 			flexShrink: 0,
 			mx: 0.5,
 		}}
@@ -128,7 +126,7 @@ const GiftCardAnalysisTab: React.FC<GiftCardAnalysisTabProps> = ({
 	themeMode,
 	onToggleTheme: _onToggleTheme,
 }) => {
-	const [selectedYear, setSelectedYear] = useState<number>(2025);
+	const [selectedYear, setSelectedYear] = useState<number>(2026);
 	const [granularity, setGranularity] = useState<
 		'monthly' | 'quarterly' | 'yearly'
 	>('monthly');
@@ -142,6 +140,9 @@ const GiftCardAnalysisTab: React.FC<GiftCardAnalysisTabProps> = ({
 		'trees',
 	);
 	const [selectedUserId, setSelectedUserId] = useState<number | null>(null);
+	const [selectedProfileType, setSelectedProfileType] = useState<
+		'user' | 'group'
+	>('user');
 	const isDark = themeMode === 'dark';
 	const sectionSpacing = { xs: 2, md: 2 } as const;
 	const headingColor = isDark ? 'rgba(255,255,255,0.85)' : '#1f2937';
@@ -164,7 +165,7 @@ const GiftCardAnalysisTab: React.FC<GiftCardAnalysisTabProps> = ({
 		fontWeight: 600,
 		textTransform: 'uppercase' as const,
 		letterSpacing: '0.08em',
-		color: isDark ? 'rgba(255,255,255,0.3)' : '#6b7280',
+		color: isDark ? '#4a5a4d' : '#6b7280',
 		mb: 1.5,
 		mt: 2,
 		display: 'flex',
@@ -174,7 +175,7 @@ const GiftCardAnalysisTab: React.FC<GiftCardAnalysisTabProps> = ({
 			content: '""',
 			flex: 1,
 			height: '1px',
-			background: isDark ? 'rgba(255,255,255,0.06)' : '#eeebe4',
+			background: isDark ? '#2a3832' : '#eeebe4',
 		},
 	};
 
@@ -213,6 +214,11 @@ const GiftCardAnalysisTab: React.FC<GiftCardAnalysisTabProps> = ({
 		sourceParam,
 	);
 
+	const handleSelectUser = (id: number, type: 'user' | 'group') => {
+		setSelectedUserId(id);
+		setSelectedProfileType(type);
+	};
+
 	return (
 		<Box
 			id="gift-card-analysis"
@@ -249,10 +255,8 @@ const GiftCardAnalysisTab: React.FC<GiftCardAnalysisTabProps> = ({
 					position: 'sticky',
 					top: 0,
 					zIndex: 100,
-					background: isDark ? '#13161e' : '#ffffff',
-					border: isDark
-						? '1px solid rgba(255,255,255,0.08)'
-						: '1px solid #d4cfc8',
+					background: isDark ? '#1a2820' : '#ffffff',
+					border: isDark ? '1px solid #2a3832' : '1px solid #d4cfc8',
 					borderRadius: '12px',
 					px: 2.5,
 					py: 1.5,
@@ -262,7 +266,7 @@ const GiftCardAnalysisTab: React.FC<GiftCardAnalysisTabProps> = ({
 					gap: 1.5,
 					flexWrap: { xs: 'wrap', md: 'nowrap' },
 					boxShadow: isDark
-						? '0 2px 8px rgba(0,0,0,0.3)'
+						? '0 2px 12px rgba(0,0,0,0.4)'
 						: '0 2px 8px rgba(0,0,0,0.07)',
 				}}
 			>
@@ -270,6 +274,7 @@ const GiftCardAnalysisTab: React.FC<GiftCardAnalysisTabProps> = ({
 					label="Year"
 					value={selectedYear === 0 ? 'all' : String(selectedYear)}
 					options={[
+						{ value: '2026', label: '2026' },
 						{ value: '2025', label: '2025' },
 						{ value: '2024', label: '2024' },
 						{ value: '2023', label: '2023' },
@@ -448,7 +453,7 @@ const GiftCardAnalysisTab: React.FC<GiftCardAnalysisTabProps> = ({
 					loading={leaderboardLoading}
 					sortBy={leaderboardSort}
 					onSortChange={setLeaderboardSort}
-					onRowClick={(userId) => setSelectedUserId(userId)}
+					onSelectUser={handleSelectUser}
 					onExport={() => console.log('export leaderboard', leaderboardSort)}
 					typeFilter={typeFilter}
 					year={selectedYear}
@@ -458,7 +463,11 @@ const GiftCardAnalysisTab: React.FC<GiftCardAnalysisTabProps> = ({
 
 			<RequesterProfileDrawer
 				userId={selectedUserId}
-				onClose={() => setSelectedUserId(null)}
+				profileType={selectedProfileType}
+				onClose={() => {
+					setSelectedUserId(null);
+					setSelectedProfileType('user');
+				}}
 			/>
 		</Box>
 	);

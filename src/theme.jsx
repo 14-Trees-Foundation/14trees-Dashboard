@@ -86,42 +86,42 @@ export const darkTheme = createTheme({
 	palette: {
 		mode: 'dark',
 		background: {
-			default: '#0d0f14',
-			paper: '#13161e',
+			default: '#0f1912',
+			paper: '#1a2820',
 		},
 		primary: {
-			main: '#7eb3f5',
-			light: '#7fb3f5',
-			dark: '#3a7ad4',
+			main: '#9bc53d',
+			light: '#b8d96a',
+			dark: '#7a9e2e',
 			contrastText: '#fff',
 		},
 		secondary: {
-			main: '#5fd99a',
+			main: '#4caf6e',
 			light: '#85e3b2',
 			dark: '#3db876',
-			contrastText: '#0d0f14',
+			contrastText: '#0f1912',
 		},
 		success: {
-			main: '#5fd99a',
+			main: '#4caf6e',
 			light: '#85e3b2',
 			dark: '#3db876',
 		},
 		warning: {
-			main: '#f0a050',
+			main: '#e8a838',
 			light: '#f5bb7a',
 			dark: '#d4822a',
 		},
 		error: {
-			main: '#f06060',
+			main: '#e05252',
 			light: '#f58585',
 			dark: '#d43a3a',
 		},
 		text: {
-			primary: '#f0f4ee',
-			secondary: 'rgba(255,255,255,0.45)',
-			disabled: 'rgba(255,255,255,0.2)',
+			primary: '#e8ebe9',
+			secondary: '#9ba39d',
+			disabled: '#6b7a6e',
 		},
-		divider: 'rgba(255,255,255,0.06)',
+		divider: '#2a3832',
 	},
 	typography: {
 		fontFamily: 'Helvetica, Arial, Sans-Serif',
@@ -147,11 +147,13 @@ export const darkTheme = createTheme({
 			styleOverrides: {
 				root: {
 					backgroundImage: 'none',
-					border: '1px solid rgba(255,255,255,0.06)',
-					borderRadius: '10px',
-					transition: 'border-color 0.2s ease',
+					background: '#1a2820',
+					border: '1px solid #2a3832',
+					boxShadow: '0 2px 12px rgba(0,0,0,0.3)',
+					borderRadius: '14px',
+					transition: 'box-shadow 0.2s ease',
 					'&:hover': {
-						borderColor: 'rgba(255,255,255,0.12)',
+						boxShadow: '0 4px 20px rgba(0,0,0,0.4)',
 					},
 				},
 			},
@@ -168,13 +170,14 @@ export const darkTheme = createTheme({
 			styleOverrides: {
 				root: {
 					backgroundImage: 'none',
-					border: '1px solid rgba(255,255,255,0.06)',
+					background: '#1a2820',
+					border: '1px solid #2a3832',
 				},
 			},
 		},
 		MuiDivider: {
 			styleOverrides: {
-				root: { borderColor: 'rgba(255,255,255,0.06)' },
+				root: { borderColor: '#2a3832' },
 			},
 		},
 		MuiChip: {
@@ -183,21 +186,23 @@ export const darkTheme = createTheme({
 					fontSize: '0.7rem',
 					height: '22px',
 					fontWeight: 500,
+					borderRadius: '6px',
 				},
 			},
 		},
 		MuiToggleButton: {
 			styleOverrides: {
 				root: {
-					border: 'none',
+					border: '1px solid #2a3832',
 					borderRadius: '5px !important',
 					padding: '4px 12px',
 					fontSize: '0.7rem',
-					color: 'rgba(255,255,255,0.3)',
+					color: '#9ba39d',
 					'&.Mui-selected': {
-						backgroundColor: 'rgba(255,255,255,0.1)',
-						color: '#fff',
+						backgroundColor: '#2a3832',
+						color: '#e8ebe9',
 						fontWeight: 500,
+						border: '1px solid #3a4a3d',
 						'&:hover': {
 							backgroundColor: 'rgba(255,255,255,0.14)',
 						},
@@ -212,7 +217,7 @@ export const darkTheme = createTheme({
 		MuiToggleButtonGroup: {
 			styleOverrides: {
 				root: {
-					backgroundColor: 'rgba(255,255,255,0.06)',
+					backgroundColor: '#1f2f24',
 					borderRadius: '7px',
 					padding: '2px',
 					gap: '1px',
@@ -222,16 +227,17 @@ export const darkTheme = createTheme({
 		MuiTableCell: {
 			styleOverrides: {
 				head: {
-					color: 'rgba(255,255,255,0.25)',
+					backgroundColor: 'transparent',
+					color: '#6b7a6e',
 					fontSize: '0.68rem',
 					textTransform: 'uppercase',
 					letterSpacing: '0.08em',
 					fontWeight: 500,
-					borderBottom: '1px solid rgba(255,255,255,0.06)',
+					borderBottom: '1px solid #2a3832',
 				},
 				body: {
-					color: 'rgba(255,255,255,0.75)',
-					borderBottom: '1px solid rgba(255,255,255,0.04)',
+					color: '#e8ebe9',
+					borderBottom: '1px solid #1f2f24',
 					fontSize: '0.8rem',
 				},
 			},
@@ -240,7 +246,7 @@ export const darkTheme = createTheme({
 			styleOverrides: {
 				root: {
 					'&:hover': {
-						backgroundColor: 'rgba(255,255,255,0.03)',
+						backgroundColor: '#1f2f24',
 					},
 					'&:last-child td': { borderBottom: 'none' },
 				},
@@ -249,7 +255,7 @@ export const darkTheme = createTheme({
 		MuiLinearProgress: {
 			styleOverrides: {
 				root: {
-					backgroundColor: 'rgba(255,255,255,0.06)',
+					backgroundColor: '#2a3832',
 					borderRadius: '2px',
 					height: '3px',
 				},
@@ -259,15 +265,15 @@ export const darkTheme = createTheme({
 			styleOverrides: {
 				paper: {
 					backgroundImage: 'none',
-					backgroundColor: '#0d0f14',
-					borderLeft: '1px solid rgba(255,255,255,0.08)',
+					backgroundColor: '#1a2820',
+					borderLeft: '1px solid #2a3832',
 				},
 			},
 		},
 		MuiSkeleton: {
 			styleOverrides: {
 				root: {
-					backgroundColor: 'rgba(255,255,255,0.06)',
+					backgroundColor: '#1f2f24',
 					'&::after': {
 						background:
 							'linear-gradient(90deg, transparent, rgba(255,255,255,0.04), transparent)',

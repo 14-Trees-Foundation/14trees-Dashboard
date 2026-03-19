@@ -1,21 +1,30 @@
 export const ANALYTICS_COLORS = {
-	accent: '#9BC53D',
-	accentDark: '#122018',
-	textOnDark: '#f0f4ee',
-	textMuted: 'rgba(244, 246, 251, 0.6)',
-	pageBg: '#0d0f14',
-	cardBg: '#13161e',
-	cardBorder: 'rgba(255, 255, 255, 0.08)',
-	corporate: '#286cc4',
-	personal: '#5fd99a',
-	warning: '#f0a050',
+	accent: '#9bc53d',
+	accentDark: '#1a2820',
+	textOnDark: '#e8ebe9',
+	textMuted: '#9ba39d',
+	pageBg: '#0f1912',
+	cardBg: '#1a2820',
+	cardBorder: '#2a3832',
+	corporate: '#9bc53d',
+	personal: '#4caf6e',
+	warning: '#e8a838',
 	treeBrown: '#a07840',
-	website: '#5b9cf0',
-	manual: '#5fd99a',
-	chartGrid: 'rgba(255, 255, 255, 0.05)',
-	chartAxis: 'rgba(255, 255, 255, 0.22)',
-	tooltipBg: '#1a1d27',
-	tooltipBorder: 'rgba(255, 255, 255, 0.12)',
+	website: '#9bc53d',
+	manual: '#4caf6e',
+	chartGrid: '#1f2f24',
+	chartAxis: '#4a5a4d',
+	tooltipBg: '#1a2820',
+	tooltipBorder: '#2a3832',
+	chartColors: [
+		'#9bc53d',
+		'#4caf6e',
+		'#2d8a4e',
+		'#1a5c34',
+		'#6b9e2e',
+		'#b8d96a',
+		'#9ba39d',
+	],
 } as const;
 
 export const analyticsCardSx = {
@@ -66,12 +75,13 @@ export const analyticsPageSx = {
 };
 
 export const CHART_TOOLTIP = {
-	backgroundColor: ANALYTICS_COLORS.tooltipBg,
-	border: `1px solid ${ANALYTICS_COLORS.tooltipBorder}`,
-	borderRadius: 8,
-	titleColor: 'rgba(255,255,255,0.8)',
-	bodyColor: 'rgba(255,255,255,0.45)',
-	padding: 10,
+	backgroundColor: '#1a2820',
+	borderColor: '#2a3832',
+	borderWidth: 1,
+	titleColor: '#e8ebe9',
+	bodyColor: '#9ba39d',
+	padding: 12,
+	cornerRadius: 10,
 };
 
 export const LIGHT_ANALYTICS_COLORS = {

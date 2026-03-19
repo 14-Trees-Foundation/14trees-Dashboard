@@ -44,9 +44,9 @@ const ICON_CONFIG: Record<
 	AISummaryInsightType,
 	{ symbol: string; darkColor: string; lightColor: string }
 > = {
-	TREND: { symbol: '↑', darkColor: '#7eb3f5', lightColor: '#4b83d4' },
-	HIGHLIGHT: { symbol: '◆', darkColor: '#5fd99a', lightColor: '#059669' },
-	ACTION: { symbol: '!', darkColor: '#f0a050', lightColor: '#d97706' },
+	TREND: { symbol: '↑', darkColor: '#9bc53d', lightColor: '#4b83d4' },
+	HIGHLIGHT: { symbol: '◆', darkColor: '#4caf6e', lightColor: '#059669' },
+	ACTION: { symbol: '!', darkColor: '#e8a838', lightColor: '#d97706' },
 };
 
 const AISummaryPanel: React.FC<AISummaryPanelProps> = ({ year, themeMode }) => {
@@ -116,8 +116,8 @@ const AISummaryPanel: React.FC<AISummaryPanelProps> = ({ year, themeMode }) => {
 
 	const cardSx = isDark
 		? {
-				background: 'rgba(255,255,255,0.03)',
-				border: '1px solid rgba(255,255,255,0.08)',
+				background: '#1a2820',
+				border: '1px solid #2a3832',
 				borderRadius: 2,
 				p: 2.5,
 				mb: 3,
@@ -131,9 +131,9 @@ const AISummaryPanel: React.FC<AISummaryPanelProps> = ({ year, themeMode }) => {
 				mb: 3,
 		  };
 
-	const textColor = isDark ? 'rgba(255,255,255,0.87)' : '#1a202c';
-	const mutedColor = isDark ? 'rgba(255,255,255,0.38)' : '#9ca3af';
-	const titleColor = isDark ? 'rgba(255,255,255,0.6)' : '#6b7280';
+	const textColor = isDark ? '#e8ebe9' : '#1a202c';
+	const mutedColor = isDark ? '#6b7a6e' : '#9ca3af';
+	const titleColor = isDark ? '#9ba39d' : '#6b7280';
 
 	return (
 		<Box sx={cardSx}>
@@ -188,17 +188,17 @@ const AISummaryPanel: React.FC<AISummaryPanelProps> = ({ year, themeMode }) => {
 					<Skeleton
 						variant="text"
 						width="90%"
-						sx={{ bgcolor: isDark ? 'rgba(255,255,255,0.07)' : '#e5e7eb' }}
+						sx={{ bgcolor: isDark ? '#1f2f24' : '#e5e7eb' }}
 					/>
 					<Skeleton
 						variant="text"
 						width="75%"
-						sx={{ bgcolor: isDark ? 'rgba(255,255,255,0.07)' : '#e5e7eb' }}
+						sx={{ bgcolor: isDark ? '#1f2f24' : '#e5e7eb' }}
 					/>
 					<Skeleton
 						variant="text"
 						width="60%"
-						sx={{ bgcolor: isDark ? 'rgba(255,255,255,0.07)' : '#e5e7eb' }}
+						sx={{ bgcolor: isDark ? '#1f2f24' : '#e5e7eb' }}
 					/>
 				</Box>
 			)}
@@ -213,7 +213,7 @@ const AISummaryPanel: React.FC<AISummaryPanelProps> = ({ year, themeMode }) => {
 						variant="body2"
 						onClick={() => fetchSummary(false)}
 						sx={{
-							color: isDark ? '#7eb3f5' : '#4b83d4',
+							color: isDark ? '#9bc53d' : '#4b83d4',
 							cursor: 'pointer',
 							textDecoration: 'underline',
 						}}

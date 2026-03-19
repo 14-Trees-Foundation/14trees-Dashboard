@@ -2866,18 +2866,18 @@ class ApiClient {
 	}
 
 	async getGiftCardRequesterProfile(
-		userId: number,
+		id: number,
+		type: 'user' | 'group' = 'user',
 	): Promise<GiftCardRequesterProfile> {
 		try {
-			const response = await this.api.get<GiftCardRequesterProfile>(
-				`/analytics/giftcards/requester/${userId}`,
-				{
-					headers: {
-						'x-access-token': this.token,
-						'content-type': 'application/json',
-					},
+			const params = new URLSearchParams({ type });
+			const url = `/analytics/giftcards/requester/${id}?${params.toString()}`;
+			const response = await this.api.get<GiftCardRequesterProfile>(url, {
+				headers: {
+					'x-access-token': this.token,
+					'content-type': 'application/json',
 				},
-			);
+			});
 			return response.data;
 		} catch (error: any) {
 			throw new Error(

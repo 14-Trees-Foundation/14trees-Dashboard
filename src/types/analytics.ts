@@ -6,6 +6,12 @@ export interface GiftCardSummaryKPIs {
 	pending_count: number;
 	total_trees: number;
 	avg_trees_per_card: number;
+	total_requests_delta: number | null;
+	total_trees_delta: number | null;
+	fulfilled_delta: number | null;
+	pending_delta: number | null;
+	corporate_delta: number | null;
+	personal_delta: number | null;
 }
 
 export interface GiftCardMonthlyEntry {

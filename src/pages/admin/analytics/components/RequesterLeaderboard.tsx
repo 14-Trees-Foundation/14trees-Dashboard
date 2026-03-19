@@ -27,7 +27,7 @@ interface RequesterLeaderboardProps {
 	loading: boolean;
 	sortBy: 'trees' | 'cards';
 	onSortChange: (sort: 'trees' | 'cards') => void;
-	onRowClick: (userId: number) => void;
+	onSelectUser: (id: number, type: 'user' | 'group') => void;
 	onExport?: () => void;
 	sectionLabel?: string;
 	typeFilter: 'all' | 'corporate' | 'personal';
@@ -65,14 +65,15 @@ const getAvatarStyles = (
 	}
 	if (requestType === 'Corporate') {
 		return {
-			bgcolor: ANALYTICS_COLORS.corporate,
-			color: ANALYTICS_COLORS.textOnDark,
+			bgcolor: '#1f3a1f',
+			color: '#9bc53d',
+			border: '1px solid #2d5a2d',
 		};
 	}
 	return {
-		bgcolor: ANALYTICS_COLORS.accentDark,
-		color: ANALYTICS_COLORS.accent,
-		border: `1px solid ${ANALYTICS_COLORS.accent}`,
+		bgcolor: '#1a2820',
+		color: '#9ba39d',
+		border: '1px solid #2a3832',
 	};
 };
 
@@ -86,7 +87,7 @@ const RequesterLeaderboard: React.FC<RequesterLeaderboardProps> = ({
 	loading,
 	sortBy,
 	onSortChange,
-	onRowClick,
+	onSelectUser,
 	onExport,
 	sectionLabel,
 	typeFilter,
@@ -185,6 +186,18 @@ const RequesterLeaderboard: React.FC<RequesterLeaderboardProps> = ({
 		onExport?.();
 	};
 
+	const handleEntrySelect = (entry: GiftCardLeaderboardEntry) => {
+		const isCorporate = entry.request_type === 'Corporate';
+		const rawTargetId = (isCorporate ? entry.group_id : entry.user_id) as
+			| number
+			| null;
+		if (rawTargetId === null || rawTargetId === undefined || rawTargetId < 0) {
+			return;
+		}
+		const targetType: 'user' | 'group' = isCorporate ? 'group' : 'user';
+		onSelectUser(rawTargetId, targetType);
+	};
+
 	return (
 		<Card>
 			<CardContent>
@@ -197,7 +210,7 @@ const RequesterLeaderboard: React.FC<RequesterLeaderboardProps> = ({
 							letterSpacing: '0.1em',
 							fontWeight: 600,
 							textTransform: 'uppercase',
-							color: isLightMode ? '#6b7280' : 'rgba(255,255,255,0.45)',
+							color: isLightMode ? '#6b7280' : '#9ba39d',
 							mb: 1,
 						}}
 					>
@@ -229,7 +242,7 @@ const RequesterLeaderboard: React.FC<RequesterLeaderboardProps> = ({
 							<Typography
 								variant="body2"
 								sx={{
-									color: isLightMode ? '#6b7280' : 'rgba(255,255,255,0.6)',
+									color: isLightMode ? '#6b7280' : '#9ba39d',
 								}}
 							>
 								{leaderboardSubtitle}
@@ -315,7 +328,7 @@ const RequesterLeaderboard: React.FC<RequesterLeaderboardProps> = ({
 									  };
 							return (
 								<Box
-									key={entry.user_id}
+									key={`${entry.request_type}-${entry.user_id}-${entry.group_id}`}
 									sx={{
 										display: 'flex',
 										alignItems: 'center',
@@ -335,7 +348,7 @@ const RequesterLeaderboard: React.FC<RequesterLeaderboardProps> = ({
 										},
 										'&:last-of-type': { borderBottom: 'none' },
 									}}
-									onClick={() => onRowClick(entry.user_id)}
+									onClick={() => handleEntrySelect(entry)}
 								>
 									<Typography
 										variant="caption"

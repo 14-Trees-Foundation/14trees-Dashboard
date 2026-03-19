@@ -214,13 +214,16 @@ export function useGiftCardLeaderboard(
 	return { data, loading, error };
 }
 
-export function useRequesterProfile(userId: number | null) {
+export function useRequesterProfile(
+	id: number | null,
+	type: 'user' | 'group' = 'user',
+) {
 	const [data, setData] = useState<GiftCardRequesterProfile | null>(null);
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState<string | null>(null);
 
 	useEffect(() => {
-		if (userId === null) {
+		if (id === null) {
 			setData(null);
 			setLoading(false);
 			setError(null);
@@ -232,7 +235,7 @@ export function useRequesterProfile(userId: number | null) {
 		setLoading(true);
 		setError(null);
 		apiClient
-			.getGiftCardRequesterProfile(userId)
+			.getGiftCardRequesterProfile(id, type)
 			.then((res) => {
 				setData(res);
 				setLoading(false);
@@ -241,7 +244,7 @@ export function useRequesterProfile(userId: number | null) {
 				setError(err.message || 'Failed to load');
 				setLoading(false);
 			});
-	}, [userId]);
+	}, [id, type]);
 
 	return { data, loading, error };
 }

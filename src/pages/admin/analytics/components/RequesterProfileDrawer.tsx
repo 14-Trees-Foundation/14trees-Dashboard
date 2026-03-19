@@ -21,7 +21,10 @@ import {
 import CloseIcon from '@mui/icons-material/Close';
 import FileDownloadOutlinedIcon from '@mui/icons-material/FileDownloadOutlined';
 import { useRequesterProfile } from '../hooks/useGiftCardAnalyticsV2';
-import { GiftCardLeaderboardEntry } from '../../../../types/analytics';
+import {
+	GiftCardLeaderboardEntry,
+	GiftCardRecentHistoryEntry,
+} from '../../../../types/analytics';
 import {
 	ANALYTICS_COLORS,
 	LIGHT_ANALYTICS_COLORS,
@@ -38,6 +41,7 @@ import {
 interface RequesterProfileDrawerProps {
 	userId: number | null;
 	onClose: () => void;
+	profileType?: 'user' | 'group';
 }
 
 const getInitials = (name: string): string => {
@@ -187,8 +191,9 @@ const getStatusPill = (status: string, isLight: boolean) => {
 const RequesterProfileDrawer: React.FC<RequesterProfileDrawerProps> = ({
 	userId,
 	onClose,
+	profileType = 'user',
 }) => {
-	const { data: profile, loading } = useRequesterProfile(userId);
+	const { data: profile, loading } = useRequesterProfile(userId, profileType);
 	const requester = profile?.stats;
 	const recentHistory = profile?.recent_history ?? [];
 	const requesterDisplayName = requester
@@ -196,11 +201,26 @@ const RequesterProfileDrawer: React.FC<RequesterProfileDrawerProps> = ({
 			? requester.group_name ?? 'Unknown Group'
 			: requester.requester_name
 		: '';
+	const requesterWithMeta = requester as
+		| (GiftCardLeaderboardEntry & { group_type?: string | null })
+		| undefined;
+	const drawerDisplayName =
+		profileType === 'group'
+			? requesterWithMeta?.group_name ?? requesterWithMeta?.requester_name ?? ''
+			: requesterDisplayName;
+	const drawerSubtitle =
+		profileType === 'group' && requesterWithMeta
+			? ['Corporate', requesterWithMeta.group_type].filter(Boolean).join(' · ')
+			: null;
 
 	const avgCardsPerRequest =
 		requester && requester.total_requests > 0
 			? (requester.total_cards / requester.total_requests).toFixed(1)
 			: '0.0';
+	const historyRows = recentHistory as Array<
+		GiftCardRecentHistoryEntry & { requester_name?: string | null }
+	>;
+	const showRequesterColumn = profileType === 'group';
 
 	const formatNumber = (value?: number): string => {
 		if (value === undefined) return '—';
@@ -218,12 +238,13 @@ const RequesterProfileDrawer: React.FC<RequesterProfileDrawerProps> = ({
 	const theme = useTheme();
 	const isLightMode = theme.palette.mode === 'light';
 	const palette = isLightMode ? LIGHT_ANALYTICS_COLORS : ANALYTICS_COLORS;
+	const headerName = drawerDisplayName || requesterDisplayName;
 
 	const handleExportHistory = () => {
-		if (!profile || profile.recent_history.length === 0) {
+		if (!profile || historyRows.length === 0) {
 			return;
 		}
-		const headers = [
+		const baseHeaders = [
 			'Request ID',
 			'Occasion',
 			'No of Cards',
@@ -231,22 +252,28 @@ const RequesterProfileDrawer: React.FC<RequesterProfileDrawerProps> = ({
 			'Gifted On',
 			'Created At',
 		];
-		const rows = profile.recent_history.map((history) => [
-			history.request_id ?? history.id,
-			mapEventType(history.occasion ?? ''),
-			history.no_of_cards,
-			formatStatus(history.status ?? ''),
-			history.gifted_on
-				? new Date(history.gifted_on).toLocaleDateString('en-GB')
-				: '',
-			history.created_at
-				? new Date(history.created_at).toLocaleDateString('en-GB')
-				: '',
-		]);
-		const filename = formatFilename(
-			`${requesterDisplayName || 'requester'}_request_history`,
-			{},
-		);
+		const headers = showRequesterColumn
+			? [baseHeaders[0], 'Requester', ...baseHeaders.slice(1)]
+			: baseHeaders;
+		const rows = historyRows.map((history) => {
+			const baseRow = [
+				history.request_id ?? history.id,
+				mapEventType(history.occasion ?? ''),
+				history.no_of_cards,
+				formatStatus(history.status ?? ''),
+				history.gifted_on
+					? new Date(history.gifted_on).toLocaleDateString('en-GB')
+					: '',
+				history.created_at
+					? new Date(history.created_at).toLocaleDateString('en-GB')
+					: '',
+			];
+			return showRequesterColumn
+				? [baseRow[0], history.requester_name ?? '', ...baseRow.slice(1)]
+				: baseRow;
+		});
+		const exportName = drawerDisplayName || requesterDisplayName || 'requester';
+		const filename = formatFilename(`${exportName}_request_history`, {});
 		downloadCSV(arrayToCSV(headers, rows), filename);
 	};
 
@@ -257,7 +284,7 @@ const RequesterProfileDrawer: React.FC<RequesterProfileDrawerProps> = ({
 			onClose={onClose}
 			PaperProps={{
 				sx: {
-					width: { xs: '100vw', sm: 400 },
+					width: { xs: '100vw', sm: 480 },
 					background: isLightMode ? '#ffffff' : palette.pageBg,
 					borderLeft: isLightMode
 						? '1px solid #eeebe4'
@@ -292,7 +319,7 @@ const RequesterProfileDrawer: React.FC<RequesterProfileDrawerProps> = ({
 									...getAvatarStyles(requester?.request_type, isLightMode),
 								}}
 							>
-								{requester ? getInitials(requesterDisplayName) : ''}
+								{headerName ? getInitials(headerName) : ''}
 							</Avatar>
 						)}
 						<Box>
@@ -310,35 +337,46 @@ const RequesterProfileDrawer: React.FC<RequesterProfileDrawerProps> = ({
 											color: isLightMode ? '#1a1a1a' : palette.textOnDark,
 										}}
 									>
-										{requesterDisplayName}
+										{headerName}
 									</Typography>
-									{requester && (
-										<Chip
-											size="small"
-											label={requester.request_type}
-											variant="outlined"
+									{profileType === 'group' && drawerSubtitle ? (
+										<Typography
+											variant="body2"
 											sx={{
-												borderColor:
-													requester.request_type === 'Corporate'
-														? isLightMode
-															? '#bbf7d0'
-															: alpha(palette.corporate, 0.5)
-														: isLightMode
-														? '#eeebe4'
-														: alpha(palette.personal, 0.5),
-												color:
-													requester.request_type === 'Corporate'
-														? isLightMode
-															? '#2d5a2d'
-															: palette.corporate
-														: isLightMode
-														? '#8bc34a'
-														: palette.personal,
-												backgroundColor: isLightMode
-													? '#ffffff'
-													: 'transparent',
+												color: isLightMode ? '#6b7280' : palette.textMuted,
 											}}
-										/>
+										>
+											{drawerSubtitle}
+										</Typography>
+									) : (
+										requester && (
+											<Chip
+												size="small"
+												label={requester.request_type}
+												variant="outlined"
+												sx={{
+													borderColor:
+														requester.request_type === 'Corporate'
+															? isLightMode
+																? '#bbf7d0'
+																: alpha(palette.corporate, 0.5)
+															: isLightMode
+															? '#eeebe4'
+															: alpha(palette.personal, 0.5),
+													color:
+														requester.request_type === 'Corporate'
+															? isLightMode
+																? '#2d5a2d'
+																: palette.corporate
+															: isLightMode
+															? '#8bc34a'
+															: palette.personal,
+													backgroundColor: isLightMode
+														? '#ffffff'
+														: 'transparent',
+												}}
+											/>
+										)
 									)}
 								</>
 							)}
@@ -349,9 +387,9 @@ const RequesterProfileDrawer: React.FC<RequesterProfileDrawerProps> = ({
 						size="small"
 						aria-label="close profile"
 						sx={{
-							color: isLightMode ? '#9ca3af' : alpha(palette.textOnDark, 0.6),
+							color: isLightMode ? '#9ca3af' : '#6b7a6e',
 							'&:hover': {
-								color: isLightMode ? '#1a1a1a' : palette.accent,
+								color: isLightMode ? '#1a1a1a' : '#e8ebe9',
 							},
 						}}
 					>
@@ -362,7 +400,7 @@ const RequesterProfileDrawer: React.FC<RequesterProfileDrawerProps> = ({
 				<Divider
 					sx={{
 						mb: 3,
-						borderColor: isLightMode ? '#eeebe4' : alpha(palette.accent, 0.2),
+						borderColor: isLightMode ? '#eeebe4' : '#2a3832',
 					}}
 				/>
 
@@ -377,12 +415,10 @@ const RequesterProfileDrawer: React.FC<RequesterProfileDrawerProps> = ({
 						<Grid item xs={6} key={stat.label}>
 							<Card
 								sx={{
-									background: isLightMode
-										? '#faf9f6'
-										: alpha(palette.accent, 0.08),
+									background: isLightMode ? '#faf9f6' : '#1f2f24',
 									border: isLightMode
 										? '1px solid #eeebe4'
-										: `1px solid ${alpha(palette.accent, 0.2)}`,
+										: '1px solid #2a3832',
 									borderRadius: '8px',
 								}}
 							>
@@ -490,7 +526,7 @@ const RequesterProfileDrawer: React.FC<RequesterProfileDrawerProps> = ({
 						variant="outlined"
 						startIcon={<FileDownloadOutlinedIcon fontSize="small" />}
 						onClick={handleExportHistory}
-						disabled={!profile || profile.recent_history.length === 0}
+						disabled={!profile || historyRows.length === 0}
 						sx={{
 							color: isLightMode ? '#6b7280' : palette.accent,
 							borderColor: isLightMode ? '#eeebe4' : alpha(palette.accent, 0.4),
@@ -520,7 +556,7 @@ const RequesterProfileDrawer: React.FC<RequesterProfileDrawerProps> = ({
 					</Box>
 				)}
 
-				{!loading && recentHistory.length > 0 && (
+				{!loading && historyRows.length > 0 && (
 					<Box sx={{ maxHeight: 360, overflowY: 'auto' }}>
 						<Table size="small" stickyHeader>
 							<TableHead>
@@ -540,6 +576,23 @@ const RequesterProfileDrawer: React.FC<RequesterProfileDrawerProps> = ({
 									>
 										Occasion
 									</TableCell>
+									{showRequesterColumn && (
+										<TableCell
+											sx={{
+												color: isLightMode
+													? '#9ca3af'
+													: alpha(palette.textOnDark, 0.5),
+												borderBottom: isLightMode
+													? '1px solid #eeebe4'
+													: `1px solid ${alpha(palette.accent, 0.2)}`,
+												fontSize: '0.7rem',
+												textTransform: 'uppercase',
+												letterSpacing: '0.08em',
+											}}
+										>
+											Requester
+										</TableCell>
+									)}
 									<TableCell
 										sx={{
 											color: isLightMode
@@ -588,9 +641,9 @@ const RequesterProfileDrawer: React.FC<RequesterProfileDrawerProps> = ({
 								</TableRow>
 							</TableHead>
 							<TableBody>
-								{recentHistory.map((row) => (
+								{historyRows.map((row) => (
 									<TableRow
-										key={row.id}
+										key={row.id ?? row.request_id}
 										hover
 										sx={{
 											'&:hover': {
@@ -616,6 +669,24 @@ const RequesterProfileDrawer: React.FC<RequesterProfileDrawerProps> = ({
 												{mapEventType(row.occasion)}
 											</Typography>
 										</TableCell>
+										{showRequesterColumn && (
+											<TableCell
+												sx={{
+													borderBottom: isLightMode
+														? '1px solid #f0ede6'
+														: `1px solid ${alpha(palette.accent, 0.08)}`,
+												}}
+											>
+												<Typography
+													variant="body2"
+													sx={{
+														color: isLightMode ? '#1a1a1a' : palette.textOnDark,
+													}}
+												>
+													{row.requester_name ?? '—'}
+												</Typography>
+											</TableCell>
+										)}
 										<TableCell
 											sx={{
 												borderBottom: isLightMode
@@ -685,7 +756,7 @@ const RequesterProfileDrawer: React.FC<RequesterProfileDrawerProps> = ({
 					</Box>
 				)}
 
-				{!loading && recentHistory.length === 0 && (
+				{!loading && historyRows.length === 0 && (
 					<Typography
 						sx={{ color: isLightMode ? '#9ca3af' : palette.textMuted }}
 					>

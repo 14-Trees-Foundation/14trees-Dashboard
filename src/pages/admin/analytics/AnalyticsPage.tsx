@@ -53,6 +53,7 @@ const AnalyticsContent: React.FC<AnalyticsContentProps> = ({
 			id="analytics-page"
 			sx={{
 				...analyticsPageSx,
+				m: -2,
 				minHeight: '100vh',
 				backgroundColor: theme.palette.background.default,
 				transition: 'background-color 0.2s ease',
@@ -63,7 +64,7 @@ const AnalyticsContent: React.FC<AnalyticsContentProps> = ({
 				sx={{
 					backgroundColor: isLightMode
 						? 'transparent'
-						: theme.palette.background.paper,
+						: theme.palette.background.default,
 					border: isLightMode ? 'none' : `1px solid ${theme.palette.divider}`,
 					borderBottom: isLightMode ? 'none' : undefined,
 					borderRadius: isLightMode ? 0 : 2,

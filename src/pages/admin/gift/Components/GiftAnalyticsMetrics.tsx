@@ -7,6 +7,8 @@ interface MetricCardProps {
 	value: number;
 	note?: string;
 	decimals?: number;
+	delta?: number | null;
+	invertDelta?: boolean;
 	indicator: {
 		width: string;
 		color: string;
@@ -19,6 +21,8 @@ const MetricCard: React.FC<MetricCardProps> = ({
 	value,
 	note,
 	decimals = 0,
+	delta,
+	invertDelta = false,
 	indicator,
 	isHero = false,
 }) => {
@@ -29,16 +33,36 @@ const MetricCard: React.FC<MetricCardProps> = ({
 		: '0';
 
 	const theme = useTheme();
+	const isDark = theme.palette.mode === 'dark';
 	const heroCardStyles = isHero
 		? {
-				background: '#1c3a1c',
+				background: '#0f1912',
 				border: 'none',
-				boxShadow: '0 4px 20px rgba(28,58,28,0.25)',
+				boxShadow: '0 4px 20px rgba(15,25,18,0.4)',
 		  }
 		: {};
 
+	const hoverBg = isHero
+		? isDark
+			? '#172218'
+			: '#f0f4f0'
+		: isDark
+		? '#223830'
+		: '#f5f7f5';
+
 	return (
-		<Card sx={{ height: '100%', ...heroCardStyles }}>
+		<Card
+			sx={{
+				height: '100%',
+				...heroCardStyles,
+				transition:
+					'transform 0.22s ease, background 0.22s ease, box-shadow 0.22s ease',
+				'&:hover': {
+					transform: 'scale(1.025)',
+					background: hoverBg,
+				},
+			}}
+		>
 			<CardContent sx={{ p: '18px 20px !important' }}>
 				<Typography
 					variant="body2"
@@ -58,8 +82,8 @@ const MetricCard: React.FC<MetricCardProps> = ({
 				<Typography
 					component="div"
 					sx={{
-						fontSize: '1.5rem',
-						fontWeight: 300,
+						fontSize: '2.4rem',
+						fontWeight: 700,
 						letterSpacing: '-0.02em',
 						lineHeight: 1.2,
 						color: isHero ? '#ffffff' : theme.palette.text.primary,
@@ -67,6 +91,39 @@ const MetricCard: React.FC<MetricCardProps> = ({
 				>
 					{formattedValue}
 				</Typography>
+				{delta !== null && delta !== undefined && (
+					<Typography
+						component="span"
+						sx={{
+							display: 'inline-block',
+							fontSize: '0.7rem',
+							fontWeight: 500,
+							mt: '4px',
+							px: '6px',
+							py: '1px',
+							borderRadius: '4px',
+							color:
+								delta === 0
+									? isHero
+										? 'rgba(255,255,255,0.5)'
+										: theme.palette.text.disabled
+									: delta > 0 !== invertDelta
+									? '#2e7d32'
+									: '#c62828',
+							backgroundColor:
+								delta === 0
+									? 'transparent'
+									: delta > 0 !== invertDelta
+									? 'rgba(46,125,50,0.12)'
+									: 'rgba(198,40,40,0.10)',
+						}}
+					>
+						{delta === 0 ? '–' : delta > 0 !== invertDelta ? '▲' : '▼'}{' '}
+						{delta !== 0
+							? `${delta > 0 ? '+' : ''}${delta.toFixed(1)}% vs last month`
+							: '0% vs last month'}
+					</Typography>
+				)}
 				{note && (
 					<Typography
 						sx={{
@@ -173,6 +230,7 @@ const GiftAnalyticsMetrics: React.FC<GiftAnalyticsMetricsProps> = ({
 			title: 'Total Requests',
 			value: data.total_requests,
 			note: 'All gift card requests',
+			delta: data.total_requests_delta,
 			indicator: {
 				width: '100%',
 				color: isLight ? 'rgba(139,195,74,0.6)' : theme.palette.divider,
@@ -183,30 +241,36 @@ const GiftAnalyticsMetrics: React.FC<GiftAnalyticsMetricsProps> = ({
 			title: 'Total Trees',
 			value: data.total_trees,
 			note: 'Trees gifted',
+			delta: data.total_trees_delta,
 			indicator: { width: '85%', color: theme.palette.divider },
 		},
 		{
 			title: 'Fulfilled Requests',
 			value: data.fulfilled_count,
 			note: 'Completed cards',
+			delta: data.fulfilled_delta,
 			indicator: { width: '91%', color: theme.palette.success.main },
 		},
 		{
 			title: 'Pending Requests',
 			value: data.pending_count,
 			note: 'Awaiting fulfillment',
+			delta: data.pending_delta,
+			invertDelta: true,
 			indicator: { width: '9%', color: theme.palette.warning.main },
 		},
 		{
 			title: 'Corporate Requests',
 			value: data.corporate_count,
 			note: `${requestCorporatePercentage.toFixed(1)}% of total`,
+			delta: data.corporate_delta,
 			indicator: { width: '41%', color: theme.palette.primary.main },
 		},
 		{
 			title: 'Personal Requests',
 			value: data.personal_count,
 			note: `${requestPersonalPercentage.toFixed(1)}% of total`,
+			delta: data.personal_delta,
 			indicator: { width: '59%', color: theme.palette.secondary.main },
 		},
 	];
