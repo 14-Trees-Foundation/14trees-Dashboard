@@ -1,4 +1,5 @@
 import React from 'react';
+import { MutableRefObject } from 'react';
 import {
 	Dialog,
 	DialogActions,
@@ -7,7 +8,11 @@ import {
 	Button,
 	Typography,
 } from '@mui/material';
-import { GiftCard, GiftRequestUser } from '../../../../types/gift_card';
+import {
+	GiftCard,
+	GiftRequestUser,
+	PlotAutoBookRule,
+} from '../../../../types/gift_card';
 import { Plot } from '../../../../types/plot';
 import PlotSelection from '../Components/PlotSelection';
 import EmailConfirmationModal from './EmailConfirmationModal';
@@ -31,6 +36,8 @@ interface GiftCardModalsProps {
 	setSelectedPlots: (plots: Plot[]) => void;
 	selectedTrees: any[];
 	setSelectedTrees: (trees: any[]) => void;
+	plotAutoBookRulesRef: MutableRefObject<PlotAutoBookRule[]>;
+	plotAutoBookValidationErrorRef: MutableRefObject<string | null>;
 	bookNonGiftable: boolean;
 	setBookNonGiftable: (value: boolean) => void;
 	diversify: boolean;
@@ -124,6 +131,8 @@ export const GiftCardModals: React.FC<GiftCardModalsProps> = ({
 	setSelectedPlots,
 	selectedTrees,
 	setSelectedTrees,
+	plotAutoBookRulesRef,
+	plotAutoBookValidationErrorRef,
 	bookNonGiftable,
 	setBookNonGiftable,
 	diversify,
@@ -212,6 +221,8 @@ export const GiftCardModals: React.FC<GiftCardModalsProps> = ({
 							onBookAllHabitsChange={(value) => {
 								setBookAllHabits(value);
 							}}
+							plotAutoBookRulesRef={plotAutoBookRulesRef}
+							plotAutoBookValidationErrorRef={plotAutoBookValidationErrorRef}
 						/>
 					)}
 				</DialogContent>
@@ -227,6 +238,11 @@ export const GiftCardModals: React.FC<GiftCardModalsProps> = ({
 						onClick={handlePlotSelectionSubmit}
 						color="success"
 						variant="contained"
+						disabled={
+							!!selectedGiftCard &&
+							selectedTrees.length === 0 &&
+							selectedPlots.length === 0
+						}
 					>
 						Confirm
 					</Button>
