@@ -29,6 +29,16 @@ import { Order } from '../../types/common';
 import { View } from '../../types/viewPermission';
 import { GiftRedeemTransaction } from '../../types/gift_redeem_transaction';
 import { Campaign } from '../../types/campaign';
+import {
+	GiftCardLeaderboardEntry,
+	GiftCardMonthlyEntry,
+	GiftCardOccasionsResponse,
+	GiftCardRequesterProfile,
+	GiftCardSourcesResponse,
+	GiftCardSummaryKPIs,
+	GiftCardTreeDistribution,
+	GiftCardYearlyEntry,
+} from '../../types/analytics';
 import { SortOrder } from 'antd/es/table/interface';
 import { GridFilterItem } from '@mui/x-data-grid';
 import EventsApiClient from '../events/eventsApiClient';
@@ -54,6 +64,23 @@ class ApiClient {
 		});
 		const token = localStorage.getItem('token');
 		this.token = token ? JSON.parse(token) : null;
+	}
+
+	private appendGiftCardAnalyticsFilters(
+		params: URLSearchParams,
+		year?: number,
+		type?: 'all' | 'corporate' | 'personal',
+		source?: 'all' | 'website' | 'manual',
+	) {
+		if (typeof year === 'number' && year > 0) {
+			params.append('year', year.toString());
+		}
+		if (type && type !== 'all') {
+			params.append('type', type);
+		}
+		if (source && source !== 'all') {
+			params.append('source', source);
+		}
 	}
 
 	async authenticateToken(
@@ -2652,6 +2679,213 @@ class ApiClient {
 		}
 	}
 
+	async getGiftCardSummaryKPIs(
+		year?: number,
+		source?: 'all' | 'website' | 'manual',
+	): Promise<GiftCardSummaryKPIs> {
+		const params = new URLSearchParams();
+		this.appendGiftCardAnalyticsFilters(params, year, undefined, source);
+		const queryString = params.toString();
+		const url = `/analytics/giftcards/summary${
+			queryString ? `?${queryString}` : ''
+		}`;
+		try {
+			const response = await this.api.get<GiftCardSummaryKPIs>(url, {
+				headers: {
+					'x-access-token': this.token,
+					'content-type': 'application/json',
+				},
+			});
+			return response.data;
+		} catch (error: any) {
+			throw new Error(
+				`Failed to fetch gift card summary KPIs: ${error.message}`,
+			);
+		}
+	}
+
+	async getGiftCardMonthly(
+		year?: number,
+		source?: 'all' | 'website' | 'manual',
+	): Promise<GiftCardMonthlyEntry[]> {
+		const params = new URLSearchParams();
+		if (year !== undefined) params.append('year', year.toString());
+		if (source && source !== 'all') params.append('source', source);
+		const queryString = params.toString();
+		const url = `/analytics/giftcards/monthly${
+			queryString ? `?${queryString}` : ''
+		}`;
+
+		try {
+			const response = await this.api.get<GiftCardMonthlyEntry[]>(url, {
+				headers: {
+					'x-access-token': this.token,
+					'content-type': 'application/json',
+				},
+			});
+			return response.data;
+		} catch (error: any) {
+			throw new Error(
+				`Failed to fetch gift card monthly analytics: ${error.message}`,
+			);
+		}
+	}
+
+	async getGiftCardYearly(
+		type?: 'all' | 'corporate' | 'personal',
+		source?: 'all' | 'website' | 'manual',
+	): Promise<GiftCardYearlyEntry[]> {
+		const params = new URLSearchParams();
+		if (type && type !== 'all') params.append('type', type);
+		if (source && source !== 'all') params.append('source', source);
+		const queryString = params.toString();
+		const url = `/analytics/giftcards/yearly${
+			queryString ? `?${queryString}` : ''
+		}`;
+
+		try {
+			const response = await this.api.get<GiftCardYearlyEntry[]>(url, {
+				headers: {
+					'x-access-token': this.token,
+					'content-type': 'application/json',
+				},
+			});
+			return response.data;
+		} catch (error: any) {
+			throw new Error(
+				`Failed to fetch gift card yearly analytics: ${error.message}`,
+			);
+		}
+	}
+
+	async getGiftCardOccasions(
+		type?: 'all' | 'corporate' | 'personal',
+		source?: 'all' | 'website' | 'manual',
+	): Promise<GiftCardOccasionsResponse> {
+		const params = new URLSearchParams();
+		if (type !== undefined) params.append('type', type);
+		if (source && source !== 'all') params.append('source', source);
+		const queryString = params.toString();
+		const url = `/analytics/giftcards/occasions${
+			queryString ? `?${queryString}` : ''
+		}`;
+
+		try {
+			const response = await this.api.get<GiftCardOccasionsResponse>(url, {
+				headers: {
+					'x-access-token': this.token,
+					'content-type': 'application/json',
+				},
+			});
+			return response.data;
+		} catch (error: any) {
+			throw new Error(
+				`Failed to fetch gift card occasions analytics: ${error.message}`,
+			);
+		}
+	}
+
+	async getGiftCardTreeDistribution(
+		year?: number,
+		type?: 'all' | 'corporate' | 'personal',
+		source?: 'all' | 'website' | 'manual',
+	): Promise<GiftCardTreeDistribution> {
+		const params = new URLSearchParams();
+		this.appendGiftCardAnalyticsFilters(params, year, type, source);
+		const queryString = params.toString();
+		const url = `/analytics/giftcards/tree-distribution${
+			queryString ? `?${queryString}` : ''
+		}`;
+		try {
+			const response = await this.api.get<GiftCardTreeDistribution>(url, {
+				headers: {
+					'x-access-token': this.token,
+					'content-type': 'application/json',
+				},
+			});
+			return response.data;
+		} catch (error: any) {
+			throw new Error(
+				`Failed to fetch gift card tree distribution: ${error.message}`,
+			);
+		}
+	}
+
+	async getGiftCardSources(
+		year?: number,
+		type?: 'all' | 'corporate' | 'personal',
+	): Promise<GiftCardSourcesResponse> {
+		const params = new URLSearchParams();
+		this.appendGiftCardAnalyticsFilters(params, year, type);
+		const queryString = params.toString();
+		const url = `/analytics/giftcards/sources${
+			queryString ? `?${queryString}` : ''
+		}`;
+		try {
+			const response = await this.api.get<GiftCardSourcesResponse>(url, {
+				headers: {
+					'x-access-token': this.token,
+					'content-type': 'application/json',
+				},
+			});
+			return response.data;
+		} catch (error: any) {
+			throw new Error(`Failed to fetch gift card sources: ${error.message}`);
+		}
+	}
+
+	async getGiftCardLeaderboard(
+		sortBy?: 'trees' | 'cards',
+		limit?: number,
+		year?: number,
+		type?: 'all' | 'corporate' | 'personal',
+		source?: 'all' | 'website' | 'manual',
+	): Promise<GiftCardLeaderboardEntry[]> {
+		const params = new URLSearchParams();
+		if (sortBy !== undefined) params.append('sortBy', sortBy);
+		if (limit !== undefined) params.append('limit', limit.toString());
+		this.appendGiftCardAnalyticsFilters(params, year, type, source);
+		const queryString = params.toString();
+		const url = `/analytics/giftcards/leaderboard${
+			queryString ? `?${queryString}` : ''
+		}`;
+
+		try {
+			const response = await this.api.get<GiftCardLeaderboardEntry[]>(url, {
+				headers: {
+					'x-access-token': this.token,
+					'content-type': 'application/json',
+				},
+			});
+			return response.data;
+		} catch (error: any) {
+			throw new Error(
+				`Failed to fetch gift card leaderboard: ${error.message}`,
+			);
+		}
+	}
+
+	async getGiftCardRequesterProfile(
+		id: number,
+		type: 'user' | 'group' = 'user',
+	): Promise<GiftCardRequesterProfile> {
+		try {
+			const params = new URLSearchParams({ type });
+			const url = `/analytics/giftcards/requester/${id}?${params.toString()}`;
+			const response = await this.api.get<GiftCardRequesterProfile>(url, {
+				headers: {
+					'x-access-token': this.token,
+					'content-type': 'application/json',
+				},
+			});
+			return response.data;
+		} catch (error: any) {
+			throw new Error(
+				`Failed to fetch gift card requester profile: ${error.message}`,
+			);
+		}
+	}
+
 	async createGiftCardRequestV2(
 		group_id: number,
 		sponsor_name: string,
@@ -4169,9 +4403,7 @@ class ApiClient {
 	/**
 	 * Admin Role Management
 	 */
-	async grantAdminRole(
-		userId: number,
-	): Promise<{
+	async grantAdminRole(userId: number): Promise<{
 		message: string;
 		user: { id: number; name: string; email: string; roles: string[] };
 	}> {
@@ -4197,9 +4429,7 @@ class ApiClient {
 		}
 	}
 
-	async revokeAdminRole(
-		userId: number,
-	): Promise<{
+	async revokeAdminRole(userId: number): Promise<{
 		message: string;
 		user: { id: number; name: string; email: string; roles: string[] };
 	}> {
@@ -4254,9 +4484,7 @@ class ApiClient {
 		}
 	}
 
-	async getUserRoles(
-		userId: number,
-	): Promise<{
+	async getUserRoles(userId: number): Promise<{
 		user: { id: number; name: string; email: string; roles: string[] };
 	}> {
 		try {
@@ -4274,6 +4502,73 @@ class ApiClient {
 				);
 			}
 			throw new Error('Failed to get user roles');
+		}
+	}
+
+	async streamAISummary(
+		year: number,
+		force: boolean,
+		onChunk: (text: string) => void,
+		onDone: () => void,
+		onError: (err: string) => void,
+	): Promise<void> {
+		const params = new URLSearchParams({ year: String(year) });
+		if (force) params.set('force', 'true');
+
+		const baseURL = this.api.defaults.baseURL ?? '';
+		const url = `${baseURL}/analytics/giftcards/ai-summary?${params.toString()}`;
+
+		try {
+			const response = await fetch(url, {
+				method: 'GET',
+				headers: {
+					'Content-Type': 'application/json',
+					'x-access-token': this.token ?? '',
+					'x-user-id': localStorage.getItem('userId') ?? '',
+				},
+			});
+			if (!response.ok || !response.body) {
+				onError(`Request failed: ${response.status}`);
+				return;
+			}
+
+			const reader = response.body.getReader();
+			const decoder = new TextDecoder();
+			let buffer = '';
+
+			while (true) {
+				const { done, value } = await reader.read();
+				if (done) break;
+
+				buffer += decoder.decode(value, { stream: true });
+				const lines = buffer.split('\n');
+				buffer = lines.pop() ?? '';
+
+				for (const line of lines) {
+					const trimmed = line.trim();
+					if (!trimmed.startsWith('data:')) continue;
+					const payload = trimmed.slice(5).trim();
+
+					if (payload === '[DONE]') {
+						onDone();
+						return;
+					}
+					if (payload === '[ERROR]') {
+						onError('AI summary stream error');
+						return;
+					}
+
+					try {
+						onChunk((JSON.parse(payload) as { text: string }).text);
+					} catch {
+						// ignore malformed SSE lines
+					}
+				}
+			}
+
+			onDone();
+		} catch (err) {
+			onError(err instanceof Error ? err.message : 'Unknown stream error');
 		}
 	}
 
