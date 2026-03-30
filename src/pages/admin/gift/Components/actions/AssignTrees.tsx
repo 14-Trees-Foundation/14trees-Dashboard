@@ -322,6 +322,7 @@ const AssignTrees: React.FC<AssignTreesProps> = ({
 						columns={columns}
 						totalRecords={filteredTrees.length}
 						page={page}
+						pageSize={pageSize}
 						onPaginationChange={handlePaginationChange}
 						onDownload={handleDownload}
 						footer
