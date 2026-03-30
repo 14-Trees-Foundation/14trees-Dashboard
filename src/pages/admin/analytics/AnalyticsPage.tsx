@@ -13,6 +13,7 @@ import Brightness4Icon from '@mui/icons-material/Brightness4';
 import Brightness7Icon from '@mui/icons-material/Brightness7';
 import { ThemeProvider, useTheme } from '@mui/material/styles';
 import GiftCardAnalysisTab from './GiftCardAnalysisTab';
+import DonationAnalysisTab from './DonationAnalysisTab';
 import { analyticsPageSx } from './analyticsTheme';
 import { darkTheme, lightAnalyticsTheme } from '../../../theme';
 
@@ -97,16 +98,6 @@ const AnalyticsContent: React.FC<AnalyticsContentProps> = ({
 							>
 								Analytics
 							</Typography>
-							<Typography
-								variant="body2"
-								sx={{
-									mb: 1,
-									color: isLightMode ? '#9ca3af' : 'text.secondary',
-								}}
-							>
-								Dedicated analytics workspace. Gift card analysis is the default
-								tab and more analytics tabs can be added here later.
-							</Typography>
 						</Box>
 						<Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
 							<Tooltip
@@ -188,11 +179,18 @@ const AnalyticsContent: React.FC<AnalyticsContentProps> = ({
 							},
 						}}
 					>
-						<Tab label="GIFT CARD ANALYSIS" />
+						<Tab label="DONATIONS" />
+						<Tab label="GIFT CARD" />
 					</Tabs>
 
-					<TabPanel value={activeTab} index={0}>
+					<TabPanel value={activeTab} index={1}>
 						<GiftCardAnalysisTab
+							themeMode={themeMode}
+							onToggleTheme={onToggleTheme}
+						/>
+					</TabPanel>
+					<TabPanel value={activeTab} index={0}>
+						<DonationAnalysisTab
 							themeMode={themeMode}
 							onToggleTheme={onToggleTheme}
 						/>

@@ -122,3 +122,115 @@ export interface AISummaryResponse {
 	fromCache: boolean;
 	generatedAt: Date;
 }
+
+export interface DonationSummaryKPIs {
+	total_donations: number;
+	total_amount: number;
+	total_trees: number;
+	active_donors: number;
+	avg_donation: number;
+	tree_fulfillment_rate: number;
+	monetary_only_count: number;
+	monetary_only_amount: number;
+	total_donations_delta: number | null;
+	total_amount_delta: number | null;
+	total_trees_delta: number | null;
+	active_donors_delta: number | null;
+}
+
+export interface DonationMonthlyEntry {
+	month: number;
+	month_name: string;
+	amount: number;
+	trees: number;
+	donation_count: number;
+}
+
+export interface DonationYearlyEntry {
+	year: number;
+	amount: number;
+	trees: number;
+	donation_count: number;
+}
+
+export interface DonorLeaderboardEntry {
+	user_id: number | null;
+	donor_name: string | null;
+	group_id: number | null;
+	group_name: string | null;
+	group_type: string | null;
+	donor_type: 'personal' | 'corporate';
+	total_donations: number;
+	total_amount: number;
+	total_trees: number;
+	avg_donation: number;
+	first_donation_at: string;
+	last_donation_at: string;
+	years_active: number[];
+	payment_methods: string[] | null;
+}
+
+export interface DonorLeaderboardResponse {
+	personal: DonorLeaderboardEntry[];
+	corporate: DonorLeaderboardEntry[];
+}
+
+export interface DonorRecentDonation {
+	source_type: string;
+	source_id: number;
+	amount_received: number;
+	trees_count: number | null;
+	donation_date: string;
+	donation_method: string | null;
+	status: string;
+	donor_name: string | null;
+	group_name: string | null;
+}
+
+export interface DonorProfileStats {
+	total_donations: number;
+	total_amount: number;
+	total_trees: number;
+	avg_donation: number;
+	first_donation_at: string;
+	last_donation_at: string;
+	years_active: number[];
+	payment_methods: string[] | null;
+}
+
+export interface DonorProfile {
+	stats: DonorProfileStats;
+	recent_donations: DonorRecentDonation[];
+}
+
+export interface PaymentMethodEntry {
+	method: string;
+	count: number;
+	total_amount: number;
+	pct: number;
+}
+
+export interface DonationTypeSplit {
+	both_count: number;
+	trees_only_count: number;
+	money_only_count: number;
+	total: number;
+	both_pct: number;
+	trees_only_pct: number;
+	money_only_pct: number;
+}
+
+export interface DonationFrequency {
+	once: number;
+	two_to_three: number;
+	four_to_six: number;
+	seven_plus: number;
+}
+
+export interface RepeatDonorStats {
+	repeat_donors: number;
+	total_donors: number;
+	repeat_rate: number;
+	avg_lifetime_donations: number;
+	avg_lifetime_value: number;
+}

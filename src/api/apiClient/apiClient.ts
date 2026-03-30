@@ -38,6 +38,15 @@ import {
 	GiftCardSummaryKPIs,
 	GiftCardTreeDistribution,
 	GiftCardYearlyEntry,
+	DonationSummaryKPIs,
+	DonationMonthlyEntry,
+	DonationYearlyEntry,
+	DonorLeaderboardResponse,
+	DonorProfile,
+	PaymentMethodEntry,
+	DonationTypeSplit,
+	DonationFrequency,
+	RepeatDonorStats,
 } from '../../types/analytics';
 import { SortOrder } from 'antd/es/table/interface';
 import { GridFilterItem } from '@mui/x-data-grid';
@@ -81,6 +90,18 @@ class ApiClient {
 		if (source && source !== 'all') {
 			params.append('source', source);
 		}
+	}
+
+	private appendDonationFilters(
+		params: URLSearchParams,
+		year?: number,
+		type?: 'all' | 'personal' | 'corporate',
+		source?: 'all' | 'website' | 'manual',
+	) {
+		if (typeof year === 'number' && year > 0)
+			params.append('year', year.toString());
+		if (type && type !== 'all') params.append('type', type);
+		if (source && source !== 'all') params.append('source', source);
 	}
 
 	async authenticateToken(
@@ -4600,6 +4621,231 @@ class ApiClient {
 	// ===== EVENTS API DELEGATION =====
 	get events() {
 		return new EventsApiClient();
+	}
+
+	// ===== DONATION ANALYTICS =====
+
+	async getDonationSummaryKPIs(
+		year?: number,
+		type?: 'all' | 'personal' | 'corporate',
+		source?: 'all' | 'website' | 'manual',
+	): Promise<DonationSummaryKPIs> {
+		const params = new URLSearchParams();
+		this.appendDonationFilters(params, year, type, source);
+		const qs = params.toString();
+		const url = `/analytics/donations/summary${qs ? `?${qs}` : ''}`;
+		try {
+			const response = await this.api.get<{
+				success: boolean;
+				data: DonationSummaryKPIs;
+			}>(url, {
+				headers: {
+					'x-access-token': this.token,
+					'content-type': 'application/json',
+				},
+			});
+			return response.data.data;
+		} catch (error: any) {
+			throw new Error(
+				`Failed to fetch donation summary KPIs: ${error.message}`,
+			);
+		}
+	}
+
+	async getDonationMonthly(
+		year?: number,
+		type?: 'all' | 'personal' | 'corporate',
+		source?: 'all' | 'website' | 'manual',
+	): Promise<DonationMonthlyEntry[]> {
+		const params = new URLSearchParams();
+		this.appendDonationFilters(params, year, type, source);
+		const qs = params.toString();
+		const url = `/analytics/donations/monthly${qs ? `?${qs}` : ''}`;
+		try {
+			const response = await this.api.get<{
+				success: boolean;
+				data: DonationMonthlyEntry[];
+			}>(url, {
+				headers: {
+					'x-access-token': this.token,
+					'content-type': 'application/json',
+				},
+			});
+			return response.data.data;
+		} catch (error: any) {
+			throw new Error(`Failed to fetch monthly donations: ${error.message}`);
+		}
+	}
+
+	async getDonationYearly(
+		type?: 'all' | 'personal' | 'corporate',
+		source?: 'all' | 'website' | 'manual',
+	): Promise<DonationYearlyEntry[]> {
+		const params = new URLSearchParams();
+		this.appendDonationFilters(params, undefined, type, source);
+		const qs = params.toString();
+		const url = `/analytics/donations/yearly${qs ? `?${qs}` : ''}`;
+		try {
+			const response = await this.api.get<{
+				success: boolean;
+				data: DonationYearlyEntry[];
+			}>(url, {
+				headers: {
+					'x-access-token': this.token,
+					'content-type': 'application/json',
+				},
+			});
+			return response.data.data;
+		} catch (error: any) {
+			throw new Error(`Failed to fetch yearly donations: ${error.message}`);
+		}
+	}
+
+	async getDonorLeaderboard(
+		sortBy?: string,
+		limit?: number,
+		year?: number,
+		type?: 'all' | 'personal' | 'corporate',
+		source?: 'all' | 'website' | 'manual',
+	): Promise<DonorLeaderboardResponse> {
+		const params = new URLSearchParams();
+		if (sortBy) params.append('sortBy', sortBy);
+		if (limit) params.append('limit', limit.toString());
+		this.appendDonationFilters(params, year, type, source);
+		const qs = params.toString();
+		const url = `/analytics/donations/leaderboard${qs ? `?${qs}` : ''}`;
+		try {
+			const response = await this.api.get<{
+				success: boolean;
+				data: DonorLeaderboardResponse;
+			}>(url, {
+				headers: {
+					'x-access-token': this.token,
+					'content-type': 'application/json',
+				},
+			});
+			return response.data.data;
+		} catch (error: any) {
+			throw new Error(`Failed to fetch donor leaderboard: ${error.message}`);
+		}
+	}
+
+	async getDonorProfile(
+		id: number,
+		profileType: 'user' | 'group' = 'user',
+	): Promise<DonorProfile> {
+		const url = `/analytics/donations/donor/${id}?profileType=${profileType}`;
+		try {
+			const response = await this.api.get<{
+				success: boolean;
+				data: DonorProfile;
+			}>(url, {
+				headers: {
+					'x-access-token': this.token,
+					'content-type': 'application/json',
+				},
+			});
+			return response.data.data;
+		} catch (error: any) {
+			throw new Error(`Failed to fetch donor profile: ${error.message}`);
+		}
+	}
+
+	async getPaymentMethods(
+		year?: number,
+		type?: 'all' | 'personal' | 'corporate',
+	): Promise<PaymentMethodEntry[]> {
+		const params = new URLSearchParams();
+		this.appendDonationFilters(params, year, type);
+		const qs = params.toString();
+		const url = `/analytics/donations/payment-methods${qs ? `?${qs}` : ''}`;
+		try {
+			const response = await this.api.get<{
+				success: boolean;
+				data: PaymentMethodEntry[];
+			}>(url, {
+				headers: {
+					'x-access-token': this.token,
+					'content-type': 'application/json',
+				},
+			});
+			return response.data.data;
+		} catch (error: any) {
+			throw new Error(`Failed to fetch payment methods: ${error.message}`);
+		}
+	}
+
+	async getDonationTypeSplit(
+		year?: number,
+		type?: 'all' | 'personal' | 'corporate',
+		source?: 'all' | 'website' | 'manual',
+	): Promise<DonationTypeSplit> {
+		const params = new URLSearchParams();
+		this.appendDonationFilters(params, year, type, source);
+		const qs = params.toString();
+		const url = `/analytics/donations/type-split${qs ? `?${qs}` : ''}`;
+		try {
+			const response = await this.api.get<{
+				success: boolean;
+				data: DonationTypeSplit;
+			}>(url, {
+				headers: {
+					'x-access-token': this.token,
+					'content-type': 'application/json',
+				},
+			});
+			return response.data.data;
+		} catch (error: any) {
+			throw new Error(`Failed to fetch donation type split: ${error.message}`);
+		}
+	}
+
+	async getDonationFrequency(
+		year?: number,
+		type?: 'all' | 'personal' | 'corporate',
+	): Promise<DonationFrequency> {
+		const params = new URLSearchParams();
+		this.appendDonationFilters(params, year, type);
+		const qs = params.toString();
+		const url = `/analytics/donations/frequency${qs ? `?${qs}` : ''}`;
+		try {
+			const response = await this.api.get<{
+				success: boolean;
+				data: DonationFrequency;
+			}>(url, {
+				headers: {
+					'x-access-token': this.token,
+					'content-type': 'application/json',
+				},
+			});
+			return response.data.data;
+		} catch (error: any) {
+			throw new Error(`Failed to fetch donation frequency: ${error.message}`);
+		}
+	}
+
+	async getRepeatDonorStats(
+		year?: number,
+		type?: 'all' | 'personal' | 'corporate',
+	): Promise<RepeatDonorStats> {
+		const params = new URLSearchParams();
+		this.appendDonationFilters(params, year, type);
+		const qs = params.toString();
+		const url = `/analytics/donations/repeat-stats${qs ? `?${qs}` : ''}`;
+		try {
+			const response = await this.api.get<{
+				success: boolean;
+				data: RepeatDonorStats;
+			}>(url, {
+				headers: {
+					'x-access-token': this.token,
+					'content-type': 'application/json',
+				},
+			});
+			return response.data.data;
+		} catch (error: any) {
+			throw new Error(`Failed to fetch repeat donor stats: ${error.message}`);
+		}
 	}
 }
 
