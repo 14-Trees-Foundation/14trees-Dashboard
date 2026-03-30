@@ -188,8 +188,48 @@ const AssignTrees: React.FC<AssignTreesProps> = ({
 		setPageSize(pageSize);
 	};
 
+	const filteredTrees = trees.filter((tree) => {
+		return Object.values(filters).every((filter) => {
+			const value = String((tree as any)[filter.columnField] ?? '');
+			const filterValue = filter.value;
+
+			switch (filter.operatorValue) {
+				case 'contains':
+					return value
+						.toLowerCase()
+						.includes(String(filterValue ?? '').toLowerCase());
+				case 'equals':
+					return (
+						value.toLowerCase() === String(filterValue ?? '').toLowerCase()
+					);
+				case 'startsWith':
+					return value
+						.toLowerCase()
+						.startsWith(String(filterValue ?? '').toLowerCase());
+				case 'endsWith':
+					return value
+						.toLowerCase()
+						.endsWith(String(filterValue ?? '').toLowerCase());
+				case 'isEmpty':
+					return !value || value === '';
+				case 'isNotEmpty':
+					return !!value && value !== '';
+				case 'isAnyOf': {
+					const values = Array.isArray(filterValue)
+						? filterValue
+						: [filterValue];
+					return values.some(
+						(v) => value.toLowerCase() === String(v ?? '').toLowerCase(),
+					);
+				}
+				default:
+					return true;
+			}
+		});
+	});
+
 	const handleDownload = async () => {
-		return trees;
+		return filteredTrees;
 	};
 
 	const handleUserSelection = (selectedUser: GiftRequestUser) => {
@@ -278,9 +318,9 @@ const AssignTrees: React.FC<AssignTreesProps> = ({
 				<Box>
 					<GeneralTable
 						loading={loading}
-						rows={trees.slice(page * pageSize, (page + 1) * pageSize)}
+						rows={filteredTrees.slice(page * pageSize, (page + 1) * pageSize)}
 						columns={columns}
-						totalRecords={trees.length}
+						totalRecords={filteredTrees.length}
 						page={page}
 						onPaginationChange={handlePaginationChange}
 						onDownload={handleDownload}
