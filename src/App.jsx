@@ -51,6 +51,10 @@ import GCInventory from './pages/admin/Inventory/GCInventory';
 import { DonationComponent } from './pages/admin/donation/Donation';
 import CSRAdminPage from './pages/admin/csr/CSRAdminPage';
 import Campaigns from './pages/admin/campaign/Campaign';
+import { RbacUsers } from './pages/admin/rbac/RbacUsers';
+import { RbacRoles } from './pages/admin/rbac/RbacRoles';
+import { RbacPermissions } from './pages/admin/rbac/RbacPermissions';
+import { RbacAuditLog } from './pages/admin/rbac/RbacAuditLog';
 import { CampaignsPage } from './pages/admin/campaign/CampaignsPage';
 import { ReferralsPage } from './pages/admin/campaign/ReferralsPage';
 import { ReferralUserPage } from './pages/admin/campaign/ReferralUserPage';
@@ -162,6 +166,10 @@ function App() {
 						<Route path="tree-cards" element={<GiftTreesComponent />} />
 						<Route path="donations" element={<DonationComponent />} />
 						<Route path="corporate-dashboard" element={<CSRAdminPage />} />
+						<Route path="rbac/users" element={<RbacUsers />} />
+						<Route path="rbac/roles" element={<RbacRoles />} />
+						<Route path="rbac/permissions" element={<RbacPermissions />} />
+						<Route path="rbac/audit-log" element={<RbacAuditLog />} />
 						<Route path="forms" element={<Forms />}>
 							<Route path="assigntrees" element={<AssignTree />}></Route>
 							<Route path="addorg" element={<AddOrg />}></Route>
