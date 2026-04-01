@@ -4989,6 +4989,28 @@ class ApiClient {
 		return response.data;
 	}
 
+	async getUserSites(userId: number): Promise<{ sites: any[] }> {
+		const response = await this.api.get(`/admin/users/${userId}/sites`, {
+			headers: { 'x-access-token': this.token },
+		});
+		return response.data;
+	}
+
+	async assignUserSites(userId: number, siteIds: string[]): Promise<any> {
+		const response = await this.api.post(
+			`/admin/users/${userId}/sites`,
+			{ site_ids: siteIds },
+			{ headers: { 'x-access-token': this.token } },
+		);
+		return response.data;
+	}
+
+	async removeUserSite(userId: number, siteId: string): Promise<void> {
+		await this.api.delete(`/admin/users/${userId}/sites/${siteId}`, {
+			headers: { 'x-access-token': this.token },
+		});
+	}
+
 	async getAuditLogs(params: {
 		page?: number;
 		limit?: number;

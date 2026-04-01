@@ -217,25 +217,7 @@ export const AdminLeftDrawer = () => {
 			displayName: 'Staff Roles',
 			logo: AdminPanelSettingsIcon,
 			display: canManageRbac,
-			path: 'rbac/users',
-		},
-		{
-			displayName: 'Roles',
-			logo: AdminPanelSettingsIcon,
-			display: canManageRbac,
-			path: 'rbac/roles',
-		},
-		{
-			displayName: 'Permissions',
-			logo: AdminPanelSettingsIcon,
-			display: canManageRbac,
-			path: 'rbac/permissions',
-		},
-		{
-			displayName: 'Audit Log',
-			logo: AdminPanelSettingsIcon,
-			display: canManageRbac,
-			path: 'rbac/audit-log',
+			path: 'rbac',
 		},
 		// {
 		//   displayName: "Images",
