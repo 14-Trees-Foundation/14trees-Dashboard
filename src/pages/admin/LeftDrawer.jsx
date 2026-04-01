@@ -34,6 +34,7 @@ import {
 	PAGE_SUB_SECTIONS,
 	getSubSectionsForPage,
 } from '../../config/pageSubSections';
+import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
 import VersionDisplay from '../../components/VersionDisplay';
 
 export const AdminLeftDrawer = () => {
@@ -43,6 +44,7 @@ export const AdminLeftDrawer = () => {
 	const location = useLocation();
 	const navigate = useNavigate();
 	const [isAdmin, setIsAdmin] = useState(false);
+	const [canManageRbac, setCanManageRbac] = useState(false);
 	const [expandedMenus, setExpandedMenus] = useState({});
 	const [activeSubSection, setActiveSubSection] = useState(null);
 	const [drawerWidth, setDrawerWidth] = useState(200); // Default width
@@ -71,6 +73,19 @@ export const AdminLeftDrawer = () => {
 			}
 		} catch (error) {
 			navigate('/login');
+		}
+
+		// Check RBAC permission from localStorage
+		try {
+			const rbacPerms = JSON.parse(
+				localStorage.getItem('rbacPermissions') || '[]',
+			);
+			const hasAcManage = rbacPerms.some(
+				(p) => p.resource === 'access_control' && p.action === 'manage',
+			);
+			setCanManageRbac(hasAcManage);
+		} catch {
+			// ignore
 		}
 	}, []);
 
@@ -194,6 +209,15 @@ export const AdminLeftDrawer = () => {
 			logo: Analytics,
 			display: isAdmin,
 			path: 'corporate-dashboard',
+		},
+		{
+			divider: canManageRbac,
+		},
+		{
+			displayName: 'Staff Roles',
+			logo: AdminPanelSettingsIcon,
+			display: canManageRbac,
+			path: 'rbac',
 		},
 		// {
 		//   displayName: "Images",

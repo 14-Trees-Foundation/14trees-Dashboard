@@ -4847,6 +4847,197 @@ class ApiClient {
 			throw new Error(`Failed to fetch repeat donor stats: ${error.message}`);
 		}
 	}
+
+	// ── RBAC ─────────────────────────────────────────────────────────────────
+
+	async getRbacRoles(): Promise<any> {
+		const response = await this.api.get('/rbac/roles', {
+			headers: { 'x-access-token': this.token },
+		});
+		return response.data;
+	}
+
+	async createRbacRole(data: {
+		id: string;
+		name: string;
+		description?: string;
+	}): Promise<any> {
+		const response = await this.api.post('/rbac/roles', data, {
+			headers: { 'x-access-token': this.token },
+		});
+		return response.data;
+	}
+
+	async updateRbacRole(
+		id: string,
+		data: { name?: string; description?: string; is_active?: boolean },
+	): Promise<any> {
+		const response = await this.api.put(`/rbac/roles/${id}`, data, {
+			headers: { 'x-access-token': this.token },
+		});
+		return response.data;
+	}
+
+	async deleteRbacRole(id: string): Promise<void> {
+		await this.api.delete(`/rbac/roles/${id}`, {
+			headers: { 'x-access-token': this.token },
+		});
+	}
+
+	async getRolePermissions(roleId: string): Promise<any> {
+		const response = await this.api.get(`/rbac/roles/${roleId}/permissions`, {
+			headers: { 'x-access-token': this.token },
+		});
+		return response.data;
+	}
+
+	async setRolePermissions(
+		roleId: string,
+		permissionIds: number[],
+	): Promise<any> {
+		const response = await this.api.put(
+			`/rbac/roles/${roleId}/permissions`,
+			{ permission_ids: permissionIds },
+			{
+				headers: { 'x-access-token': this.token },
+			},
+		);
+		return response.data;
+	}
+
+	async getRbacPermissions(): Promise<any> {
+		const response = await this.api.get('/rbac/permissions', {
+			headers: { 'x-access-token': this.token },
+		});
+		return response.data;
+	}
+
+	async createRbacPermission(data: {
+		resource: string;
+		action: string;
+		description?: string;
+	}): Promise<any> {
+		const response = await this.api.post('/rbac/permissions', data, {
+			headers: { 'x-access-token': this.token },
+		});
+		return response.data;
+	}
+
+	async updateRbacPermission(id: number, description: string): Promise<any> {
+		const response = await this.api.put(
+			`/rbac/permissions/${id}`,
+			{ description },
+			{
+				headers: { 'x-access-token': this.token },
+			},
+		);
+		return response.data;
+	}
+
+	async deleteRbacPermission(id: number, force = false): Promise<any> {
+		const response = await this.api.delete(
+			`/rbac/permissions/${id}?force=${force}`,
+			{
+				headers: { 'x-access-token': this.token },
+			},
+		);
+		return response.data;
+	}
+
+	async getRbacUsers(params: {
+		page?: number;
+		limit?: number;
+		role_id?: string;
+	}): Promise<any> {
+		const query = new URLSearchParams();
+		if (params.page) query.append('page', String(params.page));
+		if (params.limit) query.append('limit', String(params.limit));
+		if (params.role_id) query.append('role_id', params.role_id);
+		const response = await this.api.get(`/rbac/users?${query}`, {
+			headers: { 'x-access-token': this.token },
+		});
+		return response.data;
+	}
+
+	async getRbacUser(userId: number): Promise<any> {
+		const response = await this.api.get(`/rbac/users/${userId}`, {
+			headers: { 'x-access-token': this.token },
+		});
+		return response.data;
+	}
+
+	async assignUserRole(
+		userId: number,
+		roleId: string,
+		reason: string,
+	): Promise<any> {
+		const response = await this.api.put(
+			`/rbac/users/${userId}/role`,
+			{ role_id: roleId, reason },
+			{
+				headers: { 'x-access-token': this.token },
+			},
+		);
+		return response.data;
+	}
+
+	async removeUserRole(userId: number, reason: string): Promise<any> {
+		const response = await this.api.delete(`/rbac/users/${userId}/role`, {
+			data: { reason },
+			headers: { 'x-access-token': this.token },
+		});
+		return response.data;
+	}
+
+	async getUserSites(userId: number): Promise<{ sites: any[] }> {
+		const response = await this.api.get(`/admin/users/${userId}/sites`, {
+			headers: { 'x-access-token': this.token },
+		});
+		return response.data;
+	}
+
+	async assignUserSites(userId: number, siteIds: string[]): Promise<any> {
+		const response = await this.api.post(
+			`/admin/users/${userId}/sites`,
+			{ site_ids: siteIds },
+			{ headers: { 'x-access-token': this.token } },
+		);
+		return response.data;
+	}
+
+	async removeUserSite(userId: number, siteId: string): Promise<void> {
+		await this.api.delete(`/admin/users/${userId}/sites/${siteId}`, {
+			headers: { 'x-access-token': this.token },
+		});
+	}
+
+	async getAuditLogs(params: {
+		page?: number;
+		limit?: number;
+		user_id?: number;
+		changed_by?: string;
+		start_date?: string;
+		end_date?: string;
+		action_type?: string;
+	}): Promise<any> {
+		const query = new URLSearchParams();
+		Object.entries(params).forEach(([k, v]) => {
+			if (v !== undefined) query.append(k, String(v));
+		});
+		const response = await this.api.get(`/rbac/audit-log?${query}`, {
+			headers: { 'x-access-token': this.token },
+		});
+		return response.data;
+	}
+
+	getAuditLogExportUrl(params: Record<string, any>): string {
+		const baseURL = import.meta.env.VITE_APP_BASE_URL || '';
+		const query = new URLSearchParams();
+		Object.entries(params).forEach(([k, v]) => {
+			if (v !== undefined) query.append(k, String(v));
+		});
+		return `${baseURL}/rbac/audit-log/export?${query}`;
+	}
 }
 
 // new function to fetch data form localStorage
