@@ -1111,6 +1111,87 @@ class ApiClient {
 		}
 	}
 
+	async getTreeAuditSessions(
+		offset: number = 0,
+		limit: number = 20,
+		search?: string,
+		status?: string,
+	): Promise<any> {
+		const params = new URLSearchParams({
+			offset: offset.toString(),
+			limit: limit.toString(),
+			form_type: 'tree_audit',
+		});
+
+		if (search?.trim()) params.append('search', search.trim());
+		if (status && status !== 'all') params.append('status', status);
+
+		try {
+			const response = await this.api.get(`/v1/sessions?${params.toString()}`, {
+				headers: { 'x-access-token': this.token },
+			});
+			return response.data;
+		} catch (error: any) {
+			if (error.response) {
+				throw new Error(error.response.data.message);
+			}
+			throw new Error(`Failed to fetch tree audit sessions: ${error.message}`);
+		}
+	}
+
+	async getTreeAuditSessionDetail(sessionId: string): Promise<any> {
+		try {
+			const response = await this.api.get(`/v1/sessions/${sessionId}`, {
+				headers: { 'x-access-token': this.token },
+				params: { form_type: 'tree_audit' },
+			});
+			return response.data;
+		} catch (error: any) {
+			if (error.response) {
+				throw new Error(error.response.data.message);
+			}
+			throw new Error(
+				`Failed to fetch tree audit session detail: ${error.message}`,
+			);
+		}
+	}
+
+	async batchVerifyTreeSnapshots(
+		items: Array<{ id: number; sapling_id: string }>,
+	): Promise<any> {
+		try {
+			const response = await this.api.patch(
+				`/tree-snapshots/batch-verify`,
+				{ items },
+				{ headers: { 'x-access-token': this.token } },
+			);
+			return response.data;
+		} catch (error: any) {
+			if (error.response) {
+				throw new Error(error.response.data.message);
+			}
+			throw new Error(
+				`Failed to batch verify tree snapshots: ${error.message}`,
+			);
+		}
+	}
+
+	async rejectTreeSnapshot(id: number, reason: string): Promise<any> {
+		try {
+			const response = await this.api.patch(
+				`/tree-snapshots/${id}/reject`,
+				{ reason },
+				{ headers: { 'x-access-token': this.token } },
+			);
+			return response.data;
+		} catch (error: any) {
+			if (error.response) {
+				throw new Error(error.response.data.message);
+			}
+			throw new Error(`Failed to reject tree snapshot: ${error.message}`);
+		}
+	}
+
 	/*
         Model- OnsiteStaff: CRUD Operations/Apis for Onsite staff
     */
