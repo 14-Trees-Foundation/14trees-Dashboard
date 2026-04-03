@@ -11,7 +11,7 @@ import {
 	Typography,
 } from '@mui/material';
 import { GridFilterItem } from '@mui/x-data-grid';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import ApiClient from '../../../../../api/apiClient/apiClient';
 import { toast } from 'react-toastify';
 import { GiftCardUser, GiftRequestUser } from '../../../../../types/gift_card';
@@ -95,6 +95,52 @@ const AssignTrees: React.FC<AssignTreesProps> = ({
 		setPage(0);
 		setFilters(filters);
 	};
+
+	const filteredTrees = useMemo(() => {
+		const normalizeValue = (value: unknown) =>
+			value === null || value === undefined
+				? ''
+				: String(value).trim().toLowerCase();
+
+		return trees.filter((tree) =>
+			Object.values(filters).every((filter) => {
+				const operator = filter.operatorValue ?? 'contains';
+				const filterValue = filter.value;
+				const treeValue = normalizeValue(
+					tree[filter.columnField as keyof GiftCardUser],
+				);
+
+				switch (operator) {
+					case 'equals':
+						return treeValue === normalizeValue(filterValue);
+					case 'startsWith':
+						return treeValue.startsWith(normalizeValue(filterValue));
+					case 'endsWith':
+						return treeValue.endsWith(normalizeValue(filterValue));
+					case 'isEmpty':
+						return treeValue === '';
+					case 'isNotEmpty':
+						return treeValue !== '';
+					case 'isAnyOf': {
+						const values = Array.isArray(filterValue)
+							? filterValue.map(normalizeValue)
+							: [normalizeValue(filterValue)];
+						return values.includes(treeValue);
+					}
+					case 'contains':
+					default:
+						return treeValue.includes(normalizeValue(filterValue));
+				}
+			}),
+		);
+	}, [trees, filters]);
+
+	useEffect(() => {
+		const maxPage = Math.max(0, Math.ceil(filteredTrees.length / pageSize) - 1);
+		if (page > maxPage) {
+			setPage(maxPage);
+		}
+	}, [filteredTrees.length, page, pageSize]);
 
 	const handleUnAssign = (selectedTree: GiftCardUser) => {
 		const idx = trees.findIndex((tree) => selectedTree.id === tree.id);
@@ -228,8 +274,9 @@ const AssignTrees: React.FC<AssignTreesProps> = ({
 		});
 	});
 
-	const handleDownload = async () => {
-		return filteredTrees;
+	const handlePaginationChange = (nextPage: number, nextPageSize: number) => {
+		setPage(nextPageSize !== pageSize ? 0 : nextPage - 1);
+		setPageSize(nextPageSize);
 	};
 
 	const handleUserSelection = (selectedUser: GiftRequestUser) => {
@@ -318,13 +365,13 @@ const AssignTrees: React.FC<AssignTreesProps> = ({
 				<Box>
 					<GeneralTable
 						loading={loading}
-						rows={filteredTrees.slice(page * pageSize, (page + 1) * pageSize)}
+						rows={filteredTrees}
 						columns={columns}
 						totalRecords={filteredTrees.length}
 						page={page}
 						pageSize={pageSize}
 						onPaginationChange={handlePaginationChange}
-						onDownload={handleDownload}
+						onDownload={async () => filteredTrees}
 						footer
 						tableName="Booked trees"
 					/>
