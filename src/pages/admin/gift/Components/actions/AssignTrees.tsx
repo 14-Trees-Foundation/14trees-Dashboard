@@ -229,51 +229,6 @@ const AssignTrees: React.FC<AssignTreesProps> = ({
 		},
 	];
 
-	const handlePaginationChange = (page: number, pageSize: number) => {
-		setPage(page - 1);
-		setPageSize(pageSize);
-	};
-
-	const filteredTrees = trees.filter((tree) => {
-		return Object.values(filters).every((filter) => {
-			const value = String((tree as any)[filter.columnField] ?? '');
-			const filterValue = filter.value;
-
-			switch (filter.operatorValue) {
-				case 'contains':
-					return value
-						.toLowerCase()
-						.includes(String(filterValue ?? '').toLowerCase());
-				case 'equals':
-					return (
-						value.toLowerCase() === String(filterValue ?? '').toLowerCase()
-					);
-				case 'startsWith':
-					return value
-						.toLowerCase()
-						.startsWith(String(filterValue ?? '').toLowerCase());
-				case 'endsWith':
-					return value
-						.toLowerCase()
-						.endsWith(String(filterValue ?? '').toLowerCase());
-				case 'isEmpty':
-					return !value || value === '';
-				case 'isNotEmpty':
-					return !!value && value !== '';
-				case 'isAnyOf': {
-					const values = Array.isArray(filterValue)
-						? filterValue
-						: [filterValue];
-					return values.some(
-						(v) => value.toLowerCase() === String(v ?? '').toLowerCase(),
-					);
-				}
-				default:
-					return true;
-			}
-		});
-	});
-
 	const handlePaginationChange = (nextPage: number, nextPageSize: number) => {
 		setPage(nextPageSize !== pageSize ? 0 : nextPage - 1);
 		setPageSize(nextPageSize);
