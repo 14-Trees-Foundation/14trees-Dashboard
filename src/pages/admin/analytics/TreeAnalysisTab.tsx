@@ -40,6 +40,7 @@ import {
 	useTreePlantTypesByPlot,
 } from './hooks/useTreeAnalytics';
 import { ANALYTICS_COLORS, analyticsSectionTitleSx } from './analyticsTheme';
+import { SortColumnHeader } from './SortColumnHeader';
 
 interface TreeAnalysisTabProps {
 	themeMode: 'dark' | 'light';
@@ -195,6 +196,18 @@ const TreeAnalysisTab: React.FC<TreeAnalysisTabProps> = ({ themeMode }) => {
 	const [debouncedInventorySearch, setDebouncedInventorySearch] = useState('');
 	const [expandedPlots, setExpandedPlots] = useState<Set<string>>(new Set());
 	const [expandAllMode, setExpandAllMode] = useState(false);
+	const [locationSortBy, setLocationSortBy] = useState<string>('total');
+	const [locationSortOrder, setLocationSortOrder] = useState<'asc' | 'desc'>(
+		'desc',
+	);
+	const [inventorySortBy, setInventorySortBy] = useState<string>('total');
+	const [inventorySortOrder, setInventorySortOrder] = useState<'asc' | 'desc'>(
+		'desc',
+	);
+	const [selectedAgeBucket, setSelectedAgeBucket] = useState<string | null>(
+		null,
+	);
+	const [drilldownOpen, setDrilldownOpen] = useState(false);
 	const locationPageSize = 10;
 	const availabilityPageSize = 10;
 
@@ -229,6 +242,9 @@ const TreeAnalysisTab: React.FC<TreeAnalysisTabProps> = ({ themeMode }) => {
 		district || undefined,
 		taluka || undefined,
 		village || undefined,
+		undefined,
+		locationSortBy,
+		locationSortOrder,
 	);
 	const districtFilterData = useTreesByLocation(
 		'district',
@@ -251,6 +267,7 @@ const TreeAnalysisTab: React.FC<TreeAnalysisTabProps> = ({ themeMode }) => {
 		taluka || undefined,
 		undefined,
 	);
+
 	const ageDistribution = useTreeAgeDistribution(
 		district || undefined,
 		taluka || undefined,
@@ -280,10 +297,43 @@ const TreeAnalysisTab: React.FC<TreeAnalysisTabProps> = ({ themeMode }) => {
 		availabilityPageNum,
 		10, // 10 plots per page; backend paginates by plot not by row
 		debouncedInventorySearch || undefined,
+		inventorySortBy,
+		inventorySortOrder,
 	);
 
 	const formatNumber = (n: number | undefined) =>
 		n !== undefined ? n.toLocaleString() : '0';
+
+	// Age bucket columns for Trees by Location
+	const ageBucketColumns = [
+		{ key: 'count_0_1yr', label: '0-1 yr' },
+		{ key: 'count_1_3yr', label: '1-3 yr' },
+		{ key: 'count_3_5yr', label: '3-5 yr' },
+		{ key: 'count_5plus', label: '5+ yr' },
+	];
+
+	// Handle sort column click - triggers backend fetch with sort params
+	const handleLocationSort = (columnKey: string) => {
+		if (locationSortBy === columnKey) {
+			// Toggle sort order
+			setLocationSortOrder(locationSortOrder === 'asc' ? 'desc' : 'asc');
+		} else {
+			// New column, sort descending
+			setLocationSortBy(columnKey);
+			setLocationSortOrder('desc');
+		}
+	};
+
+	const handleInventorySort = (columnKey: string) => {
+		if (inventorySortBy === columnKey) {
+			// Toggle sort order
+			setInventorySortOrder(inventorySortOrder === 'asc' ? 'desc' : 'asc');
+		} else {
+			// New column, sort descending
+			setInventorySortBy(columnKey);
+			setInventorySortOrder('desc');
+		}
+	};
 
 	const speciesForChart = useMemo(
 		() => (species.data ? species.data.slice(0, 10) : []),
@@ -323,7 +373,7 @@ const TreeAnalysisTab: React.FC<TreeAnalysisTabProps> = ({ themeMode }) => {
 		];
 	}, [villageFilterData.data]);
 
-	// Pagination for location table
+	// Data is already sorted by backend. Paginate client-side.
 	const locationData = byLocation.data || [];
 	const totalLocationPages = Math.ceil(locationData.length / locationPageSize);
 	const locationStartIdx = (locationPageNum - 1) * locationPageSize;
@@ -367,6 +417,7 @@ const TreeAnalysisTab: React.FC<TreeAnalysisTabProps> = ({ themeMode }) => {
 			});
 		});
 		const result = Array.from(plotMap.values());
+		// Data is already sorted by backend, no client-side sorting needed
 		return result;
 	}, [plantTypesByPlot.data]);
 
@@ -409,6 +460,8 @@ const TreeAnalysisTab: React.FC<TreeAnalysisTabProps> = ({ themeMode }) => {
 		setInventorySearch('');
 		setExpandedPlots(new Set());
 		setExpandAllMode(false);
+		setInventorySortBy('total');
+		setInventorySortOrder('desc');
 	}, [district, taluka, village, availabilityCategory]);
 
 	useEffect(() => {
@@ -654,37 +707,51 @@ const TreeAnalysisTab: React.FC<TreeAnalysisTabProps> = ({ themeMode }) => {
 					{ageDistribution.loading ? (
 						<Skeleton variant="rectangular" height={300} />
 					) : ageDistribution.data && ageDistribution.data.length > 0 ? (
-						<ResponsiveContainer width="100%" height={300}>
-							<BarChart data={ageDistribution.data}>
-								<CartesianGrid
-									strokeDasharray="3 3"
-									stroke={isDark ? '#2a3832' : '#e5e0d8'}
-								/>
-								<XAxis
-									dataKey="age_bucket"
-									stroke={isDark ? '#9ba39d' : '#6b7280'}
-								/>
-								<YAxis stroke={isDark ? '#9ba39d' : '#6b7280'} />
-								<Tooltip
-									contentStyle={{
-										background: isDark ? '#1a2820' : '#fff',
-										border: isDark ? '1px solid #2a3832' : '1px solid #e5e0d8',
-										color: isDark ? '#e8ebe9' : '#111827',
-									}}
-								/>
-								<Legend />
-								<Bar
-									dataKey="count"
-									fill={ANALYTICS_COLORS.accent}
-									name="Total"
-								/>
-								<Bar
-									dataKey="available"
-									fill={ANALYTICS_COLORS.positive}
-									name="Available"
-								/>
-							</BarChart>
-						</ResponsiveContainer>
+						<>
+							<ResponsiveContainer width="100%" height={300}>
+								<BarChart data={ageDistribution.data}>
+									<CartesianGrid
+										strokeDasharray="3 3"
+										stroke={isDark ? '#2a3832' : '#e5e0d8'}
+									/>
+									<XAxis
+										dataKey="age_bucket"
+										stroke={isDark ? '#9ba39d' : '#6b7280'}
+									/>
+									<YAxis stroke={isDark ? '#9ba39d' : '#6b7280'} />
+									<Tooltip
+										contentStyle={{
+											background: isDark ? '#1a2820' : '#fff',
+											border: isDark
+												? '1px solid #2a3832'
+												: '1px solid #e5e0d8',
+											color: isDark ? '#e8ebe9' : '#111827',
+										}}
+									/>
+									<Legend />
+									<Bar
+										dataKey="count"
+										fill={ANALYTICS_COLORS.accent}
+										name="Total"
+										onClick={(data: any) => {
+											setSelectedAgeBucket(data.age_bucket);
+											setDrilldownOpen(true);
+										}}
+										style={{ cursor: 'pointer' }}
+									/>
+									<Bar
+										dataKey="available"
+										fill={ANALYTICS_COLORS.positive}
+										name="Available"
+										onClick={(data: any) => {
+											setSelectedAgeBucket(data.age_bucket);
+											setDrilldownOpen(true);
+										}}
+										style={{ cursor: 'pointer' }}
+									/>
+								</BarChart>
+							</ResponsiveContainer>
+						</>
 					) : (
 						<Typography
 							sx={{
@@ -762,6 +829,7 @@ const TreeAnalysisTab: React.FC<TreeAnalysisTabProps> = ({ themeMode }) => {
 					sx={{
 						background: isDark ? '#1a2820' : '#fff',
 						border: isDark ? '1px solid #2a3832' : '1px solid #e5e0d8',
+						overflowX: 'auto',
 					}}
 				>
 					<Table>
@@ -782,33 +850,49 @@ const TreeAnalysisTab: React.FC<TreeAnalysisTabProps> = ({ themeMode }) => {
 								>
 									Location
 								</TableCell>
-								<TableCell
-									align="right"
-									sx={{
-										color: isDark ? '#9ba39d' : '#6b7280',
-										fontWeight: 600,
-									}}
-								>
-									Total
+								<TableCell align="right" sx={{ minWidth: 80 }}>
+									<SortColumnHeader
+										label="Total"
+										columnKey="total"
+										currentSortBy={locationSortBy}
+										currentSortOrder={locationSortOrder}
+										onSort={handleLocationSort}
+										isDark={isDark}
+									/>
 								</TableCell>
-								<TableCell
-									align="right"
-									sx={{
-										color: isDark ? '#9ba39d' : '#6b7280',
-										fontWeight: 600,
-									}}
-								>
-									Assigned
+								<TableCell align="right" sx={{ minWidth: 80 }}>
+									<SortColumnHeader
+										label="Assigned"
+										columnKey="assigned"
+										currentSortBy={locationSortBy}
+										currentSortOrder={locationSortOrder}
+										onSort={handleLocationSort}
+										isDark={isDark}
+									/>
 								</TableCell>
-								<TableCell
-									align="right"
-									sx={{
-										color: isDark ? '#9ba39d' : '#6b7280',
-										fontWeight: 600,
-									}}
-								>
-									Available
+								<TableCell align="right" sx={{ minWidth: 80 }}>
+									<SortColumnHeader
+										label="Available"
+										columnKey="available"
+										currentSortBy={locationSortBy}
+										currentSortOrder={locationSortOrder}
+										onSort={handleLocationSort}
+										isDark={isDark}
+									/>
 								</TableCell>
+								{/* Age bucket columns */}
+								{ageBucketColumns.map((col) => (
+									<TableCell key={col.key} align="right" sx={{ minWidth: 80 }}>
+										<SortColumnHeader
+											label={col.label}
+											columnKey={col.key}
+											currentSortBy={locationSortBy}
+											currentSortOrder={locationSortOrder}
+											onSort={handleLocationSort}
+											isDark={isDark}
+										/>
+									</TableCell>
+								))}
 							</TableRow>
 						</TableHead>
 						<TableBody>
@@ -827,6 +911,11 @@ const TreeAnalysisTab: React.FC<TreeAnalysisTabProps> = ({ themeMode }) => {
 										<TableCell>
 											<Skeleton />
 										</TableCell>
+										{ageBucketColumns.map((col) => (
+											<TableCell key={`skel_${col.key}`}>
+												<Skeleton />
+											</TableCell>
+										))}
 									</TableRow>
 								))
 							) : paginatedLocationData.length > 0 ? (
@@ -860,12 +949,22 @@ const TreeAnalysisTab: React.FC<TreeAnalysisTabProps> = ({ themeMode }) => {
 										>
 											{row.available}
 										</TableCell>
+										{/* Age bucket columns */}
+										{ageBucketColumns.map((col) => (
+											<TableCell
+												key={`${idx}_${col.key}`}
+												align="right"
+												sx={{ color: isDark ? '#e8ebe9' : '#111827' }}
+											>
+												{(row as any)[col.key] || 0}
+											</TableCell>
+										))}
 									</TableRow>
 								))
 							) : (
 								<TableRow>
 									<TableCell
-										colSpan={4}
+										colSpan={8}
 										sx={{
 											textAlign: 'center',
 											color: isDark ? '#9ba39d' : '#6b7280',
@@ -1101,32 +1200,35 @@ const TreeAnalysisTab: React.FC<TreeAnalysisTabProps> = ({ themeMode }) => {
 								>
 									Category
 								</TableCell>
-								<TableCell
-									align="right"
-									sx={{
-										color: isDark ? '#9ba39d' : '#6b7280',
-										fontWeight: 600,
-									}}
-								>
-									Total
+								<TableCell align="right" sx={{ minWidth: 80 }}>
+									<SortColumnHeader
+										label="Total"
+										columnKey="total"
+										currentSortBy={inventorySortBy}
+										currentSortOrder={inventorySortOrder}
+										onSort={handleInventorySort}
+										isDark={isDark}
+									/>
 								</TableCell>
-								<TableCell
-									align="right"
-									sx={{
-										color: isDark ? '#9ba39d' : '#6b7280',
-										fontWeight: 600,
-									}}
-								>
-									Available
+								<TableCell align="right" sx={{ minWidth: 80 }}>
+									<SortColumnHeader
+										label="Available"
+										columnKey="available"
+										currentSortBy={inventorySortBy}
+										currentSortOrder={inventorySortOrder}
+										onSort={handleInventorySort}
+										isDark={isDark}
+									/>
 								</TableCell>
-								<TableCell
-									align="right"
-									sx={{
-										color: isDark ? '#9ba39d' : '#6b7280',
-										fontWeight: 600,
-									}}
-								>
-									Giftable
+								<TableCell align="right" sx={{ minWidth: 80 }}>
+									<SortColumnHeader
+										label="Giftable"
+										columnKey="card_available"
+										currentSortBy={inventorySortBy}
+										currentSortOrder={inventorySortOrder}
+										onSort={handleInventorySort}
+										isDark={isDark}
+									/>
 								</TableCell>
 							</TableRow>
 						</TableHead>

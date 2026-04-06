@@ -54,6 +54,7 @@ import {
 	TreeInventoryEntry,
 	TreePlotPlantTypeEntry,
 	TreeAgeEntry,
+	TreeAgeLocationEntry,
 } from '../../types/analytics';
 import { SortOrder } from 'antd/es/table/interface';
 import { GridFilterItem } from '@mui/x-data-grid';
@@ -4893,6 +4894,8 @@ class ApiClient {
 		taluka?: string,
 		village?: string,
 		site_id?: number,
+		sortBy?: string,
+		sortOrder?: 'asc' | 'desc',
 	): Promise<TreeByLocationEntry[]> {
 		const params = new URLSearchParams();
 		if (level) params.append('level', level);
@@ -4901,6 +4904,8 @@ class ApiClient {
 		if (taluka) params.append('taluka', taluka);
 		if (village) params.append('village', village);
 		if (site_id !== undefined) params.append('site_id', String(site_id));
+		if (sortBy) params.append('sortBy', sortBy);
+		if (sortOrder) params.append('sortOrder', sortOrder);
 		const qs = params.toString();
 		const url = `/analytics/trees/by-location${qs ? `?${qs}` : ''}`;
 		try {
@@ -5051,6 +5056,57 @@ class ApiClient {
 		}
 	}
 
+	async getTreesByAgeAndLocation(
+		ageBucket: string,
+		district?: string,
+		taluka?: string,
+		village?: string,
+		site_id?: number,
+		page: number = 1,
+		limit: number = 10,
+	): Promise<{
+		data: TreeAgeLocationEntry[];
+		pagination: {
+			page: number;
+			limit: number;
+			total: number;
+			totalPages: number;
+		};
+	}> {
+		const params = new URLSearchParams();
+		params.append('age_bucket', ageBucket);
+		if (district) params.append('district', district);
+		if (taluka) params.append('taluka', taluka);
+		if (village) params.append('village', village);
+		if (site_id !== undefined) params.append('site_id', String(site_id));
+		params.append('page', String(page));
+		params.append('limit', String(limit));
+		const qs = params.toString();
+		const url = `/analytics/trees/by-age-location${qs ? `?${qs}` : ''}`;
+		try {
+			const response = await this.api.get<{
+				success: boolean;
+				data: TreeAgeLocationEntry[];
+				pagination: {
+					page: number;
+					limit: number;
+					total: number;
+					totalPages: number;
+				};
+			}>(url, {
+				headers: {
+					'x-access-token': this.token,
+					'content-type': 'application/json',
+				},
+			});
+			return { data: response.data.data, pagination: response.data.pagination };
+		} catch (error: any) {
+			throw new Error(
+				`Failed to fetch trees by age and location: ${error.message}`,
+			);
+		}
+	}
+
 	async getTreePlantTypesByPlot(
 		district?: string,
 		taluka?: string,
@@ -5061,6 +5117,8 @@ class ApiClient {
 		page: number = 1,
 		limit: number = 10,
 		search?: string,
+		sortBy?: string,
+		sortOrder?: 'asc' | 'desc',
 	): Promise<{
 		data: TreePlotPlantTypeEntry[];
 		pagination: {
@@ -5080,6 +5138,8 @@ class ApiClient {
 		if (search) params.append('search', search);
 		params.append('page', String(page));
 		params.append('limit', String(limit));
+		if (sortBy) params.append('sortBy', sortBy);
+		if (sortOrder) params.append('sortOrder', sortOrder);
 		const qs = params.toString();
 		const url = `/analytics/trees/plot-plant-types${qs ? `?${qs}` : ''}`;
 		try {

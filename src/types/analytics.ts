@@ -308,3 +308,16 @@ export interface TreeAgeEntry {
 	available: number;
 	assigned: number;
 }
+
+export interface TreeAgeLocationEntry {
+	age_bucket: string;
+	district: string;
+	taluka: string;
+	village: string;
+	site_name: string;
+	plot_name: string;
+	site_category: string;
+	total: number;
+	assigned: number;
+	available: number;
+}
