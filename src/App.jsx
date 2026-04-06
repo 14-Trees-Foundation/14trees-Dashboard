@@ -41,6 +41,8 @@ import { Ponds } from './pages/admin/Ponds/Ponds';
 import { Users } from './pages/admin/users/Users';
 import { OrganizationComponent } from './pages/admin/organization/Organization';
 import { OnsiteReports } from './pages/admin/onsiteReports/OnsiteReports';
+import TreeAuditVerification from './pages/admin/treeAuditVerification/TreeAuditVerification';
+import TreeAuditSessionVerifier from './pages/admin/treeAuditVerification/TreeAuditSessionVerifier';
 import { VisitsComponent } from './pages/admin/visits/Visits';
 import { EventsPage } from './pages/admin/events/EventsPage';
 import SiteInventory from './pages/admin/Inventory/SiteInventory';
@@ -154,6 +156,14 @@ function App() {
 						<Route path="people" element={<Users />} />
 						<Route path="people-group" element={<OrganizationComponent />} />
 						<Route path="onsite-reports" element={<OnsiteReports />} />
+						<Route
+							path="tree-audit-verification"
+							element={<TreeAuditVerification />}
+						/>
+						<Route
+							path="tree-audit-verification/:sessionId"
+							element={<TreeAuditSessionVerifier />}
+						/>
 						<Route path="visits" element={<VisitsComponent />} />
 						<Route path="events" element={<EventsPage />} />
 						<Route path="site-inventory" element={<SiteInventory />} />

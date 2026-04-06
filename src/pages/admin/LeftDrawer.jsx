@@ -28,6 +28,7 @@ import {
 	Inventory,
 	Campaign,
 	Assessment,
+	AssignmentTurnedIn,
 } from '@mui/icons-material';
 import { UserRoles } from '../../types/common';
 import {
@@ -146,6 +147,12 @@ export const AdminLeftDrawer = () => {
 			logo: Assessment,
 			display: isAdmin,
 			path: 'onsite-reports',
+		},
+		{
+			displayName: 'Tree Audit Verification',
+			logo: AssignmentTurnedIn,
+			display: isAdmin,
+			path: 'tree-audit-verification',
 		},
 		{
 			divider: isAdmin,
