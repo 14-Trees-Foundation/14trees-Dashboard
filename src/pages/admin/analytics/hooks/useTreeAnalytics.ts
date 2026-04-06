@@ -8,6 +8,7 @@ import {
 	TreeInventoryEntry,
 	TreePlotPlantTypeEntry,
 	TreeAgeEntry,
+	TreeAgeLocationEntry,
 } from '../../../../types/analytics';
 
 export function useTreeSummary(
@@ -47,6 +48,8 @@ export function useTreesByLocation(
 	taluka?: string,
 	village?: string,
 	site_id?: number,
+	sortBy?: string,
+	sortOrder?: 'asc' | 'desc',
 ) {
 	const [data, setData] = useState<TreeByLocationEntry[] | null>(null);
 	const [loading, setLoading] = useState(true);
@@ -57,7 +60,16 @@ export function useTreesByLocation(
 		setLoading(true);
 		setError(null);
 		apiClient
-			.getTreesByLocation(level, year, district, taluka, village, site_id)
+			.getTreesByLocation(
+				level,
+				year,
+				district,
+				taluka,
+				village,
+				site_id,
+				sortBy,
+				sortOrder,
+			)
 			.then((res) => {
 				setData(res);
 				setLoading(false);
@@ -68,7 +80,16 @@ export function useTreesByLocation(
 			});
 	};
 
-	useEffect(fetch, [level, year, district, taluka, village, site_id]);
+	useEffect(fetch, [
+		level,
+		year,
+		district,
+		taluka,
+		village,
+		site_id,
+		sortBy,
+		sortOrder,
+	]);
 	return { data, loading, error, refetch: fetch };
 }
 
@@ -217,6 +238,62 @@ export function useTreeAgeDistribution(
 	return { data, loading, error, refetch: fetch };
 }
 
+export function useTreesByAgeAndLocation(
+	ageBucket: string,
+	district?: string,
+	taluka?: string,
+	village?: string,
+	site_id?: number,
+	page: number = 1,
+	limit: number = 10,
+) {
+	const [data, setData] = useState<TreeAgeLocationEntry[] | null>(null);
+	const [pagination, setPagination] = useState<{
+		page: number;
+		limit: number;
+		total: number;
+		totalPages: number;
+	} | null>(null);
+	const [loading, setLoading] = useState(true);
+	const [error, setError] = useState<string | null>(null);
+
+	const fetch = () => {
+		const apiClient = new ApiClient();
+		setLoading(true);
+		setError(null);
+		apiClient
+			.getTreesByAgeAndLocation(
+				ageBucket,
+				district,
+				taluka,
+				village,
+				site_id,
+				page,
+				limit,
+			)
+			.then((res) => {
+				setData(res.data);
+				setPagination(res.pagination);
+				setLoading(false);
+			})
+			.catch((err) => {
+				setError(err.message || 'Failed to load');
+				setLoading(false);
+			});
+	};
+
+	useEffect(fetch, [
+		ageBucket,
+		district,
+		taluka,
+		village,
+		site_id,
+		page,
+		limit,
+	]);
+	return { data, pagination, loading, error, refetch: fetch };
+}
+
 export function useTreePlantTypesByPlot(
 	district?: string,
 	taluka?: string,
@@ -227,6 +304,8 @@ export function useTreePlantTypesByPlot(
 	page: number = 1,
 	limit: number = 10,
 	search?: string,
+	sortBy?: string,
+	sortOrder?: 'asc' | 'desc',
 ) {
 	const [data, setData] = useState<TreePlotPlantTypeEntry[] | null>(null);
 	const [pagination, setPagination] = useState<{
@@ -253,6 +332,8 @@ export function useTreePlantTypesByPlot(
 				page,
 				limit,
 				search,
+				sortBy,
+				sortOrder,
 			)
 			.then((res) => {
 				setData(res.data);
@@ -275,6 +356,8 @@ export function useTreePlantTypesByPlot(
 		page,
 		limit,
 		search,
+		sortBy,
+		sortOrder,
 	]);
 	return { data, pagination, loading, error, refetch: fetch };
 }
