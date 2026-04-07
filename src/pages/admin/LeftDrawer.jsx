@@ -46,6 +46,7 @@ export const AdminLeftDrawer = () => {
 	const navigate = useNavigate();
 	const [isAdmin, setIsAdmin] = useState(false);
 	const [canManageRbac, setCanManageRbac] = useState(false);
+	const [canVerifyTreeAudits, setCanVerifyTreeAudits] = useState(false);
 	const [expandedMenus, setExpandedMenus] = useState({});
 	const [activeSubSection, setActiveSubSection] = useState(null);
 	const [drawerWidth, setDrawerWidth] = useState(200); // Default width
@@ -84,7 +85,11 @@ export const AdminLeftDrawer = () => {
 			const hasAcManage = rbacPerms.some(
 				(p) => p.resource === 'access_control' && p.action === 'manage',
 			);
+			const hasTreeAuditVerify = rbacPerms.some(
+				(p) => p.resource === 'tree_audits' && p.action === 'approve',
+			);
 			setCanManageRbac(hasAcManage);
+			setCanVerifyTreeAudits(hasTreeAuditVerify);
 		} catch {
 			// ignore
 		}
@@ -151,7 +156,7 @@ export const AdminLeftDrawer = () => {
 		{
 			displayName: 'Tree Audit Verification',
 			logo: AssignmentTurnedIn,
-			display: isAdmin,
+			display: canVerifyTreeAudits,
 			path: 'tree-audit-verification',
 		},
 		{
