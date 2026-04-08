@@ -1,6 +1,6 @@
 {
 	"name": "14treesapp",
-	"version": "1.1.0",
+	"version": "1.1.1",
 	"private": true,
 	"type": "module",
 	"dependencies": {
@@ -108,7 +108,8 @@
 		"test:monitor:clean": "rimraf demo-results demo-reports e2e/logs && playwright test --config=playwright-demo.config.ts",
 		"clean:test": "rimraf playwright-report test-results demo-results demo-reports e2e/logs",
 		"record": "playwright codegen http://localhost:3000",
-		"record:hd": "playwright codegen --viewport-size=1920,1080 http://localhost:3000"
+		"record:hd": "playwright codegen --viewport-size=1920,1080 http://localhost:3000",
+		"devdeploy": "CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD) && git push && git checkout development && git pull origin development && git pull origin $CURRENT_BRANCH && git merge $CURRENT_BRANCH && git push origin development && git checkout $CURRENT_BRANCH"
 	},
 	"browserslist": {
 		"production": [
