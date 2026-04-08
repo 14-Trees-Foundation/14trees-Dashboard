@@ -47,6 +47,7 @@ import { VisitsComponent } from './pages/admin/visits/Visits';
 import { EventsPage } from './pages/admin/events/EventsPage';
 import SiteInventory from './pages/admin/Inventory/SiteInventory';
 import AnalyticsPage from './pages/admin/analytics/AnalyticsPage';
+import SurveysPage from './pages/admin/surveys/SurveysPage';
 
 import GiftTreesComponent from './pages/admin/gift/GiftTreesRefactored';
 import GCInventory from './pages/admin/Inventory/GCInventory';
@@ -169,6 +170,7 @@ function App() {
 						<Route path="site-inventory" element={<SiteInventory />} />
 						<Route path="gc-inventory" element={<GCInventory />} />
 						<Route path="analytics" element={<AnalyticsPage />} />
+						<Route path="surveys" element={<SurveysPage />} />
 						<Route path="campaigns" element={<Campaigns />}></Route>
 						<Route path="tree-cards" element={<GiftTreesComponent />} />
 						<Route path="donations" element={<DonationComponent />} />
