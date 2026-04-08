@@ -29,6 +29,7 @@ import {
 	Campaign,
 	Assessment,
 	AssignmentTurnedIn,
+	Assignment,
 } from '@mui/icons-material';
 import { UserRoles } from '../../types/common';
 import {
@@ -173,6 +174,12 @@ export const AdminLeftDrawer = () => {
 			logo: Analytics,
 			display: true,
 			path: 'analytics',
+		},
+		{
+			displayName: 'Surveys',
+			logo: Assignment,
+			display: isAdmin,
+			path: 'surveys',
 		},
 		{
 			displayName: 'Donations',

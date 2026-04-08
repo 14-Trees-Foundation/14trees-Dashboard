@@ -52,6 +52,13 @@ import { SortOrder } from 'antd/es/table/interface';
 import { GridFilterItem } from '@mui/x-data-grid';
 import EventsApiClient from '../events/eventsApiClient';
 import { getVisitorId } from '../../helpers/visitorTracking';
+import type {
+	SurveyConfig,
+	SurveyConfigsResponse,
+	SurveyResponse,
+	SurveyResponsesData,
+	ResponseStats,
+} from '../../types/surveys';
 
 class ApiClient {
 	private api: AxiosInstance;
@@ -5118,6 +5125,181 @@ class ApiClient {
 			if (v !== undefined) query.append(k, String(v));
 		});
 		return `${baseURL}/rbac/audit-log/export?${query}`;
+	}
+
+	// Survey Forms Management
+
+	async getSurveyConfigs(
+		offset: number = 0,
+		limit: number = 50,
+		filters?: {
+			status?: string;
+			search?: string;
+			startDate?: string;
+			endDate?: string;
+		},
+	): Promise<SurveyConfigsResponse> {
+		const params = new URLSearchParams();
+		params.append('offset', offset.toString());
+		params.append('limit', limit.toString());
+		if (filters?.status) params.append('status', filters.status);
+		if (filters?.search) params.append('search', filters.search);
+		if (filters?.startDate) params.append('startDate', filters.startDate);
+		if (filters?.endDate) params.append('endDate', filters.endDate);
+		const response = await this.api.get(
+			`/v1/surveys/configs?${params.toString()}`,
+			{
+				headers: { 'x-access-token': this.token },
+			},
+		);
+		return response.data;
+	}
+
+	async getSurveyConfig(surveyId: string): Promise<SurveyConfig> {
+		const response = await this.api.get(`/v1/surveys/configs/${surveyId}`, {
+			headers: { 'x-access-token': this.token },
+		});
+		// Backend wraps response in { success, data }
+		return response.data.data ?? response.data;
+	}
+
+	async archiveSurveyConfig(
+		surveyId: string,
+	): Promise<{ message: string; config: SurveyConfig }> {
+		const response = await this.api.delete(`/v1/surveys/configs/${surveyId}`, {
+			headers: { 'x-access-token': this.token },
+		});
+		return response.data;
+	}
+
+	async restoreSurveyConfig(
+		surveyId: string,
+	): Promise<{ message: string; config: SurveyConfig }> {
+		const response = await this.api.post(
+			`/v1/surveys/configs/${surveyId}/restore`,
+			{},
+			{
+				headers: { 'x-access-token': this.token },
+			},
+		);
+		return response.data;
+	}
+
+	async createSurveyConfig(data: {
+		surveyId?: string;
+		formTitle: string;
+		permissions: string[];
+		formStructure: any;
+		status?: 'draft' | 'active';
+		autoGenerateId?: boolean;
+	}): Promise<SurveyConfig> {
+		const response = await this.api.post('/v1/surveys/configs', data, {
+			headers: { 'x-access-token': this.token },
+		});
+		return response.data;
+	}
+
+	async updateSurveyConfig(
+		surveyId: string,
+		data: {
+			formTitle?: string;
+			permissions?: string[];
+			formStructure?: any;
+			status?: 'draft' | 'active';
+		},
+	): Promise<SurveyConfig> {
+		const response = await this.api.put(
+			`/v1/surveys/configs/${surveyId}`,
+			data,
+			{
+				headers: { 'x-access-token': this.token },
+			},
+		);
+		return response.data;
+	}
+
+	async cloneSurveyConfig(
+		surveyId: string,
+		data?: { newSurveyId?: string; newFormTitle?: string },
+	): Promise<{ message: string; config: SurveyConfig }> {
+		const response = await this.api.post(
+			`/v1/surveys/configs/${surveyId}/clone`,
+			data || {},
+			{
+				headers: { 'x-access-token': this.token },
+			},
+		);
+		return response.data;
+	}
+
+	// Survey Responses
+
+	async getSurveyResponses(
+		offset: number = 0,
+		limit: number = 50,
+		filters?: {
+			surveyId?: string;
+			submittedBy?: string;
+			search?: string;
+			startDate?: string;
+			endDate?: string;
+		},
+	): Promise<SurveyResponsesData> {
+		const params = new URLSearchParams();
+		params.append('offset', offset.toString());
+		params.append('limit', limit.toString());
+		if (filters?.surveyId) params.append('surveyId', filters.surveyId);
+		if (filters?.submittedBy) params.append('submittedBy', filters.submittedBy);
+		if (filters?.search) params.append('search', filters.search);
+		if (filters?.startDate) params.append('startDate', filters.startDate);
+		if (filters?.endDate) params.append('endDate', filters.endDate);
+		const response = await this.api.get(
+			`/v1/surveys/responses?${params.toString()}`,
+			{
+				headers: { 'x-access-token': this.token },
+			},
+		);
+		return response.data;
+	}
+
+	async getSurveyResponseById(responseId: string): Promise<SurveyResponse> {
+		const response = await this.api.get(`/v1/surveys/responses/${responseId}`, {
+			headers: { 'x-access-token': this.token },
+		});
+		return response.data.data ?? response.data;
+	}
+
+	async getResponseStats(surveyId?: string): Promise<ResponseStats> {
+		const params = surveyId ? `?surveyId=${surveyId}` : '';
+		const response = await this.api.get(
+			`/v1/surveys/responses/stats${params}`,
+			{
+				headers: { 'x-access-token': this.token },
+			},
+		);
+		return response.data;
+	}
+
+	async exportSurveyResponses(filters?: {
+		surveyId?: string;
+		submittedBy?: string;
+		startDate?: string;
+		endDate?: string;
+	}): Promise<Blob> {
+		const params = new URLSearchParams();
+		if (filters?.surveyId) params.append('surveyId', filters.surveyId);
+		if (filters?.submittedBy) params.append('submittedBy', filters.submittedBy);
+		if (filters?.startDate) params.append('startDate', filters.startDate);
+		if (filters?.endDate) params.append('endDate', filters.endDate);
+
+		const response = await this.api.get(
+			`/v1/surveys/responses/export?${params.toString()}`,
+			{
+				headers: { 'x-access-token': this.token },
+				responseType: 'blob',
+			},
+		);
+		return response.data;
 	}
 }
 
