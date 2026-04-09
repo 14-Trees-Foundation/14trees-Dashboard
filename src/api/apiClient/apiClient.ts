@@ -47,6 +47,14 @@ import {
 	DonationTypeSplit,
 	DonationFrequency,
 	RepeatDonorStats,
+	TreeSummaryKPIs,
+	TreeByLocationEntry,
+	TreeSpeciesEntry,
+	TreeAvailabilityEntry,
+	TreeInventoryEntry,
+	TreePlotPlantTypeEntry,
+	TreeAgeEntry,
+	TreeAgeLocationEntry,
 } from '../../types/analytics';
 import { SortOrder } from 'antd/es/table/interface';
 import { GridFilterItem } from '@mui/x-data-grid';
@@ -4933,6 +4941,314 @@ class ApiClient {
 			return response.data.data;
 		} catch (error: any) {
 			throw new Error(`Failed to fetch repeat donor stats: ${error.message}`);
+		}
+	}
+
+	// ── TREE ANALYTICS ────────────────────────────────────────────────────────
+
+	async getTreeSummary(
+		year?: number,
+		district?: string,
+		taluka?: string,
+		village?: string,
+	): Promise<TreeSummaryKPIs> {
+		const params = new URLSearchParams();
+		if (year !== undefined) params.append('year', String(year));
+		if (district) params.append('district', district);
+		if (taluka) params.append('taluka', taluka);
+		if (village) params.append('village', village);
+		const qs = params.toString();
+		const url = `/analytics/trees/summary${qs ? `?${qs}` : ''}`;
+		try {
+			const response = await this.api.get<{
+				success: boolean;
+				data: TreeSummaryKPIs;
+			}>(url, {
+				headers: {
+					'x-access-token': this.token,
+					'content-type': 'application/json',
+				},
+			});
+			return response.data.data;
+		} catch (error: any) {
+			throw new Error(`Failed to fetch tree summary: ${error.message}`);
+		}
+	}
+
+	async getTreesByLocation(
+		level?: 'district' | 'taluka' | 'village' | 'site' | 'plot',
+		year?: number,
+		district?: string,
+		taluka?: string,
+		village?: string,
+		site_id?: number,
+		sortBy?: string,
+		sortOrder?: 'asc' | 'desc',
+	): Promise<TreeByLocationEntry[]> {
+		const params = new URLSearchParams();
+		if (level) params.append('level', level);
+		if (year !== undefined) params.append('year', String(year));
+		if (district) params.append('district', district);
+		if (taluka) params.append('taluka', taluka);
+		if (village) params.append('village', village);
+		if (site_id !== undefined) params.append('site_id', String(site_id));
+		if (sortBy) params.append('sortBy', sortBy);
+		if (sortOrder) params.append('sortOrder', sortOrder);
+		const qs = params.toString();
+		const url = `/analytics/trees/by-location${qs ? `?${qs}` : ''}`;
+		try {
+			const response = await this.api.get<{
+				success: boolean;
+				data: TreeByLocationEntry[];
+			}>(url, {
+				headers: {
+					'x-access-token': this.token,
+					'content-type': 'application/json',
+				},
+			});
+			return response.data.data;
+		} catch (error: any) {
+			throw new Error(`Failed to fetch trees by location: ${error.message}`);
+		}
+	}
+
+	async getTreeSpecies(
+		year?: number,
+		district?: string,
+		taluka?: string,
+		village?: string,
+	): Promise<TreeSpeciesEntry[]> {
+		const params = new URLSearchParams();
+		if (year !== undefined) params.append('year', String(year));
+		if (district) params.append('district', district);
+		if (taluka) params.append('taluka', taluka);
+		if (village) params.append('village', village);
+		const qs = params.toString();
+		const url = `/analytics/trees/species${qs ? `?${qs}` : ''}`;
+		try {
+			const response = await this.api.get<{
+				success: boolean;
+				data: TreeSpeciesEntry[];
+			}>(url, {
+				headers: {
+					'x-access-token': this.token,
+					'content-type': 'application/json',
+				},
+			});
+			return response.data.data;
+		} catch (error: any) {
+			throw new Error(`Failed to fetch tree species: ${error.message}`);
+		}
+	}
+
+	async getTreeAvailability(
+		district?: string,
+		taluka?: string,
+		village?: string,
+		site_id?: number,
+		plot_id?: number,
+		site_category?: 'Foundation' | 'Public' | 'Others',
+		page: number = 1,
+		limit: number = 10,
+	): Promise<{
+		data: TreeAvailabilityEntry[];
+		pagination: {
+			page: number;
+			limit: number;
+			total: number;
+			totalPages: number;
+		};
+	}> {
+		const params = new URLSearchParams();
+		if (district) params.append('district', district);
+		if (taluka) params.append('taluka', taluka);
+		if (village) params.append('village', village);
+		if (site_id !== undefined) params.append('site_id', String(site_id));
+		if (plot_id !== undefined) params.append('plot_id', String(plot_id));
+		if (site_category) params.append('site_category', site_category);
+		params.append('page', String(page));
+		params.append('limit', String(limit));
+		const qs = params.toString();
+		const url = `/analytics/trees/availability${qs ? `?${qs}` : ''}`;
+		try {
+			const response = await this.api.get<{
+				success: boolean;
+				data: TreeAvailabilityEntry[];
+				pagination: {
+					page: number;
+					limit: number;
+					total: number;
+					totalPages: number;
+				};
+			}>(url, {
+				headers: {
+					'x-access-token': this.token,
+					'content-type': 'application/json',
+				},
+			});
+			return { data: response.data.data, pagination: response.data.pagination };
+		} catch (error: any) {
+			throw new Error(`Failed to fetch tree availability: ${error.message}`);
+		}
+	}
+
+	async getTreeInventory(
+		site_category?: 'Foundation' | 'Public' | 'Others',
+	): Promise<TreeInventoryEntry[]> {
+		const params = new URLSearchParams();
+		if (site_category) params.append('site_category', site_category);
+		const qs = params.toString();
+		const url = `/analytics/trees/inventory${qs ? `?${qs}` : ''}`;
+		try {
+			const response = await this.api.get<{
+				success: boolean;
+				data: TreeInventoryEntry[];
+			}>(url, {
+				headers: {
+					'x-access-token': this.token,
+					'content-type': 'application/json',
+				},
+			});
+			return response.data.data;
+		} catch (error: any) {
+			throw new Error(`Failed to fetch tree inventory: ${error.message}`);
+		}
+	}
+
+	async getTreeAgeDistribution(
+		district?: string,
+		taluka?: string,
+		village?: string,
+	): Promise<TreeAgeEntry[]> {
+		const params = new URLSearchParams();
+		if (district) params.append('district', district);
+		if (taluka) params.append('taluka', taluka);
+		if (village) params.append('village', village);
+		const qs = params.toString();
+		const url = `/analytics/trees/age-distribution${qs ? `?${qs}` : ''}`;
+		try {
+			const response = await this.api.get<{
+				success: boolean;
+				data: TreeAgeEntry[];
+			}>(url, {
+				headers: {
+					'x-access-token': this.token,
+					'content-type': 'application/json',
+				},
+			});
+			return response.data.data;
+		} catch (error: any) {
+			throw new Error(
+				`Failed to fetch tree age distribution: ${error.message}`,
+			);
+		}
+	}
+
+	async getTreesByAgeAndLocation(
+		ageBucket: string,
+		district?: string,
+		taluka?: string,
+		village?: string,
+		site_id?: number,
+		page: number = 1,
+		limit: number = 10,
+	): Promise<{
+		data: TreeAgeLocationEntry[];
+		pagination: {
+			page: number;
+			limit: number;
+			total: number;
+			totalPages: number;
+		};
+	}> {
+		const params = new URLSearchParams();
+		params.append('age_bucket', ageBucket);
+		if (district) params.append('district', district);
+		if (taluka) params.append('taluka', taluka);
+		if (village) params.append('village', village);
+		if (site_id !== undefined) params.append('site_id', String(site_id));
+		params.append('page', String(page));
+		params.append('limit', String(limit));
+		const qs = params.toString();
+		const url = `/analytics/trees/by-age-location${qs ? `?${qs}` : ''}`;
+		try {
+			const response = await this.api.get<{
+				success: boolean;
+				data: TreeAgeLocationEntry[];
+				pagination: {
+					page: number;
+					limit: number;
+					total: number;
+					totalPages: number;
+				};
+			}>(url, {
+				headers: {
+					'x-access-token': this.token,
+					'content-type': 'application/json',
+				},
+			});
+			return { data: response.data.data, pagination: response.data.pagination };
+		} catch (error: any) {
+			throw new Error(
+				`Failed to fetch trees by age and location: ${error.message}`,
+			);
+		}
+	}
+
+	async getTreePlantTypesByPlot(
+		district?: string,
+		taluka?: string,
+		village?: string,
+		site_id?: number,
+		plot_id?: number,
+		site_category?: 'Foundation' | 'Public' | 'Others',
+		page: number = 1,
+		limit: number = 10,
+		search?: string,
+		sortBy?: string,
+		sortOrder?: 'asc' | 'desc',
+	): Promise<{
+		data: TreePlotPlantTypeEntry[];
+		pagination: {
+			page: number;
+			limit: number;
+			total: number;
+			totalPages: number;
+		};
+	}> {
+		const params = new URLSearchParams();
+		if (district) params.append('district', district);
+		if (taluka) params.append('taluka', taluka);
+		if (village) params.append('village', village);
+		if (site_id !== undefined) params.append('site_id', String(site_id));
+		if (plot_id !== undefined) params.append('plot_id', String(plot_id));
+		if (site_category) params.append('site_category', site_category);
+		if (search) params.append('search', search);
+		params.append('page', String(page));
+		params.append('limit', String(limit));
+		if (sortBy) params.append('sortBy', sortBy);
+		if (sortOrder) params.append('sortOrder', sortOrder);
+		const qs = params.toString();
+		const url = `/analytics/trees/plot-plant-types${qs ? `?${qs}` : ''}`;
+		try {
+			const response = await this.api.get<{
+				success: boolean;
+				data: TreePlotPlantTypeEntry[];
+				pagination: {
+					page: number;
+					limit: number;
+					total: number;
+					totalPages: number;
+				};
+			}>(url, {
+				headers: {
+					'x-access-token': this.token,
+					'content-type': 'application/json',
+				},
+			});
+			return { data: response.data.data, pagination: response.data.pagination };
+		} catch (error: any) {
+			throw new Error(`Failed to fetch plant types by plot: ${error.message}`);
 		}
 	}
 
