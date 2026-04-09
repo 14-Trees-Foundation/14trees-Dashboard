@@ -22,6 +22,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import Editor from '@monaco-editor/react';
 import type { SurveyConfig } from '../../../../types/surveys';
 import VisualBuilder from './formBuilder/VisualBuilder';
+import StructureBuilder from './formBuilder/StructureBuilder';
 
 interface FormEditorDialogProps {
 	open: boolean;
@@ -76,8 +77,9 @@ const selectSx = {
 
 // tab indices
 const TAB_BASIC = 0;
-const TAB_VISUAL = 1;
-const TAB_JSON = 2;
+const TAB_STRUCTURE = 1;
+const TAB_VISUAL = 2;
+const TAB_JSON = 3;
 
 const FormEditorDialog: React.FC<FormEditorDialogProps> = ({
 	open,
@@ -255,6 +257,7 @@ const FormEditorDialog: React.FC<FormEditorDialogProps> = ({
 				}}
 			>
 				<Tab label="Basic Info" />
+				<Tab label="Structure Builder" />
 				<Tab label="Visual Builder" />
 				<Tab label="JSON Editor" />
 			</Tabs>
@@ -263,7 +266,7 @@ const FormEditorDialog: React.FC<FormEditorDialogProps> = ({
 				sx={{
 					flex: 1,
 					overflow: 'auto',
-					p: tab === TAB_VISUAL ? 2 : 3,
+					p: tab === TAB_VISUAL || tab === TAB_STRUCTURE ? 2 : 3,
 					display: 'flex',
 					flexDirection: 'column',
 				}}
@@ -412,7 +415,17 @@ const FormEditorDialog: React.FC<FormEditorDialogProps> = ({
 					</Box>
 				)}
 
-				{/* Tab 1: Visual Builder */}
+				{/* Tab 1: Structure Builder */}
+				{tab === TAB_STRUCTURE && (
+					<Box sx={{ flex: 1, minHeight: 0 }}>
+						<StructureBuilder
+							formStructure={formStructure}
+							onChange={handleVisualBuilderChange}
+						/>
+					</Box>
+				)}
+
+				{/* Tab 2: Visual Builder */}
 				{tab === TAB_VISUAL && (
 					<Box sx={{ flex: 1, minHeight: 0 }}>
 						<VisualBuilder
@@ -422,7 +435,7 @@ const FormEditorDialog: React.FC<FormEditorDialogProps> = ({
 					</Box>
 				)}
 
-				{/* Tab 2: JSON Editor */}
+				{/* Tab 3: JSON Editor */}
 				{tab === TAB_JSON && (
 					<Box
 						sx={{
