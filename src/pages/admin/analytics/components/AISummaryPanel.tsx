@@ -111,8 +111,6 @@ const AISummaryPanel: React.FC<AISummaryPanelProps> = ({ year, themeMode }) => {
 	}, [year]);
 
 	const insights = parseInsights(streamedText);
-	console.log('[AI Panel] streamedText:', streamedText);
-	console.log('[AI Panel] insights:', insights);
 
 	const cardSx = isDark
 		? {

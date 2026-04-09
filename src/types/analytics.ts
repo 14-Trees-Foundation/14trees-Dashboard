@@ -234,3 +234,90 @@ export interface RepeatDonorStats {
 	avg_lifetime_donations: number;
 	avg_lifetime_value: number;
 }
+
+// ============================================================================
+// Tree Analytics Types
+// ============================================================================
+
+export interface TreeSummaryKPIs {
+	total_trees: number;
+	healthy: number;
+	diseased: number;
+	dead: number;
+	lost: number;
+	assigned: number;
+	available: number;
+	foundation_trees: number;
+	public_trees: number;
+	others_trees: number;
+}
+
+export interface TreeByLocationEntry {
+	location: string;
+	total: number;
+	assigned: number;
+	available: number;
+}
+
+export interface TreeSpeciesEntry {
+	species_name: string;
+	scientific_name: string | null;
+	count: number;
+	available: number;
+}
+
+export interface TreeAvailabilityEntry {
+	district: string;
+	taluka: string;
+	village: string;
+	site_name: string;
+	plot_name: string;
+	site_category: string;
+	available_count: number;
+}
+
+export interface TreeInventoryEntry {
+	site_category: string;
+	district: string;
+	site_name: string;
+	plot_name: string;
+	total: number;
+	available: number;
+	assigned: number;
+}
+
+export interface TreePlotPlantTypeEntry {
+	plot_id: number;
+	district: string;
+	taluka: string;
+	village: string;
+	site_name: string;
+	plot_name: string;
+	site_category: string;
+	species_name: string;
+	scientific_name: string | null;
+	total: number;
+	assigned: number;
+	available: number;
+	card_available: number;
+}
+
+export interface TreeAgeEntry {
+	age_bucket: string;
+	count: number;
+	available: number;
+	assigned: number;
+}
+
+export interface TreeAgeLocationEntry {
+	age_bucket: string;
+	district: string;
+	taluka: string;
+	village: string;
+	site_name: string;
+	plot_name: string;
+	site_category: string;
+	total: number;
+	assigned: number;
+	available: number;
+}

@@ -148,6 +148,12 @@ export const AdminLeftDrawer = () => {
 			path: 'people-group',
 		},
 		{
+			displayName: 'Analytics',
+			logo: Analytics,
+			display: true,
+			path: 'analytics',
+		},
+		{
 			displayName: 'Onsite Reports',
 			logo: Assessment,
 			display: isAdmin,
@@ -167,12 +173,6 @@ export const AdminLeftDrawer = () => {
 			logo: CardGiftcard,
 			display: true, // Show to all users who can access the admin panel
 			path: 'tree-cards',
-		},
-		{
-			displayName: 'Analytics',
-			logo: Analytics,
-			display: true,
-			path: 'analytics',
 		},
 		{
 			displayName: 'Donations',

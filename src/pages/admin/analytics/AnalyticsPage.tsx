@@ -14,6 +14,7 @@ import Brightness7Icon from '@mui/icons-material/Brightness7';
 import { ThemeProvider, useTheme } from '@mui/material/styles';
 import GiftCardAnalysisTab from './GiftCardAnalysisTab';
 import DonationAnalysisTab from './DonationAnalysisTab';
+import TreeAnalysisTab from './TreeAnalysisTab';
 import { analyticsPageSx } from './analyticsTheme';
 import { darkTheme, lightAnalyticsTheme } from '../../../theme';
 
@@ -179,17 +180,23 @@ const AnalyticsContent: React.FC<AnalyticsContentProps> = ({
 							},
 						}}
 					>
-						<Tab label="DONATIONS" />
+						<Tab label="TREES" />
 						<Tab label="GIFT CARD" />
+						<Tab label="DONATIONS" />
 					</Tabs>
-
+					<TabPanel value={activeTab} index={0}>
+						<TreeAnalysisTab
+							themeMode={themeMode}
+							onToggleTheme={onToggleTheme}
+						/>
+					</TabPanel>
 					<TabPanel value={activeTab} index={1}>
 						<GiftCardAnalysisTab
 							themeMode={themeMode}
 							onToggleTheme={onToggleTheme}
 						/>
 					</TabPanel>
-					<TabPanel value={activeTab} index={0}>
+					<TabPanel value={activeTab} index={2}>
 						<DonationAnalysisTab
 							themeMode={themeMode}
 							onToggleTheme={onToggleTheme}
