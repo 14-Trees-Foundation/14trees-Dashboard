@@ -1,12 +1,4 @@
-import {
-	TableChart,
-	Settings,
-	Analytics,
-	People,
-	Inventory,
-	CardGiftcard,
-	TrendingUp,
-} from '@mui/icons-material';
+import { TableChart, Settings } from '@mui/icons-material';
 import { PageSection } from '../hooks/usePageSections';
 
 export interface PageSubSectionConfig {
@@ -42,16 +34,6 @@ export const PAGE_SUB_SECTIONS: PageSubSectionConfig[] = [
 				displayName: 'Auto Processing',
 				sectionId: 'tree-cards-auto-processing',
 				icon: Settings,
-			},
-		],
-	},
-	{
-		path: 'analytics',
-		sections: [
-			{
-				displayName: 'Gift Card Analysis',
-				sectionId: 'gift-card-analysis',
-				icon: TrendingUp,
 			},
 		],
 	},

@@ -304,6 +304,11 @@ const TreeAnalysisTab: React.FC<TreeAnalysisTabProps> = ({ themeMode }) => {
 	const formatNumber = (n: number | undefined) =>
 		n !== undefined ? n.toLocaleString() : '0';
 
+	const declinedTrees =
+		(summary.data?.diseased || 0) +
+		(summary.data?.dead || 0) +
+		(summary.data?.lost || 0);
+
 	// Age bucket columns for Trees by Location
 	const ageBucketColumns = [
 		{ key: 'count_0_1yr', label: '0-1 yr' },
@@ -578,33 +583,199 @@ const TreeAnalysisTab: React.FC<TreeAnalysisTabProps> = ({ themeMode }) => {
 						loading={summary.loading}
 					/>
 					<KPICard
-						label="Available"
-						value={formatNumber(summary.data?.available)}
+						label="Healthy"
+						value={formatNumber(summary.data?.healthy)}
 						icon={<CheckCircleIcon />}
+						isDark={isDark}
+						loading={summary.loading}
+					/>
+					<KPICard
+						label="Declined (D+Dead+Lost)"
+						value={formatNumber(declinedTrees)}
+						icon={<PendingIcon />}
 						isDark={isDark}
 						loading={summary.loading}
 					/>
 					<KPICard
 						label="Assigned"
 						value={formatNumber(summary.data?.assigned)}
-						icon={<PendingIcon />}
-						isDark={isDark}
-						loading={summary.loading}
-					/>
-					<KPICard
-						label="Foundation"
-						value={formatNumber(summary.data?.foundation_trees)}
 						icon={<ForestIcon />}
 						isDark={isDark}
 						loading={summary.loading}
 					/>
 					<KPICard
-						label="Public"
-						value={formatNumber(summary.data?.public_trees)}
+						label="Available"
+						value={formatNumber(summary.data?.available)}
 						icon={<ForestIcon />}
 						isDark={isDark}
 						loading={summary.loading}
 					/>
+				</Box>
+				<Box
+					sx={{
+						mt: 1.5,
+						display: 'grid',
+						gridTemplateColumns: { xs: '1fr', md: 'repeat(3, 1fr)' },
+						gap: 1.5,
+					}}
+				>
+					<Box
+						sx={{
+							p: 1.25,
+							borderRadius: '10px',
+							background: isDark ? '#152018' : '#f9f7f4',
+							border: isDark ? '1px solid #2a3832' : '1px solid #e5e0d8',
+						}}
+					>
+						<Typography
+							sx={{
+								fontSize: '10px',
+								fontWeight: 700,
+								letterSpacing: '0.06em',
+								textTransform: 'uppercase',
+								color: isDark ? '#9ba39d' : '#6b7280',
+								mb: 0.5,
+							}}
+						>
+							Integrity Check
+						</Typography>
+						<Typography
+							sx={{
+								fontSize: '12px',
+								color: isDark ? '#e8ebe9' : '#1f2937',
+								fontWeight: 600,
+							}}
+						>
+							{formatNumber(summary.data?.total_trees)} ={' '}
+							{formatNumber(summary.data?.healthy)} +{' '}
+							{formatNumber(declinedTrees)}
+						</Typography>
+						<Typography
+							sx={{ fontSize: '11px', color: isDark ? '#9ba39d' : '#6b7280' }}
+						>
+							Total = Healthy + Declined
+						</Typography>
+					</Box>
+
+					<Box
+						sx={{
+							p: 1.25,
+							borderRadius: '10px',
+							background: isDark ? '#152018' : '#f9f7f4',
+							border: isDark ? '1px solid #2a3832' : '1px solid #e5e0d8',
+						}}
+					>
+						<Typography
+							sx={{
+								fontSize: '10px',
+								fontWeight: 700,
+								letterSpacing: '0.06em',
+								textTransform: 'uppercase',
+								color: isDark ? '#9ba39d' : '#6b7280',
+								mb: 0.75,
+							}}
+						>
+							Declined Breakdown
+						</Typography>
+						<Box sx={{ display: 'flex', gap: 0.75, flexWrap: 'wrap' }}>
+							<Box
+								sx={{
+									px: 1,
+									py: 0.35,
+									borderRadius: '999px',
+									fontSize: '11px',
+									color: isDark ? '#e8ebe9' : '#1f2937',
+									background: isDark ? '#1f2d24' : '#ebe7e1',
+								}}
+							>
+								Diseased {formatNumber(summary.data?.diseased)}
+							</Box>
+							<Box
+								sx={{
+									px: 1,
+									py: 0.35,
+									borderRadius: '999px',
+									fontSize: '11px',
+									color: isDark ? '#e8ebe9' : '#1f2937',
+									background: isDark ? '#1f2d24' : '#ebe7e1',
+								}}
+							>
+								Dead {formatNumber(summary.data?.dead)}
+							</Box>
+							<Box
+								sx={{
+									px: 1,
+									py: 0.35,
+									borderRadius: '999px',
+									fontSize: '11px',
+									color: isDark ? '#e8ebe9' : '#1f2937',
+									background: isDark ? '#1f2d24' : '#ebe7e1',
+								}}
+							>
+								Lost {formatNumber(summary.data?.lost)}
+							</Box>
+						</Box>
+					</Box>
+
+					<Box
+						sx={{
+							p: 1.25,
+							borderRadius: '10px',
+							background: isDark ? '#152018' : '#f9f7f4',
+							border: isDark ? '1px solid #2a3832' : '1px solid #e5e0d8',
+						}}
+					>
+						<Typography
+							sx={{
+								fontSize: '10px',
+								fontWeight: 700,
+								letterSpacing: '0.06em',
+								textTransform: 'uppercase',
+								color: isDark ? '#9ba39d' : '#6b7280',
+								mb: 0.75,
+							}}
+						>
+							Site Distribution
+						</Typography>
+						<Box sx={{ display: 'flex', gap: 0.75, flexWrap: 'wrap' }}>
+							<Box
+								sx={{
+									px: 1,
+									py: 0.35,
+									borderRadius: '999px',
+									fontSize: '11px',
+									color: isDark ? '#e8ebe9' : '#1f2937',
+									background: isDark ? '#1f2d24' : '#ebe7e1',
+								}}
+							>
+								Foundation {formatNumber(summary.data?.foundation_trees)}
+							</Box>
+							<Box
+								sx={{
+									px: 1,
+									py: 0.35,
+									borderRadius: '999px',
+									fontSize: '11px',
+									color: isDark ? '#e8ebe9' : '#1f2937',
+									background: isDark ? '#1f2d24' : '#ebe7e1',
+								}}
+							>
+								Public {formatNumber(summary.data?.public_trees)}
+							</Box>
+							<Box
+								sx={{
+									px: 1,
+									py: 0.35,
+									borderRadius: '999px',
+									fontSize: '11px',
+									color: isDark ? '#e8ebe9' : '#1f2937',
+									background: isDark ? '#1f2d24' : '#ebe7e1',
+								}}
+							>
+								Others {formatNumber(summary.data?.others_trees)}
+							</Box>
+						</Box>
+					</Box>
 				</Box>
 			</Box>
 
