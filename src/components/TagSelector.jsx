@@ -86,14 +86,15 @@ const TagSelector = ({
 				if (option.inputValue) return option.inputValue; // For newly created tags
 				return option;
 			}}
-			renderOption={(props, option) =>
-				option === 'System Tags' || option === 'User Tags' ? (
-					<li {...props}>
-						<strong>{option}</strong>
-					</li> // Render label sections
-				) : (
-					<li {...props}>{option.title || option}</li>
-				) // Render tag options
+			renderOption={
+				(props, option) =>
+					option === 'System Tags' || option === 'User Tags' ? (
+						<li {...props}>
+							<strong>{option}</strong>
+						</li> // Render label sections
+					) : (
+						<li {...props}>{option.title || option}</li>
+					) // Render tag options
 			}
 			freeSolo
 			renderTags={(value, getTagProps) =>

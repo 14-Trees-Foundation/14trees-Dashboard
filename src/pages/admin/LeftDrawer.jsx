@@ -29,6 +29,7 @@ import {
 	Campaign,
 	Assessment,
 	AssignmentTurnedIn,
+	Assignment,
 } from '@mui/icons-material';
 import { UserRoles } from '../../types/common';
 import {
@@ -224,6 +225,12 @@ export const AdminLeftDrawer = () => {
 		},
 		{
 			divider: canManageRbac,
+		},
+		{
+			displayName: 'Surveys',
+			logo: Assignment,
+			display: isAdmin,
+			path: 'surveys',
 		},
 		{
 			displayName: 'Staff Roles',
