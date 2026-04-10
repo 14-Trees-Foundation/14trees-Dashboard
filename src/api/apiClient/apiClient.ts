@@ -1176,7 +1176,7 @@ class ApiClient {
 	): Promise<any> {
 		try {
 			const response = await this.api.patch(
-				`/tree-snapshots/batch-verify`,
+				`/v1/tree-snapshots/batch-verify`,
 				{ items },
 				{ headers: { 'x-access-token': this.token } },
 			);
@@ -1188,22 +1188,6 @@ class ApiClient {
 			throw new Error(
 				`Failed to batch verify tree snapshots: ${error.message}`,
 			);
-		}
-	}
-
-	async rejectTreeSnapshot(id: number, reason: string): Promise<any> {
-		try {
-			const response = await this.api.patch(
-				`/tree-snapshots/${id}/reject`,
-				{ reason },
-				{ headers: { 'x-access-token': this.token } },
-			);
-			return response.data;
-		} catch (error: any) {
-			if (error.response) {
-				throw new Error(error.response.data.message);
-			}
-			throw new Error(`Failed to reject tree snapshot: ${error.message}`);
 		}
 	}
 
@@ -5594,6 +5578,22 @@ class ApiClient {
 			},
 		);
 		return response.data;
+	}
+
+	async rejectTreeSnapshot(id: number, reason: string): Promise<any> {
+		try {
+			const response = await this.api.patch(
+				`/v1/tree-snapshots/${id}/reject`,
+				{ reason },
+				{ headers: { 'x-access-token': this.token } },
+			);
+			return response.data;
+		} catch (error: any) {
+			if (error.response) {
+				throw new Error(error.response.data.message);
+			}
+			throw new Error(`Failed to reject tree snapshot: ${error.message}`);
+		}
 	}
 
 	async exportSurveyResponses(filters?: {

@@ -116,7 +116,7 @@ const SessionsContent = ({
 			dataIndex: 'upload_session_id',
 			key: 'upload_session_id',
 			title: 'Session ID',
-			width: 220,
+			width: 190,
 			render: (value: string) => (
 				<Typography
 					variant="body2"
@@ -130,7 +130,7 @@ const SessionsContent = ({
 			dataIndex: 'worker_name',
 			key: 'worker_name',
 			title: 'Worker',
-			width: 180,
+			width: 150,
 			render: (value: string | null, record) =>
 				value || `User #${record.uploaded_by}`,
 		},
@@ -138,14 +138,14 @@ const SessionsContent = ({
 			dataIndex: 'plot_name',
 			key: 'plot_name',
 			title: 'Plot',
-			width: 150,
+			width: 120,
 			render: (value: string | null) => value || '—',
 		},
 		{
 			dataIndex: 'site_name',
 			key: 'site_name',
 			title: 'Site',
-			width: 160,
+			width: 130,
 			render: (value: string | null) => value || '—',
 		},
 		{
@@ -182,7 +182,7 @@ const SessionsContent = ({
 			dataIndex: 'uploaded_at',
 			key: 'uploaded_at',
 			title: 'Uploaded',
-			width: 160,
+			width: 140,
 			render: (value: string) =>
 				value ? new Date(value).toLocaleString() : '—',
 		},
@@ -221,8 +221,9 @@ const SessionsContent = ({
 			dataIndex: 'action',
 			key: 'action',
 			title: '',
-			width: 90,
+			width: 60,
 			align: 'center',
+			fixed: 'right',
 			render: (_: any, record) => (
 				<Tooltip title="Open session">
 					<IconButton
@@ -405,7 +406,7 @@ const SessionsContent = ({
 							onDownload={getAllRows}
 							footer
 							tableName="Tree Audit Verification Sessions"
-							scroll={{ x: 1300, y: 620 }}
+							scroll={{ x: 1150, y: 620 }}
 							rowClassName={(record: TreeAuditSessionRow) =>
 								record.status === 'completed' ? 'sequence-ordering-column' : ''
 							}
