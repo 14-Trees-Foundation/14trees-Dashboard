@@ -164,6 +164,14 @@ const AssignTrees: React.FC<AssignTreesProps> = ({
 			...getColumnSearchProps('sapling_id', filters, handleSetFilters),
 		},
 		{
+			dataIndex: 'plot_name',
+			key: 'plot_name',
+			title: 'Plot Name',
+			align: 'center',
+			width: 200,
+			...getColumnSearchProps('plot_name', filters, handleSetFilters),
+		},
+		{
 			dataIndex: 'plant_type',
 			key: 'plant_type',
 			title: 'Plant Type',
