@@ -1,4 +1,4 @@
-import { Route, Routes, useLocation } from 'react-router-dom';
+import { Route, Routes, useLocation, useParams } from 'react-router-dom';
 import { Search } from './pages/Search/Search';
 import { Visitor } from './pages/Visitor/Visitor';
 import { AddTree } from './pages/admin/Forms/components/Addtree';
@@ -31,6 +31,18 @@ import RequestTreeCardsForm from './pages/admin/gift/Components/TreeCardRequest/
 import SponsorProfile from './pages/SponsorProfile/SponsorProfile';
 import CSRPage from './pages/admin/csr/CSRPage';
 import EventPage from './pages/EventDashboard/EventPage';
+import EventLandingPage from './pages/EventLanding/EventLandingPage';
+
+const NEW_EVENT_LANDING_LINKS = new Set(['ij5h8ow9', '5e7vujoc']);
+
+const EventPageRouter = () => {
+	const { linkId } = useParams();
+	return NEW_EVENT_LANDING_LINKS.has(linkId) ? (
+		<EventLandingPage />
+	) : (
+		<EventPage />
+	);
+};
 import GiftDashboard from './pages/GiftDashboard/GiftDashboard';
 import { AdminHome } from './pages/admin/home/AdminHome';
 import { SitesComponent } from './pages/admin/sites/Sites';
@@ -60,6 +72,7 @@ import { ReferralsPage } from './pages/admin/campaign/ReferralsPage';
 import { ReferralUserPage } from './pages/admin/campaign/ReferralUserPage';
 import CorpRegistration from './pages/CorpRegistration';
 import GroupDashboard from './pages/GroupDashboard/GroupDashboard';
+import GroupLandingPage from './pages/GroupLanding/GroupLandingPage';
 import { getOrCreateVisitorId } from './helpers/visitorTracking';
 import { useEffect, useRef } from 'react';
 import ApiClient from './api/apiClient/apiClient';
@@ -130,7 +143,7 @@ function App() {
 					<Route path="/organization/:id" element={<OrgProfile />}></Route>
 					<Route path="/group/:grptype" element={<OrgEvent />}></Route>
 					<Route path="/events/corp/:event_id" element={<Corporate />}></Route>
-					<Route path="/events/:linkId" element={<EventPage />}></Route>
+					<Route path="/events/:linkId" element={<EventPageRouter />}></Route>
 					<Route path="/campaign/:c_key" element={<CampaignsPage />}></Route>
 					<Route path="/referral" element={<ReferralsPage />}></Route>
 					<Route path="/referral/:rfr" element={<ReferralUserPage />}></Route>
@@ -229,6 +242,10 @@ function App() {
 								<CSRPage />
 							</RequireAuth>
 						}
+					/>
+					<Route
+						path="/dashboard/sprih"
+						element={<GroupLandingPage nameKey="sprih" />}
 					/>
 					<Route path="/dashboard/:name_key" element={<GroupDashboard />} />
 					<Route
