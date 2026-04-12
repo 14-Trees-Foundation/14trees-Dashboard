@@ -2862,10 +2862,12 @@ class ApiClient {
 	async getGiftCardOccasions(
 		type?: 'all' | 'corporate' | 'personal',
 		source?: 'all' | 'website' | 'manual',
+		year?: number,
 	): Promise<GiftCardOccasionsResponse> {
 		const params = new URLSearchParams();
 		if (type !== undefined) params.append('type', type);
 		if (source && source !== 'all') params.append('source', source);
+		if (year) params.append('year', String(year));
 		const queryString = params.toString();
 		const url = `/analytics/giftcards/occasions${
 			queryString ? `?${queryString}` : ''
