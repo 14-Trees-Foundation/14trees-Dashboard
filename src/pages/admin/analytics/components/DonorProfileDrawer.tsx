@@ -43,13 +43,13 @@ const getInitials = (name: string): string =>
 		.slice(0, 2);
 
 const formatCurrency = (v: number) =>
-	`₹${
-		v >= 1000000
-			? `${(v / 1000000).toFixed(1)}M`
-			: v >= 1000
-			? `${(v / 1000).toFixed(0)}K`
-			: v.toFixed(0)
-	}`;
+	v >= 10000000
+		? `₹${(v / 10000000).toFixed(2).replace(/\.?0+$/, '')} Cr`
+		: v >= 100000
+		? `₹${(v / 100000).toFixed(2).replace(/\.?0+$/, '')} L`
+		: v >= 1000
+		? `₹${(v / 1000).toFixed(1).replace(/\.?0+$/, '')} K`
+		: `₹${v.toFixed(0)}`;
 const formatDate = (d: string) =>
 	new Date(d).toLocaleDateString('en-IN', {
 		day: 'numeric',
