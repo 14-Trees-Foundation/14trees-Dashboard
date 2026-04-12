@@ -107,24 +107,24 @@ const VisitFilmStrip: React.FC<Props> = ({ visits, giftCards }) => {
 		});
 
 	return (
-		<Box sx={{ bgcolor: '#f5f5f0', pt: SECTION_GAP, pb: 6 }}>
+		<Box sx={{ bgcolor: '#dfe4e0', pt: SECTION_GAP, pb: { xs: 5, md: 6 } }}>
 			{/* Search + filter bar */}
 			<Box sx={{ px: { xs: 2, sm: 3 } }}>
 				<Box
 					sx={{
-						width: '100%',
-						maxWidth: '800px',
+						// width: { xs: 'calc(100% - 16px)', sm: '100%' },
+						maxWidth: { xs: '680px', md: '800px' },
 						ml: 'auto',
 						mr: 'auto',
 						bgcolor: '#fff',
 						border: '1px solid #e6e8e6',
-						borderRadius: '28px',
+						borderRadius: { xs: '20px', md: '28px' },
 						boxShadow: '0px 4px 17px 0px #1F36251A',
 						px: { xs: 2, md: 3 },
-						py: { xs: 2, md: 2 },
+						py: { xs: 2.25, md: 2 },
 						display: 'flex',
 						flexDirection: 'column',
-						gap: '40px',
+						gap: { xs: 2.1, md: '40px' },
 					}}
 				>
 					{/* Search input */}
@@ -134,12 +134,16 @@ const VisitFilmStrip: React.FC<Props> = ({ visits, giftCards }) => {
 							alignItems: 'center',
 							bgcolor: '#fff',
 							border: '1px solid #d0d5d0',
-							borderRadius: '12px',
+							borderRadius: '14px',
 							pl: 2,
 							pr: 0.5,
-							py: 0.35,
+							py: 0.45,
+							width: '100%',
 							maxWidth: '100%',
-							minHeight: 48,
+							boxSizing: 'border-box',
+							minHeight: 56,
+							gap: 1,
+							overflow: 'hidden',
 						}}
 					>
 						<InputBase
@@ -148,7 +152,9 @@ const VisitFilmStrip: React.FC<Props> = ({ visits, giftCards }) => {
 							value={search}
 							onChange={(e) => setSearch(e.target.value)}
 							sx={{
-								fontSize: 16,
+								flex: 1,
+								minWidth: 0,
+								fontSize: 14,
 								color: '#6f7b73',
 								'& input::placeholder': {
 									color: '#6f7b73',
@@ -162,12 +168,14 @@ const VisitFilmStrip: React.FC<Props> = ({ visits, giftCards }) => {
 								bgcolor: '#1f452d',
 								textTransform: 'none',
 								borderRadius: '12px',
-								minWidth: 116,
-								height: 40,
-								px: 1,
+								minWidth: { xs: 92, md: 116 },
+								flexShrink: 0,
+								height: 44,
+								px: 2,
 								fontWeight: 500,
-								fontSize: '18px',
+								fontSize: { xs: '14px', md: '18px' },
 								lineHeight: '24px',
+								boxShadow: 'none',
 								'&:hover': { bgcolor: '#163824' },
 							}}
 						>
@@ -180,7 +188,7 @@ const VisitFilmStrip: React.FC<Props> = ({ visits, giftCards }) => {
 						sx={{
 							display: 'flex',
 							alignItems: 'center',
-							justifyContent: 'space-between',
+							justifyContent: { xs: 'flex-start', md: 'space-between' },
 							gap: 1.5,
 							flexWrap: 'wrap',
 						}}
@@ -195,13 +203,13 @@ const VisitFilmStrip: React.FC<Props> = ({ visits, giftCards }) => {
 						>
 							<Typography
 								sx={{
-									mr: 0.75,
+									mr: 0.5,
 									color: '#6f7b73',
-									fontSize: '16px',
+									fontSize: { xs: '14px', md: '16px' },
 									lineHeight: '24px',
 								}}
 							>
-								Filter by
+								Filter by:
 							</Typography>
 							{FILTERS.map((filter) => (
 								<Chip
@@ -209,8 +217,8 @@ const VisitFilmStrip: React.FC<Props> = ({ visits, giftCards }) => {
 									label={filter.value === 'all' ? '• All' : filter.label}
 									onClick={() => setActiveFilter(filter.value)}
 									sx={{
-										height: 44,
-										borderRadius: '12px',
+										height: { xs: 40, md: 44 },
+										borderRadius: '10px',
 										border:
 											activeFilter === filter.value
 												? 'none'
@@ -218,8 +226,8 @@ const VisitFilmStrip: React.FC<Props> = ({ visits, giftCards }) => {
 										bgcolor: activeFilter === filter.value ? '#1f452d' : '#fff',
 										color: activeFilter === filter.value ? '#fff' : '#1f241f',
 										fontWeight: 500,
-										fontSize: '16px',
-										'& .MuiChip-label': { px: 2 },
+										fontSize: { xs: '14px', md: '16px' },
+										'& .MuiChip-label': { px: { xs: 1.4, md: 2 } },
 										'&:hover': {
 											bgcolor:
 												activeFilter === filter.value ? '#163824' : '#f5f5f5',
@@ -232,7 +240,7 @@ const VisitFilmStrip: React.FC<Props> = ({ visits, giftCards }) => {
 						<Box
 							onClick={() => setSortDialogOpen(true)}
 							sx={{
-								height: 40,
+								height: 44,
 								borderRadius: '12px',
 								border: '1px solid #d4d8d4',
 								px: 2,
@@ -240,18 +248,23 @@ const VisitFilmStrip: React.FC<Props> = ({ visits, giftCards }) => {
 								alignItems: 'center',
 								gap: 1.25,
 								color: '#2b4533',
-								minWidth: 180,
+								minWidth: { xs: 200, md: 180 },
+								mt: { xs: 0.25, md: 0 },
 								cursor: 'pointer',
 								'&:hover': { bgcolor: '#f9f9f9' },
 							}}
 						>
-							<Sort sx={{ fontSize: 24 }} />
+							<Sort sx={{ fontSize: 20 }} />
 							<Typography
-								sx={{ fontSize: '16px', lineHeight: '24px', fontWeight: 500 }}
+								sx={{
+									fontSize: { xs: '14px', md: '16px' },
+									lineHeight: '24px',
+									fontWeight: 500,
+								}}
 							>
 								{sortOrder === 'asc' ? 'A-z order' : 'Z-a order'}
 							</Typography>
-							<KeyboardArrowDown sx={{ fontSize: 24, ml: 'auto' }} />
+							<KeyboardArrowDown sx={{ fontSize: 22, ml: 'auto' }} />
 						</Box>
 					</Box>
 				</Box>
@@ -267,7 +280,7 @@ const VisitFilmStrip: React.FC<Props> = ({ visits, giftCards }) => {
 					<Box
 						sx={{
 							width: '100%',
-							maxWidth: { xs: '100%', md: cardsMaxWidth },
+							maxWidth: { xs: '680px', md: cardsMaxWidth },
 							mx: 'auto',
 							display: 'grid',
 							gridTemplateColumns: {

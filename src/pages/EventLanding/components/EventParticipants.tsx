@@ -78,7 +78,7 @@ const EventParticipants: React.FC<Props> = ({ participants }) => {
 					<Typography
 						sx={{
 							fontWeight: 400,
-							fontSize: { xs: '28px', md: '44px' },
+							fontSize: { xs: '24px', md: '44px' },
 							color: '#1f3625',
 							lineHeight: 1.1,
 							mb: 1,
@@ -88,7 +88,7 @@ const EventParticipants: React.FC<Props> = ({ participants }) => {
 					</Typography>
 					<Typography
 						sx={{
-							fontSize: { xs: 16, md: 20 },
+							fontSize: { xs: 14, md: 20 },
 							color: '#2f4a38',
 							lineHeight: 1.5,
 						}}
@@ -147,12 +147,12 @@ const EventParticipants: React.FC<Props> = ({ participants }) => {
 								</Box>
 								<Box>
 									<Typography
-										sx={{ fontSize: 15, color: '#66756b', lineHeight: 1.2 }}
+										sx={{ fontSize: 14, color: '#66756b', lineHeight: 1.2 }}
 									>
 										Trees Planted
 									</Typography>
 									<Typography
-										sx={{ fontSize: 24, color: '#1f3625', lineHeight: 1.05 }}
+										sx={{ fontSize: 20, color: '#1f3625', lineHeight: 1.05 }}
 									>
 										{participants.length}+
 									</Typography>
@@ -193,7 +193,7 @@ const EventParticipants: React.FC<Props> = ({ participants }) => {
 										Acres restored
 									</Typography>
 									<Typography
-										sx={{ fontSize: 24, color: '#1f3625', lineHeight: 1.05 }}
+										sx={{ fontSize: 20, color: '#1f3625', lineHeight: 1.05 }}
 									>
 										00 Acres
 									</Typography>
@@ -229,12 +229,12 @@ const EventParticipants: React.FC<Props> = ({ participants }) => {
 								</Box>
 								<Box>
 									<Typography
-										sx={{ fontSize: 15, color: '#66756b', lineHeight: 1.2 }}
+										sx={{ fontSize: 14, color: '#66756b', lineHeight: 1.2 }}
 									>
 										Native species
 									</Typography>
 									<Typography
-										sx={{ fontSize: 24, color: '#1f3625', lineHeight: 1.05 }}
+										sx={{ fontSize: 20, color: '#1f3625', lineHeight: 1.05 }}
 									>
 										{nativeSpeciesCount}
 									</Typography>
@@ -276,7 +276,7 @@ const EventParticipants: React.FC<Props> = ({ participants }) => {
 									if (e.key === 'Enter') onSearch();
 								}}
 								sx={{
-									fontSize: 16,
+									fontSize: { xs: 14, md: 16 },
 									color: '#4f6156',
 									'& input::placeholder': { color: '#748479', opacity: 1 },
 								}}
@@ -290,7 +290,7 @@ const EventParticipants: React.FC<Props> = ({ participants }) => {
 									textTransform: 'none',
 									minWidth: 110,
 									height: 44,
-									fontSize: 18,
+									fontSize: { xs: 14, md: 18 },
 									fontWeight: 500,
 									'&:hover': { bgcolor: '#163824' },
 								}}
@@ -325,7 +325,7 @@ const EventParticipants: React.FC<Props> = ({ participants }) => {
 										height: 42,
 										borderRadius: '10px',
 										textTransform: 'none',
-										fontSize: 16,
+										fontSize: { xs: 14, md: 16 },
 										fontWeight: 500,
 										color: '#1f3625',
 										bgcolor: viewMode === 'people' ? '#ffffff' : 'transparent',
@@ -350,7 +350,7 @@ const EventParticipants: React.FC<Props> = ({ participants }) => {
 										height: 42,
 										borderRadius: '10px',
 										textTransform: 'none',
-										fontSize: 16,
+										fontSize: { xs: 14, md: 16 },
 										fontWeight: 500,
 										color: '#1f3625',
 										bgcolor: viewMode === 'tree' ? '#ffffff' : 'transparent',
@@ -385,7 +385,9 @@ const EventParticipants: React.FC<Props> = ({ participants }) => {
 								}}
 							>
 								<FilterList sx={{ fontSize: 20 }} />
-								<Typography sx={{ fontSize: 16, fontWeight: 500 }}>
+								<Typography
+									sx={{ fontSize: { xs: 14, md: 16 }, fontWeight: 500 }}
+								>
 									{sortOrder === 'asc' ? 'A-z order' : 'Z-a order'}
 								</Typography>
 								<KeyboardArrowDown sx={{ fontSize: 22 }} />
@@ -452,7 +454,7 @@ const EventParticipants: React.FC<Props> = ({ participants }) => {
 							sx={{
 								display: 'flex',
 								flexDirection: 'column',
-								bgcolor: '#f7f8f6',
+								bgcolor: '#fff',
 								borderRadius: '18px',
 								overflow: 'hidden',
 								border: '1px solid #e5e9e5',
@@ -535,8 +537,8 @@ const EventParticipants: React.FC<Props> = ({ participants }) => {
 											position: 'absolute',
 											left: { xs: -8, md: -16 },
 											bottom: { xs: -16, md: -42 },
-											width: { xs: 120, md: 182 },
-											height: { xs: 120, md: 182 },
+											width: { xs: 132, md: 200 },
+											height: { xs: 132, md: 200 },
 											p: 0,
 											borderRadius: 0,
 											background: 'transparent',
@@ -562,7 +564,15 @@ const EventParticipants: React.FC<Props> = ({ participants }) => {
 								)}
 							</Box>
 
-							<Box sx={{ p: 2.5, bgcolor: '#fff' }}>
+							<Box
+								sx={{
+									p: 2.5,
+									bgcolor: '#fff',
+									flex: 1,
+									display: 'flex',
+									flexDirection: 'column',
+								}}
+							>
 								<Typography
 									sx={{
 										fontSize: 12,
@@ -600,6 +610,7 @@ const EventParticipants: React.FC<Props> = ({ participants }) => {
 										alignItems: 'flex-start',
 										justifyContent: 'space-between',
 										gap: 1.5,
+										mt: 'auto',
 									}}
 								>
 									<Box sx={{ minWidth: 0, flex: 1 }}>

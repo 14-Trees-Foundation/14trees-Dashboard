@@ -78,7 +78,7 @@ const AboutSection: React.FC<Props> = ({ image, description }) => {
 							<Box>
 								<Typography
 									sx={{
-										fontSize: 15,
+										fontSize: 14,
 										fontWeight: 600,
 										color: '#1e3a28',
 										lineHeight: 1.2,
@@ -87,7 +87,7 @@ const AboutSection: React.FC<Props> = ({ image, description }) => {
 									14 Trees
 								</Typography>
 								<Typography
-									sx={{ fontSize: 13, color: '#4a7058', lineHeight: 1.2 }}
+									sx={{ fontSize: 12, color: '#4a7058', lineHeight: 1.2 }}
 								>
 									Foundation
 								</Typography>
@@ -105,7 +105,7 @@ const AboutSection: React.FC<Props> = ({ image, description }) => {
 								gap: 0.5,
 								bgcolor: '#1f3625',
 								color: '#fff',
-								fontSize: 14,
+								fontSize: 12,
 								fontWeight: 500,
 								px: 2,
 								py: 1.25,
@@ -115,14 +115,14 @@ const AboutSection: React.FC<Props> = ({ image, description }) => {
 							}}
 						>
 							Explore 14 Trees
-							<OpenInNewIcon sx={{ fontSize: 15 }} />
+							<OpenInNewIcon sx={{ fontSize: 12 }} />
 						</Link>
 					</Box>
 
 					{/* Heading */}
 					<Typography
 						sx={{
-							fontSize: { xs: 24, md: 30 },
+							fontSize: { xs: 20, md: 30 },
 							fontWeight: 600,
 							color: '#1e3a28',
 							mb: 2,
@@ -134,9 +134,9 @@ const AboutSection: React.FC<Props> = ({ image, description }) => {
 					{/* Body */}
 					<Typography
 						sx={{
-							fontSize: { xs: 15, md: 16 },
-							lineHeight: 1.8,
-							color: '#2e4a38',
+							fontSize: { xs: 14, md: 16 },
+							lineHeight: 1.5,
+							color: '#1f3625',
 						}}
 					>
 						{description ||
