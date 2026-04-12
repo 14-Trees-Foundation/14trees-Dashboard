@@ -17,6 +17,8 @@ type Props = {
 const EventGallery: React.FC<Props> = ({ images, description }) => {
 	const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
 	const [activeIndex, setActiveIndex] = useState(0);
+	const [touchStartX, setTouchStartX] = useState<number | null>(null);
+	const [touchCurrentX, setTouchCurrentX] = useState<number | null>(null);
 
 	if (images.length === 0) return null;
 
@@ -33,6 +35,38 @@ const EventGallery: React.FC<Props> = ({ images, description }) => {
 		setActiveIndex((i) => (i - 1 + images.length) % images.length);
 	const nextMain = () => setActiveIndex((i) => (i + 1) % images.length);
 
+	const onSwipeStart = (clientX: number) => {
+		setTouchStartX(clientX);
+		setTouchCurrentX(clientX);
+	};
+
+	const onSwipeMove = (clientX: number) => {
+		if (touchStartX === null) return;
+		setTouchCurrentX(clientX);
+	};
+
+	const onMainSwipeEnd = () => {
+		if (touchStartX === null || touchCurrentX === null) return;
+		const delta = touchStartX - touchCurrentX;
+		if (Math.abs(delta) > 40) {
+			if (delta > 0) nextMain();
+			else prevMain();
+		}
+		setTouchStartX(null);
+		setTouchCurrentX(null);
+	};
+
+	const onLightboxSwipeEnd = () => {
+		if (touchStartX === null || touchCurrentX === null) return;
+		const delta = touchStartX - touchCurrentX;
+		if (Math.abs(delta) > 40) {
+			if (delta > 0) next();
+			else prev();
+		}
+		setTouchStartX(null);
+		setTouchCurrentX(null);
+	};
+
 	return (
 		<Box
 			sx={{
@@ -48,13 +82,14 @@ const EventGallery: React.FC<Props> = ({ images, description }) => {
 		>
 			<Box
 				sx={{
-					width: '100%',
+					// width: '100%',
 					maxWidth: '1320px',
 					mx: 'auto',
 					display: 'grid',
 					gridTemplateColumns: { xs: '1fr', md: '1.1fr 0.9fr' },
 					gap: { xs: 3, md: 4 },
 					alignItems: 'start',
+					m: 1,
 				}}
 			>
 				<Box>
@@ -71,12 +106,16 @@ const EventGallery: React.FC<Props> = ({ images, description }) => {
 							src={images[activeIndex].image_url}
 							alt={`Photo ${activeIndex + 1}`}
 							onClick={() => openLightbox(activeIndex)}
+							onTouchStart={(e) => onSwipeStart(e.touches[0].clientX)}
+							onTouchMove={(e) => onSwipeMove(e.touches[0].clientX)}
+							onTouchEnd={onMainSwipeEnd}
 							sx={{
 								width: '100%',
 								height: { xs: 360, md: 600 },
 								objectFit: 'cover',
 								display: 'block',
 								cursor: 'pointer',
+								touchAction: 'pan-y',
 							}}
 						/>
 					</Box>
@@ -130,8 +169,8 @@ const EventGallery: React.FC<Props> = ({ images, description }) => {
 					</Typography>
 					<Typography
 						sx={{
-							fontSize: { xs: 15, md: 17 },
-							lineHeight: 1.75,
+							fontSize: { xs: 14, md: 17 },
+							lineHeight: 1.5,
 							color: 'rgba(240,247,239,0.92)',
 							whiteSpace: 'pre-line',
 						}}
@@ -195,11 +234,15 @@ const EventGallery: React.FC<Props> = ({ images, description }) => {
 							component="img"
 							src={images[lightboxIndex].image_url}
 							alt={`Photo ${lightboxIndex + 1}`}
+							onTouchStart={(e) => onSwipeStart(e.touches[0].clientX)}
+							onTouchMove={(e) => onSwipeMove(e.touches[0].clientX)}
+							onTouchEnd={onLightboxSwipeEnd}
 							sx={{
 								maxHeight: '90vh',
 								maxWidth: '90vw',
 								borderRadius: '8px',
 								objectFit: 'contain',
+								touchAction: 'pan-y',
 							}}
 						/>
 					)}

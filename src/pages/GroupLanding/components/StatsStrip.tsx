@@ -1,4 +1,4 @@
-import { Box, Divider, Typography } from '@mui/material';
+import { Box, Typography } from '@mui/material';
 import { Park, Spa, TrendingUp } from '@mui/icons-material';
 import {
 	GroupLandingStats,
@@ -47,35 +47,39 @@ const StatsStrip: React.FC<Props> = ({ group, stats }) => {
 	return (
 		<Box
 			sx={{
-				bgcolor: '#f5f5f0',
-				pt: 3,
-				pb: 0,
-				px: 2,
+				bgcolor: '#dfe4e0',
+				pt: { xs: 3, md: 4 },
+				pb: { xs: 2, md: 1 },
+				px: { xs: 2, md: 2 },
 			}}
 		>
 			<Box
 				sx={{
-					pt: 4,
-					width: '100%',
-					maxWidth: '1208.666748046875px',
+					pt: { xs: 1.5, md: 3 },
+					width: {
+						xs: 'calc(100% - 16px)',
+						sm: 'calc(100% - 24px)',
+						md: '100%',
+					},
+					maxWidth: { xs: '600px', md: '1208.666748046875px' },
 					mx: 'auto',
 					display: 'flex',
 					flexDirection: 'column',
 					alignItems: 'center',
-					gap: '40px',
+					gap: { xs: 2.5, md: 4.5 },
 				}}
 			>
-				<Box sx={{ textAlign: 'center' }}>
+				<Box sx={{ textAlign: 'center', maxWidth: { xs: 360, md: 'none' } }}>
 					<Typography
 						sx={{
 							fontFamily:
 								'"Instrument Sans", "HelveticaNowDisplay", sans-serif',
 							fontWeight: 500,
-							fontSize: '24px',
-							lineHeight: '32px',
+							fontSize: { xs: '22px', sm: '26px', md: '24px' },
+							lineHeight: { xs: '32px', sm: '34px', md: '32px' },
 							color: '#1f3625',
-							mb: 1,
-							whiteSpace: { xs: 'normal', md: 'nowrap' },
+							mb: { xs: 1.5, md: 1 },
+							whiteSpace: 'normal',
 						}}
 					>
 						Thank you for your partnership in restoring our ecosystems!
@@ -85,10 +89,10 @@ const StatsStrip: React.FC<Props> = ({ group, stats }) => {
 							fontFamily:
 								'"Instrument Sans", "HelveticaNowDisplay", sans-serif',
 							fontWeight: 400,
-							fontSize: '16px',
-							lineHeight: '26px',
+							fontSize: { xs: '16px', sm: '18px', md: '16px' },
+							lineHeight: { xs: '28px', sm: '30px', md: '26px' },
 							color: '#1f3625',
-							whiteSpace: { xs: 'normal', md: 'nowrap' },
+							whiteSpace: 'normal',
 						}}
 					>
 						Your support helps us plant native trees, conserve biodiversity, and
@@ -98,35 +102,45 @@ const StatsStrip: React.FC<Props> = ({ group, stats }) => {
 
 				<Box
 					sx={{
-						width: '100%',
-						maxWidth: '1208.666748046875px',
-						minHeight: 109,
-						display: 'flex',
-						alignItems: 'center',
-						justifyContent: 'space-between',
-						flexWrap: { xs: 'wrap', md: 'nowrap' },
+						// width: { xs: 'calc(100% - 16px)', sm: 'calc(100% - 24px)', md: '100%' },
+						maxWidth: { xs: '600px', md: '1208.666748046875px' },
+						mx: 'auto',
+						display: 'grid',
+						gridTemplateColumns: {
+							xs: 'repeat(2, minmax(0, 1fr))',
+							md: 'repeat(5, minmax(0, 1fr))',
+						},
 						bgcolor: '#fff',
-						borderRadius: '20px',
+						borderRadius: { xs: '18px', md: '20px' },
 						border: '0.67px solid #e0e0e0',
 						boxShadow: '0px 4px 17px 0px #1F36251A',
-						p: 2,
-						columnGap: 1,
-						rowGap: 1.5,
+						px: { xs: 2.5, md: 2 },
+						py: { xs: 2.25, md: 2 },
+						columnGap: { xs: 1.5, md: 0.5 },
+						rowGap: { xs: 1.75, md: 0.5 },
 					}}
 				>
 					{STATS.map(({ icon: Icon, label, getValue }, index) => (
 						<Box
 							key={label}
-							sx={{ display: 'flex', alignItems: 'center', minWidth: 0 }}
+							sx={{
+								display: 'flex',
+								alignItems: 'center',
+								minWidth: 0,
+								gridColumn: {
+									xs: index === STATS.length - 1 ? '1 / span 1' : 'auto',
+									md: 'auto',
+								},
+							}}
 						>
 							<Box
 								sx={{
 									display: 'flex',
 									alignItems: 'center',
-									gap: 1.75,
-									px: { xs: 0.5, md: 1.25 },
+									gap: 1.4,
+									px: { xs: 0.25, md: 1 },
 									py: 0.25,
-									minWidth: { xs: '46%', md: 'auto' },
+									minWidth: 0,
 								}}
 							>
 								<Box
@@ -134,15 +148,17 @@ const StatsStrip: React.FC<Props> = ({ group, stats }) => {
 										display: 'flex',
 										alignItems: 'center',
 										justifyContent: 'center',
-										width: 40,
-										height: 40,
-										borderRadius: '20px',
+										width: { xs: 48, md: 40 },
+										height: { xs: 48, md: 40 },
+										borderRadius: '999px',
 										bgcolor: '#eff2ee',
 										border: '1px solid #e2e6e2',
 										flexShrink: 0,
 									}}
 								>
-									<Icon sx={{ fontSize: 30, color: '#2f4a38' }} />
+									<Icon
+										sx={{ fontSize: { xs: 23, md: 30 }, color: '#2f4a38' }}
+									/>
 								</Box>
 								<Box sx={{ textAlign: 'left', minWidth: 0 }}>
 									<Typography
@@ -150,10 +166,10 @@ const StatsStrip: React.FC<Props> = ({ group, stats }) => {
 											fontFamily:
 												'"Instrument Sans", "HelveticaNowDisplay", sans-serif',
 											fontWeight: 400,
-											fontSize: '16px',
-											lineHeight: '24px',
+											fontSize: { xs: '15px', md: '16px' },
+											lineHeight: { xs: '24px', md: '24px' },
 											color: '#6a746d',
-											whiteSpace: 'nowrap',
+											whiteSpace: { xs: 'normal', md: 'nowrap' },
 										}}
 									>
 										{label}
@@ -162,9 +178,9 @@ const StatsStrip: React.FC<Props> = ({ group, stats }) => {
 										sx={{
 											fontFamily:
 												'"Instrument Sans", "HelveticaNowDisplay", sans-serif',
-											fontWeight: 400,
-											fontSize: '20px',
-											lineHeight: '32px',
+											fontWeight: 500,
+											fontSize: { xs: '18px', md: '20px' },
+											lineHeight: { xs: '28px', md: '32px' },
 											color: '#1f3625',
 											whiteSpace: 'nowrap',
 										}}
@@ -173,19 +189,6 @@ const StatsStrip: React.FC<Props> = ({ group, stats }) => {
 									</Typography>
 								</Box>
 							</Box>
-
-							{index < STATS.length - 1 && (
-								<Divider
-									orientation="vertical"
-									flexItem
-									sx={{
-										display: { xs: 'none', md: 'block' },
-										borderColor: '#d9ddd9',
-										mx: { md: 1.5 },
-										height: 64,
-									}}
-								/>
-							)}
 						</Box>
 					))}
 				</Box>

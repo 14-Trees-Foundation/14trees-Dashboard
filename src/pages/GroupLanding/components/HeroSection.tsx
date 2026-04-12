@@ -16,7 +16,7 @@ const HeroSection: React.FC<Props> = ({ group }) => {
 			sx={{
 				position: 'relative',
 				width: '100%',
-				minHeight: '100vh',
+				minHeight: { xs: '82vh', md: '100vh' },
 				display: 'flex',
 				flexDirection: 'column',
 				alignItems: 'center',
@@ -60,7 +60,7 @@ const HeroSection: React.FC<Props> = ({ group }) => {
 				onClick={handleScrollDown}
 				sx={{
 					position: 'absolute',
-					bottom: 32,
+					bottom: { xs: 22, md: 32 },
 					left: '50%',
 					transform: 'translateX(-50%)',
 					zIndex: 2,
@@ -82,10 +82,11 @@ const HeroSection: React.FC<Props> = ({ group }) => {
 					variant="body2"
 					sx={{
 						color: '#fff',
-						letterSpacing: 3,
+						letterSpacing: { xs: 2.4, md: 3 },
 						textTransform: 'uppercase',
-						fontSize: 13,
+						fontSize: { xs: 11.5, md: 13 },
 						fontWeight: 500,
+						whiteSpace: 'nowrap',
 					}}
 				>
 					Scroll to Explore

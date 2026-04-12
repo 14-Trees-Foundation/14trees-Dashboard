@@ -1,4 +1,4 @@
-import { Box, Typography, Chip } from '@mui/material';
+import { Box, Typography, Chip, Button } from '@mui/material';
 import { GroupLandingEvent } from '../../../types/GroupLanding';
 
 type Props = {
@@ -28,7 +28,6 @@ const VisitCard: React.FC<Props> = ({ event, onClick }) => {
 
 	return (
 		<Box
-			onClick={handleClick}
 			sx={{
 				width: '100%',
 				maxWidth: { xs: '100%', md: 372 },
@@ -38,7 +37,6 @@ const VisitCard: React.FC<Props> = ({ event, onClick }) => {
 				bgcolor: '#fff',
 				border: '1px solid #dfe4df',
 				boxShadow: '0px 4px 17px 0px #1F36251A',
-				cursor: 'pointer',
 				transition: 'box-shadow 0.2s, transform 0.2s',
 				'&:hover': {
 					boxShadow: '0 10px 26px rgba(31,54,37,0.18)',
@@ -49,7 +47,7 @@ const VisitCard: React.FC<Props> = ({ event, onClick }) => {
 			{/* Cover image */}
 			<Box
 				sx={{
-					height: { xs: 200, md: 250 },
+					height: { xs: 220, md: 270 },
 					bgcolor: '#e8f0e9',
 					overflow: 'hidden',
 				}}
@@ -90,7 +88,7 @@ const VisitCard: React.FC<Props> = ({ event, onClick }) => {
 			<Box
 				sx={{
 					p: 2.25,
-					minHeight: 108,
+					minHeight: 96,
 					display: 'flex',
 					flexDirection: 'column',
 					justifyContent: 'space-between',
@@ -101,7 +99,7 @@ const VisitCard: React.FC<Props> = ({ event, onClick }) => {
 						fontFamily: '"Instrument Sans", "HelveticaNowDisplay", sans-serif',
 						color: '#1f3625',
 						fontWeight: 500,
-						fontSize: '16px',
+						fontSize: { xs: '18px', md: '16px' },
 						lineHeight: '24px',
 						mb: 0.25,
 						overflow: 'hidden',
@@ -113,10 +111,10 @@ const VisitCard: React.FC<Props> = ({ event, onClick }) => {
 					{event.name}
 				</Typography>
 
-				<Typography
+				{/* <Typography
 					sx={{
 						fontFamily: '"Instrument Sans", "HelveticaNowDisplay", sans-serif',
-						fontSize: '15px',
+						fontSize: { xs: '16px', md: '15px' },
 						lineHeight: '22px',
 						color: '#8a938d',
 						display: 'block',
@@ -126,50 +124,78 @@ const VisitCard: React.FC<Props> = ({ event, onClick }) => {
 					}}
 				>
 					{event.site_name ?? 'placeholder'}
-				</Typography>
+				</Typography> */}
 
 				<Box
 					sx={{
 						display: 'flex',
 						alignItems: 'center',
-						gap: 1,
+						justifyContent: 'space-between',
+						gap: 1.5,
 						flexWrap: 'wrap',
 					}}
 				>
-					<Chip
-						label={
-							event.name.toLowerCase().includes('visit')
-								? 'Site visit'
-								: event.name.toLowerCase().includes('gift')
-								? 'Gifts'
-								: 'Event'
-						}
-						size="small"
+					<Box
 						sx={{
-							bgcolor: '#dbe4d6',
-							color: '#38513f',
-							fontWeight: 500,
-							fontSize: '11px',
-							height: 26,
-							borderRadius: '6px',
-							'& .MuiChip-label': { px: 1.25 },
+							display: 'flex',
+							alignItems: 'center',
+							gap: 1,
+							flexWrap: 'wrap',
 						}}
-					/>
-					{formattedDate && (
+					>
 						<Chip
-							label={formattedDate}
+							label={
+								event.name.toLowerCase().includes('visit')
+									? 'Site visit'
+									: event.name.toLowerCase().includes('gift')
+									? 'Gifts'
+									: 'Event'
+							}
 							size="small"
 							sx={{
 								bgcolor: '#dbe4d6',
 								color: '#38513f',
 								fontWeight: 500,
 								fontSize: '11px',
-								height: 26,
+								height: 28,
 								borderRadius: '6px',
 								'& .MuiChip-label': { px: 1.25 },
 							}}
 						/>
-					)}
+						{formattedDate && (
+							<Chip
+								label={formattedDate}
+								size="small"
+								sx={{
+									bgcolor: '#dbe4d6',
+									color: '#38513f',
+									fontWeight: 500,
+									fontSize: '11px',
+									height: 28,
+									borderRadius: '6px',
+									'& .MuiChip-label': { px: 1.25 },
+								}}
+							/>
+						)}
+					</Box>
+
+					<Button
+						onClick={handleClick}
+						sx={{
+							minWidth: { xs: 112, md: 104 },
+							height: 42,
+							borderRadius: '10px',
+							textTransform: 'none',
+							fontWeight: 500,
+							fontSize: { xs: '14px', md: '18px' },
+							lineHeight: '24px',
+							bgcolor: '#1f452d',
+							color: '#fff',
+							'&:hover': { bgcolor: '#163824' },
+						}}
+					>
+						View
+					</Button>
 				</Box>
 			</Box>
 		</Box>
