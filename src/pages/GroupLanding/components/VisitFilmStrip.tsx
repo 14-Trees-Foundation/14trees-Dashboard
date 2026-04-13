@@ -124,7 +124,7 @@ const VisitFilmStrip: React.FC<Props> = ({ visits, giftCards }) => {
 						py: { xs: 2.25, md: 2 },
 						display: 'flex',
 						flexDirection: 'column',
-						gap: { xs: 2.1, md: '40px' },
+						gap: { xs: 2, md: 3 },
 					}}
 				>
 					{/* Search input */}
@@ -132,49 +132,54 @@ const VisitFilmStrip: React.FC<Props> = ({ visits, giftCards }) => {
 						sx={{
 							display: 'flex',
 							alignItems: 'center',
-							bgcolor: '#fff',
-							border: '1px solid #d0d5d0',
-							borderRadius: '14px',
-							pl: 2,
-							pr: 0.5,
-							py: 0.45,
+							gap: 1,
 							width: '100%',
 							maxWidth: '100%',
-							boxSizing: 'border-box',
-							minHeight: 56,
-							gap: 1,
-							overflow: 'hidden',
+							minHeight: 44,
 						}}
 					>
-						<InputBase
-							fullWidth
-							placeholder="Search by Name..."
-							value={search}
-							onChange={(e) => setSearch(e.target.value)}
+						<Box
 							sx={{
 								flex: 1,
 								minWidth: 0,
-								fontSize: 14,
-								color: '#6f7b73',
-								'& input::placeholder': {
-									color: '#6f7b73',
-									opacity: 1,
-								},
+								bgcolor: '#fff',
+								border: '1px solid #d0d5d0',
+								borderRadius: '14px',
+								pl: 2,
+								pr: 1,
+								height: 48,
+								display: 'flex',
+								alignItems: 'center',
+								boxSizing: 'border-box',
 							}}
-						/>
+						>
+							<InputBase
+								fullWidth
+								placeholder="Search by Name..."
+								value={search}
+								onChange={(e) => setSearch(e.target.value)}
+								sx={{
+									fontSize: 14,
+									color: '#6f7b73',
+									'& input::placeholder': {
+										color: '#6f7b73',
+										opacity: 1,
+									},
+								}}
+							/>
+						</Box>
 						<Button
 							variant="contained"
 							sx={{
 								bgcolor: '#1f452d',
 								textTransform: 'none',
 								borderRadius: '12px',
-								minWidth: { xs: 92, md: 116 },
+								minWidth: { xs: 96, md: 116 },
 								flexShrink: 0,
-								height: 44,
+								height: 48,
 								px: 2,
 								fontWeight: 500,
 								fontSize: { xs: '14px', md: '18px' },
-								lineHeight: '24px',
 								boxShadow: 'none',
 								'&:hover': { bgcolor: '#163824' },
 							}}
