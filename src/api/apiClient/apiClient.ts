@@ -734,6 +734,21 @@ class ApiClient {
 		}
 	}
 
+	async getGroupGiftCardsData(nameKey: string): Promise<any> {
+		try {
+			const response = await this.api.get<any>(
+				`/groups/by-key/${encodeURIComponent(nameKey)}/gifts`,
+			);
+			return response.data;
+		} catch (error: any) {
+			console.error('Failed to fetch group landing data', error);
+			if (error?.response?.data?.message) {
+				throw new Error(error.response.data.message);
+			}
+			throw new Error('Failed to load group landing page');
+		}
+	}
+
 	async mergeGroups(
 		primary_group: number,
 		secondary_group: number,

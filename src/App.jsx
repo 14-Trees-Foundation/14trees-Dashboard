@@ -73,6 +73,7 @@ import { ReferralUserPage } from './pages/admin/campaign/ReferralUserPage';
 import CorpRegistration from './pages/CorpRegistration';
 import GroupDashboard from './pages/GroupDashboard/GroupDashboard';
 import GroupLandingPage from './pages/GroupLanding/GroupLandingPage';
+import GiftCardsPage from './pages/GroupLanding/GiftCardsPage';
 import { getOrCreateVisitorId } from './helpers/visitorTracking';
 import { useEffect, useRef } from 'react';
 import ApiClient from './api/apiClient/apiClient';
@@ -246,6 +247,10 @@ function App() {
 					<Route
 						path="/dashboard/sprih"
 						element={<GroupLandingPage nameKey="sprih" />}
+					/>
+					<Route
+						path="/dashboard/:name_key/gifts"
+						element={<GiftCardsPage />}
 					/>
 					<Route path="/dashboard/:name_key" element={<GroupDashboard />} />
 					<Route
