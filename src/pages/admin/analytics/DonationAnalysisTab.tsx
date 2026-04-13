@@ -135,10 +135,12 @@ const FilterDivider: React.FC<{ isDark: boolean }> = ({ isDark }) => (
 );
 
 const formatCurrency = (v: number) =>
-	v >= 1000000
-		? `₹${(v / 1000000).toFixed(1)}M`
+	v >= 10000000
+		? `₹${(v / 10000000).toFixed(2).replace(/\.?0+$/, '')} Cr`
+		: v >= 100000
+		? `₹${(v / 100000).toFixed(2).replace(/\.?0+$/, '')} L`
 		: v >= 1000
-		? `₹${(v / 1000).toFixed(0)}K`
+		? `₹${(v / 1000).toFixed(1).replace(/\.?0+$/, '')} K`
 		: `₹${v.toFixed(0)}`;
 const formatNumber = (v: number) =>
 	v >= 1000 ? `${(v / 1000).toFixed(1)}K` : String(v);
@@ -792,11 +794,42 @@ const DonationAnalysisTab: React.FC<DonationAnalysisTabProps> = ({
 			</Typography>
 			<Typography
 				variant="body2"
-				sx={{ mb: 3, color: isDark ? 'rgba(255,255,255,0.45)' : '#4b5563' }}
+				sx={{ mb: 2, color: isDark ? 'rgba(255,255,255,0.45)' : '#4b5563' }}
 			>
 				Unified view of monetary donations and gift card purchases — trends,
 				donors, and payment breakdowns.
 			</Typography>
+
+			<Box
+				sx={{
+					display: 'flex',
+					alignItems: 'flex-start',
+					gap: 1.5,
+					mb: 3,
+					px: 2,
+					py: 1.5,
+					borderRadius: '10px',
+					background: isDark ? 'rgba(234,179,8,0.08)' : 'rgba(234,179,8,0.1)',
+					border: isDark
+						? '1px solid rgba(234,179,8,0.25)'
+						: '1px solid rgba(234,179,8,0.35)',
+				}}
+			>
+				<Typography sx={{ fontSize: '15px', lineHeight: 1, mt: '1px' }}>
+					⚠️
+				</Typography>
+				<Typography
+					sx={{
+						fontSize: '12px',
+						color: isDark ? 'rgba(234,179,8,0.9)' : '#92400e',
+						lineHeight: 1.5,
+					}}
+				>
+					<strong>Data under reconciliation.</strong> The figures shown here are
+					being verified and may not match official records. Cross-check with
+					source documents before relying on this data.
+				</Typography>
+			</Box>
 
 			{/* Filter bar */}
 			<Box
@@ -1144,6 +1177,7 @@ const DonationAnalysisTab: React.FC<DonationAnalysisTabProps> = ({
 						letterSpacing: '0.08em',
 						color: 'inherit',
 						flexShrink: 0,
+						mt: 2,
 					}}
 				>
 					Breakdown
@@ -1170,7 +1204,7 @@ const DonationAnalysisTab: React.FC<DonationAnalysisTabProps> = ({
 							display: 'flex',
 							alignItems: 'center',
 							justifyContent: 'space-between',
-							mb: 2,
+							mb: 0.5,
 						}}
 					>
 						<Typography
@@ -1180,7 +1214,7 @@ const DonationAnalysisTab: React.FC<DonationAnalysisTabProps> = ({
 								color: isDark ? '#e8ebe9' : '#1a1a1a',
 							}}
 						>
-							Payment Methods
+							Contribution Mode
 						</Typography>
 						<IconButton
 							size="small"
@@ -1191,6 +1225,17 @@ const DonationAnalysisTab: React.FC<DonationAnalysisTabProps> = ({
 							<FileDownloadOutlinedIcon fontSize="small" />
 						</IconButton>
 					</Box>
+					<Typography
+						sx={{
+							fontSize: '11px',
+							color: isDark ? '#6b7a6e' : '#9ca3af',
+							mb: 2,
+							lineHeight: 1.4,
+						}}
+					>
+						How donations are split by contribution mode — tree sponsorship vs.
+						monetary donations, by number of transactions.
+					</Typography>
 					{pmLoading ? (
 						<Skeleton
 							variant="rectangular"
@@ -1237,7 +1282,7 @@ const DonationAnalysisTab: React.FC<DonationAnalysisTabProps> = ({
 							display: 'flex',
 							alignItems: 'center',
 							justifyContent: 'space-between',
-							mb: 2,
+							mb: 0.5,
 						}}
 					>
 						<Typography
@@ -1258,6 +1303,17 @@ const DonationAnalysisTab: React.FC<DonationAnalysisTabProps> = ({
 							<FileDownloadOutlinedIcon fontSize="small" />
 						</IconButton>
 					</Box>
+					<Typography
+						sx={{
+							fontSize: '11px',
+							color: isDark ? '#6b7a6e' : '#9ca3af',
+							mb: 2,
+							lineHeight: 1.4,
+						}}
+					>
+						Breakdown of donations by what was given — trees only, money only,
+						or both trees and money in the same donation.
+					</Typography>
 					{typeSplitLoading ? (
 						<Skeleton
 							variant="rectangular"
@@ -1333,6 +1389,17 @@ const DonationAnalysisTab: React.FC<DonationAnalysisTabProps> = ({
 							<FileDownloadOutlinedIcon fontSize="small" />
 						</IconButton>
 					</Box>
+					<Typography
+						sx={{
+							fontSize: '11px',
+							color: isDark ? '#6b7a6e' : '#9ca3af',
+							mb: 1.5,
+							lineHeight: 1.4,
+						}}
+					>
+						Loyalty and retention signals — repeat donor rate, average lifetime
+						contribution, and how often donors give (one-time vs. recurring).
+					</Typography>
 					{repeatLoading || freqLoading ? (
 						Array.from({ length: 4 }).map((_, i) => (
 							<Skeleton
