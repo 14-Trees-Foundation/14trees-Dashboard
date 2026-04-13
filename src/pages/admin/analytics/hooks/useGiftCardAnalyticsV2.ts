@@ -101,6 +101,7 @@ export function useGiftCardYearly(
 export function useGiftCardOccasions(
 	type: 'all' | 'corporate' | 'personal' = 'all',
 	source?: GiftCardSourceFilter,
+	year?: number,
 ) {
 	const [data, setData] = useState<GiftCardOccasionsResponse | null>(null);
 	const [loading, setLoading] = useState(true);
@@ -112,7 +113,7 @@ export function useGiftCardOccasions(
 		setLoading(true);
 		setError(null);
 		apiClient
-			.getGiftCardOccasions(type, source)
+			.getGiftCardOccasions(type, source, year || undefined)
 			.then((res) => {
 				setData(res);
 				setLoading(false);
@@ -121,7 +122,7 @@ export function useGiftCardOccasions(
 				setError(err.message || 'Failed to load');
 				setLoading(false);
 			});
-	}, [type, source]);
+	}, [type, source, year]);
 
 	return { data, loading, error };
 }

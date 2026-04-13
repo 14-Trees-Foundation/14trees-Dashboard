@@ -190,6 +190,7 @@ const GiftCardAnalysisTab: React.FC<GiftCardAnalysisTabProps> = ({
 	const { data: occasions, loading: occasionsLoading } = useGiftCardOccasions(
 		typeFilter !== 'all' ? typeFilter : undefined,
 		sourceParam,
+		selectedYear || undefined,
 	);
 	const { data: treeDistribution, loading: treeDistLoading } =
 		useGiftCardTreeDistribution(

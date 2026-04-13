@@ -36,8 +36,6 @@ import ConfirmDialog from './ConfirmDialog';
 import FormEditorDialog from './FormEditorDialog';
 import ApiClient from '../../../../api/apiClient/apiClient';
 
-const apiClient = new ApiClient();
-
 const SurveyForms: React.FC = () => {
 	const theme = useTheme();
 	const [page, setPage] = useState(0);
@@ -102,6 +100,7 @@ const SurveyForms: React.FC = () => {
 		if (!selectedForm) return;
 		setActionError(null);
 		try {
+			const apiClient = new ApiClient();
 			if (confirmAction === 'archive') {
 				await apiClient.archiveSurveyConfig(selectedForm.surveyId);
 			} else {
@@ -137,6 +136,7 @@ const SurveyForms: React.FC = () => {
 		if (!selectedForm) return;
 		handleMenuClose();
 		try {
+			const apiClient = new ApiClient();
 			const result = await apiClient.cloneSurveyConfig(selectedForm.surveyId);
 			setActionError(null);
 			refetch();
@@ -150,6 +150,7 @@ const SurveyForms: React.FC = () => {
 	};
 
 	const handleSaveForm = async (payload: any) => {
+		const apiClient = new ApiClient();
 		if (editorMode === 'create') {
 			await apiClient.createSurveyConfig(payload);
 		} else if (editingForm) {

@@ -36,8 +36,6 @@ import type {
 import ResponseDetailsDrawer from './ResponseDetailsDrawer';
 import ApiClient from '../../../../api/apiClient/apiClient';
 
-const apiClient = new ApiClient();
-
 const SurveyResponses: React.FC = () => {
 	const theme = useTheme();
 	const [page, setPage] = useState(0);
@@ -100,6 +98,7 @@ const SurveyResponses: React.FC = () => {
 	const handleExport = async () => {
 		setExporting(true);
 		try {
+			const apiClient = new ApiClient();
 			const blob = await apiClient.exportSurveyResponses({
 				surveyId: filters.surveyId || undefined,
 				submittedBy: filters.submittedBy || undefined,
