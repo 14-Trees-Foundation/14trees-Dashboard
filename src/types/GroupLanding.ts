@@ -44,3 +44,24 @@ export type GroupLandingData = {
 	events: GroupLandingEvent[];
 	gift_cards: GroupLandingGiftCard[];
 };
+
+export type GroupGiftCardItem = {
+	id: number;
+	gift_card_request_id: number;
+	request_id: string | null;
+	event_type: string | null;
+	status: string | null;
+	card_image_url: string | null;
+	event_name: string | null;
+	gifted_on: string | null;
+	recipient_name: string | null;
+	assigned_to_name: string | null;
+	sapling_id: string | null;
+	tree_type: string | null;
+	info_card_s3_path: string | null;
+	illustration_s3_path: string | null;
+};
+
+export type GroupGiftCardsData = {
+	cards: GroupGiftCardItem[];
+};

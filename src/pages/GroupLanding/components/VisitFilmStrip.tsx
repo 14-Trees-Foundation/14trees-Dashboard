@@ -1,4 +1,5 @@
 import { useState, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
 	Box,
 	Typography,
@@ -23,11 +24,12 @@ import {
 	GroupLandingGiftCard,
 } from '../../../types/GroupLanding';
 import VisitCard from './VisitCard';
-import GiftCard from './GiftCard';
+import corporateGiftsImg from '../../../assets/home/corporate-gifts.jpeg';
 
 type Props = {
 	visits: GroupLandingEvent[];
 	giftCards: GroupLandingGiftCard[];
+	nameKey: string;
 };
 
 const FILTERS = [
@@ -46,7 +48,8 @@ const getEventCategory = (event: GroupLandingEvent) => {
 
 const SECTION_GAP = { xs: 3, md: 5 };
 
-const VisitFilmStrip: React.FC<Props> = ({ visits, giftCards }) => {
+const VisitFilmStrip: React.FC<Props> = ({ visits, giftCards, nameKey }) => {
+	const navigate = useNavigate();
 	const [search, setSearch] = useState('');
 	const [activeFilter, setActiveFilter] = useState('all');
 	const [selected, setSelected] = useState<GroupLandingEvent | null>(null);
@@ -74,23 +77,14 @@ const VisitFilmStrip: React.FC<Props> = ({ visits, giftCards }) => {
 		return result;
 	}, [visits, search, activeFilter, sortOrder]);
 
-	const filteredGiftCards = useMemo(() => {
-		if (activeFilter !== 'all' && activeFilter !== 'gifts') return [];
-		return giftCards
-			.filter((gc) => {
-				const name = (gc.event_name ?? '').toLowerCase();
-				return !search || name.includes(search.toLowerCase());
-			})
-			.sort((a, b) => {
-				const nameA = (a.event_name ?? '').toLowerCase();
-				const nameB = (b.event_name ?? '').toLowerCase();
-				return sortOrder === 'asc'
-					? nameA.localeCompare(nameB)
-					: nameB.localeCompare(nameA);
-			});
-	}, [giftCards, search, activeFilter, sortOrder]);
+	const showGiftsCard =
+		giftCards.length > 0 &&
+		(activeFilter === 'all' || activeFilter === 'gifts') &&
+		(!search || 'gift'.includes(search.toLowerCase()));
 
-	const totalCount = filteredEvents.length + filteredGiftCards.length;
+	const totalGifted = giftCards.reduce((sum, gc) => sum + gc.no_of_cards, 0);
+
+	const totalCount = filteredEvents.length + (showGiftsCard ? 1 : 0);
 
 	const cardsMaxWidth =
 		totalCount >= 3
@@ -124,7 +118,7 @@ const VisitFilmStrip: React.FC<Props> = ({ visits, giftCards }) => {
 						py: { xs: 2.25, md: 2 },
 						display: 'flex',
 						flexDirection: 'column',
-						gap: { xs: 2.1, md: '40px' },
+						gap: { xs: 2, md: 3 },
 					}}
 				>
 					{/* Search input */}
@@ -132,49 +126,54 @@ const VisitFilmStrip: React.FC<Props> = ({ visits, giftCards }) => {
 						sx={{
 							display: 'flex',
 							alignItems: 'center',
-							bgcolor: '#fff',
-							border: '1px solid #d0d5d0',
-							borderRadius: '14px',
-							pl: 2,
-							pr: 0.5,
-							py: 0.45,
+							gap: 1,
 							width: '100%',
 							maxWidth: '100%',
-							boxSizing: 'border-box',
-							minHeight: 56,
-							gap: 1,
-							overflow: 'hidden',
+							minHeight: 44,
 						}}
 					>
-						<InputBase
-							fullWidth
-							placeholder="Search by Name..."
-							value={search}
-							onChange={(e) => setSearch(e.target.value)}
+						<Box
 							sx={{
 								flex: 1,
 								minWidth: 0,
-								fontSize: 14,
-								color: '#6f7b73',
-								'& input::placeholder': {
-									color: '#6f7b73',
-									opacity: 1,
-								},
+								bgcolor: '#fff',
+								border: '1px solid #d0d5d0',
+								borderRadius: '14px',
+								pl: 2,
+								pr: 1,
+								height: 48,
+								display: 'flex',
+								alignItems: 'center',
+								boxSizing: 'border-box',
 							}}
-						/>
+						>
+							<InputBase
+								fullWidth
+								placeholder="Search by Name..."
+								value={search}
+								onChange={(e) => setSearch(e.target.value)}
+								sx={{
+									fontSize: 14,
+									color: '#6f7b73',
+									'& input::placeholder': {
+										color: '#6f7b73',
+										opacity: 1,
+									},
+								}}
+							/>
+						</Box>
 						<Button
 							variant="contained"
 							sx={{
 								bgcolor: '#1f452d',
 								textTransform: 'none',
 								borderRadius: '12px',
-								minWidth: { xs: 92, md: 116 },
+								minWidth: { xs: 96, md: 116 },
 								flexShrink: 0,
-								height: 44,
+								height: 48,
 								px: 2,
 								fontWeight: 500,
 								fontSize: { xs: '14px', md: '18px' },
-								lineHeight: '24px',
 								boxShadow: 'none',
 								'&:hover': { bgcolor: '#163824' },
 							}}
@@ -308,14 +307,17 @@ const VisitFilmStrip: React.FC<Props> = ({ visits, giftCards }) => {
 								<VisitCard event={event} onClick={setSelected} />
 							</Box>
 						))}
-						{filteredGiftCards.map((gc) => (
+						{showGiftsCard && (
 							<Box
-								key={`gc-${gc.id}`}
+								key="gifts-aggregate"
 								sx={{ display: 'flex', justifyContent: 'center' }}
 							>
-								<GiftCard card={gc} />
+								<AggregatedGiftCard
+									totalGifts={totalGifted}
+									onClick={() => navigate(`/dashboard/${nameKey}/gifts`)}
+								/>
 							</Box>
-						))}
+						)}
 					</Box>
 				)}
 
@@ -491,5 +493,110 @@ const VisitFilmStrip: React.FC<Props> = ({ visits, giftCards }) => {
 		</Box>
 	);
 };
+
+const AggregatedGiftCard: React.FC<{
+	totalGifts: number;
+	onClick: () => void;
+}> = ({ totalGifts, onClick }) => (
+	<Box
+		onClick={onClick}
+		sx={{
+			width: '100%',
+			maxWidth: { xs: '100%', md: 372 },
+			mx: 'auto',
+			borderRadius: '14px',
+			overflow: 'hidden',
+			bgcolor: '#fff',
+			border: '1px solid #dfe4df',
+			boxShadow: '0px 4px 17px 0px #1F36251A',
+			cursor: 'pointer',
+			transition: 'box-shadow 0.2s, transform 0.2s',
+			'&:hover': {
+				boxShadow: '0 10px 26px rgba(31,54,37,0.18)',
+				transform: 'translateY(-2px)',
+			},
+		}}
+	>
+		<Box
+			sx={{
+				height: { xs: 200, md: 250 },
+				overflow: 'hidden',
+			}}
+		>
+			<Box
+				component="img"
+				src={corporateGiftsImg}
+				alt="Corporate Gifts"
+				sx={{
+					width: '100%',
+					height: '100%',
+					objectFit: 'cover',
+					display: 'block',
+				}}
+			/>
+		</Box>
+		<Box
+			sx={{
+				p: 2.25,
+				minHeight: 108,
+				display: 'flex',
+				flexDirection: 'column',
+				justifyContent: 'space-between',
+			}}
+		>
+			<Typography
+				sx={{
+					fontFamily: '"Instrument Sans", "HelveticaNowDisplay", sans-serif',
+					color: '#1f3625',
+					fontWeight: 500,
+					fontSize: '16px',
+					lineHeight: '24px',
+					mb: 0.25,
+				}}
+			>
+				Gift Cards
+			</Typography>
+			<Typography
+				sx={{
+					fontFamily: '"Instrument Sans", "HelveticaNowDisplay", sans-serif',
+					fontSize: '15px',
+					lineHeight: '22px',
+					color: '#8a938d',
+					mb: 1.5,
+				}}
+			>
+				{totalGifts.toLocaleString('en-IN')} trees gifted
+			</Typography>
+			<Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+				<Chip
+					label="Gift Card"
+					size="small"
+					sx={{
+						bgcolor: '#dbe4d6',
+						color: '#38513f',
+						fontWeight: 500,
+						fontSize: '11px',
+						height: 26,
+						borderRadius: '6px',
+						'& .MuiChip-label': { px: 1.25 },
+					}}
+				/>
+				<Chip
+					label={`${totalGifts.toLocaleString('en-IN')} Gift card events`}
+					size="small"
+					sx={{
+						bgcolor: '#dbe4d6',
+						color: '#38513f',
+						fontWeight: 500,
+						fontSize: '11px',
+						height: 26,
+						borderRadius: '6px',
+						'& .MuiChip-label': { px: 1.25 },
+					}}
+				/>
+			</Box>
+		</Box>
+	</Box>
+);
 
 export default VisitFilmStrip;
