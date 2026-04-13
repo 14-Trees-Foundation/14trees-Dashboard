@@ -1,7 +1,5 @@
 import { useState, useEffect } from 'react';
 import ApiClient from '../../../../api/apiClient/apiClient';
-
-const apiClient = new ApiClient();
 import type {
 	SurveyConfig,
 	SurveyConfigsResponse,
@@ -21,6 +19,7 @@ export const useSurveyForms = (
 		setLoading(true);
 		setError(null);
 		try {
+			const apiClient = new ApiClient();
 			const offset = page * rowsPerPage;
 			const response = await apiClient.getSurveyConfigs(offset, rowsPerPage, {
 				status: filters.status !== 'all' ? filters.status : undefined,
@@ -65,6 +64,7 @@ export const useSurveyForm = (surveyId: string | null) => {
 			setLoading(true);
 			setError(null);
 			try {
+				const apiClient = new ApiClient();
 				const response = await apiClient.getSurveyConfig(surveyId);
 				setForm(response);
 			} catch (err: any) {

@@ -7,8 +7,6 @@ import type {
 	ResponseStats,
 } from '../../../../types/surveys';
 
-const apiClient = new ApiClient();
-
 export const useSurveyResponses = (
 	page: number,
 	rowsPerPage: number,
@@ -22,6 +20,7 @@ export const useSurveyResponses = (
 		setLoading(true);
 		setError(null);
 		try {
+			const apiClient = new ApiClient();
 			const offset = page * rowsPerPage;
 			const response = await apiClient.getSurveyResponses(offset, rowsPerPage, {
 				surveyId: filters.surveyId || undefined,
@@ -68,6 +67,7 @@ export const useSurveyResponse = (responseId: string | null) => {
 			setLoading(true);
 			setError(null);
 			try {
+				const apiClient = new ApiClient();
 				const data = await apiClient.getSurveyResponseById(responseId);
 				setResponse(data);
 			} catch (err: any) {
@@ -93,6 +93,7 @@ export const useResponseStats = (surveyId?: string) => {
 			setLoading(true);
 			setError(null);
 			try {
+				const apiClient = new ApiClient();
 				const data = await apiClient.getResponseStats(surveyId);
 				setStats(data);
 			} catch (err: any) {
