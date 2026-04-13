@@ -341,7 +341,14 @@ const EmailConfirmationModal: React.FC<EmailConfirmationModalProps> = ({
 				<Button onClick={onClose} color="error">
 					Cancel
 				</Button>
-				<Button onClick={handleSendMails} color="success" variant="contained">
+				<Button
+					onClick={handleSendMails}
+					color="success"
+					variant="contained"
+					disabled={
+						loading || toEmails.length > 0 || emailInput.trim().length > 0
+					}
+				>
 					Confirm
 				</Button>
 			</DialogActions>
