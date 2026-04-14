@@ -125,3 +125,55 @@ export const LIGHT_CHART_TOOLTIP = {
 	padding: 12,
 	cornerRadius: 10,
 };
+
+// ─── Form design tokens ───────────────────────────────────────────────────────
+// Shared by all admin forms (Add/Edit dialogs). Mirror lightAnalyticsTheme values
+// so forms feel visually consistent with the analytics pages.
+
+export const FORM_COLORS = {
+	dialogBg: '#ffffff',
+	sectionBg: '#fafaf8',
+	border: '#e8e4dc',
+	borderFocus: '#2d5a2d',
+	accent: '#2d5a2d',
+	accentLight: '#8bc34a',
+	textPrimary: '#1a1a1a',
+	textSecondary: '#4b5563',
+	textMuted: '#9ca3af',
+	stepActive: '#2d5a2d',
+	stepCompleted: '#8bc34a',
+	stepInactive: '#e5e7eb',
+	fieldBg: '#ffffff',
+	errorRed: '#dc2626',
+	chipBg: '#f0fdf4',
+	chipBorder: '#bbf7d0',
+} as const;
+
+export const formLabelSx = {
+	fontSize: '0.68rem',
+	fontWeight: 600,
+	textTransform: 'uppercase' as const,
+	letterSpacing: '0.07em',
+	color: FORM_COLORS.textMuted,
+	mb: 0.5,
+	display: 'block',
+};
+
+export const formSectionTitleSx = {
+	fontSize: '0.88rem',
+	fontWeight: 600,
+	color: FORM_COLORS.textPrimary,
+	letterSpacing: '-0.01em',
+};
+
+export const formSectionSubtitleSx = {
+	fontSize: '0.75rem',
+	color: FORM_COLORS.textMuted,
+	mt: 0.25,
+};
+
+export const formHelperTextSx = {
+	fontSize: '0.68rem',
+	color: FORM_COLORS.textMuted,
+	mt: 0.25,
+};

@@ -1697,14 +1697,13 @@ class ApiClient {
 			if (file) {
 				formData.append('file', file);
 			}
+			const ARRAY_KEYS = ['google_earth_link', 'tags'];
 			Object.entries(data).forEach(([key, value]) => {
-				if (value === null || value === '') return;
-				if (key !== 'google_earth_link' && key !== 'tags') {
-					const strValue = value as string;
-					formData.append(key, strValue);
-				}
-				if (key === 'tags') {
+				if (value === null || value === undefined || value === '') return;
+				if (ARRAY_KEYS.includes(key)) {
 					formData.append(key, JSON.stringify(value));
+				} else {
+					formData.append(key, value as string);
 				}
 			});
 
