@@ -77,6 +77,7 @@ import GiftCardsPage from './pages/GroupLanding/GiftCardsPage';
 import { getOrCreateVisitorId } from './helpers/visitorTracking';
 import { useEffect, useRef } from 'react';
 import ApiClient from './api/apiClient/apiClient';
+import DevBanner, { DEV_BANNER_HEIGHT } from './components/DevBanner';
 
 function App() {
 	const location = useLocation();
@@ -119,7 +120,9 @@ function App() {
 
 	return (
 		<AuthProvider>
+			<DevBanner />
 			<Layout>
+				{<div style={{ height: DEV_BANNER_HEIGHT, flexShrink: 0 }} />}
 				<Routes>
 					<Route
 						path="/home"
