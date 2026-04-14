@@ -28,7 +28,7 @@ import {
 	GroupGiftCardsData,
 } from '../../types/GroupLanding';
 import CorpFooter from './components/CorpFooter';
-import corporateGiftsImg from '../../assets/home/corporate-gifts.jpeg';
+import corporateGiftsImg from '../../assets/home/gift-hero.jpeg';
 
 type RequestGroup = {
 	gift_card_request_id: number;
