@@ -33,7 +33,7 @@ import CSRPage from './pages/admin/csr/CSRPage';
 import EventPage from './pages/EventDashboard/EventPage';
 import EventLandingPage from './pages/EventLanding/EventLandingPage';
 
-const NEW_EVENT_LANDING_LINKS = new Set(['ij5h8ow9', '5e7vujoc']);
+const NEW_EVENT_LANDING_LINKS = new Set(['ij5h8ow9', '5e7vujoc', 'fl14l9ci']);
 
 const EventPageRouter = () => {
 	const { linkId } = useParams();

@@ -543,18 +543,10 @@ const CardsView: React.FC<{
 	groups: RequestGroup[];
 	onOpenProfile: (saplingId: string | null) => void;
 }> = ({ groups, onOpenProfile }) => {
-	const pendingCards: GroupGiftCardItem[] = [];
 	return (
 		<Box sx={{ display: 'flex', flexDirection: 'column', gap: 2.5 }}>
 			{groups.map((group) => {
-				const groupedCards = group.cards.filter((card) => {
-					if (!hasRecipientName(card)) {
-						pendingCards.push(card);
-						return false;
-					}
-					return true;
-				});
-				if (!groupedCards.length) return null;
+				if (!group.cards.length) return null;
 				return (
 					<Accordion
 						key={group.gift_card_request_id}
@@ -582,7 +574,7 @@ const CardsView: React.FC<{
 									gap: { xs: 1, sm: 1.5 },
 								}}
 							>
-								{groupedCards.map((card) => (
+								{group.cards.map((card) => (
 									<IndividualCard
 										key={card.id}
 										card={card}
@@ -594,48 +586,6 @@ const CardsView: React.FC<{
 					</Accordion>
 				);
 			})}
-			{pendingCards.length > 0 ? (
-				<Accordion disableGutters elevation={0} sx={accordionSx}>
-					<AccordionSummary
-						expandIcon={<ExpandMore sx={{ color: '#2a4937' }} />}
-						sx={accordionSummarySx}
-					>
-						<Box sx={{ flex: 1 }}>
-							<Typography
-								sx={{ color: '#1f3625', fontSize: 18, fontWeight: 600 }}
-							>
-								{pendingCards.length} card{pendingCards.length !== 1 ? 's' : ''}{' '}
-								yet to be assigned
-							</Typography>
-							<Typography sx={{ color: '#69786e', fontSize: 12, mt: 0.5 }}>
-								These cards have not been assigned to a recipient yet.
-							</Typography>
-						</Box>
-					</AccordionSummary>
-					<AccordionDetails sx={{ p: { xs: 1.5, sm: 2 }, pt: 0.5 }}>
-						<Box
-							sx={{
-								display: 'grid',
-								gridTemplateColumns: {
-									xs: 'repeat(2,minmax(0,1fr))',
-									sm: 'repeat(3,minmax(0,1fr))',
-									md: 'repeat(4,minmax(0,1fr))',
-								},
-								gap: { xs: 1, sm: 1.5 },
-							}}
-						>
-							{pendingCards.map((card) => (
-								<IndividualCard
-									key={card.id}
-									card={card}
-									showLink={false}
-									onOpenProfile={onOpenProfile}
-								/>
-							))}
-						</Box>
-					</AccordionDetails>
-				</Accordion>
-			) : null}
 		</Box>
 	);
 };
@@ -644,18 +594,10 @@ const PeopleView: React.FC<{
 	groups: RequestGroup[];
 	onOpenProfile: (saplingId: string | null) => void;
 }> = ({ groups, onOpenProfile }) => {
-	const unassignedCards: GroupGiftCardItem[] = [];
 	return (
 		<Box sx={{ display: 'flex', flexDirection: 'column', gap: 2.5 }}>
 			{groups.map((group) => {
-				const assignedCards = group.cards.filter((card) => {
-					if (!hasRecipientName(card)) {
-						unassignedCards.push(card);
-						return false;
-					}
-					return true;
-				});
-				if (!assignedCards.length) return null;
+				if (!group.cards.length) return null;
 				return (
 					<Accordion
 						key={group.gift_card_request_id}
@@ -736,7 +678,7 @@ const PeopleView: React.FC<{
 										Link to Dashboard
 									</Typography>
 								</Box>
-								{assignedCards.map((card) => (
+								{group.cards.map((card) => (
 									<Box
 										key={card.id}
 										sx={{
@@ -765,13 +707,16 @@ const PeopleView: React.FC<{
 										<Typography
 											sx={{
 												fontSize: { xs: 12, md: 13 },
-												color: '#213826',
+												color: hasRecipientName(card) ? '#213826' : '#9aaa9e',
 												overflow: 'hidden',
 												textOverflow: 'ellipsis',
 												whiteSpace: 'nowrap',
+												fontStyle: hasRecipientName(card) ? 'normal' : 'italic',
 											}}
 										>
-											{card.assigned_to_name ?? card.recipient_name}
+											{hasRecipientName(card)
+												? card.assigned_to_name ?? card.recipient_name
+												: 'Yet to be assigned'}
 										</Typography>
 										<Typography
 											sx={{
@@ -813,101 +758,6 @@ const PeopleView: React.FC<{
 					</Accordion>
 				);
 			})}
-			{unassignedCards.length > 0 ? (
-				<Accordion disableGutters elevation={0} sx={accordionSx}>
-					<AccordionSummary
-						expandIcon={<ExpandMore sx={{ color: '#2a4937' }} />}
-						sx={accordionSummarySx}
-					>
-						<Box sx={{ flex: 1 }}>
-							<Typography
-								sx={{ color: '#1f3625', fontSize: 18, fontWeight: 600 }}
-							>
-								{unassignedCards.length} card
-								{unassignedCards.length !== 1 ? 's' : ''} yet to be assigned
-							</Typography>
-							<Typography sx={{ color: '#69786e', fontSize: 12, mt: 0.5 }}>
-								These cards have not been assigned to a recipient yet.
-							</Typography>
-						</Box>
-					</AccordionSummary>
-					<AccordionDetails sx={{ p: { xs: 1.5, sm: 2 }, pt: 0.5 }}>
-						<Box
-							sx={{
-								borderRadius: '8px',
-								overflow: 'hidden',
-								border: '1px solid #e0e6df',
-								bgcolor: '#fff',
-							}}
-						>
-							<Box
-								sx={{
-									display: 'grid',
-									gridTemplateColumns: { xs: '1fr .8fr', md: '1.5fr .9fr' },
-									columnGap: 1,
-									px: 1.5,
-									py: 1,
-									bgcolor: '#f8faf8',
-									borderBottom: '1px solid #e8ece8',
-								}}
-							>
-								<Typography
-									sx={{
-										fontSize: 10,
-										fontWeight: 700,
-										color: '#7a867d',
-										textTransform: 'uppercase',
-									}}
-								>
-									Tree Type
-								</Typography>
-								<Typography
-									sx={{
-										fontSize: 10,
-										fontWeight: 700,
-										color: '#7a867d',
-										textTransform: 'uppercase',
-									}}
-								>
-									Sapling ID
-								</Typography>
-							</Box>
-							{unassignedCards.map((card) => (
-								<Box
-									key={card.id}
-									sx={{
-										display: 'grid',
-										gridTemplateColumns: { xs: '1fr .8fr', md: '1.5fr .9fr' },
-										columnGap: 1,
-										alignItems: 'center',
-										px: 1.5,
-										py: 0.85,
-										borderBottom: '1px solid #eff2ef',
-										'&:last-child': { borderBottom: 'none' },
-									}}
-								>
-									<Typography
-										sx={{
-											fontSize: { xs: 12, md: 13 },
-											color: '#3f5545',
-											overflow: 'hidden',
-											textOverflow: 'ellipsis',
-											whiteSpace: 'nowrap',
-										}}
-									>
-										{card.tree_type ?? '-'}
-									</Typography>
-									<Typography
-										sx={{ fontSize: { xs: 11, md: 12 }, color: '#4f5d52' }}
-									>
-										{card.sapling_id ?? '-'}
-									</Typography>
-								</Box>
-							))}
-						</Box>
-					</AccordionDetails>
-				</Accordion>
-			) : null}
 		</Box>
 	);
 };
