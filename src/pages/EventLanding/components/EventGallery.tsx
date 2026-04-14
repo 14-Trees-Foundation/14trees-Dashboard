@@ -78,11 +78,13 @@ const EventGallery: React.FC<Props> = ({ images, description }) => {
 				flexDirection: 'column',
 				justifyContent: 'center',
 				bgcolor: '#1f3625',
+				alignItems: 'center',
+				width: '100%',
+				mx: 'auto',
 			}}
 		>
 			<Box
 				sx={{
-					// width: '100%',
 					maxWidth: '1320px',
 					mx: 'auto',
 					display: 'grid',
@@ -161,7 +163,7 @@ const EventGallery: React.FC<Props> = ({ images, description }) => {
 					</Box>
 				</Box>
 
-				<Box sx={{ color: '#fff', pt: { xs: 0, md: 0 } }}>
+				<Box sx={{ color: '#fff', pt: { xs: 0, md: 0 }, pl: { xs: 0, md: 3 } }}>
 					<Typography
 						sx={{ fontSize: { xs: 24, md: 28 }, fontWeight: 500, mb: 1.5 }}
 					>
