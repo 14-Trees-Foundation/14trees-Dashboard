@@ -24,7 +24,7 @@ import {
 	GroupLandingGiftCard,
 } from '../../../types/GroupLanding';
 import VisitCard from './VisitCard';
-import corporateGiftsImg from '../../../assets/home/gift-hero.jpeg';
+import corporateGiftsImg from '../../../assets/gift-hero.jpeg';
 
 type Props = {
 	visits: GroupLandingEvent[];
