@@ -9,6 +9,7 @@ import { GroupLandingData } from '../../types/GroupLanding';
 import HeroSection from './components/HeroSection';
 import StatsStrip from './components/StatsStrip';
 import VisitFilmStrip from './components/VisitFilmStrip';
+import AboutSection from '../../components/AboutSection';
 import CorpFooter from './components/CorpFooter';
 
 type Props = {
@@ -65,6 +66,7 @@ const GroupLandingPage: React.FC<Props> = ({ nameKey: nameKeyProp }) => {
 				giftCards={data.gift_cards}
 				nameKey={name_key!}
 			/>
+			<AboutSection />
 			<CorpFooter />
 		</Box>
 	);
