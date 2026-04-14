@@ -1,6 +1,6 @@
 {
 	"name": "14treesapp",
-	"version": "1.4.5",
+	"version": "1.5.0",
 	"private": true,
 	"type": "module",
 	"dependencies": {
@@ -92,6 +92,7 @@
 	},
 	"scripts": {
 		"dev": "vite",
+		"dev:lan": "vite --host 0.0.0.0 --port 3000",
 		"build": "vite build",
 		"build-with-tsc": "tsc && vite build",
 		"preview": "vite preview",
