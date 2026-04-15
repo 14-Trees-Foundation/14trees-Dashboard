@@ -47,6 +47,7 @@ export const DistrictOptions = [
 	{ value: 'Jalgaon (जळगाव)', label: 'Jalgaon (जळगाव)' },
 	{ value: 'Buldhana (बुलढाणा)', label: 'Buldhana (बुलढाणा)' },
 	{ value: 'Sambhajinagar (संभाजीनगर)', label: 'Sambhajinagar (संभाजीनगर)' },
+	{ value: 'Ahilyanagar (अहिल्यनगर)', label: 'Ahilyanagar (अहिल्यनगर)' },
 ];
 
 export const TalukaOptions = [
