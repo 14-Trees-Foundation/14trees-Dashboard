@@ -60,6 +60,7 @@ import { SortOrder } from 'antd/es/table/interface';
 import { GridFilterItem } from '@mui/x-data-grid';
 import EventsApiClient from '../events/eventsApiClient';
 import { getVisitorId } from '../../helpers/visitorTracking';
+import { resolveApiBaseUrl } from '../apiBaseUrl';
 import type {
 	SurveyConfig,
 	SurveyConfigsResponse,
@@ -73,7 +74,7 @@ class ApiClient {
 	private token: string | null;
 
 	constructor() {
-		const baseURL = import.meta.env.VITE_APP_BASE_URL;
+		const baseURL = resolveApiBaseUrl(import.meta.env.VITE_APP_BASE_URL);
 		const userId = localStorage.getItem('userId');
 		const visitorId = getVisitorId();
 
@@ -715,6 +716,36 @@ class ApiClient {
 				throw new Error(error.response.data.message);
 			}
 			throw new Error('Failed to load group statistics');
+		}
+	}
+
+	async getGroupLandingData(nameKey: string): Promise<any> {
+		try {
+			const response = await this.api.get<any>(
+				`/groups/by-key/${encodeURIComponent(nameKey)}/landing`,
+			);
+			return response.data;
+		} catch (error: any) {
+			console.error('Failed to fetch group landing data', error);
+			if (error?.response?.data?.message) {
+				throw new Error(error.response.data.message);
+			}
+			throw new Error('Failed to load group landing page');
+		}
+	}
+
+	async getGroupGiftCardsData(nameKey: string): Promise<any> {
+		try {
+			const response = await this.api.get<any>(
+				`/groups/by-key/${encodeURIComponent(nameKey)}/gifts`,
+			);
+			return response.data;
+		} catch (error: any) {
+			console.error('Failed to fetch group landing data', error);
+			if (error?.response?.data?.message) {
+				throw new Error(error.response.data.message);
+			}
+			throw new Error('Failed to load group landing page');
 		}
 	}
 

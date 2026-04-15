@@ -78,15 +78,15 @@ function validateStep(step: number, values: SiteFormValues): SiteFormErrors {
 			errors.name_english = 'Site name (English) is required';
 		if (!values.name_marathi.trim())
 			errors.name_marathi = 'Site name (Marathi) is required';
-		if (!values.owner) errors.owner = 'Owner type is required';
-		if (!values.maintenance_type)
-			errors.maintenance_type = 'Service type is required';
+		// if (!values.owner) errors.owner = 'Owner type is required';
+		// if (!values.maintenance_type)
+		// errors.maintenance_type = 'Service type is required';
 	}
 
-	if (step === 1) {
-		if (!values.land_type) errors.land_type = 'Land type is required';
-		if (!values.land_strata) errors.land_strata = 'Land strata is required';
-	}
+	// if (step === 1) {
+	// 	if (!values.land_type) errors.land_type = 'Land type is required';
+	// 	if (!values.land_strata) errors.land_strata = 'Land strata is required';
+	// }
 
 	if (step === 2) {
 		if (!values.district) errors.district = 'District is required';
