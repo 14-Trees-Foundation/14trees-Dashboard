@@ -40,9 +40,23 @@ export type EventLandingMessage = {
 	sequence: number;
 };
 
+export type EventLandingTree = {
+	id: number;
+	sapling_id: string | null;
+	assigned_to: number | null;
+	image_url: string | null;
+	tree_image: string | null;
+	plant_type_name: string | null;
+	plant_type_english_name: string | null;
+	plant_type_illustration: string | null;
+	user_id: number | null;
+	user_name: string | null;
+};
+
 export type EventLandingData = {
 	event: EventLandingEvent;
 	images: EventLandingImage[];
 	participants: EventLandingParticipant[];
+	trees: EventLandingTree[];
 	messages: EventLandingMessage[];
 };
