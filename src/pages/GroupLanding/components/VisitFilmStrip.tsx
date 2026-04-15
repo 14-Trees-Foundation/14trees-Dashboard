@@ -53,7 +53,7 @@ const VisitFilmStrip: React.FC<Props> = ({ visits, giftCards, nameKey }) => {
 	const [search, setSearch] = useState('');
 	const [activeFilter, setActiveFilter] = useState('all');
 	const [selected, setSelected] = useState<GroupLandingEvent | null>(null);
-	const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
+	const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
 	const [sortDialogOpen, setSortDialogOpen] = useState(false);
 
 	const filteredEvents = useMemo(() => {
@@ -68,11 +68,9 @@ const VisitFilmStrip: React.FC<Props> = ({ visits, giftCards, nameKey }) => {
 			return matchesSearch && matchesFilter;
 		});
 		result.sort((a, b) => {
-			const nameA = a.name.toLowerCase();
-			const nameB = b.name.toLowerCase();
-			return sortOrder === 'asc'
-				? nameA.localeCompare(nameB)
-				: nameB.localeCompare(nameA);
+			const dateA = new Date(a.event_date).getTime();
+			const dateB = new Date(b.event_date).getTime();
+			return sortOrder === 'asc' ? dateA - dateB : dateB - dateA;
 		});
 		return result;
 	}, [visits, search, activeFilter, sortOrder]);
@@ -261,7 +259,7 @@ const VisitFilmStrip: React.FC<Props> = ({ visits, giftCards, nameKey }) => {
 									fontWeight: 500,
 								}}
 							>
-								{sortOrder === 'asc' ? 'A-z order' : 'Z-a order'}
+								{sortOrder === 'desc' ? 'Latest first' : 'Oldest first'}
 							</Typography>
 							<KeyboardArrowDown sx={{ fontSize: 22, ml: 'auto' }} />
 						</Box>
@@ -358,28 +356,6 @@ const VisitFilmStrip: React.FC<Props> = ({ visits, giftCards, nameKey }) => {
 						<Button
 							fullWidth
 							onClick={() => {
-								setSortOrder('asc');
-								setSortDialogOpen(false);
-							}}
-							sx={{
-								justifyContent: 'flex-start',
-								textTransform: 'none',
-								color: sortOrder === 'asc' ? '#1f452d' : '#6f7b73',
-								bgcolor: sortOrder === 'asc' ? '#eff2ee' : '#fff',
-								border: '1px solid #d4d8d4',
-								py: 1.5,
-								px: 2,
-								fontWeight: sortOrder === 'asc' ? 600 : 400,
-								'&:hover': {
-									bgcolor: sortOrder === 'asc' ? '#e8eddf' : '#f9f9f9',
-								},
-							}}
-						>
-							A → Z (Ascending)
-						</Button>
-						<Button
-							fullWidth
-							onClick={() => {
 								setSortOrder('desc');
 								setSortDialogOpen(false);
 							}}
@@ -397,7 +373,29 @@ const VisitFilmStrip: React.FC<Props> = ({ visits, giftCards, nameKey }) => {
 								},
 							}}
 						>
-							Z → A (Descending)
+							Latest first
+						</Button>
+						<Button
+							fullWidth
+							onClick={() => {
+								setSortOrder('asc');
+								setSortDialogOpen(false);
+							}}
+							sx={{
+								justifyContent: 'flex-start',
+								textTransform: 'none',
+								color: sortOrder === 'asc' ? '#1f452d' : '#6f7b73',
+								bgcolor: sortOrder === 'asc' ? '#eff2ee' : '#fff',
+								border: '1px solid #d4d8d4',
+								py: 1.5,
+								px: 2,
+								fontWeight: sortOrder === 'asc' ? 600 : 400,
+								'&:hover': {
+									bgcolor: sortOrder === 'asc' ? '#e8eddf' : '#f9f9f9',
+								},
+							}}
+						>
+							Oldest first
 						</Button>
 					</Box>
 				</DialogContent>
