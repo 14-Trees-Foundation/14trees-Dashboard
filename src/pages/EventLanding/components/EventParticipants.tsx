@@ -612,7 +612,7 @@ const EventParticipants: React.FC<Props> = ({ participants, trees }) => {
 										mb: 0.75,
 									}}
 								>
-									{cardImage ? 'Dedicated to' : 'Planted by'}
+									{cardImage ? 'Planted for' : 'Planted by'}
 								</Typography>
 
 								<Typography
