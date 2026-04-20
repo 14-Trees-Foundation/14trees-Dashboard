@@ -4351,6 +4351,12 @@ class ApiClient {
 			amountRaised: number;
 			treesSponsored: number;
 		} | null;
+		donors: {
+			donationId: number;
+			donationReceiptNumber: string | null;
+			name: string | null;
+			amount: number | null;
+		}[];
 	}> {
 		try {
 			const response = await this.api.get<{
@@ -4368,6 +4374,12 @@ class ApiClient {
 					amountRaised: number;
 					treesSponsored: number;
 				} | null;
+				donors: {
+					donationId: number;
+					donationReceiptNumber: string | null;
+					name: string | null;
+					amount: number | null;
+				}[];
 			}>(`/campaigns/${c_key}/analytics`);
 
 			return response.data;
