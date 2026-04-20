@@ -4484,36 +4484,6 @@ class ApiClient {
 	}
 
 	/**
-	 * Gen AI
-	 */
-	async serveUserQuery(
-		message: string,
-		history: any[],
-	): Promise<{ text_output: string; sponsor_details?: any }> {
-		try {
-			const response = await this.api.post<{
-				text_output: string;
-				sponsor_details: any;
-			}>(
-				`/gift-cards/gen-ai`,
-				{ message, history },
-				{
-					headers: {
-						'x-access-token': this.token,
-						'content-type': 'application/json',
-					},
-				},
-			);
-			return response.data;
-		} catch (error: any) {
-			if (error.response) {
-				throw new Error(error.response.data.message);
-			}
-			throw new Error('Failed to connect with our AI bot!');
-		}
-	}
-
-	/**
 	 * Admin Role Management
 	 */
 	async grantAdminRole(userId: number): Promise<{
