@@ -24,6 +24,7 @@ import {
 } from './giftCardReducer';
 import { tagsDataReducer } from './tagReducer';
 import { campaignsDataReducer } from './campaignReducer';
+import { csrRequestsDataReducer } from './csrReducer';
 
 const rootReducer = combineReducers({
 	plantTypesData: plantTypesDataReducer,
@@ -51,6 +52,7 @@ const rootReducer = combineReducers({
 	giftCardUsersData: giftCardUsersDataReducer,
 	tagsData: tagsDataReducer,
 	campaignsData: campaignsDataReducer,
+	csrRequestsData: csrRequestsDataReducer,
 });
 
 export default rootReducer;

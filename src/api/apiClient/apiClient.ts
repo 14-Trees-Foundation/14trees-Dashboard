@@ -5562,6 +5562,184 @@ class ApiClient {
 		return response.data;
 	}
 
+	// ─── CSR Requests ────────────────────────────────────────────────────────────
+
+	async getCsrRequests(
+		offset: number,
+		limit: number,
+		filters?: any[],
+		paymentStatus?: string,
+	): Promise<any> {
+		try {
+			const params =
+				paymentStatus && paymentStatus !== 'all'
+					? `?payment_status=${paymentStatus}`
+					: '';
+			const response = await this.api.post(
+				`/csr/requests/get?offset=${offset}&limit=${limit}${params}`,
+				{ filters: filters ?? [] },
+				{ headers: { 'x-access-token': this.token } },
+			);
+			return response.data;
+		} catch (error: any) {
+			throw new Error(
+				error.response?.data?.message ?? 'Failed to fetch CSR requests',
+			);
+		}
+	}
+
+	async getCsrRequestById(id: number): Promise<any> {
+		try {
+			const response = await this.api.get(`/csr/requests/${id}`, {
+				headers: { 'x-access-token': this.token },
+			});
+			return response.data;
+		} catch (error: any) {
+			throw new Error(
+				error.response?.data?.message ?? 'Failed to fetch CSR request',
+			);
+		}
+	}
+
+	async createCsrRequest(data: any): Promise<any> {
+		try {
+			const response = await this.api.post('/csr/requests', data, {
+				headers: { 'x-access-token': this.token },
+			});
+			return response.data;
+		} catch (error: any) {
+			throw new Error(
+				error.response?.data?.message ?? 'Failed to create CSR request',
+			);
+		}
+	}
+
+	async updateCsrRequest(id: number, data: any): Promise<any> {
+		try {
+			const response = await this.api.put(`/csr/requests/${id}`, data, {
+				headers: { 'x-access-token': this.token },
+			});
+			return response.data;
+		} catch (error: any) {
+			throw new Error(
+				error.response?.data?.message ?? 'Failed to update CSR request',
+			);
+		}
+	}
+
+	async deleteCsrRequest(id: number): Promise<void> {
+		try {
+			await this.api.delete(`/csr/requests/${id}`, {
+				headers: { 'x-access-token': this.token },
+			});
+		} catch (error: any) {
+			throw new Error(
+				error.response?.data?.message ?? 'Failed to delete CSR request',
+			);
+		}
+	}
+
+	async addCsrRequestPlot(id: number, plotId: number): Promise<any> {
+		try {
+			const response = await this.api.post(
+				`/csr/requests/${id}/plots`,
+				{ plot_id: plotId },
+				{ headers: { 'x-access-token': this.token } },
+			);
+			return response.data;
+		} catch (error: any) {
+			throw new Error(error.response?.data?.message ?? 'Failed to add plot');
+		}
+	}
+
+	async getCsrRequestPlots(id: number): Promise<any> {
+		try {
+			const response = await this.api.get(`/csr/requests/${id}/plots`, {
+				headers: { 'x-access-token': this.token },
+			});
+			return response.data;
+		} catch (error: any) {
+			throw new Error(error.response?.data?.message ?? 'Failed to fetch plots');
+		}
+	}
+
+	async bookCsrTrees(
+		id: number,
+		count: number,
+		assignedTo?: number,
+	): Promise<any> {
+		try {
+			const response = await this.api.post(
+				`/csr/requests/${id}/book`,
+				{ count, assigned_to: assignedTo },
+				{ headers: { 'x-access-token': this.token } },
+			);
+			return response.data;
+		} catch (error: any) {
+			throw new Error(error.response?.data?.message ?? 'Failed to book trees');
+		}
+	}
+
+	async createCsrEventAllocation(id: number, data: any): Promise<any> {
+		try {
+			const response = await this.api.post(`/csr/requests/${id}/event`, data, {
+				headers: { 'x-access-token': this.token },
+			});
+			return response.data;
+		} catch (error: any) {
+			throw new Error(
+				error.response?.data?.message ?? 'Failed to create event allocation',
+			);
+		}
+	}
+
+	async getCsrRequestTrees(
+		id: number,
+		offset: number,
+		limit: number,
+	): Promise<any> {
+		try {
+			const response = await this.api.get(
+				`/csr/requests/${id}/trees?offset=${offset}&limit=${limit}`,
+				{ headers: { 'x-access-token': this.token } },
+			);
+			return response.data;
+		} catch (error: any) {
+			throw new Error(
+				error.response?.data?.message ?? 'Failed to fetch request trees',
+			);
+		}
+	}
+
+	async getGroupCsrSummary(groupId: number): Promise<any> {
+		try {
+			const response = await this.api.get(`/csr/groups/${groupId}/summary`, {
+				headers: { 'x-access-token': this.token },
+			});
+			return response.data;
+		} catch (error: any) {
+			throw new Error(
+				error.response?.data?.message ?? 'Failed to fetch CSR summary',
+			);
+		}
+	}
+
+	async getCsrCorporateList(offset: number, limit: number): Promise<any> {
+		try {
+			const response = await this.api.get(
+				`/csr/corporates?offset=${offset}&limit=${limit}`,
+				{ headers: { 'x-access-token': this.token } },
+			);
+			return response.data;
+		} catch (error: any) {
+			throw new Error(
+				error.response?.data?.message ?? 'Failed to fetch corporate list',
+			);
+		}
+	}
+
+	// ─────────────────────────────────────────────────────────────────────────────
+
 	async rejectTreeSnapshot(id: number, reason: string): Promise<any> {
 		try {
 			const response = await this.api.patch(

@@ -65,6 +65,10 @@ import GiftTreesComponent from './pages/admin/gift/GiftTreesRefactored';
 import GCInventory from './pages/admin/Inventory/GCInventory';
 import { DonationComponent } from './pages/admin/donation/Donation';
 import CSRAdminPage from './pages/admin/csr/CSRAdminPage';
+import CsrManagementPage from './pages/admin/csr-management/CsrManagementPage';
+import CorporateDetailPage from './pages/admin/csr-management/CorporateDetailPage';
+import CsrRequestDetailPage from './pages/admin/csr-management/CsrRequestDetailPage';
+import CsrRequestWizard from './pages/admin/csr-management/CsrRequestWizard';
 import Campaigns from './pages/admin/campaign/Campaign';
 import StaffRolesPage from './pages/admin/rbac/StaffRolesPage';
 import { CampaignsPage } from './pages/admin/campaign/CampaignsPage';
@@ -189,6 +193,16 @@ function App() {
 						<Route path="tree-cards" element={<GiftTreesComponent />} />
 						<Route path="donations" element={<DonationComponent />} />
 						<Route path="corporate-dashboard" element={<CSRAdminPage />} />
+						<Route path="csr-management" element={<CsrManagementPage />} />
+						<Route
+							path="csr-management/corporate/:group_id"
+							element={<CorporateDetailPage />}
+						/>
+						<Route
+							path="csr-management/requests/:id"
+							element={<CsrRequestDetailPage />}
+						/>
+						<Route path="csr-management/new" element={<CsrRequestWizard />} />
 						<Route path="rbac" element={<StaffRolesPage />} />
 						<Route path="forms" element={<Forms />}>
 							<Route path="assigntrees" element={<AssignTree />}></Route>
