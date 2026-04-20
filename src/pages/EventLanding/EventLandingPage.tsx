@@ -47,7 +47,7 @@ const EventLandingPage: React.FC = () => {
 	if (loading) return <Spinner text="Loading event…" />;
 	if (error || !data) return <NotFound text={error ?? 'Event not found'} />;
 
-	const { event, images, participants, messages } = data;
+	const { event, images, participants, trees, messages } = data;
 
 	return (
 		<Box
@@ -65,7 +65,7 @@ const EventLandingPage: React.FC = () => {
 
 			<EventGallery images={images} description={event.message} />
 
-			<EventParticipants participants={participants} />
+			<EventParticipants participants={participants} trees={trees} />
 
 			<EventMessages messages={messages} />
 

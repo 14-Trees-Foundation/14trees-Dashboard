@@ -13,10 +13,7 @@ import {
 	MapTreesUsingSaplingIdsRequest,
 	Tree,
 } from '../../types/tree';
-import {
-	UserTree,
-	UserTreeCountPaginationResponse,
-} from '../../types/userTree';
+import { UserTree } from '../../types/userTree';
 import { PaginatedResponse } from '../../types/pagination';
 import { Event, EventMessage } from '../../types/event';
 import { Visit, BulkVisitUsersMappingResponse } from '../../types/visits';
@@ -1483,23 +1480,6 @@ class ApiClient {
 				throw new Error(error.response.data.message);
 			}
 			throw new Error(`Failed to fetch trees!`);
-		}
-	}
-
-	async getUserTreeCount(
-		offset: number,
-		limit: number,
-		filters?: any,
-	): Promise<UserTreeCountPaginationResponse> {
-		let url = `/mapping/count/usertreescount?offset=${offset}&limit=${limit}`;
-		try {
-			let result = await this.api.post<UserTreeCountPaginationResponse>(url, {
-				filters: filters,
-			});
-			return result.data;
-		} catch (error) {
-			console.error(error);
-			throw new Error('Failed to create Trees in bulk');
 		}
 	}
 

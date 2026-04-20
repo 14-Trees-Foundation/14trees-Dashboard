@@ -1,34 +1,48 @@
 import { useMemo, useState } from 'react';
-import { Box, Typography, InputBase, Button, Divider } from '@mui/material';
 import {
+	Accordion,
+	AccordionDetails,
+	AccordionSummary,
+	Box,
+	Typography,
+	InputBase,
+	Button,
+	Divider,
+} from '@mui/material';
+import {
+	ExpandMore,
 	FilterList,
 	KeyboardArrowDown,
 	Park,
 	Spa,
 	AccountCircle,
 } from '@mui/icons-material';
-import { EventLandingParticipant } from '../../../types/EventLanding';
+import {
+	EventLandingParticipant,
+	EventLandingTree,
+} from '../../../types/EventLanding';
 
 type Props = {
 	participants: EventLandingParticipant[];
+	trees: EventLandingTree[];
 };
 
-const EventParticipants: React.FC<Props> = ({ participants }) => {
+const EventParticipants: React.FC<Props> = ({ participants, trees }) => {
 	const [searchInput, setSearchInput] = useState('');
 	const [searchQuery, setSearchQuery] = useState('');
 	const [viewMode, setViewMode] = useState<'people' | 'tree'>('people');
 	const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
 
-	if (participants.length === 0) return null;
+	if (participants.length === 0 && trees.length === 0) return null;
 
 	const nativeSpeciesCount = useMemo(() => {
 		const uniqueSpecies = new Set(
-			participants
-				.map((p) => p.plant_type_english_name ?? p.plant_type_name)
+			trees
+				.map((t) => t.plant_type_english_name ?? t.plant_type_name)
 				.filter(Boolean),
 		);
 		return uniqueSpecies.size;
-	}, [participants]);
+	}, [trees]);
 
 	const filteredParticipants = useMemo(() => {
 		const q = searchQuery.trim().toLowerCase();
@@ -55,6 +69,21 @@ const EventParticipants: React.FC<Props> = ({ participants }) => {
 
 		return result;
 	}, [participants, searchQuery, viewMode, sortOrder]);
+
+	const filteredUnassignedTrees = useMemo(() => {
+		const q = searchQuery.trim().toLowerCase();
+		return trees
+			.filter((t) => t.assigned_to === null)
+			.filter((t) => {
+				if (!q) return true;
+				const species = (
+					t.plant_type_english_name ??
+					t.plant_type_name ??
+					''
+				).toLowerCase();
+				return species.includes(q);
+			});
+	}, [trees, searchQuery]);
 
 	const onSearch = () => setSearchQuery(searchInput);
 
@@ -93,8 +122,8 @@ const EventParticipants: React.FC<Props> = ({ participants }) => {
 							lineHeight: 1.5,
 						}}
 					>
-						{participants.length} Trees Planted in this grove,{' '}
-						{nativeSpeciesCount} Tree Species native to the region
+						{trees.length} Trees Planted in this grove, {nativeSpeciesCount}{' '}
+						Tree Species native to the region
 					</Typography>
 				</Box>
 
@@ -154,7 +183,7 @@ const EventParticipants: React.FC<Props> = ({ participants }) => {
 									<Typography
 										sx={{ fontSize: 20, color: '#1f3625', lineHeight: 1.05 }}
 									>
-										{participants.length}+
+										{trees.length}+
 									</Typography>
 								</Box>
 							</Box>
@@ -583,7 +612,7 @@ const EventParticipants: React.FC<Props> = ({ participants }) => {
 										mb: 0.75,
 									}}
 								>
-									{cardImage ? 'Dedicated to' : 'Planted by'}
+									{cardImage ? 'Planted for' : 'Planted by'}
 								</Typography>
 
 								<Typography
@@ -684,13 +713,332 @@ const EventParticipants: React.FC<Props> = ({ participants }) => {
 				})}
 			</Box>
 
-			{filteredParticipants.length === 0 && (
-				<Typography
-					sx={{ color: '#6f7b73', fontSize: 16, textAlign: 'center', py: 2 }}
+			{filteredUnassignedTrees.length > 0 && (
+				<Accordion
+					disableGutters
+					elevation={0}
+					sx={{
+						width: '100%',
+						maxWidth: '1520px',
+						mx: 'auto',
+						mt: 2,
+						bgcolor: 'transparent',
+						border: '1px solid #d8e0d8',
+						borderRadius: '18px !important',
+						'&:before': { display: 'none' },
+						overflow: 'hidden',
+					}}
 				>
-					No participants found for your search.
-				</Typography>
+					<AccordionSummary
+						expandIcon={<ExpandMore sx={{ color: '#2a4937' }} />}
+						sx={{
+							px: { xs: 2, md: 3 },
+							py: 1.5,
+							bgcolor: '#eef2ee',
+							'& .MuiAccordionSummary-content': { my: 0 },
+						}}
+					>
+						<Box>
+							<Typography
+								sx={{
+									fontSize: { xs: 16, md: 18 },
+									fontWeight: 600,
+									color: '#1f3625',
+								}}
+							>
+								{filteredUnassignedTrees.length} tree
+								{filteredUnassignedTrees.length !== 1 ? 's' : ''} yet to be
+								assigned
+							</Typography>
+							<Typography sx={{ fontSize: 13, color: '#69786e', mt: 0.25 }}>
+								These trees have been planted but not yet dedicated to a
+								recipient
+							</Typography>
+						</Box>
+					</AccordionSummary>
+					<AccordionDetails sx={{ p: { xs: 2, md: 3 }, bgcolor: '#f5f5f0' }}>
+						<Box
+							sx={{
+								display: 'grid',
+								gridTemplateColumns: {
+									xs: '1fr',
+									sm: 'repeat(2, minmax(0, 1fr))',
+									md: 'repeat(3, minmax(0, 1fr))',
+									lg: 'repeat(5, minmax(0, 1fr))',
+								},
+								gap: { xs: 2, md: 2.5 },
+							}}
+						>
+							{filteredUnassignedTrees.map((tree) => {
+								const cleanedPlantName = (tree.plant_type_name ?? '')
+									.replace(/\s*\(.*\)\s*$/, '')
+									.trim();
+								const localPlantNameMatch = (tree.plant_type_name ?? '').match(
+									/\(([^)]+)\)/,
+								);
+								const localPlantName = localPlantNameMatch
+									? localPlantNameMatch[1].trim()
+									: '';
+								const englishPlantName = (
+									tree.plant_type_english_name ?? ''
+								).trim();
+								const primaryPlantName =
+									cleanedPlantName ||
+									englishPlantName ||
+									'Tree name unavailable';
+								const englishTreeType =
+									englishPlantName && englishPlantName !== primaryPlantName
+										? englishPlantName
+										: '';
+								const cardImage = tree.image_url ?? tree.tree_image;
+								const plantIllustration = (
+									tree.plant_type_illustration ?? ''
+								).trim();
+
+								return (
+									<Box
+										key={tree.id}
+										sx={{
+											display: 'flex',
+											flexDirection: 'column',
+											bgcolor: '#fff',
+											borderRadius: '18px',
+											overflow: 'hidden',
+											border: '1px solid #e5e9e5',
+											minHeight: 430,
+											'& .view-profile-btn': {
+												opacity: { xs: 1, md: 0 },
+												pointerEvents: { xs: 'auto', md: 'none' },
+												transform: { xs: 'none', md: 'translateY(4px)' },
+												transition: 'opacity 180ms ease, transform 180ms ease',
+											},
+											'&:hover .view-profile-btn': {
+												opacity: 1,
+												pointerEvents: 'auto',
+												transform: 'translateY(0)',
+											},
+											'& .tree-illustration-overlay': {
+												opacity: { xs: 1, md: 0 },
+												transform: {
+													xs: 'translateY(0)',
+													md: 'translateY(8px) scale(0.98)',
+												},
+												transition: 'opacity 220ms ease, transform 220ms ease',
+											},
+											'&:hover .tree-illustration-overlay': {
+												opacity: 1,
+												transform: 'translateY(0) scale(1)',
+											},
+										}}
+									>
+										<Box
+											sx={{
+												width: '100%',
+												height: { xs: 220, md: 250 },
+												display: 'flex',
+												alignItems: 'center',
+												justifyContent: 'center',
+												position: 'relative',
+												overflow: 'visible',
+											}}
+										>
+											<Box
+												sx={{
+													position: 'absolute',
+													inset: 0,
+													bgcolor: '#ecefed',
+													overflow: 'hidden',
+												}}
+											>
+												{cardImage ? (
+													<Box
+														component="img"
+														src={cardImage}
+														alt={primaryPlantName}
+														sx={{
+															width: '100%',
+															height: '100%',
+															objectFit: 'cover',
+															display: 'block',
+														}}
+													/>
+												) : (
+													<Box
+														sx={{
+															width: '100%',
+															height: '100%',
+															display: 'flex',
+															alignItems: 'center',
+															justifyContent: 'center',
+														}}
+													>
+														<Park sx={{ fontSize: 168, color: '#c2c8c2' }} />
+													</Box>
+												)}
+											</Box>
+
+											{plantIllustration && (
+												<Box
+													className="tree-illustration-overlay"
+													sx={{
+														position: 'absolute',
+														left: { xs: -8, md: -16 },
+														bottom: { xs: -16, md: -42 },
+														width: { xs: 132, md: 200 },
+														height: { xs: 132, md: 200 },
+														borderRadius: 0,
+														background: 'transparent',
+														border: 'none',
+														boxShadow: 'none',
+														zIndex: 2,
+														pointerEvents: 'none',
+														transform: {
+															xs: 'rotate(-4deg)',
+															md: 'rotate(-8deg)',
+														},
+													}}
+												>
+													<Box
+														component="img"
+														src={plantIllustration}
+														alt={`${primaryPlantName} illustration`}
+														sx={{
+															width: '100%',
+															height: '100%',
+															display: 'block',
+															objectFit: 'contain',
+														}}
+													/>
+												</Box>
+											)}
+										</Box>
+
+										<Box
+											sx={{
+												p: 2.5,
+												bgcolor: '#fff',
+												flex: 1,
+												display: 'flex',
+												flexDirection: 'column',
+											}}
+										>
+											<Typography
+												sx={{
+													fontSize: 12,
+													color: '#7a857d',
+													letterSpacing: 0.4,
+													textTransform: 'uppercase',
+													lineHeight: 1.2,
+													mb: 0.75,
+												}}
+											>
+												Planted at
+											</Typography>
+											<Typography
+												sx={{
+													fontSize: 18,
+													fontWeight: 500,
+													color: '#9aaa9e',
+													fontStyle: 'italic',
+													lineHeight: 1.35,
+													mb: 2,
+												}}
+											>
+												Yet to be assigned
+											</Typography>
+											<Divider sx={{ backgroundColor: '#dde2dc', mb: 2 }} />
+											<Box
+												sx={{
+													minHeight: 52,
+													display: 'flex',
+													alignItems: 'flex-start',
+													gap: 1.5,
+													mt: 'auto',
+												}}
+											>
+												<Box sx={{ minWidth: 0, flex: 1 }}>
+													<Typography
+														sx={{
+															fontSize: 16,
+															fontWeight: 500,
+															color: '#294032',
+															lineHeight: 1.3,
+														}}
+													>
+														{primaryPlantName}
+													</Typography>
+													{englishTreeType && (
+														<Typography
+															sx={{
+																fontSize: 14,
+																color: '#6f7b73',
+																lineHeight: 1.2,
+																mt: 0.4,
+															}}
+														>
+															{englishTreeType}
+														</Typography>
+													)}
+													{localPlantName && (
+														<Typography
+															sx={{
+																fontSize: 14,
+																color: '#6f7b73',
+																lineHeight: 1.2,
+																mt: 0.25,
+															}}
+														>
+															({localPlantName})
+														</Typography>
+													)}
+												</Box>
+												{tree.sapling_id && (
+													<Button
+														className="view-profile-btn"
+														onClick={() =>
+															window.open(
+																`/profile/${encodeURIComponent(
+																	tree.sapling_id!,
+																)}`,
+																'_blank',
+																'noopener,noreferrer',
+															)
+														}
+														sx={{
+															bgcolor: '#9bc53d',
+															color: '#1f3625',
+															textTransform: 'none',
+															minWidth: 90,
+															height: 40,
+															borderRadius: '14px',
+															fontSize: 16,
+															fontWeight: 500,
+															'&:hover': { bgcolor: '#88b332' },
+															flexShrink: 0,
+															alignSelf: 'center',
+														}}
+													>
+														View
+													</Button>
+												)}
+											</Box>
+										</Box>
+									</Box>
+								);
+							})}
+						</Box>
+					</AccordionDetails>
+				</Accordion>
 			)}
+
+			{filteredParticipants.length === 0 &&
+				filteredUnassignedTrees.length === 0 && (
+					<Typography
+						sx={{ color: '#6f7b73', fontSize: 16, textAlign: 'center', py: 2 }}
+					>
+						No participants found for your search.
+					</Typography>
+				)}
 		</Box>
 	);
 };
