@@ -75,6 +75,7 @@ const Step1: React.FC<{
 		const api = new ApiClient();
 		const result = await api.getGroups(0, 20, [
 			{ columnField: 'name', operatorValue: 'contains', value: q },
+			{ columnField: 'type', operatorValue: 'equals', value: 'corporate' },
 		]);
 		setGroups(result.results ?? []);
 		setSearching(false);

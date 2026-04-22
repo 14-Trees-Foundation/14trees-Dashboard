@@ -69,6 +69,8 @@ import CsrManagementPage from './pages/admin/csr-management/CsrManagementPage';
 import CorporateDetailPage from './pages/admin/csr-management/CorporateDetailPage';
 import CsrRequestDetailPage from './pages/admin/csr-management/CsrRequestDetailPage';
 import CsrRequestWizard from './pages/admin/csr-management/CsrRequestWizard';
+import MigrationCandidatesPage from './pages/admin/csr-management/MigrationCandidatesPage';
+import CorporateMigrationPage from './pages/admin/csr-management/CorporateMigrationPage';
 import Campaigns from './pages/admin/campaign/Campaign';
 import StaffRolesPage from './pages/admin/rbac/StaffRolesPage';
 import { CampaignsPage } from './pages/admin/campaign/CampaignsPage';
@@ -203,6 +205,14 @@ function App() {
 							element={<CsrRequestDetailPage />}
 						/>
 						<Route path="csr-management/new" element={<CsrRequestWizard />} />
+						<Route
+							path="csr-management/migrate"
+							element={<MigrationCandidatesPage />}
+						/>
+						<Route
+							path="csr-management/migrate/:group_id"
+							element={<CorporateMigrationPage />}
+						/>
 						<Route path="rbac" element={<StaffRolesPage />} />
 						<Route path="forms" element={<Forms />}>
 							<Route path="assigntrees" element={<AssignTree />}></Route>

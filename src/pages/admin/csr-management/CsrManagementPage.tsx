@@ -7,6 +7,8 @@ import CorporateFareIcon from '@mui/icons-material/CorporateFare';
 import ListAltIcon from '@mui/icons-material/ListAlt';
 import { darkTheme, lightAnalyticsTheme } from '../../../theme';
 import { analyticsPageSx, analyticsSectionTitleSx } from '../shared/adminTheme';
+import SwapHorizIcon from '@mui/icons-material/SwapHoriz';
+import { useNavigate } from 'react-router-dom';
 import CorporateListTab from './CorporateListTab';
 import CsrRequestListTab from './CsrRequestListTab';
 
@@ -18,6 +20,7 @@ const CsrManagementContent: React.FC<{
 }> = ({ themeMode, onToggle }) => {
 	const [activeTab, setActiveTab] = useState(0);
 	const theme = useTheme();
+	const navigate = useNavigate();
 	const isLight = themeMode === 'light';
 
 	const tabSx = {
@@ -103,6 +106,13 @@ const CsrManagementContent: React.FC<{
 						iconPosition="start"
 						label="All Requests"
 						sx={tabSx}
+					/>
+					<Tab
+						icon={<SwapHorizIcon sx={{ fontSize: 18 }} />}
+						iconPosition="start"
+						label="Migration"
+						sx={tabSx}
+						onClick={() => navigate('/admin/csr-management/migrate')}
 					/>
 				</Tabs>
 			</Box>

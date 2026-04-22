@@ -5675,6 +5675,18 @@ class ApiClient {
 		}
 	}
 
+	async removeCsrRequestPlot(id: number, plotId: number): Promise<any> {
+		try {
+			const response = await this.api.delete(
+				`/csr/requests/${id}/plots/${plotId}`,
+				{ headers: { 'x-access-token': this.token } },
+			);
+			return response.data;
+		} catch (error: any) {
+			throw new Error(error.response?.data?.message ?? 'Failed to remove plot');
+		}
+	}
+
 	async bookCsrTrees(
 		id: number,
 		count: number,
@@ -5746,6 +5758,113 @@ class ApiClient {
 		} catch (error: any) {
 			throw new Error(
 				error.response?.data?.message ?? 'Failed to fetch corporate list',
+			);
+		}
+	}
+
+	async getCsrMigrationCandidates(): Promise<any> {
+		try {
+			const response = await this.api.get('/csr/migrate/candidates', {
+				headers: { 'x-access-token': this.token },
+			});
+			return response.data;
+		} catch (error: any) {
+			throw new Error(
+				error.response?.data?.message ?? 'Failed to fetch migration candidates',
+			);
+		}
+	}
+
+	async getCsrMigrationPreview(groupId: number): Promise<any> {
+		try {
+			const response = await this.api.get(`/csr/migrate/preview/${groupId}`, {
+				headers: { 'x-access-token': this.token },
+			});
+			return response.data;
+		} catch (error: any) {
+			throw new Error(
+				error.response?.data?.message ?? 'Failed to fetch migration preview',
+			);
+		}
+	}
+
+	async executeCsrMigration(groupId: number, gcrIds: number[]): Promise<any> {
+		try {
+			const response = await this.api.post(
+				`/csr/migrate/${groupId}`,
+				{ gcr_ids: gcrIds },
+				{
+					headers: { 'x-access-token': this.token },
+				},
+			);
+			return response.data;
+		} catch (error: any) {
+			throw new Error(
+				error.response?.data?.message ?? 'Failed to execute migration',
+			);
+		}
+	}
+
+	async verifyCsrMigration(groupId: number): Promise<any> {
+		try {
+			const response = await this.api.get(`/csr/migrate/verify/${groupId}`, {
+				headers: { 'x-access-token': this.token },
+			});
+			return response.data;
+		} catch (error: any) {
+			throw new Error(
+				error.response?.data?.message ?? 'Failed to verify migration',
+			);
+		}
+	}
+
+	async archiveCsrMigration(groupId: number): Promise<any> {
+		try {
+			const response = await this.api.post(
+				`/csr/migrate/archive/${groupId}`,
+				{},
+				{
+					headers: { 'x-access-token': this.token },
+				},
+			);
+			return response.data;
+		} catch (error: any) {
+			throw new Error(
+				error.response?.data?.message ?? 'Failed to archive migration',
+			);
+		}
+	}
+
+	async unarchiveCsrMigration(groupId: number): Promise<any> {
+		try {
+			const response = await this.api.post(
+				`/csr/migrate/unarchive/${groupId}`,
+				{},
+				{
+					headers: { 'x-access-token': this.token },
+				},
+			);
+			return response.data;
+		} catch (error: any) {
+			throw new Error(
+				error.response?.data?.message ?? 'Failed to unarchive migration',
+			);
+		}
+	}
+
+	async rollbackCsrMigration(groupId: number): Promise<any> {
+		try {
+			const response = await this.api.post(
+				`/csr/migrate/rollback/${groupId}`,
+				{},
+				{
+					headers: { 'x-access-token': this.token },
+				},
+			);
+			return response.data;
+		} catch (error: any) {
+			throw new Error(
+				error.response?.data?.message ?? 'Failed to rollback migration',
 			);
 		}
 	}

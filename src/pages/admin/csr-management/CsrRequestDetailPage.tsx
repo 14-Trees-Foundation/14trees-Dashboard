@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
 	Box,
@@ -13,6 +13,9 @@ import {
 	DialogActions,
 	TextField,
 	CircularProgress,
+	Tooltip,
+	Autocomplete,
+	IconButton,
 } from '@mui/material';
 import { ThemeProvider, useTheme } from '@mui/material/styles';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
@@ -20,6 +23,12 @@ import Brightness4Icon from '@mui/icons-material/Brightness4';
 import Brightness7Icon from '@mui/icons-material/Brightness7';
 import EditIcon from '@mui/icons-material/Edit';
 import ForestIcon from '@mui/icons-material/Forest';
+import CardGiftcardIcon from '@mui/icons-material/CardGiftcard';
+import TourIcon from '@mui/icons-material/TourOutlined';
+import HistoryIcon from '@mui/icons-material/History';
+import OpenInNewIcon from '@mui/icons-material/OpenInNew';
+import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
+import LayersIcon from '@mui/icons-material/Layers';
 import { Table } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import { darkTheme, lightAnalyticsTheme } from '../../../theme';
@@ -29,7 +38,6 @@ import {
 	ANALYTICS_COLORS,
 	LIGHT_ANALYTICS_COLORS,
 	analyticsSectionTitleSx,
-	formLabelSx,
 } from '../shared/adminTheme';
 import ApiClient from '../../../api/apiClient/apiClient';
 import { CsrRequest } from '../../../types/csrRequest';
@@ -54,51 +62,35 @@ const BookDialog: React.FC<BookDialogProps> = ({
 	const [count, setCount] = useState(remaining);
 	const [assignedTo, setAssignedTo] = useState('');
 	const [loading, setLoading] = useState(false);
-
 	const handle = async () => {
 		setLoading(true);
 		try {
-			await onBook(count, assignedTo ? parseInt(assignedTo) : undefined);
+			await onBook(count, assignedTo ? Number(assignedTo) : undefined);
 			onClose();
 		} finally {
 			setLoading(false);
 		}
 	};
-
 	return (
 		<Dialog open={open} onClose={onClose} maxWidth="xs" fullWidth>
 			<DialogTitle>Book Trees</DialogTitle>
-			<DialogContent
-				sx={{ display: 'flex', flexDirection: 'column', gap: 2, pt: 2 }}
-			>
-				<Box>
-					<Typography component="label" sx={formLabelSx}>
-						Number of trees to book (max {remaining})
-					</Typography>
+			<DialogContent>
+				<Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, pt: 1 }}>
 					<TextField
-						fullWidth
-						size="small"
+						label="Number of trees"
 						type="number"
 						value={count}
-						onChange={(e) =>
-							setCount(
-								Math.min(remaining, Math.max(1, parseInt(e.target.value) || 1)),
-							)
-						}
+						onChange={(e) => setCount(Number(e.target.value))}
 						inputProps={{ min: 1, max: remaining }}
-					/>
-				</Box>
-				<Box>
-					<Typography component="label" sx={formLabelSx}>
-						Assign to user ID (optional — synthetic CSR user)
-					</Typography>
-					<TextField
-						fullWidth
 						size="small"
-						type="number"
+						helperText={`${remaining} remaining`}
+					/>
+					<TextField
+						label="Assign to user ID (optional)"
 						value={assignedTo}
 						onChange={(e) => setAssignedTo(e.target.value)}
 						placeholder="Leave blank to skip"
+						size="small"
 					/>
 				</Box>
 			</DialogContent>
@@ -118,6 +110,18 @@ const BookDialog: React.FC<BookDialogProps> = ({
 		</Dialog>
 	);
 };
+
+// ── Activity helpers ──────────────────────────────────────────────────────────
+
+const MUTATION_LABELS: Record<string, { label: string; color: string }> = {
+	plantation_book: { label: 'Trees Booked', color: '#4caf50' },
+	migration: { label: 'Migrated from GCR', color: '#2196f3' },
+	event_complete: { label: 'Event Completed', color: '#9c27b0' },
+	rollback_adjustment: { label: 'Rollback', color: '#f44336' },
+	admin_adjustment: { label: 'Admin Adjustment', color: '#ff9800' },
+};
+
+// ── Main content ──────────────────────────────────────────────────────────────
 
 const CsrRequestDetailContent: React.FC<{
 	requestId: number;
@@ -139,6 +143,15 @@ const CsrRequestDetailContent: React.FC<{
 	const [loadingTrees, setLoadingTrees] = useState(false);
 	const [activeTab, setActiveTab] = useState(0);
 	const [bookOpen, setBookOpen] = useState(false);
+
+	const [plots, setPlots] = useState<any[]>([]);
+	const [loadingPlots, setLoadingPlots] = useState(false);
+	const [plotSearch, setPlotSearch] = useState('');
+	const [plotOptions, setPlotOptions] = useState<any[]>([]);
+	const [searchingPlots, setSearchingPlots] = useState(false);
+	const [selectedPlot, setSelectedPlot] = useState<any | null>(null);
+	const [addingPlot, setAddingPlot] = useState(false);
+
 	const PAGE_SIZE = 20;
 
 	const loadRequest = async () => {
@@ -160,12 +173,64 @@ const CsrRequestDetailContent: React.FC<{
 		setLoadingTrees(false);
 	};
 
+	const loadPlots = useCallback(async () => {
+		setLoadingPlots(true);
+		try {
+			const api = new ApiClient();
+			const result = await api.getCsrRequestPlots(requestId);
+			setPlots(result.plots ?? []);
+		} finally {
+			setLoadingPlots(false);
+		}
+	}, [requestId]);
+
+	const handlePlotSearch = useCallback(async (q: string) => {
+		if (!q || q.length < 2) {
+			setPlotOptions([]);
+			return;
+		}
+		setSearchingPlots(true);
+		try {
+			const api = new ApiClient();
+			const result = await api.getPlots(0, 20, [
+				{ columnField: 'name', operatorValue: 'contains', value: q },
+			]);
+			setPlotOptions(result.results ?? []);
+		} finally {
+			setSearchingPlots(false);
+		}
+	}, []);
+
+	const handleAddPlot = async () => {
+		if (!selectedPlot) return;
+		setAddingPlot(true);
+		try {
+			const api = new ApiClient();
+			await api.addCsrRequestPlot(requestId, selectedPlot.id);
+			setSelectedPlot(null);
+			setPlotSearch('');
+			setPlotOptions([]);
+			await loadPlots();
+		} finally {
+			setAddingPlot(false);
+		}
+	};
+
+	const handleRemovePlot = async (plotId: number) => {
+		const api = new ApiClient();
+		await api.removeCsrRequestPlot(requestId, plotId);
+		await loadPlots();
+	};
+
 	useEffect(() => {
 		loadRequest();
 	}, [requestId]);
 	useEffect(() => {
 		if (activeTab === 1) loadTrees(treesPage);
 	}, [activeTab, treesPage]);
+	useEffect(() => {
+		if (activeTab === 2) loadPlots();
+	}, [activeTab, loadPlots]);
 
 	const handleBook = async (count: number, assignedTo?: number) => {
 		const api = new ApiClient();
@@ -181,11 +246,12 @@ const CsrRequestDetailContent: React.FC<{
 		'&.Mui-selected': { color: theme.palette.primary.main, fontWeight: 700 },
 	};
 
+	// ── Columns ────────────────────────────────────────────────────────────────
+
 	const treeColumns: ColumnsType<any> = [
 		{
 			title: 'Sapling ID',
 			dataIndex: 'sapling_id',
-			key: 'sapling_id',
 			render: (v) => (
 				<Typography variant="caption" sx={{ fontFamily: 'monospace' }}>
 					{v}
@@ -195,31 +261,26 @@ const CsrRequestDetailContent: React.FC<{
 		{
 			title: 'Plant Type',
 			dataIndex: 'plant_type',
-			key: 'plant_type',
 			render: (v) => <Typography variant="caption">{v}</Typography>,
 		},
 		{
 			title: 'Plot',
 			dataIndex: 'plot',
-			key: 'plot',
 			render: (v) => <Typography variant="caption">{v}</Typography>,
 		},
 		{
 			title: 'Site',
 			dataIndex: 'site_name',
-			key: 'site_name',
 			render: (v) => <Typography variant="caption">{v}</Typography>,
 		},
 		{
 			title: 'Assigned To',
 			dataIndex: 'assigned_to_name',
-			key: 'assigned_to_name',
 			render: (v) => <Typography variant="caption">{v ?? '—'}</Typography>,
 		},
 		{
 			title: 'Mapped At',
 			dataIndex: 'mapped_at',
-			key: 'mapped_at',
 			render: (v) => (
 				<Typography variant="caption">
 					{v ? new Date(v).toLocaleDateString() : '—'}
@@ -227,6 +288,218 @@ const CsrRequestDetailContent: React.FC<{
 			),
 		},
 	];
+
+	const gcrColumns: ColumnsType<any> = [
+		{
+			title: 'Request',
+			key: 'req',
+			render: (_, row) => (
+				<Box>
+					<Typography
+						variant="caption"
+						sx={{ fontFamily: 'monospace', display: 'block' }}
+					>
+						{row.request_id}
+					</Typography>
+					<Typography variant="caption" sx={{ color: colors.textMuted }}>
+						{row.event_name ?? '—'}
+					</Typography>
+				</Box>
+			),
+		},
+		{
+			title: 'Type',
+			dataIndex: 'event_type',
+			render: (v, row) => (
+				<Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
+					<Typography variant="caption">{v ?? '—'}</Typography>
+					{row.visit_id && (
+						<Chip
+							label="Visit"
+							size="small"
+							sx={{ height: 16, fontSize: '0.65rem', width: 'fit-content' }}
+						/>
+					)}
+					{row.migrated_to_csr && (
+						<Chip
+							label="Migrated"
+							size="small"
+							sx={{
+								height: 16,
+								fontSize: '0.65rem',
+								bgcolor: '#e3f2fd',
+								color: '#1565c0',
+								width: 'fit-content',
+							}}
+						/>
+					)}
+				</Box>
+			),
+		},
+		{
+			title: 'Trees',
+			dataIndex: 'no_of_cards',
+			align: 'right' as const,
+			render: (v) => (
+				<Typography variant="caption">{Number(v).toLocaleString()}</Typography>
+			),
+		},
+		{
+			title: 'Date',
+			dataIndex: 'gifted_on',
+			render: (v) => (
+				<Typography variant="caption">
+					{v ? new Date(v).toLocaleDateString() : '—'}
+				</Typography>
+			),
+		},
+		{
+			title: 'Status',
+			dataIndex: 'status',
+			render: (v) => (
+				<Chip label={v} size="small" sx={{ height: 18, fontSize: '0.68rem' }} />
+			),
+		},
+		{
+			title: '',
+			key: 'action',
+			render: (_, row) => (
+				<Tooltip title="Open gift card request">
+					<OpenInNewIcon
+						sx={{ fontSize: 16, color: colors.primary, cursor: 'pointer' }}
+						onClick={() => navigate(`/admin/tree-cards?request_id=${row.id}`)}
+					/>
+				</Tooltip>
+			),
+		},
+	];
+
+	const visitColumns: ColumnsType<any> = [
+		{
+			title: 'Visit',
+			key: 'visit',
+			render: (_, row) => (
+				<Box>
+					<Typography variant="body2" sx={{ fontWeight: 600 }}>
+						{row.visit_name}
+					</Typography>
+					<Typography variant="caption" sx={{ color: colors.textMuted }}>
+						{row.visit_date
+							? new Date(row.visit_date).toLocaleDateString()
+							: '—'}
+					</Typography>
+				</Box>
+			),
+		},
+		{
+			title: 'Trees',
+			dataIndex: 'trees_allocated',
+			align: 'right' as const,
+			render: (v) => (
+				<Typography variant="caption">{Number(v).toLocaleString()}</Typography>
+			),
+		},
+		{
+			title: 'Status',
+			dataIndex: 'status',
+			render: (v) => (
+				<Chip
+					label={v ?? '—'}
+					size="small"
+					sx={{ height: 18, fontSize: '0.68rem' }}
+				/>
+			),
+		},
+		{
+			title: '',
+			key: 'action',
+			render: (_, row) =>
+				row.gcr_id && (
+					<Tooltip title="Open visit request">
+						<OpenInNewIcon
+							sx={{ fontSize: 16, color: colors.primary, cursor: 'pointer' }}
+							onClick={() => navigate(`/admin/visits`)}
+						/>
+					</Tooltip>
+				),
+		},
+	];
+
+	const activityColumns: ColumnsType<any> = [
+		{
+			title: 'Action',
+			dataIndex: 'mutation_type',
+			render: (v) => {
+				const meta = MUTATION_LABELS[v] ?? { label: v, color: '#888' };
+				return (
+					<Chip
+						label={meta.label}
+						size="small"
+						sx={{
+							bgcolor: `${meta.color}22`,
+							color: meta.color,
+							fontWeight: 600,
+							fontSize: '0.72rem',
+							height: 20,
+						}}
+					/>
+				);
+			},
+		},
+		{
+			title: 'Source',
+			key: 'source',
+			render: (_, row) => (
+				<Box>
+					<Typography variant="caption" sx={{ color: colors.textMuted }}>
+						{row.source_type}
+					</Typography>
+					<Typography
+						variant="caption"
+						sx={{
+							display: 'block',
+							fontFamily: 'monospace',
+							fontSize: '0.7rem',
+						}}
+					>
+						{row.source_id}
+					</Typography>
+				</Box>
+			),
+		},
+		{
+			title: 'Trees',
+			dataIndex: 'delta',
+			align: 'right' as const,
+			render: (v) => (
+				<Typography
+					variant="caption"
+					sx={{
+						color: Number(v) >= 0 ? '#4caf50' : '#f44336',
+						fontWeight: 600,
+					}}
+				>
+					{Number(v) >= 0 ? `+${v}` : v}
+				</Typography>
+			),
+		},
+		{
+			title: 'By',
+			dataIndex: 'created_by_name',
+			render: (v) => <Typography variant="caption">{v ?? 'System'}</Typography>,
+		},
+		{
+			title: 'When',
+			dataIndex: 'created_at',
+			render: (v) => (
+				<Typography variant="caption">
+					{v ? new Date(v).toLocaleString() : '—'}
+				</Typography>
+			),
+		},
+	];
+
+	// ── Render ─────────────────────────────────────────────────────────────────
 
 	if (!data)
 		return (
@@ -236,6 +509,13 @@ const CsrRequestDetailContent: React.FC<{
 		);
 
 	const remaining = data.no_of_trees - data.trees_assigned;
+	const gcrs: any[] = (data as any).gift_card_requests ?? [];
+	const visits: any[] = (data as any).visits ?? [];
+	const activity: any[] = (data as any).activity ?? [];
+
+	const gcrCount = gcrs.length;
+	const visitCount = visits.length;
+	const plotCount = plots.length;
 
 	return (
 		<Box
@@ -315,7 +595,7 @@ const CsrRequestDetailContent: React.FC<{
 				</Box>
 			</Box>
 
-			{/* Main grid */}
+			{/* KPI cards */}
 			<Box
 				sx={{
 					display: 'grid',
@@ -324,7 +604,7 @@ const CsrRequestDetailContent: React.FC<{
 					mb: 3,
 				}}
 			>
-				{/* Metadata card */}
+				{/* Metadata */}
 				<Box sx={{ ...cardSx, borderRadius: 2, p: 2.5 }}>
 					<Typography
 						variant="subtitle2"
@@ -374,7 +654,7 @@ const CsrRequestDetailContent: React.FC<{
 					)}
 				</Box>
 
-				{/* Payment card */}
+				{/* Payment */}
 				<Box sx={{ ...cardSx, borderRadius: 2, p: 2.5 }}>
 					<Typography
 						variant="subtitle2"
@@ -432,60 +712,14 @@ const CsrRequestDetailContent: React.FC<{
 				<AllocationBreakdownCard
 					noOfTrees={data.no_of_trees}
 					treesAssigned={data.trees_assigned}
-					plantationTrees={Number(data.plantation_trees ?? 0)}
-					giftCardTrees={Number(data.gift_card_trees ?? 0)}
-					visitTrees={Number(data.visit_trees ?? 0)}
+					plantationTrees={Number((data as any).plantation_trees ?? 0)}
+					giftCardTrees={Number((data as any).gift_card_trees ?? 0)}
+					visitTrees={Number((data as any).visit_trees ?? 0)}
 					isDark={!isLight}
 				/>
 			</Box>
 
-			{/* Visits section */}
-			{data.visits && data.visits.length > 0 && (
-				<Box sx={{ ...cardSx, borderRadius: 2, p: 2.5, mb: 3 }}>
-					<Typography
-						variant="subtitle2"
-						sx={{ fontWeight: 600, mb: 2, color: colors.textOnDark }}
-					>
-						Visit Sub-allocations ({data.visits.length})
-					</Typography>
-					{data.visits.map((v) => (
-						<Box
-							key={v.id}
-							sx={{
-								display: 'flex',
-								justifyContent: 'space-between',
-								alignItems: 'center',
-								py: 1,
-								borderBottom: `1px solid ${isLight ? '#f0ede6' : '#2a3832'}`,
-							}}
-						>
-							<Box>
-								<Typography
-									variant="body2"
-									sx={{ fontWeight: 600, color: colors.textOnDark }}
-								>
-									{v.visit_name}
-								</Typography>
-								<Typography variant="caption" sx={{ color: colors.textMuted }}>
-									{new Date(v.visit_date).toLocaleDateString()}
-								</Typography>
-							</Box>
-							<Box sx={{ textAlign: 'right' }}>
-								<Typography variant="body2" sx={{ fontWeight: 600 }}>
-									{Number(v.trees_allocated).toLocaleString()} trees
-								</Typography>
-								<Chip
-									label={v.status}
-									size="small"
-									sx={{ height: 18, fontSize: '0.65rem' }}
-								/>
-							</Box>
-						</Box>
-					))}
-				</Box>
-			)}
-
-			{/* Trees tab */}
+			{/* Tabs */}
 			<Box sx={{ borderBottom: `1px solid ${theme.palette.divider}`, mb: 3 }}>
 				<Tabs
 					value={activeTab}
@@ -497,8 +731,44 @@ const CsrRequestDetailContent: React.FC<{
 						label={`Trees (${data.trees_assigned.toLocaleString()})`}
 						sx={tabSx}
 					/>
+					<Tab
+						icon={<LayersIcon sx={{ fontSize: 16 }} />}
+						iconPosition="start"
+						label={`Plots${plotCount > 0 ? ` (${plotCount})` : ''}`}
+						sx={tabSx}
+					/>
+					<Tab
+						icon={<CardGiftcardIcon sx={{ fontSize: 16 }} />}
+						iconPosition="start"
+						label={`Gift Cards${gcrCount > 0 ? ` (${gcrCount})` : ''}`}
+						sx={tabSx}
+					/>
+					<Tab
+						icon={<TourIcon sx={{ fontSize: 16 }} />}
+						iconPosition="start"
+						label={`Visits${visitCount > 0 ? ` (${visitCount})` : ''}`}
+						sx={tabSx}
+					/>
+					<Tab
+						icon={<HistoryIcon sx={{ fontSize: 16 }} />}
+						iconPosition="start"
+						label={`Activity${
+							activity.length > 0 ? ` (${activity.length})` : ''
+						}`}
+						sx={tabSx}
+					/>
 				</Tabs>
 			</Box>
+
+			{/* Tab content */}
+			{activeTab === 0 && (
+				<Box sx={{ color: theme.palette.text.secondary }}>
+					<Typography variant="body2">
+						Use the tabs above to explore trees, gift card allocations, visit
+						allocations, and activity log for this CSR request.
+					</Typography>
+				</Box>
+			)}
 
 			{activeTab === 1 && (
 				<Table
@@ -515,6 +785,204 @@ const CsrRequestDetailContent: React.FC<{
 					size="small"
 					style={{ borderRadius: 8 }}
 				/>
+			)}
+
+			{activeTab === 2 && (
+				<Box>
+					{/* Add plot row */}
+					<Box
+						sx={{ display: 'flex', gap: 1.5, mb: 2.5, alignItems: 'center' }}
+					>
+						<Autocomplete
+							sx={{ flex: 1, maxWidth: 400 }}
+							size="small"
+							options={plotOptions}
+							getOptionLabel={(o: any) => `${o.name} (${o.plot_id ?? o.id})`}
+							value={selectedPlot}
+							onChange={(_, v) => setSelectedPlot(v)}
+							inputValue={plotSearch}
+							onInputChange={(_, v) => {
+								setPlotSearch(v);
+								handlePlotSearch(v);
+							}}
+							loading={searchingPlots}
+							noOptionsText={
+								plotSearch.length < 2
+									? 'Type to search plots…'
+									: 'No plots found'
+							}
+							renderInput={(params) => (
+								<TextField
+									{...params}
+									label="Search plots"
+									InputProps={{
+										...params.InputProps,
+										endAdornment: (
+											<>
+												{searchingPlots ? <CircularProgress size={16} /> : null}
+												{params.InputProps.endAdornment}
+											</>
+										),
+									}}
+								/>
+							)}
+						/>
+						<Button
+							variant="contained"
+							size="small"
+							disabled={!selectedPlot || addingPlot}
+							onClick={handleAddPlot}
+							sx={{
+								textTransform: 'none',
+								fontWeight: 600,
+								whiteSpace: 'nowrap',
+							}}
+						>
+							{addingPlot ? <CircularProgress size={16} /> : 'Add Plot'}
+						</Button>
+					</Box>
+
+					{/* Linked plots */}
+					{loadingPlots ? (
+						<Box sx={{ textAlign: 'center', py: 4 }}>
+							<CircularProgress size={24} />
+						</Box>
+					) : plots.length === 0 ? (
+						<Typography
+							variant="body2"
+							sx={{
+								color: theme.palette.text.secondary,
+								py: 4,
+								textAlign: 'center',
+							}}
+						>
+							No plots linked yet. Add a plot above to enable tree booking.
+						</Typography>
+					) : (
+						<Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+							{plots.map((p: any) => (
+								<Box
+									key={p.id}
+									sx={{
+										display: 'flex',
+										alignItems: 'center',
+										justifyContent: 'space-between',
+										p: 1.5,
+										borderRadius: 1.5,
+										border: `1px solid ${theme.palette.divider}`,
+										backgroundColor: theme.palette.background.paper,
+									}}
+								>
+									<Box>
+										<Typography variant="body2" sx={{ fontWeight: 600 }}>
+											{p.name}
+										</Typography>
+										<Typography
+											variant="caption"
+											sx={{ color: colors.textMuted }}
+										>
+											{[
+												p.plot_id && `ID: ${p.plot_id}`,
+												p.total_trees != null &&
+													`${Number(p.total_trees).toLocaleString()} total`,
+												p.available_trees != null &&
+													`${Number(
+														p.available_trees,
+													).toLocaleString()} available`,
+											]
+												.filter(Boolean)
+												.join(' · ')}
+										</Typography>
+									</Box>
+									<Tooltip title="Remove plot">
+										<IconButton
+											size="small"
+											onClick={() => handleRemovePlot(p.id)}
+											sx={{ color: theme.palette.error.main }}
+										>
+											<DeleteOutlineIcon fontSize="small" />
+										</IconButton>
+									</Tooltip>
+								</Box>
+							))}
+						</Box>
+					)}
+				</Box>
+			)}
+
+			{activeTab === 3 && (
+				<Box>
+					{gcrs.length === 0 ? (
+						<Typography
+							variant="body2"
+							sx={{
+								color: theme.palette.text.secondary,
+								py: 4,
+								textAlign: 'center',
+							}}
+						>
+							No gift card allocations linked to this CSR request yet.
+						</Typography>
+					) : (
+						<Table
+							columns={gcrColumns}
+							dataSource={gcrs.map((g) => ({ ...g, key: g.id }))}
+							pagination={false}
+							size="small"
+							style={{ borderRadius: 8 }}
+						/>
+					)}
+				</Box>
+			)}
+
+			{activeTab === 4 && (
+				<Box>
+					{visits.length === 0 ? (
+						<Typography
+							variant="body2"
+							sx={{
+								color: theme.palette.text.secondary,
+								py: 4,
+								textAlign: 'center',
+							}}
+						>
+							No visits linked to this CSR request yet.
+						</Typography>
+					) : (
+						<Table
+							columns={visitColumns}
+							dataSource={visits.map((v) => ({ ...v, key: v.id }))}
+							pagination={false}
+							size="small"
+							style={{ borderRadius: 8 }}
+						/>
+					)}
+				</Box>
+			)}
+
+			{activeTab === 5 && (
+				<Box>
+					{activity.length === 0 ? (
+						<Typography
+							variant="body2"
+							sx={{
+								color: theme.palette.text.secondary,
+								py: 4,
+								textAlign: 'center',
+							}}
+						>
+							No activity recorded yet.
+						</Typography>
+					) : (
+						<Table
+							columns={activityColumns}
+							dataSource={activity.map((a) => ({ ...a, key: a.id }))}
+							pagination={false}
+							size="small"
+							style={{ borderRadius: 8 }}
+						/>
+					)}
+				</Box>
 			)}
 
 			<BookDialog
