@@ -74,6 +74,8 @@ import CorpRegistration from './pages/CorpRegistration';
 import GroupDashboard from './pages/GroupDashboard/GroupDashboard';
 import GroupLandingPage from './pages/GroupLanding/GroupLandingPage';
 import GiftCardsPage from './pages/GroupLanding/GiftCardsPage';
+import SiteVisitsPage from './pages/GroupLanding/SiteVisitsPage';
+import CsrEventsPage from './pages/GroupLanding/CsrEventsPage';
 import { getOrCreateVisitorId } from './helpers/visitorTracking';
 import { useEffect, useRef } from 'react';
 import ApiClient from './api/apiClient/apiClient';
@@ -249,9 +251,20 @@ function App() {
 						element={<GroupLandingPage nameKey="sprih" />}
 					/>
 					<Route
+						path="/dashboard/hd-hyundai-construction-equipment-india-pvt-ltd"
+						element={
+							<GroupLandingPage nameKey="hd-hyundai-construction-equipment-india-pvt-ltd" />
+						}
+					/>
+					<Route
 						path="/dashboard/:name_key/gifts"
 						element={<GiftCardsPage />}
 					/>
+					<Route
+						path="/dashboard/:name_key/visits"
+						element={<SiteVisitsPage />}
+					/>
+					<Route path="/dashboard/:name_key/csr" element={<CsrEventsPage />} />
 					<Route path="/dashboard/:name_key" element={<GroupDashboard />} />
 					<Route
 						path="/personal/dashboard/:userId"
