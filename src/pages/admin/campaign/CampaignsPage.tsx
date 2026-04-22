@@ -73,6 +73,7 @@ export const CampaignsPage = () => {
 						treesCount: 0,
 					}),
 					champions: data.champion || null,
+					donors: data.donors || [],
 				});
 			} catch (err: unknown) {
 				console.log(err);
@@ -437,7 +438,7 @@ export const CampaignsPage = () => {
 						>
 							<Box
 								component="img"
-								src={buildS3Url('campaigns/glowback-logo.png')}
+								src="https://14treesplants.s3.ap-south-1.amazonaws.com/campaigns/glowback-logo.png"
 								alt="Glowback Campaign Logo"
 								sx={{
 									width: '100%',

@@ -746,6 +746,21 @@ class ApiClient {
 		}
 	}
 
+	async getGroupVisitCardsData(nameKey: string): Promise<any> {
+		try {
+			const response = await this.api.get<any>(
+				`/groups/by-key/${encodeURIComponent(nameKey)}/visit-cards`,
+			);
+			return response.data;
+		} catch (error: any) {
+			console.error('Failed to fetch group visit cards data', error);
+			if (error?.response?.data?.message) {
+				throw new Error(error.response.data.message);
+			}
+			throw new Error('Failed to load site visits page');
+		}
+	}
+
 	async mergeGroups(
 		primary_group: number,
 		secondary_group: number,
@@ -4351,6 +4366,12 @@ class ApiClient {
 			amountRaised: number;
 			treesSponsored: number;
 		} | null;
+		donors: {
+			donationId: number;
+			donationReceiptNumber: string | null;
+			name: string | null;
+			amount: number | null;
+		}[];
 	}> {
 		try {
 			const response = await this.api.get<{
@@ -4368,6 +4389,12 @@ class ApiClient {
 					amountRaised: number;
 					treesSponsored: number;
 				} | null;
+				donors: {
+					donationId: number;
+					donationReceiptNumber: string | null;
+					name: string | null;
+					amount: number | null;
+				}[];
 			}>(`/campaigns/${c_key}/analytics`);
 
 			return response.data;
