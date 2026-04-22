@@ -417,10 +417,22 @@ const SiteVisitsPage: React.FC = () => {
 									}}
 								>
 									<AccordionSummary
-										expandIcon={<ExpandMore sx={{ color: '#2a4937' }} />}
+										expandIcon={
+											<ExpandMore
+												sx={{
+													color: '#fff',
+													fontSize: 28,
+													bgcolor: '#1f3625',
+													borderRadius: '50%',
+													p: 0.3,
+												}}
+											/>
+										}
 										sx={{
 											px: { xs: 1.5, sm: 2 },
 											py: 0.75,
+											bgcolor: '#2a5c3f',
+											borderRadius: '10px 10px 0 0',
 											'& .MuiAccordionSummary-content': { my: 0.75 },
 										}}
 									>
@@ -509,7 +521,7 @@ const VisitHeader: React.FC<{ visit: VisitGroup }> = ({ visit }) => (
 			mb: 1,
 		}}
 	>
-		<Typography sx={{ color: '#1f3625', fontSize: 20, fontWeight: 500 }}>
+		<Typography sx={{ color: '#fff', fontSize: 20, fontWeight: 500 }}>
 			{visit.event_name ?? 'Site Visit'}
 		</Typography>
 		<Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
@@ -520,8 +532,8 @@ const VisitHeader: React.FC<{ visit: VisitGroup }> = ({ visit }) => (
 					height: 22,
 					fontSize: 11,
 					fontWeight: 600,
-					bgcolor: '#e4ebe3',
-					color: '#30503d',
+					bgcolor: 'rgba(255,255,255,0.18)',
+					color: '#fff',
 				}}
 			/>
 			<Chip
@@ -533,25 +545,19 @@ const VisitHeader: React.FC<{ visit: VisitGroup }> = ({ visit }) => (
 					height: 22,
 					fontSize: 11,
 					fontWeight: 600,
-					bgcolor: '#e4ebe3',
-					color: '#30503d',
+					bgcolor: 'rgba(255,255,255,0.18)',
+					color: '#fff',
 				}}
 			/>
-			{visit.request_id ? (
-				<Chip
-					label={visit.request_id}
-					size="small"
-					sx={{
-						height: 22,
-						fontSize: 11,
-						fontWeight: 600,
-						bgcolor: '#e4ebe3',
-						color: '#30503d',
-					}}
-				/>
-			) : null}
 			{visit.gifted_on ? (
-				<Typography sx={{ color: '#6b7a70', fontSize: 11, fontWeight: 500 }}>
+				<Typography
+					sx={{
+						color: 'rgba(255,255,255,0.75)',
+						fontSize: 11,
+						fontWeight: 500,
+						pr: 2,
+					}}
+				>
 					{formattedDate(visit.gifted_on)}
 				</Typography>
 			) : null}
