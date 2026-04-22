@@ -260,6 +260,10 @@ function App() {
 						}
 					/>
 					<Route
+						path="/dashboard/legalogic-consulting"
+						element={<GroupLandingPage nameKey="legalogic-consulting" />}
+					/>
+					<Route
 						path="/dashboard/:name_key/gifts"
 						element={<GiftCardsPage />}
 					/>
