@@ -60,7 +60,11 @@ const GroupLandingPage: React.FC<Props> = ({ nameKey: nameKeyProp }) => {
 		>
 			<ToastContainer />
 			<HeroSection group={data.group} />
-			<StatsStrip group={data.group} stats={data.stats} />
+			<StatsStrip
+				group={data.group}
+				stats={data.stats}
+				giftCards={data.gift_cards}
+			/>
 			<VisitFilmStrip
 				visits={data.events}
 				giftCards={data.gift_cards}

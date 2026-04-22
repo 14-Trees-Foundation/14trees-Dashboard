@@ -729,7 +729,7 @@ const AggregatedGiftCard: React.FC<{
 					}}
 				/>
 				<Chip
-					label={`${totalGifts.toLocaleString('en-IN')} Gift card events`}
+					label={`${totalGifts.toLocaleString('en-IN')} Gift cards`}
 					size="small"
 					sx={{
 						bgcolor: '#dbe4d6',
