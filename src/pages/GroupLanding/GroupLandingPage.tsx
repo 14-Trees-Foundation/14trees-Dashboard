@@ -64,6 +64,7 @@ const GroupLandingPage: React.FC<Props> = ({ nameKey: nameKeyProp }) => {
 			<VisitFilmStrip
 				visits={data.events}
 				giftCards={data.gift_cards}
+				siteVisits={data.visits ?? []}
 				nameKey={name_key!}
 			/>
 			<AboutSection />

@@ -13,6 +13,7 @@ export type GroupLandingStats = {
 	trees_sponsored: number;
 	event_count: number;
 	gift_card_count: number;
+	visit_count: number;
 };
 
 export type GroupLandingEvent = {
@@ -35,14 +36,19 @@ export type GroupLandingGiftCard = {
 	gifted_on: string | null;
 	display_image: string | null;
 	event_type: string | null;
+	request_type: string | null;
 	status: string;
+	visit_hero_image: string | null;
 };
+
+export type GroupLandingVisit = GroupLandingGiftCard;
 
 export type GroupLandingData = {
 	group: GroupLandingGroup;
 	stats: GroupLandingStats;
 	events: GroupLandingEvent[];
 	gift_cards: GroupLandingGiftCard[];
+	visits: GroupLandingVisit[];
 };
 
 export type GroupGiftCardItem = {
@@ -64,4 +70,15 @@ export type GroupGiftCardItem = {
 
 export type GroupGiftCardsData = {
 	cards: GroupGiftCardItem[];
+};
+
+export type GroupVisitCardItem = GroupGiftCardItem & {
+	request_type: string | null;
+	user_tree_image: string | null;
+	image: string | null;
+	visit_hero_image: string | null;
+};
+
+export type GroupVisitCardsData = {
+	cards: GroupVisitCardItem[];
 };
