@@ -75,6 +75,7 @@ import GroupDashboard from './pages/GroupDashboard/GroupDashboard';
 import GroupLandingPage from './pages/GroupLanding/GroupLandingPage';
 import GiftCardsPage from './pages/GroupLanding/GiftCardsPage';
 import SiteVisitsPage from './pages/GroupLanding/SiteVisitsPage';
+import CsrEventsPage from './pages/GroupLanding/CsrEventsPage';
 import { getOrCreateVisitorId } from './helpers/visitorTracking';
 import { useEffect, useRef } from 'react';
 import ApiClient from './api/apiClient/apiClient';
@@ -266,6 +267,7 @@ function App() {
 						path="/dashboard/:name_key/visits"
 						element={<SiteVisitsPage />}
 					/>
+					<Route path="/dashboard/:name_key/csr" element={<CsrEventsPage />} />
 					<Route path="/dashboard/:name_key" element={<GroupDashboard />} />
 					<Route
 						path="/personal/dashboard/:userId"

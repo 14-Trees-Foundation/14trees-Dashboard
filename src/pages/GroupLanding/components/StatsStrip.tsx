@@ -3,47 +3,71 @@ import { Park, Spa, TrendingUp } from '@mui/icons-material';
 import {
 	GroupLandingStats,
 	GroupLandingGroup,
+	GroupLandingGiftCard,
 } from '../../../types/GroupLanding';
 
 type Props = {
 	group: GroupLandingGroup;
 	stats: GroupLandingStats;
+	giftCards: GroupLandingGiftCard[];
 };
 
 const STATS = [
 	{
 		icon: Park,
 		label: 'Trees Planted',
-		getValue: (_g: GroupLandingGroup, s: GroupLandingStats) =>
-			`${s.trees_sponsored.toLocaleString('en-IN')}+`,
+		getValue: (
+			_g: GroupLandingGroup,
+			s: GroupLandingStats,
+			_gc: GroupLandingGiftCard[],
+		) => `${s.trees_sponsored.toLocaleString('en-IN')}+`,
 	},
 	{
 		icon: Spa,
 		label: 'Acres restored',
-		getValue: (g: GroupLandingGroup) =>
-			g.acres_of_land != null ? `${g.acres_of_land} Acres` : '—',
+		getValue: (
+			g: GroupLandingGroup,
+			_s: GroupLandingStats,
+			_gc: GroupLandingGiftCard[],
+		) => (g.acres_of_land != null ? `${g.acres_of_land} Acres` : '—'),
 	},
 	{
 		icon: Spa,
 		label: 'Total events',
-		getValue: (_g: GroupLandingGroup, s: GroupLandingStats) =>
-			String(s.event_count),
+		getValue: (
+			_g: GroupLandingGroup,
+			s: GroupLandingStats,
+			_gc: GroupLandingGiftCard[],
+		) => String(s.event_count),
 	},
 	{
 		icon: TrendingUp,
-		label: 'Cards gifted',
-		getValue: (_g: GroupLandingGroup, s: GroupLandingStats) =>
-			String(s.gift_card_count ?? 0),
+		label: 'No of Gift Cards',
+		getValue: (
+			_g: GroupLandingGroup,
+			_s: GroupLandingStats,
+			giftCards: GroupLandingGiftCard[],
+		) =>
+			String(
+				giftCards.reduce(
+					(sum, giftCard) => sum + (giftCard.no_of_cards ?? 0),
+					0,
+				),
+			),
 	},
 	{
 		icon: TrendingUp,
 		label: 'Years of partnership',
-		getValue: (g: GroupLandingGroup) =>
+		getValue: (
+			g: GroupLandingGroup,
+			_s: GroupLandingStats,
+			_gc: GroupLandingGiftCard[],
+		) =>
 			g.years_of_partnership != null ? String(g.years_of_partnership) : '—',
 	},
 ];
 
-const StatsStrip: React.FC<Props> = ({ group, stats }) => {
+const StatsStrip: React.FC<Props> = ({ group, stats, giftCards }) => {
 	return (
 		<Box
 			sx={{
@@ -185,7 +209,7 @@ const StatsStrip: React.FC<Props> = ({ group, stats }) => {
 											whiteSpace: 'nowrap',
 										}}
 									>
-										{getValue(group, stats)}
+										{getValue(group, stats, giftCards)}
 									</Typography>
 								</Box>
 							</Box>
