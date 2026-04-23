@@ -41,6 +41,11 @@ const EventParticipants: React.FC<Props> = ({
 		isBirthday ? 'tree' : 'people',
 	);
 	const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
+	const [visibleCount, setVisibleCount] = useState(10);
+
+	useEffect(() => {
+		setVisibleCount(10);
+	}, [viewMode, searchQuery]);
 
 	useEffect(() => {
 		if (searchInput.trim() === '') {
@@ -428,7 +433,7 @@ const EventParticipants: React.FC<Props> = ({
 						}}
 					>
 						{viewMode === 'tree'
-							? filteredTrees.map((t) => {
+							? filteredTrees.slice(0, visibleCount).map((t) => {
 									const { primaryPlantName, englishTreeType, localPlantName } =
 										parsePlantName(
 											t.plant_type_name,
@@ -443,6 +448,7 @@ const EventParticipants: React.FC<Props> = ({
 											key={t.id}
 											heading={t.assigned_to ? 'Planted for' : 'Planted at'}
 											title={t.user_name ?? 'Yet to be assigned'}
+											hideTitle={isBirthday}
 											titleMuted={!t.user_name}
 											primaryPlantName={primaryPlantName}
 											englishTreeType={englishTreeType}
@@ -464,7 +470,7 @@ const EventParticipants: React.FC<Props> = ({
 										/>
 									);
 							  })
-							: filteredParticipants.map((p) => {
+							: filteredParticipants.slice(0, visibleCount).map((p) => {
 									const { primaryPlantName, englishTreeType, localPlantName } =
 										parsePlantName(
 											p.plant_type_name,
@@ -497,6 +503,54 @@ const EventParticipants: React.FC<Props> = ({
 									);
 							  })}
 					</Box>
+
+					{/* View more button */}
+					{viewMode === 'tree' && filteredTrees.length > visibleCount && (
+						<Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
+							<Button
+								onClick={() => setVisibleCount((c) => c + 10)}
+								sx={{
+									border: '1.5px solid #b8cdb8',
+									borderRadius: '12px',
+									px: 4,
+									py: 1.25,
+									textTransform: 'none',
+									fontSize: { xs: 14, md: 16 },
+									fontWeight: 500,
+									color: '#1f3625',
+									bgcolor: '#fff',
+									'&:hover': { bgcolor: '#f0f7f0' },
+								}}
+							>
+								View {Math.min(10, filteredTrees.length - visibleCount)} more
+								trees
+							</Button>
+						</Box>
+					)}
+					{viewMode === 'people' &&
+						filteredParticipants.length > visibleCount && (
+							<Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
+								<Button
+									onClick={() => setVisibleCount((c) => c + 10)}
+									sx={{
+										border: '1.5px solid #b8cdb8',
+										borderRadius: '12px',
+										px: 4,
+										py: 1.25,
+										textTransform: 'none',
+										fontSize: { xs: 14, md: 16 },
+										fontWeight: 500,
+										color: '#1f3625',
+										bgcolor: '#fff',
+										'&:hover': { bgcolor: '#f0f7f0' },
+									}}
+								>
+									View{' '}
+									{Math.min(10, filteredParticipants.length - visibleCount)}{' '}
+									more people
+								</Button>
+							</Box>
+						)}
 
 					{viewMode === 'tree'
 						? filteredTrees.length === 0 && (

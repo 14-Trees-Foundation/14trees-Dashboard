@@ -87,6 +87,7 @@ const EventGallery: React.FC<Props> = ({
 
 	return (
 		<Box
+			id="event-gallery-section"
 			sx={{
 				px: { xs: 2, md: 5 },
 				pb: { xs: 6, md: 8 },
