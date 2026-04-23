@@ -249,7 +249,7 @@ const EventHero: React.FC<Props> = ({
 									'&:hover': { bgcolor: 'rgba(255,255,255,0.08)' },
 								}}
 								onClick={() => {
-									const el = document.getElementById('event-trees-section');
+									const el = document.getElementById('event-gallery-section');
 									if (el) el.scrollIntoView({ behavior: 'smooth' });
 								}}
 							>
