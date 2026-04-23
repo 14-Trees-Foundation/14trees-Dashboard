@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
 	Box,
 	Button,
@@ -23,6 +23,7 @@ import PostCreationTips from './components/PostCreationTips';
 // Common Components
 import UserLookupComponent from '../../../../../components/common/UserLookup/UserLookupComponent';
 import { USER_LOOKUP_PRESETS } from '../../../../../components/common/UserLookup/types';
+import ApiClient from '../../../../../api/apiClient/apiClient';
 
 const AddUpdateEventModal = ({
 	open,
@@ -33,6 +34,18 @@ const AddUpdateEventModal = ({
 }) => {
 	const [showPostCreationTips, setShowPostCreationTips] = useState(false);
 	const [selectedUser, setSelectedUser] = useState(null);
+	const [campaigns, setCampaigns] = useState([]);
+
+	useEffect(() => {
+		if (!open) return;
+		const client = new ApiClient();
+		client
+			.getCampaigns(0, 100)
+			.then((res) => {
+				setCampaigns(res.results ?? []);
+			})
+			.catch(() => {});
+	}, [open]);
 
 	// Custom hooks
 	const {
@@ -181,6 +194,7 @@ const AddUpdateEventModal = ({
 								eventTypes={eventTypes}
 								locationOptions={locationOptions}
 								themeColorOptions={themeColorOptions}
+								campaigns={campaigns}
 							/>
 
 							<Grid item xs={12}>

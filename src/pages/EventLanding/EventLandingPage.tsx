@@ -5,6 +5,7 @@ import { toast, ToastContainer } from 'react-toastify';
 import { Spinner } from '../../components/Spinner';
 import { NotFound } from '../notfound/NotFound';
 import EventsApiClient from '../../api/events/eventsApiClient';
+import ApiClient from '../../api/apiClient/apiClient';
 import { EventLandingData } from '../../types/EventLanding';
 import EventHero from './components/EventHero';
 import EventGallery from './components/EventGallery';
@@ -14,11 +15,19 @@ import EventMessages from './components/EventMessages';
 import CorpFooter from '../GroupLanding/components/CorpFooter';
 import AboutSection from '../../components/AboutSection';
 
+type Donor = {
+	donationId: number;
+	donationReceiptNumber: string | null;
+	name: string | null;
+	amount: number | null;
+};
+
 const EventLandingPage: React.FC = () => {
 	const { linkId } = useParams<{ linkId: string }>();
 	const [loading, setLoading] = useState(true);
 	const [data, setData] = useState<EventLandingData | null>(null);
 	const [error, setError] = useState<string | null>(null);
+	const [donors, setDonors] = useState<Donor[]>([]);
 
 	useEffect(() => {
 		if (!linkId) {
@@ -27,14 +36,22 @@ const EventLandingPage: React.FC = () => {
 			return;
 		}
 
-		const client = new EventsApiClient();
-		client
+		const eventsClient = new EventsApiClient();
+		eventsClient
 			.getEventLandingData(linkId)
 			.then((res) => {
 				setData(res);
 				document.title = `${res.event.name} | 14 Trees`;
-				// Track view (fire-and-forget)
-				client.trackEventView(linkId);
+				eventsClient.trackEventView(linkId);
+
+				// Fetch campaign donors if the event is linked to a campaign
+				if (res.event.campaign_c_key) {
+					const apiClient = new ApiClient();
+					apiClient
+						.getCampaignAnalytics(res.event.campaign_c_key)
+						.then((analytics) => setDonors(analytics.donors ?? []))
+						.catch(() => {});
+				}
 			})
 			.catch((err: any) => {
 				const msg = err.message || 'Event not found';
@@ -48,6 +65,7 @@ const EventLandingPage: React.FC = () => {
 	if (error || !data) return <NotFound text={error ?? 'Event not found'} />;
 
 	const { event, images, participants, trees, messages } = data;
+	const isBirthday = Number(event.type) === 1;
 
 	return (
 		<Box
@@ -61,11 +79,24 @@ const EventLandingPage: React.FC = () => {
 		>
 			<ToastContainer />
 
-			<EventHero event={event} fallbackImage={images[0]?.image_url ?? null} />
+			<EventHero
+				event={event}
+				fallbackImage={images[0]?.image_url ?? null}
+				isBirthday={isBirthday}
+			/>
 
-			<EventGallery images={images} description={event.message} />
+			<EventGallery
+				images={images}
+				description={event.message}
+				isBirthday={isBirthday}
+			/>
 
-			<EventParticipants participants={participants} trees={trees} />
+			<EventParticipants
+				participants={participants}
+				trees={trees}
+				isBirthday={isBirthday}
+				donors={donors}
+			/>
 
 			<EventMessages messages={messages} />
 

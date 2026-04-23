@@ -107,6 +107,8 @@ class EventsApiClient {
 				if (eventData.site_id) {
 					formData.append('site_id', eventData.site_id.toString());
 				}
+				if ((eventData as any).campaign_c_key)
+					formData.append('campaign_c_key', (eventData as any).campaign_c_key);
 
 				// Always append tags as JSON string (may be empty array)
 				formData.append('tags', JSON.stringify(tagsArray));
@@ -154,6 +156,7 @@ class EventsApiClient {
 					link: link,
 					assigned_by: eventData.assigned_by || 1,
 					site_id: eventData.site_id || null,
+					campaign_c_key: (eventData as any).campaign_c_key || null,
 				};
 
 				// Remove undefined values to avoid backend issues
@@ -230,6 +233,8 @@ class EventsApiClient {
 					formData.append('description', eventData.description);
 				if (eventData.message) formData.append('message', eventData.message);
 				if (eventData.link) formData.append('link', eventData.link);
+				if ((eventData as any).campaign_c_key)
+					formData.append('campaign_c_key', (eventData as any).campaign_c_key);
 
 				// Normalize tags into array and always append (may be empty)
 				let updateTagsArray: string[] = [];
