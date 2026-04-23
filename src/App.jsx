@@ -37,6 +37,7 @@ const NEW_EVENT_LANDING_LINKS = new Set([
 	'ij5h8ow9',
 	'5e7vujoc',
 	'2f8chrbn',
+	'fl14l9ci',
 	'fb621e6b',
 ]);
 
