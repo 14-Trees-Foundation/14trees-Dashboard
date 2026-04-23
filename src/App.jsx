@@ -36,8 +36,8 @@ import EventLandingPage from './pages/EventLanding/EventLandingPage';
 const NEW_EVENT_LANDING_LINKS = new Set([
 	'ij5h8ow9',
 	'5e7vujoc',
-	'fl14l9ci',
 	'2f8chrbn',
+	'fb621e6b',
 ]);
 
 const EventPageRouter = () => {
