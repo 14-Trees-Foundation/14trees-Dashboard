@@ -72,7 +72,7 @@ const TreeProfileCard: React.FC<Props> = ({
 			<Box
 				sx={{
 					width: '100%',
-					height: { xs: 220, md: 250 },
+					height: hideTitle ? { xs: 280, md: 320 } : { xs: 220, md: 250 },
 					display: 'flex',
 					alignItems: 'center',
 					justifyContent: 'center',
@@ -193,9 +193,9 @@ const TreeProfileCard: React.FC<Props> = ({
 						>
 							{title}
 						</Typography>
+						<Divider sx={{ backgroundColor: '#dde2dc', mb: 2 }} />
 					</>
 				)}
-				<Divider sx={{ backgroundColor: '#dde2dc', mb: 2 }} />
 				<Box
 					sx={{
 						minHeight: 52,
