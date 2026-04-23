@@ -18,7 +18,7 @@ type Props = {
 // Deterministic angle per image index so angles are stable across renders
 const seededAngle = (idx: number): number => {
 	const seed = Math.sin(idx * 127.1 + 311.7) * 43758.5453;
-	const frac = seed - Math.floor(seed); // 0..1
+	const frac = seed - Math.floor(seed);
 	return Math.round(frac * 30 - 20);
 };
 
@@ -29,29 +29,33 @@ const EventGallery: React.FC<Props> = ({
 }) => {
 	const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
 	const [activeIndex, setActiveIndex] = useState(0);
+	const [touchStartX, setTouchStartX] = useState<number | null>(null);
+	const [touchCurrentX, setTouchCurrentX] = useState<number | null>(null);
 
-	// Pre-computed angles — only used in birthday mode
 	const angles = useMemo(
 		() => (isBirthday ? images.map((_, i) => seededAngle(i)) : []),
 		[isBirthday, images.length],
 	);
-	const [touchStartX, setTouchStartX] = useState<number | null>(null);
-	const [touchCurrentX, setTouchCurrentX] = useState<number | null>(null);
 
 	if (images.length === 0) return null;
 
-	const openLightbox = (i: number) => setLightboxIndex(i);
+	const openLightbox = (index: number) => setLightboxIndex(index);
 	const closeLightbox = () => setLightboxIndex(null);
+
 	const prev = () =>
-		setLightboxIndex((i) =>
-			i === null ? 0 : (i - 1 + images.length) % images.length,
+		setLightboxIndex((index) =>
+			index === null ? 0 : (index - 1 + images.length) % images.length,
 		);
+
 	const next = () =>
-		setLightboxIndex((i) => (i === null ? 0 : (i + 1) % images.length));
+		setLightboxIndex((index) =>
+			index === null ? 0 : (index + 1) % images.length,
+		);
 
 	const prevMain = () =>
-		setActiveIndex((i) => (i - 1 + images.length) % images.length);
-	const nextMain = () => setActiveIndex((i) => (i + 1) % images.length);
+		setActiveIndex((index) => (index - 1 + images.length) % images.length);
+
+	const nextMain = () => setActiveIndex((index) => (index + 1) % images.length);
 
 	const onSwipeStart = (clientX: number) => {
 		setTouchStartX(clientX);
@@ -65,22 +69,26 @@ const EventGallery: React.FC<Props> = ({
 
 	const onMainSwipeEnd = () => {
 		if (touchStartX === null || touchCurrentX === null) return;
+
 		const delta = touchStartX - touchCurrentX;
 		if (Math.abs(delta) > 40) {
 			if (delta > 0) nextMain();
 			else prevMain();
 		}
+
 		setTouchStartX(null);
 		setTouchCurrentX(null);
 	};
 
 	const onLightboxSwipeEnd = () => {
 		if (touchStartX === null || touchCurrentX === null) return;
+
 		const delta = touchStartX - touchCurrentX;
 		if (Math.abs(delta) > 40) {
 			if (delta > 0) next();
 			else prev();
 		}
+
 		setTouchStartX(null);
 		setTouchCurrentX(null);
 	};
@@ -103,7 +111,6 @@ const EventGallery: React.FC<Props> = ({
 			}}
 		>
 			{isBirthday ? (
-				/* Birthday: stacked Polaroid cards with description alongside */
 				<Box
 					sx={{
 						maxWidth: '1100px',
@@ -114,7 +121,6 @@ const EventGallery: React.FC<Props> = ({
 						alignItems: 'center',
 					}}
 				>
-					{/* Stack area */}
 					<Box
 						sx={{
 							display: 'flex',
@@ -124,76 +130,89 @@ const EventGallery: React.FC<Props> = ({
 							py: { xs: 2, md: 4 },
 						}}
 					>
-						{/* Card stack */}
 						<Box
 							sx={{
-								position: 'relative',
-								display: 'flex',
-								justifyContent: 'center',
-								alignItems: 'center',
-								// Give enough room for the back cards to peek out
-								p: '32px 48px',
+								width: '100%',
+								maxWidth: { xs: 340, md: 440 },
+								borderRadius: '28px',
+								overflow: 'hidden',
+								px: { xs: 1, md: 2 },
+								py: { xs: 2, md: 3 },
 							}}
-							onTouchStart={(e) => onSwipeStart(e.touches[0].clientX)}
-							onTouchMove={(e) => onSwipeMove(e.touches[0].clientX)}
-							onTouchEnd={onMainSwipeEnd}
 						>
-							{/* Back cards (peek behind) */}
-							{[2, 1].map((offset) => {
-								const idx = (activeIndex + offset) % images.length;
-								if (images.length <= offset) return null;
-								const angle = angles[(activeIndex + offset) % angles.length];
-								return (
-									<Box
-										key={`back-${offset}`}
-										sx={{
-											position: 'absolute',
-											bgcolor: '#fff',
-											p: '10px 10px 40px',
-											transform: `rotate(${angle}deg)`,
-											boxShadow: '0 8px 24px rgba(0,0,0,0.3)',
-											maxWidth: { xs: 220, md: 300 },
-										}}
-									>
-										<Box
-											component="img"
-											src={images[idx].image_url}
-											alt=""
-											sx={{ width: '100%', height: 'auto', display: 'block' }}
-										/>
-									</Box>
-								);
-							})}
-
-							{/* Active (front) card */}
 							<Box
 								sx={{
 									position: 'relative',
-									bgcolor: '#fff',
-									p: '12px 12px 48px',
-									transform: `rotate(${angles[activeIndex]}deg)`,
-									boxShadow: '0 20px 50px rgba(0,0,0,0.5)',
-									maxWidth: { xs: 240, md: 320 },
-									cursor: 'pointer',
-									transition: 'transform 0.25s',
-									'&:hover': {
-										transform: `rotate(${
-											angles[activeIndex] * 0.5
-										}deg) scale(1.03)`,
-									},
+									display: 'flex',
+									justifyContent: 'center',
+									alignItems: 'center',
+									minHeight: { xs: 340, md: 470 },
+									p: '32px 48px',
 								}}
-								onClick={() => openLightbox(activeIndex)}
+								onTouchStart={(e) => onSwipeStart(e.touches[0].clientX)}
+								onTouchMove={(e) => onSwipeMove(e.touches[0].clientX)}
+								onTouchEnd={onMainSwipeEnd}
 							>
+								{[2, 1].map((offset) => {
+									const imageIndex = (activeIndex + offset) % images.length;
+									if (images.length <= offset) return null;
+
+									const angle = angles[(activeIndex + offset) % angles.length];
+
+									return (
+										<Box
+											key={`back-${offset}`}
+											sx={{
+												position: 'absolute',
+												bgcolor: '#fff',
+												p: '10px 10px 40px',
+												transform: `rotate(${angle}deg)`,
+												boxShadow: '0 8px 24px rgba(0,0,0,0.3)',
+												maxWidth: { xs: 220, md: 300 },
+											}}
+										>
+											<Box
+												component="img"
+												src={images[imageIndex].image_url}
+												alt=""
+												sx={{
+													width: '100%',
+													height: 'auto',
+													display: 'block',
+												}}
+											/>
+										</Box>
+									);
+								})}
+
 								<Box
-									component="img"
-									src={images[activeIndex].image_url}
-									alt={`Photo ${activeIndex + 1}`}
-									sx={{ width: '100%', height: 'auto', display: 'block' }}
-								/>
+									sx={{
+										position: 'relative',
+										bgcolor: '#fff',
+										p: '12px 12px 48px',
+										transform: `rotate(${angles[activeIndex]}deg)`,
+										boxShadow: '0 20px 50px rgba(0,0,0,0.5)',
+										maxWidth: { xs: 240, md: 320 },
+										cursor: 'pointer',
+										transition: 'transform 0.25s',
+										'&:hover': {
+											transform: `rotate(${
+												angles[activeIndex] * 0.5
+											}deg) scale(1.03)`,
+										},
+									}}
+									onClick={() => openLightbox(activeIndex)}
+								>
+									<Box
+										component="img"
+										src={images[activeIndex].image_url}
+										alt={`Photo ${activeIndex + 1}`}
+										sx={{ width: '100%', height: 'auto', display: 'block' }}
+									/>
+								</Box>
 							</Box>
 						</Box>
 
-						{/* Prev / dots / Next — below the stack */}
 						<Box
 							sx={{
 								display: 'flex',
@@ -213,16 +232,18 @@ const EventGallery: React.FC<Props> = ({
 								Previous
 							</Typography>
 							<Box sx={{ display: 'flex', gap: 0.75 }}>
-								{images.slice(0, 4).map((_, idx) => (
+								{images.slice(0, 4).map((_, index) => (
 									<Box
-										key={idx}
-										onClick={() => setActiveIndex(idx)}
+										key={index}
+										onClick={() => setActiveIndex(index)}
 										sx={{
-											width: idx === activeIndex ? 10 : 8,
-											height: idx === activeIndex ? 10 : 8,
+											width: index === activeIndex ? 10 : 8,
+											height: index === activeIndex ? 10 : 8,
 											borderRadius: '50%',
 											bgcolor:
-												idx === activeIndex ? '#fff' : 'rgba(255,255,255,0.35)',
+												index === activeIndex
+													? '#fff'
+													: 'rgba(255,255,255,0.35)',
 											cursor: 'pointer',
 											transition: 'all 0.2s',
 										}}
@@ -242,7 +263,6 @@ const EventGallery: React.FC<Props> = ({
 						</Box>
 					</Box>
 
-					{/* Description */}
 					<Box sx={{ color: '#fff', pl: { xs: 0, md: 2 } }}>
 						<Typography
 							sx={{
@@ -268,7 +288,6 @@ const EventGallery: React.FC<Props> = ({
 					</Box>
 				</Box>
 			) : (
-				/* Default: standard side-by-side grid */
 				<Box
 					sx={{
 						maxWidth: '1320px',
@@ -325,15 +344,15 @@ const EventGallery: React.FC<Props> = ({
 								Previous
 							</Typography>
 							<Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75 }}>
-								{images.slice(0, 4).map((_, idx) => (
+								{images.slice(0, 4).map((_, index) => (
 									<Box
-										key={idx}
+										key={index}
 										sx={{
 											width: 10,
 											height: 10,
 											borderRadius: '50%',
 											bgcolor:
-												idx === activeIndex
+												index === activeIndex
 													? '#ffffff'
 													: 'rgba(255,255,255,0.35)',
 										}}
@@ -372,7 +391,6 @@ const EventGallery: React.FC<Props> = ({
 				</Box>
 			)}
 
-			{/* Lightbox */}
 			<Dialog
 				open={lightboxIndex !== null}
 				onClose={closeLightbox}
