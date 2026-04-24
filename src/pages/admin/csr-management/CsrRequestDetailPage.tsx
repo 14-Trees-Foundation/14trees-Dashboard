@@ -42,7 +42,7 @@ import {
 } from '../shared/adminTheme';
 import ApiClient from '../../../api/apiClient/apiClient';
 import { CsrRequest } from '../../../types/csrRequest';
-import { EVENT_TYPE_MAP } from '../../../utils/eventTypes';
+import EventUpsertDialog from '../events/components/shared/EventUpsertDialog';
 import CsrStatusChip from './components/CsrStatusChip';
 import PaymentStatusChip from './components/PaymentStatusChip';
 import AllocationBreakdownCard from './components/AllocationBreakdownCard';
@@ -116,100 +116,37 @@ const BookDialog: React.FC<BookDialogProps> = ({
 interface EventDialogProps {
 	open: boolean;
 	onClose: () => void;
-	onCreate: (data: {
-		event_name: string;
-		event_type: string;
-		event_date: string;
-	}) => Promise<void>;
+	onCreate: (data: any) => Promise<void>;
+	groupId?: number | null;
+	sponsorUserId?: number | null;
+	themeMode: 'dark' | 'light';
 }
 
 const EventDialog: React.FC<EventDialogProps> = ({
 	open,
 	onClose,
 	onCreate,
+	groupId,
+	sponsorUserId,
+	themeMode,
 }) => {
-	const [eventName, setEventName] = useState('');
-	const [eventType, setEventType] = useState('3');
-	const [eventDate, setEventDate] = useState(() =>
-		new Date().toISOString().slice(0, 10),
-	);
-	const [loading, setLoading] = useState(false);
-	const eventTypes = Object.entries(EVENT_TYPE_MAP);
-
-	useEffect(() => {
-		if (open) {
-			setEventName('');
-			setEventType('3');
-			setEventDate(new Date().toISOString().slice(0, 10));
-		}
-	}, [open]);
-
-	const handleCreate = async () => {
-		setLoading(true);
-		try {
-			await onCreate({
-				event_name: eventName,
-				event_type: eventType,
-				event_date: eventDate,
-			});
-			onClose();
-		} finally {
-			setLoading(false);
-		}
-	};
-
 	return (
-		<Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
-			<DialogTitle>Create CSR Event</DialogTitle>
-			<DialogContent>
-				<Box sx={{ display: 'grid', gap: 2, pt: 1 }}>
-					<TextField
-						label="Event name"
-						value={eventName}
-						onChange={(e) => setEventName(e.target.value)}
-						size="small"
-						fullWidth
-						placeholder="e.g. Infosys Tree Cards - April 2026"
-					/>
-					<TextField
-						label="Event type"
-						select
-						value={eventType}
-						onChange={(e) => setEventType(e.target.value)}
-						size="small"
-						fullWidth
-					>
-						{eventTypes.map(([value, label]) => (
-							<MenuItem key={value} value={value}>
-								{label}
-							</MenuItem>
-						))}
-					</TextField>
-					<TextField
-						label="Event date"
-						type="date"
-						value={eventDate}
-						onChange={(e) => setEventDate(e.target.value)}
-						InputLabelProps={{ shrink: true }}
-						size="small"
-						fullWidth
-					/>
-				</Box>
-			</DialogContent>
-			<DialogActions>
-				<Button onClick={onClose} sx={{ textTransform: 'none' }}>
-					Cancel
-				</Button>
-				<Button
-					variant="contained"
-					onClick={handleCreate}
-					disabled={loading || !eventName.trim() || !eventType || !eventDate}
-					sx={{ textTransform: 'none', fontWeight: 600 }}
-				>
-					{loading ? <CircularProgress size={18} /> : 'Create Event'}
-				</Button>
-			</DialogActions>
-		</Dialog>
+		<EventUpsertDialog
+			open={open}
+			onClose={onClose}
+			onSubmit={onCreate}
+			mode="add"
+			themeMode={themeMode}
+			title="Create CSR Event"
+			submitLabel="Create Event"
+			initialValues={{
+				group_id: groupId ?? '',
+				assigned_by: sponsorUserId ?? '',
+				event_location: 'onsite',
+				default_tree_view_mode: 'profile',
+				show_blessings: true,
+			}}
+		/>
 	);
 };
 
@@ -498,19 +435,13 @@ const CsrRequestDetailContent: React.FC<{
 		await loadRequest();
 	};
 
-	const handleCreateEvent = async (payload: {
-		event_name: string;
-		event_type: string;
-		event_date: string;
-	}) => {
+	const handleCreateEvent = async (payload: any) => {
 		const api = new ApiClient();
 		await api.events.createEvent({
-			name: payload.event_name,
-			type: payload.event_type,
-			event_date: payload.event_date,
-			group_id: data.group_id,
-			assigned_by: data.sponsor_user_id ?? undefined,
-			event_location: 'onsite',
+			...payload,
+			group_id: payload.group_id || data?.group_id || null,
+			assigned_by: payload.assigned_by || data?.sponsor_user_id || undefined,
+			event_location: payload.event_location || 'onsite',
 		});
 		await loadRequest();
 		navigate('/admin/events');
@@ -1341,6 +1272,9 @@ const CsrRequestDetailContent: React.FC<{
 				open={eventOpen}
 				onClose={() => setEventOpen(false)}
 				onCreate={handleCreateEvent}
+				groupId={data?.group_id ?? null}
+				sponsorUserId={data?.sponsor_user_id ?? null}
+				themeMode={themeMode}
 			/>
 			<EditDialog
 				open={editOpen}
