@@ -176,6 +176,12 @@ export const AdminLeftDrawer = () => {
 			path: 'tree-cards',
 		},
 		{
+			displayName: 'CSR',
+			logo: CorporateFareIcon,
+			display: isAdmin,
+			path: 'csr-management',
+		},
+		{
 			displayName: 'Donations',
 			logo: VolunteerActivismIcon,
 			display: isAdmin,
@@ -249,6 +255,7 @@ export const AdminLeftDrawer = () => {
 	const isActive = (path) => {
 		return (
 			location.pathname === `/admin/${path}` ||
+			location.pathname.startsWith(`/admin/${path}/`) ||
 			(path === 'home' && location.pathname === '/admin')
 		);
 	};

@@ -177,3 +177,43 @@ export const formHelperTextSx = {
 	color: FORM_COLORS.textMuted,
 	mt: 0.25,
 };
+
+// ─── CSR status color map ─────────────────────────────────────────────────────
+export const CSR_STATUS_COLORS: Record<
+	string,
+	{ bg: string; text: string; border: string }
+> = {
+	pending_plot_selection: { bg: '#fef3c7', text: '#92400e', border: '#fcd34d' },
+	pending_assignment: { bg: '#dbeafe', text: '#1e40af', border: '#93c5fd' },
+	partially_assigned: { bg: '#fce7f3', text: '#9d174d', border: '#f9a8d4' },
+	completed: { bg: '#d1fae5', text: '#065f46', border: '#6ee7b7' },
+	cancelled: { bg: '#f3f4f6', text: '#6b7280', border: '#d1d5db' },
+};
+
+export const CSR_STATUS_COLORS_DARK: Record<
+	string,
+	{ bg: string; text: string; border: string }
+> = {
+	pending_plot_selection: {
+		bg: '#451a0320',
+		text: '#fcd34d',
+		border: '#92400e',
+	},
+	pending_assignment: { bg: '#1e3a5f20', text: '#93c5fd', border: '#1e40af' },
+	partially_assigned: { bg: '#4c051e20', text: '#f9a8d4', border: '#9d174d' },
+	completed: { bg: '#06402820', text: '#6ee7b7', border: '#065f46' },
+	cancelled: { bg: '#1f1f1f', text: '#9ba39d', border: '#2a3832' },
+};
+
+export const CSR_PAYMENT_COLORS = {
+	linked: { icon: '#22c55e', text: '#065f46' },
+	partial: { icon: '#f59e0b', text: '#92400e' },
+	unlinked: { icon: '#9ca3af', text: '#6b7280' },
+};
+
+// Stepper sx for the 3-step CSR wizard
+export const csrWizardStepSx = {
+	'& .MuiStepLabel-label': { fontSize: '0.8rem', fontWeight: 500 },
+	'& .MuiStepIcon-root.Mui-active': { color: FORM_COLORS.stepActive },
+	'& .MuiStepIcon-root.Mui-completed': { color: FORM_COLORS.stepCompleted },
+};

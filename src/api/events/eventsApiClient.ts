@@ -14,11 +14,13 @@ import { resolveApiBaseUrl } from '../apiBaseUrl';
 
 class EventsApiClient {
 	private api: AxiosInstance;
+	private currentUserId: number | null;
 
 	constructor() {
 		const baseURL = resolveApiBaseUrl(import.meta.env.VITE_APP_BASE_URL);
 		const userId = localStorage.getItem('userId');
 		const visitorId = getVisitorId();
+		this.currentUserId = userId ? Number(userId) : null;
 
 		this.api = axios.create({
 			baseURL: baseURL,
@@ -96,7 +98,14 @@ class EventsApiClient {
 					);
 				}
 				formData.append('link', link);
-				formData.append('assigned_by', (eventData.assigned_by || 1).toString());
+				const assignedBy = eventData.assigned_by ?? this.currentUserId;
+				if (assignedBy == null) {
+					throw new Error('Unable to create event: missing assigned_by user');
+				}
+				formData.append('assigned_by', assignedBy.toString());
+				if (eventData.group_id != null) {
+					formData.append('group_id', eventData.group_id.toString());
+				}
 
 				// Add optional fields only if they have values
 				if (eventData.description)
@@ -154,8 +163,9 @@ class EventsApiClient {
 					message: eventData.message,
 					theme_color: (eventData as any).theme_color,
 					link: link,
-					assigned_by: eventData.assigned_by || 1,
+					assigned_by: eventData.assigned_by ?? this.currentUserId,
 					site_id: eventData.site_id || null,
+					group_id: eventData.group_id || null,
 					campaign_c_key: (eventData as any).campaign_c_key || null,
 				};
 
