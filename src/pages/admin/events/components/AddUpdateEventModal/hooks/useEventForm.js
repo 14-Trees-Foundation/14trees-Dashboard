@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 
-export const useEventForm = (mode, existingEvent) => {
+export const useEventForm = (mode, existingEvent, initialValues = {}) => {
 	// Helper function to format date for HTML date input
 	const formatDateForInput = (dateString) => {
 		if (!dateString) return '';
@@ -48,6 +48,7 @@ export const useEventForm = (mode, existingEvent) => {
 				landing_image_mobile_s3_path:
 					existingEvent.landing_image_mobile_s3_path || null,
 				blessings_cta_text: existingEvent.blessings_cta_text || '',
+				group_id: existingEvent.group_id || '',
 			};
 		}
 		return {
@@ -59,6 +60,7 @@ export const useEventForm = (mode, existingEvent) => {
 			theme_color: '',
 			assigned_by: '',
 			site_id: '',
+			group_id: '',
 			message: '',
 			tags: '',
 			default_tree_view_mode: 'profile',
@@ -71,6 +73,8 @@ export const useEventForm = (mode, existingEvent) => {
 			landing_image_mobile: null,
 			landing_image_mobile_s3_path: null,
 			blessings_cta_text: '',
+			show_blessings: true,
+			...initialValues,
 		};
 	};
 
@@ -80,7 +84,7 @@ export const useEventForm = (mode, existingEvent) => {
 	// Reset form data when mode or existingEvent changes
 	useEffect(() => {
 		setFormData(getInitialFormData());
-	}, [mode, existingEvent]);
+	}, [mode, existingEvent, initialValues]);
 
 	const handleChange = (event) => {
 		setFormData({
