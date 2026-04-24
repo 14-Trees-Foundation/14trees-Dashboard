@@ -16,6 +16,8 @@ export interface CsrRequest {
 	group_id: number;
 	group_name?: string;
 	group_logo_url?: string;
+	sponsor_user_id?: number | null;
+	sponsor_user_name?: string | null;
 	financial_year: string;
 	no_of_trees: number;
 	trees_assigned: number;
@@ -41,6 +43,9 @@ export interface CsrRequest {
 	donation_status?: string | null;
 	payment_amount?: number | null;
 	payment_created_at?: string | null;
+	plot_count?: number;
+	linked_total_trees?: number;
+	linked_available_trees?: number;
 	// sub-allocations
 	visits?: CsrVisit[];
 	plantation_trees?: number;

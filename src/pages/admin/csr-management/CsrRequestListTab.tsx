@@ -110,6 +110,29 @@ const CsrRequestListTab: React.FC<Props> = ({ isDark }) => {
 			),
 		},
 		{
+			title: 'Plots',
+			key: 'plots',
+			render: (_, r) => {
+				const plotCount = Number(r.plot_count ?? 0);
+				const availableTrees = Number(r.linked_available_trees ?? 0);
+				return (
+					<Box>
+						<Typography variant="body2" sx={{ fontWeight: 600 }}>
+							{plotCount > 0 ? `${plotCount} linked` : '—'}
+						</Typography>
+						<Typography
+							variant="caption"
+							sx={{ color: theme.palette.text.secondary }}
+						>
+							{plotCount > 0
+								? `${availableTrees.toLocaleString()} available`
+								: 'No plots linked'}
+						</Typography>
+					</Box>
+				);
+			},
+		},
+		{
 			title: 'Amount',
 			dataIndex: 'amount_received',
 			key: 'amount_received',

@@ -16,6 +16,7 @@ import {
 	Tooltip,
 	Autocomplete,
 	IconButton,
+	MenuItem,
 } from '@mui/material';
 import { ThemeProvider, useTheme } from '@mui/material/styles';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
@@ -41,6 +42,7 @@ import {
 } from '../shared/adminTheme';
 import ApiClient from '../../../api/apiClient/apiClient';
 import { CsrRequest } from '../../../types/csrRequest';
+import { EVENT_TYPE_MAP } from '../../../utils/eventTypes';
 import CsrStatusChip from './components/CsrStatusChip';
 import PaymentStatusChip from './components/PaymentStatusChip';
 import AllocationBreakdownCard from './components/AllocationBreakdownCard';
@@ -111,6 +113,246 @@ const BookDialog: React.FC<BookDialogProps> = ({
 	);
 };
 
+interface EventDialogProps {
+	open: boolean;
+	onClose: () => void;
+	onCreate: (data: {
+		event_name: string;
+		event_type: string;
+		event_date: string;
+	}) => Promise<void>;
+}
+
+const EventDialog: React.FC<EventDialogProps> = ({
+	open,
+	onClose,
+	onCreate,
+}) => {
+	const [eventName, setEventName] = useState('');
+	const [eventType, setEventType] = useState('3');
+	const [eventDate, setEventDate] = useState(() =>
+		new Date().toISOString().slice(0, 10),
+	);
+	const [loading, setLoading] = useState(false);
+	const eventTypes = Object.entries(EVENT_TYPE_MAP);
+
+	useEffect(() => {
+		if (open) {
+			setEventName('');
+			setEventType('3');
+			setEventDate(new Date().toISOString().slice(0, 10));
+		}
+	}, [open]);
+
+	const handleCreate = async () => {
+		setLoading(true);
+		try {
+			await onCreate({
+				event_name: eventName,
+				event_type: eventType,
+				event_date: eventDate,
+			});
+			onClose();
+		} finally {
+			setLoading(false);
+		}
+	};
+
+	return (
+		<Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
+			<DialogTitle>Create CSR Event</DialogTitle>
+			<DialogContent>
+				<Box sx={{ display: 'grid', gap: 2, pt: 1 }}>
+					<TextField
+						label="Event name"
+						value={eventName}
+						onChange={(e) => setEventName(e.target.value)}
+						size="small"
+						fullWidth
+						placeholder="e.g. Infosys Tree Cards - April 2026"
+					/>
+					<TextField
+						label="Event type"
+						select
+						value={eventType}
+						onChange={(e) => setEventType(e.target.value)}
+						size="small"
+						fullWidth
+					>
+						{eventTypes.map(([value, label]) => (
+							<MenuItem key={value} value={value}>
+								{label}
+							</MenuItem>
+						))}
+					</TextField>
+					<TextField
+						label="Event date"
+						type="date"
+						value={eventDate}
+						onChange={(e) => setEventDate(e.target.value)}
+						InputLabelProps={{ shrink: true }}
+						size="small"
+						fullWidth
+					/>
+				</Box>
+			</DialogContent>
+			<DialogActions>
+				<Button onClick={onClose} sx={{ textTransform: 'none' }}>
+					Cancel
+				</Button>
+				<Button
+					variant="contained"
+					onClick={handleCreate}
+					disabled={loading || !eventName.trim() || !eventType || !eventDate}
+					sx={{ textTransform: 'none', fontWeight: 600 }}
+				>
+					{loading ? <CircularProgress size={18} /> : 'Create Event'}
+				</Button>
+			</DialogActions>
+		</Dialog>
+	);
+};
+
+interface EditDialogProps {
+	open: boolean;
+	onClose: () => void;
+	onSave: (data: {
+		donation_date: string | null;
+		amount_received: number | null;
+		amount_per_tree: number | null;
+		contact_person: string | null;
+		contact_email: string | null;
+		notes: string | null;
+	}) => Promise<void>;
+	initialData: {
+		donation_date: string;
+		amount_received: string;
+		amount_per_tree: string;
+		contact_person: string;
+		contact_email: string;
+		notes: string;
+	};
+}
+
+const EditDialog: React.FC<EditDialogProps> = ({
+	open,
+	onClose,
+	onSave,
+	initialData,
+}) => {
+	const [form, setForm] = useState(initialData);
+	const [loading, setLoading] = useState(false);
+
+	useEffect(() => {
+		setForm(initialData);
+	}, [initialData, open]);
+
+	const handleSave = async () => {
+		setLoading(true);
+		try {
+			await onSave({
+				donation_date: form.donation_date || null,
+				amount_received: form.amount_received
+					? Number(form.amount_received)
+					: null,
+				amount_per_tree: form.amount_per_tree
+					? Number(form.amount_per_tree)
+					: null,
+				contact_person: form.contact_person || null,
+				contact_email: form.contact_email || null,
+				notes: form.notes || null,
+			});
+			onClose();
+		} finally {
+			setLoading(false);
+		}
+	};
+
+	return (
+		<Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
+			<DialogTitle>Edit CSR Request</DialogTitle>
+			<DialogContent>
+				<Box sx={{ display: 'grid', gap: 2, pt: 1 }}>
+					<TextField
+						label="Donation Date"
+						type="date"
+						value={form.donation_date}
+						onChange={(e) =>
+							setForm((prev) => ({ ...prev, donation_date: e.target.value }))
+						}
+						InputLabelProps={{ shrink: true }}
+						size="small"
+						fullWidth
+					/>
+					<TextField
+						label="Amount Received"
+						type="number"
+						value={form.amount_received}
+						onChange={(e) =>
+							setForm((prev) => ({ ...prev, amount_received: e.target.value }))
+						}
+						size="small"
+						fullWidth
+					/>
+					<TextField
+						label="Amount / Tree"
+						type="number"
+						value={form.amount_per_tree}
+						onChange={(e) =>
+							setForm((prev) => ({ ...prev, amount_per_tree: e.target.value }))
+						}
+						size="small"
+						fullWidth
+					/>
+					<TextField
+						label="Contact Person"
+						value={form.contact_person}
+						onChange={(e) =>
+							setForm((prev) => ({ ...prev, contact_person: e.target.value }))
+						}
+						size="small"
+						fullWidth
+					/>
+					<TextField
+						label="Contact Email"
+						type="email"
+						value={form.contact_email}
+						onChange={(e) =>
+							setForm((prev) => ({ ...prev, contact_email: e.target.value }))
+						}
+						size="small"
+						fullWidth
+					/>
+					<TextField
+						label="Notes"
+						value={form.notes}
+						onChange={(e) =>
+							setForm((prev) => ({ ...prev, notes: e.target.value }))
+						}
+						multiline
+						rows={3}
+						size="small"
+						fullWidth
+					/>
+				</Box>
+			</DialogContent>
+			<DialogActions>
+				<Button onClick={onClose} sx={{ textTransform: 'none' }}>
+					Cancel
+				</Button>
+				<Button
+					variant="contained"
+					onClick={handleSave}
+					disabled={loading}
+					sx={{ textTransform: 'none', fontWeight: 600 }}
+				>
+					{loading ? <CircularProgress size={18} /> : 'Save Changes'}
+				</Button>
+			</DialogActions>
+		</Dialog>
+	);
+};
+
 // ── Activity helpers ──────────────────────────────────────────────────────────
 
 const MUTATION_LABELS: Record<string, { label: string; color: string }> = {
@@ -143,6 +385,8 @@ const CsrRequestDetailContent: React.FC<{
 	const [loadingTrees, setLoadingTrees] = useState(false);
 	const [activeTab, setActiveTab] = useState(0);
 	const [bookOpen, setBookOpen] = useState(false);
+	const [eventOpen, setEventOpen] = useState(false);
+	const [editOpen, setEditOpen] = useState(false);
 
 	const [plots, setPlots] = useState<any[]>([]);
 	const [loadingPlots, setLoadingPlots] = useState(false);
@@ -210,6 +454,7 @@ const CsrRequestDetailContent: React.FC<{
 			setSelectedPlot(null);
 			setPlotSearch('');
 			setPlotOptions([]);
+			await loadRequest();
 			await loadPlots();
 		} finally {
 			setAddingPlot(false);
@@ -219,6 +464,7 @@ const CsrRequestDetailContent: React.FC<{
 	const handleRemovePlot = async (plotId: number) => {
 		const api = new ApiClient();
 		await api.removeCsrRequestPlot(requestId, plotId);
+		await loadRequest();
 		await loadPlots();
 	};
 
@@ -236,6 +482,49 @@ const CsrRequestDetailContent: React.FC<{
 		const api = new ApiClient();
 		await api.bookCsrTrees(requestId, count, assignedTo);
 		await loadRequest();
+		await loadPlots();
+	};
+
+	const handleSaveEdit = async (payload: {
+		donation_date: string | null;
+		amount_received: number | null;
+		amount_per_tree: number | null;
+		contact_person: string | null;
+		contact_email: string | null;
+		notes: string | null;
+	}) => {
+		const api = new ApiClient();
+		await api.updateCsrRequest(requestId, payload);
+		await loadRequest();
+	};
+
+	const handleCreateEvent = async (payload: {
+		event_name: string;
+		event_type: string;
+		event_date: string;
+	}) => {
+		const api = new ApiClient();
+		await api.events.createEvent({
+			name: payload.event_name,
+			type: payload.event_type,
+			event_date: payload.event_date,
+			group_id: data.group_id,
+			assigned_by: data.sponsor_user_id ?? undefined,
+			event_location: 'onsite',
+		});
+		await loadRequest();
+		navigate('/admin/events');
+	};
+
+	const editInitialData = {
+		donation_date: data?.donation_date ? data.donation_date.slice(0, 10) : '',
+		amount_received:
+			data?.amount_received != null ? String(data.amount_received) : '',
+		amount_per_tree:
+			data?.amount_per_tree != null ? String(data.amount_per_tree) : '',
+		contact_person: data?.contact_person ?? '',
+		contact_email: data?.contact_email ?? '',
+		notes: data?.notes ?? '',
 	};
 
 	const tabSx = {
@@ -266,7 +555,21 @@ const CsrRequestDetailContent: React.FC<{
 		{
 			title: 'Plot',
 			dataIndex: 'plot',
-			render: (v) => <Typography variant="caption">{v}</Typography>,
+			render: (v, row) => (
+				<Box>
+					<Typography variant="caption" sx={{ display: 'block' }}>
+						{v}
+					</Typography>
+					{row.plot_id && (
+						<Typography
+							variant="caption"
+							sx={{ display: 'block', color: colors.textMuted }}
+						>
+							{row.plot_id}
+						</Typography>
+					)}
+				</Box>
+			),
 		},
 		{
 			title: 'Site',
@@ -499,6 +802,67 @@ const CsrRequestDetailContent: React.FC<{
 		},
 	];
 
+	const plotColumns: ColumnsType<any> = [
+		{
+			title: 'Plot',
+			key: 'plot',
+			render: (_, row) => (
+				<Box>
+					<Typography variant="body2" sx={{ fontWeight: 600 }}>
+						{row.name}
+					</Typography>
+					<Typography variant="caption" sx={{ color: colors.textMuted }}>
+						{row.plot_id ? `ID: ${row.plot_id}` : '—'}
+					</Typography>
+				</Box>
+			),
+		},
+		{
+			title: 'Total Trees',
+			dataIndex: 'total_trees',
+			align: 'right' as const,
+			render: (v) => (
+				<Typography variant="caption">
+					{Number(v ?? 0).toLocaleString()}
+				</Typography>
+			),
+		},
+		{
+			title: 'Available Trees',
+			dataIndex: 'available_trees',
+			align: 'right' as const,
+			render: (v) => (
+				<Typography variant="caption" sx={{ fontWeight: 600 }}>
+					{Number(v ?? 0).toLocaleString()}
+				</Typography>
+			),
+		},
+		{
+			title: 'Linked At',
+			dataIndex: 'linked_at',
+			render: (v) => (
+				<Typography variant="caption">
+					{v ? new Date(v).toLocaleString() : '—'}
+				</Typography>
+			),
+		},
+		{
+			title: '',
+			key: 'action',
+			render: (_, row) => (
+				<Tooltip title="Remove plot from request">
+					<IconButton
+						size="small"
+						onClick={() => handleRemovePlot(row.id)}
+						sx={{ color: theme.palette.error.main }}
+					>
+						<DeleteOutlineIcon fontSize="small" />
+					</IconButton>
+				</Tooltip>
+			),
+		},
+	];
+
 	// ── Render ─────────────────────────────────────────────────────────────────
 
 	if (!data)
@@ -579,8 +943,18 @@ const CsrRequestDetailContent: React.FC<{
 						</Button>
 					)}
 					<Button
+						variant="outlined"
+						size="small"
+						startIcon={<CardGiftcardIcon />}
+						onClick={() => setEventOpen(true)}
+						sx={{ textTransform: 'none', fontWeight: 600, borderRadius: 2 }}
+					>
+						Create Event
+					</Button>
+					<Button
 						size="small"
 						startIcon={<EditIcon />}
+						onClick={() => setEditOpen(true)}
 						sx={{ textTransform: 'none', borderRadius: 2 }}
 					>
 						Edit
@@ -623,6 +997,14 @@ const CsrRequestDetailContent: React.FC<{
 						},
 						{ label: 'Contact', value: data.contact_person ?? '—' },
 						{ label: 'Contact Email', value: data.contact_email ?? '—' },
+						{
+							label: 'Linked Plots',
+							value: Number(data.plot_count ?? 0).toLocaleString(),
+						},
+						{
+							label: 'Available in Plots',
+							value: Number(data.linked_available_trees ?? 0).toLocaleString(),
+						},
 					].map((f) => (
 						<Box
 							key={f.label}
@@ -797,7 +1179,11 @@ const CsrRequestDetailContent: React.FC<{
 							sx={{ flex: 1, maxWidth: 400 }}
 							size="small"
 							options={plotOptions}
-							getOptionLabel={(o: any) => `${o.name} (${o.plot_id ?? o.id})`}
+							getOptionLabel={(o: any) =>
+								`${o.name} (${o.plot_id ?? o.id}) · ${Number(
+									o.available_trees ?? 0,
+								).toLocaleString()} available`
+							}
 							value={selectedPlot}
 							onChange={(_, v) => setSelectedPlot(v)}
 							inputValue={plotSearch}
@@ -859,53 +1245,13 @@ const CsrRequestDetailContent: React.FC<{
 							No plots linked yet. Add a plot above to enable tree booking.
 						</Typography>
 					) : (
-						<Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-							{plots.map((p: any) => (
-								<Box
-									key={p.id}
-									sx={{
-										display: 'flex',
-										alignItems: 'center',
-										justifyContent: 'space-between',
-										p: 1.5,
-										borderRadius: 1.5,
-										border: `1px solid ${theme.palette.divider}`,
-										backgroundColor: theme.palette.background.paper,
-									}}
-								>
-									<Box>
-										<Typography variant="body2" sx={{ fontWeight: 600 }}>
-											{p.name}
-										</Typography>
-										<Typography
-											variant="caption"
-											sx={{ color: colors.textMuted }}
-										>
-											{[
-												p.plot_id && `ID: ${p.plot_id}`,
-												p.total_trees != null &&
-													`${Number(p.total_trees).toLocaleString()} total`,
-												p.available_trees != null &&
-													`${Number(
-														p.available_trees,
-													).toLocaleString()} available`,
-											]
-												.filter(Boolean)
-												.join(' · ')}
-										</Typography>
-									</Box>
-									<Tooltip title="Remove plot">
-										<IconButton
-											size="small"
-											onClick={() => handleRemovePlot(p.id)}
-											sx={{ color: theme.palette.error.main }}
-										>
-											<DeleteOutlineIcon fontSize="small" />
-										</IconButton>
-									</Tooltip>
-								</Box>
-							))}
-						</Box>
+						<Table
+							columns={plotColumns}
+							dataSource={plots.map((p) => ({ ...p, key: p.id }))}
+							pagination={false}
+							size="small"
+							style={{ borderRadius: 8 }}
+						/>
 					)}
 				</Box>
 			)}
@@ -990,6 +1336,17 @@ const CsrRequestDetailContent: React.FC<{
 				onClose={() => setBookOpen(false)}
 				onBook={handleBook}
 				remaining={remaining}
+			/>
+			<EventDialog
+				open={eventOpen}
+				onClose={() => setEventOpen(false)}
+				onCreate={handleCreateEvent}
+			/>
+			<EditDialog
+				open={editOpen}
+				onClose={() => setEditOpen(false)}
+				onSave={handleSaveEdit}
+				initialData={editInitialData}
 			/>
 		</Box>
 	);
