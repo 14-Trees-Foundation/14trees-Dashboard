@@ -525,3 +525,162 @@ export const lightAnalyticsTheme = createTheme({
 		},
 	},
 });
+
+const eventFormComponentOverrides = {
+	components: {
+		MuiDialog: {
+			styleOverrides: {
+				paper: ({ theme }) => ({
+					backgroundImage: 'none',
+					backgroundColor: theme.palette.background.paper,
+					border: `1px solid ${theme.palette.divider}`,
+					borderRadius: '20px',
+					boxShadow: '0 20px 60px rgba(0,0,0,0.16)',
+				}),
+			},
+		},
+		MuiDialogTitle: {
+			styleOverrides: {
+				root: ({ theme }) => ({
+					paddingBottom: theme.spacing(1.5),
+					color: theme.palette.text.primary,
+					fontWeight: 700,
+					letterSpacing: '-0.02em',
+				}),
+			},
+		},
+		MuiDialogContent: {
+			styleOverrides: {
+				root: ({ theme }) => ({
+					paddingTop: theme.spacing(2),
+					paddingBottom: theme.spacing(2),
+				}),
+			},
+		},
+		MuiDialogActions: {
+			styleOverrides: {
+				root: ({ theme }) => ({
+					padding: theme.spacing(2),
+					paddingTop: 0,
+				}),
+			},
+		},
+		MuiPaper: {
+			styleOverrides: {
+				root: ({ theme }) => ({
+					backgroundImage: 'none',
+					backgroundColor: theme.palette.background.paper,
+					border: `1px solid ${theme.palette.divider}`,
+				}),
+			},
+		},
+		MuiCard: {
+			styleOverrides: {
+				root: ({ theme }) => ({
+					backgroundImage: 'none',
+					backgroundColor: theme.palette.background.paper,
+					border: `1px solid ${theme.palette.divider}`,
+					borderRadius: '18px',
+					boxShadow: 'none',
+				}),
+			},
+		},
+		MuiCardContent: {
+			styleOverrides: {
+				root: ({ theme }) => ({
+					padding: theme.spacing(2),
+					'&:last-child': { paddingBottom: theme.spacing(2) },
+				}),
+			},
+		},
+		MuiDivider: {
+			styleOverrides: {
+				root: ({ theme }) => ({
+					borderColor: theme.palette.divider,
+				}),
+			},
+		},
+		MuiOutlinedInput: {
+			styleOverrides: {
+				root: ({ theme }) => ({
+					backgroundColor: theme.palette.background.paper,
+					borderRadius: '14px',
+					'& fieldset': { borderColor: theme.palette.divider },
+					'&:hover fieldset': { borderColor: theme.palette.text.secondary },
+					'&.Mui-focused fieldset': { borderColor: theme.palette.primary.main },
+				}),
+				input: ({ theme }) => ({
+					color: theme.palette.text.primary,
+					fontSize: '0.9rem',
+				}),
+			},
+		},
+		MuiInputLabel: {
+			styleOverrides: {
+				root: ({ theme }) => ({
+					color: theme.palette.text.secondary,
+					fontSize: '0.85rem',
+				}),
+			},
+		},
+		MuiFormHelperText: {
+			styleOverrides: {
+				root: ({ theme }) => ({
+					marginLeft: 0,
+					color: theme.palette.text.secondary,
+					fontSize: '0.72rem',
+				}),
+			},
+		},
+		MuiButton: {
+			styleOverrides: {
+				root: {
+					textTransform: 'none',
+					borderRadius: '12px',
+					fontWeight: 600,
+				},
+				contained: ({ theme }) => ({
+					backgroundColor: theme.palette.primary.main,
+					color: theme.palette.primary.contrastText,
+					boxShadow: 'none',
+					'&:hover': {
+						backgroundColor: theme.palette.primary.dark,
+						boxShadow: 'none',
+					},
+				}),
+				outlined: ({ theme }) => ({
+					borderColor: theme.palette.divider,
+					color: theme.palette.text.secondary,
+					'&:hover': {
+						borderColor: theme.palette.primary.main,
+						backgroundColor: theme.palette.action.hover,
+					},
+				}),
+			},
+		},
+		MuiChip: {
+			styleOverrides: {
+				root: ({ theme }) => ({
+					borderRadius: '999px',
+					fontSize: '0.68rem',
+					height: '24px',
+					fontWeight: 600,
+					backgroundColor: theme.palette.action.hover,
+				}),
+			},
+		},
+		MuiSelect: {
+			styleOverrides: {
+				select: {
+					fontSize: '0.9rem',
+				},
+			},
+		},
+	},
+};
+
+export const buildEventFormTheme = (mode = 'light') =>
+	createTheme(
+		mode === 'dark' ? darkTheme : lightAnalyticsTheme,
+		eventFormComponentOverrides,
+	);
