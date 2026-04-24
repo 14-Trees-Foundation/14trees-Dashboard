@@ -33,7 +33,13 @@ import CSRPage from './pages/admin/csr/CSRPage';
 import EventPage from './pages/EventDashboard/EventPage';
 import EventLandingPage from './pages/EventLanding/EventLandingPage';
 
-const NEW_EVENT_LANDING_LINKS = new Set(['ij5h8ow9', '5e7vujoc', 'fl14l9ci']);
+const NEW_EVENT_LANDING_LINKS = new Set([
+	'ij5h8ow9',
+	'5e7vujoc',
+	'2f8chrbn',
+	'fl14l9ci',
+	'fb621e6b',
+]);
 
 const EventPageRouter = () => {
 	const { linkId } = useParams();
@@ -80,6 +86,8 @@ import CorpRegistration from './pages/CorpRegistration';
 import GroupDashboard from './pages/GroupDashboard/GroupDashboard';
 import GroupLandingPage from './pages/GroupLanding/GroupLandingPage';
 import GiftCardsPage from './pages/GroupLanding/GiftCardsPage';
+import SiteVisitsPage from './pages/GroupLanding/SiteVisitsPage';
+import CsrEventsPage from './pages/GroupLanding/CsrEventsPage';
 import { getOrCreateVisitorId } from './helpers/visitorTracking';
 import { useEffect, useRef } from 'react';
 import ApiClient from './api/apiClient/apiClient';
@@ -273,9 +281,24 @@ function App() {
 						element={<GroupLandingPage nameKey="sprih" />}
 					/>
 					<Route
+						path="/dashboard/hd-hyundai-construction-equipment-india-pvt-ltd"
+						element={
+							<GroupLandingPage nameKey="hd-hyundai-construction-equipment-india-pvt-ltd" />
+						}
+					/>
+					<Route
+						path="/dashboard/legalogic-consulting"
+						element={<GroupLandingPage nameKey="legalogic-consulting" />}
+					/>
+					<Route
 						path="/dashboard/:name_key/gifts"
 						element={<GiftCardsPage />}
 					/>
+					<Route
+						path="/dashboard/:name_key/visits"
+						element={<SiteVisitsPage />}
+					/>
+					<Route path="/dashboard/:name_key/csr" element={<CsrEventsPage />} />
 					<Route path="/dashboard/:name_key" element={<GroupDashboard />} />
 					<Route
 						path="/personal/dashboard/:userId"

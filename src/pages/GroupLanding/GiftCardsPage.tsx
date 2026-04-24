@@ -626,8 +626,8 @@ const PeopleView: React.FC<{
 									sx={{
 										display: 'grid',
 										gridTemplateColumns: {
-											xs: '1.4fr 1fr .8fr auto',
-											md: '1.5fr 1.2fr .9fr auto',
+											xs: '1.6fr .9fr .7fr auto',
+											md: '1.9fr 1fr .75fr auto',
 										},
 										columnGap: 1,
 										px: 1.5,
@@ -684,8 +684,8 @@ const PeopleView: React.FC<{
 										sx={{
 											display: 'grid',
 											gridTemplateColumns: {
-												xs: '1.4fr 1fr .8fr auto',
-												md: '1.5fr 1.2fr .9fr auto',
+												xs: '1.6fr .9fr .7fr auto',
+												md: '1.9fr 1fr .75fr auto',
 											},
 											columnGap: 1,
 											alignItems: 'center',

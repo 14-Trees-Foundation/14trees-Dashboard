@@ -22,13 +22,17 @@ import {
 import {
 	GroupLandingEvent,
 	GroupLandingGiftCard,
+	GroupLandingVisit,
 } from '../../../types/GroupLanding';
+import { Spa } from '@mui/icons-material';
 import VisitCard from './VisitCard';
 import corporateGiftsImg from '../../../assets/gift-hero.jpeg';
 
 type Props = {
 	visits: GroupLandingEvent[];
 	giftCards: GroupLandingGiftCard[];
+	siteVisits: GroupLandingVisit[];
+	csrEvents: GroupLandingGiftCard[];
 	nameKey: string;
 };
 
@@ -36,19 +40,19 @@ const FILTERS = [
 	{ label: 'All', value: 'all' },
 	{ label: 'Events', value: 'events' },
 	{ label: 'Site visit', value: 'site visit' },
+	{ label: 'CSR', value: 'csr' },
 	{ label: 'Gifts', value: 'gifts' },
 ];
 
-const getEventCategory = (event: GroupLandingEvent) => {
-	const eventName = event.name.toLowerCase();
-	if (eventName.includes('visit')) return 'site visit';
-	if (eventName.includes('gift')) return 'gifts';
-	return 'events';
-};
-
 const SECTION_GAP = { xs: 3, md: 5 };
 
-const VisitFilmStrip: React.FC<Props> = ({ visits, giftCards, nameKey }) => {
+const VisitFilmStrip: React.FC<Props> = ({
+	visits,
+	giftCards,
+	siteVisits,
+	csrEvents,
+	nameKey,
+}) => {
 	const navigate = useNavigate();
 	const [search, setSearch] = useState('');
 	const [activeFilter, setActiveFilter] = useState('all');
@@ -57,14 +61,13 @@ const VisitFilmStrip: React.FC<Props> = ({ visits, giftCards, nameKey }) => {
 	const [sortDialogOpen, setSortDialogOpen] = useState(false);
 
 	const filteredEvents = useMemo(() => {
-		if (activeFilter === 'gifts') return [];
+		if (activeFilter === 'gifts' || activeFilter === 'site visit') return [];
 		let result = visits.filter((v) => {
 			const matchesSearch =
 				!search ||
 				v.name.toLowerCase().includes(search.toLowerCase()) ||
 				(v.site_name ?? '').toLowerCase().includes(search.toLowerCase());
-			const matchesFilter =
-				activeFilter === 'all' || getEventCategory(v) === activeFilter;
+			const matchesFilter = activeFilter === 'all' || activeFilter === 'events';
 			return matchesSearch && matchesFilter;
 		});
 		result.sort((a, b) => {
@@ -75,14 +78,30 @@ const VisitFilmStrip: React.FC<Props> = ({ visits, giftCards, nameKey }) => {
 		return result;
 	}, [visits, search, activeFilter, sortOrder]);
 
+	const showSiteVisitsCard =
+		siteVisits.length > 0 &&
+		(activeFilter === 'all' || activeFilter === 'site visit') &&
+		(!search || 'site visit'.includes(search.toLowerCase()));
+
+	const showCsrCard =
+		csrEvents.length > 0 &&
+		(activeFilter === 'all' || activeFilter === 'csr') &&
+		(!search || 'csr'.includes(search.toLowerCase()));
+
 	const showGiftsCard =
 		giftCards.length > 0 &&
 		(activeFilter === 'all' || activeFilter === 'gifts') &&
 		(!search || 'gift'.includes(search.toLowerCase()));
 
 	const totalGifted = giftCards.reduce((sum, gc) => sum + gc.no_of_cards, 0);
+	const totalVisitTrees = siteVisits.reduce((sum, v) => sum + v.no_of_cards, 0);
+	const totalCsrTrees = csrEvents.reduce((sum, c) => sum + c.no_of_cards, 0);
 
-	const totalCount = filteredEvents.length + (showGiftsCard ? 1 : 0);
+	const totalCount =
+		filteredEvents.length +
+		(showSiteVisitsCard ? 1 : 0) +
+		(showCsrCard ? 1 : 0) +
+		(showGiftsCard ? 1 : 0);
 
 	const cardsMaxWidth =
 		totalCount >= 3
@@ -305,6 +324,49 @@ const VisitFilmStrip: React.FC<Props> = ({ visits, giftCards, nameKey }) => {
 								<VisitCard event={event} onClick={setSelected} />
 							</Box>
 						))}
+						{showSiteVisitsCard && (
+							<Box
+								key="site-visits-aggregate"
+								sx={{ display: 'flex', justifyContent: 'center' }}
+							>
+								<AggregatedSiteVisitCard
+									visitCount={siteVisits.length}
+									totalTrees={totalVisitTrees}
+									displayImage={
+										siteVisits.find((v) => v.visit_hero_image)
+											?.visit_hero_image ??
+										siteVisits[0]?.display_image ??
+										null
+									}
+									onClick={() =>
+										window.open(
+											`/dashboard/${nameKey}/visits`,
+											'_blank',
+											'noopener,noreferrer',
+										)
+									}
+								/>
+							</Box>
+						)}
+						{showCsrCard && (
+							<Box
+								key="csr-aggregate"
+								sx={{ display: 'flex', justifyContent: 'center' }}
+							>
+								<AggregatedCsrCard
+									eventCount={csrEvents.length}
+									totalTrees={totalCsrTrees}
+									displayImage={csrEvents[0]?.display_image ?? null}
+									onClick={() =>
+										window.open(
+											`/dashboard/${nameKey}/csr`,
+											'_blank',
+											'noopener,noreferrer',
+										)
+									}
+								/>
+							</Box>
+						)}
 						{showGiftsCard && (
 							<Box
 								key="gifts-aggregate"
@@ -438,16 +500,6 @@ const VisitFilmStrip: React.FC<Props> = ({ visits, giftCards, nameKey }) => {
 											{formattedDate(selected.event_date)}
 										</Typography>
 									</Box>
-									{false && (
-										<Box
-											sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}
-										>
-											<People sx={{ fontSize: 12, color: 'text.secondary' }} />
-											<Typography variant="caption" color="text.secondary">
-												{selected.user_count} participants
-											</Typography>
-										</Box>
-									)}
 								</Box>
 							</Box>
 							<IconButton
@@ -491,6 +543,260 @@ const VisitFilmStrip: React.FC<Props> = ({ visits, giftCards, nameKey }) => {
 		</Box>
 	);
 };
+
+const AggregatedSiteVisitCard: React.FC<{
+	visitCount: number;
+	totalTrees: number;
+	displayImage: string | null;
+	onClick: () => void;
+}> = ({ visitCount, totalTrees, displayImage, onClick }) => (
+	<Box
+		onClick={onClick}
+		sx={{
+			width: '100%',
+			maxWidth: { xs: '100%', md: 372 },
+			mx: 'auto',
+			borderRadius: '14px',
+			overflow: 'hidden',
+			bgcolor: '#fff',
+			border: '1px solid #dfe4df',
+			boxShadow: '0px 4px 17px 0px #1F36251A',
+			cursor: 'pointer',
+			transition: 'box-shadow 0.2s, transform 0.2s',
+			'&:hover': {
+				boxShadow: '0 10px 26px rgba(31,54,37,0.18)',
+				transform: 'translateY(-2px)',
+			},
+		}}
+	>
+		<Box
+			sx={{
+				height: { xs: 200, md: 250 },
+				overflow: 'hidden',
+				bgcolor: '#e8f0e9',
+			}}
+		>
+			{displayImage ? (
+				<Box
+					component="img"
+					src={displayImage}
+					alt="Site Visits"
+					sx={{
+						width: '100%',
+						height: '100%',
+						objectFit: 'cover',
+						display: 'block',
+					}}
+				/>
+			) : (
+				<Box
+					sx={{
+						width: '100%',
+						height: '100%',
+						display: 'flex',
+						alignItems: 'center',
+						justifyContent: 'center',
+					}}
+				>
+					<Box
+						component="img"
+						src="/dark_logo.png"
+						alt="placeholder"
+						sx={{ width: 48, opacity: 0.25 }}
+					/>
+				</Box>
+			)}
+		</Box>
+		<Box
+			sx={{
+				p: 2.25,
+				minHeight: 108,
+				display: 'flex',
+				flexDirection: 'column',
+				justifyContent: 'space-between',
+			}}
+		>
+			<Typography
+				sx={{
+					fontFamily: '"Instrument Sans", "HelveticaNowDisplay", sans-serif',
+					color: '#1f3625',
+					fontWeight: 500,
+					fontSize: '16px',
+					lineHeight: '24px',
+					mb: 0.25,
+				}}
+			>
+				Site Visits
+			</Typography>
+			<Typography
+				sx={{
+					fontFamily: '"Instrument Sans", "HelveticaNowDisplay", sans-serif',
+					fontSize: '15px',
+					lineHeight: '22px',
+					color: '#8a938d',
+					mb: 1.5,
+				}}
+			>
+				{totalTrees.toLocaleString('en-IN')} trees planted
+			</Typography>
+			<Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+				<Chip
+					label="Site Visit"
+					size="small"
+					sx={{
+						bgcolor: '#dbe4d6',
+						color: '#38513f',
+						fontWeight: 500,
+						fontSize: '11px',
+						height: 26,
+						borderRadius: '6px',
+						'& .MuiChip-label': { px: 1.25 },
+					}}
+				/>
+				<Chip
+					label={`${visitCount} visit${visitCount !== 1 ? 's' : ''}`}
+					size="small"
+					sx={{
+						bgcolor: '#dbe4d6',
+						color: '#38513f',
+						fontWeight: 500,
+						fontSize: '11px',
+						height: 26,
+						borderRadius: '6px',
+						'& .MuiChip-label': { px: 1.25 },
+					}}
+				/>
+			</Box>
+		</Box>
+	</Box>
+);
+
+const AggregatedCsrCard: React.FC<{
+	eventCount: number;
+	totalTrees: number;
+	displayImage: string | null;
+	onClick: () => void;
+}> = ({ eventCount, totalTrees, displayImage, onClick }) => (
+	<Box
+		onClick={onClick}
+		sx={{
+			width: '100%',
+			maxWidth: { xs: '100%', md: 372 },
+			mx: 'auto',
+			borderRadius: '14px',
+			overflow: 'hidden',
+			bgcolor: '#fff',
+			border: '1px solid #dfe4df',
+			boxShadow: '0px 4px 17px 0px #1F36251A',
+			cursor: 'pointer',
+			transition: 'box-shadow 0.2s, transform 0.2s',
+			'&:hover': {
+				boxShadow: '0 10px 26px rgba(31,54,37,0.18)',
+				transform: 'translateY(-2px)',
+			},
+		}}
+	>
+		<Box
+			sx={{
+				height: { xs: 200, md: 250 },
+				overflow: 'hidden',
+				bgcolor: '#1f3625',
+				display: 'flex',
+				alignItems: 'center',
+				justifyContent: 'center',
+			}}
+		>
+			{displayImage ? (
+				<Box
+					component="img"
+					src={displayImage}
+					alt="CSR Plantations"
+					sx={{
+						width: '75%',
+						height: '75%',
+						objectFit: 'contain',
+						display: 'block',
+						borderRadius: '8px',
+						m: 2,
+					}}
+				/>
+			) : (
+				<Box
+					sx={{
+						width: '100%',
+						height: '100%',
+						display: 'flex',
+						alignItems: 'center',
+						justifyContent: 'center',
+					}}
+				>
+					<Spa sx={{ fontSize: 64, color: '#b0c4b8', opacity: 0.5 }} />
+				</Box>
+			)}
+		</Box>
+		<Box
+			sx={{
+				p: 2.25,
+				minHeight: 108,
+				display: 'flex',
+				flexDirection: 'column',
+				justifyContent: 'space-between',
+			}}
+		>
+			<Typography
+				sx={{
+					fontFamily: '"Instrument Sans", "HelveticaNowDisplay", sans-serif',
+					color: '#1f3625',
+					fontWeight: 500,
+					fontSize: '16px',
+					lineHeight: '24px',
+					mb: 0.25,
+				}}
+			>
+				CSR Plantations
+			</Typography>
+			<Typography
+				sx={{
+					fontFamily: '"Instrument Sans", "HelveticaNowDisplay", sans-serif',
+					fontSize: '15px',
+					lineHeight: '22px',
+					color: '#8a938d',
+					mb: 1.5,
+				}}
+			>
+				{totalTrees.toLocaleString('en-IN')} trees planted
+			</Typography>
+			<Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+				<Chip
+					label="CSR"
+					size="small"
+					sx={{
+						bgcolor: '#dbe4d6',
+						color: '#38513f',
+						fontWeight: 500,
+						fontSize: '11px',
+						height: 26,
+						borderRadius: '6px',
+						'& .MuiChip-label': { px: 1.25 },
+					}}
+				/>
+				<Chip
+					label={`${eventCount} event${eventCount !== 1 ? 's' : ''}`}
+					size="small"
+					sx={{
+						bgcolor: '#dbe4d6',
+						color: '#38513f',
+						fontWeight: 500,
+						fontSize: '11px',
+						height: 26,
+						borderRadius: '6px',
+						'& .MuiChip-label': { px: 1.25 },
+					}}
+				/>
+			</Box>
+		</Box>
+	</Box>
+);
 
 const AggregatedGiftCard: React.FC<{
 	totalGifts: number;
@@ -580,7 +886,7 @@ const AggregatedGiftCard: React.FC<{
 					}}
 				/>
 				<Chip
-					label={`${totalGifts.toLocaleString('en-IN')} Gift card events`}
+					label={`${totalGifts.toLocaleString('en-IN')} Gift cards`}
 					size="small"
 					sx={{
 						bgcolor: '#dbe4d6',

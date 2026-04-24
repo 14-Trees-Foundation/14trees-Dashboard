@@ -746,6 +746,36 @@ class ApiClient {
 		}
 	}
 
+	async getGroupVisitCardsData(nameKey: string): Promise<any> {
+		try {
+			const response = await this.api.get<any>(
+				`/groups/by-key/${encodeURIComponent(nameKey)}/visit-cards`,
+			);
+			return response.data;
+		} catch (error: any) {
+			console.error('Failed to fetch group visit cards data', error);
+			if (error?.response?.data?.message) {
+				throw new Error(error.response.data.message);
+			}
+			throw new Error('Failed to load site visits page');
+		}
+	}
+
+	async getGroupCsrEventCardsData(nameKey: string): Promise<any> {
+		try {
+			const response = await this.api.get<any>(
+				`/groups/by-key/${encodeURIComponent(nameKey)}/csr-cards`,
+			);
+			return response.data;
+		} catch (error: any) {
+			console.error('Failed to fetch group CSR event cards data', error);
+			if (error?.response?.data?.message) {
+				throw new Error(error.response.data.message);
+			}
+			throw new Error('Failed to load CSR events page');
+		}
+	}
+
 	async mergeGroups(
 		primary_group: number,
 		secondary_group: number,

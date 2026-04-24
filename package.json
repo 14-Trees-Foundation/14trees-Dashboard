@@ -1,6 +1,6 @@
 {
 	"name": "14treesapp",
-	"version": "1.10.0",
+	"version": "1.16.1",
 	"private": true,
 	"type": "module",
 	"dependencies": {
