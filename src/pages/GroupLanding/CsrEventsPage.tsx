@@ -19,17 +19,6 @@ import {
 } from '../../types/GroupLanding';
 import CorpFooter from './components/CorpFooter';
 
-type CsrGroup = {
-	gift_card_request_id: number;
-	event_name: string | null;
-	gifted_on: string | null;
-	request_id: string | null;
-	display_image: string | null;
-	total_trees: number;
-	first_sapling_id: string | null;
-	species: { name: string; count: number }[];
-};
-
 const formattedDate = (dateStr: string | null) => {
 	if (!dateStr) return '';
 	return new Date(dateStr).toLocaleDateString('en-IN', {
@@ -39,12 +28,14 @@ const formattedDate = (dateStr: string | null) => {
 	});
 };
 
+const parseTrees = (v: string | number) => Number(v) || 0;
+
 const CsrEventsPage: React.FC = () => {
 	const { name_key } = useParams<{ name_key: string }>();
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState<string | null>(null);
 	const [data, setData] = useState<GroupCsrEventCardsData | null>(null);
-	const [selectedGroup, setSelectedGroup] = useState<CsrGroup | null>(null);
+	const [selected, setSelected] = useState<GroupCsrEventCardItem | null>(null);
 
 	useEffect(() => {
 		if (!name_key) {
@@ -63,63 +54,21 @@ const CsrEventsPage: React.FC = () => {
 			.finally(() => setLoading(false));
 	}, [name_key]);
 
-	const groups = useMemo<CsrGroup[]>(() => {
-		if (!data) return [];
+	const totalTrees = useMemo(
+		() =>
+			data?.cards.reduce((sum, c) => sum + parseTrees(c.total_trees), 0) ?? 0,
+		[data],
+	);
 
-		const map = new Map<
-			number,
-			{
-				meta: GroupCsrEventCardItem;
-				speciesMap: Map<string, number>;
-				firstSaplingId: string | null;
-				count: number;
-			}
-		>();
+	const totalEvents = data?.cards.length ?? 0;
 
-		for (const card of data.cards) {
-			const rid = card.gift_card_request_id;
-			if (!map.has(rid)) {
-				map.set(rid, {
-					meta: card,
-					speciesMap: new Map(),
-					firstSaplingId: card.sapling_id ?? null,
-					count: 0,
-				});
-			}
-			const entry = map.get(rid)!;
-			entry.count += 1;
-			if (card.tree_type) {
-				entry.speciesMap.set(
-					card.tree_type,
-					(entry.speciesMap.get(card.tree_type) ?? 0) + 1,
-				);
-			}
-			if (!entry.firstSaplingId && card.sapling_id) {
-				entry.firstSaplingId = card.sapling_id;
-			}
-		}
-
-		return Array.from(map.values()).map(
-			({ meta, speciesMap, firstSaplingId, count }) => ({
-				gift_card_request_id: meta.gift_card_request_id,
-				event_name: meta.event_name,
-				gifted_on: meta.gifted_on,
-				request_id: meta.request_id,
-				display_image: meta.display_image,
-				total_trees: count,
-				first_sapling_id: firstSaplingId,
-				species: Array.from(speciesMap.entries())
-					.sort((a, b) => b[1] - a[1])
-					.map(([name, count]) => ({ name, count })),
-			}),
-		);
-	}, [data]);
-
-	const totalTrees = data?.cards.length ?? 0;
-	const totalEvents = groups.length;
 	const speciesCount = useMemo(() => {
 		if (!data) return 0;
-		return new Set(data.cards.map((c) => c.tree_type).filter(Boolean)).size;
+		const names = new Set<string>();
+		data.cards.forEach((c) =>
+			c.tree_species.forEach((s) => names.add(s.tree_type)),
+		);
+		return names.size;
 	}, [data]);
 
 	if (loading) {
@@ -249,7 +198,7 @@ const CsrEventsPage: React.FC = () => {
 
 			{/* Cards grid */}
 			<Box sx={{ px: { xs: 2, sm: 4 }, py: { xs: 4, md: 6 } }}>
-				{groups.length === 0 ? (
+				{data.cards.length === 0 ? (
 					<Typography sx={{ color: '#5d6c62', textAlign: 'center', py: 8 }}>
 						No CSR events found.
 					</Typography>
@@ -258,21 +207,19 @@ const CsrEventsPage: React.FC = () => {
 						sx={{
 							maxWidth: 1208,
 							mx: 'auto',
-							display: 'grid',
-							gridTemplateColumns: {
-								xs: '1fr',
-								sm: 'repeat(2, minmax(0,1fr))',
-								md: 'repeat(3, minmax(0,1fr))',
-							},
+							display: 'flex',
+							flexWrap: 'wrap',
+							justifyContent: 'center',
 							gap: { xs: 2, md: 2.5 },
 						}}
 					>
-						{groups.map((group) => (
-							<CsrGroupCard
-								key={group.gift_card_request_id}
-								group={group}
-								onOpenDrawer={setSelectedGroup}
-							/>
+						{data.cards.map((card, idx) => (
+							<Box
+								key={card.sponsored_by_user_id ?? idx}
+								sx={{ width: { xs: '100%', sm: '360px', md: '380px' } }}
+							>
+								<CsrGroupCard card={card} onOpenDrawer={setSelected} />
+							</Box>
 						))}
 					</Box>
 				)}
@@ -283,8 +230,8 @@ const CsrEventsPage: React.FC = () => {
 			{/* Detail Drawer */}
 			<Drawer
 				anchor="right"
-				open={!!selectedGroup}
-				onClose={() => setSelectedGroup(null)}
+				open={!!selected}
+				onClose={() => setSelected(null)}
 				PaperProps={{
 					sx: {
 						width: { xs: '100vw', sm: 420 },
@@ -295,7 +242,7 @@ const CsrEventsPage: React.FC = () => {
 					},
 				}}
 			>
-				{selectedGroup && (
+				{selected && (
 					<Box
 						sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}
 					>
@@ -320,9 +267,9 @@ const CsrEventsPage: React.FC = () => {
 										lineHeight: '26px',
 									}}
 								>
-									{selectedGroup.event_name ?? 'CSR Plantation'}
+									{selected.event_name ?? 'CSR Plantation'}
 								</Typography>
-								{selectedGroup.gifted_on && (
+								{selected.gifted_on && (
 									<Typography
 										sx={{
 											color: 'rgba(255,255,255,0.6)',
@@ -330,12 +277,12 @@ const CsrEventsPage: React.FC = () => {
 											mt: 0.25,
 										}}
 									>
-										{formattedDate(selectedGroup.gifted_on)}
+										{formattedDate(selected.gifted_on)}
 									</Typography>
 								)}
 							</Box>
 							<IconButton
-								onClick={() => setSelectedGroup(null)}
+								onClick={() => setSelected(null)}
 								size="small"
 								sx={{ color: '#fff', mt: -0.5 }}
 							>
@@ -344,7 +291,7 @@ const CsrEventsPage: React.FC = () => {
 						</Box>
 
 						{/* Cover image */}
-						{selectedGroup.display_image && (
+						{selected.display_image && (
 							<Box
 								sx={{
 									height: 200,
@@ -357,8 +304,8 @@ const CsrEventsPage: React.FC = () => {
 							>
 								<Box
 									component="img"
-									src={selectedGroup.display_image}
-									alt={selectedGroup.event_name ?? 'CSR Event'}
+									src={selected.display_image}
+									alt={selected.event_name ?? 'CSR Event'}
 									sx={{
 										width: '75%',
 										height: '75%',
@@ -401,7 +348,7 @@ const CsrEventsPage: React.FC = () => {
 											lineHeight: 1.1,
 										}}
 									>
-										{selectedGroup.total_trees.toLocaleString('en-IN')}
+										{parseTrees(selected.total_trees).toLocaleString('en-IN')}
 									</Typography>
 									<Typography sx={{ fontSize: 11, color: '#8a938d', mt: 0.25 }}>
 										Trees Planted
@@ -425,39 +372,12 @@ const CsrEventsPage: React.FC = () => {
 											lineHeight: 1.1,
 										}}
 									>
-										{selectedGroup.species.length}
+										{selected.tree_species.length}
 									</Typography>
 									<Typography sx={{ fontSize: 11, color: '#8a938d', mt: 0.25 }}>
 										Species
 									</Typography>
 								</Box>
-								{selectedGroup.request_id && (
-									<Box
-										sx={{
-											bgcolor: '#fff',
-											border: '1px solid #dfe4df',
-											borderRadius: '12px',
-											px: 2.5,
-											py: 1.5,
-										}}
-									>
-										<Typography
-											sx={{
-												fontSize: 12,
-												fontWeight: 600,
-												color: '#1f3625',
-												lineHeight: 1.3,
-											}}
-										>
-											{selectedGroup.request_id}
-										</Typography>
-										<Typography
-											sx={{ fontSize: 11, color: '#8a938d', mt: 0.25 }}
-										>
-											Request ID
-										</Typography>
-									</Box>
-								)}
 							</Box>
 
 							{/* Full species list */}
@@ -472,7 +392,7 @@ const CsrEventsPage: React.FC = () => {
 										mb: 1.5,
 									}}
 								>
-									All Tree Species ({selectedGroup.species.length})
+									All Tree Species ({selected.tree_species.length})
 								</Typography>
 								<Box
 									sx={{
@@ -482,8 +402,8 @@ const CsrEventsPage: React.FC = () => {
 										overflow: 'hidden',
 									}}
 								>
-									{selectedGroup.species.map(({ name, count }, idx) => (
-										<Box key={name}>
+									{selected.tree_species.map(({ tree_type, count }, idx) => (
+										<Box key={tree_type}>
 											{idx > 0 && <Divider sx={{ borderColor: '#f0f3f0' }} />}
 											<Box
 												sx={{
@@ -520,7 +440,7 @@ const CsrEventsPage: React.FC = () => {
 															whiteSpace: 'nowrap',
 														}}
 													>
-														{name}
+														{tree_type}
 													</Typography>
 												</Box>
 												<Box
@@ -542,7 +462,7 @@ const CsrEventsPage: React.FC = () => {
 													</Typography>
 													<Chip
 														label={`${Math.round(
-															(count / selectedGroup.total_trees) * 100,
+															(count / parseTrees(selected.total_trees)) * 100,
 														)}%`}
 														size="small"
 														sx={{
@@ -564,15 +484,13 @@ const CsrEventsPage: React.FC = () => {
 						</Box>
 
 						{/* Footer action */}
-						{selectedGroup.first_sapling_id && (
+						{selected.sponsored_by_user_id && (
 							<Box sx={{ px: 3, py: 2.5, borderTop: '1px solid #e2e7e2' }}>
 								<Button
 									fullWidth
 									onClick={() =>
 										window.open(
-											`/profile/${encodeURIComponent(
-												selectedGroup.first_sapling_id!,
-											)}`,
+											`/profile/user/${selected.sponsored_by_user_id}`,
 											'_blank',
 											'noopener,noreferrer',
 										)
@@ -633,13 +551,15 @@ const StatPill: React.FC<{
 );
 
 const CsrGroupCard: React.FC<{
-	group: CsrGroup;
-	onOpenDrawer: (g: CsrGroup) => void;
-}> = ({ group, onOpenDrawer }) => {
+	card: GroupCsrEventCardItem;
+	onOpenDrawer: (c: GroupCsrEventCardItem) => void;
+}> = ({ card, onOpenDrawer }) => {
+	const totalTrees = parseTrees(card.total_trees);
+
 	const handleView = () => {
-		if (!group.first_sapling_id) return;
+		if (!card.sponsored_by_user_id) return;
 		window.open(
-			`/profile/${encodeURIComponent(group.first_sapling_id)}`,
+			`/profile/user/${card.sponsored_by_user_id}`,
 			'_blank',
 			'noopener,noreferrer',
 		);
@@ -647,7 +567,7 @@ const CsrGroupCard: React.FC<{
 
 	return (
 		<Box
-			onClick={() => onOpenDrawer(group)}
+			onClick={() => onOpenDrawer(card)}
 			sx={{
 				borderRadius: '16px',
 				overflow: 'hidden',
@@ -676,11 +596,11 @@ const CsrGroupCard: React.FC<{
 					justifyContent: 'center',
 				}}
 			>
-				{group.display_image ? (
+				{card.display_image ? (
 					<Box
 						component="img"
-						src={group.display_image}
-						alt={group.event_name ?? 'CSR Event'}
+						src={card.display_image}
+						alt={card.event_name ?? 'CSR Event'}
 						sx={{
 							width: '75%',
 							height: '75%',
@@ -734,7 +654,7 @@ const CsrGroupCard: React.FC<{
 							WebkitBoxOrient: 'vertical',
 						}}
 					>
-						{group.event_name ?? 'CSR Plantation'}
+						{card.event_name ?? 'CSR Plantation'}
 					</Typography>
 					<Box
 						sx={{
@@ -757,11 +677,11 @@ const CsrGroupCard: React.FC<{
 								'& .MuiChip-label': { px: 1 },
 							}}
 						/>
-						{group.gifted_on && (
+						{/* {card.gifted_on && (
 							<Typography sx={{ fontSize: 12, color: '#8a938d' }}>
-								{formattedDate(group.gifted_on)}
+								{formattedDate(card.gifted_on)}
 							</Typography>
-						)}
+						)} */}
 					</Box>
 				</Box>
 
@@ -782,9 +702,9 @@ const CsrGroupCard: React.FC<{
 						Tree Species
 					</Typography>
 					<Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.6 }}>
-						{group.species.slice(0, 5).map(({ name, count }) => (
+						{card.tree_species.slice(0, 5).map(({ tree_type, count }) => (
 							<Box
-								key={name}
+								key={tree_type}
 								sx={{
 									display: 'flex',
 									alignItems: 'center',
@@ -802,7 +722,7 @@ const CsrGroupCard: React.FC<{
 										flex: 1,
 									}}
 								>
-									{name}
+									{tree_type}
 								</Typography>
 								<Typography
 									sx={{
@@ -816,11 +736,11 @@ const CsrGroupCard: React.FC<{
 								</Typography>
 							</Box>
 						))}
-						{group.species.length > 5 && (
+						{card.tree_species.length > 5 && (
 							<Typography
 								onClick={(e) => {
 									e.stopPropagation();
-									onOpenDrawer(group);
+									onOpenDrawer(card);
 								}}
 								sx={{
 									fontSize: 12,
@@ -831,7 +751,7 @@ const CsrGroupCard: React.FC<{
 									'&:hover': { textDecoration: 'underline' },
 								}}
 							>
-								+{group.species.length - 5} more species — View all
+								+{card.tree_species.length - 5} more species — View all
 							</Typography>
 						)}
 					</Box>
@@ -856,14 +776,14 @@ const CsrGroupCard: React.FC<{
 								lineHeight: 1.1,
 							}}
 						>
-							{group.total_trees.toLocaleString('en-IN')}
+							{totalTrees.toLocaleString('en-IN')}
 						</Typography>
 						<Typography sx={{ fontSize: 11, color: '#8a938d' }}>
 							trees planted
 						</Typography>
 					</Box>
 
-					{group.first_sapling_id && (
+					{card.sponsored_by_user_id && (
 						<Button
 							onClick={(e) => {
 								e.stopPropagation();
