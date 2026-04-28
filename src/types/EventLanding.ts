@@ -1,6 +1,7 @@
 export type EventLandingEvent = {
 	id: number;
 	name: string;
+	type: number | null;
 	description: string | null;
 	event_date: string;
 	link: string;
@@ -14,6 +15,7 @@ export type EventLandingEvent = {
 	event_poster: string | null;
 	location: { lat: number; lng: number } | null;
 	theme_color: string | null;
+	campaign_c_key: string | null;
 };
 
 export type EventLandingImage = {

@@ -2,8 +2,9 @@ import { AccountCircle, Park } from '@mui/icons-material';
 import { Box, Button, Divider, Typography } from '@mui/material';
 
 type Props = {
-	heading: string;
+	heading?: string;
 	title: string;
+	hideTitle?: boolean;
 	primaryPlantName: string;
 	englishTreeType?: string;
 	localPlantName?: string;
@@ -19,6 +20,7 @@ type Props = {
 const TreeProfileCard: React.FC<Props> = ({
 	heading,
 	title,
+	hideTitle = false,
 	primaryPlantName,
 	englishTreeType,
 	localPlantName,
@@ -70,7 +72,7 @@ const TreeProfileCard: React.FC<Props> = ({
 			<Box
 				sx={{
 					width: '100%',
-					height: { xs: 220, md: 250 },
+					height: hideTitle ? { xs: 280, md: 320 } : { xs: 220, md: 250 },
 					display: 'flex',
 					alignItems: 'center',
 					justifyContent: 'center',
@@ -159,35 +161,41 @@ const TreeProfileCard: React.FC<Props> = ({
 					flexDirection: 'column',
 				}}
 			>
-				<Typography
-					sx={{
-						fontSize: 12,
-						color: '#7a857d',
-						letterSpacing: 0.4,
-						textTransform: 'uppercase',
-						lineHeight: 1.2,
-						mb: 0.75,
-					}}
-				>
-					{heading}
-				</Typography>
-				<Typography
-					sx={{
-						fontSize: 18,
-						fontWeight: 500,
-						color: titleMuted ? '#9aaa9e' : '#294032',
-						fontStyle: titleMuted ? 'italic' : 'normal',
-						lineHeight: 1.35,
-						mb: 2,
-						overflow: 'hidden',
-						display: '-webkit-box',
-						WebkitLineClamp: 2,
-						WebkitBoxOrient: 'vertical',
-					}}
-				>
-					{title}
-				</Typography>
-				<Divider sx={{ backgroundColor: '#dde2dc', mb: 2 }} />
+				{!hideTitle && (
+					<>
+						{heading && (
+							<Typography
+								sx={{
+									fontSize: 12,
+									color: '#7a857d',
+									letterSpacing: 0.4,
+									textTransform: 'uppercase',
+									lineHeight: 1.2,
+									mb: 0.75,
+								}}
+							>
+								{heading}
+							</Typography>
+						)}
+						<Typography
+							sx={{
+								fontSize: 18,
+								fontWeight: 500,
+								color: titleMuted ? '#9aaa9e' : '#294032',
+								fontStyle: titleMuted ? 'italic' : 'normal',
+								lineHeight: 1.35,
+								mb: 2,
+								overflow: 'hidden',
+								display: '-webkit-box',
+								WebkitLineClamp: 2,
+								WebkitBoxOrient: 'vertical',
+							}}
+						>
+							{title}
+						</Typography>
+						<Divider sx={{ backgroundColor: '#dde2dc', mb: 2 }} />
+					</>
+				)}
 				<Box
 					sx={{
 						minHeight: 52,
