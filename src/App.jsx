@@ -77,7 +77,6 @@ import { CampaignsPage } from './pages/admin/campaign/CampaignsPage';
 import { ReferralsPage } from './pages/admin/campaign/ReferralsPage';
 import { ReferralUserPage } from './pages/admin/campaign/ReferralUserPage';
 import CorpRegistration from './pages/CorpRegistration';
-import GroupDashboard from './pages/GroupDashboard/GroupDashboard';
 import GroupLandingPage from './pages/GroupLanding/GroupLandingPage';
 import GiftCardsPage from './pages/GroupLanding/GiftCardsPage';
 import SiteVisitsPage from './pages/GroupLanding/SiteVisitsPage';
@@ -256,20 +255,6 @@ function App() {
 						}
 					/>
 					<Route
-						path="/dashboard/sprih"
-						element={<GroupLandingPage nameKey="sprih" />}
-					/>
-					<Route
-						path="/dashboard/hd-hyundai-construction-equipment-india-pvt-ltd"
-						element={
-							<GroupLandingPage nameKey="hd-hyundai-construction-equipment-india-pvt-ltd" />
-						}
-					/>
-					<Route
-						path="/dashboard/legalogic-consulting"
-						element={<GroupLandingPage nameKey="legalogic-consulting" />}
-					/>
-					<Route
 						path="/dashboard/:name_key/gifts"
 						element={<GiftCardsPage />}
 					/>
@@ -278,7 +263,7 @@ function App() {
 						element={<SiteVisitsPage />}
 					/>
 					<Route path="/dashboard/:name_key/csr" element={<CsrEventsPage />} />
-					<Route path="/dashboard/:name_key" element={<GroupDashboard />} />
+					<Route path="/dashboard/:name_key" element={<GroupLandingPage />} />
 					<Route
 						path="/personal/dashboard/:userId"
 						element={
