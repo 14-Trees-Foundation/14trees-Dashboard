@@ -26,6 +26,7 @@ import logo from '../../../assets/logo_light.png';
 import { Spinner } from '../../../components/Spinner';
 import { Campaign } from '../../../types/campaign';
 import { NotFound } from '../../notfound/NotFound';
+import { buildS3Url } from '../../../config/s3';
 
 export const CampaignsPage = () => {
 	const [loading, setLoading] = useState(true);
