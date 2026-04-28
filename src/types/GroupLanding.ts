@@ -85,21 +85,24 @@ export type GroupVisitCardsData = {
 	cards: GroupVisitCardItem[];
 };
 
-export type GroupCsrEventCardItem = {
-	id: number;
-	gift_card_request_id: number;
-	request_id: string | null;
-	event_name: string | null;
-	gifted_on: string | null;
-	no_of_cards: number;
-	tree_type: string | null;
-	sapling_id: string | null;
-	assigned_to_name: string | null;
-	card_image_url: string | null;
+export type CsrTreeSpecies = {
+	tree_type: string;
+	count: number;
 	info_card_s3_path: string | null;
 	illustration_s3_path: string | null;
-	display_image: string | null;
+};
+
+export type GroupCsrEventCardItem = {
+	sponsored_by_user_id: number | null;
+	sponsored_by_user_name: string | null;
+	total_trees: string | number;
+	gifted_on: string | null;
+	event_type: string | null;
+	event_name: string | null;
 	status: string | null;
+	request_type: string | null;
+	display_image: string | null;
+	tree_species: CsrTreeSpecies[];
 };
 
 export type GroupCsrEventCardsData = {
